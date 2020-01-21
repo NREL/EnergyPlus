@@ -108,7 +108,7 @@
 ! Purchased Heating:              No
 ! Purchased Chilled Water:        No
 ! Purchased Hot Water:            No
-! Coils:                          COIL:Heating:DX:VariableSpeed, Coil:Cooling:DX, COIL:ELECTRIC:HEATING
+! Coils:                          COIL:Heating:DX:VariableSpeed, Coil:Cooling:DX:VariableSpeed, COIL:ELECTRIC:HEATING
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -144,7 +144,7 @@
     Coil:Heating:DX:VariableSpeed,  !- Heating Coil Object Type
     Zone1PTHPDXHeatCoil,     !- Heating Coil Name
     0.001,                   !- Heating Convergence Tolerance {dimensionless}
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type
     Zone1PTHPDXCoolCoil,     !- Cooling Coil Name
     0.001,                   !- Cooling Convergence Tolerance {dimensionless}
     Coil:Heating:Electric,   !- Supplemental Heating Coil Object Type
@@ -172,7 +172,7 @@
     Coil:Heating:DX:VariableSpeed,  !- Heating Coil Object Type
     Zone2PTHPDXHeatCoil,     !- Heating Coil Name
     0.001,                   !- Heating Convergence Tolerance {dimensionless}
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type
     Zone2PTHPDXCoolCoil,     !- Cooling Coil Name
     0.001,                   !- Cooling Convergence Tolerance {dimensionless}
     Coil:Heating:Electric,   !- Supplemental Heating Coil Object Type
@@ -200,7 +200,7 @@
     Coil:Heating:DX:VariableSpeed,  !- Heating Coil Object Type
     Zone3PTHPDXHeatCoil,     !- Heating Coil Name
     0.001,                   !- Heating Convergence Tolerance {dimensionless}
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type
     Zone3PTHPDXCoolCoil,     !- Cooling Coil Name
     0.001,                   !- Cooling Convergence Tolerance {dimensionless}
     Coil:Heating:Electric,   !- Supplemental Heating Coil Object Type
@@ -482,793 +482,376 @@
     HPACHeatEIRFT,           !- Speed 10 Energy Input Ratio Function of Temperature Curve Name
     HPACHeatEIRFFF;          !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name
 
-!-   ===========  ALL OBJECTS IN CLASS: Coil:Cooling:DX ===========
+!-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:DX:VARIABLESPEED ===========
 
-  OutdoorAir:Node,
-    Zone1PTHPDXCoolCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:VariableSpeed,
     Zone1PTHPDXCoolCoil,     !- Name
-    Zone1PTHPFanOutletNode,  !- Evaporator Inlet Node Name
-    Zone1PTHPDXCoolCoilOutletNode,  !- Evaporator Outlet Node Name
-    ,                        !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    Zone1PTHPDXCoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    Zone1PTHPDXCoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    Zone1PTHPDXCoolCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    Zone1PTHPDXCoolCoil Performance,  !- Name
-    200.0,                   !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    VariableSpeed,           !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    Zone1PTHPDXCoolCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    Zone1PTHPDXCoolCoil Operating Mode,  !- Name
-    7200.0,                  !- Rated Gross Total Cooling Capacity {W}
-    0.4,                     !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    0.0,                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    0.0,                     !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
+    Zone1PTHPFanOutletNode,  !- Indoor Air Inlet Node Name
+    Zone1PTHPDXCoolCoilOutletNode,  !- Indoor Air Outlet Node Name
+    10.0,                    !- Number of Speeds {dimensionless}
+    10.0,                    !- Nominal Speed Level {dimensionless}
+    7200.0,                  !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {W}
+    0.4,                     !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
+    0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}
+    0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}
+    HPACPLFFPLR,             !- Energy Part Load Fraction Curve Name
+    ,                        !- Condenser Air Inlet Node Name
     AirCooled,               !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    10.0,                    !- Nominal Speed Number
-    Zone1PTHPDXCoolCoil Speed 1 Performance,  !- Speed 1 Name
-    Zone1PTHPDXCoolCoil Speed 2 Performance,  !- Speed 2 Name
-    Zone1PTHPDXCoolCoil Speed 3 Performance,  !- Speed 3 Name
-    Zone1PTHPDXCoolCoil Speed 4 Performance,  !- Speed 4 Name
-    Zone1PTHPDXCoolCoil Speed 5 Performance,  !- Speed 5 Name
-    Zone1PTHPDXCoolCoil Speed 6 Performance,  !- Speed 6 Name
-    Zone1PTHPDXCoolCoil Speed 7 Performance,  !- Speed 7 Name
-    Zone1PTHPDXCoolCoil Speed 8 Performance,  !- Speed 8 Name
-    Zone1PTHPDXCoolCoil Speed 9 Performance,  !- Speed 9 Name
-    Zone1PTHPDXCoolCoil Speed 10 Performance;  !- Speed 10 Name
+    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
+    200.0,                   !- Crankcase Heater Capacity {W}
+    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    ,                        !- Supply Water Storage Tank Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    ,                        !- Basin Heater Capacity {W/K}
+    ,                        !- Basin Heater Setpoint Temperature {C}
+    ,                        !- Basin Heater Operating Schedule Name
+    1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.1359072,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
+    0.26,                    !- Speed 1 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    HPACCoolCapFT,           !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPACEIRFT,               !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
+    HPACEIRFFF,              !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    1877.9,                  !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.151008,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
+    0.30,                    !- Speed 2 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 2 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    HPACCoolCapFT,           !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPACEIRFT,               !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
+    HPACEIRFFF,              !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    2226.6,                  !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.1661088,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
+    0.33,                    !- Speed 3 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 3 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    HPACCoolCapFT,           !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPACEIRFT,               !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
+    HPACEIRFFF,              !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    2911.3,                  !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.1963104,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
+    0.38,                    !- Speed 4 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 4 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    HPACCoolCapFT,           !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Speed 4 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPACEIRFT,               !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
+    HPACEIRFFF,              !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    3581.7,                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.226512,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
+    0.44,                    !- Speed 5 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 5 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    HPACCoolCapFT,           !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Speed 5 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPACEIRFT,               !- Speed 5 Energy Input Ratio Function of Temperature Curve Name
+    HPACEIRFFF,              !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    4239.5,                  !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.2567136,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
+    0.50,                    !- Speed 6 Reference Unit Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 6 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    HPACCoolCapFT,           !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Speed 6 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPACEIRFT,               !- Speed 6 Energy Input Ratio Function of Temperature Curve Name
+    HPACEIRFFF,              !- Speed 6 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    4885.7,                  !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.2869152,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
+    0.57,                    !- Speed 7 Reference Unit Condenser Flow Rate {m3/s}
+    ,                        !- Speed 7 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    HPACCoolCapFT,           !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Speed 7 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPACEIRFT,               !- Speed 7 Energy Input Ratio Function of Temperature Curve Name
+    HPACEIRFFF,              !- Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    5520.7,                  !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.3171168,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
+    0.63,                    !- Speed 8 Reference Unit Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 8 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    HPACCoolCapFT,           !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Speed 8 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPACEIRFT,               !- Speed 8 Energy Input Ratio Function of Temperature Curve Name
+    HPACEIRFFF,              !- Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    6144.8,                  !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.3473184,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
+    0.69,                    !- Speed 9 Reference Unit Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 9 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    HPACCoolCapFT,           !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Speed 9 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPACEIRFT,               !- Speed 9 Energy Input Ratio Function of Temperature Curve Name
+    HPACEIRFFF,              !- Speed 9 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    6758.0,                  !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
+    0.74,                    !- Speed 10 Reference Unit Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 10 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    HPACCoolCapFT,           !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Speed 10 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPACEIRFT,               !- Speed 10 Energy Input Ratio Function of Temperature Curve Name
+    HPACEIRFFF;              !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name
 
-  Coil:Cooling:DX:CurveFit:Speed,
-    Zone1PTHPDXCoolCoil Speed 1 Performance,  !- Name
-    0.2255,                  !- Gross Total Cooling Capacity Fraction
-    0.3600,                  !- Evaporator Air Flow Rate Fraction
-    0.3514,                  !- Condenser Air Flow Rate Fraction
-    0.75,                    !- Gross Sensible Heat Ratio
-    4.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    HPACCoolCapFT,           !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    HPACCoolCapFFF,          !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    HPACEIRFT,               !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    HPACEIRFFF,              !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    HPACPLFFPLR,             !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Zone1PTHPDXCoolCoil Speed 2 Performance,  !- Name
-    0.2779,                  !- Gross Total Cooling Capacity Fraction
-    0.4000,                  !- Evaporator Air Flow Rate Fraction
-    0.4054,                  !- Condenser Air Flow Rate Fraction
-    0.75,                    !- Gross Sensible Heat Ratio
-    4.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    HPACCoolCapFT,           !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    HPACCoolCapFFF,          !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    HPACEIRFT,               !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    HPACEIRFFF,              !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    HPACPLFFPLR,             !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Zone1PTHPDXCoolCoil Speed 3 Performance,  !- Name
-    0.3295,                  !- Gross Total Cooling Capacity Fraction
-    0.4400,                  !- Evaporator Air Flow Rate Fraction
-    0.4459,                  !- Condenser Air Flow Rate Fraction
-    0.75,                    !- Gross Sensible Heat Ratio
-    4.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    HPACCoolCapFT,           !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    HPACCoolCapFFF,          !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    HPACEIRFT,               !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    HPACEIRFFF,              !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    HPACPLFFPLR,             !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Zone1PTHPDXCoolCoil Speed 4 Performance,  !- Name
-    0.4308,                  !- Gross Total Cooling Capacity Fraction
-    0.5200,                  !- Evaporator Air Flow Rate Fraction
-    0.5135,                  !- Condenser Air Flow Rate Fraction
-    0.75,                    !- Gross Sensible Heat Ratio
-    4.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    HPACCoolCapFT,           !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    HPACCoolCapFFF,          !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    HPACEIRFT,               !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    HPACEIRFFF,              !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    HPACPLFFPLR,             !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Zone1PTHPDXCoolCoil Speed 5 Performance,  !- Name
-    0.5300,                  !- Gross Total Cooling Capacity Fraction
-    0.6000,                  !- Evaporator Air Flow Rate Fraction
-    0.5946,                  !- Condenser Air Flow Rate Fraction
-    0.75,                    !- Gross Sensible Heat Ratio
-    4.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    HPACCoolCapFT,           !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    HPACCoolCapFFF,          !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    HPACEIRFT,               !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    HPACEIRFFF,              !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    HPACPLFFPLR,             !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Zone1PTHPDXCoolCoil Speed 6 Performance,  !- Name
-    0.6273,                  !- Gross Total Cooling Capacity Fraction
-    0.6800,                  !- Evaporator Air Flow Rate Fraction
-    0.6757,                  !- Condenser Air Flow Rate Fraction
-    0.75,                    !- Gross Sensible Heat Ratio
-    4.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    HPACCoolCapFT,           !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    HPACCoolCapFFF,          !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    HPACEIRFT,               !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    HPACEIRFFF,              !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    HPACPLFFPLR,             !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Zone1PTHPDXCoolCoil Speed 7 Performance,  !- Name
-    0.7230,                  !- Gross Total Cooling Capacity Fraction
-    0.7600,                  !- Evaporator Air Flow Rate Fraction
-    0.7703,                  !- Condenser Air Flow Rate Fraction
-    0.75,                    !- Gross Sensible Heat Ratio
-    4.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    HPACCoolCapFT,           !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    HPACCoolCapFFF,          !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    HPACEIRFT,               !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    HPACEIRFFF,              !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    HPACPLFFPLR,             !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Zone1PTHPDXCoolCoil Speed 8 Performance,  !- Name
-    0.8169,                  !- Gross Total Cooling Capacity Fraction
-    0.8400,                  !- Evaporator Air Flow Rate Fraction
-    0.8514,                  !- Condenser Air Flow Rate Fraction
-    0.75,                    !- Gross Sensible Heat Ratio
-    4.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    HPACCoolCapFT,           !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    HPACCoolCapFFF,          !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    HPACEIRFT,               !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    HPACEIRFFF,              !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    HPACPLFFPLR,             !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Zone1PTHPDXCoolCoil Speed 9 Performance,  !- Name
-    0.9093,                  !- Gross Total Cooling Capacity Fraction
-    0.9200,                  !- Evaporator Air Flow Rate Fraction
-    0.9324,                  !- Condenser Air Flow Rate Fraction
-    0.75,                    !- Gross Sensible Heat Ratio
-    4.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    HPACCoolCapFT,           !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    HPACCoolCapFFF,          !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    HPACEIRFT,               !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    HPACEIRFFF,              !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    HPACPLFFPLR,             !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Zone1PTHPDXCoolCoil Speed 10 Performance,  !- Name
-    1.0000,                  !- Gross Total Cooling Capacity Fraction
-    1.0000,                  !- Evaporator Air Flow Rate Fraction
-    1.0000,                  !- Condenser Air Flow Rate Fraction
-    0.75,                    !- Gross Sensible Heat Ratio
-    4.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    HPACCoolCapFT,           !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    HPACCoolCapFFF,          !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    HPACEIRFT,               !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    HPACEIRFFF,              !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    HPACPLFFPLR,             !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  OutdoorAir:Node,
-    Zone2PTHPDXCoolCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:VariableSpeed,
     Zone2PTHPDXCoolCoil,     !- Name
-    Zone2PTHPFanOutletNode,  !- Evaporator Inlet Node Name
-    Zone2PTHPCoolCoilOutletNode,  !- Evaporator Outlet Node Name
-    ,                        !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    Zone2PTHPDXCoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    Zone2PTHPDXCoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    Zone2PTHPDXCoolCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    Zone2PTHPDXCoolCoil Performance,  !- Name
-    200.0,                   !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    VariableSpeed,           !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    Zone2PTHPDXCoolCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    Zone2PTHPDXCoolCoil Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    0.0,                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    0.0,                     !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
+    Zone2PTHPFanOutletNode,  !- Indoor Air Inlet Node Name
+    Zone2PTHPCoolCoilOutletNode,  !- Indoor Air Outlet Node Name
+    10.0,                    !- Number of Speeds {dimensionless}
+    10.0,                    !- Nominal Speed Level {dimensionless}
+    autosize,                !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {W}
+    autosize,                !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
+    0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}
+    0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}
+    HPACPLFFPLR,             !- Energy Part Load Fraction Curve Name
+    ,                        !- Condenser Air Inlet Node Name
     AirCooled,               !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    10.0,                    !- Nominal Speed Number
-    Zone2PTHPDXCoolCoil Speed 1 Performance,  !- Speed 1 Name
-    Zone2PTHPDXCoolCoil Speed 2 Performance,  !- Speed 2 Name
-    Zone2PTHPDXCoolCoil Speed 3 Performance,  !- Speed 3 Name
-    Zone2PTHPDXCoolCoil Speed 4 Performance,  !- Speed 4 Name
-    Zone2PTHPDXCoolCoil Speed 5 Performance,  !- Speed 5 Name
-    Zone2PTHPDXCoolCoil Speed 6 Performance,  !- Speed 6 Name
-    Zone2PTHPDXCoolCoil Speed 7 Performance,  !- Speed 7 Name
-    Zone2PTHPDXCoolCoil Speed 8 Performance,  !- Speed 8 Name
-    Zone2PTHPDXCoolCoil Speed 9 Performance,  !- Speed 9 Name
-    Zone2PTHPDXCoolCoil Speed 10 Performance;  !- Speed 10 Name
+    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
+    200.0,                   !- Crankcase Heater Capacity {W}
+    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    ,                        !- Supply Water Storage Tank Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    ,                        !- Basin Heater Capacity {W/K}
+    ,                        !- Basin Heater Setpoint Temperature {C}
+    ,                        !- Basin Heater Operating Schedule Name
+    1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.1359072,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
+    0.26,                    !- Speed 1 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    HPACCoolCapFT,           !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPACEIRFT,               !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
+    HPACEIRFFF,              !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    1877.9,                  !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.151008,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
+    0.30,                    !- Speed 2 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 2 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    HPACCoolCapFT,           !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPACEIRFT,               !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
+    HPACEIRFFF,              !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    2226.6,                  !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.1661088,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
+    0.33,                    !- Speed 3 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 3 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    HPACCoolCapFT,           !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPACEIRFT,               !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
+    HPACEIRFFF,              !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    2911.3,                  !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.1963104,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
+    0.38,                    !- Speed 4 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 4 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    HPACCoolCapFT,           !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Speed 4 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPACEIRFT,               !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
+    HPACEIRFFF,              !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    3581.7,                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.226512,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
+    0.44,                    !- Speed 5 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 5 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    HPACCoolCapFT,           !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Speed 5 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPACEIRFT,               !- Speed 5 Energy Input Ratio Function of Temperature Curve Name
+    HPACEIRFFF,              !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    4239.5,                  !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.2567136,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
+    0.50,                    !- Speed 6 Reference Unit Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 6 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    HPACCoolCapFT,           !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Speed 6 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPACEIRFT,               !- Speed 6 Energy Input Ratio Function of Temperature Curve Name
+    HPACEIRFFF,              !- Speed 6 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    4885.7,                  !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.2869152,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
+    0.57,                    !- Speed 7 Reference Unit Condenser Flow Rate {m3/s}
+    ,                        !- Speed 7 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    HPACCoolCapFT,           !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Speed 7 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPACEIRFT,               !- Speed 7 Energy Input Ratio Function of Temperature Curve Name
+    HPACEIRFFF,              !- Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    5520.7,                  !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.3171168,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
+    0.63,                    !- Speed 8 Reference Unit Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 8 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    HPACCoolCapFT,           !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Speed 8 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPACEIRFT,               !- Speed 8 Energy Input Ratio Function of Temperature Curve Name
+    HPACEIRFFF,              !- Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    6144.8,                  !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.3473184,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
+    0.69,                    !- Speed 9 Reference Unit Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 9 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    HPACCoolCapFT,           !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Speed 9 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPACEIRFT,               !- Speed 9 Energy Input Ratio Function of Temperature Curve Name
+    HPACEIRFFF,              !- Speed 9 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    6758.0,                  !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
+    0.74,                    !- Speed 10 Reference Unit Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 10 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    HPACCoolCapFT,           !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Speed 10 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPACEIRFT,               !- Speed 10 Energy Input Ratio Function of Temperature Curve Name
+    HPACEIRFFF;              !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name
 
-  Coil:Cooling:DX:CurveFit:Speed,
-    Zone2PTHPDXCoolCoil Speed 1 Performance,  !- Name
-    0.2255,                  !- Gross Total Cooling Capacity Fraction
-    0.3600,                  !- Evaporator Air Flow Rate Fraction
-    0.3514,                  !- Condenser Air Flow Rate Fraction
-    0.75,                    !- Gross Sensible Heat Ratio
-    4.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    HPACCoolCapFT,           !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    HPACCoolCapFFF,          !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    HPACEIRFT,               !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    HPACEIRFFF,              !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    HPACPLFFPLR,             !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Zone2PTHPDXCoolCoil Speed 2 Performance,  !- Name
-    0.2779,                  !- Gross Total Cooling Capacity Fraction
-    0.4000,                  !- Evaporator Air Flow Rate Fraction
-    0.4054,                  !- Condenser Air Flow Rate Fraction
-    0.75,                    !- Gross Sensible Heat Ratio
-    4.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    HPACCoolCapFT,           !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    HPACCoolCapFFF,          !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    HPACEIRFT,               !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    HPACEIRFFF,              !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    HPACPLFFPLR,             !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Zone2PTHPDXCoolCoil Speed 3 Performance,  !- Name
-    0.3295,                  !- Gross Total Cooling Capacity Fraction
-    0.4400,                  !- Evaporator Air Flow Rate Fraction
-    0.4459,                  !- Condenser Air Flow Rate Fraction
-    0.75,                    !- Gross Sensible Heat Ratio
-    4.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    HPACCoolCapFT,           !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    HPACCoolCapFFF,          !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    HPACEIRFT,               !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    HPACEIRFFF,              !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    HPACPLFFPLR,             !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Zone2PTHPDXCoolCoil Speed 4 Performance,  !- Name
-    0.4308,                  !- Gross Total Cooling Capacity Fraction
-    0.5200,                  !- Evaporator Air Flow Rate Fraction
-    0.5135,                  !- Condenser Air Flow Rate Fraction
-    0.75,                    !- Gross Sensible Heat Ratio
-    4.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    HPACCoolCapFT,           !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    HPACCoolCapFFF,          !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    HPACEIRFT,               !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    HPACEIRFFF,              !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    HPACPLFFPLR,             !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Zone2PTHPDXCoolCoil Speed 5 Performance,  !- Name
-    0.5300,                  !- Gross Total Cooling Capacity Fraction
-    0.6000,                  !- Evaporator Air Flow Rate Fraction
-    0.5946,                  !- Condenser Air Flow Rate Fraction
-    0.75,                    !- Gross Sensible Heat Ratio
-    4.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    HPACCoolCapFT,           !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    HPACCoolCapFFF,          !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    HPACEIRFT,               !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    HPACEIRFFF,              !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    HPACPLFFPLR,             !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Zone2PTHPDXCoolCoil Speed 6 Performance,  !- Name
-    0.6273,                  !- Gross Total Cooling Capacity Fraction
-    0.6800,                  !- Evaporator Air Flow Rate Fraction
-    0.6757,                  !- Condenser Air Flow Rate Fraction
-    0.75,                    !- Gross Sensible Heat Ratio
-    4.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    HPACCoolCapFT,           !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    HPACCoolCapFFF,          !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    HPACEIRFT,               !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    HPACEIRFFF,              !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    HPACPLFFPLR,             !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Zone2PTHPDXCoolCoil Speed 7 Performance,  !- Name
-    0.7230,                  !- Gross Total Cooling Capacity Fraction
-    0.7600,                  !- Evaporator Air Flow Rate Fraction
-    0.7703,                  !- Condenser Air Flow Rate Fraction
-    0.75,                    !- Gross Sensible Heat Ratio
-    4.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    HPACCoolCapFT,           !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    HPACCoolCapFFF,          !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    HPACEIRFT,               !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    HPACEIRFFF,              !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    HPACPLFFPLR,             !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Zone2PTHPDXCoolCoil Speed 8 Performance,  !- Name
-    0.8169,                  !- Gross Total Cooling Capacity Fraction
-    0.8400,                  !- Evaporator Air Flow Rate Fraction
-    0.8514,                  !- Condenser Air Flow Rate Fraction
-    0.75,                    !- Gross Sensible Heat Ratio
-    4.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    HPACCoolCapFT,           !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    HPACCoolCapFFF,          !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    HPACEIRFT,               !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    HPACEIRFFF,              !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    HPACPLFFPLR,             !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Zone2PTHPDXCoolCoil Speed 9 Performance,  !- Name
-    0.9093,                  !- Gross Total Cooling Capacity Fraction
-    0.9200,                  !- Evaporator Air Flow Rate Fraction
-    0.9324,                  !- Condenser Air Flow Rate Fraction
-    0.75,                    !- Gross Sensible Heat Ratio
-    4.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    HPACCoolCapFT,           !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    HPACCoolCapFFF,          !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    HPACEIRFT,               !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    HPACEIRFFF,              !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    HPACPLFFPLR,             !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Zone2PTHPDXCoolCoil Speed 10 Performance,  !- Name
-    1.0000,                  !- Gross Total Cooling Capacity Fraction
-    1.0000,                  !- Evaporator Air Flow Rate Fraction
-    1.0000,                  !- Condenser Air Flow Rate Fraction
-    0.75,                    !- Gross Sensible Heat Ratio
-    4.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    HPACCoolCapFT,           !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    HPACCoolCapFFF,          !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    HPACEIRFT,               !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    HPACEIRFFF,              !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    HPACPLFFPLR,             !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  OutdoorAir:Node,
-    Zone3PTHPDXCoolCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:VariableSpeed,
     Zone3PTHPDXCoolCoil,     !- Name
-    Zone3PTHPOAMixerOutletNode,  !- Evaporator Inlet Node Name
-    Zone3PTHPCoolCoilOutletNode,  !- Evaporator Outlet Node Name
-    ,                        !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    Zone3PTHPDXCoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    Zone3PTHPDXCoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    Zone3PTHPDXCoolCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    Zone3PTHPDXCoolCoil Performance,  !- Name
-    200.0,                   !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    VariableSpeed,           !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    Zone3PTHPDXCoolCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    Zone3PTHPDXCoolCoil Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    0.0,                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    0.0,                     !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
+    Zone3PTHPOAMixerOutletNode,  !- Indoor Air Inlet Node Name
+    Zone3PTHPCoolCoilOutletNode,  !- Indoor Air Outlet Node Name
+    10.0,                    !- Number of Speeds {dimensionless}
+    10.0,                    !- Nominal Speed Level {dimensionless}
+    autosize,                !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {W}
+    autosize,                !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
+    0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}
+    0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}
+    HPACPLFFPLR,             !- Energy Part Load Fraction Curve Name
+    ,                        !- Condenser Air Inlet Node Name
     AirCooled,               !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    10.0,                    !- Nominal Speed Number
-    Zone3PTHPDXCoolCoil Speed 1 Performance,  !- Speed 1 Name
-    Zone3PTHPDXCoolCoil Speed 2 Performance,  !- Speed 2 Name
-    Zone3PTHPDXCoolCoil Speed 3 Performance,  !- Speed 3 Name
-    Zone3PTHPDXCoolCoil Speed 4 Performance,  !- Speed 4 Name
-    Zone3PTHPDXCoolCoil Speed 5 Performance,  !- Speed 5 Name
-    Zone3PTHPDXCoolCoil Speed 6 Performance,  !- Speed 6 Name
-    Zone3PTHPDXCoolCoil Speed 7 Performance,  !- Speed 7 Name
-    Zone3PTHPDXCoolCoil Speed 8 Performance,  !- Speed 8 Name
-    Zone3PTHPDXCoolCoil Speed 9 Performance,  !- Speed 9 Name
-    Zone3PTHPDXCoolCoil Speed 10 Performance;  !- Speed 10 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Zone3PTHPDXCoolCoil Speed 1 Performance,  !- Name
-    0.2255,                  !- Gross Total Cooling Capacity Fraction
-    0.3600,                  !- Evaporator Air Flow Rate Fraction
-    0.3514,                  !- Condenser Air Flow Rate Fraction
-    0.75,                    !- Gross Sensible Heat Ratio
-    4.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    HPACCoolCapFT,           !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    HPACCoolCapFFF,          !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    HPACEIRFT,               !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    HPACEIRFFF,              !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    HPACPLFFPLR,             !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Zone3PTHPDXCoolCoil Speed 2 Performance,  !- Name
-    0.2779,                  !- Gross Total Cooling Capacity Fraction
-    0.4000,                  !- Evaporator Air Flow Rate Fraction
-    0.4054,                  !- Condenser Air Flow Rate Fraction
-    0.75,                    !- Gross Sensible Heat Ratio
-    4.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    HPACCoolCapFT,           !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    HPACCoolCapFFF,          !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    HPACEIRFT,               !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    HPACEIRFFF,              !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    HPACPLFFPLR,             !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Zone3PTHPDXCoolCoil Speed 3 Performance,  !- Name
-    0.3295,                  !- Gross Total Cooling Capacity Fraction
-    0.4400,                  !- Evaporator Air Flow Rate Fraction
-    0.4459,                  !- Condenser Air Flow Rate Fraction
-    0.75,                    !- Gross Sensible Heat Ratio
-    4.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    HPACCoolCapFT,           !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    HPACCoolCapFFF,          !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    HPACEIRFT,               !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    HPACEIRFFF,              !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    HPACPLFFPLR,             !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Zone3PTHPDXCoolCoil Speed 4 Performance,  !- Name
-    0.4308,                  !- Gross Total Cooling Capacity Fraction
-    0.5200,                  !- Evaporator Air Flow Rate Fraction
-    0.5135,                  !- Condenser Air Flow Rate Fraction
-    0.75,                    !- Gross Sensible Heat Ratio
-    4.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    HPACCoolCapFT,           !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    HPACCoolCapFFF,          !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    HPACEIRFT,               !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    HPACEIRFFF,              !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    HPACPLFFPLR,             !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Zone3PTHPDXCoolCoil Speed 5 Performance,  !- Name
-    0.5300,                  !- Gross Total Cooling Capacity Fraction
-    0.6000,                  !- Evaporator Air Flow Rate Fraction
-    0.5946,                  !- Condenser Air Flow Rate Fraction
-    0.75,                    !- Gross Sensible Heat Ratio
-    4.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    HPACCoolCapFT,           !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    HPACCoolCapFFF,          !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    HPACEIRFT,               !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    HPACEIRFFF,              !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    HPACPLFFPLR,             !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Zone3PTHPDXCoolCoil Speed 6 Performance,  !- Name
-    0.6273,                  !- Gross Total Cooling Capacity Fraction
-    0.6800,                  !- Evaporator Air Flow Rate Fraction
-    0.6757,                  !- Condenser Air Flow Rate Fraction
-    0.75,                    !- Gross Sensible Heat Ratio
-    4.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    HPACCoolCapFT,           !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    HPACCoolCapFFF,          !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    HPACEIRFT,               !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    HPACEIRFFF,              !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    HPACPLFFPLR,             !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Zone3PTHPDXCoolCoil Speed 7 Performance,  !- Name
-    0.7230,                  !- Gross Total Cooling Capacity Fraction
-    0.7600,                  !- Evaporator Air Flow Rate Fraction
-    0.7703,                  !- Condenser Air Flow Rate Fraction
-    0.75,                    !- Gross Sensible Heat Ratio
-    4.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    HPACCoolCapFT,           !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    HPACCoolCapFFF,          !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    HPACEIRFT,               !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    HPACEIRFFF,              !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    HPACPLFFPLR,             !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Zone3PTHPDXCoolCoil Speed 8 Performance,  !- Name
-    0.8169,                  !- Gross Total Cooling Capacity Fraction
-    0.8400,                  !- Evaporator Air Flow Rate Fraction
-    0.8514,                  !- Condenser Air Flow Rate Fraction
-    0.75,                    !- Gross Sensible Heat Ratio
-    4.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    HPACCoolCapFT,           !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    HPACCoolCapFFF,          !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    HPACEIRFT,               !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    HPACEIRFFF,              !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    HPACPLFFPLR,             !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Zone3PTHPDXCoolCoil Speed 9 Performance,  !- Name
-    0.9093,                  !- Gross Total Cooling Capacity Fraction
-    0.9200,                  !- Evaporator Air Flow Rate Fraction
-    0.9324,                  !- Condenser Air Flow Rate Fraction
-    0.75,                    !- Gross Sensible Heat Ratio
-    4.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    HPACCoolCapFT,           !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    HPACCoolCapFFF,          !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    HPACEIRFT,               !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    HPACEIRFFF,              !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    HPACPLFFPLR,             !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Zone3PTHPDXCoolCoil Speed 10 Performance,  !- Name
-    1.0000,                  !- Gross Total Cooling Capacity Fraction
-    1.0000,                  !- Evaporator Air Flow Rate Fraction
-    1.0000,                  !- Condenser Air Flow Rate Fraction
-    0.75,                    !- Gross Sensible Heat Ratio
-    4.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    HPACCoolCapFT,           !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    HPACCoolCapFFF,          !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    HPACEIRFT,               !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    HPACEIRFFF,              !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    HPACPLFFPLR,             !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
+    200.0,                   !- Crankcase Heater Capacity {W}
+    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    ,                        !- Supply Water Storage Tank Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    ,                        !- Basin Heater Capacity {W/K}
+    ,                        !- Basin Heater Setpoint Temperature {C}
+    ,                        !- Basin Heater Operating Schedule Name
+    1524.1,                  !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.1359072,               !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
+    0.26,                    !- Speed 1 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    HPACCoolCapFT,           !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPACEIRFT,               !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
+    HPACEIRFFF,              !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    1877.9,                  !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.151008,                !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
+    0.30,                    !- Speed 2 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 2 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    HPACCoolCapFT,           !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPACEIRFT,               !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
+    HPACEIRFFF,              !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    2226.6,                  !- Speed 3 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 3 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 3 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.1661088,               !- Speed 3 Reference Unit Rated Air Flow Rate {m3/s}
+    0.33,                    !- Speed 3 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 3 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    HPACCoolCapFT,           !- Speed 3 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Speed 3 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPACEIRFT,               !- Speed 3 Energy Input Ratio Function of Temperature Curve Name
+    HPACEIRFFF,              !- Speed 3 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    2911.3,                  !- Speed 4 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 4 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 4 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.1963104,               !- Speed 4 Reference Unit Rated Air Flow Rate {m3/s}
+    0.38,                    !- Speed 4 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 4 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    HPACCoolCapFT,           !- Speed 4 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Speed 4 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPACEIRFT,               !- Speed 4 Energy Input Ratio Function of Temperature Curve Name
+    HPACEIRFFF,              !- Speed 4 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    3581.7,                  !- Speed 5 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 5 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 5 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.226512,                !- Speed 5 Reference Unit Rated Air Flow Rate {m3/s}
+    0.44,                    !- Speed 5 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 5 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    HPACCoolCapFT,           !- Speed 5 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Speed 5 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPACEIRFT,               !- Speed 5 Energy Input Ratio Function of Temperature Curve Name
+    HPACEIRFFF,              !- Speed 5 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    4239.5,                  !- Speed 6 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 6 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 6 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.2567136,               !- Speed 6 Reference Unit Rated Air Flow Rate {m3/s}
+    0.50,                    !- Speed 6 Reference Unit Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 6 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    HPACCoolCapFT,           !- Speed 6 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Speed 6 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPACEIRFT,               !- Speed 6 Energy Input Ratio Function of Temperature Curve Name
+    HPACEIRFFF,              !- Speed 6 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    4885.7,                  !- Speed 7 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 7 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 7 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.2869152,               !- Speed 7 Reference Unit Rated Air Flow Rate {m3/s}
+    0.57,                    !- Speed 7 Reference Unit Condenser Flow Rate {m3/s}
+    ,                        !- Speed 7 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    HPACCoolCapFT,           !- Speed 7 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Speed 7 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPACEIRFT,               !- Speed 7 Energy Input Ratio Function of Temperature Curve Name
+    HPACEIRFFF,              !- Speed 7 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    5520.7,                  !- Speed 8 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 8 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 8 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.3171168,               !- Speed 8 Reference Unit Rated Air Flow Rate {m3/s}
+    0.63,                    !- Speed 8 Reference Unit Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 8 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    HPACCoolCapFT,           !- Speed 8 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Speed 8 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPACEIRFT,               !- Speed 8 Energy Input Ratio Function of Temperature Curve Name
+    HPACEIRFFF,              !- Speed 8 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    6144.8,                  !- Speed 9 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 9 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 9 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.3473184,               !- Speed 9 Reference Unit Rated Air Flow Rate {m3/s}
+    0.69,                    !- Speed 9 Reference Unit Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 9 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    HPACCoolCapFT,           !- Speed 9 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Speed 9 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPACEIRFT,               !- Speed 9 Energy Input Ratio Function of Temperature Curve Name
+    HPACEIRFFF,              !- Speed 9 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    6758.0,                  !- Speed 10 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 10 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    4.0,                     !- Speed 10 Reference Unit Gross Rated Cooling COP {dimensionless}
+    0.37752,                 !- Speed 10 Reference Unit Rated Air Flow Rate {m3/s}
+    0.74,                    !- Speed 10 Reference Unit Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 10 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    HPACCoolCapFT,           !- Speed 10 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Speed 10 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPACEIRFT,               !- Speed 10 Energy Input Ratio Function of Temperature Curve Name
+    HPACEIRFFF;              !- Speed 10 Energy Input Ratio Function of Air Flow Fraction Curve Name
 
   Curve:Biquadratic,
     HPACHeatCapFT,           !- Name

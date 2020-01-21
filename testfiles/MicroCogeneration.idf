@@ -1267,7 +1267,7 @@
     ZN_1_FLR_1_SEC_1 PTACFan,!- Supply Air Fan Name
     Coil:Heating:Water,      !- Heating Coil Object Type
     ZN_1_FLR_1_SEC_1 PTAC heat coil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ZN_1_FLR_1_SEC_1 PTAC DXCoil,  !- Cooling Coil Name
     DrawThrough,             !- Fan Placement
     ALWAYS_OFF;              !- Supply Air Fan Operating Mode Schedule Name
@@ -1296,69 +1296,21 @@
   OutdoorAir:Node,
     ZN_1_FLR_1_SEC_1 PTAC OA node;  !- Name
 
-  OutdoorAir:Node,
-    ZN_1_FLR_1_SEC_1 PTAC DXCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     ZN_1_FLR_1_SEC_1 PTAC DXCoil,  !- Name
-    ZN_1_FLR_1_SEC_1 PTACDXcool inlet,  !- Evaporator Inlet Node Name
-    ZN_1_FLR_1_SEC_1 PTAC Post CC Node,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    ZN_1_FLR_1_SEC_1 PTAC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    ZN_1_FLR_1_SEC_1 PTAC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    ZN_1_FLR_1_SEC_1 PTAC DXCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    ZN_1_FLR_1_SEC_1 PTAC DXCoil Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    ZN_1_FLR_1_SEC_1 PTAC DXCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    ZN_1_FLR_1_SEC_1 PTAC DXCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    ZN_1_FLR_1_SEC_1 PTAC DXCoil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    ZN_1_FLR_1_SEC_1 PTAC DXCoil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    2.5636,                  !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
+    2.5636,                  !- Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    ZN_1_FLR_1_SEC_1 PTACHPACCoolCapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    ZN_1_FLR_1_SEC_1 PTACHPACCoolCapFFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    ZN_1_FLR_1_SEC_1 PTACHPACEIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    ZN_1_FLR_1_SEC_1 PTACHPACEIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    ZN_1_FLR_1_SEC_1 PTACHPACPLFFPLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ZN_1_FLR_1_SEC_1 PTACDXcool inlet,  !- Air Inlet Node Name
+    ZN_1_FLR_1_SEC_1 PTAC Post CC Node,  !- Air Outlet Node Name
+    ZN_1_FLR_1_SEC_1 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    ZN_1_FLR_1_SEC_1 PTACHPACCoolCapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    ZN_1_FLR_1_SEC_1 PTACHPACEIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    ZN_1_FLR_1_SEC_1 PTACHPACEIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    ZN_1_FLR_1_SEC_1 PTACHPACPLFFPLR;  !- Part Load Fraction Correlation Curve Name
 
   Curve:Biquadratic,
     ZN_1_FLR_1_SEC_1 PTACHPACCoolCapFT,  !- Name
@@ -1859,7 +1811,7 @@
     ZN_1_FLR_1_SEC_2 PTACFan,!- Supply Air Fan Name
     Coil:Heating:Water,      !- Heating Coil Object Type
     ZN_1_FLR_1_SEC_2 PTAC heat coil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ZN_1_FLR_1_SEC_2 PTAC DXCoil,  !- Cooling Coil Name
     DrawThrough,             !- Fan Placement
     ALWAYS_OFF;              !- Supply Air Fan Operating Mode Schedule Name
@@ -1888,69 +1840,21 @@
   OutdoorAir:Node,
     ZN_1_FLR_1_SEC_2 PTAC OA node;  !- Name
 
-  OutdoorAir:Node,
-    ZN_1_FLR_1_SEC_2 PTAC DXCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     ZN_1_FLR_1_SEC_2 PTAC DXCoil,  !- Name
-    ZN_1_FLR_1_SEC_2 PTACDXcool inlet,  !- Evaporator Inlet Node Name
-    ZN_1_FLR_1_SEC_2 PTAC Post CC Node,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    ZN_1_FLR_1_SEC_2 PTAC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    ZN_1_FLR_1_SEC_2 PTAC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    ZN_1_FLR_1_SEC_2 PTAC DXCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    ZN_1_FLR_1_SEC_2 PTAC DXCoil Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    ZN_1_FLR_1_SEC_2 PTAC DXCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    ZN_1_FLR_1_SEC_2 PTAC DXCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    ZN_1_FLR_1_SEC_2 PTAC DXCoil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    ZN_1_FLR_1_SEC_2 PTAC DXCoil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    2.5636,                  !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
+    2.5636,                  !- Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    ZN_1_FLR_1_SEC_2 PTACHPACCoolCapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    ZN_1_FLR_1_SEC_2 PTACHPACCoolCapFFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    ZN_1_FLR_1_SEC_2 PTACHPACEIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    ZN_1_FLR_1_SEC_2 PTACHPACEIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    ZN_1_FLR_1_SEC_2 PTACHPACPLFFPLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ZN_1_FLR_1_SEC_2 PTACDXcool inlet,  !- Air Inlet Node Name
+    ZN_1_FLR_1_SEC_2 PTAC Post CC Node,  !- Air Outlet Node Name
+    ZN_1_FLR_1_SEC_2 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    ZN_1_FLR_1_SEC_2 PTACHPACCoolCapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    ZN_1_FLR_1_SEC_2 PTACHPACEIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    ZN_1_FLR_1_SEC_2 PTACHPACEIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    ZN_1_FLR_1_SEC_2 PTACHPACPLFFPLR;  !- Part Load Fraction Correlation Curve Name
 
   Curve:Biquadratic,
     ZN_1_FLR_1_SEC_2 PTACHPACCoolCapFT,  !- Name
@@ -2451,7 +2355,7 @@
     ZN_1_FLR_1_SEC_3 PTACFan,!- Supply Air Fan Name
     Coil:Heating:Water,      !- Heating Coil Object Type
     ZN_1_FLR_1_SEC_3 PTAC heat coil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ZN_1_FLR_1_SEC_3 PTAC DXCoil,  !- Cooling Coil Name
     DrawThrough,             !- Fan Placement
     ALWAYS_OFF;              !- Supply Air Fan Operating Mode Schedule Name
@@ -2480,69 +2384,21 @@
   OutdoorAir:Node,
     ZN_1_FLR_1_SEC_3 PTAC OA node;  !- Name
 
-  OutdoorAir:Node,
-    ZN_1_FLR_1_SEC_3 PTAC DXCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     ZN_1_FLR_1_SEC_3 PTAC DXCoil,  !- Name
-    ZN_1_FLR_1_SEC_3 PTACDXcool inlet,  !- Evaporator Inlet Node Name
-    ZN_1_FLR_1_SEC_3 PTAC Post CC Node,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    ZN_1_FLR_1_SEC_3 PTAC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    ZN_1_FLR_1_SEC_3 PTAC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    ZN_1_FLR_1_SEC_3 PTAC DXCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    ZN_1_FLR_1_SEC_3 PTAC DXCoil Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    ZN_1_FLR_1_SEC_3 PTAC DXCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    ZN_1_FLR_1_SEC_3 PTAC DXCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    ZN_1_FLR_1_SEC_3 PTAC DXCoil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    ZN_1_FLR_1_SEC_3 PTAC DXCoil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    2.5636,                  !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
+    2.5636,                  !- Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    ZN_1_FLR_1_SEC_3 PTACHPACCoolCapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    ZN_1_FLR_1_SEC_3 PTACHPACCoolCapFFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    ZN_1_FLR_1_SEC_3 PTACHPACEIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    ZN_1_FLR_1_SEC_3 PTACHPACEIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    ZN_1_FLR_1_SEC_3 PTACHPACPLFFPLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ZN_1_FLR_1_SEC_3 PTACDXcool inlet,  !- Air Inlet Node Name
+    ZN_1_FLR_1_SEC_3 PTAC Post CC Node,  !- Air Outlet Node Name
+    ZN_1_FLR_1_SEC_3 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    ZN_1_FLR_1_SEC_3 PTACHPACCoolCapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    ZN_1_FLR_1_SEC_3 PTACHPACEIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    ZN_1_FLR_1_SEC_3 PTACHPACEIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    ZN_1_FLR_1_SEC_3 PTACHPACPLFFPLR;  !- Part Load Fraction Correlation Curve Name
 
   Curve:Biquadratic,
     ZN_1_FLR_1_SEC_3 PTACHPACCoolCapFT,  !- Name
@@ -3043,7 +2899,7 @@
     ZN_1_FLR_1_SEC_4 PTACFan,!- Supply Air Fan Name
     Coil:Heating:Water,      !- Heating Coil Object Type
     ZN_1_FLR_1_SEC_4 PTAC heat coil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ZN_1_FLR_1_SEC_4 PTAC DXCoil,  !- Cooling Coil Name
     DrawThrough,             !- Fan Placement
     ALWAYS_OFF;              !- Supply Air Fan Operating Mode Schedule Name
@@ -3072,69 +2928,21 @@
   OutdoorAir:Node,
     ZN_1_FLR_1_SEC_4 PTAC OA node;  !- Name
 
-  OutdoorAir:Node,
-    ZN_1_FLR_1_SEC_4 PTAC DXCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     ZN_1_FLR_1_SEC_4 PTAC DXCoil,  !- Name
-    ZN_1_FLR_1_SEC_4 PTACDXcool inlet,  !- Evaporator Inlet Node Name
-    ZN_1_FLR_1_SEC_4 PTAC Post CC Node,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    ZN_1_FLR_1_SEC_4 PTAC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    ZN_1_FLR_1_SEC_4 PTAC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    ZN_1_FLR_1_SEC_4 PTAC DXCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    ZN_1_FLR_1_SEC_4 PTAC DXCoil Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    ZN_1_FLR_1_SEC_4 PTAC DXCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    ZN_1_FLR_1_SEC_4 PTAC DXCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    ZN_1_FLR_1_SEC_4 PTAC DXCoil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    ZN_1_FLR_1_SEC_4 PTAC DXCoil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    2.5636,                  !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
+    2.5636,                  !- Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    ZN_1_FLR_1_SEC_4 PTACHPACCoolCapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    ZN_1_FLR_1_SEC_4 PTACHPACCoolCapFFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    ZN_1_FLR_1_SEC_4 PTACHPACEIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    ZN_1_FLR_1_SEC_4 PTACHPACEIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    ZN_1_FLR_1_SEC_4 PTACHPACPLFFPLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ZN_1_FLR_1_SEC_4 PTACDXcool inlet,  !- Air Inlet Node Name
+    ZN_1_FLR_1_SEC_4 PTAC Post CC Node,  !- Air Outlet Node Name
+    ZN_1_FLR_1_SEC_4 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    ZN_1_FLR_1_SEC_4 PTACHPACCoolCapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    ZN_1_FLR_1_SEC_4 PTACHPACEIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    ZN_1_FLR_1_SEC_4 PTACHPACEIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    ZN_1_FLR_1_SEC_4 PTACHPACPLFFPLR;  !- Part Load Fraction Correlation Curve Name
 
   Curve:Biquadratic,
     ZN_1_FLR_1_SEC_4 PTACHPACCoolCapFT,  !- Name
@@ -3622,7 +3430,7 @@
     ZN_1_FLR_1_SEC_5 PTACFan,!- Supply Air Fan Name
     Coil:Heating:Water,      !- Heating Coil Object Type
     ZN_1_FLR_1_SEC_5 PTAC heat coil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ZN_1_FLR_1_SEC_5 PTAC DXCoil,  !- Cooling Coil Name
     DrawThrough,             !- Fan Placement
     ALWAYS_OFF;              !- Supply Air Fan Operating Mode Schedule Name
@@ -3651,69 +3459,21 @@
   OutdoorAir:Node,
     ZN_1_FLR_1_SEC_5 PTAC OA node;  !- Name
 
-  OutdoorAir:Node,
-    ZN_1_FLR_1_SEC_5 PTAC DXCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     ZN_1_FLR_1_SEC_5 PTAC DXCoil,  !- Name
-    ZN_1_FLR_1_SEC_5 PTACDXcool inlet,  !- Evaporator Inlet Node Name
-    ZN_1_FLR_1_SEC_5 PTAC Post CC Node,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    ZN_1_FLR_1_SEC_5 PTAC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    ZN_1_FLR_1_SEC_5 PTAC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    ZN_1_FLR_1_SEC_5 PTAC DXCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    ZN_1_FLR_1_SEC_5 PTAC DXCoil Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    ZN_1_FLR_1_SEC_5 PTAC DXCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    ZN_1_FLR_1_SEC_5 PTAC DXCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    ZN_1_FLR_1_SEC_5 PTAC DXCoil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    ZN_1_FLR_1_SEC_5 PTAC DXCoil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    2.5636,                  !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
+    2.5636,                  !- Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    ZN_1_FLR_1_SEC_5 PTACHPACCoolCapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    ZN_1_FLR_1_SEC_5 PTACHPACCoolCapFFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    ZN_1_FLR_1_SEC_5 PTACHPACEIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    ZN_1_FLR_1_SEC_5 PTACHPACEIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    ZN_1_FLR_1_SEC_5 PTACHPACPLFFPLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ZN_1_FLR_1_SEC_5 PTACDXcool inlet,  !- Air Inlet Node Name
+    ZN_1_FLR_1_SEC_5 PTAC Post CC Node,  !- Air Outlet Node Name
+    ZN_1_FLR_1_SEC_5 PTACHPACCoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    ZN_1_FLR_1_SEC_5 PTACHPACCoolCapFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    ZN_1_FLR_1_SEC_5 PTACHPACEIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    ZN_1_FLR_1_SEC_5 PTACHPACEIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    ZN_1_FLR_1_SEC_5 PTACHPACPLFFPLR;  !- Part Load Fraction Correlation Curve Name
 
   Curve:Biquadratic,
     ZN_1_FLR_1_SEC_5 PTACHPACCoolCapFT,  !- Name
@@ -4893,7 +4653,7 @@
 !
 
   FuelFactors,
-    FuelOil#1,               !- Existing Fuel Resource Name
+    FuelOilNo1,                !- Existing Fuel Resource Name
     m3,                      !- Units of Measure
     38.656E+09,              !- Energy per Unit Factor
     1.158,                   !- Source Energy Factor {J/J}

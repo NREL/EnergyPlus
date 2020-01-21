@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -109,7 +109,9 @@ using namespace ObjexxFCL;
 
 namespace EnergyPlus {
 
-TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
+class PTHPFixture : public EnergyPlusFixture {};
+
+TEST_F(PTHPFixture, PackagedTerminalHP_VSCoils_Sizing)
 {
     std::string const idf_objects = delimited_string({
 
@@ -566,7 +568,7 @@ TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
     EXPECT_EQ(Fan(1).MaxAirFlowRate, max(ZoneEqSizing(1).CoolingAirVolFlow, ZoneEqSizing(1).HeatingAirVolFlow));
 }
 
-TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
+TEST_F(PTHPFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
 {
 
     bool ErrorsFound(false);
@@ -916,7 +918,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     ASSERT_NEAR(HeatingCoils::HeatingCoil(1).HeatingCoilRate, 2217.0, 1.0);
 }
 
-TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
+TEST_F(PTHPFixture, SimPTAC_SZVAVTest)
 {
 
     bool ErrorsFound(false);

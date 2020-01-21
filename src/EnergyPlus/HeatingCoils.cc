@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -3085,8 +3085,8 @@ namespace HeatingCoils {
     }
 
     int GetHeatReclaimSourceIndex(int const &CoilType_Num, // must match coil types in this module
-                                  int &CoilIndex, // must match coil names for the coil type
-                                  bool &ErrorsFound            // set to true if problem
+                                  int &CoilIndex,          // must match coil names for the coil type
+                                  bool &ErrorsFound        // set to true if problem
     )
     {
 
@@ -3113,8 +3113,7 @@ namespace HeatingCoils {
         CoilFound = 0;
 
         // This function only used for dessicant regeneration
-        if ((CoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) ||
-            (CoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) ||
+        if ((CoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) || (CoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) ||
             (CoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl)) {
             for (NumCoil = 1; NumCoil <= NumHeatingCoils; ++NumCoil) {
                 if (HeatingCoil(NumCoil).ReclaimHeatingSource != COIL_DX_COOLING && HeatingCoil(NumCoil).ReclaimHeatingSource != COIL_DX_MULTISPEED &&
@@ -3125,7 +3124,8 @@ namespace HeatingCoils {
             }
         } else if (CoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
             for (NumCoil = 1; NumCoil <= NumHeatingCoils; ++NumCoil) {
-                if (HeatingCoil(NumCoil).ReclaimHeatingSource != COIL_DX_VARIABLE_COOLING && HeatingCoil(NumCoil).ReclaimHeatingSourceIndexNum != CoilIndex)
+                if (HeatingCoil(NumCoil).ReclaimHeatingSource != COIL_DX_VARIABLE_COOLING &&
+                    HeatingCoil(NumCoil).ReclaimHeatingSourceIndexNum != CoilIndex)
                     continue;
                 CoilFound = CoilIndex;
                 break;

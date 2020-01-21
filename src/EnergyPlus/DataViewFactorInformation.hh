@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -76,6 +76,8 @@ namespace DataViewFactorInformation {
         Array1D<Real64> Emissivity;         // Surface emissivity
         Array1D<Real64> Azimuth;            // Azimuth angle of the surface (in degrees)
         Array1D<Real64> Tilt;               // Tilt angle of the surface (in degrees)
+        Array1D<Real64> FMRT;               // Mean Radiant Temperature "View Factor" used in Carroll method
+        Array1D<Real64> Fp;                 // F' (Oppenheim surface resistance used in Carroll method)
         Array1D_int SurfacePtr;             // Surface number for surfaces in this enclosure
         Real64 FloorArea;                   // Floor area of zone(s) in enclosure
         Real64 ExtWindowArea;               // Exterior window area

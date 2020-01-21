@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -490,6 +490,7 @@ namespace AirflowNetwork {
     {
         // Members
         std::string Name; // Name of crack component
+        // std::string ExternalNodeNames; // Name of external node.Not required for internal surface
         Real64 FlowCoef;  // Air Mass Flow Coefficient When Window or Door Is Closed [kg/s at 1Pa]
         Real64 FlowExpo;  // Air Mass Flow exponent When Window or Door Is Closed [dimensionless]
         Real64 StandardT; // Standard temperature for crack data

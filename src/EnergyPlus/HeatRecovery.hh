@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -555,13 +555,12 @@ namespace HeatRecovery {
                                      Optional<Real64 const> HXPartLoadRatio = _ //
     );
 
-    void CalcDesiccantBalancedHeatExch(int const ExNum,                 // number of the current heat exchanger being simulated
-                                       bool const HXUnitOn,             // flag to simulate heat exchager heat recovery
-                                       bool const FirstHVACIteration,   // First HVAC iteration flag
-                                       int const FanOpMode,             // Supply air fan operating mode (1=cycling, 2=constant)
-                                       Real64 const PartLoadRatio,      // Part load ratio requested of DX compressor
-                                       int const CompanionCoilIndex,    // index of companion cooling coil
-                                       int const CompanionCoilType_Num, // cooling coil type of coil
+    void CalcDesiccantBalancedHeatExch(int const ExNum,               // number of the current heat exchanger being simulated
+                                       bool const HXUnitOn,           // flag to simulate heat exchager heat recovery
+                                       bool const FirstHVACIteration, // First HVAC iteration flag
+                                       int const FanOpMode,           // Supply air fan operating mode (1=cycling, 2=constant)
+                                       Real64 const PartLoadRatio,    // Part load ratio requested of DX compressor
+                                       int const CompanionCoilIndex,  // index of companion cooling coil
                                        bool const RegenInletIsOANode, // Flag to determine if regen side inlet is OANode, if so this air stream cycles
                                        Optional_bool_const EconomizerFlag = _, // economizer flag pass by air loop or OA sys
                                        Optional_bool_const HighHumCtrlFlag = _ // high humidity control flag passed by airloop or OA sys

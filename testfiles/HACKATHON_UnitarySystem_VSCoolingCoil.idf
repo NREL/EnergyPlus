@@ -102,7 +102,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.2;
 
   Building,
     NONE,                    !- Name
@@ -1480,7 +1480,7 @@
     Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type
     Heat Pump DX Heating Coil 1,  !- Heating Coil Name
     ,                        !- DX Heating Coil Sizing Ratio
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type
     Heat Pump ACDXCoil 1,    !- Cooling Coil Name
     ,                        !- Use DOAS DX Cooling Coil
     ,                        !- Minimum Supply Air Temperature {C}
@@ -1595,91 +1595,48 @@
     SuppHeating Coil Air Inlet Node,  !- Air Inlet Node Name
     Air Loop Outlet Node;    !- Air Outlet Node Name
 
-  OutdoorAir:Node,
-    Heat Pump ACDXCoil 1 Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:VariableSpeed,
     Heat Pump ACDXCoil 1,    !- Name
-    DX Cooling Coil Air Inlet Node,  !- Evaporator Inlet Node Name
-    Heating Coil Air Inlet Node,  !- Evaporator Outlet Node Name
-    ,                        !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    Heat Pump ACDXCoil 1 Condenser Inlet Node,  !- Condenser Inlet Node Name
-    Heat Pump ACDXCoil 1 Condenser Outlet Node,  !- Condenser Outlet Node Name
-    Heat Pump ACDXCoil 1 Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    Heat Pump ACDXCoil 1 Performance,  !- Name
-    0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    VariableSpeed,           !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    Heat Pump ACDXCoil 1 Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    Heat Pump ACDXCoil 1 Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    1.5,                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    1000,                    !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
+    DX Cooling Coil Air Inlet Node,  !- Indoor Air Inlet Node Name
+    Heating Coil Air Inlet Node,  !- Indoor Air Outlet Node Name
+    2,                       !- Number of Speeds {dimensionless}
+    2,                       !- Nominal Speed Level {dimensionless}
+    autosize,                !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {W}
+    autosize,                !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
+    1000,                    !- Nominal Time for Condensate to Begin Leaving the Coil {s}
+    1.5,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}
+    HPACCOOLPLFFPLR,         !- Energy Part Load Fraction Curve Name
+    ,                        !- Condenser Air Inlet Node Name
     AirCooled,               !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    2,                       !- Nominal Speed Number
-    Heat Pump ACDXCoil 1 Speed 1 Performance,  !- Speed 1 Name
-    Heat Pump ACDXCoil 1 Speed 2 Performance;  !- Speed 2 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Heat Pump ACDXCoil 1 Speed 1 Performance,  !- Name
-    0.5000,                  !- Gross Total Cooling Capacity Fraction
-    0.5000,                  !- Evaporator Air Flow Rate Fraction
-    ,                        !- Condenser Air Flow Rate Fraction
-    0.75,                    !- Gross Sensible Heat Ratio
-    1.9,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    HPACCoolCapFT,           !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    HPACCoolCapFFF,          !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    HPACCOOLEIRFT,           !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    HPACCOOLEIRFFF,          !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Heat Pump ACDXCoil 1 Speed 2 Performance,  !- Name
-    1.0000,                  !- Gross Total Cooling Capacity Fraction
-    1.0000,                  !- Evaporator Air Flow Rate Fraction
-    ,                        !- Condenser Air Flow Rate Fraction
-    0.79,                    !- Gross Sensible Heat Ratio
-    3.9,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    HPACCoolCapFT,           !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    HPACCoolCapFFF,          !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    HPACCOOLEIRFT,           !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    HPACCOOLEIRFFF,          !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
+    0,                       !- Crankcase Heater Capacity {W}
+    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    ,                        !- Supply Water Storage Tank Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    ,                        !- Basin Heater Capacity {W/K}
+    ,                        !- Basin Heater Setpoint Temperature {C}
+    ,                        !- Basin Heater Operating Schedule Name
+    21975.0,                 !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    1.9,                     !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
+    1.5,                     !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 1 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    HPACCoolCapFT,           !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPACCOOLEIRFT,           !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
+    HPACCOOLEIRFFF,          !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
+    43950.0,                 !- Speed 2 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.79,                    !- Speed 2 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    3.9,                     !- Speed 2 Reference Unit Gross Rated Cooling COP {dimensionless}
+    3.0,                     !- Speed 2 Reference Unit Rated Air Flow Rate {m3/s}
+    ,                        !- Speed 2 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 2 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    HPACCoolCapFT,           !- Speed 2 Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Speed 2 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPACCOOLEIRFT,           !- Speed 2 Energy Input Ratio Function of Temperature Curve Name
+    HPACCOOLEIRFFF;          !- Speed 2 Energy Input Ratio Function of Air Flow Fraction Curve Name
 
   Coil:Heating:DX:SingleSpeed,
     Heat Pump DX Heating Coil 1,  !- Name
@@ -1808,4 +1765,3 @@
 
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
-

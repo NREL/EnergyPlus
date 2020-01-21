@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,7 +55,6 @@
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
@@ -103,6 +102,7 @@
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZoneDehumidifier.hh>
+
 
 namespace EnergyPlus {
 
@@ -404,7 +404,7 @@ namespace AirflowNetworkBalanceManager {
         int AFNSupplyFanType = 0;
 
         if (AirflowNetworkGetInputFlag) {
-            GetAirflowNetworkInput();
+            GetAirflowNetworkInput(OutputFiles::getSingleton());
             AirflowNetworkGetInputFlag = false;
             return;
         }
@@ -1551,7 +1551,7 @@ namespace AirflowNetworkBalanceManager {
         return success;
     }
 
-    void GetAirflowNetworkInput()
+    void GetAirflowNetworkInput(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1589,7 +1589,6 @@ namespace AirflowNetworkBalanceManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
         static std::string const RoutineName("GetAirflowNetworkInput: "); // include trailing blank space
 
         // INTERFACE BLOCK SPECIFICATIONS:
@@ -1644,10 +1643,10 @@ namespace AirflowNetworkBalanceManager {
         Real64 baseratio;
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_110(
-            "('! <AirflowNetwork Model:Control>, No Multizone or Distribution/Multizone with Distribution/','Multizone "
-            "without Distribution/Multizone with Distribution only during Fan Operation')");
-        static ObjexxFCL::gio::Fmt Format_120("('AirflowNetwork Model:Control,',A)");
+        static constexpr auto Format_110(
+            "! <AirflowNetwork Model:Control>, No Multizone or Distribution/Multizone with Distribution/Multizone "
+            "without Distribution/Multizone with Distribution only during Fan Operation\n");
+        static constexpr auto Format_120("AirflowNetwork Model:Control,{}\n");
 
         // Set the maximum numbers of input fields
         inputProcessor->getObjectDefMaxArgs("AirflowNetwork:SimulationControl", TotalArgs, NumAlphas, NumNumbers);
@@ -1895,8 +1894,8 @@ namespace AirflowNetworkBalanceManager {
         NumAirflowNetwork = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (NumAirflowNetwork == 0) {
             SimulateAirflowNetwork = AirflowNetworkControlSimple;
-            ObjexxFCL::gio::write(OutputFileInits, Format_110);
-            ObjexxFCL::gio::write(OutputFileInits, Format_120) << "NoMultizoneOrDistribution";
+            print(outputFiles.eio, Format_110);
+            print(outputFiles.eio, Format_120, "NoMultizoneOrDistribution");
             return;
         }
         if (NumAirflowNetwork > 1) {
@@ -1960,9 +1959,8 @@ namespace AirflowNetworkBalanceManager {
                 LoopOnOffFlag = false;
             }
         }
-
-        ObjexxFCL::gio::write(OutputFileInits, Format_110);
-        ObjexxFCL::gio::write(OutputFileInits, Format_120) << SimAirNetworkKey;
+        print(outputFiles.eio, Format_110);
+        print(outputFiles.eio, Format_120, SimAirNetworkKey);
 
         // Check whether there are any objects from infiltration, ventilation, mixing and cross mixing
         if (SimulateAirflowNetwork == AirflowNetworkControlSimple || SimulateAirflowNetwork == AirflowNetworkControlSimpleADS) {
@@ -2845,15 +2843,16 @@ namespace AirflowNetworkBalanceManager {
         for (i = 1; i <= AirflowNetworkNumOfSurfaces; ++i) {
             if (MultizoneSurfaceData(i).NonRectangular) {
                 if (found) {
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA)
-                        << "! <AirflowNetwork Model:Equivalent Rectangle Surface>, Name, Equivalent Height {m}, "
-                           "Equivalent Width {m} AirflowNetwork Model:Equivalent Rectangle";
+                    print(outputFiles.eio,
+                          "! <AirflowNetwork Model:Equivalent Rectangle Surface>, Name, Equivalent Height {{m}}, Equivalent Width {{m}} AirflowNetwork "
+                          "Model:Equivalent Rectangle\n");
                     found = false;
                 }
-                StringOut = "AirflowNetwork Model:Equivalent Rectangle Surface, " + MultizoneSurfaceData(i).SurfName;
-                StringOut =
-                    StringOut + ", " + RoundSigDigits(MultizoneSurfaceData(i).Height, 2) + "," + RoundSigDigits(MultizoneSurfaceData(i).Width, 2);
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut;
+                print(outputFiles.eio,
+                      "AirflowNetwork Model:Equivalent Rectangle Surface, {}, {:.2R},{:.2R}\n",
+                      MultizoneSurfaceData(i).SurfName,
+                      MultizoneSurfaceData(i).Height,
+                      MultizoneSurfaceData(i).Width);
             }
         }
 
@@ -3132,12 +3131,8 @@ namespace AirflowNetworkBalanceManager {
         if (ErrorsFound) ShowFatalError(RoutineName + "Errors found getting inputs. Previous error(s) cause program termination.");
 
         // Write wind pressure coefficients in the EIO file
-        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <AirflowNetwork Model:Wind Direction>, Wind Direction #1 to n (degree)";
-        {
-            IOFlags flags;
-            flags.ADVANCE("No");
-            ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "AirflowNetwork Model:Wind Direction, ";
-        }
+        print(outputFiles.eio, "! <AirflowNetwork Model:Wind Direction>, Wind Direction #1 to n (degree)\n");
+        print(outputFiles.eio, "AirflowNetwork Model:Wind Direction, ");
 
         int numWinDirs = 11;
         Real64 angleDelta = 30.0;
@@ -3147,22 +3142,11 @@ namespace AirflowNetworkBalanceManager {
         }
 
         for (i = 0; i < numWinDirs; ++i) {
-            StringOut = RoundSigDigits(i * angleDelta, 1);
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-            }
+            print(outputFiles.eio, "{:.1R},", i * angleDelta);
         }
-        StringOut = RoundSigDigits(numWinDirs * angleDelta, 1);
-        ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut;
+        print(outputFiles.eio, "{:.1R}\n", numWinDirs * angleDelta);
 
-        {
-            IOFlags flags;
-            flags.ADVANCE("No");
-            ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "! <AirflowNetwork Model:Wind Pressure Coefficients>, Name, ";
-        }
-        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Wind Pressure Coefficients #1 to n (dimensionless)";
+        print(outputFiles.eio, "! <AirflowNetwork Model:Wind Pressure Coefficients>, Name, Wind Pressure Coefficients #1 to n (dimensionless)\n");
 
         // The old version used to write info with single-sided natural ventilation specific labeling, this version no longer does that.
         std::set<int> curves;
@@ -3170,52 +3154,23 @@ namespace AirflowNetworkBalanceManager {
             curves.insert(MultizoneExternalNodeData(i).curve);
         }
         for (auto index : curves) {
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "AirflowNetwork Model:Wind Pressure Coefficients, ";
-            }
-            {
-                IOFlags flags;
-                flags.ADVANCE("No");
-                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << CurveManager::GetCurveName(index) + ", ";
-            }
+            print(outputFiles.eio, "AirflowNetwork Model:Wind Pressure Coefficients, {}, ", CurveManager::GetCurveName(index));
+
             for (j = 0; j < numWinDirs; ++j) {
-                StringOut = RoundSigDigits(CurveManager::CurveValue(index, j * angleDelta), 2);
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("No");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-                }
+                print(outputFiles.eio, "{:.2R},", CurveManager::CurveValue(index, j * angleDelta));
             }
-            StringOut = RoundSigDigits(CurveManager::CurveValue(index, numWinDirs * angleDelta), 2);
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut;
+            print(outputFiles.eio, "{:.2R}\n", CurveManager::CurveValue(index, numWinDirs * angleDelta));
         }
 
         if (AirflowNetworkNumOfSingleSideZones > 0) {
             for (i = 1; i <= AirflowNetworkNumOfZones; ++i) {
                 if (MultizoneZoneData(i).SingleSidedCpType == "ADVANCED") {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("No");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags)
-                            << "AirflowNetwork: Advanced Single-Sided Model: Difference in Opening Wind Pressure Coefficients (DeltaCP), ";
-                    }
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("No");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << MultizoneZoneData(i).ZoneName + ", ";
-                    }
+                    print(outputFiles.eio, "AirflowNetwork: Advanced Single-Sided Model: Difference in Opening Wind Pressure Coefficients (DeltaCP), ");
+                    print(outputFiles.eio, "{}, ", MultizoneZoneData(i).ZoneName);
                     for (unsigned j = 1; j <= EPDeltaCP(i).WindDir.size() - 1; ++j) {
-                        StringOut = RoundSigDigits(EPDeltaCP(i).WindDir(j), 2);
-                        {
-                            IOFlags flags;
-                            flags.ADVANCE("No");
-                            ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut + ',';
-                        }
+                        print(outputFiles.eio, "{:.2R},", EPDeltaCP(i).WindDir(j));
                     }
-                    StringOut = RoundSigDigits(EPDeltaCP(i).WindDir(EPDeltaCP(i).WindDir.size()), 2);
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA) << StringOut;
+                    print(outputFiles.eio, "{:.2R}\n", EPDeltaCP(i).WindDir(EPDeltaCP(i).WindDir.size()));
                 }
             }
         }
@@ -5157,14 +5112,6 @@ namespace AirflowNetworkBalanceManager {
         int ZoneNum;
         int n;
         int SurfNum;
-
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_900("(1X,i2)");
-        static ObjexxFCL::gio::Fmt Format_901("(1X,2I4,4F9.4)");
-        static ObjexxFCL::gio::Fmt Format_902("(1X,2I4,4F9.4)");
-        static ObjexxFCL::gio::Fmt Format_903("(9X,4F9.4)");
-        static ObjexxFCL::gio::Fmt Format_904("(1X,2I4,1F9.4)");
-        static ObjexxFCL::gio::Fmt Format_910("(1X,I4,2(I4,F9.4),I4,2F4.1)");
 
         AirflowNetworkNodeSimu.allocate(AirflowNetworkNumOfNodes);   // Node simulation variable in air distribution system
         AirflowNetworkLinkSimu.allocate(AirflowNetworkNumOfLinks);   // Link simulation variable in air distribution system

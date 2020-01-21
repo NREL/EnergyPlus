@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -611,13 +611,13 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
     SimulationManager::GetProjectData();
     bool FoundError = false;
 
-    HeatBalanceManager::GetProjectControlData(FoundError); // read project control data
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), FoundError); // read project control data
     EXPECT_FALSE(FoundError);                              // expect no errors
 
     HeatBalanceManager::SetPreConstructionInputParameters();
     ScheduleManager::ProcessScheduleInput(); // read schedules
 
-    HeatBalanceManager::GetMaterialData(FoundError);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(FoundError);
@@ -674,7 +674,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
 {
-    std::string const idf_objects = delimited_string({"  Version, 9.2;                                                                      ",
+    std::string const idf_objects = delimited_string({"  Version,9.3;                                                                      ",
                                                       "  Building,                                                                          ",
                                                       "    DemoFDT,                 !- Name                                                 ",
                                                       "    0,                       !- North Axis {deg}                                     ",
@@ -1005,13 +1005,13 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
     SimulationManager::GetProjectData();
     bool FoundError = false;
 
-    HeatBalanceManager::GetProjectControlData(FoundError); // read project control data
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), FoundError); // read project control data
     EXPECT_FALSE(FoundError);                              // expect no errors
 
     HeatBalanceManager::SetPreConstructionInputParameters();
     ScheduleManager::ProcessScheduleInput(); // read schedules
 
-    HeatBalanceManager::GetMaterialData(FoundError);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(FoundError);
@@ -1411,13 +1411,13 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
     SimulationManager::GetProjectData();
     bool FoundError = false;
 
-    HeatBalanceManager::GetProjectControlData(FoundError); // read project control data
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), FoundError); // read project control data
     EXPECT_FALSE(FoundError);                              // expect no errors
 
     HeatBalanceManager::SetPreConstructionInputParameters();
     ScheduleManager::ProcessScheduleInput(); // read schedules
 
-    HeatBalanceManager::GetMaterialData(FoundError);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(FoundError);

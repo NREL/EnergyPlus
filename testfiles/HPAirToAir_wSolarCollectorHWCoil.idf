@@ -97,7 +97,7 @@
 ! Purchased Chilled Water:        No
 ! Purchased Hot Water:            No
 ! HVAC System:                    AirLoopHVAC:Unitary:Furnace:HeatCool
-! Coils:                          Coil:Cooling:DX, Coil:Heating:Fuel
+! Coils:                          Coil:Cooling:DX:SingleSpeed, Coil:Heating:Fuel
 ! Pumps:                          None
 ! Boilers:                        None
 ! Chillers:                       None
@@ -1370,71 +1370,28 @@
     Mixed Air Node,          !- Air Inlet Node Name
     DX Cooling Coil Air Inlet Node;  !- Air Outlet Node Name
 
-!-   ===========  ALL OBJECTS IN CLASS: Coil:Cooling:DX ===========
+!-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:DX:SINGLESPEED ===========
 
-  OutdoorAir:Node,
-    Furnace ACDXCoil 1 Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     Furnace ACDXCoil 1,      !- Name
-    DX Cooling Coil Air Inlet Node,  !- Evaporator Inlet Node Name
-    Heating Coil Air Inlet Node,  !- Evaporator Outlet Node Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    Furnace ACDXCoil 1 Condenser Inlet Node,  !- Condenser Inlet Node Name
-    Furnace ACDXCoil 1 Condenser Outlet Node,  !- Condenser Outlet Node Name
-    Furnace ACDXCoil 1 Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    Furnace ACDXCoil 1 Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    Furnace ACDXCoil 1 Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    Furnace ACDXCoil 1 Operating Mode,  !- Name
-    32000,                   !- Rated Gross Total Cooling Capacity {W}
-    1.6,                     !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    4,                       !- Maximum Cycling Rate {cycles/hr}
-    0.4,                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    45,                      !- Latent Capacity Time Constant {s}
-    1000,                    !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    Furnace ACDXCoil 1 Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Furnace ACDXCoil 1 Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    0.75,                    !- Gross Sensible Heat Ratio
-    3.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    32000,                   !- Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Gross Rated Sensible Heat Ratio
+    3.0,                     !- Gross Rated Cooling COP {W/W}
+    1.6,                     !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    HPCoolCAPFT,             !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    HPCoolCapFFF,            !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    HPCoolEIRFT,             !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    HPCoolEIRFFF,            !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    DX Cooling Coil Air Inlet Node,  !- Air Inlet Node Name
+    Heating Coil Air Inlet Node,  !- Air Outlet Node Name
+    HPCoolCAPFT,             !- Total Cooling Capacity Function of Temperature Curve Name
+    HPCoolCapFFF,            !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    HPCoolEIRFT,             !- Energy Input Ratio Function of Temperature Curve Name
+    HPCoolEIRFFF,            !- Energy Input Ratio Function of Flow Fraction Curve Name
     HPCoolPLFFPLR,           !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    1000,                    !- Nominal Time for Condensate Removal to Begin {s}
+    0.4,                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    4,                       !- Maximum Cycling Rate {cycles/hr}
+    45;                      !- Latent Capacity Time Constant {s}
 
 !-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:FUEL ===========
 
@@ -1478,7 +1435,7 @@
     Supply Fan 1,            !- Supply Air Fan Name
     Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type
     HP DX Heating Coil 1,    !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Furnace ACDXCoil 1,      !- Cooling Coil Name
     Coil:Heating:Water,      !- Supplemental Heating Coil Object Type
     Supp Heating Coil,       !- Supplemental Heating Coil Name
@@ -2383,7 +2340,7 @@
     ,                        !- Heater Minimum Capacity {W}
     ,                        !- Heater Ignition Minimum Flow Rate {m3/s}
     ,                        !- Heater Ignition Delay {s}
-    ELECTRIC,                !- Heater Fuel Type
+    Electricity,             !- Heater Fuel Type
     0.96,                    !- Heater Thermal Efficiency
     ,                        !- Part Load Factor Curve Name
     ,                        !- Off Cycle Parasitic Fuel Consumption Rate {W}

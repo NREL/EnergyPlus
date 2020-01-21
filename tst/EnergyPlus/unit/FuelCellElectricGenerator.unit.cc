@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -60,7 +60,11 @@
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
 
-TEST_F(EnergyPlusFixture, FuelCellTest_LowInletEnthalySover1)
+class FuelCellGenFixture : public EnergyPlusFixture
+{
+};
+
+TEST_F(FuelCellGenFixture, FuelCellTest_LowInletEnthalySover1)
 {
 
     std::string const idf_objects = delimited_string({

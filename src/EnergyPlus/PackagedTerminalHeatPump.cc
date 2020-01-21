@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,7 +57,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
-#include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
@@ -937,24 +936,6 @@ namespace PackagedTerminalHeatPump {
                                                   GetHXDXCoilName(PTUnit(PTUnitNum).DXCoolCoilType, PTUnit(PTUnitNum).DXCoolCoilName, errFlag),
                                                   errFlag);
                     if (errFlag) ShowContinueError("...occurs in " + PTUnit(PTUnitNum).UnitType + " \"" + PTUnit(PTUnitNum).Name + "\"");
-                }
-            } else if (UtilityRoutines::SameString(Alphas(11), "Coil:Cooling:DX")) {
-                PTUnit(PTUnitNum).DXCoolCoilType = Alphas(11);
-                PTUnit(PTUnitNum).DXCoolCoilType_Num = CoilDX_Cooling;
-                errFlag = false;
-                ValidateComponent(Alphas(11), PTUnit(PTUnitNum).DXCoolCoilName, errFlag, CurrentModuleObject);
-                if (errFlag) {
-                    ShowContinueError("...occurs in " + PTUnit(PTUnitNum).UnitType + " \"" + PTUnit(PTUnitNum).Name + "\"");
-                } else {
-                    PTUnit(PTUnitNum).DXCoolCoilIndexNum = CoilCoolingDX::factory(PTUnit(PTUnitNum).DXCoolCoilName);
-                    CoilCoolingDXCurveFitPerformance::CapControlMethod dummy1;
-                    coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].getFixedData(
-                        CoolCoilInletNodeNum, CoolCoilOutletNodeNum, PTUnit(PTUnitNum).CondenserNodeNum,
-                        PTUnit(PTUnitNum).NumOfSpeedCooling, dummy1, PTUnit(PTUnitNum).MinOATCompressorCooling
-                    );
-                    if (PTUnit(PTUnitNum).NumOfSpeedCooling > 1) {
-                        PTUnit(PTUnitNum).useVSCoilModel = true;
-                    }
                 }
             } else if (UtilityRoutines::SameString(Alphas(11), "COIL:COOLING:DX:VARIABLESPEED")) {
                 PTUnit(PTUnitNum).DXCoolCoilType = Alphas(11);
@@ -1875,24 +1856,6 @@ namespace PackagedTerminalHeatPump {
                     if (errFlag) {
                         ShowContinueError("...occurs in " + PTUnit(PTUnitNum).UnitType + " \"" + PTUnit(PTUnitNum).Name + "\"");
                         ErrorsFound = true;
-                    }
-                }
-            } else if (UtilityRoutines::SameString(Alphas(11), "Coil:Cooling:DX")) {
-                PTUnit(PTUnitNum).DXCoolCoilType = Alphas(11);
-                PTUnit(PTUnitNum).DXCoolCoilType_Num = CoilDX_Cooling;
-                errFlag = false;
-                ValidateComponent(Alphas(11), PTUnit(PTUnitNum).DXCoolCoilName, errFlag, CurrentModuleObject);
-                if (errFlag) {
-                    ShowContinueError("...occurs in " + PTUnit(PTUnitNum).UnitType + " \"" + PTUnit(PTUnitNum).Name + "\"");
-                } else {
-                    PTUnit(PTUnitNum).DXCoolCoilIndexNum = CoilCoolingDX::factory(PTUnit(PTUnitNum).DXCoolCoilName);
-                    CoilCoolingDXCurveFitPerformance::CapControlMethod dummy1;
-                    coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].getFixedData(
-                        CoolCoilInletNodeNum, CoolCoilOutletNodeNum, PTUnit(PTUnitNum).CondenserNodeNum,
-                        PTUnit(PTUnitNum).NumOfSpeedCooling, dummy1, PTUnit(PTUnitNum).MinOATCompressorCooling
-                    );
-                    if (PTUnit(PTUnitNum).NumOfSpeedCooling > 1) {
-                        PTUnit(PTUnitNum).useVSCoilModel = true;
                     }
                 }
             } else if (UtilityRoutines::SameString(Alphas(11), "COIL:COOLING:DX:VARIABLESPEED")) {
@@ -3996,14 +3959,6 @@ namespace PackagedTerminalHeatPump {
         }
 
         if (!SysSizingCalc && MySizeFlag(PTUnitNum)) {
-
-            // we should call the coils first
-            coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].size();
-
-            if (PTUnit(PTUnitNum).NumOfSpeedCooling > 1) {
-                PTUnit(PTUnitNum).useVSCoilModel = true;
-            }
-
             SizePTUnit(PTUnitNum);
             MySizeFlag(PTUnitNum) = false;
 
@@ -4013,6 +3968,7 @@ namespace PackagedTerminalHeatPump {
 
             if (PTUnit(PTUnitNum).useVSCoilModel && PTUnit(PTUnitNum).NumOfSpeedCooling == 0) {
 
+<<<<<<< HEAD
                 if (PTUnit(PTUnitNum).DXCoolCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
                     // Call coil to make sure sizing executes
                     coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].simulate(coilNormalMode, 0.0, 1, 0.0, PTUnit(PTUnitNum).OpMode);
@@ -4045,15 +4001,29 @@ namespace PackagedTerminalHeatPump {
                                           0.0,
                                           0.0); // conduct the sizing operation in the VS WSHP
                     PTUnit(PTUnitNum).NumOfSpeedCooling = VarSpeedCoil(PTUnit(PTUnitNum).DXCoolCoilIndexNum).NumOfSpeeds;
+=======
+                SimVariableSpeedCoils("",
+                                      PTUnit(PTUnitNum).DXCoolCoilIndexNum,
+                                      0,
+                                      PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
+                                      PTUnit(PTUnitNum).HPTimeConstant,
+                                      PTUnit(PTUnitNum).FanDelayTime,
+                                      0,
+                                      0.0,
+                                      1,
+                                      0.0,
+                                      0.0,
+                                      0.0,
+                                      0.0); // conduct the sizing operation in the VS WSHP
+                PTUnit(PTUnitNum).NumOfSpeedCooling = VarSpeedCoil(PTUnit(PTUnitNum).DXCoolCoilIndexNum).NumOfSpeeds;
+>>>>>>> CoilHackathonBranch1
 
-                    for (Iter = 1; Iter <= PTUnit(PTUnitNum).NumOfSpeedCooling; ++Iter) {
-                        PTUnit(PTUnitNum).MSCoolingSpeedRatio(Iter) =
-                            VarSpeedCoil(PTUnit(PTUnitNum).DXCoolCoilIndexNum).MSRatedAirVolFlowRate(Iter) /
-                            VarSpeedCoil(PTUnit(PTUnitNum).DXCoolCoilIndexNum).MSRatedAirVolFlowRate(PTUnit(PTUnitNum).NumOfSpeedCooling);
-                        PTUnit(PTUnitNum).CoolVolumeFlowRate(Iter) =
-                            PTUnit(PTUnitNum).MaxCoolAirVolFlow * PTUnit(PTUnitNum).MSCoolingSpeedRatio(Iter);
-                        PTUnit(PTUnitNum).CoolMassFlowRate(Iter) = PTUnit(PTUnitNum).MaxCoolAirMassFlow * PTUnit(PTUnitNum).MSCoolingSpeedRatio(Iter);
-                    }
+                for (Iter = 1; Iter <= PTUnit(PTUnitNum).NumOfSpeedCooling; ++Iter) {
+                    PTUnit(PTUnitNum).MSCoolingSpeedRatio(Iter) =
+                        VarSpeedCoil(PTUnit(PTUnitNum).DXCoolCoilIndexNum).MSRatedAirVolFlowRate(Iter) /
+                        VarSpeedCoil(PTUnit(PTUnitNum).DXCoolCoilIndexNum).MSRatedAirVolFlowRate(PTUnit(PTUnitNum).NumOfSpeedCooling);
+                    PTUnit(PTUnitNum).CoolVolumeFlowRate(Iter) = PTUnit(PTUnitNum).MaxCoolAirVolFlow * PTUnit(PTUnitNum).MSCoolingSpeedRatio(Iter);
+                    PTUnit(PTUnitNum).CoolMassFlowRate(Iter) = PTUnit(PTUnitNum).MaxCoolAirMassFlow * PTUnit(PTUnitNum).MSCoolingSpeedRatio(Iter);
                 }
 
                 if (PTUnit(PTUnitNum).DXHeatCoilType_Num == Coil_HeatingWaterToAirHPVSEquationFit ||
@@ -5102,6 +5072,7 @@ namespace PackagedTerminalHeatPump {
                 SizingString = PTUnitUNumericFields(PTUnitNum).FieldNames(FieldNum) + " [m3/s]";
                 TempSize = PTUnit(PTUnitNum).MaxCoolAirVolFlow;
                 if (PTUnit(PTUnitNum).useVSCoilModel) {
+<<<<<<< HEAD
                     if (PTUnit(PTUnitNum).DXCoolCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
                         // Call coil to make sure sizing executes
                         coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].simulate(coilNormalMode, 0.0, 1, 0.0, PTUnit(PTUnitNum).OpMode);
@@ -5128,6 +5099,24 @@ namespace PackagedTerminalHeatPump {
                         ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow =
                             GetCoilAirFlowRateVariableSpeed(PTUnit(PTUnitNum).DXCoolCoilType, PTUnit(PTUnitNum).DXCoolCoilName, ErrorsFound);
                     }
+=======
+                    SimVariableSpeedCoils(BlankString,
+                                          PTUnit(PTUnitNum).DXCoolCoilIndexNum,
+                                          PTUnit(PTUnitNum).OpMode,
+                                          PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
+                                          PTUnit(PTUnitNum).HPTimeConstant,
+                                          PTUnit(PTUnitNum).FanDelayTime,
+                                          1,
+                                          0.0,
+                                          1,
+                                          0.0,
+                                          0.0,
+                                          0.0,
+                                          1.0);
+                    ZoneEqSizing(CurZoneEqNum).CoolingAirFlow = true;
+                    ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow =
+                        GetCoilAirFlowRateVariableSpeed(PTUnit(PTUnitNum).DXCoolCoilType, PTUnit(PTUnitNum).DXCoolCoilName, ErrorsFound);
+>>>>>>> CoilHackathonBranch1
                     ZoneEqSizing(CurZoneEqNum).SystemAirFlow = true;
                     ZoneEqSizing(CurZoneEqNum).AirVolFlow = ZoneEqSizing(CurZoneEqNum).CoolingAirVolFlow;
                     TempSize = PTUnit(PTUnitNum).MaxCoolAirVolFlow;
@@ -5935,12 +5924,15 @@ namespace PackagedTerminalHeatPump {
                                                  PTUnit(PTUnitNum).CoolCoilCompIndex,
                                                  PTUnit(PTUnitNum).OpMode,
                                                  HXUnitOn);
+<<<<<<< HEAD
                         SaveCompressorPLR = DXCoilPartLoadRatio(PTUnit(PTUnitNum).DXCoolCoilIndexNum);
                     } else if(PTUnit(PTUnitNum).DXCoolCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
                         coilCoolingDXs[PTUnit(PTUnitNum).CoolCoilCompIndex].simulate(coilNormalMode, PartLoadFrac, 1, 1.0, PTUnit(PTUnitNum).OpMode);
                         // TODO: setting this to the PLR that was passed in - this might cause diffs
                         //SaveCompressorPLR = DXCoilPartLoadRatio(PTUnit(PTUnitNum).DXCoolCoilIndexNum);
                         SaveCompressorPLR = PartLoadFrac;
+=======
+>>>>>>> CoilHackathonBranch1
                     } else {
                         SimDXCoil(PTUnit(PTUnitNum).DXCoolCoilName,
                                   On,
@@ -5949,8 +5941,8 @@ namespace PackagedTerminalHeatPump {
                                   PTUnit(PTUnitNum).OpMode,
                                   PartLoadFrac,
                                   OnOffAirFlowRatio);
-                        SaveCompressorPLR = DXCoilPartLoadRatio(PTUnit(PTUnitNum).DXCoolCoilIndexNum);
                     }
+                    SaveCompressorPLR = DXCoilPartLoadRatio(PTUnit(PTUnitNum).DXCoolCoilIndexNum);
                 } else if (SELECT_CASE_var == PTWSHPUnit) {
                     HeatPumpRunFrac(PTUnitNum, PartLoadFrac, errFlag, WSHPRuntimeFrac);
                     SimWatertoAirHPSimple(BlankString,
@@ -5982,8 +5974,11 @@ namespace PackagedTerminalHeatPump {
                                                  PTUnit(PTUnitNum).CoolCoilCompIndex,
                                                  PTUnit(PTUnitNum).OpMode,
                                                  HXUnitOn);
+<<<<<<< HEAD
                     } else if(PTUnit(PTUnitNum).DXCoolCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
                         coilCoolingDXs[PTUnit(PTUnitNum).CoolCoilCompIndex].simulate(coilNormalMode, 0.0, 1, 0, PTUnit(PTUnitNum).OpMode);
+=======
+>>>>>>> CoilHackathonBranch1
                     } else {
                         SimDXCoil(PTUnit(PTUnitNum).DXCoolCoilName,
                                   Off,
@@ -8109,6 +8104,7 @@ namespace PackagedTerminalHeatPump {
         }
 
         if (CoolingLoad && OutsideDryBulbTemp > PTUnit(PTUnitNum).MinOATCompressorCooling) {
+<<<<<<< HEAD
             if (PTUnit(PTUnitNum).DXCoolCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
                 coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].simulate(
                     coilNormalMode, PartLoadFrac, SpeedNum, SpeedRatio, PTUnit(PTUnitNum).OpMode);
@@ -8147,6 +8143,37 @@ namespace PackagedTerminalHeatPump {
                                       0.0,
                                       OnOffAirFlowRatio);
             }
+=======
+            SimVariableSpeedCoils(BlankString,
+                                  PTUnit(PTUnitNum).DXCoolCoilIndexNum,
+                                  PTUnit(PTUnitNum).OpMode,
+                                  PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
+                                  PTUnit(PTUnitNum).HPTimeConstant,
+                                  PTUnit(PTUnitNum).FanDelayTime,
+                                  CompOp,
+                                  PartLoadFrac,
+                                  SpeedNum,
+                                  SpeedRatio,
+                                  QZnReq,
+                                  QLatReq,
+                                  OnOffAirFlowRatio);
+
+            SaveCompressorPLR = PartLoadFrac;
+        } else { // cooling coil is off
+            SimVariableSpeedCoils(BlankString,
+                                  PTUnit(PTUnitNum).DXCoolCoilIndexNum,
+                                  PTUnit(PTUnitNum).OpMode,
+                                  PTUnit(PTUnitNum).MaxONOFFCyclesperHour,
+                                  PTUnit(PTUnitNum).HPTimeConstant,
+                                  PTUnit(PTUnitNum).FanDelayTime,
+                                  CompOp,
+                                  0.0,
+                                  1,
+                                  0.0,
+                                  0.0,
+                                  0.0,
+                                  OnOffAirFlowRatio);
+>>>>>>> CoilHackathonBranch1
         }
 
         if (PTUnit(PTUnitNum).UnitType_Num != PTACUnit) { // PTHP
@@ -8772,9 +8799,6 @@ namespace PackagedTerminalHeatPump {
         errFlag = false;
         if (PTUnit(PTUnitNum).DXCoolCoilType_Num == CoilDX_CoolingSingleSpeed) {
             PTUnit(PTUnitNum).MinOATCompressorCooling = DXCoils::GetMinOATCompressorUsingIndex(CoolingCoilIndex, errFlag);
-        } else if (PTUnit(PTUnitNum).DXCoolCoilType_Num == CoilDX_Cooling) {
-            // Retrieved earlier
-            //PTUnit(PTUnitNum).MinOATCompressorCooling = coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].performance.minOutdoorDrybulb;
         } else if (PTUnit(PTUnitNum).DXCoolCoilType_Num == CoilDX_CoolingHXAssisted) {
             PTUnit(PTUnitNum).MinOATCompressorCooling = DXCoils::GetMinOATCompressorUsingIndex(PTUnit(PTUnitNum).DXCoolCoilIndexNum, errFlag);
         } else if (PTUnit(PTUnitNum).DXHeatCoilType_Num == Coil_CoolingAirToAirVariableSpeed) {

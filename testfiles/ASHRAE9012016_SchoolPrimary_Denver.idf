@@ -13980,611 +13980,170 @@
     PSZ-AC_2:7_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
     ;                        !- End-Use Subcategory
 
-!-   ===========  ALL OBJECTS IN CLASS: Coil:Cooling:DX ===========
+!-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:DX:SINGLESPEED ===========
 
-  OutdoorAir:Node,
-    PSZ-AC_2:5_Unitary_Package_CoolCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:TwoSpeed,
     PSZ-AC_2:5_Unitary_Package_CoolCoil,  !- Name
-    PSZ-AC_2:5_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
-    PSZ-AC_2:5 Supply Equipment Outlet Node,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    PSZ-AC_2:5_Unitary_Package_CoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    PSZ-AC_2:5_Unitary_Package_CoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    PSZ-AC_2:5_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    PSZ-AC_2:5_Unitary_Package_CoolCoil Performance,  !- Name
-    0.0,                     !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    15055.82,                !- High Speed Gross Rated Total Cooling Capacity {W}
+    0.78918,                 !- High Speed Rated Sensible Heat Ratio
+    4.11713235489972,        !- High Speed Gross Rated Cooling COP {W/W}
+    0.88609,                 !- High Speed Rated Air Flow Rate {m3/s}
     ,                        !- Unit Internal Static Air Pressure {Pa}
-    MultiSpeed,              !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    PSZ-AC_2:5_Unitary_Package_CoolCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    PSZ-AC_2:5_Unitary_Package_CoolCoil Operating Mode,  !- Name
-    15055.82,                !- Rated Gross Total Cooling Capacity {W}
-    0.88609,                 !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    2,                       !- Nominal Speed Number
-    PSZ-AC_2:5_Unitary_Package_CoolCoil Speed 1 Performance,  !- Speed 1 Name
-    PSZ-AC_2:5_Unitary_Package_CoolCoil Speed 2 Performance;  !- Speed 2 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    PSZ-AC_2:5_Unitary_Package_CoolCoil Speed 1 Performance,  !- Name
-    0.5000,                  !- Gross Total Cooling Capacity Fraction
-    0.6667,                  !- Evaporator Air Flow Rate Fraction
-    ,                        !- Condenser Air Flow Rate Fraction
-    0.78918,                 !- Gross Sensible Heat Ratio
-    4.11713235489972,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    PSZ-AC_2:5_Unitary_PackagecoolCapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    PSZ-AC_2:5_Unitary_PackagecoolFFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    PSZ-AC_2:5_Unitary_PackagecoolEIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    PSZ-AC_2:5_Unitary_PackagecoolEIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    PSZ-AC_2:5_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
+    PSZ-AC_2:5 Supply Equipment Outlet Node,  !- Air Outlet Node Name
+    PSZ-AC_2:5_Unitary_PackagecoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    PSZ-AC_2:5_Unitary_PackagecoolFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    PSZ-AC_2:5_Unitary_PackagecoolEIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    PSZ-AC_2:5_Unitary_PackagecoolEIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
     PSZ-AC_2:5_Unitary_PackagecoolPLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    7527.91,                 !- Low Speed Gross Rated Total Cooling Capacity {W}
+    0.78918,                 !- Low Speed Gross Rated Sensible Heat Ratio
+    4.11713235489972,        !- Low Speed Gross Rated Cooling COP {W/W}
+    0.590726666666667,       !- Low Speed Rated Air Flow Rate {m3/s}
+    PSZ-AC_2:5_Unitary_PackagecoolCapFT,  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
+    PSZ-AC_2:5_Unitary_PackagecoolEIRFT,  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
+    ;                        !- Condenser Air Inlet Node Name
 
-  Coil:Cooling:DX:CurveFit:Speed,
-    PSZ-AC_2:5_Unitary_Package_CoolCoil Speed 2 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    0.78918,                 !- Gross Sensible Heat Ratio
-    4.11713235489972,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    PSZ-AC_2:5_Unitary_PackagecoolCapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    PSZ-AC_2:5_Unitary_PackagecoolFFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    PSZ-AC_2:5_Unitary_PackagecoolEIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    PSZ-AC_2:5_Unitary_PackagecoolEIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    PSZ-AC_2:5_Unitary_PackagecoolPLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  OutdoorAir:Node,
-    PSZ-AC_1:6_Unitary_Package_CoolCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:TwoSpeed,
     PSZ-AC_1:6_Unitary_Package_CoolCoil,  !- Name
-    PSZ-AC_1:6_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
-    PSZ-AC_1:6 Supply Equipment Outlet Node,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    PSZ-AC_1:6_Unitary_Package_CoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    PSZ-AC_1:6_Unitary_Package_CoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    PSZ-AC_1:6_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    PSZ-AC_1:6_Unitary_Package_CoolCoil Performance,  !- Name
-    0.0,                     !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    26850.07,                !- High Speed Gross Rated Total Cooling Capacity {W}
+    0.78766,                 !- High Speed Rated Sensible Heat Ratio
+    3.7988306741603,         !- High Speed Gross Rated Cooling COP {W/W}
+    1.57348,                 !- High Speed Rated Air Flow Rate {m3/s}
     ,                        !- Unit Internal Static Air Pressure {Pa}
-    MultiSpeed,              !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    PSZ-AC_1:6_Unitary_Package_CoolCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    PSZ-AC_1:6_Unitary_Package_CoolCoil Operating Mode,  !- Name
-    26850.07,                !- Rated Gross Total Cooling Capacity {W}
-    1.57348,                 !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    2,                       !- Nominal Speed Number
-    PSZ-AC_1:6_Unitary_Package_CoolCoil Speed 1 Performance,  !- Speed 1 Name
-    PSZ-AC_1:6_Unitary_Package_CoolCoil Speed 2 Performance;  !- Speed 2 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    PSZ-AC_1:6_Unitary_Package_CoolCoil Speed 1 Performance,  !- Name
-    0.5000,                  !- Gross Total Cooling Capacity Fraction
-    0.6667,                  !- Evaporator Air Flow Rate Fraction
-    ,                        !- Condenser Air Flow Rate Fraction
-    0.78766,                 !- Gross Sensible Heat Ratio
-    3.7988306741603,         !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    PSZ-AC_1:6_Unitary_PackagecoolCapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    PSZ-AC_1:6_Unitary_PackagecoolFFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    PSZ-AC_1:6_Unitary_PackagecoolEIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    PSZ-AC_1:6_Unitary_PackagecoolEIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    PSZ-AC_1:6_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
+    PSZ-AC_1:6 Supply Equipment Outlet Node,  !- Air Outlet Node Name
+    PSZ-AC_1:6_Unitary_PackagecoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    PSZ-AC_1:6_Unitary_PackagecoolFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    PSZ-AC_1:6_Unitary_PackagecoolEIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    PSZ-AC_1:6_Unitary_PackagecoolEIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
     PSZ-AC_1:6_Unitary_PackagecoolPLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    13425.035,               !- Low Speed Gross Rated Total Cooling Capacity {W}
+    0.78766,                 !- Low Speed Gross Rated Sensible Heat Ratio
+    3.7988306741603,         !- Low Speed Gross Rated Cooling COP {W/W}
+    1.04898666666667,        !- Low Speed Rated Air Flow Rate {m3/s}
+    PSZ-AC_1:6_Unitary_PackagecoolCapFT,  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
+    PSZ-AC_1:6_Unitary_PackagecoolEIRFT,  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
+    ;                        !- Condenser Air Inlet Node Name
 
-  Coil:Cooling:DX:CurveFit:Speed,
-    PSZ-AC_1:6_Unitary_Package_CoolCoil Speed 2 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    0.78766,                 !- Gross Sensible Heat Ratio
-    3.7988306741603,         !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    PSZ-AC_1:6_Unitary_PackagecoolCapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    PSZ-AC_1:6_Unitary_PackagecoolFFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    PSZ-AC_1:6_Unitary_PackagecoolEIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    PSZ-AC_1:6_Unitary_PackagecoolEIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    PSZ-AC_1:6_Unitary_PackagecoolPLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  OutdoorAir:Node,
-    PSZ-AC_2:7_Unitary_Package_CoolCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:TwoSpeed,
     PSZ-AC_2:7_Unitary_Package_CoolCoil,  !- Name
-    PSZ-AC_2:7_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
-    PSZ-AC_2:7 Supply Equipment Outlet Node,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    PSZ-AC_2:7_Unitary_Package_CoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    PSZ-AC_2:7_Unitary_Package_CoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    PSZ-AC_2:7_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    PSZ-AC_2:7_Unitary_Package_CoolCoil Performance,  !- Name
-    0.0,                     !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    26768.69,                !- High Speed Gross Rated Total Cooling Capacity {W}
+    0.76933,                 !- High Speed Rated Sensible Heat Ratio
+    3.7988306741603,         !- High Speed Gross Rated Cooling COP {W/W}
+    1.48809,                 !- High Speed Rated Air Flow Rate {m3/s}
     ,                        !- Unit Internal Static Air Pressure {Pa}
-    MultiSpeed,              !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    PSZ-AC_2:7_Unitary_Package_CoolCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    PSZ-AC_2:7_Unitary_Package_CoolCoil Operating Mode,  !- Name
-    26768.69,                !- Rated Gross Total Cooling Capacity {W}
-    1.48809,                 !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    2,                       !- Nominal Speed Number
-    PSZ-AC_2:7_Unitary_Package_CoolCoil Speed 1 Performance,  !- Speed 1 Name
-    PSZ-AC_2:7_Unitary_Package_CoolCoil Speed 2 Performance;  !- Speed 2 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    PSZ-AC_2:7_Unitary_Package_CoolCoil Speed 1 Performance,  !- Name
-    0.5000,                  !- Gross Total Cooling Capacity Fraction
-    0.6667,                  !- Evaporator Air Flow Rate Fraction
-    ,                        !- Condenser Air Flow Rate Fraction
-    0.76933,                 !- Gross Sensible Heat Ratio
-    3.7988306741603,         !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    PSZ-AC_2:7_Unitary_PackagecoolCapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    PSZ-AC_2:7_Unitary_PackagecoolFFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    PSZ-AC_2:7_Unitary_PackagecoolEIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    PSZ-AC_2:7_Unitary_PackagecoolEIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    PSZ-AC_2:7_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
+    PSZ-AC_2:7 Supply Equipment Outlet Node,  !- Air Outlet Node Name
+    PSZ-AC_2:7_Unitary_PackagecoolCapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    PSZ-AC_2:7_Unitary_PackagecoolFFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    PSZ-AC_2:7_Unitary_PackagecoolEIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    PSZ-AC_2:7_Unitary_PackagecoolEIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
     PSZ-AC_2:7_Unitary_PackagecoolPLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    PSZ-AC_2:7_Unitary_Package_CoolCoil Speed 2 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    0.76933,                 !- Gross Sensible Heat Ratio
-    3.7988306741603,         !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    PSZ-AC_2:7_Unitary_PackagecoolCapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    PSZ-AC_2:7_Unitary_PackagecoolFFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    PSZ-AC_2:7_Unitary_PackagecoolEIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    PSZ-AC_2:7_Unitary_PackagecoolEIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    PSZ-AC_2:7_Unitary_PackagecoolPLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    13384.345,               !- Low Speed Gross Rated Total Cooling Capacity {W}
+    0.76933,                 !- Low Speed Gross Rated Sensible Heat Ratio
+    3.7988306741603,         !- Low Speed Gross Rated Cooling COP {W/W}
+    0.99206,                 !- Low Speed Rated Air Flow Rate {m3/s}
+    PSZ-AC_2:7_Unitary_PackagecoolCapFT,  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
+    PSZ-AC_2:7_Unitary_PackagecoolEIRFT,  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
+    ;                        !- Condenser Air Inlet Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:DX:TWOSPEED ===========
 
-  OutdoorAir:Node,
-    VAV_POD_1_CoolC DXCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:TwoSpeed,
     VAV_POD_1_CoolC DXCoil,  !- Name
-    VAV_POD_1_OA-VAV_POD_1_CoolCNode,  !- Evaporator Inlet Node Name
-    VAV_POD_1_CoolC-VAV_POD_1_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    VAV_POD_1_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    VAV_POD_1_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    VAV_POD_1_CoolC DXCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    VAV_POD_1_CoolC DXCoil Performance,  !- Name
-    0.0,                     !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    AUTOSIZE,                !- High Speed Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- High Speed Rated Sensible Heat Ratio
+    3.73224036438218,        !- High Speed Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- High Speed Rated Air Flow Rate {m3/s}
     ,                        !- Unit Internal Static Air Pressure {Pa}
-    MultiSpeed,              !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    VAV_POD_1_CoolC DXCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    VAV_POD_1_CoolC DXCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    2,                       !- Nominal Speed Number
-    VAV_POD_1_CoolC DXCoil Speed 1 Performance,  !- Speed 1 Name
-    VAV_POD_1_CoolC DXCoil Speed 2 Performance;  !- Speed 2 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    VAV_POD_1_CoolC DXCoil Speed 1 Performance,  !- Name
-    0.3333,                  !- Gross Total Cooling Capacity Fraction
-    0.3333,                  !- Evaporator Air Flow Rate Fraction
-    ,                        !- Condenser Air Flow Rate Fraction
-    0.69,                    !- Gross Sensible Heat Ratio
-    3.73224036438218,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    VAV_POD_1_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    VAV_POD_1_CoolCLennoxStandard10Ton_TGA120S2B_CapFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    VAV_POD_1_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    VAV_POD_1_CoolCLennoxStandard10Ton_TGA120S2B_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    VAV_POD_1_OA-VAV_POD_1_CoolCNode,  !- Air Inlet Node Name
+    VAV_POD_1_CoolC-VAV_POD_1_HeatCNode,  !- Air Outlet Node Name
+    VAV_POD_1_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    VAV_POD_1_CoolCLennoxStandard10Ton_TGA120S2B_CapFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    VAV_POD_1_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    VAV_POD_1_CoolCLennoxStandard10Ton_TGA120S2B_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
     VAV_POD_1_CoolCLennoxStandard10Ton_TGA120S2B_PLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    AUTOSIZE,                !- Low Speed Gross Rated Total Cooling Capacity {W}
+    0.69,                    !- Low Speed Gross Rated Sensible Heat Ratio
+    3.73224036438218,        !- Low Speed Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Low Speed Rated Air Flow Rate {m3/s}
+    VAV_POD_1_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
+    VAV_POD_1_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
+    ;                        !- Condenser Air Inlet Node Name
 
-  Coil:Cooling:DX:CurveFit:Speed,
-    VAV_POD_1_CoolC DXCoil Speed 2 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    3.73224036438218,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    VAV_POD_1_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    VAV_POD_1_CoolCLennoxStandard10Ton_TGA120S2B_CapFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    VAV_POD_1_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    VAV_POD_1_CoolCLennoxStandard10Ton_TGA120S2B_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    VAV_POD_1_CoolCLennoxStandard10Ton_TGA120S2B_PLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  OutdoorAir:Node,
-    VAV_POD_2_CoolC DXCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:TwoSpeed,
     VAV_POD_2_CoolC DXCoil,  !- Name
-    VAV_POD_2_OA-VAV_POD_2_CoolCNode,  !- Evaporator Inlet Node Name
-    VAV_POD_2_CoolC-VAV_POD_2_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    VAV_POD_2_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    VAV_POD_2_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    VAV_POD_2_CoolC DXCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    VAV_POD_2_CoolC DXCoil Performance,  !- Name
-    0.0,                     !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    AUTOSIZE,                !- High Speed Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- High Speed Rated Sensible Heat Ratio
+    3.73224036438218,        !- High Speed Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- High Speed Rated Air Flow Rate {m3/s}
     ,                        !- Unit Internal Static Air Pressure {Pa}
-    MultiSpeed,              !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    VAV_POD_2_CoolC DXCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    VAV_POD_2_CoolC DXCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    2,                       !- Nominal Speed Number
-    VAV_POD_2_CoolC DXCoil Speed 1 Performance,  !- Speed 1 Name
-    VAV_POD_2_CoolC DXCoil Speed 2 Performance;  !- Speed 2 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    VAV_POD_2_CoolC DXCoil Speed 1 Performance,  !- Name
-    0.3333,                  !- Gross Total Cooling Capacity Fraction
-    0.3333,                  !- Evaporator Air Flow Rate Fraction
-    ,                        !- Condenser Air Flow Rate Fraction
-    0.69,                    !- Gross Sensible Heat Ratio
-    3.73224036438218,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    VAV_POD_2_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    VAV_POD_2_CoolCLennoxStandard10Ton_TGA120S2B_CapFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    VAV_POD_2_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    VAV_POD_2_CoolCLennoxStandard10Ton_TGA120S2B_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    VAV_POD_2_OA-VAV_POD_2_CoolCNode,  !- Air Inlet Node Name
+    VAV_POD_2_CoolC-VAV_POD_2_HeatCNode,  !- Air Outlet Node Name
+    VAV_POD_2_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    VAV_POD_2_CoolCLennoxStandard10Ton_TGA120S2B_CapFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    VAV_POD_2_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    VAV_POD_2_CoolCLennoxStandard10Ton_TGA120S2B_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
     VAV_POD_2_CoolCLennoxStandard10Ton_TGA120S2B_PLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    AUTOSIZE,                !- Low Speed Gross Rated Total Cooling Capacity {W}
+    0.69,                    !- Low Speed Gross Rated Sensible Heat Ratio
+    3.73224036438218,        !- Low Speed Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Low Speed Rated Air Flow Rate {m3/s}
+    VAV_POD_2_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
+    VAV_POD_2_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
+    ;                        !- Condenser Air Inlet Node Name
 
-  Coil:Cooling:DX:CurveFit:Speed,
-    VAV_POD_2_CoolC DXCoil Speed 2 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    3.73224036438218,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    VAV_POD_2_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    VAV_POD_2_CoolCLennoxStandard10Ton_TGA120S2B_CapFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    VAV_POD_2_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    VAV_POD_2_CoolCLennoxStandard10Ton_TGA120S2B_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    VAV_POD_2_CoolCLennoxStandard10Ton_TGA120S2B_PLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  OutdoorAir:Node,
-    VAV_POD_3_CoolC DXCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:TwoSpeed,
     VAV_POD_3_CoolC DXCoil,  !- Name
-    VAV_POD_3_OA-VAV_POD_3_CoolCNode,  !- Evaporator Inlet Node Name
-    VAV_POD_3_CoolC-VAV_POD_3_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    VAV_POD_3_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    VAV_POD_3_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    VAV_POD_3_CoolC DXCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    VAV_POD_3_CoolC DXCoil Performance,  !- Name
-    0.0,                     !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    AUTOSIZE,                !- High Speed Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- High Speed Rated Sensible Heat Ratio
+    3.73224036438218,        !- High Speed Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- High Speed Rated Air Flow Rate {m3/s}
     ,                        !- Unit Internal Static Air Pressure {Pa}
-    MultiSpeed,              !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    VAV_POD_3_CoolC DXCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    VAV_POD_3_CoolC DXCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    2,                       !- Nominal Speed Number
-    VAV_POD_3_CoolC DXCoil Speed 1 Performance,  !- Speed 1 Name
-    VAV_POD_3_CoolC DXCoil Speed 2 Performance;  !- Speed 2 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    VAV_POD_3_CoolC DXCoil Speed 1 Performance,  !- Name
-    0.3333,                  !- Gross Total Cooling Capacity Fraction
-    0.3333,                  !- Evaporator Air Flow Rate Fraction
-    ,                        !- Condenser Air Flow Rate Fraction
-    0.69,                    !- Gross Sensible Heat Ratio
-    3.73224036438218,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    VAV_POD_3_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    VAV_POD_3_CoolCLennoxStandard10Ton_TGA120S2B_CapFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    VAV_POD_3_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    VAV_POD_3_CoolCLennoxStandard10Ton_TGA120S2B_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    VAV_POD_3_OA-VAV_POD_3_CoolCNode,  !- Air Inlet Node Name
+    VAV_POD_3_CoolC-VAV_POD_3_HeatCNode,  !- Air Outlet Node Name
+    VAV_POD_3_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    VAV_POD_3_CoolCLennoxStandard10Ton_TGA120S2B_CapFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    VAV_POD_3_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    VAV_POD_3_CoolCLennoxStandard10Ton_TGA120S2B_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
     VAV_POD_3_CoolCLennoxStandard10Ton_TGA120S2B_PLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    AUTOSIZE,                !- Low Speed Gross Rated Total Cooling Capacity {W}
+    0.69,                    !- Low Speed Gross Rated Sensible Heat Ratio
+    3.73224036438218,        !- Low Speed Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Low Speed Rated Air Flow Rate {m3/s}
+    VAV_POD_3_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
+    VAV_POD_3_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
+    ;                        !- Condenser Air Inlet Node Name
 
-  Coil:Cooling:DX:CurveFit:Speed,
-    VAV_POD_3_CoolC DXCoil Speed 2 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    3.73224036438218,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    VAV_POD_3_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    VAV_POD_3_CoolCLennoxStandard10Ton_TGA120S2B_CapFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    VAV_POD_3_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    VAV_POD_3_CoolCLennoxStandard10Ton_TGA120S2B_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    VAV_POD_3_CoolCLennoxStandard10Ton_TGA120S2B_PLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  OutdoorAir:Node,
-    VAV_OTHER_CoolC DXCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:TwoSpeed,
     VAV_OTHER_CoolC DXCoil,  !- Name
-    VAV_OTHER_OA-VAV_OTHER_CoolCNode,  !- Evaporator Inlet Node Name
-    VAV_OTHER_CoolC-VAV_OTHER_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    VAV_OTHER_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    VAV_OTHER_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    VAV_OTHER_CoolC DXCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    VAV_OTHER_CoolC DXCoil Performance,  !- Name
-    0.0,                     !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    AUTOSIZE,                !- High Speed Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- High Speed Rated Sensible Heat Ratio
+    3.39928881549157,        !- High Speed Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- High Speed Rated Air Flow Rate {m3/s}
     ,                        !- Unit Internal Static Air Pressure {Pa}
-    MultiSpeed,              !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    VAV_OTHER_CoolC DXCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    VAV_OTHER_CoolC DXCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    2,                       !- Nominal Speed Number
-    VAV_OTHER_CoolC DXCoil Speed 1 Performance,  !- Speed 1 Name
-    VAV_OTHER_CoolC DXCoil Speed 2 Performance;  !- Speed 2 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    VAV_OTHER_CoolC DXCoil Speed 1 Performance,  !- Name
-    0.3333,                  !- Gross Total Cooling Capacity Fraction
-    0.3333,                  !- Evaporator Air Flow Rate Fraction
-    ,                        !- Condenser Air Flow Rate Fraction
-    0.69,                    !- Gross Sensible Heat Ratio
-    3.39928881549157,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    VAV_OTHER_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    VAV_OTHER_CoolCLennoxStandard10Ton_TGA120S2B_CapFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    VAV_OTHER_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    VAV_OTHER_CoolCLennoxStandard10Ton_TGA120S2B_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    VAV_OTHER_OA-VAV_OTHER_CoolCNode,  !- Air Inlet Node Name
+    VAV_OTHER_CoolC-VAV_OTHER_HeatCNode,  !- Air Outlet Node Name
+    VAV_OTHER_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    VAV_OTHER_CoolCLennoxStandard10Ton_TGA120S2B_CapFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    VAV_OTHER_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    VAV_OTHER_CoolCLennoxStandard10Ton_TGA120S2B_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
     VAV_OTHER_CoolCLennoxStandard10Ton_TGA120S2B_PLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    VAV_OTHER_CoolC DXCoil Speed 2 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    3.39928881549157,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    VAV_OTHER_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    VAV_OTHER_CoolCLennoxStandard10Ton_TGA120S2B_CapFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    VAV_OTHER_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    VAV_OTHER_CoolCLennoxStandard10Ton_TGA120S2B_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    VAV_OTHER_CoolCLennoxStandard10Ton_TGA120S2B_PLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    AUTOSIZE,                !- Low Speed Gross Rated Total Cooling Capacity {W}
+    0.69,                    !- Low Speed Gross Rated Sensible Heat Ratio
+    3.39928881549157,        !- Low Speed Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Low Speed Rated Air Flow Rate {m3/s}
+    VAV_OTHER_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
+    VAV_OTHER_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
+    ;                        !- Condenser Air Inlet Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:WATER ===========
 
@@ -15070,7 +14629,7 @@
     PSZ-AC_2:5_Unitary_PackageCoolCoil air inlet,  !- DX Cooling Coil System Inlet Node Name
     PSZ-AC_2:5 Supply Equipment Outlet Node,  !- DX Cooling Coil System Outlet Node Name
     PSZ-AC_2:5 Supply Equipment Outlet Node,  !- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:TwoSpeed,!- Cooling Coil Object Type
     PSZ-AC_2:5_Unitary_Package_CoolCoil;  !- Cooling Coil Name
 
   CoilSystem:Cooling:DX,
@@ -15079,7 +14638,7 @@
     PSZ-AC_1:6_Unitary_PackageCoolCoil air inlet,  !- DX Cooling Coil System Inlet Node Name
     PSZ-AC_1:6 Supply Equipment Outlet Node,  !- DX Cooling Coil System Outlet Node Name
     PSZ-AC_1:6 Supply Equipment Outlet Node,  !- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:TwoSpeed,!- Cooling Coil Object Type
     PSZ-AC_1:6_Unitary_Package_CoolCoil;  !- Cooling Coil Name
 
   CoilSystem:Cooling:DX,
@@ -15088,7 +14647,7 @@
     PSZ-AC_2:7_Unitary_PackageCoolCoil air inlet,  !- DX Cooling Coil System Inlet Node Name
     PSZ-AC_2:7 Supply Equipment Outlet Node,  !- DX Cooling Coil System Outlet Node Name
     PSZ-AC_2:7 Supply Equipment Outlet Node,  !- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:TwoSpeed,!- Cooling Coil Object Type
     PSZ-AC_2:7_Unitary_Package_CoolCoil;  !- Cooling Coil Name
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:UNITARYCOOLONLY ===========
@@ -15099,7 +14658,7 @@
     VAV_POD_1_OA-VAV_POD_1_CoolCNode,  !- DX Cooling Coil System Inlet Node Name
     VAV_POD_1_CoolC-VAV_POD_1_HeatCNode,  !- DX Cooling Coil System Outlet Node Name
     VAV_POD_1_CoolC-VAV_POD_1_HeatCNode,  !- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:TwoSpeed,!- Cooling Coil Object Type
     VAV_POD_1_CoolC DXCoil;  !- Cooling Coil Name
 
   CoilSystem:Cooling:DX,
@@ -15108,7 +14667,7 @@
     VAV_POD_2_OA-VAV_POD_2_CoolCNode,  !- DX Cooling Coil System Inlet Node Name
     VAV_POD_2_CoolC-VAV_POD_2_HeatCNode,  !- DX Cooling Coil System Outlet Node Name
     VAV_POD_2_CoolC-VAV_POD_2_HeatCNode,  !- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:TwoSpeed,!- Cooling Coil Object Type
     VAV_POD_2_CoolC DXCoil;  !- Cooling Coil Name
 
   CoilSystem:Cooling:DX,
@@ -15117,7 +14676,7 @@
     VAV_POD_3_OA-VAV_POD_3_CoolCNode,  !- DX Cooling Coil System Inlet Node Name
     VAV_POD_3_CoolC-VAV_POD_3_HeatCNode,  !- DX Cooling Coil System Outlet Node Name
     VAV_POD_3_CoolC-VAV_POD_3_HeatCNode,  !- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:TwoSpeed,!- Cooling Coil Object Type
     VAV_POD_3_CoolC DXCoil;  !- Cooling Coil Name
 
   CoilSystem:Cooling:DX,
@@ -15126,7 +14685,7 @@
     VAV_OTHER_OA-VAV_OTHER_CoolCNode,  !- DX Cooling Coil System Inlet Node Name
     VAV_OTHER_CoolC-VAV_OTHER_HeatCNode,  !- DX Cooling Coil System Outlet Node Name
     VAV_OTHER_CoolC-VAV_OTHER_HeatCNode,  !- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:TwoSpeed,!- Cooling Coil Object Type
     VAV_OTHER_CoolC DXCoil;  !- Cooling Coil Name
 
 !-   ===========  ALL OBJECTS IN CLASS: CONTROLLER:WATERCOIL ===========

@@ -122,7 +122,7 @@ struct CoilCoolingDXCurveFitPerformance
 		VARIABLE,
 		MULTISPEED
 	};
-	CapControlMethod capControlMethod = CapControlMethod::STAGED;
+	CapControlMethod capControlMethod = CapControlMethod::MULTISPEED;
 
     Real64 evapCondBasinHeatCap = 0.0;
     Real64 evapCondBasinHeatSetpoint = 0.0;

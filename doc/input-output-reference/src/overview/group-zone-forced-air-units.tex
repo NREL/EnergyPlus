@@ -1933,7 +1933,9 @@ This field specifies the type of cooling coil to be modeled for this window air 
 
 \begin{itemize}
 \item
-  \hyperref[coilcoolingdx]{Coil:Cooling:DX}
+  \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed}
+\item
+  \hyperref[coilcoolingdxvariablespeed]{Coil:Cooling:DX:VariableSpeed}
 \item
   \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted}
 \end{itemize}
@@ -1989,7 +1991,7 @@ Following is an example input for the cycling window air conditioner, along with
          CyclingFanSch,                ! Supply Air Fan Operation Mode Schedule Name
          DrawThrough,                  ! Fan Placement
          0.001,                        ! Cooling Convergence Tolerance
-         Coil:Cooling:DX;              ! Cooling Coil Object Type
+         Coil:Cooling:DX:SingleSpeed;  ! Cooling Coil Object Type
 
   Schedule:Compact,
          CyclingFanSch,                !- Name
@@ -2023,9 +2025,7 @@ Following is an example input for the cycling window air conditioner, along with
        ,                               !- Electric Power Per Unit Flow Rate Per Unit Pressure
        0.5;                            !- Fan Total Efficiency
 
-<<<Update Coil IO Definition>>>
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
       Zone3WindACDXCoil,       !- Name
       CoolingCoilAvailSched,   !- Availability Schedule Name
       autosize,                !- Rated Total Cooling Capacity {W}
@@ -2215,9 +2215,11 @@ This alpha field defines the type of DX cooling coil used by this PTAC. The inpu
 
 \begin{itemize}
 \item
-  \hyperref[coilcoolingdx]{Coil:Cooling:DX}
+  \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed}
 \item
   \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted}
+\item
+  \hyperref[coilcoolingdxvariablespeed]{Coil:Cooling:DX:VariableSpeed}
 \end{itemize}
 
 \paragraph{Field: Cooling Coil Name}\label{field-cooling-coil-name-2-001}
@@ -2244,7 +2246,7 @@ This optional input field is the name of a \hyperref[designspecificationzonehvac
 
 \paragraph{Field: Capacity Control Method}\label{field-capacity-control-method-2}
 
-This input denotes how the unit's output is controlled in order to meet zone heating or cooling requirement. The choices are \textbf{\emph{None}} or \textbf{\emph{SingleZoneVAV}}. For \emph{None}, the unit varies the fan and/or coil speed to meet the load. If constant fan operating mode is selected the fan operates at the design cooling or heating air flow rate while the coil modulates to meet the load. If cycling fan operating mode is selected the fan and coil modulate in unison to meet the load. For \emph{SingleZoneVAV}, the fan air flow rate is reduced to the no load supply air flow rate when the zone sensible load is low such that the maximum supply air temperature limit is not exceeded. If the unit cannot meet the load at this lower air flow rate, the fan speed increases while maintaining the maximum supply air temperature. If the unit still cannot meet the load the unit will operate at the maximum supply air flow rate and the maximum supply air temperature limit can be exceeded. Supply air temperature limits are identified in the input fields for Minimum Supply Air Temperature in Cooling Mode and Maximum Supply Air Temperature in Heating Mode. Additionally, specific coil types are required for the SingleZoneVAV capacity control method. The cooling coil type is \hyperref[coilcoolingdx]{Coil:Cooling:DX} while the heating coil types are \hyperref[coilheatingwater]{Coil:Heating:Water}, \hyperref[coilheatinggas-000]{Coil:Heating:Fuel} and \hyperref[coilheatingelectric]{Coil:Heating:Electric}. If alternate coil types are used they are modeled using the load based control method.
+This input denotes how the unit's output is controlled in order to meet zone heating or cooling requirement. The choices are \textbf{\emph{None}} or \textbf{\emph{SingleZoneVAV}}. For \emph{None}, the unit varies the fan and/or coil speed to meet the load. If constant fan operating mode is selected the fan operates at the design cooling or heating air flow rate while the coil modulates to meet the load. If cycling fan operating mode is selected the fan and coil modulate in unison to meet the load. For \emph{SingleZoneVAV}, the fan air flow rate is reduced to the no load supply air flow rate when the zone sensible load is low such that the maximum supply air temperature limit is not exceeded. If the unit cannot meet the load at this lower air flow rate, the fan speed increases while maintaining the maximum supply air temperature. If the unit still cannot meet the load the unit will operate at the maximum supply air flow rate and the maximum supply air temperature limit can be exceeded. Supply air temperature limits are identified in the input fields for Minimum Supply Air Temperature in Cooling Mode and Maximum Supply Air Temperature in Heating Mode. Additionally, specific coil types are required for the SingleZoneVAV capacity control method. The cooling coil type is \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed} while the heating coil types are \hyperref[coilheatingwater]{Coil:Heating:Water}, \hyperref[coilheatinggas-000]{Coil:Heating:Fuel} and \hyperref[coilheatingelectric]{Coil:Heating:Electric}. If alternate coil types are used they are modeled using the load based control method.
 
 \paragraph{Field: Minimum Supply Air Temperature in Cooling Mode}\label{field-minimum-supply-air-temperature-in-cooling-mode-2}
 
@@ -2262,7 +2264,7 @@ As shown in the example below, correct specification of the packaged terminal ai
 \item
   Fan (\hyperref[fanonoff]{Fan:OnOff} or \hyperref[fanconstantvolume]{Fan:ConstantVolume})
 \item
-  DX cooling coil (\hyperref[coilcoolingdx]{Coil:Cooling:DX} or \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted})
+  DX cooling coil (\hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed} or \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted})
 \item
   Heating coil (\hyperref[coilheatinggas-000]{Coil:Heating:Fuel}, \hyperref[coilheatingelectric]{Coil:Heating:Electric}, \hyperref[coilheatingwater]{Coil:Heating:Water}, or \hyperref[coilheatingsteam]{Coil:Heating:Steam})
 \item
@@ -2288,7 +2290,7 @@ ZoneHVAC:PackagedTerminalAirConditioner,
   Zone2PTACFan,                          !- Supply Air Fan Name
   Coil:Heating:Electric,                 !- Heating Coil Object Type
   Zone2PTACHeatCoil,                     !- Heating Coil Name
-  Coil:Cooling:DX,  !- Cooling Coil Object Type
+  Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
   Zone2PTACDXCoolCoil,                   !- Cooling Coil Name
   BlowThrough,                           !- Fan Placement
   SupplyFanSch;                          !- Supply Air Fan Operating Mode Schedule Name
@@ -2324,9 +2326,7 @@ ZoneHVAC:PackagedTerminalAirConditioner,
       Zone2PTACOAMixerOutletNode,  !- Air Inlet Node Name
       Zone2PTACFanOutletNode;      !- Air Outlet Node Name
 
-<<<Update Coil IO Definition>>>
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
       Zone2PTACDXCoolCoil,         !- Coil Name
       CoolingCoilAvailSched,       !- Availability Schedule Name
       autosize,                    !- Rated Total Cooling Capacity (gross) {W}
@@ -2562,9 +2562,11 @@ This alpha field defines the type of DX cooling coil used by this PTHP. The inpu
 
 \begin{itemize}
 \item
-  \hyperref[coilcoolingdx]{Coil:Cooling:DX}
+  \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed}
 \item
   \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted}
+\item
+  \hyperref[coilcoolingdxvariablespeed]{Coil:Cooling:DX:VariableSpeed}
 \end{itemize}
 
 \paragraph{Field: Cooling Coil Name}\label{field-cooling-coil-name-3-000}
@@ -2630,7 +2632,7 @@ This optional input field is the name of a \hyperref[designspecificationzonehvac
 
 \paragraph{Field: Capacity Control Method}\label{field-capacity-control-method-3}
 
-This input denotes how the unit's output is controlled in order to meet zone heating or cooling requirement. The choices are \textbf{\emph{None}} or \textbf{\emph{SingleZoneVAV}}. For \emph{None}, the unit varies the fan and/or coil speed to meet the load. If constant fan operating mode is selected the fan operates at the design cooling or heating air flow rate while the coil modulates to meet the load. If cycling fan operating mode is selected the fan and coil modulate in unison to meet the load. For \emph{SingleZoneVAV}, the fan air flow rate is reduced to the no load supply air flow rate when the zone sensible load is low such that the maximum supply air temperature limit is not exceeded. If the unit cannot meet the load at this lower air flow rate, the fan speed increases while maintaining the maximum supply air temperature. If the unit still cannot meet the load the unit will operate at the maximum supply air flow rate and the maximum supply air temperature limit can be exceeded. Supply air temperature limits are identified in the input fields for Minimum Supply Air Temperature in Cooling Mode and Maximum Supply Air Temperature in Heating Mode. Additionally, specific coil types are required for the SingleZoneVAV capacity control method. The cooling coil type is \hyperref[coilcoolingdx]{Coil:Cooling:DX} while the heating coil type is \hyperref[coilheatingdxsinglespeed]{Coil:Heating:DX:SingleSpeed}.
+This input denotes how the unit's output is controlled in order to meet zone heating or cooling requirement. The choices are \textbf{\emph{None}} or \textbf{\emph{SingleZoneVAV}}. For \emph{None}, the unit varies the fan and/or coil speed to meet the load. If constant fan operating mode is selected the fan operates at the design cooling or heating air flow rate while the coil modulates to meet the load. If cycling fan operating mode is selected the fan and coil modulate in unison to meet the load. For \emph{SingleZoneVAV}, the fan air flow rate is reduced to the no load supply air flow rate when the zone sensible load is low such that the maximum supply air temperature limit is not exceeded. If the unit cannot meet the load at this lower air flow rate, the fan speed increases while maintaining the maximum supply air temperature. If the unit still cannot meet the load the unit will operate at the maximum supply air flow rate and the maximum supply air temperature limit can be exceeded. Supply air temperature limits are identified in the input fields for Minimum Supply Air Temperature in Cooling Mode and Maximum Supply Air Temperature in Heating Mode. Additionally, specific coil types are required for the SingleZoneVAV capacity control method. The cooling coil type is \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed} while the heating coil type is \hyperref[coilheatingdxsinglespeed]{Coil:Heating:DX:SingleSpeed}.
 
 \paragraph{Field: Minimum Supply Air Temperature in Cooling Mode}\label{field-minimum-supply-air-temperature-in-cooling-mode-3}
 
@@ -2648,7 +2650,7 @@ As shown in the example below, correct specification of the packaged terminal he
 \item
   Fan (\hyperref[fanonoff]{Fan:OnOff} or \hyperref[fanconstantvolume]{Fan:ConstantVolume})
 \item
-  DX cooling coil (\hyperref[coilcoolingdx]{Coil:Cooling:DX} or \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted})
+  DX cooling coil (\hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed} or \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted})
 \item
   DX heating coil (\hyperref[coilheatingdxsinglespeed]{Coil:Heating:DX:SingleSpeed})
 \item
@@ -2677,7 +2679,7 @@ ZoneHVAC:PackagedTerminalHeatPump,
   Coil:Heating:DX:SingleSpeed,  !- Heating Coil Object Type
   Zone2PTHPDXHeatCoil,     !- Heating Coil Name
   0.001,                   !- Heating Convergence Tolerance {dimensionless}
-  Coil:Cooling:DX,  !- Cooling Coil Object Type
+  Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
   Zone2PTHPDXCoolCoil,     !- Cooling Coil Name
   0.001,                   !- Cooling Convergence Tolerance {dimensionless}
   Coil:Heating:Electric,   !- Supplemental Heating Coil Object Type
@@ -2714,9 +2716,7 @@ ZoneHVAC:PackagedTerminalHeatPump,
       Zone2PTHPOAMixerOutletNode,  !- Air Inlet Node Name
       Zone2PTHPFanOutletNode;      !- Air Outlet Node Name
 
-<<< Update >>>
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
       Zone2PTHPDXCoolCoil,         !- Coil Name
       CoolingCoilAvailSched,       !- Availability Schedule
       autosize,                    !- Rated Total Cooling Capacity (gross) {W}
@@ -4248,13 +4248,13 @@ This numeric field specifies the number of discrete operating modes for the hybr
 This numeric field specifies the minimum time that must pass before the hybrid unit can change mode. If the value in this field is larger than each timestep, the mode selected in one time step will persist in later time steps until the minimum time between mode change is satisfied. If the value in this field is smaller than each timestep, it will determine the minimum part runtime fraction allowed for any mode. Supply air mass flow rate and outdoor air fraction within a mode are not subject to minimum runtime and may change in every time step, or with any part runtime fraction. Mode 0 does not have a minimum time. If this field is blank, the default minimum time between mode change is 10 minutes.
 
 \paragraph{Field: First Fuel Type}
-This alpha field specifies the fuel type associated with the \hyperref[tablelookup]{Table:Lookup} object specified in field ''System Electric Power Power Lookup Table``. Valid choices include: None, Electricity, NaturalGas, PropaneGas, FuelOil\#1, FuelOil\#2, Diesel, Gasoline, Coal, OtherFuel1, OtherFuel2, Steam, \hyperref[districtheating]{DistrictHeating} and \hyperref[districtcooling]{DistrictCooling}. If this field is blank, the default first fuel type is Electricity.
+This alpha field specifies the fuel type associated with the \hyperref[tablelookup]{Table:Lookup} object specified in field ''System Electric Power Power Lookup Table``. Valid choices include: None, Electricity, NaturalGas, Propane, FuelOilNo1, FuelOilNo2, Diesel, Gasoline, Coal, OtherFuel1, OtherFuel2, Steam, \hyperref[districtheating]{DistrictHeating} and \hyperref[districtcooling]{DistrictCooling}. If this field is blank, the default first fuel type is Electricity.
 
 \paragraph{Field: Second Fuel Type}
-This alpha field specifies the fuel type associated with the \hyperref[tablelookup]{Table:Lookup} object specified in field ''System Second Fuel Consumption Lookup Table``. Valid choices include: None, Electricity, NaturalGas, PropaneGas, FuelOil\#1, FuelOil\#2, Diesel, Gasoline, Coal, OtherFuel1, OtherFuel2, Steam, \hyperref[districtheating]{DistrictHeating} and \hyperref[districtcooling]{DistrictCooling}. If this field is blank, the default second fuel type is None.
+This alpha field specifies the fuel type associated with the \hyperref[tablelookup]{Table:Lookup} object specified in field ''System Second Fuel Consumption Lookup Table``. Valid choices include: None, Electricity, NaturalGas, Propane, FuelOilNo1, FuelOilNo2, Diesel, Gasoline, Coal, OtherFuel1, OtherFuel2, Steam, \hyperref[districtheating]{DistrictHeating} and \hyperref[districtcooling]{DistrictCooling}. If this field is blank, the default second fuel type is None.
 
 \paragraph{Field: Third Fuel Type}
-This alpha field specifies the fuel type associated with the \hyperref[tablelookup]{Table:Lookup} object specified in field ''System Third Fuel Consumption Lookup Table``. Valid choices include: None, Electricity, NaturalGas, PropaneGas, FuelOil\#1, FuelOil\#2, Diesel, Gasoline, Coal, OtherFuel1, OtherFuel2, Steam, \hyperref[districtheating]{DistrictHeating} and \hyperref[districtcooling]{DistrictCooling}. If this field is blank, the default second fuel type is None.
+This alpha field specifies the fuel type associated with the \hyperref[tablelookup]{Table:Lookup} object specified in field ''System Third Fuel Consumption Lookup Table``. Valid choices include: None, Electricity, NaturalGas, Propane, FuelOilNo1, FuelOilNo2, Diesel, Gasoline, Coal, OtherFuel1, OtherFuel2, Steam, \hyperref[districtheating]{DistrictHeating} and \hyperref[districtcooling]{DistrictCooling}. If this field is blank, the default second fuel type is None.
 
 \paragraph{Field: Objective Function to Minimize}
 In each time step ZoneHVAC:HybridUnitaryHVAC will choose one or more combinations of the controlled independent variables, subject to constraints, so as to best satisfy sensible load, latent load, and scheduled ventilation with the least amount of resource consumption. This alpha field specifies which resource will be minimized by the optimization.  Valid choices include: Electricity Use, Second Fuel Use, Third Fuel Use, and Water Use.  If this field is blank, the objective function will minimize electricity use.

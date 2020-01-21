@@ -1318,7 +1318,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     FurnaceAC1 Heating Coil, !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     FurnaceAC1 Cooling Coil, !- Cooling Coil Name
     None;                    !- Dehumidification Control Type
 
@@ -1331,66 +1331,33 @@
     FurnaceAC1 Supply Fan Outlet,  !- Air Inlet Node Name
     FurnaceAC1 Heating Coil Outlet;  !- Air Outlet Node Name
 
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     FurnaceAC1 Cooling Coil, !- Name
-    FurnaceAC1 Heating Coil Outlet,  !- Evaporator Inlet Node Name
-    FurnaceAC1 Air Loop Outlet,  !- Evaporator Outlet Node Name
     ,                        !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    FurnaceAC1 Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    FurnaceAC1 Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    FurnaceAC1 Cooling Coil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    FurnaceAC1 Cooling Coil Performance,  !- Name
-    0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    FurnaceAC1 Cooling Coil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    FurnaceAC1 Cooling Coil Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    0,                       !- Maximum Cycling Rate {cycles/hr}
-    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    0,                       !- Latent Capacity Time Constant {s}
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    AirCooled,               !- Condenser Type
-    0,                       !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    FurnaceAC1 Cooling Coil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    FurnaceAC1 Cooling Coil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    3,                       !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    3,                       !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
-    FurnaceAC1 DX Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    FurnaceAC1 DX Coil Cap-FF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    FurnaceAC1 DX Coil EIR-FT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    FurnaceAC1 DX Coil EIR-FF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    FurnaceAC1 Heating Coil Outlet,  !- Air Inlet Node Name
+    FurnaceAC1 Air Loop Outlet,  !- Air Outlet Node Name
+    FurnaceAC1 DX Coil Cap-FT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    FurnaceAC1 DX Coil Cap-FF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    FurnaceAC1 DX Coil EIR-FT,  !- Energy Input Ratio Function of Temperature Curve Name
+    FurnaceAC1 DX Coil EIR-FF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
     FurnaceAC1 DX Coil PLF,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    0,                       !- Nominal Time for Condensate Removal to Begin {s}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Maximum Cycling Rate {cycles/hr}
+    0,                       !- Latent Capacity Time Constant {s}
+    FurnaceAC1 Cooling Coil Condenser Inlet,  !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
+    0,                       !- Crankcase Heater Capacity {W}
+    10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
 ! DOE-2.1E, COOL-CAP-FT for PTAC w/ SI temps
 
@@ -1577,7 +1544,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     FurnaceAC2 Heating Coil, !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     FurnaceAC2 Cooling Coil, !- Cooling Coil Name
     None;                    !- Dehumidification Control Type
 
@@ -1590,66 +1557,33 @@
     FurnaceAC2 Supply Fan Outlet,  !- Air Inlet Node Name
     FurnaceAC2 Heating Coil Outlet;  !- Air Outlet Node Name
 
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     FurnaceAC2 Cooling Coil, !- Name
-    FurnaceAC2 Heating Coil Outlet,  !- Evaporator Inlet Node Name
-    FurnaceAC2 Air Loop Outlet,  !- Evaporator Outlet Node Name
     ,                        !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    FurnaceAC2 Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    FurnaceAC2 Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    FurnaceAC2 Cooling Coil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    FurnaceAC2 Cooling Coil Performance,  !- Name
-    0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    FurnaceAC2 Cooling Coil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    FurnaceAC2 Cooling Coil Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    0,                       !- Maximum Cycling Rate {cycles/hr}
-    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    0,                       !- Latent Capacity Time Constant {s}
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    AirCooled,               !- Condenser Type
-    0,                       !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    FurnaceAC2 Cooling Coil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    FurnaceAC2 Cooling Coil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    3,                       !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    3,                       !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
-    FurnaceAC2 DX Coil Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    FurnaceAC2 DX Coil Cap-FF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    FurnaceAC2 DX Coil EIR-FT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    FurnaceAC2 DX Coil EIR-FF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    FurnaceAC2 Heating Coil Outlet,  !- Air Inlet Node Name
+    FurnaceAC2 Air Loop Outlet,  !- Air Outlet Node Name
+    FurnaceAC2 DX Coil Cap-FT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    FurnaceAC2 DX Coil Cap-FF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    FurnaceAC2 DX Coil EIR-FT,  !- Energy Input Ratio Function of Temperature Curve Name
+    FurnaceAC2 DX Coil EIR-FF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
     FurnaceAC2 DX Coil PLF,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    0,                       !- Nominal Time for Condensate Removal to Begin {s}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Maximum Cycling Rate {cycles/hr}
+    0,                       !- Latent Capacity Time Constant {s}
+    FurnaceAC2 Cooling Coil Condenser Inlet,  !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
+    0,                       !- Crankcase Heater Capacity {W}
+    10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
 ! DOE-2.1E, COOL-CAP-FT for PTAC w/ SI temps
 

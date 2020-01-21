@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,14 +53,12 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
-#include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
@@ -426,23 +424,6 @@ namespace HVACHXAssistedCoolingCoil {
                 if (CoolingCoilErrFlag) {
                     ShowContinueError("...occurs in " + CurrentModuleObject + "=\"" + HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
                     ErrorsFound = true;
-                }
-            } else if (UtilityRoutines::SameString(HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType, "Coil:Cooling:DX")) {
-                HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num = DataHVACGlobals::CoilDX_Cooling;
-                HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType = CurrentModuleObject;
-                HXAssistedCoil(HXAssistedCoilNum).HXAssistedCoilType_Num = CoilDX_CoolingHXAssisted;
-                bool isNotOK = false;
-                ValidateComponent(HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType,
-                                  HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName,
-                                  isNotOK,
-                                  CurrentModuleObject);
-                if (isNotOK) {
-                    ShowContinueError("Occurs in " + CurrentModuleObject + " = " + HXAssistedCoil(HXAssistedCoilNum).Name);
-                    ErrorsFound = true;
-                } else {
-                    //                    // call CoilCoolingDX constructor
-                    HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex = CoilCoolingDX::factory(HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName);
-                    HXAssistedCoil(HXAssistedCoilNum).DXCoilNumOfSpeeds = coilCoolingDXs[HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex].performance.normalMode.nominalSpeedNum;
                 }
             } else {
                 ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + HXAssistedCoil(HXAssistedCoilNum).Name + "\"");
@@ -862,8 +843,6 @@ namespace HVACHXAssistedCoolingCoil {
             DXCoilFullLoadOutAirHumRat(HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex) = 0.0;
         } else if (HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
             //
-        } else if (HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
-            //
         }
     }
 
@@ -937,8 +916,7 @@ namespace HVACHXAssistedCoolingCoil {
         Node(HXAssistedCoil(HXAssistedCoilNum).HXExhaustAirInletNodeNum).MassFlowRate = AirMassFlow;
 
         if (HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed ||
-            HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed || 
-            HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
+            HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
             CompanionCoilIndexNum = HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex;
         } else {
             CompanionCoilIndexNum = 0;
@@ -1001,9 +979,12 @@ namespace HVACHXAssistedCoolingCoil {
                                                           QZnReq,
                                                           QLatReq,
                                                           OnOffAirFlowRatio); // call vs coil model at top speed.
+<<<<<<< HEAD
             } else if (HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
                 coilCoolingDXs[HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex].simulate(
                     coilNormalMode, PartLoadRatio, HXAssistedCoil(HXAssistedCoilNum).DXCoilNumOfSpeeds, 1.0, FanOpMode);
+=======
+>>>>>>> CoilHackathonBranch1
             } else {
                 SimulateWaterCoilComponents(
                     HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName, FirstHVACIteration, HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex);
@@ -1186,8 +1167,6 @@ namespace HVACHXAssistedCoolingCoil {
                 } else if (HXAssistedCoil(WhichCoil).CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
                     CoilCapacity = VariableSpeedCoils::GetCoilCapacityVariableSpeed(
                         HXAssistedCoil(WhichCoil).CoolingCoilType, HXAssistedCoil(WhichCoil).CoolingCoilName, errFlag);
-                } else if (HXAssistedCoil(WhichCoil).CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
-                    CoilCapacity = coilCoolingDXs[HXAssistedCoil(WhichCoil).CoolingCoilIndex].performance.normalMode.ratedGrossTotalCap;
                 }
                 if (errFlag) {
                     ShowRecurringWarningErrorAtEnd("Requested DX Coil from CoilSystem:Cooling:DX:HeatExchangerAssisted not found", ErrCount);

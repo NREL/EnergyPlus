@@ -4014,7 +4014,7 @@
     PSZ-AC:1_OA-PSZ-AC:1_CoolCNode,  !- DX Cooling Coil System Inlet Node Name
     PSZ-AC:1_CoolC-PSZ-AC:1_HeatCNode,  !- DX Cooling Coil System Outlet Node Name
     PSZ-AC:1_CoolC-PSZ-AC:1_HeatCNode,  !- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed:ThermalStorage,  !- Cooling Coil Object Type
     PSZ-AC:1_CoolC DXCoil;   !- Cooling Coil Name
 
   SetpointManager:MixedAir,
@@ -4039,7 +4039,7 @@
     PSZ-AC:2_OA-PSZ-AC:2_CoolCNode,  !- DX Cooling Coil System Inlet Node Name
     PSZ-AC:2_CoolC-PSZ-AC:2_HeatCNode,  !- DX Cooling Coil System Outlet Node Name
     PSZ-AC:2_CoolC-PSZ-AC:2_HeatCNode,  !- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed:ThermalStorage,  !- Cooling Coil Object Type
     PSZ-AC:2_CoolC DXCoil;   !- Cooling Coil Name
 
   SetpointManager:MixedAir,
@@ -4064,7 +4064,7 @@
     PSZ-AC:3_OA-PSZ-AC:3_CoolCNode,  !- DX Cooling Coil System Inlet Node Name
     PSZ-AC:3_CoolC-PSZ-AC:3_HeatCNode,  !- DX Cooling Coil System Outlet Node Name
     PSZ-AC:3_CoolC-PSZ-AC:3_HeatCNode,  !- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed:ThermalStorage,  !- Cooling Coil Object Type
     PSZ-AC:3_CoolC DXCoil;   !- Cooling Coil Name
 
   SetpointManager:MixedAir,
@@ -4089,7 +4089,7 @@
     PSZ-AC:4_OA-PSZ-AC:4_CoolCNode,  !- DX Cooling Coil System Inlet Node Name
     PSZ-AC:4_CoolC-PSZ-AC:4_HeatCNode,  !- DX Cooling Coil System Outlet Node Name
     PSZ-AC:4_CoolC-PSZ-AC:4_HeatCNode,  !- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed:ThermalStorage,  !- Cooling Coil Object Type
     PSZ-AC:4_CoolC DXCoil;   !- Cooling Coil Name
 
   Curve:Biquadratic,
