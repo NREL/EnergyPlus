@@ -3085,8 +3085,8 @@ namespace HeatingCoils {
     }
 
     int GetHeatReclaimSourceIndex(int const &CoilType_Num, // must match coil types in this module
-                                  int &CoilIndex, // must match coil names for the coil type
-                                  bool &ErrorsFound            // set to true if problem
+                                  int &CoilIndex,          // must match coil names for the coil type
+                                  bool &ErrorsFound        // set to true if problem
     )
     {
 
@@ -3112,11 +3112,9 @@ namespace HeatingCoils {
 
         CoilFound = 0;
 
-        // note should eventually get rid of this string comparison
-        if (UtilityRoutines::SameString(CoilType, "COIL:COOLING:DX:SINGLESPEED") ||
-            UtilityRoutines::SameString(CoilType, "COIL:COOLING:DX:TWOSPEED") ||
-            UtilityRoutines::SameString(CoilType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE")) {
-            GetDXCoilIndex(CoilName, CoilNum, GetCoilErrFlag, CoilType, SuppressWarning);
+        // This function only used for dessicant regeneration
+        if ((CoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed) || (CoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) ||
+            (CoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl)) {
             for (NumCoil = 1; NumCoil <= NumHeatingCoils; ++NumCoil) {
                 if (HeatingCoil(NumCoil).ReclaimHeatingSource != COIL_DX_COOLING && HeatingCoil(NumCoil).ReclaimHeatingSource != COIL_DX_MULTISPEED &&
                     HeatingCoil(NumCoil).ReclaimHeatingSource != COIL_DX_MULTIMODE && HeatingCoil(NumCoil).ReclaimHeatingSourceIndexNum != CoilIndex)
@@ -3126,7 +3124,8 @@ namespace HeatingCoils {
             }
         } else if (CoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
             for (NumCoil = 1; NumCoil <= NumHeatingCoils; ++NumCoil) {
-                if (HeatingCoil(NumCoil).ReclaimHeatingSource != COIL_DX_VARIABLE_COOLING && HeatingCoil(NumCoil).ReclaimHeatingSourceIndexNum != CoilIndex)
+                if (HeatingCoil(NumCoil).ReclaimHeatingSource != COIL_DX_VARIABLE_COOLING &&
+                    HeatingCoil(NumCoil).ReclaimHeatingSourceIndexNum != CoilIndex)
                     continue;
                 CoilFound = CoilIndex;
                 break;
