@@ -5349,10 +5349,18 @@ namespace HVACVariableRefrigerantFlow {
                             ShowContinueError("Illegal Supply Air Fan Placement.");
                             ErrorsFound = true;
                         }
-                        if (VRFTU(VRFTUNum).FanIndex == 0) {
-                            ShowSevereError("ZoneHVAC:TerminalUnit:VariableRefrigerantFlow = " + VRFTU(VRFTUNum).Name);
-                            ShowContinueError("VRF Terminal Unit fan is required when used as zone equipment.");
-                            ErrorsFound = true;
+                        if (VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+                            if (VRFTU(VRFTUNum).FanIndex == -1) {
+                                ShowSevereError("ZoneHVAC:TerminalUnit:VariableRefrigerantFlow = " + VRFTU(VRFTUNum).Name);
+                                ShowContinueError("VRF Terminal Unit fan is required when used as zone equipment.");
+                                ErrorsFound = true;
+                            }
+                        } else {
+                            if (VRFTU(VRFTUNum).FanIndex == 0) {
+                                ShowSevereError("ZoneHVAC:TerminalUnit:VariableRefrigerantFlow = " + VRFTU(VRFTUNum).Name);
+                                ShowContinueError("VRF Terminal Unit fan is required when used as zone equipment.");
+                                ErrorsFound = true;
+                            }
                         }
                     }
                     if (DataLoopNode::Node(VRFTU(TUIndex).VRFTUOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue &&

@@ -2418,8 +2418,6 @@ TEST_F(HVACVRFFixture, VRF_FluidTCtrl_CalcVRFIUAirFlow)
     EXPECT_NEAR(Houtlet, 49113, 1);
     EXPECT_NEAR(SCact, 5.00, 0.01);
 
-    // Clean up
-    ZoneSysEnergyDemand.deallocate();
 }
 
 TEST_F(HVACVRFFixture, VRF_FluidTCtrl_CalcVRFIUTeTc)
@@ -3206,8 +3204,7 @@ TEST_F(HVACVRFFixture, VRFTest_SysCurve)
     ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = 0.0; // set load = 0
     ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = 0.0;
     ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0;
-    VRFTU(VRFTUNum).isInZone = true; // set as zone TU
-    VRFTU(VRFTUNum).ZoneAirNode = 3; // init zone air node
+    DataAirLoop::AirLoopInputsFilled = true;
 
     FinalZoneSizing(CurZoneEqNum).ZoneRetTempAtCoolPeak = 26.66667;
     FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtCoolPeak = 0.01117049470250416; // AHRI condition at 80 F db / 67 F wb
@@ -3414,6 +3411,7 @@ TEST_F(HVACVRFFixture, VRFTest_SysCurve)
     TempControlType = 4;
     ZT.allocate(1);
     ZT = 25.0;
+    Node(VRFTU(VRFTUNum).ZoneAirNode).Temp = 27.0;
 
     ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired =
         -VRF(VRFCond).CoolingCapacity * 0.75; // set load equal to the VRF cooling capacity adjusted for SHR
@@ -3494,7 +3492,11 @@ TEST_F(HVACVRFFixture, VRFTest_SysCurve)
 
     // ensure that TU turns off when fan heat exceeds the heating load
     ZT = 20.0;                                       // set zone temp below heating SP (SP=21) to ensure heating mode
-    Node(VRF(VRFCond).CondenserNodeNum).Temp = 19.0; // within the heating temperature range of VRF outdoor unit
+    Node(VRFTU(VRFTUNum).ZoneAirNode).Temp = 20.0;
+    Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).Temp = 20;          // 20 C at 13 C WB (44.5 % RH) for indoor heating condition
+    Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).HumRat = 0.0064516; // need to set these so OA mixer will get proper mixed air condition
+    Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).Enthalpy = 36485.3142;
+    Node(VRF(VRFCond).CondenserNodeNum).Temp = 20.0; // within the heating temperature range of VRF outdoor unit
     Node(VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum).Temp = 19.0;
     ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = 400.0; // set load equal to small value less than expected fan heat
     ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = 500.0;
@@ -4174,12 +4176,10 @@ TEST_F(HVACVRFFixture, VRFTest_SysCurve_GetInputFailers)
     GetVRFInputData(ErrorsFound);
     EXPECT_TRUE(ErrorsFound);
     EXPECT_EQ(0, VRFTU(VRFTUNum).VRFSysNum);
-    EXPECT_EQ(0, VRFTU(VRFTUNum).ZoneNum);
+    EXPECT_EQ(1, VRFTU(VRFTUNum).ZoneNum);
     EXPECT_EQ(0, VRFTU(VRFTUNum).TUListIndex);
     EXPECT_EQ(0, VRFTU(VRFTUNum).IndexToTUInTUList);
 
-    // clean up
-    ZoneSysEnergyDemand.deallocate();
 }
 
 TEST_F(HVACVRFFixture, VRFTest_SysCurve_WaterCooled)
@@ -5034,6 +5034,7 @@ TEST_F(HVACVRFFixture, VRFTest_SysCurve_WaterCooled)
 
     HVACVariableRefrigerantFlow::MyEnvrnFlag = true;
     ZoneInletAirNode = GetVRFTUZoneInletAirNode(VRFTUNum); // trigger GetVRFInput by calling a mining function
+    DataAirLoop::AirLoopInputsFilled = true;
 
     Schedule(VRF(VRFCond).SchedPtr).CurrentValue = 1.0;             // enable the VRF condenser
     Schedule(VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;          // enable the terminal unit
@@ -5094,6 +5095,9 @@ TEST_F(HVACVRFFixture, VRFTest_SysCurve_WaterCooled)
     DataZoneEnergyDemands::ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = -2000.0;
 
     BeginEnvrnFlag = true;
+    DataLoopNode::Node(VRFTU(VRFTUNum).ZoneAirNode).Temp = 24.0;
+    DataLoopNode::Node(VRFTU(VRFTUNum).ZoneAirNode).HumRat = 0.0093;
+    DataLoopNode::Node(VRFTU(VRFTUNum).ZoneAirNode).Enthalpy = 47794.1;
     DataLoopNode::Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).Temp = 24.0;
     DataLoopNode::Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).HumRat = 0.0093;
     DataLoopNode::Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).Enthalpy = 47794.1;
@@ -5138,6 +5142,9 @@ TEST_F(HVACVRFFixture, VRFTest_SysCurve_WaterCooled)
     DataLoopNode::Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).Temp = 20.0;        // TU inlet air temp
     DataLoopNode::Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).HumRat = 0.0056;    // TU inlet air humrat
     DataLoopNode::Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).Enthalpy = 34823.5; // TU inlet air enthalpy
+    DataLoopNode::Node(VRFTU(VRFTUNum).ZoneAirNode).Temp = 20.0;              // also set zone conditions
+    DataLoopNode::Node(VRFTU(VRFTUNum).ZoneAirNode).HumRat = 0.0056;
+    DataLoopNode::Node(VRFTU(VRFTUNum).ZoneAirNode).Enthalpy = 34823.5;
     DataEnvironment::OutDryBulbTemp = 5.0;
     DataEnvironment::OutHumRat = 0.00269; // 50% RH
     DataEnvironment::OutBaroPress = 101325.0;
@@ -5879,12 +5886,14 @@ TEST_F(HVACVRFFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
     DataGlobals::SysSizingCalc = true;
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60;
+    DataSizing::ZoneEqSizing.allocate(1);
 
     CurveManager::GetCurveInput();                // read curves
     HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
     DataZoneEquipment::GetZoneEquipmentData(); // read equipment list and connections
+    DataAirLoop::AirLoopInputsFilled = true;
     HVACVariableRefrigerantFlow::MyEnvrnFlag = true;
     ZoneInletAirNode = GetVRFTUZoneInletAirNode(VRFTUNum);  // trigger GetVRFInput by calling a mining function
     OutsideAirNode = VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum; // outside air air inlet node num
@@ -5902,8 +5911,6 @@ TEST_F(HVACVRFFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
     AverageOAMassFlow = DataEnvironment::StdRhoAir * VRFTU(VRFTUNum).NoCoolHeatOutAirVolFlow;
     EXPECT_EQ(AverageOAMassFlow, Node(OutsideAirNode).MassFlowRate);
 
-    // clean up
-    ZoneSysEnergyDemand.deallocate();
 }
 
 TEST_F(HVACVRFFixture, VRFTest_CondenserCalcTest)
@@ -10008,6 +10015,8 @@ TEST_F(HVACVRFFixture, VRFFluidControl_FanSysModel_OnOffModeTest)
     ZoneSysEnergyDemand(1).RemainingOutputRequired = -5000.0;
     ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.0;
     ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -7000.0;
+    ZoneEqSizing.allocate(1);
+    DataAirLoop::AirLoopInputsFilled = true;
     InitVRF(VRFTUNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
     EXPECT_EQ(QZnReq, -5000.0);
     SimVRF(VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
@@ -10588,6 +10597,7 @@ TEST_F(HVACVRFFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     StdRhoAir = PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, 20.0, 0.0);
     ZoneEqSizing.allocate(1);
+    DataAirLoop::AirLoopInputsFilled = true;
     ZoneSizingRunDone = true;
     ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = false;
     ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(25);
@@ -10623,6 +10633,9 @@ TEST_F(HVACVRFFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     Node(thisVRFTU.VRFTUInletNodeNum).Temp = 24.0;
     Node(thisVRFTU.VRFTUInletNodeNum).HumRat = 0.0075;
     Node(thisVRFTU.VRFTUInletNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(thisVRFTU.VRFTUInletNodeNum).Temp, Node(thisVRFTU.VRFTUInletNodeNum).HumRat);
+    Node(thisVRFTU.ZoneAirNode).Temp = 24.0;
+    Node(thisVRFTU.ZoneAirNode).HumRat = 0.0075;
+    Node(thisVRFTU.ZoneAirNode).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(thisVRFTU.VRFTUInletNodeNum).Temp, Node(thisVRFTU.VRFTUInletNodeNum).HumRat);
 
     DataEnvironment::OutDryBulbTemp = 35.0;
     DataEnvironment::OutHumRat = 0.0100;
@@ -12313,6 +12326,7 @@ TEST_F(HVACVRFFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     StdRhoAir = PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, 20.0, 0.0);
     ZoneEqSizing.allocate(1);
+    DataAirLoop::AirLoopInputsFilled = true;
     ZoneSizingRunDone = true;
     ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = false;
     ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(25);
@@ -12350,6 +12364,9 @@ TEST_F(HVACVRFFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     Node(thisVRFTU.VRFTUInletNodeNum).Temp = 24.0;
     Node(thisVRFTU.VRFTUInletNodeNum).HumRat = 0.0075;
     Node(thisVRFTU.VRFTUInletNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(thisVRFTU.VRFTUInletNodeNum).Temp, Node(thisVRFTU.VRFTUInletNodeNum).HumRat);
+    Node(thisVRFTU.ZoneAirNode).Temp = 24.0;
+    Node(thisVRFTU.ZoneAirNode).HumRat = 0.0075;
+    Node(thisVRFTU.ZoneAirNode).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(thisVRFTU.VRFTUInletNodeNum).Temp, Node(thisVRFTU.VRFTUInletNodeNum).HumRat);
 
     DataEnvironment::OutDryBulbTemp = 35.0;
     DataEnvironment::OutHumRat = 0.0100;
