@@ -86320,72 +86320,29 @@
     SYS-1 Mixed Air Outlet,  !- DX Cooling Coil System Inlet Node Name
     SYS-1 Cooling Coil Outlet,  !- DX Cooling Coil System Outlet Node Name
     SYS-1 Cooling Coil Outlet,  !- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SYS-1 DX Cooling Coil;   !- Cooling Coil Name
 
-  OutdoorAir:Node,
-    SYS-1 DX Cooling Coil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     SYS-1 DX Cooling Coil,   !- Name
-    SYS-1 Mixed Air Outlet,  !- Evaporator Inlet Node Name
-    SYS-1 Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     ALWAYSON,                !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    SYS-1 DX Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    SYS-1 DX Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    SYS-1 DX Cooling Coil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    SYS-1 DX Cooling Coil Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    SYS-1 DX Cooling Coil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    SYS-1 DX Cooling Coil Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    SYS-1 DX Cooling Coil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    SYS-1 DX Cooling Coil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    2.777778,                !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    2.777778,                !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    WindACCoolCapFT,         !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    WindACCoolCapFFF,        !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    WindACEIRFT,             !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    WindACEIRFFF,            !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    SYS-1 Mixed Air Outlet,  !- Air Inlet Node Name
+    SYS-1 Cooling Coil Outlet,  !- Air Outlet Node Name
+    WindACCoolCapFT,         !- Total Cooling Capacity Function of Temperature Curve Name
+    WindACCoolCapFFF,        !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    WindACEIRFT,             !- Energy Input Ratio Function of Temperature Curve Name
+    WindACEIRFFF,            !- Energy Input Ratio Function of Flow Fraction Curve Name
     WindACPLFFPLR,           !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    ,                        !- Maximum Cycling Rate {cycles/hr}
+    ;                        !- Latent Capacity Time Constant {s}
 
   Coil:Heating:Fuel,
     SYS-1 Heating Coil,      !- Name

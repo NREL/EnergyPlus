@@ -2,7 +2,7 @@
 ! Basic file description:  1 story building divided into 3 conditioned zones. Roof with no plenum.
 !                          No ground contact with floor. Window air conditioners serve each zone.
 !
-! Highlights:              Illustrates use of Window air conditioners with autosizing, using the DX coil model in Coil:Cooling:DX.
+! Highlights:              Illustrates use of Window air conditioners with autosizing, using the DX coil model in Coil:Cooling:DX:VariableSpeed.
 !                          derived from WindACAuto.idf
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
@@ -81,7 +81,7 @@
 ! Purchased Heating:              No
 ! Purchased Chilled Water:        No
 ! Purchased Hot Water:            Yes
-! Coils:                          Coil:Cooling:DX
+! Coils:                          Coil:Cooling:DX:VariableSpeed
 ! Pumps:                          Pump:VariableSpeed
 ! Boilers:                        None
 ! Chillers:                       None
@@ -1583,7 +1583,7 @@
     Zone1WindACOAMixer,      !- Outdoor Air Mixer Name
     Fan:OnOff,               !- Supply Air Fan Object Type
     Zone1WindACFan,          !- Supply Air Fan Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:VariableSpeed,  !- Cooling Coil Object Type
     Zone1WindAC_VS_DXCoil,   !- DX Cooling Coil Name
     CyclingFanSch,           !- Supply Air Fan Operating Mode Schedule Name
     BlowThrough,             !- Fan Placement
@@ -1607,69 +1607,38 @@
     Zone1WindACOAMixerOutletNode,  !- Air Inlet Node Name
     Zone1WindACFanOutletNode;!- Air Outlet Node Name
 
-  OutdoorAir:Node,
-    Zone1WindAC_VS_DXCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:VariableSpeed,
     Zone1WindAC_VS_DXCoil,   !- Name
-    Zone1WindACFanOutletNode,!- Evaporator Inlet Node Name
-    Zone1WindACAirOutletNode,!- Evaporator Outlet Node Name
-    ,                        !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    Zone1WindAC_VS_DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    Zone1WindAC_VS_DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    Zone1WindAC_VS_DXCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    Zone1WindAC_VS_DXCoil Performance,  !- Name
-    0.0,                     !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    VariableSpeed,           !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    Zone1WindAC_VS_DXCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    Zone1WindAC_VS_DXCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    0.0,                     !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    0.0,                     !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
+    Zone1WindACFanOutletNode,!- Indoor Air Inlet Node Name
+    Zone1WindACAirOutletNode,!- Indoor Air Outlet Node Name
+    1.0,                     !- Number of Speeds {dimensionless}
+    1.0,                     !- Nominal Speed Level {dimensionless}
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity At Selected Nominal Speed Level {W}
+    AUTOSIZE,                !- Rated Air Flow Rate At Selected Nominal Speed Level {m3/s}
+    0.0,                     !- Nominal Time for Condensate to Begin Leaving the Coil {s}
+    0.0,                     !- Initial Moisture Evaporation Rate Divided by Steady-State AC Latent Capacity {dimensionless}
+    HPACCOOLPLFFPLR,         !- Energy Part Load Fraction Curve Name
+    ,                        !- Condenser Air Inlet Node Name
     AirCooled,               !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1.0,                     !- Nominal Speed Number
-    Zone1WindAC_VS_DXCoil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Zone1WindAC_VS_DXCoil Speed 1 Performance,  !- Name
-    1.0000,                  !- Gross Total Cooling Capacity Fraction
-    1.0000,                  !- Evaporator Air Flow Rate Fraction
-    1.0000,                  !- Condenser Air Flow Rate Fraction
-    0.75,                    !- Gross Sensible Heat Ratio
-    3.866381837,             !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    HPCoolingCAPFTemp4,      !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    HPACFFF,                 !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    HPCoolingEIRFTemp4,      !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    HPACFFF,                 !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
+    0.0,                     !- Crankcase Heater Capacity {W}
+    10.0,                    !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    ,                        !- Supply Water Storage Tank Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    ,                        !- Basin Heater Capacity {W/K}
+    ,                        !- Basin Heater Setpoint Temperature {C}
+    ,                        !- Basin Heater Operating Schedule Name
+    36991.44197,             !- Speed 1 Reference Unit Gross Rated Total Cooling Capacity {W}
+    0.75,                    !- Speed 1 Reference Unit Gross Rated Sensible Heat Ratio {dimensionless}
+    3.866381837,             !- Speed 1 Reference Unit Gross Rated Cooling COP {dimensionless}
+    3.776,                   !- Speed 1 Reference Unit Rated Air Flow Rate {m3/s}
+    10.62,                   !- Speed 1 Reference Unit Rated Condenser Air Flow Rate {m3/s}
+    ,                        !- Speed 1 Reference Unit Rated Pad Effectiveness of Evap Precooling {dimensionless}
+    HPCoolingCAPFTemp4,      !- Speed 1 Total Cooling Capacity Function of Temperature Curve Name
+    HPACFFF,                 !- Speed 1 Total Cooling Capacity Function of Air Flow Fraction Curve Name
+    HPCoolingEIRFTemp4,      !- Speed 1 Energy Input Ratio Function of Temperature Curve Name
+    HPACFFF;                 !- Speed 1 Energy Input Ratio Function of Air Flow Fraction Curve Name
 
   Curve:Quadratic,
     HPACCOOLPLFFPLR,         !- Name
@@ -1780,7 +1749,7 @@
     Zone2WindACOAMixer,      !- Outdoor Air Mixer Name
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     Zone2WindACFan,          !- Supply Air Fan Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Zone2WindACDXCoil,       !- DX Cooling Coil Name
     ConstantFanSch,          !- Supply Air Fan Operating Mode Schedule Name
     BlowThrough,             !- Fan Placement
@@ -1804,69 +1773,21 @@
     Zone2WindACOAMixerOutletNode,  !- Air Inlet Node Name
     Zone2WindACFanOutletNode;!- Air Outlet Node Name
 
-  OutdoorAir:Node,
-    Zone2WindACDXCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     Zone2WindACDXCoil,       !- Name
-    Zone2WindACFanOutletNode,!- Evaporator Inlet Node Name
-    Zone2WindACAirOutletNode,!- Evaporator Outlet Node Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    Zone2WindACDXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    Zone2WindACDXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    Zone2WindACDXCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    Zone2WindACDXCoil Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    Zone2WindACDXCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    Zone2WindACDXCoil Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    Zone2WindACDXCoil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Zone2WindACDXCoil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    3.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    3.0,                     !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    WindACCoolCapFT,         !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    WindACCoolCapFFF,        !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    WindACEIRFT,             !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    WindACEIRFFF,            !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    WindACPLFFPLR,           !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    Zone2WindACFanOutletNode,!- Air Inlet Node Name
+    Zone2WindACAirOutletNode,!- Air Outlet Node Name
+    WindACCoolCapFT,         !- Total Cooling Capacity Function of Temperature Curve Name
+    WindACCoolCapFFF,        !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    WindACEIRFT,             !- Energy Input Ratio Function of Temperature Curve Name
+    WindACEIRFFF,            !- Energy Input Ratio Function of Flow Fraction Curve Name
+    WindACPLFFPLR;           !- Part Load Fraction Correlation Curve Name
 
   ZoneHVAC:EquipmentConnections,
     NORTH ZONE,              !- Zone Name
@@ -1924,7 +1845,7 @@
     Zone3WindACOAMixer,      !- Outdoor Air Mixer Name
     Fan:ConstantVolume,      !- Supply Air Fan Object Type
     Zone3WindACFan,          !- Supply Air Fan Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Zone3WindACDXCoil,       !- DX Cooling Coil Name
     ConstantFanSch,          !- Supply Air Fan Operating Mode Schedule Name
     DrawThrough,             !- Fan Placement
@@ -1948,69 +1869,21 @@
     Zone3WindACDXOutletNode, !- Air Inlet Node Name
     Zone3WindACAirOutletNode;!- Air Outlet Node Name
 
-  OutdoorAir:Node,
-    Zone3WindACDXCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     Zone3WindACDXCoil,       !- Name
-    Zone3WindACOAMixerOutletNode,  !- Evaporator Inlet Node Name
-    Zone3WindACDXOutletNode, !- Evaporator Outlet Node Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    Zone3WindACDXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    Zone3WindACDXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    Zone3WindACDXCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    Zone3WindACDXCoil Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    Zone3WindACDXCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    Zone3WindACDXCoil Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    Zone3WindACDXCoil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Zone3WindACDXCoil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    3.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    3.0,                     !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    WindACCoolCapFT,         !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    WindACCoolCapFFF,        !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    WindACEIRFT,             !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    WindACEIRFFF,            !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    WindACPLFFPLR,           !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    Zone3WindACOAMixerOutletNode,  !- Air Inlet Node Name
+    Zone3WindACDXOutletNode, !- Air Outlet Node Name
+    WindACCoolCapFT,         !- Total Cooling Capacity Function of Temperature Curve Name
+    WindACCoolCapFFF,        !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    WindACEIRFT,             !- Energy Input Ratio Function of Temperature Curve Name
+    WindACEIRFFF,            !- Energy Input Ratio Function of Flow Fraction Curve Name
+    WindACPLFFPLR;           !- Part Load Fraction Correlation Curve Name
 
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
 

@@ -34,7 +34,7 @@
 ! System Equipment Autosize:      Yes
 ! Purchased Cooling:              None
 ! Purchased Heating:              None
-! Coils:                          Coil:Cooling:DX; Coil:Heating:Fuel (apartment zones)
+! Coils:                          Coil:Cooling:DX:SingleSpeed; Coil:Heating:Fuel (apartment zones)
 !                                 Coil:Heating:Electric (corridor zones)
 ! Pumps:                          None
 ! Boilers:                        None
@@ -7171,1541 +7171,389 @@
     SPLITSYSTEMAC:24_Unitary_PackageHeatCoil air inlet,  !- Air Inlet Node Name
     SPLITSYSTEMAC:24 Supply Equipment Outlet Node;  !- Air Outlet Node Name
 
-  OutdoorAir:Node,
-    SPLITSYSTEMAC:01_Unitary_Package_CoolCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     SPLITSYSTEMAC:01_Unitary_Package_CoolCoil,  !- Name
-    SPLITSYSTEMAC:01_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
-    SPLITSYSTEMAC:01_Unitary_PackageHeatCoil air inlet,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    SPLITSYSTEMAC:01_Unitary_Package_CoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    SPLITSYSTEMAC:01_Unitary_Package_CoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    SPLITSYSTEMAC:01_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    SPLITSYSTEMAC:01_Unitary_Package_CoolCoil Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    SPLITSYSTEMAC:01_Unitary_Package_CoolCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    SPLITSYSTEMAC:01_Unitary_Package_CoolCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    SPLITSYSTEMAC:01_Unitary_Package_CoolCoil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    SPLITSYSTEMAC:01_Unitary_Package_CoolCoil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    3.66668442928701,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
+    3.66668442928701,        !- Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Cool-Cap-fT,             !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Cool-EIR-fT,             !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    Cool-PLF-fPLR,           !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    SPLITSYSTEMAC:01_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
+    SPLITSYSTEMAC:01_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
+    Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
+    ConstantCubic,           !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Cool-EIR-fT,             !- Energy Input Ratio Function of Temperature Curve Name
+    ConstantCubic,           !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Cool-PLF-fPLR;           !- Part Load Fraction Correlation Curve Name
 
-  OutdoorAir:Node,
-    SPLITSYSTEMAC:02_Unitary_Package_CoolCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     SPLITSYSTEMAC:02_Unitary_Package_CoolCoil,  !- Name
-    SPLITSYSTEMAC:02_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
-    SPLITSYSTEMAC:02_Unitary_PackageHeatCoil air inlet,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    SPLITSYSTEMAC:02_Unitary_Package_CoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    SPLITSYSTEMAC:02_Unitary_Package_CoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    SPLITSYSTEMAC:02_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    SPLITSYSTEMAC:02_Unitary_Package_CoolCoil Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    SPLITSYSTEMAC:02_Unitary_Package_CoolCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    SPLITSYSTEMAC:02_Unitary_Package_CoolCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    SPLITSYSTEMAC:02_Unitary_Package_CoolCoil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    SPLITSYSTEMAC:02_Unitary_Package_CoolCoil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    3.66668442928701,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
+    3.66668442928701,        !- Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Cool-Cap-fT,             !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Cool-EIR-fT,             !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    Cool-PLF-fPLR,           !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    SPLITSYSTEMAC:02_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
+    SPLITSYSTEMAC:02_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
+    Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
+    ConstantCubic,           !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Cool-EIR-fT,             !- Energy Input Ratio Function of Temperature Curve Name
+    ConstantCubic,           !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Cool-PLF-fPLR;           !- Part Load Fraction Correlation Curve Name
 
-  OutdoorAir:Node,
-    SPLITSYSTEMAC:03_Unitary_Package_CoolCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     SPLITSYSTEMAC:03_Unitary_Package_CoolCoil,  !- Name
-    SPLITSYSTEMAC:03_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
-    SPLITSYSTEMAC:03_Unitary_PackageHeatCoil air inlet,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    SPLITSYSTEMAC:03_Unitary_Package_CoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    SPLITSYSTEMAC:03_Unitary_Package_CoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    SPLITSYSTEMAC:03_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    SPLITSYSTEMAC:03_Unitary_Package_CoolCoil Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    SPLITSYSTEMAC:03_Unitary_Package_CoolCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    SPLITSYSTEMAC:03_Unitary_Package_CoolCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    SPLITSYSTEMAC:03_Unitary_Package_CoolCoil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    SPLITSYSTEMAC:03_Unitary_Package_CoolCoil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    3.66668442928701,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
+    3.66668442928701,        !- Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Cool-Cap-fT,             !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Cool-EIR-fT,             !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    Cool-PLF-fPLR,           !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    SPLITSYSTEMAC:03_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
+    SPLITSYSTEMAC:03_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
+    Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
+    ConstantCubic,           !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Cool-EIR-fT,             !- Energy Input Ratio Function of Temperature Curve Name
+    ConstantCubic,           !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Cool-PLF-fPLR;           !- Part Load Fraction Correlation Curve Name
 
-  OutdoorAir:Node,
-    SPLITSYSTEMAC:04_Unitary_Package_CoolCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     SPLITSYSTEMAC:04_Unitary_Package_CoolCoil,  !- Name
-    SPLITSYSTEMAC:04_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
-    SPLITSYSTEMAC:04_Unitary_PackageHeatCoil air inlet,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    SPLITSYSTEMAC:04_Unitary_Package_CoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    SPLITSYSTEMAC:04_Unitary_Package_CoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    SPLITSYSTEMAC:04_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    SPLITSYSTEMAC:04_Unitary_Package_CoolCoil Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    SPLITSYSTEMAC:04_Unitary_Package_CoolCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    SPLITSYSTEMAC:04_Unitary_Package_CoolCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    SPLITSYSTEMAC:04_Unitary_Package_CoolCoil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    SPLITSYSTEMAC:04_Unitary_Package_CoolCoil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    3.66668442928701,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
+    3.66668442928701,        !- Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Cool-Cap-fT,             !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Cool-EIR-fT,             !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    Cool-PLF-fPLR,           !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    SPLITSYSTEMAC:04_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
+    SPLITSYSTEMAC:04_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
+    Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
+    ConstantCubic,           !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Cool-EIR-fT,             !- Energy Input Ratio Function of Temperature Curve Name
+    ConstantCubic,           !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Cool-PLF-fPLR;           !- Part Load Fraction Correlation Curve Name
 
-  OutdoorAir:Node,
-    SPLITSYSTEMAC:05_Unitary_Package_CoolCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     SPLITSYSTEMAC:05_Unitary_Package_CoolCoil,  !- Name
-    SPLITSYSTEMAC:05_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
-    SPLITSYSTEMAC:05_Unitary_PackageHeatCoil air inlet,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    SPLITSYSTEMAC:05_Unitary_Package_CoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    SPLITSYSTEMAC:05_Unitary_Package_CoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    SPLITSYSTEMAC:05_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    SPLITSYSTEMAC:05_Unitary_Package_CoolCoil Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    SPLITSYSTEMAC:05_Unitary_Package_CoolCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    SPLITSYSTEMAC:05_Unitary_Package_CoolCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    SPLITSYSTEMAC:05_Unitary_Package_CoolCoil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    SPLITSYSTEMAC:05_Unitary_Package_CoolCoil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    3.66668442928701,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
+    3.66668442928701,        !- Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Cool-Cap-fT,             !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Cool-EIR-fT,             !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    Cool-PLF-fPLR,           !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    SPLITSYSTEMAC:05_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
+    SPLITSYSTEMAC:05_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
+    Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
+    ConstantCubic,           !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Cool-EIR-fT,             !- Energy Input Ratio Function of Temperature Curve Name
+    ConstantCubic,           !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Cool-PLF-fPLR;           !- Part Load Fraction Correlation Curve Name
 
-  OutdoorAir:Node,
-    SPLITSYSTEMAC:06_Unitary_Package_CoolCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     SPLITSYSTEMAC:06_Unitary_Package_CoolCoil,  !- Name
-    SPLITSYSTEMAC:06_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
-    SPLITSYSTEMAC:06_Unitary_PackageHeatCoil air inlet,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    SPLITSYSTEMAC:06_Unitary_Package_CoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    SPLITSYSTEMAC:06_Unitary_Package_CoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    SPLITSYSTEMAC:06_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    SPLITSYSTEMAC:06_Unitary_Package_CoolCoil Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    SPLITSYSTEMAC:06_Unitary_Package_CoolCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    SPLITSYSTEMAC:06_Unitary_Package_CoolCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    SPLITSYSTEMAC:06_Unitary_Package_CoolCoil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    SPLITSYSTEMAC:06_Unitary_Package_CoolCoil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    3.66668442928701,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
+    3.66668442928701,        !- Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Cool-Cap-fT,             !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Cool-EIR-fT,             !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    Cool-PLF-fPLR,           !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    SPLITSYSTEMAC:06_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
+    SPLITSYSTEMAC:06_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
+    Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
+    ConstantCubic,           !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Cool-EIR-fT,             !- Energy Input Ratio Function of Temperature Curve Name
+    ConstantCubic,           !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Cool-PLF-fPLR;           !- Part Load Fraction Correlation Curve Name
 
-  OutdoorAir:Node,
-    SPLITSYSTEMAC:07_Unitary_Package_CoolCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     SPLITSYSTEMAC:07_Unitary_Package_CoolCoil,  !- Name
-    SPLITSYSTEMAC:07_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
-    SPLITSYSTEMAC:07_Unitary_PackageHeatCoil air inlet,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    SPLITSYSTEMAC:07_Unitary_Package_CoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    SPLITSYSTEMAC:07_Unitary_Package_CoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    SPLITSYSTEMAC:07_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    SPLITSYSTEMAC:07_Unitary_Package_CoolCoil Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    SPLITSYSTEMAC:07_Unitary_Package_CoolCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    SPLITSYSTEMAC:07_Unitary_Package_CoolCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    SPLITSYSTEMAC:07_Unitary_Package_CoolCoil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    SPLITSYSTEMAC:07_Unitary_Package_CoolCoil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    3.66668442928701,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
+    3.66668442928701,        !- Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Cool-Cap-fT,             !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Cool-EIR-fT,             !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    Cool-PLF-fPLR,           !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    SPLITSYSTEMAC:07_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
+    SPLITSYSTEMAC:07_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
+    Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
+    ConstantCubic,           !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Cool-EIR-fT,             !- Energy Input Ratio Function of Temperature Curve Name
+    ConstantCubic,           !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Cool-PLF-fPLR;           !- Part Load Fraction Correlation Curve Name
 
-  OutdoorAir:Node,
-    SPLITSYSTEMAC:08_Unitary_Package_CoolCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     SPLITSYSTEMAC:08_Unitary_Package_CoolCoil,  !- Name
-    SPLITSYSTEMAC:08_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
-    SPLITSYSTEMAC:08_Unitary_PackageHeatCoil air inlet,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    SPLITSYSTEMAC:08_Unitary_Package_CoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    SPLITSYSTEMAC:08_Unitary_Package_CoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    SPLITSYSTEMAC:08_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    SPLITSYSTEMAC:08_Unitary_Package_CoolCoil Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    SPLITSYSTEMAC:08_Unitary_Package_CoolCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    SPLITSYSTEMAC:08_Unitary_Package_CoolCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    SPLITSYSTEMAC:08_Unitary_Package_CoolCoil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    SPLITSYSTEMAC:08_Unitary_Package_CoolCoil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    3.66668442928701,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
+    3.66668442928701,        !- Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Cool-Cap-fT,             !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Cool-EIR-fT,             !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    Cool-PLF-fPLR,           !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    SPLITSYSTEMAC:08_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
+    SPLITSYSTEMAC:08_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
+    Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
+    ConstantCubic,           !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Cool-EIR-fT,             !- Energy Input Ratio Function of Temperature Curve Name
+    ConstantCubic,           !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Cool-PLF-fPLR;           !- Part Load Fraction Correlation Curve Name
 
-  OutdoorAir:Node,
-    SPLITSYSTEMAC:09_Unitary_Package_CoolCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     SPLITSYSTEMAC:09_Unitary_Package_CoolCoil,  !- Name
-    SPLITSYSTEMAC:09_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
-    SPLITSYSTEMAC:09_Unitary_PackageHeatCoil air inlet,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    SPLITSYSTEMAC:09_Unitary_Package_CoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    SPLITSYSTEMAC:09_Unitary_Package_CoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    SPLITSYSTEMAC:09_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    SPLITSYSTEMAC:09_Unitary_Package_CoolCoil Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    SPLITSYSTEMAC:09_Unitary_Package_CoolCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    SPLITSYSTEMAC:09_Unitary_Package_CoolCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    SPLITSYSTEMAC:09_Unitary_Package_CoolCoil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    SPLITSYSTEMAC:09_Unitary_Package_CoolCoil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    3.66668442928701,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
+    3.66668442928701,        !- Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Cool-Cap-fT,             !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Cool-EIR-fT,             !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    Cool-PLF-fPLR,           !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    SPLITSYSTEMAC:09_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
+    SPLITSYSTEMAC:09_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
+    Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
+    ConstantCubic,           !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Cool-EIR-fT,             !- Energy Input Ratio Function of Temperature Curve Name
+    ConstantCubic,           !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Cool-PLF-fPLR;           !- Part Load Fraction Correlation Curve Name
 
-  OutdoorAir:Node,
-    SPLITSYSTEMAC:10_Unitary_Package_CoolCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     SPLITSYSTEMAC:10_Unitary_Package_CoolCoil,  !- Name
-    SPLITSYSTEMAC:10_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
-    SPLITSYSTEMAC:10_Unitary_PackageHeatCoil air inlet,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    SPLITSYSTEMAC:10_Unitary_Package_CoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    SPLITSYSTEMAC:10_Unitary_Package_CoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    SPLITSYSTEMAC:10_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    SPLITSYSTEMAC:10_Unitary_Package_CoolCoil Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    SPLITSYSTEMAC:10_Unitary_Package_CoolCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    SPLITSYSTEMAC:10_Unitary_Package_CoolCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    SPLITSYSTEMAC:10_Unitary_Package_CoolCoil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    SPLITSYSTEMAC:10_Unitary_Package_CoolCoil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    3.66668442928701,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
+    3.66668442928701,        !- Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Cool-Cap-fT,             !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Cool-EIR-fT,             !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    Cool-PLF-fPLR,           !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    SPLITSYSTEMAC:10_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
+    SPLITSYSTEMAC:10_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
+    Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
+    ConstantCubic,           !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Cool-EIR-fT,             !- Energy Input Ratio Function of Temperature Curve Name
+    ConstantCubic,           !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Cool-PLF-fPLR;           !- Part Load Fraction Correlation Curve Name
 
-  OutdoorAir:Node,
-    SPLITSYSTEMAC:11_Unitary_Package_CoolCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     SPLITSYSTEMAC:11_Unitary_Package_CoolCoil,  !- Name
-    SPLITSYSTEMAC:11_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
-    SPLITSYSTEMAC:11_Unitary_PackageHeatCoil air inlet,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    SPLITSYSTEMAC:11_Unitary_Package_CoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    SPLITSYSTEMAC:11_Unitary_Package_CoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    SPLITSYSTEMAC:11_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    SPLITSYSTEMAC:11_Unitary_Package_CoolCoil Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    SPLITSYSTEMAC:11_Unitary_Package_CoolCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    SPLITSYSTEMAC:11_Unitary_Package_CoolCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    SPLITSYSTEMAC:11_Unitary_Package_CoolCoil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    SPLITSYSTEMAC:11_Unitary_Package_CoolCoil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    3.66668442928701,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
+    3.66668442928701,        !- Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Cool-Cap-fT,             !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Cool-EIR-fT,             !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    Cool-PLF-fPLR,           !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    SPLITSYSTEMAC:11_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
+    SPLITSYSTEMAC:11_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
+    Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
+    ConstantCubic,           !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Cool-EIR-fT,             !- Energy Input Ratio Function of Temperature Curve Name
+    ConstantCubic,           !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Cool-PLF-fPLR;           !- Part Load Fraction Correlation Curve Name
 
-  OutdoorAir:Node,
-    SPLITSYSTEMAC:12_Unitary_Package_CoolCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     SPLITSYSTEMAC:12_Unitary_Package_CoolCoil,  !- Name
-    SPLITSYSTEMAC:12_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
-    SPLITSYSTEMAC:12_Unitary_PackageHeatCoil air inlet,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    SPLITSYSTEMAC:12_Unitary_Package_CoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    SPLITSYSTEMAC:12_Unitary_Package_CoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    SPLITSYSTEMAC:12_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    SPLITSYSTEMAC:12_Unitary_Package_CoolCoil Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    SPLITSYSTEMAC:12_Unitary_Package_CoolCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    SPLITSYSTEMAC:12_Unitary_Package_CoolCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    SPLITSYSTEMAC:12_Unitary_Package_CoolCoil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    SPLITSYSTEMAC:12_Unitary_Package_CoolCoil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    3.66668442928701,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
+    3.66668442928701,        !- Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Cool-Cap-fT,             !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Cool-EIR-fT,             !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    Cool-PLF-fPLR,           !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    SPLITSYSTEMAC:12_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
+    SPLITSYSTEMAC:12_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
+    Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
+    ConstantCubic,           !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Cool-EIR-fT,             !- Energy Input Ratio Function of Temperature Curve Name
+    ConstantCubic,           !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Cool-PLF-fPLR;           !- Part Load Fraction Correlation Curve Name
 
-  OutdoorAir:Node,
-    SPLITSYSTEMAC:13_Unitary_Package_CoolCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     SPLITSYSTEMAC:13_Unitary_Package_CoolCoil,  !- Name
-    SPLITSYSTEMAC:13_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
-    SPLITSYSTEMAC:13_Unitary_PackageHeatCoil air inlet,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    SPLITSYSTEMAC:13_Unitary_Package_CoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    SPLITSYSTEMAC:13_Unitary_Package_CoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    SPLITSYSTEMAC:13_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    SPLITSYSTEMAC:13_Unitary_Package_CoolCoil Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    SPLITSYSTEMAC:13_Unitary_Package_CoolCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    SPLITSYSTEMAC:13_Unitary_Package_CoolCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    SPLITSYSTEMAC:13_Unitary_Package_CoolCoil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    SPLITSYSTEMAC:13_Unitary_Package_CoolCoil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    3.66668442928701,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
+    3.66668442928701,        !- Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Cool-Cap-fT,             !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Cool-EIR-fT,             !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    Cool-PLF-fPLR,           !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    SPLITSYSTEMAC:13_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
+    SPLITSYSTEMAC:13_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
+    Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
+    ConstantCubic,           !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Cool-EIR-fT,             !- Energy Input Ratio Function of Temperature Curve Name
+    ConstantCubic,           !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Cool-PLF-fPLR;           !- Part Load Fraction Correlation Curve Name
 
-  OutdoorAir:Node,
-    SPLITSYSTEMAC:14_Unitary_Package_CoolCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     SPLITSYSTEMAC:14_Unitary_Package_CoolCoil,  !- Name
-    SPLITSYSTEMAC:14_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
-    SPLITSYSTEMAC:14_Unitary_PackageHeatCoil air inlet,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    SPLITSYSTEMAC:14_Unitary_Package_CoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    SPLITSYSTEMAC:14_Unitary_Package_CoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    SPLITSYSTEMAC:14_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    SPLITSYSTEMAC:14_Unitary_Package_CoolCoil Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    SPLITSYSTEMAC:14_Unitary_Package_CoolCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    SPLITSYSTEMAC:14_Unitary_Package_CoolCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    SPLITSYSTEMAC:14_Unitary_Package_CoolCoil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    SPLITSYSTEMAC:14_Unitary_Package_CoolCoil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    3.66668442928701,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
+    3.66668442928701,        !- Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Cool-Cap-fT,             !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Cool-EIR-fT,             !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    Cool-PLF-fPLR,           !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    SPLITSYSTEMAC:14_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
+    SPLITSYSTEMAC:14_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
+    Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
+    ConstantCubic,           !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Cool-EIR-fT,             !- Energy Input Ratio Function of Temperature Curve Name
+    ConstantCubic,           !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Cool-PLF-fPLR;           !- Part Load Fraction Correlation Curve Name
 
-  OutdoorAir:Node,
-    SPLITSYSTEMAC:15_Unitary_Package_CoolCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     SPLITSYSTEMAC:15_Unitary_Package_CoolCoil,  !- Name
-    SPLITSYSTEMAC:15_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
-    SPLITSYSTEMAC:15_Unitary_PackageHeatCoil air inlet,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    SPLITSYSTEMAC:15_Unitary_Package_CoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    SPLITSYSTEMAC:15_Unitary_Package_CoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    SPLITSYSTEMAC:15_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    SPLITSYSTEMAC:15_Unitary_Package_CoolCoil Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    SPLITSYSTEMAC:15_Unitary_Package_CoolCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    SPLITSYSTEMAC:15_Unitary_Package_CoolCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    SPLITSYSTEMAC:15_Unitary_Package_CoolCoil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    SPLITSYSTEMAC:15_Unitary_Package_CoolCoil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    3.66668442928701,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
+    3.66668442928701,        !- Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Cool-Cap-fT,             !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Cool-EIR-fT,             !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    Cool-PLF-fPLR,           !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    SPLITSYSTEMAC:15_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
+    SPLITSYSTEMAC:15_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
+    Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
+    ConstantCubic,           !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Cool-EIR-fT,             !- Energy Input Ratio Function of Temperature Curve Name
+    ConstantCubic,           !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Cool-PLF-fPLR;           !- Part Load Fraction Correlation Curve Name
 
-  OutdoorAir:Node,
-    SPLITSYSTEMAC:16_Unitary_Package_CoolCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     SPLITSYSTEMAC:16_Unitary_Package_CoolCoil,  !- Name
-    SPLITSYSTEMAC:16_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
-    SPLITSYSTEMAC:16_Unitary_PackageHeatCoil air inlet,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    SPLITSYSTEMAC:16_Unitary_Package_CoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    SPLITSYSTEMAC:16_Unitary_Package_CoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    SPLITSYSTEMAC:16_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    SPLITSYSTEMAC:16_Unitary_Package_CoolCoil Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    SPLITSYSTEMAC:16_Unitary_Package_CoolCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    SPLITSYSTEMAC:16_Unitary_Package_CoolCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    SPLITSYSTEMAC:16_Unitary_Package_CoolCoil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    SPLITSYSTEMAC:16_Unitary_Package_CoolCoil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    3.66668442928701,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
+    3.66668442928701,        !- Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Cool-Cap-fT,             !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Cool-EIR-fT,             !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    Cool-PLF-fPLR,           !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    SPLITSYSTEMAC:16_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
+    SPLITSYSTEMAC:16_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
+    Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
+    ConstantCubic,           !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Cool-EIR-fT,             !- Energy Input Ratio Function of Temperature Curve Name
+    ConstantCubic,           !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Cool-PLF-fPLR;           !- Part Load Fraction Correlation Curve Name
 
-  OutdoorAir:Node,
-    SPLITSYSTEMAC:17_Unitary_Package_CoolCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     SPLITSYSTEMAC:17_Unitary_Package_CoolCoil,  !- Name
-    SPLITSYSTEMAC:17_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
-    SPLITSYSTEMAC:17_Unitary_PackageHeatCoil air inlet,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    SPLITSYSTEMAC:17_Unitary_Package_CoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    SPLITSYSTEMAC:17_Unitary_Package_CoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    SPLITSYSTEMAC:17_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    SPLITSYSTEMAC:17_Unitary_Package_CoolCoil Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    SPLITSYSTEMAC:17_Unitary_Package_CoolCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    SPLITSYSTEMAC:17_Unitary_Package_CoolCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    SPLITSYSTEMAC:17_Unitary_Package_CoolCoil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    SPLITSYSTEMAC:17_Unitary_Package_CoolCoil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    3.66668442928701,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
+    3.66668442928701,        !- Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Cool-Cap-fT,             !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Cool-EIR-fT,             !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    Cool-PLF-fPLR,           !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    SPLITSYSTEMAC:17_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
+    SPLITSYSTEMAC:17_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
+    Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
+    ConstantCubic,           !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Cool-EIR-fT,             !- Energy Input Ratio Function of Temperature Curve Name
+    ConstantCubic,           !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Cool-PLF-fPLR;           !- Part Load Fraction Correlation Curve Name
 
-  OutdoorAir:Node,
-    SPLITSYSTEMAC:18_Unitary_Package_CoolCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     SPLITSYSTEMAC:18_Unitary_Package_CoolCoil,  !- Name
-    SPLITSYSTEMAC:18_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
-    SPLITSYSTEMAC:18_Unitary_PackageHeatCoil air inlet,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    SPLITSYSTEMAC:18_Unitary_Package_CoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    SPLITSYSTEMAC:18_Unitary_Package_CoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    SPLITSYSTEMAC:18_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    SPLITSYSTEMAC:18_Unitary_Package_CoolCoil Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    SPLITSYSTEMAC:18_Unitary_Package_CoolCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    SPLITSYSTEMAC:18_Unitary_Package_CoolCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    SPLITSYSTEMAC:18_Unitary_Package_CoolCoil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    SPLITSYSTEMAC:18_Unitary_Package_CoolCoil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    3.66668442928701,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
+    3.66668442928701,        !- Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Cool-Cap-fT,             !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Cool-EIR-fT,             !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    Cool-PLF-fPLR,           !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    SPLITSYSTEMAC:18_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
+    SPLITSYSTEMAC:18_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
+    Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
+    ConstantCubic,           !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Cool-EIR-fT,             !- Energy Input Ratio Function of Temperature Curve Name
+    ConstantCubic,           !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Cool-PLF-fPLR;           !- Part Load Fraction Correlation Curve Name
 
-  OutdoorAir:Node,
-    SPLITSYSTEMAC:19_Unitary_Package_CoolCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     SPLITSYSTEMAC:19_Unitary_Package_CoolCoil,  !- Name
-    SPLITSYSTEMAC:19_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
-    SPLITSYSTEMAC:19_Unitary_PackageHeatCoil air inlet,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    SPLITSYSTEMAC:19_Unitary_Package_CoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    SPLITSYSTEMAC:19_Unitary_Package_CoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    SPLITSYSTEMAC:19_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    SPLITSYSTEMAC:19_Unitary_Package_CoolCoil Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    SPLITSYSTEMAC:19_Unitary_Package_CoolCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    SPLITSYSTEMAC:19_Unitary_Package_CoolCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    SPLITSYSTEMAC:19_Unitary_Package_CoolCoil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    SPLITSYSTEMAC:19_Unitary_Package_CoolCoil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    3.66668442928701,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
+    3.66668442928701,        !- Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Cool-Cap-fT,             !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Cool-EIR-fT,             !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    Cool-PLF-fPLR,           !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    SPLITSYSTEMAC:19_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
+    SPLITSYSTEMAC:19_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
+    Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
+    ConstantCubic,           !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Cool-EIR-fT,             !- Energy Input Ratio Function of Temperature Curve Name
+    ConstantCubic,           !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Cool-PLF-fPLR;           !- Part Load Fraction Correlation Curve Name
 
-  OutdoorAir:Node,
-    SPLITSYSTEMAC:20_Unitary_Package_CoolCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     SPLITSYSTEMAC:20_Unitary_Package_CoolCoil,  !- Name
-    SPLITSYSTEMAC:20_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
-    SPLITSYSTEMAC:20_Unitary_PackageHeatCoil air inlet,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    SPLITSYSTEMAC:20_Unitary_Package_CoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    SPLITSYSTEMAC:20_Unitary_Package_CoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    SPLITSYSTEMAC:20_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    SPLITSYSTEMAC:20_Unitary_Package_CoolCoil Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    SPLITSYSTEMAC:20_Unitary_Package_CoolCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    SPLITSYSTEMAC:20_Unitary_Package_CoolCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    SPLITSYSTEMAC:20_Unitary_Package_CoolCoil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    SPLITSYSTEMAC:20_Unitary_Package_CoolCoil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    3.66668442928701,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
+    3.66668442928701,        !- Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Cool-Cap-fT,             !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Cool-EIR-fT,             !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    Cool-PLF-fPLR,           !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    SPLITSYSTEMAC:20_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
+    SPLITSYSTEMAC:20_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
+    Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
+    ConstantCubic,           !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Cool-EIR-fT,             !- Energy Input Ratio Function of Temperature Curve Name
+    ConstantCubic,           !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Cool-PLF-fPLR;           !- Part Load Fraction Correlation Curve Name
 
-  OutdoorAir:Node,
-    SPLITSYSTEMAC:21_Unitary_Package_CoolCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     SPLITSYSTEMAC:21_Unitary_Package_CoolCoil,  !- Name
-    SPLITSYSTEMAC:21_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
-    SPLITSYSTEMAC:21_Unitary_PackageHeatCoil air inlet,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    SPLITSYSTEMAC:21_Unitary_Package_CoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    SPLITSYSTEMAC:21_Unitary_Package_CoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    SPLITSYSTEMAC:21_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    SPLITSYSTEMAC:21_Unitary_Package_CoolCoil Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    SPLITSYSTEMAC:21_Unitary_Package_CoolCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    SPLITSYSTEMAC:21_Unitary_Package_CoolCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    SPLITSYSTEMAC:21_Unitary_Package_CoolCoil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    SPLITSYSTEMAC:21_Unitary_Package_CoolCoil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    3.66668442928701,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
+    3.66668442928701,        !- Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Cool-Cap-fT,             !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Cool-EIR-fT,             !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    Cool-PLF-fPLR,           !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    SPLITSYSTEMAC:21_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
+    SPLITSYSTEMAC:21_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
+    Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
+    ConstantCubic,           !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Cool-EIR-fT,             !- Energy Input Ratio Function of Temperature Curve Name
+    ConstantCubic,           !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Cool-PLF-fPLR;           !- Part Load Fraction Correlation Curve Name
 
-  OutdoorAir:Node,
-    SPLITSYSTEMAC:22_Unitary_Package_CoolCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     SPLITSYSTEMAC:22_Unitary_Package_CoolCoil,  !- Name
-    SPLITSYSTEMAC:22_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
-    SPLITSYSTEMAC:22_Unitary_PackageHeatCoil air inlet,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    SPLITSYSTEMAC:22_Unitary_Package_CoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    SPLITSYSTEMAC:22_Unitary_Package_CoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    SPLITSYSTEMAC:22_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    SPLITSYSTEMAC:22_Unitary_Package_CoolCoil Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    SPLITSYSTEMAC:22_Unitary_Package_CoolCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    SPLITSYSTEMAC:22_Unitary_Package_CoolCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    SPLITSYSTEMAC:22_Unitary_Package_CoolCoil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    SPLITSYSTEMAC:22_Unitary_Package_CoolCoil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    3.66668442928701,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
+    3.66668442928701,        !- Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Cool-Cap-fT,             !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Cool-EIR-fT,             !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    Cool-PLF-fPLR,           !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    SPLITSYSTEMAC:22_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
+    SPLITSYSTEMAC:22_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
+    Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
+    ConstantCubic,           !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Cool-EIR-fT,             !- Energy Input Ratio Function of Temperature Curve Name
+    ConstantCubic,           !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Cool-PLF-fPLR;           !- Part Load Fraction Correlation Curve Name
 
-  OutdoorAir:Node,
-    SPLITSYSTEMAC:23_Unitary_Package_CoolCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     SPLITSYSTEMAC:23_Unitary_Package_CoolCoil,  !- Name
-    SPLITSYSTEMAC:23_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
-    SPLITSYSTEMAC:23_Unitary_PackageHeatCoil air inlet,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    SPLITSYSTEMAC:23_Unitary_Package_CoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    SPLITSYSTEMAC:23_Unitary_Package_CoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    SPLITSYSTEMAC:23_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    SPLITSYSTEMAC:23_Unitary_Package_CoolCoil Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    SPLITSYSTEMAC:23_Unitary_Package_CoolCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    SPLITSYSTEMAC:23_Unitary_Package_CoolCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    SPLITSYSTEMAC:23_Unitary_Package_CoolCoil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    SPLITSYSTEMAC:23_Unitary_Package_CoolCoil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    3.66668442928701,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
+    3.66668442928701,        !- Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Cool-Cap-fT,             !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Cool-EIR-fT,             !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    Cool-PLF-fPLR,           !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    SPLITSYSTEMAC:23_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
+    SPLITSYSTEMAC:23_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
+    Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
+    ConstantCubic,           !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Cool-EIR-fT,             !- Energy Input Ratio Function of Temperature Curve Name
+    ConstantCubic,           !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Cool-PLF-fPLR;           !- Part Load Fraction Correlation Curve Name
 
-  OutdoorAir:Node,
-    SPLITSYSTEMAC:24_Unitary_Package_CoolCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     SPLITSYSTEMAC:24_Unitary_Package_CoolCoil,  !- Name
-    SPLITSYSTEMAC:24_Unitary_PackageCoolCoil air inlet,  !- Evaporator Inlet Node Name
-    SPLITSYSTEMAC:24_Unitary_PackageHeatCoil air inlet,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    SPLITSYSTEMAC:24_Unitary_Package_CoolCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    SPLITSYSTEMAC:24_Unitary_Package_CoolCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    SPLITSYSTEMAC:24_Unitary_Package_CoolCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    SPLITSYSTEMAC:24_Unitary_Package_CoolCoil Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    SPLITSYSTEMAC:24_Unitary_Package_CoolCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    SPLITSYSTEMAC:24_Unitary_Package_CoolCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    SPLITSYSTEMAC:24_Unitary_Package_CoolCoil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    SPLITSYSTEMAC:24_Unitary_Package_CoolCoil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    3.66668442928701,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    AUTOSIZE,                !- Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- Gross Rated Sensible Heat Ratio
+    3.66668442928701,        !- Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Cool-Cap-fT,             !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Cool-EIR-fT,             !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    ConstantCubic,           !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    Cool-PLF-fPLR,           !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    SPLITSYSTEMAC:24_Unitary_PackageCoolCoil air inlet,  !- Air Inlet Node Name
+    SPLITSYSTEMAC:24_Unitary_PackageHeatCoil air inlet,  !- Air Outlet Node Name
+    Cool-Cap-fT,             !- Total Cooling Capacity Function of Temperature Curve Name
+    ConstantCubic,           !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Cool-EIR-fT,             !- Energy Input Ratio Function of Temperature Curve Name
+    ConstantCubic,           !- Energy Input Ratio Function of Flow Fraction Curve Name
+    Cool-PLF-fPLR;           !- Part Load Fraction Correlation Curve Name
 
   ZoneHVAC:UnitHeater,
     G Corridor Unit Heater,  !- Name
@@ -12303,7 +11151,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     SPLITSYSTEMAC:01_Unitary_Package_HeatCoil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:01_Unitary_Package_CoolCoil,  !- Cooling Coil Name
     None,                    !- Dehumidification Control Type
     ,                        !- Reheat Coil Object Type
@@ -12325,7 +11173,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     SPLITSYSTEMAC:02_Unitary_Package_HeatCoil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:02_Unitary_Package_CoolCoil,  !- Cooling Coil Name
     None,                    !- Dehumidification Control Type
     ,                        !- Reheat Coil Object Type
@@ -12347,7 +11195,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     SPLITSYSTEMAC:03_Unitary_Package_HeatCoil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:03_Unitary_Package_CoolCoil,  !- Cooling Coil Name
     None,                    !- Dehumidification Control Type
     ,                        !- Reheat Coil Object Type
@@ -12369,7 +11217,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     SPLITSYSTEMAC:04_Unitary_Package_HeatCoil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:04_Unitary_Package_CoolCoil,  !- Cooling Coil Name
     None,                    !- Dehumidification Control Type
     ,                        !- Reheat Coil Object Type
@@ -12391,7 +11239,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     SPLITSYSTEMAC:05_Unitary_Package_HeatCoil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:05_Unitary_Package_CoolCoil,  !- Cooling Coil Name
     None,                    !- Dehumidification Control Type
     ,                        !- Reheat Coil Object Type
@@ -12413,7 +11261,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     SPLITSYSTEMAC:06_Unitary_Package_HeatCoil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:06_Unitary_Package_CoolCoil,  !- Cooling Coil Name
     None,                    !- Dehumidification Control Type
     ,                        !- Reheat Coil Object Type
@@ -12435,7 +11283,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     SPLITSYSTEMAC:07_Unitary_Package_HeatCoil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:07_Unitary_Package_CoolCoil,  !- Cooling Coil Name
     None,                    !- Dehumidification Control Type
     ,                        !- Reheat Coil Object Type
@@ -12457,7 +11305,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     SPLITSYSTEMAC:08_Unitary_Package_HeatCoil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:08_Unitary_Package_CoolCoil,  !- Cooling Coil Name
     None,                    !- Dehumidification Control Type
     ,                        !- Reheat Coil Object Type
@@ -12479,7 +11327,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     SPLITSYSTEMAC:09_Unitary_Package_HeatCoil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:09_Unitary_Package_CoolCoil,  !- Cooling Coil Name
     None,                    !- Dehumidification Control Type
     ,                        !- Reheat Coil Object Type
@@ -12501,7 +11349,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     SPLITSYSTEMAC:10_Unitary_Package_HeatCoil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:10_Unitary_Package_CoolCoil,  !- Cooling Coil Name
     None,                    !- Dehumidification Control Type
     ,                        !- Reheat Coil Object Type
@@ -12523,7 +11371,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     SPLITSYSTEMAC:11_Unitary_Package_HeatCoil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:11_Unitary_Package_CoolCoil,  !- Cooling Coil Name
     None,                    !- Dehumidification Control Type
     ,                        !- Reheat Coil Object Type
@@ -12545,7 +11393,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     SPLITSYSTEMAC:12_Unitary_Package_HeatCoil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:12_Unitary_Package_CoolCoil,  !- Cooling Coil Name
     None,                    !- Dehumidification Control Type
     ,                        !- Reheat Coil Object Type
@@ -12567,7 +11415,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     SPLITSYSTEMAC:13_Unitary_Package_HeatCoil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:13_Unitary_Package_CoolCoil,  !- Cooling Coil Name
     None,                    !- Dehumidification Control Type
     ,                        !- Reheat Coil Object Type
@@ -12589,7 +11437,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     SPLITSYSTEMAC:14_Unitary_Package_HeatCoil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:14_Unitary_Package_CoolCoil,  !- Cooling Coil Name
     None,                    !- Dehumidification Control Type
     ,                        !- Reheat Coil Object Type
@@ -12611,7 +11459,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     SPLITSYSTEMAC:15_Unitary_Package_HeatCoil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:15_Unitary_Package_CoolCoil,  !- Cooling Coil Name
     None,                    !- Dehumidification Control Type
     ,                        !- Reheat Coil Object Type
@@ -12633,7 +11481,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     SPLITSYSTEMAC:16_Unitary_Package_HeatCoil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:16_Unitary_Package_CoolCoil,  !- Cooling Coil Name
     None,                    !- Dehumidification Control Type
     ,                        !- Reheat Coil Object Type
@@ -12655,7 +11503,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     SPLITSYSTEMAC:17_Unitary_Package_HeatCoil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:17_Unitary_Package_CoolCoil,  !- Cooling Coil Name
     None,                    !- Dehumidification Control Type
     ,                        !- Reheat Coil Object Type
@@ -12677,7 +11525,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     SPLITSYSTEMAC:18_Unitary_Package_HeatCoil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:18_Unitary_Package_CoolCoil,  !- Cooling Coil Name
     None,                    !- Dehumidification Control Type
     ,                        !- Reheat Coil Object Type
@@ -12699,7 +11547,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     SPLITSYSTEMAC:19_Unitary_Package_HeatCoil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:19_Unitary_Package_CoolCoil,  !- Cooling Coil Name
     None,                    !- Dehumidification Control Type
     ,                        !- Reheat Coil Object Type
@@ -12721,7 +11569,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     SPLITSYSTEMAC:20_Unitary_Package_HeatCoil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:20_Unitary_Package_CoolCoil,  !- Cooling Coil Name
     None,                    !- Dehumidification Control Type
     ,                        !- Reheat Coil Object Type
@@ -12743,7 +11591,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     SPLITSYSTEMAC:21_Unitary_Package_HeatCoil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:21_Unitary_Package_CoolCoil,  !- Cooling Coil Name
     None,                    !- Dehumidification Control Type
     ,                        !- Reheat Coil Object Type
@@ -12765,7 +11613,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     SPLITSYSTEMAC:22_Unitary_Package_HeatCoil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:22_Unitary_Package_CoolCoil,  !- Cooling Coil Name
     None,                    !- Dehumidification Control Type
     ,                        !- Reheat Coil Object Type
@@ -12787,7 +11635,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     SPLITSYSTEMAC:23_Unitary_Package_HeatCoil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:23_Unitary_Package_CoolCoil,  !- Cooling Coil Name
     None,                    !- Dehumidification Control Type
     ,                        !- Reheat Coil Object Type
@@ -12809,7 +11657,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     SPLITSYSTEMAC:24_Unitary_Package_HeatCoil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     SPLITSYSTEMAC:24_Unitary_Package_CoolCoil,  !- Cooling Coil Name
     None,                    !- Dehumidification Control Type
     ,                        !- Reheat Coil Object Type

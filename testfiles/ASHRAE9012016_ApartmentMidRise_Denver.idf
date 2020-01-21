@@ -12693,7 +12693,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     Split GSW Heating Coil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Split GSW Cooling Coil,  !- Cooling Coil Name
     None;                    !- Dehumidification Control Type
 
@@ -12713,7 +12713,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     Split GNW Heating Coil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Split GNW Cooling Coil,  !- Cooling Coil Name
     None;                    !- Dehumidification Control Type
 
@@ -12733,7 +12733,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     Split Office Heating Coil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Split Office Cooling Coil,  !- Cooling Coil Name
     None;                    !- Dehumidification Control Type
 
@@ -12753,7 +12753,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     Split GNE Heating Coil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Split GNE Cooling Coil,  !- Cooling Coil Name
     None;                    !- Dehumidification Control Type
 
@@ -12773,7 +12773,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     Split GN1 Heating Coil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Split GN1 Cooling Coil,  !- Cooling Coil Name
     None;                    !- Dehumidification Control Type
 
@@ -12793,7 +12793,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     Split GN2 Heating Coil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Split GN2 Cooling Coil,  !- Cooling Coil Name
     None;                    !- Dehumidification Control Type
 
@@ -12813,7 +12813,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     Split GS1 Heating Coil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Split GS1 Cooling Coil,  !- Cooling Coil Name
     None;                    !- Dehumidification Control Type
 
@@ -12833,7 +12833,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     Split GS2 Heating Coil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Split GS2 Cooling Coil,  !- Cooling Coil Name
     None;                    !- Dehumidification Control Type
 
@@ -12853,7 +12853,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     Split MSW Heating Coil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Split MSW Cooling Coil,  !- Cooling Coil Name
     None;                    !- Dehumidification Control Type
 
@@ -12873,7 +12873,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     Split MNW Heating Coil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Split MNW Cooling Coil,  !- Cooling Coil Name
     None;                    !- Dehumidification Control Type
 
@@ -12893,7 +12893,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     Split MSE Heating Coil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Split MSE Cooling Coil,  !- Cooling Coil Name
     None;                    !- Dehumidification Control Type
 
@@ -12913,7 +12913,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     Split MNE Heating Coil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Split MNE Cooling Coil,  !- Cooling Coil Name
     None;                    !- Dehumidification Control Type
 
@@ -12933,7 +12933,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     Split MN1 Heating Coil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Split MN1 Cooling Coil,  !- Cooling Coil Name
     None;                    !- Dehumidification Control Type
 
@@ -12953,7 +12953,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     Split MN2 Heating Coil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Split MN2 Cooling Coil,  !- Cooling Coil Name
     None;                    !- Dehumidification Control Type
 
@@ -12973,7 +12973,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     Split MS1 Heating Coil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Split MS1 Cooling Coil,  !- Cooling Coil Name
     None;                    !- Dehumidification Control Type
 
@@ -12993,7 +12993,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     Split MS2 Heating Coil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Split MS2 Cooling Coil,  !- Cooling Coil Name
     None;                    !- Dehumidification Control Type
 
@@ -13013,7 +13013,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     Split TSW Heating Coil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Split TSW Cooling Coil,  !- Cooling Coil Name
     None;                    !- Dehumidification Control Type
 
@@ -13033,7 +13033,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     Split TNW Heating Coil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Split TNW Cooling Coil,  !- Cooling Coil Name
     None;                    !- Dehumidification Control Type
 
@@ -13053,7 +13053,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     Split TSE Heating Coil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Split TSE Cooling Coil,  !- Cooling Coil Name
     None;                    !- Dehumidification Control Type
 
@@ -13073,7 +13073,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     Split TNE Heating Coil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Split TNE Cooling Coil,  !- Cooling Coil Name
     None;                    !- Dehumidification Control Type
 
@@ -13093,7 +13093,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     Split TN1 Heating Coil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Split TN1 Cooling Coil,  !- Cooling Coil Name
     None;                    !- Dehumidification Control Type
 
@@ -13113,7 +13113,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     Split TN2 Heating Coil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Split TN2 Cooling Coil,  !- Cooling Coil Name
     None;                    !- Dehumidification Control Type
 
@@ -13133,7 +13133,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     Split TS1 Heating Coil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Split TS1 Cooling Coil,  !- Cooling Coil Name
     None;                    !- Dehumidification Control Type
 
@@ -13153,7 +13153,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     Split TS2 Heating Coil,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Split TS2 Cooling Coil,  !- Cooling Coil Name
     None;                    !- Dehumidification Control Type
 
@@ -14956,1469 +14956,677 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: COIL:DX:COOLINGBYPASSFACTOREMPIRICAL ===========
 
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     Split GSW Cooling Coil,  !- Name
-    Split GSW Heating Coil Outlet,  !- Evaporator Inlet Node Name
-    Split GSW Air Loop Outlet,  !- Evaporator Outlet Node Name
     All On,                  !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    Split GSW Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    Split GSW Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    Split GSW Cooling Coil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    Split GSW Cooling Coil Performance,  !- Name
-    0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    Split GSW Cooling Coil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    Split GSW Cooling Coil Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    0,                       !- Maximum Cycling Rate {cycles/hr}
-    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    0,                       !- Latent Capacity Time Constant {s}
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    AirCooled,               !- Condenser Type
-    0,                       !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    Split GSW Cooling Coil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Split GSW Cooling Coil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    4.11713235489972,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    4.11713235489972,        !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
-    Split DX Coil Cap-FT,    !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Split DX Coil Cap-FF,    !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Split DX Coil EIR-FT,    !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Split DX Coil EIR-FF,    !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Split GSW Heating Coil Outlet,  !- Air Inlet Node Name
+    Split GSW Air Loop Outlet,  !- Air Outlet Node Name
+    Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
+    Split DX Coil Cap-FF,    !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Split DX Coil EIR-FT,    !- Energy Input Ratio Function of Temperature Curve Name
+    Split DX Coil EIR-FF,    !- Energy Input Ratio Function of Flow Fraction Curve Name
     Split DX Coil PLF,       !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    0,                       !- Nominal Time for Condensate Removal to Begin {s}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Maximum Cycling Rate {cycles/hr}
+    0,                       !- Latent Capacity Time Constant {s}
+    Split GSW Cooling Coil Condenser Inlet,  !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
+    0,                       !- Crankcase Heater Capacity {W}
+    10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     Split GNW Cooling Coil,  !- Name
-    Split GNW Heating Coil Outlet,  !- Evaporator Inlet Node Name
-    Split GNW Air Loop Outlet,  !- Evaporator Outlet Node Name
     All On,                  !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    Split GNW Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    Split GNW Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    Split GNW Cooling Coil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    Split GNW Cooling Coil Performance,  !- Name
-    0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    Split GNW Cooling Coil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    Split GNW Cooling Coil Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    0,                       !- Maximum Cycling Rate {cycles/hr}
-    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    0,                       !- Latent Capacity Time Constant {s}
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    AirCooled,               !- Condenser Type
-    0,                       !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    Split GNW Cooling Coil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Split GNW Cooling Coil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    4.11713235489972,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    4.11713235489972,        !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
-    Split DX Coil Cap-FT,    !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Split DX Coil Cap-FF,    !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Split DX Coil EIR-FT,    !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Split DX Coil EIR-FF,    !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Split GNW Heating Coil Outlet,  !- Air Inlet Node Name
+    Split GNW Air Loop Outlet,  !- Air Outlet Node Name
+    Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
+    Split DX Coil Cap-FF,    !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Split DX Coil EIR-FT,    !- Energy Input Ratio Function of Temperature Curve Name
+    Split DX Coil EIR-FF,    !- Energy Input Ratio Function of Flow Fraction Curve Name
     Split DX Coil PLF,       !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    0,                       !- Nominal Time for Condensate Removal to Begin {s}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Maximum Cycling Rate {cycles/hr}
+    0,                       !- Latent Capacity Time Constant {s}
+    Split GNW Cooling Coil Condenser Inlet,  !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
+    0,                       !- Crankcase Heater Capacity {W}
+    10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     Split Office Cooling Coil,  !- Name
-    Split Office Heating Coil Outlet,  !- Evaporator Inlet Node Name
-    Split Office Air Loop Outlet,  !- Evaporator Outlet Node Name
     All On,                  !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    Split Office Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    Split Office Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    Split Office Cooling Coil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    Split Office Cooling Coil Performance,  !- Name
-    0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    Split Office Cooling Coil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    Split Office Cooling Coil Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    0,                       !- Maximum Cycling Rate {cycles/hr}
-    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    0,                       !- Latent Capacity Time Constant {s}
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    AirCooled,               !- Condenser Type
-    0,                       !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    Split Office Cooling Coil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Split Office Cooling Coil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    4.11713235489972,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    4.11713235489972,        !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
-    Split DX Coil Cap-FT,    !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Split DX Coil Cap-FF,    !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Split DX Coil EIR-FT,    !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Split DX Coil EIR-FF,    !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Split Office Heating Coil Outlet,  !- Air Inlet Node Name
+    Split Office Air Loop Outlet,  !- Air Outlet Node Name
+    Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
+    Split DX Coil Cap-FF,    !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Split DX Coil EIR-FT,    !- Energy Input Ratio Function of Temperature Curve Name
+    Split DX Coil EIR-FF,    !- Energy Input Ratio Function of Flow Fraction Curve Name
     Split DX Coil PLF,       !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    0,                       !- Nominal Time for Condensate Removal to Begin {s}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Maximum Cycling Rate {cycles/hr}
+    0,                       !- Latent Capacity Time Constant {s}
+    Split Office Cooling Coil Condenser Inlet,  !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
+    0,                       !- Crankcase Heater Capacity {W}
+    10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     Split GNE Cooling Coil,  !- Name
-    Split GNE Heating Coil Outlet,  !- Evaporator Inlet Node Name
-    Split GNE Air Loop Outlet,  !- Evaporator Outlet Node Name
     All On,                  !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    Split GNE Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    Split GNE Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    Split GNE Cooling Coil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    Split GNE Cooling Coil Performance,  !- Name
-    0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    Split GNE Cooling Coil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    Split GNE Cooling Coil Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    0,                       !- Maximum Cycling Rate {cycles/hr}
-    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    0,                       !- Latent Capacity Time Constant {s}
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    AirCooled,               !- Condenser Type
-    0,                       !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    Split GNE Cooling Coil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Split GNE Cooling Coil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    4.11713235489972,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    4.11713235489972,        !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
-    Split DX Coil Cap-FT,    !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Split DX Coil Cap-FF,    !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Split DX Coil EIR-FT,    !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Split DX Coil EIR-FF,    !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Split GNE Heating Coil Outlet,  !- Air Inlet Node Name
+    Split GNE Air Loop Outlet,  !- Air Outlet Node Name
+    Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
+    Split DX Coil Cap-FF,    !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Split DX Coil EIR-FT,    !- Energy Input Ratio Function of Temperature Curve Name
+    Split DX Coil EIR-FF,    !- Energy Input Ratio Function of Flow Fraction Curve Name
     Split DX Coil PLF,       !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    0,                       !- Nominal Time for Condensate Removal to Begin {s}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Maximum Cycling Rate {cycles/hr}
+    0,                       !- Latent Capacity Time Constant {s}
+    Split GNE Cooling Coil Condenser Inlet,  !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
+    0,                       !- Crankcase Heater Capacity {W}
+    10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     Split GN1 Cooling Coil,  !- Name
-    Split GN1 Heating Coil Outlet,  !- Evaporator Inlet Node Name
-    Split GN1 Air Loop Outlet,  !- Evaporator Outlet Node Name
     All On,                  !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    Split GN1 Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    Split GN1 Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    Split GN1 Cooling Coil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    Split GN1 Cooling Coil Performance,  !- Name
-    0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    Split GN1 Cooling Coil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    Split GN1 Cooling Coil Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    0,                       !- Maximum Cycling Rate {cycles/hr}
-    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    0,                       !- Latent Capacity Time Constant {s}
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    AirCooled,               !- Condenser Type
-    0,                       !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    Split GN1 Cooling Coil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Split GN1 Cooling Coil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    4.11713235489972,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    4.11713235489972,        !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
-    Split DX Coil Cap-FT,    !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Split DX Coil Cap-FF,    !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Split DX Coil EIR-FT,    !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Split DX Coil EIR-FF,    !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Split GN1 Heating Coil Outlet,  !- Air Inlet Node Name
+    Split GN1 Air Loop Outlet,  !- Air Outlet Node Name
+    Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
+    Split DX Coil Cap-FF,    !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Split DX Coil EIR-FT,    !- Energy Input Ratio Function of Temperature Curve Name
+    Split DX Coil EIR-FF,    !- Energy Input Ratio Function of Flow Fraction Curve Name
     Split DX Coil PLF,       !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    0,                       !- Nominal Time for Condensate Removal to Begin {s}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Maximum Cycling Rate {cycles/hr}
+    0,                       !- Latent Capacity Time Constant {s}
+    Split GN1 Cooling Coil Condenser Inlet,  !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
+    0,                       !- Crankcase Heater Capacity {W}
+    10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     Split GN2 Cooling Coil,  !- Name
-    Split GN2 Heating Coil Outlet,  !- Evaporator Inlet Node Name
-    Split GN2 Air Loop Outlet,  !- Evaporator Outlet Node Name
     All On,                  !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    Split GN2 Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    Split GN2 Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    Split GN2 Cooling Coil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    Split GN2 Cooling Coil Performance,  !- Name
-    0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    Split GN2 Cooling Coil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    Split GN2 Cooling Coil Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    0,                       !- Maximum Cycling Rate {cycles/hr}
-    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    0,                       !- Latent Capacity Time Constant {s}
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    AirCooled,               !- Condenser Type
-    0,                       !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    Split GN2 Cooling Coil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Split GN2 Cooling Coil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    4.11713235489972,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    4.11713235489972,        !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
-    Split DX Coil Cap-FT,    !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Split DX Coil Cap-FF,    !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Split DX Coil EIR-FT,    !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Split DX Coil EIR-FF,    !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Split GN2 Heating Coil Outlet,  !- Air Inlet Node Name
+    Split GN2 Air Loop Outlet,  !- Air Outlet Node Name
+    Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
+    Split DX Coil Cap-FF,    !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Split DX Coil EIR-FT,    !- Energy Input Ratio Function of Temperature Curve Name
+    Split DX Coil EIR-FF,    !- Energy Input Ratio Function of Flow Fraction Curve Name
     Split DX Coil PLF,       !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    0,                       !- Nominal Time for Condensate Removal to Begin {s}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Maximum Cycling Rate {cycles/hr}
+    0,                       !- Latent Capacity Time Constant {s}
+    Split GN2 Cooling Coil Condenser Inlet,  !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
+    0,                       !- Crankcase Heater Capacity {W}
+    10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     Split GS1 Cooling Coil,  !- Name
-    Split GS1 Heating Coil Outlet,  !- Evaporator Inlet Node Name
-    Split GS1 Air Loop Outlet,  !- Evaporator Outlet Node Name
     All On,                  !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    Split GS1 Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    Split GS1 Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    Split GS1 Cooling Coil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    Split GS1 Cooling Coil Performance,  !- Name
-    0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    Split GS1 Cooling Coil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    Split GS1 Cooling Coil Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    0,                       !- Maximum Cycling Rate {cycles/hr}
-    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    0,                       !- Latent Capacity Time Constant {s}
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    AirCooled,               !- Condenser Type
-    0,                       !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    Split GS1 Cooling Coil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Split GS1 Cooling Coil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    4.11713235489972,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    4.11713235489972,        !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
-    Split DX Coil Cap-FT,    !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Split DX Coil Cap-FF,    !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Split DX Coil EIR-FT,    !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Split DX Coil EIR-FF,    !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Split GS1 Heating Coil Outlet,  !- Air Inlet Node Name
+    Split GS1 Air Loop Outlet,  !- Air Outlet Node Name
+    Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
+    Split DX Coil Cap-FF,    !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Split DX Coil EIR-FT,    !- Energy Input Ratio Function of Temperature Curve Name
+    Split DX Coil EIR-FF,    !- Energy Input Ratio Function of Flow Fraction Curve Name
     Split DX Coil PLF,       !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    0,                       !- Nominal Time for Condensate Removal to Begin {s}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Maximum Cycling Rate {cycles/hr}
+    0,                       !- Latent Capacity Time Constant {s}
+    Split GS1 Cooling Coil Condenser Inlet,  !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
+    0,                       !- Crankcase Heater Capacity {W}
+    10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     Split GS2 Cooling Coil,  !- Name
-    Split GS2 Heating Coil Outlet,  !- Evaporator Inlet Node Name
-    Split GS2 Air Loop Outlet,  !- Evaporator Outlet Node Name
     All On,                  !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    Split GS2 Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    Split GS2 Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    Split GS2 Cooling Coil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    Split GS2 Cooling Coil Performance,  !- Name
-    0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    Split GS2 Cooling Coil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    Split GS2 Cooling Coil Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    0,                       !- Maximum Cycling Rate {cycles/hr}
-    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    0,                       !- Latent Capacity Time Constant {s}
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    AirCooled,               !- Condenser Type
-    0,                       !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    Split GS2 Cooling Coil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Split GS2 Cooling Coil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    4.11713235489972,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    4.11713235489972,        !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
-    Split DX Coil Cap-FT,    !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Split DX Coil Cap-FF,    !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Split DX Coil EIR-FT,    !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Split DX Coil EIR-FF,    !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Split GS2 Heating Coil Outlet,  !- Air Inlet Node Name
+    Split GS2 Air Loop Outlet,  !- Air Outlet Node Name
+    Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
+    Split DX Coil Cap-FF,    !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Split DX Coil EIR-FT,    !- Energy Input Ratio Function of Temperature Curve Name
+    Split DX Coil EIR-FF,    !- Energy Input Ratio Function of Flow Fraction Curve Name
     Split DX Coil PLF,       !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    0,                       !- Nominal Time for Condensate Removal to Begin {s}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Maximum Cycling Rate {cycles/hr}
+    0,                       !- Latent Capacity Time Constant {s}
+    Split GS2 Cooling Coil Condenser Inlet,  !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
+    0,                       !- Crankcase Heater Capacity {W}
+    10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     Split MSW Cooling Coil,  !- Name
-    Split MSW Heating Coil Outlet,  !- Evaporator Inlet Node Name
-    Split MSW Air Loop Outlet,  !- Evaporator Outlet Node Name
     All On,                  !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    Split MSW Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    Split MSW Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    Split MSW Cooling Coil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    Split MSW Cooling Coil Performance,  !- Name
-    0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    Split MSW Cooling Coil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    Split MSW Cooling Coil Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    0,                       !- Maximum Cycling Rate {cycles/hr}
-    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    0,                       !- Latent Capacity Time Constant {s}
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    AirCooled,               !- Condenser Type
-    0,                       !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    Split MSW Cooling Coil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Split MSW Cooling Coil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    4.11713235489972,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    4.11713235489972,        !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
-    Split DX Coil Cap-FT,    !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Split DX Coil Cap-FF,    !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Split DX Coil EIR-FT,    !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Split DX Coil EIR-FF,    !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Split MSW Heating Coil Outlet,  !- Air Inlet Node Name
+    Split MSW Air Loop Outlet,  !- Air Outlet Node Name
+    Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
+    Split DX Coil Cap-FF,    !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Split DX Coil EIR-FT,    !- Energy Input Ratio Function of Temperature Curve Name
+    Split DX Coil EIR-FF,    !- Energy Input Ratio Function of Flow Fraction Curve Name
     Split DX Coil PLF,       !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    0,                       !- Nominal Time for Condensate Removal to Begin {s}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Maximum Cycling Rate {cycles/hr}
+    0,                       !- Latent Capacity Time Constant {s}
+    Split MSW Cooling Coil Condenser Inlet,  !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
+    0,                       !- Crankcase Heater Capacity {W}
+    10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     Split MNW Cooling Coil,  !- Name
-    Split MNW Heating Coil Outlet,  !- Evaporator Inlet Node Name
-    Split MNW Air Loop Outlet,  !- Evaporator Outlet Node Name
     All On,                  !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    Split MNW Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    Split MNW Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    Split MNW Cooling Coil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    Split MNW Cooling Coil Performance,  !- Name
-    0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    Split MNW Cooling Coil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    Split MNW Cooling Coil Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    0,                       !- Maximum Cycling Rate {cycles/hr}
-    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    0,                       !- Latent Capacity Time Constant {s}
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    AirCooled,               !- Condenser Type
-    0,                       !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    Split MNW Cooling Coil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Split MNW Cooling Coil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    4.11713235489972,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    4.11713235489972,        !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
-    Split DX Coil Cap-FT,    !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Split DX Coil Cap-FF,    !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Split DX Coil EIR-FT,    !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Split DX Coil EIR-FF,    !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Split MNW Heating Coil Outlet,  !- Air Inlet Node Name
+    Split MNW Air Loop Outlet,  !- Air Outlet Node Name
+    Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
+    Split DX Coil Cap-FF,    !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Split DX Coil EIR-FT,    !- Energy Input Ratio Function of Temperature Curve Name
+    Split DX Coil EIR-FF,    !- Energy Input Ratio Function of Flow Fraction Curve Name
     Split DX Coil PLF,       !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    0,                       !- Nominal Time for Condensate Removal to Begin {s}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Maximum Cycling Rate {cycles/hr}
+    0,                       !- Latent Capacity Time Constant {s}
+    Split MNW Cooling Coil Condenser Inlet,  !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
+    0,                       !- Crankcase Heater Capacity {W}
+    10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     Split MSE Cooling Coil,  !- Name
-    Split MSE Heating Coil Outlet,  !- Evaporator Inlet Node Name
-    Split MSE Air Loop Outlet,  !- Evaporator Outlet Node Name
     All On,                  !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    Split MSE Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    Split MSE Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    Split MSE Cooling Coil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    Split MSE Cooling Coil Performance,  !- Name
-    0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    Split MSE Cooling Coil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    Split MSE Cooling Coil Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    0,                       !- Maximum Cycling Rate {cycles/hr}
-    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    0,                       !- Latent Capacity Time Constant {s}
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    AirCooled,               !- Condenser Type
-    0,                       !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    Split MSE Cooling Coil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Split MSE Cooling Coil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    4.11713235489972,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    4.11713235489972,        !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
-    Split DX Coil Cap-FT,    !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Split DX Coil Cap-FF,    !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Split DX Coil EIR-FT,    !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Split DX Coil EIR-FF,    !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Split MSE Heating Coil Outlet,  !- Air Inlet Node Name
+    Split MSE Air Loop Outlet,  !- Air Outlet Node Name
+    Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
+    Split DX Coil Cap-FF,    !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Split DX Coil EIR-FT,    !- Energy Input Ratio Function of Temperature Curve Name
+    Split DX Coil EIR-FF,    !- Energy Input Ratio Function of Flow Fraction Curve Name
     Split DX Coil PLF,       !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    0,                       !- Nominal Time for Condensate Removal to Begin {s}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Maximum Cycling Rate {cycles/hr}
+    0,                       !- Latent Capacity Time Constant {s}
+    Split MSE Cooling Coil Condenser Inlet,  !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
+    0,                       !- Crankcase Heater Capacity {W}
+    10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     Split MNE Cooling Coil,  !- Name
-    Split MNE Heating Coil Outlet,  !- Evaporator Inlet Node Name
-    Split MNE Air Loop Outlet,  !- Evaporator Outlet Node Name
     All On,                  !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    Split MNE Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    Split MNE Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    Split MNE Cooling Coil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    Split MNE Cooling Coil Performance,  !- Name
-    0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    Split MNE Cooling Coil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    Split MNE Cooling Coil Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    0,                       !- Maximum Cycling Rate {cycles/hr}
-    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    0,                       !- Latent Capacity Time Constant {s}
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    AirCooled,               !- Condenser Type
-    0,                       !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    Split MNE Cooling Coil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Split MNE Cooling Coil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    4.11713235489972,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    4.11713235489972,        !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
-    Split DX Coil Cap-FT,    !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Split DX Coil Cap-FF,    !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Split DX Coil EIR-FT,    !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Split DX Coil EIR-FF,    !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Split MNE Heating Coil Outlet,  !- Air Inlet Node Name
+    Split MNE Air Loop Outlet,  !- Air Outlet Node Name
+    Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
+    Split DX Coil Cap-FF,    !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Split DX Coil EIR-FT,    !- Energy Input Ratio Function of Temperature Curve Name
+    Split DX Coil EIR-FF,    !- Energy Input Ratio Function of Flow Fraction Curve Name
     Split DX Coil PLF,       !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    0,                       !- Nominal Time for Condensate Removal to Begin {s}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Maximum Cycling Rate {cycles/hr}
+    0,                       !- Latent Capacity Time Constant {s}
+    Split MNE Cooling Coil Condenser Inlet,  !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
+    0,                       !- Crankcase Heater Capacity {W}
+    10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     Split MN1 Cooling Coil,  !- Name
-    Split MN1 Heating Coil Outlet,  !- Evaporator Inlet Node Name
-    Split MN1 Air Loop Outlet,  !- Evaporator Outlet Node Name
     All On,                  !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    Split MN1 Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    Split MN1 Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    Split MN1 Cooling Coil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    Split MN1 Cooling Coil Performance,  !- Name
-    0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    Split MN1 Cooling Coil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    Split MN1 Cooling Coil Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    0,                       !- Maximum Cycling Rate {cycles/hr}
-    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    0,                       !- Latent Capacity Time Constant {s}
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    AirCooled,               !- Condenser Type
-    0,                       !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    Split MN1 Cooling Coil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Split MN1 Cooling Coil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    4.11713235489972,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    4.11713235489972,        !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
-    Split DX Coil Cap-FT,    !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Split DX Coil Cap-FF,    !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Split DX Coil EIR-FT,    !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Split DX Coil EIR-FF,    !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Split MN1 Heating Coil Outlet,  !- Air Inlet Node Name
+    Split MN1 Air Loop Outlet,  !- Air Outlet Node Name
+    Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
+    Split DX Coil Cap-FF,    !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Split DX Coil EIR-FT,    !- Energy Input Ratio Function of Temperature Curve Name
+    Split DX Coil EIR-FF,    !- Energy Input Ratio Function of Flow Fraction Curve Name
     Split DX Coil PLF,       !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    0,                       !- Nominal Time for Condensate Removal to Begin {s}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Maximum Cycling Rate {cycles/hr}
+    0,                       !- Latent Capacity Time Constant {s}
+    Split MN1 Cooling Coil Condenser Inlet,  !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
+    0,                       !- Crankcase Heater Capacity {W}
+    10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     Split MN2 Cooling Coil,  !- Name
-    Split MN2 Heating Coil Outlet,  !- Evaporator Inlet Node Name
-    Split MN2 Air Loop Outlet,  !- Evaporator Outlet Node Name
     All On,                  !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    Split MN2 Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    Split MN2 Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    Split MN2 Cooling Coil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    Split MN2 Cooling Coil Performance,  !- Name
-    0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    Split MN2 Cooling Coil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    Split MN2 Cooling Coil Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    0,                       !- Maximum Cycling Rate {cycles/hr}
-    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    0,                       !- Latent Capacity Time Constant {s}
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    AirCooled,               !- Condenser Type
-    0,                       !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    Split MN2 Cooling Coil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Split MN2 Cooling Coil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    4.11713235489972,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    4.11713235489972,        !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
-    Split DX Coil Cap-FT,    !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Split DX Coil Cap-FF,    !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Split DX Coil EIR-FT,    !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Split DX Coil EIR-FF,    !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Split MN2 Heating Coil Outlet,  !- Air Inlet Node Name
+    Split MN2 Air Loop Outlet,  !- Air Outlet Node Name
+    Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
+    Split DX Coil Cap-FF,    !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Split DX Coil EIR-FT,    !- Energy Input Ratio Function of Temperature Curve Name
+    Split DX Coil EIR-FF,    !- Energy Input Ratio Function of Flow Fraction Curve Name
     Split DX Coil PLF,       !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    0,                       !- Nominal Time for Condensate Removal to Begin {s}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Maximum Cycling Rate {cycles/hr}
+    0,                       !- Latent Capacity Time Constant {s}
+    Split MN2 Cooling Coil Condenser Inlet,  !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
+    0,                       !- Crankcase Heater Capacity {W}
+    10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     Split MS1 Cooling Coil,  !- Name
-    Split MS1 Heating Coil Outlet,  !- Evaporator Inlet Node Name
-    Split MS1 Air Loop Outlet,  !- Evaporator Outlet Node Name
     All On,                  !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    Split MS1 Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    Split MS1 Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    Split MS1 Cooling Coil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    Split MS1 Cooling Coil Performance,  !- Name
-    0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    Split MS1 Cooling Coil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    Split MS1 Cooling Coil Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    0,                       !- Maximum Cycling Rate {cycles/hr}
-    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    0,                       !- Latent Capacity Time Constant {s}
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    AirCooled,               !- Condenser Type
-    0,                       !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    Split MS1 Cooling Coil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Split MS1 Cooling Coil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    4.11713235489972,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    4.11713235489972,        !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
-    Split DX Coil Cap-FT,    !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Split DX Coil Cap-FF,    !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Split DX Coil EIR-FT,    !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Split DX Coil EIR-FF,    !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Split MS1 Heating Coil Outlet,  !- Air Inlet Node Name
+    Split MS1 Air Loop Outlet,  !- Air Outlet Node Name
+    Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
+    Split DX Coil Cap-FF,    !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Split DX Coil EIR-FT,    !- Energy Input Ratio Function of Temperature Curve Name
+    Split DX Coil EIR-FF,    !- Energy Input Ratio Function of Flow Fraction Curve Name
     Split DX Coil PLF,       !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    0,                       !- Nominal Time for Condensate Removal to Begin {s}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Maximum Cycling Rate {cycles/hr}
+    0,                       !- Latent Capacity Time Constant {s}
+    Split MS1 Cooling Coil Condenser Inlet,  !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
+    0,                       !- Crankcase Heater Capacity {W}
+    10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     Split MS2 Cooling Coil,  !- Name
-    Split MS2 Heating Coil Outlet,  !- Evaporator Inlet Node Name
-    Split MS2 Air Loop Outlet,  !- Evaporator Outlet Node Name
     All On,                  !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    Split MS2 Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    Split MS2 Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    Split MS2 Cooling Coil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    Split MS2 Cooling Coil Performance,  !- Name
-    0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    Split MS2 Cooling Coil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    Split MS2 Cooling Coil Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    0,                       !- Maximum Cycling Rate {cycles/hr}
-    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    0,                       !- Latent Capacity Time Constant {s}
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    AirCooled,               !- Condenser Type
-    0,                       !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    Split MS2 Cooling Coil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Split MS2 Cooling Coil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    4.11713235489972,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    4.11713235489972,        !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
-    Split DX Coil Cap-FT,    !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Split DX Coil Cap-FF,    !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Split DX Coil EIR-FT,    !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Split DX Coil EIR-FF,    !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Split MS2 Heating Coil Outlet,  !- Air Inlet Node Name
+    Split MS2 Air Loop Outlet,  !- Air Outlet Node Name
+    Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
+    Split DX Coil Cap-FF,    !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Split DX Coil EIR-FT,    !- Energy Input Ratio Function of Temperature Curve Name
+    Split DX Coil EIR-FF,    !- Energy Input Ratio Function of Flow Fraction Curve Name
     Split DX Coil PLF,       !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    0,                       !- Nominal Time for Condensate Removal to Begin {s}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Maximum Cycling Rate {cycles/hr}
+    0,                       !- Latent Capacity Time Constant {s}
+    Split MS2 Cooling Coil Condenser Inlet,  !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
+    0,                       !- Crankcase Heater Capacity {W}
+    10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     Split TSW Cooling Coil,  !- Name
-    Split TSW Heating Coil Outlet,  !- Evaporator Inlet Node Name
-    Split TSW Air Loop Outlet,  !- Evaporator Outlet Node Name
     All On,                  !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    Split TSW Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    Split TSW Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    Split TSW Cooling Coil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    Split TSW Cooling Coil Performance,  !- Name
-    0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    Split TSW Cooling Coil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    Split TSW Cooling Coil Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    0,                       !- Maximum Cycling Rate {cycles/hr}
-    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    0,                       !- Latent Capacity Time Constant {s}
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    AirCooled,               !- Condenser Type
-    0,                       !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    Split TSW Cooling Coil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Split TSW Cooling Coil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    4.11713235489972,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    4.11713235489972,        !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
-    Split DX Coil Cap-FT,    !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Split DX Coil Cap-FF,    !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Split DX Coil EIR-FT,    !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Split DX Coil EIR-FF,    !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Split TSW Heating Coil Outlet,  !- Air Inlet Node Name
+    Split TSW Air Loop Outlet,  !- Air Outlet Node Name
+    Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
+    Split DX Coil Cap-FF,    !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Split DX Coil EIR-FT,    !- Energy Input Ratio Function of Temperature Curve Name
+    Split DX Coil EIR-FF,    !- Energy Input Ratio Function of Flow Fraction Curve Name
     Split DX Coil PLF,       !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    0,                       !- Nominal Time for Condensate Removal to Begin {s}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Maximum Cycling Rate {cycles/hr}
+    0,                       !- Latent Capacity Time Constant {s}
+    Split TSW Cooling Coil Condenser Inlet,  !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
+    0,                       !- Crankcase Heater Capacity {W}
+    10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     Split TNW Cooling Coil,  !- Name
-    Split TNW Heating Coil Outlet,  !- Evaporator Inlet Node Name
-    Split TNW Air Loop Outlet,  !- Evaporator Outlet Node Name
     All On,                  !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    Split TNW Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    Split TNW Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    Split TNW Cooling Coil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    Split TNW Cooling Coil Performance,  !- Name
-    0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    Split TNW Cooling Coil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    Split TNW Cooling Coil Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    0,                       !- Maximum Cycling Rate {cycles/hr}
-    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    0,                       !- Latent Capacity Time Constant {s}
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    AirCooled,               !- Condenser Type
-    0,                       !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    Split TNW Cooling Coil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Split TNW Cooling Coil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    4.11713235489972,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    4.11713235489972,        !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
-    Split DX Coil Cap-FT,    !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Split DX Coil Cap-FF,    !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Split DX Coil EIR-FT,    !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Split DX Coil EIR-FF,    !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Split TNW Heating Coil Outlet,  !- Air Inlet Node Name
+    Split TNW Air Loop Outlet,  !- Air Outlet Node Name
+    Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
+    Split DX Coil Cap-FF,    !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Split DX Coil EIR-FT,    !- Energy Input Ratio Function of Temperature Curve Name
+    Split DX Coil EIR-FF,    !- Energy Input Ratio Function of Flow Fraction Curve Name
     Split DX Coil PLF,       !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    0,                       !- Nominal Time for Condensate Removal to Begin {s}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Maximum Cycling Rate {cycles/hr}
+    0,                       !- Latent Capacity Time Constant {s}
+    Split TNW Cooling Coil Condenser Inlet,  !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
+    0,                       !- Crankcase Heater Capacity {W}
+    10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     Split TSE Cooling Coil,  !- Name
-    Split TSE Heating Coil Outlet,  !- Evaporator Inlet Node Name
-    Split TSE Air Loop Outlet,  !- Evaporator Outlet Node Name
     All On,                  !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    Split TSE Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    Split TSE Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    Split TSE Cooling Coil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    Split TSE Cooling Coil Performance,  !- Name
-    0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    Split TSE Cooling Coil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    Split TSE Cooling Coil Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    0,                       !- Maximum Cycling Rate {cycles/hr}
-    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    0,                       !- Latent Capacity Time Constant {s}
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    AirCooled,               !- Condenser Type
-    0,                       !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    Split TSE Cooling Coil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Split TSE Cooling Coil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    4.11713235489972,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    4.11713235489972,        !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
-    Split DX Coil Cap-FT,    !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Split DX Coil Cap-FF,    !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Split DX Coil EIR-FT,    !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Split DX Coil EIR-FF,    !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Split TSE Heating Coil Outlet,  !- Air Inlet Node Name
+    Split TSE Air Loop Outlet,  !- Air Outlet Node Name
+    Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
+    Split DX Coil Cap-FF,    !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Split DX Coil EIR-FT,    !- Energy Input Ratio Function of Temperature Curve Name
+    Split DX Coil EIR-FF,    !- Energy Input Ratio Function of Flow Fraction Curve Name
     Split DX Coil PLF,       !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    0,                       !- Nominal Time for Condensate Removal to Begin {s}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Maximum Cycling Rate {cycles/hr}
+    0,                       !- Latent Capacity Time Constant {s}
+    Split TSE Cooling Coil Condenser Inlet,  !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
+    0,                       !- Crankcase Heater Capacity {W}
+    10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     Split TNE Cooling Coil,  !- Name
-    Split TNE Heating Coil Outlet,  !- Evaporator Inlet Node Name
-    Split TNE Air Loop Outlet,  !- Evaporator Outlet Node Name
     All On,                  !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    Split TNE Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    Split TNE Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    Split TNE Cooling Coil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    Split TNE Cooling Coil Performance,  !- Name
-    0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    Split TNE Cooling Coil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    Split TNE Cooling Coil Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    0,                       !- Maximum Cycling Rate {cycles/hr}
-    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    0,                       !- Latent Capacity Time Constant {s}
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    AirCooled,               !- Condenser Type
-    0,                       !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    Split TNE Cooling Coil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Split TNE Cooling Coil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    4.11713235489972,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    4.11713235489972,        !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
-    Split DX Coil Cap-FT,    !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Split DX Coil Cap-FF,    !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Split DX Coil EIR-FT,    !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Split DX Coil EIR-FF,    !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Split TNE Heating Coil Outlet,  !- Air Inlet Node Name
+    Split TNE Air Loop Outlet,  !- Air Outlet Node Name
+    Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
+    Split DX Coil Cap-FF,    !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Split DX Coil EIR-FT,    !- Energy Input Ratio Function of Temperature Curve Name
+    Split DX Coil EIR-FF,    !- Energy Input Ratio Function of Flow Fraction Curve Name
     Split DX Coil PLF,       !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    0,                       !- Nominal Time for Condensate Removal to Begin {s}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Maximum Cycling Rate {cycles/hr}
+    0,                       !- Latent Capacity Time Constant {s}
+    Split TNE Cooling Coil Condenser Inlet,  !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
+    0,                       !- Crankcase Heater Capacity {W}
+    10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     Split TN1 Cooling Coil,  !- Name
-    Split TN1 Heating Coil Outlet,  !- Evaporator Inlet Node Name
-    Split TN1 Air Loop Outlet,  !- Evaporator Outlet Node Name
     All On,                  !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    Split TN1 Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    Split TN1 Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    Split TN1 Cooling Coil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    Split TN1 Cooling Coil Performance,  !- Name
-    0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    Split TN1 Cooling Coil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    Split TN1 Cooling Coil Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    0,                       !- Maximum Cycling Rate {cycles/hr}
-    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    0,                       !- Latent Capacity Time Constant {s}
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    AirCooled,               !- Condenser Type
-    0,                       !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    Split TN1 Cooling Coil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Split TN1 Cooling Coil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    4.11713235489972,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    4.11713235489972,        !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
-    Split DX Coil Cap-FT,    !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Split DX Coil Cap-FF,    !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Split DX Coil EIR-FT,    !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Split DX Coil EIR-FF,    !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Split TN1 Heating Coil Outlet,  !- Air Inlet Node Name
+    Split TN1 Air Loop Outlet,  !- Air Outlet Node Name
+    Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
+    Split DX Coil Cap-FF,    !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Split DX Coil EIR-FT,    !- Energy Input Ratio Function of Temperature Curve Name
+    Split DX Coil EIR-FF,    !- Energy Input Ratio Function of Flow Fraction Curve Name
     Split DX Coil PLF,       !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    0,                       !- Nominal Time for Condensate Removal to Begin {s}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Maximum Cycling Rate {cycles/hr}
+    0,                       !- Latent Capacity Time Constant {s}
+    Split TN1 Cooling Coil Condenser Inlet,  !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
+    0,                       !- Crankcase Heater Capacity {W}
+    10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     Split TN2 Cooling Coil,  !- Name
-    Split TN2 Heating Coil Outlet,  !- Evaporator Inlet Node Name
-    Split TN2 Air Loop Outlet,  !- Evaporator Outlet Node Name
     All On,                  !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    Split TN2 Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    Split TN2 Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    Split TN2 Cooling Coil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    Split TN2 Cooling Coil Performance,  !- Name
-    0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    Split TN2 Cooling Coil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    Split TN2 Cooling Coil Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    0,                       !- Maximum Cycling Rate {cycles/hr}
-    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    0,                       !- Latent Capacity Time Constant {s}
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    AirCooled,               !- Condenser Type
-    0,                       !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    Split TN2 Cooling Coil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Split TN2 Cooling Coil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    4.11713235489972,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    4.11713235489972,        !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
-    Split DX Coil Cap-FT,    !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Split DX Coil Cap-FF,    !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Split DX Coil EIR-FT,    !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Split DX Coil EIR-FF,    !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Split TN2 Heating Coil Outlet,  !- Air Inlet Node Name
+    Split TN2 Air Loop Outlet,  !- Air Outlet Node Name
+    Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
+    Split DX Coil Cap-FF,    !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Split DX Coil EIR-FT,    !- Energy Input Ratio Function of Temperature Curve Name
+    Split DX Coil EIR-FF,    !- Energy Input Ratio Function of Flow Fraction Curve Name
     Split DX Coil PLF,       !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    0,                       !- Nominal Time for Condensate Removal to Begin {s}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Maximum Cycling Rate {cycles/hr}
+    0,                       !- Latent Capacity Time Constant {s}
+    Split TN2 Cooling Coil Condenser Inlet,  !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
+    0,                       !- Crankcase Heater Capacity {W}
+    10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     Split TS1 Cooling Coil,  !- Name
-    Split TS1 Heating Coil Outlet,  !- Evaporator Inlet Node Name
-    Split TS1 Air Loop Outlet,  !- Evaporator Outlet Node Name
     All On,                  !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    Split TS1 Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    Split TS1 Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    Split TS1 Cooling Coil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    Split TS1 Cooling Coil Performance,  !- Name
-    0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    Split TS1 Cooling Coil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    Split TS1 Cooling Coil Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    0,                       !- Maximum Cycling Rate {cycles/hr}
-    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    0,                       !- Latent Capacity Time Constant {s}
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    AirCooled,               !- Condenser Type
-    0,                       !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    Split TS1 Cooling Coil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Split TS1 Cooling Coil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    4.11713235489972,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    4.11713235489972,        !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
-    Split DX Coil Cap-FT,    !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Split DX Coil Cap-FF,    !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Split DX Coil EIR-FT,    !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Split DX Coil EIR-FF,    !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Split TS1 Heating Coil Outlet,  !- Air Inlet Node Name
+    Split TS1 Air Loop Outlet,  !- Air Outlet Node Name
+    Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
+    Split DX Coil Cap-FF,    !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Split DX Coil EIR-FT,    !- Energy Input Ratio Function of Temperature Curve Name
+    Split DX Coil EIR-FF,    !- Energy Input Ratio Function of Flow Fraction Curve Name
     Split DX Coil PLF,       !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    0,                       !- Nominal Time for Condensate Removal to Begin {s}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Maximum Cycling Rate {cycles/hr}
+    0,                       !- Latent Capacity Time Constant {s}
+    Split TS1 Cooling Coil Condenser Inlet,  !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
+    0,                       !- Crankcase Heater Capacity {W}
+    10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     Split TS2 Cooling Coil,  !- Name
-    Split TS2 Heating Coil Outlet,  !- Evaporator Inlet Node Name
-    Split TS2 Air Loop Outlet,  !- Evaporator Outlet Node Name
     All On,                  !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    Split TS2 Cooling Coil Condenser Inlet,  !- Condenser Inlet Node Name
-    Split TS2 Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    Split TS2 Cooling Coil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    Split TS2 Cooling Coil Performance,  !- Name
-    0,                       !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    10,                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    Split TS2 Cooling Coil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    Split TS2 Cooling Coil Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    0,                       !- Maximum Cycling Rate {cycles/hr}
-    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    0,                       !- Latent Capacity Time Constant {s}
-    0,                       !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    AirCooled,               !- Condenser Type
-    0,                       !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    Split TS2 Cooling Coil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Split TS2 Cooling Coil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    4.11713235489972,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    4.11713235489972,        !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
-    Split DX Coil Cap-FT,    !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Split DX Coil Cap-FF,    !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Split DX Coil EIR-FT,    !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Split DX Coil EIR-FF,    !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Split TS2 Heating Coil Outlet,  !- Air Inlet Node Name
+    Split TS2 Air Loop Outlet,  !- Air Outlet Node Name
+    Split DX Coil Cap-FT,    !- Total Cooling Capacity Function of Temperature Curve Name
+    Split DX Coil Cap-FF,    !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Split DX Coil EIR-FT,    !- Energy Input Ratio Function of Temperature Curve Name
+    Split DX Coil EIR-FF,    !- Energy Input Ratio Function of Flow Fraction Curve Name
     Split DX Coil PLF,       !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    0,                       !- Nominal Time for Condensate Removal to Begin {s}
+    0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    0,                       !- Maximum Cycling Rate {cycles/hr}
+    0,                       !- Latent Capacity Time Constant {s}
+    Split TS2 Cooling Coil Condenser Inlet,  !- Condenser Air Inlet Node Name
+    AirCooled,               !- Condenser Type
+    0,                       !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    0,                       !- Evaporative Condenser Pump Rated Power Consumption {W}
+    0,                       !- Crankcase Heater Capacity {W}
+    10;                      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
 
 !-   ===========  ALL OBJECTS IN CLASS: FAN:SIMPLE:ONOFF ===========
 

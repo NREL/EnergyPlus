@@ -108,12 +108,23 @@ namespace HVACDXSystem {
     // To encapsulate the data and algorithms required to
     // manage the DXCoolingSystem System Component
 
+    // METHODOLOGY EMPLOYED:
+
+    // REFERENCES:
+
+    // OTHER NOTES:
+
+    // USE STATEMENTS:
+    // Use statements for data only modules
+    // Using/Aliasing
     using namespace DataPrecisionGlobals;
     using namespace DataLoopNode;
     using namespace DataGlobals;
     using namespace DataHVACGlobals;
     using namespace ScheduleManager;
 
+    // Data
+    // MODULE PARAMETER DEFINITIONS
     Real64 const MinAirMassFlow(0.001);
     // Compressor operation
     int const On(1);  // normal compressor operation
@@ -132,13 +143,29 @@ namespace HVACDXSystem {
     int const ChargeOnlyMode(4);
     int const DischargeOnlyMode(5);
 
+    // DERIVED TYPE DEFINITIONS
+
+    // MODULE VARIABLE DECLARATIONS:
     int NumDXSystem(0);         // The Number of DXCoolingSystems found in the Input
     bool EconomizerFlag(false); // holds air loop economizer status
 
     // Make this type allocatable
     Array1D_bool CheckEquipName;
 
+    // Subroutine Specifications for the Module
+    // Driver/Manager Routines
+
+    // Get Input routines for module
+
+    // Update routine to check convergence and update nodes
+
+    // Object Data
     Array1D<DXCoolingConditions> DXCoolingSystem;
+
+    // MODULE SUBROUTINES:
+    //*************************************************************************
+
+    // Functions
 
     void clear_state()
     {
@@ -384,6 +411,8 @@ namespace HVACDXSystem {
         Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
         //  certain object in the input file
+
+        // Flow
 
         CurrentModuleObject = "CoilSystem:Cooling:DX";
         NumDXSystem = inputProcessor->getNumObjectsFound(CurrentModuleObject);

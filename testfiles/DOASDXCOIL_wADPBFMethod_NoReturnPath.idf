@@ -2393,7 +2393,7 @@
     DOAS Supply Fan Outlet,  !- DX Cooling Coil System Inlet Node Name
     DOAS Cooling Coil Outlet,!- DX Cooling Coil System Outlet Node Name
     DOAS Cooling Coil Outlet,!- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:TwoStageWithHumidityControlMode,  !- Cooling Coil Object Type
     DOAS Cooling Coil,       !- Cooling Coil Name
     Multimode,               !- Dehumidification Control Type
     Yes,                     !- Run on Sensible Load
@@ -2401,150 +2401,114 @@
     Yes,                     !- Use Outdoor Air DX Cooling Coil
     2.0;                     !- Outdoor Air DX Cooling Coil Leaving Minimum Air Temperature {C}
 
-  OutdoorAir:Node,
-    DOAS Cooling Coil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:TwoStageWithHumidityControlMode,
     DOAS Cooling Coil,       !- Name
-    DOAS Supply Fan Outlet,  !- Evaporator Inlet Node Name
-    DOAS Cooling Coil Outlet,!- Evaporator Outlet Node Name
     HVACTemplate-Always 1,   !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    DOAS Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    DOAS Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    DOAS Cooling Coil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    DOAS Cooling Coil Performance,  !- Name
+    DOAS Supply Fan Outlet,  !- Air Inlet Node Name
+    DOAS Cooling Coil Outlet,!- Air Outlet Node Name
     ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
     ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    MultiSpeed,              !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    DOAS Cooling Coil Normal Operating Mode,  !- Base Operating Mode
-    DOAS Cooling Coil Dehumidification Operating Mode;  !- Alternative Operating Mode
+    2,                       !- Number of Capacity Stages
+    1,                       !- Number of Enhanced Dehumidification Modes
+    CoilPerformance:DX:Cooling,  !- Normal Mode Stage 1 Coil Performance Object Type
+    DOAS Standard Perf 1,    !- Normal Mode Stage 1 Coil Performance Name
+    CoilPerformance:DX:Cooling,  !- Normal Mode Stage 1+2 Coil Performance Object Type
+    DOAS Standard Perf 1+2,  !- Normal Mode Stage 1+2 Coil Performance Name
+    CoilPerformance:DX:Cooling,  !- Dehumidification Mode 1 Stage 1 Coil Performance Object Type
+    DOAS Dehumid Perf 1,     !- Dehumidification Mode 1 Stage 1 Coil Performance Name
+    CoilPerformance:DX:Cooling,  !- Dehumidification Mode 1 Stage 1+2 Coil Performance Object Type
+    DOAS Dehumid Perf 1+2;   !- Dehumidification Mode 1 Stage 1+2 Coil Performance Name
 
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    DOAS Cooling Coil Normal Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
+  CoilPerformance:DX:Cooling,
+    DOAS Standard Perf 1,    !- Name
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    3,                       !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
+    0.5,                     !- Fraction of Air Flow Bypassed Around Coil
+    DOAS DX Coil Std Cap-FT, !- Total Cooling Capacity Function of Temperature Curve Name
+    DOAS DX Coil Cap-FF,     !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    DOAS DX Coil Std EIR-FT, !- Energy Input Ratio Function of Temperature Curve Name
+    DOAS DX Coil EIR-FF,     !- Energy Input Ratio Function of Flow Fraction Curve Name
+    DOAS DX Coil PLF,        !- Part Load Fraction Correlation Curve Name
     ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    Yes,                     !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    2,                       !- Nominal Speed Number
-    DOAS Cooling Coil Normal Mode Stage 1 Performance,  !- Speed 1 Name
-    DOAS Cooling Coil Normal Mode Stage 2 Performance;  !- Speed 2 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    DOAS Cooling Coil Normal Mode Stage 1 Performance,  !- Name
-    0.50,                    !- Gross Total Cooling Capacity Fraction
-    0.50,                    !- Evaporator Air Flow Rate Fraction
-    ,                        !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    3,                       !- Gross Cooling COP {W/W}
-    0.5000,                  !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    DOAS DX Coil Std Cap-FT, !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    DOAS DX Coil Cap-FF,     !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    DOAS DX Coil Std EIR-FT, !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    DOAS DX Coil EIR-FF,     !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    DOAS DX Coil PLF,        !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    DOAS Cooling Coil Normal Mode Stage 2 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    3,                       !- Gross Cooling COP {W/W}
-    1.0000,                  !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    DOAS DX Coil Std Cap-FT, !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    DOAS DX Coil Cap-FF,     !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    DOAS DX Coil Std EIR-FT, !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    DOAS DX Coil EIR-FF,     !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    DOAS DX Coil PLF,        !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    DOAS Cooling Coil Dehumidification Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
     ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    ,                        !- Maximum Cycling Rate {cycles/hr}
     ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    Yes,                     !- Apply Latent Degradation to Speeds Greater than 1
+    ,                        !- Condenser Air Inlet Node Name
     ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    2,                       !- Nominal Speed Number
-    DOAS Cooling Coil Dehumidification Mode Stage 1 Performance,  !- Speed 1 Name
-    DOAS Cooling Coil Dehumidification Mode Stage 2 Performance;  !- Speed 2 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    DOAS Cooling Coil Dehumidification Mode Stage 1 Performance,  !- Name
-    0.50,                    !- Gross Total Cooling Capacity Fraction
-    0.50,                    !- Evaporator Air Flow Rate Fraction
-    ,                        !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    2.700000,                !- Gross Cooling COP {W/W}
-    0.5000,                  !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
     ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    DOAS DX Coil Dehum Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    DOAS DX Coil Cap-FF,     !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    DOAS DX Coil Dehum EIR-FT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    DOAS DX Coil EIR-FF,     !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    DOAS DX Coil PLF,        !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    ;                        !- Evaporative Condenser Pump Rated Power Consumption {W}
 
-  Coil:Cooling:DX:CurveFit:Speed,
-    DOAS Cooling Coil Dehumidification Mode Stage 2 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    2.700000,                !- Gross Cooling COP {W/W}
-    1.0000,                  !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    DOAS DX Coil Dehum Cap-FT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    DOAS DX Coil Cap-FF,     !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    DOAS DX Coil Dehum EIR-FT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    DOAS DX Coil EIR-FF,     !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+  CoilPerformance:DX:Cooling,
+    DOAS Standard Perf 1+2,  !- Name
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    3,                       !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
+    0.0,                     !- Fraction of Air Flow Bypassed Around Coil
+    DOAS DX Coil Std Cap-FT, !- Total Cooling Capacity Function of Temperature Curve Name
+    DOAS DX Coil Cap-FF,     !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    DOAS DX Coil Std EIR-FT, !- Energy Input Ratio Function of Temperature Curve Name
+    DOAS DX Coil EIR-FF,     !- Energy Input Ratio Function of Flow Fraction Curve Name
     DOAS DX Coil PLF,        !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    ,                        !- Maximum Cycling Rate {cycles/hr}
+    ,                        !- Latent Capacity Time Constant {s}
+    ,                        !- Condenser Air Inlet Node Name
+    ,                        !- Condenser Type
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
+    ;                        !- Sensible Heat Ratio Function of Temperature Curve Name
+
+  CoilPerformance:DX:Cooling,
+    DOAS Dehumid Perf 1,     !- Name
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    2.700000,                !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
+    0.5,                     !- Fraction of Air Flow Bypassed Around Coil
+    DOAS DX Coil Dehum Cap-FT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    DOAS DX Coil Cap-FF,     !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    DOAS DX Coil Dehum EIR-FT,  !- Energy Input Ratio Function of Temperature Curve Name
+    DOAS DX Coil EIR-FF,     !- Energy Input Ratio Function of Flow Fraction Curve Name
+    DOAS DX Coil PLF,        !- Part Load Fraction Correlation Curve Name
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    ,                        !- Maximum Cycling Rate {cycles/hr}
+    ,                        !- Latent Capacity Time Constant {s}
+    ,                        !- Condenser Air Inlet Node Name
+    ,                        !- Condenser Type
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
+    ;                        !- Sensible Heat Ratio Function of Temperature Curve Name
+
+  CoilPerformance:DX:Cooling,
+    DOAS Dehumid Perf 1+2,   !- Name
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    2.700000,                !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
+    0.0,                     !- Fraction of Air Flow Bypassed Around Coil
+    DOAS DX Coil Dehum Cap-FT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    DOAS DX Coil Cap-FF,     !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    DOAS DX Coil Dehum EIR-FT,  !- Energy Input Ratio Function of Temperature Curve Name
+    DOAS DX Coil EIR-FF,     !- Energy Input Ratio Function of Flow Fraction Curve Name
+    DOAS DX Coil PLF,        !- Part Load Fraction Correlation Curve Name
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    ,                        !- Maximum Cycling Rate {cycles/hr}
+    ,                        !- Latent Capacity Time Constant {s}
+    ,                        !- Condenser Air Inlet Node Name
+    ,                        !- Condenser Type
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
+    ;                        !- Sensible Heat Ratio Function of Temperature Curve Name
 
   Curve:Biquadratic,
     DOAS DX Coil Std Cap-FT, !- Name
