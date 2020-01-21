@@ -193,6 +193,7 @@ namespace UnitarySystems {
         int m_SystemHeatControlNodeNum;
         bool m_CoolCoilExists;
         int m_CoolingCoilType_Num;
+        int m_CoolingCoilSubType_Num;
         int m_NumOfSpeedCooling;
         int m_CoolingCoilAvailSchPtr;
         Real64 m_DesignCoolingCapacity;
@@ -408,6 +409,8 @@ namespace UnitarySystems {
         DesignSpecMSHP *m_CompPointerMSHP;
         std::string Name;
         std::string UnitType;
+        Real64 LoadSHR;                  // Load sensible heat ratio with humidity control
+        Real64 CoilSHR;    // Load sensible heat ratio with humidity control
 
         //    private:
         // private members not initialized in constructor
@@ -429,6 +432,8 @@ namespace UnitarySystems {
         std::vector<Real64> m_HeatingVolFlowRatio;
         std::vector<int> m_IterationMode; // array of operating mode each iteration
         std::vector<Real64> FullOutput;   // Full output for different speed
+        std::vector<Real64> FullLatOutput;   // Full latent output for different speed
+        std::vector<Real64> SpeedSHR; // SHR at different speed
 
         struct WarnMessages
         {

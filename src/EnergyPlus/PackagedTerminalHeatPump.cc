@@ -4015,7 +4015,7 @@ namespace PackagedTerminalHeatPump {
 
                 if (PTUnit(PTUnitNum).DXCoolCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
                     // Call coil to make sure sizing executes
-                    coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].simulate(false, 0.0, 1, 0.0, PTUnit(PTUnitNum).OpMode);
+                    coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].simulate(coilNormalMode, 0.0, 1, 0.0, PTUnit(PTUnitNum).OpMode);
                     Real64 normalModeRatedEvapAirFlowRate;
                     std::vector<Real64> normalModeFlowRates;
                     std::vector<Real64> normalModeRatedCapacities_notused;
@@ -5104,7 +5104,7 @@ namespace PackagedTerminalHeatPump {
                 if (PTUnit(PTUnitNum).useVSCoilModel) {
                     if (PTUnit(PTUnitNum).DXCoolCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
                         // Call coil to make sure sizing executes
-                        coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].simulate(false, 0.0, 1, 0.0, PTUnit(PTUnitNum).OpMode);
+                        coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].simulate(coilNormalMode, 0.0, 1, 0.0, PTUnit(PTUnitNum).OpMode);
                         std::vector<Real64> normalModeFlowRates_notused;
                         std::vector<Real64> normalModeRatedCapacities_notused;
                         coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].getDataAfterSizing(
@@ -5937,8 +5937,7 @@ namespace PackagedTerminalHeatPump {
                                                  HXUnitOn);
                         SaveCompressorPLR = DXCoilPartLoadRatio(PTUnit(PTUnitNum).DXCoolCoilIndexNum);
                     } else if(PTUnit(PTUnitNum).DXCoolCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
-                        coilCoolingDXs[PTUnit(PTUnitNum).CoolCoilCompIndex].simulate(
-                            false, PartLoadFrac, 1, 1.0, PTUnit(PTUnitNum).OpMode);
+                        coilCoolingDXs[PTUnit(PTUnitNum).CoolCoilCompIndex].simulate(coilNormalMode, PartLoadFrac, 1, 1.0, PTUnit(PTUnitNum).OpMode);
                         // TODO: setting this to the PLR that was passed in - this might cause diffs
                         //SaveCompressorPLR = DXCoilPartLoadRatio(PTUnit(PTUnitNum).DXCoolCoilIndexNum);
                         SaveCompressorPLR = PartLoadFrac;
@@ -5984,8 +5983,7 @@ namespace PackagedTerminalHeatPump {
                                                  PTUnit(PTUnitNum).OpMode,
                                                  HXUnitOn);
                     } else if(PTUnit(PTUnitNum).DXCoolCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
-                        coilCoolingDXs[PTUnit(PTUnitNum).CoolCoilCompIndex].simulate(
-                            false, 0.0, 1, 0, PTUnit(PTUnitNum).OpMode);
+                        coilCoolingDXs[PTUnit(PTUnitNum).CoolCoilCompIndex].simulate(coilNormalMode, 0.0, 1, 0, PTUnit(PTUnitNum).OpMode);
                     } else {
                         SimDXCoil(PTUnit(PTUnitNum).DXCoolCoilName,
                                   Off,
@@ -8112,7 +8110,8 @@ namespace PackagedTerminalHeatPump {
 
         if (CoolingLoad && OutsideDryBulbTemp > PTUnit(PTUnitNum).MinOATCompressorCooling) {
             if (PTUnit(PTUnitNum).DXCoolCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
-                coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].simulate(false, PartLoadFrac, SpeedNum, SpeedRatio, PTUnit(PTUnitNum).OpMode);
+                coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].simulate(
+                    coilNormalMode, PartLoadFrac, SpeedNum, SpeedRatio, PTUnit(PTUnitNum).OpMode);
             } else {
                 SimVariableSpeedCoils(BlankString,
                                       PTUnit(PTUnitNum).DXCoolCoilIndexNum,
@@ -8132,7 +8131,7 @@ namespace PackagedTerminalHeatPump {
             SaveCompressorPLR = PartLoadFrac;
         } else { // cooling coil is off
             if (PTUnit(PTUnitNum).DXCoolCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
-                coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].simulate(false, 0.0, 1, 0.0, PTUnit(PTUnitNum).OpMode);
+                coilCoolingDXs[PTUnit(PTUnitNum).DXCoolCoilIndexNum].simulate(coilNormalMode, 0.0, 1, 0.0, PTUnit(PTUnitNum).OpMode);
             } else {
                 SimVariableSpeedCoils(BlankString,
                                       PTUnit(PTUnitNum).DXCoolCoilIndexNum,
