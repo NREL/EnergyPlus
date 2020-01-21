@@ -82,7 +82,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 118
 
-  Version,9.3;
+  Version,9.2;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -21675,709 +21675,709 @@
   InternalMass,
     Floor 1 Anesthesia Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Anesthesia,      !- Zone or ZoneList Name
+    Floor 1 Anesthesia,      !- Zone Name
     20.0671;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Bio Haz Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Bio Haz,         !- Zone or ZoneList Name
+    Floor 1 Bio Haz,         !- Zone Name
     10.4051;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Cafe Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Cafe,            !- Zone or ZoneList Name
+    Floor 1 Cafe,            !- Zone Name
     78.0386;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Clean Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Clean,           !- Zone or ZoneList Name
+    Floor 1 Clean,           !- Zone Name
     23.4116;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Clean Work Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Clean Work,      !- Zone or ZoneList Name
+    Floor 1 Clean Work,      !- Zone Name
     30.6580;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Dictation Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Dictation,       !- Zone or ZoneList Name
+    Floor 1 Dictation,       !- Zone Name
     23.4116;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Dressing Room Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Dressing Room,   !- Zone or ZoneList Name
+    Floor 1 Dressing Room,   !- Zone Name
     8.3613;                  !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Electrical Room Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Electrical Room, !- Zone or ZoneList Name
+    Floor 1 Electrical Room, !- Zone Name
     18.2090;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Elevator Pump Room Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Elevator Pump Room,  !- Zone or ZoneList Name
+    Floor 1 Elevator Pump Room,  !- Zone Name
     16.9084;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Humid Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Humid,           !- Zone or ZoneList Name
+    Floor 1 Humid,           !- Zone Name
     10.0335;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 IT Hall Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 IT Hall,         !- Zone or ZoneList Name
+    Floor 1 IT Hall,         !- Zone Name
     26.0129;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 IT Room Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 IT Room,         !- Zone or ZoneList Name
+    Floor 1 IT Room,         !- Zone Name
     20.8103;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Lobby Hall Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Lobby Hall,      !- Zone or ZoneList Name
+    Floor 1 Lobby Hall,      !- Zone Name
     44.5935;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Lobby Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Lobby,           !- Zone or ZoneList Name
+    Floor 1 Lobby,           !- Zone Name
     115.5714;                !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Lobby Toilet Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Lobby Toilet,    !- Zone or ZoneList Name
+    Floor 1 Lobby Toilet,    !- Zone Name
     10.0335;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Locker Room Hall Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Locker Room Hall,!- Zone or ZoneList Name
+    Floor 1 Locker Room Hall,!- Zone Name
     92.1598;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Locker Room Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Locker Room,     !- Zone or ZoneList Name
+    Floor 1 Locker Room,     !- Zone Name
     122.6320;                !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Lounge Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Lounge,          !- Zone or ZoneList Name
+    Floor 1 Lounge,          !- Zone Name
     66.8902;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 MRI Control Room Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 MRI Control Room,!- Zone or ZoneList Name
+    Floor 1 MRI Control Room,!- Zone Name
     31.2154;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 MRI Hall Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 MRI Hall,        !- Zone or ZoneList Name
+    Floor 1 MRI Hall,        !- Zone Name
     27.3135;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 MRI Room Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 MRI Room,        !- Zone or ZoneList Name
+    Floor 1 MRI Room,        !- Zone Name
     81.7547;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 MRI Toilet Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 MRI Toilet,      !- Zone or ZoneList Name
+    Floor 1 MRI Toilet,      !- Zone Name
     10.0335;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Med Gas Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Med Gas,         !- Zone or ZoneList Name
+    Floor 1 Med Gas,         !- Zone Name
     10.4051;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Nourishment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Nourishment,     !- Zone or ZoneList Name
+    Floor 1 Nourishment,     !- Zone Name
     33.8167;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Nurse Hall Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Nurse Hall,      !- Zone or ZoneList Name
+    Floor 1 Nurse Hall,      !- Zone Name
     92.1598;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Nurse Janitor Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Nurse Janitor,   !- Zone or ZoneList Name
+    Floor 1 Nurse Janitor,   !- Zone Name
     10.0335;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Nurse Station Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Nurse Station,   !- Zone or ZoneList Name
+    Floor 1 Nurse Station,   !- Zone Name
     48.4954;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Nurse Toilet Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Nurse Toilet,    !- Zone or ZoneList Name
+    Floor 1 Nurse Toilet,    !- Zone Name
     10.0335;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Office Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Office,          !- Zone or ZoneList Name
+    Floor 1 Office,          !- Zone Name
     89.7443;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Operating Room 1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Operating Room 1,!- Zone or ZoneList Name
+    Floor 1 Operating Room 1,!- Zone Name
     85.4708;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Operating Room 2 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Operating Room 2,!- Zone or ZoneList Name
+    Floor 1 Operating Room 2,!- Zone Name
     89.1869;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Operating Room 3 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Operating Room 3,!- Zone or ZoneList Name
+    Floor 1 Operating Room 3,!- Zone Name
     88.4437;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 PACU Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 PACU,            !- Zone or ZoneList Name
+    Floor 1 PACU,            !- Zone Name
     20.0671;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Pre-Op Hall Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Pre-Op Hall,     !- Zone or ZoneList Name
+    Floor 1 Pre-Op Hall,     !- Zone Name
     98.1056;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Pre-Op Room 1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Pre-Op Room 1,   !- Zone or ZoneList Name
+    Floor 1 Pre-Op Room 1,   !- Zone Name
     35.1173;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Pre-Op Room 2 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Pre-Op Room 2,   !- Zone or ZoneList Name
+    Floor 1 Pre-Op Room 2,   !- Zone Name
     62.8025;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Pre-Op Toilet Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Pre-Op Toilet,   !- Zone or ZoneList Name
+    Floor 1 Pre-Op Toilet,   !- Zone Name
     10.0335;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Procedure Room Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Procedure Room,  !- Zone or ZoneList Name
+    Floor 1 Procedure Room,  !- Zone Name
     52.9547;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Reception Hall Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Reception Hall,  !- Zone or ZoneList Name
+    Floor 1 Reception Hall,  !- Zone Name
     23.7832;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Reception Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Reception,       !- Zone or ZoneList Name
+    Floor 1 Reception,       !- Zone Name
     94.5753;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Recovery Room Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Recovery Room,   !- Zone or ZoneList Name
+    Floor 1 Recovery Room,   !- Zone Name
     100.3353;                !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Scheduling Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Scheduling,      !- Zone or ZoneList Name
+    Floor 1 Scheduling,      !- Zone Name
     22.1109;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Scrub Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Scrub,           !- Zone or ZoneList Name
+    Floor 1 Scrub,           !- Zone Name
     15.6077;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Soil Hold Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Soil Hold,       !- Zone or ZoneList Name
+    Floor 1 Soil Hold,       !- Zone Name
     10.4051;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Soil Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Soil,            !- Zone or ZoneList Name
+    Floor 1 Soil,            !- Zone Name
     23.4116;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Soil Work Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Soil Work,       !- Zone or ZoneList Name
+    Floor 1 Soil Work,       !- Zone Name
     33.4451;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Step Down Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Step Down,       !- Zone or ZoneList Name
+    Floor 1 Step Down,       !- Zone Name
     55.7418;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Sterile Hall Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Sterile Hall,    !- Zone or ZoneList Name
+    Floor 1 Sterile Hall,    !- Zone Name
     114.4565;                !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Sterile Storage Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Sterile Storage, !- Zone or ZoneList Name
+    Floor 1 Sterile Storage, !- Zone Name
     73.5792;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Storage Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Storage,         !- Zone or ZoneList Name
+    Floor 1 Storage,         !- Zone Name
     170.9416;                !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Sub-Sterile Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Sub-Sterile,     !- Zone or ZoneList Name
+    Floor 1 Sub-Sterile,     !- Zone Name
     36.4180;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Utility Hall Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Utility Hall,    !- Zone or ZoneList Name
+    Floor 1 Utility Hall,    !- Zone Name
     47.5664;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Utility Janitor Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Utility Janitor, !- Zone or ZoneList Name
+    Floor 1 Utility Janitor, !- Zone Name
     7.8039;                  !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Utility Room Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Utility Room,    !- Zone or ZoneList Name
+    Floor 1 Utility Room,    !- Zone Name
     66.8902;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 1 Vestibule Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 1 Vestibule,       !- Zone or ZoneList Name
+    Floor 1 Vestibule,       !- Zone Name
     13.3780;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Conference Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Conference,      !- Zone or ZoneList Name
+    Floor 2 Conference,      !- Zone Name
     62.4308;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Conference Toilet Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Conference Toilet,  !- Zone or ZoneList Name
+    Floor 2 Conference Toilet,  !- Zone Name
     11.8916;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Dictation Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Dictation,       !- Zone or ZoneList Name
+    Floor 2 Dictation,       !- Zone Name
     13.0064;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Exam 1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Exam 1,          !- Zone or ZoneList Name
+    Floor 2 Exam 1,          !- Zone Name
     66.8902;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Exam 2 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Exam 2,          !- Zone or ZoneList Name
+    Floor 2 Exam 2,          !- Zone Name
     100.3353;                !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Exam 3 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Exam 3,          !- Zone or ZoneList Name
+    Floor 2 Exam 3,          !- Zone Name
     133.7804;                !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Exam 4 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Exam 4,          !- Zone or ZoneList Name
+    Floor 2 Exam 4,          !- Zone Name
     15.6077;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Exam 5 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Exam 5,          !- Zone or ZoneList Name
+    Floor 2 Exam 5,          !- Zone Name
     65.0321;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Exam 6 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Exam 6,          !- Zone or ZoneList Name
+    Floor 2 Exam 6,          !- Zone Name
     41.8064;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Exam 7 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Exam 7,          !- Zone or ZoneList Name
+    Floor 2 Exam 7,          !- Zone Name
     147.1584;                !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Exam 8 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Exam 8,          !- Zone or ZoneList Name
+    Floor 2 Exam 8,          !- Zone Name
     50.1676;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Exam 9 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Exam 9,          !- Zone or ZoneList Name
+    Floor 2 Exam 9,          !- Zone Name
     73.5792;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Exam Hall 1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Exam Hall 1,     !- Zone or ZoneList Name
+    Floor 2 Exam Hall 1,     !- Zone Name
     33.4451;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Exam Hall 2 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Exam Hall 2,     !- Zone or ZoneList Name
+    Floor 2 Exam Hall 2,     !- Zone Name
     33.4451;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Exam Hall 3 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Exam Hall 3,     !- Zone or ZoneList Name
+    Floor 2 Exam Hall 3,     !- Zone Name
     33.4451;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Exam Hall 4 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Exam Hall 4,     !- Zone or ZoneList Name
+    Floor 2 Exam Hall 4,     !- Zone Name
     36.7896;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Exam Hall 5 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Exam Hall 5,     !- Zone or ZoneList Name
+    Floor 2 Exam Hall 5,     !- Zone Name
     36.7896;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Exam Hall 6 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Exam Hall 6,     !- Zone or ZoneList Name
+    Floor 2 Exam Hall 6,     !- Zone Name
     36.7896;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Janitor Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Janitor,         !- Zone or ZoneList Name
+    Floor 2 Janitor,         !- Zone Name
     11.7058;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Lounge Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Lounge,          !- Zone or ZoneList Name
+    Floor 2 Lounge,          !- Zone Name
     14.8645;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Nurse Station 1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Nurse Station 1, !- Zone or ZoneList Name
+    Floor 2 Nurse Station 1, !- Zone Name
     27.8709;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Nurse Station 2 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Nurse Station 2, !- Zone or ZoneList Name
+    Floor 2 Nurse Station 2, !- Zone Name
     33.4451;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Office Hall Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Office Hall,     !- Zone or ZoneList Name
+    Floor 2 Office Hall,     !- Zone Name
     82.4979;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Office Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Office,          !- Zone or ZoneList Name
+    Floor 2 Office,          !- Zone Name
     104.0514;                !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Reception Hall Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Reception Hall,  !- Zone or ZoneList Name
+    Floor 2 Reception Hall,  !- Zone Name
     104.7946;                !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Reception Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Reception,       !- Zone or ZoneList Name
+    Floor 2 Reception,       !- Zone Name
     182.8332;                !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Reception Toilet Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Reception Toilet,!- Zone or ZoneList Name
+    Floor 2 Reception Toilet,!- Zone Name
     23.4116;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Scheduling 1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Scheduling 1,    !- Zone or ZoneList Name
+    Floor 2 Scheduling 1,    !- Zone Name
     60.2012;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Scheduling 2 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Scheduling 2,    !- Zone or ZoneList Name
+    Floor 2 Scheduling 2,    !- Zone Name
     63.5457;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Storage 1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Storage 1,       !- Zone or ZoneList Name
+    Floor 2 Storage 1,       !- Zone Name
     10.4051;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Storage 2 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Storage 2,       !- Zone or ZoneList Name
+    Floor 2 Storage 2,       !- Zone Name
     22.2967;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Storage 3 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Storage 3,       !- Zone or ZoneList Name
+    Floor 2 Storage 3,       !- Zone Name
     26.7561;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Utility Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Utility,         !- Zone or ZoneList Name
+    Floor 2 Utility,         !- Zone Name
     23.4116;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Work Hall Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Work Hall,       !- Zone or ZoneList Name
+    Floor 2 Work Hall,       !- Zone Name
     154.9623;                !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Work Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Work,            !- Zone or ZoneList Name
+    Floor 2 Work,            !- Zone Name
     314.0123;                !- Surface Area {m2}
 
   InternalMass,
     Floor 2 Work Toilet Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 Work Toilet,     !- Zone or ZoneList Name
+    Floor 2 Work Toilet,     !- Zone Name
     10.0335;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 2 X-Ray Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 2 X-Ray,           !- Zone or ZoneList Name
+    Floor 2 X-Ray,           !- Zone Name
     167.2255;                !- Surface Area {m2}
 
   InternalMass,
     Floor 3 Dressing Room Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 3 Dressing Room,   !- Zone or ZoneList Name
+    Floor 3 Dressing Room,   !- Zone Name
     7.8039;                  !- Surface Area {m2}
 
   InternalMass,
     Floor 3 Elevator Hall Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 3 Elevator Hall,   !- Zone or ZoneList Name
+    Floor 3 Elevator Hall,   !- Zone Name
     68.7482;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 3 Humid Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 3 Humid,           !- Zone or ZoneList Name
+    Floor 3 Humid,           !- Zone Name
     20.0671;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 3 Janitor Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 3 Janitor,         !- Zone or ZoneList Name
+    Floor 3 Janitor,         !- Zone Name
     11.7058;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 3 Locker Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 3 Locker,          !- Zone or ZoneList Name
+    Floor 3 Locker,          !- Zone Name
     22.2967;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 3 Lounge Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 3 Lounge,          !- Zone or ZoneList Name
+    Floor 3 Lounge,          !- Zone Name
     141.0268;                !- Surface Area {m2}
 
   InternalMass,
     Floor 3 Lounge Toilet Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 3 Lounge Toilet,   !- Zone or ZoneList Name
+    Floor 3 Lounge Toilet,   !- Zone Name
     35.6748;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 3 Mechanical Hall Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 3 Mechanical Hall, !- Zone or ZoneList Name
+    Floor 3 Mechanical Hall, !- Zone Name
     55.7418;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 3 Mechanical Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 3 Mechanical,      !- Zone or ZoneList Name
+    Floor 3 Mechanical,      !- Zone Name
     65.0321;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 3 Office Hall Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 3 Office Hall,     !- Zone or ZoneList Name
+    Floor 3 Office Hall,     !- Zone Name
     154.9623;                !- Surface Area {m2}
 
   InternalMass,
     Floor 3 Office Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 3 Office,          !- Zone or ZoneList Name
+    Floor 3 Office,          !- Zone Name
     564.1073;                !- Surface Area {m2}
 
   InternalMass,
     Floor 3 Office Toilet Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 3 Office Toilet,   !- Zone or ZoneList Name
+    Floor 3 Office Toilet,   !- Zone Name
     10.0335;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 3 Physical Therapy 1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 3 Physical Therapy 1,  !- Zone or ZoneList Name
+    Floor 3 Physical Therapy 1,  !- Zone Name
     241.5479;                !- Surface Area {m2}
 
   InternalMass,
     Floor 3 Physical Therapy 2 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 3 Physical Therapy 2,  !- Zone or ZoneList Name
+    Floor 3 Physical Therapy 2,  !- Zone Name
     109.9972;                !- Surface Area {m2}
 
   InternalMass,
     Floor 3 Physical Therapy Toilet Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 3 Physical Therapy Toilet,  !- Zone or ZoneList Name
+    Floor 3 Physical Therapy Toilet,  !- Zone Name
     15.6077;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 3 Storage 1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 3 Storage 1,       !- Zone or ZoneList Name
+    Floor 3 Storage 1,       !- Zone Name
     20.0671;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 3 Storage 2 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 3 Storage 2,       !- Zone or ZoneList Name
+    Floor 3 Storage 2,       !- Zone Name
     15.6077;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 3 Treatment Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 3 Treatment,       !- Zone or ZoneList Name
+    Floor 3 Treatment,       !- Zone Name
     88.4437;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 3 Undeveloped 1 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 3 Undeveloped 1,   !- Zone or ZoneList Name
+    Floor 3 Undeveloped 1,   !- Zone Name
     421.4082;                !- Surface Area {m2}
 
   InternalMass,
     Floor 3 Undeveloped 2 Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 3 Undeveloped 2,   !- Zone or ZoneList Name
+    Floor 3 Undeveloped 2,   !- Zone Name
     214.0486;                !- Surface Area {m2}
 
   InternalMass,
     Floor 3 Utility Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 3 Utility,         !- Zone or ZoneList Name
+    Floor 3 Utility,         !- Zone Name
     40.1341;                 !- Surface Area {m2}
 
   InternalMass,
     Floor 3 Work Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Floor 3 Work,            !- Zone or ZoneList Name
+    Floor 3 Work,            !- Zone Name
     106.6527;                !- Surface Area {m2}
 
   InternalMass,
     NE Stair Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    NE Stair,                !- Zone or ZoneList Name
+    NE Stair,                !- Zone Name
     31.2154;                 !- Surface Area {m2}
 
   InternalMass,
     NW Elevator Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    NW Elevator,             !- Zone or ZoneList Name
+    NW Elevator,             !- Zone Name
     26.0129;                 !- Surface Area {m2}
 
   InternalMass,
     NW Stair Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    NW Stair,                !- Zone or ZoneList Name
+    NW Stair,                !- Zone Name
     35.6748;                 !- Surface Area {m2}
 
   InternalMass,
     SW Stair Internal Mass,  !- Name
     InteriorFurnishings,     !- Construction Name
-    SW Stair,                !- Zone or ZoneList Name
+    SW Stair,                !- Zone Name
     17.8374;                 !- Surface Area {m2}
 
 ! ***INTERNAL GAINS SCHEDULES***
@@ -23008,177 +23008,49 @@
     Floor 1 Soil Work Exhaust Fan Outlet Node Name,  !- Air Outlet Node Name
     Zone Exhaust Fans;       !- End-Use Subcategory
 
-  OutdoorAir:Node,
-    AHU-1_CoolC DXCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:TwoSpeed,
     AHU-1_CoolC DXCoil,      !- Name
-    AHU-1_OA-AHU-1_CoolCNode,!- Evaporator Inlet Node Name
-    AHU-1_CoolC-AHU-1_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    AHU-1_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    AHU-1_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    AHU-1_CoolC DXCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    AHU-1_CoolC DXCoil Performance,  !- Name
-    0.0,                     !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    AUTOSIZE,                !- High Speed Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- High Speed Rated Sensible Heat Ratio
+    3.23372055845678,        !- High Speed Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- High Speed Rated Air Flow Rate {m3/s}
     ,                        !- Unit Internal Static Air Pressure {Pa}
-    MultiSpeed,              !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    AHU-1_CoolC DXCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    AHU-1_CoolC DXCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    2,                       !- Nominal Speed Number
-    AHU-1_CoolC DXCoil Speed 1 Performance,  !- Speed 1 Name
-    AHU-1_CoolC DXCoil Speed 2 Performance;  !- Speed 2 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    AHU-1_CoolC DXCoil Speed 1 Performance,  !- Name
-    0.3333,                  !- Gross Total Cooling Capacity Fraction
-    0.3333,                  !- Evaporator Air Flow Rate Fraction
-    ,                        !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    3.28186528141147,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Measured_LowSpeedCoolCapLSFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Measured_CoolCStandard10Ton_CapFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Measured_LowSpeedCoolEIRLSFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Measured_CoolCStandard10Ton_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    AHU-1_OA-AHU-1_CoolCNode,!- Air Inlet Node Name
+    AHU-1_CoolC-AHU-1_HeatCNode,  !- Air Outlet Node Name
+    Measured_CoolCStandard10Ton_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    Measured_CoolCStandard10Ton_CapFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Measured_CoolCStandard10Ton_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    Measured_CoolCStandard10Ton_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
     No_PLR_Degredation,      !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    AUTOSIZE,                !- Low Speed Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- Low Speed Gross Rated Sensible Heat Ratio
+    3.28186528141147,        !- Low Speed Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Low Speed Rated Air Flow Rate {m3/s}
+    Measured_LowSpeedCoolCapLSFT,  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
+    Measured_LowSpeedCoolEIRLSFT;  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
 
-  Coil:Cooling:DX:CurveFit:Speed,
-    AHU-1_CoolC DXCoil Speed 2 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    3.23372055845678,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Measured_CoolCStandard10Ton_CapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Measured_CoolCStandard10Ton_CapFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Measured_CoolCStandard10Ton_EIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Measured_CoolCStandard10Ton_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    No_PLR_Degredation,      !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  OutdoorAir:Node,
-    AHU-2_CoolC DXCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:TwoSpeed,
     AHU-2_CoolC DXCoil,      !- Name
-    AHU-2_OA-AHU-2_CoolCNode,!- Evaporator Inlet Node Name
-    AHU-2_CoolC-AHU-2_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    AHU-2_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    AHU-2_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    AHU-2_CoolC DXCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    AHU-2_CoolC DXCoil Performance,  !- Name
-    0.0,                     !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    AUTOSIZE,                !- High Speed Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- High Speed Rated Sensible Heat Ratio
+    3.13380581903442,        !- High Speed Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- High Speed Rated Air Flow Rate {m3/s}
     ,                        !- Unit Internal Static Air Pressure {Pa}
-    MultiSpeed,              !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    AHU-2_CoolC DXCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    AHU-2_CoolC DXCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    2,                       !- Nominal Speed Number
-    AHU-2_CoolC DXCoil Speed 1 Performance,  !- Speed 1 Name
-    AHU-2_CoolC DXCoil Speed 2 Performance;  !- Speed 2 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    AHU-2_CoolC DXCoil Speed 1 Performance,  !- Name
-    0.3333,                  !- Gross Total Cooling Capacity Fraction
-    0.3333,                  !- Evaporator Air Flow Rate Fraction
-    ,                        !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    3.18046297763047,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Measured_LowSpeedCoolCapLSFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Measured_CoolCStandard10Ton_CapFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Measured_LowSpeedCoolEIRLSFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Measured_CoolCStandard10Ton_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    AHU-2_OA-AHU-2_CoolCNode,!- Air Inlet Node Name
+    AHU-2_CoolC-AHU-2_HeatCNode,  !- Air Outlet Node Name
+    Measured_CoolCStandard10Ton_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    Measured_CoolCStandard10Ton_CapFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Measured_CoolCStandard10Ton_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    Measured_CoolCStandard10Ton_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
     No_PLR_Degredation,      !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    AHU-2_CoolC DXCoil Speed 2 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    3.13380581903442,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Measured_CoolCStandard10Ton_CapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Measured_CoolCStandard10Ton_CapFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Measured_CoolCStandard10Ton_EIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Measured_CoolCStandard10Ton_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    No_PLR_Degredation,      !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    AUTOSIZE,                !- Low Speed Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- Low Speed Gross Rated Sensible Heat Ratio
+    3.18046297763047,        !- Low Speed Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Low Speed Rated Air Flow Rate {m3/s}
+    Measured_LowSpeedCoolCapLSFT,  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
+    Measured_LowSpeedCoolEIRLSFT;  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
 
   Coil:Heating:Water,
     AHU-1_HeatC,             !- Name
@@ -26045,14 +25917,14 @@
     Floor 1 Anesthesia VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
     Fan:ZoneExhaust,         !- Zone Equipment 2 Object Type
     Floor 1 Anesthesia Exhaust Fan,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Bio Haz Equipment,  !- Name
@@ -26061,8 +25933,8 @@
     Floor 1 Bio Haz VAV Box, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Cafe Equipment,  !- Name
@@ -26071,8 +25943,8 @@
     Floor 1 Cafe VAV Box,    !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Clean Equipment, !- Name
@@ -26081,8 +25953,8 @@
     Floor 1 Clean VAV Box,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Clean Work Equipment,  !- Name
@@ -26091,8 +25963,8 @@
     Floor 1 Clean Work VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Dictation Equipment,  !- Name
@@ -26101,8 +25973,8 @@
     Floor 1 Dictation VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Dressing Room Equipment,  !- Name
@@ -26111,8 +25983,8 @@
     Floor 1 Dressing Room VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Humid Equipment, !- Name
@@ -26121,8 +25993,8 @@
     Floor 1 Humid VAV Box,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 IT Hall Equipment,  !- Name
@@ -26131,8 +26003,8 @@
     Floor 1 IT Hall VAV Box, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 IT Room Equipment,  !- Name
@@ -26141,8 +26013,8 @@
     Floor 1 IT Room VAV Box, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Lobby Equipment, !- Name
@@ -26151,8 +26023,8 @@
     Floor 1 Lobby VAV Box,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Lobby Hall Equipment,  !- Name
@@ -26161,8 +26033,8 @@
     Floor 1 Lobby Hall VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Locker Room Equipment,  !- Name
@@ -26171,8 +26043,8 @@
     Floor 1 Locker Room VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Locker Room Hall Equipment,  !- Name
@@ -26181,8 +26053,8 @@
     Floor 1 Locker Room Hall VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Lounge Equipment,!- Name
@@ -26191,8 +26063,8 @@
     Floor 1 Lounge VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 MRI Control Room Equipment,  !- Name
@@ -26201,14 +26073,14 @@
     Floor 1 MRI Control Room VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
     Fan:ZoneExhaust,         !- Zone Equipment 2 Object Type
     Floor 1 MRI Control Room Exhaust Fan,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 MRI Hall Equipment,  !- Name
@@ -26217,8 +26089,8 @@
     Floor 1 MRI Hall VAV Box,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 MRI Room Equipment,  !- Name
@@ -26227,14 +26099,14 @@
     Floor 1 MRI Room VAV Box,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
     Fan:ZoneExhaust,         !- Zone Equipment 2 Object Type
     Floor 1 MRI Room Exhaust Fan,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential $1 Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Med Gas Equipment,  !- Name
@@ -26243,8 +26115,8 @@
     Floor 1 Med Gas VAV Box, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Nourishment Equipment,  !- Name
@@ -26253,8 +26125,8 @@
     Floor 1 Nourishment VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Nurse Hall Equipment,  !- Name
@@ -26263,8 +26135,8 @@
     Floor 1 Nurse Hall VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Nurse Station Equipment,  !- Name
@@ -26273,8 +26145,8 @@
     Floor 1 Nurse Station VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Office Equipment,!- Name
@@ -26283,8 +26155,8 @@
     Floor 1 Office VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Operating Room 1 Equipment,  !- Name
@@ -26293,8 +26165,8 @@
     Floor 1 Operating Room 1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Operating Room 2 Equipment,  !- Name
@@ -26303,8 +26175,8 @@
     Floor 1 Operating Room 2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Operating Room 3 Equipment,  !- Name
@@ -26313,8 +26185,8 @@
     Floor 1 Operating Room 3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 PACU Equipment,  !- Name
@@ -26323,8 +26195,8 @@
     Floor 1 PACU VAV Box,    !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Pre-Op Hall Equipment,  !- Name
@@ -26333,8 +26205,8 @@
     Floor 1 Pre-Op Hall VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Pre-Op Room 1 Equipment,  !- Name
@@ -26343,8 +26215,8 @@
     Floor 1 Pre-Op Room 1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Pre-Op Room 2 Equipment,  !- Name
@@ -26353,8 +26225,8 @@
     Floor 1 Pre-Op Room 2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Procedure Room Equipment,  !- Name
@@ -26363,8 +26235,8 @@
     Floor 1 Procedure Room VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Reception Equipment,  !- Name
@@ -26373,8 +26245,8 @@
     Floor 1 Reception VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Reception Hall Equipment,  !- Name
@@ -26383,8 +26255,8 @@
     Floor 1 Reception Hall VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Recovery Room Equipment,  !- Name
@@ -26393,8 +26265,8 @@
     Floor 1 Recovery Room VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Scheduling Equipment,  !- Name
@@ -26403,8 +26275,8 @@
     Floor 1 Scheduling VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Scrub Equipment, !- Name
@@ -26413,8 +26285,8 @@
     Floor 1 Scrub VAV Box,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Soil Equipment,  !- Name
@@ -26423,14 +26295,14 @@
     Floor 1 Soil VAV Box,    !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
     Fan:ZoneExhaust,         !- Zone Equipment 2 Object Type
     Floor 1 Soil Exhaust Fan,!- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Soil Hold Equipment,  !- Name
@@ -26439,14 +26311,14 @@
     Floor 1 Soil Hold VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
     Fan:ZoneExhaust,         !- Zone Equipment 2 Object Type
     Floor 1 Soil Hold Exhaust Fan,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Soil Work Equipment,  !- Name
@@ -26455,14 +26327,14 @@
     Floor 1 Soil Work VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
     Fan:ZoneExhaust,         !- Zone Equipment 2 Object Type
     Floor 1 Soil Work Exhaust Fan,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Step Down Equipment,  !- Name
@@ -26471,8 +26343,8 @@
     Floor 1 Step Down VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Sterile Hall Equipment,  !- Name
@@ -26481,8 +26353,8 @@
     Floor 1 Sterile Hall VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Sterile Storage Equipment,  !- Name
@@ -26491,8 +26363,8 @@
     Floor 1 Sterile Storage VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Sub-Sterile Equipment,  !- Name
@@ -26501,8 +26373,8 @@
     Floor 1 Sub-Sterile VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Utility Hall Equipment,  !- Name
@@ -26511,8 +26383,8 @@
     Floor 1 Utility Hall VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 1 Vestibule Equipment,  !- Name
@@ -26521,8 +26393,8 @@
     Floor 1 Vestibule VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 2 Conference Equipment,  !- Name
@@ -26531,8 +26403,8 @@
     Floor 2 Conference VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 2 Dictation Equipment,  !- Name
@@ -26541,8 +26413,8 @@
     Floor 2 Dictation VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 2 Exam 1 Equipment,!- Name
@@ -26551,8 +26423,8 @@
     Floor 2 Exam 1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 2 Exam 2 Equipment,!- Name
@@ -26561,8 +26433,8 @@
     Floor 2 Exam 2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 2 Exam 3 Equipment,!- Name
@@ -26571,8 +26443,8 @@
     Floor 2 Exam 3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 2 Exam 4 Equipment,!- Name
@@ -26581,8 +26453,8 @@
     Floor 2 Exam 4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 2 Exam 5 Equipment,!- Name
@@ -26591,8 +26463,8 @@
     Floor 2 Exam 5 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 2 Exam 6 Equipment,!- Name
@@ -26601,8 +26473,8 @@
     Floor 2 Exam 6 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 2 Exam 7 Equipment,!- Name
@@ -26611,8 +26483,8 @@
     Floor 2 Exam 7 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 2 Exam 8 Equipment,!- Name
@@ -26621,8 +26493,8 @@
     Floor 2 Exam 8 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 2 Exam 9 Equipment,!- Name
@@ -26631,8 +26503,8 @@
     Floor 2 Exam 9 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 2 Exam Hall 1 Equipment,  !- Name
@@ -26641,8 +26513,8 @@
     Floor 2 Exam Hall 1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 2 Exam Hall 2 Equipment,  !- Name
@@ -26651,8 +26523,8 @@
     Floor 2 Exam Hall 2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 2 Exam Hall 3 Equipment,  !- Name
@@ -26661,8 +26533,8 @@
     Floor 2 Exam Hall 3 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 2 Exam Hall 4 Equipment,  !- Name
@@ -26671,8 +26543,8 @@
     Floor 2 Exam Hall 4 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 2 Exam Hall 5 Equipment,  !- Name
@@ -26681,8 +26553,8 @@
     Floor 2 Exam Hall 5 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 2 Exam Hall 6 Equipment,  !- Name
@@ -26691,8 +26563,8 @@
     Floor 2 Exam Hall 6 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 2 Lounge Equipment,!- Name
@@ -26701,8 +26573,8 @@
     Floor 2 Lounge VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 2 Nurse Station 1 Equipment,  !- Name
@@ -26711,8 +26583,8 @@
     Floor 2 Nurse Station 1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 2 Nurse Station 2 Equipment,  !- Name
@@ -26721,8 +26593,8 @@
     Floor 2 Nurse Station 2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential $1 Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 2 Office Equipment,!- Name
@@ -26731,8 +26603,8 @@
     Floor 2 Office VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 2 Office Hall Equipment,  !- Name
@@ -26741,8 +26613,8 @@
     Floor 2 Office Hall VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 2 Reception Equipment,  !- Name
@@ -26751,8 +26623,8 @@
     Floor 2 Reception VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 2 Reception Hall Equipment,  !- Name
@@ -26761,8 +26633,8 @@
     Floor 2 Reception Hall VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 2 Scheduling 1 Equipment,  !- Name
@@ -26771,8 +26643,8 @@
     Floor 2 Scheduling 1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 2 Scheduling 2 Equipment,  !- Name
@@ -26781,8 +26653,8 @@
     Floor 2 Scheduling 2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 2 Work Equipment,  !- Name
@@ -26791,8 +26663,8 @@
     Floor 2 Work VAV Box,    !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 2 Work Hall Equipment,  !- Name
@@ -26801,8 +26673,8 @@
     Floor 2 Work Hall VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 2 X-Ray Equipment, !- Name
@@ -26811,8 +26683,8 @@
     Floor 2 X-Ray VAV Box,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 3 Dressing Room Equipment,  !- Name
@@ -26821,8 +26693,8 @@
     Floor 3 Dressing Room VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 3 Elevator Hall Equipment,  !- Name
@@ -26831,8 +26703,8 @@
     Floor 3 Elevator Hall VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 3 Humid Equipment, !- Name
@@ -26841,8 +26713,8 @@
     Floor 3 Humid VAV Box,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 3 Locker Equipment,!- Name
@@ -26851,8 +26723,8 @@
     Floor 3 Locker VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 3 Lounge Equipment,!- Name
@@ -26861,8 +26733,8 @@
     Floor 3 Lounge VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 3 Mechanical Hall Equipment,  !- Name
@@ -26871,8 +26743,8 @@
     Floor 3 Mechanical Hall VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 3 Office Equipment,!- Name
@@ -26881,8 +26753,8 @@
     Floor 3 Office VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 3 Office Hall Equipment,  !- Name
@@ -26891,8 +26763,8 @@
     Floor 3 Office Hall VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 3 Physical Therapy 1 Equipment,  !- Name
@@ -26901,8 +26773,8 @@
     Floor 3 Physical Therapy 1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 3 Physical Therapy 2 Equipment,  !- Name
@@ -26911,8 +26783,8 @@
     Floor 3 Physical Therapy 2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 3 Treatment Equipment,  !- Name
@@ -26921,8 +26793,8 @@
     Floor 3 Treatment VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Floor 3 Work Equipment,  !- Name
@@ -26931,8 +26803,8 @@
     Floor 3 Work VAV Box,    !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
 ! ***SIZING & CONTROLS***
   ! Cooling min. flow = 8 ACH, per AIA Healthcare Guide 2001
@@ -30582,7 +30454,7 @@
     AHU-1_OA-AHU-1_CoolCNode,!- DX Cooling Coil System Inlet Node Name
     AHU-1_CoolC-AHU-1_HeatCNode,  !- DX Cooling Coil System Outlet Node Name
     AHU-1_CoolC-AHU-1_HeatCNode,  !- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:TwoSpeed,!- Cooling Coil Object Type
     AHU-1_CoolC DXCoil;      !- Cooling Coil Name
 
   CoilSystem:Cooling:DX,
@@ -30591,7 +30463,7 @@
     AHU-2_OA-AHU-2_CoolCNode,!- DX Cooling Coil System Inlet Node Name
     AHU-2_CoolC-AHU-2_HeatCNode,  !- DX Cooling Coil System Outlet Node Name
     AHU-2_CoolC-AHU-2_HeatCNode,  !- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:TwoSpeed,!- Cooling Coil Object Type
     AHU-2_CoolC DXCoil;      !- Cooling Coil Name
 
 ! ***CONNECTIONS***

@@ -128,7 +128,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.2;
 
   Building,
     Small Office with AirflowNetwork model,  !- Name
@@ -2584,7 +2584,7 @@
 
   AirflowNetwork:Distribution:Component:Coil,
     ACDXCoil 1,              !- Coil Name
-    Coil:Cooling:DX,         !- Coil Object Type
+    Coil:Cooling:DX:TwoSpeed,!- Coil Object Type
     0.1,                     !- Air Path Length {m}
     1.00;                    !- Air Path Hydraulic Diameter {m}
 
@@ -2957,8 +2957,8 @@
     Zone1TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
@@ -2967,8 +2967,8 @@
     Zone2TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
@@ -2977,14 +2977,14 @@
     Zone3TermReheat,         !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
     Fan:ZoneExhaust,         !- Zone Equipment 2 Object Type
     Zone3 Exhaust Fan,       !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
 
   Fan:ZoneExhaust,
     Zone3 Exhaust Fan,       !- Name
@@ -3020,7 +3020,7 @@
     Cooling Coil Air Inlet Node,  !- DX Cooling Coil System Inlet Node Name
     Heating Coil Air Inlet Node,  !- DX Cooling Coil System Outlet Node Name
     Heating Coil Air Inlet Node,  !- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:TwoSpeed,!- Cooling Coil Object Type
     ACDXCoil 1;              !- Cooling Coil Name
 
   AirTerminal:SingleDuct:VAV:Reheat,
@@ -3311,88 +3311,28 @@
     Zone 3 Coil Air Inlet Node,  !- Air Inlet Node Name
     Zone 3 Reheat Air Outlet Node;  !- Air Outlet Node Name
 
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:TwoSpeed,
     ACDXCoil 1,              !- Name
-    Cooling Coil Air Inlet Node,  !- Evaporator Inlet Node Name
-    Heating Coil Air Inlet Node,  !- Evaporator Outlet Node Name
     CoolingCoilAvailSched,   !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    Outside Air Inlet Node,  !- Condenser Inlet Node Name
-    ACDXCoil 1 Condenser Outlet Node,  !- Condenser Outlet Node Name
-    ACDXCoil 1 Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    ACDXCoil 1 Performance,  !- Name
-    0.0,                     !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    autosize,                !- High Speed Gross Rated Total Cooling Capacity {W}
+    0.8,                     !- High Speed Rated Sensible Heat Ratio
+    3.0,                     !- High Speed Gross Rated Cooling COP {W/W}
+    autosize,                !- High Speed Rated Air Flow Rate {m3/s}
     ,                        !- Unit Internal Static Air Pressure {Pa}
-    MultiSpeed,              !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    ACDXCoil 1 Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    ACDXCoil 1 Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    2,                       !- Nominal Speed Number
-    ACDXCoil 1 Speed 1 Performance,  !- Speed 1 Name
-    ACDXCoil 1 Speed 2 Performance;  !- Speed 2 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    ACDXCoil 1 Speed 1 Performance,  !- Name
-    0.3333,                  !- Gross Total Cooling Capacity Fraction
-    0.3333,                  !- Evaporator Air Flow Rate Fraction
-    ,                        !- Condenser Air Flow Rate Fraction
-    0.8,                     !- Gross Sensible Heat Ratio
-    4.2,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    VarSpeedCoolCapLSFT,     !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    PackagedRatedCoolCapFFlow,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    VarSpeedCoolEIRLSFT,     !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    PackagedRatedCoolEIRFFlow,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Cooling Coil Air Inlet Node,  !- Air Inlet Node Name
+    Heating Coil Air Inlet Node,  !- Air Outlet Node Name
+    VarSpeedCoolCapFT,       !- Total Cooling Capacity Function of Temperature Curve Name
+    PackagedRatedCoolCapFFlow,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    VarSpeedCoolEIRFT,       !- Energy Input Ratio Function of Temperature Curve Name
+    PackagedRatedCoolEIRFFlow,  !- Energy Input Ratio Function of Flow Fraction Curve Name
     VarSpeedCyclingPLFFPLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    ACDXCoil 1 Speed 2 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    0.8,                     !- Gross Sensible Heat Ratio
-    3.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    VarSpeedCoolCapFT,       !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    PackagedRatedCoolCapFFlow,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    VarSpeedCoolEIRFT,       !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    PackagedRatedCoolEIRFFlow,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    VarSpeedCyclingPLFFPLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    autosize,                !- Low Speed Gross Rated Total Cooling Capacity {W}
+    0.8,                     !- Low Speed Gross Rated Sensible Heat Ratio
+    4.2,                     !- Low Speed Gross Rated Cooling COP {W/W}
+    autosize,                !- Low Speed Rated Air Flow Rate {m3/s}
+    VarSpeedCoolCapLSFT,     !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
+    VarSpeedCoolEIRLSFT,     !- Low Speed Energy Input Ratio Function of Temperature Curve Name
+    Outside Air Inlet Node;  !- Condenser Air Inlet Node Name
 
   Fan:VariableVolume,
     Supply Fan 1,            !- Name

@@ -240,7 +240,7 @@
 !    CHW_deltaT = 8.33
 !    HOTW_PumpCurve_flag = pump_ride_on_curve
 
-  Version,9.3;
+  Version,9.2;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -13482,277 +13482,277 @@
   InternalMass,
     Corner_Class_1_Pod_1_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corner_Class_1_Pod_1_ZN_1_FLR_1,  !- Zone or ZoneList Name
+    Corner_Class_1_Pod_1_ZN_1_FLR_1,  !- Zone Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corner_Class_1_Pod_1_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corner_Class_1_Pod_1_ZN_1_FLR_2,  !- Zone or ZoneList Name
+    Corner_Class_1_Pod_1_ZN_1_FLR_2,  !- Zone Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_1_Pod_1_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Mult_Class_1_Pod_1_ZN_1_FLR_1,  !- Zone or ZoneList Name
+    Mult_Class_1_Pod_1_ZN_1_FLR_1,  !- Zone Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_1_Pod_1_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Mult_Class_1_Pod_1_ZN_1_FLR_2,  !- Zone or ZoneList Name
+    Mult_Class_1_Pod_1_ZN_1_FLR_2,  !- Zone Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corridor_Pod_1_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corridor_Pod_1_ZN_1_FLR_1,  !- Zone or ZoneList Name
+    Corridor_Pod_1_ZN_1_FLR_1,  !- Zone Name
     640.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corridor_Pod_1_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corridor_Pod_1_ZN_1_FLR_2,  !- Zone or ZoneList Name
+    Corridor_Pod_1_ZN_1_FLR_2,  !- Zone Name
     640.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corner_Class_2_Pod_1_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corner_Class_2_Pod_1_ZN_1_FLR_1,  !- Zone or ZoneList Name
+    Corner_Class_2_Pod_1_ZN_1_FLR_1,  !- Zone Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corner_Class_2_Pod_1_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corner_Class_2_Pod_1_ZN_1_FLR_2,  !- Zone or ZoneList Name
+    Corner_Class_2_Pod_1_ZN_1_FLR_2,  !- Zone Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_2_Pod_1_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Mult_Class_2_Pod_1_ZN_1_FLR_1,  !- Zone or ZoneList Name
+    Mult_Class_2_Pod_1_ZN_1_FLR_1,  !- Zone Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_2_Pod_1_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Mult_Class_2_Pod_1_ZN_1_FLR_2,  !- Zone or ZoneList Name
+    Mult_Class_2_Pod_1_ZN_1_FLR_2,  !- Zone Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corner_Class_1_Pod_2_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corner_Class_1_Pod_2_ZN_1_FLR_1,  !- Zone or ZoneList Name
+    Corner_Class_1_Pod_2_ZN_1_FLR_1,  !- Zone Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corner_Class_1_Pod_2_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corner_Class_1_Pod_2_ZN_1_FLR_2,  !- Zone or ZoneList Name
+    Corner_Class_1_Pod_2_ZN_1_FLR_2,  !- Zone Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_1_Pod_2_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Mult_Class_1_Pod_2_ZN_1_FLR_1,  !- Zone or ZoneList Name
+    Mult_Class_1_Pod_2_ZN_1_FLR_1,  !- Zone Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_1_Pod_2_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Mult_Class_1_Pod_2_ZN_1_FLR_2,  !- Zone or ZoneList Name
+    Mult_Class_1_Pod_2_ZN_1_FLR_2,  !- Zone Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corridor_Pod_2_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corridor_Pod_2_ZN_1_FLR_1,  !- Zone or ZoneList Name
+    Corridor_Pod_2_ZN_1_FLR_1,  !- Zone Name
     640.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corridor_Pod_2_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corridor_Pod_2_ZN_1_FLR_2,  !- Zone or ZoneList Name
+    Corridor_Pod_2_ZN_1_FLR_2,  !- Zone Name
     640.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corner_Class_2_Pod_2_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corner_Class_2_Pod_2_ZN_1_FLR_1,  !- Zone or ZoneList Name
+    Corner_Class_2_Pod_2_ZN_1_FLR_1,  !- Zone Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corner_Class_2_Pod_2_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corner_Class_2_Pod_2_ZN_1_FLR_2,  !- Zone or ZoneList Name
+    Corner_Class_2_Pod_2_ZN_1_FLR_2,  !- Zone Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_2_Pod_2_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Mult_Class_2_Pod_2_ZN_1_FLR_1,  !- Zone or ZoneList Name
+    Mult_Class_2_Pod_2_ZN_1_FLR_1,  !- Zone Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_2_Pod_2_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Mult_Class_2_Pod_2_ZN_1_FLR_2,  !- Zone or ZoneList Name
+    Mult_Class_2_Pod_2_ZN_1_FLR_2,  !- Zone Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corner_Class_1_Pod_3_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corner_Class_1_Pod_3_ZN_1_FLR_1,  !- Zone or ZoneList Name
+    Corner_Class_1_Pod_3_ZN_1_FLR_1,  !- Zone Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corner_Class_1_Pod_3_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corner_Class_1_Pod_3_ZN_1_FLR_2,  !- Zone or ZoneList Name
+    Corner_Class_1_Pod_3_ZN_1_FLR_2,  !- Zone Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_1_Pod_3_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Mult_Class_1_Pod_3_ZN_1_FLR_1,  !- Zone or ZoneList Name
+    Mult_Class_1_Pod_3_ZN_1_FLR_1,  !- Zone Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_1_Pod_3_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Mult_Class_1_Pod_3_ZN_1_FLR_2,  !- Zone or ZoneList Name
+    Mult_Class_1_Pod_3_ZN_1_FLR_2,  !- Zone Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corridor_Pod_3_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corridor_Pod_3_ZN_1_FLR_1,  !- Zone or ZoneList Name
+    Corridor_Pod_3_ZN_1_FLR_1,  !- Zone Name
     640.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corridor_Pod_3_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corridor_Pod_3_ZN_1_FLR_2,  !- Zone or ZoneList Name
+    Corridor_Pod_3_ZN_1_FLR_2,  !- Zone Name
     640.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corner_Class_2_Pod_3_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corner_Class_2_Pod_3_ZN_1_FLR_1,  !- Zone or ZoneList Name
+    Corner_Class_2_Pod_3_ZN_1_FLR_1,  !- Zone Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Corner_Class_2_Pod_3_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Corner_Class_2_Pod_3_ZN_1_FLR_2,  !- Zone or ZoneList Name
+    Corner_Class_2_Pod_3_ZN_1_FLR_2,  !- Zone Name
     198.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_2_Pod_3_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Mult_Class_2_Pod_3_ZN_1_FLR_1,  !- Zone or ZoneList Name
+    Mult_Class_2_Pod_3_ZN_1_FLR_1,  !- Zone Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mult_Class_2_Pod_3_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Mult_Class_2_Pod_3_ZN_1_FLR_2,  !- Zone or ZoneList Name
+    Mult_Class_2_Pod_3_ZN_1_FLR_2,  !- Zone Name
     954.0000;                !- Surface Area {m2}
 
   InternalMass,
     Main_Corridor_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Main_Corridor_ZN_1_FLR_1,!- Zone or ZoneList Name
+    Main_Corridor_ZN_1_FLR_1,!- Zone Name
     2280.0000;               !- Surface Area {m2}
 
   InternalMass,
     Main_Corridor_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Main_Corridor_ZN_1_FLR_2,!- Zone or ZoneList Name
+    Main_Corridor_ZN_1_FLR_2,!- Zone Name
     2280.0000;               !- Surface Area {m2}
 
   InternalMass,
     Lobby_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Lobby_ZN_1_FLR_1,        !- Zone or ZoneList Name
+    Lobby_ZN_1_FLR_1,        !- Zone Name
     420.0000;                !- Surface Area {m2}
 
   InternalMass,
     Lobby_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Lobby_ZN_1_FLR_2,        !- Zone or ZoneList Name
+    Lobby_ZN_1_FLR_2,        !- Zone Name
     420.0000;                !- Surface Area {m2}
 
   InternalMass,
     Bathrooms_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Bathrooms_ZN_1_FLR_1,    !- Zone or ZoneList Name
+    Bathrooms_ZN_1_FLR_1,    !- Zone Name
     420.0000;                !- Surface Area {m2}
 
   InternalMass,
     Bathrooms_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Bathrooms_ZN_1_FLR_2,    !- Zone or ZoneList Name
+    Bathrooms_ZN_1_FLR_2,    !- Zone Name
     420.0000;                !- Surface Area {m2}
 
   InternalMass,
     Offices_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Offices_ZN_1_FLR_1,      !- Zone or ZoneList Name
+    Offices_ZN_1_FLR_1,      !- Zone Name
     1064.0000;               !- Surface Area {m2}
 
   InternalMass,
     Offices_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Offices_ZN_1_FLR_2,      !- Zone or ZoneList Name
+    Offices_ZN_1_FLR_2,      !- Zone Name
     1064.0000;               !- Surface Area {m2}
 
   InternalMass,
     Gym_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Gym_ZN_1_FLR_1,          !- Zone or ZoneList Name
+    Gym_ZN_1_FLR_1,          !- Zone Name
     3952.0000;               !- Surface Area {m2}
 
   InternalMass,
     Aux_Gym_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Aux_Gym_ZN_1_FLR_1,      !- Zone or ZoneList Name
+    Aux_Gym_ZN_1_FLR_1,      !- Zone Name
     2496.0000;               !- Surface Area {m2}
 
   InternalMass,
     Auditorium_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Auditorium_ZN_1_FLR_1,   !- Zone or ZoneList Name
+    Auditorium_ZN_1_FLR_1,   !- Zone Name
     1976.0000;               !- Surface Area {m2}
 
   InternalMass,
     Kitchen_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Kitchen_ZN_1_FLR_1,      !- Zone or ZoneList Name
+    Kitchen_ZN_1_FLR_1,      !- Zone Name
     432.0000;                !- Surface Area {m2}
 
   InternalMass,
     LIBRARY_MEDIA_CENTER_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    LIBRARY_MEDIA_CENTER_ZN_1_FLR_2,  !- Zone or ZoneList Name
+    LIBRARY_MEDIA_CENTER_ZN_1_FLR_2,  !- Zone Name
     1680.0000;               !- Surface Area {m2}
 
   InternalMass,
     Cafeteria_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Cafeteria_ZN_1_FLR_1,    !- Zone or ZoneList Name
+    Cafeteria_ZN_1_FLR_1,    !- Zone Name
     1248.0000;               !- Surface Area {m2}
 
   InternalMass,
     Mech_ZN_1_FLR_1_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Mech_ZN_1_FLR_1,         !- Zone or ZoneList Name
+    Mech_ZN_1_FLR_1,         !- Zone Name
     684.0000;                !- Surface Area {m2}
 
   InternalMass,
     Mech_ZN_1_FLR_2_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Mech_ZN_1_FLR_2,         !- Zone or ZoneList Name
+    Mech_ZN_1_FLR_2,         !- Zone Name
     684.0000;                !- Surface Area {m2}
 
 !-   ===========  ALL OBJECTS IN CLASS: PEOPLE ===========
@@ -21538,8 +21538,8 @@
     Corner_Class_1_Pod_1_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corner_Class_1_Pod_1_ZN_1_FLR_2 Equipment,  !- Name
@@ -21548,8 +21548,8 @@
     Corner_Class_1_Pod_1_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Mult_Class_1_Pod_1_ZN_1_FLR_1 Equipment,  !- Name
@@ -21558,8 +21558,8 @@
     Mult_Class_1_Pod_1_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Mult_Class_1_Pod_1_ZN_1_FLR_2 Equipment,  !- Name
@@ -21568,8 +21568,8 @@
     Mult_Class_1_Pod_1_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corridor_Pod_1_ZN_1_FLR_1 Equipment,  !- Name
@@ -21578,8 +21578,8 @@
     Corridor_Pod_1_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corridor_Pod_1_ZN_1_FLR_2 Equipment,  !- Name
@@ -21588,8 +21588,8 @@
     Corridor_Pod_1_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corner_Class_2_Pod_1_ZN_1_FLR_1 Equipment,  !- Name
@@ -21598,8 +21598,8 @@
     Corner_Class_2_Pod_1_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corner_Class_2_Pod_1_ZN_1_FLR_2 Equipment,  !- Name
@@ -21608,8 +21608,8 @@
     Corner_Class_2_Pod_1_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Mult_Class_2_Pod_1_ZN_1_FLR_1 Equipment,  !- Name
@@ -21618,8 +21618,8 @@
     Mult_Class_2_Pod_1_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Mult_Class_2_Pod_1_ZN_1_FLR_2 Equipment,  !- Name
@@ -21628,8 +21628,8 @@
     Mult_Class_2_Pod_1_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corner_Class_1_Pod_2_ZN_1_FLR_1 Equipment,  !- Name
@@ -21638,8 +21638,8 @@
     Corner_Class_1_Pod_2_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corner_Class_1_Pod_2_ZN_1_FLR_2 Equipment,  !- Name
@@ -21648,8 +21648,8 @@
     Corner_Class_1_Pod_2_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Mult_Class_1_Pod_2_ZN_1_FLR_1 Equipment,  !- Name
@@ -21658,8 +21658,8 @@
     Mult_Class_1_Pod_2_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Mult_Class_1_Pod_2_ZN_1_FLR_2 Equipment,  !- Name
@@ -21668,8 +21668,8 @@
     Mult_Class_1_Pod_2_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corridor_Pod_2_ZN_1_FLR_1 Equipment,  !- Name
@@ -21678,8 +21678,8 @@
     Corridor_Pod_2_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corridor_Pod_2_ZN_1_FLR_2 Equipment,  !- Name
@@ -21688,8 +21688,8 @@
     Corridor_Pod_2_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corner_Class_2_Pod_2_ZN_1_FLR_1 Equipment,  !- Name
@@ -21698,8 +21698,8 @@
     Corner_Class_2_Pod_2_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corner_Class_2_Pod_2_ZN_1_FLR_2 Equipment,  !- Name
@@ -21708,8 +21708,8 @@
     Corner_Class_2_Pod_2_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Mult_Class_2_Pod_2_ZN_1_FLR_1 Equipment,  !- Name
@@ -21718,8 +21718,8 @@
     Mult_Class_2_Pod_2_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Mult_Class_2_Pod_2_ZN_1_FLR_2 Equipment,  !- Name
@@ -21728,8 +21728,8 @@
     Mult_Class_2_Pod_2_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corner_Class_1_Pod_3_ZN_1_FLR_1 Equipment,  !- Name
@@ -21738,8 +21738,8 @@
     Corner_Class_1_Pod_3_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corner_Class_1_Pod_3_ZN_1_FLR_2 Equipment,  !- Name
@@ -21748,8 +21748,8 @@
     Corner_Class_1_Pod_3_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Mult_Class_1_Pod_3_ZN_1_FLR_1 Equipment,  !- Name
@@ -21758,8 +21758,8 @@
     Mult_Class_1_Pod_3_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Mult_Class_1_Pod_3_ZN_1_FLR_2 Equipment,  !- Name
@@ -21768,8 +21768,8 @@
     Mult_Class_1_Pod_3_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corridor_Pod_3_ZN_1_FLR_1 Equipment,  !- Name
@@ -21778,8 +21778,8 @@
     Corridor_Pod_3_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corridor_Pod_3_ZN_1_FLR_2 Equipment,  !- Name
@@ -21788,8 +21788,8 @@
     Corridor_Pod_3_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corner_Class_2_Pod_3_ZN_1_FLR_1 Equipment,  !- Name
@@ -21798,8 +21798,8 @@
     Corner_Class_2_Pod_3_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Corner_Class_2_Pod_3_ZN_1_FLR_2 Equipment,  !- Name
@@ -21808,8 +21808,8 @@
     Corner_Class_2_Pod_3_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Mult_Class_2_Pod_3_ZN_1_FLR_1 Equipment,  !- Name
@@ -21818,8 +21818,8 @@
     Mult_Class_2_Pod_3_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Mult_Class_2_Pod_3_ZN_1_FLR_2 Equipment,  !- Name
@@ -21828,8 +21828,8 @@
     Mult_Class_2_Pod_3_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Main_Corridor_ZN_1_FLR_1 Equipment,  !- Name
@@ -21838,14 +21838,14 @@
     Main_Corridor_ZN_1_FLR_1 dummy Exhaust Fan,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type
     Main_Corridor_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Main_Corridor_ZN_1_FLR_2 Equipment,  !- Name
@@ -21854,14 +21854,14 @@
     Main_Corridor_ZN_1_FLR_2 dummy Exhaust Fan,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type
     Main_Corridor_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Lobby_ZN_1_FLR_1 Equipment,  !- Name
@@ -21870,8 +21870,8 @@
     Lobby_ZN_1_FLR_1 VAV Box,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Lobby_ZN_1_FLR_2 Equipment,  !- Name
@@ -21880,8 +21880,8 @@
     Lobby_ZN_1_FLR_2 VAV Box,!- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Bathrooms_ZN_1_FLR_1 Equipment,  !- Name
@@ -21890,14 +21890,14 @@
     Bathrooms_ZN_1_FLR_1 Exhaust Fan,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type
     Bathrooms_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Bathrooms_ZN_1_FLR_2 Equipment,  !- Name
@@ -21906,14 +21906,14 @@
     Bathrooms_ZN_1_FLR_2 Exhaust Fan,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type
     Bathrooms_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Offices_ZN_1_FLR_1 Equipment,  !- Name
@@ -21922,8 +21922,8 @@
     Offices_ZN_1_FLR_1 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Offices_ZN_1_FLR_2 Equipment,  !- Name
@@ -21932,8 +21932,8 @@
     Offices_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Gym_ZN_1_FLR_1 Equipment,!- Name
@@ -21942,14 +21942,14 @@
     GYM_ZN_1_FLR_1 dummy Exhaust Fan,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 2 Object Type
     Gym_ZN_1_FLR_1 Direct Air,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Aux_Gym_ZN_1_FLR_1 Equipment,  !- Name
@@ -21958,8 +21958,8 @@
     Aux_Gym_ZN_1_FLR_1 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Auditorium_ZN_1_FLR_1 Equipment,  !- Name
@@ -21968,8 +21968,8 @@
     Auditorium_ZN_1_FLR_1 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Kitchen_ZN_1_FLR_1 Equipment,  !- Name
@@ -21978,14 +21978,14 @@
     Kitchen_ZN_1_FLR_1 Exhaust Fan,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
     AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 2 Object Type
     Kitchen_ZN_1_FLR_1 Direct Air,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Cafeteria_ZN_1_FLR_1 Equipment,  !- Name
@@ -21994,8 +21994,8 @@
     Cafeteria_ZN_1_FLR_1 Direct Air,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     LIBRARY_MEDIA_CENTER_ZN_1_FLR_2 Equipment,  !- Name
@@ -22004,8 +22004,8 @@
     LIBRARY_MEDIA_CENTER_ZN_1_FLR_2 VAV Box,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Mech_ZN_1_FLR_1 Equipment,  !- Name
@@ -22014,8 +22014,8 @@
     Mech_ZN_1_FLR_1 VAV Box, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Mech_ZN_1_FLR_2 Equipment,  !- Name
@@ -22024,8 +22024,8 @@
     Mech_ZN_1_FLR_2 VAV Box, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:EQUIPMENTCONNECTIONS ===========
 
@@ -22734,437 +22734,122 @@
     SimpleAnalysis,          !- Type of Analysis
     CrossFlow;               !- Heat Exchanger Configuration
 
-!-   ===========  ALL OBJECTS IN CLASS: Coil:Cooling:DX ===========
+!-   ===========  ALL OBJECTS IN CLASS: COIL:COOLING:DX:SINGLESPEED ===========
 
-  OutdoorAir:Node,
-    PSZ-AC_1:5_CoolC DXCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:TwoSpeed,
     PSZ-AC_1:5_CoolC DXCoil, !- Name
-    PSZ-AC_1:5_OA-PSZ-AC_1:5_CoolCNode,  !- Evaporator Inlet Node Name
-    PSZ-AC_1:5_CoolC-PSZ-AC_1:5_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    PSZ-AC_1:5_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    PSZ-AC_1:5_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    PSZ-AC_1:5_CoolC DXCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    PSZ-AC_1:5_CoolC DXCoil Performance,  !- Name
-    0.0,                     !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    80460.59,                !- High Speed Gross Rated Total Cooling Capacity {W}
+    0.79866,                 !- High Speed Rated Sensible Heat Ratio
+    3.39928881549157,        !- High Speed Gross Rated Cooling COP {W/W}
+    4.86062,                 !- High Speed Rated Air Flow Rate {m3/s}
     ,                        !- Unit Internal Static Air Pressure {Pa}
-    MultiSpeed,              !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    PSZ-AC_1:5_CoolC DXCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    PSZ-AC_1:5_CoolC DXCoil Operating Mode,  !- Name
-    80460.59,                !- Rated Gross Total Cooling Capacity {W}
-    4.86062,                 !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    2,                       !- Nominal Speed Number
-    PSZ-AC_1:5_CoolC DXCoil Speed 1 Performance,  !- Speed 1 Name
-    PSZ-AC_1:5_CoolC DXCoil Speed 2 Performance;  !- Speed 2 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    PSZ-AC_1:5_CoolC DXCoil Speed 1 Performance,  !- Name
-    0.5000,                  !- Gross Total Cooling Capacity Fraction
-    0.6667,                  !- Evaporator Air Flow Rate Fraction
-    ,                        !- Condenser Air Flow Rate Fraction
-    0.79866,                 !- Gross Sensible Heat Ratio
-    3.39928881549157,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    PSZ-AC_1:5_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    PSZ-AC_1:5_CoolCLennoxStandard10Ton_TGA120S2B_CapFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    PSZ-AC_1:5_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    PSZ-AC_1:5_CoolCLennoxStandard10Ton_TGA120S2B_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    PSZ-AC_1:5_OA-PSZ-AC_1:5_CoolCNode,  !- Air Inlet Node Name
+    PSZ-AC_1:5_CoolC-PSZ-AC_1:5_HeatCNode,  !- Air Outlet Node Name
+    PSZ-AC_1:5_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    PSZ-AC_1:5_CoolCLennoxStandard10Ton_TGA120S2B_CapFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    PSZ-AC_1:5_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    PSZ-AC_1:5_CoolCLennoxStandard10Ton_TGA120S2B_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
     PSZ-AC_1:5_CoolCLennoxStandard10Ton_TGA120S2B_PLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    40230.295,               !- Low Speed Gross Rated Total Cooling Capacity {W}
+    0.79866,                 !- Low Speed Gross Rated Sensible Heat Ratio
+    3.39928881549157,        !- Low Speed Gross Rated Cooling COP {W/W}
+    3.24041333333333,        !- Low Speed Rated Air Flow Rate {m3/s}
+    PSZ-AC_1:5_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
+    PSZ-AC_1:5_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
+    ;                        !- Condenser Air Inlet Node Name
 
-  Coil:Cooling:DX:CurveFit:Speed,
-    PSZ-AC_1:5_CoolC DXCoil Speed 2 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    0.79866,                 !- Gross Sensible Heat Ratio
-    3.39928881549157,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    PSZ-AC_1:5_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    PSZ-AC_1:5_CoolCLennoxStandard10Ton_TGA120S2B_CapFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    PSZ-AC_1:5_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    PSZ-AC_1:5_CoolCLennoxStandard10Ton_TGA120S2B_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    PSZ-AC_1:5_CoolCLennoxStandard10Ton_TGA120S2B_PLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  OutdoorAir:Node,
-    PSZ-AC_2:6_CoolC DXCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:TwoSpeed,
     PSZ-AC_2:6_CoolC DXCoil, !- Name
-    PSZ-AC_2:6_OA-PSZ-AC_2:6_CoolCNode,  !- Evaporator Inlet Node Name
-    PSZ-AC_2:6_CoolC-PSZ-AC_2:6_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    PSZ-AC_2:6_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    PSZ-AC_2:6_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    PSZ-AC_2:6_CoolC DXCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    PSZ-AC_2:6_CoolC DXCoil Performance,  !- Name
-    0.0,                     !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    84425.96,                !- High Speed Gross Rated Total Cooling Capacity {W}
+    0.79866,                 !- High Speed Rated Sensible Heat Ratio
+    3.39928881549157,        !- High Speed Gross Rated Cooling COP {W/W}
+    5.10017,                 !- High Speed Rated Air Flow Rate {m3/s}
     ,                        !- Unit Internal Static Air Pressure {Pa}
-    MultiSpeed,              !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    PSZ-AC_2:6_CoolC DXCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    PSZ-AC_2:6_CoolC DXCoil Operating Mode,  !- Name
-    84425.96,                !- Rated Gross Total Cooling Capacity {W}
-    5.10017,                 !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    2,                       !- Nominal Speed Number
-    PSZ-AC_2:6_CoolC DXCoil Speed 1 Performance,  !- Speed 1 Name
-    PSZ-AC_2:6_CoolC DXCoil Speed 2 Performance;  !- Speed 2 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    PSZ-AC_2:6_CoolC DXCoil Speed 1 Performance,  !- Name
-    0.5000,                  !- Gross Total Cooling Capacity Fraction
-    0.6667,                  !- Evaporator Air Flow Rate Fraction
-    ,                        !- Condenser Air Flow Rate Fraction
-    0.79866,                 !- Gross Sensible Heat Ratio
-    3.39928881549157,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    PSZ-AC_2:6_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    PSZ-AC_2:6_CoolCLennoxStandard10Ton_TGA120S2B_CapFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    PSZ-AC_2:6_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    PSZ-AC_2:6_CoolCLennoxStandard10Ton_TGA120S2B_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    PSZ-AC_2:6_OA-PSZ-AC_2:6_CoolCNode,  !- Air Inlet Node Name
+    PSZ-AC_2:6_CoolC-PSZ-AC_2:6_HeatCNode,  !- Air Outlet Node Name
+    PSZ-AC_2:6_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    PSZ-AC_2:6_CoolCLennoxStandard10Ton_TGA120S2B_CapFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    PSZ-AC_2:6_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    PSZ-AC_2:6_CoolCLennoxStandard10Ton_TGA120S2B_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
     PSZ-AC_2:6_CoolCLennoxStandard10Ton_TGA120S2B_PLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    42212.98,                !- Low Speed Gross Rated Total Cooling Capacity {W}
+    0.79866,                 !- Low Speed Gross Rated Sensible Heat Ratio
+    3.39928881549157,        !- Low Speed Gross Rated Cooling COP {W/W}
+    3.40011333333333,        !- Low Speed Rated Air Flow Rate {m3/s}
+    PSZ-AC_2:6_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
+    PSZ-AC_2:6_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
+    ;                        !- Condenser Air Inlet Node Name
 
-  Coil:Cooling:DX:CurveFit:Speed,
-    PSZ-AC_2:6_CoolC DXCoil Speed 2 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    0.79866,                 !- Gross Sensible Heat Ratio
-    3.39928881549157,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    PSZ-AC_2:6_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    PSZ-AC_2:6_CoolCLennoxStandard10Ton_TGA120S2B_CapFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    PSZ-AC_2:6_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    PSZ-AC_2:6_CoolCLennoxStandard10Ton_TGA120S2B_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    PSZ-AC_2:6_CoolCLennoxStandard10Ton_TGA120S2B_PLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  OutdoorAir:Node,
-    PSZ-AC_3:7_CoolC DXCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:TwoSpeed,
     PSZ-AC_3:7_CoolC DXCoil, !- Name
-    PSZ-AC_3:7_OA-PSZ-AC_3:7_CoolCNode,  !- Evaporator Inlet Node Name
-    PSZ-AC_3:7_CoolC-PSZ-AC_3:7_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    PSZ-AC_3:7_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    PSZ-AC_3:7_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    PSZ-AC_3:7_CoolC DXCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    PSZ-AC_3:7_CoolC DXCoil Performance,  !- Name
-    0.0,                     !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    82066.13,                !- High Speed Gross Rated Total Cooling Capacity {W}
+    0.79103,                 !- High Speed Rated Sensible Heat Ratio
+    3.39928881549157,        !- High Speed Gross Rated Cooling COP {W/W}
+    4.85481,                 !- High Speed Rated Air Flow Rate {m3/s}
     ,                        !- Unit Internal Static Air Pressure {Pa}
-    MultiSpeed,              !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    PSZ-AC_3:7_CoolC DXCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    PSZ-AC_3:7_CoolC DXCoil Operating Mode,  !- Name
-    82066.13,                !- Rated Gross Total Cooling Capacity {W}
-    4.85481,                 !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    2,                       !- Nominal Speed Number
-    PSZ-AC_3:7_CoolC DXCoil Speed 1 Performance,  !- Speed 1 Name
-    PSZ-AC_3:7_CoolC DXCoil Speed 2 Performance;  !- Speed 2 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    PSZ-AC_3:7_CoolC DXCoil Speed 1 Performance,  !- Name
-    0.5000,                  !- Gross Total Cooling Capacity Fraction
-    0.6667,                  !- Evaporator Air Flow Rate Fraction
-    ,                        !- Condenser Air Flow Rate Fraction
-    0.79103,                 !- Gross Sensible Heat Ratio
-    3.39928881549157,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    PSZ-AC_3:7_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    PSZ-AC_3:7_CoolCLennoxStandard10Ton_TGA120S2B_CapFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    PSZ-AC_3:7_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    PSZ-AC_3:7_CoolCLennoxStandard10Ton_TGA120S2B_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    PSZ-AC_3:7_OA-PSZ-AC_3:7_CoolCNode,  !- Air Inlet Node Name
+    PSZ-AC_3:7_CoolC-PSZ-AC_3:7_HeatCNode,  !- Air Outlet Node Name
+    PSZ-AC_3:7_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    PSZ-AC_3:7_CoolCLennoxStandard10Ton_TGA120S2B_CapFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    PSZ-AC_3:7_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    PSZ-AC_3:7_CoolCLennoxStandard10Ton_TGA120S2B_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
     PSZ-AC_3:7_CoolCLennoxStandard10Ton_TGA120S2B_PLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    41033.065,               !- Low Speed Gross Rated Total Cooling Capacity {W}
+    0.79103,                 !- Low Speed Gross Rated Sensible Heat Ratio
+    3.39928881549157,        !- Low Speed Gross Rated Cooling COP {W/W}
+    3.23654,                 !- Low Speed Rated Air Flow Rate {m3/s}
+    PSZ-AC_3:7_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
+    PSZ-AC_3:7_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
+    ;                        !- Condenser Air Inlet Node Name
 
-  Coil:Cooling:DX:CurveFit:Speed,
-    PSZ-AC_3:7_CoolC DXCoil Speed 2 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    0.79103,                 !- Gross Sensible Heat Ratio
-    3.39928881549157,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    PSZ-AC_3:7_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    PSZ-AC_3:7_CoolCLennoxStandard10Ton_TGA120S2B_CapFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    PSZ-AC_3:7_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    PSZ-AC_3:7_CoolCLennoxStandard10Ton_TGA120S2B_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    PSZ-AC_3:7_CoolCLennoxStandard10Ton_TGA120S2B_PLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  OutdoorAir:Node,
-    PSZ-AC_4:8_CoolC DXCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:TwoSpeed,
     PSZ-AC_4:8_CoolC DXCoil, !- Name
-    PSZ-AC_4:8_OA-PSZ-AC_4:8_CoolCNode,  !- Evaporator Inlet Node Name
-    PSZ-AC_4:8_CoolC-PSZ-AC_4:8_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    PSZ-AC_4:8_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    PSZ-AC_4:8_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    PSZ-AC_4:8_CoolC DXCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    PSZ-AC_4:8_CoolC DXCoil Performance,  !- Name
-    0.0,                     !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    41303.99,                !- High Speed Gross Rated Total Cooling Capacity {W}
+    0.79660,                 !- High Speed Rated Sensible Heat Ratio
+    3.73224036438218,        !- High Speed Gross Rated Cooling COP {W/W}
+    2.48125,                 !- High Speed Rated Air Flow Rate {m3/s}
     ,                        !- Unit Internal Static Air Pressure {Pa}
-    MultiSpeed,              !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    PSZ-AC_4:8_CoolC DXCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    PSZ-AC_4:8_CoolC DXCoil Operating Mode,  !- Name
-    41303.99,                !- Rated Gross Total Cooling Capacity {W}
-    2.48125,                 !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    2,                       !- Nominal Speed Number
-    PSZ-AC_4:8_CoolC DXCoil Speed 1 Performance,  !- Speed 1 Name
-    PSZ-AC_4:8_CoolC DXCoil Speed 2 Performance;  !- Speed 2 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    PSZ-AC_4:8_CoolC DXCoil Speed 1 Performance,  !- Name
-    0.5000,                  !- Gross Total Cooling Capacity Fraction
-    0.6667,                  !- Evaporator Air Flow Rate Fraction
-    ,                        !- Condenser Air Flow Rate Fraction
-    0.79660,                 !- Gross Sensible Heat Ratio
-    3.73224036438218,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    PSZ-AC_4:8_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    PSZ-AC_4:8_CoolCLennoxStandard10Ton_TGA120S2B_CapFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    PSZ-AC_4:8_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    PSZ-AC_4:8_CoolCLennoxStandard10Ton_TGA120S2B_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    PSZ-AC_4:8_OA-PSZ-AC_4:8_CoolCNode,  !- Air Inlet Node Name
+    PSZ-AC_4:8_CoolC-PSZ-AC_4:8_HeatCNode,  !- Air Outlet Node Name
+    PSZ-AC_4:8_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    PSZ-AC_4:8_CoolCLennoxStandard10Ton_TGA120S2B_CapFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    PSZ-AC_4:8_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    PSZ-AC_4:8_CoolCLennoxStandard10Ton_TGA120S2B_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
     PSZ-AC_4:8_CoolCLennoxStandard10Ton_TGA120S2B_PLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    20651.995,               !- Low Speed Gross Rated Total Cooling Capacity {W}
+    0.79660,                 !- Low Speed Gross Rated Sensible Heat Ratio
+    3.73224036438218,        !- Low Speed Gross Rated Cooling COP {W/W}
+    1.65416666666667,        !- Low Speed Rated Air Flow Rate {m3/s}
+    PSZ-AC_4:8_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
+    PSZ-AC_4:8_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
+    ;                        !- Condenser Air Inlet Node Name
 
-  Coil:Cooling:DX:CurveFit:Speed,
-    PSZ-AC_4:8_CoolC DXCoil Speed 2 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    0.79660,                 !- Gross Sensible Heat Ratio
-    3.73224036438218,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    PSZ-AC_4:8_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    PSZ-AC_4:8_CoolCLennoxStandard10Ton_TGA120S2B_CapFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    PSZ-AC_4:8_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    PSZ-AC_4:8_CoolCLennoxStandard10Ton_TGA120S2B_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    PSZ-AC_4:8_CoolCLennoxStandard10Ton_TGA120S2B_PLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  OutdoorAir:Node,
-    PSZ-AC_5:9_CoolC DXCoil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:TwoSpeed,
     PSZ-AC_5:9_CoolC DXCoil, !- Name
-    PSZ-AC_5:9_OA-PSZ-AC_5:9_CoolCNode,  !- Evaporator Inlet Node Name
-    PSZ-AC_5:9_CoolC-PSZ-AC_5:9_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    PSZ-AC_5:9_CoolC DXCoil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    PSZ-AC_5:9_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    PSZ-AC_5:9_CoolC DXCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    PSZ-AC_5:9_CoolC DXCoil Performance,  !- Name
-    0.0,                     !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    49830.54,                !- High Speed Gross Rated Total Cooling Capacity {W}
+    0.79103,                 !- High Speed Rated Sensible Heat Ratio
+    3.73224036438218,        !- High Speed Gross Rated Cooling COP {W/W}
+    2.94784,                 !- High Speed Rated Air Flow Rate {m3/s}
     ,                        !- Unit Internal Static Air Pressure {Pa}
-    MultiSpeed,              !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    PSZ-AC_5:9_CoolC DXCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    PSZ-AC_5:9_CoolC DXCoil Operating Mode,  !- Name
-    49830.54,                !- Rated Gross Total Cooling Capacity {W}
-    2.94784,                 !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    2,                       !- Nominal Speed Number
-    PSZ-AC_5:9_CoolC DXCoil Speed 1 Performance,  !- Speed 1 Name
-    PSZ-AC_5:9_CoolC DXCoil Speed 2 Performance;  !- Speed 2 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    PSZ-AC_5:9_CoolC DXCoil Speed 1 Performance,  !- Name
-    0.5000,                  !- Gross Total Cooling Capacity Fraction
-    0.6667,                  !- Evaporator Air Flow Rate Fraction
-    ,                        !- Condenser Air Flow Rate Fraction
-    0.79103,                 !- Gross Sensible Heat Ratio
-    3.73224036438218,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    PSZ-AC_5:9_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    PSZ-AC_5:9_CoolCLennoxStandard10Ton_TGA120S2B_CapFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    PSZ-AC_5:9_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    PSZ-AC_5:9_CoolCLennoxStandard10Ton_TGA120S2B_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    PSZ-AC_5:9_OA-PSZ-AC_5:9_CoolCNode,  !- Air Inlet Node Name
+    PSZ-AC_5:9_CoolC-PSZ-AC_5:9_HeatCNode,  !- Air Outlet Node Name
+    PSZ-AC_5:9_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    PSZ-AC_5:9_CoolCLennoxStandard10Ton_TGA120S2B_CapFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    PSZ-AC_5:9_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    PSZ-AC_5:9_CoolCLennoxStandard10Ton_TGA120S2B_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
     PSZ-AC_5:9_CoolCLennoxStandard10Ton_TGA120S2B_PLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    PSZ-AC_5:9_CoolC DXCoil Speed 2 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    0.79103,                 !- Gross Sensible Heat Ratio
-    3.73224036438218,        !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    PSZ-AC_5:9_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    PSZ-AC_5:9_CoolCLennoxStandard10Ton_TGA120S2B_CapFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    PSZ-AC_5:9_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    PSZ-AC_5:9_CoolCLennoxStandard10Ton_TGA120S2B_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    PSZ-AC_5:9_CoolCLennoxStandard10Ton_TGA120S2B_PLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    24915.27,                !- Low Speed Gross Rated Total Cooling Capacity {W}
+    0.79103,                 !- Low Speed Gross Rated Sensible Heat Ratio
+    3.73224036438218,        !- Low Speed Gross Rated Cooling COP {W/W}
+    1.96522666666667,        !- Low Speed Rated Air Flow Rate {m3/s}
+    PSZ-AC_5:9_CoolCLennoxStandard10Ton_TGA120S2B_CapFT,  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
+    PSZ-AC_5:9_CoolCLennoxStandard10Ton_TGA120S2B_EIRFT,  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
+    ;                        !- Condenser Air Inlet Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: COIL:HEATING:WATER ===========
 
@@ -23993,7 +23678,7 @@
     PSZ-AC_1:5_OA-PSZ-AC_1:5_CoolCNode,  !- DX Cooling Coil System Inlet Node Name
     PSZ-AC_1:5_CoolC-PSZ-AC_1:5_HeatCNode,  !- DX Cooling Coil System Outlet Node Name
     PSZ-AC_1:5_CoolC-PSZ-AC_1:5_HeatCNode,  !- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:TwoSpeed,!- Cooling Coil Object Type
     PSZ-AC_1:5_CoolC DXCoil; !- Cooling Coil Name
 
   CoilSystem:Cooling:DX,
@@ -24002,7 +23687,7 @@
     PSZ-AC_2:6_OA-PSZ-AC_2:6_CoolCNode,  !- DX Cooling Coil System Inlet Node Name
     PSZ-AC_2:6_CoolC-PSZ-AC_2:6_HeatCNode,  !- DX Cooling Coil System Outlet Node Name
     PSZ-AC_2:6_CoolC-PSZ-AC_2:6_HeatCNode,  !- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:TwoSpeed,!- Cooling Coil Object Type
     PSZ-AC_2:6_CoolC DXCoil; !- Cooling Coil Name
 
   CoilSystem:Cooling:DX,
@@ -24011,7 +23696,7 @@
     PSZ-AC_3:7_OA-PSZ-AC_3:7_CoolCNode,  !- DX Cooling Coil System Inlet Node Name
     PSZ-AC_3:7_CoolC-PSZ-AC_3:7_HeatCNode,  !- DX Cooling Coil System Outlet Node Name
     PSZ-AC_3:7_CoolC-PSZ-AC_3:7_HeatCNode,  !- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:TwoSpeed,!- Cooling Coil Object Type
     PSZ-AC_3:7_CoolC DXCoil; !- Cooling Coil Name
 
   CoilSystem:Cooling:DX,
@@ -24020,7 +23705,7 @@
     PSZ-AC_4:8_OA-PSZ-AC_4:8_CoolCNode,  !- DX Cooling Coil System Inlet Node Name
     PSZ-AC_4:8_CoolC-PSZ-AC_4:8_HeatCNode,  !- DX Cooling Coil System Outlet Node Name
     PSZ-AC_4:8_CoolC-PSZ-AC_4:8_HeatCNode,  !- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:TwoSpeed,!- Cooling Coil Object Type
     PSZ-AC_4:8_CoolC DXCoil; !- Cooling Coil Name
 
   CoilSystem:Cooling:DX,
@@ -24029,7 +23714,7 @@
     PSZ-AC_5:9_OA-PSZ-AC_5:9_CoolCNode,  !- DX Cooling Coil System Inlet Node Name
     PSZ-AC_5:9_CoolC-PSZ-AC_5:9_HeatCNode,  !- DX Cooling Coil System Outlet Node Name
     PSZ-AC_5:9_CoolC-PSZ-AC_5:9_HeatCNode,  !- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:TwoSpeed,!- Cooling Coil Object Type
     PSZ-AC_5:9_CoolC DXCoil; !- Cooling Coil Name
 
 !-   ===========  ALL OBJECTS IN CLASS: CONTROLLER:WATERCOIL ===========

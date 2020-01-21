@@ -106,7 +106,7 @@
 ! Purchase Heating:            No
 ! Purchased Chilled Water:     No
 ! Purchased Hot Water:         No
-! Coils:                       Coil:Heating:Fuel (heating and reheat), Coil:Cooling:DX
+! Coils:                       Coil:Heating:Fuel (heating and reheat), Coil:Cooling:DX:SingleSpeed
 ! Pumps:                       None
 ! Boilers:                     None
 ! Chillers:                    None
@@ -126,7 +126,7 @@
 ! Report Variables:            All available in RDD (442 requested, monthly and annual results)
 !
 
-  Version,9.3;
+  Version,9.2;
 
   Building,
     Small Office 2 Story 4 zone 550 m2,  !- Name
@@ -1585,25 +1585,25 @@
   InternalMass,
     InternalMass_SouthZone_1stFloor,  !- Name
     FURNITURE,               !- Construction Name
-    SouthZone_1stFloor,      !- Zone or ZoneList Name
+    SouthZone_1stFloor,      !- Zone Name
     77;                      !- Surface Area {m2}
 
   InternalMass,
     InternalMass_NorthZone_1stFloor,  !- Name
     FURNITURE,               !- Construction Name
-    NorthZone_1stFloor,      !- Zone or ZoneList Name
+    NorthZone_1stFloor,      !- Zone Name
     77;                      !- Surface Area {m2}
 
   InternalMass,
     InternalMass_SouthZone_2ndFloor,  !- Name
     FURNITURE,               !- Construction Name
-    SouthZone_2ndFloor,      !- Zone or ZoneList Name
+    SouthZone_2ndFloor,      !- Zone Name
     77;                      !- Surface Area {m2}
 
   InternalMass,
     InternalMass_NorthZone_2ndFloor,  !- Name
     FURNITURE,               !- Construction Name
-    NorthZone_2ndFloor,      !- Zone or ZoneList Name
+    NorthZone_2ndFloor,      !- Zone Name
     77;                      !- Surface Area {m2}
 
   ScheduleTypeLimits,
@@ -2845,8 +2845,8 @@
     DirectAir_SouthZone_1stFloor,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Equipment_NorthZone_1stFloor,  !- Name
@@ -2855,8 +2855,8 @@
     DirectAir_NorthZone_1stFloor,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Equipment_SouthZone_2ndFloor,  !- Name
@@ -2865,8 +2865,8 @@
     DirectAir_SouthZone_2ndFloor,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Equipment_NorthZone_2ndFloor,  !- Name
@@ -2875,8 +2875,8 @@
     DirectAir_NorthZone_2ndFloor,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirLoopHVAC:UnitaryHeatCool,
     UnitarySystem_SouthZone_1stFloor,  !- Name
@@ -2894,7 +2894,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     HeatingCoil_SouthZone_1stFloor,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     DXCoolingCoil_SouthZone_1stFloor,  !- Cooling Coil Name
     CoolReheat,              !- Dehumidification Control Type
     Coil:Heating:Fuel,       !- Reheat Coil Object Type
@@ -2916,7 +2916,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     HeatingCoil_NorthZone_1stFloor,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     DXCoolingCoil_NorthZone_1stFloor,  !- Cooling Coil Name
     CoolReheat,              !- Dehumidification Control Type
     Coil:Heating:Fuel,       !- Reheat Coil Object Type
@@ -2938,7 +2938,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     HeatingCoil_SouthZone_2ndFloor,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     DXCoolingCoil_SouthZone_2ndFloor,  !- Cooling Coil Name
     CoolReheat,              !- Dehumidification Control Type
     Coil:Heating:Fuel,       !- Reheat Coil Object Type
@@ -2960,7 +2960,7 @@
     BlowThrough,             !- Fan Placement
     Coil:Heating:Fuel,       !- Heating Coil Object Type
     HeatingCoil_NorthZone_2ndFloor,  !- Heating Coil Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     DXCoolingCoil_NorthZone_2ndFloor,  !- Cooling Coil Name
     CoolReheat,              !- Dehumidification Control Type
     Coil:Heating:Fuel,       !- Reheat Coil Object Type
@@ -3147,261 +3147,69 @@
     InletNode_ReheatCoil_NorthZone_2ndFloor,  !- Air Inlet Node Name
     OutletNode_AirLoop_NorthZone_2ndFloor;  !- Air Outlet Node Name
 
-  OutdoorAir:Node,
-    DXCoolingCoil_SouthZone_1stFloor Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     DXCoolingCoil_SouthZone_1stFloor,  !- Name
-    InletNode_DXCoolingCoil_SouthZone_1stFloor,  !- Evaporator Inlet Node Name
-    InletNode_HeatingCoil_SouthZone_1stFloor,  !- Evaporator Outlet Node Name
     Office HVAC,             !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    DXCoolingCoil_SouthZone_1stFloor Condenser Inlet Node,  !- Condenser Inlet Node Name
-    DXCoolingCoil_SouthZone_1stFloor Condenser Outlet Node,  !- Condenser Outlet Node Name
-    DXCoolingCoil_SouthZone_1stFloor Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    DXCoolingCoil_SouthZone_1stFloor Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    DXCoolingCoil_SouthZone_1stFloor Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    DXCoolingCoil_SouthZone_1stFloor Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    DXCoolingCoil_SouthZone_1stFloor Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    DXCoolingCoil_SouthZone_1stFloor Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    3.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    3.0,                     !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    DX-Cap-FT-Curve-Default, !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    DX-Cap-FF-Curve-Default, !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    DX-EIR-FT-Curve-Default, !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    DX-EIR-FF-Curve-Default, !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    DX-PLF-Curve-Default,    !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    InletNode_DXCoolingCoil_SouthZone_1stFloor,  !- Air Inlet Node Name
+    InletNode_HeatingCoil_SouthZone_1stFloor,  !- Air Outlet Node Name
+    DX-Cap-FT-Curve-Default, !- Total Cooling Capacity Function of Temperature Curve Name
+    DX-Cap-FF-Curve-Default, !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    DX-EIR-FT-Curve-Default, !- Energy Input Ratio Function of Temperature Curve Name
+    DX-EIR-FF-Curve-Default, !- Energy Input Ratio Function of Flow Fraction Curve Name
+    DX-PLF-Curve-Default;    !- Part Load Fraction Correlation Curve Name
 
-  OutdoorAir:Node,
-    DXCoolingCoil_NorthZone_1stFloor Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     DXCoolingCoil_NorthZone_1stFloor,  !- Name
-    InletNode_DXCoolingCoil_NorthZone_1stFloor,  !- Evaporator Inlet Node Name
-    InletNode_HeatingCoil_NorthZone_1stFloor,  !- Evaporator Outlet Node Name
     Office HVAC,             !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    DXCoolingCoil_NorthZone_1stFloor Condenser Inlet Node,  !- Condenser Inlet Node Name
-    DXCoolingCoil_NorthZone_1stFloor Condenser Outlet Node,  !- Condenser Outlet Node Name
-    DXCoolingCoil_NorthZone_1stFloor Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    DXCoolingCoil_NorthZone_1stFloor Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    DXCoolingCoil_NorthZone_1stFloor Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    DXCoolingCoil_NorthZone_1stFloor Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    DXCoolingCoil_NorthZone_1stFloor Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    DXCoolingCoil_NorthZone_1stFloor Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    3.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    3.0,                     !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    DX-Cap-FT-Curve-Default, !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    DX-Cap-FF-Curve-Default, !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    DX-EIR-FT-Curve-Default, !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    DX-EIR-FF-Curve-Default, !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    DX-PLF-Curve-Default,    !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    InletNode_DXCoolingCoil_NorthZone_1stFloor,  !- Air Inlet Node Name
+    InletNode_HeatingCoil_NorthZone_1stFloor,  !- Air Outlet Node Name
+    DX-Cap-FT-Curve-Default, !- Total Cooling Capacity Function of Temperature Curve Name
+    DX-Cap-FF-Curve-Default, !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    DX-EIR-FT-Curve-Default, !- Energy Input Ratio Function of Temperature Curve Name
+    DX-EIR-FF-Curve-Default, !- Energy Input Ratio Function of Flow Fraction Curve Name
+    DX-PLF-Curve-Default;    !- Part Load Fraction Correlation Curve Name
 
-  OutdoorAir:Node,
-    DXCoolingCoil_SouthZone_2ndFloor Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     DXCoolingCoil_SouthZone_2ndFloor,  !- Name
-    InletNode_DXCoolingCoil_SouthZone_2ndFloor,  !- Evaporator Inlet Node Name
-    InletNode_HeatingCoil_SouthZone_2ndFloor,  !- Evaporator Outlet Node Name
     Office HVAC,             !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    DXCoolingCoil_SouthZone_2ndFloor Condenser Inlet Node,  !- Condenser Inlet Node Name
-    DXCoolingCoil_SouthZone_2ndFloor Condenser Outlet Node,  !- Condenser Outlet Node Name
-    DXCoolingCoil_SouthZone_2ndFloor Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    DXCoolingCoil_SouthZone_2ndFloor Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    DXCoolingCoil_SouthZone_2ndFloor Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    DXCoolingCoil_SouthZone_2ndFloor Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    DXCoolingCoil_SouthZone_2ndFloor Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    DXCoolingCoil_SouthZone_2ndFloor Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    3.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    3.0,                     !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    DX-Cap-FT-Curve-Default, !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    DX-Cap-FF-Curve-Default, !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    DX-EIR-FT-Curve-Default, !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    DX-EIR-FF-Curve-Default, !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    DX-PLF-Curve-Default,    !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    InletNode_DXCoolingCoil_SouthZone_2ndFloor,  !- Air Inlet Node Name
+    InletNode_HeatingCoil_SouthZone_2ndFloor,  !- Air Outlet Node Name
+    DX-Cap-FT-Curve-Default, !- Total Cooling Capacity Function of Temperature Curve Name
+    DX-Cap-FF-Curve-Default, !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    DX-EIR-FT-Curve-Default, !- Energy Input Ratio Function of Temperature Curve Name
+    DX-EIR-FF-Curve-Default, !- Energy Input Ratio Function of Flow Fraction Curve Name
+    DX-PLF-Curve-Default;    !- Part Load Fraction Correlation Curve Name
 
-  OutdoorAir:Node,
-    DXCoolingCoil_NorthZone_2ndFloor Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     DXCoolingCoil_NorthZone_2ndFloor,  !- Name
-    InletNode_DXCoolingCoil_NorthZone_2ndFloor,  !- Evaporator Inlet Node Name
-    InletNode_HeatingCoil_NorthZone_2ndFloor,  !- Evaporator Outlet Node Name
     Office HVAC,             !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    DXCoolingCoil_NorthZone_2ndFloor Condenser Inlet Node,  !- Condenser Inlet Node Name
-    DXCoolingCoil_NorthZone_2ndFloor Condenser Outlet Node,  !- Condenser Outlet Node Name
-    DXCoolingCoil_NorthZone_2ndFloor Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    DXCoolingCoil_NorthZone_2ndFloor Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    DXCoolingCoil_NorthZone_2ndFloor Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    DXCoolingCoil_NorthZone_2ndFloor Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    DXCoolingCoil_NorthZone_2ndFloor Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    DXCoolingCoil_NorthZone_2ndFloor Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    3.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    3.0,                     !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    DX-Cap-FT-Curve-Default, !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    DX-Cap-FF-Curve-Default, !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    DX-EIR-FT-Curve-Default, !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    DX-EIR-FF-Curve-Default, !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    DX-PLF-Curve-Default,    !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    InletNode_DXCoolingCoil_NorthZone_2ndFloor,  !- Air Inlet Node Name
+    InletNode_HeatingCoil_NorthZone_2ndFloor,  !- Air Outlet Node Name
+    DX-Cap-FT-Curve-Default, !- Total Cooling Capacity Function of Temperature Curve Name
+    DX-Cap-FF-Curve-Default, !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    DX-EIR-FT-Curve-Default, !- Energy Input Ratio Function of Temperature Curve Name
+    DX-EIR-FF-Curve-Default, !- Energy Input Ratio Function of Flow Fraction Curve Name
+    DX-PLF-Curve-Default;    !- Part Load Fraction Correlation Curve Name
 
   Fan:ConstantVolume,
     SupplyFan_SouthZone_1stFloor,  !- Name

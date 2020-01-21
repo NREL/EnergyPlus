@@ -26,7 +26,7 @@
 ! Floor Area:              232.25 m2
 ! Number of Stories:       1
 
-  Version,9.3;
+  Version,9.2;
 
   Timestep,6;
 
@@ -371,72 +371,44 @@
     Supply Inlet Node,       !- DX Cooling Coil System Inlet Node Name
     Main Cooling Coil 1 Outlet Node,  !- DX Cooling Coil System Outlet Node Name
     Main Cooling Coil 1 Outlet Node,  !- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     Main Cooling Coil 1;     !- Cooling Coil Name
 
-  OutdoorAir:Node,
-    Main Cooling Coil 1 Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     Main Cooling Coil 1,     !- Name
-    Supply Inlet Node,       !- Evaporator Inlet Node Name
-    Main Cooling Coil 1 Outlet Node,  !- Evaporator Outlet Node Name
     System Availability Schedule,  !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    Main Cooling Coil 1 Condenser Inlet Node,  !- Condenser Inlet Node Name
-    Main Cooling Coil 1 Condenser Outlet Node,  !- Condenser Outlet Node Name
-    Main Cooling Coil 1 Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    Main Cooling Coil 1 Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    Main Cooling Coil 1 Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    Main Cooling Coil 1 Operating Mode,  !- Name
-    148300,                  !- Rated Gross Total Cooling Capacity {W}
-    8.5,                     !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    Main Cooling Coil 1 Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    Main Cooling Coil 1 Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    0.83,                    !- Gross Sensible Heat Ratio
-    4.5669,                  !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    148300,                  !- Gross Rated Total Cooling Capacity {W}
+    0.83,                    !- Gross Rated Sensible Heat Ratio
+    4.5669,                  !- Gross Rated Cooling COP {W/W}
+    8.5,                     !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Cool Cap Mod func of Temperature,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    HPACCoolCapFFF,          !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Liebert Econophase EIR Func T,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    HPACCOOLEIRFFF,          !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    Supply Inlet Node,       !- Air Inlet Node Name
+    Main Cooling Coil 1 Outlet Node,  !- Air Outlet Node Name
+    Cool Cap Mod func of Temperature,  !- Total Cooling Capacity Function of Temperature Curve Name
+    HPACCoolCapFFF,          !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Liebert Econophase EIR Func T,  !- Energy Input Ratio Function of Temperature Curve Name
+    HPACCOOLEIRFFF,          !- Energy Input Ratio Function of Flow Fraction Curve Name
     HPACCOOLPLFFPLR,         !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    ,                        !- Maximum Cycling Rate {cycles/hr}
+    ,                        !- Latent Capacity Time Constant {s}
+    ,                        !- Condenser Air Inlet Node Name
+    ,                        !- Condenser Type
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
+    ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Supply Water Storage Tank Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    ,                        !- Basin Heater Capacity {W/K}
+    ,                        !- Basin Heater Setpoint Temperature {C}
+    ,                        !- Basin Heater Operating Schedule Name
+    ,                        !- Sensible Heat Ratio Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Function of Flow Fraction Curve Name
+    Yes;                     !- Report ASHRAE Standard 127 Performance Ratings
 
   Table:IndependentVariable,
     Cool Cap Mod func of Temperature_IndependentVariable1,  !- Name
@@ -450,10 +422,10 @@
     ,                        !- External File Column Number
     ,                        !- External File Starting Row Number
     13.00000,                !- Value 1
-    17.00000,                !- Value 2
-    19.44440,                !- <none>
-    21.00000,                !- <none>
-    23.90000;                !- <none>
+    17.00000,                !- Extended Field
+    19.44440,                !- Extended Field
+    21.00000,                !- Extended Field
+    23.90000;                !- Extended Field
 
   Table:IndependentVariable,
     Cool Cap Mod func of Temperature_IndependentVariable2,  !- Name
@@ -467,18 +439,18 @@
     ,                        !- External File Column Number
     ,                        !- External File Starting Row Number
     -10.00000,               !- Value 1
-    15.00000,                !- Value 2
-    18.00000,                !- <none>
-    24.00000,                !- <none>
-    30.00000,                !- <none>
-    35.00000,                !- <none>
-    38.00000,                !- <none>
-    46.00000;                !- <none>
+    15.00000,                !- Extended Field
+    18.00000,                !- Extended Field
+    24.00000,                !- Extended Field
+    30.00000,                !- Extended Field
+    35.00000,                !- Extended Field
+    38.00000,                !- Extended Field
+    46.00000;                !- Extended Field
 
   Table:IndependentVariableList,
     Cool Cap Mod func of Temperature_IndependentVariableList,  !- Name
     Cool Cap Mod func of Temperature_IndependentVariable1,  !- Independent Variable 1 Name
-    Cool Cap Mod func of Temperature_IndependentVariable2;  !- Independent Variable 2 Name
+    Cool Cap Mod func of Temperature_IndependentVariable2;  !- Extended Field
 
   Table:Lookup,
     Cool Cap Mod func of Temperature,  !- Name
@@ -492,45 +464,45 @@
     ,                        !- External File Column Number
     ,                        !- External File Starting Row Number
     1.00,                    !- Output Value 1
-    1.00,                    !- Output Value 2
-    1.00,                    !- <none>
-    0.924738271,             !- <none>
-    0.883909339,             !- <none>
-    0.835522309,             !- <none>
-    0.800222635,             !- <none>
-    0.683109499,             !- <none>
-    1.00,                    !- <none>
-    1.00,                    !- <none>
-    1.00,                    !- <none>
-    1.00,                    !- <none>
-    0.976933863,             !- <none>
-    0.937696593,             !- <none>
-    0.907886775,             !- <none>
-    0.805413255,             !- <none>
-    1.00,                    !- <none>
-    1.00,                    !- <none>
-    1.00,                    !- <none>
-    1.00,                    !- <none>
-    1.00,                    !- <none>
-    1.00,                    !- <none>
-    0.9718,                  !- <none>
-    0.8782,                  !- <none>
-    1.00,                    !- <none>
-    1.00,                    !- <none>
-    1.00,                    !- <none>
-    1.00,                    !- <none>
-    1.00,                    !- <none>
-    1.0385,                  !- <none>
-    1.0142,                  !- <none>
-    0.9264,                  !- <none>
-    1.00,                    !- <none>
-    1.00,                    !- <none>
-    1.00,                    !- <none>
-    1.00,                    !- <none>
-    1.00,                    !- <none>
-    1.110828252,             !- <none>
-    1.090488436,             !- <none>
-    1.013268253;             !- <none>
+    1.00,                    !- Extended Field
+    1.00,                    !- Extended Field
+    0.924738271,             !- Extended Field
+    0.883909339,             !- Extended Field
+    0.835522309,             !- Extended Field
+    0.800222635,             !- Extended Field
+    0.683109499,             !- Extended Field
+    1.00,                    !- Extended Field
+    1.00,                    !- Extended Field
+    1.00,                    !- Extended Field
+    1.00,                    !- Extended Field
+    0.976933863,             !- Extended Field
+    0.937696593,             !- Extended Field
+    0.907886775,             !- Extended Field
+    0.805413255,             !- Extended Field
+    1.00,                    !- Extended Field
+    1.00,                    !- Extended Field
+    1.00,                    !- Extended Field
+    1.00,                    !- Extended Field
+    1.00,                    !- Extended Field
+    1.00,                    !- Extended Field
+    0.9718,                  !- Extended Field
+    0.8782,                  !- Extended Field
+    1.00,                    !- Extended Field
+    1.00,                    !- Extended Field
+    1.00,                    !- Extended Field
+    1.00,                    !- Extended Field
+    1.00,                    !- Extended Field
+    1.0385,                  !- Extended Field
+    1.0142,                  !- Extended Field
+    0.9264,                  !- Extended Field
+    1.00,                    !- Extended Field
+    1.00,                    !- Extended Field
+    1.00,                    !- Extended Field
+    1.00,                    !- Extended Field
+    1.00,                    !- Extended Field
+    1.110828252,             !- Extended Field
+    1.090488436,             !- Extended Field
+    1.013268253;             !- Extended Field
 
   Curve:Quadratic,
     HPACCoolCapFFF,          !- Name
@@ -570,7 +542,7 @@
     ,                        !- External File Column Number
     ,                        !- External File Starting Row Number
     12.70000,                !- Value 1
-    23.80000;                !- Value 2
+    23.80000;                !- Extended Field
 
   Table:IndependentVariable,
     Liebert Econophase EIR Func T_IndependentVariable2,  !- Name
@@ -584,27 +556,27 @@
     ,                        !- External File Column Number
     ,                        !- External File Starting Row Number
     -50.00000,               !- Value 1
-    -4.00000,                !- Value 2
-    -1.22220,                !- <none>
-    1.55550,                 !- <none>
-    4.33330,                 !- <none>
-    7.11110,                 !- <none>
-    9.88880,                 !- <none>
-    12.66670,                !- <none>
-    15.44440,                !- <none>
-    18.22200,                !- <none>
-    21.00000,                !- <none>
-    23.77778,                !- <none>
-    26.55556,                !- <none>
-    29.33333,                !- <none>
-    32.11111,                !- <none>
+    -4.00000,                !- Extended Field
+    -1.22220,                !- Extended Field
+    1.55550,                 !- Extended Field
+    4.33330,                 !- Extended Field
+    7.11110,                 !- Extended Field
+    9.88880,                 !- Extended Field
+    12.66670,                !- Extended Field
+    15.44440,                !- Extended Field
+    18.22200,                !- Extended Field
+    21.00000,                !- Extended Field
+    23.77778,                !- Extended Field
+    26.55556,                !- Extended Field
+    29.33333,                !- Extended Field
+    32.11111,                !- Extended Field
     34.88889,                !- Extended Field
     50.00000;                !- Extended Field
 
   Table:IndependentVariableList,
     Liebert Econophase EIR Func T_IndependentVariableList,  !- Name
     Liebert Econophase EIR Func T_IndependentVariable1,  !- Independent Variable 1 Name
-    Liebert Econophase EIR Func T_IndependentVariable2;  !- Independent Variable 2 Name
+    Liebert Econophase EIR Func T_IndependentVariable2;  !- Extended Field
 
   Table:Lookup,
     Liebert Econophase EIR Func T,  !- Name
@@ -618,39 +590,39 @@
     ,                        !- External File Column Number
     ,                        !- External File Starting Row Number
     0.042,                   !- Output Value 1
-    0.042,                   !- Output Value 2
-    0.084,                   !- <none>
-    0.084,                   !- <none>
-    0.2269,                  !- <none>
-    0.2395,                  !- <none>
-    0.311,                   !- <none>
-    0.3697,                  !- <none>
-    0.4454,                  !- <none>
-    0.5462,                  !- <none>
-    0.6723,                  !- <none>
-    0.7227,                  !- <none>
-    0.7773,                  !- <none>
-    0.8193,                  !- <none>
-    0.895,                   !- <none>
-    1.0,                     !- <none>
-    1.5,                     !- <none>
-    0.042,                   !- <none>
-    0.042,                   !- <none>
-    0.084,                   !- <none>
-    0.084,                   !- <none>
-    0.2269,                  !- <none>
-    0.2395,                  !- <none>
-    0.311,                   !- <none>
-    0.3697,                  !- <none>
-    0.4454,                  !- <none>
-    0.5462,                  !- <none>
-    0.6723,                  !- <none>
-    0.7227,                  !- <none>
-    0.7773,                  !- <none>
-    0.8193,                  !- <none>
-    0.895,                   !- <none>
-    1.0,                     !- <none>
-    1.5;                     !- <none>
+    0.042,                   !- Extended Field
+    0.084,                   !- Extended Field
+    0.084,                   !- Extended Field
+    0.2269,                  !- Extended Field
+    0.2395,                  !- Extended Field
+    0.311,                   !- Extended Field
+    0.3697,                  !- Extended Field
+    0.4454,                  !- Extended Field
+    0.5462,                  !- Extended Field
+    0.6723,                  !- Extended Field
+    0.7227,                  !- Extended Field
+    0.7773,                  !- Extended Field
+    0.8193,                  !- Extended Field
+    0.895,                   !- Extended Field
+    1.0,                     !- Extended Field
+    1.5,                     !- Extended Field
+    0.042,                   !- Extended Field
+    0.042,                   !- Extended Field
+    0.084,                   !- Extended Field
+    0.084,                   !- Extended Field
+    0.2269,                  !- Extended Field
+    0.2395,                  !- Extended Field
+    0.311,                   !- Extended Field
+    0.3697,                  !- Extended Field
+    0.4454,                  !- Extended Field
+    0.5462,                  !- Extended Field
+    0.6723,                  !- Extended Field
+    0.7227,                  !- Extended Field
+    0.7773,                  !- Extended Field
+    0.8193,                  !- Extended Field
+    0.895,                   !- Extended Field
+    1.0,                     !- Extended Field
+    1.5;                     !- Extended Field
 
   Curve:Quadratic,
     HPACCOOLEIRFFF,          !- Name
@@ -741,14 +713,14 @@
     Main Zone ATU,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     2,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
     ZoneHVAC:Baseboard:Convective:Electric,  !- Zone Equipment 2 Object Type
     Main Zone Baseboard,     !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     1,                       !- Zone Equipment 2 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 2 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 2 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 2 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     Main Zone ATU,           !- Name

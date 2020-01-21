@@ -33,7 +33,7 @@
 !         The relief air that would have been dumped outside is fed into the secondary side of the
 !         indirect evaporative cooler.  Systems are set to Night Cycle during setup/setback.
 
-  Version,9.3;
+  Version,9.2;
 
   Timestep,6;
 
@@ -3932,8 +3932,8 @@
     Zone ZN1 DirectAir,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirLoopHVAC:SupplyPath,
     DirectSupplyPath ZN1,    !- Name
@@ -3972,7 +3972,7 @@
     Evap Cooler Outlet Node ZN1,  !- DX Cooling Coil System Inlet Node Name
     Cooling Coil Air Outlet Node ZN1,  !- DX Cooling Coil System Outlet Node Name
     Air Loop Outlet Node ZN1,!- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ACDXCoil ZN1;            !- Cooling Coil Name
 
   Coil:Heating:Fuel,
@@ -4012,69 +4012,21 @@
     ,                        !- Drift Loss Fraction
     ;                        !- Blowdown Concentration Ratio
 
-  OutdoorAir:Node,
-    ACDXCoil ZN1 Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     ACDXCoil ZN1,            !- Name
-    Evap Cooler Outlet Node ZN1,  !- Evaporator Inlet Node Name
-    Cooling Coil Air Outlet Node ZN1,  !- Evaporator Outlet Node Name
     On_Except_Winter_Night,  !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    ACDXCoil ZN1 Condenser Inlet Node,  !- Condenser Inlet Node Name
-    ACDXCoil ZN1 Condenser Outlet Node,  !- Condenser Outlet Node Name
-    ACDXCoil ZN1 Performance,!- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    ACDXCoil ZN1 Performance,!- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    ACDXCoil ZN1 Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    ACDXCoil ZN1 Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    ACDXCoil ZN1 Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    ACDXCoil ZN1 Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    3.1,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    3.1,                     !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Carrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Carrier48TM014_12tons_FFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Carrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Carrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    IEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    Evap Cooler Outlet Node ZN1,  !- Air Inlet Node Name
+    Cooling Coil Air Outlet Node ZN1,  !- Air Outlet Node Name
+    Carrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    Carrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Carrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    Carrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    IEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
 
   Fan:ConstantVolume,
     Supply Fan ZN1,          !- Name
@@ -4313,8 +4265,8 @@
     Zone ZN3 DirectAir,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirLoopHVAC:SupplyPath,
     DirectSupplyPath ZN3,    !- Name
@@ -4353,7 +4305,7 @@
     Evap Cooler Outlet Node ZN3,  !- DX Cooling Coil System Inlet Node Name
     Cooling Coil Air Outlet Node ZN3,  !- DX Cooling Coil System Outlet Node Name
     Air Loop Outlet Node ZN3,!- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ACDXCoil ZN3;            !- Cooling Coil Name
 
   Coil:Heating:Fuel,
@@ -4393,69 +4345,21 @@
     ,                        !- Drift Loss Fraction
     ;                        !- Blowdown Concentration Ratio
 
-  OutdoorAir:Node,
-    ACDXCoil ZN3 Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     ACDXCoil ZN3,            !- Name
-    Evap Cooler Outlet Node ZN3,  !- Evaporator Inlet Node Name
-    Cooling Coil Air Outlet Node ZN3,  !- Evaporator Outlet Node Name
     On_Except_Winter_Night,  !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    ACDXCoil ZN3 Condenser Inlet Node,  !- Condenser Inlet Node Name
-    ACDXCoil ZN3 Condenser Outlet Node,  !- Condenser Outlet Node Name
-    ACDXCoil ZN3 Performance,!- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    ACDXCoil ZN3 Performance,!- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    ACDXCoil ZN3 Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    ACDXCoil ZN3 Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    ACDXCoil ZN3 Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    ACDXCoil ZN3 Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    3.1,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    3.1,                     !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Carrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Carrier48TM014_12tons_FFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Carrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Carrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    IEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    Evap Cooler Outlet Node ZN3,  !- Air Inlet Node Name
+    Cooling Coil Air Outlet Node ZN3,  !- Air Outlet Node Name
+    Carrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    Carrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Carrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    Carrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    IEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
 
   Fan:ConstantVolume,
     Supply Fan ZN3,          !- Name
@@ -4694,8 +4598,8 @@
     Zone ZN5 DirectAir,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirLoopHVAC:SupplyPath,
     DirectSupplyPath ZN5,    !- Name
@@ -4734,7 +4638,7 @@
     Evap Cooler Outlet Node ZN5,  !- DX Cooling Coil System Inlet Node Name
     Cooling Coil Air Outlet Node ZN5,  !- DX Cooling Coil System Outlet Node Name
     Air Loop Outlet Node ZN5,!- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ACDXCoil ZN5;            !- Cooling Coil Name
 
   Coil:Heating:Fuel,
@@ -4774,69 +4678,21 @@
     ,                        !- Drift Loss Fraction
     ;                        !- Blowdown Concentration Ratio
 
-  OutdoorAir:Node,
-    ACDXCoil ZN5 Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     ACDXCoil ZN5,            !- Name
-    Evap Cooler Outlet Node ZN5,  !- Evaporator Inlet Node Name
-    Cooling Coil Air Outlet Node ZN5,  !- Evaporator Outlet Node Name
     On_Except_Winter_Night,  !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    ACDXCoil ZN5 Condenser Inlet Node,  !- Condenser Inlet Node Name
-    ACDXCoil ZN5 Condenser Outlet Node,  !- Condenser Outlet Node Name
-    ACDXCoil ZN5 Performance,!- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    ACDXCoil ZN5 Performance,!- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    ACDXCoil ZN5 Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    ACDXCoil ZN5 Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    ACDXCoil ZN5 Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    ACDXCoil ZN5 Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    3.1,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    3.1,                     !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Carrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Carrier48TM014_12tons_FFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Carrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Carrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    IEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    Evap Cooler Outlet Node ZN5,  !- Air Inlet Node Name
+    Cooling Coil Air Outlet Node ZN5,  !- Air Outlet Node Name
+    Carrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    Carrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Carrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    Carrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    IEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
 
   Fan:ConstantVolume,
     Supply Fan ZN5,          !- Name
@@ -5075,8 +4931,8 @@
     Zone ZN7 DirectAir,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirLoopHVAC:SupplyPath,
     DirectSupplyPath ZN7,    !- Name
@@ -5115,7 +4971,7 @@
     Evap Cooler Outlet Node ZN7,  !- DX Cooling Coil System Inlet Node Name
     Cooling Coil Air Outlet Node ZN7,  !- DX Cooling Coil System Outlet Node Name
     Air Loop Outlet Node ZN7,!- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ACDXCoil ZN7;            !- Cooling Coil Name
 
   Coil:Heating:Fuel,
@@ -5155,69 +5011,21 @@
     ,                        !- Drift Loss Fraction
     ;                        !- Blowdown Concentration Ratio
 
-  OutdoorAir:Node,
-    ACDXCoil ZN7 Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     ACDXCoil ZN7,            !- Name
-    Evap Cooler Outlet Node ZN7,  !- Evaporator Inlet Node Name
-    Cooling Coil Air Outlet Node ZN7,  !- Evaporator Outlet Node Name
     On_Except_Winter_Night,  !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    ACDXCoil ZN7 Condenser Inlet Node,  !- Condenser Inlet Node Name
-    ACDXCoil ZN7 Condenser Outlet Node,  !- Condenser Outlet Node Name
-    ACDXCoil ZN7 Performance,!- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    ACDXCoil ZN7 Performance,!- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    ACDXCoil ZN7 Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    ACDXCoil ZN7 Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    ACDXCoil ZN7 Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    ACDXCoil ZN7 Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    3.1,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    3.1,                     !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Carrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Carrier48TM014_12tons_FFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Carrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Carrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    IEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    Evap Cooler Outlet Node ZN7,  !- Air Inlet Node Name
+    Cooling Coil Air Outlet Node ZN7,  !- Air Outlet Node Name
+    Carrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    Carrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Carrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    Carrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    IEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
 
   Fan:ConstantVolume,
     Supply Fan ZN7,          !- Name
@@ -5456,8 +5264,8 @@
     Zone ZN9 DirectAir,      !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirLoopHVAC:SupplyPath,
     DirectSupplyPath ZN9,    !- Name
@@ -5496,7 +5304,7 @@
     Evap Cooler Outlet Node ZN9,  !- DX Cooling Coil System Inlet Node Name
     Cooling Coil Air Outlet Node ZN9,  !- DX Cooling Coil System Outlet Node Name
     Air Loop Outlet Node ZN9,!- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ACDXCoil ZN9;            !- Cooling Coil Name
 
   Coil:Heating:Fuel,
@@ -5536,69 +5344,21 @@
     ,                        !- Drift Loss Fraction
     ;                        !- Blowdown Concentration Ratio
 
-  OutdoorAir:Node,
-    ACDXCoil ZN9 Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     ACDXCoil ZN9,            !- Name
-    Evap Cooler Outlet Node ZN9,  !- Evaporator Inlet Node Name
-    Cooling Coil Air Outlet Node ZN9,  !- Evaporator Outlet Node Name
     On_Except_Winter_Night,  !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    ACDXCoil ZN9 Condenser Inlet Node,  !- Condenser Inlet Node Name
-    ACDXCoil ZN9 Condenser Outlet Node,  !- Condenser Outlet Node Name
-    ACDXCoil ZN9 Performance,!- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    ACDXCoil ZN9 Performance,!- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    ACDXCoil ZN9 Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    ACDXCoil ZN9 Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    ACDXCoil ZN9 Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    ACDXCoil ZN9 Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    3.1,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    3.1,                     !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Carrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Carrier48TM014_12tons_FFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Carrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Carrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    IEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    Evap Cooler Outlet Node ZN9,  !- Air Inlet Node Name
+    Cooling Coil Air Outlet Node ZN9,  !- Air Outlet Node Name
+    Carrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    Carrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Carrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    Carrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    IEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
 
   Fan:ConstantVolume,
     Supply Fan ZN9,          !- Name
@@ -5837,8 +5597,8 @@
     Zone ZN11 DirectAir,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirLoopHVAC:SupplyPath,
     DirectSupplyPath ZN11,   !- Name
@@ -5877,7 +5637,7 @@
     Evap Cooler Outlet Node ZN11,  !- DX Cooling Coil System Inlet Node Name
     Cooling Coil Air Outlet Node ZN11,  !- DX Cooling Coil System Outlet Node Name
     Air Loop Outlet Node ZN11,  !- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ACDXCoil ZN11;           !- Cooling Coil Name
 
   Coil:Heating:Fuel,
@@ -5917,69 +5677,21 @@
     ,                        !- Drift Loss Fraction
     ;                        !- Blowdown Concentration Ratio
 
-  OutdoorAir:Node,
-    ACDXCoil ZN11 Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     ACDXCoil ZN11,           !- Name
-    Evap Cooler Outlet Node ZN11,  !- Evaporator Inlet Node Name
-    Cooling Coil Air Outlet Node ZN11,  !- Evaporator Outlet Node Name
     On_Except_Winter_Night,  !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    ACDXCoil ZN11 Condenser Inlet Node,  !- Condenser Inlet Node Name
-    ACDXCoil ZN11 Condenser Outlet Node,  !- Condenser Outlet Node Name
-    ACDXCoil ZN11 Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    ACDXCoil ZN11 Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    ACDXCoil ZN11 Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    ACDXCoil ZN11 Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    ACDXCoil ZN11 Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    ACDXCoil ZN11 Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    3.1,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    3.1,                     !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Carrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Carrier48TM014_12tons_FFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Carrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Carrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    IEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    Evap Cooler Outlet Node ZN11,  !- Air Inlet Node Name
+    Cooling Coil Air Outlet Node ZN11,  !- Air Outlet Node Name
+    Carrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    Carrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Carrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    Carrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    IEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
 
   Fan:ConstantVolume,
     Supply Fan ZN11,         !- Name
@@ -6218,8 +5930,8 @@
     Zone ZN13 DirectAir,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirLoopHVAC:SupplyPath,
     DirectSupplyPath ZN13,   !- Name
@@ -6258,7 +5970,7 @@
     Evap Cooler Outlet Node ZN13,  !- DX Cooling Coil System Inlet Node Name
     Cooling Coil Air Outlet Node ZN13,  !- DX Cooling Coil System Outlet Node Name
     Air Loop Outlet Node ZN13,  !- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ACDXCoil ZN13;           !- Cooling Coil Name
 
   Coil:Heating:Fuel,
@@ -6298,69 +6010,21 @@
     ,                        !- Drift Loss Fraction
     ;                        !- Blowdown Concentration Ratio
 
-  OutdoorAir:Node,
-    ACDXCoil ZN13 Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     ACDXCoil ZN13,           !- Name
-    Evap Cooler Outlet Node ZN13,  !- Evaporator Inlet Node Name
-    Cooling Coil Air Outlet Node ZN13,  !- Evaporator Outlet Node Name
     On_Except_Winter_Night,  !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    ACDXCoil ZN13 Condenser Inlet Node,  !- Condenser Inlet Node Name
-    ACDXCoil ZN13 Condenser Outlet Node,  !- Condenser Outlet Node Name
-    ACDXCoil ZN13 Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    ACDXCoil ZN13 Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    ACDXCoil ZN13 Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    ACDXCoil ZN13 Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    ACDXCoil ZN13 Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    ACDXCoil ZN13 Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    3.1,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    3.1,                     !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Carrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Carrier48TM014_12tons_FFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Carrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Carrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    IEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    Evap Cooler Outlet Node ZN13,  !- Air Inlet Node Name
+    Cooling Coil Air Outlet Node ZN13,  !- Air Outlet Node Name
+    Carrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    Carrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Carrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    Carrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    IEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
 
   Fan:ConstantVolume,
     Supply Fan ZN13,         !- Name
@@ -6599,8 +6263,8 @@
     Zone ZN15 DirectAir,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirLoopHVAC:SupplyPath,
     DirectSupplyPath ZN15,   !- Name
@@ -6639,7 +6303,7 @@
     Evap Cooler Outlet Node ZN15,  !- DX Cooling Coil System Inlet Node Name
     Cooling Coil Air Outlet Node ZN15,  !- DX Cooling Coil System Outlet Node Name
     Air Loop Outlet Node ZN15,  !- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ACDXCoil ZN15;           !- Cooling Coil Name
 
   Coil:Heating:Fuel,
@@ -6679,69 +6343,21 @@
     ,                        !- Drift Loss Fraction
     ;                        !- Blowdown Concentration Ratio
 
-  OutdoorAir:Node,
-    ACDXCoil ZN15 Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     ACDXCoil ZN15,           !- Name
-    Evap Cooler Outlet Node ZN15,  !- Evaporator Inlet Node Name
-    Cooling Coil Air Outlet Node ZN15,  !- Evaporator Outlet Node Name
     On_Except_Winter_Night,  !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    ACDXCoil ZN15 Condenser Inlet Node,  !- Condenser Inlet Node Name
-    ACDXCoil ZN15 Condenser Outlet Node,  !- Condenser Outlet Node Name
-    ACDXCoil ZN15 Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    ACDXCoil ZN15 Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    ACDXCoil ZN15 Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    ACDXCoil ZN15 Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    ACDXCoil ZN15 Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    ACDXCoil ZN15 Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    3.1,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    3.1,                     !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Carrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Carrier48TM014_12tons_FFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Carrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Carrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    IEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    Evap Cooler Outlet Node ZN15,  !- Air Inlet Node Name
+    Cooling Coil Air Outlet Node ZN15,  !- Air Outlet Node Name
+    Carrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    Carrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Carrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    Carrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    IEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
 
   Fan:ConstantVolume,
     Supply Fan ZN15,         !- Name
@@ -6980,8 +6596,8 @@
     Zone ZN17 DirectAir,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirLoopHVAC:SupplyPath,
     DirectSupplyPath ZN17,   !- Name
@@ -7020,7 +6636,7 @@
     Evap Cooler Outlet Node ZN17,  !- DX Cooling Coil System Inlet Node Name
     Cooling Coil Air Outlet Node ZN17,  !- DX Cooling Coil System Outlet Node Name
     Air Loop Outlet Node ZN17,  !- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ACDXCoil ZN17;           !- Cooling Coil Name
 
   Coil:Heating:Fuel,
@@ -7060,69 +6676,21 @@
     ,                        !- Drift Loss Fraction
     ;                        !- Blowdown Concentration Ratio
 
-  OutdoorAir:Node,
-    ACDXCoil ZN17 Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     ACDXCoil ZN17,           !- Name
-    Evap Cooler Outlet Node ZN17,  !- Evaporator Inlet Node Name
-    Cooling Coil Air Outlet Node ZN17,  !- Evaporator Outlet Node Name
     On_Except_Winter_Night,  !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    ACDXCoil ZN17 Condenser Inlet Node,  !- Condenser Inlet Node Name
-    ACDXCoil ZN17 Condenser Outlet Node,  !- Condenser Outlet Node Name
-    ACDXCoil ZN17 Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    ACDXCoil ZN17 Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    ACDXCoil ZN17 Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    ACDXCoil ZN17 Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    ACDXCoil ZN17 Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    ACDXCoil ZN17 Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    3.1,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    3.1,                     !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Carrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Carrier48TM014_12tons_FFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Carrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Carrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    IEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    Evap Cooler Outlet Node ZN17,  !- Air Inlet Node Name
+    Cooling Coil Air Outlet Node ZN17,  !- Air Outlet Node Name
+    Carrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    Carrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Carrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    Carrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    IEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
 
   Fan:ConstantVolume,
     Supply Fan ZN17,         !- Name
@@ -7361,8 +6929,8 @@
     Zone ZN19 DirectAir,     !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   AirLoopHVAC:SupplyPath,
     DirectSupplyPath ZN19,   !- Name
@@ -7401,7 +6969,7 @@
     Evap Cooler Outlet Node ZN19,  !- DX Cooling Coil System Inlet Node Name
     Cooling Coil Air Outlet Node ZN19,  !- DX Cooling Coil System Outlet Node Name
     Air Loop Outlet Node ZN19,  !- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     ACDXCoil ZN19;           !- Cooling Coil Name
 
   Coil:Heating:Fuel,
@@ -7441,69 +7009,21 @@
     ,                        !- Drift Loss Fraction
     ;                        !- Blowdown Concentration Ratio
 
-  OutdoorAir:Node,
-    ACDXCoil ZN19 Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     ACDXCoil ZN19,           !- Name
-    Evap Cooler Outlet Node ZN19,  !- Evaporator Inlet Node Name
-    Cooling Coil Air Outlet Node ZN19,  !- Evaporator Outlet Node Name
     On_Except_Winter_Night,  !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    ACDXCoil ZN19 Condenser Inlet Node,  !- Condenser Inlet Node Name
-    ACDXCoil ZN19 Condenser Outlet Node,  !- Condenser Outlet Node Name
-    ACDXCoil ZN19 Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    ACDXCoil ZN19 Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    ACDXCoil ZN19 Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    ACDXCoil ZN19 Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    ACDXCoil ZN19 Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    ACDXCoil ZN19 Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    3.1,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    3.1,                     !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    Carrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    Carrier48TM014_12tons_FFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    Carrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    Carrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    IEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    Evap Cooler Outlet Node ZN19,  !- Air Inlet Node Name
+    Cooling Coil Air Outlet Node ZN19,  !- Air Outlet Node Name
+    Carrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    Carrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    Carrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    Carrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
+    IEA_HVAC_BESTEST_9ton-PLR;  !- Part Load Fraction Correlation Curve Name
 
   Fan:ConstantVolume,
     Supply Fan ZN19,         !- Name

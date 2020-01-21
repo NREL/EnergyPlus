@@ -97,7 +97,7 @@
 ! Purchased Hot Water:            No
 ! Air Terminal Unit Type:         AirTerminal:SingleDuct:VAV:NoReheat
 ! Evaporative Cooler:             EvaporativeCooler:Direct:ResearchSpecial, EvaporativeCooler:Indirect:ResearchSpecial
-! Coils:                          Coil:Cooling:DX, Coil:Cooling:Water
+! Coils:                          Coil:Cooling:DX:SingleSpeed, Coil:Cooling:Water
 ! Pumps:                          Pump:VariableSpeed
 ! Boilers:                        None
 ! Chillers:                       Chiller:Electric,
@@ -111,7 +111,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.3;
+  Version,9.2;
 
   Timestep,4;
 
@@ -851,8 +851,8 @@
     West Zone ATU,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     West Zone ATU,           !- Name
@@ -1118,11 +1118,11 @@
     ,                        !- External File Starting Row Number
     0.0,                     !- Value 1
     0.125,                   !- Value 2
-    0.250,                   !- <none>
-    0.375,                   !- <none>
-    0.500,                   !- <none>
-    0.625,                   !- <none>
-    0.750,                   !- <none>
+    0.250,                   !- Value 3
+    0.375,                   !- Value 4
+    0.500,                   !- Value 5
+    0.625,                   !- Value 6
+    0.750,                   !- Value 7
     0.875,                   !- <none>
     1.000,                   !- <none>
     1.125,                   !- <none>
@@ -1131,7 +1131,7 @@
     1.500,                   !- <none>
     1.625,                   !- <none>
     1.750,                   !- <none>
-    1.875;                   !- Extended Field
+    1.875;                   !- <none>
 
   Table:IndependentVariableList,
     IECEffWBFlowMod_IndependentVariableList,  !- Name
@@ -1150,11 +1150,11 @@
     ,                        !- External File Starting Row Number
     0.0,                     !- Output Value 1
     0.503563817,             !- Output Value 2
-    0.669042545,             !- <none>
-    0.765841395,             !- <none>
-    0.834521272,             !- <none>
-    0.887793524,             !- <none>
-    0.931320123,             !- <none>
+    0.669042545,             !- Output Value 3
+    0.765841395,             !- Output Value 4
+    0.834521272,             !- Output Value 5
+    0.887793524,             !- Output Value 6
+    0.931320123,             !- Output Value 7
     0.968121338,             !- <none>
     1.0,                     !- <none>
     1.028118973,             !- <none>
@@ -1164,6 +1164,7 @@
     1.115907873,             !- <none>
     1.133600065,             !- <none>
     1.150071102;             !- <none>
+
 
    ! Munters Oasis Dry Op Eff Mod Fac,  ! formulated no mass capacitance flux ratio, flow ratio = sec/sys
 
@@ -1180,11 +1181,11 @@
     ,                        !- External File Starting Row Number
     0.0,                     !- Value 1
     0.156016442,             !- Value 2
-    0.224969531,             !- <none>
-    0.245292433,             !- <none>
-    0.269624525,             !- <none>
-    0.299327692,             !- <none>
-    0.33698954,              !- <none>
+    0.224969531,             !- Value 3
+    0.245292433,             !- Value 4
+    0.269624525,             !- Value 5
+    0.299327692,             !- Value 6
+    0.33698954,              !- Value 7
     0.385709241,             !- <none>
     0.453044107,             !- <none>
     0.553875806,             !- <none>
@@ -1211,11 +1212,11 @@
     ,                        !- External File Starting Row Number
     0.0,                     !- Output Value 1
     0.251901141,             !- Output Value 2
-    0.272633745,             !- <none>
-    0.297085202,             !- <none>
-    0.32635468,              !- <none>
-    0.362021858,             !- <none>
-    0.406441718,             !- <none>
+    0.272633745,             !- Output Value 3
+    0.297085202,             !- Output Value 4
+    0.32635468,              !- Output Value 5
+    0.362021858,             !- Output Value 6
+    0.406441718,             !- Output Value 7
     0.463286713,             !- <none>
     0.538617886,             !- <none>
     0.643203883,             !- <none>
@@ -1240,11 +1241,11 @@
     ,                        !- External File Starting Row Number
     0,                       !- Value 1
     0.125,                   !- Value 2
-    0.25,                    !- <none>
-    0.375,                   !- <none>
-    0.5,                     !- <none>
-    0.625,                   !- <none>
-    0.75,                    !- <none>
+    0.25,                    !- Value 3
+    0.375,                   !- Value 4
+    0.5,                     !- Value 5
+    0.625,                   !- Value 6
+    0.75,                    !- Value 7
     0.875,                   !- <none>
     1;                       !- <none>
 
@@ -1265,11 +1266,11 @@
     ,                        !- External File Starting Row Number
     0,                       !- Output Value 1
     0.004487103,             !- Output Value 2
-    0.027204705,             !- <none>
-    0.078069482,             !- <none>
-    0.164938489,             !- <none>
-    0.294637516,             !- <none>
-    0.473324827,             !- <none>
+    0.027204705,             !- Output Value 3
+    0.078069482,             !- Output Value 4
+    0.164938489,             !- Output Value 5
+    0.294637516,             !- Output Value 6
+    0.473324827,             !- Output Value 7
     0.706676969,             !- <none>
     1;                       !- <none>
 
@@ -1288,11 +1289,11 @@
     ,                        !- External File Starting Row Number
     0,                       !- Value 1
     0.125,                   !- Value 2
-    0.25,                    !- <none>
-    0.375,                   !- <none>
-    0.5,                     !- <none>
-    0.625,                   !- <none>
-    0.75,                    !- <none>
+    0.25,                    !- Value 3
+    0.375,                   !- Value 4
+    0.5,                     !- Value 5
+    0.625,                   !- Value 6
+    0.75,                    !- Value 7
     0.875,                   !- <none>
     1;                       !- <none>
 
@@ -1313,11 +1314,11 @@
     ,                        !- External File Starting Row Number
     0.4,                     !- Output Value 1
     0.4,                     !- Output Value 2
-    0.4,                     !- <none>
-    0.4,                     !- <none>
-    1,                       !- <none>
-    1,                       !- <none>
-    1,                       !- <none>
+    0.4,                     !- Output Value 3
+    0.4,                     !- Output Value 4
+    1,                       !- Output Value 5
+    1,                       !- Output Value 6
+    1,                       !- Output Value 7
     1,                       !- <none>
     1;                       !- <none>
 
@@ -1344,7 +1345,7 @@
     West Zone IEC Outlet Node,  !- DX Cooling Coil System Inlet Node Name
     West Zone CCoil Air Outlet Node,  !- DX Cooling Coil System Outlet Node Name
     West Zone CCoil Air Outlet Node,  !- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     West DX Cooling Coil,    !- Cooling Coil Name
     None,                    !- Dehumidification Control Type
     yes,                     !- Run on Sensible Load
@@ -1419,69 +1420,41 @@
     Until: 18:00,1.0,        !- Field 5
     Until: 24:00,0.05;       !- Field 7
 
-  OutdoorAir:Node,
-    West DX Cooling Coil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     West DX Cooling Coil,    !- Name
-    West Zone IEC Outlet Node,  !- Evaporator Inlet Node Name
-    West Zone CCoil Air Outlet Node,  !- Evaporator Outlet Node Name
     WestDXCCoilAvailSched,   !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    West DX Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    West DX Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    West DX Cooling Coil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    West DX Cooling Coil Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    West DX Cooling Coil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    West DX Cooling Coil Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    West DX Cooling Coil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    West DX Cooling Coil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    3.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    3.0,                     !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    DXSysACCoolCapFT,        !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    DXSysACCoolCapFFF,       !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    DXSysACCoolEIRFT,        !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    DXSysACCoolEIRFFF,       !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    West Zone IEC Outlet Node,  !- Air Inlet Node Name
+    West Zone CCoil Air Outlet Node,  !- Air Outlet Node Name
+    DXSysACCoolCapFT,        !- Total Cooling Capacity Function of Temperature Curve Name
+    DXSysACCoolCapFFF,       !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    DXSysACCoolEIRFT,        !- Energy Input Ratio Function of Temperature Curve Name
+    DXSysACCoolEIRFFF,       !- Energy Input Ratio Function of Flow Fraction Curve Name
     DXSysACCoolPLFFPLR,      !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    ,                        !- Maximum Cycling Rate {cycles/hr}
+    ,                        !- Latent Capacity Time Constant {s}
+    ,                        !- Condenser Air Inlet Node Name
+    ,                        !- Condenser Type
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
+    ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Supply Water Storage Tank Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    ,                        !- Basin Heater Capacity {W/K}
+    ,                        !- Basin Heater Setpoint Temperature {C}
+    ,                        !- Basin Heater Operating Schedule Name
+    ,                        !- Sensible Heat Ratio Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Function of Flow Fraction Curve Name
+    Yes;                     !- Report ASHRAE Standard 127 Performance Ratings
 
   Curve:Biquadratic,
     DXSysACCoolCapFT,        !- Name
@@ -1566,8 +1539,8 @@
     East Zone ATU,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     East Zone ATU,           !- Name
@@ -1839,7 +1812,7 @@
     East Zone IEC Outlet Node,  !- DX Cooling Coil System Inlet Node Name
     East Zone CCoil Air Outlet Node,  !- DX Cooling Coil System Outlet Node Name
     East Zone CCoil Air Outlet Node,  !- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:SingleSpeed,  !- Cooling Coil Object Type
     East DX Cooling Coil,    !- Cooling Coil Name
     None,                    !- Dehumidification Control Type
     yes,                     !- Run on Sensible Load
@@ -1905,69 +1878,41 @@
     East Zone Mixed Air Node,!- Air Inlet Node Name
     East Zone Supply Fan Outlet Node;  !- Air Outlet Node Name
 
-  OutdoorAir:Node,
-    East DX Cooling Coil Condenser Inlet Node;  !- Name
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:SingleSpeed,
     East DX Cooling Coil,    !- Name
-    East Zone IEC Outlet Node,  !- Evaporator Inlet Node Name
-    East Zone CCoil Air Outlet Node,  !- Evaporator Outlet Node Name
     EastDXCCoilAvailSched,   !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    East DX Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
-    East DX Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    East DX Cooling Coil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    East DX Cooling Coil Performance,  !- Name
-    ,                        !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-    ,                        !- Unit Internal Static Air Pressure {Pa}
-    ,                        !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    East DX Cooling Coil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    East DX Cooling Coil Operating Mode,  !- Name
-    autosize,                !- Rated Gross Total Cooling Capacity {W}
-    autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    1,                       !- Nominal Speed Number
-    East DX Cooling Coil Speed 1 Performance;  !- Speed 1 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    East DX Cooling Coil Speed 1 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    autosize,                !- Gross Sensible Heat Ratio
-    3.0,                     !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
+    autosize,                !- Gross Rated Total Cooling Capacity {W}
+    autosize,                !- Gross Rated Sensible Heat Ratio
+    3.0,                     !- Gross Rated Cooling COP {W/W}
+    autosize,                !- Rated Air Flow Rate {m3/s}
     ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    DXSysACCoolCapFT,        !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    DXSysACCoolCapFFF,       !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    DXSysACCoolEIRFT,        !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    DXSysACCoolEIRFFF,       !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    East Zone IEC Outlet Node,  !- Air Inlet Node Name
+    East Zone CCoil Air Outlet Node,  !- Air Outlet Node Name
+    DXSysACCoolCapFT,        !- Total Cooling Capacity Function of Temperature Curve Name
+    DXSysACCoolCapFFF,       !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    DXSysACCoolEIRFT,        !- Energy Input Ratio Function of Temperature Curve Name
+    DXSysACCoolEIRFFF,       !- Energy Input Ratio Function of Flow Fraction Curve Name
     DXSysACCoolPLFFPLR,      !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+    ,                        !- Nominal Time for Condensate Removal to Begin {s}
+    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
+    ,                        !- Maximum Cycling Rate {cycles/hr}
+    ,                        !- Latent Capacity Time Constant {s}
+    ,                        !- Condenser Air Inlet Node Name
+    ,                        !- Condenser Type
+    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
+    ,                        !- Evaporative Condenser Air Flow Rate {m3/s}
+    ,                        !- Evaporative Condenser Pump Rated Power Consumption {W}
+    ,                        !- Crankcase Heater Capacity {W}
+    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    ,                        !- Supply Water Storage Tank Name
+    ,                        !- Condensate Collection Water Storage Tank Name
+    ,                        !- Basin Heater Capacity {W/K}
+    ,                        !- Basin Heater Setpoint Temperature {C}
+    ,                        !- Basin Heater Operating Schedule Name
+    ,                        !- Sensible Heat Ratio Function of Temperature Curve Name
+    ,                        !- Sensible Heat Ratio Function of Flow Fraction Curve Name
+    Yes;                     !- Report ASHRAE Standard 127 Performance Ratings
 
 ! ***************End of HVAC Air Loop Serving East Zone *************************************
 !********************************************************************************************
