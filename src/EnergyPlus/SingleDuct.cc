@@ -4463,6 +4463,7 @@ namespace SingleDuct {
                     Par(7) = double(FanOp);
                     Par(8) = QTotLoad;
                     SolveRoot(UnitFlowToler, 50, SolFlag, FracDelivered, VAVVSHCFanOnResidual, 0.0, 1.0, Par);
+                    MassFlow = Node(SysInletNode).MassFlowRate;
                     if (SolFlag == -1) {
                         if (Sys(SysNum).IterationLimit == 0) {
                             ShowWarningError("Heating coil control failed in VS VAV terminal unit " + Sys(SysNum).SysName);
