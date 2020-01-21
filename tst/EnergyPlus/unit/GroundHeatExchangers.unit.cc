@@ -184,7 +184,7 @@ TEST_F(GHEFixture, BaseProps_Init)
     nlohmann::json j = {{"conductivity", 0.4}, {"density", 950}, {"specific-heat", 1900}};
 
     // test default constructor and setup
-    GroundHeatExchangers::BaseProps p1;
+    GroundHeatExchangers::ThermoProps p1;
     p1.k = j["conductivity"];
     p1.rho = j["density"];
     p1.cp = j["specific-heat"];
@@ -196,7 +196,7 @@ TEST_F(GHEFixture, BaseProps_Init)
     EXPECT_EQ(p1.diffusivity, 0.4 / (950 * 1900));
 
     // test member constructor
-    GroundHeatExchangers::BaseProps p2(j["conductivity"], j["density"], j["specific-heat"]);
+    GroundHeatExchangers::ThermoProps p2(j["conductivity"], j["density"], j["specific-heat"]);
     EXPECT_EQ(p2.k, 0.4);
     EXPECT_EQ(p2.rho, 950);
     EXPECT_EQ(p2.cp, 1900);
@@ -700,14 +700,14 @@ TEST_F(GHEFixture, Pipe_simulate)
 }
 
 TEST_F(GHEFixture, SingleUtubeBHPassThroughSegment){
-    GroundHeatExchangers::SingleUtubeBHPassThroughSegment s;
+    GroundHeatExchangers::BHSegmentPassThrough s;
     s.simulate(10.0);
     EXPECT_EQ(s.temperature, 10.0);
     EXPECT_EQ(s.getOutletTemp2(), 10.0);
 }
 
 TEST_F(GHEFixture, SingleUtubeBHSegment_calcPipeVolume) {
-    GroundHeatExchangers::SingleUtubeBHSegment s;
+    GroundHeatExchangers::BHSegment s;
     nlohmann::json j = {{"grout-conductivity", 0.744},
                         {"grout-density", 1500},
                         {"grout-specific-heat", 800},
@@ -753,7 +753,7 @@ TEST_F(GHEFixture, SingleUtubeBHSegment_calcPipeVolume) {
 }
 
 TEST_F(GHEFixture, SingleUtubeBHSegment_simulate) {
-    GroundHeatExchangers::SingleUtubeBHSegment s;
+    GroundHeatExchangers::BHSegment s;
     nlohmann::json j = {{"grout-conductivity", 0.744},
                         {"grout-density", 1500},
                         {"grout-specific-heat", 800},

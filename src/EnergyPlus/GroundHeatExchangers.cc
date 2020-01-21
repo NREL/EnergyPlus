@@ -50,7 +50,6 @@
 #include <fstream>
 #include <vector>
 #include <functional>
-#include <stdarg.h>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
@@ -114,7 +113,7 @@ namespace GroundHeatExchangers {
     // Yavuzturk, C., J.D. Spitler. 1999. 'A Short Time Step Response Factor Model
     //   for Vertical Ground Loop Heat Exchangers. ASHRAE Transactions. 105(2): 475-485.
     // Xiong, Z., D.E. Fisher, J.D. Spitler. 2015. 'Development and Validation of a Slinky
-    //   Ground Heat Exchanger.' Applied Energy. Vol 114, 57-69.
+    //   Ground Heat Exchanger Model.' Applied Energy. Vol 114, 57-69.
 
     // CONSTANTS
     Real64 const avgHrsPerMonth(730.0); // Number of hours in month
@@ -147,9 +146,9 @@ namespace GroundHeatExchangers {
     std::vector<GLHEVert> verticalGLHE;
     std::vector<GLHESlinky> slinkyGLHE;
     std::vector<std::shared_ptr<GLHEVertArray>> vertArrays;
-    std::vector<std::shared_ptr<GLHEVertProps>> vertProps;
+    std::vector<std::shared_ptr<BHPropsStruct>> vertProps;
     std::vector<std::shared_ptr<GLHEResponseFactors>> responseFactors;
-    std::vector<std::shared_ptr<GLHEVertSingle>> singleBoreholes;
+    std::vector<std::shared_ptr<BHStruct>> singleBoreholes;
 
     void clear_state()
     {
@@ -240,7 +239,7 @@ namespace GroundHeatExchangers {
         return d;
     }
 
-    void BaseProps::setup() {
+    void ThermoProps::setup() {
         this->rhoCp = this->rho * this->cp;
         this->diffusivity = this->k / this->rhoCp;
     }
@@ -319,15 +318,15 @@ namespace GroundHeatExchangers {
         return it2->second + (it->second - it2->second)*(x - it2->first)/(it->first - it2->first);
     }
 
-    Real64 SingleUtubeBHPassThroughSegment::getOutletTemp2() {
+    Real64 BHSegmentPassThrough::getOutletTemp2() {
         return this->temperature;
     }
 
-    void SingleUtubeBHPassThroughSegment::simulate(const Real64 &temp) {
+    void BHSegmentPassThrough::simulate(const Real64 &temp) {
         this->temperature = temp;
     }
 
-    void SingleUtubeBHSegment::setup(Real64 const &initTemp, int const &loopNum) {
+    void BHSegment::setup(Real64 const &initTemp, int const &loopNum) {
         this->pipe.setup(initTemp, loopNum);
         this->soil.setup();
         this->grout.setup();
@@ -335,33 +334,33 @@ namespace GroundHeatExchangers {
         std::replace(this->temps.begin(), this->temps.end(), 0.0, initTemp);
     }
 
-    Real64 SingleUtubeBHSegment::calcGroutVolume() {
+    Real64 BHSegment::calcGroutVolume() {
         return this->calcSegVolume() - this->calcTotalPipeVolume();
     }
 
-    Real64 SingleUtubeBHSegment::calcTotalPipeVolume() {
+    Real64 BHSegment::calcTotalPipeVolume() {
         return this->pipe.volTotal * this->numPipes;
     }
 
-    Real64 SingleUtubeBHSegment::calcSegVolume() {
+    Real64 BHSegment::calcSegVolume() {
         return DataGlobals::PiOvr4 * std::pow(this->diameter, 2.0) * this->length;
     }
 
-    Real64 SingleUtubeBHSegment::getOutletTemp1() {
+    Real64 BHSegment::getOutletTemp1() {
         return this->temps[0];
     }
 
-    Real64 SingleUtubeBHSegment::getOutletTemp2() {
+    Real64 BHSegment::getOutletTemp2() {
         return this->temps[1];
     }
 
-    Real64 SingleUtubeBHSegment::getHeatRate() {
+    Real64 BHSegment::getHeatRate() {
         Real64 qTot = (this->temps[3] - this->boundaryTemp) / this->bhResist * this->length;
         qTot += (this->temps[4] - this->boundaryTemp) / this->bhResist * this->length;
         return qTot;
     }
 
-    std::vector<Real64> SingleUtubeBHSegment::rhs(std::vector<Real64> const &y, std::vector<Real64> const &params)
+    std::vector<Real64> BHSegment::rhs(std::vector<Real64> const &y, std::vector<Real64> const &params)
     {
         // setup results vector
         std::vector<Real64> r(this->numEquations, 0.0);
@@ -386,13 +385,13 @@ namespace GroundHeatExchangers {
         Real64 cf2 = cf1;
 
         // direct-coupling grout node
-        Real64 f = this->groutFrac;
+        Real64 f = BHSegment::groutFrac;
         Real64 cg1 = f * this->grout.rhoCp * this->groutVolume;
-        cg1 += this->pipe.props.rhoCp * this->pipe.volPipeWall;
+        cg1 += this->pipe.rhoCp * this->pipe.volPipeWall;
 
         // node between leg 1 and wall
         Real64 cg2 = (1 - f) * this->grout.rhoCp * this->groutVolume;
-        cg2 += this->pipe.props.rhoCp * this->pipe.volPipeWall;
+        cg2 += this->pipe.rhoCp * this->pipe.volPipeWall;
         cg2 /= 2.0;
 
         // node between leg 2 and wall
@@ -416,9 +415,9 @@ namespace GroundHeatExchangers {
         return r;
     }
 
-    std::vector<Real64> SingleUtubeBHSegment::rk4(std::vector<Real64> const &y,
-                                                  Real64 const &h,
-                                                  std::vector<Real64> const &params)
+    std::vector<Real64> BHSegment::rk4(std::vector<Real64> const &y,
+                                       Real64 const &h,
+                                       std::vector<Real64> const &params)
     {
         // y1 = y
         std::vector<Real64> y1;
@@ -481,9 +480,9 @@ namespace GroundHeatExchangers {
         return r;
     }
 
-    void SingleUtubeBHSegment::simulate(Real64 const &inletTemp1,
-                                        Real64 const &inletTemp2,
-                                        Real64 const &flowRate)
+    void BHSegment::simulate(Real64 const &inletTemp1,
+                             Real64 const &inletTemp2,
+                             Real64 const &flowRate)
     {
         Real64 cp = 4179.8;
         Real64 rho = 995.6;
@@ -541,13 +540,7 @@ namespace GroundHeatExchangers {
         return 0;
     }
 
-    void Pipe::setup(Real64 const &initTemp, int const &loopNum) {
-
-        // props
-        this->props.setup();
-
-        // fluid
-        this->fluid.setup(loopNum);
+    void Pipe::setup(Real64 const &initTemp) {
 
         // radii
         this->outRadius = this->outDia / 2;
@@ -582,6 +575,7 @@ namespace GroundHeatExchangers {
 
         Real64 rho = this->fluid.getDens(temperature, routineName);
         Real64 vdot = flowRate / rho;
+
         return this->volFluid / vdot;
     }
 
@@ -705,6 +699,8 @@ namespace GroundHeatExchangers {
             }
             ++idx;
         }
+        assert(false);
+        return 0;
     }
 
     void Pipe::logInletTemps(Real64 inletTemp, Real64 time)
@@ -868,7 +864,31 @@ namespace GroundHeatExchangers {
         return std::pow(0.79 * std::log(Re) - 1.64, -2.0);
     }
 
-    std::shared_ptr<GLHEVertProps> GetVertProps(std::string const &objectName)
+    void EnhancedGHE::setupOutputVars()
+    {
+    }
+
+    void EnhancedGHE::simulate(const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration), Real64 &EP_UNUSED(CurLoad), bool EP_UNUSED(RunFlag))
+    {
+    }
+
+    void EnhancedGHE::getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &EP_UNUSED(MaxLoad), Real64 &EP_UNUSED(MinLoad), Real64 &EP_UNUSED(OptLoad))
+    {
+    }
+
+    void EnhancedGHE::getDesignTemperatures(Real64 &EP_UNUSED(TempDesCondIn), Real64 &EP_UNUSED(TempDesEvapOut))
+    {
+    }
+
+    void EnhancedGHE::getSizingFactor(Real64 &EP_UNUSED(sizFac))
+    {
+    }
+
+    void EnhancedGHE::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
+    {
+    }
+
+    std::shared_ptr<BHPropsStruct> GetVertProps(std::string const &objectName)
     {
         // Check if this instance of this model has already been retrieved
         for (auto &thisProp : vertProps) {
@@ -881,7 +901,7 @@ namespace GroundHeatExchangers {
         return nullptr;
     }
 
-    std::shared_ptr<GLHEVertSingle> GetSingleBH(std::string const &objectName)
+    std::shared_ptr<BHStruct> GetSingleBH(std::string const &objectName)
     {
         // Check if this instance of this model has already been retrieved
         for (auto &thisBH : singleBoreholes) {
@@ -897,10 +917,10 @@ namespace GroundHeatExchangers {
     std::shared_ptr<GLHEVertArray> GetVertArray(std::string const &objectName)
     {
         // Check if this instance of this model has already been retrieved
-        for (auto &thisProp : vertArrays) {
+        for (auto &thisArr : vertArrays) {
             // Check if the type and name match
-            if (objectName == thisProp->name) {
-                return thisProp;
+            if (objectName == thisArr->name) {
+                return thisArr;
             }
         }
 
@@ -934,7 +954,7 @@ namespace GroundHeatExchangers {
             int yLoc = 0;
             for (int yBH = 1; yBH <= arrayObjectPtr->numBHinYDirection; ++yBH) {
                 bhCounter += 1;
-                std::shared_ptr<GLHEVertSingle> thisBH(new GLHEVertSingle);
+                std::shared_ptr<BHStruct> thisBH(new BHStruct);
                 thisBH->name =
                     thisRF->name + " BH " + std::to_string(bhCounter) + " loc: (" + std::to_string(xLoc) + ", " + std::to_string(yLoc) + ")";
                 thisBH->props = GetVertProps(arrayObjectPtr->props->name);
@@ -953,21 +973,21 @@ namespace GroundHeatExchangers {
         return thisRF;
     }
 
-    std::shared_ptr<GLHEResponseFactors> BuildAndGetResponseFactorsObjectFromSingleBHs(std::vector<std::shared_ptr<GLHEVertSingle>> const &singleBHsForRFVect)
+    std::shared_ptr<GLHEResponseFactors> BuildAndGetResponseFactorsObjectFromSingleBHs(std::vector<std::shared_ptr<BHStruct>> const &singleBHsForRFVect)
     {
         // Make new response factor object and store it for later use
         std::shared_ptr<GLHEResponseFactors> thisRF(new GLHEResponseFactors);
         thisRF->name = "Response Factor Object Auto Generated No: " + std::to_string(numAutoGeneratedResponseFactors + 1);
 
         // Make new props object which has the mean values of the other props objects referenced by the individual BH objects
-        std::shared_ptr<GLHEVertProps> thisProps(new GLHEVertProps);
+        std::shared_ptr<BHPropsStruct> thisProps(new BHPropsStruct);
         thisProps->name = "Response Factor Auto Generated Mean Props No: " + std::to_string(numAutoGeneratedResponseFactors + 1);
         int numBH = singleBHsForRFVect.size();
         for (auto &thisBH : singleBoreholes) {
-            thisProps->bhDiameter += thisBH->props->bhDiameter;
-            thisProps->bhLength += thisBH->props->bhLength;
-            thisProps->bhTopDepth += thisBH->props->bhTopDepth;
-            thisProps->bhUTubeDist += thisBH->props->bhUTubeDist;
+            thisProps->diameter += thisBH->props->diameter;
+            thisProps->length += thisBH->props->length;
+            thisProps->topDepth += thisBH->props->topDepth;
+            thisProps->shankSpace += thisBH->props->shankSpace;
 
             thisProps->grout.cp += thisBH->props->grout.cp;
             thisProps->grout.diffusivity += thisBH->props->grout.diffusivity;
@@ -990,10 +1010,10 @@ namespace GroundHeatExchangers {
         }
 
         // normalize by number of bh
-        thisProps->bhDiameter /= numBH;
-        thisProps->bhLength /= numBH;
-        thisProps->bhTopDepth /= numBH;
-        thisProps->bhUTubeDist /= numBH;
+        thisProps->diameter /= numBH;
+        thisProps->length /= numBH;
+        thisProps->topDepth /= numBH;
+        thisProps->shankSpace /= numBH;
 
         thisProps->grout.cp /= numBH;
         thisProps->grout.diffusivity /= numBH;
@@ -1035,31 +1055,31 @@ namespace GroundHeatExchangers {
             int numPanels_ii = 50;
             int numPanels_j = 560;
 
-            thisBH->dl_i = thisBH->props->bhLength / numPanels_i;
+            thisBH->dl_i = thisBH->props->length / numPanels_i;
             for (int i = 0; i <= numPanels_i; ++i) {
                 MyCartesian newPoint;
                 newPoint.x = thisBH->xLoc;
                 newPoint.y = thisBH->yLoc;
-                newPoint.z = thisBH->props->bhTopDepth + (i * thisBH->dl_i);
+                newPoint.z = thisBH->props->topDepth + (i * thisBH->dl_i);
                 thisBH->pointLocations_i.push_back(newPoint);
             }
 
-            thisBH->dl_ii = thisBH->props->bhLength / numPanels_ii;
+            thisBH->dl_ii = thisBH->props->length / numPanels_ii;
             for (int i = 0; i <= numPanels_ii; ++i) {
                 MyCartesian newPoint;
                 // For case when bh is being compared to itself, shift points by 1 radius in the horizontal plane
-                newPoint.x = thisBH->xLoc + (thisBH->props->bhDiameter / 2.0) / sqrt(2.0);
-                newPoint.y = thisBH->yLoc + (thisBH->props->bhDiameter / 2.0) / (-sqrt(2.0));
-                newPoint.z = thisBH->props->bhTopDepth + (i * thisBH->dl_ii);
+                newPoint.x = thisBH->xLoc + (thisBH->props->diameter / 2.0) / sqrt(2.0);
+                newPoint.y = thisBH->yLoc + (thisBH->props->diameter / 2.0) / (-sqrt(2.0));
+                newPoint.z = thisBH->props->topDepth + (i * thisBH->dl_ii);
                 thisBH->pointLocations_ii.push_back(newPoint);
             }
 
-            thisBH->dl_j = thisBH->props->bhLength / numPanels_j;
+            thisBH->dl_j = thisBH->props->length / numPanels_j;
             for (int i = 0; i <= numPanels_j; ++i) {
                 MyCartesian newPoint;
                 newPoint.x = thisBH->xLoc;
                 newPoint.y = thisBH->yLoc;
-                newPoint.z = thisBH->props->bhTopDepth + (i * thisBH->dl_j);
+                newPoint.z = thisBH->props->topDepth + (i * thisBH->dl_j);
                 thisBH->pointLocations_j.push_back(newPoint);
             }
         }
@@ -1143,9 +1163,8 @@ namespace GroundHeatExchangers {
         return pointToPointResponse - pointToReflectedResponse;
     }
 
-    Real64 GLHEVert::integral(MyCartesian const &point_i, std::shared_ptr<GLHEVertSingle> const &bh_j, Real64 const &currTime)
+    Real64 GLHEVert::integral(MyCartesian const &point_i, std::shared_ptr<BHStruct> const &bh_j, Real64 const &currTime)
     {
-
         // This code could be optimized in a number of ways.
         // The first, most simple way would be to precompute the distances from point i to point j, then store them for reuse.
         // The second, more intensive method would be to break the calcResponse calls out into four different parts.
@@ -1174,8 +1193,8 @@ namespace GroundHeatExchangers {
         return (bh_j->dl_j / 3.0) * sum_f;
     }
 
-    Real64 GLHEVert::doubleIntegral(std::shared_ptr<GLHEVertSingle> const &bh_i,
-                                    std::shared_ptr<GLHEVertSingle> const &bh_j,
+    Real64 GLHEVert::doubleIntegral(std::shared_ptr<BHStruct> const &bh_i,
+                                    std::shared_ptr<BHStruct> const &bh_j,
                                     Real64 const &currTime)
     {
 
@@ -1619,16 +1638,16 @@ namespace GroundHeatExchangers {
         d["Flow Rate"] = designFlow;
         d["Soil k"] = soil.k;
         d["Soil rhoCp"] = soil.rhoCp;
-        d["BH Top Depth"] = myRespFactors->props->bhTopDepth;
-        d["BH Length"] = myRespFactors->props->bhLength;
-        d["BH Diameter"] = myRespFactors->props->bhDiameter;
+        d["BH Top Depth"] = myRespFactors->props->topDepth;
+        d["BH Length"] = myRespFactors->props->length;
+        d["BH Diameter"] = myRespFactors->props->diameter;
         d["Grout k"] = myRespFactors->props->grout.k;
         d["Grout rhoCp"] = myRespFactors->props->grout.rhoCp;
         d["Pipe k"] = myRespFactors->props->pipe.k;
         d["Pipe rhoCP"] = myRespFactors->props->pipe.rhoCp;
         d["Pipe Diameter"] = myRespFactors->props->pipe.outDia;
         d["Pipe Thickness"] = myRespFactors->props->pipe.thickness;
-        d["U-tube Dist"] = myRespFactors->props->bhUTubeDist;
+        d["U-tube Dist"] = myRespFactors->props->shankSpace;
         d["Max Simulation Years"] = myRespFactors->maxSimYears;
 
         int i = 0;
@@ -2656,7 +2675,7 @@ namespace GroundHeatExchangers {
 
         if (numVerticalGLHEs <= 0 && numSlinkyGLHEs <= 0) {
             ShowSevereError("Error processing inputs for GLHE objects");
-            ShowContinueError("Simulation indicated these objects were found, but input processor doesn't find any");
+            ShowContinueError("Simulation indicated these objects were found, but input processor did not find any");
             ShowContinueError("Check inputs for GroundHeatExchanger:System and GroundHeatExchanger:Slinky");
             ShowContinueError("Also check plant/branch inputs for references to invalid/deleted objects");
             errorsFound = true;
@@ -2702,24 +2721,24 @@ namespace GroundHeatExchangers {
                 }
 
                 // Build out new instance and add it to the vector
-                std::shared_ptr<GLHEVertProps> thisProp(new GLHEVertProps);
+                std::shared_ptr<BHPropsStruct> thisProp(new BHPropsStruct);
                 thisProp->name = DataIPShortCuts::cAlphaArgs(1);
-                thisProp->bhTopDepth = DataIPShortCuts::rNumericArgs(1);
-                thisProp->bhLength = DataIPShortCuts::rNumericArgs(2);
-                thisProp->bhDiameter = DataIPShortCuts::rNumericArgs(3);
+                thisProp->topDepth = DataIPShortCuts::rNumericArgs(1);
+                thisProp->length = DataIPShortCuts::rNumericArgs(2);
+                thisProp->diameter = DataIPShortCuts::rNumericArgs(3);
                 thisProp->grout.k = DataIPShortCuts::rNumericArgs(4);
                 thisProp->grout.rhoCp = DataIPShortCuts::rNumericArgs(5);
                 thisProp->pipe.k = DataIPShortCuts::rNumericArgs(6);
                 thisProp->pipe.rhoCp = DataIPShortCuts::rNumericArgs(7);
                 thisProp->pipe.outDia = DataIPShortCuts::rNumericArgs(8);
                 thisProp->pipe.thickness = DataIPShortCuts::rNumericArgs(9);
-                thisProp->bhUTubeDist = DataIPShortCuts::rNumericArgs(10);
+                thisProp->shankSpace = DataIPShortCuts::rNumericArgs(10);
 
-                if (thisProp->bhUTubeDist < thisProp->pipe.outDia) {
+                if (thisProp->shankSpace < thisProp->pipe.outDia) {
                     ShowWarningError(
                         "Borehole shank spacing is less than the pipe diameter. U-tube spacing is reference from the u-tube pipe center.");
                     ShowWarningError("Shank spacing is set to the outer pipe diameter.");
-                    thisProp->bhUTubeDist = thisProp->pipe.outDia;
+                    thisProp->shankSpace = thisProp->pipe.outDia;
                 }
 
                 thisProp->pipe.innerDia = thisProp->pipe.outDia - 2 * thisProp->pipe.thickness;
@@ -2900,7 +2919,7 @@ namespace GroundHeatExchangers {
                 }
 
                 // Build out new instance and add it to the vector
-                std::shared_ptr<GLHEVertSingle> thisArray(new GLHEVertSingle);
+                std::shared_ptr<BHStruct> thisArray(new BHStruct);
                 thisArray->name = DataIPShortCuts::cAlphaArgs(1);
                 thisArray->props = GetVertProps(DataIPShortCuts::cAlphaArgs(2));
                 thisArray->xLoc = DataIPShortCuts::rNumericArgs(1);
@@ -3012,11 +3031,11 @@ namespace GroundHeatExchangers {
                     }
 
                     // Calculate response factors from individual boreholes
-                    std::vector<std::shared_ptr<GLHEVertSingle>> tempVectOfBHObjects;
+                    std::vector<std::shared_ptr<BHStruct>> tempVectOfBHObjects;
 
                     for (int index = 8; index <= DataIPShortCuts::cAlphaArgs.u1(); ++index) {
                         if (!DataIPShortCuts::lAlphaFieldBlanks(index)) {
-                            std::shared_ptr<GLHEVertSingle> tempBHptr = GetSingleBH(DataIPShortCuts::cAlphaArgs(index));
+                            std::shared_ptr<BHStruct> tempBHptr = GetSingleBH(DataIPShortCuts::cAlphaArgs(index));
                             if (tempBHptr) {
                                 tempVectOfBHObjects.push_back(tempBHptr);
                             } else {
@@ -3037,10 +3056,10 @@ namespace GroundHeatExchangers {
                     }
                 }
 
-                thisGLHE.bhDiameter = thisGLHE.myRespFactors->props->bhDiameter;
+                thisGLHE.bhDiameter = thisGLHE.myRespFactors->props->diameter;
                 thisGLHE.bhRadius = thisGLHE.bhDiameter / 2.0;
-                thisGLHE.bhLength = thisGLHE.myRespFactors->props->bhLength;
-                thisGLHE.bhUTubeDist = thisGLHE.myRespFactors->props->bhUTubeDist;
+                thisGLHE.bhLength = thisGLHE.myRespFactors->props->length;
+                thisGLHE.bhUTubeDist = thisGLHE.myRespFactors->props->shankSpace;
 
                 // pull pipe and grout data up from response factor struct for simplicity
                 thisGLHE.pipe.outDia = thisGLHE.myRespFactors->props->pipe.outDia;
@@ -3060,7 +3079,7 @@ namespace GroundHeatExchangers {
                 thisGLHE.myRespFactors->maxSimYears = DataEnvironment::MaxNumberSimYears;
 
                 // total tube length
-                thisGLHE.totalTubeLength = thisGLHE.myRespFactors->numBoreholes * thisGLHE.myRespFactors->props->bhLength;
+                thisGLHE.totalTubeLength = thisGLHE.myRespFactors->numBoreholes * thisGLHE.myRespFactors->props->length;
 
                 // ground thermal diffusivity
                 thisGLHE.soil.diffusivity = thisGLHE.soil.k / thisGLHE.soil.rhoCp;
@@ -3793,8 +3812,8 @@ namespace GroundHeatExchangers {
 
         // Calculate the average ground temperature over the depth of the borehole
 
-        Real64 minDepth = myRespFactors->props->bhTopDepth;
-        Real64 maxDepth = myRespFactors->props->bhLength + minDepth;
+        Real64 minDepth = myRespFactors->props->topDepth;
+        Real64 maxDepth = myRespFactors->props->length + minDepth;
         Real64 oneQuarterDepth = minDepth + (maxDepth - minDepth) * 0.25;
         Real64 halfDepth = minDepth + (maxDepth - minDepth) * 0.5;
         Real64 threeQuarterDepth = minDepth + (maxDepth - minDepth) * 0.75;
