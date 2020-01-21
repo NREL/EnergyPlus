@@ -13820,91 +13820,31 @@
     PACKAGED VAV WITH REHEAT_OA-PACKAGED VAV WITH REHEAT_CoolCNode,  !- DX Cooling Coil System Inlet Node Name
     PACKAGED VAV WITH REHEAT_CoolC-PACKAGED VAV WITH REHEAT_HeatCNode,  !- DX Cooling Coil System Outlet Node Name
     PACKAGED VAV WITH REHEAT_CoolC-PACKAGED VAV WITH REHEAT_HeatCNode,  !- DX Cooling Coil System Sensor Node Name
-    Coil:Cooling:DX,         !- Cooling Coil Object Type
+    Coil:Cooling:DX:TwoSpeed,!- Cooling Coil Object Type
     PACKAGED VAV WITH REHEAT_CoolC DXCoil;  !- Cooling Coil Name
 
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:TwoSpeed,
     PACKAGED VAV WITH REHEAT_CoolC DXCoil,  !- Name
-    PACKAGED VAV WITH REHEAT_OA-PACKAGED VAV WITH REHEAT_CoolCNode,  !- Evaporator Inlet Node Name
-    PACKAGED VAV WITH REHEAT_CoolC-PACKAGED VAV WITH REHEAT_HeatCNode,  !- Evaporator Outlet Node Name
     ALWAYS_ON,               !- Availability Schedule Name
-    ,                        !- Condenser Zone Name
-    PACKAGED VAV WITH REHEAT_CoolC Cond OA node,  !- Condenser Inlet Node Name
-    PACKAGED VAV WITH REHEAT_CoolC DXCoil Condenser Outlet Node,  !- Condenser Outlet Node Name
-    PACKAGED VAV WITH REHEAT_CoolC DXCoil Performance,  !- Performance Object Name
-    ,                        !- Condensate Collection Water Storage Tank Name
-    ;                        !- Evaporative Condenser Supply Water Storage Tank Name
-
-  Coil:Cooling:DX:CurveFit:Performance,
-    PACKAGED VAV WITH REHEAT_CoolC DXCoil Performance,  !- Name
-    0.0,                     !- Crankcase Heater Capacity {W}
-    ,                        !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+    AUTOSIZE,                !- High Speed Gross Rated Total Cooling Capacity {W}
+    AUTOSIZE,                !- High Speed Rated Sensible Heat Ratio
+    3,                       !- High Speed Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- High Speed Rated Air Flow Rate {m3/s}
     ,                        !- Unit Internal Static Air Pressure {Pa}
-    MultiSpeed,              !- Capacity Control Method
-    ,                        !- Evaporative Condenser Basin Heater Capacity {W/K}
-    ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-    ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
-    Electricity,             !- Compressor Fuel Type
-    PACKAGED VAV WITH REHEAT_CoolC DXCoil Operating Mode;  !- Base Operating Mode
-
-  Coil:Cooling:DX:CurveFit:OperatingMode,
-    PACKAGED VAV WITH REHEAT_CoolC DXCoil Operating Mode,  !- Name
-    AUTOSIZE,                !- Rated Gross Total Cooling Capacity {W}
-    AUTOSIZE,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
-    ,                        !- Maximum Cycling Rate {cycles/hr}
-    ,                        !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
-    ,                        !- Latent Capacity Time Constant {s}
-    ,                        !- Nominal Time for Condensate Removal to Begin {s}
-    ,                        !- Apply Latent Degradation to Speeds Greater than 1
-    ,                        !- Condenser Type
-    ,                        !- Nominal Evaporative Condenser Pump Power {W}
-    2,                       !- Nominal Speed Number
-    PACKAGED VAV WITH REHEAT_CoolC DXCoil Speed 1 Performance,  !- Speed 1 Name
-    PACKAGED VAV WITH REHEAT_CoolC DXCoil Speed 2 Performance;  !- Speed 2 Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    PACKAGED VAV WITH REHEAT_CoolC DXCoil Speed 1 Performance,  !- Name
-    0.3333,                  !- Gross Total Cooling Capacity Fraction
-    0.3333,                  !- Evaporator Air Flow Rate Fraction
-    ,                        !- Condenser Air Flow Rate Fraction
-    0.69,                    !- Gross Sensible Heat Ratio
-    3,                       !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    ,                        !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    PACKAGED VAV WITH REHEAT_CoolCCarrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    PACKAGED VAV WITH REHEAT_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    PACKAGED VAV WITH REHEAT_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    PACKAGED VAV WITH REHEAT_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+    PACKAGED VAV WITH REHEAT_OA-PACKAGED VAV WITH REHEAT_CoolCNode,  !- Air Inlet Node Name
+    PACKAGED VAV WITH REHEAT_CoolC-PACKAGED VAV WITH REHEAT_HeatCNode,  !- Air Outlet Node Name
+    PACKAGED VAV WITH REHEAT_CoolCCarrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+    PACKAGED VAV WITH REHEAT_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Function of Flow Fraction Curve Name
+    PACKAGED VAV WITH REHEAT_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Function of Temperature Curve Name
+    PACKAGED VAV WITH REHEAT_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Function of Flow Fraction Curve Name
     PACKAGED VAV WITH REHEAT_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
-
-  Coil:Cooling:DX:CurveFit:Speed,
-    PACKAGED VAV WITH REHEAT_CoolC DXCoil Speed 2 Performance,  !- Name
-    1.0,                     !- Gross Total Cooling Capacity Fraction
-    1.0,                     !- Evaporator Air Flow Rate Fraction
-    1.0,                     !- Condenser Air Flow Rate Fraction
-    AUTOSIZE,                !- Gross Sensible Heat Ratio
-    3,                       !- Gross Cooling COP {W/W}
-    1.0,                     !- Active Fraction of Coil Face Area
-    ,                        !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-    1.0,                     !- Evaporative Condenser Pump Power Fraction
-    ,                        !- Evaporative Condenser Effectiveness {dimensionless}
-    PACKAGED VAV WITH REHEAT_CoolCCarrier48TM014_12tons_CapFT,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-    PACKAGED VAV WITH REHEAT_CoolCCarrier48TM014_12tons_FFF,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-    PACKAGED VAV WITH REHEAT_CoolCCarrier48TM014_12tons_EIRFT,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
-    PACKAGED VAV WITH REHEAT_CoolCCarrier48TM014_12tons_EIRFFF,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-    PACKAGED VAV WITH REHEAT_CoolCIEA_HVAC_BESTEST_9ton-PLR,  !- Part Load Fraction Correlation Curve Name
-    ,                        !- Rated Waste Heat Fraction of Power Input {dimensionless}
-    ,                        !- Waste Heat Modifier Function of Temperature Curve Name
-    ,                        !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
-    ;                        !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
+    AUTOSIZE,                !- Low Speed Gross Rated Total Cooling Capacity {W}
+    0.69,                    !- Low Speed Gross Rated Sensible Heat Ratio
+    3,                       !- Low Speed Gross Rated Cooling COP {W/W}
+    AUTOSIZE,                !- Low Speed Rated Air Flow Rate {m3/s}
+    PACKAGED VAV WITH REHEAT_CoolCCarrier48TM014_12tons_CapFT,  !- Low Speed Total Cooling Capacity Function of Temperature Curve Name
+    PACKAGED VAV WITH REHEAT_CoolCCarrier48TM014_12tons_EIRFT,  !- Low Speed Energy Input Ratio Function of Temperature Curve Name
+    PACKAGED VAV WITH REHEAT_CoolC Cond OA node;  !- Condenser Air Inlet Node Name
 
   OutdoorAir:Node,
     PACKAGED VAV WITH REHEAT_CoolC Cond OA node;  !- Name
