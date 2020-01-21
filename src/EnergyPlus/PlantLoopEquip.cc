@@ -114,13 +114,6 @@ namespace PlantLoopEquip {
     using namespace DataPlant;
     using DataLoopNode::Node;
 
-    // Data
-    // SUBROUTINE SPECIFICATION
-
-    // MODULE SUBROUTINES
-
-    // Functions
-
     void SimPlantEquip(int const LoopNum,     // loop counter
                        int const LoopSideNum, // loop counter
                        int const BranchNum,
@@ -173,19 +166,12 @@ namespace PlantLoopEquip {
         // as a time reduction measure.  Specific ifs are set to catch those modules that don't.
         // If you add a module or new equipment type, you must set up this structure.
 
-        // REFERENCES:
-        // na
-
         // Using/Aliasing
-        using ChillerElectricEIR::SimElectricEIRChiller;
         using ChillerExhaustAbsorption::SimExhaustAbsorber;
-        using ChillerGasAbsorption::SimGasAbsorber;
         using ChillerReformulatedEIR::SimReformulatedEIRChiller;
-        using PlantChillers::SimChiller;
         using Pumps::SimPumps;
         using ScheduleManager::GetCurrentScheduleValue;
         using BaseboardRadiator::UpdateBaseboardPlantConnection;
-        using HVACVariableRefrigerantFlow::SimVRFCondenserPlant;
         using HWBaseboardRadiator::UpdateHWBaseboardPlantConnection;
         using SteamBaseboardRadiator::UpdateSteamBaseboardPlantConnection;
         using WaterCoils::UpdateWaterToAirCoilPlantConnection;
@@ -302,73 +288,26 @@ namespace PlantLoopEquip {
 
             // CHILLERS
         } else if (GeneralEquipType == GenEquipTypes_Chiller) {
-            if ((EquipTypeNum == TypeOf_Chiller_EngineDriven) || (EquipTypeNum == TypeOf_Chiller_Electric) ||
-                (EquipTypeNum == TypeOf_Chiller_ConstCOP) || (EquipTypeNum == TypeOf_Chiller_CombTurbine)) {
-                SimChiller(LoopNum,
-                           LoopSideNum,
-                           EquipTypeNum,
-                           sim_component.Name,
-                           EquipFlowCtrl,
-                           EquipNum,
-                           RunFlag,
-                           FirstHVACIteration,
-                           InitLoopEquip,
-                           CurLoad,
-                           MaxLoad,
-                           MinLoad,
-                           OptLoad,
-                           GetCompSizFac,
-                           SizingFac,
-                           TempCondInDesign,
-                           TempEvapOutDesign);
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                    sim_component.TempDesCondIn = TempCondInDesign;
-                    sim_component.TempDesEvapOut = TempEvapOutDesign;
-                }
-                if (GetCompSizFac) {
-                    sim_component.SizFac = SizingFac;
-                }
+            if (EquipTypeNum == TypeOf_Chiller_Electric) {
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
+
+            } else if (EquipTypeNum == TypeOf_Chiller_EngineDriven) {
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
+
+            } else if (EquipTypeNum == TypeOf_Chiller_CombTurbine) {
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
+
+            } else if (EquipTypeNum == TypeOf_Chiller_ConstCOP) {
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_Chiller_Absorption) {
-
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_Chiller_Indirect_Absorption) {
-                dynamic_cast<ChillerIndirectAbsorption::IndirectAbsorberSpecs*> (sim_component.compPtr)->EquipFlowCtrl = EquipFlowCtrl;
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_Chiller_ElectricEIR) {
-                SimElectricEIRChiller(sim_component.TypeOf,
-                                      sim_component.Name,
-                                      EquipFlowCtrl,
-                                      EquipNum,
-                                      LoopNum,
-                                      RunFlag,
-                                      FirstHVACIteration,
-                                      InitLoopEquip,
-                                      CurLoad,
-                                      MaxLoad,
-                                      MinLoad,
-                                      OptLoad,
-                                      GetCompSizFac,
-                                      SizingFac,
-                                      TempCondInDesign,
-                                      TempEvapOutDesign);
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                    sim_component.TempDesCondIn = TempCondInDesign;
-                    sim_component.TempDesEvapOut = TempEvapOutDesign;
-                }
-                if (GetCompSizFac) {
-                    sim_component.SizFac = SizingFac;
-                }
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_Chiller_ElectricReformEIR) {
                 SimReformulatedEIRChiller(sim_component.TypeOf,
@@ -402,36 +341,9 @@ namespace PlantLoopEquip {
                 // Chiller-Heater needs to know whether it is being called for heating or cooling
                 // Since loops are generic, pass the branch inlet nodenum
             } else if (EquipTypeNum == TypeOf_Chiller_DFAbsorption) {
-                SimGasAbsorber(sim_component.TypeOf,
-                               sim_component.Name,
-                               EquipFlowCtrl,
-                               EquipNum,
-                               RunFlag,
-                               FirstHVACIteration,
-                               InitLoopEquip,
-                               CurLoad,
-                               PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).NodeNumIn,
-                               MaxLoad,
-                               MinLoad,
-                               OptLoad,
-                               GetCompSizFac,
-                               SizingFac,
-                               TempCondInDesign,
-                               TempEvapOutDesign); // DSU
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                    sim_component.TempDesCondIn = TempCondInDesign;
-                    sim_component.TempDesEvapOut = TempEvapOutDesign;
-                }
-                if (GetCompSizFac) {
-                    sim_component.SizFac = SizingFac;
-                }
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
                 // Exhaust Fired Absorption Chiller
-
             } else if (EquipTypeNum == TypeOf_Chiller_ExhFiredAbsorption) {
                 SimExhaustAbsorber(sim_component.TypeOf,
                                    sim_component.Name,
@@ -490,24 +402,7 @@ namespace PlantLoopEquip {
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_HeatPumpVRF) {
-
-                SimVRFCondenserPlant(sim_component.TypeOf,
-                                     EquipTypeNum,
-                                     sim_component.Name,
-                                     EquipNum,
-                                     FirstHVACIteration,
-                                     InitLoopEquip,
-                                     CurLoad,
-                                     MaxLoad,
-                                     MinLoad,
-                                     OptLoad,
-                                     LoopNum); // DSU
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                }
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else {
                 ShowSevereError("SimPlantEquip: Invalid Heat Pump Type=" + sim_component.TypeOf);
@@ -574,19 +469,10 @@ namespace PlantLoopEquip {
         } else if (GeneralEquipType == GenEquipTypes_WaterThermalTank) {
 
             if ((EquipTypeNum == TypeOf_WtrHeaterMixed) || (EquipTypeNum == TypeOf_WtrHeaterStratified)) {
-
-                dynamic_cast<WaterThermalTanks::WaterThermalTankData*> (sim_component.compPtr)->callerLoopNum = LoopNum;
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
-                dynamic_cast<WaterThermalTanks::WaterThermalTankData*> (sim_component.compPtr)->callerLoopNum = 0;
 
-                // HEAT PUMP WATER HEATER
             } else if (EquipTypeNum == TypeOf_HeatPumpWtrHeaterPumped || EquipTypeNum == TypeOf_HeatPumpWtrHeaterWrapped) {
-
-                int tankIdx = dynamic_cast<WaterThermalTanks::HeatPumpWaterHeaterData*> (sim_component.compPtr)->WaterHeaterTankNum;
-                auto &tank = WaterThermalTanks::WaterThermalTank(tankIdx);
-                tank.callerLoopNum = LoopNum;
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
-                tank.callerLoopNum = 0;
 
             } else {
                 ShowSevereError("SimPlantEquip: Invalid Water Heater Type=" + sim_component.TypeOf);
@@ -639,24 +525,11 @@ namespace PlantLoopEquip {
             } else if (EquipTypeNum == TypeOf_GrndHtExchgHorizTrench) {
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
-                if (InitLoopEquip) {
-                    sim_component.CompNum = EquipNum;
-                }
-
             } else if (EquipTypeNum == TypeOf_GrndHtExchgSlinky) { // 'GROUND HEAT EXCHANGER:SLINKY'
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
             }
             // THERMAL STORAGE
         } else if (GeneralEquipType == GenEquipTypes_ThermalStorage) {
-
-            // If component setpoint based control is active for this equipment
-            // then reset CurLoad to original EquipDemand.
-            // Allow negative CurLoad.  For cold storage this means the storage should
-            // charge, for hot storage, this means the storage should discharge.
-            if (sim_component.CurOpSchemeType == CompSetPtBasedSchemeType) {
-                CurLoad = sim_component.EquipDemand;
-                if (CurLoad != 0) RunFlag = true;
-            }
 
             if (EquipTypeNum == TypeOf_TS_IceSimple) {
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
@@ -665,14 +538,7 @@ namespace PlantLoopEquip {
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if ((EquipTypeNum == TypeOf_ChilledWaterTankMixed) || (EquipTypeNum == TypeOf_ChilledWaterTankStratified)) {
-
-                int tankIDX = WaterThermalTanks::getTankIDX(sim_component.Name, EquipNum);
-                auto &tank = WaterThermalTanks::WaterThermalTank(tankIDX);
-                tank.callerLoopNum = LoopNum;
-
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
-
-                WaterThermalTanks::WaterThermalTank(tankIDX).callerLoopNum = 0;
 
             } else {
                 ShowSevereError("SimPlantEquip: Invalid Chilled/Ice Thermal Storage Type=" + sim_component.TypeOf);
@@ -699,11 +565,9 @@ namespace PlantLoopEquip {
             // for heat recovery plant interactions.
 
             if (EquipTypeNum == TypeOf_Generator_FCExhaust) {
-                dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (sim_component.compPtr)->TypeOf = DataPlant::TypeOf_Generator_FCExhaust;
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_Generator_FCStackCooler) {
-                dynamic_cast<FuelCellElectricGenerator::FCDataStruct*> (sim_component.compPtr)->TypeOf = DataPlant::TypeOf_Generator_FCStackCooler;
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_Generator_MicroCHP) {
@@ -734,9 +598,6 @@ namespace PlantLoopEquip {
 
             if (EquipTypeNum == TypeOf_PlantLoadProfile) {
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
-                if (InitLoopEquip) {
-                    sim_component.CompNum = EquipNum;
-                }
 
             } else {
                 ShowSevereError("SimPlantEquip: Invalid Load Profile Type=" + sim_component.TypeOf);
@@ -794,7 +655,6 @@ namespace PlantLoopEquip {
         } else if (GeneralEquipType == GenEquipTypes_WaterUse) {
 
             if (EquipTypeNum == TypeOf_WaterUseConnection) {
-
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else {
@@ -806,11 +666,9 @@ namespace PlantLoopEquip {
         } else if (GeneralEquipType == GenEquipTypes_SolarCollector) {
 
             if ((EquipTypeNum == TypeOf_SolarCollectorFlatPlate) || (EquipTypeNum == TypeOf_SolarCollectorICS)) {
-
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_PVTSolarCollectorFlatPlate) {
-
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else {
@@ -882,12 +740,7 @@ namespace PlantLoopEquip {
         } else if (GeneralEquipType == GenEquipTypes_CentralHeatPumpSystem) {
 
             if (EquipTypeNum == TypeOf_CentralGroundSourceHeatPump) {
-
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
-
-                if (GetCompSizFac) {
-                    sim_component.SizFac = SizingFac;
-                }
 
             } else {
                 ShowSevereError("SimPlantEquip: Invalid Central Heat Pump System Type=" + sim_component.TypeOf);

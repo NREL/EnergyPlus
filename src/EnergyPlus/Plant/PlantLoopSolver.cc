@@ -323,7 +323,7 @@ namespace EnergyPlus {
             // Now that flow rates have been resolved, we just need to set the flow lock status
             //  flag, and resimulate.  During this simulation each component will still use the
             //  SetFlowRequest routine, but this routine will also set the outlet flow rate
-            //  equal to the inlet flow rate, accoridng to flowlock logic.
+            //  equal to the inlet flow rate, according to flowlock logic.
             DataPlant::PlantLoop(LoopNum).LoopSide(ThisSide).FlowLock = DataPlant::FlowLocked;
             DataPlant::PlantLoop(LoopNum).loopSolver.SimulateAllLoopSideBranches(
                     LoopNum, ThisSide, ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag);
