@@ -157,7 +157,7 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(const std::st
     }
 
     if (!found_it) {
-        // error
+        ShowFatalError("Could not find Coil:Cooling:DX:Performance object with name: " + name_to_find);
     }
 }
 

@@ -311,7 +311,7 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(const std::string& name_t
     }
 
     if (!found_it) {
-        // error
+        ShowFatalError("Could not find Coil:Cooling:DX:CurveFit:Speed object with name: " + name_to_find);
     }
 }
 
