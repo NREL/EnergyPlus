@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -164,14 +164,14 @@ namespace DataGenerators {
         Real64 PfuelCompEl;       // fuel compressor power
         Real64 QskinLoss;         // pumping losses for zone
         Real64 CO2ProductGasCoef; // molar multiplier for stoic products of this fuel
-        Real64 H20ProductGasCoef; // molar multiplier for stoic products of this fuel
+        Real64 H2OProductGasCoef; // molar multiplier for stoic products of this fuel
 
         // Default Constructor
         GeneratorFuelSupplyDataStruct()
             : FuelTempMode(0), FuelTypeMode(0), NodeNum(0), SchedNum(0), CompPowerCurveID(0), CompPowerLossFactor(0.0), ConstitName(14),
               ConstitMolalFract(14, 0.0), GasLibID(14, 0), LHV(0.0), LHVJperkg(0.0), LHVliquid(0.0), HHV(0.0), MW(0.0), eCO2(0.0),
               KmolPerSecToKgPerSec(0.0), StoicOxygenRate(0.0), TfuelIntoCompress(0.0), TfuelIntoFCPM(0.0), PfuelCompEl(0.0), QskinLoss(0.0),
-              CO2ProductGasCoef(0.0), H20ProductGasCoef(0.0)
+              CO2ProductGasCoef(0.0), H2OProductGasCoef(0.0)
         {
         }
     };

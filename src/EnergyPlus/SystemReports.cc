@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -204,7 +204,7 @@ namespace SystemReports {
     Array1D<Real64> SysHCCompHTNG;
     Array1D<Real64> SysHCCompGas;
     Array1D<Real64> SysHCCompSteam;
-    Array1D<Real64> SysDomesticH20;
+    Array1D<Real64> SysDomesticH2O;
 
     Array1D<Real64> ZoneOAMassFlow;       // zone mech vent mass flow rate {kg/s}
     Array1D<Real64> ZoneOAMass;           // zone mech vent total mass for time {kg}
@@ -1990,7 +1990,7 @@ namespace SystemReports {
         SysHCCompHTNG.allocate(NumPrimaryAirSys);
         SysHCCompGas.allocate(NumPrimaryAirSys);
         SysHCCompSteam.allocate(NumPrimaryAirSys);
-        SysDomesticH20.allocate(NumPrimaryAirSys);
+        SysDomesticH2O.allocate(NumPrimaryAirSys);
 
         SetBackCounter.allocate(NumOfZones);
         HeatCoolFlag.allocate(NumOfZones);
@@ -2055,7 +2055,7 @@ namespace SystemReports {
         SysHumidHTNG = 0.0;
         SysEvapCLNG = 0.0;
         DesDehumidCLNG = 0.0;
-        SysDomesticH20 = 0.0;
+        SysDomesticH2O = 0.0;
 
         // SYSTEM COMPONENT ENERGY REPORT
         SysFANCompElec = 0.0;
@@ -2111,7 +2111,7 @@ namespace SystemReports {
                     "Air System Gas Energy", OutputProcessor::Unit::J, SysTotGas(SysIndex), "HVAC", "Sum", PrimaryAirSystem(SysIndex).Name);
 
                 SetupOutputVariable(
-                    "Air System Water Volume", OutputProcessor::Unit::m3, SysDomesticH20(SysIndex), "HVAC", "Sum", PrimaryAirSystem(SysIndex).Name);
+                    "Air System Water Volume", OutputProcessor::Unit::m3, SysDomesticH2O(SysIndex), "HVAC", "Sum", PrimaryAirSystem(SysIndex).Name);
 
                 // SYSTEM COMPONENT LOAD REPORT
                 SetupOutputVariable("Air System Fan Air Heating Energy",
@@ -3575,7 +3575,7 @@ namespace SystemReports {
         SysHumidHTNG = 0.0;
         SysEvapCLNG = 0.0;
         DesDehumidCLNG = 0.0;
-        SysDomesticH20 = 0.0;
+        SysDomesticH2O = 0.0;
 
         // SYSTEM COMPONENT ENERGY REPORT
         SysFANCompElec = 0.0;
@@ -4205,7 +4205,7 @@ namespace SystemReports {
         case HUMIDIFIER_STEAM_ELECTRIC:
             if (CompLoadFlag) SysHumidHTNG(AirLoopNum) += std::abs(CompLoad);
             if (EnergyType == iRT_Water) {
-                SysDomesticH20(AirLoopNum) += std::abs(CompEnergy);
+                SysDomesticH2O(AirLoopNum) += std::abs(CompEnergy);
             } else if (EnergyType == iRT_Electricity) {
                 SysHumidElec(AirLoopNum) += CompEnergy;
             } else if ((EnergyType == iRT_Natural_Gas) || (EnergyType == iRT_Propane)) {
@@ -4221,7 +4221,7 @@ namespace SystemReports {
         case EVAPORATIVECOOLER_INDIRECT_RESEARCHSPECIAL:
             if (CompLoadFlag) SysEvapCLNG(AirLoopNum) += std::abs(CompLoad);
             if (EnergyType == iRT_Water) {
-                SysDomesticH20(AirLoopNum) += std::abs(CompEnergy);
+                SysDomesticH2O(AirLoopNum) += std::abs(CompEnergy);
             } else if (EnergyType == iRT_Electricity) {
                 SysEvapElec(AirLoopNum) += CompEnergy;
             }

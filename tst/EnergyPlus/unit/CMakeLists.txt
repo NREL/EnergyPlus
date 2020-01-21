@@ -135,6 +135,7 @@ set( test_src
   PlantComponentTemperatureSources.unit.cc
   PlantChillers.unit.cc
   PlantCondLoopOperation.unit.cc
+  PlantLoopHeatPumpEIR.unit.cc
   PlantUtilities.unit.cc
   PoweredInductionUnits.unit.cc
   Psychrometrics.unit.cc
@@ -186,7 +187,6 @@ set( test_src
   WaterThermalTanks.unit.cc
   WaterToAirHeatPump.unit.cc
   WaterToAirHeatPumpSimple.unit.cc
-  WaterToWaterHeatPumpEIR.unit.cc
   WeatherManager.unit.cc
   WinCalcEngine.unit.cc
   WindowAC.unit.cc

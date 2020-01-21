@@ -1,4 +1,4 @@
-! WaterToWaterHeatPump_EIR.idf
+! PlantLoopHeatPump_EIR_WaterSource.idf
 !
 ! Basic file description:
 ! The EIR formulated water-to-water heat pump is demonstrated using a simple collection of plant loops.  Building loads
@@ -106,11 +106,20 @@
     1,                       !- Upper Limit Value
     Discrete;                !- Numeric Type
 
-  Schedule:Constant,Heating Coil Load Loop Setpoint Temperature Schedule,Any Number,65.0;
+  Schedule:Constant,
+    Heating Coil Load Loop Setpoint Temperature Schedule,     !- Name
+    Any Number,              !- Schedule Type Limits Name
+    65.0;                    !- Value
 
-  Schedule:Constant,Cooling Coil Load Loop Setpoint Temperature Schedule,Any Number,20;
+  Schedule:Constant,
+    Cooling Coil Load Loop Setpoint Temperature Schedule,     !- Name
+    Any Number,              !- Schedule Type Limits Name
+    20;                      !- Value
 
-  Schedule:Constant,AlwaysOnSchedule,On/Off,1;
+  Schedule:Constant,
+    AlwaysOnSchedule,        !- Name
+    On/Off,                  !- Schedule Type Limits Name
+    1;                       !- Value
 
   ! Simulate a winter time, overnight hours load, but the pump is always running in that season
 
@@ -221,7 +230,7 @@
 
   PlantEquipmentList,
     Heating Coil Load Loop Heating Equipment,  !- Name
-    HeatPump:WaterToWater:EIR:Heating,  !- Equipment 1 Object Type
+    HeatPump:PlantLoop:EIR:Heating,  !- Equipment 1 Object Type
     Heating Coil;            !- Equipment 1 Name
 
   BranchList,
@@ -235,10 +244,10 @@
     Heating Coil Load Loop Pump,  !- Component 1 Name
     Heating Coil Load Loop Supply Inlet Node,  !- Component 1 Inlet Node Name
     Heating Coil Load Loop Intermediate Node,  !- Component 1 Outlet Node Name
-    HeatPump:WaterToWater:EIR:Heating,  !- Component 2 Object Type
-    Heating Coil,            !- Component 2 Name
-    Heating Coil Load Loop Intermediate Node,  !- Component 2 Inlet Node Name
-    Heating Coil Load Loop Supply Outlet Node;  !- Component 2 Outlet Node Name
+    HeatPump:PlantLoop:EIR:Heating,  !- Component 1 Object Type
+    Heating Coil,            !- Component 1 Name
+    Heating Coil Load Loop Intermediate Node,  !- Component 1 Inlet Node Name
+    Heating Coil Load Loop Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pump:VariableSpeed,
     Heating Coil Load Loop Pump,  !- Name
@@ -256,10 +265,11 @@
     0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
-  HeatPump:WaterToWater:EIR:Heating,
+  HeatPump:PlantLoop:EIR:Heating,
     Heating Coil,            !- Name
     Heating Coil Load Loop Intermediate Node,  !- Load Side Inlet Node Name
     Heating Coil Load Loop Supply Outlet Node,  !- Load Side Outlet Node Name
+    WaterSource,             !- Condenser Type
     Condenser Loop Demand Inlet Node,  !- Source Side Inlet Node Name
     Condenser Loop Demand Intermediate Node,  !- Source Side Outlet Node Name
     Cooling Coil,            !- Companion Heat Pump Name
@@ -379,7 +389,7 @@
 
   PlantEquipmentList,
     Cooling Coil Load Loop Cooling Equipment,  !- Name
-    HeatPump:WaterToWater:EIR:Cooling,  !- Equipment 1 Object Type
+    HeatPump:PlantLoop:EIR:Cooling,  !- Equipment 1 Object Type
     Cooling Coil;            !- Equipment 1 Name
 
   BranchList,
@@ -393,10 +403,10 @@
     Cooling Coil Load Loop Pump,  !- Component 1 Name
     Cooling Coil Load Loop Supply Inlet Node,  !- Component 1 Inlet Node Name
     Cooling Coil Load Loop Intermediate Node,  !- Component 1 Outlet Node Name
-    HeatPump:WaterToWater:EIR:Cooling,  !- Component 2 Object Type
-    Cooling Coil,            !- Component 2 Name
-    Cooling Coil Load Loop Intermediate Node,  !- Component 2 Inlet Node Name
-    Cooling Coil Load Loop Supply Outlet Node;  !- Component 2 Outlet Node Name
+    HeatPump:PlantLoop:EIR:Cooling,  !- Component 1 Object Type
+    Cooling Coil,            !- Component 1 Name
+    Cooling Coil Load Loop Intermediate Node,  !- Component 1 Inlet Node Name
+    Cooling Coil Load Loop Supply Outlet Node;  !- Component 1 Outlet Node Name
 
   Pump:VariableSpeed,
     Cooling Coil Load Loop Pump,  !- Name
@@ -414,10 +424,11 @@
     0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
-  HeatPump:WaterToWater:EIR:Cooling,
+  HeatPump:PlantLoop:EIR:Cooling,
     Cooling Coil,            !- Name
     Cooling Coil Load Loop Intermediate Node,  !- Load Side Inlet Node Name
     Cooling Coil Load Loop Supply Outlet Node,  !- Load Side Outlet Node Name
+    WaterSource,             !- Condenser Type
     Condenser Loop Demand Intermediate Node,  !- Source Side Inlet Node Name
     Condenser Loop Demand Outlet Node,  !- Source Side Outlet Node Name
     Heating Coil,            !- Companion Heat Pump Name
@@ -691,48 +702,30 @@
   Branch,
     Condenser Loop Demand Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
-    HeatPump:WaterToWater:EIR:Heating,  !- Component 1 Object Type
+    HeatPump:PlantLoop:EIR:Heating,  !- Component 1 Object Type
     Heating Coil,            !- Component 1 Name
     Condenser Loop Demand Inlet Node,  !- Component 1 Inlet Node Name
     Condenser Loop Demand Intermediate Node,  !- Component 1 Outlet Node Name
-    HeatPump:WaterToWater:EIR:Cooling,  !- Component 2 Object Type
+    HeatPump:PlantLoop:EIR:Cooling,  !- Component 2 Object Type
     Cooling Coil,            !- Component 2 Name
     Condenser Loop Demand Intermediate Node,  !- Component 2 Inlet Node Name
     Condenser Loop Demand Outlet Node;  !- Component 2 Outlet Node Name
 
   Output:VariableDictionary,IDF;
-
-  Output:Variable,*,Plant Load Profile Mass Flow Rate,Hourly;
-
-  Output:Variable,*,Plant Load Profile Heat Transfer Rate,Hourly;
-
-  Output:Variable,*,Water to Water Heat Pump Load Side Heat Transfer Rate,Hourly;
-
-  Output:Variable,*,Water to Water Heat Pump Load Side Heat Transfer Energy,Hourly;
-
-  Output:Variable,*,Water to Water Heat Pump Source Side Heat Transfer Rate,Hourly;
-
-  Output:Variable,*,Water to Water Heat Pump Source Side Heat Transfer Energy,Hourly;
-
-  Output:Variable,*,Water to Water Heat Pump Load Side Inlet Temperature,Hourly;
-
-  Output:Variable,*,Water to Water Heat Pump Load Side Outlet Temperature,Hourly;
-
-  Output:Variable,*,Water to Water Heat Pump Source Side Inlet Temperature,Hourly;
-
-  Output:Variable,*,Water to Water Heat Pump Source Side Outlet Temperature,Hourly;
-
-  Output:Variable,*,Water to Water Heat Pump Electric Power,Hourly;
-
-  Output:Variable,*,Water to Water Heat Pump Electric Energy,Hourly;
-
-  Output:Variable,*,Water to Water Heat Pump Load Side Mass Flow Rate,Hourly;
-
-  Output:Variable,*,Water to Water Heat Pump Source Side Mass Flow Rate,Hourly;
-
-  Output:Variable,*,Ground Heat Exchanger Heat Transfer Rate,Hourly;
-
-  Output:Variable,*,Ground Heat Exchanger Inlet Temperature,Hourly;
-
-  Output:Variable,*,Ground Heat Exchanger Outlet Temperature,Hourly;
-
+  Output:Variable, *, Plant Load Profile Mass Flow Rate, Hourly;
+  Output:Variable, *, Plant Load Profile Heat Transfer Rate, Hourly;
+  Output:Variable, *, Heat Pump Load Side Heat Transfer Rate, Hourly;
+  Output:Variable, *, Heat Pump Load Side Heat Transfer Energy, Hourly;
+  Output:Variable, *, Heat Pump Source Side Heat Transfer Rate, Hourly;
+  Output:Variable, *, Heat Pump Source Side Heat Transfer Energy, Hourly;
+  Output:Variable, *, Heat Pump Load Side Inlet Temperature, Hourly;
+  Output:Variable, *, Heat Pump Load Side Outlet Temperature, Hourly;
+  Output:Variable, *, Heat Pump Source Side Inlet Temperature, Hourly;
+  Output:Variable, *, Heat Pump Source Side Outlet Temperature, Hourly;
+  Output:Variable, *, Heat Pump Electric Power, Hourly;
+  Output:Variable, *, Heat Pump Electric Energy, Hourly;
+  Output:Variable, *, Heat Pump Load Side Mass Flow Rate, Hourly;
+  Output:Variable, *, Heat Pump Source Side Mass Flow Rate, Hourly;
+  Output:Variable, *, Ground Heat Exchanger Heat Transfer Rate, Hourly;
+  Output:Variable, *, Ground Heat Exchanger Inlet Temperature, Hourly;
+  Output:Variable, *, Ground Heat Exchanger Outlet Temperature, Hourly;
