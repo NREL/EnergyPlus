@@ -121,7 +121,7 @@ The name corresponding to a Coil:Cooling:DX:CurveFit:OperatingMode object. Opera
 
 \subsection{Coil:Cooling:DX:CurveFit:OperatingMode}\label{coilcoolingdxcurvefitoperatingmode}
 
-This object defines DX cooling coil performance for a single operating mode at rated conditions. Each operating mode may have one or more speeds, which are defined using the Coil:Cooling:DX:CurveFit:Speed object. Operating mode 1 is always the base design operating mode. Additional modes may be optional enhanced dehumidification states such as subcool reheat. The operating mode also defines the condenser type. Each performance specification can reference a maximum of 10 operating modes.
+This object defines DX cooling coil performance for a single operating mode at rated conditions. Each operating mode may have one or more speeds, which are defined using the Coil:Cooling:DX:CurveFit:Speed object. Each operation mode can reference a maximum of 10 Coil:Cooling:DX:CurveFit:Speed objects.
 
 \subsubsection{Inputs}\label{inputs-03}
 
@@ -131,7 +131,7 @@ A unique user-assigned name for an instance of a cooling coil operating mode. An
 
 \paragraph{Field: Rated Gross Total Cooling Capacity}\label{field-rated-gross-total-cooling-capacity-1}
 
-The total, full load gross cooling capacity (sensible plus latent) in Watts of the DX coil unit at rated conditions (air entering the cooling coil at 26.7 °C drybulb/19.4 °C wetbulb (80 °F drybulb/67 °F wetbulb), air entering the outdoor condenser coil at 35 °C drybulb/23.9 °C wetbulb\protect\hyperlink{ux5fftn1}{{[}1{]}} (95 °F drybulb/75 °F wetbulb), and a cooling coil air flow rate defined by field rated air flow rate below). Capacity should be gross (i.e., the effect of supply air fan heat is NOT accounted for). When used in a heat pump, the gross rated total cooling capacity should be within 20\% of the gross rated heating capacity, otherwise a warning message is issued.
+The total, full load gross cooling capacity (sensible plus latent) in Watts of the DX coil unit at rated conditions (air entering the cooling coil at 26.7 °C drybulb/19.4 °C wetbulb (80 °F drybulb/67 °F wetbulb), air entering the outdoor condenser coil at 35 °C drybulb/23.9 °C wetbulb (95 °F drybulb/75 °F wetbulb), and a cooling coil air flow rate defined by field rated air flow rate below). Capacity should be gross (i.e., the effect of supply air fan heat is NOT accounted for). When used in a heat pump, the gross rated total cooling capacity should be within 20\% of the gross rated heating capacity, otherwise a warning message is issued.
 
 \paragraph{Field: Rated Evaporator Air Flow Rate}\label{field-rated-evaporator-air-flow-rate-2}
 
@@ -170,10 +170,6 @@ The type of condenser used by the DX cooling coil. Valid choices for this input 
 \paragraph{Field: Nominal Evaporative Condenser Pump Power}\label{field-nominal-evaporative-condenser-pump-power-1}
 
 The rated power of the evaporative condenser water pump in Watts. This value is used to calculate the power required to pump the water used to evaporatively cool the condenser inlet air. The default value for this input field is zero, but it is autosizable (equivalent to 0.004266 W per watt {[}15 W/ton{]} of rated total cooling capacity). This field is not used when Condenser Type = \textbf{AirCooled}.
-
-\paragraph{Field: Capacity Control Method}\label{field-capacity-control-method}
-
-This field determines how the cooling coil capacity is to be controlled. Options are \textbf{Staged}, \textbf{VariableSpeed}, and \textbf{MultiSpeed}. The default is \textbf{MultiSpeed}.
 
 \paragraph{Field: Nominal Speed Number}\label{field-nominal-speed-number}
 
@@ -393,7 +389,7 @@ Coil:Cooling:DX:CurveFit:Performance,
   -25.0, !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
   10.0, !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
   500.0, !- Unit Internal Static Air Pressure {Pa}
-  HumidityControl, !- Capacity Control Method
+  Staged, !- Capacity Control Method
   0.0, !- Evaporative Condenser Basin Heater Capacity {W}
   2.0, !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
   FanAndCoilAvailSched, !- Evaporative Condenser Basin Heater Operating Schedule Name
@@ -409,11 +405,9 @@ Coil:Cooling:DX:CurveFit:OperatingMode,
   0.0, !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity
   0.0, !- Latent Capacity Time Constant {s}
   0.0, !- Nominal Time for Condensate Removal to Begin {s}
-  No, !- Apply Latent Degradation to Speeds Greater than 1
-  EvaporativelyCooled, !- Condenser Type
-  0.0, !- Nominal Evaporative Condenser Pump Power {W}
-  Multispeed, !- Capacity Control Method
-  3, !- Nominal Speed Number
+  No,  !- Apply Latent Degradation to Speeds Greater than 1
+  Aircooled, !- Condenser Type
+  , !- Nominal Evaporative Condenser Pump Power
   Three Speed Cooling Coil Speed 1, !- Speed 1 Name
   Three Speed Cooling Coil Speed 2, !- Speed 2 Name
   Three Speed Cooling Coil Speed 3; !- Speed 3 Name
