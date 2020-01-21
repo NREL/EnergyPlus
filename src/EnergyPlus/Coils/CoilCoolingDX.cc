@@ -92,6 +92,7 @@ int CoilCoolingDX::factory(std::string const & coilName) {
             return handle;
         }
     }
+    ShowSevereError("Coil:Cooling:DX Coil not found=" + coilName);
     return -1;
 }
 
