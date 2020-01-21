@@ -53,7 +53,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
-#include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -338,7 +337,6 @@ namespace HeatRecovery {
                                               FanOpMode,
                                               PartLoadRatio,
                                               CompanionCoilNum,
-                                              companionCoilType,
                                               RegInIsOANode,
                                               EconomizerFlag,
                                               HighHumCtrlFlag);
@@ -1583,9 +1581,6 @@ namespace HeatRecovery {
                         // how to support VS dx coil here?
                         FullLoadOutAirTemp = VariableSpeedCoils::VarSpeedCoil(CompanionCoilIndex).OutletAirDBTemp;
                         FullLoadOutAirHumRat = VariableSpeedCoils::VarSpeedCoil(CompanionCoilIndex).OutletAirHumRat;
-                    } else if (CompanionCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
-                        FullLoadOutAirTemp = coilCoolingDXs[CompanionCoilIndex - 1].outletAirDryBulbTemp;
-                        FullLoadOutAirHumRat = coilCoolingDXs[CompanionCoilIndex - 1].outletAirHumRat;
                     }
 
                 } else {
@@ -2431,13 +2426,12 @@ namespace HeatRecovery {
         }
     }
 
-    void CalcDesiccantBalancedHeatExch(int const ExNum,                 // number of the current heat exchanger being simulated
-                                       bool const HXUnitOn,             // flag to simulate heat exchager heat recovery
-                                       bool const FirstHVACIteration,   // First HVAC iteration flag
-                                       int const FanOpMode,             // Supply air fan operating mode (1=cycling, 2=constant)
-                                       Real64 const PartLoadRatio,      // Part load ratio requested of DX compressor
-                                       int const CompanionCoilIndex,    // index of companion cooling coil
-                                       int const CompanionCoilType_Num, // cooling coil type of coil
+    void CalcDesiccantBalancedHeatExch(int const ExNum,               // number of the current heat exchanger being simulated
+                                       bool const HXUnitOn,           // flag to simulate heat exchager heat recovery
+                                       bool const FirstHVACIteration, // First HVAC iteration flag
+                                       int const FanOpMode,           // Supply air fan operating mode (1=cycling, 2=constant)
+                                       Real64 const PartLoadRatio,    // Part load ratio requested of DX compressor
+                                       int const CompanionCoilIndex,  // index of companion cooling coil
                                        bool const RegenInletIsOANode, // Flag to determine if regen side inlet is OANode, if so this air stream cycles
                                        Optional_bool_const EconomizerFlag, // economizer flag pass by air loop or OA sys
                                        Optional_bool_const HighHumCtrlFlag // high humidity control flag passed by airloop or OA sys
@@ -2711,12 +2705,8 @@ namespace HeatRecovery {
                         HXPartLoadRatio = min(1.0, HXPartLoadRatio);
 
                     } else if (CompanionCoilIndex > 0) {
-                        if (CompanionCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
-                            HXPartLoadRatio = coilCoolingDXs[CompanionCoilIndex - 1].partLoadRatioReport;
-                        } else {
-                            // VS coil issue here?
-                            HXPartLoadRatio = DXCoilPartLoadRatio(CompanionCoilIndex);
-                        }
+                        // VS coil issue here?
+                        HXPartLoadRatio = DXCoilPartLoadRatio(CompanionCoilIndex);
                     }
 
                     if (FanOpMode == CycFanCycCoil || RegenInletIsOANode) {

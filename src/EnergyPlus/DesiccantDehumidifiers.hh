@@ -197,7 +197,6 @@ namespace DesiccantDehumidifiers {
         int HXRegenOutNode;                // regen outlet node number mined from desiccant heat exchanger object
         int CondenserInletNode;            // regen outlet node number mined from desiccant heat exchanger object
         int DXCoilIndex;                   // DX Coil index mined from coil object
-        bool HasDXCoil;                    // True if cooling coil is DX
         int ErrCount;                      // error count
         int ErrIndex1;                     // error index
         int CoilUpstreamOfProcessSide;     // used to determine if process inlet is pre-cooled
@@ -230,7 +229,7 @@ namespace DesiccantDehumidifiers {
               ExhaustFanMaxVolFlowRate(0.0), ExhaustFanMaxMassFlowRate(0.0), ExhaustFanMaxPower(0.0), ExhaustFanPower(0.0),
               ExhaustFanElecConsumption(0.0), CompanionCoilCapacity(0.0), RegenFanPlacement(0), ControlNodeNum(0), ExhaustFanCurveIndex(0),
               CompIndex(0), CoolingCoilOutletNode(0), RegenFanOutNode(0), RegenCoilInletNode(0), RegenCoilOutletNode(0), HXProcInNode(0),
-              HXProcOutNode(0), HXRegenInNode(0), HXRegenOutNode(0), CondenserInletNode(0), DXCoilIndex(0), HasDXCoil(false), ErrCount(0), ErrIndex1(0),
+              HXProcOutNode(0), HXRegenInNode(0), HXRegenOutNode(0), CondenserInletNode(0), DXCoilIndex(0), ErrCount(0), ErrIndex1(0),
               CoilUpstreamOfProcessSide(0), RegenInletIsOutsideAirNode(false), RegenCoilType_Num(0), CoilControlNode(0), CoilOutletNode(0),
               LoopNum(0), LoopSide(0), BranchNum(0), CompNum(0), HotWaterCoilMaxIterIndex(0), HotWaterCoilMaxIterIndex2(0), MaxCoilFluidFlow(0.0),
               RegenCoilCapacity(0.0)
