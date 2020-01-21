@@ -59,7 +59,7 @@ This alpha field contains the identifying name for the unitary system.
 
 \paragraph{Field: Control Type}\label{field-control-type-004}
 
-This alpha field contains control type i.e.~load based or setpoint based for the unitary system. Valid choices are \textbf{Load}, \textbf{SetPoint} and \textbf{SingleZoneVAV}. Load and SingleZoneVAV control requires a Controlling Zone name. SetPoint control requires set points at each coil outlet node. A single set point at the outlet of the system is allowed but not recommended. If setpoint control is used and the system represents a heat pump (i.e., cooling and heating coils are both DX coils) then only one of these coils may operate at a time. SingleZoneVAV requires two distinct fan flow rates, namely the Cooling and Heating Supply Air Flow Rate and a lower No Load Supply Air Flow Rate which is used during times of reduced cooling or heating loads. SingleZoneVAV allows load control at low speed fan until the load exceeds available capacity or the outlet air temperature exceeds the specified limits where the fan speed is then increased. For the SingleZoneVAV control type, temperature limits are identified in the input fields for Minimum and Maximum Supply Air Temperature. Additionally, specific coil types are required for the SingleZoneVAV control type. The cooling coil types are \hyperref[coilcoolingwater]{Coil:Cooling:Water}, \hyperref[coilcoolingwaterdetailedgeometry]{Coil:Cooling:Water:DetailedGeometry} and \hyperref[coilcoolingdx]{Coil:Cooling:DX} while the heating coil types are \hyperref[coilheatingwater]{Coil:Heating:Water}, \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}, \hyperref[coilheatingelectric]{Coil:Heating:Electric} and \hyperref[coilheatingdxsinglespeed]{Coil:Heating:DX:SingleSpeed}. If alternate coil types are used they are modeled using the load based control method.
+This alpha field contains control type i.e.~load based or setpoint based for the unitary system. Valid choices are \textbf{Load}, \textbf{SetPoint} and \textbf{SingleZoneVAV}. Load and SingleZoneVAV control requires a Controlling Zone name. SetPoint control requires set points at each coil outlet node. A single set point at the outlet of the system is allowed but not recommended. If setpoint control is used and the system represents a heat pump (i.e., cooling and heating coils are both DX coils) then only one of these coils may operate at a time. SingleZoneVAV requires two distinct fan flow rates, namely the Cooling and Heating Supply Air Flow Rate and a lower No Load Supply Air Flow Rate which is used during times of reduced cooling or heating loads. SingleZoneVAV allows load control at low speed fan until the load exceeds available capacity or the outlet air temperature exceeds the specified limits where the fan speed is then increased. For the SingleZoneVAV control type, temperature limits are identified in the input fields for Minimum and Maximum Supply Air Temperature. Additionally, specific coil types are required for the SingleZoneVAV control type. The cooling coil types are \hyperref[coilcoolingwater]{Coil:Cooling:Water}, \hyperref[coilcoolingwaterdetailedgeometry]{Coil:Cooling:Water:DetailedGeometry} and \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed} while the heating coil types are \hyperref[coilheatingwater]{Coil:Heating:Water}, \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}, \hyperref[coilheatingelectric]{Coil:Heating:Electric} and \hyperref[coilheatingdxsinglespeed]{Coil:Heating:DX:SingleSpeed}. If alternate coil types are used they are modeled using the load based control method.
 
 \paragraph{Field: Controlling Zone or Thermostat Location}\label{field-controlling-zone-or-thermostat-location}
 
@@ -156,9 +156,17 @@ This alpha field contains the identifying type of cooling coil specified in the 
 
 \begin{itemize}
 \item
-  \hyperref[coilcoolingdx]{Coil:Cooling:DX}
+  \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed}
 \item
   \hyperref[coilcoolingdxsinglespeedthermalstorage]{Coil:Cooling:DX:SingleSpeed:ThermalStorage}
+\item
+  \hyperref[coilcoolingdxtwospeed]{Coil:Cooling:DX:TwoSpeed}
+\item
+  \hyperref[coilcoolingdxmultispeed]{Coil:Cooling:DX:MultiSpeed}
+\item
+  \hyperref[coilcoolingdxvariablespeed]{Coil:Cooling:DX:VariableSpeed}
+\item
+  \hyperref[coilcoolingdxtwostagewithhumiditycontrolmode]{Coil:Cooling:DX:TwoStageWithHumidityControlMode}
 \item
   \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted}
 \item
@@ -399,7 +407,7 @@ AirLoopHVAC:UnitarySystem,
   Coil:Heating:DX:MultiSpeed,  !- Heating Coil Object Type
   Heat Pump DX Heating Coil 1, !- Heating Coil Name
   ,                            !- DX Heating Coil Sizing Ratio
-  Coil:Cooling:DX,             !- Cooling Coil Object Type
+  Coil:Cooling:DX:MultiSpeed,  !- Cooling Coil Object Type
   Heat Pump ACDXCoil 1,        !- Cooling Coil Name
   ,                            !- Use DOAS DX Cooling Coil
   ,                            !- Minimum Supply Air Temperature {C}
@@ -697,7 +705,7 @@ This field specifies the coil operation mode for multiple speed DX cooling and h
 
 The allowed cooling and heating coil types are restricted to the following combinations:
 
-\hyperref[coilcoolingdx]{Coil:Cooling:DX} and \hyperref[coilheatingdxmultispeed]{Coil:Heating:DX:MultiSpeed} or \hyperref[coilcoolingdx]{Coil:Cooling:DX} and \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}.
+\hyperref[coilcoolingdxmultispeed]{Coil:Cooling:DX:MultiSpeed} and \hyperref[coilheatingdxmultispeed]{Coil:Heating:DX:MultiSpeed} or \hyperref[coilcoolingdxmultispeed]{Coil:Cooling:DX:MultiSpeed} and \hyperref[coilheatinggas-000]{Coil:Heating:Fuel}.
 
 \paragraph{Field: No Load Supply Air Flow Rate Ratio}\label{field-no-load-supply-air-flow-rate-ratio}
 
@@ -809,9 +817,11 @@ This alpha field contains the identifying type of cooling coil specified in the 
 
 \begin{itemize}
 \item
-  \hyperref[coilcoolingdx]{Coil:Cooling:DX}
+  \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed}
 \item
   \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted}
+\item
+  \hyperref[coilcoolingdxvariablespeed]{Coil:Cooling:DX:VariableSpeed}
 \end{itemize}
 
 \paragraph{Field: Cooling Coil Name}\label{field-cooling-coil-name-1-000}
@@ -861,7 +871,7 @@ As shown in the example below, correct specification of the heat/cool furnace re
 \item
   fan (\hyperref[fanonoff]{Fan:OnOff} or \hyperref[fanconstantvolume]{Fan:ConstantVolume})
 \item
-  cooling coil (\hyperref[coilcoolingdx]{Coil:Cooling:DX} or \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted})
+  cooling coil (\hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed} or \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted})
 \item
   heating coil (\hyperref[coilheatinggas-000]{Coil:Heating:Fuel} or \hyperref[coilheatingelectric]{Coil:Heating:Electric})
 \item
@@ -890,7 +900,7 @@ AirLoopHVAC:Unitary:Furnace:HeatCool,
   BlowThrough,            !- Fan Placement
   Coil:Heating:Fuel,       !- Heating coil type
   Furnace Heating Coil 1, !- Heating coil name
-  Coil:Cooling:DX,  !- Cooling coil type
+  Coil:Cooling:DX:SingleSpeed,  !- Cooling coil type
   Furnace ACDXCoil 1,     !- Cooling coil name
   None;                   !- Dehumidificatioin Control Type
 
@@ -904,9 +914,7 @@ AirLoopHVAC:Unitary:Furnace:HeatCool,
       Heating Coil Air Inlet Node,    !- Coil\_Air\_Inlet\_Node
       Air Loop Outlet Node;           !- Coil\_Air\_Outlet\_Node
 
-<<< UPDATE >>>
-
-    Coil:Cooling:DX,
+    Coil:Cooling:DX:SingleSpeed,
       Furnace ACDXCoil 1,    !- Coil Name
       FanAndCoilAvailSched,  !- Availability Schedule
       25000,  !- Rated Total Cooling Capacity (gross) {W}
@@ -1057,9 +1065,11 @@ This alpha field contains the identifying type of cooling coil specified in the 
 
 \begin{itemize}
 \item
-  \hyperref[coilcoolingdx]{Coil:Cooling:DX}
+  \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed}
 \item
   \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted}
+\item
+  \hyperref[coilcoolingdxvariablespeed]{Coil:Cooling:DX:VariableSpeed}
 \end{itemize}
 
 \subsubsection{Field: Cooling Coil Name}\label{field-cooling-coil-name-2-000}
@@ -1106,7 +1116,7 @@ As shown in the example below, correct specification of the heat/cool unitary sy
 
 1)~~~Fan (\hyperref[fanonoff]{Fan:OnOff} or \hyperref[fanconstantvolume]{Fan:ConstantVolume})
 
-2)~~~Cooling coil (\hyperref[coilcoolingdx]{Coil:Cooling:DX} or \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted})
+2)~~~Cooling coil (\hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed} or \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted})
 
 3)~~~Heating coil (\hyperref[coilheatinggas-000]{Coil:Heating:Fuel} or \hyperref[coilheatingelectric]{Coil:Heating:Electric})
 
@@ -1134,7 +1144,7 @@ AirLoopHVAC:Unitary:Furnace:HeatCool,
   BlowThrough,            !- Fan Placement
   Coil:Heating:Fuel,       !- Heating coil type
   Unitary System Heating Coil 1,   !- Heating coil name
-  Coil:Cooling:DX,  !- Cooling coil type
+  Coil:Cooling:DX:SingleSpeed,  !- Cooling coil type
   Unitary System ACDXCoil 1,       !- Cooling coil name
   None;        !- High humidity control
 
@@ -1147,9 +1157,8 @@ AirLoopHVAC:Unitary:Furnace:HeatCool,
       Heating Coil Air Inlet Node,    !- Coil\_Air\_Inlet\_Node
       Air Loop Outlet Node;           !- Coil\_Air\_Outlet\_Node
 
-<<< UPDATE >>>
 
-    Coil:Cooling:DX,
+    Coil:Cooling:DX:SingleSpeed,
       Unitary System ACDXCoil 1,      !- Coil Name
       FanAndCoilAvailSched,  !- Availability Schedule
       25000,  !- Rated Total Cooling Capacity (gross) {W}
@@ -1283,9 +1292,11 @@ This alpha field contains the identifying type of cooling coil specified in the 
 
 \begin{itemize}
 \item
-  \hyperref[coilcoolingdx]{Coil:Cooling:DX}
+  \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed}
 \item
   \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted}
+\item
+  \hyperref[coilcoolingdxvariablespeed]{Coil:Cooling:DX:VariableSpeed}
 \end{itemize}
 
 \paragraph{Field: Cooling Coil Name}\label{field-cooling-coil-name-3}
@@ -1333,7 +1344,7 @@ As shown in the example below, correct specification of the air-to-air heat pump
 
 2)~~~Heating coil (\hyperref[coilheatingdxsinglespeed]{Coil:Heating:DX:SingleSpeed})
 
-3)~~~Cooling coil (\hyperref[coilcoolingdx]{Coil:Cooling:DX} or \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted})
+3)~~~Cooling coil (\hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed} or \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted})
 
 4)~~~Supplemental heating coil (\hyperref[coilheatinggas-000]{Coil:Heating:Fuel} or \hyperref[coilheatingelectric]{Coil:Heating:Electric})
 
@@ -1373,7 +1384,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir,
         Supply Fan 1,                ! Supply air fan name –- same name used in fan object
         Coil:Heating:DX:SingleSpeed,    ! Heating coil type
         Heat Pump DX Heating Coil 1, ! Heating coil name –- same name used in DX heating coil object
-        Coil:Cooling:DX, !  Cooling coil type
+        Coil:Cooling:DX:SingleSpeed, !  Cooling coil type
         Heat Pump ACDXCoil 1,        ! Cooling coil name –- same name used in DX cooling coil object
         Coil:Heating:Fuel,            ! Supplemental heating coil type
         Heat Pump DX Supp Heating Coil 1, ! Supplemental heating coil name–- same as in heating coil object
@@ -1407,9 +1418,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir,
         0.166667,                        !Defrost time period fraction (used for timed defrost control only)
         20000;                           ! Resistive defrost heater capacity [W]
 
-<<< UPDATE >>>
-
-     Coil:Cooling:DX,
+     Coil:Cooling:DX:SingleSpeed,
         Heat Pump ACDXCoil 1,            ! Name of cooling coil
         FanAndCoilAvailSched,            ! Availability schedule
         32000,                           ! Rated total cooling capacity [W]
@@ -1553,11 +1562,11 @@ This alpha field contains the identifying name given to the DX heating coil, and
 
 \paragraph{Field: Minimum Outdoor Dry-Bulb Temperature for Compressor Operation}\label{field-minimum-outdoor-dry-bulb-temperature-for-compressor-operation-000}
 
-\textbf{Deprecated field}. The Minimum Outdoor Dry-Bulb Temperature for Compressor Operation is now controlled by the \hyperref[coilcoolingdx]{Coil:Cooling:DX} and \hyperref[coilheatingdxmultispeed]{Coil:Heating:DX:MultiSpeed} (if used) coil objects.
+\textbf{Deprecated field}. The Minimum Outdoor Dry-Bulb Temperature for Compressor Operation is now controlled by the \hyperref[coilcoolingdxmultispeed]{Coil:Cooling:DX:MultiSpeed} and \hyperref[coilheatingdxmultispeed]{Coil:Heating:DX:MultiSpeed} (if used) coil objects.
 
 \paragraph{Field: Cooling Coil Object Type}\label{field-cooling-coil-object-type-4}
 
-This alpha field contains the identifying type of cooling coil specified in the heat pump.~ Cooling coil type must be \hyperref[coilcoolingdx]{Coil:Cooling:DX}.
+This alpha field contains the identifying type of cooling coil specified in the heat pump.~ Cooling coil type must be \hyperref[coilcoolingdxmultispeed]{Coil:Cooling:DX:MultiSpeed}.
 
 \paragraph{Field: Cooling Coil Name}\label{field-cooling-coil-name-4}
 
@@ -1678,7 +1687,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
   FanModeSchedule,         !- Supply air fan operating mode schedule name
   Coil:Heating:DX:MultiSpeed, Heat Pump DX Heating Coil 1,  !- Heating coil type & name
   -8.0,                    !- Minimum outdoor dry-bulb temperature for compressor operation
-  Coil:Cooling:DX, Heat Pump ACDXCoil 1,    !- Cooling coil type & name
+  Coil:Cooling:DX:MultiSpeed, Heat Pump ACDXCoil 1,    !- Cooling coil type & name
   Coil:Heating:Fuel,        !- Supplemental heating coil type
   Supp Gas Heating Coil 1, !- Supplemental heating coil name
   50.0,                    !- Maximum supply air temperature from supplemental heater
@@ -1699,9 +1708,7 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
   1.2,                     !- Cooling Speed 3 Supply Air Flow Rate
   1.7;                     !- Cooling Speed 4 Supply Air Flow Rate
 
-<<< UPDATE >>>
-
-  Coil:Heating:DX,
+  Coil:Heating:DX:MultiSpeed,
       Heat Pump DX Heating Coil 1,  !- Name of heat pump heating coil
       FanAndCoilAvailSched,    !- Availability Schedule
       Heating Coil Air Inlet Node,  !- Coil Air Inlet Node
@@ -1761,9 +1768,8 @@ AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed,
       0.2,                     !- Rated waste heat fraction of power input, Speed 4
       HAPCHeatWHFT Speed 4;    !- Waste heat modifier curve, Speed 4 (temperature)
 
-<<< UPDATE >>>
 
-    COIL:Cooling:DX,
+    COIL:Cooling:DX:MultiSpeed,
       Heat Pump ACDXCoil 1,    !- Coil Name
       FanAndCoilAvailSched,    !- Availability Schedule
       DX Cooling Coil Air Inlet Node,  !- Coil Air Inlet Node
@@ -2935,9 +2941,13 @@ This alpha field defines the type of cooling coil used by this unitary system. T
 
 \begin{itemize}
 \item
-  \hyperref[coilcoolingdx]{Coil:Cooling:DX}
+  \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed}
+\item
+  \hyperref[coilcoolingdxvariablespeed]{Coil:Cooling:DX:VariableSpeed}
 \item
   \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted}
+\item
+  \hyperref[coilcoolingdxtwostagewithhumiditycontrolmode]{Coil:Cooling:DX:TwoStageWithHumidityControlMode}
 \end{itemize}
 
 The input requirements for these cooling coil objects are described elsewhere in this document.
@@ -3002,9 +3012,9 @@ This alpha field contains the type of dehumidification control. The following op
 
 \textbf{None} - meet sensible load only, no active dehumidification control
 
-\textbf{Multimode} - activate enhanced dehumidification mode as needed and meet sensible load. This option is used to model DX equipment with a controllable heat exchanger assisting the DX cooling coil for improved dehumidification. It is valid only with cooling coil type = \hyperref[coilcoolingdx]{Coil:Cooling:DX}.
+\textbf{Multimode} - activate enhanced dehumidification mode as needed and meet sensible load. This option is used to model DX equipment with a controllable heat exchanger assisting the DX cooling coil for improved dehumidification. It is valid only with cooling coil type = \hyperref[coilcoolingdxtwostagewithhumiditycontrolmode]{Coil:Cooling:DX:TwoStageWithHumidityControlMode}.
 
-\textbf{CoolReheat} - cool beyond the dry-bulb temperature set point as required to meet the high humidity setpoint. It is valid only with cooling coil type = \hyperref[coilcoolingdx]{Coil:Cooling:DX}.
+\textbf{CoolReheat} - cool beyond the dry-bulb temperature set point as required to meet the high humidity setpoint. It is valid only with cooling coil type = \hyperref[coilcoolingdxtwostagewithhumiditycontrolmode]{Coil:Cooling:DX:TwoStageWithHumidityControlMode}.
 
 The default is \textbf{None}. For the other dehumidification control modes, the maximum humidity setpoint on the CBVAV system's air outlet node is used. This must be set using a \textbf{\hyperref[zonecontrolhumidistat]{ZoneControl:Humidistat}} and one of:
 
@@ -3034,7 +3044,7 @@ As shown in the example below, correct specification of the CBVAV unitary system
 
 2)~~~fan (\hyperref[fansystemmodel]{Fan:SystemModel}, \hyperref[fanonoff]{Fan:OnOff}, or \hyperref[fanconstantvolume]{Fan:ConstantVolume})
 
-3)~~~cooling coil (\hyperref[coilcoolingdx]{Coil:Cooling:DX}, \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted})
+3)~~~cooling coil (\hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed}, \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted}, or \hyperref[coilcoolingdxtwostagewithhumiditycontrolmode]{Coil:Cooling:DX:TwoStageWithHumidityControlMode})
 
 4)~~~heating coil (\hyperref[coilheatinggas-000]{Coil:Heating:Fuel}, \hyperref[coilheatingelectric]{Coil:Heating:Electric}, or \hyperref[coilheatingdxsinglespeed]{Coil:Heating:DX:SingleSpeed})
 
@@ -3066,7 +3076,7 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
   Supply Fan 1,            !- Supply air fan name
   BlowThrough,            !- Supply air fan placement
   Fan OpMode Schedule,     !- Supply air fan operating mode schedule name
-  Coil:Cooling:DX,  !- Cooling coil type
+  Coil:Cooling:DX:TwoStageWithHumidityControlMode,  !- Cooling coil type
   ACDXCoil 2,              !- Cooling coil name
   Coil:Heating:Fuel,        !- Heating coil type
   Furnace Heating Coil 1,  !- Heating coil name
@@ -3093,9 +3103,7 @@ AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass,
       Mixed Air Node,          !- Fan\_Inlet\_Node
       DX Cooling Coil Air Inlet Node;  !- Fan\_Outlet\_Node
 
-<<< UPDATE >>>
-
-  Coil:Cooling:DX,
+  Coil:Cooling:DX:TwoStageWithHumidityControlMode,
       ACDXCoil 2,              !- Coil Name
       FanAndCoilAvailSched,    !- Availability Schedule
       DX Cooling Coil Air Inlet Node, !- Coil Air Inlet Node

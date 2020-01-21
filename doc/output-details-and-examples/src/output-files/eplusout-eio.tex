@@ -3024,7 +3024,7 @@ Component Sizing Information, Coil:Cooling:Water, MAIN COOLING COIL 1, Design In
 
 ~Component Sizing Information, Coil:Cooling:Water, MAIN COOLING COIL 1, Design Outlet Air Humidity Ratio, 8.00000E-003
 
-Component Sizing Information, Coil:Cooling:DX, ACDXCOIL 2:ACDXCOIL 2 STANDARD MODE-STAGE 1, Rated Air Flow Rate {[}m3/s{]}, 2.04925
+Component Sizing Information, Coil:Cooling:DX:TwoStageWithHumidityControlMode, ACDXCOIL 2:ACDXCOIL 2 STANDARD MODE-STAGE 1, Rated Air Flow Rate {[}m3/s{]}, 2.04925
 
 ~Component Sizing Information, Coil:Heating:Water, MAIN HEATING COIL 1, Maximum Water Flow Rate {[}m3/s{]}, 7.51969E-005
 
@@ -4148,15 +4148,15 @@ Outputs are provided for air-cooled, single-speed direct expansion (DX) cooling 
 ! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER {Btu/W-h}, IEER {Btu/W-h}
 \end{lstlisting}
 
-~ DX Cooling Coil Standard Rating Information, Coil:Cooling:DX, PSZ-AC\_1:1\_COOLC DXCOIL, 29299.3, 3.04, 10.38, 10.47, 10.67
+~ DX Cooling Coil Standard Rating Information, Coil:Cooling:DX:SingleSpeed, PSZ-AC\_1:1\_COOLC DXCOIL, 29299.3, 3.04, 10.38, 10.47, 10.67
 
 \begin{lstlisting}
-DX Cooling Coil Standard Rating Information, Coil:Cooling:DX, PSZ-AC\_2:2\_COOLC DXCOIL, 17427.1, 3.21, 10.95, 11.04, 11.20
+DX Cooling Coil Standard Rating Information, Coil:Cooling:DX:SingleSpeed, PSZ-AC\_2:2\_COOLC DXCOIL, 17427.1, 3.21, 10.95, 11.04, 11.20
 \end{lstlisting}
 
 \subsubsection{Field: Component Type}\label{field-component-type-3}
 
-This is the component type, currently Coil:Cooling:DX is the only valid type.
+This is the component type, currently Coil:Cooling:DX:SingleSpeed is the only valid type.
 
 \subsubsection{Field: Component Name}\label{field-component-name-3}
 
@@ -4186,7 +4186,7 @@ The integrated energy efficiency ratio (\emph{IEER}) for the DX cooling coil in 
 
 \subsubsection{Field: Component Type}\label{field-component-type-4}
 
-This is the component type, currently Coil:Cooling:DX is the only valid type.
+This is the component type, currently Coil:Cooling:DX:SingleSpeed is the only valid type.
 
 \subsubsection{Field: Component Name}\label{field-component-name-4}
 
@@ -4230,10 +4230,10 @@ Rated total electric power input of the unit at Test condition D per Standard AS
 
 \begin{lstlisting}
 ! <DX Cooling Coil ASHRAE 127 Standard Ratings Information>, Component Type, Component Name, Standard 127 Classification, Rated Net Cooling Capacity Test A {W}, Rated Total Electric Power Test A {W}, Rated Net Cooling Capacity Test B {W}, Rated Total Electric Power Test B {W}, Rated Net Cooling Capacity Test C {W}, Rated Total Electric Power Test C {W}, Rated Net Cooling Capacity Test D {W}, Rated Total Electric Power Test D {W}
- DX Cooling Coil ASHRAE 127 Standard Ratings Information, Coil:Cooling:DX, MAIN COOLING COIL 1, Class 1, 126953.8, 35918.5, 135678.7, 30852.7, 141523.1, 24400.1, 141727.0, 13951.0
- DX Cooling Coil ASHRAE 127 Standard Ratings Information, Coil:Cooling:DX, MAIN COOLING COIL 1, Class 2, 133377.6, 37330.3, 140336.0, 31647.7, 141727.0, 24424.7, 141727.0, 13951.0
- DX Cooling Coil ASHRAE 127 Standard Ratings Information, Coil:Cooling:DX, MAIN COOLING COIL 1, Class 3, 139488.4, 38673.3, 141354.0, 31821.4, 141727.0, 24424.7, 141727.0, 13951.0
- DX Cooling Coil ASHRAE 127 Standard Ratings Information, Coil:Cooling:DX, MAIN COOLING COIL 1, Class 4, 145024.0, 39889.8, 141727.0, 31885.1, 141727.0, 24424.7, 141727.0, 13951.0
+ DX Cooling Coil ASHRAE 127 Standard Ratings Information, Coil:Cooling:DX:SingleSpeed, MAIN COOLING COIL 1, Class 1, 126953.8, 35918.5, 135678.7, 30852.7, 141523.1, 24400.1, 141727.0, 13951.0
+ DX Cooling Coil ASHRAE 127 Standard Ratings Information, Coil:Cooling:DX:SingleSpeed, MAIN COOLING COIL 1, Class 2, 133377.6, 37330.3, 140336.0, 31647.7, 141727.0, 24424.7, 141727.0, 13951.0
+ DX Cooling Coil ASHRAE 127 Standard Ratings Information, Coil:Cooling:DX:SingleSpeed, MAIN COOLING COIL 1, Class 3, 139488.4, 38673.3, 141354.0, 31821.4, 141727.0, 24424.7, 141727.0, 13951.0
+ DX Cooling Coil ASHRAE 127 Standard Ratings Information, Coil:Cooling:DX:SingleSpeed, MAIN COOLING COIL 1, Class 4, 145024.0, 39889.8, 141727.0, 31885.1, 141727.0, 24424.7, 141727.0, 13951.0
 \end{lstlisting}
 
 \subsection{DX Heating Coil Outputs}\label{dx-heating-coil-outputs}

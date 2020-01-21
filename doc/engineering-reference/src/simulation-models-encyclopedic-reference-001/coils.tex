@@ -959,7 +959,7 @@ Wetter, M. 1999. Simulation Model: Finned Water-to-Air Coil Without Condensation
 
 \subsubsection{Overview}\label{overview-1-004}
 
-This model (Coil:Cooling:DX) simulates the performance of an air-cooled or evaporative-cooled direct expansion (DX) air conditioner. The model uses performance information at rated conditions along with curve fits for variations in total capacity, energy input ratio and part-load fraction to determine the performance of the unit at part-load conditions (Henderson et al. 1992, ASHRAE 1993). Sensible/latent capacity splits are determined by the rated sensible heat ratio (SHR) and the apparatus dewpoint (ADP)/bypass factor (BF) approach. This approach is analogous to the NTU-effectiveness calculations used for sensible-only heat exchanger calculations, extended to a cooling and dehumidifying coil.
+This model (object names Coil:Cooling:DX:SingleSpeed and \\ Coil:Cooling:DX:TwoStageWithHumidityControlMode, with CoilPerformance:DX:Cooling) simulates the performance of an air-cooled or evaporative-cooled direct expansion (DX) air conditioner. The model uses performance information at rated conditions along with curve fits for variations in total capacity, energy input ratio and part-load fraction to determine the performance of the unit at part-load conditions (Henderson et al. 1992, ASHRAE 1993). Sensible/latent capacity splits are determined by the rated sensible heat ratio (SHR) and the apparatus dewpoint (ADP)/bypass factor (BF) approach. This approach is analogous to the NTU-effectiveness calculations used for sensible-only heat exchanger calculations, extended to a cooling and dehumidifying coil.
 
 This model simulates the thermal performance of the DX cooling coil and the power consumption of the outdoor condensing unit (compressor, fan, crankcase heater and evap condenser water pump). The total amount of heat rejected by the condenser is also calculated and stored for use by other waste heat recovery models (e.g., Coil:Heating:Desuperheater). The performance of the indoor supply air fan varies widely from system to system depending on control strategy (e.g., constant fan vs.~AUTO fan, constant air volume vs.~variable air volume, etc.), fan type, fan motor efficiency and pressure losses through the air distribution system. Therefore, this DX system model does not account for the thermal effects or electric power consumption of the indoor supply air fan. EnergyPlus contains separate models for simulating the performance of various indoor fan configurations, and these models can be easily linked with the DX system model described here to simulate the entire DX air conditioner being considered (e.g., see AirLoopHVAC:Unitary:Furnace:HeatCool, AirLoopHVAC:UnitaryHeatCool, ZoneHVAC:WindowAirConditioner or AirLoopHVAC:UnitaryHeatPump:AirToAir).
 
@@ -1386,7 +1386,7 @@ For the case of continuous fan/cycling compressor, the air mass flow rate is con
 
 The latent (dehumidification) capacity of a direct-expansion (DX) cooling coil is strongly affected by part-load, or cyclic, operation. This is especially true in applications where the supply air fan operates continuously while the cooling coil cycles on and off to meet the cooling load. During constant fan operation, moisture condenses on the cooling coil when the compressor operates, but part or all of the moisture that is held by the coil evaporates back into the airstream when the cooling coil is deactivated (Figure~\ref{fig:transient-sensible-and-latent-capacity-of-a}). The net effect is that the amount of moisture removed from the air is degraded at part-load conditions as compared to steady-state conditions when the compressor operates continuously (Figure~\ref{fig:field-data-showing-the-net-impact-of-part}).
 
-EnergyPlus is able to model latent capacity degradation based on algorithms developed by Henderson and Rengarajan (1996). The model is applicable to single-stage cooling units, like residential and small commercial air conditioners or heat pumps with less than 19 kW of nominal cooling capacity. The model inputs are described in the EnergyPlus Input/Output Reference for the object Coil:Cooling:DX. The model is enabled only if the four numerical inputs are defined (values greater than zero, see IO Reference).
+EnergyPlus is able to model latent capacity degradation based on algorithms developed by Henderson and Rengarajan (1996). The model is applicable to single-stage cooling units, like residential and small commercial air conditioners or heat pumps with less than 19 kW of nominal cooling capacity. The model inputs are described in the EnergyPlus Input/Output Reference for the object Coil:Cooling:DX:SingleSpeed. The model is enabled only if the four numerical inputs are defined (values greater than zero, see IO Reference).
 
 The following discussion applies to both cycling fan and continuous fan operation when the fan operates for a longer period of time than the compressor and air continues to flow over the moisture laden cooling coil after compressor operation has terminated.
 
@@ -1559,7 +1559,7 @@ where:
 
 \(RTF\) is the run time fraction of DX cooling coil.
 
-\subsubsection{Special Calculations for Coil:Cooling:DX}\label{special-calculations-for-coilcoolingdx}
+\subsubsection{Special Calculations for Coil:Cooling:DX:TwoStageWithHumidityControlMode with CoilPerformance:DX:Cooling}\label{special-calculations-for-coilcoolingdxtwostagewithhumiditycontrolmode-with-coilperformancedxcooling}
 
 The multimode DX coil uses 1 to 4 set of performance specifications which all feed into the main DX coil model as described above. The multimode DX coil may have 1 or 2 capacity stages and may have 1 enhanced dehumidification mode in addition to its ``normal'' or base mode performance. Any mode may specify that a portion of the total airflow is bypassed.
 
@@ -1573,13 +1573,13 @@ Multi-stage control is modeled with the DX coil. If 2-stage operation has been s
 
 \paragraph{Enhanced Dehumidification Mode}\label{enhanced-dehumidification-mode}
 
-If enhanced dehumidification mode is available, this is controlled by the parent object of the DX coil, such as DXSystem:AirLoop. A dehumidification mode flag is passed to the coil model which is used to select a different set of performance specifications from a CoilPerformance:DX:Cooling <<<UPDATE>>> input object. Then the simulation of the DX coil proceeds as described above including any bypass or multi-stage operation.
+If enhanced dehumidification mode is available, this is controlled by the parent object of the DX coil, such as DXSystem:AirLoop. A dehumidification mode flag is passed to the coil model which is used to select a different set of performance specifications from a CoilPerformance:DX:Cooling input object. Then the simulation of the DX coil proceeds as described above including any bypass or multi-stage operation.
 
 \subsubsection{Standard Rating of Single-Speed DX Cooling Coils}\label{standard-rating-of-single-speed-dx-cooling-coils}
 
 For small single-speed direct expansion (DX) cooling coils, the industry standard ratings of Standard Rating Cooling Capacity and Seasonal Energy Efficiency Ratio (SEER) are calculated according to ANSI/AHRI Standard 210/240 (AHRI 2008). These ratings apply to unitary air conditioners and air-source unitary heat pumps with air-cooled condensers with standard rating cooling capacities under 19 kW (\textless{}65,000 Btu/hr). For larger DX cooling coils, the industry standard ratings of Standard Rating Cooling Capacity, Energy Efficiency Ratio (EER), and Integrated Energy Efficiency Ratio (IEER) are calculated according to ANSI/AHRI Standard 340/360 (AHRI 2007). These ratings apply to unitary air conditioners and air-source unitary heat pumps with standard rating cooling capacities from 19 kW to below 73.2 kW (65,000 Btu/hr to \textless{}250,000 Btu/hr).
 
-For the Coil:Cooling:DX object in EnergyPlus, these standard ratings are not direct inputs to the model. However, these standard ratings can be calculated using user-entered information for the Coil:Cooling:DX object. Since users sometimes lump the performance of several smaller DX cooling units into a single larger cooling coil object for simulation purposes, EnergyPlus outputs the Standard Rating Cooling Capacity, SEER, EER, and IEER regardless of the magnitude of the standard rating cooling capacity of the coil. It is up to the user to determine which standard ratings are applicable to the cooling coil(s) they are modeling. These standard rating values are provided in the eplusout.eio output file (Ref. OutputDetailsAndExamples.pdf) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). Currently, the standard ratings are only calculated and output for single-speed DX cooling coils with air-cooled condensers. If the single-speed DX coling coil is specified with an evaporatively-cooled condenser, then no standard ratings are output from EnergyPlus at this time.
+For the Coil:Cooling:DX:SingleSpeed object in EnergyPlus, these standard ratings are not direct inputs to the model. However, these standard ratings can be calculated using user-entered information for the Coil:Cooling:DX:SingleSpeed object. Since users sometimes lump the performance of several smaller DX cooling units into a single larger cooling coil object for simulation purposes, EnergyPlus outputs the Standard Rating Cooling Capacity, SEER, EER, and IEER regardless of the magnitude of the standard rating cooling capacity of the coil. It is up to the user to determine which standard ratings are applicable to the cooling coil(s) they are modeling. These standard rating values are provided in the eplusout.eio output file (Ref. OutputDetailsAndExamples.pdf) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary). Currently, the standard ratings are only calculated and output for single-speed DX cooling coils with air-cooled condensers. If the single-speed DX coling coil is specified with an evaporatively-cooled condenser, then no standard ratings are output from EnergyPlus at this time.
 
 Note: The standard ratings described in this section require that the DX cooling coil model be evaluated at specific operating conditions (i.e., specific wet-bulb temperatures for air entering the cooling coil and dry-bulb temperatures for air entering the air-cooled {[}outdoor{]} condenser). If the cooling coil performance curves can not be evaluated at the required test conditions, then a standard rating value calculated at the curves limit will be output and a warning message will written to eplusout.err. For example, if the curve object (Curve:Biquadratic) for Total Cooling Capacity Function of Temperature Curve has a minimum value of 21\(^{\circ}\)C for dry-bulb temperature entering the air-cooled condenser coil, the IEER calculation requires that EER\(_{D}\) be calculated at 18.3\(^{\circ}\)C -- so, this would result in IEER calculatd at user specified curve limit as an output and a warning message in the eplusout.err file.
 
@@ -1742,7 +1742,7 @@ The calculations for \(Q_{Total,Net,PartLoad}\) and \(Power_{Total,PartLoad}\) a
 
 \subsubsection{ANSI/ASHRAE 127 - Standard Ratings of Single-Speed DX Cooling Coils}\label{ansiashrae-127---standard-ratings-of-single-speed-dx-cooling-coils}
 
-For computer and data processing room unitary air conditioners single-speed direct expansion (DX) cooling coils, the standard ratings net total cooling capacity and total cooling electric power inputs are calculated according to ANSI/AHRI Standard 127 (ASHRAE 2012). These ratings apply to unitary air conditioners with air-cooled. If the single-speed DX cooling coil is specified with an evaporatively-cooled condenser, then no standard ratings are output from EnergyPlus at this time. These standard ratings are not direct inputs to the model. However, these standard ratings can be calculated using user-entered information for the Coil:Cooling:DX object. These standard rating values are provided in the eplusout.eio output file and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary).
+For computer and data processing room unitary air conditioners single-speed direct expansion (DX) cooling coils, the standard ratings net total cooling capacity and total cooling electric power inputs are calculated according to ANSI/AHRI Standard 127 (ASHRAE 2012). These ratings apply to unitary air conditioners with air-cooled. If the single-speed DX cooling coil is specified with an evaporatively-cooled condenser, then no standard ratings are output from EnergyPlus at this time. These standard ratings are not direct inputs to the model. However, these standard ratings can be calculated using user-entered information for the Coil:Cooling:DX:SingleSpeed object. These standard rating values are provided in the eplusout.eio output file and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary).
 
 \textbf{Note}: The standard ratings described in this section require that the DX cooling coil model be evaluated at sixteen different test conditions (i.e., specific wet-bulb temperatures for air entering the cooling coil and dry-bulb temperatures for air entering the air-cooled {[}outdoor{]} condenser) for each of the four standard tests and four application classes (ASHRAE -- 2012). The four test conditions: A, B, C and D are provided in the ANSI/ASHRAE Standard 127. And the test conditions are different for each application classes described in the standard. In total sixteen performance data of net cooling capacity and total electric power inputs are reported. The total cooling electric power includes the supply fan power.
 
@@ -1814,6 +1814,14 @@ Reference:
 
 ASHRAE 2012. ANSI/ASHRAE Standard 127-2012 Method of Testing for Rating Computer and Data Processing Room Unitary Air Conditioners.
 
+\subsubsection{Basin Heater For Two-Stage DX Coil}\label{basin-heater-for-two-stage-dx-coil}
+
+Basin heater for the object Coil:Cooling:DX:TwoStageWithHumidityControlMode operates in the same manner as for Coil:Cooling:DX:SingleSpeed. Refer to the ``Basin Heater For Single-Speed DX Coil'' description above.
+
+If the number of capacity stages is equal to 1 and the CondenserType for that stage is EvapCooled, then the basin heater power is calculated for (1 - RunTimeFractionStage1) of DX coil.
+
+If the number of capacity stages is greater than 1, then
+
 \begin{enumerate}
 \item If the CondenserType for stage 1 is EvapCooled, then the basin heater power is calculated for (1 - RunTimeFractionStage1) of DX coil
 \item Elseif the CondenserType for stage 2 is EvapCooled, then the basin heater power is calculated for (1 - RunTimeFractionStage2) of DX coil.
@@ -1840,6 +1848,1170 @@ Henderson, H. and D. Shirey. 2003. Understanding the Dehumidification Performanc
 Walker, I.S. and Lutz, J.D. 2005. Laboratory Evaluation of Residential Furnace Blower Performance. Berekely, CA:~ Lawrence Berkeley National Laboratory, Report LBNL 58752.
 
 Walker, I.S. 2007. Comparing Residential Furnace Blowers for Rating and Installed Performance. Berkeley, CA:~ Lawrence Berkeley National Laboratory, Environmental Energy Technologies Division Report LBNL 62344.
+
+\subsection{Multi-Speed Electric DX Air Cooling Coil}\label{multi-speed-electric-dx-air-cooling-coil}
+
+\subsubsection{Overview}\label{overview-2-004}
+
+This model (object name Coil:Cooling:DX:MultiSpeed) simulates the performance of an air-to-air direct expansion (DX) cooling system. The main difference compared to the other cooling coil models, such as Coil:Cooling:DX:SingleSpeed, is that this cooling coil allows modeling of two to four discrete compressor speeds. Each speed has a set of corresponding performance information at rated conditions along with curve fits for variations in total capacity, SHR, energy input ratio and part-load fraction to determine the performance of the unit at part-load conditions (DOE 1982).~ The full load supply airflow rate is dependent on the speed number and provided by its parent object (Ref. AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed). The part-load impact on coil energy use is automatically applied to the lowest speed. A choice is provided to determine whether part-load impacts on coil energy use are applied when the coil is operating at speeds greater than speed 1.
+
+This model simulates the thermal performance of the indoor DX cooling coil, and the power consumption of the outdoor unit (multispeed compressor, fans, and crankcase heaters). The performance of the indoor supply air fan varies widely from system to system depending on control strategy (e.g., constant fan vs.~AUTO fan), fan type, fan motor efficiency and pressure losses through the air distribution system. Therefore, this DX system model does not account for the thermal effects or electric power consumption of the indoor supply air fan. EnergyPlus contains separate models for simulating the performance of various indoor fan configurations, and these models can be easily linked with the DX system model described here to simulate the entire DX system being considered. For the time being, this coil model can only be called by the parent object AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed.
+
+When the model determines performance at Speed 1 (the lowest speed) or cycling between OFF and Speed 1, its performance is almost the same as the performance for the Coil:Cooling:DX:SingleSpeed model. However, the outlet conditions are calculated slightly differently. Therefore, the Coil:Cooling:DX:SingleSpeed model may be considered as a subset of the model described here. When the multispeed coil model determines performance at higher speeds (above 1), the model linearly interpolates the performance at two consecutive speeds (n-1 and n) as needed to meet the cooling load, with the fraction of time at each speed established by the speed ratio.
+
+When single mode operation is specified at higher speeds (above 1), defined in the UnitarySystemPerformance:Multispeed object, a child object of AirLoopHVAC:UnitarySystem, its performance is almost the same as the performance for the Coil:Cooling:DX:SingleSpeed model at different flow rate and capacity with given speed number. No linear interpolation is performed between two adjacent speeds. The highest speed which does not exceed the sensible load is used for each HVAC timestep. This operation does not apply to speed 1 operation and the case when the sensible load is above the highest sensible capacity.
+
+\subsubsection{Model Inputs}\label{model-inputs}
+
+The model inputs are also very similar to the inputs of the Coil:Cooling:DX:SingleSpeed object. The main difference is that this multispeed model requires a set of fields at each speed, such as rated capacity, rated SHR, rated COP, two capacity modifiers, two energy input ratio modifiers, part-load correction, and latent degradation inputs. The inputs also include waste heat fraction at the rated conditions and modifier as a function of temperature to calculate recoverable waste heat for heat recovery, which are not available in the similar Coil:Cooling:DX:SingleSpeed object
+
+\subsubsection{Speed 1 Operation}\label{speed-1-operation}
+
+The calculation procedures in this model, including defrost and crankcase heater, are indentical to the Coil:Heating:DX:SingleSpeed object (Ref: Coil:Heating:DX:SingleSpeed) with one exception: outlet node condition calculation when the supply air fan operates continuously (i.e., supply air fan operating mode schedule value is not equal to 0; Ref. AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed).
+
+The following procedure provides the detailed description of the exception.
+
+\begin{itemize}
+  \item Total delivered cooling capacity
+\end{itemize}
+
+The total delivered cooling capacity for speed 1 operating at the cycling ratio needed to meet the requested cooling load is:
+
+\begin{equation}
+{Q_{coil,cycling}} = {\dot{m}_{Speed1}}*CycRatio*({h_{inlet}} - {h_{outlet,full}})
+\end{equation}
+
+where:
+
+\emph{Q\(_{coil,cyclingl}\)} is the delivered total cooling capacity for Speed 1 operating at a specific cycling ratio (W)
+
+\({\dot{m}_{Speed\,\,1}}\) is the air mass flow rate through cooling coil at Speed 1 as set by the parent object (kg/s)
+
+\(h_{outlet,full}\) is the specific enthalpy of the coil outlet air during full-load operation at Speed 1 (no cycling) (J/kg)
+
+\(h_{inlet}\) is the specific enthalpy of the coil inlet air (J/kg)
+
+\emph{CycRatio} is the cycling ratio at Speed 1, ratio of requested heating load to the full-load capacity of the coil at Speed 1 (dimensionless).
+
+It is assumed that the coil provides no cooling capacity when the coil is OFF, even if the supply air fan continues to operate.
+
+\begin{itemize}
+  \item Outlet air specific enthalpy
+\end{itemize}
+
+The average specific enthalpy of the coil outlet air is then calculated based on the total delivered cooling capacity and the average air mass flow rate entering the coil:
+
+\begin{equation}
+  h_{outlet,average} = h_{inlet} -  \frac{Q_{coil,cycling}}{{\mathop m\limits^\cdot}_{inlet}}
+\end{equation}
+
+where
+
+h\(_{outlet,average}\) is the averaged specific enthalpy at the coil outlet (J/kg)
+
+h\(_{inlet}\) is the specific enthalpy at the coil inlet (J/kg)
+
+Q\(_{coil,cycling}\) is the total capacity at full load (W)
+
+\({\dot{m}_{inlet}}\) is the mass flow rate at the inlet to the coil as established by the parent object (Ref. AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed, Mass Flow Rate Calculation). This flow rate is the average value determined by the parent object, accounting for the specified flow rate when the cooling coil is ON and the specified flow rate when the cooling coil is OFF for the time step being simulated.
+
+\begin{itemize}
+  \item Sensible capacity
+\end{itemize}
+
+The minimum humidity ratio (HR\(_{min}\)) is based on humidity ratios between inlet and full load outlet as:
+
+\begin{equation}
+HR_{min} = Minimum(HR_{inlet}, HR_{full})
+\end{equation}
+
+where
+
+HR\(_{inlet}\) is the humidity ratio at the inlet (kg/kg)
+
+HR\(_{full}\) is the full load humidity ratio at the outlet (kg/kg).
+
+The coil sensible capacity may be calculated as:
+
+\begin{equation}
+  Q_{coil,sens} = {\dot{m}_{Speed1}}*CycRatio*[{h_{inlet}}({T_{inlet}},H{R_{\min }}) - {h_{outlet,full}}({T_{outlet,full}},H{R_{\min }})]
+\end{equation}
+
+where:
+
+Q\(_{coil,sens}\) is the delivered sensible cooling capacity (W)
+
+h\(_{outlet,full}\) is the full load specific enthalpy at the coil outlet as a function of outlet dry-bulb temperature at the full load, and the minimum humidity ratio (J/kg)
+
+h\(_{inlet}\) is the specific enthalpy at the coil inlet (J/kg).
+
+\begin{itemize}
+  \item Latent capacity
+\end{itemize}
+
+The latent capacity is the difference between total and sensible capacities
+
+\begin{equation}
+  Q_{coil,latent} = Q_{coil,cycling} - Q_{coil,sens}
+\end{equation}
+
+where Q\(_{coil,latent}\) is the delivered latent cooling capacity (W).
+
+\begin{itemize}
+  \item Average outlet air humidity ratio
+\end{itemize}
+
+The averaged outlet HR can be calculated as:
+
+\begin{equation}
+  HR_{outlet,average} = HR_{inlet} - \frac{Q_{coil,latent}}{{\lambda}\dot{m}_{inlet}}
+\end{equation}
+
+where \(\lambda\) is the heat of vaporization as a function of HR\(_{min}\) and CycRatio * T\(_{outlet,full}\)+(1-CycRatio) * T\(_{inlet}\) (J/kg).
+
+\begin{itemize}
+  \item Average outlet air temperature
+\end{itemize}
+
+Using the above averaged outlet humidity ratio and specific enthalpy, the averaged outlet temperature can be calculated using the psych function of PsyTdbFnHW.
+
+The main reason using the above approach is that outlet conditions are calculated in the same way in low and high speed operation.
+
+The crankcase heater defined for this DX cooling coil is enabled during the time that the compressor is not running for either heating or cooling. The crankcase heater power use from either heating or cooling is reported in the heating coil (Coil:Heating:DX:MultiSpeed).
+
+\subsubsection{Higher Speed Operation}\label{higher-speed-operation-000}
+
+This section describes how higher speed operation is simulated. When the required sensible load is less than the full load sensible capacity at Speed n (Speed Number \textgreater{} 1), the following calculations are performed:
+
+\begin{itemize}
+  \item Bypass factor at Speed n-1 and Speed n
+\end{itemize}
+
+\begin{equation}
+BypassFacto{r_n} = f(RatedBypassFacto{r_n},RatedFlowRat{e_n},ActualFowRat{e_n})
+\end{equation}
+
+\begin{equation}
+BypassFacto{r_{n - 1}} = f(RatedBypassFacto{r_{n - 1}},RatedFlowRat{e_{n - 1}},ActualFowRat{e_{n - 1}})
+\end{equation}
+
+where:
+
+BypassFactor\(_{i}\) is the bypass factor at actual flow rate conditions at Speed i (dimensionless)
+
+RatedBypassFactor\(_{i}\) is the bypass factor at the rated conditions at Speed i (dimensionless)
+
+RatedFowRate\(_{i}\) is the air mass flow rate at the rated conditions at Speed i (kg/s)
+
+ActualFowRate\(_{i}\) is the actual air mass flow rate at Speed i (kg/s)
+
+i is Speed n or Speed n-1.
+
+The bypass factor at Speed n is a function of the bypass factor at the rated conditions, rated airflow rate, and actual flow rate at Speed n. The calculation is performed by a function, called AdjustCBF in the DXCoil module.
+
+\begin{itemize}
+  \item Total capacity at Speed n-1 and Speed n
+\end{itemize}
+
+\begin{equation}
+  TotCa{p_{n - 1}} = f(RatedCa{p_{n - 1}},TotCapTempModFa{c_{n - 1}},TotCapFlowModFa{c_{n - 1}},BypassFacto{r_{n - 1}})
+\end{equation}
+
+\begin{equation}
+ TotCa{p_n} = f(RatedCa{p_n},TotCapTempModFa{c_n},TotCapFlowModFa{c_n},BypassFacto{r_n})
+\end{equation}
+
+where
+
+TotCap\(_{i}\) is the total cooling capacity at given temperatures and flow rates at Speed i (W)
+
+RatedCap\(_{i}\) is the cooling capacity at the rated conditions at Speed i (W)
+
+TotCapTempModFac\(_{i}\) is the total cooling capacity modifier as a function of indoor web-bulb temperature and outdoor air dry-bulb temperature at Speed i
+
+TotCapFlowModFac\(_{i}\) is the total cooling capacity modifier as a function of the ratio of the actual flow rate across the cooling coil to the rated airflow rate at Speed i
+
+i is Speed n or Speed n-1.
+
+The calculation is performed by a subroutine, called CalcTotCapSHR in the DXCoil module.
+
+\begin{itemize}
+  \item EIR at Speed n-1 and Speed n
+\end{itemize}
+
+\begin{equation}
+EI{R_{n - 1}} = RatedEI{R_{n - 1}}*EIRTempModFa{c_{n - 1}}*EIRFlowModFa{c_{n - 1}}
+\end{equation}
+
+\begin{equation}
+EI{R_n} = RateEI{R_n}*EIRTempModFa{c_n}*EIRFlowModFa{c_n}
+\end{equation}
+
+where:
+
+EIR\(_{i}\) is the energy input ratio at given temperatures and flow rates at Speed i (W)
+
+RatedEIR\(_{i}\) is the energy input ratio at the rated conditions at Speed i (W)
+
+EIRTempModFac\(_{i}\) is the energy input ratio modifier as a function of indoor and outdoor air dry-bulb temperature at Speed i
+
+EIRFlowModFac\(_{i}\) is the energy input ratio modifier as a function of ratio of the actual flow rate across the heating coil to the rated airflow rate at Speed i
+
+i is n or n-1.
+
+\begin{itemize}
+  \item Full load outlet conditions at Speed n-1 and Speed n
+\end{itemize}
+
+The calculation procedure of full load outlet conditions at Speed n-1 and Speed n is the same as the calculation procedure used in the Coil:Cooling:DX:SingleSpeed model (Ref. Coil:Cooling:DX:SingleSpeed). The difference is that the outlet conditions at Speed n-1 are calculated based on the total cooling capacity and mass flow rate at Speed n-1, while the outlet conditions at Speed n are calculated based on the total cooling capacity and mass flow rate at Speed n.
+
+\begin{itemize}
+  \item Effective total cooling capacity
+\end{itemize}
+
+\begin{equation}
+\begin{array}{l}
+{Q_{coil,SpeedRatio}} = (SpeedRatio){\dot{m}_{Speed,n}}({h_{inlet}} - {h_{outlet,FullSpeed\;n}}) \\
+\;\;\;\;\;\;\;\;\; + (1 - SpeedRatio){\dot{m}_{Speed,n-1}}({h_{inlet}} - {h_{outlet,FullSpeed\;n - 1}})
+\end{array}
+\end{equation}
+
+where:
+
+\({Q_{coil,SpeedRatio}}\) is the delivered sensible cooling capacity at a given speed ratio between two consecutive speeds (W)
+
+\({\dot{m}_{Speed,n}}\) is the air mass flow rate through cooling coil at Speed n as set by the parent object (kg/s)
+
+\({\dot{m}_{Speed,n-1}}\) is the air mass flow rate through cooling coil at Speed 1 as set by the parent object (kg/s)
+
+h\(_{inlet}\) is the specific enthalpy at the coil inlet (J/kg)
+
+h\(_{outlet,FullSpeed\,n}\) is the full load specific enthalpy at the coil outlet at Speed n (J/kg)
+
+h\(_{outlet,FullSpeed\,n-1}\) is the full load specific enthalpy at the coil outlet at Speed n-1 (J/kg).
+
+\begin{itemize}
+  \item Average outlet air specific enthalpy
+\end{itemize}
+
+\begin{equation}
+  {h_{outlet,average}} = {h_{inlet}} - \frac{Q_{coil,SpeedRatio}}{\dot{m}_{inlet}}
+\end{equation}
+
+where:
+
+h\(_{outlet,average}\) is the averaged specific enthalpy at the coil outlet (J/kg)
+
+h\(_{inlet}\) is the specific enthalpy at the coil inlet (J/kg)
+
+\({\dot{m}_{inlet}}\) is the mass flow rate at the inlet to the coil as established by the parent object (Ref. AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed, Mass Flow Rate Calculation). This flow rate is the average value determined by the parent object, accounting for the specified flow rate when the heating coil is at Speed n and the specified flow rate when the heating coil is at Speed n-1 for the time step being simulated.
+
+\begin{itemize}
+  \item Effective sensible cooling capacity
+\end{itemize}
+
+The minimum humidity ratio (HR\(_{min}\)) is calculated as:
+
+\begin{equation}
+HR_{min} = Minimum[HR_{inlet}, (SpeedRatio)HR_{full,n}+(1.0-SpeedRatio)HR_{full,n-1})]
+\end{equation}
+
+The effective sensible cooling capacity is expressed as:
+
+\begin{equation}
+\begin{array}{l}
+{Q_{coil,sens}} = {\dot{m}_{Speed,n}}(SpeedRatio)[{h_{inlet}}({T_{inlet}},H{R_{min}}) - {h_{outlet,FullSpeed,n}}({T_{outlet,n}},H{R_{min}})] \\
+\;\;\;\;\;\;\;\;\;\;\;\;\;\; + {\dot{m}_{Speed,n-1}}(1 - SpeedRatio)[{h_{inlet}}({T_{inlet}},H{R_{min}}) - {h_{outlet,FullSpeed,n-1}}({T_{outlet,n-1}},H{R_{min}})]
+\end{array}
+\end{equation}
+
+where:
+
+Q\(_{coil,sens}\) is the effective sensible cooling capacity (W)
+
+h\(_{outlet,FullSpeed,n}\) is the full load specific enthalpy at the coil outlet at Speed n as a function of outlet dry-bulb temperature at the full load, and the minimum humidity ratio (J/kg)
+
+h\(_{outlet,FullSpeed,n-1}\) is the full load specific enthalpy at the coil outlet at Speed n-1 as a function of outlet dry-bulb temperature at the full load, and the minimum humidity ratio (J/kg)
+
+h\(_{inlet}\) is the specific enthalpy at the coil inlet (J/kg).
+
+\begin{itemize}
+  \item Average outlet air humidity ratio and temperature
+\end{itemize}
+
+The effective latent cooling capacity is the difference between the total and sensible capacity:
+
+\begin{equation}
+{Q_{coil,latent}} = {Q_{coil,SpeedRatio}} - {Q_{coil,sens}}
+\end{equation}
+
+where Q\(_{coil,latent}\) is the effective latent cooling capacity (W).
+
+The average outlet air HR can be calculated as:
+
+\begin{equation}
+  HR_{outlet,average} = HR_{inlet} - \frac{Q_{coil,latent}}{{\lambda} \dot{m}_{inlet}}
+\end{equation}
+
+where \(\lambda\) is the heat of vaporization as a function of HR\(_{min}\) and SpeedRatio*T\(_{outlet,n}\)+(1-SpeedRatio)*T\(_{outlet,n-1}\) (J/kg).
+
+At the given averaged outlet humidity ratio and specific enthalpy, the averaged outlet temperature can be calculated using the psych function of PsyTdbFnHW.
+
+\begin{itemize}
+  \item Calculate combined energy input
+\end{itemize}
+
+When the input for the field `Apply Part Load Fraction to Speeds Greater than 1' is No in the object (equivalent to a single compressor), the combined energy output is calculated as follows:
+
+\begin{equation}
+CoolingPower = (TotCa{p_n})(EI{R_n})(SpeedRatio) + (TotCa{p_{n-1}})(EI{R_{n-1}})(1.0 - SpeedRatio)
+\end{equation}
+
+When the input for the field 'Apply Part Load Fraction to Speeds Greater than 1' is Yes in the object (equivalent to multiple compressors), the combined energy output is calculated as follows:
+
+\begin{equation}
+CoolingPower = (TotCa{p_n})(EI{R_n})(RTF) + (TotCa{p_{n - 1}})(EI{R_{n - 1}})(1.0 - RTF)
+\end{equation}
+
+where CoolingPower is the power used (W) and RTF is the run time fraction at Speed n.
+
+\begin{itemize}
+  \item Latent degradation
+\end{itemize}
+
+When the supply fan operation mode is ContinuousFanWithCyclingCompressorand the input of the Apply Latent Degradation to Speeds Greater than 1 is Yes, the latent degradation is included at Speed n. The calculation procedure is the same as one in the Coil:Cooling:DX:SingleSpeed object. The difference is that the rated values and run time fraction at Speed n are used. The adjusted SHR is used to calculate full load outlet conditions at Speed n.
+
+It is expected to have less latent degradation at Speed n than Speed 1. Therefore, smaller values of the latent degradation inputs at Speed n than those at Speed 1 are recommended.
+
+\begin{itemize}
+  \item Crankcase heater
+\end{itemize}
+
+There is no power need at higher speed operation.
+
+\subsubsection{Higher Speed Operation with Single Mode Operation}\label{higher-speed-operation-with-single-mode-operation}
+
+This section describes how higher speed operation is simulated with single mode operation. When the required sensible load is less than the full load sensible capacity at Speed n (Speed Number \textgreater{} 1), its performance is almost the same as the performance for the Coil:Cooling:DX:SingleSpeed model at different flow rate and capacity with given Speed n. No linear interpolation is performed between two adjacent speeds.
+
+\subsubsection{Waste heat calculation}\label{waste-heat-calculation-000}
+
+The waste heat generated by this coil object is calculated as:
+
+\begin{equation}
+{Q_{WasteHeat}} = (Fraction)(TempModifier)(CoolingPower)
+\end{equation}
+
+where Fraction is the rated waste heat fraction of the energy input and TempModifer is the waste heat modifier as a function of indoor and outdoor air dry-bulb temperature.
+
+\subsubsection{Basin Heater For Multi-Speed DX Coil}\label{basin-heater-for-multi-speed-dx-coil}
+
+Basin heater for the object Coil:Cooling:DX:MultiSpeed operates in the same manner as for Coil:Cooling:DX:SingleSpeed. Refer to the Basin Heater For Single-Speed DX Coil description above.
+
+\subsubsection{Standard Rating of Multi-Speed DX Cooling Coils}\label{standard-rating-of-multi-speed-dx-cooling-coils}
+
+For multi-speed direct expansion cooling coils, the industry standard ratings of Standard Rating Seasonal Energy Efficiency Ratio (SEER) are calculated according to ANSI/AHRI Standard 210/240 (AHRI 2008). These standard ratings can be calculated using the user-entered information for the Coil:Cooling:DX:MultiSpeed object. According to Standard 210/240, the Standard Rating SEER applies to air-to-air unitary heat pumps and air conditions with rated cooling capacities under 19,000 Watts (\textless{}65,000 Btu/h). The Cooling Mode Test Conditions for Units Having two-capacity Compressor standard tests A\(_{2}\), B\(_{2}\), B\(_{1}\), and F\(_{1}\) are also provided in Table~\ref{table:cooling-mode-test-conditions-for-units-having}. Cooling Mode Test Conditions for Units Having a Two-Capacity Compressor. The equations required to calculate the net cooling capacity and SEER value are described next.
+
+\subsubsection{Standard Rating Cooling Capacity}\label{standard-rating-cooling-capacity}
+
+The standard net cooling capacity of multi-speed DX cooling coil is reported at the maximum speed and full load A2 test condition only. The Standard Rating (Net) Cooling Capacity calculation is the same as single speed DX cooling coil procedure when calculated at maximum speed.The procedure for calculating the Standard Rating Cooling Capacity is given by:
+
+\begin{equation}
+{\dot Q_{StandardRating}} = \dot Q_{T,\,CRated}^{k = 2} \cdot CAPFT_{TestA2}^{k = 2} \cdot CAPFFF_{TestA2}^{k = 2}
+\end{equation}
+
+\begin{equation}
+{\dot Q_{Standard\,Rating\,Net}} = {\dot Q_{StandardRating}} - Fa{n_{Power,\,CRated}}
+\end{equation}
+
+\begin{equation}
+Fa{n_{Power,\,CRated}} = FanPowerPerVolFlowRat{e^{k = 2}} \cdot \dot V_{CRated}^{k = 2}
+\end{equation}
+
+where:
+
+\({\dot Q_{StandardRating\,Net}}\) is the total standard \textbf{(net)} cooling capacity (W) of the air-conditioning or heat pump equipment in cooling mode determined from ANSI/AHRI Standard 210/240 and A2 test conditions shown in Table~\ref{table:cooling-mode-test-conditions-for-units-having}. The standard cooling test conditions for air-cooled condenser are: indoor coil entering air dry-bulb and wet-bulb temperatures 26.7\(^{\circ}\)C/19.4\(^{\circ}\)C and outdoor coil entering air dry-bulb and wet-bulb temperatures 35.0\(^{\circ}\)C/23.9\(^{\circ}\)C
+
+\({\dot Q_{StandardRating}}\) is the total standard cooling capacity (W) of the air-conditioning or heat pump equipment determined from ANSI/AHRI Standard 210/240 and A2 test conditions shown in Table~\ref{table:cooling-mode-test-conditions-for-units-having}. The standard cooling test conditions for air-cooled are: indoor coil entering air dry-bulb and wet-bulb temperatures 26.7\(^{\circ}\)C/19.4\(^{\circ}\)C and outdoor coil entering air dry-bulb and wet-bulb temperatures 35.0\(^{\circ}\)C/23.9\(^{\circ}\)C
+
+\(\dot Q_{T,\,CRated}^{k = 2}\) is the rated total cooling capacity at maximum speed, user input (W)
+
+\(CAPFT_{TestA2}^{k = 2}\) is the user-specified bi-quadratic curve evaluated at the indoor coil entering air wet-bulb temperature (19.4\(^{\circ}\)C) and outdoor coil entering air dry-bulb temperature (35.0\(^{\circ}\)C) for air-cooled condenser per A2 test condition as specified in Table~\ref{table:cooling-mode-test-conditions-for-units-having} (dimensionless)
+
+\(CAPFFF_{TestA2}^{k = 2}\) is the user-specified quadratic or cubic curve modifying the total cooling capacity as function of flow fraction, (dimensionless).~ This curve is evaluated at a flow fraction of 1.0.
+
+\(Fa{n_{Power,\,Rated}}\) is the supply air fan power at rated conditions at high (maximum) compressor speed (W)
+
+\(\dot V_{_{CRated}}^{k = 2}\) is the rated air volume flow rate at high (maximum) compressor speed, user input (m\(^{3}\)/s)
+
+\(FanPowerPerVolFlowRat{e^{k = 2}}\) is the rated indoor coil fan power per volume flow rate is a user-entered value, with a default of 773.3 W/(m\(^{3}\)/s)) if the user leaves this input field blank. The default value is taken from ANSI/ASHRAE Standard 210/240 -2008 where it is defined for systems which do not have an indoor coil fan furnished as part of the system. See the description given below how this value is calculated, user input (W/(m\(^{3}\)/s)).
+
+The Rated Evaporator (Indoor Coil) Fan Power Per Volume Flow rate is a user-entered value, with a default of 773.3 W/(m\(^{3}\)/s)) if the user leaves this input field blank. The default value is taken from ANSI/ASHRAE Standard 210/240-2008 where it is defined for systems which do not have an Indoor Coil (Evaporator) fan furnished as part of the system. The test conditions in ANSI/AHRI Standard 210/240 vary the external static pressure (i.e., pressure drop associated with ductwork and other devices external to the indoor fan/coil section) seen by the supply air fan based on the standard rating cooling capacity.
+
+\subsubsection{Seasonal Energy Efficiency Ratio (SEER) for Multi-Speed DX Coil}\label{seasonal-energy-efficiency-ratio-seer-for-multi-speed-dx-coil}
+
+The SEER value for multi-speed compressor air conditioner or air-to-air heat pumps per AHRI/ANSI Std. 210/240 -- 2008 is calculated as follows:
+
+\begin{equation}
+SEER = \frac{{\sum\limits_{j = 1}^8 {\frac{{{q_c}({T_j})}}{N}} }}{{\sum\limits_{j = 1}^8 {\frac{{{e_c}({T_j})}}{N}} }}
+\end{equation}
+
+where:
+
+\(q_{c}\)(T\(_{j}\))/N is the ratio of space cooling capacity provided by the unit during periods of the space cooling season when the outdoor temperature fell within the range represented by bin temperature \(T_{j}\) to the total number of hours in the cooling season (N), (W)
+
+\(e_{c}\)(T\(_{j}\))/N is the ratio of the electrical energy consumed by the unit during periods of the space cooling season when the outdoor temperature fell within the range represented by bin temperature Tj to the total number of hours in the cooling season (N), W.
+
+\emph{j} is the bin number, dimensionless. For cooling season, j ranges from 1 to 8.
+
+\(T_{j}\) is the outdoor air bin temperature (\(^{\circ}\)C). Outdoor temperatures are ``binned'' such that calculations are only performed based one temperature within the bin. Bins of 2.8\(^{\circ}\)C with 8 cooling season bin temperatures being 19.44\(^{\circ}\)C, 22.22\(^{\circ}\)C, 25.0\(^{\circ}\)C, 27.78\(^{\circ}\)C, 30.56\(^{\circ}\)C, 33.33\(^{\circ}\)C, 36.11\(^{\circ}\)C, 38.89\(^{\circ}\)C.
+
+For multi-speed compressor the SEER value is weighted average performance at different outdoor air temperature bins.~ The eight outdoor air temperature bins and the corresponding weight are provided in Table~\ref{table:distribution-of-fractional-hours-with-in}. Distribution of Fractional Hours with in Cooling Season Temperature Bins.
+
+The steady-state cooling capacity delivered and the electric power inputs when the DX coil is operating at minimum compressor speed (\emph{k = 1}), and outdoor air temperature \(T_{j}\), are determined by linear interpolation using the values of B1 and F1 tests as follows:
+
+\begin{equation}
+\dot Q_c^{k = 1}({T_j}) = \dot Q_c^{k = 1}(19.44) + \frac{{\dot Q_c^{k = 1}(27.78) - \dot Q_c^{k = 1}(19.44)}}{{27.78 - 19.44}}\left( {{T_j} - 19.44} \right)
+\end{equation}
+
+\begin{equation}
+\dot E_c^{k = 1}({T_j}) = \dot E_c^{k = 1}(19.44) + \frac{{\dot E_c^{k = 1}(27.78) - \dot E_c^{k = 1}(19.44)}}{{27.78 - 19.44}}\left( {{T_j} - 19.44} \right)
+\end{equation}
+
+The steady-state cooling capacities and electric power inputs at the minimum speed and test condition \(B_{1}\) and \(F_{1}\) are calculated from the minimum (low) speed performance curves as follows:
+
+\begin{equation}
+\dot Q_c^{k = 1}(27.78) = \dot Q_{T,\,CRated}^{k = 1} \cdot CAPFT_{TestB1}^{k = 1} \cdot CAPFFF_{TestB1}^{k = 1} - FanPower_{CRated}^{k = 1}
+\end{equation}
+
+\begin{equation}
+\dot E_c^{k = 1}(27.78) = \left[ {\frac{{\dot Q_c^{k = 1}(27.78)}}{{COP_{CRated}^{k = 1}}}} \right] \cdot EIRFT_{TestB1}^{k = 1} \cdot EIRFFF_{TestB1}^{k = 1} + FanPower_{CRated}^{k = 1}
+\end{equation}
+
+\begin{equation}
+\dot Q_c^{k = 1}(19.44) = \dot Q_{T,\,CRated}^{k = 1} \cdot CAPFT_{TestF1}^{k = 1} \cdot CAPFFF_{TestF1}^{k = 1} - FanPower_{CRated}^{k = 1}
+\end{equation}
+
+\begin{equation}
+\dot E_c^{k = 1}(19.44) = \left[ {\frac{{\dot Q_c^{k = 1}(19.44)}}{{COP_{CRated}^{k = 1}}}} \right] \cdot EIRFT_{TestF1}^{k = 1} \cdot EIRFFF_{TestF1}^{k = 1} + FanPower_{CRated}^{k = 1}
+\end{equation}
+
+\begin{equation}
+FanPower_{CRated}^{k = 1} = FanPowerPerVolFlowRat{e^{k = 1}} \cdot {\rm{\dot V}}_{CRated}^{k = 1}
+\end{equation}
+
+where:
+
+\(\dot Q_{T,\,CRated}^{k = 1}\) is the rated total cooling capacity at minimum compressor speed specified by users (W)
+
+\(COP_{CRated}^{k = 1}\) is the rated gross COP at minimum compressor speed specified by users (-)
+
+\(CAPFT_{TestB1}^{k = 1}\) is the cooling capacities modifier curve for temperature at minimum compressor speed and B1 test condition (-)
+
+\(CAPFFF_{TestB1}^{k = 1}\) is the cooling capacities modifier curve for flow fraction at minimum compressor speed and B1 test condition (-)
+
+\(EIRFT_{TestB1}^{k = 1}\) is the EIR modifier curve for temperature at minimum compressor speed and B1 test condition (-)
+
+\(EIRFFF_{TestB1}^{k = 1}\) is the EIR modifier curve for flow fraction at minimum compressor speed and B1 test condition (-)
+
+\(CAPFT_{TestF1}^{k = 1}\) is the cooling capacities modifier curve for temperature at minimum compressor speed and F1 test condition (-)
+
+\(CAPFFF_{TestF1}^{k = 1}\) is the cooling capacities modifier curve for flow fraction at minimum compressor speed and F1 test condition (-)
+
+\(EIRFT_{TestF1}^{k = 1}\) is the EIR modifier curve for temperature at minimum compressor speed and F1 test condition (-)
+
+\(EIRFFF_{TestF1}^{k = 1}\) is the EIR modifier curve for flow fraction at minimum compressor speed and F1 test condition (-)
+
+\(FanPower_{CRated}^{k = 1}\) is the the rated supply air fan power when the unit is operating at minimum compressor speed (W)
+
+\(V_{CRated}^{k = 1}\) is the rated cooling supply air volume flow rate at minimum compressor speed specified by users (-)
+
+\(FanPowerPerVolFlowRat{e^{k = 1}}\) is the rated indoor coil fan power per volume flow rate at low (minimum) compressor speed specified value by the user (W/(m\(^3\)/s)).
+
+The steady-state cooling capacity delivered and the electric power inputs when the DX cooling coil is operating at maximum (high) compressor speed (\emph{k = 2}), and outdoor air temperature \(T_{j}\), are determined as follows:
+
+\begin{equation}
+\dot Q_c^{k = 2}({T_j}) = \dot Q_c^{k = 2}(27.78) + \frac{{\dot Q_c^{k = 2}(35.0) - \dot Q_c^{k = 2}(27.78)}}{{35.0 - 27.78}}\left( {{T_j} - 27.78} \right)
+\end{equation}
+
+\begin{equation}
+\dot E_c^{k = 2}({T_j}) = \dot E_c^{k = 2}(27.78) + \frac{{\dot E_c^{k = 2}(35.0) - \dot E_c^{k = 2}(27.7)}}{{35.0 - 27.78}}\left( {{T_j} - 27.78} \right)
+\end{equation}
+
+The steady-state cooling capacities and electric power input at the maximum speed and test condition \(A_{2}\) and \(B_{2}\) are determined from the maximum (high) speed performance curves as follows:
+
+\begin{equation}
+\dot Q_c^{k = 2}(35.0) = \dot Q_{T,\,CRated}^{k = 2} \cdot CAPFT_{TestA2}^{k = 2} \cdot CAPFFF_{TestA2}^{k = 2} - FanPower_{CRated}^{k = 2}
+\end{equation}
+
+\begin{equation}
+\dot E_c^{k = 2}(35.0) = \left[ {\frac{{\dot Q_c^{k = 2}(35.0)}}{{COP_{CRated}^{k = 2}}}} \right] \cdot EIRFT_{TestA2}^{k = 2} \cdot EIRFFF_{TestA2}^{k = 2} + FanPower_{CRated}^{k = 2}
+\end{equation}
+
+\begin{equation}
+  \dot Q_c^{k = 2}(27.78) = \dot Q_{T,\,CRated}^{k = 2} \cdot CAPFT_{TestB2}^{k = 2} \cdot CAPFFF_{TestB2}^{k = 2} - FanPower_{CRated}^{k = 2}
+\end{equation}
+
+\begin{equation}
+  \dot E_c^{k = 2}(27.78) = \left[ {\frac{{\dot Q_c^{k = 2}(19.44)}}{{COP_{CRated}^{k = 2}}}} \right] \cdot EIRFT_{TestB2}^{k = 2} \cdot EIRFFF_{TestB2}^{k = 2} + FanPower_{CRated}^{k = 2}
+\end{equation}
+
+\begin{equation}
+  FanPower_{CRated}^{k = 2} = FanPowerPerVolFlowRat{e^{k = 2}} \cdot {\rm{\dot V}}_{CRated}^{k = 2}
+\end{equation}
+
+where:
+
+\(\dot Q_{T,\,CRated}^{k = 2}\) is the rated total cooling capacity at maximum (high) compressor speed specified by users (W)
+
+\(COP_{CRated}^{k = 2}\) is the rated gross COP at maximum (high) compressor speed specified by users (-)
+
+\(CAPFT_{TestA2}^{k = 2}\) is the cooling capacity modifier curve for temperature at maximum (high) compressor speed and \emph{A}\(_{2}\) test condition (-)
+
+\(CAPFFF_{TestA2}^{k = 2}\) is the cooling capacity modifier curve for flow fraction at maximum (high) compressor speed and \emph{A}\(_{2}\) test condition (-)
+
+\(EIRFT_{TestA2}^{k = 2}\) is the EIR modifier curve for temperature at maximum (high) compressor speed and \emph{A}\(_{2}\) test condition (-)
+
+\(EIRFFF_{TestA2}^{k = 2}\) is the EIR modifier curve for flow fraction at maximum (high)~ compressor speed and \emph{A}\(_{2}\) test condition (-)
+
+\(CAPFT_{TestB2}^{k = 2}\) is the cooling capacity modifier curve for temperature at maximum (high) compressor speed and \emph{B}\(_{2}\) test condition (-)
+
+\(CAPFFF_{TestB2}^{k = 2}\) is the cooling capacity modifier curve for flow fraction at maximum (high) compressor speed and \emph{B}\(_{2}\) test condition (-)
+
+\(EIRFT_{TestB2}^{k = 2}\) is the EIR modifier curve for temperature at maximum (high) compressor speed and \emph{B}\(_{2}\) test condition (-)
+
+\(EIRFFF_{TestB2}^{k = 2}\) is EIR modifier curve for flow fraction at maximum (high) compressor speed and \emph{B}\(_{2}\) test condition (-)
+
+\(FanPower_{CRated}^{k = 2}\) is the the rated supply air fan power when the unit is operating at maximum (high) compressor speed (W)
+
+\(V_{CRated}^{k = 2}\) is the rated supply air volume flow rate at maximum (high) compressor speed specified by users (-)
+
+\(FanPowerPerVolFlowRat{e^{k = 2}}\) is the the Rated Evaporator (Indoor Coil) Fan Power Per Volume Flow rate at maximum (high) compressor speed specified value by the user (W/(m\(^3\)/s)).
+
+The above steps show how the cooling capacity and electric power inputs are determined when the DX cooling coil is operating at minimum (low) and maximum (high) compressor speeds.~ But the unit may operate at minimum (low) speed capacity, cycle on--off, cycle between successiave lower and higher compressor speed capacity, or operate at maximum (high) speed capacity depending on the building cooling load. The operating range of the DX cooling coil is determined based on the building cooling load for each binned outside air temperature. The building cooling load at an outdoor air temperature \(T_{j}\), is calculated as follows:
+
+\begin{equation}
+BL({T_j}) = \left( {\frac{{{T_j} - 18.3}}{{35.0 - 18.3}}} \right)\left( {\frac{{\dot Q_c^{k = 2}(35.0)}}{{1.1}}} \right)
+\end{equation}
+
+where:
+
+\emph{BL(T}\(_{j}\)) is the building space cooling load corresponding to outdoor temperature of \(T_{j}\) (W)
+
+\(\dot Q_c^{k = 2}(35.0)\) is the the cooling capacity determined from the standard A2 test (W).
+
+The temperatures 35.0\(^{\circ}\)C and 18.3\(^{\circ}\)C in the building load calculation equation represent the outdoor design air temperature, and zero-load base temperature, respectively (ANSI/ASHRAE, 2008).~ 1.1 is a sizing factor.
+
+The cooling capacity delivered and the electric power inputs calculations when the DX cooling coil is cycling on-off, operating at minimum (low) compressor speed, cycling between successive minimum (low) and maximum (high) compressor speed, or operating at maximum (high) compressor speed are described next.
+
+\emph{Case 1}:~ The steady state cooling capacity when the unit is operating at or below the minimum (low) speed compressor capacity, i.e., when the building cooling load is less or equal to the minimum (low) compressor speed capacity, is calculated as follows:
+
+\begin{equation}
+\dot Q_c^{k = 1}({T_j}) \ge BL({T_j})
+\end{equation}
+
+\begin{equation}
+\frac{{{q_c}({T_j})}}{N} = \left[ {{X^{k = 1}}({T_j}) \cdot \dot Q_c^{k = 1}({T_j})} \right] \cdot \frac{{{n_j}}}{N}
+\end{equation}
+
+\begin{equation}
+\frac{{{e_c}({T_j})}}{N} = \left[ {\frac{{{X^{k = 1}}({T_j})}}{{PL{F_j}}}\dot E_c^{k = 1}({T_j})} \right] \cdot \frac{{{n_j}}}{N}
+\end{equation}
+
+\begin{equation}
+{X^{k = 1}}({T_j}) = \frac{{BL({T_j})}}{{\dot Q_c^{k = 1}({T_j})}}
+\end{equation}
+
+\begin{equation}
+PL{F_j} = 1 - C_D^c\left[ {1 - {X^{k = 1}}({T_j})} \right]
+\end{equation}
+
+where:
+
+\emph{X(T\(_{j}\))} is the cooling mode load factor or part-load ratio for temperature bin j (-)
+
+n\(_{i}\)/N is the fractional bin hours for the cooling season; the ratio of the number of hours during the cooling season when the outdoor temperature fell within the range represented by bin temperature \emph{T\(_{j}\)} to the total number of hours in the cooling season (-). (see Table~\ref{table:distribution-of-fractional-hours-with-in})
+
+\(C_D^c\) is the cooling coefficient of degradation, default value is 0.25.
+
+\emph{Case 2}:~ The unit cycles between successive the minimum (low) and maximum (high) compressor speed capacity to meet the building cooling load at outdoor air temperature \emph{T\(_{j}\)}.~ That is, the cooling building load is between the units successive minimum (low) and maximum (high) compressor speed capacities:
+
+\begin{equation}
+\dot Q_c^{k = 1}({T_j}) < BL({T_j}) < \dot Q_c^{k = 2}({T_j})
+\end{equation}
+
+\begin{equation}
+  \frac{{{q_c}({T_j})}}{N} = \left[ {{X^{k = 1}}({T_j}) \cdot \dot Q_c^{k = 1}({T_j}) + \left( {1 - {X^{k = 1}}({T_j})} \right) \cdot \dot Q_c^{k = 2}({T_j})} \right] \cdot \frac{{{n_j}}}{N}
+\end{equation}
+
+\begin{equation}
+  \frac{{{e_c}({T_j})}}{N} = \left[ {{X^{k = 1}}({T_j}) \cdot \dot E_c^{k = 1}({T_j}) + \left( {1 - {X^{k = 1}}({T_j})} \right) \cdot \dot E_c^{k = 2}({T_j})} \right] \cdot \frac{{{n_j}}}{N}
+\end{equation}
+
+\begin{equation}
+{X^{k = 1}}({T_j}) = \frac{{\dot Q_c^{k = 2}({T_j}) - BL({T_j})}}{{\dot Q_c^{k = 2}({T_j}) - \dot Q_c^{k = 1}({T_j})}}
+\end{equation}
+
+\emph{Case 3}:~ The steady-state cooling capacity when the unit is operating continuously at maximum (high) compressor speed capacity at outdoor air temperature \(T_{j}\). That is the building cooling load is greater or equal to the available capacity at maximum (high) compressor speed:
+
+\begin{equation}
+BL({T_j}) \ge \dot Q_c^{k = 2}({T_j})
+\end{equation}
+
+For units when operating continuously at maximum (high) compressor speed (k = 2) at temperature \(T_{j}\), the delivered cooling capacity and electric power inputs are calculated as follows:
+
+\begin{equation}
+\frac{{{q_c}({T_j})}}{N} = \left[ {\dot Q_c^{k = 2}({T_j})} \right] \cdot \frac{{{n_j}}}{N}
+\end{equation}
+
+\begin{equation}
+\frac{{{e_c}({T_j})}}{N} = \left[ {\dot E_c^{k = 2}({T_j})} \right] \cdot \frac{{{n_j}}}{N}
+\end{equation}
+
+% table 56
+\begin{longtable}[c]{>{\raggedright}p{1.5in}p{0.7in}p{0.7in}p{0.7in}p{0.7in}p{0.7in}>{\raggedright}p{1.0in}}
+\caption{Cooling Mode Test Conditions for Units Having a Two-Capacity Compressor \label{table:cooling-mode-test-conditions-for-units-having}} \tabularnewline
+\toprule 
+Test & \multicolumn{2}{p{1.4in}}{\raggedright Air Entering Indoor Unit Temperature (\(^{\circ}\)F/\(^{\circ}\)C)} & \multicolumn{2}{p{1.4in}}{\raggedright Air Entering Outdoor Unit Temperature (\(^{\circ}\)F/\(^{\circ}\)C)} \tabularnewline
+\cmidrule(r){2-3}
+\cmidrule(l){4-5}
+Description & Dry Bulb & Wet Bulb & Dry Bulb & Wet Bulb & Compressor Capacity & Cooling Air Volume Rate \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Cooling Mode Test Conditions for Units Having a Two-Capacity Compressor} \tabularnewline
+\toprule 
+Test & \multicolumn{2}{p{1.4in}}{\raggedright Air Entering Indoor Unit Temperature (\(^{\circ}\)F/\(^{\circ}\)C)} & \multicolumn{2}{p{1.4in}}{\raggedright Air Entering Outdoor Unit Temperature (\(^{\circ}\)F/\(^{\circ}\)C)} \tabularnewline
+\cmidrule(r){2-3}
+\cmidrule(l){4-5}
+Description & Dry Bulb & Wet Bulb & Dry Bulb & Wet Bulb & Compressor Capacity & Cooling Air Volume Rate \tabularnewline
+\midrule
+\endhead
+
+A2 Test-required (steady, wet coil) & 80.0/26.7 & 67.0/19.4 & 95.0/35.0 & 75.0/23.9 & High & Cooling Full-load \tabularnewline
+B2 Test-required (steady, wet coil) & 80.0/26.7 & 67.0/19.4 & 82.0/27.8 & 65.0/18.3 & High & Cooling Full-load \tabularnewline
+B1 Test-required (steady, wet coil) & 80.0/26.7 & 67.0/19.4 & 82.0/27.8 & 65.0/18.3 & Low & Cooling Minimum \tabularnewline
+C2 Test-optional (steady, dry coil) & 80.0/26.7 &  & 82.0/27.8 &  & High & Cooling Full-load \tabularnewline
+D2 Test-required (cyclic, dry coil) & 80.0/26.7 &  & 82.0/27.8 &  & High &  \tabularnewline
+C1 Test-optional (steady, dry coil) & 80.0/26.7 &  & 82.0/27.8 &  & Low & Cooling Minimum \tabularnewline
+D1 Test-optional (cyclic, dry coil) & 80.0/26.7 &  & 82.0/27.8 &  & Low &  \tabularnewline
+F1 Test-optional (steady, dry coil) & 80.0/26.7 & 67.0/19.4 & 67.0/19.4 & 53.5/11.9 & High & Cooling Minimum \tabularnewline
+\bottomrule
+\multicolumn{7}{l}{Source: AHRI Standard 210-240, 2008; Table 5, Page 65}
+\end{longtable}
+
+% table 57
+\begin{longtable}[c]{p{1.5in}p{1.5in}p{1.5in}p{1.5in}}
+\caption{Distribution of Fractional Hours with in Cooling Season Temperature Bins \label{table:distribution-of-fractional-hours-with-in}} \tabularnewline
+\toprule 
+\endfirsthead
+
+\caption[]{Distribution of Fractional Hours with in Cooling Season Temperature Bins} \tabularnewline
+\toprule 
+\endhead
+
+Bin Number j & Bin Temperature Range (\(^{\circ}\)C) & Representative Temperature for bin (\(^{\circ}\)C) & Fraction of Total Temperature Bin Hours Nj/N \tabularnewline
+1 & Dry Bulb & Wet Bulb & Dry Bulb \tabularnewline
+2 & 18.33 - 20.56 & 19.44 & 0.214 \tabularnewline
+3 & 21.11 - 23.33 & 22.22 & 0.231 \tabularnewline
+4 & 23.89 - 26.11 & 25 & 0.216 \tabularnewline
+5 & 26.67 - 28.89 & 27.78 & 0.161 \tabularnewline
+6 & 29.44 - 31.67 & 30.56 & 0.104 \tabularnewline
+7 & 32.22 - 34.44 & 33.33 & 0.052 \tabularnewline
+8 & 35.00 - 37.22 & 36.11 & 0.018 \tabularnewline
+\bottomrule
+\multicolumn{4}{l}{Source: AHRI Standard 210-240, 2008; Table 16, Page 94}
+\end{longtable}
+
+\subsubsection{References}\label{references-3-001}
+
+See the references for the single speed DX cooling coil earlier in this document.
+
+\subsection{Two-Speed Electric DX Air Cooling Coil}\label{two-speed-electric-dx-air-cooling-coil}
+
+\subsubsection{Overview}\label{overview-3-003}
+
+The input object Coil:Cooling:DX:TwoSpeed provides a model that is meant to represent either a 2 speed (fan and compressor) DX cooling unit (compressor, evaporator, condenser) or a variable speed DX cooling unit in which the variation of compressor speed and air flow rate is nearly linear as a function of cooling part load. In EnergyPlus Coil:Cooling:DX:TwoSpeed is used as the cooling coil in packaged variable volume systems (PVAV). The model is based upon the single speed DX unit Coil:Cooling:DX:SingleSpeed. Basically the model for Coil:Cooling:DX:TwoSpeed employs a separate single speed model at high speed (full load) and low speed (minimum load) and interpolates between these 2 states to obtain the needed cooling output. Below minimum load the unit cycles on/off, just like the single speed unit.
+
+\subsubsection{Inputs and Data}\label{inputs-and-data-001}
+
+The input is similar to that for Coil:Cooling:DX:SingleSpeed except there needs to be two complete sets of performance data. The user inputs a rated total cooling capacity, rated SHR, rated COP, and rated air volumetric flow rate for the high speed and low speed states. Performance curves -- cooling capacity as a function of entering air wet-bulb temperature and outside dry-bulb temperature (wet-bulb if there is an evaporatively cooled condenser), EIR as a function of the same two temperatures -- must be defined and referenced for both high and low speed states. The performance characteristics of the evaporative condenser, if present, also need to be given at high and low speed states: effectiveness, air volumetric flow rate, and pump power consumption. The full list of inputs is given in the Input/Output Reference document.
+
+The data for Coil:Cooling:DX:TwoSpeed is stored in the array structure \emph{DXCoil} in the program module \emph{DXCoils}
+
+\subsubsection{Calculation}\label{calculation-000}
+
+Calculation is performed in routine \emph{CalcMultiSpeedDXCoil} in module \emph{DXCoils}. The inputs to the calculation are the coil index (denoting a specific coil with its particular performance parameters), the speed ratio, and the cycling ratio. The speed ratio is an artificial parameter between 0 and 1. If the speed ratio (\emph{SR}) is greater than zero, the performance of the unit will be:
+
+\begin{equation}
+SR\cdot HighSpeedPerformance + (1 - SR)\cdot LowSpeedPerformance
+\end{equation}
+
+Here \emph{HighSpeedPerformance} means the electricity consumption, cooling output, and outlet conditions of the unit if the unit were operating at high speed (full load). Similarly \emph{LowSpeed Performance} means the electricity consumption, cooling output, and outlet conditions if the unit were operating at low speed (minimum non-cycling load). The calculations for each state are the same as for the single speed, cycling DX unit Coil:Cooling:DX:SingleSpeed.
+
+If the speed ratio is zero and the cycling ratio is \textgreater{} 0, the unit will be in cycling mode. The unit will be on for \emph{cycling ratio} fraction of the time step, off for the remainder of the time step. While on, the unit will perform according to the low speed performance parameters.
+
+\subsubsection{Simulation and Control}\label{simulation-and-control-001}
+
+Coil:Cooling:DX:TwoSpeed is not used by itself; it is used as part of an encompassing component or system that provides control for the unit. In setting up a PVAV system, for instance, Coil:Cooling:DX:TwoSpeed is part of the component CoilSystem:Cooling:DX, which controls Coil:Cooling:DX:TwoSpeed. When used in the CoilSystem:Cooling:DX component, the simulation allows for either temperature \emph{or} temperature and dehumidification control based on a dehumidification control selection in the CoilSystem:Cooling:DX component. If None is selected the simulation runs the DX unit to satisfy a supply air temperature setpoint. It typically varies the speed ratio in an iterative solution process to establish the operating point that will give the desired unit outlet air temperature. If CoolReheat is selected, the simulation first runs the DX unit to satisfy a supply air temperature setpoint. However, in this case if the DX unit outlet air humidity ratio is above the humidity ratio setpoint, the simulation will increase the speed and/or cycling ratio to meet the desired unit outlet air humidity ratio. The humidity ratio setpoint is specified through the use of a humidistat (ref. ZoneControl:Humidistat) and a setpoint manager (ref. SetpointManager:SingleZone:Humidity:Maximum, SetpointManager:MultiZone:MaximumHumidity:Average,~ SetpointManager:MultiZone:Humidity:Maximum or SetpointManager:OudoorAirPretreat). When used with the CoilSystem:Cooling:DX component, the dehumidification control type Multimode is not allowed.
+
+\subsubsection{Basin Heater For Two-Speed DX Coil}\label{basin-heater-for-two-speed-dx-coil}
+
+Basin heater for the object Coil:Cooling:DX:TwoSpeed operates in the same manner as for Coil:Cooling:DX:SingleSpeed. Refer to the ``Basin Heater For Single-Speed DX Coil'' description above.
+
+\subsubsection{Standard Ratings}\label{standard-ratings}
+
+The Coil:Cooling:DX:TwoSpeed object includes industry standard ratings of Standard Rating Cooling Capacity, Energy Efficiency Ratio (EER), and Integrated Energy Efficiency Ratio (IEER) which are calculated according to ANSI/AHRI Standard 340/360-2007 with Addenda 1 and 2 (AHRI 2007). These ratings apply to unitary air conditioners with air-cooled condensers with standard rated cooling capacities from 19 kW (65,000 Btu/h) to below 220 kW (760,000 Btu/h).
+
+For the Coil:Cooling:DX:TwoSpeed object in EnergyPlus, these standard ratings are not direct inputs to the model. However, these standard ratings can be calculated using user-entered information for the Coil:Cooling:DX:TwoSpeed object. These standard rating values are provided in the eplusout.eio output file (Ref. OutputDetailsAndExamples.pdf) and also in the predefined tabular output reports (Output:Table:SummaryReports object, Equipment Summary report, DX Cooling Coil table and VAV DX Cooling Standard Rating Details table). Currently, the standard ratings are only calculated and output for Packaged VAV cooling coils with air-cooled condensers and variable-air-volume fans. If the two-speed DX coling coil is specified with an evaporatively-cooled condenser or along with a constant volume fan, then no standard ratings are output from EnergyPlus at this time.
+
+The standard rating cooling capacity is calculated as follows:
+
+\begin{equation}
+\dot{Q}_{StandardRating} = \dot{Q}_{Total,Rated} TotCapTempModFac_{Rated} TotCapFlowModFac_{Rated} - FanHeatCorrection
+\end{equation}
+
+where:
+
+\({\dot Q_{StandardRating}}\) is the standard rating (net) cooling capacity (W)
+
+\({\dot Q_{Total,Rated}}\) is the rated total (gross) cooling capacity, user input (W)
+
+\(TotCapTempModFa{c_{Rated}}\) is the total cooling capacity function of temperature curve evaluated with 19.4\(^{\circ}\)C wet-bulb temperature air entering the cooling coil and 35.0\(^{\circ}\)C dry-bulb temperature air entering the air-cooled (outdoor) condenser (dimensionless)
+
+\(TotCapFlowModFa{c_{Rated}}\) is the total cooling capacity function of flow fraction curve evaluated at a flow fraction of 1.0 (dimensionless)
+
+\(FanHeatCorrection\) is the rate that air is heated by the supply fan (W).
+
+\(FanHeatCorrection\) is calculated in one of two ways depending on the user's input for the field called Unit Internal Static Air Pressure.~ If this field was left blank, then the fan heat is calculated using:
+
+\begin{equation}
+FanHeatCorrection = {\dot V_{RatedHighSpeed}}*773.3
+\end{equation}
+
+where:
+
+\({\dot V_{RatedHighSpeed}}\) is the rated air volume flow rate at high speed, user input (m\(^{3}\)/s).
+
+The value of 773.3 W/(m\(^{3}\)/s) (365 W/1000cfm) is specified by ANSI/AHRI 340/360 for indoor-coil-only units that are not provided with a supply fan.
+
+If an internal static pressure is provided, then the fan heat is modeled by evaluating the full model for Fan:VariableVolume.~ This is different that the ratings calculated for single-speed DX equipment which does not use data from an associated fan object.~ The program detects the VAV fan associated with the two-speed coil and uses the input data for that fan but with a different total air pressure rise.~ The total pressure is the sum of the internal pressure and the external pressure (i.e., pressure drop associated with ductwork and other devices external to the indoor fan/coil section). The test conditions in ANSI/AHRI Standard 340/360 vary the (minimum) external static pressure seen by the supply air fan based on the standard rating cooling capacity (see Table \# 5 in ANSI/AHRI Standard 340/360).~ For the part load test points the supply air flow is reduced and the external pressure varies with the square of the flow ratio (see Note 1 in Table \# 6 in ANSI/AHRI Standard 340/360-2007 with Addenda 1 and 2). The entire VAV fan model in EnergyPlus is evaluated at the specified air flow rate and the total static pressure for rating and the fan heat is calculated using
+
+\begin{equation}
+FanHeatCorrection = Enthalp{y_{leavingFan}} - Enthalp{y_{enteringFan}}
+\end{equation}
+
+Energy Efficiency Ratio (EER) is another standard rating (AHRI 2007), and it is defined as the ratio of the total cooling capacity to the total power input at any given set of rating conditions, expressed in W/W (or Btu/W-h). For this class of air-cooled DX cooling coils, EER is calculated at rated test conditions as follows:
+
+\begin{equation}
+  EER = \frac{{\dot Q}_{Standard\,Rating}}{Power_{Total,Rated}}
+\end{equation}
+
+\begin{equation}
+    Power_{Total,Rated} = \dot{Q}_{Total,Rated} TotCapTempModFac_{Rated} TotCapFlowModFac_{Rated} EIR_{Rated} + FanPowerCorrection
+\end{equation}
+
+\begin{equation}
+  EIR_{Rated} = \left( {\frac{1}{{CO{P_{Rated}}}}} \right)(EIRTempModFa{c_{Rated}})(EIRFlowModFa{c_{Rated}})
+\end{equation}
+
+where:
+
+\emph{EER} is the Energy Efficiency Ratio (W/W)
+
+\(Power_{Total,Rated}\) is the total electric power (compressors, condenser fans and evaporator fan) with 19.4\(^{\circ}\)C wet-bulb temperature air entering the cooling coil, 35.0\(^{\circ}\)C dry-bulb temperature air entering the air-cooled (outdoor) condenser, and air flow rate across the evaporator at the rated high speed air flow rate.
+
+Similar to the fan heat correction, the fan power correction is calculated in one of two ways depending on the input for internal static pressure.~ If no internal static is provided, fan power is calculated using:
+
+\begin{equation}
+  FanPowerCorrection = {\dot V_{RatedHighSpeed}} * 773.3
+\end{equation}
+
+If the internal static pressure is provided, then the entire VAV fan model in EnergyPlus is evaluated at the rated high speed air flow rate and the total static pressure for rating and the then the fan power calculated by the fan model is used for the fan power correction.
+
+\(TotCapTempModFac_{Rated}\) is the total cooling capacity function of temperature curve evaluated with 19.44\(^{\circ}\)C wet-bulb temperature air entering the cooling coil and 35.0\(^{\circ}\)C dry-bulb temperature air entering the air-cooled (outdoor) condenser (dimensionless)
+
+\(EIRTempModFa{c_{Rated}}\) is the Energy Input Ratio function of temperature curve evaluated with 19.44\(^{\circ}\)C wet-bulb temperature air entering the cooling coil and 35.0\(^{\circ}\)C dry-bulb temperature air entering the air-cooled (outdoor) condenser (dimensionless).
+
+The Integrated Energy Efficiency Ratio (IEER) is intended to be a measure of merit for the cooling coil's part-load efficiency. IEER replaced Integrated Part-Load Value (IPLV) as the part-load performance metric in Std. 340/360 as of January 1, 2010. Full details regarding the IEER calculation are available in ANSI/AHRI Std. 340/360 (AHRI 2007). A summary of the IEER calculations made by EnergyPlus for two-speed air-cooled DX cooling coils is provided below:
+
+\begin{equation}
+  IEER = \,(0.02 \cdot EE{R_A}) + (0.617 \cdot EE{R_B}) + (0.238 \cdot EE{R_C}) + (0.125 \cdot EE{R_D})
+\end{equation}
+
+where:
+
+\(EER_A\) is the \emph{EER} at 100\% net capacity at AHRI standard rating conditions (same as EER calculation shown above but in Btu/h)
+
+\(EER_B\) is the \emph{EER} at 75\% net capacity and reduced outdoor air temperature Btu/h
+
+\(EER_C\) is the \emph{EER} at 50\% net capacity and reduced outdoor air temperature Btu/h
+
+\(EER_D\) is the \emph{EER} at 25\% net capacity and reduced outdoor air temperature Btu/h.
+
+The following table summarizes the test points.
+
+% table 58
+\begin{longtable}[c]{p{0.8in}p{0.8in}p{0.8in}p{0.8in}p{0.8in}p{2.0in}}
+\caption{Test points for Two-Speed DX Coil Ratings \label{table:test-points-for-two-speed-dx-coil-ratings}} \tabularnewline
+\toprule 
+Point & Net Capacity & Coil inlet wetbulb & Coil inlet drybulb & Condenser inlet drybulb & Supply air flow rate \tabularnewline
+\midrule
+\endfirsthead
+
+\caption[]{Test points for Two-Speed DX Coil Ratings} \tabularnewline
+\toprule 
+Point & Net Capacity & Coil inlet wetbulb & Coil inlet drybulb & Condenser inlet drybulb & Supply air flow rate \tabularnewline
+\midrule
+\endhead
+
+A & 100\% & 19.4\(^{\circ}\)C & 26.7\(^{\circ}\)C & 35.0\(^{\circ}\)C & Rated High speed flow rate \tabularnewline
+\midrule
+B & 75\% & 19.4\(^{\circ}\)C & 26.7\(^{\circ}\)C & 27.5\(^{\circ}\)C & Root solver result where \tabularnewline
+C & 50\% & 19.4\(^{\circ}\)C & 26.7\(^{\circ}\)C & 20.0\(^{\circ}\)C & coil leaving drybulb\tabularnewline
+D & 25\% & 19.4\(^{\circ}\)C & 26.7\(^{\circ}\)C & 18.3\(^{\circ}\)C & matches Point A\tabularnewline
+\bottomrule
+\end{longtable}
+
+The units are assumed to be VAV and Standard 340/360 is be applied as for VAV indoor supply fan.~ Because the standard stipulates ``the airflow rate at part load should be adjusted to maintain the full load measured leaving dry-bulb temperature,'' the part load rating test points ``B'', ``C'', and ``D'' are evaluated by using the entire DX coil model calculations to obtain the supply air conditions leaving the coil and iterating on supply air flow rate to find the supply air flow rate.~ The numerical method called root solver is used to find the supply flow rate at each of the part load test points.~ Once the supply air flow rate is known, the two-speed DX coil model results are used to determine EER at the part load test points.
+
+When evaluating the two-speed DX coil model, the speed ratio and cycling ratio are specified based on the desired or target net capacity.~ When the low speed net capacity is lower than the target part load net capacity, the speed ratio is calculated using:
+
+\begin{equation}
+SpeedRatio = \frac{{DesiredNetCapacity - LowSpeedNetCapacity}}{{HighSpeedNetCapacity - LowSpeedNetCapacity}}
+\end{equation}
+
+When the low speed net capacity is higher than a target part load net capacity then the unit must cycle to meet the lower load.~ The speed ratio is then set to 0.0 (minimum unloading) and the cycling ratio is calculated using:
+
+\begin{equation}
+CyclingRatio = \frac{{DesiredNetCapacity}}{{LowSpeedNetCapacity}}
+\end{equation}
+
+The results for EER, COP, and supply air mass flow rate at the part load test points are reported to the EIO file and a predefined table report called VAV DX Cooling Standard Rating Details.
+
+\subsubsection{References}\label{references-4-001}
+
+See the references for the single speed DX cooling coil earlier in this document.
+
+\subsection{Variable Speed DX Cooling Coil}\label{variable-speed-dx-cooling-coil}
+
+\subsubsection{Overview}\label{overview-4-002}
+
+The Coil:Cooling:DX:VariableSpeed object will simulate the performance of a DX cooling coil used in combination with a variable-speed unitary air conditioner and air-to-air heat pump. It fits into the parent objects of AirLoopHVAC:UnitaryHeatCool, ZoneHVAC:PackagedTerminalAirConditioner, AirLoopHVAC:UnitaryHeatPump:AirToAir and ZoneHVAC:PackagedTerminalHeatPump, etc.
+
+The rated conditions for obtaining the capacities, COPs and SHR~ are indoor dry-bulb temperature at 26.67\(^{\circ}\)C (80\(^{\circ}\)F), wet bulb temperature at 19.44\(^{\circ}\)C (67\(^{\circ}\)F),~ and the source side entering air temperature at 35\(^{\circ}\)C (95\(^{\circ}\)F).
+
+Variable-speed cooling coils lead to varied dehumidification behaviors, that the Bypass Factor (BF) is not only dependent on the indoor air flow rate, but also on the refrigerant mass flow rate, i.e.~the compressor speed. The methods of calculating Bypass factor and Sensible Heat Transfer Ratio at each speed are the same as the water source variable-speed cooling coil (object name Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit).
+
+\subsubsection{Model Description}\label{model-description-3-003}
+
+The Coil:Cooling:DX:VariableSpeed object is modeled in a manner similar to Coil:Cooling:WaterTo-AirHeatPump:VariableSpeedEquationFit. Of course, rather than referencing a water-cooled condenser, the new coil object references to outdoor air-cooled condenser, and has the air entering temperature in place of the condenser water entering temperature.
+
+It shall be noted for the total cooling capacity and flow rate inputs, two fields are autosizable, which are Rated Total Cooling Capacity at Selected Nominal Speed Level and Rated Volumetric Air Flow Rate at Selected Nominal Speed Level. They are used to scale the performances of an actual unit and correlate with the actual loop flow. Except the two fields, all other total cooling capacity and flow rate inputs at individual speed levels should be directly obtained from Reference Unit catalog.
+
+The Rated Total Cooling Capacity at Selected Nominal Speed Level contains the rated total cooling capacity to match the building sensible or latent cooling load.~ The rated cooling capacity is used to determine a capacity scaling factor, as compared to the Reference Unit catalog capacity at the nominal speed level.
+
+\begin{equation}
+{\rm{Capacity~Scale~Factor}} = \frac{{{\rm{Rated~Total~Cooling~Capacity}}}}{{{\rm{Reference~Unit~Total~Cooling~Capacity}}@{\rm{Nominal~Speed~Level}}}}
+\end{equation}
+
+And then, this scaling factor is used to determine capacities at rated condition for other speed levels, as below,
+
+\begin{equation}
+\begin{array}{l}
+{\rm{Rated~Total~Cooling~Capacity}}@{\rm{Speed~Level}}\left( {\rm{x}} \right) = \\
+{\rm{Capacity~Scale~Factor}} \times {\rm{Reference~Unit~Total~Cooling~Capacity}}@{\rm{Speed~Level}}({\rm{x}})
+\end{array}
+\end{equation}
+
+The Rated Volumetric Air Flow Rate is used to determine an internal scaling factor, and calculate the air flow rates in the parent objects, as follows:
+
+\begin{equation}
+{\rm{Air~Flow~Scale~Factor}} = \frac{{{\rm{Rated~Volumetric~Air~Flow~Rate}}}}{{{\rm{Reference~Unit~Vol~Air~Flow~Rate}}@{\rm{Nominal~Speed~Level}} \times {\rm{CapacityScaleFactor}}}}
+\end{equation}
+
+And the loop volumetric air flow rates in the parent objects are calculated as below:
+
+\begin{equation}
+\begin{array}{l}
+{\rm{Loop~Volumetric~Air~Flow~Rate}}@{\rm{Speed~Level}}\left( {\rm{x}} \right) = \\ {\rm{Air~Flow~Scale~Factor}} \times {\rm{Reference~Unit~Vol~Air~Flow~Rate}}@{\rm{Speed~Level}}({\rm{x}}) \times {\rm{Capacity~Scale~Factor}}
+\end{array}
+\end{equation}
+
+If the volumetric air flow rate at one speed level is higher than the flow rate allowed by the fan in the parent object, the flow rate will be set back to the fan flow rate.
+
+If \({\rm{Air~Flow~Scale~Factor}}\) equals to unity, the loop air flow rate become the design flow rates of the original unit (after scaled by the rated total cooling capacity). The Rated Volumetric Air Flow Rate is introduced here to correlate with the actual flow rate in the air loop, in case that these differ from the design specifications. Certainly, it is recommended that the Rated Volumetric Air Flow Rate is selected in the way that \({\rm{Air~Flow~Scale~Factor}}\) is unity, so as to get more accurate results from the performance curves.
+
+If the condenser is evaporatively cooled, it is necessary to know the condenser air flow rate, so as to calculate the water evaporation rate. We will have fields for specifying the Reference Unit condenser volumetric air flow rates at individual speed levels, and these inputs are optional. If the condenser air flow rates are not inputted by the user, default values of condenser volumetric air flow rate as a function of the rated total cooling capacity will be used. Condenser air flow rates of the simulated unit are calculated as below,
+
+\begin{equation}
+  \begin{array}{l}
+    \rm{Condenser~Volumetric~Air~Flow~Rate} @ \rm{Speed~Level} \left( {\rm{x}} \right) = \\
+    \quad \quad \rm{Reference~Unit~Condenser~Vol~Air~Flow~Rate} @ \rm{Speed~Level} (\rm{x}) \times \\
+    \quad \quad \quad \rm{Capacity~Scale~Factor}
+  \end{array}
+\end{equation}
+
+\subsubsection{Performance Curves}\label{performance-curves}
+
+This object includes 4 curve objects at each individual speed level.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi})}
+\tightlist
+\item Total cooling capacity modifier curve (function of temperature)
+\item Total cooling capacity modifier curve (function of air flow fraction)
+\item Energy input ratio (EIR) modifier curve (function of temperature)
+\item Energy input ratio (EIR) modifier curve (function of air flow fraction)
+\end{enumerate}
+
+The flow fraction modifier curves are used as a placeholder, to account for off-design flow rates if needed. If the manufacturer doesn't provide the off-design performances, we can simply use a default modification multiplier of 1.0.
+
+At the lowest speed, there will be one additional performance curve to correlate the part-load condition, i.e.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi})}
+\setcounter{enumi}{4}
+\tightlist
+\item
+  Part load fraction correlation (function of part load ratio)
+\end{enumerate}
+
+More information on each of these curves is given below.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi})}
+\item Total cooling capacity modifier curve (function of temperature)
+\end{enumerate}
+
+The total cooling capacity modifier as a function of temperature curve (CAP-FT) is a biquadratic curve with two independent variables: wet-bulb temperature of the air entering the cooling coil and the condenser entering air temperature. The output of this curve is multiplied by the rated total cooling capacity at the speed, to give the total cooling capacity at the specific entering air WB and condenser inlet air DB at which the DX unit is operating (i.e., at temperatures different from the rating point temperatures).
+
+Note: The data used to develop the total cooling capacity modifier curve (function of temperature) should represent performance when the cooling coil is `wet' (i.e., coil providing sensible cooling and at least some dehumidification). Performance data when the cooling coil is `dry' (i.e., not providing any dehumidification) should not be included when developing this modifier curve. This model automatically detects and adjusts for `dry coil' conditions.
+
+\begin{equation}
+{\rm{TotCapTempModFac}} = {\rm{a}} + {\rm{b*W}}{{\rm{B}}_{\rm{i}}} + {\rm{c*WB}}_{\rm{i}}^2 + {\rm{d*D}}{{\rm{B}}_{\rm{o}}} + {\rm{e*D}}{{\rm{B}}_{\rm{o}}}^2 + {\rm{f*W}}{{\rm{B}}_{\rm{i}}}{\rm{*D}}{{\rm{B}}_{\rm{o}}}
+\end{equation}
+
+where:
+
+WB\(_{i}\) is the wet-bulb temperature of the air entering the indoor cooling coil (\(^{\circ}\)C)
+
+DB\(_{o}\) is the dry-bulb temperature of the air entering the condenser coil (\(^{\circ}\)C)
+
+a-f is the regression curve-fit coefficients.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi})}
+\setcounter{enumi}{1}
+\item Total cooling capacity modifier curve (function of air flow fraction)
+\end{enumerate}
+
+The total cooling capacity modifier curve (function of air flow fraction) is a cubic curve with the independent variable being the ratio of the actual air flow rate across the cooling coil to the design air flow rate (i.e., fraction of design flow at the speed).
+
+\begin{equation}
+{\rm{TotCapAirFlowModFac}} = {\rm{a}} + {\rm{b*f}}{{\rm{f}}_{\rm{a}}} + {\rm{c*ff}}_{\rm{a}}^2 + {\rm{d*ff}}_{\rm{a}}^3
+\end{equation}
+
+where:
+
+ff\(_{a}\) is the actual air mass flow rate/design air mass flow rate, at one speed level
+
+a-d are the regression curve fit coefficients.  If no data for correction is available, the user can simply use a = 1.0 and set the other coefficients to 0.0.
+
+\begin{equation}
+  \begin{array}{l}
+    {\rm{DesignAirMassFlowRate}}@{\rm{SpeedLevel}}({\rm{x}}) = {\rm{}}\\\quad \quad \quad {\rm{ReferenceUnitAirMassFlowRate}}@{\rm{SpeedLevel}}({\rm{x}}) \times {\rm{CapacityScaleFactor}}
+  \end{array}
+\end{equation}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi})}
+\setcounter{enumi}{2}
+\tightlist
+\item
+  Energy input ratio (EIR) modifier curve (function of temperature)
+\end{enumerate}
+
+The energy input ratio modifier curve as a function of temperature (EIR-FT) is a biquadratic curve with two independent variables: wet-bulb temperature of the air entering the cooling coil and the condenser entering air temperature. The output of this curve is multiplied by the rated EIR (inverse of the rated COP) at the speed level, to give the EIR at the specific entering air temperatures at which the DX unit is operating (i.e., at temperatures different from the rating point temperatures).
+
+\begin{equation}
+{\rm{EIRTempModFac}} = {\rm{a}} + {\rm{b*W}}{{\rm{B}}_{\rm{i}}} + {\rm{c*WB}}_{\rm{i}}^2 + {\rm{d*D}}{{\rm{B}}_{\rm{o}}} + {\rm{e*D}}{{\rm{B}}_{\rm{o}}}^2 + {\rm{f*W}}{{\rm{B}}_{\rm{i}}}{\rm{*D}}{{\rm{B}}_{\rm{o}}}
+\end{equation}
+
+where a-f are regression curve fit coefficients.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi})}
+\setcounter{enumi}{3}
+\tightlist
+\item
+  Energy input ratio (EIR) modifier curve (function of air flow fraction)
+\end{enumerate}
+
+\begin{equation}
+{\rm{EIRAirFlowModFac}} = {\rm{a}} + {\rm{b*f}}{{\rm{f}}_{\rm{a}}} + {\rm{c*ff}}_{\rm{a}}^2 + {\rm{d*ff}}_{\rm{a}}^3
+\end{equation}
+
+where a-d are regression curve fit coefficients.  If no data is available for correction, the user can simply use a = 1.0 and set the other coefficients to 0.0.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi})}
+\setcounter{enumi}{4}
+\tightlist
+\item
+  Part load fraction correlation (function of part load ratio)
+\end{enumerate}
+
+This field defines the name of a quadratic or cubic performance curve (Ref: Performance Curves) that parameterizes the variation of electrical power input to the unit as a function of the part load ratio (PLR, Sensible or Latent Load/Steady-State Sensible or Latent Capacity for Speed 1). The description of the part load fraction correlation for the variable-speed DX cooling coil is similar to the variable-speed DX heating coil.
+
+\subsubsection{Lowest Speed Operation}\label{lowest-speed-operation}
+
+The lowest speed operation of the variable-speed DX cooling coil is similar to the single speed DX cooling coil. The total (gross) cooling capacity of the variable-speed DX coil is calculated as follows:
+
+\begin{equation}
+  \begin{array}{l}
+    \rm{Q}_{\rm{total},1} = \rm{Rated~Total~Cooling~Capacity} @ \rm{Speed~Level} \left( 1 \right) \rm{*} \\
+    \quad \quad \rm{TotCapTempModFa} \rm{c}_1 \rm{*TotCapAirFlowModFa} \rm{c}_1
+  \end{array}
+\end{equation}
+
+And the EIR is calculated as:
+
+\begin{equation}
+\rm{EI} \rm{R}_1 = \frac{1.0}{\rm{Reference~Unit~COP} @ \rm{Speed}(1)}{\rm{EIRTempModFa}}{\rm{c}_1}{\rm{*EIRAirFlowModFa}}{\rm{c}_1}
+\end{equation}
+
+And the power consumption excluding the indoor fan is:
+
+\begin{equation}
+{\rm{Powe}}{{\rm{r}}_1} = {{\rm{Q}}_{{\rm{total}},1}}{\rm{*EI}}{{\rm{R}}_1}{\rm{*RTF}}
+\end{equation}
+
+At the lowest speed, the dehumidification calculation is exactly the same as the single speed DX coil. That is to use the rated SHR and the design air flow rate at the lowest speed to calculate rated bypass factor of BF\(_{rated,1}\), and the corresponding effective surface area of A\(_{o,1}\). With A\(_{o,1}\) known, the coil BF can be adjusted for non-rated air flow rates.
+
+The part load ratio for sensible cooling is:
+
+\begin{equation}
+{\rm{PLR}} = {\rm{SensibleCoolingLoad}}/({{\rm{Q}}_{{\rm{total}},1}}{\rm{*SH}}{{\rm{R}}_1})
+\end{equation}
+
+For latent cooling:
+
+\begin{equation}
+{\rm{PLR}} = {\rm{LatentCoolingLoad}}/[{{\rm{Q}}_{{\rm{total}},1}}{\rm{*}}(1.0 - {\rm{SH}}{{\rm{R}}_1})]
+\end{equation}
+
+\subsubsection{Higher Speed Operation}\label{higher-speed-operation-1-000}
+
+At the speed level between the lowest and the highest, there is no part-load loss. A parameter of speed ratio (SpeedRatio) is used to define the capacity partition between Speed x-1 and Speed x.
+
+The design air flow rate at the speed ratio are given as following:
+
+\begin{equation}
+  \begin{array}{l}
+    \rm{DesignAirFlowRateSpeedRatio} = \rm{Reference~Unit~Air~Mass~Flow~Rate} @ \rm{Speed~Level} \left( \rm{x} - 1 \right) \rm{*} \\
+    \quad \quad \quad \rm{CapacityScaleFactor*} \left( 1 - \rm{SpeedRatio} \right) + \\
+    \quad \quad \rm{Reference~Unit~Air~Mass~Flow~Rate} @ \rm{Speed~Level} \left( \rm{x} \right) \rm{*} \\
+    \quad \quad \quad \rm{CapacityScaleFactor*SpeedRatio}
+  \end{array}
+\end{equation}
+
+The fraction of air flow is given by \({\rm{f}}{{\rm{f}}_{{\rm{a}},{\rm{x}} - 1}}\) = \({\rm{f}}{{\rm{f}}_{{\rm{a}},{\rm{x}}}}\) = actual air mass flow rate/DesignAirFlowRateSpeedRatio.
+
+The total cooling capacities and EIRs at Speed x-1 and Speed x are calculated:
+
+\begin{equation}
+  \begin{array}{l}
+    \rm{Q}_{\rm{total},\rm{x} - 1} = \rm{Rated~Total~Cooling~Capacity} @ \rm{Speed~Level} \left( \rm{x} - 1 \right) \rm{*} \\
+    \quad \quad \quad \rm{TotCapTempModFa} \rm{c}_{\rm{x} - 1} \rm{*TotCapAirFlowModFa} \rm{c}_{\rm{x} - 1}
+  \end{array}
+\end{equation}
+
+\begin{equation}
+  \begin{array}{l}
+    \rm{Q}_{\rm{total},\rm{x}} = \rm{Rated~Total~Cooling~Capacity} @ \rm{Speed~Level} \left( \rm{x} \right) \rm{*} \\
+    \quad \quad \quad \rm{TotCapTempModFa} \rm{c}_{\rm{x}} \rm{*TotCapAirFlowModFa} \rm{c}_{\rm{x}}
+  \end{array}
+\end{equation}
+
+\begin{equation}
+{\rm{EI}}{{\rm{R}}_{{\rm{x}} - 1}} = \frac{{1.0}}{{{\rm{Reference~Unit~COP}}@{\rm{Speed}}({\rm{x}} - 1)}}{\rm{EIRTempModFa}}{{\rm{c}}_{{\rm{x}} - 1}}{\rm{*EIRAirFlowModFa}}{{\rm{c}}_{{\rm{x}} - 1}}
+\end{equation}
+
+\begin{equation}
+{\rm{EI}}{{\rm{R}}_{\rm{x}}} = \frac{{1.0}}{{{\rm{Reference~Unit~COP}}@{\rm{Speed}}\left( {\rm{x}} \right)}}{\rm{EIRTempModFa}}{{\rm{c}}_{\rm{x}}}{\rm{*EIRAirFlowModFa}}{{\rm{c}}_{\rm{x}}}
+\end{equation}
+
+The total cooling capacity at the corresponding speed ratio is:
+
+\begin{equation}
+{{\rm{Q}}_{{\rm{total}},{\rm{SpeedRatio}}}} = \left( {1.0 - {\rm{SpeedRatio}}} \right){\rm{*}}{{\rm{Q}}_{{\rm{total}},{\rm{x}} - 1}} + {\rm{SpeedRatio*}}{{\rm{Q}}_{{\rm{total}},{\rm{x}}}}
+\end{equation}
+
+and the power consumption, excluding the indoor fan, is:
+
+\begin{equation}
+{\rm{Powe}}{{\rm{r}}_{{\rm{SpeedRatio}}}} = \left( {1.0 - {\rm{SpeedRatio}}} \right){\rm{*}}{{\rm{Q}}_{{\rm{total}},{\rm{x}} - 1}}{\rm{*EI}}{{\rm{R}}_{{\rm{x}} - 1}} + {\rm{SpeedRatio*}}{{\rm{Q}}_{{\rm{total}},{\rm{x}}}}{\rm{*EI}}{{\rm{R}}_{\rm{x}}}
+\end{equation}
+
+The net heat discharged from the condenser is:
+
+\begin{equation}
+{{\rm{Q}}_{{\rm{cond}},{\rm{SpeedRatio}}}} = {\rm{Powe}}{{\rm{r}}_{{\rm{SpeedRatio}}}} + {{\rm{Q}}_{{\rm{total}},{\rm{SpeedRatio}}}}
+\end{equation}
+
+and the effective surface area in the correlations of BF factor is calculated as below:
+
+\begin{equation}
+{{\rm{A}}_{{\rm{o}},{\rm{SpeedRatio}}}} = \left( {1 - {\rm{SpeedRatio}}} \right){\rm{*}}{{\rm{A}}_{{\rm{o}},{\rm{x}} - 1}} + {\rm{SpeedRatio*}}{{\rm{A}}_{{\rm{o}},{\rm{x}}}}
+\end{equation}
+
+Using A\(_{o,SpeedRatio}\) in the same BF and SHR calculation procedure as the single speed DX cooling coil, we can get BF\(_{SpeedRatio}\) and SHR\(_{SpeedRatio}\).  The sensible cooling capacity is calculated using:
+
+\begin{equation}
+{{\rm{Q}}_{{\rm{sensible}},{\rm{SpeedRatio}}}} = {{\rm{Q}}_{{\rm{total}},{\rm{SpeedRatio}}}}{\rm{*SH}}{{\rm{R}}_{{\rm{SpeedRatio}}}}
+\end{equation}
+
+If the variable-speed DX cooling coil used to match the sensible cooling load, then:
+
+\begin{equation}
+{{\rm{Q}}_{{\rm{sensible}},{\rm{SpeedRatio}}}} = {\rm{SensibleLoad}}
+\end{equation}
+
+If it intends to match the latent cooling load, then:
+
+\begin{equation}
+{{\rm{Q}}_{{\rm{total}},{\rm{SpeedRatio}}}}{\rm{*}}\left( {1.0 - {\rm{SH}}{{\rm{R}}_{{\rm{SpeedRatio}}}}} \right) = {\rm{LatentLoad}}
+\end{equation}
+
+If the speed reaches the highest level, the speed ratio becomes 1.0, and Speed n represents the highest speed.
+
+\subsubsection{Evaporatively Cooled Condenser}\label{evaporatively-cooled-condenser}
+
+If using evaporative pre-cooling pad upstream of the condenser, the user must also enter the appropriate evaporative effectiveness for the media at each compressor speed, so as to correlate variation of the effectiveness as a function of compressor speed, i.e.~the variation of condenser air flow rate. The evaporative effectiveness is interpolated between speed levels as:
+
+\begin{equation}
+{\rm{Effectivenes}}{{\rm{s}}_{{\rm{SpeedRatio}}}} = \left( {1.0 - {\rm{SpeedRatio}}} \right){\rm{*Effectivenes}}{{\rm{s}}_{{\rm{x}} - 1}} + {\rm{SpeedRatio*Effectivenes}}{{\rm{s}}_{\rm{x}}}
+\end{equation}
+
+The interpolated effectiveness at the speed ratio is used to calculate the air temperature reduction across the evaporative cooling pad, and the decreased air temperature entering the condenser coil is used in place of the ambient temperature as:
+
+\begin{equation}
+{{\rm{T}}_{{\rm{c}},{\rm{i}}}} = {{\rm{T}}_{{\rm{wb}},{\rm{o}}}} + (1.0 - {\rm{Effectivenes}}{{\rm{s}}_{{\rm{SpeedRatio}}}}){\rm{*}}({{\rm{T}}_{{\rm{db}},{\rm{o}}}} - {{\rm{T}}_{{\rm{wb}},{\rm{o}}}})
+\end{equation}
+
+where:
+
+\({{\rm{T}}_{{\rm{c}},{\rm{i}}}}\) is the condenser entering air temperature (\(^{\circ}\)C)
+
+\({{\rm{T}}_{{\rm{wb}},{\rm{o}}}}\) is the outdoor air wet bulb temperature (\(^{\circ}\)C)
+
+\({{\rm{T}}_{{\rm{db}},{\rm{o}}}}\) is the outdoor air dry bulb temperature (\(^{\circ}\)C).
+
+The water consumption rate is calculated based on the interpolated condenser air flow rate at the speed ratio, i.e.~the condenser flow rate at the speed ratio is:
+
+\begin{equation}
+{\dot m_{condair,{\rm{}}SpeedRatio}} = \left( {1.0 - SpeedRatio} \right){\rm{*}}{\dot m_{condair,{\rm{}}x - 1}} + SpeedRatio{\rm{*}}{\dot m_{condair,{\rm{}}x}}
+\end{equation}
 
 \subsection{Electric Air Heating Coil}\label{electric-air-heating-coil}
 
@@ -3624,7 +4796,11 @@ This is the same as the single-speed DX heating coil.
 
 The input object Coil:Heating:Desuperheater provides a model that simulates the thermal performance of a refrigerant-to-air heating coil and the parasitic electric consumption of its control valves or other auxiliary devices. The model assumes that the heating energy provided by this coil is reclaimed from the superheated refrigerant gas leaving a compressor and does not impact the performance of the compressor. The objects from which this coil can obtain its heating energy are:
 
-Coil:Cooling:DX
+Coil:Cooling:DX:SingleSpeed
+
+Coil:Cooling:DX:TwoSpeed
+
+Coil:Cooling:DX:TwoStageWithHumidityControlMode
 
 Refrigeration:CompressorRack
 
@@ -3636,7 +4812,7 @@ NOTE: When the heating source is a refrigeration compressor rack, the heat rejec
 
 The sources for the waste heat can also be used to supply other coils.~ To avoid double-counting this waste heat, the amount available is corrected to reflect these other uses. For the three DX Cooling Coil sources, this correction is made within the same time step loop.~ For the two refrigeration system sources, the correction is made using the value from the previous time step.
 
-The desuperheater heating coil can be used in air loop simulations for various air heating applications. For example, it can be used as an air reheat coil for high humidity control in the compound objects AirLoopHVAC:Unitary:Furnace:HeatCool and AirLoopHVAC:UnitaryHeatCool (see High Humidity Control With HeatCool Configuration). For this application, the desuperheater coil is controlled based on the calculated heating load to maintain the zone temperature and humidity setpoints (load-based control). The source of reclaimed heat could be the direct expansion (DX) cooling coil itself (Coil:Cooling:DX) or a refrigerated case compressor rack (Refrigeration:CompressorRack).
+The desuperheater heating coil can be used in air loop simulations for various air heating applications. For example, it can be used as an air reheat coil for high humidity control in the compound objects AirLoopHVAC:Unitary:Furnace:HeatCool and AirLoopHVAC:UnitaryHeatCool (see High Humidity Control With HeatCool Configuration). For this application, the desuperheater coil is controlled based on the calculated heating load to maintain the zone temperature and humidity setpoints (load-based control). The source of reclaimed heat could be the direct expansion (DX) cooling coil itself (Coil:Cooling:DX:SingleSpeed) or a refrigerated case compressor rack (Refrigeration:CompressorRack).
 
 The desuperheater heating coil can also be used with cooling/heating systems that maintain specific air loop (deck) temperatures. For example, Figure~\ref{fig:desuperheater-heating-coil-used-as-a-reheat} shows a schematic diagram of the desuperheater heating coil used in conjunction with the CoilSystem:Cooling:DX object. The desuperheater heating coil must be placed downstream of the DX cooling coil when reclaiming heat from that cooling coil's compressor(s). Desuperheating heating coil placement is unrestricted when reclaiming heat from a refrigeration compressor rack or refrigeration condenser. The configuration in Figure~\ref{fig:desuperheater-heating-coil-used-as-a-reheat} shows the heating coil being controlled via a temperature-based strategy. In this example, the DX cooling coil could be used to the maintain its discharge air temperature at 11°C for zone dehumidification. The desuperheater heating coil could then raise the air dry-bulb temperature to 16°C providing a dry supply air stream at a temperature which does not require much additional heating by terminal units to meet the zone temperature setpoint.
 
@@ -3646,7 +4822,7 @@ The desuperheater heating coil can also be used with cooling/heating systems tha
 \caption{Desuperheater Heating Coil Used as a Reheat Coil with CoilSystem:Cooling:DX \protect \label{fig:desuperheater-heating-coil-used-as-a-reheat}}
 \end{figure}
 
-Since the heating provided by the desuperheater coil is based on available waste heat from another system, the selection of fan control for the air loop equipment is essential for proper modeling. When the coil's heating source is a direct expansion cooling coil (Coil:Cooling:DX), the air loop's fan control mode may be auto fan (cycling fan cycling coil), constant fan, or variable volume since the desuperheater heating coil cycles on/off with the DX cooling coil. When the heating source is a compressor rack or condenser for refrigerated cases, the supply air fan control should be either variable volume or constant fan since the desuperheater heating coil will typically be available the entire simulation time step.
+Since the heating provided by the desuperheater coil is based on available waste heat from another system, the selection of fan control for the air loop equipment is essential for proper modeling. When the coil's heating source is a direct expansion cooling coil (Coil:Cooling:DX:SingleSpeed, Coil:Cooling:DX:TwoSpeed, or Coil:Cooling:DX:TwoStageWithHumidityControlMode), the air loop's fan control mode may be auto fan (cycling fan cycling coil), constant fan, or variable volume since the desuperheater heating coil cycles on/off with the DX cooling coil. When the heating source is a compressor rack or condenser for refrigerated cases, the supply air fan control should be either variable volume or constant fan since the desuperheater heating coil will typically be available the entire simulation time step.
 
 NOTE: Use of the desuperheater heating coil in variable air volume systems should be done with caution since the model assumption of a fixed heat reclaim recovery efficiency may not be valid if the air flow rate over the coil varies significantly.
 
@@ -3818,7 +4994,11 @@ Nimmo, B.G. et al. 1993.DEAC: Desiccant Enhancement of Cooling-Based Dehumidific
 
 The input object Coil:WaterHeating:Desuperheater provides a model that simulates the thermal performance of a refrigerant-to-water heating coil and the electric consumption of its water circulation pump, control valves, and other auxiliary devices. The model assumes that the heating energy provided by this coil is reclaimed from the superheated refrigerant gas leaving a compressor and does not impact the performance of the compressor. For water cooled systems, the impact of the desuperheater is reflected by reducing the heat transfer to the condensing plant loop. The objects from which this coil can obtain its heating energy are:
 
-Coil:Cooling:DX
+Coil:Cooling:DX:SingleSpeed
+
+Coil:Cooling:DX:TwoSpeed
+
+Coil:Cooling:DX:TwoStageWithHumidityControlMode
 
 Coil:Cooling:WaterToAirHeatPump:EquationFit
 
@@ -3835,7 +5015,7 @@ To model a desuperheater water heating coil, the input data file must include th
 \begin{itemize}
 \item Coil:WaterHeating:Desuperheater
 \item WaterHeater:Mixed or WaterHeater:Stratified
-\item Coil:Cooling:DX or Refrigeration:CompressorRack or Refrigeration:Condenser:* or Coil:Cooling:WaterToAirHeatPump:EquationFit
+\item Coil:Cooling:DX:* or Refrigeration:CompressorRack or Refrigeration:Condenser:* or Coil:Cooling:WaterToAirHeatPump:EquationFit
 \end{itemize}
 
 A schematic diagram showing the desuperheater water heating coil with its water heater and DX system condenser is shown below.
@@ -4109,9 +5289,9 @@ Air Source Integrated Heat Pump (ASIHP) is an air source, multi-functional spaci
 
 The latest technology for commercial air conditioners and air-to-air heat pumps can utilize a variable-speed compressor with a variable-speed indoor blower and outdoor fan. Integrated heat pumps are multi-functional units capable of space conditioning and water heating. They use condenser waste heat for water heating, and thus achieve significant energy saving. The control and operation of ASIHPs are complicated because they have six working modes in total:  (1) space cooling (SC), (2) space heating (SH), (3) dedicated water heating (DWH), (4) combined space cooling and water heating with full condensing (SCWH), (5) combined space cooling and water heating with desuperheating (SCDWH), and (6) combined space heating and water heating with desuperheating (SHDWH). 
 
-The SC mode has the same operation as Coil:Cooling:DX. The SH mode has the same operation as Coil:Heating:DX:VariableSpeed. The DWH mode uses outdoor air as the heating source, which can be represented by an object of Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed. The SCWH mode uses indoor air as the heating source and full condenser heat for water heating.  Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed is used for the mode.
+The SC mode has the same operation as Coil:Cooling:DX:VariableSpeed. The SH mode has the same operation as Coil:Heating:DX:VariableSpeed. The DWH mode uses outdoor air as the heating source, which can be represented by an object of Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed. The SCWH mode uses indoor air as the heating source and full condenser heat for water heating.  Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed is used for the mode. 
 
-The SCDWH mode uses the superheated section of an outdoor condenser to heat the water. In this combined SCDWH mode, the cooling function is simulated using an object of Coil:Cooling:DX, containing temperature correction curves as a function of the indoor air and ambient temperatures at each speed level. The water heating function is simulated using an object of Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed, having temperature correction curves as a function of the ambient air temperature and entering water temperature at each speed level.  It should be noted that the rated power and power correction curves are contained in the Coil:Cooling:DX object. Thus, the power values and curves in the Coil:WaterHeating:AirToWater--HeatPump:VariableSpeed are not used. That means the power consumption at each speed level of the SCDWH mode is accounted by the cooling coil part.
+The SCDWH mode uses the superheated section of an outdoor condenser to heat the water. In this combined SCDWH mode, the cooling function is simulated using an object of Coil:Cooling:DX:VariableSpeed, containing temperature correction curves as a function of the indoor air and ambient temperatures at each speed level. The water heating function is simulated using an object of Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed, having temperature correction curves as a function of the ambient air temperature and entering water temperature at each speed level.  It should be noted that the rated power and power correction curves are contained in the Coil:Cooling:DX:VariableSpeed object. Thus, the power values and curves in the Coil:WaterHeating:AirToWater--HeatPump:VariableSpeed are not used. That means the power consumption at each speed level of the SCDWH mode is accounted by the cooling coil part. 
 
 The SHDWH uses the superheated section of an indoor condenser to heat the water. In this combined mode, the heating function is simulated using an object of Coil:Heating:DX:VariableSpeed, having temperature correction curves as a function of the indoor air and ambient temperatures at each speed level. The water heating function is simulated using an object of Coil:WaterHeating:AirTo--WaterHeatPump:VariableSpeed, having temperature correction curves as a function of the ambient air temperature and entering water temperature at each speed level. It should be noted that the rated power and power correction curves are contained in the Coil:Heating:DX:VariableSpeed object. Thus, the power values and curves in the Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed are not used. That means the power consumption at each speed level of the SHDWH mode is accounted by the heating coil. Coil:Heating:DX:VariableSpeed object calculates the total heating capacity added to the indoor air flow. The WH capacity is calculated using Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed. 
 
@@ -4124,7 +5304,7 @@ The ASIHP is a collection of working modes, i.e., objects, as described below:
 
 Space Cooling Mode (SC):
 
---Coil object: Coil:Cooling:DX.
+--Coil object: Coil:Cooling:DX:VariableSpeed. 
 
 --Loop object: AirLoopHVAC:UnitarySystem,  which refers to the CoilSystem:IntegratedHeatPump:AirSource object. 
 
@@ -4164,9 +5344,9 @@ Combined Space Cooling and Water Heating with Full Condensing Mode (SCWH):
 
 Combined Space Cooling and Water Heating with Desuperheating Mode (SCDWH):
 
---Coil object: use two coil objects, Coil:Cooling:DX and -- Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed. The desuperheater heat is used for water heating, which changes with the compressor speed and operation conditions. This is a dual-function coil, which provides both space cooling and water heating, and so performance curves for the dual functions will be included in the coil objects, respectively. These should be different objects from the SCWH mode and SC mode. The water heating coil contains temperature correction curves as a function of the ambient air temperature and entering water temperature.
+--Coil object: use two coil objects, Coil:Cooling:DX:VariableSpeed and -- Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed. The desuperheater heat is used for water heating, which changes with the compressor speed and operation conditions. This is a dual-function coil, which provides both space cooling and water heating, and so performance curves for the dual functions will be included in the coil objects, respectively. These should be different objects from the SCWH mode and SC mode. The water heating coil contains temperature correction curves as a function of the ambient air temperature and entering water temperature. 
 
-It should be noted that the rated power and power correction curves are contained in the Coil:Cooling:DX object. Thus, the power values and curves in the Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed are not used. That means the power consumption at each speed level of the SCDWH mode is accounted by the cooling coil part.
+It should be noted that the rated power and power correction curves are contained in the Coil:Cooling:DX:VariableSpeed object. Thus, the power values and curves in the Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed are not used. That means the power consumption at each speed level of the SCDWH mode is accounted by the cooling coil part. 
 
 --Loop object: 
 
@@ -4594,7 +5774,7 @@ The steam coils are included in the discussion on steam loops, see: Steam To Air
 
 \subsubsection{Overview}\label{overview-12}
 
-The variable refrigerant flow (VRF) DX cooling coil model is identical to the single-speed DX cooling coil model (Ref. Coil:Cooling:DX) when the compressor operates at it's maximum speed. The calculations used when the VRF heat pump operates at part-load are slightly different than the single-speed DX cooling coil model. For this reason, an adaptation of the single-speed DX cooling coil model is used to model the variable-speed compression system used in the VRF model. The difference in model calculations occur when the VRF DX cooling coil's electronic expansion device reduces refrigerant flow through the cooling coil. When the refrigerant flow is reduced, the coil's apparatus dew point (ADP) temperature changes, as well as the coil's sensible heat ratio (SHR). Since the single-speed DX cooling coil model is able to determine the ADP and SHR of a cooling coil at various operating conditions, this same model concept will be used to determine the ADP and SHR of the variable refrigerant flow DX cooling coil.
+The variable refrigerant flow (VRF) DX cooling coil model is identical to the single-speed DX cooling coil model (Ref. Coil:Cooling:DX:SingleSpeed) when the compressor operates at it's maximum speed. The calculations used when the VRF heat pump operates at part-load are slightly different than the single-speed DX cooling coil model. For this reason, an adaptation of the single-speed DX cooling coil model is used to model the variable-speed compression system used in the VRF model. The difference in model calculations occur when the VRF DX cooling coil's electronic expansion device reduces refrigerant flow through the cooling coil. When the refrigerant flow is reduced, the coil's apparatus dew point (ADP) temperature changes, as well as the coil's sensible heat ratio (SHR). Since the single-speed DX cooling coil model is able to determine the ADP and SHR of a cooling coil at various operating conditions, this same model concept will be used to determine the ADP and SHR of the variable refrigerant flow DX cooling coil.
 
 \subsubsection{Model Description}\label{model-description-9}
 
@@ -4690,7 +5870,7 @@ BF = {e^{ - NTU}} = {e^{{{ - \left( {\frac{{UA}}{{{c_p}}}} \right)} \mathord{\le
 
 For a given coil geometry, the bypass factor is only a function of air mass flow rate. The model calculates the parameter A\(_{o}\) in the equation above based on BF\(_{rated}\) and the rated air mass flow rate. With A\(_{o}\) known, the coil BF can be determined for non-rated air flow rates.
 
-For each simulation time step when the DX cooling coil operates, the total cooling capacity and coil bypass factor at the actual operating conditions are calculated. The coil bypass factor is used to calculate the operating sensible heat ratio (SHR) of the cooling coil using the following equations. Here is where the differnce in models occur for the VRF DX cooling coil and single-speed DX cooling coil. The original coil model (ref: Coil:Cooling:DX) calculates the full load outlet air enthalpy and, considering the bypass factor, finds the coil surface temperture (h\(_{ADP}\)) at full load (i.e., PLR = 1). Conversely, the VRF coil model modulates refrigerant flow to the VRF DX cooling coil which is why this model uses the full load coil capacity multipled by the part-load ratio (the modulated refrigerant flow). The effectively finds the coil surface temperature for a variable refrigerant flow DX cooling coil and the operating sensible heat ratio (SHR) can be calculated.
+For each simulation time step when the DX cooling coil operates, the total cooling capacity and coil bypass factor at the actual operating conditions are calculated. The coil bypass factor is used to calculate the operating sensible heat ratio (SHR) of the cooling coil using the following equations. Here is where the differnce in models occur for the VRF DX cooling coil and single-speed DX cooling coil. The original coil model (ref: Coil:Cooling:DX:SingleSpeed) calculates the full load outlet air enthalpy and, considering the bypass factor, finds the coil surface temperture (h\(_{ADP}\)) at full load (i.e., PLR = 1). Conversely, the VRF coil model modulates refrigerant flow to the VRF DX cooling coil which is why this model uses the full load coil capacity multipled by the part-load ratio (the modulated refrigerant flow). The effectively finds the coil surface temperature for a variable refrigerant flow DX cooling coil and the operating sensible heat ratio (SHR) can be calculated.
 
 \begin{equation}
 {h_{ADP}} = {h_{in}} - \frac{{\left( {{\dot{Q}_{total}}/ \dot{m}} \right)}}{{1 - BF}} ~~for a single-speed DX coil model (h_{ADP1} in figure below)
@@ -5292,7 +6472,7 @@ As shown in the A\(_{o}\) figure, we can almost assume that the A\(_{o}\) parame
 
 \subsubsection{Model Description}\label{model-description-11}
 
-The Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit object is modeled in a manner similar to the multi-speed DX cooling coil model (Ref. Coil:Cooling:DX). Of course, rather than referencing an air-cooled condenser, the new coil object references the water loop, and have the water entering temperature in place of the condenser air entering dry bulb temperature.
+The Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit object is modeled in a manner similar to the multiple-speed DX cooling coil model (Ref. Coil:Cooling:DX:MultiSpeed). Of course, rather than referencing an air-cooled condenser, the new coil object references the water loop, and have the water entering temperature in place of the condenser air entering dry bulb temperature.
 
 It shall be noted for the total cooling capacity and flow rate inputs, three fields are autosizable, which are Rated Total Cooling Capacity (Numeric Field 3) at Selected Nominal Speed Level, Rated Volumetric Air Flow Rate (Numeric Field 4) ~and Rated Volumetric Water Flow Rate (Numeric Field 5). They are used to scale the performances of an actual unit and correlate with the actual loop flows. Except the three fields, all other total cooling capacity and flow rate inputs at individual speed levels should be directly obtained from Reference Unit catalog data, specific to an actual unit.
 
@@ -5731,7 +6911,7 @@ Secondary coils reject to or remove heat from a secondary zone. Secondary coil r
 \caption{Schematic of DX System in cooling operating mode \protect \label{fig:schematic-of-dx-system-in-cooling-operating-mode}}
 \end{figure}
 
-Applications of this technology include: inter-zone heat pump in NTED (Dixon, 2010), and PTAC or PTHP serving Offices attached to a Warehouse, where the office partially or fully enclosed by the warehouse and the condenser is placed inside the Warehouse. The heat rejected or extracted by the secondary DX coil is estimated from the delivered capacity and electric power input of the primary DX coils. And the rejected or extracted heat is treated as internal gain of the secondary zone. Currently secondary DX coil are allowed in single speed, two speed and multi speed DX coil objects: \emph{Coil:Cooling:DX}, \emph{Coil:Heating:DX:SingleSpeed}, and \emph{Coil:Heating:DX:MultiSpeed}.
+Applications of this technology include: inter-zone heat pump in NTED (Dixon, 2010), and PTAC or PTHP serving Offices attached to a Warehouse, where the office partially or fully enclosed by the warehouse and the condenser is placed inside the Warehouse. The heat rejected or extracted by the secondary DX coil is estimated from the delivered capacity and electric power input of the primary DX coils. And the rejected or extracted heat is treated as internal gain of the secondary zone. Currently secondary DX coil are allowed in single speed, two speed and multi speed DX coil objects: \emph{Coil:Cooling:DX:SingleSpeed}, \emph{Coil:Heating:DX:SingleSpeed}, \emph{Coil:Cooling:DX:TwoSpeed}, \emph{Coil:Cooling:DX:MultiSpeed}, and \emph{Coil:Heating:DX:MultiSpeed}.
 
 \subsubsection{Model Description:}\label{model-description-12}
 

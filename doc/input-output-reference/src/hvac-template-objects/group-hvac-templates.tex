@@ -1020,7 +1020,7 @@ Enter autosize to allow the sizing algorithm to determine the proper capacity re
 
 \paragraph{Field: Capacity Control Method}\label{field-capacity-control-method-2}
 
-This input denotes how the unit's output is controlled in order to meet zone heating or cooling requirement. The choices are \textbf{\emph{None}} or \textbf{\emph{SingleZoneVAV}}. For \emph{None}, the unit varies the fan and/or coil speed to meet the load. If constant fan operating mode is selected the fan operates at the design cooling or heating air flow rate while the coil modulates to meet the load. If cycling fan operating mode is selected the fan and coil modulate in unison to meet the load. For \emph{SingleZoneVAV}, the fan air flow rate is reduced to the no load supply air flow rate when the zone sensible load is low such that the maximum supply air temperature limit is not exceeded. If the unit cannot meet the load at this lower air flow rate, the fan speed increases while maintaining the maximum supply air temperature. If the unit still cannot meet the load the unit will operate at the maximum supply air flow rate and the maximum supply air temperature limit can be exceeded. Supply air temperature limits are identified in the \hyperref[zonehvacpackagedterminalairconditioner]{ZoneHVAC:PackagedTerminalAirConditioner} input fields for Minimum Supply Air Temperature in Cooling Mode and Maximum Supply Air Temperature in Heating Mode. Additionally, specific coil types are required for the SingleZoneVAV capacity control method. The cooling coil type is \hyperref[coilcoolingdx]{Coil:Cooling:DX} while the heating coil types are \hyperref[coilheatingwater]{Coil:Heating:Water}, \hyperref[coilheatinggas-000]{Coil:Heating:Fuel} and \hyperref[coilheatingelectric]{Coil:Heating:Electric}. If alternate coil types are used they are modeled using the load based control method.
+This input denotes how the unit's output is controlled in order to meet zone heating or cooling requirement. The choices are \textbf{\emph{None}} or \textbf{\emph{SingleZoneVAV}}. For \emph{None}, the unit varies the fan and/or coil speed to meet the load. If constant fan operating mode is selected the fan operates at the design cooling or heating air flow rate while the coil modulates to meet the load. If cycling fan operating mode is selected the fan and coil modulate in unison to meet the load. For \emph{SingleZoneVAV}, the fan air flow rate is reduced to the no load supply air flow rate when the zone sensible load is low such that the maximum supply air temperature limit is not exceeded. If the unit cannot meet the load at this lower air flow rate, the fan speed increases while maintaining the maximum supply air temperature. If the unit still cannot meet the load the unit will operate at the maximum supply air flow rate and the maximum supply air temperature limit can be exceeded. Supply air temperature limits are identified in the \hyperref[zonehvacpackagedterminalairconditioner]{ZoneHVAC:PackagedTerminalAirConditioner} input fields for Minimum Supply Air Temperature in Cooling Mode and Maximum Supply Air Temperature in Heating Mode. Additionally, specific coil types are required for the SingleZoneVAV capacity control method. The cooling coil type is \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed} while the heating coil types are \hyperref[coilheatingwater]{Coil:Heating:Water}, \hyperref[coilheatinggas-000]{Coil:Heating:Fuel} and \hyperref[coilheatingelectric]{Coil:Heating:Electric}. If alternate coil types are used they are modeled using the load based control method.
 
 
 As shown in an IDF:
@@ -1306,7 +1306,7 @@ Enter autosize to allow the sizing algorithm to determine the proper capacity re
 
 \paragraph{Field: Capacity Control Method}\label{field-capacity-control-method-3}
 
-This input denotes how the unit's output is controlled in order to meet zone heating or cooling requirement. The choices are \textbf{\emph{None}} or \textbf{\emph{SingleZoneVAV}}. For \emph{None}, the unit varies the fan and/or coil speed to meet the load. If constant fan operating mode is selected the fan operates at the design cooling or heating air flow rate while the coil modulates to meet the load. If cycling fan operating mode is selected the fan and coil modulate in unison to meet the load. For \emph{SingleZoneVAV}, the fan air flow rate is reduced to the no load supply air flow rate when the zone sensible load is low such that the maximum supply air temperature limit is not exceeded. If the unit cannot meet the load at this lower air flow rate, the fan speed increases while maintaining the maximum supply air temperature. If the unit still cannot meet the load the unit will operate at the maximum supply air flow rate and the maximum supply air temperature limit can be exceeded. Supply air temperature limits are identified in the \hyperref[zonehvacpackagedterminalheatpump]{ZoneHVAC:PackagedTerminalHeatPump} input fields for Minimum Supply Air Temperature in Cooling Mode and Maximum Supply Air Temperature in Heating Mode. Additionally, specific coil types are required for the SingleZoneVAV capacity control method. The cooling coil type is \hyperref[coilcoolingdx]{Coil:Cooling:DX} while the heating coil type is \hyperref[coilheatingdxsinglespeed]{Coil:Heating:DX:SingleSpeed}.
+This input denotes how the unit's output is controlled in order to meet zone heating or cooling requirement. The choices are \textbf{\emph{None}} or \textbf{\emph{SingleZoneVAV}}. For \emph{None}, the unit varies the fan and/or coil speed to meet the load. If constant fan operating mode is selected the fan operates at the design cooling or heating air flow rate while the coil modulates to meet the load. If cycling fan operating mode is selected the fan and coil modulate in unison to meet the load. For \emph{SingleZoneVAV}, the fan air flow rate is reduced to the no load supply air flow rate when the zone sensible load is low such that the maximum supply air temperature limit is not exceeded. If the unit cannot meet the load at this lower air flow rate, the fan speed increases while maintaining the maximum supply air temperature. If the unit still cannot meet the load the unit will operate at the maximum supply air flow rate and the maximum supply air temperature limit can be exceeded. Supply air temperature limits are identified in the \hyperref[zonehvacpackagedterminalheatpump]{ZoneHVAC:PackagedTerminalHeatPump} input fields for Minimum Supply Air Temperature in Cooling Mode and Maximum Supply Air Temperature in Heating Mode. Additionally, specific coil types are required for the SingleZoneVAV capacity control method. The cooling coil type is \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed} while the heating coil type is \hyperref[coilheatingdxsinglespeed]{Coil:Heating:DX:SingleSpeed}.
 
 As shown in an IDF:
 
@@ -4089,9 +4089,15 @@ There are seven coil types available:
   None
 \end{itemize}
 
-\emph{SingleSpeedDX} uses the \hyperref[coilcoolingdx]{Coil:Cooling:DX} object.
+\emph{SingleSpeedDX} uses the \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed} object.
 
-\emph{HeatExchangerAssistedDX} uses the \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted}, \hyperref[heatexchangerairtoairsensibleandlatent]{HeatExchanger:AirToAir:SensibleAndLatent}, and \hyperref[coilcoolingdx]{Coil:Cooling:DX} objects.
+\emph{TwoSpeedDX} uses the \hyperref[coilcoolingdxtwospeed]{Coil:Cooling:DX:TwoSpeed} object.
+
+\emph{MultiSpeedDX} uses the \hyperref[coilcoolingdxmultispeed]{Coil:Cooling:DX:MultiSpeed} object.
+
+\emph{TwoStageDX} and \emph{TwoStageHumidityControlDX} use the \hyperref[coilcoolingdxtwostagewithhumiditycontrolmode]{Coil:Cooling:DX:TwoStageWithHumidityControlMode} object.
+
+\emph{HeatExchangerAssistedDX} uses the \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted}, \hyperref[heatexchangerairtoairsensibleandlatent]{HeatExchanger:AirToAir:SensibleAndLatent}, and \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed} objects.
 
 \emph{SingleSpeedDXWaterCooled} uses the \hyperref[coilcoolingwatertoairheatpumpequationfit]{Coil:Cooling:WaterToAirHeatPump:EquationFit} object. This option requires an \hyperref[hvactemplateplantmixedwaterloop]{HVACTemplate:Plant:MixedWaterLoop} to serve as the water source.
 
@@ -5010,7 +5016,7 @@ HVACTemplate:System:VAV,
   19,                      !- Economizer Upper Temperature Limit {C}
   4,                       !- Economizer Lower Temperature Limit {C}
   ,                        !- Economizer Upper Enthalpy Limit {J/kg}
-  ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}
+  ,                    !- Economizer Maximum Limit Dewpoint Temperature {C}
   ,                        !- Supply Plenum Name
   PLENUM-1,                !- Return Plenum Name
   DrawThrough,             !- Supply Fan Placement
@@ -5084,7 +5090,16 @@ Enter the fraction of the motor heat that is added to the air stream. A value of
 
 \paragraph{Field: Cooling Coil Type}\label{field-cooling-coil-type-9}
 
-\hyperref[coilcoolingdx]{Coil:Cooling:DX} object.
+The coil types available:
+
+\begin{itemize}
+\item
+  TwoSpeedDX
+\item
+  TwoSpeedHumidControlDX
+\end{itemize}
+
+\emph{TwoSpeedDX} uses the \hyperref[coilcoolingdxtwospeed]{Coil:Cooling:DX:TwoSpeed} object. This is the preferred coil model for most applications. The \emph{TwoSpeedHumidControlDX} option uses the \hyperref[coilcoolingdxtwostagewithhumiditycontrolmode]{Coil:Cooling:DX:TwoStageWithHumidityControlMode} object.
 
 \paragraph{Field: Cooling Coil Availability Schedule Name}\label{field-cooling-coil-availability-schedule-name-8}
 
@@ -6761,7 +6776,11 @@ There are seven coil types available:
 \item
   ChilledWaterDetailedFlatModel
 \item
-  DXCoil
+  TwoSpeedDX
+\item
+  TwoStageDX
+\item
+  TwoStageHumidityControlDX
 \item
   HeatExchangerAssistedChilledWater
 \item
@@ -6774,11 +6793,13 @@ There are seven coil types available:
 
 \emph{ChilledWaterDetailedFlatModel} uses the \hyperref[coilcoolingwaterdetailedgeometry]{Coil:Cooling:Water:DetailedGeometry} object. This option is available for special applications.
 
-\emph{DXCoil} uses the \hyperref[coilcoolingdx]{Coil:Cooling:DX} object.
+\emph{TwoSpeedDX} uses the \hyperref[coilcoolingdxtwospeed]{Coil:Cooling:DX:TwoSpeed} object.
+
+\emph{TwoStageDX} and \emph{TwoStageHumidityControlDX} use the \hyperref[coilcoolingdxtwostagewithhumiditycontrolmode]{Coil:Cooling:DX:TwoStageWithHumidityControlMode} object.
 
 \emph{HeatExchangerAssistedChilledWater} uses the \hyperref[coilsystemcoolingwaterheatexchangerassisted]{CoilSystem:Cooling:Water:HeatExchangerAssisted}, \hyperref[heatexchangerairtoairsensibleandlatent]{HeatExchanger:AirToAir:SensibleAndLatent}, and \hyperref[coilcoolingwater]{Coil:Cooling:Water} objects.
 
-\emph{HeatExchangerAssistedDX} uses the \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted}, \hyperref[heatexchangerairtoairsensibleandlatent]{HeatExchanger:AirToAir:SensibleAndLatent}, and \hyperref[coilcoolingdx]{Coil:Cooling:DX} objects.
+\emph{HeatExchangerAssistedDX} uses the \hyperref[coilsystemcoolingdxheatexchangerassisted]{CoilSystem:Cooling:DX:HeatExchangerAssisted}, \hyperref[heatexchangerairtoairsensibleandlatent]{HeatExchanger:AirToAir:SensibleAndLatent}, and \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed} objects.
 
 The default type is \emph{ChilledWater}.
 

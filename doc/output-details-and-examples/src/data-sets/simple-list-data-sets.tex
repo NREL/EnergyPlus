@@ -213,7 +213,125 @@ CONSTRUCTION,Composite 2x4 Wood Stud R11,
 
 \subsection{DXCoolingCoil.idf}\label{dxcoolingcoil.idf}
 
-This dataset includes performance curves for the object types Coil:Cooling:DX. This data set is developed by using catalog data published by different manufacturers which are listed in the file DXCoolingCoil.idf where example inputs including curve objects generated from the manufacturer's data are given.
+This dataset includes performance curves for the object types Coil:Cooling:DX:SingleSpeed and Coil:Cooling:DX:TwoStageWithHumidityControlMode. This data set is developed by using catalog data published by different manufacturers which are listed in the file.
+
+Here is a synopsis of the DXCoolingCoil.idf:
+
+\begin{lstlisting}
+
+! DXCoolingCoil.idf
+  !
+  ! This dataset includes performance curves for the object types Coil:Cooling:DX:SingleSpeed and
+  ! Coil:Cooling:DX:TwoStageWithHumidityControlMode
+  !
+  ! Reference capacity at standard rating conditions (ARI 95F OAT, 67F EWBT and air flow rate
+  ! around 400 cfm/Ton).
+  !
+  ! In the objects Coil:Cooling:DX:SingleSpeed and Coil:Cooling:DX:TwoStageWithHumidityControlMode
+  ! below, input fields 'Availability Schedule Name', 'Air Inlet Node Name' and 'Air Outlet Node
+  ! Name' need to be defined by the user.
+  !
+  !------------------------------------------------------------------------------------------------!                             Compressor  Nominal    Reference      Reference   Refrig  Expansion
+  !                                                                                         Valve
+  ! Name                           Type     Capacity   Capacity          COP       Type      Type
+  !                                         (tons)     kW (tons)
+  !------------------------------------------------------------------------------------------------! Carrier Centurion 50PG06      Scroll      5        18.28(5.2)        4.15     R-410A    TXV
+  ! Carrier Centurion 50PG12      Scroll      10       36.79(10.47)      4.05     R-410A    TXV
+  ! Carrier Centurion 50PG24      Scroll      20       73.81(21)         3.95     R-410A    TXV
+
+    Coil:Cooling:DX:SingleSpeed,
+      Carrier Centurion 50PG06,     !- Name
+      CoolingCoilAvailSched,        !- Availability Schedule Name
+      18276.96,                     !- Rated Total Cooling Capacity {W}
+      0.74,                         !- Rated Sensible Heat Ratio
+      4.15,                         !- Rated COP
+      0.944,                        !- Rated Air Flow Rate {m3/s}
+      ,                             !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+      DXCoilAirInletNode,           !- Air Inlet Node Name
+      DXCoilAirOutletNode,          !- Air Outlet Node Name
+      CarrierCenturion50PG06CapFT,  !- Total Cooling Capacity Function of Temperature Curve Name
+      CarrierCenturion50PG06CapFFF, !- Total Cooling Capacity Function of Flow Fraction Curve Name
+      CarrierCenturion50PG06EIRFT,       !- Energy Input Ratio Function of Temperature Curve Name
+      CarrierCenturion50PG06EIRFFF,      !- Energy Input Ratio Function of Flow Fraction Curve Name
+      Carrier Centurion 50PG06 PLFFPLR;  !- Part Load Fraction Correlation Curve Name
+
+  ! Curve set (5 Curves):
+
+  ! Cooling Capacity Function of Temperature Curve
+  ! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+    Curve:Biquadratic,
+      CarrierCenturion50PG06CapFT,  !- Name
+      0.9953455,               !- Coefficient1 Constant
+      -0.0118418,              !- Coefficient2 x
+      0.0012277,               !- Coefficient3 x**2
+      0.0030246,               !- Coefficient4 y
+      -0.0000702,              !- Coefficient5 y**2
+      -0.0003685,              !- Coefficient6 x*y
+      12.22,                   !- Minimum Value of x
+      26.67,                   !- Maximum Value of x
+      15.56,                   !- Minimum Value of y
+      51.67,                   !- Maximum Value of y
+      ,                        !- Minimum Curve Output
+      ,                        !- Maximum Curve Output
+      Temperature,             !- Input Unit Type for X
+      Temperature,             !- Input Unit Type for Y
+      Dimensionless;           !- Output Unit Type
+
+  ! EIR Function of Temperature Curve
+  ! x = Entering Wet-bulb Temp and y = Outdoor Dry-bulb Temp
+
+    Curve:Biquadratic,
+      CarrierCenturion50PG06EIRFT,  !- Name
+      0.3802131,               !- Coefficient1 Constant
+      0.0199468,               !- Coefficient2 x
+      -0.0006682,              !- Coefficient3 x**2
+      0.0058933,               !- Coefficient4 y
+      0.0004646,               !- Coefficient5 y**2
+      -0.0004072,              !- Coefficient6 x*y
+      12.22,                   !- Minimum Value of x
+      26.67,                   !- Maximum Value of x
+      15.56,                   !- Minimum Value of y
+      51.67,                   !- Maximum Value of y
+      ,                        !- Minimum Curve Output
+      ,                        !- Maximum Curve Output
+      Temperature,             !- Input Unit Type for X
+      Temperature,             !- Input Unit Type for Y
+      Dimensionless;           !- Output Unit Type
+
+  ! Cooling Capacity Function of Flow Fraction Curve
+  ! x = Flow Fraction
+
+    Curve:Quadratic,
+      CarrierCenturion50PG06CapFFF,  !- Name
+      0.7705358,               !- Coefficient1 Constant
+      0.2848007,               !- Coefficient2 x
+      -0.0580891,              !- Coefficient3 x**2
+      0.75,                    !- Minimum Value of x
+      1.25;                    !- Maximum Value of x
+
+  ! EIR Function of Flow Fraction Curve
+  ! x = Flow Fraction
+
+    Curve:Quadratic,
+      CarrierCenturion50PG06EIRFFF,   !- Name
+      1.3439758,               !- Coefficient1 Constant
+      -0.5111244,              !- Coefficient2 x
+      0.1732549,               !- Coefficient3 x**2
+      0.75,                    !- Minimum Value of x
+      1.25;                    !- Maximum Value of x
+
+  ! Part Load Fraction Function of Part Load Ratio Curve
+  ! x = Part Load Ratio
+
+    Curve:Quadratic,
+      CarrierCenturion50PG06PLFFPLR,   !- Name
+      0.85,                    !- Coefficient1 Constant
+      0.15,                    !- Coefficient2 x
+      0.0,                     !- Coefficient3 x**2
+      0.0,                     !- Minimum Value of x
+      1.0;                     !- Maximum Value of x
+\end{lstlisting}
 
 \subsection{ElectricGenerators.idf}\label{electricgenerators.idf}
 
@@ -431,7 +549,7 @@ This file contains performance curves for various EnergyPlus equipment objects.
 
 \begin{itemize}
 \item
-  Variable speed DX cooling:~ These curves are appropriate for small DX cooling units with variable speed compressors. These curves would be referenced by the EnergyPlus object Coil:Cooling:DX. See the example input file 5ZoneAutoDXVAV for an example of their use.
+  Variable speed DX cooling:~ These curves are appropriate for small DX cooling units with variable speed compressors. These curves would be referenced by the EnergyPlus object Coil:Cooling:DX:TwoSpeed. See the example input file 5ZoneAutoDXVAV for an example of their use.
 \item
   Variable Speed Cooling Tower: These model coefficient objects are appropriate for use with the variable speed cooling tower object and represent the coefficients used in the YorkCalc and CoolTools empirical models. These model coefficient objects would be referenced by the EnergyPlus object Cooling Tower:Variable Speed. See the example input file CoolingTower\_VariableSpeed.idf for an example of where these curves could be used (these model coefficient objects are not specifically used in this idf but could be used by the Cooling Tower:Variable Speed object). Additional information on variable speed cooling tower model coefficients can be found in the Input Output Reference and Engineering Reference documents.
 \item
@@ -1224,7 +1342,7 @@ Curve:Bicubic,
 
 \subsection{RooftopPackagedHeatPump.idf}\label{rooftoppackagedheatpump.idf}
 
-This dataset includes performance curves for the object types Coil:Cooling:DX required to model rooftop packaged heat pumps in EnergyPlus. Manufacturer's data used to develop the data set is also listed in the file. The part of RooftopPackagedHeatPump.idf is shown below.
+This dataset includes performance curves for the object types Coil:Cooling:DX:SingleSpeed, Coil:Cooling:DX:TwoStageWithHumidityControlMode and Coil:Heating:DX:SingleSpeed required to model rooftop packaged heat pumps in EnergyPlus. Manufacturer's data used to develop the data set is also listed in the file. The part of RooftopPackagedHeatPump.idf is shown below.
 
 \subsection{SandiaPVData.idf}\label{sandiapvdata.idf-000}
 

@@ -376,7 +376,7 @@ Currently the only heat exchanger choice for this object is HeatExchanger:Desicc
 \item
   \hyperref[coilheatingelectric]{Coil:Heating:Electric} or \hyperref[coilheatinggas-000]{Coil:Heating:Fuel} (optional regeneration air heater)
 \item
-  \hyperref[coilcoolingdx]{Coil:Cooling:DX}
+  \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed}, \hyperref[coilcoolingdxvariablespeed]{Coil:Cooling:DX:VariableSpeed}, or \hyperref[coilcoolingdxtwostagewithhumiditycontrolmode]{Coil:Cooling:DX:TwoStageWithHumidityControlMode} (optional companion cooling coil)
 \end{itemize}
 
 If the user wants to model the Dehumidifier:Desiccant:System in an \hyperref[airloophvacoutdoorairsystem]{AirLoopHVAC:OutdoorAirSystem}, then the process air path of the dehumidifier should be located in the outdoor air stream and the regeneration air path may be placed in the relief air stream or modeled by the desiccant dehumidifier itself where the first node for the regeneration inlet air stream must be an outdoor air node. If the user wants to model the Dehumidifier:Desiccant:System in an air loop (\hyperref[airloophvac]{AirLoopHVAC}) Branch, then the process air path of the dehumidifier should be located in the air loop Branch object. For this case, the regeneration air stream is modeled by the desiccant dehumidifier object itself (i.e., not part of an air loop Branch statement) and the first node for the regeneration inlet air stream must be an outdoor air node (ref. Figure~\ref{fig:schematic-of-dehumidifier-desiccant-system} or Figure~\ref{fig:schematic-of-dehumidifier-desiccant-system-001}).
@@ -442,7 +442,7 @@ This optional numeric field specifies the regeneration air inlet temperature set
 
 \paragraph{Field: Companion Cooling Coil Object Type}\label{field-companion-cooling-coil-object-type}
 
-This optional alpha field contains the type of companion cooling coil used with this desiccant dehumidifier. The only valid choices are \hyperref[coilcoolingdx]{Coil:Cooling:DX}.
+This optional alpha field contains the type of companion cooling coil used with this desiccant dehumidifier. The only valid choices are \hyperref[coilcoolingdxsinglespeed]{Coil:Cooling:DX:SingleSpeed}, \hyperref[coilcoolingdxvariablespeed]{Coil:Cooling:DX:VariableSpeed}, and \hyperref[coilcoolingdxtwostagewithhumiditycontrolmode]{Coil:Cooling:DX:TwoStageWithHumidityControlMode}.
 
 \paragraph{Field: Companion Cooling Coil Name}\label{field-companion-cooling-coil-name}
 
@@ -484,7 +484,7 @@ Dehumidifier:Desiccant:System,
   Coil:Heating:Fuel,               !- Regeneration Air Heater Object Type
   Desiccant Regen Coil,       !- Regeneration Air Heater Name
   46.111111,                             !- Regeneration Inlet Air Setpoint Temperature {C}
-  Coil:Cooling:DX,   !- Companion Cooling Coil Object Type
+  Coil:Cooling:DX:SingleSpeed,   !- Companion Cooling Coil Object Type
   Desiccant DXSystem Cooling Coil,   !- Companion Cooling Coil Name
   Yes,                           !- Companion Cooling Coil Upstream of Dehumidifier Process Inlet
   Yes,                                         !- Companion Coil Regeneration Air Heating
