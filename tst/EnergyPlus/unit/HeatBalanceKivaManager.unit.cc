@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,6 +50,9 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
+// ObjexxFCL Headers
+#include <ObjexxFCL/gio.hh>
+
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DataEnvironment.hh>
@@ -62,8 +65,10 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/HeatBalanceKivaManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
+
 
 namespace EnergyPlus {
 
@@ -117,7 +122,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     HeatBalanceKivaManager::KivaManager km;
 
     std::string const idf_objects = delimited_string({
-        "Version,9.2;",
+        "Version,9.3;",
         " ",
         "Zone,",
         "  Core_bottom,             !- Name",
@@ -189,7 +194,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     DataGlobals::MinutesPerTimeStep = 60;       // must initialize this to get schedules initialized
     ScheduleManager::ProcessScheduleInput();    // read schedules
 
-    ZoneTempPredictorCorrector::GetZoneAirSetPoints();
+    ZoneTempPredictorCorrector::GetZoneAirSetPoints(OutputFiles::getSingleton());
 
     ScheduleManager::Schedule(DataZoneControls::TempControlledZone(DualZoneNum).CTSchedIndex).CurrentValue = DataHVACGlobals::DualSetPointWithDeadBand; 
 
