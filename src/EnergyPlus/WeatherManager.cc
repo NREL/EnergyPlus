@@ -4610,13 +4610,13 @@ namespace WeatherManager {
 
                 bool SkyTempScheduled = false;
 
-                if (Environment(Envrn).WP_Type1 != 0 && WPSkyTemperature(Environment(Envrn).WP_Type1).IsSchedule) {
+                if (Environment(EnvrnNum).WP_Type1 != 0 && WPSkyTemperature(Environment(EnvrnNum).WP_Type1).IsSchedule) {
                     SkyTempScheduled = true;
                 }
 
                 if (!SkyTempScheduled) {
                     double DryBulb = TomorrowOutDryBulbTemp(TS, Hour);
-                    ESky = CalcSkyEmissivity(Envrn, OSky, DryBulb, TomorrowOutDewPointTemp(TS, Hour), OutHumRat);
+                    ESky = CalcSkyEmissivity(EnvrnNum, OSky, DryBulb, TomorrowOutDewPointTemp(TS, Hour), OutHumRat);
                     TomorrowHorizIRSky(TS, Hour) = ESky * Sigma * pow_4(DryBulb + TKelvin);
                     TomorrowSkyTemp(TS, Hour) = (DryBulb + TKelvin) * root_4(ESky) - TKelvin;
                 } else {

@@ -777,6 +777,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     DesignDay.allocate(DataEnvironment::TotDesDays);
 
     Environment(1).DesignDayNum = 1;
+    Environment(1).WP_Type1 = 0;
     DataGlobals::MinutesPerTimeStep = 60;
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::BeginSimFlag = true;
@@ -787,7 +788,6 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
 
     WeatherManager::GetDesignDayData(DataEnvironment::TotDesDays, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-
 
     WeatherManager::SetUpDesignDay(1);
     EXPECT_EQ(WeatherManager::DesDayInput(1).HumIndType, DDHumIndType_Enthalpy);
