@@ -62,6 +62,7 @@
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -3205,6 +3206,8 @@ TEST_F(HVACVRFFixture, VRFTest_SysCurve)
     ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = 0.0; // set load = 0
     ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToCoolSP = 0.0;
     ZoneSysEnergyDemand(CurZoneNum).RemainingOutputReqToHeatSP = 0.0;
+    VRFTU(VRFTUNum).isInZone = true; // set as zone TU
+    VRFTU(VRFTUNum).ZoneAirNode = 3; // init zone air node
 
     FinalZoneSizing(CurZoneEqNum).ZoneRetTempAtCoolPeak = 26.66667;
     FinalZoneSizing(CurZoneEqNum).ZoneHumRatAtCoolPeak = 0.01117049470250416; // AHRI condition at 80 F db / 67 F wb
@@ -3225,6 +3228,7 @@ TEST_F(HVACVRFFixture, VRFTest_SysCurve)
     int OAUnitNum = 0;
     Real64 OAUCoilOutTemp = 0.0;
     bool ZoneEquipment = true;
+    DataAirLoop::AirLoopInputsFilled = true;
 
     SimulateVRF(VRFTU(VRFTUNum).Name,
                 FirstHVACIteration,

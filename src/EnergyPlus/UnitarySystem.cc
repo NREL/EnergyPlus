@@ -501,7 +501,7 @@ namespace UnitarySystems {
         }
     } // namespace UnitarySystems
 
-    HVACSystemData* UnitarySys::factory(int const object_type_of_num, std::string const objectName, bool const ZoneEquipment, int const ZoneOAUnitNum)
+    HVACSystemData *UnitarySys::factory(int const object_type_of_num, std::string const objectName, bool const ZoneEquipment, int const ZoneOAUnitNum)
     {
         if (UnitarySystems::getInputOnceFlag) {
             UnitarySys::getUnitarySystemInput(objectName, ZoneEquipment, ZoneOAUnitNum);

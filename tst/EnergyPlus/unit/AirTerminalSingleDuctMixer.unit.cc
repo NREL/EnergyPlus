@@ -2469,6 +2469,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMInletSide)
     VRFNum = 1;
     VRFTUNum = 1;
     VRFTU(VRFTUNum).OpMode = ContFanCycCoil;
+    VRFTU(VRFTUNum).isInZone = true;
+    VRFTU(VRFTUNum).ZoneAirNode = ZoneEquipConfig(1).ZoneNode;
     // VRFTU( VRFTUNum ).VRFTUOutletNodeNum
     // initialize mass flow rates
     Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate = HVACInletMassFlowRate;
@@ -4896,6 +4898,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSi
     VRFNum = 1;
     VRFTUNum = 1;
     VRFTU(VRFTUNum).OpMode = CycFanCycCoil;
+    VRFTU(VRFTUNum).isInZone = true;
+    VRFTU(VRFTUNum).ZoneAirNode = ZoneEquipConfig(1).ZoneNode;
     // initialize mass flow rates
     Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate = HVACInletMassFlowRate;
     Node(VRFTU(VRFTUNum).ATMixerPriNode).MassFlowRate = PrimaryAirMassFlowRate;
@@ -6646,6 +6650,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplyS
     VRFNum = 1;
     VRFTUNum = 1;
     VRFTU(VRFTUNum).OpMode = CycFanCycCoil;
+    VRFTU(VRFTUNum).isInZone = true;
+    VRFTU(VRFTUNum).ZoneAirNode = ZoneEquipConfig(1).ZoneNode;
     // initialize mass flow rates
     Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate = HVACInletMassFlowRate;
     Node(VRFTU(VRFTUNum).ATMixerPriNode).MassFlowRate = PrimaryAirMassFlowRate;
