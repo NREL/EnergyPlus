@@ -4495,16 +4495,12 @@ namespace SingleDuct {
             CalcVAVVS(SysNum, FirstHVACIteration, ZoneNodeNum, HCType, 0.0, 0.0, FanType, MassFlow, FanOp, QDelivered);
         }
 
-        //MassFlow = Node(SysInletNode).MassFlowRate;
-        // Move data to the damper outlet node
-        SysOutlet(SysNum).AirTemp = SysInlet(SysNum).AirTemp;
-        SysOutlet(SysNum).AirHumRat = SysInlet(SysNum).AirHumRat;
+        // Move mass flow rates to the damper outlet node
         SysOutlet(SysNum).AirMassFlowRate = MassFlow;
         SysOutlet(SysNum).AirMassFlowRateMaxAvail = SysInlet(SysNum).AirMassFlowRateMaxAvail;
         SysOutlet(SysNum).AirMassFlowRateMinAvail = SysInlet(SysNum).AirMassFlowRateMinAvail;
-        SysOutlet(SysNum).AirEnthalpy = SysInlet(SysNum).AirEnthalpy;
 
-        // calculate damper Position.
+        // calculate VAV damper Position.
         if (Sys(SysNum).AirMassFlowRateMax == 0.0) {
             Sys(SysNum).DamperPosition = 0.0;
         } else {
