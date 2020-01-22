@@ -133,6 +133,8 @@ namespace ChillerReformulatedEIR {
     // MODULE VARIABLE DECLARATIONS:
     int NumElecReformEIRChillers(0); // Number of electric reformulated EIR chillers specified in input
 
+    Real64 condOutletTempMod(0.0);
+
     bool GetInputREIR(true); // When TRUE, calls subroutine to read input file
 
     // Object Data
@@ -1735,7 +1737,7 @@ namespace ChillerReformulatedEIR {
             } else {
                 //    If iteration is not possible, average the min/max condenser outlet temperature and manually determine solution
                 this->calculate(MyLoad, RunFlag, (CondTempMin + CondTempMax) / 2.0);
-                this->calculate(MyLoad, RunFlag, this->CondOutletTemp);
+                this->calculate(MyLoad, RunFlag, condOutletTempMod);
             }
 
             //  Call subroutine to evaluate all performance curve min/max values against evaporator/condenser outlet temps and PLR
@@ -1867,7 +1869,7 @@ namespace ChillerReformulatedEIR {
         } else { // Chiller is running, so pass calculated values
             // Set node temperatures
             DataLoopNode::Node(this->EvapOutletNodeNum).Temp = this->EvapOutletTemp;
-            DataLoopNode::Node(this->CondOutletNodeNum).Temp = this->CondOutletTemp;
+            DataLoopNode::Node(this->CondOutletNodeNum).Temp = condOutletTempMod;
             // Set node flow rates;  for these load based models
             // assume that sufficient evaporator flow rate is available
             this->ChillerFalseLoad = this->ChillerFalseLoadRate * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
@@ -1876,6 +1878,7 @@ namespace ChillerReformulatedEIR {
             this->CondEnergy = this->QCondenser * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
             this->EvapInletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
             this->CondInletTemp = DataLoopNode::Node(this->CondInletNodeNum).Temp;
+            this->CondOutletTemp = DataLoopNode::Node(this->CondOutletNodeNum).Temp;
             if (this->Power != 0.0) {
                 this->ActualCOP = (this->QEvaporator + this->ChillerFalseLoadRate) / this->Power;
             } else {
@@ -1914,7 +1917,7 @@ namespace ChillerReformulatedEIR {
         bool RunFlag = (int(Par(3)) == 1);
 
         this->calculate(MyLoad, RunFlag, FalsiCondOutTemp);
-        Real64 CondOutTempResidual = FalsiCondOutTemp - this->CondOutletTemp; // CondOutletTemp is module level variable, final value used for reporting
+        Real64 CondOutTempResidual = FalsiCondOutTemp - condOutletTempMod; // CondOutletTemp is module level variable, final value used for reporting
 
         return CondOutTempResidual;
     }
@@ -2083,7 +2086,7 @@ namespace ChillerReformulatedEIR {
             if ((this->QHeatRecovery + this->QCondenser) >
                 0.0) { // protect div by zero
                 this->ChillerCondAvgTemp = (this->QHeatRecovery * this->HeatRecOutletTemp +
-                        this->QCondenser * this->CondOutletTemp) / // Maybe here too
+                        this->QCondenser * this->CondOutletTemp) /
                                   (this->QHeatRecovery + this->QCondenser);
             } else {
                 this->ChillerCondAvgTemp = FalsiCondOutTemp;
@@ -2417,7 +2420,7 @@ namespace ChillerReformulatedEIR {
                                                         condInletTemp,
                                                         DataPlant::PlantLoop(this->CDLoopNum).FluidIndex,
                                                         RoutineName);
-            this->CondOutletTemp = this->QCondenser / this->CondMassFlowRate / Cp + condInletTemp;
+            condOutletTempMod = this->QCondenser / this->CondMassFlowRate / Cp + condInletTemp;
         } else {
             ShowSevereError("ControlReformEIRChillerModel: Condenser flow = 0, for ElecReformEIRChiller=" + this->Name);
             ShowContinueErrorTimeStamp("");
@@ -2533,7 +2536,7 @@ namespace ChillerReformulatedEIR {
         Real64 EIRFPLRPLRmax = this->ChillerEIRFPLRPLRMax;
 
         // Check bounds for curves, lump min/max into same check since min/max values are reported in recurring warning messages
-        if (this->CondOutletTemp < CAPFTYTmin || this->CondOutletTemp > CAPFTYTmax) {
+        if (condOutletTempMod < CAPFTYTmin || condOutletTempMod > CAPFTYTmax) {
             ++this->CAPFTYIter;
             if (this->CAPFTYIter == 1) {
                 ShowWarningError("CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
@@ -2556,7 +2559,7 @@ namespace ChillerReformulatedEIR {
             }
         }
 
-        if (this->CondOutletTemp < EIRFTYTmin || this->CondOutletTemp > EIRFTYTmax) {
+        if (condOutletTempMod < EIRFTYTmin || condOutletTempMod > EIRFTYTmax) {
             ++this->EIRFTYIter;
             if (this->EIRFTYIter == 1) {
                 ShowWarningError("CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
@@ -2582,7 +2585,7 @@ namespace ChillerReformulatedEIR {
         }
 
         if (this->PartLoadCurveType == PLR_LeavingCondenserWaterTemperature) {
-            if (this->CondOutletTemp < EIRFPLRTmin || this->CondOutletTemp > EIRFPLRTmax) {
+            if (condOutletTempMod < EIRFPLRTmin || condOutletTempMod > EIRFPLRTmax) {
                 ++this->EIRFPLRTIter;
                 if (this->EIRFPLRTIter == 1) {
                     ShowWarningError("CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
@@ -2662,7 +2665,7 @@ namespace ChillerReformulatedEIR {
             }
         }
 
-        this->ChillerCapFT = CurveManager::CurveValue(this->ChillerCapFTIndex, EvapOutletTempSetPoint, this->CondOutletTemp);
+        this->ChillerCapFT = CurveManager::CurveValue(this->ChillerCapFTIndex, EvapOutletTempSetPoint, condOutletTempMod);
 
         if (this->ChillerCapFT < 0) {
             if (this->ChillerCapFTError < 1 && DataPlant::PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock != 0 &&
@@ -2684,7 +2687,7 @@ namespace ChillerReformulatedEIR {
             }
         }
 
-        this->ChillerEIRFT = CurveManager::CurveValue(this->ChillerEIRFTIndex, this->EvapOutletTemp, this->CondOutletTemp);
+        this->ChillerEIRFT = CurveManager::CurveValue(this->ChillerEIRFTIndex, this->EvapOutletTemp, condOutletTempMod);
 
         if (this->ChillerEIRFT < 0.0) {
             if (this->ChillerEIRFTError < 1 && DataPlant::PlantLoop(PlantLoopNum).LoopSide(LoopSideNum).FlowLock != 0 &&
@@ -2707,11 +2710,11 @@ namespace ChillerReformulatedEIR {
         }
 
         if (this->PartLoadCurveType == PLR_LeavingCondenserWaterTemperature) {
-            this->ChillerEIRFPLR = CurveManager::CurveValue(this->ChillerEIRFPLRIndex, this->CondOutletTemp, this->ChillerPartLoadRatio);
+            this->ChillerEIRFPLR = CurveManager::CurveValue(this->ChillerEIRFPLRIndex, condOutletTempMod, this->ChillerPartLoadRatio);
         } else if (this->PartLoadCurveType == PLR_Lift) {
 
             // Chiller lift  [C]
-            Real64 ChillerLift = this->CondOutletTemp - this->EvapOutletTemp;
+            Real64 ChillerLift = condOutletTempMod - this->EvapOutletTemp;
 
             // Deviation of leaving chilled water temperature from the reference condition
             Real64 ChillerTdev = std::abs(this->EvapOutletTemp - this->TempRefEvapOut);

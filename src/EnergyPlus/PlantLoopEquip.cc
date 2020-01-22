@@ -172,13 +172,7 @@ namespace PlantLoopEquip {
         bool RunFlag; // TRUE if operating this iteration
         int EquipFlowCtrl;
         Real64 CurLoad;
-        Real64 MaxLoad;
-        Real64 MinLoad;
-        Real64 OptLoad;
-        Real64 SizingFac = 0.0;        // the component sizing fraction
         int GeneralEquipType;    // Basic Equipment type from EquipType Used to help organize this routine
-        Real64 TempCondInDesign; // Design condenser inlet temp. C , or 25.d0
-        Real64 TempEvapOutDesign;
         EnergyPlus::PlantLocation sim_component_location(LoopNum, LoopSideNum, BranchNum, Num);
 
         // set up a reference for this component
