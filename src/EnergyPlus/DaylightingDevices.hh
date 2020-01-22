@@ -52,6 +52,7 @@
 #include <ObjexxFCL/Array1A.hh>
 
 // EnergyPlus Headers
+#include "OutputFiles.hh"
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -70,7 +71,7 @@ namespace DaylightingDevices {
 
     // Functions
 
-    void InitDaylightingDevices();
+    void InitDaylightingDevices(OutputFiles &outputFiles);
 
     void GetTDDInput();
 
