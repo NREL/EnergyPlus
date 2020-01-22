@@ -12983,114 +12983,116 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     int OAUnitNum = 0;
     Real64 OAUCoilOutTemp = 0.0;
     DataGlobals::SysSizingCalc = false;
-    //DataSizing::CurSysNum = 1;
-    ; // permits unitary system sizing
+    DataSizing::CurSysNum = 1;
     bool ZoneEquipFlag = false;
     // simulate function is overloaded, but only to report back SysOutputProvided and LatOutputProvided. Either signature should give same result.
     // thisSys->m_OKToPrintSizing = true;
-    //DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
-    //DataZoneEnergyDemands::ZoneSysMoistureDemand.allocate(1);
-    //DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = -1000.0;
-    //DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -1000.0;
-    //DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -200.0;
-    //DataZoneEnergyDemands::ZoneSysMoistureDemand(1).RemainingOutputReqToDehumidSP = -200.0 / 2500940.0;
-    //// test COOLING condition
-    //DataLoopNode::Node(1).Temp = 24.0;         // 24C db
-    //DataLoopNode::Node(1).HumRat = 0.00922;    // 17C wb
-    //DataLoopNode::Node(1).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
-    //DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
-    //DataHeatBalFanSys::MAT.allocate(1);
-    //DataHeatBalFanSys::ZoneAirHumRat(1) = DataLoopNode::Node(1).HumRat;
-    //DataHeatBalFanSys::MAT(1) = DataLoopNode::Node(1).Temp;
-    //DirectAirManager::DirectAir.allocate(1);
-    //DirectAirManager::DirectAir(1).ZoneSupplyAirNode = 2;
-    //DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1;
-    //DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
+    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
+    DataZoneEnergyDemands::ZoneSysMoistureDemand.allocate(1);
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = -1000.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -1000.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -200.0;
+    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).RemainingOutputReqToDehumidSP = -200.0 / 2500940.0;
+    // test COOLING condition
+    DataLoopNode::Node(1).Temp = 24.0;         // 24C db
+    DataLoopNode::Node(1).HumRat = 0.00922;    // 17C wb
+    DataLoopNode::Node(1).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
+    DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
+    DataHeatBalFanSys::MAT.allocate(1);
+    DataHeatBalFanSys::ZoneAirHumRat(1) = DataLoopNode::Node(1).HumRat;
+    DataHeatBalFanSys::MAT(1) = DataLoopNode::Node(1).Temp;
+    DirectAirManager::DirectAir.allocate(1);
+    DirectAirManager::DirectAir(1).ZoneSupplyAirNode = 2;
+    DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1;
+    DataZoneEnergyDemands::CurDeadBandOrSetback.allocate(1);
 
-    //DataZoneEnergyDemands::CurDeadBandOrSetback(1) = false;
-    //DataHeatBalFanSys::TempControlType.allocate(1);
-    //DataHeatBalFanSys::TempControlType(1) = 4;
-    //DataLoopNode::Node(8).Temp = 23.822;        // 24C db
-    //DataLoopNode::Node(8).HumRat = 0.0145946;   // 17C wb
-    //DataLoopNode::Node(8).Enthalpy = 61084.266; // www.sugartech.com/psychro/index.php
-    //Real64 SenOutput;
-    //Real64 LatOutput;
+    DataZoneEnergyDemands::CurDeadBandOrSetback(1) = false;
+    DataHeatBalFanSys::TempControlType.allocate(1);
+    DataHeatBalFanSys::TempControlType(1) = 4;
+    DataLoopNode::Node(8).Temp = 23.822;        // 24C db
+    DataLoopNode::Node(8).HumRat = 0.0145946;   // 17C wb
+    DataLoopNode::Node(8).Enthalpy = 61084.266; // www.sugartech.com/psychro/index.php
+    Real64 SenOutput;
+    Real64 LatOutput;
 
-    //// OperatingMode 3 above the range
-    //DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = -227.705;
-    //DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -227.705;
-    //DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -50.0;
-    //DataZoneEnergyDemands::ZoneSysMoistureDemand(1).RemainingOutputReqToDehumidSP = -0.007806893;
-    //thisSys->simulate(compName,
-    //                  FirstHVACIteration,
-    //                  AirLoopNum,
-    //                  CompIndex,
-    //                  HeatingActive,
-    //                  CoolingActive,
-    //                  OAUnitNum,
-    //                  OAUCoilOutTemp,
-    //                  ZoneEquipFlag,
-    //                  SenOutput,
-    //                  LatOutput);
-    //EXPECT_EQ(EnergyPlus::coilCoolingDXs[0].performance.OperatingMode, 3);
-    //EXPECT_EQ(EnergyPlus::coilCoolingDXs[0].performance.ModeRatio, 1.0);
-    //EXPECT_NEAR(thisSys->CoilSHR, thisSys->LoadSHR, 0.001);
-    //EXPECT_NEAR(SenOutput, -227.705, 0.1);
-    //EXPECT_NEAR(LatOutput, -526.912, 0.1);
+    // OperatingMode 3 above the range
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = -227.705;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -227.705;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -50.0;
+    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).RemainingOutputReqToDehumidSP = -0.007806893;
+    DataEnvironment::StdRhoAir = 1.2043;
+    //DataLoopNode::Node(12).MassFlowRate = 0.539092;
+    thisSys->simulate(compName,
+                      FirstHVACIteration,
+                      AirLoopNum,
+                      CompIndex,
+                      HeatingActive,
+                      CoolingActive,
+                      OAUnitNum,
+                      OAUCoilOutTemp,
+                      ZoneEquipFlag,
+                      SenOutput,
+                      LatOutput);
+    EXPECT_EQ(EnergyPlus::coilCoolingDXs[0].performance.OperatingMode, 3);
+    EXPECT_EQ(EnergyPlus::coilCoolingDXs[0].performance.ModeRatio, 1.0);
+    EXPECT_NEAR(thisSys->CoilSHR, thisSys->LoadSHR, 0.001);
+    EXPECT_NEAR(SenOutput, -227.705, 0.1);
+    EXPECT_NEAR(LatOutput, -646.34, 0.1);
 
-    //// OperatingMode 2
-    //thisSys->m_ZoneSequenceCoolingNum = 0;
-    //thisSys->m_ZoneSequenceHeatingNum = 0;
-    //DataLoopNode::Node(1).HumRat = 0.0114544;   // 17C wb
-    //DataLoopNode::Node(1).Enthalpy = 53273.99;  // www.sugartech.com/psychro/index.php
-    //DataLoopNode::Node(8).Temp = 24.18496;      // 24C db
-    //DataLoopNode::Node(8).HumRat = 0.0121542;   // 17C wb
-    //DataLoopNode::Node(8).Enthalpy = 55245.434; // www.sugartech.com/psychro/index.php
-    //DataHeatBalFanSys::ZoneAirHumRat(1) = DataLoopNode::Node(1).HumRat;
-    //DataHeatBalFanSys::MAT(1) = DataLoopNode::Node(1).Temp;
+    // OperatingMode 2
+    thisSys->m_ZoneSequenceCoolingNum = 0;
+    thisSys->m_ZoneSequenceHeatingNum = 0;
+    DataLoopNode::Node(1).HumRat = 0.0114544;   // 17C wb
+    DataLoopNode::Node(1).Enthalpy = 53273.99;  // www.sugartech.com/psychro/index.php
+    DataLoopNode::Node(8).Temp = 24.18496;      // 24C db
+    DataLoopNode::Node(8).HumRat = 0.0121542;   // 17C wb
+    DataLoopNode::Node(8).Enthalpy = 55245.434; // www.sugartech.com/psychro/index.php
+    DataHeatBalFanSys::ZoneAirHumRat(1) = DataLoopNode::Node(1).HumRat;
+    DataHeatBalFanSys::MAT(1) = DataLoopNode::Node(1).Temp;
 
-    //DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = -397.162;
-    //DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -397.162;
-    //DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -3601.8;
-    //DataZoneEnergyDemands::ZoneSysMoistureDemand(1).RemainingOutputReqToDehumidSP = -4.1696238E-5;
-    //thisSys->simulate(compName,
-    //                  FirstHVACIteration,
-    //                  AirLoopNum,
-    //                  CompIndex,
-    //                  HeatingActive,
-    //                  CoolingActive,
-    //                  OAUnitNum,
-    //                  OAUCoilOutTemp,
-    //                  ZoneEquipFlag,
-    //                  SenOutput,
-    //                  LatOutput);
-    //EXPECT_EQ(EnergyPlus::coilCoolingDXs[0].performance.OperatingMode, 2);
-    //EXPECT_NEAR(EnergyPlus::coilCoolingDXs[0].performance.ModeRatio, 0.90049, 0.001);
-    //EXPECT_NEAR(thisSys->LoadSHR, 0.78911, 0.001);
-    //EXPECT_NEAR(thisSys->CoilSHR, 0.69526, 0.001);
-    //EXPECT_NEAR(SenOutput, -397.162, 0.1);
-    //EXPECT_NEAR(LatOutput, -129.649, 0.1);
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = -397.162;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -397.162;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -3601.8;
+    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).RemainingOutputReqToDehumidSP = -4.1696238E-5;
+    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).RemainingOutputReqToDehumidSP = -1.1696238E-4;
+    thisSys->simulate(compName,
+                      FirstHVACIteration,
+                      AirLoopNum,
+                      CompIndex,
+                      HeatingActive,
+                      CoolingActive,
+                      OAUnitNum,
+                      OAUCoilOutTemp,
+                      ZoneEquipFlag,
+                      SenOutput,
+                      LatOutput);
+    EXPECT_EQ(EnergyPlus::coilCoolingDXs[0].performance.OperatingMode, 2);
+    EXPECT_NEAR(EnergyPlus::coilCoolingDXs[0].performance.ModeRatio, 0.3727, 0.001);
+    EXPECT_NEAR(thisSys->LoadSHR, 0.57154, 0.001);
+    EXPECT_NEAR(thisSys->CoilSHR, 0.54009, 0.001);
+    EXPECT_NEAR(SenOutput, -397.162, 0.1);
+    EXPECT_NEAR(LatOutput, -301.374, 0.1);
 
-    //// OperatingMode 1
-    //thisSys->m_ZoneSequenceCoolingNum = 0;
-    //thisSys->m_ZoneSequenceHeatingNum = 0;
-    //DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = -1000.00;
-    //DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -1000.00;
-    //thisSys->simulate(compName,
-    //                  FirstHVACIteration,
-    //                  AirLoopNum,
-    //                  CompIndex,
-    //                  HeatingActive,
-    //                  CoolingActive,
-    //                  OAUnitNum,
-    //                  OAUCoilOutTemp,
-    //                  ZoneEquipFlag,
-    //                  SenOutput,
-    //                  LatOutput);
-    //EXPECT_EQ(EnergyPlus::coilCoolingDXs[0].performance.OperatingMode, 1);
-    //EXPECT_EQ(EnergyPlus::coilCoolingDXs[0].performance.ModeRatio, 0.0);
-    //EXPECT_NEAR(thisSys->LoadSHR, 0.90404, 0.001);
-    //EXPECT_NEAR(thisSys->CoilSHR, 0.85173, 0.001);
-    //EXPECT_NEAR(SenOutput, -1000.0, 0.5);
-    //EXPECT_NEAR(LatOutput, -157.74, 0.1);
+    // OperatingMode 1
+    thisSys->m_ZoneSequenceCoolingNum = 0;
+    thisSys->m_ZoneSequenceHeatingNum = 0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = -1000.00;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -1000.00;
+    thisSys->simulate(compName,
+                      FirstHVACIteration,
+                      AirLoopNum,
+                      CompIndex,
+                      HeatingActive,
+                      CoolingActive,
+                      OAUnitNum,
+                      OAUCoilOutTemp,
+                      ZoneEquipFlag,
+                      SenOutput,
+                      LatOutput);
+    EXPECT_EQ(EnergyPlus::coilCoolingDXs[0].performance.OperatingMode, 1);
+    EXPECT_EQ(EnergyPlus::coilCoolingDXs[0].performance.ModeRatio, 0.0);
+    EXPECT_NEAR(thisSys->LoadSHR, 0.77057, 0.001);
+    EXPECT_NEAR(thisSys->CoilSHR, 0.74727, 0.001);
+    EXPECT_NEAR(SenOutput, -1000.0, 0.5);
+    EXPECT_NEAR(LatOutput, -668.63, 0.1);
 }
