@@ -839,7 +839,7 @@ Of course, these could not all appear in the same IDF as only one DaylightSaving
 
 \subsection{WeatherProperty:SkyTemperature}\label{weatherpropertyskytemperature}
 
-Sky Temperature, or radiative sky temperature, is internally calculated by EnergyPlus using an algorithm using horizontal infrared radiation from sky, cloudiness factors and current temperature. The algorithm is fully described in the Engineering Reference document. For flexibility, the following object can be entered to override the internal calculations. Much of the literature describes the sky temperature as relative to either drybulb or dewpoint temperature.
+Sky Temperature, or radiative sky temperature, is internally calculated by EnergyPlus using an algorithm using (1) horizontal infrared radiation or (2) an empirical model using sky cloudiness factors and current clear sky emissivity. By default, EnergyPlus calculates clear sky emissivity using Clark-Allen model, and its algorithm is fully described in the Engineering Reference document. For flexibility, the following object can be entered to adopt alternative sky emissivity calculation methods, or to override the entire internal sky temperature calculation from schedule import. Alternative methods of sky emissivity calculation include the calibrated forms of Martin \& Berdahl, Brunt, and Idso model, and their algorithms are described in the Engineering Reference as well. Much of the literature describes the sky temperature as relative to water vapor pressure, drybulb or dewpoint temperature.
 
 \subsubsection{Inputs}\label{inputs-8-011}
 
@@ -849,14 +849,21 @@ This name references an existing design period (i.e., \hyperref[sizingperioddesi
 
 \paragraph{Field: Calculation Type}\label{field-calculation-type}
 
-Allowable entries here are: \textbf{ScheduleValue}, \textbf{DifferenceScheduleDryBulbValue}, or \textbf{DifferenceScheduleDewPointValue}.
-In each case the following field must specify a valid schedule name.
+Allowable entries here are: \textbf{ScheduleValue}, \textbf{DifferenceScheduleDryBulbValue}, \textbf{DifferenceScheduleDewPointValue}, \textbf{UseBruntModel}, \textbf{UseIdsoModel}, or \textbf{UseBerdahlMartinModel}.
+
+In the case of \textbf{ScheduleValue}, \textbf{DifferenceScheduleDryBulbValue} and \textbf{DifferenceScheduleDewPointValue} the following field must specify a valid schedule name.
 
 \textbf{ScheduleValue} -- the values in the schedule are used as the sky temperature.
 
 \textbf{DifferenceScheduleDryBulbValue} -- the values in the schedule are \emph{subtracted} from the drybulb temperature value (+values would then be less than the drybulb temperature, -values would then be greater than the drybulb temperature) for the resulting sky temperature value.
 
 \textbf{DifferenceScheduleDewPointValue} -- the values in the schedule are \emph{subtracted} from the dewpoint temperature value (+values would then be less than the dewpoint temperature, -values would then be greater than the dewpoint temperature) for the resulting sky temperature value.
+
+\textbf{UseBruntModel} -- the clear sky emissivity are calculated using Brunt model.
+
+\textbf{UseIdsoModel} -- the clear sky emissivity are calculated using Idso model.
+
+\textbf{UseBerdahlMartinModel} -- the clear sky emissivity are calculated using Berdahl & Martin model.
 
 \paragraph{Field: ScheduleName}\label{field-schedulename}
 
@@ -897,6 +904,15 @@ Schedule:Day:Interval,
   until: 24:00,      !- Time 1
   5;                 !- Value Until Time 1
 \end{lstlisting}
+
+Another example of IDF usage:
+
+\begin{lstlisting}
+WeatherProperty:SkyTemperature,
+  ,
+  UseBerdahlMartinModel;     !- Calculation Type
+\end{lstlisting}
+
 
 \subsection{Site:WeatherStation}\label{siteweatherstation}
 

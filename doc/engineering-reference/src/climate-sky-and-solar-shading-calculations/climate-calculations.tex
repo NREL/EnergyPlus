@@ -60,17 +60,44 @@ Sigma = Stefan-Boltzmann constant = 5.6697e-8 \{W/m\(^{2}\)-K\(^{4}\)\}
 
 Temperature\(_{drybulb}\) = drybulb temperature \{K\}
 
-The sky emissivity is given by
+By default, the clear sky emissivity is calculated by the Clark \& Allen (1978) model as
 
 \begin{equation}
-Sk{y_{emissivity}} = \left( {.787 + .764\cdot \ln \left( {\frac{{Temperatur{e_{dewpoint}}}}{{273.}}} \right)} \right)\cdot \left( {1. + .0224N - .0035{N^2} + .00028{N^3}} \right)
+Sky_{clear-sky-emissivity} = 0.787 + 0.764\cdot \ln \frac {T_{dewpoint}}{T_{Kelvin}}
 \end{equation}
 
-where
+where, T\(_{dewpoint}\) = dewpoint temperature \{K\}.
 
-Temperature\(_{dewpoint}\) = dewpoint temperature \{K\}
+Alternatively, the clear sky emissivity can also be calculated using different models set by the user from options using the \textbf{WeatherProperty:SkyTemperature} object, including the calibrated version of the Berdahl and Martin, Brunt and Idso models (2017), listed as follows.
 
-N = opaque sky cover \{tenths\}
+Calibrated Berdahl and Martin model:
+
+\begin{equation}
+Sky_{clear-sky-emissivity} = 0.711 + 0.56\cdot(T_{dewpoint} / 100) + 0.73\cdot{T_{dewpoint} / 100}^2.
+\end{equation}
+
+Calibrated Brunt model:
+
+\begin{equation}
+Sky_{clear-sky-emissivity} = 0.52 + 0.065\cdot(P_{water-vapor})^0.5,
+\end{equation}
+
+where, P\(_{water-vapor}\) = partial water vapor pressure \{hPa\}.
+
+Calibrated Idso model:
+
+\begin{equation}
+Sky_{clear_sky_emissivity} = 0.70 + 5.95\cdot10E-5\cdot(P_{water-vapor} \cdot exp(1500/T_{drybulb})).
+\end{equation}
+
+
+Then the sky emissivity is given by:
+
+\begin{equation}
+Sky_{emissivity} = Sky_{clear-sky-emissivity} \cdot \left( {1. + .0224N - .0035{N^2} + .00028{N^3}} \right)
+\end{equation}
+
+where, N = opaque sky cover \{tenths\}
 
 Example: Clear sky (N = 0), Temperature\(_{drybulb}\) = 273+20 = 293 K, Temperature\(_{dewpoint}\) = 273+10 = 283 K:
 
