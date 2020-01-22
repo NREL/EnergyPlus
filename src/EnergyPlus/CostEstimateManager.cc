@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -433,8 +433,14 @@ namespace CostEstimateManager {
                                         "\", Chiller:Electric, need to specify a Reference Object Name");
                         ErrorsFound = true;
                     }
-
-                    thisChil = UtilityRoutines::FindItem(CostLineItem(Item).ParentObjName, ElectricChiller.ma(&ElectricChillerSpecs::Base));
+                    thisChil = 0;
+                    int chillNum = 0;
+                    for (auto &ch : ElectricChiller) {
+                        chillNum++;
+                        if (CostLineItem(Item).ParentObjName == ch.Name) {
+                            thisChil = chillNum;
+                        }
+                    }
                     if (thisChil == 0) {
                         ShowWarningError("ComponentCost:LineItem: \"" + CostLineItem(Item).LineName +
                                          "\", Chiller:Electric, invalid chiller specified.");
@@ -756,15 +762,22 @@ namespace CostEstimateManager {
                     }
 
                 } else if (SELECT_CASE_var == "CHILLER:ELECTRIC") {
-                    thisChil = UtilityRoutines::FindItem(CostLineItem(Item).ParentObjName, ElectricChiller.ma(&ElectricChillerSpecs::Base));
+                    thisChil = 0;
+                    int chillNum = 0;
+                    for (auto &ch : ElectricChiller) {
+                        chillNum++;
+                        if (CostLineItem(Item).ParentObjName == ch.Name) {
+                            thisChil = chillNum;
+                        }
+                    }
                     if ((thisChil > 0) && (CostLineItem(Item).PerKiloWattCap > 0.0)) {
-                        CostLineItem(Item).Qty = ElectricChiller(thisChil).Base.NomCap / 1000.0;
+                        CostLineItem(Item).Qty = ElectricChiller(thisChil).NomCap / 1000.0;
                         CostLineItem(Item).Units = "kW (tot cool cap.)";
                         CostLineItem(Item).ValuePer = CostLineItem(Item).PerKiloWattCap;
                         CostLineItem(Item).LineSubTotal = CostLineItem(Item).Qty * CostLineItem(Item).ValuePer;
                     }
                     if ((thisChil > 0) && (CostLineItem(Item).PerKWCapPerCOP > 0.0)) {
-                        CostLineItem(Item).Qty = ElectricChiller(thisChil).Base.COP * ElectricChiller(thisChil).Base.NomCap / 1000.0;
+                        CostLineItem(Item).Qty = ElectricChiller(thisChil).COP * ElectricChiller(thisChil).NomCap / 1000.0;
                         CostLineItem(Item).Units = "kW*COP (total, rated) ";
                         CostLineItem(Item).ValuePer = CostLineItem(Item).PerKWCapPerCOP;
                         CostLineItem(Item).LineSubTotal = CostLineItem(Item).Qty * CostLineItem(Item).ValuePer;

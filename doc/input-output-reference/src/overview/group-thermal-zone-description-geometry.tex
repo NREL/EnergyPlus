@@ -608,7 +608,7 @@ Surfaces are always specified as being viewed from the outside of the zone to wh
 
 \paragraph{Field: Coordinate System}\label{field-coordinate-system}
 
-Vertices can be specified in two ways: using ``Absolute''/``World'' coordinates, or a \textbf{relative} coordinate specification. Relative coordinates allow flexibility of rapid change to observe changes in building results due to orientation and position. ``World'' coordinates will facilitate use within a CADD system structure.
+Vertices can be specified in two ways: using \textbf{World} coordinates, or a \textbf{Relative} coordinate specification. Relative coordinates allow flexibility of rapid change to observe changes in building results due to orientation and position. \textbf{World} coordinates will facilitate use within a CADD system structure.
 
 \textbf{Relative} coordinates make use of both Building and Zone North Axis values as well as Zone Origin values to locate the surface in 3D coordinate space. \textbf{World} coordinates do not use these values.
 
@@ -616,7 +616,7 @@ Typically, all zone origin values for ``World'' coordinates will be (0,0,0) but 
 
 \paragraph{Field: Daylighting Reference Point Coordinate System}\label{field-daylighting-reference-point-coordinate-system}
 
-Daylighting reference points need to be specified as well. Again, there can be two flavors; \textbf{relative} and \textbf{world}. Daylighting reference points must fit within the zone boundaries.
+Daylighting reference points need to be specified as well. Again, there can be two flavors; \textbf{Relative} and \textbf{World}. Daylighting reference points must fit within the zone boundaries.
 
 \textbf{Relative} coordinates make use of both Building and Zone North Axis values as well as Zone Origin values to locate the reference point in 3D coordinate space. \textbf{World} coordinates do not use these values.
 
@@ -1750,7 +1750,7 @@ This field specifies the number of sides in the surface (number of X,Y,Z vertex 
 
 \subsection{RoofCeiling:Detailed}\label{roofceilingdetailed}
 
-The RoofCeiling:Detailed object is used to describe walls.
+The RoofCeiling:Detailed object is used to describe a roof or ceiling.
 
 \subsubsection{Inputs}\label{inputs-21-007}
 
@@ -1859,7 +1859,7 @@ This field specifies the number of sides in the surface (number of X,Y,Z vertex 
 
 \subsection{Floor:Detailed}\label{floordetailed}
 
-The Floor:Detailed object is used to describe walls.
+The Floor:Detailed object is used to describe floors.
 
 \subsubsection{Inputs}\label{inputs-22-006}
 

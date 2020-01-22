@@ -100,7 +100,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.2;
+  Version,9.3;
 
   Building,
     Building,                !- Name
@@ -2068,8 +2068,8 @@
     Zone1DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     Zone1DirectAir,          !- Name
@@ -2337,8 +2337,8 @@
     Zone2DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     Zone2DirectAir,          !- Name
@@ -2599,8 +2599,8 @@
     Zone3DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     Zone3DirectAir,          !- Name
@@ -2861,8 +2861,8 @@
     Zone4DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     Zone4DirectAir,          !- Name
@@ -3123,8 +3123,8 @@
     Zone5DirectAir,          !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     Zone5DirectAir,          !- Name
@@ -3714,10 +3714,10 @@
     HEffFTemp,               !- Heat Reclaim Efficiency Function of Temperature Curve Name
     WaterHeatingCoilInletNode,  !- Water Inlet Node Name
     WaterHeatingCoilOutletNode,  !- Water Outlet Node Name
-    WaterHeater:Stratified,       !- Tank Object Type
-    StratifiedWaterHeater,    !- Tank Name
+    WaterHeater:Stratified,  !- Tank Object Type
+    StratifiedWaterHeater,   !- Tank Name
     Coil:Cooling:WaterToAirHeatPump:EquationFit,  !- Heating Source Object Type
-    Sys 5 Heat Pump Cooling Mode,     !- Heating Source Name
+    Sys 5 Heat Pump Cooling Mode,  !- Heating Source Name
     0.0001,                  !- Water Flow Rate {m3/s}
     25.0,                    !- Water Pump Power {W}
     0.2,                     !- Fraction of Pump Heat to Water
@@ -3785,8 +3785,8 @@
     ,                        !- Use Side Effectiveness
     0,                       !- Use Side Inlet Height {m}
     autocalculate,           !- Use Side Outlet Height {m}
-    WaterHeatingCoilOutletNode,     !- Source Side Inlet Node Name
-    WaterHeatingCoilInletNode,      !- Source Side Outlet Node Name
+    WaterHeatingCoilOutletNode,  !- Source Side Inlet Node Name
+    WaterHeatingCoilInletNode,  !- Source Side Outlet Node Name
     0.95,                    !- Source Side Effectiveness
     0,                       !- Source Side Inlet Height {m}
     0.257441,                !- Source Side Outlet Height {m}
@@ -3794,7 +3794,7 @@
     ,                        !- Use Side Design Flow Rate {m3/s}
     ,                        !- Source Side Design Flow Rate {m3/s}
     ,                        !- Indirect Water Heating Recovery Time {hr}
-    6;                      !- Number of Nodes
+    6;                       !- Number of Nodes
 
   Output:Variable,*,Unitary System Requested Sensible Cooling Rate,hourly;
 
