@@ -119,7 +119,7 @@ namespace ChillerReformulatedEIR {
         Real64 HeatRecMaxCapacityLimit;            // Capacity limit for Heat recovery, one time calc [W]
         int HeatRecSetPointNodeNum;                // index for system node with the heat recover leaving setpoint
         int HeatRecInletLimitSchedNum;             // index for schedule for the inlet high limit for heat recovery operation
-        int ChillerCapFTIndex;                          // Index for the total cooling capacity modifier curve
+        int ChillerCapFTIndex;                     // Index for the total cooling capacity modifier curve
         // (function of leaving evaporator and condenser water temperatures)
         int ChillerEIRFTIndex; // Index for the energy input ratio modifier curve
         // (function of leaving evaporator and condenser water temperatures)
@@ -190,32 +190,32 @@ namespace ChillerReformulatedEIR {
         bool MyEnvrnFlag;
         bool MyInitFlag;
         bool MySizeFlag;
-        Real64 ChillerCondAvgTemp; // reporting: average condenser temp for curves with Heat recovery [C]
-        Real64 ChillerFalseLoadRate; // reporting: Chiller false load over and above water side load [J]
-        Real64 ChillerCyclingRatio;  // reporting: Chiller cycling ratio (time on/time step)
-        Real64 ChillerPartLoadRatio; // reporting: Chiller PLR (Load/Capacity)
-        Real64 ChillerEIRFPLR;       // reporting: Chiller EIRFPLR curve output value
-        Real64 ChillerEIRFT;         // reporting: Chiller EIRFT curve output value
-        Real64 ChillerCapFT;         // reporting: Chiller capacity curve output value
+        Real64 ChillerCondAvgTemp;   // average condenser temp for curves with Heat recovery [C]
+        Real64 ChillerFalseLoadRate; // Chiller false load over and above water side load [J]
+        Real64 ChillerCyclingRatio;  // Chiller cycling ratio (time on/time step)
+        Real64 ChillerPartLoadRatio; // Chiller PLR (Load/Capacity)
+        Real64 ChillerEIRFPLR;       // Chiller EIRFPLR curve output value
+        Real64 ChillerEIRFT;         // Chiller EIRFT curve output value
+        Real64 ChillerCapFT;         // Chiller capacity curve output value
         Real64 HeatRecOutletTemp;
-        Real64 QHeatRecovery;        // reporting: Heat recovered from water-cooled condenser [W]
+        Real64 QHeatRecovery; // Heat recovered from water-cooled condenser [W]
         Real64 QCondenser;
-        Real64 QEvaporator;                // reporting: Evaporator heat transfer rate [W]
-        Real64 Power;                // reporting: Chiller power [W]
-        Real64 EvapOutletTemp;       // reporting: Evaporator outlet temperature [C]
-        Real64 CondOutletTemp;       // reporting: Condenser outlet temperature [C]
-        Real64 EvapMassFlowRate;             // reporting: Evaporator mass flow rate [kg/s]
-        Real64 CondMassFlowRate;    // Condenser mass flow rate [kg/s]
-        Real64 ChillerFalseLoad;     // reporting: Chiller false load over and above water side load [W]
-        Real64 Energy;               // reporting: Chiller electric consumption [J]
-        Real64 EvapEnergy;           // reporting: Evaporator heat transfer energy [J]
-        Real64 CondEnergy;           // reporting: Condenser heat transfer energy [J]
-        Real64 CondInletTemp;        // reporting: Condenser inlet temperature [C]
-        Real64 EvapInletTemp;        // reporting: Evaporator inlet temperature [C]
-        Real64 ActualCOP;            // reporting: Coefficient of performance
-        Real64 EnergyHeatRecovery;   // reporting: Energy recovered from water-cooled condenser [J]
-        Real64 HeatRecInletTemp;     // reporting: Heat reclaim inlet temperature [C]
-        Real64 HeatRecMassFlow;      // reporting: Heat reclaim mass flow rate [kg/s]
+        Real64 QEvaporator;        // Evaporator heat transfer rate [W]
+        Real64 Power;              // Chiller power [W]
+        Real64 EvapOutletTemp;     // Evaporator outlet temperature [C]
+        Real64 CondOutletTemp;     // Condenser outlet temperature [C]
+        Real64 EvapMassFlowRate;   // Evaporator mass flow rate [kg/s]
+        Real64 CondMassFlowRate;   // Condenser mass flow rate [kg/s]
+        Real64 ChillerFalseLoad;   // Chiller false load over and above water side load [W]
+        Real64 Energy;             // Chiller electric consumption [J]
+        Real64 EvapEnergy;         // Evaporator heat transfer energy [J]
+        Real64 CondEnergy;         // Condenser heat transfer energy [J]
+        Real64 CondInletTemp;      // Condenser inlet temperature [C]
+        Real64 EvapInletTemp;      // Evaporator inlet temperature [C]
+        Real64 ActualCOP;          // Coefficient of performance
+        Real64 EnergyHeatRecovery; // Energy recovered from water-cooled condenser [J]
+        Real64 HeatRecInletTemp;   // Heat reclaim inlet temperature [C]
+        Real64 HeatRecMassFlow;    // Heat reclaim mass flow rate [kg/s]
         int EquipFlowCtrl;
 
         // Default Constructor
@@ -227,25 +227,23 @@ namespace ChillerReformulatedEIR {
               MinPartLoadRat(0.0), MaxPartLoadRat(0.0), OptPartLoadRat(0.0), MinUnloadRat(0.0), TempRefCondIn(0.0), TempRefCondOut(0.0),
               TempRefEvapOut(0.0), TempLowLimitEvapOut(0.0), DesignHeatRecVolFlowRate(0.0), DesignHeatRecVolFlowRateWasAutoSized(false),
               DesignHeatRecMassFlowRate(0.0), SizFac(0.0), HeatRecActive(false), HeatRecInletNodeNum(0), HeatRecOutletNodeNum(0),
-              HeatRecCapacityFraction(0.0), HeatRecMaxCapacityLimit(0.0), HeatRecSetPointNodeNum(0), HeatRecInletLimitSchedNum(0), ChillerCapFTIndex(0),
-              ChillerEIRFTIndex(0), ChillerEIRFPLRIndex(0), ChillerCapFTError(0), ChillerCapFTErrorIndex(0), ChillerEIRFTError(0), ChillerEIRFTErrorIndex(0),
-              ChillerEIRFPLRError(0), ChillerEIRFPLRErrorIndex(0), ChillerCAPFTXTempMin(0.0), ChillerCAPFTXTempMax(0.0), ChillerCAPFTYTempMin(0.0),
-              ChillerCAPFTYTempMax(0.0), ChillerEIRFTXTempMin(0.0), ChillerEIRFTXTempMax(0.0), ChillerEIRFTYTempMin(0.0), ChillerEIRFTYTempMax(0.0),
-              ChillerEIRFPLRTempMin(0.0), ChillerEIRFPLRTempMax(0.0), ChillerEIRFPLRPLRMin(0.0), ChillerEIRFPLRPLRMax(0.0),
-              ChillerLiftNomMin(0.0),
-              ChillerLiftNomMax(10.0), ChillerTdevNomMin(0.0), ChillerTdevNomMax(10.0), CAPFTXIter(0), CAPFTXIterIndex(0), CAPFTYIter(0),
-              CAPFTYIterIndex(0), EIRFTXIter(0), EIRFTXIterIndex(0), EIRFTYIter(0), EIRFTYIterIndex(0), EIRFPLRTIter(0), EIRFPLRTIterIndex(0),
-              EIRFPLRPLRIter(0), EIRFPLRPLRIterIndex(0), FaultyChillerSWTFlag(false), FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0),
-              IterLimitExceededNum(0), IterLimitErrIndex(0), IterFailed(0), IterFailedIndex(0), DeltaTErrCount(0), DeltaTErrCountIndex(0),
-              CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), CDLoopNum(0), CDLoopSideNum(0), CDBranchNum(0), CDCompNum(0),
-              HRLoopNum(0), HRLoopSideNum(0), HRBranchNum(0), HRCompNum(0), CondMassFlowIndex(0), PossibleSubcooling(false),
-              FaultyChillerFoulingFlag(false), FaultyChillerFoulingIndex(0), FaultyChillerFoulingFactor(1.0), MyEnvrnFlag(true),
-              MyInitFlag(true), MySizeFlag(true), ChillerCondAvgTemp(0.0), ChillerFalseLoadRate(0.0), ChillerCyclingRatio(0.0),
-              ChillerPartLoadRatio(0.0), ChillerEIRFPLR(0.0), ChillerEIRFT(0.0), ChillerCapFT(0.0), HeatRecOutletTemp(0.0),
-              QHeatRecovery(0.0), QCondenser(0.0), QEvaporator(0.0), Power(0.0), EvapOutletTemp(0.0), CondOutletTemp(0.0),
-              EvapMassFlowRate(0.0), CondMassFlowRate(0.0), ChillerFalseLoad(0.0), Energy(0.0), EvapEnergy(0.0), CondEnergy(0.0),
-              CondInletTemp(0.0), EvapInletTemp(0.0), ActualCOP(0.0), EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0),
-              HeatRecMassFlow(0.0), EquipFlowCtrl(0)
+              HeatRecCapacityFraction(0.0), HeatRecMaxCapacityLimit(0.0), HeatRecSetPointNodeNum(0), HeatRecInletLimitSchedNum(0),
+              ChillerCapFTIndex(0), ChillerEIRFTIndex(0), ChillerEIRFPLRIndex(0), ChillerCapFTError(0), ChillerCapFTErrorIndex(0),
+              ChillerEIRFTError(0), ChillerEIRFTErrorIndex(0), ChillerEIRFPLRError(0), ChillerEIRFPLRErrorIndex(0), ChillerCAPFTXTempMin(0.0),
+              ChillerCAPFTXTempMax(0.0), ChillerCAPFTYTempMin(0.0), ChillerCAPFTYTempMax(0.0), ChillerEIRFTXTempMin(0.0), ChillerEIRFTXTempMax(0.0),
+              ChillerEIRFTYTempMin(0.0), ChillerEIRFTYTempMax(0.0), ChillerEIRFPLRTempMin(0.0), ChillerEIRFPLRTempMax(0.0), ChillerEIRFPLRPLRMin(0.0),
+              ChillerEIRFPLRPLRMax(0.0), ChillerLiftNomMin(0.0), ChillerLiftNomMax(10.0), ChillerTdevNomMin(0.0), ChillerTdevNomMax(10.0),
+              CAPFTXIter(0), CAPFTXIterIndex(0), CAPFTYIter(0), CAPFTYIterIndex(0), EIRFTXIter(0), EIRFTXIterIndex(0), EIRFTYIter(0),
+              EIRFTYIterIndex(0), EIRFPLRTIter(0), EIRFPLRTIterIndex(0), EIRFPLRPLRIter(0), EIRFPLRPLRIterIndex(0), FaultyChillerSWTFlag(false),
+              FaultyChillerSWTIndex(0), FaultyChillerSWTOffset(0.0), IterLimitExceededNum(0), IterLimitErrIndex(0), IterFailed(0), IterFailedIndex(0),
+              DeltaTErrCount(0), DeltaTErrCountIndex(0), CWLoopNum(0), CWLoopSideNum(0), CWBranchNum(0), CWCompNum(0), CDLoopNum(0), CDLoopSideNum(0),
+              CDBranchNum(0), CDCompNum(0), HRLoopNum(0), HRLoopSideNum(0), HRBranchNum(0), HRCompNum(0), CondMassFlowIndex(0),
+              PossibleSubcooling(false), FaultyChillerFoulingFlag(false), FaultyChillerFoulingIndex(0), FaultyChillerFoulingFactor(1.0),
+              MyEnvrnFlag(true), MyInitFlag(true), MySizeFlag(true), ChillerCondAvgTemp(0.0), ChillerFalseLoadRate(0.0), ChillerCyclingRatio(0.0),
+              ChillerPartLoadRatio(0.0), ChillerEIRFPLR(0.0), ChillerEIRFT(0.0), ChillerCapFT(0.0), HeatRecOutletTemp(0.0), QHeatRecovery(0.0),
+              QCondenser(0.0), QEvaporator(0.0), Power(0.0), EvapOutletTemp(0.0), CondOutletTemp(0.0), EvapMassFlowRate(0.0), CondMassFlowRate(0.0),
+              ChillerFalseLoad(0.0), Energy(0.0), EvapEnergy(0.0), CondEnergy(0.0), CondInletTemp(0.0), EvapInletTemp(0.0), ActualCOP(0.0),
+              EnergyHeatRecovery(0.0), HeatRecInletTemp(0.0), HeatRecMassFlow(0.0), EquipFlowCtrl(0)
         {
         }
 
