@@ -4,15 +4,13 @@ This coil input structure is meant to supplant the coil objects from previous En
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
-\item
- Coil:Cooling:DX - Defines where the coil's evaporator and condenser sections are connected to the HVAC system through node connections to air loops or zones (if condenser section rejects heat to a zone), as well as the coil's availability.
-\item
- Coil:Cooling:DX:CurveFit:Performance - Defines how the coil operates over a range of operating conditions.
-\item
- Coil:Cooling:DX:CurveFit:OperatingMode - Defines the rated coil characteristics (capacity, evaporator section air flow rate, etc.) and capacity control method for a given operating mode. Operating modes are generally used to describe humidity control strategies for DX cooling coil arrangements that enable enhanced dehumidification. 
-\item
- Coil:Cooling:DX:CurveFit:Speed - Defines DX cooling coil performance for a specific speed within a single operating mode.
+\item Coil:Cooling:DX - Defines where the coil's evaporator and condenser sections are connected to the HVAC system through node connections to air loops or zones (if condenser section rejects heat to a zone), as well as the coil's availability.
 
+\item Coil:Cooling:DX:CurveFit:Performance - Defines how the coil operates over a range of operating conditions.
+
+\item Coil:Cooling:DX:CurveFit:OperatingMode - Defines the rated coil characteristics (capacity, evaporator section air flow rate, etc.) and capacity control method for a given operating mode. Operating modes are generally used to describe humidity control strategies for DX cooling coil arrangements that enable enhanced dehumidification.
+
+\item Coil:Cooling:DX:CurveFit:Speed - Defines DX cooling coil performance for a specific speed within a single operating mode.
 \end{enumerate}
 Note: The Coil:Cooling:DX:CurveFit:Performance object also allows users to input 3 operating modes: Base Operating Mode, Alternative Operating Mode 1, and Alternative Operating Mode 2. When the Base Operating Mode is an only mode input, the coil performs like a regular cooling DX coil and no specific dehumidication capability. The alternative operating mode 1 is used for enhanced dehumidification. When all 3 modes are inputs, the coil performs as a subcool rehat coil. When load sensible heat ratio (SHR), defined as sensible cooling load / (sensible cooling load + latent cooling load), is greater than the SHR in the Base Operating Mode at given inlet air conditions, the coil performs in Base Operating Mode only. When the load SHR is less than the SHR in the Base Operating Mode and greater than the SHR in the Alternative Operating Mode 1 at the same given inlet air conditions, the coil performs combination of both Base Operating Mode, and Alternative Operating Mode 1. Mode ratio determines a fraction of time Alternative Operating Mode 1 operates and the rest (1 - Mode ratio) of time Base Operating Mode operates in a single time step. When the load SHR is less than the SHR in the Alternative Operating Mode 1 and greater than the SHR in the Alternative Operating Mode 2 at the same given inlet air conditions, the coil performs combination of both Base Operating Mode, and Alternative Operating Mode 2. Mode ratio determines a fraction of time Alternative Operating Mode 2 operates and (1 - Mode ratio) of time Base Operating Mode operates in a single time step.  When the load SHR is greater than the SHR in the Alternative Operating Mode 2, the coil performs as Alternative Operating Mode 2 alone.   
 
@@ -98,10 +96,6 @@ This choice field defined the capacity control method. Valid choices for this in
 
 If the DX unit can switch operating modes to increase dehumidification based on a humidistat signal, then set this to \textbf{HumidityControl}. This field just specifies the availability of enhanced dehumidification. Actual control of the operating mode is handled by the coil's parent component.
 
-\paragraph{Field: Operating Mode Number Schedule Name}\label{field-operation-mode-number-schedule-name}
-
-This field is used (and required) if the operating mode control method is set to \textbf{Scheduled} in the previous input field. The control schedule consists of a series of integer values that indicate what mode the coil should operate in for a given time period. This input is useful for EMS control of operating mode. The integer values in this control schedule should correlate with the operating mode numbers defined in the last input field(s) of this object.
-
 \paragraph{Field: Evaporative Condenser Basin Heater Capacity}\label{field-evaporative-condenser-basin-heater-capacity-000}
 
 This numeric field contains the capacity of the coil's electric evaporative cooler basin heater in Watts per degree Kelvin. This field only applies for Condenser Type = \textbf{EvaporativelyCooled}. This field is used in conjunction with the Evaporative Condenser Basin Heater Setpoint Temperature and Evaporative Condenser Basin Heater Operating Schedule Name described in the following fields. The basin heater electric power is equal to this field multiplied by the difference between the basin heater set point temperature and the outdoor dry-bulb temperature. The basin heater only operates when the DX coil is off, regardless of the basin heater schedule described below. The basin heater capacity must be greater than or equal to zero, with a default value of zero if this field is left blank.
@@ -116,19 +110,21 @@ This alpha field contains the name of the basin heater operating schedule. This 
 
 \paragraph{Field: Compressor Fuel Type}\label{field-compressor-fuel-type-000}
 
-This alpha field determines the type of fuel that this cooling coil's compressor uses. This field has nine choices: \textbf{Electricity}, \textbf{NaturalGas}, \textbf{Propane}, \textbf{Diesel}, \textbf{Gasoline}, \textbf{FuelOil\#1}, \textbf{FuelOil\#2}, \textbf{OtherFuel1} and \textbf{OtherFuel2}. The default is \textbf{Electricity}.
+This alpha field determines the type of fuel that this cooling coil's compressor uses. This field has nine choices: \textbf{Electricity}, \textbf{NaturalGas}, \textbf{Propane}, \textbf{Diesel}, \textbf{Gasoline}, \textbf{FuelOilNo1}, \textbf{FuelOilNo2}, \textbf{OtherFuel1} and \textbf{OtherFuel2}. The default is \textbf{Electricity}.
 
-\paragraph{Field: Operating Mode \textless{}x\textgreater{} Name}\label{field-operating-mode-x-name}
+\paragraph{Field: Base Operating Mode}\label{field-base-operating-mode}
 
-For operating mode \textless{}x\textgreater{}, the name of the corresponding Coil:Cooling:DX:CurveFit:OperatingMode object. Operating Mode 1 is always used as the base design operating mode. Each coil may have up to 10 operating modes defined, and each operating mode may have one or more speeds.
+The name corresponding to a Coil:Cooling:DX:CurveFit:OperatingMode object. Operating Mode is always used as the base design operating mode. This field is required.
 
-If \textit{Method for Switching Operating Modes} is set to \textbf{HumidityControl}, then the operating modes should be listed in order from least dehumidification capacity to most dehumidification capacity. If \textit{Method for Switching Operating Modes} is set to \textbf{Scheduled}, then the operating mode numbers should align with the control schedule referenced in \textit{Operating Mode Number Schedule Name}.
+\paragraph{Field: Alternate Operating Mode}\label{field-alternate-operating-mode}
+
+The name corresponding to a Coil:Cooling:DX:CurveFit:OperatingMode object. Operating Mode is used as the alternate operating mode operating mode to be used for enhanced deumidification when needed. If field is blank, the base operating mode will be used. This field is optional.
 
 If there are 3 operating modes, it represents a subcool-reheat mode coil. The Operating Mode 1 represents a base operating mode coil. The Operating Mode 2 represents a subcool mode coil with lower SHR than the Operating Mode 1. The Operating Mode 3 represents a rehaet mode coil with lower SHR than the Operating Mode 2. All 3 operation modes work together to represent a subcool reheat coil model. The operation procedure is described in \ref{coilcoolingdx}  
 
 \subsection{Coil:Cooling:DX:CurveFit:OperatingMode}\label{coilcoolingdxcurvefitoperatingmode}
 
-This object defines DX cooling coil performance for a single operating mode at rated conditions. Each operating mode may have one or more speeds, which are defined using the Coil:Cooling:DX:CurveFit:Speed object. Operating mode 1 is always the base design operating mode. Additional modes may be optional enhanced dehumidification states such as subcool reheat. The operating mode also defines the condenser type. Each performance specification can reference a maximum of 10 operating modes.
+This object defines DX cooling coil performance for a single operating mode at rated conditions. Each operating mode may have one or more speeds, which are defined using the Coil:Cooling:DX:CurveFit:Speed object. Each operation mode can reference a maximum of 10 Coil:Cooling:DX:CurveFit:Speed objects.
 
 \subsubsection{Inputs}\label{inputs-03}
 
@@ -138,7 +134,7 @@ A unique user-assigned name for an instance of a cooling coil operating mode. An
 
 \paragraph{Field: Rated Gross Total Cooling Capacity}\label{field-rated-gross-total-cooling-capacity-1}
 
-The total, full load gross cooling capacity (sensible plus latent) in Watts of the DX coil unit at rated conditions (air entering the cooling coil at 26.7 °C drybulb/19.4 °C wetbulb (80 °F drybulb/67 °F wetbulb), air entering the outdoor condenser coil at 35 °C drybulb/23.9 °C wetbulb\protect\hyperlink{ux5fftn1}{{[}1{]}} (95 °F drybulb/75 °F wetbulb), and a cooling coil air flow rate defined by field rated air flow rate below). Capacity should be gross (i.e., the effect of supply air fan heat is NOT accounted for). When used in a heat pump, the gross rated total cooling capacity should be within 20\% of the gross rated heating capacity, otherwise a warning message is issued.
+The total, full load gross cooling capacity (sensible plus latent) in Watts of the DX coil unit at rated conditions (air entering the cooling coil at 26.7 °C drybulb/19.4 °C wetbulb (80 °F drybulb/67 °F wetbulb), air entering the outdoor condenser coil at 35 °C drybulb/23.9 °C wetbulb (95 °F drybulb/75 °F wetbulb), and a cooling coil air flow rate defined by field rated air flow rate below). Capacity should be gross (i.e., the effect of supply air fan heat is NOT accounted for). When used in a heat pump, the gross rated total cooling capacity should be within 20\% of the gross rated heating capacity, otherwise a warning message is issued.
 
 \paragraph{Field: Rated Evaporator Air Flow Rate}\label{field-rated-evaporator-air-flow-rate-2}
 
@@ -177,10 +173,6 @@ The type of condenser used by the DX cooling coil. Valid choices for this input 
 \paragraph{Field: Nominal Evaporative Condenser Pump Power}\label{field-nominal-evaporative-condenser-pump-power-1}
 
 The rated power of the evaporative condenser water pump in Watts. This value is used to calculate the power required to pump the water used to evaporatively cool the condenser inlet air. The default value for this input field is zero, but it is autosizable (equivalent to 0.004266 W per watt {[}15 W/ton{]} of rated total cooling capacity). This field is not used when Condenser Type = \textbf{AirCooled}.
-
-\paragraph{Field: Capacity Control Method}\label{field-capacity-control-method}
-
-This field determines how the cooling coil capacity is to be controlled. Options are \textbf{Staged}, \textbf{VariableSpeed}, and \textbf{MultiSpeed}. The default is \textbf{MultiSpeed}.
 
 \paragraph{Field: Nominal Speed Number}\label{field-nominal-speed-number}
 
@@ -308,7 +300,6 @@ The name of a bivariate (e.g. biquadratic) curve or table object (ref Curve:* an
 
 The name of a bivariate (e.g. biquadratic) curve or table object (ref Curve:* and Table:*) that parameterizes the variation of the sensible heat ratio (SHR) as a function of DX cooling coil entering air wet-bulb and dry-bulb temperatures. The output of this curve is multiplied by the rated SHR and the SHR modifier curve (function of flow fraction) to give the SHR at the specific coil entering air temperature and air flow conditions at which the cooling coil is operating. This curve is normalized to a value of 1.0 at the rated condition. This input field is optional. If this input is not blank then the \textit{Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name} must also be entered. If left blank, SHR is calculated using the apparatus dew point method based on total capacity and coil bypass factor.
 
-
 \paragraph{Field: Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name}\label{field-sensible-heat-ratio-modifier-function-of-flow-fraction-curve-name}
 
 The name of a univariate (e.g. quadratic) curve or table object (ref Curve:* and Table:*) that parameterizes the variation of the sensible heat ratio (SHR) as a function of the ratio of actual air flow rate across the cooling coil to the rated air flow rate (i.e., fraction of full load flow). The output of this curve is multiplied by the rated SHR and the SHR modifier curve (function of temperature) to give the SHR at the specific temperature and air flow conditions at which the cooling coil is operating. This curve is normalized to a value of 1.0 when the actual air flow rate equals the rated air flow rate. This input field is optional. If this input is not blank then the \textit{Sensible Heat Ratio Modifier Function of Temperature Curve Name} must also be entered. If left blank, SHR is calculated using the apparatus dew point method based on total capacity and coil bypass factor.
@@ -335,8 +326,7 @@ Coil:Cooling:DX:CurveFit:Performance,
   -25.0, !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
   10.0, !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
   500.0, !- Unit Internal Static Air Pressure {Pa}
-  HumidityControl, !- Method for Switching Operating Modes
-  , !- Operating Mode Number Schedule Name
+  HumidityControl, !- Capacity Control Method
   , !- Evaporative Condenser Basin Heater Capacity {W}
   , !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
   , !- Evaporative Condenser Basin Heater Operating Schedule Name
@@ -402,8 +392,7 @@ Coil:Cooling:DX:CurveFit:Performance,
   -25.0, !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
   10.0, !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
   500.0, !- Unit Internal Static Air Pressure {Pa}
-  HumidityControl, !- Method for Switching Operating Modes
-  , !- Operating Mode Number Schedule Name
+  Staged, !- Capacity Control Method
   0.0, !- Evaporative Condenser Basin Heater Capacity {W}
   2.0, !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
   FanAndCoilAvailSched, !- Evaporative Condenser Basin Heater Operating Schedule Name
@@ -419,11 +408,9 @@ Coil:Cooling:DX:CurveFit:OperatingMode,
   0.0, !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity
   0.0, !- Latent Capacity Time Constant {s}
   0.0, !- Nominal Time for Condensate Removal to Begin {s}
-  No, !- Apply Latent Degradation to Speeds Greater than 1
-  EvaporativelyCooled, !- Condenser Type
-  0.0, !- Nominal Evaporative Condenser Pump Power {W}
-  Multispeed, !- Capacity Control Method
-  3, !- Nominal Speed Number
+  No,  !- Apply Latent Degradation to Speeds Greater than 1
+  Aircooled, !- Condenser Type
+  , !- Nominal Evaporative Condenser Pump Power
   Three Speed Cooling Coil Speed 1, !- Speed 1 Name
   Three Speed Cooling Coil Speed 2, !- Speed 2 Name
   Three Speed Cooling Coil Speed 3; !- Speed 3 Name

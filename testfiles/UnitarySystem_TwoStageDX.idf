@@ -2,22 +2,20 @@
 !-Option OriginalOrderTop UseSpecialFormat
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
-! HVACTemplate-5ZoneUnitarySystem.idf
+! UnitarySystem_TwoStageDX.idf
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and plenum
-!                          illustrates the use of HVACTemplate objects to define zone thermostats and
-!                          unitary system including furnace with DX cooling (single and multi-speed),
-!                          air-to-air heat pump (single and multi-speed) and single-speed water to
-!                          air heat pump.
+!                          with unitary system including furnace with DX cooling (two-stage),
+!                          furnace (gas and electric), and air-to-air heat pump (single-speed)
 !
-! Highlights:              HVACTemplate thermostats and unitary systems
+! Highlights:              Unitary furnace and heat pump with single-speed DX cooling.
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
 !                          Run Control executes the run periods using the weather file
 !
 ! Location:                Chicago, IL
 !
-! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3�C
-!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5�C MCWB=  23.0�C
+! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
+!                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C
 !
 ! Run Period (Weather File): Winter 1/14, Summer 7/7, CHICAGO_IL_USA TMY2-94846
 !
@@ -79,8 +77,8 @@
 ! Natural Ventilation:            None
 ! Compact Schedules:              Yes
 !
-! HVAC:                           Single-zone unitary system with various types of dx cooling, heat
-!                                 pump, or HW and ChW.  The plenum zone is unconditioned and is not
+! HVAC:                           Single-zone unitary system with two-stage dx cooling, heat
+!                                 pump, or furnace.  The plenum zone is unconditioned and is not
 !                                 used for HVAC air flow. All equipment is autosized.
 !
 ! Zonal Equipment:                No
@@ -161,22 +159,34 @@
     CONTINUOUS;              !- Numeric Type
 
   RunPeriod,
-    ,                        !- Name
+    Jan14,                   !- Name
     1,                       !- Begin Month
-    1,                       !- Begin Day of Month
+    14,                      !- Begin Day of Month
     ,                        !- Begin Year
-    12,                      !- End Month
-    31,                      !- End Day of Month
+    1,                       !- End Month
+    14,                      !- End Day of Month
     ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
     Yes,                     !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
-    Yes,                     !- Use Weather File Snow Indicators
-    ;                        !- Treat Weather as Actual
+    Yes;                     !- Use Weather File Snow Indicators
 
-!
+  RunPeriod,
+    July7,                   !- Name
+    7,                       !- Begin Month
+    7,                       !- Begin Day of Month
+    ,                        !- Begin Year
+    7,                       !- End Month
+    7,                       !- End Day of Month
+    ,                        !- End Year
+    Tuesday,                 !- Day of Week for Start Day
+    Yes,                     !- Use Weather File Holidays and Special Days
+    Yes,                     !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
 
   Site:Location,
     CHICAGO_IL_USA TMY2-94846,  !- Name
@@ -188,11 +198,11 @@
   SimulationControl,
     Yes,                     !- Do Zone Sizing Calculation
     Yes,                     !- Do System Sizing Calculation
-    Yes,                     !- Do Plant Sizing Calculation
+    No,                     !- Do Plant Sizing Calculation
     No,                      !- Run Simulation for Sizing Periods
     Yes;                     !- Run Simulation for Weather File Run Periods
 
-! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3�C
+! CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Heating 99% Design Conditions DB,  !- Name
@@ -222,7 +232,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     0.0;                     !- Sky Clearness
 
-! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5�C MCWB=  23.0�C
+! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C
 
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name
@@ -252,8 +262,7 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     1.0;                     !- Sky Clearness
 
-!
-! Site:GroundTemperature:BuildingSurface,21.5,21.4,21.5,21.5,22.0,22.9,23.0,23.1,23.1,22.2,21.7,21.6;
+  Site:GroundTemperature:BuildingSurface,20.03,20.03,20.13,20.30,20.43,20.52,20.62,20.77,20.78,20.55,20.44,20.20;
 
   Material,
     WD10,                    !- Name
@@ -1734,494 +1743,6 @@
     1.2,                     !- Heating Sizing Factor
     1.2;                     !- Cooling Sizing Factor
 
-!
-! HVACTemplate:Thermostat,
-!     All Zones,               !- Name
-!     Htg-SetP-Sch,            !- Heating Setpoint Schedule Name
-!     ,                        !- Constant Heating Setpoint {C}
-!     Clg-SetP-Sch,            !- Cooling Setpoint Schedule Name
-!     ;                        !- Constant Cooling Setpoint {C}
-!
-! HVACTemplate:Zone:Unitary,
-!     SPACE1-1,                !- Zone Name
-!     Sys 1 Furnace DX Cool,   !- Template Unitary System Name
-!     All Zones,               !- Template Thermostat Name
-!     autosize,                !- Supply Air Maximum Flow Rate {m3/s}
-!     ,                        !- Zone Heating Sizing Factor
-!     ,                        !- Zone Cooling Sizing Factor
-!     flow/person,             !- Outdoor Air Method
-!     0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
-!     0.0,                     !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
-!     0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
-!     ,                        !- Supply Plenum Name
-!     ,                        !- Return Plenum Name
-!     None,                    !- Baseboard Heating Type
-!     ,                        !- Baseboard Heating Availability Schedule Name
-!     autosize,                !- Baseboard Heating Capacity {W}
-!     SystemSupplyAirTemperature,  !- Zone Cooling Design Supply Air Temperature Input Method
-!     ,                        !- Zone Cooling Design Supply Air Temperature {C}
-!     ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
-!     SystemSupplyAirTemperature,  !- Zone Heating Design Supply Air Temperature Input Method
-!     ,                        !- Zone Heating Design Supply Air Temperature {C}
-!     ;                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}
-!
-! HVACTemplate:Zone:Unitary,
-!     SPACE2-1,                !- Zone Name
-!     Sys 2 Furnace DX Cool ,  !- Template Unitary System Name
-!     All Zones,               !- Template Thermostat Name
-!     autosize,                !- Supply Air Maximum Flow Rate {m3/s}
-!     ,                        !- Zone Heating Sizing Factor
-!     ,                        !- Zone Cooling Sizing Factor
-!     flow/person,             !- Outdoor Air Method
-!     0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
-!     0.0,                     !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
-!     0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
-!     ,                        !- Supply Plenum Name
-!     ,                        !- Return Plenum Name
-!     None,                    !- Baseboard Heating Type
-!     ,                        !- Baseboard Heating Availability Schedule Name
-!     autosize,                !- Baseboard Heating Capacity {W}
-!     SystemSupplyAirTemperature,  !- Zone Cooling Design Supply Air Temperature Input Method
-!     ,                        !- Zone Cooling Design Supply Air Temperature {C}
-!     ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
-!     SystemSupplyAirTemperature,  !- Zone Heating Design Supply Air Temperature Input Method
-!     ,                        !- Zone Heating Design Supply Air Temperature {C}
-!     ;                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}
-!
-! HVACTemplate:Zone:Unitary,
-!     SPACE3-1,                !- Zone Name
-!     Sys 3 Heat Pump Air Source,  !- Template Unitary System Name
-!     All Zones,               !- Template Thermostat Name
-!     autosize,                !- Supply Air Maximum Flow Rate {m3/s}
-!     ,                        !- Zone Heating Sizing Factor
-!     ,                        !- Zone Cooling Sizing Factor
-!     flow/person,             !- Outdoor Air Method
-!     0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
-!     0.0,                     !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
-!     0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
-!     ,                        !- Supply Plenum Name
-!     ,                        !- Return Plenum Name
-!     None,                    !- Baseboard Heating Type
-!     ,                        !- Baseboard Heating Availability Schedule Name
-!     autosize,                !- Baseboard Heating Capacity {W}
-!     SystemSupplyAirTemperature,  !- Zone Cooling Design Supply Air Temperature Input Method
-!     ,                        !- Zone Cooling Design Supply Air Temperature {C}
-!     ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
-!     SystemSupplyAirTemperature,  !- Zone Heating Design Supply Air Temperature Input Method
-!     ,                        !- Zone Heating Design Supply Air Temperature {C}
-!     ;                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}
-!
-! HVACTemplate:Zone:Unitary,
-!     SPACE4-1,                !- Zone Name
-!     Sys 4 Heat Pump Air Source,  !- Template Unitary System Name
-!     All Zones,               !- Template Thermostat Name
-!     autosize,                !- Supply Air Maximum Flow Rate {m3/s}
-!     ,                        !- Zone Heating Sizing Factor
-!     ,                        !- Zone Cooling Sizing Factor
-!     flow/person,             !- Outdoor Air Method
-!     0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
-!     0.0,                     !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
-!     0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
-!     ,                        !- Supply Plenum Name
-!     ,                        !- Return Plenum Name
-!     None,                    !- Baseboard Heating Type
-!     ,                        !- Baseboard Heating Availability Schedule Name
-!     autosize,                !- Baseboard Heating Capacity {W}
-!     SystemSupplyAirTemperature,  !- Zone Cooling Design Supply Air Temperature Input Method
-!     ,                        !- Zone Cooling Design Supply Air Temperature {C}
-!     ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
-!     SystemSupplyAirTemperature,  !- Zone Heating Design Supply Air Temperature Input Method
-!     ,                        !- Zone Heating Design Supply Air Temperature {C}
-!     ;                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}
-!
-! HVACTemplate:Zone:Unitary,
-!     SPACE5-1,                !- Zone Name
-!     Sys 5 Furnace DX Cool,   !- Template Unitary System Name
-!     All Zones,               !- Template Thermostat Name
-!     autosize,                !- Supply Air Maximum Flow Rate {m3/s}
-!     ,                        !- Zone Heating Sizing Factor
-!     ,                        !- Zone Cooling Sizing Factor
-!     flow/person,             !- Outdoor Air Method
-!     0.00944,                 !- Outdoor Air Flow Rate per Person {m3/s}
-!     0.0,                     !- Outdoor Air Flow Rate per Zone Floor Area {m3/s-m2}
-!     0.0,                     !- Outdoor Air Flow Rate per Zone {m3/s}
-!     ,                        !- Supply Plenum Name
-!     ,                        !- Return Plenum Name
-!     None,                    !- Baseboard Heating Type
-!     ,                        !- Baseboard Heating Availability Schedule Name
-!     autosize,                !- Baseboard Heating Capacity {W}
-!     SystemSupplyAirTemperature,  !- Zone Cooling Design Supply Air Temperature Input Method
-!     ,                        !- Zone Cooling Design Supply Air Temperature {C}
-!     ,                        !- Zone Cooling Design Supply Air Temperature Difference {deltaC}
-!     SystemSupplyAirTemperature,  !- Zone Heating Design Supply Air Temperature Input Method
-!     ,                        !- Zone Heating Design Supply Air Temperature {C}
-!     ;                        !- Zone Heating Design Supply Air Temperature Difference {deltaC}
-!
-! HVACTemplate:System:UnitarySystem,
-!     Sys 1 Furnace DX Cool,   !- Name
-!     ,                        !- System Availability Schedule Name
-!     Load,                    !- Control Type
-!     SPACE1-1,                !- Control Zone or Thermostat Location Name
-!     autosize,                !- Cooling Supply Air Flow Rate {m3/s}
-!     autosize,                !- Heating Supply Air Flow Rate {m3/s}
-!     autosize,                !- No Load Supply Air Flow Rate {m3/s}
-!     FanAvailSched,           !- Supply Fan Operating Mode Schedule Name
-!     BlowThrough,             !- Supply Fan Placement
-!     0.7,                     !- Supply Fan Total Efficiency
-!     600,                     !- Supply Fan Delta Pressure {Pa}
-!     0.9,                     !- Supply Fan Motor Efficiency
-!     1,                       !- Supply Fan Motor in Air Stream Fraction
-!     TwoStageDX,              !- Cooling Coil Type
-!     1,                       !- Number of Speeds for Cooling
-!     ,                        !- Cooling Coil Availability Schedule Name
-!     12.8,                    !- Cooling Design Supply Air Temperature {C}
-!     autosize,                !- DX Cooling Coil Gross Rated Total Capacity {W}
-!     autosize,                !- DX Cooling Coil Gross Rated Sensible Heat Ratio
-!     3,                       !- DX Cooling Coil Gross Rated COP {W/W}
-!     Gas,                     !- Heating Coil Type
-!     1,                       !- Number of Speeds or Stages for Heating
-!     ,                        !- Heating Coil Availability Schedule Name
-!     50,                      !- Heating Design Supply Air Temperature {C}
-!     autosize,                !- Heating Coil Gross Rated Capacity {W}
-!     0.8,                     !- Gas Heating Coil Efficiency
-!     ,                        !- Gas Heating Coil Parasitic Electric Load {W}
-!     2.75,                    !- Heat Pump Heating Coil Gross Rated COP {W/W}
-!     -8,                      !- Heat Pump Heating Minimum Outdoor Dry-Bulb Temperature {C}
-!     5,                       !- Heat Pump Defrost Maximum Outdoor Dry-Bulb Temperature {C}
-!     ,                        !- Heat Pump Defrost Strategy
-!     ,                        !- Heat Pump Defrost Control
-!     ,                        !- Heat Pump Defrost Time Period Fraction
-!     None,                    !- Supplemental Heating or Reheat Coil Type
-!     ,                        !- Supplemental Heating or Reheat Coil Availability Schedule Name
-!     autosize,                !- Supplemental Heating or Reheat Coil Capacity {W}
-!     21,                      !- Supplemental Heating or Reheat Coil Maximum Outdoor Dry-Bulb Temperature {C}
-!     0.8,                     !- Supplemental Gas Heating or Reheat Coil Efficiency
-!     ,                        !- Supplemental Gas Heating or Reheat Coil Parasitic Electric Load {W}
-!     autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
-!     autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
-!     Min OA Sched,            !- Minimum Outdoor Air Schedule Name
-!     DifferentialDryBulb,     !- Economizer Type
-!     LockoutWithCompressor,   !- Economizer Lockout
-!     20,                      !- Economizer Maximum Limit Dry-Bulb Temperature {C}
-!     ,                        !- Economizer Maximum Limit Enthalpy {J/kg}
-!     ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}
-!     ,                        !- Economizer Minimum Limit Dry-Bulb Temperature {C}
-!     ,                        !- Supply Plenum Name
-!     ,                        !- Return Plenum Name
-!     None,                    !- Heat Recovery Type
-!     0.7,                     !- Sensible Heat Recovery Effectiveness
-!     0.65,                    !- Latent Heat Recovery Effectiveness
-!     Plate,                   !- Heat Recovery Heat Exchanger Type
-!     None,                    !- Heat Recovery Frost Control Type
-!     CoolReheat,              !- Dehumidification Control Type
-!     60,                      !- Dehumidification Relative Humidity Setpoint {percent}
-!     ,                        !- Dehumidification Relative Humidity Setpoint Schedule Name
-!     None,                    !- Humidifier Type
-!     ,                        !- Humidifier Availability Schedule Name
-!     0.000001,                !- Humidifier Rated Capacity {m3/s}
-!     autosize,                !- Humidifier Rated Electric Power {W}
-!     ,                        !- Humidifier Control Zone Name
-!     30,                      !- Humidifier Relative Humidity Setpoint {percent}
-!     ,                        !- Humidifier Relative Humidity Setpoint Schedule Name
-!     NonCoincident,           !- Sizing Option
-!     No,                      !- Return Fan
-!     0.7,                     !- Return Fan Total Efficiency
-!     300,                     !- Return Fan Delta Pressure {Pa}
-!     0.9,                     !- Return Fan Motor Efficiency
-!     1;                       !- Return Fan Motor in Air Stream Fraction
-!
-! HVACTemplate:System:UnitarySystem,
-!     Sys 2 Furnace DX Cool ,  !- Name
-!     ,                        !- System Availability Schedule Name
-!     Load,                    !- Control Type
-!     SPACE2-1,                !- Control Zone or Thermostat Location Name
-!     autosize,                !- Cooling Supply Air Flow Rate {m3/s}
-!     autosize,                !- Heating Supply Air Flow Rate {m3/s}
-!     autosize,                !- No Load Supply Air Flow Rate {m3/s}
-!     FanAvailSched,           !- Supply Fan Operating Mode Schedule Name
-!     DrawThrough,             !- Supply Fan Placement
-!     0.7,                     !- Supply Fan Total Efficiency
-!     600,                     !- Supply Fan Delta Pressure {Pa}
-!     0.9,                     !- Supply Fan Motor Efficiency
-!     1,                       !- Supply Fan Motor in Air Stream Fraction
-!     TwoStageDX,              !- Cooling Coil Type
-!     1,                       !- Number of Speeds for Cooling
-!     ,                        !- Cooling Coil Availability Schedule Name
-!     12.8,                    !- Cooling Design Supply Air Temperature {C}
-!     autosize,                !- DX Cooling Coil Gross Rated Total Capacity {W}
-!     autosize,                !- DX Cooling Coil Gross Rated Sensible Heat Ratio
-!     3,                       !- DX Cooling Coil Gross Rated COP {W/W}
-!     Electric,                !- Heating Coil Type
-!     1,                       !- Number of Speeds or Stages for Heating
-!     ,                        !- Heating Coil Availability Schedule Name
-!     50,                      !- Heating Design Supply Air Temperature {C}
-!     autosize,                !- Heating Coil Gross Rated Capacity {W}
-!     0.8,                     !- Gas Heating Coil Efficiency
-!     ,                        !- Gas Heating Coil Parasitic Electric Load {W}
-!     2.75,                    !- Heat Pump Heating Coil Gross Rated COP {W/W}
-!     -8,                      !- Heat Pump Heating Minimum Outdoor Dry-Bulb Temperature {C}
-!     5,                       !- Heat Pump Defrost Maximum Outdoor Dry-Bulb Temperature {C}
-!     ,                        !- Heat Pump Defrost Strategy
-!     ,                        !- Heat Pump Defrost Control
-!     ,                        !- Heat Pump Defrost Time Period Fraction
-!     None,                    !- Supplemental Heating or Reheat Coil Type
-!     ,                        !- Supplemental Heating or Reheat Coil Availability Schedule Name
-!     autosize,                !- Supplemental Heating or Reheat Coil Capacity {W}
-!     21,                      !- Supplemental Heating or Reheat Coil Maximum Outdoor Dry-Bulb Temperature {C}
-!     0.8,                     !- Supplemental Gas Heating or Reheat Coil Efficiency
-!     ,                        !- Supplemental Gas Heating or Reheat Coil Parasitic Electric Load {W}
-!     autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
-!     autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
-!     Min OA Sched,            !- Minimum Outdoor Air Schedule Name
-!     DifferentialDryBulb,     !- Economizer Type
-!     LockoutWithCompressor,   !- Economizer Lockout
-!     20,                      !- Economizer Maximum Limit Dry-Bulb Temperature {C}
-!     ,                        !- Economizer Maximum Limit Enthalpy {J/kg}
-!     ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}
-!     ,                        !- Economizer Minimum Limit Dry-Bulb Temperature {C}
-!     ,                        !- Supply Plenum Name
-!     ,                        !- Return Plenum Name
-!     None,                    !- Heat Recovery Type
-!     0.7,                     !- Sensible Heat Recovery Effectiveness
-!     0.65,                    !- Latent Heat Recovery Effectiveness
-!     Plate,                   !- Heat Recovery Heat Exchanger Type
-!     None,                    !- Heat Recovery Frost Control Type
-!     CoolReheat,              !- Dehumidification Control Type
-!     60,                      !- Dehumidification Relative Humidity Setpoint {percent}
-!     ,                        !- Dehumidification Relative Humidity Setpoint Schedule Name
-!     None,                    !- Humidifier Type
-!     ,                        !- Humidifier Availability Schedule Name
-!     0.000001,                !- Humidifier Rated Capacity {m3/s}
-!     autosize,                !- Humidifier Rated Electric Power {W}
-!     ,                        !- Humidifier Control Zone Name
-!     30,                      !- Humidifier Relative Humidity Setpoint {percent}
-!     ,                        !- Humidifier Relative Humidity Setpoint Schedule Name
-!     NonCoincident,           !- Sizing Option
-!     No,                      !- Return Fan
-!     0.7,                     !- Return Fan Total Efficiency
-!     300,                     !- Return Fan Delta Pressure {Pa}
-!     0.9,                     !- Return Fan Motor Efficiency
-!     1;                       !- Return Fan Motor in Air Stream Fraction
-!
-! HVACTemplate:System:UnitarySystem,
-!     Sys 3 Heat Pump Air Source,  !- Name
-!     ,                        !- System Availability Schedule Name
-!     Load,                    !- Control Type
-!     SPACE3-1,                !- Control Zone or Thermostat Location Name
-!     autosize,                !- Cooling Supply Air Flow Rate {m3/s}
-!     autosize,                !- Heating Supply Air Flow Rate {m3/s}
-!     autosize,                !- No Load Supply Air Flow Rate {m3/s}
-!     FanAvailSched,           !- Supply Fan Operating Mode Schedule Name
-!     BlowThrough,             !- Supply Fan Placement
-!     0.7,                     !- Supply Fan Total Efficiency
-!     600,                     !- Supply Fan Delta Pressure {Pa}
-!     0.9,                     !- Supply Fan Motor Efficiency
-!     1,                       !- Supply Fan Motor in Air Stream Fraction
-!     TwoStageDX,              !- Cooling Coil Type
-!     1,                       !- Number of Speeds for Cooling
-!     ,                        !- Cooling Coil Availability Schedule Name
-!     12.8,                    !- Cooling Design Supply Air Temperature {C}
-!     autosize,                !- DX Cooling Coil Gross Rated Total Capacity {W}
-!     autosize,                !- DX Cooling Coil Gross Rated Sensible Heat Ratio
-!     3,                       !- DX Cooling Coil Gross Rated COP {W/W}
-!     SingleSpeedDXHeatPumpAirSource,  !- Heating Coil Type
-!     1,                       !- Number of Speeds or Stages for Heating
-!     ,                        !- Heating Coil Availability Schedule Name
-!     50,                      !- Heating Design Supply Air Temperature {C}
-!     autosize,                !- Heating Coil Gross Rated Capacity {W}
-!     0.8,                     !- Gas Heating Coil Efficiency
-!     ,                        !- Gas Heating Coil Parasitic Electric Load {W}
-!     2.75,                    !- Heat Pump Heating Coil Gross Rated COP {W/W}
-!     -8,                      !- Heat Pump Heating Minimum Outdoor Dry-Bulb Temperature {C}
-!     5,                       !- Heat Pump Defrost Maximum Outdoor Dry-Bulb Temperature {C}
-!     ReverseCycle,            !- Heat Pump Defrost Strategy
-!     Timed,                   !- Heat Pump Defrost Control
-!     0.058333,                !- Heat Pump Defrost Time Period Fraction
-!     Electric,                !- Supplemental Heating or Reheat Coil Type
-!     ,                        !- Supplemental Heating or Reheat Coil Availability Schedule Name
-!     autosize,                !- Supplemental Heating or Reheat Coil Capacity {W}
-!     21,                      !- Supplemental Heating or Reheat Coil Maximum Outdoor Dry-Bulb Temperature {C}
-!     0.8,                     !- Supplemental Gas Heating or Reheat Coil Efficiency
-!     ,                        !- Supplemental Gas Heating or Reheat Coil Parasitic Electric Load {W}
-!     autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
-!     autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
-!     Min OA Sched,            !- Minimum Outdoor Air Schedule Name
-!     DifferentialDryBulb,     !- Economizer Type
-!     LockoutWithCompressor,   !- Economizer Lockout
-!     20,                      !- Economizer Maximum Limit Dry-Bulb Temperature {C}
-!     ,                        !- Economizer Maximum Limit Enthalpy {J/kg}
-!     ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}
-!     ,                        !- Economizer Minimum Limit Dry-Bulb Temperature {C}
-!     ,                        !- Supply Plenum Name
-!     ,                        !- Return Plenum Name
-!     None,                    !- Heat Recovery Type
-!     0.7,                     !- Sensible Heat Recovery Effectiveness
-!     0.65,                    !- Latent Heat Recovery Effectiveness
-!     Plate,                   !- Heat Recovery Heat Exchanger Type
-!     None,                    !- Heat Recovery Frost Control Type
-!     CoolReheat,              !- Dehumidification Control Type
-!     60,                      !- Dehumidification Relative Humidity Setpoint {percent}
-!     ,                        !- Dehumidification Relative Humidity Setpoint Schedule Name
-!     None,                    !- Humidifier Type
-!     ,                        !- Humidifier Availability Schedule Name
-!     0.000001,                !- Humidifier Rated Capacity {m3/s}
-!     autosize,                !- Humidifier Rated Electric Power {W}
-!     ,                        !- Humidifier Control Zone Name
-!     30,                      !- Humidifier Relative Humidity Setpoint {percent}
-!     ,                        !- Humidifier Relative Humidity Setpoint Schedule Name
-!     NonCoincident,           !- Sizing Option
-!     No,                      !- Return Fan
-!     0.7,                     !- Return Fan Total Efficiency
-!     300,                     !- Return Fan Delta Pressure {Pa}
-!     0.9,                     !- Return Fan Motor Efficiency
-!     1;                       !- Return Fan Motor in Air Stream Fraction
-!
-! HVACTemplate:System:UnitarySystem,
-!     Sys 4 Heat Pump Air Source,  !- Name
-!     ,                        !- System Availability Schedule Name
-!     Load,                    !- Control Type
-!     SPACE4-1,                !- Control Zone or Thermostat Location Name
-!     autosize,                !- Cooling Supply Air Flow Rate {m3/s}
-!     autosize,                !- Heating Supply Air Flow Rate {m3/s}
-!     autosize,                !- No Load Supply Air Flow Rate {m3/s}
-!     FanAvailSched,           !- Supply Fan Operating Mode Schedule Name
-!     BlowThrough,             !- Supply Fan Placement
-!     0.7,                     !- Supply Fan Total Efficiency
-!     600,                     !- Supply Fan Delta Pressure {Pa}
-!     0.9,                     !- Supply Fan Motor Efficiency
-!     1,                       !- Supply Fan Motor in Air Stream Fraction
-!     TwoStageDX,              !- Cooling Coil Type
-!     1,                       !- Number of Speeds for Cooling
-!     ,                        !- Cooling Coil Availability Schedule Name
-!     12.8,                    !- Cooling Design Supply Air Temperature {C}
-!     autosize,                !- DX Cooling Coil Gross Rated Total Capacity {W}
-!     autosize,                !- DX Cooling Coil Gross Rated Sensible Heat Ratio
-!     3,                       !- DX Cooling Coil Gross Rated COP {W/W}
-!     SingleSpeedDXHeatPumpAirSource,  !- Heating Coil Type
-!     1,                       !- Number of Speeds or Stages for Heating
-!     ,                        !- Heating Coil Availability Schedule Name
-!     50,                      !- Heating Design Supply Air Temperature {C}
-!     autosize,                !- Heating Coil Gross Rated Capacity {W}
-!     0.8,                     !- Gas Heating Coil Efficiency
-!     ,                        !- Gas Heating Coil Parasitic Electric Load {W}
-!     2.75,                    !- Heat Pump Heating Coil Gross Rated COP {W/W}
-!     -8,                      !- Heat Pump Heating Minimum Outdoor Dry-Bulb Temperature {C}
-!     5,                       !- Heat Pump Defrost Maximum Outdoor Dry-Bulb Temperature {C}
-!     ,                        !- Heat Pump Defrost Strategy
-!     ,                        !- Heat Pump Defrost Control
-!     ,                        !- Heat Pump Defrost Time Period Fraction
-!     Electric,                !- Supplemental Heating or Reheat Coil Type
-!     ,                        !- Supplemental Heating or Reheat Coil Availability Schedule Name
-!     autosize,                !- Supplemental Heating or Reheat Coil Capacity {W}
-!     21,                      !- Supplemental Heating or Reheat Coil Maximum Outdoor Dry-Bulb Temperature {C}
-!     0.8,                     !- Supplemental Gas Heating or Reheat Coil Efficiency
-!     ,                        !- Supplemental Gas Heating or Reheat Coil Parasitic Electric Load {W}
-!     autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
-!     autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
-!     Min OA Sched,            !- Minimum Outdoor Air Schedule Name
-!     DifferentialDryBulb,     !- Economizer Type
-!     LockoutWithCompressor,   !- Economizer Lockout
-!     20,                      !- Economizer Maximum Limit Dry-Bulb Temperature {C}
-!     ,                        !- Economizer Maximum Limit Enthalpy {J/kg}
-!     ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}
-!     ,                        !- Economizer Minimum Limit Dry-Bulb Temperature {C}
-!     ,                        !- Supply Plenum Name
-!     ,                        !- Return Plenum Name
-!     None,                    !- Heat Recovery Type
-!     0.7,                     !- Sensible Heat Recovery Effectiveness
-!     0.65,                    !- Latent Heat Recovery Effectiveness
-!     Plate,                   !- Heat Recovery Heat Exchanger Type
-!     None,                    !- Heat Recovery Frost Control Type
-!     CoolReheat,              !- Dehumidification Control Type
-!     60,                      !- Dehumidification Relative Humidity Setpoint {percent}
-!     ,                        !- Dehumidification Relative Humidity Setpoint Schedule Name
-!     None,                    !- Humidifier Type
-!     ,                        !- Humidifier Availability Schedule Name
-!     0.000001,                !- Humidifier Rated Capacity {m3/s}
-!     autosize,                !- Humidifier Rated Electric Power {W}
-!     ,                        !- Humidifier Control Zone Name
-!     30,                      !- Humidifier Relative Humidity Setpoint {percent}
-!     ,                        !- Humidifier Relative Humidity Setpoint Schedule Name
-!     NonCoincident,           !- Sizing Option
-!     No,                      !- Return Fan
-!     0.7,                     !- Return Fan Total Efficiency
-!     300,                     !- Return Fan Delta Pressure {Pa}
-!     0.9,                     !- Return Fan Motor Efficiency
-!     1;                       !- Return Fan Motor in Air Stream Fraction
-!
-! HVACTemplate:System:UnitarySystem,
-!     Sys 5 Furnace DX Cool,   !- Name
-!     ,                        !- System Availability Schedule Name
-!     Load,                    !- Control Type
-!     SPACE5-1,                !- Control Zone or Thermostat Location Name
-!     autosize,                !- Cooling Supply Air Flow Rate {m3/s}
-!     autosize,                !- Heating Supply Air Flow Rate {m3/s}
-!     autosize,                !- No Load Supply Air Flow Rate {m3/s}
-!     FanAvailSched,           !- Supply Fan Operating Mode Schedule Name
-!     BlowThrough,             !- Supply Fan Placement
-!     0.7,                     !- Supply Fan Total Efficiency
-!     600,                     !- Supply Fan Delta Pressure {Pa}
-!     0.9,                     !- Supply Fan Motor Efficiency
-!     1,                       !- Supply Fan Motor in Air Stream Fraction
-!     TwoStageDX,              !- Cooling Coil Type
-!     1,                       !- Number of Speeds for Cooling
-!     ,                        !- Cooling Coil Availability Schedule Name
-!     12.8,                    !- Cooling Design Supply Air Temperature {C}
-!     autosize,                !- DX Cooling Coil Gross Rated Total Capacity {W}
-!     autosize,                !- DX Cooling Coil Gross Rated Sensible Heat Ratio
-!     3,                       !- DX Cooling Coil Gross Rated COP {W/W}
-!     Gas,                     !- Heating Coil Type
-!     1,                       !- Number of Speeds or Stages for Heating
-!     ,                        !- Heating Coil Availability Schedule Name
-!     50,                      !- Heating Design Supply Air Temperature {C}
-!     autosize,                !- Heating Coil Gross Rated Capacity {W}
-!     0.8,                     !- Gas Heating Coil Efficiency
-!     ,                        !- Gas Heating Coil Parasitic Electric Load {W}
-!     2.75,                    !- Heat Pump Heating Coil Gross Rated COP {W/W}
-!     -8,                      !- Heat Pump Heating Minimum Outdoor Dry-Bulb Temperature {C}
-!     5,                       !- Heat Pump Defrost Maximum Outdoor Dry-Bulb Temperature {C}
-!     ,                        !- Heat Pump Defrost Strategy
-!     ,                        !- Heat Pump Defrost Control
-!     ,                        !- Heat Pump Defrost Time Period Fraction
-!     None,                    !- Supplemental Heating or Reheat Coil Type
-!     ,                        !- Supplemental Heating or Reheat Coil Availability Schedule Name
-!     autosize,                !- Supplemental Heating or Reheat Coil Capacity {W}
-!     21,                      !- Supplemental Heating or Reheat Coil Maximum Outdoor Dry-Bulb Temperature {C}
-!     0.8,                     !- Supplemental Gas Heating or Reheat Coil Efficiency
-!     ,                        !- Supplemental Gas Heating or Reheat Coil Parasitic Electric Load {W}
-!     autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
-!     autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
-!     Min OA Sched,            !- Minimum Outdoor Air Schedule Name
-!     DifferentialDryBulb,     !- Economizer Type
-!     NoLockout,               !- Economizer Lockout
-!     20,                      !- Economizer Maximum Limit Dry-Bulb Temperature {C}
-!     ,                        !- Economizer Maximum Limit Enthalpy {J/kg}
-!     ,                        !- Economizer Maximum Limit Dewpoint Temperature {C}
-!     ,                        !- Economizer Minimum Limit Dry-Bulb Temperature {C}
-!     ,                        !- Supply Plenum Name
-!     ,                        !- Return Plenum Name
-!     None,                    !- Heat Recovery Type
-!     0.7,                     !- Sensible Heat Recovery Effectiveness
-!     0.65,                    !- Latent Heat Recovery Effectiveness
-!     Plate,                   !- Heat Recovery Heat Exchanger Type
-!     None,                    !- Heat Recovery Frost Control Type
-!     None,                    !- Dehumidification Control Type
-!     60,                      !- Dehumidification Relative Humidity Setpoint {percent}
-!     ,                        !- Dehumidification Relative Humidity Setpoint Schedule Name
-!     None,                    !- Humidifier Type
-!     ,                        !- Humidifier Availability Schedule Name
-!     0.000001,                !- Humidifier Rated Capacity {m3/s}
-!     autosize,                !- Humidifier Rated Electric Power {W}
-!     ,                        !- Humidifier Control Zone Name
-!     30,                      !- Humidifier Relative Humidity Setpoint {percent}
-!     ,                        !- Humidifier Relative Humidity Setpoint Schedule Name
-!     NonCoincident,           !- Sizing Option
-!     No,                      !- Return Fan
-!     0.7,                     !- Return Fan Total Efficiency
-!     300,                     !- Return Fan Delta Pressure {Pa}
-!     0.9,                     !- Return Fan Motor Efficiency
-!     1;                       !- Return Fan Motor in Air Stream Fraction
-
   Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
 
   Output:Variable,*,Zone Air Temperature,hourly;
@@ -2252,29 +1773,11 @@
 
   Output:Variable,*,Cooling Coil Sensible Cooling Rate,hourly;
 
-  Output:Variable,*,Plant Supply Side Outlet Temperature,hourly;
-
-  Output:Variable,*,Chiller Evaporator Cooling Rate,hourly;
-
-  Output:Variable,*,Chiller Condenser Heat Transfer Rate,hourly;
-
-  Output:Variable,*,Chiller Electric Power,hourly;
-
-  Output:Variable,*,Chiller COP,hourly;
-
-  Output:Variable,*,Boiler Heating Rate,hourly;
-
-  Output:Variable,*,Boiler Gas Rate,hourly;
-
-  Output:Variable,*,Cooling Tower Heat Transfer Rate,hourly;
-
-  Output:Variable,*,Cooling Tower Fan Electric Power,hourly;
+  Output:Variable,*,Cooling Coil Electric Power,hourly; !- HVAC Average [W]
+  
+  Output:Variable,*,Cooling Coil Runtime Fraction,hourly; !- HVAC Average []
 
   Output:VariableDictionary,IDF;
-
-  Output:Surfaces:Drawing,dxf;
-
-  Output:Surfaces:List,lines;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
 
@@ -2285,8 +1788,6 @@
   Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;
 
   Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
-
-  Output:Meter:MeterFileOnly,Gas:Plant,monthly;
 
   Output:Meter:MeterFileOnly,Gas:Facility,monthly;
 
@@ -2299,8 +1800,6 @@
   Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
 
   Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
-
-  Output:Meter:MeterFileOnly,Gas:Plant,runperiod;
 
   Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
 
@@ -2390,8 +1889,8 @@
     SPACE1-1 Air Terminal,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     SPACE1-1 Air Terminal,   !- Name
@@ -2458,8 +1957,8 @@
     SPACE2-1 Air Terminal,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     SPACE2-1 Air Terminal,   !- Name
@@ -2526,8 +2025,8 @@
     SPACE3-1 Air Terminal,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     SPACE3-1 Air Terminal,   !- Name
@@ -2594,8 +2093,8 @@
     SPACE4-1 Air Terminal,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     SPACE4-1 Air Terminal,   !- Name
@@ -2662,8 +2161,8 @@
     SPACE5-1 Air Terminal,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Fraction
-    ;                        !- Zone Equipment 1 Sequential Heating Fraction
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirTerminal:SingleDuct:Uncontrolled,
     SPACE5-1 Air Terminal,   !- Name
@@ -2844,13 +2343,16 @@
     ,                        !- Design Specification Multispeed Object Type
     ;                        !- Design Specification Multispeed Object Name
 
+  OutdoorAir:Node,
+    Sys 1 Furnace DX Cool Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     Sys 1 Furnace DX Cool Cooling Coil,  !- Name
     Sys 1 Furnace DX Cool Supply Fan Outlet,  !- Evaporator Inlet Node Name
     Sys 1 Furnace DX Cool Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     ,                        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
+    Sys 1 Furnace DX Cool Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
     Sys 1 Furnace DX Cool Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Sys 1 Furnace DX Cool Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
@@ -2867,7 +2369,7 @@
     ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
     Electricity,             !- Compressor Fuel Type
-    Sys 1 Furnace DX Cool Cooling Coil Normal Operating Mode;  !- Operating Mode 1 Name
+    Sys 1 Furnace DX Cool Cooling Coil Normal Operating Mode;  !- Base Operating Mode
 
   Coil:Cooling:DX:CurveFit:OperatingMode,
     Sys 1 Furnace DX Cool Cooling Coil Normal Operating Mode,  !- Name
@@ -3245,13 +2747,16 @@
     ,                        !- Design Specification Multispeed Object Type
     ;                        !- Design Specification Multispeed Object Name
 
+  OutdoorAir:Node,
+    Sys 2 Furnace DX Cool Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     Sys 2 Furnace DX Cool Cooling Coil,  !- Name
     Sys 2 Furnace DX Cool Mixed Air Outlet,  !- Evaporator Inlet Node Name
     Sys 2 Furnace DX Cool Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     ,                        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
+    Sys 2 Furnace DX Cool Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
     Sys 2 Furnace DX Cool Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Sys 2 Furnace DX Cool Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
@@ -3268,7 +2773,7 @@
     ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
     Electricity,             !- Compressor Fuel Type
-    Sys 2 Furnace DX Cool Cooling Coil Normal Operating Mode;  !- Operating Mode 1 Name
+    Sys 2 Furnace DX Cool Cooling Coil Normal Operating Mode;  !- Base Operating Mode
 
   Coil:Cooling:DX:CurveFit:OperatingMode,
     Sys 2 Furnace DX Cool Cooling Coil Normal Operating Mode,  !- Name
@@ -3633,13 +3138,16 @@
     ,                        !- Design Specification Multispeed Object Type
     ;                        !- Design Specification Multispeed Object Name
 
+  OutdoorAir:Node,
+    Sys 3 Heat Pump Air Source Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     Sys 3 Heat Pump Air Source Cooling Coil,  !- Name
     Sys 3 Heat Pump Air Source Supply Fan Outlet,  !- Evaporator Inlet Node Name
     Sys 3 Heat Pump Air Source Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     ,                        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
+    Sys 3 Heat Pump Air Source Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
     Sys 3 Heat Pump Air Source Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Sys 3 Heat Pump Air Source Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
@@ -3656,7 +3164,7 @@
     ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
     Electricity,             !- Compressor Fuel Type
-    Sys 3 Heat Pump Air Source Cooling Coil Normal Operating Mode;  !- Operating Mode 1 Name
+    Sys 3 Heat Pump Air Source Cooling Coil Normal Operating Mode;  !- Base Operating Mode
 
   Coil:Cooling:DX:CurveFit:OperatingMode,
     Sys 3 Heat Pump Air Source Cooling Coil Normal Operating Mode,  !- Name
@@ -4102,13 +3610,16 @@
     ,                        !- Design Specification Multispeed Object Type
     ;                        !- Design Specification Multispeed Object Name
 
+  OutdoorAir:Node,
+    Sys 4 Heat Pump Air Source Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     Sys 4 Heat Pump Air Source Cooling Coil,  !- Name
     Sys 4 Heat Pump Air Source Supply Fan Outlet,  !- Evaporator Inlet Node Name
     Sys 4 Heat Pump Air Source Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     ,                        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
+    Sys 4 Heat Pump Air Source Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
     Sys 4 Heat Pump Air Source Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Sys 4 Heat Pump Air Source Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
@@ -4125,7 +3636,7 @@
     ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
     Electricity,             !- Compressor Fuel Type
-    Sys 4 Heat Pump Air Source Cooling Coil Normal Operating Mode;  !- Operating Mode 1 Name
+    Sys 4 Heat Pump Air Source Cooling Coil Normal Operating Mode;  !- Base Operating Mode
 
   Coil:Cooling:DX:CurveFit:OperatingMode,
     Sys 4 Heat Pump Air Source Cooling Coil Normal Operating Mode,  !- Name
@@ -4565,13 +4076,16 @@
     ,                        !- Design Specification Multispeed Object Type
     ;                        !- Design Specification Multispeed Object Name
 
+  OutdoorAir:Node,
+    Sys 5 Furnace DX Cool Cooling Coil Condenser Inlet Node;  !- Name
+
   Coil:Cooling:DX,
     Sys 5 Furnace DX Cool Cooling Coil,  !- Name
     Sys 5 Furnace DX Cool Supply Fan Outlet,  !- Evaporator Inlet Node Name
     Sys 5 Furnace DX Cool Cooling Coil Outlet,  !- Evaporator Outlet Node Name
     ,                        !- Availability Schedule Name
     ,                        !- Condenser Zone Name
-    ,                        !- Condenser Inlet Node Name
+    Sys 5 Furnace DX Cool Cooling Coil Condenser Inlet Node,  !- Condenser Inlet Node Name
     Sys 5 Furnace DX Cool Cooling Coil Condenser Outlet Node,  !- Condenser Outlet Node Name
     Sys 5 Furnace DX Cool Cooling Coil Performance,  !- Performance Object Name
     ,                        !- Condensate Collection Water Storage Tank Name
@@ -4588,7 +4102,7 @@
     ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
     Electricity,             !- Compressor Fuel Type
-    Sys 5 Furnace DX Cool Cooling Coil Normal Operating Mode;  !- Operating Mode 1 Name
+    Sys 5 Furnace DX Cool Cooling Coil Normal Operating Mode;  !- Base Operating Mode
 
   Coil:Cooling:DX:CurveFit:OperatingMode,
     Sys 5 Furnace DX Cool Cooling Coil Normal Operating Mode,  !- Name
@@ -4806,6 +4320,3 @@
     ,                        !- Minimum Fraction of Outdoor Air Schedule Name
     ,                        !- Maximum Fraction of Outdoor Air Schedule Name
     ;                        !- Mechanical Ventilation Controller Name
-
-  Site:GroundTemperature:BuildingSurface,21.5,21.4,21.5,21.5,22.0,22.9,23.0,23.1,23.1,22.2,21.7,21.6;
-

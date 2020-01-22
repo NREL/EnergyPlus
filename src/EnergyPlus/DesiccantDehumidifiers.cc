@@ -1387,7 +1387,7 @@ namespace DesiccantDehumidifiers {
                 if (DesicDehum(DesicDehumNum).Preheat == Yes) { // Companion coil waste heat used for regeneration of desiccant
                     ErrorsFound2 = false;
                     DesuperHeaterIndex = GetHeatReclaimSourceIndexNum(
-                        DesicDehum(DesicDehumNum).coolingCoil_TypeNum, DesicDehum(DesicDehumNum).DXCoilIndex, ErrorsFound2);
+                        DesicDehum(DesicDehumNum).CoolingCoilType, DesicDehum(DesicDehumNum).CoolingCoilName, ErrorsFound2);
                     if (ErrorsFound2) {
                         ShowContinueError("...occurs in " + DesicDehum(DesicDehumNum).DehumType + " \"" + DesicDehum(DesicDehumNum).Name + "\"");
                         ErrorsFoundGeneric = true;
