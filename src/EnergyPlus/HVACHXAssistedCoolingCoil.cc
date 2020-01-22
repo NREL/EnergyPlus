@@ -979,12 +979,6 @@ namespace HVACHXAssistedCoolingCoil {
                                                           QZnReq,
                                                           QLatReq,
                                                           OnOffAirFlowRatio); // call vs coil model at top speed.
-<<<<<<< HEAD
-            } else if (HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
-                coilCoolingDXs[HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex].simulate(
-                    coilNormalMode, PartLoadRatio, HXAssistedCoil(HXAssistedCoilNum).DXCoilNumOfSpeeds, 1.0, FanOpMode);
-=======
->>>>>>> CoilHackathonBranch1
             } else {
                 SimulateWaterCoilComponents(
                     HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName, FirstHVACIteration, HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex);
