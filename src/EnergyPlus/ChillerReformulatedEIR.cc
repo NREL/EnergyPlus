@@ -326,7 +326,7 @@ namespace ChillerReformulatedEIR {
                 ErrorsFound = true;
             }
 
-            // Check the type of part-load curves implemented: 1_LeavingCondenserWaterTemperature, 2_Lift    zrp_Aug2014
+            // Check the type of part-load curves implemented: 1_LeavingCondenserWaterTemperature, 2_Lift
             if (UtilityRoutines::SameString(PartLoadCurveType, "LeavingCondenserWaterTemperature") &&
                 CurveManager::PerfCurve(ElecReformEIRChiller(EIRChillerNum).ChillerEIRFPLRIndex).NumDims == 2) {
                 ElecReformEIRChiller(EIRChillerNum).PartLoadCurveType = PLR_LeavingCondenserWaterTemperature;
@@ -1464,7 +1464,7 @@ namespace ChillerReformulatedEIR {
                 if (this->PartLoadCurveType == PLR_LeavingCondenserWaterTemperature) {
                     CurveVal = CurveManager::CurveValue(this->ChillerEIRFPLRIndex, this->TempRefCondOut, 1.0);
                 } else if (this->PartLoadCurveType == PLR_Lift) {
-                    CurveVal = CurveManager::CurveValue(this->ChillerEIRFPLRIndex, 1.0, 1.0, 0.0); // zrp_Aug2014
+                    CurveVal = CurveManager::CurveValue(this->ChillerEIRFPLRIndex, 1.0, 1.0, 0.0);
                 }
                 if (CurveVal > 1.10 || CurveVal < 0.90) {
                     ShowWarningError("Energy input ratio as a function of part-load ratio curve output is not equal to 1.0");
@@ -1478,7 +1478,7 @@ namespace ChillerReformulatedEIR {
                                          this->ChillerEIRFPLRTempMax,
                                          this->ChillerEIRFPLRPLRMin,
                                          this->ChillerEIRFPLRPLRMax);
-                } else if (this->PartLoadCurveType == PLR_Lift) { // zrp_Aug2014
+                } else if (this->PartLoadCurveType == PLR_Lift) {
                     CurveManager::GetCurveMinMaxValues(this->ChillerEIRFPLRIndex,
                                          this->ChillerLiftNomMin,
                                          this->ChillerLiftNomMax,
@@ -1592,7 +1592,7 @@ namespace ChillerReformulatedEIR {
                                      this->ChillerEIRFPLRTempMax,
                                      this->ChillerEIRFPLRPLRMin,
                                      this->ChillerEIRFPLRPLRMax);
-            } else if (this->PartLoadCurveType == PLR_Lift) { // zrp_Aug2014
+            } else if (this->PartLoadCurveType == PLR_Lift) {
                 CurveManager::GetCurveMinMaxValues(this->ChillerEIRFPLRIndex,
                                      this->ChillerLiftNomMin,
                                      this->ChillerLiftNomMax,
@@ -1649,7 +1649,7 @@ namespace ChillerReformulatedEIR {
                 // Minimum condenser leaving temperature allowed by EIRFPLR curve [C]
                 Real64 EIRFPLRTmin = this->ChillerEIRFPLRTempMin;
                 Tmin = min(CAPFTYTmin, EIRFTYTmin, EIRFPLRTmin);
-            } else if (this->PartLoadCurveType == PLR_Lift) { // zrp_Aug2014
+            } else if (this->PartLoadCurveType == PLR_Lift) {
                 Tmin = min(CAPFTYTmin, EIRFTYTmin);
             }
 
@@ -1664,7 +1664,7 @@ namespace ChillerReformulatedEIR {
                 // Maximum condenser leaving temperature allowed by EIRFPLR curve [C]
                 Real64 EIRFPLRTmax = this->ChillerEIRFPLRTempMax;
                 Tmax = max(CAPFTYTmax, EIRFTYTmax, EIRFPLRTmax);
-            } else if (this->PartLoadCurveType == PLR_Lift) { // zrp_Aug2014
+            } else if (this->PartLoadCurveType == PLR_Lift) {
                 Tmax = max(CAPFTYTmax, EIRFTYTmax);
             }
 
@@ -2068,7 +2068,7 @@ namespace ChillerReformulatedEIR {
             }
         }
 
-        // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+        // If there is a fault of Chiller SWT Sensor
         if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
             int FaultIndex = this->FaultyChillerSWTIndex;
             Real64 EvapOutletTempSetPoint_ff = EvapOutletTempSetPoint;
@@ -2240,7 +2240,7 @@ namespace ChillerReformulatedEIR {
                 }
             } // End of Constant Variable Flow If Block
 
-            // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+            // If there is a fault of Chiller SWT Sensor
             if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
                 (this->EvapMassFlowRate > 0)) {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
@@ -2320,7 +2320,7 @@ namespace ChillerReformulatedEIR {
                 }
             }
 
-            // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+            // If there is a fault of Chiller SWT Sensor
             if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
                 (this->EvapMassFlowRate > 0)) {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
@@ -2382,7 +2382,7 @@ namespace ChillerReformulatedEIR {
 
         this->ChillerEIRFT = max(0.0, CurveManager::CurveValue(this->ChillerEIRFTIndex, this->EvapOutletTemp, this->ChillerCondAvgTemp));
 
-        // Part Load Ratio Curve Type: 1_LeavingCondenserWaterTemperature; 2_Lift  zrp_Aug2014
+        // Part Load Ratio Curve Type: 1_LeavingCondenserWaterTemperature; 2_Lift
         if (this->PartLoadCurveType == PLR_LeavingCondenserWaterTemperature) {
             this->ChillerEIRFPLR = max(0.0, CurveManager::CurveValue(this->ChillerEIRFPLRIndex, this->ChillerCondAvgTemp, PartLoadRat));
         } else if (this->PartLoadCurveType == PLR_Lift) {
