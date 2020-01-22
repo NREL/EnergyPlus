@@ -2251,7 +2251,8 @@ namespace OutputProcessor {
             }
 
             // End use subcategory
-            if (!EndUseSub.empty() && !UtilityRoutines::SameString(EndUseSub,"General")) {
+//             if (!EndUseSub.empty() && !UtilityRoutines::SameString(EndUseSub,"General")) { // attempted fix for 7556 but probably not the right approach
+            if (!EndUseSub.empty()) {
                 Found = UtilityRoutines::FindItem(EndUseSub + ':' + EndUse + ':' + ResourceType, EnergyMeters);
                 if (Found != 0) {
                     ++VarMeterArrays(NumVarMeterArrays).NumOnMeters;
@@ -5643,7 +5644,8 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
                 EndUseSub = EndUseSubKey;
                 OnMeter = true;
             } else {
-                EndUseSub = "General";
+//                EndUseSub = "General"; // attempted fix for 7556 but probably not the right approach
+                EndUseSub = "";
             }
             if (present(GroupKey)) {
                 Group = GroupKey;
