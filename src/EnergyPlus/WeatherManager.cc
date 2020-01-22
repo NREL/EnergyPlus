@@ -1915,7 +1915,7 @@ namespace WeatherManager {
         }
     }
 
-    void SetSpecialDayDates(Array1S_int MonWeekDay) // Weekday of each day 1 of month
+    void SetSpecialDayDates(Array1D_int &MonWeekDay) // Weekday of each day 1 of month
     {
 
         // SUBROUTINE INFORMATION:

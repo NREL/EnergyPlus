@@ -718,7 +718,7 @@ namespace WeatherManager {
                           Optional_int DSTActEnMon = _,
                           Optional_int DSTActEnDay = _);
 
-    void SetSpecialDayDates(Array1S_int MonWeekDay); // Weekday of each day 1 of month
+    void SetSpecialDayDates(Array1D_int &MonWeekDay); // Weekday of each day 1 of month
 
     void InitializeWeather(bool &PrintEnvrnStamp); // Set to true when the environment header should be printed
 
