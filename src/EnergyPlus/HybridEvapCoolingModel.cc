@@ -1518,7 +1518,7 @@ namespace HybridEvapCoolingModel {
                             CandidateSetting.Unscaled_Supply_Air_Mass_Flow_Rate = UnscaledMsa;
                             CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate =
                                 MsaRatio *
-                                ScaledSystemMaximumSupplyAirMassFlowRate; // spencer is this the same as Correction if so make them the same.
+                                ScaledSystemMaximumSupplyAirMassFlowRate; // spencer is this the same as Correction? If so make them the same.
                             CandidateSetting.ScaledSupply_Air_Ventilation_Volume = MsaRatio * ScaledSystemMaximumSupplyAirMassFlowRate / StdRhoAir;
                             CandidateSetting.oMode = Mode;
                             CandidateSetting.SupplyAirTemperature = Tsa;

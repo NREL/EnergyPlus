@@ -245,6 +245,7 @@ TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_Scenario1_HighCooling)
     EXPECT_GT(deliveredSC, 0);
     EXPECT_NEAR(0.0, deliveredSH, 0.001);
     EXPECT_LT(Tsa, Tra);
+    EXPECT_GT(Msa, DesignMinVR);
 }
 
 TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_Scenario2_HighCoolingLargeSys)
@@ -361,6 +362,7 @@ TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_Scenario2_HighCoolingLarge
     EXPECT_GT(deliveredSC, 0);
     EXPECT_NEAR(0.0, deliveredSH, 0.001);
     EXPECT_LT(Tsa, Tra);
+    EXPECT_GT(Msa, DesignMinVR);
 }
 TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_Scenario3_OutsideEnvConditions)
 {
@@ -589,14 +591,14 @@ TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_Scenario5_NoConditioning)
     GetOAControllerInputs();
     using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
 
-    // Setup performnace tables
+    // Setup performance tables
     using namespace EnergyPlus::DataEnvironment;
     // process schedules
     ProcessScheduleInput(); // read schedules
     UpdateScheduleValues();
     // Get Unitary system
     GetInputZoneHybridUnitaryAirConditioners(ErrorsFound);
-    // All to get OA requiremetns
+    // All to get OA requirements
     GetOARequirements();
 
     EXPECT_FALSE(ErrorsFound);
@@ -639,6 +641,11 @@ TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_Scenario5_NoConditioning)
     // checks
     EXPECT_NEAR(1.0, returnOSAF, 0.001);
     EXPECT_GT(Tsa, Tra);
+    EXPECT_NEAR(Tsa, Tra, 1.500);
+
+    //Msa and DesignMinVr should be close. If no heating or cooling is needed, the mass flow rate should be near the designed minumum flow rate
+    EXPECT_NEAR(Msa, DesignMinVR, 0.001);
+
 }
 
 } // namespace EnergyPlus
