@@ -62,6 +62,7 @@
 #include <EnergyPlus/ChillerAbsorption.hh>
 #include <EnergyPlus/ChillerElectricEIR.hh>
 #include <EnergyPlus/ChillerGasAbsorption.hh>
+#include <EnergyPlus/ChillerExhaustAbsorption.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/CTElectricGenerator.hh>
 #include <EnergyPlus/DataBranchAirLoopPlant.hh>
@@ -973,6 +974,7 @@ namespace EnergyPlus {
                                                                    "ChillerHeater:Absorption:DoubleEffect")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_ExhFiredAbsorption;
                                 this_comp.GeneralEquipType = GenEquipTypes_Chiller;
+                                this_comp.compPtr = ChillerExhaustAbsorption::ExhaustAbsorberSpecs::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "ThermalStorage:ChilledWater:Mixed")) {
                                 this_comp.TypeOf_Num = TypeOf_ChilledWaterTankMixed;
