@@ -5,7 +5,7 @@ if(CCACHE_PROGRAM)
   set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
 endif()
 
-Project(EnergyPlus)
+Project(EnergyPlus LANGUAGES NONE)  # Enable C and CXX later if they are needed
 
 cmake_minimum_required(VERSION 3.5.1)
 
@@ -54,15 +54,6 @@ else()
   set(GIT_DIR "")
 endif()
 
-# Set a default build type if none was specified
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-  message(STATUS "Setting build type to 'Release' as none was specified.")
-  set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
-  # Set the possible values of build type for cmake-gui
-  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release"
-    "MinSizeRel" "RelWithDebInfo")
-endif()
-
 option( BUILD_EXECUTABLES "Build EnergyPlus and other executables. Turn off to only build documentation." ON )
 option( BUILD_PACKAGE "Build package" OFF )
 option( BUILD_TESTING "Build testing targets" OFF )
@@ -82,6 +73,18 @@ option( ENABLE_INSTALL_REMOTE "Enable install_remote and install_remote_plist co
 mark_as_advanced( ENABLE_INSTALL_REMOTE )
 
 if (BUILD_EXECUTABLES)
+  enable_language(CXX)
+  enable_language(C)
+
+  # Set a default build type if none was specified
+  if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+    message(STATUS "Setting build type to 'Release' as none was specified.")
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+    # Set the possible values of build type for cmake-gui
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release"
+      "MinSizeRel" "RelWithDebInfo")
+  endif()
+
   # we are making python a required dependency, so find it here
   find_package(PythonInterp 3 REQUIRED)
 
