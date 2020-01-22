@@ -1454,7 +1454,6 @@ namespace HVACVariableRefrigerantFlow {
         int ZoneTerminalUnitListNum;     // Used to find connection between VRFTU, TUList and VRF condenser
         int NumCond;                     // loop counter
         int NumList;                     // loop counter
-        bool ZoneNodeNotFound;           // used in error checking
         int CtrlZone;                    // index to loop counter
         int NodeNum;                     // index to loop counter
         // Followings for VRF FluidTCtrl Only
@@ -4873,7 +4872,6 @@ namespace HVACVariableRefrigerantFlow {
         using DataSizing::AutoSize;
         using DataZoneEquipment::CheckZoneEquipmentList;
         using DataZoneEquipment::VRFTerminalUnit_Num;
-        using DataZoneEquipment::ZoneEquipInputsFilled;
         using DataZoneEquipment::ZoneEquipList;
         using Fans::GetFanVolFlow;
         using FluidProperties::GetDensityGlycol;
@@ -5092,7 +5090,6 @@ namespace HVACVariableRefrigerantFlow {
         // one-time check to see if VRF TU's are on ZoneHVAC:EquipmentList or AirloopHVAC or issue warning
         if (ZoneEquipmentListNotChecked) {
             if (!DataAirLoop::AirLoopInputsFilled) return;
-            // if (ZoneEquipInputsFilled && DataAirLoop::AirLoopInputsFilled) {
             ZoneEquipmentListNotChecked = false;
             bool AirLoopFound = false;
             bool errorsFound = false;
