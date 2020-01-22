@@ -4,8 +4,7 @@
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 ! UnitarySystem_MultiSpeedDX.idf
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and plenum
-!                          illustrates the use of HVACTemplate objects to define zone thermostats and
-!                          unitary system including furnace with DX cooling (multi-speed),
+!                          with unitary system including furnace with DX cooling (multi-speed),
 !                          furnace (gas and electric), and air-to-air heat pump (single-speed)
 !
 ! Highlights:              Unitary furnace and heat pump with multi-speed DX cooling.
@@ -2381,7 +2380,7 @@
     ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
     Electricity,             !- Compressor Fuel Type
-    Sys 1 Furnace DX Cool Cooling Coil Operating Mode;  !- Operating Mode 1 Name
+    Sys 1 Furnace DX Cool Cooling Coil Operating Mode;  !- Base Operating Mode
 
   Coil:Cooling:DX:CurveFit:OperatingMode,
     Sys 1 Furnace DX Cool Cooling Coil Operating Mode,  !- Name
@@ -2841,7 +2840,7 @@
     ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
     Electricity,             !- Compressor Fuel Type
-    Sys 2 Furnace DX Cool Cooling Coil Operating Mode;  !- Operating Mode 1 Name
+    Sys 2 Furnace DX Cool Cooling Coil Operating Mode;  !- Base Operating Mode
 
   Coil:Cooling:DX:CurveFit:OperatingMode,
     Sys 2 Furnace DX Cool Cooling Coil Operating Mode,  !- Name
@@ -3310,7 +3309,7 @@
     ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
     Electricity,             !- Compressor Fuel Type
-    Sys 3 Heat Pump Air Source Cooling Coil Operating Mode;  !- Operating Mode 1 Name
+    Sys 3 Heat Pump Air Source Cooling Coil Operating Mode;  !- Base Operating Mode
 
   Coil:Cooling:DX:CurveFit:OperatingMode,
     Sys 3 Heat Pump Air Source Cooling Coil Operating Mode,  !- Name
@@ -3960,7 +3959,7 @@
     ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
     Electricity,             !- Compressor Fuel Type
-    Sys 4 Heat Pump Air Source Cooling Coil Operating Mode;  !- Operating Mode 1 Name
+    Sys 4 Heat Pump Air Source Cooling Coil Operating Mode;  !- Base Operating Mode
 
   Coil:Cooling:DX:CurveFit:OperatingMode,
     Sys 4 Heat Pump Air Source Cooling Coil Operating Mode,  !- Name
@@ -4610,7 +4609,7 @@
     ,                        !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
     ,                        !- Evaporative Condenser Basin Heater Operating Schedule Name
     Electricity,             !- Compressor Fuel Type
-    Sys 5 Furnace DX Cool Cooling Coil Operating Mode;  !- Operating Mode 1 Name
+    Sys 5 Furnace DX Cool Cooling Coil Operating Mode;  !- Base Operating Mode
 
   Coil:Cooling:DX:CurveFit:OperatingMode,
     Sys 5 Furnace DX Cool Cooling Coil Operating Mode,  !- Name

@@ -4,8 +4,7 @@
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 ! UnitarySystem_SingleSpeedDX.idf
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and plenum
-!                          illustrates the use of HVACTemplate objects to define zone thermostats and
-!                          unitary system including furnace with DX cooling (single-speed),
+!                          with unitary system including furnace with DX cooling (single-speed),
 !                          furnace (gas and electric), and air-to-air heat pump (single-speed)
 !
 ! Highlights:              Unitary furnace and heat pump with single-speed DX cooling.
