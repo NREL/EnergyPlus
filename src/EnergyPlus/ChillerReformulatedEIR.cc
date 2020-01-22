@@ -1737,7 +1737,7 @@ namespace ChillerReformulatedEIR {
             } else {
                 //    If iteration is not possible, average the min/max condenser outlet temperature and manually determine solution
                 this->calculate(MyLoad, RunFlag, (CondTempMin + CondTempMax) / 2.0);
-                this->calculate(MyLoad, RunFlag, condOutletTempMod);
+                this->calculate(MyLoad, RunFlag, this->CondOutletTemp);
             }
 
             //  Call subroutine to evaluate all performance curve min/max values against evaporator/condenser outlet temps and PLR
@@ -2536,7 +2536,7 @@ namespace ChillerReformulatedEIR {
         Real64 EIRFPLRPLRmax = this->ChillerEIRFPLRPLRMax;
 
         // Check bounds for curves, lump min/max into same check since min/max values are reported in recurring warning messages
-        if (condOutletTempMod < CAPFTYTmin || condOutletTempMod > CAPFTYTmax) {
+        if (this->CondOutletTemp < CAPFTYTmin || this->CondOutletTemp > CAPFTYTmax) {
             ++this->CAPFTYIter;
             if (this->CAPFTYIter == 1) {
                 ShowWarningError("CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
@@ -2559,7 +2559,7 @@ namespace ChillerReformulatedEIR {
             }
         }
 
-        if (condOutletTempMod < EIRFTYTmin || condOutletTempMod > EIRFTYTmax) {
+        if (this->CondOutletTemp < EIRFTYTmin || this->CondOutletTemp > EIRFTYTmax) {
             ++this->EIRFTYIter;
             if (this->EIRFTYIter == 1) {
                 ShowWarningError("CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
@@ -2585,7 +2585,7 @@ namespace ChillerReformulatedEIR {
         }
 
         if (this->PartLoadCurveType == PLR_LeavingCondenserWaterTemperature) {
-            if (condOutletTempMod < EIRFPLRTmin || condOutletTempMod > EIRFPLRTmax) {
+            if (this->CondOutletTemp < EIRFPLRTmin || this->CondOutletTemp > EIRFPLRTmax) {
                 ++this->EIRFPLRTIter;
                 if (this->EIRFPLRTIter == 1) {
                     ShowWarningError("CHILLER:ELECTRIC:REFORMULATEDEIR \"" + this->Name +
