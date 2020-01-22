@@ -3220,9 +3220,9 @@
     -0.1729687081,           !- Coefficient2 x
     1.0828661347,            !- Coefficient3 x**2
     -0.3618480897,           !- Coefficient4 x**3
-    0.5,                     !- Minimum Value of x
+    0.25,                    !- Minimum Value of x
     1,                       !- Maximum Value of x
-    0.5946,                  !- Minimum Curve Output
+    0.4729,                  !- Minimum Curve Output
     1,                       !- Maximum Curve Output
     Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
@@ -3387,9 +3387,9 @@
     0.076016374,             !- Coefficient2 x
     0.6983235783,            !- Coefficient3 x**2
     -0.1688407813,           !- Coefficient4 x**3
-    0.5,                     !- Minimum Value of x
+    0.25,                    !- Minimum Value of x
     1,                       !- Maximum Value of x
-    0.5861,                  !- Minimum Curve Output
+    0.4524,                  !- Minimum Curve Output
     1,                       !- Maximum Curve Output
     Dimensionless,           !- Input Unit Type for X
     Dimensionless;           !- Output Unit Type
