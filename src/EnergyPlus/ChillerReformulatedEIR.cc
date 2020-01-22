@@ -1672,11 +1672,13 @@ namespace ChillerReformulatedEIR {
             this->calculate(MyLoad, RunFlag, Tmin);
 
             // Condenser outlet temperature when using Tmin as input to calculate [C]
-            Real64 CondTempMin = this->CondOutletTemp;
+            Real64 CondTempMin = condOutletTempMod;
+
+            //  Check that condenser outlet temperature is within curve object limits prior to calling RegulaFalsi
             this->calculate(MyLoad, RunFlag, Tmax);
 
             // Condenser outlet temperature when using Tmax as input to CalcReformEIRChillerModel [C]
-            Real64 CondTempMax = this->CondOutletTemp;
+            Real64 CondTempMax = condOutletTempMod;
 
             if (CondTempMin > Tmin && CondTempMax < Tmax) {
 
@@ -2083,8 +2085,7 @@ namespace ChillerReformulatedEIR {
         // correct temperature if using heat recovery
         // use report values for latest valid calculation, lagged somewhat
         if (this->HeatRecActive) {
-            if ((this->QHeatRecovery + this->QCondenser) >
-                0.0) { // protect div by zero
+            if ((this->QHeatRecovery + this->QCondenser) > 0.0) { // protect div by zero
                 this->ChillerCondAvgTemp = (this->QHeatRecovery * this->HeatRecOutletTemp +
                         this->QCondenser * this->CondOutletTemp) /
                                   (this->QHeatRecovery + this->QCondenser);
