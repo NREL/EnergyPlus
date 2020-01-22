@@ -1786,8 +1786,8 @@ namespace WeatherManager {
         }
     }
 
-    void SetDSTDateRanges(Array1S_int MonWeekDay, // Weekday of each day 1 of month
-                          Array1S_int DSTIndex,   // DST Index for each julian day (1:366)
+    void SetDSTDateRanges(Array1D_int &MonWeekDay, // Weekday of each day 1 of month
+                          Array1D_int &DSTIndex,   // DST Index for each julian day (1:366)
                           Optional_int DSTActStMon,
                           Optional_int DSTActStDay,
                           Optional_int DSTActEnMon,
