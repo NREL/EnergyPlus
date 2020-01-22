@@ -167,14 +167,7 @@ namespace PlantLoopEquip {
         // If you add a module or new equipment type, you must set up this structure.
 
         // Using/Aliasing
-        using ChillerExhaustAbsorption::SimExhaustAbsorber;
         using ChillerReformulatedEIR::SimReformulatedEIRChiller;
-        using Pumps::SimPumps;
-        using ScheduleManager::GetCurrentScheduleValue;
-        using BaseboardRadiator::UpdateBaseboardPlantConnection;
-        using HWBaseboardRadiator::UpdateHWBaseboardPlantConnection;
-        using SteamBaseboardRadiator::UpdateSteamBaseboardPlantConnection;
-        using WaterCoils::UpdateWaterToAirCoilPlantConnection;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int EquipNum; // Plant side component list equipment number
@@ -345,29 +338,7 @@ namespace PlantLoopEquip {
 
                 // Exhaust Fired Absorption Chiller
             } else if (EquipTypeNum == TypeOf_Chiller_ExhFiredAbsorption) {
-                SimExhaustAbsorber(sim_component.TypeOf,
-                                   sim_component.Name,
-                                   EquipFlowCtrl,
-                                   EquipNum,
-                                   RunFlag,
-                                   FirstHVACIteration,
-                                   InitLoopEquip,
-                                   CurLoad,
-                                   PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).NodeNumIn,
-                                   MaxLoad,
-                                   MinLoad,
-                                   OptLoad,
-                                   GetCompSizFac,
-                                   SizingFac); // DSU
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                }
-                if (GetCompSizFac) {
-                    sim_component.SizFac = SizingFac;
-                }
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else {
                 ShowSevereError("SimPlantEquip: Invalid Chiller Type=" + sim_component.TypeOf);
