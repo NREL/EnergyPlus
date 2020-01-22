@@ -312,6 +312,10 @@ namespace HVACVariableRefrigerantFlow {
             }
         }
 
+        // wait for air loop inputs
+        // figure out a way to check/initialize each TU so those that are zone equipment can be read in?
+        if (!DataAirLoop::AirLoopInputsFilled) return;
+
         // the VRF condenser index
         VRFCondenser = VRFTU(VRFTUNum).VRFSysNum;
 
@@ -4296,6 +4300,17 @@ namespace HVACVariableRefrigerantFlow {
                         }
                     }
                 }
+            } else if (VRFTU(VRFTUNum).ATMixerType == DataHVACGlobals::ATMixer_InletSide) {
+                for (CtrlZone = 1; CtrlZone <= NumOfZones; ++CtrlZone) {
+                    if (!ZoneEquipConfig(CtrlZone).IsControlled) continue;
+                    for (NodeNum = 1; NodeNum <= ZoneEquipConfig(CtrlZone).NumInletNodes; ++NodeNum) {
+                        if (VRFTU(VRFTUNum).VRFTUOutletNodeNum == ZoneEquipConfig(CtrlZone).InletNode(NodeNum)) {
+                            VRFTU(VRFTUNum).ZoneAirNode = ZoneEquipConfig(CtrlZone).ZoneNode;
+                            VRFTU(VRFTUNum).ZoneNum = CtrlZone;
+                            break;
+                        }
+                    }
+                }
             }
         } // end Number of VRF Terminal Unit Loop
 
@@ -5089,7 +5104,7 @@ namespace HVACVariableRefrigerantFlow {
 
         // one-time check to see if VRF TU's are on ZoneHVAC:EquipmentList or AirloopHVAC or issue warning
         if (ZoneEquipmentListNotChecked) {
-            if (!DataAirLoop::AirLoopInputsFilled) return;
+//            if (!DataAirLoop::AirLoopInputsFilled) return;
             ZoneEquipmentListNotChecked = false;
             bool AirLoopFound = false;
             bool errorsFound = false;
@@ -8275,8 +8290,8 @@ namespace HVACVariableRefrigerantFlow {
         Real64 AirMassFlow;         // total supply air mass flow [m3/s]
         int OpMode;                 // fan operating mode, DataHVACGlobals::CycFanCycCoil or DataHVACGlobals::ContFanCycCoil
         int VRFCond;                // index to VRF condenser
-        Real64 SpecHumOut;          // specific humidity ratio at outlet node
-        Real64 SpecHumIn;           // specific humidity ratio at inlet node
+        Real64 SpecHumOut(0.0);     // specific humidity ratio at outlet node
+        Real64 SpecHumIn(0.0);      // specific humidity ratio at inlet node
         int TUListIndex;            // index to TU list for this VRF system
         int IndexToTUInTUList;      // index to TU in specific list for the VRF system
         static int ATMixOutNode(0); // terminal unit mixer outlet node
@@ -8398,23 +8413,21 @@ namespace HVACVariableRefrigerantFlow {
                 // Air terminal supply side mixer, calculate supply side mixer output
                 SimATMixer(this->ATMixerName, FirstHVACIteration, this->ATMixerIndex);
                 TempOut = DataLoopNode::Node(ATMixOutNode).Temp;
-                TempIn = DataLoopNode::Node(ZoneNode).Temp;
                 SpecHumOut = DataLoopNode::Node(ATMixOutNode).HumRat;
-                SpecHumIn = DataLoopNode::Node(ZoneNode).HumRat;
-                AirMassFlow = DataLoopNode::Node( ATMixOutNode ).MassFlowRate;
+                AirMassFlow = DataLoopNode::Node(ATMixOutNode).MassFlowRate;
             } else {
                 // Air terminal inlet side mixer
                 TempOut = DataLoopNode::Node(VRFTUOutletNodeNum).Temp;
-                TempIn = DataLoopNode::Node(ZoneNode).Temp;
                 SpecHumOut = DataLoopNode::Node(VRFTUOutletNodeNum).HumRat;
-                SpecHumIn = DataLoopNode::Node(ZoneNode).HumRat;
             }
+            TempIn = DataLoopNode::Node(ZoneNode).Temp;
+            SpecHumIn = DataLoopNode::Node(ZoneNode).HumRat;
         } else {
             TempOut = DataLoopNode::Node(VRFTUOutletNodeNum).Temp;
             SpecHumOut = DataLoopNode::Node(VRFTUOutletNodeNum).HumRat;
-            if (this->ZoneAirNode > 0) {
-                TempIn = DataLoopNode::Node(this->ZoneAirNode).Temp;
-                SpecHumIn = DataLoopNode::Node(this->ZoneAirNode).HumRat;
+            if (ZoneNode > 0) {
+                TempIn = DataLoopNode::Node(ZoneNode).Temp;
+                SpecHumIn = DataLoopNode::Node(ZoneNode).HumRat;
             } else {
                 TempIn = DataLoopNode::Node(VRFTUInletNodeNum).Temp;
                 SpecHumIn = DataLoopNode::Node(VRFTUInletNodeNum).HumRat;
