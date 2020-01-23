@@ -351,9 +351,6 @@ namespace HVACVariableRefrigerantFlow {
         // Initialize terminal unit
         InitVRF(VRFTUNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq); // Initialize all VRFTU related parameters
 
-        if (!DataAirLoop::AirLoopInputsFilled) return; // wait for air loop inputs
-                                                       // figure out a way to check/initialize each TU so those that are zone equipment can be read in?
-
         // Simulate terminal unit
         SimVRF(VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
 
@@ -5111,9 +5108,11 @@ namespace HVACVariableRefrigerantFlow {
             std::string const cCurrentModuleObject = "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow";
             for (TUListNum = 1; TUListNum <= NumVRFTULists; ++TUListNum) {
                 for (NumTULoop = 1; NumTULoop <= TerminalUnitList(TUListNum).NumTUInList; ++NumTULoop) {
-                    AirLoopFound = false;
+                    AirLoopFound = false; // reset for next TU
+                    ctrlZoneNum = 0;      // reset for next TU
                     TUIndex = TerminalUnitList(TUListNum).ZoneTUPtr(NumTULoop);
                     std::string const thisObjectName = VRFTU(TUIndex).Name;
+                    if (VRFTU(TUIndex).isInZone) goto EquipList_exit; // already found previously
                     for (ELLoop = 1; ELLoop <= NumOfZones; ++ELLoop) {  // NumOfZoneEquipLists
                         if (ZoneEquipList(ELLoop).Name == "") continue; // dimensioned by NumOfZones.  Only valid ones have names.
                         for (ListLoop = 1; ListLoop <= ZoneEquipList(ELLoop).NumOfEquipTypes; ++ListLoop) {
@@ -5145,7 +5144,7 @@ namespace HVACVariableRefrigerantFlow {
                                     }
                                     if (!ZoneNodeNotFound) break;
                                 }
-                                if (ZoneNodeNotFound && DataAirLoop::AirLoopInputsFilled) {
+                                if (ZoneNodeNotFound) {
                                     ShowSevereError(
                                         "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow \"" + VRFTU(TUIndex).Name +
                                         "\" Zone terminal unit air inlet node name must be the same as a zone inlet or exhaust node name.");
@@ -5158,62 +5157,63 @@ namespace HVACVariableRefrigerantFlow {
                         }
                     }
                     // check if the TU is connected to an air loop
-                    for (int AirLoopNum = 1; AirLoopNum <= DataHVACGlobals::NumPrimaryAirSys; ++AirLoopNum) {
-                        for (int BranchNum = 1; BranchNum <= DataAirSystems::PrimaryAirSystem(AirLoopNum).NumBranches; ++BranchNum) {
-                            for (int CompNum = 1; CompNum <= DataAirSystems::PrimaryAirSystem(AirLoopNum).Branch(BranchNum).TotalComponents;
-                                 ++CompNum) {
-                                if (UtilityRoutines::SameString(DataAirSystems::PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
-                                                                thisObjectName) &&
-                                    UtilityRoutines::SameString(DataAirSystems::PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf,
-                                                                cCurrentModuleObject)) {
-                                    VRFTU(TUIndex).airLoopNum = AirLoopNum;
-                                    AirLoopFound = true;
-                                    VRFTU(TUIndex).isInAirLoop = true;
-                                    BranchNodeConnections::TestCompSet(cCurrentModuleObject,
-                                                                       thisObjectName,
-                                                                       DataLoopNode::NodeID(VRFTU(TUIndex).VRFTUInletNodeNum),
-                                                                       DataLoopNode::NodeID(VRFTU(TUIndex).VRFTUOutletNodeNum),
-                                                                       "Air Nodes");
-                                    if (VRFTU(TUIndex).ZoneNum > 0) {
-                                        VRFTU(TUIndex).ZoneAirNode = DataZoneEquipment::ZoneEquipConfig(VRFTU(TUIndex).ZoneNum).ZoneNode;
-                                        for (int ControlledZoneNum = 1; ControlledZoneNum <= DataGlobals::NumOfZones; ++ControlledZoneNum) {
-                                            if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ActualZoneNum != VRFTU(TUIndex).ZoneNum)
-                                                continue;
-                                            for (int TstatZoneNum = 1; TstatZoneNum <= DataZoneControls::NumTempControlledZones; ++TstatZoneNum) {
-                                                if (DataZoneControls::TempControlledZone(TstatZoneNum).ActualZoneNum != VRFTU(TUIndex).ZoneNum)
+                    if (!VRFTU(TUIndex).isInAirLoop) {
+                        for (int AirLoopNum = 1; AirLoopNum <= DataHVACGlobals::NumPrimaryAirSys; ++AirLoopNum) {
+                            for (int BranchNum = 1; BranchNum <= DataAirSystems::PrimaryAirSystem(AirLoopNum).NumBranches; ++BranchNum) {
+                                for (int CompNum = 1; CompNum <= DataAirSystems::PrimaryAirSystem(AirLoopNum).Branch(BranchNum).TotalComponents;
+                                    ++CompNum) {
+                                    if (UtilityRoutines::SameString(DataAirSystems::PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name,
+                                        thisObjectName) &&
+                                        UtilityRoutines::SameString(DataAirSystems::PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).TypeOf,
+                                            cCurrentModuleObject)) {
+                                        VRFTU(TUIndex).airLoopNum = AirLoopNum;
+                                        AirLoopFound = true;
+                                        VRFTU(TUIndex).isInAirLoop = true;
+                                        BranchNodeConnections::TestCompSet(cCurrentModuleObject,
+                                            thisObjectName,
+                                            DataLoopNode::NodeID(VRFTU(TUIndex).VRFTUInletNodeNum),
+                                            DataLoopNode::NodeID(VRFTU(TUIndex).VRFTUOutletNodeNum),
+                                            "Air Nodes");
+                                        if (VRFTU(TUIndex).ZoneNum > 0) {
+                                            VRFTU(TUIndex).ZoneAirNode = DataZoneEquipment::ZoneEquipConfig(VRFTU(TUIndex).ZoneNum).ZoneNode;
+                                            for (int ControlledZoneNum = 1; ControlledZoneNum <= DataGlobals::NumOfZones; ++ControlledZoneNum) {
+                                                if (DataZoneEquipment::ZoneEquipConfig(ControlledZoneNum).ActualZoneNum != VRFTU(TUIndex).ZoneNum)
                                                     continue;
-                                                VRF(VRFTU(TUIndex).VRFSysNum).MasterZoneTUIndex = TUIndex;
-                                                AirNodeFound = true;
-                                                ctrlZoneNum = ControlledZoneNum;
-                                                goto EquipList_exit;
+                                                for (int TstatZoneNum = 1; TstatZoneNum <= DataZoneControls::NumTempControlledZones; ++TstatZoneNum) {
+                                                    if (DataZoneControls::TempControlledZone(TstatZoneNum).ActualZoneNum != VRFTU(TUIndex).ZoneNum)
+                                                        continue;
+                                                    VRF(VRFTU(TUIndex).VRFSysNum).MasterZoneTUIndex = TUIndex;
+                                                    AirNodeFound = true;
+                                                    ctrlZoneNum = ControlledZoneNum;
+                                                    goto EquipList_exit;
+                                                }
+                                                for (int TstatZoneNum = 1; TstatZoneNum <= DataZoneControls::NumComfortControlledZones; ++TstatZoneNum) {
+                                                    if (DataZoneControls::ComfortControlledZone(TstatZoneNum).ActualZoneNum != VRFTU(TUIndex).ZoneNum)
+                                                        continue;
+                                                    VRF(VRFTU(TUIndex).VRFSysNum).MasterZoneTUIndex = TUIndex;
+                                                    AirNodeFound = true;
+                                                    ctrlZoneNum = ControlledZoneNum;
+                                                    goto EquipList_exit;
+                                                }
+                                                if (!AirNodeFound && VRFTU(TUIndex).ZoneNum > 0) {
+                                                    ShowSevereError("Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
+                                                    ShowContinueError("Did not find Air node (Zone with Thermostat or Thermal Comfort Thermostat).");
+                                                    // ShowContinueError("specified Controlling Zone or Thermostat Location name = " +
+                                                    // loc_controlZoneName);
+                                                    errorsFound = true;
+                                                }
                                             }
-                                            for (int TstatZoneNum = 1; TstatZoneNum <= DataZoneControls::NumComfortControlledZones; ++TstatZoneNum) {
-                                                if (DataZoneControls::ComfortControlledZone(TstatZoneNum).ActualZoneNum != VRFTU(TUIndex).ZoneNum)
-                                                    continue;
-                                                VRF(VRFTU(TUIndex).VRFSysNum).MasterZoneTUIndex = TUIndex;
-                                                AirNodeFound = true;
-                                                ctrlZoneNum = ControlledZoneNum;
-                                                goto EquipList_exit;
-                                            }
-                                            if (!AirNodeFound && VRFTU(TUIndex).ZoneNum > 0 && DataAirLoop::AirLoopInputsFilled) {
-                                                ShowSevereError("Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
-                                                ShowContinueError("Did not find Air node (Zone with Thermostat or Thermal Comfort Thermostat).");
-                                                // ShowContinueError("specified Controlling Zone or Thermostat Location name = " +
-                                                // loc_controlZoneName);
-                                                errorsFound = true;
-                                            }
+                                        } else if (AirLoopFound) { // control zone name not entered in TU object input
+                                            VRFTU(TUIndex).isSetPointControlled = true;
                                         }
-                                    }
-                                }
-                                if (AirLoopFound) break;
-                            }
-                            if (AirLoopFound) break;
+                                    } if (AirLoopFound) break;
+                                } if (AirLoopFound) break;
+                            } if (AirLoopFound) break;
                         }
-                        if (AirLoopFound) break;
                     }
 
                     // check if the TU is connected to an outside air system
-                    if (!AirLoopFound) {
+                    if (!AirLoopFound && !VRFTU(TUIndex).isInOASys) {
                         for (int OASysNum = 1; OASysNum <= DataAirLoop::NumOASystems; ++OASysNum) {
                             for (int OACompNum = 1; OACompNum <= DataAirLoop::OutsideAirSys(OASysNum).NumComponents; ++OACompNum) {
                                 if (!UtilityRoutines::SameString(DataAirLoop::OutsideAirSys(OASysNum).ComponentName(OACompNum),
@@ -5267,7 +5267,7 @@ namespace HVACVariableRefrigerantFlow {
                                     break;
                                 }
                             }
-                        } else if (DataAirLoop::AirLoopInputsFilled) {
+                        } else {
                             ShowSevereError("Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
                             ShowContinueError("Did not find ZoneHVAC:EquipmentList connected to this VRF terminal unit.");
                             errorsFound = true;
@@ -5275,7 +5275,7 @@ namespace HVACVariableRefrigerantFlow {
                     }
 
                     // Find the number of zones (zone Inlet nodes) attached to an air loop from the air loop number
-                    if (AirLoopFound && !VRFTU(TUIndex).isInOASys) {
+                    if (AirLoopFound) {
                         int NumAirLoopZones = 0;
                         bool initLoadBasedControlFlowFracFlagReady = false;
                         Real64 initLoadBasedControlCntrlZoneTerminalUnitMassFlowRateMax = 0.0;
@@ -5320,6 +5320,7 @@ namespace HVACVariableRefrigerantFlow {
                                                                             VRFTU(TUIndex).Name,
                                                                             "Fraction of Supply Air Flow That Goes Through the Controlling Zone",
                                                                             VRFTU(TUIndex).controlZoneMassFlowFrac);
+                                    VRFTU(TUIndex).isSetPointControlled = false;
                                 } else {
                                     if (VRFTU(TUIndex).isInAirLoop && VRFTU(TUIndex).ZoneNum == 0 && VRFTU(TUIndex).ZoneAirNode == 0) {
                                         // TU must be set point controlled and use constant fan mode (or coil out T won't change with PLR/air flow)
@@ -5345,7 +5346,7 @@ namespace HVACVariableRefrigerantFlow {
                                                                                 VRFTU(TUIndex).controlZoneMassFlowFrac);
                                     }
                                 }
-                            } else if (VRFTU(TUIndex).isInOASys) {
+                            } else if (VRFTU(TUIndex).ZoneNum == 0) {
                                 // TU must be set point controlled and use constant fan mode (or coil outlet T won't change with PLR/air flow rate)
                                 // TU inlet air flow rate is also determined by OA system, not TU
                                 VRFTU(TUIndex).isSetPointControlled = true;
@@ -5354,20 +5355,20 @@ namespace HVACVariableRefrigerantFlow {
                     }
 
                     if (VRFTU(TUIndex).isInZone) {
-                        if (VRFTU(VRFTUNum).FanPlace == 0) {
-                            ShowSevereError("ZoneHVAC:TerminalUnit:VariableRefrigerantFlow = " + VRFTU(VRFTUNum).Name);
+                        if (VRFTU(TUIndex).FanPlace == 0) {
+                            ShowSevereError("ZoneHVAC:TerminalUnit:VariableRefrigerantFlow = " + VRFTU(TUIndex).Name);
                             ShowContinueError("Illegal Supply Air Fan Placement.");
                             ErrorsFound = true;
                         }
-                        if (VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                            if (VRFTU(VRFTUNum).FanIndex == -1) {
-                                ShowSevereError("ZoneHVAC:TerminalUnit:VariableRefrigerantFlow = " + VRFTU(VRFTUNum).Name);
+                        if (VRFTU(TUIndex).fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
+                            if (VRFTU(TUIndex).FanIndex == -1) {
+                                ShowSevereError("ZoneHVAC:TerminalUnit:VariableRefrigerantFlow = " + VRFTU(TUIndex).Name);
                                 ShowContinueError("VRF Terminal Unit fan is required when used as zone equipment.");
                                 ErrorsFound = true;
                             }
                         } else {
-                            if (VRFTU(VRFTUNum).FanIndex == 0) {
-                                ShowSevereError("ZoneHVAC:TerminalUnit:VariableRefrigerantFlow = " + VRFTU(VRFTUNum).Name);
+                            if (VRFTU(TUIndex).FanIndex == 0) {
+                                ShowSevereError("ZoneHVAC:TerminalUnit:VariableRefrigerantFlow = " + VRFTU(TUIndex).Name);
                                 ShowContinueError("VRF Terminal Unit fan is required when used as zone equipment.");
                                 ErrorsFound = true;
                             }
@@ -5402,7 +5403,9 @@ namespace HVACVariableRefrigerantFlow {
                         }
                     }
 
-                    if (AirLoopFound || CheckZoneEquipmentList(DataHVACGlobals::cVRFTUTypes(VRFTU(TUIndex).VRFTUType_Num), VRFTU(TUIndex).Name)) continue;
+                    if (VRFTU(TUIndex).isInAirLoop || VRFTU(TUIndex).isInOASys ||
+                        CheckZoneEquipmentList(DataHVACGlobals::cVRFTUTypes(VRFTU(TUIndex).VRFTUType_Num), VRFTU(TUIndex).Name))
+                        continue;
                     if (!DataAirLoop::AirLoopInputsFilled) continue;
                     ShowSevereError("InitVRF: VRF Terminal Unit = [" +DataHVACGlobals::cVRFTUTypes(VRFTU(TUIndex).VRFTUType_Num) + ',' + VRFTU(TUIndex).Name +
                                     "] is not on any ZoneHVAC:EquipmentList, AirloopHVAC or AirLoopHVAC:OutdoorAirSystem:EquipmentList.  It will not "
@@ -5470,9 +5473,9 @@ namespace HVACVariableRefrigerantFlow {
             // check fan inlet and outlet nodes
             int FanInletNodeNum = 0;
             if (VRFTU(VRFTUNum).fanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                FanInletNodeNum = HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->inletNodeNum;
+                if (VRFTU(VRFTUNum).FanIndex > -1) FanInletNodeNum = HVACFan::fanObjs[VRFTU(VRFTUNum).FanIndex]->inletNodeNum;
             } else {
-                FanInletNodeNum = Fans::getFanInNodeIndex(VRFTU(VRFTUNum).FanIndex, errFlag);
+                if (VRFTU(VRFTUNum).FanIndex > 0) FanInletNodeNum = Fans::getFanInNodeIndex(VRFTU(VRFTUNum).FanIndex, errFlag);
             }
             int CCoilInletNodeNum = DXCoils::getCoilInNodeIndex(VRFTU(VRFTUNum).CoolCoilIndex, errFlag);
             int CCoilOutletNodeNum = DXCoils::getCoilOutNodeIndex(VRFTU(VRFTUNum).CoolCoilIndex, errFlag);
@@ -5641,8 +5644,7 @@ namespace HVACVariableRefrigerantFlow {
 
         // Size TU
         if (MySizeFlag(VRFTUNum)) {
-            //if ( !ZoneSizingCalc && !SysSizingCalc ) {
-            if (!ZoneSizingCalc && DataAirLoop::AirLoopInputsFilled) {
+            if (!ZoneSizingCalc && !SysSizingCalc) {
                 SizeVRF(VRFTUNum);
                 TerminalUnitList(TUListIndex).TerminalUnitNotSizedYet(IndexToTUInTUList) = false;
                 MySizeFlag(VRFTUNum) = false;
