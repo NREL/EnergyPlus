@@ -203,8 +203,7 @@ namespace ChillerElectricEIR {
         Real64 CondenserFanEnergyConsumption; // reporting: Air-cooled condenser fan energy [J]
         Real64 BasinHeaterConsumption;        // Basin heater energy consumption (J)
         bool IPLVFlag;
-        bool EquipFlowCtrl;
-        bool oneTimeInit;
+        int EquipFlowCtrl;
 
         // Default Constructor
         ElectricEIRChillerSpecs()
