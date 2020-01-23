@@ -377,7 +377,7 @@ namespace DataSystemVariables {
         DeveloperFlag = false;
         TimingFlag = false;
         SutherlandHodgman = true;
-        SlaterandBarsky = true;
+        SlaterandBarsky = false;
         DetailedSkyDiffuseAlgorithm = false;
         DetailedSolarTimestepIntegration = false;
         TrackAirLoopEnvFlag = false;
