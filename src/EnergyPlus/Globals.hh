@@ -92,13 +92,25 @@ struct FansGlobals : BaseGlobalStruct
     static constexpr int ExhaustFanDecoupledFromAvailManagers = 151;
 
     // members
-    int NumFans = 0;
-    int NumNightVentPerf = 0;      // number of FAN:NIGHT VENT PERFORMANCE objects found in the input
-    bool GetFanInputFlag = true;   // Flag set to make sure you get input once
-    bool LocalTurnFansOn = false;  // If True, overrides fan schedule and cycles ZoneHVAC component fans on
-    bool LocalTurnFansOff = false; // If True, overrides fan schedule and LocalTurnFansOn and cycles ZoneHVAC component fans off
+    int NumFans;
+    int NumNightVentPerf;      // number of FAN:NIGHT VENT PERFORMANCE objects found in the input
+    bool GetFanInputFlag;      // Flag set to make sure you get input once
+    bool LocalTurnFansOn;      // If True, overrides fan schedule and cycles ZoneHVAC component fans on
+    bool LocalTurnFansOff;     // If True, overrides fan schedule and LocalTurnFansOn and cycles ZoneHVAC component fans off
 
-    void clear_state();
+    void clear_state() override
+    {
+        NumFans = 0;
+        NumNightVentPerf = 0;
+        GetFanInputFlag = true;
+        LocalTurnFansOn = false;
+        LocalTurnFansOff = false;
+    }
+
+    FansGlobals()
+    {
+        clear_state();
+    }
 };
 
 struct AllGlobals : BaseGlobalStruct
@@ -110,7 +122,7 @@ struct AllGlobals : BaseGlobalStruct
     PipesGlobals pipes;
 
     // all clear states
-    void clear_state();
+    void clear_state() override;
 };
 
 extern AllGlobals ep_globals;

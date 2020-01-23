@@ -59,19 +59,8 @@
     // This data-only module is a repository for all variables which are considered
     // to be "global" in nature in EnergyPlus.
 
-    void FansGlobals::clear_state()
-    {
-        NumFans = 0;
-        NumNightVentPerf = 0;
-        GetFanInputFlag = true;
-        LocalTurnFansOn = false;
-        LocalTurnFansOff = false;
-    }
-
     void AllGlobals::clear_state()
     {
         // all clear states
         fans.clear_state();
     }
-
-	AllGlobals ep_globals;
