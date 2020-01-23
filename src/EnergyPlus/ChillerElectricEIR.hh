@@ -204,7 +204,6 @@ namespace ChillerElectricEIR {
         Real64 BasinHeaterConsumption;        // Basin heater energy consumption (J)
         bool IPLVFlag;
         int EquipFlowCtrl;
-        bool oneTimeInit;
 
         // Default Constructor
         ElectricEIRChillerSpecs()

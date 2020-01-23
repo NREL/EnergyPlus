@@ -312,10 +312,6 @@ namespace HVACVariableRefrigerantFlow {
             }
         }
 
-        // wait for air loop inputs
-        // figure out a way to check/initialize each TU so those that are zone equipment can be read in?
-        if (!DataAirLoop::AirLoopInputsFilled) return;
-
         // the VRF condenser index
         VRFCondenser = VRFTU(VRFTUNum).VRFSysNum;
 
@@ -354,6 +350,9 @@ namespace HVACVariableRefrigerantFlow {
 
         // Initialize terminal unit
         InitVRF(VRFTUNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq); // Initialize all VRFTU related parameters
+
+        if (!DataAirLoop::AirLoopInputsFilled) return; // wait for air loop inputs
+                                                       // figure out a way to check/initialize each TU so those that are zone equipment can be read in?
 
         // Simulate terminal unit
         SimVRF(VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
@@ -5104,8 +5103,7 @@ namespace HVACVariableRefrigerantFlow {
 
         // one-time check to see if VRF TU's are on ZoneHVAC:EquipmentList or AirloopHVAC or issue warning
         if (ZoneEquipmentListNotChecked) {
-//            if (!DataAirLoop::AirLoopInputsFilled) return;
-            ZoneEquipmentListNotChecked = false;
+            if (DataAirLoop::AirLoopInputsFilled) ZoneEquipmentListNotChecked = false;
             bool AirLoopFound = false;
             bool errorsFound = false;
             bool AirNodeFound = false;
@@ -5147,7 +5145,7 @@ namespace HVACVariableRefrigerantFlow {
                                     }
                                     if (!ZoneNodeNotFound) break;
                                 }
-                                if (ZoneNodeNotFound) {
+                                if (ZoneNodeNotFound && DataAirLoop::AirLoopInputsFilled) {
                                     ShowSevereError(
                                         "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow \"" + VRFTU(TUIndex).Name +
                                         "\" Zone terminal unit air inlet node name must be the same as a zone inlet or exhaust node name.");
@@ -5197,7 +5195,7 @@ namespace HVACVariableRefrigerantFlow {
                                                 ctrlZoneNum = ControlledZoneNum;
                                                 goto EquipList_exit;
                                             }
-                                            if (!AirNodeFound && VRFTU(TUIndex).ZoneNum > 0) {
+                                            if (!AirNodeFound && VRFTU(TUIndex).ZoneNum > 0 && DataAirLoop::AirLoopInputsFilled) {
                                                 ShowSevereError("Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
                                                 ShowContinueError("Did not find Air node (Zone with Thermostat or Thermal Comfort Thermostat).");
                                                 // ShowContinueError("specified Controlling Zone or Thermostat Location name = " +
@@ -5269,7 +5267,7 @@ namespace HVACVariableRefrigerantFlow {
                                     break;
                                 }
                             }
-                        } else {
+                        } else if (DataAirLoop::AirLoopInputsFilled) {
                             ShowSevereError("Input errors for " + cCurrentModuleObject + ":" + thisObjectName);
                             ShowContinueError("Did not find ZoneHVAC:EquipmentList connected to this VRF terminal unit.");
                             errorsFound = true;
@@ -5314,7 +5312,7 @@ namespace HVACVariableRefrigerantFlow {
                                     initLoadBasedControlCntrlZoneTerminalUnitMassFlowRateMax = DataLoopNode::Node(ZoneInletNodeNum).MassFlowRateMax;
                                 }
                             }
-                            if (SumOfMassFlowRateMax != 0.0) {
+                            if (SumOfMassFlowRateMax != 0.0 && DataAirLoop::AirLoopInputsFilled) {
                                 if (initLoadBasedControlCntrlZoneTerminalUnitMassFlowRateMax >= DataHVACGlobals::SmallAirVolFlow) {
                                     VRFTU(TUIndex).controlZoneMassFlowFrac =
                                         initLoadBasedControlCntrlZoneTerminalUnitMassFlowRateMax / SumOfMassFlowRateMax;
@@ -5395,7 +5393,7 @@ namespace HVACVariableRefrigerantFlow {
                             EMSManager::CheckIfNodeSetPointManagedByEMS(
                                 VRFTU(TUIndex).heatCoilAirOutNode, EMSManager::iTemperatureSetPoint, SetPointErrorFlag);
                             SPNotFound = SPNotFound || SetPointErrorFlag;
-                            if (SPNotFound) {
+                            if (SPNotFound && DataAirLoop::AirLoopInputsFilled) {
                                 ShowSevereError("ZoneHVAC:TerminalUnit:VariableRefrigerantFlow: Missing temperature setpoint for unitary system = " +
                                                 VRFTU(TUIndex).Name);
                                 ShowContinueError("  use a Setpoint Manager to establish a setpoint at the coil control node.");
@@ -5405,6 +5403,7 @@ namespace HVACVariableRefrigerantFlow {
                     }
 
                     if (AirLoopFound || CheckZoneEquipmentList(DataHVACGlobals::cVRFTUTypes(VRFTU(TUIndex).VRFTUType_Num), VRFTU(TUIndex).Name)) continue;
+                    if (!DataAirLoop::AirLoopInputsFilled) continue;
                     ShowSevereError("InitVRF: VRF Terminal Unit = [" +DataHVACGlobals::cVRFTUTypes(VRFTU(TUIndex).VRFTUType_Num) + ',' + VRFTU(TUIndex).Name +
                                     "] is not on any ZoneHVAC:EquipmentList, AirloopHVAC or AirLoopHVAC:OutdoorAirSystem:EquipmentList.  It will not "
                                     "be simulated.");
