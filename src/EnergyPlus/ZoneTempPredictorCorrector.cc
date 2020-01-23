@@ -3797,6 +3797,8 @@ namespace ZoneTempPredictorCorrector {
             }
 
             // Calculate the predicted zone load to be provided by the system with the given desired zone air temperature
+
+            std::cout << "CalcPredictedSystemLoad: ";
             CalcPredictedSystemLoad(ZoneNum, RAFNFrac);
 
             // Calculate the predicted zone load to be provided by the system with the given desired humidity ratio
@@ -4092,7 +4094,7 @@ namespace ZoneTempPredictorCorrector {
 
             } else if (SELECT_CASE_var == SingleHeatingSetPoint) {
 
-                // PH 3/2/04      LoadToHeatingSetPoint = (TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum))
+                // PH 3/2/04      LoadToHeatingSetPoint = TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum)
                 if (ZoneAirSolutionAlgo == Use3rdOrder) {
                     LoadToHeatingSetPoint = (TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum));
                     // Exact solution
@@ -4121,7 +4123,7 @@ namespace ZoneTempPredictorCorrector {
 
                 // PH 3/2/04      LoadToCoolingSetPoint = (TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum))
                 if (ZoneAirSolutionAlgo == Use3rdOrder) {
-                    LoadToCoolingSetPoint = (TempDepZnLd(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum)) - TempIndZnLd(ZoneNum));
+                    LoadToCoolingSetPoint = TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum);
                 } else if (ZoneAirSolutionAlgo == UseAnalyticalSolution) {
                     if (TempDepZnLd(ZoneNum) == 0.0) { // B=0
                         LoadToCoolingSetPoint = AIRRAT(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum)) - TempIndZnLd(ZoneNum);
@@ -4260,6 +4262,8 @@ namespace ZoneTempPredictorCorrector {
                 if (DataHeatBalance::Zone(ZoneNum).HasAdjustedReturnTempByITE && !(DataGlobals::BeginSimFlag)) {
                     LoadToCoolingSetPoint = TempDepZnLd(ZoneNum) * DataHeatBalance::Zone(ZoneNum).AdjustedReturnTempByITE - TempIndZnLd(ZoneNum);
                 }
+                std::cout << "LoadToCoolingSetPoint: " << LoadToCoolingSetPoint << ", Temp Dep Zn Ld - adjusted, "\
+                << TempDepZnLd(ZoneNum) * DataHeatBalance::Zone(ZoneNum).AdjustedReturnTempByITE << ", Temp Ind Zn Ld," << TempIndZnLd(ZoneNum) << "\n";
 
                 // Possible combinations:
                 // 1/  LoadToHeatingSetPoint > 0 & LoadToCoolingSetPoint > 0 -->  Heating required

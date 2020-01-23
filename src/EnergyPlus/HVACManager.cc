@@ -415,8 +415,9 @@ namespace HVACManager {
         ManageZoneAirUpdates(iPredictStep, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
         if (Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(iPredictStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
-
+        std::cout << "    Before 1st SimHVAC, Supply Node Temp, " << Node(1).Temp << "\n";
         SimHVAC();
+        std::cout << "    After 1st SimHVAC, Supply Node Temp, " << Node(1).Temp << "\n";
 
         if (AnyIdealCondEntSetPointInModel && MetersHaveBeenInitialized && !WarmupFlag) {
             RunOptCondEntTemp = true;

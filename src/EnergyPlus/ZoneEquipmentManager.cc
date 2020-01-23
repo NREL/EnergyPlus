@@ -3433,6 +3433,7 @@ namespace ZoneEquipmentManager {
         using ZoneAirLoopEquipmentManager::ManageZoneAirLoopEquipment;
         using ZoneDehumidifier::SimZoneDehumidifier;
         using ZonePlenum::SimAirZonePlenum;
+        using DataLoopNode::Node;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3472,6 +3473,8 @@ namespace ZoneEquipmentManager {
         bool AdjustZoneMassFlowFlag(true); // holds zone mixing and infiltration flow calc status
         FirstCall = true;
         ErrorFlag = false;
+
+        std::cout << "      Before SimZoneEquipment, Supply & Return Node Temp, (" << Node(1).Temp << " & " << Node(2).Temp << "), ";
 
         for (SupplyAirPathNum = 1; SupplyAirPathNum <= NumSupplyAirPaths; ++SupplyAirPathNum) {
 
@@ -3999,6 +4002,9 @@ namespace ZoneEquipmentManager {
         CalcZoneLeavingConditions(FirstHVACIteration);
 
         SimReturnAirPath();
+
+        std::cout << "After, Supply & Return Node Temp, (" << Node(1).Temp << " & " << Node(2).Temp << ")\n";
+        std::cout << "      Supply & Return Node Flowrate, (" << Node(1).MassFlowRate << " & " << Node(2).MassFlowRate << ")\n";
     }
 
     void SetZoneEquipSimOrder(int const ControlledZoneNum, int const ActualZoneNum)
@@ -5341,10 +5347,10 @@ namespace ZoneEquipmentManager {
                             Node(ReturnNode).Temp = TempRetAir;
                         }
                         // Overwrite heat-to-return from ITE objects, other return air flow from window or lights are not allowed in this situation
-                        if (Zone(ActualZoneNum).HasAdjustedReturnTempByITE && !(DataGlobals::BeginSimFlag)) {
-                            TempRetAir = Zone(ActualZoneNum).AdjustedReturnTempByITE;
-                            Node(ReturnNode).Temp = TempRetAir;
-                        }
+//                        if (Zone(ActualZoneNum).HasAdjustedReturnTempByITE && !(DataGlobals::BeginSimFlag)) {
+//                            TempRetAir = Zone(ActualZoneNum).AdjustedReturnTempByITE;
+//                            Node(ReturnNode).Temp = TempRetAir;
+//                        }
                     } else { // No return air flow
                         // Assign all heat-to-return from window gap airflow to zone air
                         if (WinGapFlowToRA > 0.0) SysDepZoneLoads(ActualZoneNum) += WinGapFlowToRA * CpAir * (WinGapTtoRA - TempZoneAir);

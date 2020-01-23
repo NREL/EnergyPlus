@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -709,7 +709,7 @@ namespace InternalHeatGains {
                         MustInpSch = false;
                         UsingThermalComfort = false;
                         lastOption = NumAlpha;
-
+                        
                         // check to see if the user has specified schedules for air velocity, clothing insulation, and/or work efficiency
                         // but have NOT made a selection for a thermal comfort model.  If so, then the schedules are reported as unused
                         // which could cause confusion.  The solution is for the user to either remove those schedules or pick a thermal
@@ -3961,11 +3961,12 @@ namespace InternalHeatGains {
 //                    ZoneITEq(Loop).DesignAirVolFlowRate = IHGNumbers(5) * ZoneITEq(Loop).DesignTotalPower;
                 }
 
-//                std::cout << "Report:\nZoneITEq(Loop).DesignTAirIn " << ZoneITEq(Loop).DesignTAirIn << "\n";
-//                std::cout << "\nZoneITEq(Loop).DesignFanPower " << ZoneITEq(Loop).DesignFanPower << "\n";
-//                std::cout << "\nZoneITEq(Loop).DesignCPUPower  " << ZoneITEq(Loop).DesignCPUPower << "\n";
-//                std::cout << "\nZoneITEq(Loop).DesignTotalPower " << ZoneITEq(Loop).DesignTotalPower << "\n";
-//                std::cout << "\nZoneITEq(Loop).DesignAirVolFlowRate " << ZoneITEq(Loop).DesignAirVolFlowRate << "\n\n";
+                std::cout << "Report:\nZoneITEq(Loop).DesignTAirIn " << ZoneITEq(Loop).DesignTAirIn << "\n";
+                std::cout << "\nZoneITEq(Loop).DesignFanPower " << ZoneITEq(Loop).DesignFanPower << "\n";
+                std::cout << "\nZoneITEq(Loop).DesignCPUPower  " << ZoneITEq(Loop).DesignCPUPower << "\n";
+                std::cout << "\nZoneITEq(Loop).DesignTotalPower " << ZoneITEq(Loop).DesignTotalPower << "\n";
+                std::cout << "\nZoneITEq(Loop).DesignAirVolFlowRate " << ZoneITEq(Loop).DesignAirVolFlowRate << "\n\n";
+
                 // Object report variables
                 SetupOutputVariable(
                     "ITE CPU Electric Power", OutputProcessor::Unit::W, ZoneITEq(Loop).CPUPower, "Zone", "Average", ZoneITEq(Loop).Name);
@@ -6198,13 +6199,13 @@ namespace InternalHeatGains {
         Real64 CPULoadSchedFrac;                          // CPU loading schedule fraction
         Real64 AirConnection;                             // Air connection type
         Real64 TSupply;                                   // Supply air temperature [C]
-        Real64 WSupply;                                   // Supply air humidity ratio [kgWater/kgDryAir]
+        Real64 WSupply;                                   // Supply air humidity ratio [kgH2O/kgdryair]
         Real64 RecircFrac;                                // Recirulation fraction - current
         Real64 TRecirc;                                   // Recirulation air temperature [C]
-        Real64 WRecirc;                                   // Recirulation air humidity ratio [kgWater/kgDryAir]
+        Real64 WRecirc;                                   // Recirulation air humidity ratio [kgH2O/kgdryair]
         Real64 TAirIn;                                    // Entering air dry-bulb temperature [C]
         Real64 TAirInDesign;                              // Design entering air dry-bulb temperature [C]
-        Real64 WAirIn;                                    // Entering air humidity ratio [kgWater/kgDryAir]
+        Real64 WAirIn;                                    // Entering air humidity ratio [kgH2O/kgdryair]
         Real64 TDPAirIn;                                  // Entering air dewpoint temperature [C]
         Real64 RHAirIn;                                   // Entering air relative humidity [%]
         Real64 SupplyHeatIndex;                           // Supply heat index
@@ -6358,6 +6359,7 @@ namespace InternalHeatGains {
 
             // Calculate power input and airflow
             TAirInDesign = ZoneITEq(Loop).DesignTAirIn;
+
             Real64 DesignTotalPower = ZoneITEq(Loop).DesignTotalPower;
             Real64 AirVolFlowAtDesign = ZoneITEq(Loop).DesignAirVolFlowRate;
 
@@ -6391,7 +6393,6 @@ namespace InternalHeatGains {
                 }
 
             }
-
 
             CPUPower =
                 max(ZoneITEq(Loop).DesignCPUPower * OperSchedFrac * CurveValue(ZoneITEq(Loop).CPUPowerFLTCurve, CPULoadSchedFrac, TAirIn), 0.0);
@@ -6466,17 +6467,15 @@ namespace InternalHeatGains {
             if (Zone(ZoneITEq(Loop).ZonePtr).HasAdjustedReturnTempByITE) {
                 ZoneITEMap[ZoneITEq(Loop).ZonePtr].push_back(Loop);
             }
-
             if (DoingSizing && ZoneITEq(Loop).FlowControlWithApproachTemps) {
                 ZoneITEq(Loop).ConGainRateToZone = DesignTotalPower;
-//                if (DataGlobals::BeginSimFlag) {
-//                    std::cout << "\nSizing: TAirInDesign " << TAirInDesign << "\n";
-//                    std::cout << "Sizing: ZoneITEq(Loop).ConGainRateToZone (DesignTotalPower) " << ZoneITEq(Loop).ConGainRateToZone << "\n";
-//                    std::cout << "Sizing: AirVolFlowAtDesign " << AirVolFlowAtDesign << "\n\n";
-//                }
+                if (DataGlobals::BeginSimFlag) {
+                    std::cout << "\nSizing: TAirInDesign " << TAirInDesign << "\n";
+                    std::cout << "Sizing: ZoneITEq(Loop).ConGainRateToZone (DesignTotalPower) " << ZoneITEq(Loop).ConGainRateToZone << "\n";
+                    std::cout << "Sizing: AirVolFlowAtDesign " << AirVolFlowAtDesign << "\n\n";
+                }
 
             }
-
             // Object report variables
             ZoneITEq(Loop).CPUPower = CPUPower;
             ZoneITEq(Loop).FanPower = FanPower;
@@ -6515,7 +6514,7 @@ namespace InternalHeatGains {
             ZoneITEq(Loop).AirMassFlow = AirMassFlowRate;
             ZoneITEq(Loop).AirInletDryBulbT = TAirIn;
             ZoneITEq(Loop).AirInletDewpointT = TDPAirIn;
-            ZoneITEq(Loop).AirInletRelHum = RHAirIn * 100.0;
+            ZoneITEq(Loop).AirInletRelHum = RHAirIn;
             ZoneITEq(Loop).AirOutletDryBulbT = TAirOut;
             ZoneITEq(Loop).SHI = SupplyHeatIndex;
 
@@ -6523,6 +6522,11 @@ namespace InternalHeatGains {
             ZnRpt(NZ).ITEqAirMassFlow += ZoneITEq(Loop).AirMassFlow;
             ZoneSumTinMinusTSup(NZ) += (TAirIn - TSupply) * AirVolFlowRate;
             ZoneSumToutMinusTSup(NZ) += (TAirOut - TSupply) * AirVolFlowRate;
+
+            std::cout << "\nDayOfYear: " << DataEnvironment::DayOfYear << ", HourOfDay: " << DataGlobals::HourOfDay << ", Timestep: " << DataGlobals::TimeStep << "\n";
+            std::cout << "\nSupplyNodeNum, " << SupplyNodeNum << ", ITE TAirIn: " << TAirIn << ", ITE TSupply: " << TSupply << ", Diff: " << TAirIn - TSupply << "\n";
+            int ZoneNode = ZoneEquipConfig(1).ZoneNode;
+            std::cout << "Zone Temp, " << Node(ZoneNode).Temp << "\n";
 
             // Check environmental class operating range limits (defined as parameters in this subroutine)
             EnvClass = ZoneITEq(Loop).Class;
@@ -6571,6 +6575,7 @@ namespace InternalHeatGains {
                 }
             }
 
+
         } // ZoneITEq calc loop
 
         // Zone-level sensible heat index
@@ -6604,7 +6609,9 @@ namespace InternalHeatGains {
             }
             it++;
         }
-    } // End CalcZoneITEq
+
+        std::cout << "ITEAdjReturnTemp, " << ZnRpt(1).ITEAdjReturnTemp << "\n";
+    } // End CalcZoneIT
 
     void ReportInternalHeatGains()
     {
@@ -6919,20 +6926,20 @@ namespace InternalHeatGains {
 
         return DesignLightingLevelSum;
     }
-
+    
     bool CheckThermalComfortSchedules(bool const WorkEffSch, // Blank work efficiency schedule = true
                                       bool const CloInsSch,  // Blank clothing insulation schedule = true
                                       bool const AirVeloSch) // Blank air velocity schedule = true
     {
         bool TCSchedsPresent = false;
-
+        
         if ( !WorkEffSch || !CloInsSch || !AirVeloSch ) {
             TCSchedsPresent = true;
         }
-
+        
         return TCSchedsPresent;
     }
-
+    
     void CheckLightsReplaceableMinMaxForZone(int const WhichZone) // Zone Number
     {
 
