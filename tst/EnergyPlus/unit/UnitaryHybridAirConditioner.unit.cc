@@ -621,8 +621,20 @@ TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_Scenario5_NoConditioning)
     Tosa = 26.67733333;
     RHra = 18.894394;
     RHosa = 13.1602401;
+    Wra = PsyWFnTdbRhPb(Tra, RHra / 100, 101.325);
+    Wosa = PsyWFnTdbRhPb(Tosa, RHosa / 100, 101.325);
     Requestedheating = -55795.8058;
     RequestedCooling = 8171.47128;
+    pZoneHybridUnitaryAirConditioner->InletTemp = Tra;
+    pZoneHybridUnitaryAirConditioner->InletHumRat = Wra;
+    pZoneHybridUnitaryAirConditioner->InletEnthalpy = PsyHFnTdbRhPb(Tra, RHra / 100, 101325, "test");
+    pZoneHybridUnitaryAirConditioner->InletPressure = 101325;
+    pZoneHybridUnitaryAirConditioner->InletRH = RHra / 100;
+    pZoneHybridUnitaryAirConditioner->SecInletTemp = Tosa;
+    pZoneHybridUnitaryAirConditioner->SecInletHumRat = Wosa;
+    pZoneHybridUnitaryAirConditioner->SecInletEnthalpy = PsyHFnTdbRhPb(Tosa, RHosa / 100, 101325, "test");
+    pZoneHybridUnitaryAirConditioner->SecInletPressure = 101325;
+    pZoneHybridUnitaryAirConditioner->SecInletRH = RHosa / 100;
     pZoneHybridUnitaryAirConditioner->Initialize(1);
     pZoneHybridUnitaryAirConditioner->doStep(RequestedCooling, Requestedheating, Requested_Humidification, Requested_Dehumidification, DesignMinVR);
 
@@ -639,9 +651,7 @@ TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_Scenario5_NoConditioning)
     Real64 Ventilation = pZoneHybridUnitaryAirConditioner->SupplyVentilationAir;
     Real64 returnOSAF = pZoneHybridUnitaryAirConditioner->averageOSAF;
     // checks
-    EXPECT_NEAR(1.0, returnOSAF, 0.001);
-    EXPECT_GT(Tsa, Tra);
-    EXPECT_NEAR(Tsa, Tra, 1.500);
+    EXPECT_NEAR(Tsa, Tosa, 1.0);
 
     //Msa and DesignMinVr should be close. If no heating or cooling is needed, the mass flow rate should be near the designed minumum flow rate
     EXPECT_NEAR(Msa, DesignMinVR, 0.001);

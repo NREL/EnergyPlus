@@ -50,8 +50,6 @@
 
 #include <EnergyPlus/UtilityRoutines.hh>
 
-#include <cmath>
-#include <string>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
@@ -61,6 +59,8 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <cmath>
+#include <string>
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
@@ -255,7 +255,7 @@ namespace HybridEvapCoolingModel {
 
             if (ValidPointer(HRsa_curve_pointer)) {
                 Y_val = NormalizationReference * CurveValue(HRsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
-                Y_val = max(min(Y_val,1.0),0.0);
+                Y_val = max(min(Y_val, 1.0), 0.0);
             } else {
                 Y_val = X_4; // return HR
             }
@@ -919,11 +919,11 @@ namespace HybridEvapCoolingModel {
           InletTemp(0.0), InletWetBulbTemp(0.0), InletHumRat(0.0), InletEnthalpy(0.0), InletPressure(0.0), InletRH(0.0),
           OutletVolumetricFlowRate(0.0), OutletMassFlowRate(0.0), OutletTemp(0.0), OutletWetBulbTemp(0.0), OutletHumRat(0.0), OutletEnthalpy(0.0),
           OutletPressure(0.0), OutletRH(0.0), SecInletMassFlowRate(0.0), SecInletTemp(0.0), SecInletWetBulbTemp(0.0), SecInletHumRat(0.0),
-          SecInletEnthalpy(0.0), SecInletPressure(0.0), SecInletRH(0.0), SecOutletMassFlowRate(0.0), 
-          SecOutletTemp(0.0), SecOutletWetBulbTemp(0.0), SecOutletHumRat(0.0), SecOutletEnthalpy(0.0), SecOutletPressure(0.0), SecOutletRH(0.0),
-          Wsa(0.0), SupplyVentilationAir(0.0), SupplyVentilationVolume(0.0), ModelNormalizationReference(0.0), OutdoorAir(false), MinOA_Msa(0.0),
-          OARequirementsPtr(0), Tsa(0.0), ModeCounter(0), CoolingRequested(false), HeatingRequested(false), VentilationRequested(false),
-          DehumidificationRequested(false), HumidificationRequested(false)
+          SecInletEnthalpy(0.0), SecInletPressure(0.0), SecInletRH(0.0), SecOutletMassFlowRate(0.0), SecOutletTemp(0.0), SecOutletWetBulbTemp(0.0),
+          SecOutletHumRat(0.0), SecOutletEnthalpy(0.0), SecOutletPressure(0.0), SecOutletRH(0.0), Wsa(0.0), SupplyVentilationAir(0.0),
+          SupplyVentilationVolume(0.0), ModelNormalizationReference(0.0), OutdoorAir(false), MinOA_Msa(0.0), OARequirementsPtr(0), Tsa(0.0),
+          ModeCounter(0), CoolingRequested(false), HeatingRequested(false), VentilationRequested(false), DehumidificationRequested(false),
+          HumidificationRequested(false)
     {
         WarnOnceFlag = false;
         count_EnvironmentConditionsMetOnce = 0;
@@ -1472,6 +1472,9 @@ namespace HybridEvapCoolingModel {
                         solutionspace.PointX[point_number]; // fractions of rated mass flow rate, so for some modes this might be low but others hi
                     OSAF = solutionspace.PointY[point_number];
                     UnscaledMsa = ModelNormalizationReference * MsaRatio;
+                    if (StepIns.RequestedCoolingLoad < 0 && StepIns.RequestedHeatingLoad > 0) {
+                        ScaledSystemMaximumSupplyAirMassFlowRate = MinOA_Msa / MsaRatio;
+                    }
                     ScaledMsa = ScaledSystemMaximumSupplyAirMassFlowRate * MsaRatio;
                     Real64 Supply_Air_Ventilation_Volume = 0;
                     // Calculate the ventilation mass flow rate
@@ -1530,8 +1533,8 @@ namespace HybridEvapCoolingModel {
                 }
             }
             if (!WarmupFlag) {
-                // Keep an account of the number of times the supply air temperature and humidity constraints were not met for a given mode but only
-                // do this when its not warmup.
+                // Keep an account of the number of times the supply air temperature and humidity constraints were not met for a given mode but
+                // only do this when its not warmup.
                 if (!SAT_OC_MetinMode) {
                     SAT_OC_MetinMode_v[Mode.ModeID] = SAT_OC_MetinMode_v[Mode.ModeID] + 1;
                 }
@@ -1757,8 +1760,8 @@ namespace HybridEvapCoolingModel {
         Real64 TimeElapsed = DataGlobals::HourOfDay + DataGlobals::TimeStep * DataGlobals::TimeStepZone + SysTimeElapsed;
 
         // Use the elapsed time to only give a summary of warnings related to the number of Timesteps environmental conditions, or supply air
-        // temperature constraints were not met for a given day. ideally there would be a clear flag that indicates "this is the last timestep of the
-        // day, so report", but that doesn't seem to exist.
+        // temperature constraints were not met for a given day. ideally there would be a clear flag that indicates "this is the last timestep of
+        // the day, so report", but that doesn't seem to exist.
         if ((TimeElapsed > 24) && WarnOnceFlag && !WarmupFlag) {
             if (count_EnvironmentConditionsNotMet > 0)
                 ShowWarningError("In day " + RoundSigDigits((Real64)DayOfSim, 1) + " of simulation, " + Name.c_str() + " was unable to operate for " +
@@ -1884,8 +1887,8 @@ namespace HybridEvapCoolingModel {
         }
     }
 
-    // doStep is passed some variables that could have just used the class members, but this adds clarity about whats needed, especially helpful in
-    // unit testing
+    // doStep is passed some variables that could have just used the class members, but this adds clarity about whats needed, especially helpful
+    // in unit testing
     void Model::doStep(Real64 RequestedCoolingLoad,       // in joules, cooling load as negitive
                        Real64 RequestedHeatingLoad,       // in joules, heating load as positive
                        Real64 OutputRequiredToHumidify,   // Load required to meet humidifying setpoint (>0 = a humidify load) [kgWater/s]
@@ -1930,8 +1933,8 @@ namespace HybridEvapCoolingModel {
 
         MinOA_Msa = DesignMinVR; // as mass flow kg/s
 
-        // Collate all the inputs required for calculation into one local data structure CStepInputs, this helps with the unit tests so we always know
-        // what values need to be set
+        // Collate all the inputs required for calculation into one local data structure CStepInputs, this helps with the unit tests so we always
+        // know what values need to be set
         CStepInputs StepIns;
         StepIns.Tosa = SecInletTemp; // degrees C
         StepIns.Tra = InletTemp;     // degrees C
