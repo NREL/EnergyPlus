@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -142,7 +142,7 @@ TEST_F(EnergyPlusFixture, GasAbsorption_GetInput_Test)
 
     GetGasAbsorberInput();
 
-    EXPECT_EQ(1, NumGasAbsorbers);
+    EXPECT_EQ(1u, GasAbsorber.size());
     EXPECT_EQ("BIG CHILLER", GasAbsorber(1).Name);
     EXPECT_EQ(100000., GasAbsorber(1).NomCoolingCap);
     EXPECT_EQ(0.8, GasAbsorber(1).NomHeatCoolRatio);

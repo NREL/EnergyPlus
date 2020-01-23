@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2559,7 +2559,7 @@ namespace EconomicLifeCycleCost {
                 columnHead(8) = "cons";
                 columnHead(9) = "slvg";
                 columnHead(10) = "oCap";
-                columnHead(11) = "H20";
+                columnHead(11) = "H2O";
                 columnHead(12) = "ene";
                 columnHead(13) = "tEne";
                 columnHead(14) = "tOpr";
