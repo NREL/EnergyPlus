@@ -4463,6 +4463,7 @@ namespace SingleDuct {
                     Par(7) = double(FanOp);
                     Par(8) = QTotLoad;
                     SolveRoot(UnitFlowToler, 50, SolFlag, FracDelivered, VAVVSHCFanOnResidual, 0.0, 1.0, Par);
+                    MassFlow = Node(SysInletNode).MassFlowRate;
                     if (SolFlag == -1) {
                         if (Sys(SysNum).IterationLimit == 0) {
                             ShowWarningError("Heating coil control failed in VS VAV terminal unit " + Sys(SysNum).SysName);
@@ -4493,6 +4494,21 @@ namespace SingleDuct {
             FanOp = 0;
             CalcVAVVS(SysNum, FirstHVACIteration, ZoneNodeNum, HCType, 0.0, 0.0, FanType, MassFlow, FanOp, QDelivered);
         }
+
+        // Move mass flow rates to the damper outlet node
+        SysOutlet(SysNum).AirMassFlowRate = MassFlow;
+        SysOutlet(SysNum).AirMassFlowRateMaxAvail = SysInlet(SysNum).AirMassFlowRateMaxAvail;
+        SysOutlet(SysNum).AirMassFlowRateMinAvail = SysInlet(SysNum).AirMassFlowRateMinAvail;
+
+        // calculate VAV damper Position.
+        if (Sys(SysNum).AirMassFlowRateMax == 0.0) {
+            Sys(SysNum).DamperPosition = 0.0;
+        } else {
+            Sys(SysNum).DamperPosition = MassFlow / Sys(SysNum).AirMassFlowRateMax;
+        }
+        // update the air terminal outlet node data
+        UpdateSys(SysNum);
+
     }
 
     void SimConstVol(int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum)
