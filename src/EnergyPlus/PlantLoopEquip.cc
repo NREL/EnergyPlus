@@ -166,22 +166,13 @@ namespace PlantLoopEquip {
         // as a time reduction measure.  Specific ifs are set to catch those modules that don't.
         // If you add a module or new equipment type, you must set up this structure.
 
-        // Using/Aliasing
-        using ChillerReformulatedEIR::SimReformulatedEIRChiller;
-
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int EquipNum; // Plant side component list equipment number
         int EquipTypeNum;
         bool RunFlag; // TRUE if operating this iteration
         int EquipFlowCtrl;
         Real64 CurLoad;
-        Real64 MaxLoad;
-        Real64 MinLoad;
-        Real64 OptLoad;
-        Real64 SizingFac = 0.0;        // the component sizing fraction
         int GeneralEquipType;    // Basic Equipment type from EquipType Used to help organize this routine
-        Real64 TempCondInDesign; // Design condenser inlet temp. C , or 25.d0
-        Real64 TempEvapOutDesign;
         EnergyPlus::PlantLocation sim_component_location(LoopNum, LoopSideNum, BranchNum, Num);
 
         // set up a reference for this component
@@ -303,33 +294,7 @@ namespace PlantLoopEquip {
                 sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
             } else if (EquipTypeNum == TypeOf_Chiller_ElectricReformEIR) {
-                SimReformulatedEIRChiller(sim_component.TypeOf,
-                                          sim_component.Name,
-                                          EquipFlowCtrl,
-                                          EquipNum,
-                                          LoopNum,
-                                          RunFlag,
-                                          FirstHVACIteration,
-                                          InitLoopEquip,
-                                          CurLoad,
-                                          MaxLoad,
-                                          MinLoad,
-                                          OptLoad,
-                                          GetCompSizFac,
-                                          SizingFac,
-                                          TempCondInDesign,
-                                          TempEvapOutDesign);
-                if (InitLoopEquip) {
-                    sim_component.MaxLoad = MaxLoad;
-                    sim_component.MinLoad = MinLoad;
-                    sim_component.OptLoad = OptLoad;
-                    sim_component.CompNum = EquipNum;
-                    sim_component.TempDesCondIn = TempCondInDesign;
-                    sim_component.TempDesEvapOut = TempEvapOutDesign;
-                }
-                if (GetCompSizFac) {
-                    sim_component.SizFac = SizingFac;
-                }
+                sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, CurLoad, RunFlag);
 
                 // Chiller-Heater needs to know whether it is being called for heating or cooling
                 // Since loops are generic, pass the branch inlet nodenum
