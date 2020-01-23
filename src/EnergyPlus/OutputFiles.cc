@@ -71,25 +71,93 @@ OutputFiles &OutputFiles::getSingleton()
 
 using arg_formatter = fmt::arg_formatter<fmt::buffer_range<char>>;
 
-// A custom argument formatter that formats negative integers as unsigned
-
-// with the ``x`` format specifier.
-
 class custom_arg_formatter : public arg_formatter
 {
 public:
     explicit custom_arg_formatter(fmt::format_context &ctx, fmt::format_parse_context *parse_ctx = nullptr, fmt::format_specs *spec = nullptr)
         : arg_formatter(ctx, parse_ctx, spec)
+
     {
     }
 
     using arg_formatter::operator();
 
-    iterator operator()(Real64 value)
+    static constexpr bool should_be_fixed_output(const Real64 value)
+    {
+        return (value >= 0.1 || value <= -0.1) || (value == 0.0);
+    }
+
+    static std::string write_to_string(const Real64 value, fmt::format_specs &specs)
+    {
+        std::string str;
+
+        struct string_ref
+        {
+            std::reference_wrapper<std::string> ref;
+            std::back_insert_iterator<std::string> begin()
+            {
+                return std::back_inserter(ref.get());
+            }
+
+            using value_type = std::string::value_type;
+            using iterator = std::back_insert_iterator<std::string>;
+        };
+
+        fmt::internal::basic_writer<string_ref> bw(string_ref{str});
+        bw.write(value, specs);
+        return str;
+    }
+
+    iterator write_string(const std::string &str)
+    {
+        // write one character at a time to avoid any spec formatting from {fmt}
+        // which may truncate our output otherwise
+        std::for_each(std::begin(str), std::end(str), [&](const char c) { writer().write(c); });
+        return out();
+    }
+
+    iterator operator()(Real64 const value)
     {
         if (specs()) {
-            if (specs()->type == 'R') {
-                if ((value >= 0.1 || value <= -0.1) || (value == 0.0)) {
+            if (specs()->type == 'T') {
+                const auto order_of_magnitude =  value == 0.0 ? 1 : static_cast<int>(std::log10(std::abs(value)));
+
+                if (should_be_fixed_output(value) && specs()->precision > order_of_magnitude) {
+                    specs()->type = 'F';
+                    // seems 0 reading fixed point values from Fortran IO 'G' format
+                    // has an extra place of precision added.
+                    if (value < 1 && value > -1) {
+                        ++specs()->precision;
+                    }
+                    // account for alignment with E formatted output
+                    specs()->width -= 4;
+                    specs()->precision -= (order_of_magnitude + 1);
+                    (*this)(value);
+
+                    // write the last 4 chars
+                    return write_string("    ");
+                } else {
+                    // The Fortran 'G' format insists on a leading 0, even though
+                    // that actually means losing data
+                    specs()->type = 'E';
+                    specs()->alt = true;
+
+                    // multiply by 10 to get the exponent we want
+                    auto str = write_to_string(value * 10, *specs());
+
+                    // rotate out everything from the beginning to the E to the right one place
+                    const auto begin = std::next(std::begin(str), specs()->width - (specs()->precision + 6));
+                    const auto end = std::next(begin, specs()->precision + 2);
+                    std::rotate(begin, std::prev(end), end);
+
+                    // swap in the 0 and . we want
+                    std::swap(*std::next(begin), *std::next(begin, 2));
+                    *begin = '0';
+                    return write_string(str);
+                }
+            } else if (specs()->type == 'R') {
+                const auto order_of_magnitude = value == 0.0 ? 1 : static_cast<int>(std::log10(std::abs(value)));
+                if (should_be_fixed_output(value) && specs()->precision > order_of_magnitude) {
                     const auto magnitude = std::pow(10, specs()->precision);
                     const auto rounded = std::round(value * magnitude) / magnitude;
                     specs()->type = 'F';
@@ -98,31 +166,17 @@ public:
                     specs()->type = 'E';
 
                     // write the `E` formatted float to a std::string
-                    std::string str;
-                    struct string_ref {
-                        std::reference_wrapper<std::string> ref;
-                        std::back_insert_iterator<std::string> begin() {
-                            return std::back_inserter(ref.get());
-                        }
-                        using value_type = std::string::value_type;
-                        using iterator = std::back_insert_iterator<std::string>;
-                    };
-
-                    fmt::internal::basic_writer<string_ref> bw(string_ref{str});
-                    bw.write(value, *specs());
+                    auto str = write_to_string(value, *specs());
 
                     // if necessary, pad the exponent with a 0 to match the old formatting from Objexx
                     if (str.size() > 3) {
-                        if (!std::isdigit(str[str.size()-3])) {
+                        if (!std::isdigit(str[str.size() - 3])) {
                             // wants a 0 inserted
-                            str.insert(str.size()-2,"0");
+                            str.insert(str.size() - 2, "0");
                         }
                     }
 
-                    // write one character at a time to avoid any spec formatting from {fmt}
-                    // which may truncate our output otherwise
-                    std::for_each(begin(str), end(str), [&](const char c){ writer().write(c); });
-                    return this->out();
+                    return write_string(str);
                 }
             }
         }
@@ -130,19 +184,19 @@ public:
     }
 };
 
+
 void vprint(std::ostream &os, fmt::string_view format_str, fmt::format_args args, const std::size_t count)
 {
     fmt::memory_buffer buffer;
-
     try {
         // Pass custom argument formatter as a template arg to vformat_to.
         fmt::vformat_to<custom_arg_formatter>(buffer, format_str, args);
     } catch (const fmt::format_error &) {
         throw fmt::format_error(fmt::format("Error with format, '{}', passed {} args", format_str, count));
     }
-
     os.write(buffer.data(), buffer.size());
 }
 
-} // namespace EnergyPlus
 
+
+} // namespace EnergyPlus
