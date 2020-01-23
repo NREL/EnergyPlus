@@ -3555,7 +3555,7 @@ namespace HeatBalanceAirManager {
             print(outputFiles.eio, "{:.3R},", Infiltration(Loop).ConstantTermCoef);
             print(outputFiles.eio, "{:.3R},", Infiltration(Loop).TemperatureTermCoef);
             print(outputFiles.eio, "{:.3R},", Infiltration(Loop).VelocityTermCoef);
-            print(outputFiles.eio, "{:.3R}", Infiltration(Loop).VelocitySQTermCoef);
+            print(outputFiles.eio, "{:.3R}\n", Infiltration(Loop).VelocitySQTermCoef);
         }
 
         if (ZoneAirMassFlow.EnforceZoneMassBalance) {
