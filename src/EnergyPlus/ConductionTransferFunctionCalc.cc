@@ -2196,10 +2196,10 @@ namespace ConductionTransferFunctionCalc {
                     {
                         auto const SELECT_CASE_var(Material(Layer).Group);
                         if (SELECT_CASE_var == Air) {
-                            static constexpr auto Format_702(" Material:Air,{},{:12.4G}\n");
+                            static constexpr auto Format_702(" Material:Air,{},{:12.4T}\n");
                             print(outputFiles.eio, Format_702, Material(Layer).Name, Material(Layer).Resistance);
                         } else {
-                            static constexpr auto Format_701(" Material CTF Summary,{},{:8.4F},{:14.3F},{:11.3F},{:13.3F},{:12.4G}\n");
+                            static constexpr auto Format_701(" Material CTF Summary,{},{:8.4F},{:14.3F},{:11.3F},{:13.3F},{:12.4T}\n");
                             print(outputFiles.eio,
                                   Format_701,
                                   Material(Layer).Name,

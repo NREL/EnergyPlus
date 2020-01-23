@@ -120,7 +120,7 @@ public:
     {
         if (specs()) {
             if (specs()->type == 'T') {
-                const auto order_of_magnitude =  value == 0.0 ? 1 : static_cast<int>(std::log10(std::abs(value)));
+                const auto order_of_magnitude = value == 0.0 ? 1 : static_cast<int>(std::log10(std::abs(value)));
 
                 if (should_be_fixed_output(value) && specs()->precision > order_of_magnitude) {
                     specs()->type = 'F';
@@ -140,17 +140,22 @@ public:
                     // The Fortran 'G' format insists on a leading 0, even though
                     // that actually means losing data
                     specs()->type = 'E';
+
+                    // 0 pad the end
                     specs()->alt = true;
+
+                    // reduce the precision to get rounding behavior
+                    --specs()->precision;
 
                     // multiply by 10 to get the exponent we want
                     auto str = write_to_string(value * 10, *specs());
 
-                    // rotate out everything from the beginning to the E to the right one place
-                    const auto begin = std::next(std::begin(str), specs()->width - (specs()->precision + 6));
-                    const auto end = std::next(begin, specs()->precision + 2);
-                    std::rotate(begin, std::prev(end), end);
-
-                    // swap in the 0 and . we want
+                    // swap around the first few characters and add in the leading
+                    // 0 that we need to get the same formatting behavor on the rounded
+                    // value that was acquired from the reduction in precision
+                    auto begin = std::next(std::begin(str), specs()->width - (specs()->precision + 8));
+                    std::swap(*begin, *std::next(begin));
+                    std::advance(begin, 1);
                     std::swap(*std::next(begin), *std::next(begin, 2));
                     *begin = '0';
                     return write_string(str);
@@ -184,7 +189,6 @@ public:
     }
 };
 
-
 void vprint(std::ostream &os, fmt::string_view format_str, fmt::format_args args, const std::size_t count)
 {
     fmt::memory_buffer buffer;
@@ -196,7 +200,5 @@ void vprint(std::ostream &os, fmt::string_view format_str, fmt::format_args args
     }
     os.write(buffer.data(), buffer.size());
 }
-
-
 
 } // namespace EnergyPlus
