@@ -752,6 +752,33 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                    CALL FixFuelTypes(OutArgs(20), NoDiff)
                  END IF
 
+              CASE("HEATPUMP:WATERTOWATER:EIR:HEATING")
+                  ! object rename
+                  ObjectName = "HeatPump:PlantLoop:EIR:Heating"
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  ! fields 1-3 same
+                  OutArgs(1:3)=InArgs(1:3)
+                  ! insert condenser type field
+                  OutArgs(4)=Blank
+                  ! all others equal
+                  OutArgs(5:CurArgs+1)=InArgs(4:CurArgs)
+                  CurArgs = CurArgs + 1
+                  NoDiff = .false.
+
+              CASE("HEATPUMP:WATERTOWATER:EIR:COOLING")
+                  ! object rename
+                  ObjectName = "HeatPump:PlantLoop:EIR:Cooling"
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  ! fields 1-3 same
+                  OutArgs(1:3)=InArgs(1:3)
+                  ! insert condenser type field
+                  OutArgs(4)=Blank
+                  ! all others equal
+                  OutArgs(5:CurArgs+1)=InArgs(4:CurArgs)
+                  CurArgs = CurArgs + 1
+                  NoDiff = .false.
 
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')

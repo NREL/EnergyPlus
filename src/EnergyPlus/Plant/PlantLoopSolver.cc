@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -323,7 +323,7 @@ namespace EnergyPlus {
             // Now that flow rates have been resolved, we just need to set the flow lock status
             //  flag, and resimulate.  During this simulation each component will still use the
             //  SetFlowRequest routine, but this routine will also set the outlet flow rate
-            //  equal to the inlet flow rate, accoridng to flowlock logic.
+            //  equal to the inlet flow rate, according to flowlock logic.
             DataPlant::PlantLoop(LoopNum).LoopSide(ThisSide).FlowLock = DataPlant::FlowLocked;
             DataPlant::PlantLoop(LoopNum).loopSolver.SimulateAllLoopSideBranches(
                     LoopNum, ThisSide, ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag);
