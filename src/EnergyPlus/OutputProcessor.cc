@@ -3970,7 +3970,16 @@ namespace OutputProcessor {
         // resolve use of EndUseNames that are not in standard list but widely used to define output variables.
         if (!Found) {
             if (EndUseSubName == "General") {
-                if (EndUseName == "Photovoltaic" || EndUseName == "PowerConversion" || EndUseName == "HeatingCoils" || EndUseName == "CoolingCoils") {
+                if (EndUseName == "Photovoltaic" || 
+                    EndUseName == "PowerConversion" || 
+                    EndUseName == "HeatingCoils" || 
+                    EndUseName == "CoolingCoils" || 
+                    EndUseName == "Chillers" || 
+                    EndUseName == "Boilers" || 
+                    EndUseName == "Baseboard" ||
+                    EndUseName == "CarbonEquivalentEmissions" ||
+                    EndUseName == "HeatRecoveryForHeating" ||
+                    EndUseName == "HeatRecoveryForCooling") {
                     Found = true;
                 }
             }
