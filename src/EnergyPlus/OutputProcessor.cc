@@ -3979,6 +3979,9 @@ namespace OutputProcessor {
                     EndUseName == "Baseboard" ||
                     EndUseName == "CarbonEquivalentEmissions" ||
                     EndUseName == "HeatRecoveryForHeating" ||
+                    EndUseName == "ElectricStorage" ||
+                    EndUseName == "HeatProduced" ||
+                    EndUseName == "LoopToLoop" ||
                     EndUseName == "HeatRecoveryForCooling") {
                     Found = true;
                 }
