@@ -1555,26 +1555,6 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFan_DamperPositionTest)
         "     1.0,                     !- Maximum Curve Output",
         "     Dimensionless,           !- Input Unit Type for X",
         "     Dimensionless;           !- Output Unit Type",
-
-        //"   Schedule:Compact,",
-        //"     TurndownMinAirFlowSch1,     !- Name",
-        //"     Fraction,                   !- Schedule Type Limits Name",
-        //"     Through: 12/31,             !- Field 1",
-        //"     For: AllDays,               !- Field 2",
-        //"     Until: 24:00, 1.0;          !- Field 3",
-
-        //"   Schedule:Compact,",
-        //"     TurndownMinAirFlowSch2,     !- Name",
-        //"     Fraction,                   !- Schedule Type Limits Name",
-        //"     Through: 12/31,             !- Field 1",
-        //"     For: AllDays,               !- Field 2",
-        //"     Until: 24:00, 0.5;          !- Field 3",
-
-        //"   ScheduleTypeLimits,",
-        //"     Fraction,                   !- Name",
-        //"     0,                          !- Lower Limit Value",
-        //"     1,                          !- Upper Limit Value",
-        //"     CONTINUOUS;                 !- Numeric Type",
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
