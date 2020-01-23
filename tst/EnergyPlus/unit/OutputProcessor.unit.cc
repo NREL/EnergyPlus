@@ -3672,7 +3672,7 @@ namespace OutputProcessor {
 
         compare_eso_stream(delimited_string({
             "7,1,,Zone Ideal Loads Supply Air Total Heating Energy [J] !Each Call",
-            "44,11,,Zone Ideal Loads Supply Air Total Heating Energy [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+            "56,11,,Zone Ideal Loads Supply Air Total Heating Energy [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
             "2,365,12,31, 0,24,10.00,20.00,Tuesday",
             "7,1.1",
             "2,365,12,31, 0,24,20.00,30.00,Tuesday",
@@ -3686,7 +3686,7 @@ namespace OutputProcessor {
             "2,365,12,31, 0,24,60.00,70.00,Tuesday",
             "7,2.2",
             "5,365",
-            "44,9.7,1.1,12,31,24,20,2.2,12,31,24,70",
+            "56,9.7,1.1,12,31,24,20,2.2,12,31,24,70",
         }));
 
         ResetAccumulationWhenWarmupComplete();
@@ -3709,7 +3709,7 @@ namespace OutputProcessor {
             "2,365,12,31, 0,24,10.00,20.00,Tuesday",
             "7,200.0",
             "5,365",
-            "44,300.0,100.0,12,31,24,10,200.0,12,31,24,20",
+            "56,300.0,100.0,12,31,24,10,200.0,12,31,24,20",
         }));
     }
     TEST_F(EnergyPlusFixture, OutputProcessor_GenOutputVariablesAuditReport)
