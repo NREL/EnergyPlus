@@ -50,17 +50,13 @@
 
 
     // MODULE INFORMATION:
-    //       AUTHOR         
-    //       DATE WRITTEN   
-    //       MODIFIED       
+    //       AUTHOR
+    //       DATE WRITTEN
+    //       MODIFIED
     //       RE-ENGINEERED
 
     // PURPOSE OF THIS MODULE:
     // This data-only module is a repository for all variables which are considered
     // to be "global" in nature in EnergyPlus.
 
-    void AllGlobals::clear_state()
-    {
-        // all clear states
-        fans.clear_state();
-    }
+AllGlobals ep_globals;

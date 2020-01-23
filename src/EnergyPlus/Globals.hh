@@ -98,6 +98,10 @@ struct FansGlobals : BaseGlobalStruct
     bool LocalTurnFansOn;      // If True, overrides fan schedule and cycles ZoneHVAC component fans on
     bool LocalTurnFansOff;     // If True, overrides fan schedule and LocalTurnFansOn and cycles ZoneHVAC component fans off
 
+        FansGlobals() : NumFans(0), NumNightVentPerf(0), GetFanInputFlag(true), LocalTurnFansOn(false), LocalTurnFansOff(false)
+    {
+    }
+
     void clear_state() override
     {
         NumFans = 0;
@@ -105,11 +109,6 @@ struct FansGlobals : BaseGlobalStruct
         GetFanInputFlag = true;
         LocalTurnFansOn = false;
         LocalTurnFansOff = false;
-    }
-
-    FansGlobals()
-    {
-        clear_state();
     }
 };
 
@@ -122,7 +121,10 @@ struct AllGlobals : BaseGlobalStruct
     PipesGlobals pipes;
 
     // all clear states
-    void clear_state() override;
+    void clear_state() override
+    {
+        fans.clear_state();
+    };
 };
 
 extern AllGlobals ep_globals;
