@@ -1064,7 +1064,7 @@ namespace EIRPlantLoopHeatPumps {
                                         "; entered curve name: " + capEIRtName.get<std::string>());
                         errorsFound = true;
                     }
-                    auto &capEIRplrName = fields.at("electric_input_to_output_ratio_modifier_function_of_temperature_curve_name");
+                    auto &capEIRplrName = fields.at("electric_input_to_output_ratio_modifier_function_of_part_load_ratio_curve_name");
                     thisPLHP.powerRatioFuncPLRCurveIndex = CurveManager::GetCurveIndex(UtilityRoutines::MakeUPPERCase(capEIRplrName));
                     if (thisPLHP.capFuncTempCurveIndex == 0) {
                         ShowSevereError("Invalid curve name for EIR PLHP (name=" + thisPLHP.name +
