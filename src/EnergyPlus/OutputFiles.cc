@@ -122,7 +122,7 @@ public:
             if (specs()->type == 'T') {
                 const auto order_of_magnitude = value == 0.0 ? 1 : static_cast<int>(std::log10(std::abs(value)));
 
-                if (should_be_fixed_output(value) && specs()->precision > order_of_magnitude) {
+                if (should_be_fixed_output(value) && (specs()->width - specs()->precision) > order_of_magnitude) {
                     specs()->type = 'F';
                     // seems 0 reading fixed point values from Fortran IO 'G' format
                     // has an extra place of precision added.
