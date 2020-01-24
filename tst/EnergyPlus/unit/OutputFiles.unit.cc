@@ -45,58 +45,40 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef OutputFiles_hh_INCLUDED
-#define OutputFiles_hh_INCLUDED
+// Google Test Headers
+#include <gtest/gtest.h>
 
+// EnergyPlus Headers
+#include <EnergyPlus/OutputFiles.hh>
 
-#include "DataGlobals.hh"
-#include <ObjexxFCL/gio.hh>
-#include <fmt/format.h>
-#include <fmt/ostream.h>
-#include <ostream>
+// EnergyPlus Headers
+#include "Fixtures/EnergyPlusFixture.hh"
 
 namespace EnergyPlus {
-class OutputFiles
+TEST_F(EnergyPlusFixture, OutputFiles_Expected_Formatting_Tests)
 {
-public:
-    std::ostream &eio;
+    // R syntax, which replicates the "RoundSigDigits" function
+    // by rounding and displaying 3 digits in the exponent and chooses between
+    // fixed and E notation depending on magnitude
+    EXPECT_EQ(print_to_string("{:.4R}", 8.4138E-02), "8.4138E-002");
+    EXPECT_EQ(print_to_string("{:.4R}", 8.41385E-02), "8.4139E-002");
 
-    static OutputFiles makeOutputFiles();
-    static OutputFiles &getSingleton();
+    EXPECT_EQ(print_to_string("{:.4R}", 0.1518), "0.1518");
+    EXPECT_EQ(print_to_string("{:.4R}", 0.15185), "0.1519");
 
-private:
-    OutputFiles();
-};
+    // T formatting simulates the 'G' from Fortran
+    // Always has a leading 0 if printing in fixed notation
+    EXPECT_EQ(print_to_string("{:20.8T}", -0.23111252E-04), "     -0.23111252E-04");
+    EXPECT_EQ(print_to_string("{:20.8T}", -0.0),            "      -0.0000000    ");
+    EXPECT_EQ(print_to_string("{:20.8T}",  0.0),            "       0.0000000    ");
+    EXPECT_EQ(print_to_string("{:20.8T}", 2.13608134),      "       2.1360813    ");
+    EXPECT_EQ(print_to_string("{:20.8T}", 213608134.0),     "      213608134.    ");
+    EXPECT_EQ(print_to_string("{:20.8T}", 213608139.6),     "      213608140.    ");
+    EXPECT_EQ(print_to_string("{:20.8T}", 0.213608134),     "      0.21360813    ");
+    //    EXPECT_EQ(print_to_string("{:20.8T}", -0.23111252), "     -0.23111252    ");
+//    EXPECT_EQ(print_to_string("{:20.8T}", -0.23111252), "     -0.23111252    ");
 
-void vprint(std::ostream &os, fmt::string_view format_str, fmt::format_args args, const std::size_t count);
-std::string vprint(fmt::string_view format_str, fmt::format_args args, const std::size_t count);
 
 
-// Uses lib {fmt} (which has been accepted for C++20)
-// Formatting syntax guide is here: https://fmt.dev/latest/syntax.html
-// The syntax is similar to printf, but uses {} to indicate parameters to be formatted
-// you must escape any {} that you want with {}, like `{{}}`
-//
-// Defines a custom formatting type 'R' (round_ which chooses between `E` and `G` depending
-// on the value being printed.
-// This is necessary for parity with the old "RoundSigDigits" utility function
-//
-// Defines a custom formatting type 'T' that behaves like Fortran's G type.
-// (The T was chosen because it was unused and fits with "forTran")
-//
-template <typename... Args>
-void print(std::ostream &os, fmt::string_view format_str, const Args &... args)
-{
-    EnergyPlus::vprint(os, format_str, fmt::make_format_args(args...), sizeof...(Args));
 }
-
-template <typename... Args>
-std::string print_to_string(fmt::string_view format_str, const Args &... args)
-{
-    return EnergyPlus::vprint(format_str, fmt::make_format_args(args...), sizeof...(Args));
 }
-
-} // namespace EnergyPlus
-
-#endif
-

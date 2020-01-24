@@ -120,14 +120,20 @@ public:
     {
         if (specs()) {
             if (specs()->type == 'T') {
-                const auto order_of_magnitude = value == 0.0 ? 1 : static_cast<int>(std::log10(std::abs(value)));
 
                 if (should_be_fixed_output(value)) {
                     specs()->type = 'F';
 
                     // account for alignment with E formatted
                     specs()->width -= 4;
-                    specs()->precision -= (order_of_magnitude + 1);
+                    if (value == 0.0) {
+                        --specs()->precision;
+                    } else if (value < 1.0 && value > -1.0) {
+                        // No adjustment necessary
+                    } else {
+                        const auto order_of_magnitude = value == 0.0 ? 1 : static_cast<int>(std::log10(std::abs(value)));
+                        specs()->precision -= (order_of_magnitude + 1);
+                    }
 
                     // if precision adjustment would result in negative, make it 0 to get rounding
                     // and adjust spacing
@@ -208,6 +214,18 @@ void vprint(std::ostream &os, fmt::string_view format_str, fmt::format_args args
         throw fmt::format_error(fmt::format("Error with format, '{}', passed {} args", format_str, count));
     }
     os.write(buffer.data(), buffer.size());
+}
+
+std::string vprint(fmt::string_view format_str, fmt::format_args args, const std::size_t count)
+{
+    fmt::memory_buffer buffer;
+    try {
+        // Pass custom argument formatter as a template arg to vformat_to.
+        fmt::vformat_to<custom_arg_formatter>(buffer, format_str, args);
+    } catch (const fmt::format_error &) {
+        throw fmt::format_error(fmt::format("Error with format, '{}', passed {} args", format_str, count));
+    }
+    return fmt::to_string(buffer);
 }
 
 } // namespace EnergyPlus
