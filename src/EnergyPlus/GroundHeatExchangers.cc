@@ -120,7 +120,7 @@ namespace GroundHeatExchangers {
     int const maxTSinHr(60);            // Max number of time step in a hour
 
     // MODULE VARIABLE DECLARATIONS:
-    int numVerticalGLHEs(0);
+    int numVertGHEs(0);
     int numSlinkyGLHEs(0);
     int numVertArray(0);
     int numVertProps(0);
@@ -150,9 +150,11 @@ namespace GroundHeatExchangers {
     std::vector<std::shared_ptr<GLHEResponseFactors>> responseFactors;
     std::vector<std::shared_ptr<BHStruct>> singleBoreholes;
 
+    std::vector<EnhancedGHE> enhancedVertGHEVect;
+
     void clear_state()
     {
-        numVerticalGLHEs = 0;
+        numVertGHEs = 0;
         numSlinkyGLHEs = 0;
         numVertArray = 0;
         numVertProps = 0;
@@ -171,6 +173,8 @@ namespace GroundHeatExchangers {
         vertProps.clear();
         responseFactors.clear();
         singleBoreholes.clear();
+
+        enhancedVertGHEVect.clear();
     }
 
     Real64 smoothingFunc(Real64 const &x, Real64 const &a, Real64 const &b)
@@ -326,8 +330,8 @@ namespace GroundHeatExchangers {
         this->temperature = temp;
     }
 
-    void BHSegment::setup(Real64 const &initTemp, int const &loopNum) {
-        this->pipe.setup(initTemp, loopNum);
+    void BHSegment::setup(Real64 const &initTemp) {
+        this->pipe.setup(initTemp);
         this->soil.setup();
         this->grout.setup();
         this->groutVolume = this->calcGroutVolume();
@@ -339,7 +343,7 @@ namespace GroundHeatExchangers {
     }
 
     Real64 BHSegment::calcTotalPipeVolume() {
-        return this->pipe.volTotal * this->numPipes;
+        return this->pipe.volTotal * BHSegment::numPipes;
     }
 
     Real64 BHSegment::calcSegVolume() {
@@ -363,7 +367,7 @@ namespace GroundHeatExchangers {
     std::vector<Real64> BHSegment::rhs(std::vector<Real64> const &y, std::vector<Real64> const &params)
     {
         // setup results vector
-        std::vector<Real64> r(this->numEquations, 0.0);
+        std::vector<Real64> r(BHSegment::numEquations, 0.0);
 
         // local parameters
         Real64 dz = this->length;
@@ -613,10 +617,10 @@ namespace GroundHeatExchangers {
 
             // transit time for plug-flow cell
             // Rees Eq. 17
-            Real64 tau_n = tau * std::sqrt(2 / (this->numCells * Pe));
+            Real64 tau_n = tau * std::sqrt(2 / (Pipe::numCells * Pe));
 
             // transit time for ideal-mixed cells
-            Real64 tau_0 = tau - this->numCells * tau_n;
+            Real64 tau_0 = tau - Pipe::numCells * tau_n;
 
             // volume flow rate
             Real64 rho = this->fluid.getDens(inletTemp, routineName);
@@ -637,11 +641,11 @@ namespace GroundHeatExchangers {
             Real64 t_sub = time;
 
             // setup tri-diagonal equations
-            std::vector<Real64> a(this->numCells, -v_dot);
+            std::vector<Real64> a(Pipe::numCells, -v_dot);
             a[0] = 0;
-            std::vector<Real64> b(this->numCells, v_n / dt_sub + v_dot);
+            std::vector<Real64> b(Pipe::numCells, v_n / dt_sub + v_dot);
             b[0] = 1;
-            std::vector<Real64> c(this->numCells, 0);
+            std::vector<Real64> c(Pipe::numCells, 0);
             for (int step = 0; step < num_sub_steps; ++step) {
                 // vector multiply
                 std::vector<Real64> d;
@@ -754,7 +758,7 @@ namespace GroundHeatExchangers {
 
         // returns: conduction resistance, K/(W/m)
 
-        return std::log(this->outDia / this->innerDia) / (2 * DataGlobals::Pi * this->props.k);
+        return std::log(this->outDia / this->innerDia) / (2 * DataGlobals::Pi * this->k);
     }
 
     Real64 Pipe::turbulentNusselt(Real64 Re, Real64 temperature)
@@ -1166,10 +1170,11 @@ namespace GroundHeatExchangers {
     Real64 GLHEVert::integral(MyCartesian const &point_i, std::shared_ptr<BHStruct> const &bh_j, Real64 const &currTime)
     {
         // This code could be optimized in a number of ways.
-        // The first, most simple way would be to precompute the distances from point i to point j, then store them for reuse.
-        // The second, more intensive method would be to break the calcResponse calls out into four different parts.
-        // The first point, last point, odd points, and even points. Then multiply the odd/even points by their respective coefficient for the
-        // Simpson's method. After that, all points are summed together and divided by 3.
+        // The first, most simple way would be to precompute the distances from point i to point j,
+        // then store them for reuse. The second, more intensive method would be to break the calcResponse
+        // calls out into four different parts. The first point, last point, odd points, and even points.
+        // Then multiply the odd/even points by their respective coefficient for the Simpson's method.
+        // After that, all points are summed together and divided by 3.
 
         Real64 sum_f = 0;
         int index = 0;
@@ -2573,7 +2578,7 @@ namespace GroundHeatExchangers {
 
         Real64 GLHEdeltaTemp = std::abs(outletTemp - inletTemp);
 
-        if (GLHEdeltaTemp > deltaTempLimit && this->numErrorCalls < numVerticalGLHEs && !DataGlobals::WarmupFlag) {
+        if (GLHEdeltaTemp > deltaTempLimit && this->numErrorCalls < numVertGHEs && !DataGlobals::WarmupFlag) {
             Real64 fluidDensity = FluidProperties::GetDensityGlycol(
                 DataPlant::PlantLoop(loopNum).FluidName, inletTemp, DataPlant::PlantLoop(loopNum).FluidIndex, RoutineName);
             designMassFlow = designFlow * fluidDensity;
@@ -2666,14 +2671,14 @@ namespace GroundHeatExchangers {
         //       RE-ENGINEERED    na
 
         // GET NUMBER OF ALL EQUIPMENT TYPES
-        numVerticalGLHEs = inputProcessor->getNumObjectsFound("GroundHeatExchanger:System");
+        numVertGHEs = inputProcessor->getNumObjectsFound("GroundHeatExchanger:System");
         numSlinkyGLHEs = inputProcessor->getNumObjectsFound("GroundHeatExchanger:Slinky");
         numVertArray = inputProcessor->getNumObjectsFound("GroundHeatExchanger:Vertical:Array");
         numVertProps = inputProcessor->getNumObjectsFound("GroundHeatExchanger:Vertical:Properties");
         numResponseFactors = inputProcessor->getNumObjectsFound("GroundHeatExchanger:ResponseFactors");
         numSingleBorehole = inputProcessor->getNumObjectsFound("GroundHeatExchanger:Vertical:Single");
 
-        if (numVerticalGLHEs <= 0 && numSlinkyGLHEs <= 0) {
+        if (numVertGHEs <= 0 && numSlinkyGLHEs <= 0) {
             ShowSevereError("Error processing inputs for GLHE objects");
             ShowContinueError("Simulation indicated these objects were found, but input processor did not find any");
             ShowContinueError("Check inputs for GroundHeatExchanger:System and GroundHeatExchanger:Slinky");
@@ -2929,11 +2934,81 @@ namespace GroundHeatExchangers {
             }
         }
 
-        if (numVerticalGLHEs > 0) {
+        if (numVertGHEs > 0) {
 
             DataIPShortCuts::cCurrentModuleObject = "GroundHeatExchanger:System";
 
-            for (int GLHENum = 1; GLHENum <= numVerticalGLHEs; ++GLHENum) {
+            for (int GHENum = 1; GHENum <= numVertGHEs; ++GHENum) {
+                // just a few vars to pass in and out to GetObjectItem
+                int ioStatus;
+                int numAlphas;
+                int numNumbers;
+
+                // get the input data and store it in the Shortcuts structures
+                inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+                                              GHENum,
+                                              DataIPShortCuts::cAlphaArgs,
+                                              numAlphas,
+                                              DataIPShortCuts::rNumericArgs,
+                                              numNumbers,
+                                              ioStatus,
+                                              DataIPShortCuts::lNumericFieldBlanks,
+                                              DataIPShortCuts::lAlphaFieldBlanks,
+                                              DataIPShortCuts::cAlphaFieldNames,
+                                              DataIPShortCuts::cNumericFieldNames);
+
+                // the input processor validates the numeric inputs based on the IDD definition
+                // still validate the name to make sure there aren't any duplicates or blanks
+                // blanks are easy: fatal if blank
+                if (DataIPShortCuts::lAlphaFieldBlanks(1)) {
+                    ShowFatalError("Invalid input for " + DataIPShortCuts::cCurrentModuleObject + " object: Name cannot be blank");
+                }
+
+                // we just need to loop over the existing vector elements to check for duplicates since we haven't add this one yet
+                for (auto &existingVerticalGLHE : verticalGLHE) {
+                    if (DataIPShortCuts::cAlphaArgs(1) == existingVerticalGLHE.name) {
+                        ShowFatalError("Invalid input for " + DataIPShortCuts::cCurrentModuleObject +
+                                       " object: Duplicate name found: " + existingVerticalGLHE.name);
+                    }
+                }
+
+                // Build out new instance
+                EnhancedGHE thisGHE;
+                thisGHE.name = DataIPShortCuts::cAlphaArgs(1);
+
+                // get inlet node num
+                thisGHE.inletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(2),
+                                                                            errorsFound,
+                                                                            DataIPShortCuts::cCurrentModuleObject,
+                                                                            DataIPShortCuts::cAlphaArgs(1),
+                                                                            DataLoopNode::NodeType_Water,
+                                                                            DataLoopNode::NodeConnectionType_Inlet,
+                                                                            1,
+                                                                            DataLoopNode::ObjectIsNotParent);
+
+                // get outlet node num
+                thisGHE.outletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(3),
+                                                                             errorsFound,
+                                                                             DataIPShortCuts::cCurrentModuleObject,
+                                                                             DataIPShortCuts::cAlphaArgs(1),
+                                                                             DataLoopNode::NodeType_Water,
+                                                                             DataLoopNode::NodeConnectionType_Outlet,
+                                                                             1,
+                                                                             DataLoopNode::ObjectIsNotParent);
+
+                BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject,
+                                                   DataIPShortCuts::cAlphaArgs(1),
+                                                   DataIPShortCuts::cAlphaArgs(2),
+                                                   DataIPShortCuts::cAlphaArgs(3),
+                                                   "Condenser Water Nodes");
+
+                thisGHE.designFlow = DataIPShortCuts::rNumericArgs(1);
+                PlantUtilities::RegisterPlantCompDesignFlow(thisGHE.inletNodeNum, thisGHE.designFlow);
+
+
+            }
+
+            for (int GLHENum = 1; GLHENum <= numVertGHEs; ++GLHENum) {
 
                 // just a few vars to pass in and out to GetObjectItem
                 int ioStatus;
@@ -2991,8 +3066,6 @@ namespace GroundHeatExchangers {
                                                                              DataLoopNode::NodeConnectionType_Outlet,
                                                                              1,
                                                                              DataLoopNode::ObjectIsNotParent);
-                thisGLHE.available = true;
-                thisGLHE.on = true;
 
                 BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject,
                                                    DataIPShortCuts::cAlphaArgs(1),
@@ -3118,7 +3191,7 @@ namespace GroundHeatExchangers {
             }
 
             // Set up report variables
-            for (int GLHENum = 0; GLHENum < numVerticalGLHEs; ++GLHENum) {
+            for (int GLHENum = 0; GLHENum < numVertGHEs; ++GLHENum) {
                 auto &thisGLHE(verticalGLHE[GLHENum]);
                 SetupOutputVariable("Ground Heat Exchanger Average Borehole Temperature",
                                     OutputProcessor::Unit::C,
@@ -3213,8 +3286,6 @@ namespace GroundHeatExchangers {
                                                                              DataLoopNode::NodeConnectionType_Outlet,
                                                                              1,
                                                                              DataLoopNode::ObjectIsNotParent);
-                thisGLHE.available = true;
-                thisGLHE.on = true;
 
                 BranchNodeConnections::TestCompSet(DataIPShortCuts::cCurrentModuleObject,
                                                    DataIPShortCuts::cAlphaArgs(1),

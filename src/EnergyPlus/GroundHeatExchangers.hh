@@ -121,9 +121,10 @@ namespace GroundHeatExchangers {
         Real64 getPrtl(Real64 const &temperature, const std::string &routineName);
     };
 
-    struct Pipe : ThermoProps, FluidWorker
+    struct Pipe : ThermoProps
     {
         // members
+        FluidWorker fluid;    // Pipe fluid
         Real64 outDia;        // Outer diameter [m]
         Real64 innerDia;      // Inner diameter [m]
         Real64 length;        // Length [m]
@@ -224,7 +225,7 @@ namespace GroundHeatExchangers {
         ~BHSegment() = default;
 
         // member methods
-        void setup(Real64 const &initTemp, int const &loopNum);
+        void setup(Real64 const &initTemp);
         Real64 calcGroutVolume();
         Real64 calcTotalPipeVolume();
         Real64 calcSegVolume();
@@ -458,8 +459,6 @@ namespace GroundHeatExchangers {
     struct GLHEBase : PlantComponent, PlantLocation
     {
         // Members
-        bool available;   // need an array of logical--load identifiers of available equipment
-        bool on;          // simulate the machine at it's operating part load ratio
         std::string name; // user identifier
         int inletNodeNum;  // Node number on the inlet side of the plant
         int outletNodeNum; // Node number on the outlet side of the plant
@@ -503,7 +502,7 @@ namespace GroundHeatExchangers {
 
         // Default constructor
         GLHEBase()
-            : available(false), on(false), inletNodeNum(0), outletNodeNum(0), designFlow(0.0),
+            : inletNodeNum(0), outletNodeNum(0), designFlow(0.0),
               designMassFlow(0.0), tempGround(0.0), prevHour(1), AGG(0), SubAGG(0), bhTemp(0.0), massFlowRate(0.0), outletTemp(0.0), inletTemp(0.0),
               aveFluidTemp(0.0), QGLHE(0.0), myFlag(true), myEnvrnFlag(true), gFunctionsExist(false), lastQnSubHr(0.0), HXResistance(0.0),
               totalTubeLength(0.0), timeSS(0.0), timeSSFactor(0.0), firstTime(true), numErrorCalls(0), ToutNew(19.375), PrevN(1),
@@ -624,6 +623,18 @@ namespace GroundHeatExchangers {
     {
         // members
         std::string name;
+        int inletNodeNum;
+        int outletNodeNum;
+        Real64 designFlow;
+        ThermoProps soil;
+
+        // default constructor
+        EnhancedGHE() : inletNodeNum(0), outletNodeNum(0), designFlow(0.0)
+        {
+        }
+
+        // default destructor
+        ~EnhancedGHE() = default;
 
         void setupOutputVars();
 
