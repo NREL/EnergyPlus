@@ -199,8 +199,6 @@ void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &in
         Real64 HumRatNorOut;
         Real64 TempNorOut;
         Real64 EnthalpyNorOut;
-        Real64 PowerNormal;
-        Real64 WasteHeatNorOut;
         Real64 modeRatio;
 
         this->recoveredEnergyRate = 0.0;
@@ -229,8 +227,6 @@ void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &in
         this->recoveredEnergyRate = sensNorRate;
 
         if (LoadSHR < SysNorSHR) {
-            auto InletNode = inletNode;
-            auto OutletNode = outletNode;
             outletNode.MassFlowRate = inletNode.MassFlowRate;
             this->calculate(this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
             totalCoolingRate = outletNode.MassFlowRate * (inletNode.Enthalpy - outletNode.Enthalpy);
