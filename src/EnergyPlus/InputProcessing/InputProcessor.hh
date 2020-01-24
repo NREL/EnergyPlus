@@ -57,6 +57,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
+#include <ObjexxFCL/Array1S.fwd.hh>
 #include <ObjexxFCL/Optional.hh>
 
 #include <nlohmann/json.hpp>
@@ -129,7 +130,7 @@ public:
 
     void getObjectItem(std::string const &Object,
                        int const Number,
-                       Array1D_string &Alphas,
+                       Array1S_string Alphas,
                        int &NumAlphas,
                        Array1D<Real64> &Numbers,
                        int &NumNumbers,
@@ -240,7 +241,7 @@ private:
                             int &alpha_index,
                             int &numeric_index,
                             bool within_max_fields,
-                            Array1D_string &Alphas,
+                            Array1S_string Alphas,
                             int &NumAlphas,
                             Array1D<Real64> &Numbers,
                             int &NumNumbers,
