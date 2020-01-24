@@ -5291,7 +5291,7 @@ namespace CondenserLoopTowers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SolFla;             // Flag of solver
         Array1D<Real64> Par(4); // Parameter array for regula falsi solver
-        Real64 const VSTowerMaxRangeTemp(40.0); 
+        Real64 const VSTowerMaxRangeTemp(22.2222); // set YorkCalc maximum 
 
         //   determine tower outlet water temperature
         Par(1) = this->thisTowerNum; // Index to cooling tower
