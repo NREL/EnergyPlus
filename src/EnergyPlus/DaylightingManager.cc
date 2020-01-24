@@ -752,7 +752,7 @@ namespace DaylightingManager {
                                 DaylFac2 = 0.0;
                                 if (ZoneDaylight(ZoneNum).TotalDaylRefPoints > 1) DaylFac2 = ZoneDaylight(ZoneNum).DaylIllFacSky(12, 1, 2, 2, loop);
                                 print(outputFiles.eio,
-                                      " Clear Turbid Daylight Factors,{},{},{},{:.4R},{:.4R}\n",
+                                      " Clear Turbid Sky Daylight Factors,{},{},{},{:.4R},{:.4R}\n",
                                       CurMnDy,
                                       Zone(ZoneNum).Name,
                                       Surface(IWin).Name,
@@ -10733,7 +10733,7 @@ namespace DaylightingManager {
             }
 
         } // End of primary zone loop
-        static constexpr auto Format_700("! <Zone/Window Adjacency Daylighting Counts>, Zone Name, Number of Exterior Windows, Number of Exterior Windows in Adjacent Zones");
+        static constexpr auto Format_700("! <Zone/Window Adjacency Daylighting Counts>, Zone Name, Number of Exterior Windows, Number of Exterior Windows in Adjacent Zones\n");
         print(outputFiles.eio, Format_700);
         for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
             if (ZoneDaylight(ZoneNum).TotalDaylRefPoints == 0 || ZoneDaylight(ZoneNum).DaylightMethod != SplitFluxDaylighting) continue;

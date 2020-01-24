@@ -291,7 +291,7 @@ namespace HeatBalanceAirManager {
 
         GetSimpleAirModelInputs(outputFiles, ErrorsFound);
         if (TotInfiltration + TotVentilation + TotMixing + TotCrossMixing + TotRefDoorMixing > 0) {
-            static constexpr auto Format_720("! <AirFlow Model>, Simple AirFlow Model, {}\n");
+            static constexpr auto Format_720("! <AirFlow Model>, Simple\n AirFlow Model, {}\n");
             print(outputFiles.eio, Format_720, "Simple");
         }
     }
@@ -3544,9 +3544,9 @@ namespace HeatBalanceAirManager {
                 continue;
             }
             TotInfilVentFlow(ZoneNum) += Infiltration(Loop).DesignLevel;
-            print(outputFiles.eio, Format_720, "ZoneInfiltration", Infiltration(Loop).Name, GetScheduleName(Infiltration(Loop).SchedPtr), Zone(ZoneNum).Name
-                    , Zone(ZoneNum).FloorArea, Zone(ZoneNum).TotOccupants);
-            print(outputFiles.eio, "{:.3R}", Infiltration(Loop).DesignLevel);
+            print(outputFiles.eio, Format_720, "ZoneInfiltration", Infiltration(Loop).Name, GetScheduleName(Infiltration(Loop).SchedPtr),
+                Zone(ZoneNum).Name, Zone(ZoneNum).FloorArea, Zone(ZoneNum).TotOccupants);
+            print(outputFiles.eio, "{:.3R},", Infiltration(Loop).DesignLevel);
 
             divide_and_print_if_greater_than_zero(Zone(ZoneNum).FloorArea, Infiltration(Loop).DesignLevel);
             divide_and_print_if_greater_than_zero(Zone(ZoneNum).ExteriorTotalSurfArea, Infiltration(Loop).DesignLevel);

@@ -122,17 +122,26 @@ public:
             if (specs()->type == 'T') {
                 const auto order_of_magnitude = value == 0.0 ? 1 : static_cast<int>(std::log10(std::abs(value)));
 
-                if (should_be_fixed_output(value) && specs()->precision > order_of_magnitude) {
+                if (should_be_fixed_output(value)) {
                     specs()->type = 'F';
-                    // seems 0 reading fixed point values from Fortran IO 'G' format
-                    // has an extra place of precision added.
-                    if (value < 1 && value > -1) {
-                        ++specs()->precision;
-                    }
-                    // account for alignment with E formatted output
+
+                    // account for alignment with E formatted
                     specs()->width -= 4;
                     specs()->precision -= (order_of_magnitude + 1);
+
+                    // if precision adjustment would result in negative, make it 0 to get rounding
+                    // and adjust spacing
+                    if (specs()->precision <= 0) {
+                        specs()->width -= 1;
+                        specs()->precision = 0;
+                    }
+
                     (*this)(value);
+
+                    // When precision hit 0, add . to match Fortran formatting
+                    if (specs()->precision == 0) {
+                        write_string(".");
+                    }
 
                     // write the last 4 chars
                     return write_string("    ");
@@ -161,7 +170,7 @@ public:
                     return write_string(str);
                 }
             } else if (specs()->type == 'R') {
-//                const auto order_of_magnitude = value == 0.0 ? 1 : static_cast<int>(std::log10(std::abs(value)));
+                //                const auto order_of_magnitude = value == 0.0 ? 1 : static_cast<int>(std::log10(std::abs(value)));
                 if (should_be_fixed_output(value)) {
                     const auto magnitude = std::pow(10, specs()->precision);
                     const auto rounded = std::round(value * magnitude) / magnitude;
@@ -187,7 +196,7 @@ public:
         }
         return arg_formatter::operator()(value);
     }
-};
+}; // namespace EnergyPlus
 
 void vprint(std::ostream &os, fmt::string_view format_str, fmt::format_args args, const std::size_t count)
 {
