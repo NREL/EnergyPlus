@@ -330,7 +330,7 @@ namespace ExternalInterface {
 
     void CalcExternalInterface();
 
-    void ParseString(std::string const &str, Array1S_string ele, int const nEle);
+    void ParseString(std::string const &str, Array1D_string &ele, int const nEle);
 
     void GetReportVariableKey(
         Array1S_string const varKeys, int const numberOfKeys, Array1S_string const varNames, Array1S_int keyVarIndexes, Array1S_int varTypes);

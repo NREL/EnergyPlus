@@ -421,7 +421,7 @@ namespace ExternalInterface {
     }
 
     void ParseString(std::string const &str, // The string, with all elements separated by ';'
-                     Array1S_string ele,     // The elements
+                     Array1D_string &ele,     // The elements
                      int const nEle          // The number of elements
     )
     {
