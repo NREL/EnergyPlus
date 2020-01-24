@@ -3474,8 +3474,6 @@ namespace ZoneEquipmentManager {
         FirstCall = true;
         ErrorFlag = false;
 
-        std::cout << "      Before SimZoneEquipment, Supply & Return Node Temp, (" << Node(1).Temp << " & " << Node(2).Temp << "), ";
-
         for (SupplyAirPathNum = 1; SupplyAirPathNum <= NumSupplyAirPaths; ++SupplyAirPathNum) {
 
             for (CompNum = 1; CompNum <= SupplyAirPath(SupplyAirPathNum).NumOfComponents; ++CompNum) {
@@ -4003,8 +4001,6 @@ namespace ZoneEquipmentManager {
 
         SimReturnAirPath();
 
-        std::cout << "After, Supply & Return Node Temp, (" << Node(1).Temp << " & " << Node(2).Temp << ")\n";
-        std::cout << "      Supply & Return Node Flowrate, (" << Node(1).MassFlowRate << " & " << Node(2).MassFlowRate << ")\n";
     }
 
     void SetZoneEquipSimOrder(int const ControlledZoneNum, int const ActualZoneNum)

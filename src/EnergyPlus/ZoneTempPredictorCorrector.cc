@@ -3798,7 +3798,6 @@ namespace ZoneTempPredictorCorrector {
 
             // Calculate the predicted zone load to be provided by the system with the given desired zone air temperature
 
-            std::cout << "CalcPredictedSystemLoad: ";
             CalcPredictedSystemLoad(ZoneNum, RAFNFrac);
 
             // Calculate the predicted zone load to be provided by the system with the given desired humidity ratio
@@ -4262,8 +4261,6 @@ namespace ZoneTempPredictorCorrector {
                 if (DataHeatBalance::Zone(ZoneNum).HasAdjustedReturnTempByITE && !(DataGlobals::BeginSimFlag)) {
                     LoadToCoolingSetPoint = TempDepZnLd(ZoneNum) * DataHeatBalance::Zone(ZoneNum).AdjustedReturnTempByITE - TempIndZnLd(ZoneNum);
                 }
-                std::cout << "LoadToCoolingSetPoint: " << LoadToCoolingSetPoint << ", Temp Dep Zn Ld - adjusted, "\
-                << TempDepZnLd(ZoneNum) * DataHeatBalance::Zone(ZoneNum).AdjustedReturnTempByITE << ", Temp Ind Zn Ld," << TempIndZnLd(ZoneNum) << "\n";
 
                 // Possible combinations:
                 // 1/  LoadToHeatingSetPoint > 0 & LoadToCoolingSetPoint > 0 -->  Heating required
