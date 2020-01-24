@@ -52,9 +52,6 @@
 #include <istream>
 #include <unordered_set>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1S.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataOutputs.hh>
@@ -622,9 +619,9 @@ void InputProcessor::setObjectItemValue(json const &ep_object,
                                         int &alpha_index,
                                         int &numeric_index,
                                         bool within_max_fields,
-                                        Array1S_string Alphas,
+                                        Array1D_string &Alphas,
                                         int &NumAlphas,
-                                        Array1S<Real64> Numbers,
+                                        Array1D<Real64> &Numbers,
                                         int &NumNumbers,
                                         Optional<Array1D_bool> NumBlank,
                                         Optional<Array1D_bool> AlphaBlank,
@@ -709,9 +706,9 @@ void InputProcessor::setObjectItemValue(json const &ep_object,
 
 void InputProcessor::getObjectItem(std::string const &Object,
                                    int const Number,
-                                   Array1S_string Alphas,
+                                   Array1D_string &Alphas,
                                    int &NumAlphas,
-                                   Array1S<Real64> Numbers,
+                                   Array1D<Real64> &Numbers,
                                    int &NumNumbers,
                                    int &Status,
                                    Optional<Array1D_bool> NumBlank,

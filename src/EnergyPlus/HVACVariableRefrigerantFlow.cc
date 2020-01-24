@@ -8646,10 +8646,10 @@ namespace HVACVariableRefrigerantFlow {
     void LimitTUCapacity(int const VRFCond,              // Condenser Unit index
                          int const NumTUInList,          // Number of terminal units in list
                          Real64 const StartingCapacity,  // temporary variable holding condenser capacity [W]
-                         Array1S<Real64> const CapArray, // Array of coil capacities in either cooling or heating mode [W]
+                         const Array1D<Real64> &CapArray, // Array of coil capacities in either cooling or heating mode [W]
                          Real64 &MaxLimit,               // Maximum terminal unit capacity for coils in same operating mode [W]
                          Real64 const AltCapacity,       // temporary variable holding heat recovery capacity [W]
-                         Array1S<Real64> const AltArray, // Array of coil capacities of heat recovery [W]
+                         const Array1D<Real64> &AltArray, // Array of coil capacities of heat recovery [W]
                          Real64 &AltLimit                // Maximum terminal unit capacity of heat recovery coils [W]
     )
     {
@@ -8705,7 +8705,7 @@ namespace HVACVariableRefrigerantFlow {
 
     void LimitCoilCapacity(int const NumTUInList,          // Number of terminal units in list
                            Real64 const TotalCapacity,     // temporary variable holding condenser capacity [W]
-                           Array1S<Real64> const CapArray, // Array of coil capacities in either cooling or heating mode [W]
+                           const Array1D<Real64> &CapArray, // Array of coil capacities in either cooling or heating mode [W]
                            Real64 &MaxLimit                // Maximum terminal unit capacity for coils in same operating mode [W]
     )
     {
