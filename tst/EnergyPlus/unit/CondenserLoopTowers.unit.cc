@@ -63,7 +63,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
-#include <EnergyPlus/Psychrometrics.hh>>
+#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/WeatherManager.hh>
@@ -3898,8 +3898,6 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     ASSERT_TRUE(process_idf(idf_objects));
     SimulationManager::PostIPProcessing();
 
-    bool ErrorsFound = false;
-
     DataGlobals::BeginSimFlag = true;
     SimulationManager::GetProjectData();
     OutputReportPredefined::SetPredefinedTables();
@@ -3951,6 +3949,7 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
 
     VSTower.calculateVariableSpeedTower();
     EXPECT_DOUBLE_EQ(30.0, VSTower.OutletWaterTemp);
+    EXPECT_DOUBLE_EQ(1.0, VSTower.FanCyclingRatio);
     Real64 TowerOutletWaterTemp = VSTower.calculateVariableTowerOutletTemp(WaterFlowRateRatio, VSTower.__AirFlowRateRatio, AirWetBulbTemp);
     EXPECT_NEAR(30.0, TowerOutletWaterTemp, 0.0001);
 
@@ -3960,10 +3959,19 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     DataEnvironment::OutHumRat =
         Psychrometrics::PsyWFnTdbTwbPb(DataEnvironment::OutDryBulbTemp, DataEnvironment::OutWetBulbTemp, DataEnvironment::OutBaroPress);
     AirWetBulbTemp = DataEnvironment::OutWetBulbTemp;
+    VSTower.WaterMassFlowRate = VSTower.DesWaterMassFlowRate * WaterFlowRateRatio;
+
+    VSTower.AirTemp = DataEnvironment::OutDryBulbTemp;
+    VSTower.AirWetBulb = DataEnvironment::OutWetBulbTemp;
+    VSTower.AirHumRat = DataEnvironment::OutHumRat;
+    
     VSTower.calculateVariableSpeedTower();
     EXPECT_DOUBLE_EQ(30.0, VSTower.OutletWaterTemp);
-    TowerOutletWaterTemp = VSTower.calculateVariableTowerOutletTemp(WaterFlowRateRatio, VSTower.__AirFlowRateRatio, AirWetBulbTemp);
-    EXPECT_NEAR(30.0, TowerOutletWaterTemp, 0.0001);
+    EXPECT_NEAR(0.5213, VSTower.FanCyclingRatio, 0.0001);
+    // outside air condition is favorable that fan only needs to cycle at min flow to meet the setpoint
+    TowerOutletWaterTemp = VSTower.calculateVariableTowerOutletTemp(WaterFlowRateRatio, VSTower.MinimumVSAirFlowFrac, AirWetBulbTemp);
+    // this is tower outlet temperature at continous minimum fan flow
+    EXPECT_NEAR(26.9537, TowerOutletWaterTemp, 0.0001);
 }
 
 } // namespace EnergyPlus
