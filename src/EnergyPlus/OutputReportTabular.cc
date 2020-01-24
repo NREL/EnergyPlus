@@ -12897,10 +12897,10 @@ namespace OutputReportTabular {
                         (AirLoopZonesCoolCompLoadTables(iZone).timeStepMax == ZoneCoolCompLoadTables(iZone).timeStepMax)) {
                         AirLoopZonesCoolCompLoadTables(iZone) = ZoneCoolCompLoadTables(iZone);
                     } else {
-                        coolDesSelected = AirLoopZonesCoolCompLoadTables(iZone).desDayNum;
-                        timeCoolMax = AirLoopZonesCoolCompLoadTables(iZone).timeStepMax;
+                        int coolDesSelectedByZone = AirLoopZonesCoolCompLoadTables(iZone).desDayNum;
+                        int timeCoolMaxByZone = AirLoopZonesCoolCompLoadTables(iZone).timeStepMax;
 
-                        GetDelaySequences(coolDesSelected,
+                        GetDelaySequences(coolDesSelectedByZone,
                                           true,
                                           iZone,
                                           peopleDelaySeqCool,
@@ -12913,8 +12913,8 @@ namespace OutputReportTabular {
                                           surfDelaySeqCool);
                         ComputeTableBodyUsingMovingAvg(AirLoopZonesCoolCompLoadTables(iZone).cells,
                                                        AirLoopZonesCoolCompLoadTables(iZone).cellUsed,
-                                                       coolDesSelected,
-                                                       timeCoolMax,
+                                                       coolDesSelectedByZone,
+                                                       timeCoolMaxByZone,
                                                        iZone,
                                                        peopleDelaySeqCool,
                                                        equipDelaySeqCool,
@@ -12924,7 +12924,7 @@ namespace OutputReportTabular {
                                                        feneSolarDelaySeqCool,
                                                        feneCondInstantSeq,
                                                        surfDelaySeqCool);
-                        CollectPeakZoneConditions(AirLoopZonesCoolCompLoadTables(iZone), coolDesSelected, timeCoolMax, iZone, true);
+                        CollectPeakZoneConditions(AirLoopZonesCoolCompLoadTables(iZone), coolDesSelectedByZone, timeCoolMaxByZone, iZone, true);
                         AddAreaColumnForZone(iZone, ZoneComponentAreas, AirLoopZonesCoolCompLoadTables(iZone));
                     }
                     if (displayZoneComponentLoadSummary &&
@@ -12932,10 +12932,10 @@ namespace OutputReportTabular {
                         (AirLoopZonesHeatCompLoadTables(iZone).timeStepMax == ZoneHeatCompLoadTables(iZone).timeStepMax)) {
                         AirLoopZonesHeatCompLoadTables(iZone) = ZoneHeatCompLoadTables(iZone);
                     } else {
-                        heatDesSelected = AirLoopZonesHeatCompLoadTables(iZone).desDayNum;
-                        timeHeatMax = AirLoopZonesHeatCompLoadTables(iZone).timeStepMax;
+                        int heatDesSelectedByZone = AirLoopZonesHeatCompLoadTables(iZone).desDayNum;
+                        int timeHeatMaxByZone = AirLoopZonesHeatCompLoadTables(iZone).timeStepMax;
 
-                        GetDelaySequences(heatDesSelected,
+                        GetDelaySequences(heatDesSelectedByZone,
                                           false,
                                           iZone,
                                           peopleDelaySeqHeat,
@@ -12948,8 +12948,8 @@ namespace OutputReportTabular {
                                           surfDelaySeqHeat);
                         ComputeTableBodyUsingMovingAvg(AirLoopZonesHeatCompLoadTables(iZone).cells,
                                                        AirLoopZonesHeatCompLoadTables(iZone).cellUsed,
-                                                       heatDesSelected,
-                                                       timeHeatMax,
+                                                       heatDesSelectedByZone,
+                                                       timeHeatMaxByZone,
                                                        iZone,
                                                        peopleDelaySeqHeat,
                                                        equipDelaySeqHeat,
@@ -12959,7 +12959,7 @@ namespace OutputReportTabular {
                                                        feneSolarDelaySeqHeat,
                                                        feneCondInstantSeq,
                                                        surfDelaySeqHeat);
-                        CollectPeakZoneConditions(AirLoopZonesHeatCompLoadTables(iZone), heatDesSelected, timeHeatMax, iZone, false);
+                        CollectPeakZoneConditions(AirLoopZonesHeatCompLoadTables(iZone), heatDesSelectedByZone, timeHeatMaxByZone, iZone, false);
                         AddAreaColumnForZone(iZone, ZoneComponentAreas, AirLoopZonesHeatCompLoadTables(iZone));
                     }
                 }
