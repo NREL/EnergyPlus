@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,42 +56,43 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
-#include <DataDefineEquip.hh>
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalSurface.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataRoomAirModel.hh>
-#include <DataStringGlobals.hh>
-#include <DataSurfaces.hh>
-#include <DataZoneControls.hh>
-#include <DataZoneEnergyDemands.hh>
-#include <DataZoneEquipment.hh>
-#include <DirectAirManager.hh>
-#include <EMSManager.hh>
-#include <FaultsManager.hh>
-#include <General.hh>
-#include <GlobalNames.hh>
-#include <HeatBalFiniteDiffManager.hh>
-#include <HybridModel.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <InternalHeatGains.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportPredefined.hh>
-#include <OutputReportTabular.hh>
-#include <Psychrometrics.hh>
-#include <RoomAirModelAirflowNetwork.hh>
-#include <RoomAirModelManager.hh>
-#include <ScheduleManager.hh>
-#include <ThermalComfort.hh>
-#include <UtilityRoutines.hh>
-#include <WeatherManager.hh>
-#include <ZonePlenum.hh>
-#include <ZoneTempPredictorCorrector.hh>
+#include <EnergyPlus/DataDefineEquip.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataRoomAirModel.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataZoneControls.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DirectAirManager.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/FaultsManager.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/HeatBalFiniteDiffManager.hh>
+#include <EnergyPlus/HybridModel.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
+#include <EnergyPlus/RoomAirModelManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/ThermalComfort.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/ZonePlenum.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -351,7 +352,7 @@ namespace ZoneTempPredictorCorrector {
         // unused1208  INTEGER :: zoneloop
 
         if (GetZoneAirStatsInputFlag) {
-            GetZoneAirSetPoints();
+            GetZoneAirSetPoints(OutputFiles::getSingleton());
             GetZoneAirStatsInputFlag = false;
         }
 
@@ -381,7 +382,7 @@ namespace ZoneTempPredictorCorrector {
         }
     }
 
-    void GetZoneAirSetPoints()
+    void GetZoneAirSetPoints(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -491,9 +492,8 @@ namespace ZoneTempPredictorCorrector {
         Array1D<NeededComfortControlTypes> TComfortControlTypes;
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_700("('! <Zone Volume Capacitance Multiplier>, Sensible Heat Capacity Multiplier, Moisture Capacity Multiplier, "
-                                   "','Carbon Dioxide Capacity Multiplier, Generic Contaminant Capacity Multiplier')");
-        static ObjexxFCL::gio::Fmt Format_701("('Zone Volume Capacitance Multiplier,',F8.3,' ,',F8.3,',',F8.3,',',F8.3)");
+        static constexpr auto Header("! <Zone Volume Capacitance Multiplier>, Sensible Heat Capacity Multiplier, Moisture Capacity Multiplier, Carbon Dioxide Capacity Multiplier, Generic Contaminant Capacity Multiplier\n");
+        static constexpr auto Format_701("Zone Volume Capacitance Multiplier,{:8.3F} ,{:8.3F},{:8.3F},{:8.3F}\n");
 
         // FLOW:
         cCurrentModuleObject = cZControlTypes(iZC_TStat);
@@ -1884,8 +1884,8 @@ namespace ZoneTempPredictorCorrector {
             }
         }
 
-        ObjexxFCL::gio::write(OutputFileInits, Format_700);
-        ObjexxFCL::gio::write(OutputFileInits, Format_701) << ZoneVolCapMultpSens << ZoneVolCapMultpMoist << ZoneVolCapMultpCO2 << ZoneVolCapMultpGenContam;
+        print(outputFiles.eio, Header);
+        print(outputFiles.eio, Format_701, ZoneVolCapMultpSens, ZoneVolCapMultpMoist, ZoneVolCapMultpCO2, ZoneVolCapMultpGenContam);
 
         cCurrentModuleObject = cZControlTypes(iZC_OTTStat);
         NumOpTempControlledZones = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
@@ -4677,7 +4677,7 @@ namespace ZoneTempPredictorCorrector {
             // smooth the changes using the zone air capacitance.  Positive values of Moist Load means that
             // this amount of moisture must be added to the zone to reach the setpoint.  Negative values represent
             // the amount of moisture that must be removed by the system.
-            // MoistLoadHumidSetPoint = massflow * HumRat = kg air/sec  * kg H2O/kg Air = kg H2O/sec
+            // MoistLoadHumidSetPoint = massflow * HumRat = kgDryAir/s * kgWater/kgDryAir = kgWater/s
             WZoneSetPoint = PsyWFnTdbRhPb(ZT(ZoneNum), (ZoneRHHumidifyingSetPoint / 100.0), OutBaroPress, RoutineName);
             Real64 exp_700_A_C(0.0);
             if (ZoneAirSolutionAlgo == Use3rdOrder) {
@@ -6862,7 +6862,7 @@ namespace ZoneTempPredictorCorrector {
         bool HasThermostat; // True if does, false if not.
 
         if (GetZoneAirStatsInputFlag) {
-            GetZoneAirSetPoints();
+            GetZoneAirSetPoints(OutputFiles::getSingleton());
             GetZoneAirStatsInputFlag = false;
         }
         if (NumTempControlledZones > 0) {

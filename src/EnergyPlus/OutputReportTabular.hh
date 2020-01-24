@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -61,9 +61,9 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
-#include <OutputProcessor.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/OutputProcessor.hh>
 
 namespace EnergyPlus {
 
@@ -889,6 +889,10 @@ namespace OutputReportTabular {
     std::string ConvertToEscaped(std::string const &inString); // Input String
 
     void DetermineBuildingFloorArea();
+
+    /* Tables with Subcategories in particular have a blank for rowHead for display in the HTML output.
+     * This routine will fill up the blanks for output to Sql in particular */
+    void FillRowHead(Array1D_string & rowHead);
 
     //======================================================================================================================
     //======================================================================================================================

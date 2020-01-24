@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -60,33 +60,33 @@
 #include <ObjexxFCL/time.hh>
 
 // EnergyPlus Headers
-#include <CommandLineInterface.hh>
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataReportingFlags.hh>
-#include <DataSizing.hh>
-#include <DataStringGlobals.hh>
-#include <DataSurfaces.hh>
-#include <DataSystemVariables.hh>
-#include <DisplayRoutines.hh>
-#include <EMSManager.hh>
-#include <General.hh>
-#include <GlobalNames.hh>
-#include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportPredefined.hh>
-#include <OutputReportTabular.hh>
-#include <Psychrometrics.hh>
-#include <ScheduleManager.hh>
-#include <SurfaceGeometry.hh>
-#include <ThermalComfort.hh>
-#include <UtilityRoutines.hh>
-#include <Vectors.hh>
-#include <WeatherManager.hh>
+#include <EnergyPlus/CommandLineInterface.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataReportingFlags.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
+#include <EnergyPlus/ThermalComfort.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/Vectors.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
 
@@ -4135,7 +4135,7 @@ namespace WeatherManager {
         Real64 const ZHGlobalSolarConstant(1355.0);
         static ObjexxFCL::gio::Fmt EnvDDHdFormat(
             "('! <Environment:Design Day Data>, Max Dry-Bulb Temp {C}, ',   'Temp Range {dC}, Temp Range Ind Type, ',   "
-            "'Hum Ind Value at Max Temp, Hum Ind Type,Pressure {Pa}, ',   'Wind Direction {deg CW from N}, ',    'Wind "
+            "'Hum Ind Type, Hum Ind Value at Max Temp, Hum Ind Units, Pressure {Pa}, ',   'Wind Direction {deg CW from N}, ',    'Wind "
             "Speed {m/s}, Clearness, Rain, Snow')");
         static ObjexxFCL::gio::Fmt EnvDDayFormat("('Environment:Design Day Data,')");
         static ObjexxFCL::gio::Fmt DDayMiscHdFormat(
@@ -4324,23 +4324,31 @@ namespace WeatherManager {
                 flags.ADVANCE("No");
                 ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut;
             }
+
+            // Hum Ind Type, Hum Ind Value at Max Temp, Hum Ind Units
             if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WetBulb) {
-                StringOut = "Wetbulb," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + " {C},";
+                StringOut = "Wetbulb," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + ",{C},";
             } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_DewPoint) {
-                StringOut = "Dewpoint," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + " {C},";
+                StringOut = "Dewpoint," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + ",{C},";
             } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_Enthalpy) {
-                StringOut = "Enthalpy," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + " {kJ/kg},";
+                StringOut = "Enthalpy," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + ",{J/kgDryAir},";
             } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_HumRatio) {
-                StringOut = "HumidityRatio," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 4) + " {},";
+                StringOut = "HumidityRatio," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 4) + ",{kgWater/kgDryAir},";
             } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_RelHumSch) {
-                StringOut = "Schedule,<schedule values from 0.0 to 100.0 {percent},";
+                StringOut = "Schedule,<schedule values from 0.0 to 100.0>,{percent},";
             } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WBProfDef) {
-                StringOut = "WetBulbProfileDefaultMultipliers," + RoundSigDigits(DesDayInput(Envrn).HumIndValue, 2) + " {C},";
+                StringOut = "WetBulbProfileDefaultMultipliers," + RoundSigDigits(DesDayInput(Envrn).HumIndValue, 2) + ",{C},";
             } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WBProfDif) {
-                StringOut = "WetBulbProfileDifferenceSchedule," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + " {C},";
+                StringOut = "WetBulbProfileDifferenceSchedule," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + ",{C},";
             } else if (DesDayInput(EnvrnNum).HumIndType == DDHumIndType_WBProfMul) {
-                StringOut = "WetBulbProfileMultiplierSchedule," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + " {C},";
+                StringOut = "WetBulbProfileMultiplierSchedule," + RoundSigDigits(DesDayInput(EnvrnNum).HumIndValue, 2) + ",{C},";
             }
+            {
+                IOFlags flags;
+                flags.ADVANCE("No");
+                ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << StringOut;
+            }
+
             StringOut = RoundSigDigits(DesDayInput(EnvrnNum).PressBarom, 0);
             {
                 IOFlags flags;
@@ -4448,7 +4456,8 @@ namespace WeatherManager {
                 ConstantHumidityRatio = true;
 
             } else if (SELECT_CASE_var == DDHumIndType_Enthalpy) {
-                HumidityRatio = PsyWFnTdbH(DesDayInput(EnvrnNum).MaxDryBulb, DesDayInput(EnvrnNum).HumIndValue * 1000.0, RoutineNamePsyWFnTdbH);
+                // HumIndValue is already in J/kg, so no conversions needed
+                HumidityRatio = PsyWFnTdbH(DesDayInput(EnvrnNum).MaxDryBulb, DesDayInput(EnvrnNum).HumIndValue, RoutineNamePsyWFnTdbH);
                 ConstantHumidityRatio = true;
 
             } else if (SELECT_CASE_var == DDHumIndType_RelHumSch) {
@@ -7103,10 +7112,27 @@ namespace WeatherManager {
             //   N14; \field Sky Clearness
             DesDayInput(EnvrnNum).SkyClear = rNumericArgs(14); // Sky Clearness (0 to 1)
 
+            //   N15, \field Maximum Warmup Days Between Sizing Periods
+            if (lNumericFieldBlanks(15)) {
+                // Default to -1 if not input
+                DesDayInput(EnvrnNum).maxWarmupDays = -1;
+            } else {
+                DesDayInput(EnvrnNum).maxWarmupDays = int(rNumericArgs(15));
+            }
+            //   A13, \field Begin Environment Reset Mode
+            if (lAlphaFieldBlanks(13)) {
+                DesDayInput(EnvrnNum).suppressBegEnvReset = false;
+            } else {
+                if (UtilityRoutines::SameString(cAlphaArgs(13), "FullResetAtBeginEnvironment")) {
+                    DesDayInput(EnvrnNum).suppressBegEnvReset = false;
+                } else if (UtilityRoutines::SameString(cAlphaArgs(13), "SuppressThermalResetAtBeginEnvironment")) {
+                    DesDayInput(EnvrnNum).suppressBegEnvReset = true;
+                }
+            }
             //   A7,  \field Rain Indicator
-            if (UtilityRoutines::SameString(cAlphaArgs(7), "Yes") || UtilityRoutines::SameString(cAlphaArgs(7), "1")) {
+            if (UtilityRoutines::SameString(cAlphaArgs(7), "Yes")) {
                 DesDayInput(EnvrnNum).RainInd = 1;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(7), "No") || UtilityRoutines::SameString(cAlphaArgs(7), "0") || lAlphaFieldBlanks(7)) {
+            } else if (UtilityRoutines::SameString(cAlphaArgs(7), "No") || lAlphaFieldBlanks(7)) {
                 DesDayInput(EnvrnNum).RainInd = 0;
             } else {
                 ShowWarningError(cCurrentModuleObject + "=\"" + DesDayInput(EnvrnNum).Title + "\", invalid field: " + cAlphaFieldNames(7) + "=\"" +
@@ -7116,9 +7142,9 @@ namespace WeatherManager {
             }
 
             //   A8,  \field Snow Indicator
-            if (UtilityRoutines::SameString(cAlphaArgs(8), "Yes") || UtilityRoutines::SameString(cAlphaArgs(8), "1")) {
+            if (UtilityRoutines::SameString(cAlphaArgs(8), "Yes")) {
                 DesDayInput(EnvrnNum).SnowInd = 1;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(8), "No") || UtilityRoutines::SameString(cAlphaArgs(8), "0") || lAlphaFieldBlanks(8)) {
+            } else if (UtilityRoutines::SameString(cAlphaArgs(8), "No") || lAlphaFieldBlanks(8)) {
                 DesDayInput(EnvrnNum).SnowInd = 0;
             } else {
                 ShowWarningError(cCurrentModuleObject + "=\"" + DesDayInput(EnvrnNum).Title + "\", invalid field: " + cAlphaFieldNames(8) + "=\"" +
@@ -7362,7 +7388,7 @@ namespace WeatherManager {
                 }
             } else if (UtilityRoutines::SameString(cAlphaArgs(5), "Enthalpy")) {
                 cAlphaArgs(5) = "Enthalpy";
-                //   N7,  \field Enthalpy at Maximum Dry-Bulb  !will require units transition.
+                //   N7,  \field Enthalpy at Maximum Dry-Bulb {J/kg}.
                 if (!lNumericFieldBlanks(7)) {
                     DesDayInput(EnvrnNum).HumIndValue = rNumericArgs(7); // Humidity Indicating Conditions at Max Dry-Bulb
                 } else {
@@ -7704,9 +7730,9 @@ namespace WeatherManager {
             }
 
             //   A9,  \field Daylight Saving Time Indicator
-            if (UtilityRoutines::SameString(cAlphaArgs(9), "Yes") || UtilityRoutines::SameString(cAlphaArgs(9), "1")) {
+            if (UtilityRoutines::SameString(cAlphaArgs(9), "Yes")) {
                 DesDayInput(EnvrnNum).DSTIndicator = 1;
-            } else if (UtilityRoutines::SameString(cAlphaArgs(9), "No") || UtilityRoutines::SameString(cAlphaArgs(9), "0") || lAlphaFieldBlanks(9)) {
+            } else if (UtilityRoutines::SameString(cAlphaArgs(9), "No") || lAlphaFieldBlanks(9)) {
                 DesDayInput(EnvrnNum).DSTIndicator = 0;
             } else {
                 ShowWarningError(cCurrentModuleObject + "=\"" + DesDayInput(EnvrnNum).Title + "\", invalid data.");
@@ -8357,7 +8383,6 @@ namespace WeatherManager {
         Real64 Lag;                           // Value used in correlation
         Real64 Offset;                        // Value used in correlation
         Real64 CurrentWaterMainsTemp;         // calculated water main temp (F)
-        Real64 WaterMainsTempFromCorrelation; // calculated water main temp (C)
 
         // FLOW:
         Tavg = AnnualOAAvgDryBulbTemp * (9.0 / 5.0) + 32.0;
@@ -8368,17 +8393,17 @@ namespace WeatherManager {
         Offset = 6.0;
         int latitude_sign;
         if (Latitude >= 0) {
-            latitude_sign = -1;
-        } else {
             latitude_sign = 1;
+        } else {
+            latitude_sign = -1;
         }
 
-        CurrentWaterMainsTemp = Tavg + Offset + Ratio * (Tdiff / 2.0) * latitude_sign * std::cos((0.986 * (DayOfYear - 15.0 - Lag)) * DegToRadians);
+        CurrentWaterMainsTemp = Tavg + Offset + Ratio * (Tdiff / 2.0) * latitude_sign * std::sin((0.986 * (DayOfYear - 15.0 - Lag) - 90) * DegToRadians);
 
         if (CurrentWaterMainsTemp < 32.0) CurrentWaterMainsTemp = 32.0;
 
         // Convert F to C
-        return WaterMainsTempFromCorrelation = (CurrentWaterMainsTemp - 32.0) * (5.0 / 9.0);
+        return (CurrentWaterMainsTemp - 32.0) * (5.0 / 9.0);
     }
     void GetWeatherStation(bool &ErrorsFound)
     {

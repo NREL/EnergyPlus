@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -87,7 +87,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     bool ErrorsFound(false);
 
     std::string const idf_objects = delimited_string({
-        "  Version,9.2;",
+        "  Version,9.3;",
 
         "  Timestep,6;",
 
@@ -803,11 +803,11 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     ScheduleManager::ProcessScheduleInput(); // read schedules
 
     ErrorsFound = false;
-    GetProjectControlData(ErrorsFound); // read project control data
+    GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);          // expect no errors
 
     ErrorsFound = false;
-    GetMaterialData(ErrorsFound); // read material data
+    GetMaterialData(OutputFiles::getSingleton(), ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
     ErrorsFound = false;

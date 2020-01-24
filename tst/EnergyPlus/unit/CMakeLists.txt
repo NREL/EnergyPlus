@@ -1,6 +1,3 @@
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src/EnergyPlus )
-INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR} )
 
 set( test_src
   TestHelpers/IdfParser.cc
@@ -39,6 +36,7 @@ set( test_src
   CrossVentMgr.unit.cc
   CurveManager.unit.cc
   DataEnvironment.unit.cc
+  DataGlobalConstants.unit.cc
   DataHeatBalance.unit.cc
   DataPlant.unit.cc
   Datasets.unit.cc
@@ -132,6 +130,7 @@ set( test_src
   PlantComponentTemperatureSources.unit.cc
   PlantChillers.unit.cc
   PlantCondLoopOperation.unit.cc
+  PlantLoopHeatPumpEIR.unit.cc
   PlantUtilities.unit.cc
   PoweredInductionUnits.unit.cc
   Psychrometrics.unit.cc
@@ -183,7 +182,6 @@ set( test_src
   WaterThermalTanks.unit.cc
   WaterToAirHeatPump.unit.cc
   WaterToAirHeatPumpSimple.unit.cc
-  WaterToWaterHeatPumpEIR.unit.cc
   WeatherManager.unit.cc
   WinCalcEngine.unit.cc
   WindowAC.unit.cc

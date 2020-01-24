@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,23 +56,23 @@
 #include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
-#include <DataBranchAirLoopPlant.hh>
-#include <DataConvergParams.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DataLoopNode.hh>
-#include <DataPlant.hh>
-#include <DataPrecisionGlobals.hh>
-#include <FluidProperties.hh>
-#include <General.hh>
-#include <HVACInterfaceManager.hh>
-#include <Plant/PlantLoopSolver.hh>
-#include <PlantCondLoopOperation.hh>
-#include <PlantLoopEquip.hh>
-#include <PlantPressureSystem.hh>
-#include <PlantUtilities.hh>
-#include <Pumps.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
+#include <EnergyPlus/DataConvergParams.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/HVACInterfaceManager.hh>
+#include <EnergyPlus/Plant/PlantLoopSolver.hh>
+#include <EnergyPlus/PlantCondLoopOperation.hh>
+#include <EnergyPlus/PlantLoopEquip.hh>
+#include <EnergyPlus/PlantPressureSystem.hh>
+#include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/Pumps.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -323,7 +323,7 @@ namespace EnergyPlus {
             // Now that flow rates have been resolved, we just need to set the flow lock status
             //  flag, and resimulate.  During this simulation each component will still use the
             //  SetFlowRequest routine, but this routine will also set the outlet flow rate
-            //  equal to the inlet flow rate, accoridng to flowlock logic.
+            //  equal to the inlet flow rate, according to flowlock logic.
             DataPlant::PlantLoop(LoopNum).LoopSide(ThisSide).FlowLock = DataPlant::FlowLocked;
             DataPlant::PlantLoop(LoopNum).loopSolver.SimulateAllLoopSideBranches(
                     LoopNum, ThisSide, ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag);

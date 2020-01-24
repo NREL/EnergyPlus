@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,49 +55,74 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <Boilers.hh>
-#include <BoilerSteam.hh>
-#include <BranchInputManager.hh>
-#include <CondenserLoopTowers.hh>
-#include <DataBranchAirLoopPlant.hh>
-#include <DataConvergParams.hh>
-#include <DataEnvironment.hh>
-#include <DataErrorTracking.hh>
-#include <DataHVACGlobals.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSizing.hh>
-#include <EMSManager.hh>
-#include <FluidCoolers.hh>
-#include <FluidProperties.hh>
-#include <General.hh>
-#include <GroundHeatExchangers.hh>
-#include <HVACInterfaceManager.hh>
-#include <HeatPumpWaterToWaterSimple.hh>
-#include <HeatPumpWaterToWaterCOOLING.hh>
-#include <HeatPumpWaterToWaterHEATING.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <OutputProcessor.hh>
-#include <OutsideEnergySources.hh>
-#include <PipeHeatTransfer.hh>
-#include <Pipes.hh>
-#include <Plant/PlantLoopSolver.hh>
-#include <Plant/PlantManager.hh>
-#include <PlantLoadProfile.hh>
-#include <PlantLoopEquip.hh>
-#include <PlantPipingSystemsManager.hh>
-#include <PlantUtilities.hh>
-#include <PlantValves.hh>
-#include <PondGroundHeatExchanger.hh>
-#include <ReportSizingManager.hh>
-#include <ScheduleManager.hh>
-#include <SetPointManager.hh>
-#include <SurfaceGroundHeatExchanger.hh>
-#include <SystemAvailabilityManager.hh>
-#include <UtilityRoutines.hh>
-#include <WaterToWaterHeatPumpEIR.hh>
+#include <EnergyPlus/Boilers.hh>
+#include <EnergyPlus/BoilerSteam.hh>
+#include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/ChillerIndirectAbsorption.hh>
+#include <EnergyPlus/ChillerAbsorption.hh>
+#include <EnergyPlus/ChillerElectricEIR.hh>
+#include <EnergyPlus/ChillerGasAbsorption.hh>
+#include <EnergyPlus/ChillerExhaustAbsorption.hh>
+#include <EnergyPlus/ChillerReformulatedEIR.hh>
+#include <EnergyPlus/CondenserLoopTowers.hh>
+#include <EnergyPlus/CTElectricGenerator.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
+#include <EnergyPlus/DataConvergParams.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/EvaporativeFluidCoolers.hh>
+#include <EnergyPlus/FluidCoolers.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/FuelCellElectricGenerator.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GroundHeatExchangers.hh>
+#include <EnergyPlus/HVACInterfaceManager.hh>
+#include <EnergyPlus/HeatPumpWaterToWaterSimple.hh>
+#include <EnergyPlus/HeatPumpWaterToWaterCOOLING.hh>
+#include <EnergyPlus/HeatPumpWaterToWaterHEATING.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
+#include <EnergyPlus/ICEngineElectricGenerator.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/MicroturbineElectricGenerator.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/MicroCHPElectricGenerator.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutsideEnergySources.hh>
+#include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
+#include <EnergyPlus/PipeHeatTransfer.hh>
+#include <EnergyPlus/Pipes.hh>
+#include <EnergyPlus/Plant/PlantLoopSolver.hh>
+#include <EnergyPlus/Plant/PlantManager.hh>
+#include <EnergyPlus/PlantCentralGSHP.hh>
+#include <EnergyPlus/PlantChillers.hh>
+#include <EnergyPlus/PlantComponentTemperatureSources.hh>
+#include <EnergyPlus/PlantHeatExchangerFluidToFluid.hh>
+#include <EnergyPlus/PlantLoadProfile.hh>
+#include <EnergyPlus/PlantLoopEquip.hh>
+#include <EnergyPlus/PlantLoopHeatPumpEIR.hh>
+#include <EnergyPlus/PlantPipingSystemsManager.hh>
+#include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/PlantValves.hh>
+#include <EnergyPlus/PondGroundHeatExchanger.hh>
+#include <EnergyPlus/RefrigeratedCase.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SetPointManager.hh>
+#include <EnergyPlus/SolarCollectors.hh>
+#include <EnergyPlus/SurfaceGroundHeatExchanger.hh>
+#include <EnergyPlus/SwimmingPool.hh>
+#include <EnergyPlus/SystemAvailabilityManager.hh>
+#include <EnergyPlus/UserDefinedComponents.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WaterThermalTanks.hh>
+#include <EnergyPlus/WaterUse.hh>
+#include <EnergyPlus/IceThermalStorage.hh>
 
 namespace EnergyPlus {
 
@@ -931,6 +956,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = WaterThermalTanks::WaterThermalTankData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "WaterHeater:Stratified")) {
                                 this_comp.TypeOf_Num = TypeOf_WtrHeaterStratified;
                                 this_comp.GeneralEquipType = GenEquipTypes_WaterThermalTank;
@@ -939,14 +965,17 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = WaterThermalTanks::WaterThermalTankData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "ChillerHeater:Absorption:Directfired")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_DFAbsorption;
                                 this_comp.GeneralEquipType = GenEquipTypes_Chiller;
+                                this_comp.compPtr = ChillerGasAbsorption::GasAbsorberSpecs::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "ChillerHeater:Absorption:DoubleEffect")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_ExhFiredAbsorption;
                                 this_comp.GeneralEquipType = GenEquipTypes_Chiller;
+                                this_comp.compPtr = ChillerExhaustAbsorption::ExhaustAbsorberSpecs::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "ThermalStorage:ChilledWater:Mixed")) {
                                 this_comp.TypeOf_Num = TypeOf_ChilledWaterTankMixed;
@@ -956,6 +985,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = WaterThermalTanks::WaterThermalTankData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "ThermalStorage:ChilledWater:Stratified")) {
                                 this_comp.TypeOf_Num = TypeOf_ChilledWaterTankStratified;
@@ -965,10 +995,12 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = WaterThermalTanks::WaterThermalTankData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "WaterUse:Connections")) {
                                 this_comp.TypeOf_Num = TypeOf_WaterUseConnection;
                                 this_comp.GeneralEquipType = GenEquipTypes_WaterUse;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
+                                this_comp.compPtr = WaterUse::WaterConnectionsType::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Coil:Cooling:Water")) {
                                 this_comp.TypeOf_Num = TypeOf_CoilWaterCooling;
                                 this_comp.GeneralEquipType = GenEquipTypes_DemandCoil;
@@ -994,6 +1026,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
                                 }
+                                this_comp.compPtr = SolarCollectors::CollectorData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "SolarCollector:IntegralCollectorStorage")) {
                                 this_comp.TypeOf_Num = TypeOf_SolarCollectorICS;
@@ -1003,6 +1036,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
                                 }
+                                this_comp.compPtr = SolarCollectors::CollectorData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "LoadProfile:Plant")) {
                                 this_comp.TypeOf_Num = TypeOf_PlantLoadProfile;
                                 this_comp.GeneralEquipType = GenEquipTypes_LoadProfile;
@@ -1026,8 +1060,7 @@ namespace EnergyPlus {
                                 this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
                                 this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
                                 this_comp.compPtr =
-                                        PondGroundHeatExchanger::PondGroundHeatExchangerData::factory(
-                                                TypeOf_GrndHtExchgPond, CompNames(CompNum));
+                                        PondGroundHeatExchanger::PondGroundHeatExchangerData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "GroundHeatExchanger:Slinky")) {
                                 this_comp.TypeOf_Num = TypeOf_GrndHtExchgSlinky;
                                 this_comp.GeneralEquipType = GenEquipTypes_GroundHeatExchanger;
@@ -1042,6 +1075,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = ChillerElectricEIR::ElectricEIRChillerSpecs::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "Chiller:Electric:ReformulatedEIR")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_ElectricReformEIR;
@@ -1051,6 +1085,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = ChillerReformulatedEIR::ReformulatedEIRChillerSpecs::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Chiller:Electric")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_Electric;
                                 this_comp.GeneralEquipType = GenEquipTypes_Chiller;
@@ -1059,6 +1094,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = PlantChillers::ElectricChillerSpecs::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Chiller:EngineDriven")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_EngineDriven;
                                 this_comp.GeneralEquipType = GenEquipTypes_Chiller;
@@ -1067,6 +1103,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = PlantChillers::EngineDrivenChillerSpecs::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Chiller:CombustionTurbine")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_CombTurbine;
                                 this_comp.GeneralEquipType = GenEquipTypes_Chiller;
@@ -1075,6 +1112,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = PlantChillers::GTChillerSpecs::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Chiller:ConstantCOP")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_ConstCOP;
                                 this_comp.GeneralEquipType = GenEquipTypes_Chiller;
@@ -1083,6 +1121,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = PlantChillers::ConstCOPChillerSpecs::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Boiler:HotWater")) {
                                 this_comp.TypeOf_Num = TypeOf_Boiler_Simple;
                                 this_comp.GeneralEquipType = GenEquipTypes_Boiler;
@@ -1101,6 +1140,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = ChillerIndirectAbsorption::IndirectAbsorberSpecs::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Chiller:Absorption")) {
                                 this_comp.TypeOf_Num = TypeOf_Chiller_Absorption;
                                 this_comp.GeneralEquipType = GenEquipTypes_Chiller;
@@ -1109,6 +1149,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = ChillerAbsorption::BLASTAbsorberSpecs::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "CoolingTower:SingleSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_CoolingTower_SingleSpd;
                                 this_comp.GeneralEquipType = GenEquipTypes_CoolingTower;
@@ -1127,10 +1168,10 @@ namespace EnergyPlus {
                                 this_comp.TypeOf_Num = TypeOf_CoolingTower_VarSpdMerkel;
                                 this_comp.GeneralEquipType = GenEquipTypes_CoolingTower;
                                 this_comp.compPtr = CondenserLoopTowers::CoolingTower::factory(CompNames(CompNum));
-                            } else if (UtilityRoutines::SameString(this_comp_type,
-                                                                   "Generator:FuelCell:ExhaustGasToWaterHeatExchanger")) {
+                            } else if (UtilityRoutines::SameString(this_comp_type, "Generator:FuelCell:ExhaustGasToWaterHeatExchanger")) {
                                 this_comp.TypeOf_Num = TypeOf_Generator_FCExhaust;
                                 this_comp.GeneralEquipType = GenEquipTypes_Generator;
+                                this_comp.compPtr = FuelCellElectricGenerator::FCDataStruct::factory_exhaust(CompNames(CompNum));
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 } else if (LoopSideNum == SupplySide) {
@@ -1141,11 +1182,13 @@ namespace EnergyPlus {
                                 this_comp.TypeOf_Num = TypeOf_HeatPumpWtrHeaterPumped;
                                 this_comp.GeneralEquipType = GenEquipTypes_WaterThermalTank;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
+                                this_comp.compPtr = WaterThermalTanks::HeatPumpWaterHeaterData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "WaterHeater:HeatPump:WrappedCondenser")) {
                                 this_comp.TypeOf_Num = TypeOf_HeatPumpWtrHeaterWrapped;
                                 this_comp.GeneralEquipType = GenEquipTypes_WaterThermalTank;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
+                                this_comp.compPtr = WaterThermalTanks::HeatPumpWaterHeaterData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "HeatPump:WatertoWater:EquationFit:Cooling")) {
                                 this_comp.compPtr = HeatPumpWaterToWaterSimple::GshpSpecs::factory(
@@ -1189,8 +1232,8 @@ namespace EnergyPlus {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
                             } else if (UtilityRoutines::SameString(this_comp_type,
-                                                                   "HeatPump:WaterToWater:EIR:Heating")) {
-                                this_comp.compPtr = EIRWaterToWaterHeatPumps::EIRWaterToWaterHeatPump::factory(
+                                                                   "HeatPump:PlantLoop:EIR:Heating")) {
+                                this_comp.compPtr = EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::factory(
                                         TypeOf_HeatPumpEIRHeating, CompNames(CompNum));
                                 this_comp.TypeOf_Num = TypeOf_HeatPumpEIRHeating;
                                 this_comp.GeneralEquipType = GenEquipTypes_HeatPump;
@@ -1200,8 +1243,8 @@ namespace EnergyPlus {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
                             } else if (UtilityRoutines::SameString(this_comp_type,
-                                                                   "HeatPump:WaterToWater:EIR:Cooling")) {
-                                this_comp.compPtr = EIRWaterToWaterHeatPumps::EIRWaterToWaterHeatPump::factory(
+                                                                   "HeatPump:PlantLoop:EIR:Cooling")) {
+                                this_comp.compPtr = EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::factory(
                                         TypeOf_HeatPumpEIRCooling, CompNames(CompNum));
                                 this_comp.TypeOf_Num = TypeOf_HeatPumpEIRCooling;
                                 this_comp.GeneralEquipType = GenEquipTypes_HeatPump;
@@ -1219,6 +1262,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = HVACVariableRefrigerantFlow::VRFCondenserEquipment::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "DistrictCooling")) {
                                 this_comp.TypeOf_Num = TypeOf_PurchChilledWater;
                                 this_comp.GeneralEquipType = GenEquipTypes_Purchased;
@@ -1230,9 +1274,11 @@ namespace EnergyPlus {
                             } else if (UtilityRoutines::SameString(this_comp_type, "ThermalStorage:Ice:Simple")) {
                                 this_comp.TypeOf_Num = TypeOf_TS_IceSimple;
                                 this_comp.GeneralEquipType = GenEquipTypes_ThermalStorage;
+                                this_comp.compPtr = IceThermalStorage::SimpleIceStorageData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "ThermalStorage:Ice:Detailed")) {
                                 this_comp.TypeOf_Num = TypeOf_TS_IceDetailed;
                                 this_comp.GeneralEquipType = GenEquipTypes_ThermalStorage;
+                                this_comp.compPtr = IceThermalStorage::DetailedIceStorageData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "TemperingValve")) {
                                 this_comp.compPtr = PlantValves::TemperValveData::factory(CompNames(CompNum));
                                 this_comp.TypeOf_Num = TypeOf_ValveTempering;
@@ -1245,6 +1291,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = FreeRejectionOpSchemeType;
                                 }
+                                this_comp.compPtr = PlantHeatExchangerFluidToFluid::HeatExchangerStruct::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Generator:MicroTurbine")) {
                                 this_comp.TypeOf_Num = TypeOf_Generator_MicroTurbine;
                                 this_comp.GeneralEquipType = GenEquipTypes_Generator;
@@ -1253,6 +1300,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = MicroturbineElectricGenerator::MTGeneratorSpecs::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "Generator:InternalCombustionEngine")) {
                                 this_comp.TypeOf_Num = TypeOf_Generator_ICEngine;
@@ -1262,6 +1310,8 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = ICEngineElectricGenerator::ICEngineGeneratorSpecs::factory(CompNames(CompNum));
+
                             } else if (UtilityRoutines::SameString(this_comp_type, "Generator:CombustionTurbine")) {
                                 this_comp.TypeOf_Num = TypeOf_Generator_CTurbine;
                                 this_comp.GeneralEquipType = GenEquipTypes_Generator;
@@ -1270,6 +1320,7 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = CTElectricGenerator::CTGeneratorData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Generator:MicroCHP")) {
                                 this_comp.TypeOf_Num = TypeOf_Generator_MicroCHP;
                                 this_comp.GeneralEquipType = GenEquipTypes_Generator;
@@ -1278,32 +1329,36 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = MicroCHPElectricGenerator::MicroCHPDataStruct::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Generator:FuelCell:StackCooler")) {
                                 this_comp.TypeOf_Num = TypeOf_Generator_FCStackCooler;
                                 this_comp.GeneralEquipType = GenEquipTypes_Generator;
+                                this_comp.compPtr = FuelCellElectricGenerator::FCDataStruct::factory(CompNames(CompNum));
                                 if (LoopSideNum == DemandSide) {
                                     this_comp.CurOpSchemeType = DemandOpSchemeType;
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
-                            } else if (UtilityRoutines::SameString(this_comp_type, "Fluidcooler:SingleSpeed")) {
+                            } else if (UtilityRoutines::SameString(this_comp_type, "FluidCooler:SingleSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_FluidCooler_SingleSpd;
                                 this_comp.GeneralEquipType = GenEquipTypes_FluidCooler;
                                 this_comp.compPtr = FluidCoolers::FluidCoolerspecs::factory(
                                         TypeOf_FluidCooler_SingleSpd, CompNames(CompNum));
-                                //
-                            } else if (UtilityRoutines::SameString(this_comp_type, "Fluidcooler:TwoSpeed")) {
+                            } else if (UtilityRoutines::SameString(this_comp_type, "FluidCooler:TwoSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_FluidCooler_TwoSpd;
                                 this_comp.GeneralEquipType = GenEquipTypes_FluidCooler;
                                 this_comp.compPtr = FluidCoolers::FluidCoolerspecs::factory(
                                         TypeOf_FluidCooler_TwoSpd, CompNames(CompNum));
-                            } else if (UtilityRoutines::SameString(this_comp_type,
-                                                                   "EvaporativeFluidcooler:SingleSpeed")) {
+                            } else if (UtilityRoutines::SameString(this_comp_type, "EvaporativeFluidCooler:SingleSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_EvapFluidCooler_SingleSpd;
                                 this_comp.GeneralEquipType = GenEquipTypes_EvapFluidCooler;
-                            } else if (UtilityRoutines::SameString(this_comp_type, "EvaporativeFluidcooler:TwoSpeed")) {
+                                this_comp.compPtr = EvaporativeFluidCoolers::EvapFluidCoolerSpecs::factory(
+                                        TypeOf_EvapFluidCooler_SingleSpd, CompNames(CompNum));
+                            } else if (UtilityRoutines::SameString(this_comp_type, "EvaporativeFluidCooler:TwoSpeed")) {
                                 this_comp.TypeOf_Num = TypeOf_EvapFluidCooler_TwoSpd;
                                 this_comp.GeneralEquipType = GenEquipTypes_EvapFluidCooler;
+                                this_comp.compPtr = EvaporativeFluidCoolers::EvapFluidCoolerSpecs::factory(
+                                        TypeOf_EvapFluidCooler_TwoSpd, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "SolarCollector:FlatPlate:PhotovoltaicThermal")) {
                                 this_comp.TypeOf_Num = TypeOf_PVTSolarCollectorFlatPlate;
@@ -1313,10 +1368,11 @@ namespace EnergyPlus {
                                 } else if (LoopSideNum == SupplySide) {
                                     this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                                 }
+                                this_comp.compPtr = PhotovoltaicThermalCollectors::PVTCollectorStruct::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "CentralHeatPumpSystem")) {
                                 this_comp.TypeOf_Num = TypeOf_CentralGroundSourceHeatPump;
                                 this_comp.GeneralEquipType = GenEquipTypes_CentralHeatPumpSystem;
-
+                                this_comp.compPtr = PlantCentralGSHP::WrapperSpecs::factory(CompNames(CompNum));
                                 // now deal with demand components of the ZoneHVAC type served by ControlCompOutput
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "ZoneHVAC:Baseboard:RadiantConvective:Water")) {
@@ -1402,14 +1458,17 @@ namespace EnergyPlus {
                                 this_comp.TypeOf_Num = TypeOf_RefrigSystemWaterCondenser;
                                 this_comp.GeneralEquipType = GenEquipTypes_Refrigeration;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
+                                this_comp.compPtr = RefrigeratedCase::RefrigCondenserData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Refrigeration:CompressorRack")) {
                                 this_comp.TypeOf_Num = TypeOf_RefrigerationWaterCoolRack;
                                 this_comp.GeneralEquipType = GenEquipTypes_Refrigeration;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
+                                this_comp.compPtr = RefrigeratedCase::RefrigRackData::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "PlantComponent:UserDefined")) {
                                 this_comp.TypeOf_Num = TypeOf_PlantComponentUserDefined;
                                 this_comp.GeneralEquipType = GenEquipTypes_PlantComponent;
                                 this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
+                                this_comp.compPtr = UserDefinedComponents::UserPlantComponentStruct::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Coil:UserDefined")) {
                                 this_comp.TypeOf_Num = TypeOf_CoilUserDefined;
                                 this_comp.GeneralEquipType = GenEquipTypes_PlantComponent;
@@ -1423,11 +1482,11 @@ namespace EnergyPlus {
                                 this_comp.TypeOf_Num = TypeOf_AirTerminalUserDefined;
                                 this_comp.GeneralEquipType = GenEquipTypes_PlantComponent;
                                 this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
-                            } else if (UtilityRoutines::SameString(this_comp_type,
-                                                                   "PlantComponent:TemperatureSource")) {
+                            } else if (UtilityRoutines::SameString(this_comp_type,"PlantComponent:TemperatureSource")) {
                                 this_comp.TypeOf_Num = TypeOf_WaterSource;
                                 this_comp.GeneralEquipType = GenEquipTypes_PlantComponent;
                                 this_comp.CurOpSchemeType = UncontrolledOpSchemeType;
+                                this_comp.compPtr = PlantComponentTemperatureSources::WaterSourceSpecs::factory(CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "GroundHeatExchanger:HorizontalTrench")) {
                                 this_comp.TypeOf_Num = TypeOf_GrndHtExchgHorizTrench;
@@ -1793,7 +1852,7 @@ namespace EnergyPlus {
                             } else if (UtilityRoutines::SameString(this_comp.TypeOf,
                                                                    "PlantComponent:TemperatureSource")) {
                                 GeneralEquipType = GenEquipTypes_HeatExchanger;
-                            } else if (UtilityRoutines::SameString(this_comp.TypeOf, "CENTRALHEATPUMPSYSTEM")) {
+                            } else if (UtilityRoutines::SameString(this_comp.TypeOf, "CentralHeatPumpSystem")) {
                                 GeneralEquipType = GenEquipTypes_CentralHeatPumpSystem;
                             } else {
                                 ShowSevereError("GetPlantInput: PlantLoop=\"" + PlantLoop(LoopNum).Name +
@@ -3913,8 +3972,7 @@ namespace EnergyPlus {
                                     this_component.FlowCtrl = ControlType_Active;
                                     this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
                                     this_component.HowLoadServed = HowMet_ByNominalCap;
-                                } else if (SELECT_CASE_var ==
-                                           TypeOf_Chiller_Absorption) { //                =  3  ! older BLAST absorption chiller
+                                } else if (SELECT_CASE_var == TypeOf_Chiller_Absorption) {  // = 3 ! older BLAST absorption chiller
                                     this_component.FlowCtrl = ControlType_Active;
                                     if (LoopSideCtr == DemandSide) {
                                         this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
@@ -3923,10 +3981,8 @@ namespace EnergyPlus {
                                         this_component.FlowPriority = LoopFlowStatus_TakesWhatGets;
                                         this_component.HowLoadServed = HowMet_ByNominalCapLowOutLimit;
                                     }
-                                } else if (SELECT_CASE_var ==
-                                           TypeOf_Chiller_Indirect_Absorption) { //       =  4  ! revised absorption chiller
+                                } else if (SELECT_CASE_var == TypeOf_Chiller_Indirect_Absorption) { // = 4 ! revised absorption chiller
                                     this_component.FlowCtrl = ControlType_Active;
-
                                     if (LoopSideCtr == DemandSide) {
                                         this_component.FlowPriority = LoopFlowStatus_NeedyAndTurnsLoopOn;
                                         this_component.HowLoadServed = HowMet_NoneDemand;

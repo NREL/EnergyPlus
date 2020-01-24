@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -60,70 +60,70 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
-#include <ChilledCeilingPanelSimple.hh>
-#include <CommandLineInterface.hh>
-#include <ConvectionCoefficients.hh>
-#include <DElightManagerF.hh>
-#include <DataDElight.hh>
-#include <DataDaylighting.hh>
-#include <DataDaylightingDevices.hh>
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalSurface.hh>
-#include <DataHeatBalance.hh>
-#include <DataLoopNode.hh>
-#include <DataMoistureBalance.hh>
-#include <DataMoistureBalanceEMPD.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataRoomAirModel.hh>
-#include <DataRuntimeLanguage.hh>
-#include <DataSizing.hh>
-#include <DataStringGlobals.hh>
-#include <DataSurfaces.hh>
-#include <DataSystemVariables.hh>
-#include <DataTimings.hh>
-#include <DataViewFactorInformation.hh>
-#include <DataWindowEquivalentLayer.hh>
-#include <DataZoneEquipment.hh>
-#include <DaylightingDevices.hh>
-#include <DaylightingManager.hh>
-#include <DisplayRoutines.hh>
-#include <EcoRoofManager.hh>
-#include <ElectricBaseboardRadiator.hh>
-#include <General.hh>
-#include <GeneralRoutines.hh>
-#include <HWBaseboardRadiator.hh>
-#include <HeatBalFiniteDiffManager.hh>
-#include <HeatBalanceAirManager.hh>
-#include <HeatBalanceHAMTManager.hh>
-#include <HeatBalanceIntRadExchange.hh>
-#include <HeatBalanceKivaManager.hh>
-#include <HeatBalanceMovableInsulation.hh>
-#include <HeatBalanceSurfaceManager.hh>
-#include <HighTempRadiantSystem.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <InternalHeatGains.hh>
-#include <LowTempRadiantSystem.hh>
-#include <MoistureBalanceEMPDManager.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportPredefined.hh>
-#include <OutputReportTabular.hh>
-#include <Psychrometrics.hh>
-#include <ScheduleManager.hh>
-#include <SolarShading.hh>
-#include <SteamBaseboardRadiator.hh>
-#include <SurfaceGeometry.hh>
-#include <SwimmingPool.hh>
-#include <ThermalComfort.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/ChilledCeilingPanelSimple.hh>
+#include <EnergyPlus/CommandLineInterface.hh>
+#include <EnergyPlus/ConvectionCoefficients.hh>
+#include <EnergyPlus/DElightManagerF.hh>
+#include <EnergyPlus/DataDElight.hh>
+#include <EnergyPlus/DataDaylighting.hh>
+#include <EnergyPlus/DataDaylightingDevices.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataMoistureBalance.hh>
+#include <EnergyPlus/DataMoistureBalanceEMPD.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataRoomAirModel.hh>
+#include <EnergyPlus/DataRuntimeLanguage.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/DataTimings.hh>
+#include <EnergyPlus/DataViewFactorInformation.hh>
+#include <EnergyPlus/DataWindowEquivalentLayer.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DaylightingDevices.hh>
+#include <EnergyPlus/DaylightingManager.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/EcoRoofManager.hh>
+#include <EnergyPlus/ElectricBaseboardRadiator.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/HWBaseboardRadiator.hh>
+#include <EnergyPlus/HeatBalFiniteDiffManager.hh>
+#include <EnergyPlus/HeatBalanceAirManager.hh>
+#include <EnergyPlus/HeatBalanceHAMTManager.hh>
+#include <EnergyPlus/HeatBalanceIntRadExchange.hh>
+#include <EnergyPlus/HeatBalanceKivaManager.hh>
+#include <EnergyPlus/HeatBalanceMovableInsulation.hh>
+#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
+#include <EnergyPlus/HighTempRadiantSystem.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/LowTempRadiantSystem.hh>
+#include <EnergyPlus/MoistureBalanceEMPDManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SolarShading.hh>
+#include <EnergyPlus/SteamBaseboardRadiator.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
+#include <EnergyPlus/SwimmingPool.hh>
+#include <EnergyPlus/ThermalComfort.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 #include <WCECommon.hpp>
 #include <WCEMultiLayerOptics.hpp>
 #include <WCESingleLayerOptics.hpp>
-#include <WindowEquivalentLayer.hh>
-#include <WindowManager.hh>
-#include <WindowManagerExteriorData.hh>
-#include <WindowModel.hh>
+#include <EnergyPlus/WindowEquivalentLayer.hh>
+#include <EnergyPlus/WindowManager.hh>
+#include <EnergyPlus/WindowManagerExteriorData.hh>
+#include <EnergyPlus/WindowModel.hh>
 
 namespace EnergyPlus {
 
@@ -226,7 +226,7 @@ namespace HeatBalanceSurfaceManager {
 
         using HeatBalanceAirManager::ManageAirHeatBalance;
         using HeatBalFiniteDiffManager::SurfaceFD;
-        using OutputReportTabular::GatherComponentLoadsSurface; // for writing tabular compoonent loads output reports
+        using OutputReportTabular::GatherComponentLoadsSurface; // for writing tabular component loads output reports
         using ThermalComfort::ManageThermalComfort;
 
         int SurfNum;
@@ -509,7 +509,6 @@ namespace HeatBalanceSurfaceManager {
         // gains is absorbed by interior surfaces
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Computing Interior Absorption Factors");
         if (InitSurfaceHeatBalancefirstTime) HeatBalanceIntRadExchange::InitInteriorRadExchange();
-
         ComputeIntThermalAbsorpFactors();
 
         // Calculate factors for diffuse solar absorbed by room surfaces and interior shades
