@@ -72,19 +72,34 @@ TEST_F(EnergyPlusFixture, OutputFiles_Expected_Formatting_Tests)
     EXPECT_EQ(print_to_string("{:.2R}", 42.73499999999999232614), "42.74");
     EXPECT_EQ(print_to_string("{:.2R}", 42.734), "42.73");
 
+    EXPECT_EQ(print_to_string("{:.10R}", 0.14227301774935188772), "0.1422730177");
+    EXPECT_EQ(print_to_string("{:.10R}", 9.90178849143378697617E-02), "9.9017884914E-002");
+
+    EXPECT_EQ(print_to_string("{:.10R}", 0.15991370194912388203), "0.1599137019");
+
+    EXPECT_EQ(print_to_string("{:.3R}", 4.71499999999999974687E-02), "4.715E-002");
+    EXPECT_EQ(print_to_string("{:.3R}", 2.58370321661460875667E-04), "2.584E-004");
+    EXPECT_EQ(print_to_string("{:.3R}", 2.35749999999999978670E-03), "2.358E-003");
+    EXPECT_EQ(print_to_string("{:.3R}", 0.37915258851937216900), "0.379");
+
+    EXPECT_EQ(print_to_string("{:.3R}", 0.10589999999999999414), "0.106");
+    EXPECT_EQ(print_to_string("{:.3R}", 1.09763681592039800961E-03), "1.098E-003");
+    EXPECT_EQ(print_to_string("{:.3R}", 9.62727272727272737063E-03), "9.627E-003");
+    EXPECT_EQ(print_to_string("{:.3R}", 1.59349720571666519930), "1.593");
+
+    EXPECT_EQ(print_to_string("{:.10R}", 0.11686688704901793123), "0.1168668870");
+    EXPECT_EQ(print_to_string("{:.10R}", 0.14602401770121714586), "0.1460240177");
+
     // T formatting simulates the 'G' from Fortran
     // Always has a leading 0 if printing in fixed notation
     EXPECT_EQ(print_to_string("{:20.8T}", -0.23111252E-04), "     -0.23111252E-04");
-    EXPECT_EQ(print_to_string("{:20.8T}", -0.0),            "      -0.0000000    ");
-    EXPECT_EQ(print_to_string("{:20.8T}",  0.0),            "       0.0000000    ");
-    EXPECT_EQ(print_to_string("{:20.8T}", 2.13608134),      "       2.1360813    ");
-    EXPECT_EQ(print_to_string("{:20.8T}", 213608134.0),     "      213608134.    ");
-    EXPECT_EQ(print_to_string("{:20.8T}", 213608139.6),     "      213608140.    ");
-    EXPECT_EQ(print_to_string("{:20.8T}", 0.213608134),     "      0.21360813    ");
+    EXPECT_EQ(print_to_string("{:20.8T}", -0.0), "      -0.0000000    ");
+    EXPECT_EQ(print_to_string("{:20.8T}", 0.0), "       0.0000000    ");
+    EXPECT_EQ(print_to_string("{:20.8T}", 2.13608134), "       2.1360813    ");
+    EXPECT_EQ(print_to_string("{:20.8T}", 213608134.0), "      213608134.    ");
+    EXPECT_EQ(print_to_string("{:20.8T}", 213608139.6), "      213608140.    ");
+    EXPECT_EQ(print_to_string("{:20.8T}", 0.213608134), "      0.21360813    ");
     //    EXPECT_EQ(print_to_string("{:20.8T}", -0.23111252), "     -0.23111252    ");
-//    EXPECT_EQ(print_to_string("{:20.8T}", -0.23111252), "     -0.23111252    ");
-
-
-
+    //    EXPECT_EQ(print_to_string("{:20.8T}", -0.23111252), "     -0.23111252    ");
 }
-}
+} // namespace EnergyPlus

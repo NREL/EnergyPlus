@@ -176,17 +176,26 @@ public:
                     return write_string(str);
                 }
             } else if (specs()->type == 'R') {
-                //                const auto order_of_magnitude = value == 0.0 ? 1 : static_cast<int>(std::log10(std::abs(value)));
-                if (should_be_fixed_output(value)) {
+                // push the value up a tad to get the same rounding behavior as Objexx
+                auto adjusted = value;
+                const auto fixed_output = should_be_fixed_output(value);
+
+                if (value != 0.0) {
+                    // we're looking for a few places after that which is being displayed
+                    const auto order_of_magnitude = fixed_output ? 0 : -static_cast<int>(std::log10(std::abs(value)));
+                    adjusted = adjusted + std::pow(10, -(order_of_magnitude + specs()->precision + 3));
+                }
+
+                if (fixed_output) {
                     const auto magnitude = std::pow(10, specs()->precision);
-                    const auto rounded = std::round((value * magnitude) + .01) / magnitude;
+                    const auto rounded = std::round(adjusted * magnitude) / magnitude;
                     specs()->type = 'F';
                     return (*this)(rounded);
                 } else {
                     specs()->type = 'E';
 
                     // write the `E` formatted float to a std::string
-                    auto str = write_to_string(value, *specs());
+                    auto str = write_to_string(adjusted, *specs());
 
                     // if necessary, pad the exponent with a 0 to match the old formatting from Objexx
                     if (str.size() > 3) {
