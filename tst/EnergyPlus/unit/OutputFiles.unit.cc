@@ -69,6 +69,8 @@ TEST_F(EnergyPlusFixture, OutputFiles_Expected_Formatting_Tests)
 
     // This edge case is rounding up from the old formatting routines and
     // wants to round down with 'R' format
+    //
+    // These are specific cases that have come up while testing E+ with regression diffs
     EXPECT_EQ(print_to_string("{:.2R}", 42.73499999999999232614), "42.74");
     EXPECT_EQ(print_to_string("{:.2R}", 42.734), "42.73");
 
@@ -89,6 +91,15 @@ TEST_F(EnergyPlusFixture, OutputFiles_Expected_Formatting_Tests)
 
     EXPECT_EQ(print_to_string("{:.10R}", 0.11686688704901793123), "0.1168668870");
     EXPECT_EQ(print_to_string("{:.10R}", 0.14602401770121714586), "0.1460240177");
+
+    EXPECT_EQ(print_to_string("{:.10R}", 9.12850042469573067808E-016),"9.1285004247E-016");
+    EXPECT_EQ(print_to_string("{:.10R}", 1.60782525664980535959E-015),"1.6078252566E-015");
+
+    EXPECT_EQ(print_to_string("{:.10R}", 0.10797418337603230387),"0.1079741834");
+    EXPECT_EQ(print_to_string("{:.10R}", 0.14820485805540076218),"0.1482048581");
+    EXPECT_EQ(print_to_string("{:.10R}", 3.08684514533120978041E-002),"3.0868451453E-002");
+    EXPECT_EQ(print_to_string("{:.10R}", 4.05237932036497869315E-002),"4.0523793203E-002");
+
 
     // T formatting simulates the 'G' from Fortran
     // Always has a leading 0 if printing in fixed notation

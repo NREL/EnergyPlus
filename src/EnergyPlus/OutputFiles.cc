@@ -181,9 +181,14 @@ public:
                 const auto fixed_output = should_be_fixed_output(value);
 
                 if (value != 0.0) {
-                    // we're looking for a few places after that which is being displayed
-                    const auto order_of_magnitude = fixed_output ? 0 : -static_cast<int>(std::log10(std::abs(value)));
-                    adjusted = adjusted + std::pow(10, -(order_of_magnitude + specs()->precision + 3));
+                    // we're looking for a reasonable place to push up the rounding, based on
+                    // how many places are displayed
+                    if (fixed_output) {
+                        adjusted += std::pow(10, -(specs()->precision + 10));
+                    } else {
+                        const auto order_of_magnitude = -static_cast<int>(std::log10(std::abs(value)));
+                        adjusted = adjusted + std::pow(10, -(order_of_magnitude + specs()->precision + 10));
+                    }
                 }
 
                 if (fixed_output) {
