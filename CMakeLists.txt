@@ -76,6 +76,7 @@ option( ENABLE_INSTALL_REMOTE "Enable install_remote and install_remote_plist co
 mark_as_advanced( ENABLE_INSTALL_REMOTE )
 
 include(cmake/ProjectMacros.cmake)
+include(GetPrerequisites)
 
 # We need to connect up to python for a couple reasons.
 # 1. We use Python in our testing scripts
@@ -106,17 +107,34 @@ else()
           OUTPUT_VARIABLE CREATION_OUTPUT
   )
   message("${CREATION_OUTPUT}")
+  set(EXE_EXTENSION "")
+  if(WIN32)
+    set(EXE_EXTENSION ".EXE")
+  endif()
+  message("Cleaning up virtual environment")
+  file(REMOVE ${CMAKE_BINARY_DIR}/Products/pythonenv/bin/activate)
+  file(REMOVE ${CMAKE_BINARY_DIR}/Products/pythonenv/bin/activate.csh)
+  file(REMOVE ${CMAKE_BINARY_DIR}/Products/pythonenv/bin/activate.fish)
+  file(REMOVE ${CMAKE_BINARY_DIR}/Products/pythonenv/bin/easy_install)
+  file(REMOVE ${CMAKE_BINARY_DIR}/Products/pythonenv/bin/easy_install-3.7)
+  file(REMOVE ${CMAKE_BINARY_DIR}/Products/pythonenv/bin/pip)
+  file(REMOVE ${CMAKE_BINARY_DIR}/Products/pythonenv/bin/pip3.7)
+  file(REMOVE ${CMAKE_BINARY_DIR}/Products/pythonenv/bin/python)
+  file(REMOVE_RECURSE ${CMAKE_BINARY_DIR}/Products/pythonenv/include)
+  file(REMOVE ${CMAKE_BINARY_DIR}/Products/pythonenv/pyvenv.cfg)
 endif()
 
 message("Python configuration (2): Got Python Executable: \n  Executable: ${PYTHON_EXECUTABLE} \n  Version String: ${PYTHONLIBS_VERSION_STRING}")
 
 # Now we need to try to make sure the Python executable is the right one, it should point to the one in the build env
 get_filename_component(ACTUALEXELOCATION "${PYTHON_EXECUTABLE}" ABSOLUTE)
+set(EXE_EXTENSION "")
 if(WIN32)
+  set(EXE_EXTENSION ".EXE")
   get_filename_component(IDEALEXELOCATION "${CMAKE_BINARY_DIR}/PRODUCTS/PYTHONENV/BIN/PYTHON3.EXE" ABSOLUTE)
   string(TOUPPER ACTUALEXELOCATION "${ACTUALEXELOCATION}")  # TODO: Will this work?
 else()
-  get_filename_component(IDEALEXELOCATION "${CMAKE_BINARY_DIR}/Products/pythonenv/bin/Python3" ABSOLUTE)
+  get_filename_component(IDEALEXELOCATION "${CMAKE_BINARY_DIR}/Products/pythonenv/bin/python3" ABSOLUTE)
 endif()
 
 message("Python configuration (3): \n  Actual Python EXE: ${ACTUALEXELOCATION}\n  Ideal Python EXE: ${IDEALEXELOCATION}")
@@ -131,7 +149,28 @@ else()
   if ("${PYTHON_EXECUTABLE}" STREQUAL "${IDEALEXELOCATION}")
     # I am using IDEAL location in the fixup call because I never want to accidentally "fixup" a system python executable
     message("Fixing up Python executable")
-    fixup_executable(${IDEALEXELOCATION})
+    #fixup_executable(${IDEALEXELOCATION})
+
+    get_prerequisites("${IDEALEXELOCATION}" PREREQUISITES 1 1 "" "")
+
+    foreach(PREREQ IN LISTS PREREQUISITES)
+      gp_resolve_item("" "${PREREQ}" "" "${LIBRARY_SEARCH_DIRECTORY}" resolved_item_var)
+      get_filename_component(BASE_PATH "${IDEALEXELOCATION}" DIRECTORY)
+      message("${CMAKE_COMMAND} -E copy ${resolved_item_var} ${BASE_PATH}")
+      # execute_process(COMMAND "${CMAKE_COMMAND}" -E copy "${resolved_item_var}" "${BASE_PATH}")
+      if(APPLE)
+        get_filename_component(PREREQNAME "${resolved_item_var}" NAME)
+        message("install_name_tool -change ${PREREQ} @executable_path/${PREREQNAME} ${IDEALEXELOCATION}")
+        # execute_process(COMMAND "install_name_tool" -change "${PREREQ}" "@executable_path/${PREREQNAME}" "${IDEALEXELOCATION}")
+#        foreach(PR IN LISTS PREREQUISITES)
+#          gp_resolve_item("" ${PR} "" "" PRPATH)
+#          get_filename_component( PRNAME ${PRPATH} NAME)
+#          message("install_name_tool -change ${PR} @loader_path/${PRNAME} ${BASE_PATH}/${PREREQNAME}")
+#          #execute_process(COMMAND "install_name_tool" -change "${PR}" "@loader_path/${PRNAME}" "${BASE_PATH}/${PREREQNAME}")
+#        endforeach()
+      endif()
+    endforeach()
+
     # this is currently resulting in an invalid Python executable
   else()
     error("Did not find Python executable in ideal location -- problem!")
