@@ -65,6 +65,12 @@ TEST_F(EnergyPlusFixture, OutputFiles_Expected_Formatting_Tests)
 
     EXPECT_EQ(print_to_string("{:.4R}", 0.1518), "0.1518");
     EXPECT_EQ(print_to_string("{:.4R}", 0.15185), "0.1519");
+    EXPECT_EQ(print_to_string("{:.2R}", 42.7350), "42.74");
+
+    // This edge case is rounding up from the old formatting routines and
+    // wants to round down with 'R' format
+    EXPECT_EQ(print_to_string("{:.2R}", 42.73499999999999232614), "42.74");
+    EXPECT_EQ(print_to_string("{:.2R}", 42.734), "42.73");
 
     // T formatting simulates the 'G' from Fortran
     // Always has a leading 0 if printing in fixed notation

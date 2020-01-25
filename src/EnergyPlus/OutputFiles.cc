@@ -179,7 +179,7 @@ public:
                 //                const auto order_of_magnitude = value == 0.0 ? 1 : static_cast<int>(std::log10(std::abs(value)));
                 if (should_be_fixed_output(value)) {
                     const auto magnitude = std::pow(10, specs()->precision);
-                    const auto rounded = std::round(value * magnitude) / magnitude;
+                    const auto rounded = std::round((value * magnitude) + .01) / magnitude;
                     specs()->type = 'F';
                     return (*this)(rounded);
                 } else {
