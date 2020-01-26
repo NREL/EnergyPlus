@@ -908,7 +908,7 @@
     KATemps,                 !- Undisturbed Ground Temperature Model Name
     2.5,                     !- Ground Thermal Conductivity {W/m-K}
     2.5E+06,                 !- Ground Thermal Heat Capacity {J/m3-K}
-    ,                        !- GHE:Vertical:ResponseFactors Object Name
+    ,                        !- GHE:ResponseFactors Object Name
     GHE-Array;               !- GHE:Vertical:Array Object Name
 
 !-   ===========  ALL OBJECTS IN CLASS: GROUNDHEATEXCHANGER:VERTICAL:PROPERTIES ===========
