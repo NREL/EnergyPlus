@@ -442,7 +442,7 @@ namespace DaylightingDevices {
                 // Report calculated view factor so that user knows what to make the view factor to ground
                 if (!ShelfReported) {
                     print(outputFiles.eio,
-                        "! <Shelf Details>,Name,View Factor to Outside Shelf,Window Name,Window View Factor to Sky,Window View Factor to Ground");
+                        "! <Shelf Details>,Name,View Factor to Outside Shelf,Window Name,Window View Factor to Sky,Window View Factor to Ground\n");
                     ShelfReported = true;
                 }
                 print(outputFiles.eio,

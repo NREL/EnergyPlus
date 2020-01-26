@@ -87,6 +87,15 @@ public:
         return (value >= 0.1 || value <= -0.1) || (value == 0.0);
     }
 
+    static bool fixed_will_fit(const Real64 value, const int places)
+    {
+        if (value < 1.0 && value > -1.0) {
+            return true;
+        } else {
+            return static_cast<int>(std::log10(std::abs(value))) < places;
+        }
+    }
+
     static std::string write_to_string(const Real64 value, fmt::format_specs &specs)
     {
         std::string str;
@@ -121,7 +130,7 @@ public:
         if (specs()) {
             if (specs()->type == 'T') {
 
-                if (should_be_fixed_output(value)) {
+                if (should_be_fixed_output(value) && fixed_will_fit(value, specs()->width - 5)) {
                     specs()->type = 'F';
 
                     // account for alignment with E formatted

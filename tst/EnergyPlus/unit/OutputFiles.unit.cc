@@ -132,6 +132,7 @@ TEST_F(EnergyPlusFixture, OutputFiles_Expected_Formatting_Tests)
     EXPECT_EQ(print_to_string("{:20.8T}", 213608134.0), "      213608134.    ");
     EXPECT_EQ(print_to_string("{:20.8T}", 213608139.6), "      213608140.    ");
     EXPECT_EQ(print_to_string("{:20.8T}", 0.213608134), "      0.21360813    ");
+    EXPECT_EQ(print_to_string("{:13.6T}",  0.803434E+09), " 0.803434E+09");
     //    EXPECT_EQ(print_to_string("{:20.8T}", -0.23111252), "     -0.23111252    ");
     //    EXPECT_EQ(print_to_string("{:20.8T}", -0.23111252), "     -0.23111252    ");
 }
