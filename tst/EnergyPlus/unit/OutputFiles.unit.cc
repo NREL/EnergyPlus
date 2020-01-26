@@ -92,17 +92,36 @@ TEST_F(EnergyPlusFixture, OutputFiles_Expected_Formatting_Tests)
     EXPECT_EQ(print_to_string("{:.10R}", 0.11686688704901793123), "0.1168668870");
     EXPECT_EQ(print_to_string("{:.10R}", 0.14602401770121714586), "0.1460240177");
 
-    EXPECT_EQ(print_to_string("{:.10R}", 9.12850042469573067808E-016),"9.1285004247E-016");
-    EXPECT_EQ(print_to_string("{:.10R}", 1.60782525664980535959E-015),"1.6078252566E-015");
+    EXPECT_EQ(print_to_string("{:.10R}", 9.12850042469573067808E-016), "9.1285004247E-016");
+    EXPECT_EQ(print_to_string("{:.10R}", 1.60782525664980535959E-015), "1.6078252566E-015");
 
-    EXPECT_EQ(print_to_string("{:.10R}", 0.10797418337603230387),"0.1079741834");
-    EXPECT_EQ(print_to_string("{:.10R}", 0.14820485805540076218),"0.1482048581");
-    EXPECT_EQ(print_to_string("{:.10R}", 3.08684514533120978041E-002),"3.0868451453E-002");
+    EXPECT_EQ(print_to_string("{:.10R}", 0.10797418337603230387), "0.1079741834");
+    EXPECT_EQ(print_to_string("{:.10R}", 0.14820485805540076218), "0.1482048581");
+    EXPECT_EQ(print_to_string("{:.10R}", 3.08684514533120978041E-002), "3.0868451453E-002");
+
+    EXPECT_EQ(print_to_string("{:.3R}", 7.63142731775999418747E-003), "7.631E-003");
+    EXPECT_EQ(print_to_string("{:.3R}", 1.28349999999999948505E-004), "1.283E-004");
+    EXPECT_EQ(print_to_string("{:.3R}", 2.56700000000000005430E-004), "2.567E-004");
+    EXPECT_EQ(print_to_string("{:.3R}", 0.15159450340364988286), "0.152");
+
+    EXPECT_EQ(print_to_string("{:.3R}", 2.14633893312000043063E-002), "2.146E-002");
+    EXPECT_EQ(print_to_string("{:.3R}", 8.55666666666666278192E-005), "8.557E-005");
+    EXPECT_EQ(print_to_string("{:.3R}", 6.41749999999999878051E-005), "6.418E-005");
+    EXPECT_EQ(print_to_string("{:.3R}", 0.10106298657208269420), "0.101");
+
+    EXPECT_EQ(print_to_string("{:.3R}", 5.72357048832000323002E-003),"5.724E-003");
+    EXPECT_EQ(print_to_string("{:.3R}", 8.55666666666666142667E-005),"8.557E-005");
+    EXPECT_EQ(print_to_string("{:.3R}", 6.41749999999999742525E-005),"6.417E-005");
+    EXPECT_EQ(print_to_string("{:.3R}", 0.10106298987671752387),"0.101");
+
+    EXPECT_EQ(print_to_string("{:.3R}", 7.86990942144000400760E-003),"7.870E-003");
+    EXPECT_EQ(print_to_string("{:.3R}", 8.55666666666666007142E-005),"8.557E-005");
+    EXPECT_EQ(print_to_string("{:.3R}", 6.41749999999999607000E-005),"6.417E-005");
+    EXPECT_EQ(print_to_string("{:.3R}", 0.10106298537039738739),"0.101");
 
     // The following is an expected output from the old rounding algorithm that is clearly wrong
     // So the test is commented out for now while we decide what to do
-//    EXPECT_EQ(print_to_string("{:.10R}", 4.05237932036497869315E-002),"4.0523793203E-002");
-
+    //    EXPECT_EQ(print_to_string("{:.10R}", 4.05237932036497869315E-002),"4.0523793203E-002");
 
     // T formatting simulates the 'G' from Fortran
     // Always has a leading 0 if printing in fixed notation

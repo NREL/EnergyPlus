@@ -186,8 +186,7 @@ public:
                     if (fixed_output) {
                         adjusted += std::pow(10, -(specs()->precision + 10));
                     } else {
-                        const auto order_of_magnitude = -static_cast<int>(std::log10(std::abs(value)));
-                        adjusted = adjusted + std::pow(10, -(order_of_magnitude + specs()->precision + 10));
+                        adjusted = (std::nextafter(adjusted, static_cast<Real64>(1)));
                     }
                 }
 

@@ -4923,7 +4923,7 @@ namespace DaylightingManager {
                     cAlphaArgs(1) = "COMMA";
                 }
             }
-            print(outputFiles.eio, "! <Daylighting:Illuminance Maps>,#Maps,Style");
+            print(outputFiles.eio, "! <Daylighting:Illuminance Maps>,#Maps,Style\n");
             ConvertCaseToLower(cAlphaArgs(1), cAlphaArgs(2));
             cAlphaArgs(1).erase(1);
             cAlphaArgs(1) += cAlphaArgs(2).substr(1);
@@ -5124,11 +5124,11 @@ namespace DaylightingManager {
 
         if (TotIllumMaps > 0) {
             print(outputFiles.eio, "! <Daylighting:Illuminance Maps:Detail>,Name,Zone,XMin {{m}},XMax {{m}},Xinc {{m}},#X Points,YMin "
-                                                 "{{m}},YMax {{m}},Yinc {{m}},#Y Points,Z {{m}}");
+                                                 "{{m}},YMax {{m}},Yinc {{m}},#Y Points,Z {{m}}\n");
         }
         for (MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
             print(outputFiles.eio,
-                  " Daylighting:Illuminance Maps:Detail,{},{},{:.2R},{:.2R},{:.2R},{},{:.2R},{:.2R},{:.2R},{},{:.2R}",
+                  " Daylighting:Illuminance Maps:Detail,{},{},{:.2R},{:.2R},{:.2R},{},{:.2R},{:.2R},{:.2R},{},{:.2R}\n",
                   IllumMap(MapNum).Name,
                   Zone(IllumMap(MapNum).Zone).Name,
                   IllumMap(MapNum).Xmin,
