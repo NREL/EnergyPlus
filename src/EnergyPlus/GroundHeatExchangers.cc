@@ -244,7 +244,6 @@ namespace GroundHeatExchangers {
     }
 
     void ThermoProps::setup() {
-        this->rhoCp = this->rho * this->cp;
         this->diffusivity = this->k / this->rhoCp;
     }
 
@@ -993,16 +992,12 @@ namespace GroundHeatExchangers {
             thisProps->topDepth += thisBH->props->topDepth;
             thisProps->shankSpace += thisBH->props->shankSpace;
 
-            thisProps->grout.cp += thisBH->props->grout.cp;
             thisProps->grout.diffusivity += thisBH->props->grout.diffusivity;
             thisProps->grout.k += thisBH->props->grout.k;
-            thisProps->grout.rho += thisBH->props->grout.rho;
             thisProps->grout.rhoCp += thisBH->props->grout.rhoCp;
 
-            thisProps->pipe.cp += thisBH->props->pipe.cp;
             thisProps->pipe.diffusivity += thisBH->props->pipe.diffusivity;
             thisProps->pipe.k += thisBH->props->pipe.k;
-            thisProps->pipe.rho += thisBH->props->pipe.rho;
             thisProps->pipe.rhoCp += thisBH->props->pipe.rhoCp;
 
             thisProps->pipe.outDia += thisBH->props->pipe.outDia;
@@ -1019,16 +1014,12 @@ namespace GroundHeatExchangers {
         thisProps->topDepth /= numBH;
         thisProps->shankSpace /= numBH;
 
-        thisProps->grout.cp /= numBH;
         thisProps->grout.diffusivity /= numBH;
         thisProps->grout.k /= numBH;
-        thisProps->grout.rho /= numBH;
         thisProps->grout.rhoCp /= numBH;
 
-        thisProps->pipe.cp /= numBH;
         thisProps->pipe.diffusivity /= numBH;
         thisProps->pipe.k /= numBH;
-        thisProps->pipe.rho /= numBH;
         thisProps->pipe.rhoCp /= numBH;
 
         thisProps->pipe.outDia /= numBH;
@@ -2974,9 +2965,11 @@ namespace GroundHeatExchangers {
 
                 // Build out new instance
                 EnhancedGHE thisGHE;
+
+                // OBJECT NAME
                 thisGHE.name = DataIPShortCuts::cAlphaArgs(1);
 
-                // get inlet node num
+                // INLET NODE
                 thisGHE.inletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(2),
                                                                             errorsFound,
                                                                             DataIPShortCuts::cCurrentModuleObject,
@@ -2986,7 +2979,7 @@ namespace GroundHeatExchangers {
                                                                             1,
                                                                             DataLoopNode::ObjectIsNotParent);
 
-                // get outlet node num
+                // OUTLET NODE
                 thisGHE.outletNodeNum = NodeInputManager::GetOnlySingleNode(DataIPShortCuts::cAlphaArgs(3),
                                                                              errorsFound,
                                                                              DataIPShortCuts::cCurrentModuleObject,
@@ -3002,8 +2995,12 @@ namespace GroundHeatExchangers {
                                                    DataIPShortCuts::cAlphaArgs(3),
                                                    "Condenser Water Nodes");
 
+                // DESIGN FLOW RATE
                 thisGHE.designFlow = DataIPShortCuts::rNumericArgs(1);
                 PlantUtilities::RegisterPlantCompDesignFlow(thisGHE.inletNodeNum, thisGHE.designFlow);
+
+                // Initialize ground temperature model and get pointer reference
+                thisGHE.groundTempModel = GroundTemperatureManager::GetGroundTempModelAndInit(DataIPShortCuts::cAlphaArgs(4), DataIPShortCuts::cAlphaArgs(5));
 
 
             }
@@ -3298,12 +3295,11 @@ namespace GroundHeatExchangers {
                 PlantUtilities::RegisterPlantCompDesignFlow(thisGLHE.inletNodeNum, thisGLHE.designFlow);
 
                 thisGLHE.soil.k = DataIPShortCuts::rNumericArgs(2);
-                thisGLHE.soil.rhoCp = DataIPShortCuts::rNumericArgs(3) * DataIPShortCuts::rNumericArgs(4);
-                thisGLHE.pipe.k = DataIPShortCuts::rNumericArgs(5);
-                thisGLHE.pipe.rho = DataIPShortCuts::rNumericArgs(6);
-                thisGLHE.pipe.cp = DataIPShortCuts::rNumericArgs(7);
-                thisGLHE.pipe.outDia = DataIPShortCuts::rNumericArgs(8);
-                thisGLHE.pipe.thickness = DataIPShortCuts::rNumericArgs(9);
+                thisGLHE.soil.rhoCp = DataIPShortCuts::rNumericArgs(3);
+                thisGLHE.pipe.k = DataIPShortCuts::rNumericArgs(4);
+                thisGLHE.pipe.rhoCp = DataIPShortCuts::rNumericArgs(5);
+                thisGLHE.pipe.outDia = DataIPShortCuts::rNumericArgs(6);
+                thisGLHE.pipe.thickness = DataIPShortCuts::rNumericArgs(7);
 
                 if (UtilityRoutines::SameString(DataIPShortCuts::cAlphaArgs(4), "VERTICAL")) {
                     thisGLHE.verticalConfig = true;
@@ -3311,13 +3307,13 @@ namespace GroundHeatExchangers {
                     thisGLHE.verticalConfig = false;
                 }
 
-                thisGLHE.coilDiameter = DataIPShortCuts::rNumericArgs(10);
-                thisGLHE.coilPitch = DataIPShortCuts::rNumericArgs(11);
-                thisGLHE.trenchDepth = DataIPShortCuts::rNumericArgs(12);
-                thisGLHE.trenchLength = DataIPShortCuts::rNumericArgs(13);
-                thisGLHE.numTrenches = DataIPShortCuts::rNumericArgs(14);
-                thisGLHE.trenchSpacing = DataIPShortCuts::rNumericArgs(15);
-                thisGLHE.maxSimYears = DataIPShortCuts::rNumericArgs(16);
+                thisGLHE.coilDiameter = DataIPShortCuts::rNumericArgs(8);
+                thisGLHE.coilPitch = DataIPShortCuts::rNumericArgs(9);
+                thisGLHE.trenchDepth = DataIPShortCuts::rNumericArgs(10);
+                thisGLHE.trenchLength = DataIPShortCuts::rNumericArgs(11);
+                thisGLHE.numTrenches = DataIPShortCuts::rNumericArgs(12);
+                thisGLHE.trenchSpacing = DataIPShortCuts::rNumericArgs(13);
+                thisGLHE.maxSimYears = DataIPShortCuts::rNumericArgs(14);
 
                 // Need to add a response factor object for the slinky model
                 std::shared_ptr<GLHEResponseFactors> thisRF(new GLHEResponseFactors);

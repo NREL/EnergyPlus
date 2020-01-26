@@ -74,27 +74,18 @@ namespace GroundHeatExchangers {
     {
         // members
         Real64 k;           // Thermal conductivity [W/m-K]
-        Real64 rho;         // Density [kg/m3]
-        Real64 cp;          // Specific heat [J/kg-K]
         Real64 rhoCp;       // Heat capacity [J/m3-K]
         Real64 diffusivity; // Thermal diffusivity [m2/s]
 
         // default constructor
-        ThermoProps() : k(0.0), rho(0.0), cp(0.0), rhoCp(0.0), diffusivity(0.0) {
-        }
-
-        // member constructor
-        ThermoProps(Real64 const k, Real64 const rho, Real64 const cp)
-            : k(k), rho(rho), cp(cp)
-        {
-            this->setup();
+        ThermoProps() : k(0.0), rhoCp(0.0), diffusivity(0.0) {
         }
 
         // default destructor
         ~ThermoProps() = default;
 
-        // member methods
         void setup();
+
     };
 
     struct FluidWorker
@@ -626,6 +617,7 @@ namespace GroundHeatExchangers {
         int inletNodeNum;
         int outletNodeNum;
         Real64 designFlow;
+        std::shared_ptr<BaseGroundTempsModel> groundTempModel;
         ThermoProps soil;
 
         // default constructor

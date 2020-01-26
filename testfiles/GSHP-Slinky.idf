@@ -3467,11 +3467,9 @@
     GHE Outlet Node,         !- Outlet Node Name
     0.0033,                  !- Design Flow Rate {m3/s}
     1.2,                     !- Soil Thermal Conductivity {W/m-K}
-    3200,                    !- Soil Density {kg/m3}
-    850,                     !- Soil Specific Heat {J/kg-K}
+    2.72E6,                  !- Ground Thermal Heat Capacity {J/m3-K}
     1.8,                     !- Pipe Thermal Conductivity {W/m-K}
-    920,                     !- Pipe Density {kg/m3}
-    2200,                    !- Pipe Specific Heat {J/kg-K}
+    2.024E6,                 !- Pipe Thermal Heat Capacity {J/m3-K}
     0.02667,                 !- Pipe Outer Diameter {m}
     0.002413,                !- Pipe Thickness {m}
     Vertical,                !- Heat Exchanger Configuration
