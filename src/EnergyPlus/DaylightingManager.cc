@@ -4927,7 +4927,7 @@ namespace DaylightingManager {
             ConvertCaseToLower(cAlphaArgs(1), cAlphaArgs(2));
             cAlphaArgs(1).erase(1);
             cAlphaArgs(1) += cAlphaArgs(2).substr(1);
-            print(outputFiles.eio, "Daylighting:Illuminance Maps,{},{} \n", TotIllumMaps, cAlphaArgs(1));
+            print(outputFiles.eio, "Daylighting:Illuminance Maps,{},{}\n", TotIllumMaps, cAlphaArgs(1));
         }
         for (Loop1 = 1; Loop1 <= NumOfZones; ++Loop1) {
             ZoneDaylight(Loop1).ZoneToMap.allocate(ZoneMapCount(Loop1));
