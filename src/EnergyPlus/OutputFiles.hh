@@ -69,6 +69,7 @@ private:
 };
 
 void vprint(std::ostream &os, fmt::string_view format_str, fmt::format_args args, const std::size_t count);
+std::string vprint(fmt::string_view format_str, fmt::format_args args, const std::size_t count);
 
 
 // Uses lib {fmt} (which has been accepted for C++20)
@@ -87,6 +88,12 @@ template <typename... Args>
 void print(std::ostream &os, fmt::string_view format_str, const Args &... args)
 {
     EnergyPlus::vprint(os, format_str, fmt::make_format_args(args...), sizeof...(Args));
+}
+
+template <typename... Args>
+std::string print_to_string(fmt::string_view format_str, const Args &... args)
+{
+    return EnergyPlus::vprint(format_str, fmt::make_format_args(args...), sizeof...(Args));
 }
 
 } // namespace EnergyPlus

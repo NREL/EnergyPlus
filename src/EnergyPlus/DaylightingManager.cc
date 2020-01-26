@@ -752,7 +752,7 @@ namespace DaylightingManager {
                                 DaylFac2 = 0.0;
                                 if (ZoneDaylight(ZoneNum).TotalDaylRefPoints > 1) DaylFac2 = ZoneDaylight(ZoneNum).DaylIllFacSky(12, 1, 2, 2, loop);
                                 print(outputFiles.eio,
-                                      " Clear Turbid Daylight Factors,{},{},{},{:.4R},{:.4R}\n",
+                                      " Clear Turbid Sky Daylight Factors,{},{},{},{:.4R},{:.4R}\n",
                                       CurMnDy,
                                       Zone(ZoneNum).Name,
                                       Surface(IWin).Name,
@@ -4923,11 +4923,11 @@ namespace DaylightingManager {
                     cAlphaArgs(1) = "COMMA";
                 }
             }
-            print(outputFiles.eio, "! <Daylighting:Illuminance Maps>,#Maps,Style");
+            print(outputFiles.eio, "! <Daylighting:Illuminance Maps>,#Maps,Style\n");
             ConvertCaseToLower(cAlphaArgs(1), cAlphaArgs(2));
             cAlphaArgs(1).erase(1);
             cAlphaArgs(1) += cAlphaArgs(2).substr(1);
-            print(outputFiles.eio, " Daylighting:Illuminance Maps,{},{} \n", TotIllumMaps, cAlphaArgs(1));
+            print(outputFiles.eio, "Daylighting:Illuminance Maps,{},{}\n", TotIllumMaps, cAlphaArgs(1));
         }
         for (Loop1 = 1; Loop1 <= NumOfZones; ++Loop1) {
             ZoneDaylight(Loop1).ZoneToMap.allocate(ZoneMapCount(Loop1));
@@ -5124,11 +5124,11 @@ namespace DaylightingManager {
 
         if (TotIllumMaps > 0) {
             print(outputFiles.eio, "! <Daylighting:Illuminance Maps:Detail>,Name,Zone,XMin {{m}},XMax {{m}},Xinc {{m}},#X Points,YMin "
-                                                 "{{m}},YMax {{m}},Yinc {{m}},#Y Points,Z {{m}}");
+                                                 "{{m}},YMax {{m}},Yinc {{m}},#Y Points,Z {{m}}\n");
         }
         for (MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
             print(outputFiles.eio,
-                  " Daylighting:Illuminance Maps:Detail,{},{},{:.2R},{:.2R},{:.2R},{},{:.2R},{:.2R},{:.2R},{},{:.2R}",
+                  "Daylighting:Illuminance Maps:Detail,{},{},{:.2R},{:.2R},{:.2R},{},{:.2R},{:.2R},{:.2R},{},{:.2R}\n",
                   IllumMap(MapNum).Name,
                   Zone(IllumMap(MapNum).Zone).Name,
                   IllumMap(MapNum).Xmin,
@@ -10733,7 +10733,7 @@ namespace DaylightingManager {
             }
 
         } // End of primary zone loop
-        static constexpr auto Format_700("! <Zone/Window Adjacency Daylighting Counts>, Zone Name, Number of Exterior Windows, Number of Exterior Windows in Adjacent Zones");
+        static constexpr auto Format_700("! <Zone/Window Adjacency Daylighting Counts>, Zone Name, Number of Exterior Windows, Number of Exterior Windows in Adjacent Zones\n");
         print(outputFiles.eio, Format_700);
         for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
             if (ZoneDaylight(ZoneNum).TotalDaylRefPoints == 0 || ZoneDaylight(ZoneNum).DaylightMethod != SplitFluxDaylighting) continue;

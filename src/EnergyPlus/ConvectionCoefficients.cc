@@ -5601,7 +5601,7 @@ namespace ConvectionCoefficients {
                     "XuYuZd:Z,XuYdZu:X, XuYdZu:Y, XuYdZu:Z,XuYuZu:X, XuYuZu:Y, XuYuZu:Z\n");
                 print(outputFiles.eio, Format_8800); // header for roof
                 static constexpr auto Format_8801(
-                    "Building Convection Parameters:Roof,{:.2R},{:.2R},{:.2R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{.3R},");
+                    "Building Convection Parameters:Roof,{:.2R},{:.2R},{:.2R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},");
                 print(outputFiles.eio,
                       Format_8801,
                       RoofGeo.Area,
