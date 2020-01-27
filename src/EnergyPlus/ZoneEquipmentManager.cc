@@ -617,7 +617,7 @@ namespace ZoneEquipmentManager {
         Real64 RetTemp;                       // zone return temperature [C]
         Real64 DOASMassFlowRate(0.0);         // DOAS air mass flow rate for sizing [kg/s]
         Real64 DOASSupplyTemp(0.0);           // DOAS supply air temperature [C]
-        Real64 DOASSupplyHumRat(0.0);         // DOAS supply air humidity ratio [kg H2O / kg dry air]
+        Real64 DOASSupplyHumRat(0.0);         // DOAS supply air humidity ratio [kgWater/kgDryAir]
         Real64 DOASCpAir(0.0);                // heat capacity of DOAS air [J/kg-C]
         Real64 DOASSysOutputProvided(0.0);    // heating / cooling provided by DOAS system [W]
         Real64 TotDOASSysOutputProvided(0.0); // total DOAS load on the zone [W]
@@ -1923,7 +1923,7 @@ namespace ZoneEquipmentManager {
                 ZoneSizing(DesDayNum, CtrlZoneNum).DOASCoolLoad = 0.0;          // current cooling load from DOAS supply air [W]
                 ZoneSizing(DesDayNum, CtrlZoneNum).DOASSupMassFlow = 0.0;       // current mass flow rate of DOAS supply air [kg/s]
                 ZoneSizing(DesDayNum, CtrlZoneNum).DOASSupTemp = 0.0;           // current DOAS supply air temperature [C]
-                ZoneSizing(DesDayNum, CtrlZoneNum).DOASSupHumRat = 0.0;         // current DOAS supply air humidity ratio [kg H2O / kg dry air]
+                ZoneSizing(DesDayNum, CtrlZoneNum).DOASSupHumRat = 0.0;         // current DOAS supply air humidity ratio [kgWater/kgDryAir]
                 ZoneSizing(DesDayNum, CtrlZoneNum).DOASTotCoolLoad = 0.0;       // current total cooling load imposed by DOAS supply air [W]
 
                 CalcZoneSizing(DesDayNum, CtrlZoneNum).CoolDesDay = ""; // name of a cooling design day
@@ -1983,7 +1983,7 @@ namespace ZoneEquipmentManager {
                 CalcZoneSizing(DesDayNum, CtrlZoneNum).DOASCoolLoad = 0.0;          // current cooling load from DOAS supply air [W]
                 CalcZoneSizing(DesDayNum, CtrlZoneNum).DOASSupMassFlow = 0.0;       // current mass flow rate of DOAS supply air [kg/s]
                 CalcZoneSizing(DesDayNum, CtrlZoneNum).DOASSupTemp = 0.0;           // current DOAS supply air temperature [C]
-                CalcZoneSizing(DesDayNum, CtrlZoneNum).DOASSupHumRat = 0.0;         // current DOAS supply air humidity ratio [kg H2O / kg dry air]
+                CalcZoneSizing(DesDayNum, CtrlZoneNum).DOASSupHumRat = 0.0;         // current DOAS supply air humidity ratio [kgWater/kgDryAir]
                 CalcZoneSizing(DesDayNum, CtrlZoneNum).DOASTotCoolLoad = 0.0;       // current total cooling load imposed by DOAS supply air [W]
             }
         }
@@ -2105,7 +2105,7 @@ namespace ZoneEquipmentManager {
             FinalZoneSizing(CtrlZoneNum).DOASCoolLoad = 0.0;          // current cooling load from DOAS supply air [W]
             FinalZoneSizing(CtrlZoneNum).DOASSupMassFlow = 0.0;       // current mass flow rate of DOAS supply air [kg/s]
             FinalZoneSizing(CtrlZoneNum).DOASSupTemp = 0.0;           // current DOAS supply air temperature [C]
-            FinalZoneSizing(CtrlZoneNum).DOASSupHumRat = 0.0;         // current DOAS supply air humidity ratio [kg H2O / kg dry air]
+            FinalZoneSizing(CtrlZoneNum).DOASSupHumRat = 0.0;         // current DOAS supply air humidity ratio [kgWater/kgDryAir]
             FinalZoneSizing(CtrlZoneNum).DOASTotCoolLoad = 0.0;       // current total cooling load imposed by DOAS supply air [W]
 
             CalcFinalZoneSizing(CtrlZoneNum).CoolDesDay = ""; // name of a cooling design day
@@ -2165,7 +2165,7 @@ namespace ZoneEquipmentManager {
             CalcFinalZoneSizing(CtrlZoneNum).DOASCoolLoad = 0.0;          // current cooling load from DOAS supply air [W]
             CalcFinalZoneSizing(CtrlZoneNum).DOASSupMassFlow = 0.0;       // current mass flow rate of DOAS supply air [kg/s]
             CalcFinalZoneSizing(CtrlZoneNum).DOASSupTemp = 0.0;           // current DOAS supply air temperature [C]
-            CalcFinalZoneSizing(CtrlZoneNum).DOASSupHumRat = 0.0;         // current DOAS supply air humidity ratio [kg H2O / kg dry air]
+            CalcFinalZoneSizing(CtrlZoneNum).DOASSupHumRat = 0.0;         // current DOAS supply air humidity ratio [kgWater/kgDryAir]
             CalcFinalZoneSizing(CtrlZoneNum).DOASTotCoolLoad = 0.0;       // current total cooling load imposed by DOAS supply air [W]
         }
     }
@@ -3834,6 +3834,18 @@ namespace ZoneEquipmentManager {
                                          ZoneEquipList(ControlledZoneNum).EquipIndex(EquipPtr));
 
                     } else if (SELECT_CASE_var == HPWaterHeater_Num) { // 'WaterHeater:HeatPump:PumpedCondenser'
+//                        auto HPWH = WaterThermalTanks::HeatPumpWaterHeaterData::factory(PrioritySimOrder(EquipTypeNum).EquipName);
+//                        PlantLocation A(0, 0, 0, 0);
+//                        Real64 curLoad = 0.0;
+//                        if (dynamic_cast<WaterThermalTanks::HeatPumpWaterHeaterData*> (HPWH)->StandAlone) {
+//                            dynamic_cast<WaterThermalTanks::HeatPumpWaterHeaterData*> (HPWH)->simulate(A, FirstHVACIteration, curLoad, true);
+//                            SysOutputProvided = dynamic_cast<WaterThermalTanks::HeatPumpWaterHeaterData*> (HPWH)->HPWaterHeaterSensibleCapacity;
+//                            LatOutputProvided = dynamic_cast<WaterThermalTanks::HeatPumpWaterHeaterData*> (HPWH)->HPWaterHeaterLatentCapacity;
+//                        } else {
+//                            SysOutputProvided = dynamic_cast<WaterThermalTanks::HeatPumpWaterHeaterData*> (HPWH)->HPWaterHeaterSensibleCapacity;
+//                            LatOutputProvided = dynamic_cast<WaterThermalTanks::HeatPumpWaterHeaterData*> (HPWH)->HPWaterHeaterLatentCapacity;
+//                        }
+
                         SimHeatPumpWaterHeater(PrioritySimOrder(EquipTypeNum).EquipName,
                                                FirstHVACIteration,
                                                SysOutputProvided,

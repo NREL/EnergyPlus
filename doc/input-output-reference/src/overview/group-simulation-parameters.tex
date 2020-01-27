@@ -154,11 +154,11 @@ Urban & Urban, Industrial, Forest \tabularnewline
 
 \paragraph{Warmup Convergence}\label{warmup-convergence}
 
-The following two fields along with the minimum and maximum number of warmup days (also in this object) define the user specified criteria for when EnergyPlus will ``converge'' at each environment (each sizing period or run period set as Yes in the \hyperref[simulationcontrol]{SimulationControl} object). EnergyPlus ``runs'' the first day of the environment (starting with a set of hard-coded initial conditions: temperatures are initialized to 23C and zone humidity ratios are initialized to the outdoor humidity ratio) until the loads/temperature convergence tolerance values are satisfied (next two fields) or until it reaches ``maximum number of warmup days''. Note that setting the convergence tolerance values too loose will cause the program to be satisfied too early and you may not get the results you expect from the actual simulation.
+The following two fields along with the minimum and maximum number of warmup days (also in this object) define the user specified criteria for when EnergyPlus will ``converge'' at each environment (each sizing period or run period set as Yes in the \hyperref[simulationcontrol]{SimulationControl} object). At the beginning of a new enviroment the building model is reinitialized so that temperatures are initialized to 23C and zone humidity ratios are initialized to the outdoor humidity ratio  (unless this initialization is suppressed using the input field called Begin Environment Reset Mode in the \hyperref[sizingperioddesignday]{SizingPerod:DesignDay} object).  EnergyPlus repeatedly ``runs'' the first day of the environment or until it reaches ``maximum number of warmup days'' or the convergence criteria are met. Note that setting the convergence tolerance values too loose will cause the program to be satisfied too early and you may not get the results you expect from the actual simulation. However too tight of a value and the program will repeat the first day too many times leading to excessive simulation run time.
 
 \paragraph{Field: Loads Convergence Tolerance Value}\label{field-loads-convergence-tolerance-value}
 
-This value represents the number at which the loads values must agree before ``convergence'' is reached. Loads tolerance value is a fraction of the load.
+This value represents the number at which the loads values must agree before ``convergence'' is reached. Loads tolerance is the change in peak zone heating and cooling loads that are predicted from previous warmup day to the current day, in units of W.
 
 \paragraph{Field: Temperature Convergence Tolerance Value}\label{field-temperature-convergence-tolerance-value}
 
@@ -249,9 +249,11 @@ As noted in the message, there will be more information in the .eio file. (Refer
 
 You may be able to increase the Maximum Number of Warmup Days and get convergence, but some anomalous buildings may still not converge. Simulation proceeds for x warmup days until ``convergence'' is reached (see the discussion under the Temperature Convergence Tolerance Value field in this object, just above).
 
+The value in this field is an overall parameter for all types of environments in the simulation.  The maximum nmber of warmup days can also be controlled separately for individual designgdays using the input field Maximum Number Warmup Days in the \hyperref[sizingperioddesignday]{SizingPerod:DesignDay} object. 
+
 \paragraph{Field: Minimum Number of Warmup Days}\label{field-minimum-number-of-warmup-days}
 
-This field specifies the minimum number of ``warmup'' days before EnergyPlus will check if it has achieved convergence and can thus start simulating the particular environment (design day, annual run) in question. Research into the minimum number of warmup days indicates that 6 warmup days is generally enough on the minimum end of the spectrum to avoid false predictions of convergence and thus to produce enough temperature and flux history to start EnergyPlus simulation. This was based on a study that used the benchmark reference buildings. It also was observed that convergence performance improved when the number of warmup days increased. As a result, the default value for the minimum warmup days has been set to 6. Users should decrease this number only if they have knowledge that a specific file converges more quickly than 6 days. Users may wish to increase the value in certain situations when, based on the output variables described in the Output Details document, it is determined that EnergyPlus has not converged. While this parameter should be less than the previous parameter, a value greater than the value entered in the field ``Maximum Number of Warmup Days'' above may be used when users wish to increase warmup days more than the previous field. In this particular case, the previous field will be automatically reset to the value entered in this field and EnergyPlus will run exactly the number of warmup days specified in this field.
+This field specifies the minimum number of ``warmup'' days before EnergyPlus will check if it has achieved convergence and can thus start simulating the particular environment (design day, annual run) in question. Although some older investigations indicated that 6 warmup days is generally enough on the minimum end of the spectrum, current thinking is that the convergence checks (controlled by convergence tolerance values above) can be relied on to determine a minimum number of warm days.  An arbitrary high minimum can lead to excessive run times for lightweight buildings that may converge quickly and not need many warmup days.  Therefore the default is reduced from 6 to just 1. A value of 6 here will replicate older behavior if field was being left blank.  Users may wish to increase the value in certain situations when, based on the output variables described in the Output Details document, it is determined that EnergyPlus has not converged. While this parameter should be less than the previous maximum parameter, a value greater than the value entered in the field ``Maximum Number of Warmup Days'' above may be used when users wish to increase warmup days more than the previous field. In this particular case, the previous field will be automatically reset to the value entered in this field and EnergyPlus will run exactly the number of warmup days specified in this field.
 
 An example from an IDF:
 
@@ -792,7 +794,7 @@ SimulationControl,
 
 \subsection{PerformancePrecisionTradeoffs}\label{performanceprecisiontradeoffs}
 
-The PerformancePrecisionTradeoffs object can be used to control tradeoffs between performance (speed) and precision for certain EnergyPlus features. This object enables users to choose to use selected options that are intended to shorten the time needed for the computer to run EnergyPlus simulations, but may tend to decrease the accuracy of results compared to methods that require longer computing time. 
+The PerformancePrecisionTradeoffs object can be used to control tradeoffs between performance (speed) and precision for certain EnergyPlus features. This object enables users to choose to use selected options that are intended to shorten the time needed for the computer to run EnergyPlus simulations, but may tend to decrease the accuracy of results compared to methods that require longer computing time.
 
 \paragraph{Field: Use Coil Direct Solutions}\label{use-coil-direct-solutions}
 
@@ -886,11 +888,18 @@ CoilSystem:Heating:DX & Coil:Heating:DX:SingleSpeed, Coil:Heating:DX:VariableSpe
 
 Note: The choice of Load in the Control Type of the AirLoopHVAC:UnitarySystem object is required for all coils listed in the above table.
 
+\paragraph{Field: Zone Radiant Exchange Algorithm}\label{zone-radiant-exchange-algorithm}
+
+Allowed choices are: ScriptF (default) and CarrollMRT. ScriptF uses view factors among all surfaces in a zone and calculates radiant heat transfer from each surface in the zone to each other surface in the zone based on their respective temperatures and emissivities. The CarrollMRT algorithm calculates radiant heat transfer between surfaces which exchange heat through a central, mean radiant temperature (MRT) node.
+
+Although, defined view factors cannot be used with CarrollMRT, the algorithm approximates ``view factors'' based on relative areas of the surfaces in a similar way to how EnergyPlus determines its default view factors. One exception is that with CarrollMRT, every surface can ``view'' every other surface in the zone regardless of orientation. For enclosed prism shapes, this approximation is very accurate.
+
 An IDF example:
 
 \begin{lstlisting}
 PerformancePrecisionTradeoffs,
-  Yes;                      !- Use Coil Direct Solutions
+  Yes,                      !- Use Coil Direct Solutions
+  CarrollMRT;               !- Zone Radiant Exchange Algorithm
 \end{lstlisting}
 
 \subsection{HVACSystemRootFindingAlgorithm}\label{hvacystemrootfindingalgorithm}

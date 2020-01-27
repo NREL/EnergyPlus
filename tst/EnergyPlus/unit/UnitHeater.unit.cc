@@ -1109,7 +1109,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     ProcessScheduleInput();  // read schedule data
 
     ErrorsFound = false;
-    HeatBalanceManager::GetProjectControlData(ErrorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);
 
     // OutputProcessor::TimeValue.allocate(2);

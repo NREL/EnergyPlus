@@ -990,6 +990,34 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
               ! If your original object starts with H, insert the rules here
 
+              CASE("HEATPUMP:WATERTOWATER:EIR:HEATING")
+                  ! object rename
+                  ObjectName = "HeatPump:PlantLoop:EIR:Heating"
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  ! fields 1-3 same
+                  OutArgs(1:3)=InArgs(1:3)
+                  ! insert condenser type field
+                  OutArgs(4)=Blank
+                  ! all others equal
+                  OutArgs(5:CurArgs+1)=InArgs(4:CurArgs)
+                  CurArgs = CurArgs + 1
+                  NoDiff = .false.
+
+              CASE("HEATPUMP:WATERTOWATER:EIR:COOLING")
+                  ! object rename
+                  ObjectName = "HeatPump:PlantLoop:EIR:Cooling"
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  ! fields 1-3 same
+                  OutArgs(1:3)=InArgs(1:3)
+                  ! insert condenser type field
+                  OutArgs(4)=Blank
+                  ! all others equal
+                  OutArgs(5:CurArgs+1)=InArgs(4:CurArgs)
+                  CurArgs = CurArgs + 1
+                  NoDiff = .false.
+
              CASE('HVACTEMPLATE:SYSTEM:VRF')
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  ! FixFuelTypes will set NoDiff = .false. if it makes a change
