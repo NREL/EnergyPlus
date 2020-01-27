@@ -307,7 +307,7 @@ namespace InternalHeatGains {
         static constexpr auto Format_720(" Zone Internal Gains Nominal, {},{:.2R},{:.1R},");
 
         static constexpr auto Format_722(" {} Internal Gains Nominal, {},{},{},{:.2R},{:.1R},");
-        static constexpr auto Format_723("! <{} Internal Gains Nominal>,Name,Schedule Name,Zone Name,Zone Floor Area {{m2}},# Zone Occupants,{}\n");
+        static constexpr auto Format_723("! <{} Internal Gains Nominal>,Name,Schedule Name,Zone Name,Zone Floor Area {{m2}},# Zone Occupants,{}");
         static constexpr auto Format_724(" {}, {}\n");
 
         auto print_and_divide_if_greater_than_zero = [&](const Real64 numerator, const Real64 denominator) {
@@ -4710,13 +4710,13 @@ namespace InternalHeatGains {
                       "Number of People {},People/Floor Area {person/m2},Floor Area per person {m2/person},Fraction Radiant,Fraction "
                       "Convected,Sensible Fraction Calculation,Activity level,ASHRAE 55 Warnings,Carbon Dioxide Generation Rate,Nominal Minimum "
                       "Number of People,Nominal Maximum Number of People");
-            }
-            if (Loop == 1) {
                 if (People(Loop).Fanger || People(Loop).Pierce || People(Loop).KSU) {
                     print(outputFiles.eio,
                           ",MRT Calculation Type,Work Efficiency, Clothing Insulation Calculation Method,Clothing "
                           "Insulation Calculation Method Schedule,Clothing,Air Velocity,Fanger Calculation,Pierce "
                           "Calculation,KSU Calculation\n");
+                } else {
+                    print(outputFiles.eio, "\n");
                 }
             }
 
@@ -4816,13 +4816,14 @@ namespace InternalHeatGains {
             }
         }
         for (Loop = 1; Loop <= TotLights; ++Loop) {
-            if (Loop == 1)
+            if (Loop == 1) {
                 print(outputFiles.eio,
                       Format_723,
                       "Lights",
                       "Lighting Level {W},Lights/Floor Area {W/m2},Lights per person {W/person},Fraction Return "
                       "Air,Fraction Radiant,Fraction Short Wave,Fraction Convected,Fraction Replaceable,End-Use "
-                      "Category,Nominal Minimum Lighting Level {W},Nominal Maximum Lighting Level {W}");
+                      "Category,Nominal Minimum Lighting Level {W},Nominal Maximum Lighting Level {W}\n");
+            }
 
             ZoneNum = Lights(Loop).ZonePtr;
 
@@ -4854,12 +4855,13 @@ namespace InternalHeatGains {
             print(outputFiles.eio, "{:.3R}\n", Lights(Loop).NomMaxDesignLevel);
         }
         for (Loop = 1; Loop <= TotElecEquip; ++Loop) {
-            if (Loop == 1)
+            if (Loop == 1) {
                 print(outputFiles.eio,
                       Format_723,
                       "ElectricEquipment",
                       "Equipment Level {W},Equipment/Floor Area {W/m2},Equipment per person {W/person},Fraction Latent,Fraction Radiant,Fraction "
-                      "Lost,Fraction Convected,End-Use SubCategory,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}");
+                      "Lost,Fraction Convected,End-Use SubCategory,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}\n");
+            }
 
             ZoneNum = ZoneElectric(Loop).ZonePtr;
 
@@ -4895,7 +4897,7 @@ namespace InternalHeatGains {
                       Format_723,
                       "GasEquipment",
                       "Equipment Level {W},Equipment/Floor Area {W/m2},Equipment per person {W/person},Fraction Latent,Fraction Radiant,Fraction "
-                      "Lost,Fraction Convected,End-Use SubCategory,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}");
+                      "Lost,Fraction Convected,End-Use SubCategory,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}\n");
             }
 
             ZoneNum = ZoneGas(Loop).ZonePtr;
@@ -4934,7 +4936,7 @@ namespace InternalHeatGains {
                       Format_723,
                       "HotWaterEquipment",
                       "Equipment Level {W},Equipment/Floor Area {W/m2},Equipment per person {W/person},Fraction Latent,Fraction Radiant,Fraction "
-                      "Lost,Fraction Convected,End-Use SubCategory,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}");
+                      "Lost,Fraction Convected,End-Use SubCategory,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}\n");
             }
 
             ZoneNum = ZoneHWEq(Loop).ZonePtr;
@@ -4973,7 +4975,7 @@ namespace InternalHeatGains {
                       Format_723,
                       "SteamEquipment",
                       "Equipment Level {W},Equipment/Floor Area {W/m2},Equipment per person {W/person},Fraction Latent,Fraction Radiant,Fraction "
-                      "Lost,Fraction Convected,End-Use SubCategory,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}");
+                      "Lost,Fraction Convected,End-Use SubCategory,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}\n");
             }
 
             ZoneNum = ZoneSteamEq(Loop).ZonePtr;
@@ -5012,7 +5014,7 @@ namespace InternalHeatGains {
                       Format_723,
                       "OtherEquipment",
                       "Equipment Level {W},Equipment/Floor Area {W/m2},Equipment per person {W/person},Fraction Latent,Fraction Radiant,Fraction "
-                      "Lost,Fraction Convected,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}");
+                      "Lost,Fraction Convected,Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}\n");
             }
 
             ZoneNum = ZoneOtherEq(Loop).ZonePtr;
@@ -5052,7 +5054,7 @@ namespace InternalHeatGains {
                       "Equipment Level {W},"
                       "Equipment/Floor Area {W/m2},Equipment per person {W/person},"
                       "Fraction Convected,CPU End-Use SubCategory,Fan End-Use SubCategory,UPS End-Use SubCategory,"
-                      "Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}, Design Air Volume Flow Rate {m3/s}");
+                      "Nominal Minimum Equipment Level {W},Nominal Maximum Equipment Level {W}, Design Air Volume Flow Rate {m3/s}\n");
             }
 
             ZoneNum = ZoneITEq(Loop).ZonePtr;
@@ -5091,7 +5093,7 @@ namespace InternalHeatGains {
                       Format_723,
                       "Outdoor Controlled Baseboard Heat",
                       "Capacity at Low Temperature {W},Low Temperature {C},Capacity at High Temperature "
-                      "{W},High Temperature {C},Fraction Radiant,Fraction Convected,End-Use Subcategory");
+                      "{W},High Temperature {C},Fraction Radiant,Fraction Convected,End-Use Subcategory\n");
             }
 
             ZoneNum = ZoneBBHeat(Loop).ZonePtr;
