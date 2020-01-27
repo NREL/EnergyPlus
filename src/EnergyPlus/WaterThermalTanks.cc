@@ -1034,6 +1034,9 @@ namespace WaterThermalTanks {
         int nNumPossibleNumericArgs; // the number of possible numeric arguments in the idd
         int nNumPossibleAlphaArgs;   // the number of possible numeric arguments in the idd
 
+        // For looking up in IDF/epJSON, you need the index that corresponds to the actual object type (Pumped or Wrapped)
+        int HPWaterHeaterNumOfSpecificType;
+
         for (int HPWaterHeaterNum = 1; HPWaterHeaterNum <= numHeatPumpWaterHeater; ++HPWaterHeaterNum) {
 
             // Create reference to current HPWH object in array.
@@ -1042,25 +1045,30 @@ namespace WaterThermalTanks {
             // Initialize the offsets to zero
             nAlphaOffset = 0;
             nNumericOffset = 0;
+
             if (HPWaterHeaterNum <= NumPumpedCondenser) {
                 // Pumped Condenser
                 DataIPShortCuts::cCurrentModuleObject = cHPWHPumpedCondenser;
                 HPWH.TypeNum = DataPlant::TypeOf_HeatPumpWtrHeaterPumped;
                 nNumPossibleAlphaArgs = 29;
                 nNumPossibleNumericArgs = 9;
+                // Actual index of Pumped type
+                HPWaterHeaterNumOfSpecificType = HPWaterHeaterNum;
             } else {
                 // Wrapped Condenser
                 DataIPShortCuts::cCurrentModuleObject = cHPWHWrappedCondenser;
                 HPWH.TypeNum = DataPlant::TypeOf_HeatPumpWtrHeaterWrapped;
                 nNumPossibleAlphaArgs = 27;
                 nNumPossibleNumericArgs = 10;
+                // Actual index of Wrapped type
+                HPWaterHeaterNumOfSpecificType = HPWaterHeaterNum - NumPumpedCondenser;
             }
 
             int NumAlphas;
             int NumNums;
             int IOStat;
             inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
-                                          HPWaterHeaterNum,
+                                          HPWaterHeaterNumOfSpecificType,
                                           DataIPShortCuts::cAlphaArgs,
                                           NumAlphas,
                                           DataIPShortCuts::rNumericArgs,
