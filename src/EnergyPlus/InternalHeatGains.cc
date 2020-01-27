@@ -4717,8 +4717,6 @@ namespace InternalHeatGains {
                           ",MRT Calculation Type,Work Efficiency, Clothing Insulation Calculation Method,Clothing "
                           "Insulation Calculation Method Schedule,Clothing,Air Velocity,Fanger Calculation,Pierce "
                           "Calculation,KSU Calculation\n");
-                } else {
-                    print(outputFiles.eio, "\n");
                 }
             }
 
@@ -5040,7 +5038,6 @@ namespace InternalHeatGains {
             print(outputFiles.eio, "{:.3R},", ZoneOtherEq(Loop).FractionRadiant);
             print(outputFiles.eio, "{:.3R},", ZoneOtherEq(Loop).FractionLost);
             print(outputFiles.eio, "{:.3R},", ZoneOtherEq(Loop).FractionConvected);
-            print(outputFiles.eio, "{},", ZoneOtherEq(Loop).EndUseSubcategory);
             print(outputFiles.eio, "{:.3R},", ZoneOtherEq(Loop).NomMinDesignLevel);
             print(outputFiles.eio, "{:.3R}\n", ZoneOtherEq(Loop).NomMaxDesignLevel);
         }
