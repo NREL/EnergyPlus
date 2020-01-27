@@ -4738,8 +4738,10 @@ namespace InternalHeatGains {
 
             print(outputFiles.eio, "{:.1R},", People(Loop).NumberOfPeople);
 
-            if (People(Loop).NumberOfPeople > 0.0) {
-                print_and_divide_if_greater_than_zero(People(Loop).NumberOfPeople, Zone(ZoneNum).FloorArea);
+            print_and_divide_if_greater_than_zero(People(Loop).NumberOfPeople, Zone(ZoneNum).FloorArea);
+
+            if (People(Loop).NumberOfPeople > 0.0){
+                print_and_divide_if_greater_than_zero(Zone(ZoneNum).FloorArea, People(Loop).NumberOfPeople);
             } else {
                 print(outputFiles.eio, "N/A,");
             }
@@ -4849,7 +4851,7 @@ namespace InternalHeatGains {
             print(outputFiles.eio, "{:.3R},", Lights(Loop).FractionReplaceable);
             print(outputFiles.eio, "{},", Lights(Loop).EndUseSubcategory);
             print(outputFiles.eio, "{:.3R},", Lights(Loop).NomMinDesignLevel);
-            print(outputFiles.eio, "{}\n", Lights(Loop).NomMaxDesignLevel);
+            print(outputFiles.eio, "{:.3R}\n", Lights(Loop).NomMaxDesignLevel);
         }
         for (Loop = 1; Loop <= TotElecEquip; ++Loop) {
             if (Loop == 1)
