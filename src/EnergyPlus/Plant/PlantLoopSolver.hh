@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Plant/LoopSide.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 
 namespace EnergyPlus {
 
@@ -68,48 +69,34 @@ namespace PlantLoopSolver {
     extern Real64 InitialDemandToLoopSetPointSAVED;
     extern int RefrigIndex; // Index denoting refrigerant used (possibly steam)
 
-    struct Location
-    {
-        // Members
-        int LoopNum;
-        int LoopSideNum;
-        int BranchNum;
-        int CompNum;
-
-        // Default Constructor
-        Location() : LoopNum(0), LoopSideNum(0), BranchNum(0), CompNum(0)
-        {
-        }
-    };
-
     struct PlantLoopSolverClass
     {
 
-        void ValidateFlowControlPaths(int const LoopNum, int const LoopSideNum);
+        void ValidateFlowControlPaths(int LoopNum, int LoopSideNum);
 
-        Real64 SetupLoopFlowRequest(int const LoopNum, int const ThisSide, int const OtherSide);
+        Real64 SetupLoopFlowRequest(int LoopNum, int ThisSide, int OtherSide);
 
         Real64 DetermineLoopSideFlowRate(int LoopNum, int ThisSide, int ThisSideInletNode, Real64 ThisSideLoopFlowRequest);
 
         void SimulateAllLoopSideBranches(
-            int const LoopNum, int const LoopSideNum, Real64 const ThisLoopSideFlow, bool const FirstHVACIteration, bool &LoopShutDownFlag);
+            int LoopNum, int LoopSideNum, Real64 ThisLoopSideFlow, bool FirstHVACIteration, bool &LoopShutDownFlag);
 
-        void SimulateLoopSideBranchGroup(int const LoopNum,
-                                         int const LoopSideNum,
-                                         int const FirstBranchNum,
-                                         int const LastBranchNum,
-                                         Real64 const FlowRequest,
-                                         bool const FirstHVACIteration,
+        void SimulateLoopSideBranchGroup(int LoopNum,
+                                         int LoopSideNum,
+                                         int FirstBranchNum,
+                                         int LastBranchNum,
+                                         Real64 FlowRequest,
+                                         bool FirstHVACIteration,
                                          bool &LoopShutDownFlag);
 
-        void SimulateAllLoopSidePumps(int const LoopNum,
-                                      int const ThisSide,
-                                      Optional<Location const> SpecificPumpLocation = _,
+        void SimulateAllLoopSidePumps(int LoopNum,
+                                      int ThisSide,
+                                      Optional<PlantLocation const> SpecificPumpLocation = _,
                                       Optional<Real64 const> SpecificPumpFlowRate = _);
 
-        void SimulateSinglePump(Location const SpecificPumpLocation, Real64 & SpecificPumpFlowRate);
+        void SimulateSinglePump(PlantLocation SpecificPumpLocation, Real64 & SpecificPumpFlowRate);
 
-        Real64 CalcOtherSideDemand(int const LoopNum, int const ThisSide, Real64 ThisLoopSideFlow);
+        Real64 CalcOtherSideDemand(int LoopNum, int ThisSide, Real64 ThisLoopSideFlow);
 
         void DisableAnyBranchPumpsConnectedToUnloadedEquipment(int LoopNum, int ThisSide);
 
@@ -117,51 +104,51 @@ namespace PlantLoopSolver {
 
         void DoFlowAndLoadSolutionPass(int LoopNum, int ThisSide, int OtherSide, int ThisSideInletNode, bool FirstHVACIteration);
 
-        Real64 EvaluateLoopSetPointLoad(int const LoopNum,
-                                        int const LoopSideNum,
-                                        int const FirstBranchNum,
-                                        int const LastBranchNum,
+        Real64 EvaluateLoopSetPointLoad(int LoopNum,
+                                        int LoopSideNum,
+                                        int FirstBranchNum,
+                                        int LastBranchNum,
                                         Real64 ThisLoopSideFlow,
                                         Array1S_int LastComponentSimulated);
 
-        void UpdateAnyLoopDemandAlterations(int const LoopNum, int const LoopSideNum, int const BranchNum, int const CompNum);
+        void UpdateAnyLoopDemandAlterations(int LoopNum, int LoopSideNum, int BranchNum, int CompNum);
 
-        void ResolveParallelFlows(int const LoopNum,             // plant loop number that we are balancing flow for
-                                  int const LoopSideNum,         // plant loop number that we are balancing flow for
-                                  Real64 const ThisLoopSideFlow, // [kg/s]  total flow to be split
-                                  bool const FirstHVACIteration  // TRUE if First HVAC iteration of Time step
+        void ResolveParallelFlows(int LoopNum,             // plant loop number that we are balancing flow for
+                                  int LoopSideNum,         // plant loop number that we are balancing flow for
+                                  Real64 ThisLoopSideFlow, // [kg/s]  total flow to be split
+                                  bool FirstHVACIteration  // TRUE if First HVAC iteration of Time step
         );
 
-        Real64 DetermineBranchFlowRequest(int const LoopNum, int const LoopSideNum, int const BranchNum);
+        Real64 DetermineBranchFlowRequest(int LoopNum, int LoopSideNum, int BranchNum);
 
-        void UpdateLoopSideReportVars(int const LoopNum,
-                                      int const LoopSide,
-                                      Real64 const OtherSideDemand,   // This is the 'other side' demand, based on other side flow
-                                      Real64 const LocalRemLoopDemand // Unmet Demand after equipment has been simulated (report variable)
+        void UpdateLoopSideReportVars(int LoopNum,
+                                      int LoopSide,
+                                      Real64 OtherSideDemand,   // This is the 'other side' demand, based on other side flow
+                                      Real64 LocalRemLoopDemand // Unmet Demand after equipment has been simulated (report variable)
         );
 
-        void PushBranchFlowCharacteristics(int const LoopNum,
-                                           int const LoopSideNum,
-                                           int const BranchNum,
-                                           Real64 const ValueToPush,
-                                           bool const FirstHVACIteration // TRUE if First HVAC iteration of Time step
+        void PushBranchFlowCharacteristics(int LoopNum,
+                                           int LoopSideNum,
+                                           int BranchNum,
+                                           Real64 ValueToPush,
+                                           bool FirstHVACIteration // TRUE if First HVAC iteration of Time step
         );
 
-        void CalcUnmetPlantDemand(int const LoopNum, int const LoopSideNum);
+        void CalcUnmetPlantDemand(int LoopNum, int LoopSideNum);
 
-        void CheckLoopExitNode(int const LoopNum,            // plant loop counter
-                               bool const FirstHVACIteration // TRUE if First HVAC iteration of Time step
+        void CheckLoopExitNode(int LoopNum,            // plant loop counter
+                               bool FirstHVACIteration // TRUE if First HVAC iteration of Time step
         );
 
         void
-        AdjustPumpFlowRequestByEMSControls(int const LoopNum, int const LoopSideNum, int const BranchNum, int const CompNum, Real64 &FlowToRequest);
+        AdjustPumpFlowRequestByEMSControls(int LoopNum, int LoopSideNum, int BranchNum, int CompNum, Real64 &FlowToRequest);
     };
 
     void clear_state();
 
-    void PlantHalfLoopSolver(bool const FirstHVACIteration, // TRUE if First HVAC iteration of Time step
-                             int const LoopSideNum,
-                             int const LoopNum,
+    void PlantHalfLoopSolver(bool FirstHVACIteration, // TRUE if First HVAC iteration of Time step
+                             int LoopSideNum,
+                             int LoopNum,
                              bool &ReSimOtherSideNeeded);
 
 } // namespace PlantLoopSolver

@@ -51,7 +51,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
 #include <ObjexxFCL/member.functions.hh>
 
@@ -62,10 +61,10 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataPlant.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HVACInterfaceManager.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/Plant/PlantLoopSolver.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
 #include <EnergyPlus/PlantLoopEquip.hh>
@@ -236,13 +235,12 @@ namespace EnergyPlus {
             for (int branchNum = 2; branchNum <= loop_side.TotalBranches - 1; ++branchNum) {
                 auto &branch = loop_side.Branch(branchNum);
                 Real64 totalDispatchedLoadOnBranch = 0.0;
-                int pumpCompIndexOnBranch = 0;
                 for (int compNum = 1; compNum <= branch.TotalComponents; ++compNum) {
                     auto &component = branch.Comp(compNum);
                     auto &t = component.TypeOf_Num;
                     if (t == DataPlant::TypeOf_PumpConstantSpeed || t == DataPlant::TypeOf_PumpBankConstantSpeed ||
                         t == DataPlant::TypeOf_PumpVariableSpeed || t == DataPlant::TypeOf_PumpBankVariableSpeed) {
-                        pumpCompIndexOnBranch = compNum;
+                        // don't do anything
                     } else {
                         totalDispatchedLoadOnBranch += component.MyLoad;
                     }
@@ -845,15 +843,12 @@ namespace EnergyPlus {
 
                         // 4. allocate which branches to use,
                         Real64 tmpLoopFlow = max(this_loop_side.flowRequestFinal, other_loop_side.flowRequestFinal);
-                        Real64 AccumFlowSteps = 0.0;
                         Real64 MaxBranchPumpLoopSideFlow =
                                 LoadedConstantSpeedBranchFlowRateSteps_sum + NoLoadConstantSpeedBranchFlowRateSteps_sum;
                         tmpLoopFlow = min(tmpLoopFlow, MaxBranchPumpLoopSideFlow);
                         //  4b. first use all the branches with non-zero MyLoad
-                        if (tmpLoopFlow <= LoadedConstantSpeedBranchFlowRateSteps_sum) {
-                            tmpLoopFlow = LoadedConstantSpeedBranchFlowRateSteps_sum;
-                        } else {
-                            AccumFlowSteps = LoadedConstantSpeedBranchFlowRateSteps_sum;
+                        if (tmpLoopFlow > LoadedConstantSpeedBranchFlowRateSteps_sum) {
+                            Real64 AccumFlowSteps = LoadedConstantSpeedBranchFlowRateSteps_sum;
                             ParallelBranchIndex = 0;
                             for (int BranchCounter = 1; BranchCounter <= NumBranchesOnThisLoopSide; ++BranchCounter) {
                                 if (BranchCounter > 1 && BranchCounter < NumBranchesOnThisLoopSide) {
@@ -1023,7 +1018,7 @@ namespace EnergyPlus {
 
             //~ General variables
             Real64 LoadToLoopSetPoint;
-            Location PumpLocation;
+            PlantLocation PumpLocation;
             LoadToLoopSetPoint = 0.0;
 
             // We now know what plant simulation region is available to us, let's simulate this group
@@ -1048,10 +1043,10 @@ namespace EnergyPlus {
                                                           FirstHVACIteration, DummyInit, DoNotGetCompSizFac);
                             break;
                         case DataPlant::PumpOpSchemeType: //~ pump
-                            PumpLocation.LoopNum = LoopNum;
-                            PumpLocation.LoopSideNum = LoopSideNum;
-                            PumpLocation.BranchNum = BranchCounter;
-                            PumpLocation.CompNum = CompCounter;
+                            PumpLocation.loopNum = LoopNum;
+                            PumpLocation.loopSideNum = LoopSideNum;
+                            PumpLocation.branchNum = BranchCounter;
+                            PumpLocation.compNum = CompCounter;
                             if (loop.BranchPumpsExist) {
                                 SimulateSinglePump(PumpLocation, branch.RequestedMassFlow);
                             } else {
@@ -1154,10 +1149,10 @@ namespace EnergyPlus {
                             EncounteredNonLBObjDuringPass2 = true;
                             goto components2_end; // don't do anymore components on this branch
                         case DataPlant::PumpOpSchemeType:    //~ pump
-                            PumpLocation.LoopNum = LoopNum;
-                            PumpLocation.LoopSideNum = LoopSideNum;
-                            PumpLocation.BranchNum = BranchCounter;
-                            PumpLocation.CompNum = CompCounter;
+                            PumpLocation.loopNum = LoopNum;
+                            PumpLocation.loopSideNum = LoopSideNum;
+                            PumpLocation.branchNum = BranchCounter;
+                            PumpLocation.compNum = CompCounter;
                             if (loop.BranchPumpsExist) {
                                 SimulateSinglePump(PumpLocation, branch.RequestedMassFlow);
                             } else {
@@ -1220,10 +1215,10 @@ namespace EnergyPlus {
                                                           FirstHVACIteration, DummyInit, DoNotGetCompSizFac);
                             break;
                         case DataPlant::PumpOpSchemeType: //~ pump
-                            PumpLocation.LoopNum = LoopNum;
-                            PumpLocation.LoopSideNum = LoopSideNum;
-                            PumpLocation.BranchNum = BranchCounter;
-                            PumpLocation.CompNum = CompCounter;
+                            PumpLocation.loopNum = LoopNum;
+                            PumpLocation.loopSideNum = LoopSideNum;
+                            PumpLocation.branchNum = BranchCounter;
+                            PumpLocation.compNum = CompCounter;
                             if (loop.BranchPumpsExist) {
                                 SimulateSinglePump(PumpLocation, branch.RequestedMassFlow);
                             } else {
@@ -1259,7 +1254,7 @@ namespace EnergyPlus {
 
         void PlantLoopSolverClass::SimulateAllLoopSidePumps(int const LoopNum,
                                                             int const ThisSide,
-                                                            Optional<Location const> SpecificPumpLocation,
+                                                            Optional<PlantLocation const> SpecificPumpLocation,
                                                             Optional<Real64 const> SpecificPumpFlowRate) {
 
             // SUBROUTINE INFORMATION:
@@ -1275,10 +1270,10 @@ namespace EnergyPlus {
 
             // If we have a specific loop/side/br/comp, then find the index and only do that one, otherwise do all pumps on the loop side
             if (present(SpecificPumpLocation)) {
-                PumpLoopNum = SpecificPumpLocation().LoopNum;
-                PumpLoopSideNum = SpecificPumpLocation().LoopSideNum;
-                int const PumpBranchNum = SpecificPumpLocation().BranchNum;
-                int const PumpCompNum = SpecificPumpLocation().CompNum;
+                PumpLoopNum = SpecificPumpLocation().loopNum;
+                PumpLoopSideNum = SpecificPumpLocation().loopSideNum;
+                int const PumpBranchNum = SpecificPumpLocation().branchNum;
+                int const PumpCompNum = SpecificPumpLocation().compNum;
                 PumpIndexStart = DataPlant::PlantLoop(PumpLoopNum).LoopSide(PumpLoopSideNum).Branch(PumpBranchNum).Comp(
                         PumpCompNum).IndexInLoopSidePumps;
                 PumpIndexEnd = PumpIndexStart;
@@ -1331,7 +1326,7 @@ namespace EnergyPlus {
             }
         }
 
-        void PlantLoopSolverClass::SimulateSinglePump(Location const SpecificPumpLocation, Real64 & SpecificPumpFlowRate) {
+        void PlantLoopSolverClass::SimulateSinglePump(PlantLocation const SpecificPumpLocation, Real64 & SpecificPumpFlowRate) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -1339,20 +1334,20 @@ namespace EnergyPlus {
             //       MODIFIED       na
             //       RE-ENGINEERED  na
 
-            auto &loop(DataPlant::PlantLoop(SpecificPumpLocation.LoopNum));
-            auto &loop_side(loop.LoopSide(SpecificPumpLocation.LoopSideNum));
-            auto &loop_side_branch(loop_side.Branch(SpecificPumpLocation.BranchNum));
-            auto &comp(loop_side_branch.Comp(SpecificPumpLocation.CompNum));
+            auto &loop(DataPlant::PlantLoop(SpecificPumpLocation.loopNum));
+            auto &loop_side(loop.LoopSide(SpecificPumpLocation.loopSideNum));
+            auto &loop_side_branch(loop_side.Branch(SpecificPumpLocation.branchNum));
+            auto &comp(loop_side_branch.Comp(SpecificPumpLocation.compNum));
             int const PumpIndex = comp.IndexInLoopSidePumps;
             auto &pump(loop_side.Pumps(PumpIndex));
 
-            DataPlant::PlantLoop(SpecificPumpLocation.LoopNum).loopSolver.AdjustPumpFlowRequestByEMSControls(
-                    SpecificPumpLocation.LoopNum, SpecificPumpLocation.LoopSideNum,
-                    SpecificPumpLocation.BranchNum, SpecificPumpLocation.CompNum, SpecificPumpFlowRate);
+            DataPlant::PlantLoop(SpecificPumpLocation.loopNum).loopSolver.AdjustPumpFlowRequestByEMSControls(
+                    SpecificPumpLocation.loopNum, SpecificPumpLocation.loopSideNum,
+                    SpecificPumpLocation.branchNum, SpecificPumpLocation.compNum, SpecificPumpFlowRate);
 
             // Call SimPumps, routine takes a flow request, and returns some info about the status of the pump
             bool DummyThisPumpRunning;
-            Pumps::SimPumps(pump.PumpName, SpecificPumpLocation.LoopNum, SpecificPumpFlowRate, DummyThisPumpRunning,
+            Pumps::SimPumps(pump.PumpName, SpecificPumpLocation.loopNum, SpecificPumpFlowRate, DummyThisPumpRunning,
                             loop_side_branch.PumpIndex, pump.PumpHeatToFluid);
 
             //~ Pull some state information from the pump outlet node
@@ -1736,17 +1731,12 @@ namespace EnergyPlus {
             int BranchNum;         // intermediate value used for better readabilty
             int iBranch;           // DO loop counter for cycling through branches
             int NumSplitOutlets;   // As the name implies
-            Real64 OutletBranchMinAvail;
-            Real64 OutletBranchMaxAvail;
-            Real64 InletBranchMinAvail;
-            Real64 InletBranchMaxAvail;
             Real64 BranchFlowReq;
             Real64 BranchMinAvail;
             Real64 BranchMaxAvail;
             Real64 ParallelBranchMaxAvail;
             Real64 ParallelBranchMinAvail;
             Real64 TotParallelBranchFlowReq;
-            Real64 LoopFlowRate;
             int FirstNodeOnBranchIn;
             int FirstNodeOnBranchOut;
             Real64 StartingFlowRate;
@@ -1840,16 +1830,10 @@ namespace EnergyPlus {
                 SplitterBranchIn = this_loopside.Splitter.BranchNumIn;
                 LastNodeOnBranch = this_loopside.Branch(SplitterBranchIn).NodeNumOut;
                 FirstNodeOnBranchIn = this_loopside.Branch(SplitterBranchIn).NodeNumIn;
-                InletBranchMinAvail = Node(LastNodeOnBranch).MassFlowRateMinAvail;
-                InletBranchMaxAvail = Node(LastNodeOnBranch).MassFlowRateMaxAvail;
                 //            ! Find branch number and flow rates at mixer outlet
                 MixerBranchOut = this_loopside.Mixer.BranchNumOut;
                 LastNodeOnBranch = this_loopside.Branch(MixerBranchOut).NodeNumOut;
                 FirstNodeOnBranchOut = this_loopside.Branch(MixerBranchOut).NodeNumIn;
-                OutletBranchMinAvail = Node(LastNodeOnBranch).MassFlowRateMinAvail;
-                OutletBranchMaxAvail = Node(LastNodeOnBranch).MassFlowRateMaxAvail;
-
-                LoopFlowRate = ThisLoopSideFlow;
 
                 auto &first_branch_inlet_node(Node(FirstNodeOnBranchIn));
                 auto &last_branch_inlet_node(Node(FirstNodeOnBranchOut));
@@ -2261,7 +2245,6 @@ namespace EnergyPlus {
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
             int CompCounter;
             int BranchInletNode;
-            int BranchOutletNode;
             int ComponentInletNode;
             int ComponentOutletNode;
             int ComponentTypeOfNum;
@@ -2273,7 +2256,6 @@ namespace EnergyPlus {
             auto &this_branch(this_loopside.Branch(BranchNum));
 
             BranchInletNode = this_branch.NodeNumIn;
-            BranchOutletNode = this_branch.NodeNumOut;
 
             //~ Possible error handling if needed
             if (ValueToPush != Node(BranchInletNode).MassFlowRate) {
