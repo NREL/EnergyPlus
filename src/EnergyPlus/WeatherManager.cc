@@ -3259,7 +3259,7 @@ namespace WeatherManager {
                     //         Set possible missing values
                     if (ETHoriz < 0.0) ETHoriz = 9999.0;
                     if (ETDirect < 0.0) ETDirect = 9999.0;
-                    if (IRHoriz <= 0.0) IRHoriz = 9999.0;
+                    if (IRHoriz < 0.0) IRHoriz = 9999.0;
                     if (GLBHoriz < 0.0) GLBHoriz = 9999.0;
                     if (DisplayWeatherMissingDataWarnings) {
                         if (DirectRad >= 9999.0) {
