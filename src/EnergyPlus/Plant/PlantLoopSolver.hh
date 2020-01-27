@@ -61,40 +61,10 @@ namespace EnergyPlus {
 
 namespace PlantLoopSolver {
 
-    // MODULE VARIABLE DEFINITIONS
-    extern Real64 InitialDemandToLoopSetPoint;
-    extern Real64 CurrentAlterationsToDemand;
-    extern Real64 UpdatedDemandToLoopSetPoint;
-    extern Real64 LoadToLoopSetPointThatWasntMet; // Unmet Demand
-    extern Real64 InitialDemandToLoopSetPointSAVED;
-    extern int RefrigIndex; // Index denoting refrigerant used (possibly steam)
-
     struct PlantLoopSolverClass
     {
 
-        void ValidateFlowControlPaths(int LoopNum, int LoopSideNum);
-
         Real64 SetupLoopFlowRequest(int LoopNum, int ThisSide, int OtherSide);
-
-        Real64 DetermineLoopSideFlowRate(int LoopNum, int ThisSide, int ThisSideInletNode, Real64 ThisSideLoopFlowRequest);
-
-        void SimulateAllLoopSideBranches(
-            int LoopNum, int LoopSideNum, Real64 ThisLoopSideFlow, bool FirstHVACIteration, bool &LoopShutDownFlag);
-
-        void SimulateLoopSideBranchGroup(int LoopNum,
-                                         int LoopSideNum,
-                                         int FirstBranchNum,
-                                         int LastBranchNum,
-                                         Real64 FlowRequest,
-                                         bool FirstHVACIteration,
-                                         bool &LoopShutDownFlag);
-
-        void SimulateAllLoopSidePumps(int LoopNum,
-                                      int ThisSide,
-                                      Optional<PlantLocation const> SpecificPumpLocation = _,
-                                      Optional<Real64 const> SpecificPumpFlowRate = _);
-
-        void SimulateSinglePump(PlantLocation SpecificPumpLocation, Real64 & SpecificPumpFlowRate);
 
         Real64 CalcOtherSideDemand(int LoopNum, int ThisSide, Real64 ThisLoopSideFlow);
 
@@ -110,8 +80,6 @@ namespace PlantLoopSolver {
                                         int LastBranchNum,
                                         Real64 ThisLoopSideFlow,
                                         Array1S_int LastComponentSimulated);
-
-        void UpdateAnyLoopDemandAlterations(int LoopNum, int LoopSideNum, int BranchNum, int CompNum);
 
         void ResolveParallelFlows(int LoopNum,             // plant loop number that we are balancing flow for
                                   int LoopSideNum,         // plant loop number that we are balancing flow for

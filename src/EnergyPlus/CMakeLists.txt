@@ -411,10 +411,12 @@ SET( SRC
   Plant/ReportLoopData.hh
   Plant/ReportVars.hh
   Plant/Branch.hh
+  Plant/Component.cc
   Plant/Component.hh
   Plant/ConnectedLoopData.hh
   Plant/Connection.hh
   Plant/Loop.hh
+  Plant/LoopSide.cc
   Plant/LoopSide.hh
   Plant/MixerData.hh
   Plant/SplitterData.hh
@@ -433,8 +435,6 @@ SET( SRC
   PlantLoadProfile.cc
   PlantLoadProfile.hh
   Plant/PlantLocation.hh
-  PlantLoopEquip.cc
-  PlantLoopEquip.hh
   Plant/PlantLoopSolver.cc
   Plant/PlantLoopSolver.hh
   Plant/PlantManager.cc

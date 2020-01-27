@@ -104,7 +104,6 @@
 #include <EnergyPlus/PlantComponentTemperatureSources.hh>
 #include <EnergyPlus/PlantHeatExchangerFluidToFluid.hh>
 #include <EnergyPlus/PlantLoadProfile.hh>
-#include <EnergyPlus/PlantLoopEquip.hh>
 #include <EnergyPlus/PlantLoopHeatPumpEIR.hh>
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
 #include <EnergyPlus/PlantUtilities.hh>
@@ -116,7 +115,6 @@
 #include <EnergyPlus/SetPointManager.hh>
 #include <EnergyPlus/SolarCollectors.hh>
 #include <EnergyPlus/SurfaceGroundHeatExchanger.hh>
-#include <EnergyPlus/SwimmingPool.hh>
 #include <EnergyPlus/SystemAvailabilityManager.hh>
 #include <EnergyPlus/UserDefinedComponents.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -884,6 +882,7 @@ namespace EnergyPlus {
 
                             this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                             this_comp.TypeOf = this_comp_type;
+                            this_comp.location = EnergyPlus::PlantLocation(LoopNum, LoopSideNum, BranchNum, CompNum);
 
                             if (UtilityRoutines::SameString(this_comp_type, "Pipe:Adiabatic")) {
                                 this_comp.TypeOf_Num = TypeOf_Pipe;
@@ -1760,6 +1759,10 @@ namespace EnergyPlus {
                     PlantLoop(LoopNum).LoopSide(LoopSideNum).noLoadConstantSpeedBranchFlowRateSteps.allocate(
                             TempLoop.TotalBranches - 2);
 
+                    // TODO: this is just intended to be temporary
+                    PlantLoop(LoopNum).LoopSide(LoopSideNum).myLoopNum = LoopNum;
+                    PlantLoop(LoopNum).LoopSide(LoopSideNum).myLoopSideNum = LoopSideNum;
+
                     //   Add condenser CASE statement when required.
 
                     TempLoop.Branch.deallocate();
@@ -2367,7 +2370,6 @@ namespace EnergyPlus {
             using EMSManager::iTemperatureMinSetPoint;
             using EMSManager::iTemperatureSetPoint;
             using General::RoundSigDigits;
-            using PlantLoopEquip::SimPlantEquip;
             using PlantUtilities::SetAllFlowLocks;
 
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -2474,8 +2476,7 @@ namespace EnergyPlus {
                              BranchNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
                             for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(
                                     BranchNum).TotalComponents; ++CompNum) {
-                                SimPlantEquip(LoopNum, LoopSideNum, BranchNum, CompNum, FirstHVACIteration,
-                                              InitLoopEquip, GetCompSizFac);
+                                PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).simulate(FirstHVACIteration, InitLoopEquip, GetCompSizFac);
                             } //-CompNum
                         }     //-BranchNum
                     }
@@ -2519,13 +2520,12 @@ namespace EnergyPlus {
                         SizePlantLoop(LoopNum, FinishSizingFlag);
                     }
                     // pumps are special so call them directly
-                    PlantLoop(LoopNum).loopSolver.SimulateAllLoopSidePumps(LoopNum, LoopSideNum);
+                    PlantLoop(LoopNum).LoopSide(LoopSideNum).SimulateAllLoopSidePumps();
                     for (BranchNum = 1;
                          BranchNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
                         for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(
                                 BranchNum).TotalComponents; ++CompNum) {
-                            SimPlantEquip(LoopNum, LoopSideNum, BranchNum, CompNum, FirstHVACIteration, InitLoopEquip,
-                                          GetCompSizFac);
+                            PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).simulate(FirstHVACIteration, InitLoopEquip, GetCompSizFac);
                         } //-CompNum
                     }     //-BranchNum
                     //				if ( PlantLoop( LoopNum ).PlantSizNum > 0 ) PlantSizData( PlantLoop( LoopNum ).PlantSizNum
@@ -2555,8 +2555,7 @@ namespace EnergyPlus {
                          BranchNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
                         for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(
                                 BranchNum).TotalComponents; ++CompNum) {
-                            SimPlantEquip(LoopNum, LoopSideNum, BranchNum, CompNum, FirstHVACIteration, InitLoopEquip,
-                                          GetCompSizFac);
+                            PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).simulate(FirstHVACIteration, InitLoopEquip, GetCompSizFac);
                         } //-CompNum
                     }     //-BranchNum
                 }
@@ -2579,12 +2578,11 @@ namespace EnergyPlus {
                          BranchNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
                         for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(
                                 BranchNum).TotalComponents; ++CompNum) {
-                            SimPlantEquip(LoopNum, LoopSideNum, BranchNum, CompNum, FirstHVACIteration, InitLoopEquip,
-                                          GetCompSizFac);
+                            PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).simulate(FirstHVACIteration, InitLoopEquip, GetCompSizFac);
                         } //-CompNum
                     }     //-BranchNum
                     // pumps are special so call them directly
-                    PlantLoop(LoopNum).loopSolver.SimulateAllLoopSidePumps(LoopNum, LoopSideNum);
+                    PlantLoop(LoopNum).LoopSide(LoopSideNum).SimulateAllLoopSidePumps();
                 }
 
                 PlantReSizingCompleted = true;
@@ -3276,7 +3274,6 @@ namespace EnergyPlus {
             using namespace DataSizing;
             using FluidProperties::GetDensityGlycol;
             using General::RoundSigDigits;
-            using PlantLoopEquip::SimPlantEquip;
             using ReportSizingManager::ReportSizingOutput;
 
             // Locals
@@ -3327,7 +3324,7 @@ namespace EnergyPlus {
                             continue;
                         for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(SupplySide).Branch(
                                 BranchNum).TotalComponents; ++CompNum) {
-                            SimPlantEquip(LoopNum, SupplySide, BranchNum, CompNum, true, localInitLoopEquip, GetCompSizFac);
+                            PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(CompNum).simulate(true, localInitLoopEquip, GetCompSizFac);
                             BranchSizFac = max(BranchSizFac,
                                                PlantLoop(LoopNum).LoopSide(SupplySide).Branch(BranchNum).Comp(
                                                        CompNum).SizFac);

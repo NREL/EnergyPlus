@@ -126,6 +126,14 @@ namespace DataPlant {
         Real64 flowRequestFinal;
         bool hasConstSpeedBranchPumps;
         Array1D<Real64> noLoadConstantSpeedBranchFlowRateSteps;
+        Real64 InitialDemandToLoopSetPoint;
+        Real64 CurrentAlterationsToDemand;
+        Real64 UpdatedDemandToLoopSetPoint;
+        Real64 LoadToLoopSetPointThatWasntMet; // Unmet Demand
+        Real64 InitialDemandToLoopSetPointSAVED;
+        // these are intended to be temporary
+        int myLoopNum;
+        int myLoopSideNum;
 
         // Default Constructor
         HalfLoopData()
@@ -140,9 +148,34 @@ namespace DataPlant {
               errIndex_LoadRemains(0), LoopSideInlet_TankTemp(0.0), LoopSideInlet_MdotCpDeltaT(0.0), LoopSideInlet_McpDTdt(0.0),
               LoopSideInlet_CapExcessStorageTime(0.0), LoopSideInlet_CapExcessStorageTimeReport(0.0), LoopSideInlet_TotalTime(0.0),
               InletNode(0.0, 0.0), OutletNode(0.0, 0.0), flowRequestNeedIfOn(0.0), flowRequestNeedAndTurnOn(0.0), flowRequestFinal(0.0),
-              hasConstSpeedBranchPumps(false)
+              hasConstSpeedBranchPumps(false), InitialDemandToLoopSetPoint(0.0), CurrentAlterationsToDemand(0.0), UpdatedDemandToLoopSetPoint(0.0),
+              LoadToLoopSetPointThatWasntMet(0.0), InitialDemandToLoopSetPointSAVED(0.0), myLoopNum(0), myLoopSideNum(0)
         {
         }
+
+        void ValidateFlowControlPaths();
+
+        Real64 DetermineLoopSideFlowRate(int ThisSideInletNode, Real64 ThisSideLoopFlowRequest);
+
+        void SimulateAllLoopSideBranches(Real64 ThisLoopSideFlow, bool FirstHVACIteration, bool &LoopShutDownFlag);
+
+        void SimulateLoopSideBranchGroup(int FirstBranchNum,
+                                         int LastBranchNum,
+                                         Real64 FlowRequest,
+                                         bool FirstHVACIteration,
+                                         bool &LoopShutDownFlag);
+
+        void UpdatePlantSplitter();
+
+        void UpdatePlantMixer();
+
+        void SimulateSinglePump(PlantLocation SpecificPumpLocation, Real64 & SpecificPumpFlowRate);
+
+        void UpdateAnyLoopDemandAlterations(int BranchNum, int CompNum);
+
+        void SimulateAllLoopSidePumps(Optional<PlantLocation const> SpecificPumpLocation = _,
+                                      Optional<Real64 const> SpecificPumpFlowRate = _);
+
     };
 } // namespace DataPlant
 } // namespace EnergyPlus

@@ -91,16 +91,12 @@ namespace PlantUtilities {
     Real64 RegulateCondenserCompFlowReqOp(
         int const LoopNum, int const LoopSideNum, int const BranchNum, int const CompNum, Real64 const TentativeFlowRequest);
 
-    void UpdatePlantMixer(int const LoopNum, int const LoopSideNum);
-
     bool AnyPlantSplitterMixerLacksContinuity();
 
     void
     CheckPlantMixerSplitterConsistency(int const LoopNum, int const LoopSideNum, bool const FirstHVACIteration);
 
     void CheckForRunawayPlantTemps(int const LoopNum, int const LoopSideNum);
-
-    void UpdatePlantSplitter(int const LoopNum, int const LoopSideNum);
 
     void SetAllFlowLocks(int const Value);
 

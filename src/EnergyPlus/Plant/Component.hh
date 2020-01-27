@@ -51,6 +51,7 @@
 #include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/Plant/EquipAndOperations.hh>
 #include <EnergyPlus/PlantComponent.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 
 namespace EnergyPlus {
 namespace DataPlant {
@@ -96,6 +97,7 @@ namespace DataPlant {
         Real64 TempDesCondIn;
         Real64 TempDesEvapOut;
         PlantComponent *compPtr;
+        EnergyPlus::PlantLocation location;
 
         // Default Constructor
         CompData()
@@ -107,6 +109,8 @@ namespace DataPlant {
               TempDesEvapOut(0.0), compPtr(nullptr)
         {
         }
+
+        void simulate(bool FirstHVACIteration, bool &InitLoopEquip, bool GetCompSizFac);
     };
 } // namespace DataPlant
 } // namespace EnergyPlus

@@ -93,9 +93,6 @@ namespace DataPlant {
         int LoopDemandCalcScheme;        // Load distribution scheme 1 SingleSetPoint,
         // 2 DualSetPointwithDeadBand
         int CommonPipeType;
-        std::string EconomizerHtExchanger;       // DSU review, should move these out of here
-        std::string EconPlantSideSensedNodeName; // DSU review, should move these out of here
-        std::string EconCondSideSensedNodeName;  // DSU review, should move these out of here
         int EconPlantSideSensedNodeNum;          // DSU review, should move these out of here
         int EconCondSideSensedNodeNum;           // DSU review, should move these out of here
         int EconPlacement;                       // DSU review, should move these out of here

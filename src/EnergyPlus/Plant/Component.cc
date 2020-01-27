@@ -45,33 +45,13 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// C++ Headers
-#include <algorithm>
-
-// EnergyPlus Headers
-#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/Plant/Component.hh>
 #include <EnergyPlus/DataPlant.hh>
-#include <EnergyPlus/Plant/PlantLocation.hh>
 
 namespace EnergyPlus {
+namespace DataPlant {
 
-namespace PlantLoopEquip {
-
-    // MODULE INFORMATION:
-    //       AUTHOR         Sankaranarayanan K P
-    //       DATE WRITTEN   July 2005
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    void SimPlantEquip(int const LoopNum,     // loop counter
-                       int const LoopSideNum, // loop counter
-                       int const BranchNum,
-                       int const Num,
-                       bool const FirstHVACIteration, // TRUE if First iteration of simulation
-                       bool &InitLoopEquip,
-                       bool const GetCompSizFac // Tells component routine to return the component sizing fraction
-    )
-    {
+    void CompData::simulate(bool const FirstHVACIteration, bool &InitLoopEquip, bool const GetCompSizFac) {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher
@@ -116,18 +96,16 @@ namespace PlantLoopEquip {
         // If you add a module or new equipment type, you must set up this structure.
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        EnergyPlus::PlantLocation sim_component_location(LoopNum, LoopSideNum, BranchNum, Num);
-        auto &sim_component(DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(Num));
-        static std::vector<int> compsToSimAfterInitLoopEquip = {DataPlant::TypeOf_Pipe, DataPlant::TypeOf_PipeSteam, DataPlant::TypeOf_SolarCollectorICS, DataPlant::TypeOf_SolarCollectorFlatPlate};
-        if (sim_component.compPtr != nullptr) {
+        static std::vector<int> compsToSimAfterInitLoopEquip = {
+            DataPlant::TypeOf_Pipe, DataPlant::TypeOf_PipeSteam, DataPlant::TypeOf_SolarCollectorICS, DataPlant::TypeOf_SolarCollectorFlatPlate};
+        if (this->compPtr != nullptr) {
             if (InitLoopEquip) {
-                sim_component.compPtr->onInitLoopEquip(sim_component_location);
-                sim_component.compPtr->getDesignCapacities(
-                    sim_component_location, sim_component.MaxLoad, sim_component.MinLoad, sim_component.OptLoad);
-                sim_component.compPtr->getDesignTemperatures(sim_component.TempDesCondIn, sim_component.TempDesEvapOut);
+                this->compPtr->onInitLoopEquip(this->location);
+                this->compPtr->getDesignCapacities(this->location, this->MaxLoad, this->MinLoad, this->OptLoad);
+                this->compPtr->getDesignTemperatures(this->TempDesCondIn, this->TempDesEvapOut);
 
                 if (GetCompSizFac) {
-                    sim_component.compPtr->getSizingFactor(sim_component.SizFac);
+                    this->compPtr->getSizingFactor(this->SizFac);
                 }
 
                 // KLUGEY HACK ALERT!!!
@@ -139,15 +117,14 @@ namespace PlantLoopEquip {
                 // I anticipate the list of components that fall through to be very small, so that is the check I will do.
                 // If std::find returns the .end() iterator, that means it didn't find it in the list, which means it's not one of the ones to fall
                 // through, so RETURN
-                if (std::find(compsToSimAfterInitLoopEquip.begin(), compsToSimAfterInitLoopEquip.end(), sim_component.TypeOf_Num) ==
+                if (std::find(compsToSimAfterInitLoopEquip.begin(), compsToSimAfterInitLoopEquip.end(), this->TypeOf_Num) ==
                     compsToSimAfterInitLoopEquip.end()) {
                     return;
                 }
             }
-            sim_component.compPtr->simulate(sim_component_location, FirstHVACIteration, sim_component.MyLoad, sim_component.ON);
+            this->compPtr->simulate(this->location, FirstHVACIteration, this->MyLoad, this->ON);
         }
     }
 
-} // namespace PlantLoopEquip
-
-} // namespace EnergyPlus
+}
+}

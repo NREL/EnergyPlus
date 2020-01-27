@@ -577,79 +577,6 @@ namespace PlantUtilities {
         return FlowVal;
     }
 
-    void UpdatePlantMixer(int const LoopNum, int const LoopSideNum)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Brandon Anderson, Dan Fisher
-        //       DATE WRITTEN   October 1999
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // calculate the outlet conditions at the mixer
-        // this is expected to only be called for loops with a mixer
-
-        // Find mixer outlet node number
-        int const MixerOutletNode = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.NodeNumOut;
-
-        // Find corresponding splitter inlet node number--correspondence, but currently
-        //  hard code things to a single split/mix setting it to the mixer number
-        int const SplitterInNode = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.NodeNumIn;
-        // Initialize Mixer outlet temp and mass flow rate
-        Real64 MixerOutletTemp = 0.0;
-        Real64 MixerOutletMassFlow = 0.0;
-        Real64 MixerOutletMassFlowMaxAvail = 0.0;
-        Real64 MixerOutletMassFlowMinAvail = 0.0;
-        Real64 MixerOutletPress = 0.0;
-        Real64 MixerOutletQuality = 0.0;
-
-        // Calculate Mixer outlet mass flow rate
-        for (int InletNodeNum = 1; InletNodeNum <= DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.TotalInletNodes; ++InletNodeNum) {
-            int const MixerInletNode = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.NodeNumIn(InletNodeNum);
-            MixerOutletMassFlow += DataLoopNode::Node(MixerInletNode).MassFlowRate;
-        }
-
-        // Calculate Mixer outlet temperature
-        for (int InletNodeNum = 1; InletNodeNum <= DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.TotalInletNodes; ++InletNodeNum) {
-            int const MixerInletNode = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.NodeNumIn(InletNodeNum);
-            if (MixerOutletMassFlow > 0.0) {
-                Real64 const MixerInletMassFlow = DataLoopNode::Node(MixerInletNode).MassFlowRate;
-                Real64 const MassFrac = MixerInletMassFlow / MixerOutletMassFlow;
-                // mass flow weighted temp and enthalpy for each mixer inlet
-                MixerOutletTemp += MassFrac * DataLoopNode::Node(MixerInletNode).Temp;
-                MixerOutletQuality += MassFrac * DataLoopNode::Node(MixerInletNode).Quality;
-                MixerOutletMassFlowMaxAvail += DataLoopNode::Node(MixerInletNode).MassFlowRateMaxAvail;
-                MixerOutletMassFlowMinAvail += DataLoopNode::Node(MixerInletNode).MassFlowRateMinAvail;
-                MixerOutletPress = max(MixerOutletPress, DataLoopNode::Node(MixerInletNode).Press);
-            } else { // MixerOutletMassFlow <=0, then perform the 'no flow' update.
-                MixerOutletTemp = DataLoopNode::Node(SplitterInNode).Temp;
-                MixerOutletQuality = DataLoopNode::Node(SplitterInNode).Quality;
-                MixerOutletMassFlowMaxAvail = DataLoopNode::Node(SplitterInNode).MassFlowRateMaxAvail;
-                MixerOutletMassFlowMinAvail = DataLoopNode::Node(SplitterInNode).MassFlowRateMinAvail;
-                MixerOutletPress = DataLoopNode::Node(SplitterInNode).Press;
-                break;
-            }
-        }
-
-        DataLoopNode::Node(MixerOutletNode).MassFlowRate = MixerOutletMassFlow;
-        DataLoopNode::Node(MixerOutletNode).Temp = MixerOutletTemp;
-        if (DataPlant::PlantLoop(LoopNum).HasPressureComponents) {
-            // Don't update pressure, let pressure system handle this...
-        } else {
-            // Go ahead and update!
-            DataLoopNode::Node(MixerOutletNode).Press = MixerOutletPress;
-        }
-        DataLoopNode::Node(MixerOutletNode).Quality = MixerOutletQuality;
-
-        // set max/min avails on mixer outlet to be consistent with the following rules
-        // 1.  limited by the max/min avails on splitter inlet
-        // 2.  limited by the sum of max/min avails for each branch's mixer inlet node
-
-        DataLoopNode::Node(MixerOutletNode).MassFlowRateMaxAvail = min(MixerOutletMassFlowMaxAvail, DataLoopNode::Node(SplitterInNode).MassFlowRateMaxAvail);
-        DataLoopNode::Node(MixerOutletNode).MassFlowRateMinAvail = max(MixerOutletMassFlowMinAvail, DataLoopNode::Node(SplitterInNode).MassFlowRateMinAvail);
-    }
-
     bool AnyPlantSplitterMixerLacksContinuity()
     {
 
@@ -973,58 +900,6 @@ namespace PlantUtilities {
             ShowContinueError("  If this is happening during Warmup, you can use Output:Diagnostics,ReportDuringWarmup;");
             ShowContinueError("  This is detected at the loop level, but the typical problems are in the components.");
             ShowFatalError("CheckForRunawayPlantTemps: Simulation terminated because of run away plant temperatures, too " + hotcold);
-        }
-    }
-
-    void UpdatePlantSplitter(int const LoopNum, int const LoopSideNum)
-    {
-
-        // SUBROUTINE INFORMATION:
-        //       AUTHOR         Brandon Anderson, Dan Fisher
-        //       DATE WRITTEN   October 1999
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS SUBROUTINE:
-        // Set the outlet conditions of the splitter
-
-        // Update Temperatures across splitter
-        if (DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).SplitterExists) {
-
-            // Set branch number at splitter inlet
-            int const SplitterInletNode = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.NodeNumIn;
-
-            // Loop over outlet nodes
-            for (int CurNode = 1; CurNode <= DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.TotalOutletNodes; ++CurNode) {
-                int const SplitterOutletNode = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.NodeNumOut(CurNode);
-
-                // Inlet Temp equals exit Temp to all outlet branches
-                DataLoopNode::Node(SplitterOutletNode).Temp = DataLoopNode::Node(SplitterInletNode).Temp;
-                DataLoopNode::Node(SplitterOutletNode).TempMin = DataLoopNode::Node(SplitterInletNode).TempMin;
-                DataLoopNode::Node(SplitterOutletNode).TempMax = DataLoopNode::Node(SplitterInletNode).TempMax;
-                if (DataPlant::PlantLoop(LoopNum).HasPressureComponents) {
-                    // Don't update pressure, let pressure system handle this...
-                } else {
-                    // Go ahead and update!
-                    DataLoopNode::Node(SplitterOutletNode).Press = DataLoopNode::Node(SplitterInletNode).Press;
-                }
-                DataLoopNode::Node(SplitterOutletNode).Quality = DataLoopNode::Node(SplitterInletNode).Quality;
-
-                // DSU? These two blocks and the following one which I added need to be cleaned up
-                // I think we will always pass maxavail down the splitter, min avail is the issue.
-                // Changed to include hardware max in next line 7/26/2011
-                DataLoopNode::Node(SplitterOutletNode).MassFlowRateMaxAvail =
-                    min(DataLoopNode::Node(SplitterInletNode).MassFlowRateMaxAvail, DataLoopNode::Node(SplitterOutletNode).MassFlowRateMax);
-                DataLoopNode::Node(SplitterOutletNode).MassFlowRateMinAvail = 0.0;
-
-                // DSU? Not sure about passing min avail if it is nonzero.  I am testing a pump with nonzero
-                // min flow rate, and it is causing problems because this routine passes zero down.  Perhaps if
-                // it is a single parallel branch, we are safe to assume we need to just pass it down.
-                // But need to test for multiple branches (or at least think about it), to see what we need to do...
-                if (DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.TotalOutletNodes == 1) {
-                    DataLoopNode::Node(SplitterOutletNode).MassFlowRateMinAvail = DataLoopNode::Node(SplitterInletNode).MassFlowRateMinAvail;
-                }
-            }
         }
     }
 
