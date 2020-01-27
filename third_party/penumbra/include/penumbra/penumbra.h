@@ -49,6 +49,7 @@ public:
   ~Penumbra();
 
 public:
+  static bool isValidContext();
   unsigned addSurface(const Surface &surface);
   int setModel();
   int clearModel();

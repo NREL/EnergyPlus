@@ -674,16 +674,16 @@ namespace SolarShading {
 #else
                 auto error_callback = [](const int messageType, const std::string & message, void * /*contextPtr*/){
                     if (messageType == Pumbra::MSG_ERR) {
-                        ShowSevereError(message);
+                        ShowFatalError(message);
                     } else if (messageType == Pumbra::MSG_WARN) {
                         ShowWarningError(message);
                     } else /*if (messageType == MSG_INFO)*/ {
                         ShowMessage(message);
                     }
                 };
-                penumbra = std::unique_ptr<Pumbra::Penumbra>(new Pumbra::Penumbra(error_callback, pixelRes));
-                auto vendorName = penumbra->getVendorName();
-                if (vendorName == Pumbra::VendorName::None) {
+                if (Pumbra::Penumbra::isValidContext()) {
+                    penumbra = std::unique_ptr<Pumbra::Penumbra>(new Pumbra::Penumbra(error_callback, pixelRes));
+                } else {
                     ShowWarningError("No GPU found (required for PixelCounting)");
                     ShowContinueError("PolygonClipping will be used instead");
                     shadingMethod = ShadingMethod::PolygonClipping;

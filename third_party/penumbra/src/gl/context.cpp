@@ -4,8 +4,8 @@
 #include <iostream>
 
 // Penumbra
-#include <gl/context.h>
-#include <penumbra/src/error.h>
+#include "context.h"
+#include "../error.h"
 
 namespace Pumbra {
 
@@ -449,7 +449,7 @@ void Context::setCameraMVP() {
 
 void Context::drawModel() {
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-  glClear(GL_DEPTH_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glDepthFunc(GL_LESS);
   model.drawAll();
   glDepthFunc(GL_EQUAL);

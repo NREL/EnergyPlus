@@ -23,6 +23,7 @@ public:
 
 class GLModel {
 public:
+  GLModel() : objectsSet(false) {};
   ~GLModel();
   void setVertices(const std::vector<float> &vertices);
   void setSurfaceBuffers(const std::vector<SurfaceBuffer> &surfaceBuffers);
@@ -36,6 +37,7 @@ public:
   static const int vertexSize = 3; // i.e., 3D
 private:
   GLuint vbo, vao;
+  bool objectsSet;
 };
 
 } // namespace Pumbra

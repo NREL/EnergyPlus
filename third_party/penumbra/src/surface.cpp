@@ -8,7 +8,7 @@
 // Penumbra
 #include <penumbra/surface.h>
 #include <surface-private.h>
-#include <penumbra/src/error.h>
+#include "error.h"
 
 namespace Pumbra {
 

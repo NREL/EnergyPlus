@@ -5,8 +5,8 @@
 #include <iostream>
 
 // Penumbra
-#include <gl/shader.h>
-#include <penumbra/src/error.h>
+#include "shader.h"
+#include "../error.h"
 
 namespace Pumbra {
 GLShader::GLShader(GLenum type, const char *source) {

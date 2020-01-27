@@ -8,7 +8,7 @@
 // Penumbra
 #include <penumbra/penumbra.h>
 #include <penumbra-private.h>
-#include <penumbra/src/error.h>
+#include "error.h"
 
 namespace Pumbra {
 
@@ -29,6 +29,25 @@ Penumbra::Penumbra(PenumbraCallbackFunction callbackFunction, void *contextPtr, 
 }
 
 Penumbra::~Penumbra() {}
+
+bool Penumbra::isValidContext() {
+
+	glfwSetErrorCallback([](int, const char* description) {showMessage(MSG_INFO, description); });
+
+	bool invalid(false);
+	if (!glfwInit()) {
+		invalid = true;
+	}
+
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+	glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+	GLFWwindow* window = glfwCreateWindow(1, 1, "Penumbra", NULL, NULL);
+	glfwMakeContextCurrent(window);
+	invalid |= !window;
+	glfwDestroyWindow(window);
+	return !invalid;
+}
 
 VendorName Penumbra::getVendorName() {
   auto vendorType = VendorName::None;

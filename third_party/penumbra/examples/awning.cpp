@@ -34,6 +34,8 @@ int main(void) {
   Pumbra::Surface window(windowVerts);
   Pumbra::Surface awning(awningVerts);
 
+  Pumbra::Penumbra::isValidContext();
+
   Pumbra::Penumbra pumbra(errorCallback);
 
   unsigned wallId = pumbra.addSurface(wall);
