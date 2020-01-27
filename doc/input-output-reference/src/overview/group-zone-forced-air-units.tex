@@ -4024,6 +4024,10 @@ This numeric field defines the maximum supply air temperature in degrees Celsius
 
 This numeric field defines the maximum outdoor dry-bulb temperature in degrees Celsius for this VRF terminal unit supplemental heating coil operation. The supplemental heater will not operate when the outdoor dry-bulb temperature is above this value. The maximum value must be less than or equal to 21°C. If this field is left blank, the default value of 21°C will be used.
 
+\paragraph{Field: Controlling Zone or Thermostat Location}\label{controlling-zone-or-thermostat-location-2-110}
+
+This alpha field is used only for air loop equipment and defines the controlling zone or thermostat location for load based operational control. This field is not required for zone equipment or equipment used in outdoor air systems. Leave this field blank for zone equipment, outdoor air equipment and air loop equipment that is terminal unit or coil air outlet controlled based on a set point termperature. When the terminal unit is used in an air loop and this terminal unit is load controlled, this zone's thermostat will control operation.
+
 Following is an example input for a ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object.
 
 \begin{lstlisting}
@@ -4058,7 +4062,8 @@ ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
   Coil:Heating:Electric,   !- Supplemental Heating Coil Object Type
   TU1 Supp Heating Coil,   !- Supplemental Heating Coil Name
   autosize,                !- Maximum Supply Air Temperature from Supplemental Heater
-  ;                        !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation
+  ,                        !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation
+  ;                        !- Controlling Zone or Thermostat Location
 \end{lstlisting}
 
 \subsubsection{Outputs}\label{outputs-12-006}

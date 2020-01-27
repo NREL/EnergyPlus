@@ -6052,7 +6052,7 @@ namespace HVACVariableRefrigerantFlow {
                 if ((OutsideDryBulbTemp < VRF(VRFCond).MinOATHeating || OutsideDryBulbTemp > VRF(VRFCond).MaxOATHeating) &&
                     any(TerminalUnitList(TUListIndex).HeatingCoilPresent)) {
                     HeatingLoad(VRFCond) = false;
-                    // test if heating load exists, account for thermostat control type
+                    // test if cooling load exists, account for thermostat control type
                     {
                         auto const SELECT_CASE_var(VRF(VRFCond).ThermostatPriority);
                         if ((SELECT_CASE_var == LoadPriority) || (SELECT_CASE_var == ZonePriority)) {
@@ -8899,7 +8899,7 @@ namespace HVACVariableRefrigerantFlow {
                 // adjust coil control for fan heat when set point is at outlet node
                 Real64 coolfanDeltaT = 0.0;
                 Real64 heatfanDeltaT = 0.0;
-                if (VRFTU(TUIndex).FanPlace ==DataHVACGlobals::DrawThru) {
+                if (VRFTU(TUIndex).FanPlace == DataHVACGlobals::DrawThru) {
                     if (VRFTU(TUIndex).fanOutletNode > 0)
                         coolfanDeltaT = DataLoopNode::Node(VRFTU(TUIndex).fanOutletNode).Temp - DataLoopNode::Node(VRFTU(TUIndex).fanInletNode).Temp;
                 }
@@ -8953,25 +8953,21 @@ namespace HVACVariableRefrigerantFlow {
 
                 if ((heatCoilTempSetPoint - coilInletTemp - heatfanDeltaT) > DataHVACGlobals::SmallTempDiff) { // heating
                     Real64 CpAirIn = Psychrometrics::PsyCpAirFnWTdb(coilInletHumRat, coilInletTemp);
-                    if (VRF(VRFCond).ThermostatPriority == ThermostatOffsetPriority) {
-                    } else if (VRF(VRFCond).ThermostatPriority == LoadPriority || VRF(VRFCond).ThermostatPriority == ZonePriority) {
-                        ZoneLoad = coilInletMassFlow * CpAirIn * (heatCoilTempSetPoint - coilInletTemp - heatfanDeltaT);
-                        VRFTU(TUIndex).heatSPActive = true;
-                        VRFTU(TUIndex).heatLoadToSP = ZoneLoad;
-                        ++NumHeatingLoads(VRFCond);
-                        SumHeatingLoads(VRFCond) += ZoneLoad;
-                    }
+                    ZoneLoad = coilInletMassFlow * CpAirIn * (heatCoilTempSetPoint - coilInletTemp - heatfanDeltaT);
+                    VRFTU(TUIndex).heatSPActive = true;
+                    VRFTU(TUIndex).heatLoadToSP = ZoneLoad;
+                    ++NumHeatingLoads(VRFCond);
+                    SumHeatingLoads(VRFCond) += ZoneLoad;
+                    MinDeltaT(VRFCond) = -1.0;
                     VRFTU(TUIndex).coilTempSetPoint = heatCoilTempSetPoint - heatfanDeltaT;
                 } else if ((coilInletTemp - coolCoilTempSetPoint - coolfanDeltaT) > DataHVACGlobals::SmallTempDiff) { // cooling
                     Real64 CpAirIn = Psychrometrics::PsyCpAirFnWTdb(coilInletHumRat, coilInletTemp);
-                    if (VRF(VRFCond).ThermostatPriority == ThermostatOffsetPriority) {
-                    } else if (VRF(VRFCond).ThermostatPriority == LoadPriority || VRF(VRFCond).ThermostatPriority == ZonePriority) {
-                        ZoneLoad = coilInletMassFlow * CpAirIn * (coolCoilTempSetPoint - coilInletTemp - coolfanDeltaT);
-                        VRFTU(TUIndex).coolSPActive = true;
-                        VRFTU(TUIndex).coolLoadToSP = ZoneLoad;
-                        ++NumCoolingLoads(VRFCond);
-                        SumCoolingLoads(VRFCond) += ZoneLoad;
-                    }
+                    ZoneLoad = coilInletMassFlow * CpAirIn * (coolCoilTempSetPoint - coilInletTemp - coolfanDeltaT);
+                    VRFTU(TUIndex).coolSPActive = true;
+                    VRFTU(TUIndex).coolLoadToSP = ZoneLoad;
+                    ++NumCoolingLoads(VRFCond);
+                    SumCoolingLoads(VRFCond) += ZoneLoad;
+                    MinDeltaT(VRFCond) = -1.0;
                     VRFTU(TUIndex).coilTempSetPoint = coolCoilTempSetPoint - coolfanDeltaT;
                 }
             } else { // else is not set point controlled
@@ -9403,7 +9399,7 @@ namespace HVACVariableRefrigerantFlow {
         }
 
         if (VRFTUNum > 0 && VRFTUNum <= NumVRFTU) {
-            return VRFTU(VRFTUNum).VRFTUOutletNodeNum;
+            return VRFTU(VRFTUNum).VRFTUInletNodeNum;
         } else {
             return 0;
         }

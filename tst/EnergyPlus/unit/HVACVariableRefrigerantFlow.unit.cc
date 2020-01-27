@@ -63,10 +63,12 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataPlant.hh>
@@ -80,6 +82,7 @@
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -119,7 +122,552 @@ using namespace EnergyPlus::SizingManager;
 
 namespace EnergyPlus {
 
-class HVACVRFFixture : public EnergyPlusFixture {};
+class HVACVRFFixture: public EnergyPlusFixture {};
+class AirLoopFixture: public EnergyPlusFixture {
+
+public:
+    int NumAirloops = 1;
+    int NumZoneInletNodes = 1; // number of zone inlet nodes
+    int NumZoneExhaustNodes = 1; // number of zone exhaust nodes
+    bool ErrorsFound = false;
+    Real64 const CpWater = 4180.0;  // For estimating the expected result
+    Real64 const RhoWater = 1000.0; // For estimating the expected result
+
+protected:
+    virtual void SetUp()
+    {
+        EnergyPlusFixture::SetUp(); // Sets up the base fixture first.
+
+        DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0); // initialize StdRhoAir
+        DataEnvironment::OutBaroPress = 101325.0;
+        DataSizing::DesDayWeath.allocate(1);
+        DataSizing::DesDayWeath(1).Temp.allocate(1);
+        DataSizing::DesDayWeath(1).Temp(1) = 35.0;
+        DataGlobals::BeginEnvrnFlag = true;
+        DataEnvironment::OutDryBulbTemp = 35.0;
+        DataEnvironment::OutHumRat = 0.012;
+        DataEnvironment::OutWetBulbTemp = Psychrometrics::PsyTwbFnTdbWPb(
+            DataEnvironment::OutDryBulbTemp, DataEnvironment::OutHumRat, DataEnvironment::StdPressureSeaLevel);
+        DataEnvironment::OutBaroPress = 101325;          // sea level
+        DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
+
+        int numZones = DataGlobals::NumOfZones = 5;
+        int numAirloops = 5;
+        DataLoopNode::Node.allocate(50);
+        DataLoopNode::NodeID.allocate(50);
+
+        DataHeatBalance::Zone.allocate(numZones);
+        DataZoneEquipment::ZoneEquipConfig.allocate(numZones);
+        DataZoneEquipment::ZoneEquipList.allocate(numZones);
+        DataZoneEquipment::ZoneEquipAvail.dimension(numZones, DataHVACGlobals::NoAction);
+        DataZoneEquipment::NumOfZoneEquipLists = numZones;
+        DataSizing::FinalZoneSizing.allocate(numZones);
+        DataSizing::FinalSysSizing.allocate(numAirloops);
+        DataSizing::OASysEqSizing.allocate(numAirloops);
+        DataSizing::OASysEqSizing(1).SizingMethod.allocate(30);
+        DataSizing::ZoneEqSizing.allocate(numZones);
+        DataSizing::ZoneEqSizing(1).SizingMethod.allocate(30);
+        DataSizing::UnitarySysEqSizing.allocate(numZones);
+        DataSizing::UnitarySysEqSizing(1).SizingMethod.allocate(30);
+        DataSizing::ZoneHVACSizing.allocate(50);
+        ZoneHVACSizing(1).MaxCoolAirVolFlow = DataSizing::AutoSize;
+        ZoneHVACSizing(1).MaxHeatAirVolFlow = DataSizing::AutoSize;
+        DXCoils::DXCoil.allocate(10);
+        DXCoils::DXCoilOutletTemp.allocate(10);
+        DXCoils::DXCoilOutletHumRat.allocate(10);
+        DXCoils::DXCoilFullLoadOutAirTemp.allocate(10);
+        DXCoils::DXCoilFullLoadOutAirHumRat.allocate(10);
+        DXCoils::DXCoilPartLoadRatio.allocate(10);
+        DXCoils::DXCoilFanOpMode.allocate(10);
+        DXCoils::DXCoilTotalCooling.allocate(10);
+        DXCoils::DXCoilCoolInletAirWBTemp.allocate(10);
+        DXCoils::DXCoilTotalHeating.allocate(10);
+        DXCoils::DXCoilHeatInletAirDBTemp.allocate(10);
+        DXCoils::DXCoilHeatInletAirWBTemp.allocate(10);
+
+        DXCoils::CheckEquipName.allocate(10);
+        DXCoils::DXCoilNumericFields.allocate(10);
+        DataHeatBalance::HeatReclaimDXCoil.allocate(10);
+        DXCoils::NumDXCoils = 10;
+        MixedAir::OAMixer.allocate(5);
+        DataSizing::NumSysSizInput = 1;
+        DataSizing::SysSizInput.allocate(1);
+        DataSizing::SysSizInput(1).AirLoopNum = 1;
+        CurveManager::NumCurves = 10;
+        CurveManager::PerfCurve.allocate(10);
+        CurveManager::PerfCurve(1).InterpolationType = EvaluateCurveToLimits;
+        CurveManager::PerfCurve(1).CurveType = CurveManager::Linear;
+        CurveManager::PerfCurve(1).Coeff1 = 1.0;
+        CurveManager::PerfCurve(1).CurveMax = 1.0;
+        CurveManager::PerfCurve(2).InterpolationType = EvaluateCurveToLimits;
+        CurveManager::PerfCurve(2).CurveType = CurveManager::Linear;
+        CurveManager::PerfCurve(2).Coeff1 = 1.0;
+        CurveManager::PerfCurve(2).CurveMax = 1.0;
+
+        int NumAirLoops = DataHVACGlobals::NumPrimaryAirSys = 1; // allocate to 1 air loop and adjust/resize as needed
+        DataAirSystems::PrimaryAirSystem.allocate(NumAirLoops);
+        int thisAirLoop = 1;
+        DataAirSystems::PrimaryAirSystem(thisAirLoop).Branch.allocate(1);
+        DataAirLoop::AirLoopControlInfo.allocate(1);
+
+        ZoneSysEnergyDemand.allocate(numZones);
+
+        DataSizing::ZoneSizingRunDone = true;
+        DataSizing::SysSizingRunDone = true;
+
+        // set up zone 1
+
+        int zone1 = 1;
+        int zoneNum = 1;
+        // zone nodes
+        int zoneNode = 1;
+        int zoneRetNode1 = 2;
+        int zoneInletNode1 = 3;
+        int zoneExhNode1 = 4;
+
+        DataSizing::ZoneEqSizing(zoneNum).SizingMethod.allocate(25);
+        ZoneEqSizing(zoneNum).SizingMethod.allocate(25);
+        ZoneEqSizing(zoneNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
+
+        auto &thisZoneEqConfig(DataZoneEquipment::ZoneEquipConfig(zoneNum));
+        thisZoneEqConfig.IsControlled = true;
+        thisZoneEqConfig.ActualZoneNum = 1;
+        thisZoneEqConfig.ZoneName = "ZONE1";
+        thisZoneEqConfig.EquipListName = "ZONE1EQUIPMENT";
+        thisZoneEqConfig.ZoneNode = zoneNode;
+        thisZoneEqConfig.NumReturnNodes = 1;
+        thisZoneEqConfig.ReturnNode.allocate(1);
+        thisZoneEqConfig.ReturnNode(1) = zoneRetNode1;
+        thisZoneEqConfig.FixedReturnFlow.allocate(1);
+        thisZoneEqConfig.NumInletNodes = NumZoneInletNodes;
+        thisZoneEqConfig.InletNode.allocate(NumZoneInletNodes);
+        thisZoneEqConfig.AirDistUnitCool.allocate(NumZoneInletNodes);
+        thisZoneEqConfig.AirDistUnitHeat.allocate(NumZoneInletNodes);
+        thisZoneEqConfig.InletNode(1) = zoneInletNode1;
+        thisZoneEqConfig.NumExhaustNodes = NumZoneExhaustNodes;
+        thisZoneEqConfig.ExhaustNode.allocate(NumZoneExhaustNodes);
+        thisZoneEqConfig.ExhaustNode(1) = zoneExhNode1;
+        thisZoneEqConfig.EquipListIndex = zoneNum;
+        thisZoneEqConfig.ReturnFlowSchedPtrNum = DataGlobals::ScheduleAlwaysOn;
+
+        auto &thisZone(DataHeatBalance::Zone(zoneNum));
+        thisZone.Name = "ZONE1";
+        thisZone.IsControlled = true;
+        thisZone.SystemZoneNodeNumber = zoneNode;
+
+        auto &thisZoneEqList(DataZoneEquipment::ZoneEquipList(zoneNum));
+        thisZoneEqList.Name = "ZONE1EQUIPMENT";
+        int maxEquipCount1 = 1;
+        thisZoneEqList.NumOfEquipTypes = maxEquipCount1;
+        thisZoneEqList.EquipType.allocate(maxEquipCount1);
+        thisZoneEqList.EquipType_Num.allocate(maxEquipCount1);
+        thisZoneEqList.EquipName.allocate(maxEquipCount1);
+        thisZoneEqList.EquipIndex.allocate(maxEquipCount1);
+        thisZoneEqList.EquipIndex = 1;
+        thisZoneEqList.EquipData.allocate(maxEquipCount1);
+        thisZoneEqList.CoolingPriority.allocate(maxEquipCount1);
+        thisZoneEqList.HeatingPriority.allocate(maxEquipCount1);
+        thisZoneEqList.EquipType(1) = "NOT A VRF TU";
+        thisZoneEqList.EquipName(1) = "NO NAME";
+        thisZoneEqList.CoolingPriority(1) = 1;
+        thisZoneEqList.HeatingPriority(1) = 1;
+        thisZoneEqList.EquipType_Num(1) = DataZoneEquipment::ZoneUnitarySys_Num;
+
+        auto &finalZoneSizing(DataSizing::FinalZoneSizing(zoneNum));
+        finalZoneSizing.DesCoolVolFlow = 1.5;
+        finalZoneSizing.DesHeatVolFlow = 1.2;
+        finalZoneSizing.DesCoolCoilInTemp = 25.0;
+        finalZoneSizing.ZoneTempAtCoolPeak = 25.0;
+        finalZoneSizing.DesCoolCoilInHumRat = 0.009;
+        finalZoneSizing.ZoneHumRatAtCoolPeak = 0.009;
+        finalZoneSizing.CoolDesTemp = 15.0;
+        finalZoneSizing.CoolDesHumRat = 0.006;
+        finalZoneSizing.DesHeatCoilInTemp = 20.0;
+        finalZoneSizing.ZoneTempAtHeatPeak = 20.0;
+        finalZoneSizing.HeatDesTemp = 30.0;
+        finalZoneSizing.HeatDesHumRat = 0.007;
+        finalZoneSizing.DesHeatMassFlow = finalZoneSizing.DesHeatVolFlow * DataEnvironment::StdRhoAir;
+        finalZoneSizing.TimeStepNumAtCoolMax = 1;
+        finalZoneSizing.CoolDDNum = 1;
+
+        int airloopNum1 = 1;
+        auto &finalSysSizing(DataSizing::FinalSysSizing(airloopNum1));
+        finalSysSizing.DesCoolVolFlow = 0.566337; // 400 cfm * 3 tons = 1200 cfm
+        finalSysSizing.DesHeatVolFlow = 0.566337;
+        finalSysSizing.CoolSupTemp = 12.7;
+        finalSysSizing.CoolSupHumRat = 0.008;
+        finalSysSizing.HeatSupTemp = 35.0;
+        finalSysSizing.HeatSupHumRat = 0.006;
+        finalSysSizing.DesMainVolFlow = 0.566337;
+        finalSysSizing.OutTempAtCoolPeak = 35.0;
+        finalSysSizing.HeatOutTemp = 5.0;
+        finalSysSizing.HeatRetTemp = 21.0;
+        finalSysSizing.HeatMixTemp = 15.0;
+        finalSysSizing.MixTempAtCoolPeak = 26.0;
+        finalSysSizing.MixHumRatAtCoolPeak = 0.009;
+
+        // set up air loop
+        int airLoopNum = 1; // index to air loop #1
+        int NumBranches = 1;
+        DataAirSystems::PrimaryAirSystem(1).NumBranches = 1;
+        DataAirSystems::PrimaryAirSystem(1).NumInletBranches = 1;
+        DataAirSystems::PrimaryAirSystem(1).InletBranchNum.allocate(1);
+        DataAirSystems::PrimaryAirSystem(1).InletBranchNum(1) = 1;
+        DataAirSystems::PrimaryAirSystem(1).NumOutletBranches = 1;
+        DataAirSystems::PrimaryAirSystem(1).OutletBranchNum.allocate(1);
+        DataAirSystems::PrimaryAirSystem(1).OutletBranchNum(1) = 1;
+        DataAirSystems::PrimaryAirSystem(1).Branch.allocate(1);
+        DataAirSystems::PrimaryAirSystem(1).Branch(1).TotalComponents = 1;
+        DataAirSystems::PrimaryAirSystem(thisAirLoop).Branch(1).Comp.allocate(1);
+        DataAirSystems::PrimaryAirSystem(thisAirLoop).Branch(1).Comp(1).Name = "VRFTU1";
+        DataAirSystems::PrimaryAirSystem(thisAirLoop).Branch(1).Comp(1).TypeOf = "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW";
+
+        // set up plant loop for water equipment
+        DataPlant::TotNumLoops = 2;
+        DataPlant::PlantLoop.allocate(DataPlant::TotNumLoops);
+        DataSizing::PlantSizData.allocate(DataPlant::TotNumLoops);
+        // int NumPltSizInput = DataPlant::TotNumLoops;
+        DataSizing::NumPltSizInput = 2;
+
+        for (int loopindex = 1; loopindex <= DataPlant::TotNumLoops; ++loopindex) {
+            auto &loop(DataPlant::PlantLoop(loopindex));
+            loop.LoopSide.allocate(2);
+            auto &loopside(DataPlant::PlantLoop(loopindex).LoopSide(1));
+            loopside.TotalBranches = 1;
+            loopside.Branch.allocate(1);
+            auto &loopsidebranch(DataPlant::PlantLoop(loopindex).LoopSide(1).Branch(1));
+            loopsidebranch.TotalComponents = 2;
+            loopsidebranch.Comp.allocate(2);
+        }
+        DataPlant::PlantLoop(1).Name = "Hot Water Loop";
+        DataPlant::PlantLoop(1).FluidName = "WATER";
+        DataPlant::PlantLoop(1).FluidIndex = 1;
+
+        DataPlant::PlantLoop(2).Name = "Chilled Water Loop";
+        DataPlant::PlantLoop(2).FluidName = "WATER";
+        DataPlant::PlantLoop(2).FluidIndex = 1;
+
+        DataSizing::PlantSizData(1).PlantLoopName = "Hot Water Loop";
+        DataSizing::PlantSizData(1).ExitTemp = 80.0;
+        DataSizing::PlantSizData(1).DeltaT = 10.0;
+
+        DataSizing::PlantSizData(2).PlantLoopName = "Chilled Water Loop";
+        DataSizing::PlantSizData(2).ExitTemp = 6.0;
+        DataSizing::PlantSizData(2).DeltaT = 5.0;
+
+        // set up VRF system
+        int numVRFCond = HVACVariableRefrigerantFlow::NumVRFCond = 1; // total number of condenser units
+        HVACVariableRefrigerantFlow::VRF.allocate(numVRFCond);
+        HVACVariableRefrigerantFlow::CoolCombinationRatio.allocate(1);
+        HVACVariableRefrigerantFlow::HeatCombinationRatio.allocate(1);
+
+        int condNum = 1;
+        auto &VRFCond(HVACVariableRefrigerantFlow::VRF(condNum));
+
+        int condNodeNum = 1;
+
+        VRFCond.VRFSystemTypeNum = 1;
+        VRFCond.VRFAlgorithmTypeNum = 1;
+        VRFCond.SchedPtr = 1;
+        VRFCond.CoolingCapacity = 10000.0;
+        VRFCond.CoolingCOP = 3.0;
+        VRFCond.CoolingCombinationRatio = 1.0;
+        VRFCond.HeatingCapacity = 10000.0;
+        VRFCond.HeatingCOP = 3.0;
+        VRFCond.CondenserNodeNum = condNodeNum;
+        VRFCond.ZoneTUListPtr = 1;
+        VRFCond.MaxOATCooling = 40.0;
+        VRFCond.MaxOATHeating = 30.0;
+        VRFCond.ThermostatPriority = HVACVariableRefrigerantFlow::LoadPriority;
+        HVACVariableRefrigerantFlow::MaxCoolingCapacity.allocate(1);
+        HVACVariableRefrigerantFlow::MaxCoolingCapacity(1) = 1.0E20;
+        HVACVariableRefrigerantFlow::MaxHeatingCapacity.allocate(1);
+        HVACVariableRefrigerantFlow::MaxHeatingCapacity(1) = 1.0E20;
+        
+        int Sch1 = 1;
+        int Sch2 = 2;
+
+        int numTU = 1; // total number of TUs
+        HVACVariableRefrigerantFlow::VRFTUNumericFields.allocate(numTU);
+        VRFTUNumericFields(1).FieldNames.allocate(25);
+        VRFTUNumericFields(1).FieldNames = " ";
+        HVACVariableRefrigerantFlow::NumVRFTU = numTU;
+        HVACVariableRefrigerantFlow::VRFTU.allocate(numTU);
+        HVACVariableRefrigerantFlow::NumVRFTULists = numTU;
+        HVACVariableRefrigerantFlow::TerminalUnitList.allocate(numTU);
+        HVACVariableRefrigerantFlow::CheckEquipName.allocate(numTU);
+        HVACVariableRefrigerantFlow::CheckEquipName = true;
+
+        // set up terminal unit list
+        int thisTUList = 1;
+        auto &terminalUnitList(HVACVariableRefrigerantFlow::TerminalUnitList(thisTUList));
+        terminalUnitList.NumTUInList = 1;
+        terminalUnitList.ZoneTUPtr.allocate(1);
+        terminalUnitList.ZoneTUPtr(thisTUList) = 1;
+        terminalUnitList.TerminalUnitNotSizedYet.allocate(1);
+        terminalUnitList.HRCoolRequest.allocate(1);
+        terminalUnitList.HRHeatRequest.allocate(1);
+        terminalUnitList.CoolingCoilPresent.allocate(1);
+        terminalUnitList.CoolingCoilPresent = true;
+        terminalUnitList.HeatingCoilPresent.allocate(1);
+        terminalUnitList.HeatingCoilPresent = true;
+        terminalUnitList.CoolingCoilAvailSchPtr.allocate(1);
+        terminalUnitList.CoolingCoilAvailSchPtr = Sch1;
+        terminalUnitList.HeatingCoilAvailSchPtr.allocate(1);
+        terminalUnitList.HeatingCoilAvailSchPtr = Sch1;
+        terminalUnitList.CoolingCoilAvailable.allocate(1);
+        terminalUnitList.HeatingCoilAvailable.allocate(1);
+
+        // set up VRF Terminal Unit
+        int TUNum = 1; // index to this TU
+        auto &VRFTU(HVACVariableRefrigerantFlow::VRFTU(TUNum));
+
+        int coolCoilIndex = 1;
+        int heatCoilIndex = 2;
+        int VRFTUInletNodeNum = 30;
+        int VRFTUOutletNodeNum = 31;
+        int VRFTUOAMixerOANodeNum = 32;
+        int VRFTUOAMixerRelNodeNum = 33;
+        int VRFTUOAMixerRetNodeNum = 34;
+        int VRFTUOAMixerMixNodeNum = 35;
+        int coolCoilAirInNode = VRFTUOAMixerMixNodeNum;
+        int coolCoilAirOutNode = 36;
+        int heatCoilAirInNode = coolCoilAirOutNode;
+        int heatCoilAirOutNode = VRFTUOutletNodeNum;
+
+        MixedAir::OAMixer(1).RetNode = VRFTUOAMixerRetNodeNum;
+        MixedAir::OAMixer(1).InletNode = VRFTUOAMixerOANodeNum;
+        MixedAir::OAMixer(1).RelNode = VRFTUOAMixerRelNodeNum;
+        MixedAir::OAMixer(1).MixNode = VRFTUOAMixerMixNodeNum;
+
+        VRFTU.Name = "VRFTU1";
+        VRFTU.VRFTUType_Num = DataHVACGlobals::VRFTUType_ConstVolume;
+        VRFTU.SchedPtr = Sch1;
+        VRFTU.VRFSysNum = numVRFCond;
+        VRFTU.TUListIndex = TUNum;
+        VRFTU.IndexToTUInTUList = TUNum;
+        VRFTU.VRFTUInletNodeNum = VRFTUInletNodeNum;
+        VRFTU.VRFTUOutletNodeNum = VRFTUOutletNodeNum;
+        VRFTU.VRFTUOAMixerOANodeNum = VRFTUOAMixerOANodeNum;
+        VRFTU.VRFTUOAMixerRelNodeNum = VRFTUOAMixerRelNodeNum;
+        VRFTU.VRFTUOAMixerRetNodeNum = VRFTUOAMixerRetNodeNum;
+        VRFTU.MaxCoolAirVolFlow = DataSizing::AutoSize;
+        VRFTU.MaxHeatAirVolFlow = DataSizing::AutoSize;
+        VRFTU.MaxNoCoolAirVolFlow = DataSizing::AutoSize;
+        VRFTU.MaxNoHeatAirVolFlow = DataSizing::AutoSize;
+        VRFTU.MaxCoolAirMassFlow = DataSizing::AutoSize;
+        VRFTU.MaxHeatAirMassFlow = DataSizing::AutoSize;
+        VRFTU.MaxNoCoolAirMassFlow = DataSizing::AutoSize;
+        VRFTU.MaxNoHeatAirMassFlow = DataSizing::AutoSize;
+        VRFTU.CoolOutAirVolFlow = DataSizing::AutoSize;
+        VRFTU.HeatOutAirVolFlow = DataSizing::AutoSize;
+        VRFTU.NoCoolHeatOutAirVolFlow = DataSizing::AutoSize;
+        VRFTU.MinOperatingPLR = 0.1;
+        VRFTU.fanType_Num = 0;
+        VRFTU.FanOpModeSchedPtr = Sch2;
+        VRFTU.FanAvailSchedPtr = Sch1;
+        VRFTU.FanIndex = 0;
+        VRFTU.FanPlace = 0;
+        VRFTU.OAMixerName = "OAMixer1";
+        VRFTU.OAMixerIndex = 1;
+        VRFTU.OAMixerUsed = true;
+        VRFTU.CoolCoilIndex = coolCoilIndex;
+        VRFTU.coolCoilAirInNode = coolCoilAirInNode;
+        VRFTU.coolCoilAirOutNode = coolCoilAirOutNode;
+        VRFTU.HeatCoilIndex = heatCoilIndex;
+        VRFTU.heatCoilAirInNode = heatCoilAirInNode;
+        VRFTU.heatCoilAirOutNode = heatCoilAirOutNode;
+        VRFTU.DXCoolCoilType_Num = DataHVACGlobals::CoilVRF_Cooling;
+        VRFTU.DXHeatCoilType_Num = DataHVACGlobals::CoilVRF_Heating;
+        VRFTU.CoolingCoilPresent = true;
+        VRFTU.HeatingCoilPresent = true;
+        VRFTU.ZonePtr = zone1;
+        VRFTU.HVACSizingIndex = 0;
+
+        // DX coil set up
+        DXCoils::DXCoilNumericFields(1).PerfMode.allocate(5);
+        DXCoils::DXCoilNumericFields(1).PerfMode(1).FieldNames.allocate(30);
+        DXCoils::DXCoil(1).Name = "VRFTUDXCOOLCOIL";
+        DXCoils::DXCoil(1).DXCoilType = "Coil:Cooling:DX:VariableRefrigerantFlow";
+        DXCoils::DXCoil(1).AirInNode = coolCoilAirInNode;
+        DXCoils::DXCoil(1).AirOutNode = coolCoilAirOutNode;
+        DXCoils::DXCoil(1).DXCoilType_Num = CoilVRF_Cooling;
+        DXCoils::DXCoil(1).RatedAirVolFlowRate = DataSizing::AutoSize;
+        DXCoils::DXCoil(1).RatedTotCap = DataSizing::AutoSize;
+        DXCoils::DXCoil(1).RatedSHR = DataSizing::AutoSize;
+        DXCoils::DXCoil(1).SchedPtr = Sch1;
+        DXCoils::DXCoil(1).CCapFTemp.allocate(1);
+        DXCoils::DXCoil(1).CCapFTemp(1) = Sch1;
+        DXCoils::DXCoil(1).CCapFFlow.allocate(1);
+        DXCoils::DXCoil(1).CCapFFlow(1) = Sch1;
+        DXCoils::DXCoil(1).PLFFPLR.allocate(1);
+        DXCoils::DXCoil(1).PLFFPLR(1) = Sch1;
+
+        DXCoils::DXCoilNumericFields(2).PerfMode.allocate(5);
+        DXCoils::DXCoilNumericFields(2).PerfMode(1).FieldNames.allocate(30);
+        DXCoils::DXCoil(2).Name = "VRFTUDXHEATCOIL";
+        DXCoils::DXCoil(2).DXCoilType = "Coil:Heating:DX:VariableRefrigerantFlow";
+        DXCoils::DXCoil(2).AirInNode = heatCoilAirInNode;
+        DXCoils::DXCoil(2).AirOutNode = heatCoilAirOutNode;
+        DXCoils::DXCoil(2).DXCoilType_Num = CoilVRF_Heating;
+        DXCoils::DXCoil(2).RatedAirVolFlowRate = DataSizing::AutoSize;
+        DXCoils::DXCoil(2).RatedTotCap = DataSizing::AutoSize;
+        DXCoils::DXCoil(2).RatedSHR = DataSizing::AutoSize;
+        DXCoils::DXCoil(2).SchedPtr = Sch1;
+        DXCoils::DXCoil(2).CCapFTemp.allocate(1);
+        DXCoils::DXCoil(2).CCapFTemp(1) = Sch1;
+        DXCoils::DXCoil(2).CCapFFlow.allocate(1);
+        DXCoils::DXCoil(2).CCapFFlow(1) = Sch1;
+        DXCoils::DXCoil(2).PLFFPLR.allocate(1);
+        DXCoils::DXCoil(2).PLFFPLR(1) = Sch1;
+
+        // set up schedules
+        ScheduleManager::Schedule.allocate(10);
+
+    }
+
+    virtual void TearDown()
+    {
+        EnergyPlusFixture::TearDown(); // Remember to tear down the base fixture after cleaning up derived fixture!
+    }
+
+
+};
+
+TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
+{
+
+    static std::string const RoutineName("VRF_SysModel_inAirloop");
+    StdRhoAir = PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, 20.0, 0.0);
+    int curSysNum = DataSizing::CurSysNum = 1;
+    int curZoneNum = 1;
+    int curTUNum = 1;
+
+    // turn off GetInput for AirLoopFixture unit tests, everything is set up in fixture
+    HVACVariableRefrigerantFlow::GetVRFInputFlag = false;
+    DXCoils::GetCoilsInputFlag = false;
+    // trigger a mining function (will bypass GetInput)
+    int TUInletAirNode = GetVRFTUZoneInletAirNode(1);
+    auto &thisTU(HVACVariableRefrigerantFlow::VRFTU(curTUNum));
+    // node number set up in fixture
+    EXPECT_EQ(TUInletAirNode, thisTU.VRFTUInletNodeNum);
+
+    Schedule(VRF(curSysNum).SchedPtr).CurrentValue = 1.0;  // enable the VRF condenser
+    Schedule(thisTU.SchedPtr).CurrentValue = 1.0;          // enable the terminal unit
+    Schedule(thisTU.FanAvailSchedPtr).CurrentValue = 1.0;  // turn on fan
+    Schedule(thisTU.FanOpModeSchedPtr).CurrentValue = 0.0; // set cycling fan operating mode
+
+    ZoneSysEnergyDemand(curZoneNum).RemainingOutputRequired = 0.0; // set load = 0
+    ZoneSysEnergyDemand(curZoneNum).RemainingOutputReqToCoolSP = 0.0;
+    ZoneSysEnergyDemand(curZoneNum).RemainingOutputReqToHeatSP = 0.0;
+
+    DataAirLoop::AirLoopInputsFilled = true;
+
+    Node(VRF(curSysNum).CondenserNodeNum).Temp = 35.0;
+
+    int VRFTUOAMixerOANodeNum = thisTU.VRFTUOAMixerOANodeNum;
+    int VRFTUOAMixerRetNodeNum = thisTU.VRFTUOAMixerRetNodeNum;
+    Node(VRFTUOAMixerOANodeNum).Temp = 35.0;
+    Node(VRFTUOAMixerOANodeNum).HumRat = 0.01;
+    Node(VRFTUOAMixerOANodeNum).Enthalpy = PsyHFnTdbW(Node(VRFTUOAMixerOANodeNum).Temp, Node(VRFTUOAMixerOANodeNum).HumRat);
+    Node(VRFTUOAMixerOANodeNum).Press = DataEnvironment::OutBaroPress;
+
+    Node(VRFTUOAMixerRetNodeNum).Temp = 24.0;
+    Node(VRFTUOAMixerRetNodeNum).HumRat = 0.01;
+    Node(VRFTUOAMixerRetNodeNum).Enthalpy = PsyHFnTdbW(Node(VRFTUOAMixerRetNodeNum).Temp, Node(VRFTUOAMixerRetNodeNum).HumRat);
+    Node(VRFTUOAMixerRetNodeNum).Press = DataEnvironment::OutBaroPress;
+
+    bool HeatingActive = false;
+    bool CoolingActive = false;
+    int OAUnitNum = 0;
+    Real64 OAUCoilOutTemp = 0.0;
+    bool ZoneEquipment = true;
+    bool FirstHVACIteration = true;
+    Real64 SysOutputProvided = 0.0;
+    Real64 LatOutputProvided = 0.0;
+    Real64 OnOffAirFlowRatio = 1.0;
+    Real64 QZnReq = ZoneSysEnergyDemand(curZoneNum).RemainingOutputRequired;
+
+    auto &tuInletNode(DataLoopNode::Node(TUInletAirNode));
+    tuInletNode.Temp = 24.0;
+    tuInletNode.HumRat = 0.01;
+    tuInletNode.Enthalpy = PsyHFnTdbW(tuInletNode.Temp, tuInletNode.HumRat);
+
+    DataLoopNode::Node(thisTU.VRFTUOutletNodeNum).TempSetPoint = 20.0; // select 20 C as TU outlet set point temperature
+
+    InitVRF(curTUNum, curZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq); // Initialize all VRFTU related parameters
+
+    ASSERT_EQ(1, NumVRFCond);
+    EXPECT_TRUE(thisTU.isInAirLoop);          // initialization found TU in main air loop
+    EXPECT_TRUE(thisTU.isSetPointControlled); // initialization found TU is set point controlled
+    EXPECT_EQ(20.0, thisTU.coilTempSetPoint); // set point is initialized
+
+    SimVRF(curTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
+
+    EXPECT_EQ(0.0, QZnReq);
+
+    tuInletNode.MassFlowRate = thisTU.MaxCoolAirMassFlow; // set mass flow rate at TU inlet
+
+    InitVRF(curTUNum, curZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
+    EXPECT_LT(QZnReq, 0.0);                                                      // cooling load exists
+    EXPECT_TRUE(thisTU.coolSPActive);                                            // cooling set point control active
+    EXPECT_NEAR(DataLoopNode::Node(thisTU.VRFTUOutletNodeNum).Temp, 24.0, 0.01); // verify outlet node is not at set point = 20
+
+    SimVRF(curTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
+    EXPECT_LT(SysOutputProvided, 0.0);
+    EXPECT_NEAR(DataLoopNode::Node(thisTU.VRFTUOutletNodeNum).Temp, thisTU.coilTempSetPoint, 0.01);
+    EXPECT_NEAR(DataLoopNode::Node(thisTU.VRFTUOutletNodeNum).Temp, 20.0, 0.01); // TU outlet is at set point = 20
+
+    tuInletNode.Temp = 18.0;
+    tuInletNode.HumRat = 0.007;
+    tuInletNode.Enthalpy = PsyHFnTdbW(tuInletNode.Temp, tuInletNode.HumRat);
+    Node(VRFTUOAMixerRetNodeNum).Temp = 18.0;
+    Node(VRFTUOAMixerRetNodeNum).HumRat = 0.007;
+    Node(VRFTUOAMixerRetNodeNum).Enthalpy = PsyHFnTdbW(Node(VRFTUOAMixerRetNodeNum).Temp, Node(VRFTUOAMixerRetNodeNum).HumRat);
+    DataEnvironment::OutDryBulbTemp = 10.0;
+    Node(VRF(curSysNum).CondenserNodeNum).Temp = 10.0;
+    Node(VRFTUOAMixerOANodeNum).Temp = 10.0;
+
+    InitVRF(curTUNum, curZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
+    EXPECT_GT(QZnReq, 0.0);                                                      // heating load exists
+    EXPECT_FALSE(thisTU.coolSPActive);                                           // verify cooling set point control is not active
+    EXPECT_TRUE(thisTU.heatSPActive);                                            // verify heating set point control is active
+    EXPECT_NEAR(18.0, tuInletNode.Temp, 0.001);                                  // verify TU inlet node = 18
+    EXPECT_NEAR(18.0, DataLoopNode::Node(thisTU.coolCoilAirInNode).Temp, 0.001); // verify cooling coil inlet node = 18
+    SimVRF(curTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
+    EXPECT_GT(SysOutputProvided, 0.0);                                                              // TU provides heating
+    EXPECT_NEAR(DataLoopNode::Node(thisTU.VRFTUOutletNodeNum).Temp, thisTU.coilTempSetPoint, 0.01); // TU outlet is at SP target
+    EXPECT_NEAR(DataLoopNode::Node(thisTU.VRFTUOutletNodeNum).Temp, 20.0, 0.01);
+
+    // switch to load based control
+    thisTU.isSetPointControlled = false;
+    thisTU.ZoneAirNode = 1;
+    thisTU.ZoneNum = 1;
+    InitVRF(curTUNum, curZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq); // Initialize all VRFTU related parameters
+    EXPECT_EQ(0.0, QZnReq);
+    EXPECT_FALSE(CoolingLoad(curSysNum)); // verify no load on TU
+    EXPECT_FALSE(HeatingLoad(curSysNum));
+
+    ZoneSysEnergyDemand(curZoneNum).RemainingOutputRequired = 1000.0;   // set heating load
+    ZoneSysEnergyDemand(curZoneNum).RemainingOutputReqToCoolSP = 2000.0;
+    ZoneSysEnergyDemand(curZoneNum).RemainingOutputReqToHeatSP = 1000.0;
+    InitVRF(curTUNum, curZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq); // Initialize all VRFTU related parameters
+    EXPECT_GT(QZnReq, 0.0);
+    EXPECT_FALSE(CoolingLoad(curSysNum));
+    EXPECT_TRUE(HeatingLoad(curSysNum));
+    SimVRF(curTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
+    EXPECT_NEAR(SysOutputProvided, QZnReq, 1.0);
+
+    ZoneSysEnergyDemand(curZoneNum).RemainingOutputRequired = -1000.0;    // set cooling load
+    ZoneSysEnergyDemand(curZoneNum).RemainingOutputReqToCoolSP = -1000.0;
+    ZoneSysEnergyDemand(curZoneNum).RemainingOutputReqToHeatSP = -2000.0;
+    InitVRF(curTUNum, curZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq); // Initialize all VRFTU related parameters
+    EXPECT_LT(QZnReq, 0.0);
+    EXPECT_TRUE(CoolingLoad(curSysNum));
+    EXPECT_FALSE(HeatingLoad(curSysNum));
+    SimVRF(curTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
+    EXPECT_NEAR(SysOutputProvided, QZnReq, 1.0);
+}
 
 //*****************VRF-FluidTCtrl Model
 TEST_F(HVACVRFFixture, VRF_FluidTCtrl_VRFOU_Compressor)
@@ -3171,7 +3719,7 @@ TEST_F(HVACVRFFixture, VRFTest_SysCurve)
     DataZoneEquipment::ZoneEquipInputsFilled = true; // denotes zone equipment has been read in
     StdRhoAir = PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, 20.0, 0.0);
     ZoneEqSizing.allocate(1);
-    ZoneSizingRunDone = true;
+    DataSizing::ZoneSizingRunDone = true;
     ZoneEqSizing(CurZoneEqNum).DesignSizeFromParent = false;
     ZoneEqSizing(CurZoneEqNum).SizingMethod.allocate(25);
     ZoneEqSizing(CurZoneEqNum).SizingMethod(DataHVACGlobals::SystemAirflowSizing) = DataSizing::SupplyAirFlowRate;
@@ -3186,10 +3734,6 @@ TEST_F(HVACVRFFixture, VRFTest_SysCurve)
     GetCurveInput();          // read curves
     GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
-
-    DXCoils::GetCoilsInputFlag = true; // remove this when clear_state gets added to DXCoils
-    GlobalNames::NumCoils = 0;         // remove this when clear_state gets added to GlobalNames
-    GlobalNames::CoilNames.clear();    // remove this when clear_state gets added to GlobalNames
 
     GetZoneEquipmentData();                                // read equipment list and connections
     ZoneInletAirNode = GetVRFTUZoneInletAirNode(VRFTUNum); // trigger GetVRFInput by calling a mining function
