@@ -45,65 +45,57 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef PlantTopologyBranch_hh_INCLUDED
-#define PlantTopologyBranch_hh_INCLUDED
-
-#include <EnergyPlus/Plant/Component.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/Plant/Branch.hh>
+#include <EnergyPlus/PlantUtilities.hh>
 
 namespace EnergyPlus {
 namespace DataPlant {
 
-    struct BranchData
-    {
-        // Members
-        std::string Name; // Name of the branch
-        int ControlType;
-        Real64 RequestedMassFlow;
-        bool HasConstantSpeedBranchPump;    // true if branch has a constant speed branch pump
-        Real64 ConstantSpeedBranchMassFlow; // nominal flow rate if constant speed branch pump on
-        int BranchLevel;
-        int FlowErrCount;    // For recurring error counting
-        int FlowErrIndex;    // For recurring error index
-        int TotalComponents; // Total number of components on the branch
-        int NodeNumIn;       // Component inlet node number
-        int NodeNumOut;      // Component outlet node number
-        bool IsBypass;
-        int PumpIndex;
-        Real64 PumpSizFac;
-        bool EMSCtrlOverrideOn;      // if true, EMS is calling to override branch operation avail
-        Real64 EMSCtrlOverrideValue; // value set by EMS system for branch override controls
-        Array1D<CompData> Comp;      // Component type list
-        bool HasPressureComponents;
-        Real64 PressureDrop;
-        int PressureCurveType;  // Either none, pressure curve, or generic curve
-        int PressureCurveIndex; // Curve: index for pressure drop calculations
-        Real64 PressureEffectiveK;
-        bool disableOverrideForCSBranchPumping;
-        int lastComponentSimulated;
+    Real64 BranchData::DetermineBranchFlowRequest() {
 
-        // Default Constructor
-        BranchData()
-            : ControlType(0), RequestedMassFlow(0.0), HasConstantSpeedBranchPump(false), ConstantSpeedBranchMassFlow(0.0), BranchLevel(0),
-              FlowErrCount(0), FlowErrIndex(0), TotalComponents(0), NodeNumIn(0), NodeNumOut(0), IsBypass(false), PumpIndex(0), PumpSizFac(1.0),
-              EMSCtrlOverrideOn(false), EMSCtrlOverrideValue(0.0), HasPressureComponents(false), PressureDrop(0.0), PressureCurveType(0),
-              PressureCurveIndex(0), PressureEffectiveK(0.0), disableOverrideForCSBranchPumping(false), lastComponentSimulated(0)
-        {
-        }
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Edwin Lee
+        //       DATE WRITTEN   September 2010
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
 
-        // Max abs of Comp array MyLoad values //Autodesk:Tuned For replacement of any( abs( Comp.MyLoad() > SmallLoad ) usage
-        Real64 max_abs_Comp_MyLoad() const
-        {
-            Real64 load(0.0); // Return value
-            for (int i = Comp.l(), e = Comp.u(); i <= e; ++i) {
-                load = max(load, std::abs(Comp(i).MyLoad));
+        // PURPOSE OF THIS SUBROUTINE:
+        // This routine will analyze the given branch and determine the representative
+        //  flow request.
+
+        // METHODOLOGY EMPLOYED:
+        // Several possibilities are available.  In any case, the request is constrained to within
+        //  branch outlet min/max avail.  This assumes that the component flow routines will properly
+        //  propagate the min/max avail down the branch.
+        // Some possibilities for flow request are:
+        //  1) take the outlet flow rate -- assumes that the last component wins
+        //  2) take the inlet flow rate request -- assumes that the request is propogated up and is good
+        //  3) take the maximum request
+        //  4) move down the loop and take the maximum "non-load-range-based" request within min/max avail bounds
+        //     This assumes that load range based should not request flow for load-rejection purposes, and we
+        //     should only "respond" to other component types.
+
+        int const BranchInletNodeNum = this->NodeNumIn;
+        int const BranchOutletNodeNum = this->NodeNumOut;
+        Real64 OverallFlowRequest = 0.0;
+
+        if (this->ControlType != DataBranchAirLoopPlant::ControlType_SeriesActive) {
+            OverallFlowRequest = DataLoopNode::Node(BranchInletNodeNum).MassFlowRateRequest;
+        } else { // is series active, so take largest request of all the component inlet nodes
+            for (int CompCounter = 1; CompCounter <= this->TotalComponents; ++CompCounter) {
+                int const CompInletNode = this->Comp(CompCounter).NodeNumIn;
+                OverallFlowRequest = max(OverallFlowRequest, DataLoopNode::Node(CompInletNode).MassFlowRateRequest);
             }
-            return load;
         }
 
-        Real64 DetermineBranchFlowRequest();
-    };
+        //~ Now use a worker to bound the value to outlet min/max avail
+        OverallFlowRequest = PlantUtilities::BoundValueToNodeMinMaxAvail(OverallFlowRequest, BranchOutletNodeNum);
 
-} // namespace DataPlant
-} // namespace EnergyPlus
+        return OverallFlowRequest;
 
-#endif
+    }
+
+}
+}

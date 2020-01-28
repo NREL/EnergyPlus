@@ -169,6 +169,8 @@ namespace DataPlant {
 
         void UpdatePlantMixer();
 
+        void TurnOnAllLoopSideBranches();
+
         void SimulateSinglePump(PlantLocation SpecificPumpLocation, Real64 & SpecificPumpFlowRate);
 
         void UpdateAnyLoopDemandAlterations(int BranchNum, int CompNum);

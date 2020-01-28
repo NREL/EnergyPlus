@@ -410,6 +410,7 @@ SET( SRC
   Plant/ReportCompData.hh
   Plant/ReportLoopData.hh
   Plant/ReportVars.hh
+  Plant/Branch.cc
   Plant/Branch.hh
   Plant/Component.cc
   Plant/Component.hh

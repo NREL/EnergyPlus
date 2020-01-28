@@ -70,8 +70,6 @@ namespace PlantLoopSolver {
 
         void DisableAnyBranchPumpsConnectedToUnloadedEquipment(int LoopNum, int ThisSide);
 
-        void TurnOnAllLoopSideBranches(DataPlant::HalfLoopData &loop_side);
-
         void DoFlowAndLoadSolutionPass(int LoopNum, int ThisSide, int OtherSide, int ThisSideInletNode, bool FirstHVACIteration);
 
         Real64 EvaluateLoopSetPointLoad(int LoopNum,
@@ -86,8 +84,6 @@ namespace PlantLoopSolver {
                                   Real64 ThisLoopSideFlow, // [kg/s]  total flow to be split
                                   bool FirstHVACIteration  // TRUE if First HVAC iteration of Time step
         );
-
-        Real64 DetermineBranchFlowRequest(int LoopNum, int LoopSideNum, int BranchNum);
 
         void UpdateLoopSideReportVars(int LoopNum,
                                       int LoopSide,

@@ -166,7 +166,7 @@ namespace EnergyPlus {
                 PlantPressureSystem::SimPressureDropSystem(LoopNum, FirstHVACIteration, DataPlant::PressureCall_Init);
 
             // Turn on any previously disabled branches due to constant speed branch pump issue
-            thisPlantLoop.loopSolver.TurnOnAllLoopSideBranches(thisLoopSide);
+            thisLoopSide.TurnOnAllLoopSideBranches();
 
             // Do the actual simulation here every time
             thisPlantLoop.loopSolver.DoFlowAndLoadSolutionPass(LoopNum, ThisSide, OtherSide, ThisSideInletNode,
@@ -211,13 +211,6 @@ namespace EnergyPlus {
             // Update some reporting information at Plant half loop level
             thisPlantLoop.loopSolver.UpdateLoopSideReportVars(LoopNum, LoopSideNum, thisLoopSide.InitialDemandToLoopSetPointSAVED,
                                                               thisLoopSide.LoadToLoopSetPointThatWasntMet);
-        }
-
-        void PlantLoopSolverClass::TurnOnAllLoopSideBranches(DataPlant::HalfLoopData &loop_side) {
-            for (int branchNum = 2; branchNum <= loop_side.TotalBranches - 1; ++branchNum) {
-                auto &branch = loop_side.Branch(branchNum);
-                branch.disableOverrideForCSBranchPumping = false;
-            }
         }
 
         void PlantLoopSolverClass::DisableAnyBranchPumpsConnectedToUnloadedEquipment(int LoopNum, int ThisSide) {
@@ -1018,9 +1011,7 @@ namespace EnergyPlus {
                     auto &this_splitter_outlet_branch(this_loopside.Branch(SplitterBranchOut));
                     LastNodeOnBranch = this_branch.NodeNumOut;
                     FirstNodeOnBranch = this_branch.NodeNumIn;
-                    BranchFlowReq = DataPlant::PlantLoop(LoopNum).loopSolver.DetermineBranchFlowRequest(LoopNum,
-                                                                                                        LoopSideNum,
-                                                                                                        BranchNum);
+                    BranchFlowReq = this_branch.DetermineBranchFlowRequest();
                     this_branch.RequestedMassFlow = BranchFlowReq; // store this for later use in logic for remaining flow allocations
                     // now, if we are have branch pumps, here is the situation:
                     // constant speed pumps lock in a flow request on the inlet node
@@ -1251,7 +1242,7 @@ namespace EnergyPlus {
                     for (OutletNum = 1; OutletNum <= NumSplitOutlets; ++OutletNum) {
 
                         SplitterBranchOut = this_loopside.Splitter.BranchNumOut(OutletNum);
-                        ThisBranchRequest = DetermineBranchFlowRequest(LoopNum, LoopSideNum, SplitterBranchOut);
+                        ThisBranchRequest = this_loopside.Branch(SplitterBranchOut).DetermineBranchFlowRequest();
                         FirstNodeOnBranch = this_loopside.Branch(SplitterBranchOut).NodeNumIn;
                         auto &this_splitter_outlet_branch(this_loopside.Branch(SplitterBranchOut));
 
@@ -1304,103 +1295,6 @@ namespace EnergyPlus {
                 } // Total flow requested >= or < Total parallel request
 
             } // Splitter/Mixer exists
-        }
-
-        Real64 PlantLoopSolverClass::DetermineBranchFlowRequest(int const LoopNum, int const LoopSideNum,
-                                                                int const BranchNum) {
-
-            // SUBROUTINE INFORMATION:
-            //       AUTHOR         Edwin Lee
-            //       DATE WRITTEN   September 2010
-            //       MODIFIED       na
-            //       RE-ENGINEERED  na
-
-            // PURPOSE OF THIS SUBROUTINE:
-            // This routine will analyze the given branch and determine the representative
-            //  flow request.
-
-            // METHODOLOGY EMPLOYED:
-            // Several possibilities are available.  In any case, the request is constrained to within
-            //  branch outlet min/max avail.  This assumes that the component flow routines will properly
-            //  propagate the min/max avail down the branch.
-            // Some possibilities for flow request are:
-            //  1) take the outlet flow rate -- assumes that the last component wins
-            //  2) take the inlet flow rate request -- assumes that the request is propogated up and is good
-            //  3) take the maximum request
-            //  4) move down the loop and take the maximum "non-load-range-based" request within min/max avail bounds
-            //     This assumes that load range based should not request flow for load-rejection purposes, and we
-            //     should only "respond" to other component types.
-
-            auto &this_branch(DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum));
-            int const BranchInletNodeNum = this_branch.NodeNumIn;
-            int const BranchOutletNodeNum = this_branch.NodeNumOut;
-            Real64 OverallFlowRequest = 0.0;
-
-            if (this_branch.ControlType != DataBranchAirLoopPlant::ControlType_SeriesActive) {
-                OverallFlowRequest = DataLoopNode::Node(BranchInletNodeNum).MassFlowRateRequest;
-            } else { // is series active, so take largest request of all the component inlet nodes
-                for (int CompCounter = 1; CompCounter <= this_branch.TotalComponents; ++CompCounter) {
-                    int const CompInletNode = this_branch.Comp(CompCounter).NodeNumIn;
-                    OverallFlowRequest = max(OverallFlowRequest, DataLoopNode::Node(CompInletNode).MassFlowRateRequest);
-                }
-            }
-
-            //~ Now use a worker to bound the value to outlet min/max avail
-            OverallFlowRequest = PlantUtilities::BoundValueToNodeMinMaxAvail(OverallFlowRequest, BranchOutletNodeNum);
-
-            return OverallFlowRequest;
-
-            // this block below used to allow testing out different request calculation methods, I've pulled the
-            // InletFlowRequest method above and commented these out so that future experimentation could be done easily
-//            int const OutletFlowRate(1);
-//            int const InletFlowRequest(2);
-//            int const MaximumRequest(3);
-//            int const MaxNonLRBRequest(4);
-//            int const WhichRequestCalculation(InletFlowRequest);
-//
-//            switch (WhichRequestCalculation) {
-//
-//                case OutletFlowRate:
-//                    OverallFlowRequest = Node(BranchOutletNodeNum).MassFlowRate;
-//                    break;
-//                case InletFlowRequest:
-//                    if (this_branch.ControlType != ControlType_SeriesActive) {
-//                        OverallFlowRequest = Node(BranchInletNodeNum).MassFlowRateRequest;
-//                    } else { // is series active, so take largest request of all the component inlet nodes
-//                        for (CompCounter = 1; CompCounter <= this_branch.TotalComponents; ++CompCounter) {
-//                            CompInletNode = this_branch.Comp(CompCounter).NodeNumIn;
-//                            OverallFlowRequest = max(OverallFlowRequest, Node(CompInletNode).MassFlowRateRequest);
-//                        }
-//                    }
-//                    break;
-//
-//                case MaximumRequest:
-//                    // Assumes component inlet node is where request is held...could bandaid to include outlet node, but trying not to...
-//                    for (CompCounter = 1; CompCounter <= this_branch.TotalComponents; ++CompCounter) {
-//                        CompInletNode = this_branch.Comp(CompCounter).NodeNumIn;
-//                        OverallFlowRequest = max(OverallFlowRequest, Node(CompInletNode).MassFlowRateRequest);
-//                    }
-//                    break;
-//
-//                case MaxNonLRBRequest:
-//                    // Assumes component inlet node is where request is held...could bandaid to include outlet node, but trying not to...
-//                    for (CompCounter = 1; CompCounter <= this_branch.TotalComponents; ++CompCounter) {
-//                        {
-//                            auto const SELECT_CASE_var1(this_branch.Comp(CompCounter).CurOpSchemeType);
-//                            if ((SELECT_CASE_var1 >= LoadRangeBasedMin) && (SELECT_CASE_var1 <= LoadRangeBasedMax)) {
-//                                // don't include this request
-//                            } else {
-//                                // include this
-//                                CompInletNode = this_branch.Comp(CompCounter).NodeNumIn;
-//                                OverallFlowRequest = max(OverallFlowRequest, Node(CompInletNode).MassFlowRateRequest);
-//                            }
-//                        }
-//                    }
-//                    break;
-//
-//            }
-
-
         }
 
         void PlantLoopSolverClass::UpdateLoopSideReportVars(

@@ -422,8 +422,14 @@ namespace DataPlant {
         }
     }
 
+    void HalfLoopData::TurnOnAllLoopSideBranches() {
+        for (int branchNum = 2; branchNum <= this->TotalBranches - 1; ++branchNum) {
+            auto &branch = this->Branch(branchNum);
+            branch.disableOverrideForCSBranchPumping = false;
+        }
+    }
 
-void HalfLoopData::SimulateAllLoopSideBranches(Real64 const ThisLoopSideFlow, bool const FirstHVACIteration, bool &LoopShutDownFlag)
+    void HalfLoopData::SimulateAllLoopSideBranches(Real64 const ThisLoopSideFlow, bool const FirstHVACIteration, bool &LoopShutDownFlag)
     {
 
         // SUBROUTINE INFORMATION:
