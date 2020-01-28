@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,10 +55,10 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/member.functions.hh>
 
 // EnergyPlus Headers
+#include "OutputFiles.hh"
 #include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -119,8 +119,6 @@ namespace ConvectionCoefficients {
     // MODULE PARAMETER DEFINITIONS:
     Real64 const AdaptiveHcInsideLowLimit(0.5);  // W/m2-K
     Real64 const AdaptiveHcOutsideLowLimit(1.0); // W/m2-K
-    static ObjexxFCL::gio::Fmt fmtx("(A,I4,1x,A,1x,6f16.8)");
-    static ObjexxFCL::gio::Fmt fmty("(A,1x,6f16.8)");
 
     static std::string const BlankString;
 
@@ -3258,7 +3256,7 @@ namespace ConvectionCoefficients {
             ShowFatalError(RoutineName + "Errors found getting input.  Program termination.");
         }
 
-        SetupAdaptiveConvectionStaticMetaData();
+        SetupAdaptiveConvectionStaticMetaData(OutputFiles::getSingleton());
     }
 
     void ApplyConvectionValue(std::string const &SurfaceTypes, std::string const &ConvectionType, int const Value)
@@ -4841,7 +4839,7 @@ namespace ConvectionCoefficients {
         if (HConvIn(SurfNum) < LowHConvLimit) HConvIn(SurfNum) = LowHConvLimit;
     }
 
-    void SetupAdaptiveConvectionStaticMetaData()
+    void SetupAdaptiveConvectionStaticMetaData(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4963,39 +4961,7 @@ namespace ConvectionCoefficients {
         static FacadeGeoCharactisticsStruct WestFacade(247.5, 287.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
         static FacadeGeoCharactisticsStruct NorthWestFacade(287.5, 332.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_900("('! <Surface Convection Parameters>, Surface Name, Outside Model Assignment, Outside Area [m2], ','Outside "
-                                   "Perimeter [m], Outside Height [m], Inside Model Assignment, ','Inside Height [m], Inside Perimeter Envelope [m], "
-                                   "Inside Hydraulic Diameter [m], Window Wall Ratio, ','Window Location, Near Radiant {Yes/No}, Has Active HVAC "
-                                   "{Yes/No}')");
-        static ObjexxFCL::gio::Fmt Format_901("('Surface Convection Parameters,',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)");
-        static ObjexxFCL::gio::Fmt Format_8000("('! <Building Convection Parameters:North Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')");
-        static ObjexxFCL::gio::Fmt Format_8001("('Building Convection Parameters:North Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)");
-        static ObjexxFCL::gio::Fmt Format_8100(
-            "('! <Building Convection Parameters:Northeast Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')");
-        static ObjexxFCL::gio::Fmt Format_8101("('Building Convection Parameters:Northeast Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)");
-        static ObjexxFCL::gio::Fmt Format_8200("('! <Building Convection Parameters:East Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')");
-        static ObjexxFCL::gio::Fmt Format_8201("('Building Convection Parameters:East Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)");
-        static ObjexxFCL::gio::Fmt Format_8300(
-            "('! <Building Convection Parameters:Southeast Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')");
-        static ObjexxFCL::gio::Fmt Format_8301("('Building Convection Parameters:Southeast Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)");
-        static ObjexxFCL::gio::Fmt Format_8400("('! <Building Convection Parameters:South Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')");
-        static ObjexxFCL::gio::Fmt Format_8401("('Building Convection Parameters:South Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)");
-        static ObjexxFCL::gio::Fmt Format_8500(
-            "('! <Building Convection Parameters:Southwest Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')");
-        static ObjexxFCL::gio::Fmt Format_8501("('Building Convection Parameters:Southwest Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)");
-        static ObjexxFCL::gio::Fmt Format_8600("('! <Building Convection Parameters:West Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')");
-        static ObjexxFCL::gio::Fmt Format_8601("('Building Convection Parameters:West Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)");
-        static ObjexxFCL::gio::Fmt Format_8700(
-            "('! <Building Convection Parameters:Northwest Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax ')");
-        static ObjexxFCL::gio::Fmt Format_8701("('Building Convection Parameters:NorthwWest Facade, ',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A)");
-        static ObjexxFCL::gio::Fmt Format_8800("('! <Building Convection Parameters:Roof>, Area [m2], Perimeter [m], Height [m], ','XdYdZd:X, XdYdZd:Y, "
-                                    "XdYdZd:Z',',XdYdZu:X, XdYdZu:Y, XdYdZu:Z',',XdYuZd:X, XdYuZd:Y, XdYuZd:Z',',XdYuZu:X, XdYuZu:Y, "
-                                    "XdYuZu:Z',',XuYdZd:X, XuYdZd:Y, XuYdZd:Z',',XuYuZd:X, XuYuZd:Y, XuYuZd:Z',',XuYdZu:X, XuYdZu:Y, "
-                                    "XuYdZu:Z',',XuYuZu:X, XuYuZu:Y, XuYuZu:Z')");
-        static ObjexxFCL::gio::Fmt Format_8801("('Building Convection Parameters:Roof,',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',')");
-        static ObjexxFCL::gio::Fmt Format_88012("(A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',')");
-        static ObjexxFCL::gio::Fmt Format_88013("(A,',',A,',',A,',',A,',',A,',',A,',',A)");
+
 
         BldgVolumeSum = 0.0;
         RoofBoundZvals = 0.0;
@@ -5466,8 +5432,11 @@ namespace ConvectionCoefficients {
         // now send to EIO if surface reporting selected
         ScanForReports("Surfaces", DoReport, "Details");
         if (DoReport) { // echo out static geometry data related to convection models
-
-            ObjexxFCL::gio::write(OutputFileInits, Format_900); // header
+            static constexpr auto Format_900(
+                "! <Surface Convection Parameters>, Surface Name, Outside Model Assignment, Outside Area [m2], Outside Perimeter [m], Outside Height "
+                "[m], Inside Model Assignment, Inside Height [m], Inside Perimeter Envelope [m], Inside Hydraulic Diameter [m], Window Wall Ratio, "
+                "Window Location, Near Radiant {{Yes/No}}, Has Active HVAC {{Yes/No}}\n");
+            print(outputFiles.eio, Format_900); // header
             for (SurfLoop = 1; SurfLoop <= TotSurfaces; ++SurfLoop) {
                 if (!Surface(SurfLoop).HeatTransSurf) continue;
                 if (Surface(SurfLoop).IntConvSurfGetsRadiantHeat) {
@@ -5480,87 +5449,194 @@ namespace ConvectionCoefficients {
                 } else {
                     YesNo2 = "No";
                 }
-                ObjexxFCL::gio::write(OutputFileInits, Format_901)
-                    << Surface(SurfLoop).Name << RoundSigDigits(Surface(SurfLoop).ExtConvCoeff)
-                    << RoundSigDigits(Surface(SurfLoop).OutConvFaceArea, 2) << RoundSigDigits(Surface(SurfLoop).OutConvFacePerimeter, 2)
-                    << RoundSigDigits(Surface(SurfLoop).OutConvFaceHeight, 2) << RoundSigDigits(Surface(SurfLoop).IntConvCoeff)
-                    << RoundSigDigits(Surface(SurfLoop).IntConvZoneWallHeight, 2) << RoundSigDigits(Surface(SurfLoop).IntConvZonePerimLength, 2)
-                    << RoundSigDigits(Surface(SurfLoop).IntConvZoneHorizHydrDiam, 2) << RoundSigDigits(Surface(SurfLoop).IntConvWindowWallRatio, 2)
-                    << RoundSigDigits(Surface(SurfLoop).IntConvWindowLocation) << YesNo1
-                    << YesNo2; // [m] length of perimeter zone's exterior wall | [m] hydraulic diameter, usually 4 times the zone floor area div by
-                               // perimeter | [-] area of windows over area of exterior wall for zone | relative location of window in zone for
-                               // interior Hc models
+                static constexpr auto Format_901(
+                    "Surface Convection Parameters,{},{},{:.2R},{:.2R},{:.2R},{},{:.2R},{:.2R},{:.2R},{:.2R},{},{},{}\n");
+                print(outputFiles.eio,
+                      Format_901,
+                      Surface(SurfLoop).Name,
+                      Surface(SurfLoop).ExtConvCoeff,
+                      Surface(SurfLoop).OutConvFaceArea,
+                      Surface(SurfLoop).OutConvFacePerimeter,
+                      Surface(SurfLoop).OutConvFaceHeight,
+                      Surface(SurfLoop).IntConvCoeff,
+                      Surface(SurfLoop).IntConvZoneWallHeight,
+                      Surface(SurfLoop).IntConvZonePerimLength,
+                      Surface(SurfLoop).IntConvZoneHorizHydrDiam,
+                      Surface(SurfLoop).IntConvWindowWallRatio,
+                      Surface(SurfLoop).IntConvWindowLocation,
+                      YesNo1,
+                      YesNo2);
+
+                // [m] length of perimeter zone's exterior wall | [m] hydraulic diameter, usually 4 times the zone floor area div by
+                // perimeter | [-] area of windows over area of exterior wall for zone | relative location of window in zone for
+                // interior Hc models
             }
 
             // if display advanced reports also dump meta group data used for convection geometry
             if (DisplayAdvancedReportVariables) {
-                ObjexxFCL::gio::write(OutputFileInits, Format_8000); // header for north facade
-                ObjexxFCL::gio::write(OutputFileInits, Format_8001)
-                    << RoundSigDigits(NorthFacade.Perimeter, 2) << RoundSigDigits(NorthFacade.Height, 2) << RoundSigDigits(NorthFacade.Xmin, 2)
-                    << RoundSigDigits(NorthFacade.Xmax, 2) << RoundSigDigits(NorthFacade.Ymin, 2) << RoundSigDigits(NorthFacade.Ymax, 2)
-                    << RoundSigDigits(NorthFacade.Zmin, 2) << RoundSigDigits(NorthFacade.Zmax, 2);
-                ObjexxFCL::gio::write(OutputFileInits, Format_8100); // header for northeast facade
-                ObjexxFCL::gio::write(OutputFileInits, Format_8101)
-                    << RoundSigDigits(NorthEastFacade.Perimeter, 2) << RoundSigDigits(NorthEastFacade.Height, 2)
-                    << RoundSigDigits(NorthEastFacade.Xmin, 2) << RoundSigDigits(NorthEastFacade.Xmax, 2) << RoundSigDigits(NorthEastFacade.Ymin, 2)
-                    << RoundSigDigits(NorthEastFacade.Ymax, 2) << RoundSigDigits(NorthEastFacade.Zmin, 2) << RoundSigDigits(NorthEastFacade.Zmax, 2);
-                ObjexxFCL::gio::write(OutputFileInits, Format_8200); // header for east facade
-                ObjexxFCL::gio::write(OutputFileInits, Format_8201)
-                    << RoundSigDigits(EastFacade.Perimeter, 2) << RoundSigDigits(EastFacade.Height, 2) << RoundSigDigits(EastFacade.Xmin, 2)
-                    << RoundSigDigits(EastFacade.Xmax, 2) << RoundSigDigits(EastFacade.Ymin, 2) << RoundSigDigits(EastFacade.Ymax, 2)
-                    << RoundSigDigits(EastFacade.Zmin, 2) << RoundSigDigits(EastFacade.Zmax, 2);
+                static constexpr auto Format_8000(
+                    "! <Building Convection Parameters:North Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
+                print(outputFiles.eio, Format_8000); // header for north facade
+                static constexpr auto Format_8001("Building Convection Parameters:North Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
+                print(outputFiles.eio,
+                      Format_8001,
+                      NorthFacade.Perimeter,
+                      NorthFacade.Height,
+                      NorthFacade.Xmin,
+                      NorthFacade.Xmax,
+                      NorthFacade.Ymin,
+                      NorthFacade.Ymax,
+                      NorthFacade.Zmin,
+                      NorthFacade.Zmax);
+                static constexpr auto Format_8100(
+                    "! <Building Convection Parameters:Northeast Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
+                print(outputFiles.eio, Format_8100); // header for northeast facade
+                static constexpr auto Format_8101(
+                    "Building Convection Parameters:Northeast Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
+                print(outputFiles.eio,
+                      Format_8101,
+                      NorthEastFacade.Perimeter,
+                      NorthEastFacade.Height,
+                      NorthEastFacade.Xmin,
+                      NorthEastFacade.Xmax,
+                      NorthEastFacade.Ymin,
+                      NorthEastFacade.Ymax,
+                      NorthEastFacade.Zmin,
+                      NorthEastFacade.Zmax);
+                static constexpr auto Format_8200(
+                    "! <Building Convection Parameters:East Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
+                print(outputFiles.eio, Format_8200); // header for east facade
+                static constexpr auto Format_8201(
+                    "Building Convection Parameters:East Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
+                print(outputFiles.eio,
+                      Format_8201,
+                      EastFacade.Perimeter,
+                      EastFacade.Height,
+                      EastFacade.Xmin,
+                      EastFacade.Xmax,
+                      EastFacade.Ymin,
+                      EastFacade.Ymax,
+                      EastFacade.Zmin,
+                      EastFacade.Zmax);
 
-                ObjexxFCL::gio::write(OutputFileInits, Format_8300); // header for southeast facade
-                ObjexxFCL::gio::write(OutputFileInits, Format_8301)
-                    << RoundSigDigits(SouthEastFacade.Perimeter, 2) << RoundSigDigits(SouthEastFacade.Height, 2)
-                    << RoundSigDigits(SouthEastFacade.Xmin, 2) << RoundSigDigits(SouthEastFacade.Xmax, 2) << RoundSigDigits(SouthEastFacade.Ymin, 2)
-                    << RoundSigDigits(SouthEastFacade.Ymax, 2) << RoundSigDigits(SouthEastFacade.Zmin, 2) << RoundSigDigits(SouthEastFacade.Zmax, 2);
+                static constexpr auto Format_8300(
+                    "! <Building Convection Parameters:Southeast Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
+                print(outputFiles.eio, Format_8300); // header for southeast facade
+                static constexpr auto Format_8301(
+                    "Building Convection Parameters:Southeast Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
+                print(outputFiles.eio,
+                      Format_8301,
+                      SouthEastFacade.Perimeter,
+                      SouthEastFacade.Height,
+                      SouthEastFacade.Xmin,
+                      SouthEastFacade.Xmax,
+                      SouthEastFacade.Ymin,
+                      SouthEastFacade.Ymax,
+                      SouthEastFacade.Zmin,
+                      SouthEastFacade.Zmax);
 
-                ObjexxFCL::gio::write(OutputFileInits, Format_8400); // header for south facade
-                ObjexxFCL::gio::write(OutputFileInits, Format_8401)
-                    << RoundSigDigits(SouthFacade.Perimeter, 2) << RoundSigDigits(SouthFacade.Height, 2) << RoundSigDigits(SouthFacade.Xmin, 2)
-                    << RoundSigDigits(SouthFacade.Xmax, 2) << RoundSigDigits(SouthFacade.Ymin, 2) << RoundSigDigits(SouthFacade.Ymax, 2)
-                    << RoundSigDigits(SouthFacade.Zmin, 2) << RoundSigDigits(SouthFacade.Zmax, 2);
-                ObjexxFCL::gio::write(OutputFileInits, Format_8500); // header for southwest facade
-                ObjexxFCL::gio::write(OutputFileInits, Format_8501)
-                    << RoundSigDigits(SouthWestFacade.Perimeter, 2) << RoundSigDigits(SouthWestFacade.Height, 2)
-                    << RoundSigDigits(SouthWestFacade.Xmin, 2) << RoundSigDigits(SouthWestFacade.Xmax, 2) << RoundSigDigits(SouthWestFacade.Ymin, 2)
-                    << RoundSigDigits(SouthWestFacade.Ymax, 2) << RoundSigDigits(SouthWestFacade.Zmin, 2) << RoundSigDigits(SouthWestFacade.Zmax, 2);
-                ObjexxFCL::gio::write(OutputFileInits, Format_8600); // header for west facade
-                ObjexxFCL::gio::write(OutputFileInits, Format_8601)
-                    << RoundSigDigits(WestFacade.Perimeter, 2) << RoundSigDigits(WestFacade.Height, 2) << RoundSigDigits(WestFacade.Xmin, 2)
-                    << RoundSigDigits(WestFacade.Xmax, 2) << RoundSigDigits(WestFacade.Ymin, 2) << RoundSigDigits(WestFacade.Ymax, 2)
-                    << RoundSigDigits(WestFacade.Zmin, 2) << RoundSigDigits(WestFacade.Zmax, 2);
-                ObjexxFCL::gio::write(OutputFileInits, Format_8700); // header for northwest facade
-                ObjexxFCL::gio::write(OutputFileInits, Format_8701)
-                    << RoundSigDigits(NorthWestFacade.Perimeter, 2) << RoundSigDigits(NorthWestFacade.Height, 2)
-                    << RoundSigDigits(NorthWestFacade.Xmin, 2) << RoundSigDigits(NorthWestFacade.Xmax, 2) << RoundSigDigits(NorthWestFacade.Ymin, 2)
-                    << RoundSigDigits(NorthWestFacade.Ymax, 2) << RoundSigDigits(NorthWestFacade.Zmin, 2) << RoundSigDigits(NorthWestFacade.Zmax, 2);
-                ObjexxFCL::gio::write(OutputFileInits, Format_8800); // header for roof
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("No");
-                    ObjexxFCL::gio::write(OutputFileInits, Format_8801, flags)
-                        << RoundSigDigits(RoofGeo.Area, 2) << RoundSigDigits(RoofGeo.Perimeter, 2) << RoundSigDigits(RoofGeo.Height, 2)
-                        << RoundSigDigits(RoofGeo.XdYdZd.Vertex.x, 3) << RoundSigDigits(RoofGeo.XdYdZd.Vertex.y, 3)
-                        << RoundSigDigits(RoofGeo.XdYdZd.Vertex.z, 3) << RoundSigDigits(RoofGeo.XdYdZu.Vertex.x, 3)
-                        << RoundSigDigits(RoofGeo.XdYdZu.Vertex.y, 3) << RoundSigDigits(RoofGeo.XdYdZu.Vertex.z, 3)
-                        << RoundSigDigits(RoofGeo.XdYuZd.Vertex.x, 3);
-                }
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("No");
-                    ObjexxFCL::gio::write(OutputFileInits, Format_88012, flags)
-                        << RoundSigDigits(RoofGeo.XdYuZd.Vertex.y, 3) << RoundSigDigits(RoofGeo.XdYuZd.Vertex.z, 3)
-                        << RoundSigDigits(RoofGeo.XdYuZu.Vertex.x, 3) << RoundSigDigits(RoofGeo.XdYuZu.Vertex.y, 3)
-                        << RoundSigDigits(RoofGeo.XdYuZu.Vertex.z, 3) << RoundSigDigits(RoofGeo.XuYdZd.Vertex.x, 3)
-                        << RoundSigDigits(RoofGeo.XuYdZd.Vertex.y, 3) << RoundSigDigits(RoofGeo.XuYdZd.Vertex.z, 3)
-                        << RoundSigDigits(RoofGeo.XuYuZd.Vertex.x, 3) << RoundSigDigits(RoofGeo.XuYuZd.Vertex.y, 3);
-                }
-                ObjexxFCL::gio::write(OutputFileInits, Format_88013) << RoundSigDigits(RoofGeo.XuYuZd.Vertex.z, 3) << RoundSigDigits(RoofGeo.XuYdZu.Vertex.x, 3)
-                                                          << RoundSigDigits(RoofGeo.XuYdZu.Vertex.y, 3) << RoundSigDigits(RoofGeo.XuYdZu.Vertex.z, 3)
-                                                          << RoundSigDigits(RoofGeo.XuYuZu.Vertex.x, 3) << RoundSigDigits(RoofGeo.XuYuZu.Vertex.y, 3)
-                                                          << RoundSigDigits(RoofGeo.XuYuZu.Vertex.z, 3);
+                static constexpr auto Format_8400(
+                    "! <Building Convection Parameters:South Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
+                print(outputFiles.eio, Format_8400); // header for south facade
+                static constexpr auto Format_8401(
+                    "Building Convection Parameters:South Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
+                print(outputFiles.eio,
+                      Format_8401,
+                      SouthFacade.Perimeter,
+                      SouthFacade.Height,
+                      SouthFacade.Xmin,
+                      SouthFacade.Xmax,
+                      SouthFacade.Ymin,
+                      SouthFacade.Ymax,
+                      SouthFacade.Zmin,
+                      SouthFacade.Zmax);
+                static constexpr auto Format_8500(
+                    "! <Building Convection Parameters:Southwest Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
+                print(outputFiles.eio, Format_8500); // header for southwest facade
+                static constexpr auto Format_8501(
+                    "Building Convection Parameters:Southwest Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
+                print(outputFiles.eio,
+                      Format_8501,
+                      SouthWestFacade.Perimeter,
+                      SouthWestFacade.Height,
+                      SouthWestFacade.Xmin,
+                      SouthWestFacade.Xmax,
+                      SouthWestFacade.Ymin,
+                      SouthWestFacade.Ymax,
+                      SouthWestFacade.Zmin,
+                      SouthWestFacade.Zmax);
+                static constexpr auto Format_8600(
+                    "! <Building Convection Parameters:West Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
+                print(outputFiles.eio, Format_8600); // header for west facade
+                static constexpr auto Format_8601(
+                    "Building Convection Parameters:West Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
+                print(outputFiles.eio,
+                      Format_8601,
+                      WestFacade.Perimeter,
+                      WestFacade.Height,
+                      WestFacade.Xmin,
+                      WestFacade.Xmax,
+                      WestFacade.Ymin,
+                      WestFacade.Ymax,
+                      WestFacade.Zmin,
+                      WestFacade.Zmax);
+                static constexpr auto Format_8700(
+                    "! <Building Convection Parameters:Northwest Facade>, Perimeter, Height, Xmin, Xmax, Ymin, Ymax, Zmin, Zmax \n");
+                print(outputFiles.eio, Format_8700); // header for northwest facade
+                static constexpr auto Format_8701(
+                    "Building Convection Parameters:NorthwWest Facade, {:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n");
+                print(outputFiles.eio,
+                      Format_8701,
+                      NorthWestFacade.Perimeter,
+                      NorthWestFacade.Height,
+                      NorthWestFacade.Xmin,
+                      NorthWestFacade.Xmax,
+                      NorthWestFacade.Ymin,
+                      NorthWestFacade.Ymax,
+                      NorthWestFacade.Zmin,
+                      NorthWestFacade.Zmax);
+                static constexpr auto Format_8800(
+                    "! <Building Convection Parameters:Roof>, Area [m2], Perimeter [m], Height [m], XdYdZd:X, XdYdZd:Y, XdYdZd:Z,XdYdZu:X, XdYdZu:Y, "
+                    "XdYdZu:Z,XdYuZd:X, XdYuZd:Y, XdYuZd:Z,XdYuZu:X, XdYuZu:Y, XdYuZu:Z,XuYdZd:X, XuYdZd:Y, XuYdZd:Z,XuYuZd:X, XuYuZd:Y, "
+                    "XuYuZd:Z,XuYdZu:X, XuYdZu:Y, XuYdZu:Z,XuYuZu:X, XuYuZu:Y, XuYuZu:Z\n");
+                print(outputFiles.eio, Format_8800); // header for roof
+                static constexpr auto Format_8801(
+                    "Building Convection Parameters:Roof,{:.2R},{:.2R},{:.2R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},");
+                print(outputFiles.eio,
+                      Format_8801,
+                      RoofGeo.Area,
+                      RoofGeo.Perimeter,
+                      RoofGeo.Height,
+                      RoofGeo.XdYdZd.Vertex.x,
+                      RoofGeo.XdYdZd.Vertex.y,
+                      RoofGeo.XdYdZd.Vertex.z,
+                      RoofGeo.XdYdZu.Vertex.x,
+                      RoofGeo.XdYdZu.Vertex.y,
+                      RoofGeo.XdYdZu.Vertex.z,
+                      RoofGeo.XdYuZd.Vertex.x);
+                static constexpr auto Format_88012("{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},");
+                print(outputFiles.eio,
+                      Format_88012,
+                      RoofGeo.XdYuZd.Vertex.y,
+                      RoofGeo.XdYuZd.Vertex.z,
+                      RoofGeo.XdYuZu.Vertex.x,
+                      RoofGeo.XdYuZu.Vertex.y,
+                      RoofGeo.XdYuZu.Vertex.z,
+                      RoofGeo.XuYdZd.Vertex.x,
+                      RoofGeo.XuYdZd.Vertex.y,
+                      RoofGeo.XuYdZd.Vertex.z,
+                      RoofGeo.XuYuZd.Vertex.x,
+                      RoofGeo.XuYuZd.Vertex.y);
+                static constexpr auto Format_88013("{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
+                print(outputFiles.eio,
+                      Format_88013,
+                      RoofGeo.XuYuZd.Vertex.z,
+                      RoofGeo.XuYdZu.Vertex.x,
+                      RoofGeo.XuYdZu.Vertex.y,
+                      RoofGeo.XuYdZu.Vertex.z,
+                      RoofGeo.XuYuZu.Vertex.x,
+                      RoofGeo.XuYuZu.Vertex.y,
+                      RoofGeo.XuYuZu.Vertex.z);
             }
         }
 

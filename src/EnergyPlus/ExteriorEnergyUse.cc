@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -100,7 +100,7 @@ namespace ExteriorEnergyUse {
     int const CoalUse(4);                  // Coal
     int const FuelOil1Use(5);              // FuelOil#1
     int const FuelOil2Use(6);              // FuelOil#2
-    int const LPGUse(7);                   // PropaneGas
+    int const PropaneUse(7);               // Propane
     int const GasolineUse(8);              // Gasoline
     int const DieselUse(9);                // Diesel
     int const SteamUse(10);                // Steam
@@ -540,7 +540,7 @@ namespace ExteriorEnergyUse {
         FuelTypeString = "";
 
         // Select the correct Number for the associated ascii name for the fuel type
-        if (UtilityRoutines::SameString(FuelTypeAlpha, "Electricity") || UtilityRoutines::SameString(FuelTypeAlpha, "Electric")) {
+        if (UtilityRoutines::SameString(FuelTypeAlpha, "Electricity")) {
             FuelTypeNumber = ElecUse;
             FuelTypeString = "Electric";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "NaturalGas")) {
@@ -549,11 +549,11 @@ namespace ExteriorEnergyUse {
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Coal")) {
             FuelTypeNumber = CoalUse;
             FuelTypeString = "Coal";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "FuelOil#1")) {
+        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "FuelOilNo1")) {
             FuelTypeNumber = FuelOil1Use;
             FuelTypeString = "FuelOil#1";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "PropaneGas")) {
-            FuelTypeNumber = LPGUse;
+        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Propane")) {
+            FuelTypeNumber = PropaneUse;
             FuelTypeString = "Propane";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Gasoline")) {
             FuelTypeNumber = GasolineUse;
@@ -561,7 +561,7 @@ namespace ExteriorEnergyUse {
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "Diesel")) {
             FuelTypeNumber = DieselUse;
             FuelTypeString = "Diesel";
-        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "FuelOil#2")) {
+        } else if (UtilityRoutines::SameString(FuelTypeAlpha, "FuelOilNo2")) {
             FuelTypeNumber = FuelOil2Use;
             FuelTypeString = "FuelOil#2";
         } else if (UtilityRoutines::SameString(FuelTypeAlpha, "OtherFuel1")) {
