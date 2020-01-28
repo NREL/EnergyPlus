@@ -358,7 +358,6 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineCondEntSetPointManager)
     // Set up ChW loop manually, way too much input to do that here in idf, all I care about is the
     DataPlant::TotNumLoops = 2;
     DataPlant::PlantLoop.allocate(2);
-    DataPlant::PlantReport.allocate(1);
 
     DataPlant::PlantLoop(chwLoopIndex).LoopSide.allocate(2);
     DataPlant::PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch.allocate(1);
@@ -394,14 +393,14 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineCondEntSetPointManager)
     thisSPM.TypeNum = DataPlant::TypeOf_Chiller_Electric;
 
     // switch: Weighted ratio > 9 && etc...
-    DataPlant::PlantReport(1).CoolingDemand = 4700;
+    DataPlant::PlantLoop(1).CoolingDemand = 4700;
 
     // Now call and check
     thisSPM.calculate();
     EXPECT_NEAR(designCondenserEnteringTemp + 1.0, thisSPM.SetPt, 0.001);
 
     // switch: Weighted ratio < 9 || etc...
-    DataPlant::PlantReport(1).CoolingDemand = 4000;
+    DataPlant::PlantLoop(1).CoolingDemand = 4000;
 
     // switch: OAWB>MinWb && DesignWB>MinDesignWB && CurLift>MinLift
     DataEnvironment::OutWetBulbTemp = 40;

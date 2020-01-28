@@ -306,7 +306,6 @@ namespace DataPlant {
     // Object Data
     extern Array1D<PlantLoopData> PlantLoop;
     extern Array1D<PlantAvailMgrData> PlantAvailMgr;
-    extern Array1D<ReportVars> PlantReport;
     extern Array1D<ReportLoopData> VentRepPlantSupplySide;
     extern Array1D<ReportLoopData> VentRepPlantDemandSide;
     extern Array1D<ReportLoopData> VentRepCondSupplySide;

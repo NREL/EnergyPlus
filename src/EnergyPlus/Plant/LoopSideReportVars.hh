@@ -53,14 +53,7 @@ namespace DataPlant {
 
     struct LoopSideReportVars
     {
-        // Members
-        Real64 LoopSetPtDemandAtInlet;
-        Real64 ThisSideLoadAlterations;
 
-        // Default Constructor
-        LoopSideReportVars() : LoopSetPtDemandAtInlet(0.0), ThisSideLoadAlterations(0.0)
-        {
-        }
     };
 
 } // namespace DataPlant

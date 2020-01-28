@@ -7300,7 +7300,7 @@ namespace SetPointManager {
                     PlantLoop(LoopIndexPlantSide).LoopSide(SupplySide).Branch(BranchIndexPlantSide).Comp(ChillerIndexPlantSide).TempDesEvapOut;
                 DCESPMDesignClgCapacity_Watts =
                     PlantLoop(LoopIndexPlantSide).LoopSide(SupplySide).Branch(BranchIndexPlantSide).Comp(ChillerIndexPlantSide).MaxLoad;
-                DCESPMCurrentLoad_Watts = PlantReport(LoopIndexPlantSide).CoolingDemand;
+                DCESPMCurrentLoad_Watts = PlantLoop(LoopIndexPlantSide).CoolingDemand;
             } else if (TypeNum == TypeOf_Chiller_Indirect_Absorption || TypeNum == TypeOf_Chiller_DFAbsorption) {
                 TempDesCondIn =
                     PlantLoop(LoopIndexPlantSide).LoopSide(SupplySide).Branch(BranchIndexPlantSide).Comp(ChillerIndexPlantSide).TempDesCondIn;

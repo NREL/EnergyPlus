@@ -130,7 +130,6 @@ void HVACSizingSimulationManager::CreateNewCoincidentPlantAnalysisObject(std::st
 void HVACSizingSimulationManager::SetupSizingAnalyses()
 {
     using DataLoopNode::Node;
-    using DataPlant::PlantReport;
     using DataSizing::CondenserLoop;
     using DataSizing::CoolingLoop;
     using DataSizing::HeatingLoop;
@@ -142,9 +141,9 @@ void HVACSizingSimulationManager::SetupSizingAnalyses()
         P.supplyInletNodeFlow_LogIndex = sizingLogger.SetupVariableSizingLog(Node(P.supplySideInletNodeNum).MassFlowRate, P.numTimeStepsInAvg);
         P.supplyInletNodeTemp_LogIndex = sizingLogger.SetupVariableSizingLog(Node(P.supplySideInletNodeNum).Temp, P.numTimeStepsInAvg);
         if (PlantSizData(P.plantSizingIndex).LoopType == HeatingLoop || PlantSizData(P.plantSizingIndex).LoopType == SteamLoop) {
-            P.loopDemand_LogIndex = sizingLogger.SetupVariableSizingLog(PlantReport(P.plantLoopIndex).HeatingDemand, P.numTimeStepsInAvg);
+            P.loopDemand_LogIndex = sizingLogger.SetupVariableSizingLog(DataPlant::PlantLoop(P.plantLoopIndex).HeatingDemand, P.numTimeStepsInAvg);
         } else if (PlantSizData(P.plantSizingIndex).LoopType == CoolingLoop || PlantSizData(P.plantSizingIndex).LoopType == CondenserLoop) {
-            P.loopDemand_LogIndex = sizingLogger.SetupVariableSizingLog(PlantReport(P.plantLoopIndex).CoolingDemand, P.numTimeStepsInAvg);
+            P.loopDemand_LogIndex = sizingLogger.SetupVariableSizingLog(DataPlant::PlantLoop(P.plantLoopIndex).CoolingDemand, P.numTimeStepsInAvg);
         }
     }
 }

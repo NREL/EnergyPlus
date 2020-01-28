@@ -753,7 +753,6 @@ namespace PlantUtilities {
         using DataLoopNode::NodeID;
         using DataPlant::DemandSide;
         using DataPlant::PlantLoop;
-        using DataPlant::PlantReport;
         using DataPlant::SupplySide;
         using General::RoundSigDigits;
 
@@ -861,10 +860,10 @@ namespace PlantUtilities {
                               " {kg/s}");
             ShowContinueError("PlantLoop PumpHeat (SupplySide)=" + RoundSigDigits(PlantLoop(LoopNum).LoopSide(SupplySide).TotalPumpHeat, 1) + " {W}");
             ShowContinueError("PlantLoop PumpHeat (DemandSide)=" + RoundSigDigits(PlantLoop(LoopNum).LoopSide(DemandSide).TotalPumpHeat, 1) + " {W}");
-            ShowContinueError("PlantLoop Cooling Demand=" + RoundSigDigits(PlantReport(LoopNum).CoolingDemand, 1) + " {W}");
-            ShowContinueError("PlantLoop Heating Demand=" + RoundSigDigits(PlantReport(LoopNum).HeatingDemand, 1) + " {W}");
-            ShowContinueError("PlantLoop Demand not Dispatched=" + RoundSigDigits(PlantReport(LoopNum).DemandNotDispatched, 1) + " {W}");
-            ShowContinueError("PlantLoop Unmet Demand=" + RoundSigDigits(PlantReport(LoopNum).UnmetDemand, 1) + " {W}");
+            ShowContinueError("PlantLoop Cooling Demand=" + RoundSigDigits(PlantLoop(LoopNum).CoolingDemand, 1) + " {W}");
+            ShowContinueError("PlantLoop Heating Demand=" + RoundSigDigits(PlantLoop(LoopNum).HeatingDemand, 1) + " {W}");
+            ShowContinueError("PlantLoop Demand not Dispatched=" + RoundSigDigits(PlantLoop(LoopNum).DemandNotDispatched, 1) + " {W}");
+            ShowContinueError("PlantLoop Unmet Demand=" + RoundSigDigits(PlantLoop(LoopNum).UnmetDemand, 1) + " {W}");
 
             LoopCapacity = 0.0;
             DispatchedCapacity = 0.0;

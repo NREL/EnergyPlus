@@ -49,13 +49,9 @@
 #include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
-#include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/Plant/PlantConvergencePoint.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -535,7 +531,6 @@ namespace DataPlant {
     // Object Data
     Array1D<PlantLoopData> PlantLoop;
     Array1D<PlantAvailMgrData> PlantAvailMgr;
-    Array1D<ReportVars> PlantReport;
     Array1D<ReportLoopData> VentRepPlantSupplySide;
     Array1D<ReportLoopData> VentRepPlantDemandSide;
     Array1D<ReportLoopData> VentRepCondSupplySide;
@@ -564,7 +559,6 @@ namespace DataPlant {
         PlantManageHalfLoopCalls = 0;
         PlantLoop.deallocate();
         PlantAvailMgr.deallocate();
-        PlantReport.deallocate();
         VentRepPlantSupplySide.deallocate();
         VentRepPlantDemandSide.deallocate();
         VentRepCondSupplySide.deallocate();

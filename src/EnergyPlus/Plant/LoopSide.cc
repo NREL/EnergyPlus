@@ -194,7 +194,6 @@ namespace DataPlant {
         using DataPlant::DualSetPointDeadBand;
         using DataPlant::LoopDemandTol;
         using DataPlant::PlantLoop;
-        using DataPlant::PlantReport;
         using DataPlant::SingleSetPoint;
         using FluidProperties::GetSatEnthalpyRefrig;
         using FluidProperties::GetSpecificHeatGlycol;
@@ -305,7 +304,7 @@ namespace DataPlant {
         // Trim the demand to zero if it is very small
         if (std::abs(LoadToLoopSetPoint) < LoopDemandTol) LoadToLoopSetPoint = 0.0;
 
-        PlantReport(this->myLoopNum).UnmetDemand = LoadToLoopSetPoint;
+        this_loop.UnmetDemand = LoadToLoopSetPoint;
     }
 
     void HalfLoopData::ValidateFlowControlPaths()
@@ -484,26 +483,25 @@ namespace DataPlant {
         // Using/Aliasing
         using DataLoopNode::Node;
         using DataPlant::PlantLoop;
-        using DataPlant::PlantReport;
         using DataPlant::SupplySide;
 
         if (this->myLoopSideNum == SupplySide) {
-            auto &this_loop_report(PlantReport(this->myLoopNum));
+            auto &this_loop(PlantLoop(this->myLoopNum));
 
-            this_loop_report.InletNodeFlowrate = Node(this->NodeNumIn).MassFlowRate;
-            this_loop_report.InletNodeTemperature = Node(this->NodeNumIn).Temp;
-            this_loop_report.OutletNodeFlowrate = Node(this->NodeNumOut).MassFlowRate;
-            this_loop_report.OutletNodeTemperature = Node(this->NodeNumOut).Temp;
+            this_loop.InletNodeFlowrate = Node(this->NodeNumIn).MassFlowRate;
+            this_loop.InletNodeTemperature = Node(this->NodeNumIn).Temp;
+            this_loop.OutletNodeFlowrate = Node(this->NodeNumOut).MassFlowRate;
+            this_loop.OutletNodeTemperature = Node(this->NodeNumOut).Temp;
 
             // In the baseline code, only reported supply side demand. so putting in "SupplySide" IF block for now but might expand later
             if (OtherSideDemand < 0.0) {
-                this_loop_report.CoolingDemand = std::abs(OtherSideDemand);
-                this_loop_report.HeatingDemand = 0.0;
-                this_loop_report.DemandNotDispatched = -LocalRemLoopDemand; //  Setting sign based on old logic for now
+                this_loop.CoolingDemand = std::abs(OtherSideDemand);
+                this_loop.HeatingDemand = 0.0;
+                this_loop.DemandNotDispatched = -LocalRemLoopDemand; //  Setting sign based on old logic for now
             } else {
-                this_loop_report.HeatingDemand = OtherSideDemand;
-                this_loop_report.CoolingDemand = 0.0;
-                this_loop_report.DemandNotDispatched = LocalRemLoopDemand; //  Setting sign based on old logic for now
+                this_loop.HeatingDemand = OtherSideDemand;
+                this_loop.CoolingDemand = 0.0;
+                this_loop.DemandNotDispatched = LocalRemLoopDemand; //  Setting sign based on old logic for now
             }
 
             this->CalcUnmetPlantDemand();

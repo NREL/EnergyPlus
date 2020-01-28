@@ -256,7 +256,7 @@ namespace EnergyPlus {
                         }
 
                         // Update the report variable
-                        PlantReport(LoopNum).LastLoopSideSimulated = LoopSide;
+                        this_loop.LastLoopSideSimulated = LoopSide;
 
                         ++PlantManageHalfLoopCalls;
                     }
@@ -2112,34 +2112,12 @@ namespace EnergyPlus {
             // This subroutine initializes the plant supply side reports.
             // It was created during the splitting of supply and demand side functions.
 
-            // METHODOLOGY EMPLOYED:
-            // na
-
-            // REFERENCES:
-            // na
-
-            // USE STATEMENTS:
-            // na
             // Using/Aliasing
             using DataGlobals::DisplayAdvancedReportVariables;
             using DataPlant::DemandOpSchemeType;
             using DataPlant::DemandSide;
             using DataPlant::PlantLoop;
-            using DataPlant::PlantReport;
             using DataPlant::SupplySide;
-
-            // Locals
-            // SUBROUTINE ARGUMENT DEFINITIONS:
-            // na
-
-            // SUBROUTINE PARAMETER DEFINITIONS:
-            // na
-
-            // INTERFACE BLOCK SPECIFICATIONS
-            // na
-
-            // DERIVED TYPE DEFINITIONS
-            // na
 
             // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
             int LoopNum; // DO loop counter (plant supply sides)
@@ -2152,27 +2130,23 @@ namespace EnergyPlus {
 
             // FLOW:
             MaxBranches = 0;
-            for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
-                MaxBranches = max(MaxBranches, PlantLoop(LoopNum).LoopSide(DemandSide).TotalBranches);
-                MaxBranches = max(MaxBranches, PlantLoop(LoopNum).LoopSide(SupplySide).TotalBranches);
-                PlantLoop(LoopNum).MaxBranch = MaxBranches;
-            }
-
-            PlantReport.allocate(TotNumLoops);
-
-            for (auto &e : PlantReport) {
-                e.CoolingDemand = 0.0;
-                e.HeatingDemand = 0.0;
-                e.DemandNotDispatched = 0.0;
-                e.UnmetDemand = 0.0;
-                e.InletNodeTemperature = 0.0;
-                e.OutletNodeTemperature = 0.0;
-                e.InletNodeFlowrate = 0.0;
-                e.BypassFrac = 0.0;
-                e.OutletNodeFlowrate = 0.0;
+            for (auto &loop : PlantLoop) {
+                MaxBranches = max(MaxBranches, loop.LoopSide(DemandSide).TotalBranches);
+                MaxBranches = max(MaxBranches, loop.LoopSide(SupplySide).TotalBranches);
+                loop.MaxBranch = MaxBranches;
+                loop.CoolingDemand = 0.0;
+                loop.HeatingDemand = 0.0;
+                loop.DemandNotDispatched = 0.0;
+                loop.UnmetDemand = 0.0;
+                loop.InletNodeTemperature = 0.0;
+                loop.OutletNodeTemperature = 0.0;
+                loop.InletNodeFlowrate = 0.0;
+                loop.BypassFrac = 0.0;
+                loop.OutletNodeFlowrate = 0.0;
             }
 
             for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+                auto &loop = PlantLoop(LoopNum);
                 if (LoopNum <= NumPlantLoops) {
                     CurrentModuleObject = "Plant Loop";
                 } else {
@@ -2181,67 +2155,57 @@ namespace EnergyPlus {
                 // CurrentModuleObject='Plant/Condenser Loop'
                 SetupOutputVariable("Plant Supply Side Cooling Demand Rate",
                                     OutputProcessor::Unit::W,
-                                    PlantReport(LoopNum).CoolingDemand,
+                                    loop.CoolingDemand,
                                     "System",
                                     "Average",
                                     PlantLoop(LoopNum).Name);
                 SetupOutputVariable("Plant Supply Side Heating Demand Rate",
                                     OutputProcessor::Unit::W,
-                                    PlantReport(LoopNum).HeatingDemand,
+                                    loop.HeatingDemand,
                                     "System",
                                     "Average",
                                     PlantLoop(LoopNum).Name);
                 SetupOutputVariable("Plant Supply Side Inlet Mass Flow Rate",
                                     OutputProcessor::Unit::kg_s,
-                                    PlantReport(LoopNum).InletNodeFlowrate,
+                                    loop.InletNodeFlowrate,
                                     "System",
                                     "Average",
                                     PlantLoop(LoopNum).Name);
 
                 SetupOutputVariable("Plant Supply Side Inlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    PlantReport(LoopNum).InletNodeTemperature,
+                                    loop.InletNodeTemperature,
                                     "System",
                                     "Average",
                                     PlantLoop(LoopNum).Name);
                 SetupOutputVariable("Plant Supply Side Outlet Temperature",
                                     OutputProcessor::Unit::C,
-                                    PlantReport(LoopNum).OutletNodeTemperature,
+                                    loop.OutletNodeTemperature,
                                     "System",
                                     "Average",
                                     PlantLoop(LoopNum).Name);
 
                 SetupOutputVariable("Plant Supply Side Not Distributed Demand Rate",
                                     OutputProcessor::Unit::W,
-                                    PlantReport(LoopNum).DemandNotDispatched,
+                                    loop.DemandNotDispatched,
                                     "System",
                                     "Average",
                                     PlantLoop(LoopNum).Name);
                 SetupOutputVariable("Plant Supply Side Unmet Demand Rate",
                                     OutputProcessor::Unit::W,
-                                    PlantReport(LoopNum).UnmetDemand,
+                                    loop.UnmetDemand,
                                     "System",
                                     "Average",
                                     PlantLoop(LoopNum).Name);
-
-                // Debug variables -- used by OSU developers
                 SetupOutputVariable("Debug Plant Loop Bypass Fraction",
                                     OutputProcessor::Unit::None,
-                                    PlantReport(LoopNum).BypassFrac,
+                                    loop.BypassFrac,
                                     "System",
                                     "Average",
                                     PlantLoop(LoopNum).Name);
-                //    CALL SetupOutputVariable('Debug SSInletNode Flowrate[kg/s]', &
-                //           PlantReport(LoopNum)%InletNodeFlowrate,'System','Average',PlantLoop(LoopNum)%Name)
-                //    CALL SetupOutputVariable('Debug SSInletNode Temperature[C]', &
-                //           PlantReport(LoopNum)%InletNodeTemperature,'System','Average',PlantLoop(LoopNum)%Name)
-                //    CALL SetupOutputVariable('Debug SSOutletNode Flowrate [kg/s]', &
-                //           PlantReport(LoopNum)%OutletNodeFlowrate,'System','Average',PlantLoop(LoopNum)%Name)
-                //    CALL SetupOutputVariable('Debug SSOutletNode Temperature[C]', &
-                //           PlantReport(LoopNum)%OutletNodeTemperature,'System','Average',PlantLoop(LoopNum)%Name)
                 SetupOutputVariable("Debug Plant Last Simulated Loop Side",
                                     OutputProcessor::Unit::None,
-                                    PlantReport(LoopNum).LastLoopSideSimulated,
+                                    loop.LastLoopSideSimulated,
                                     "System",
                                     "Average",
                                     PlantLoop(LoopNum).Name);
@@ -2882,16 +2846,16 @@ namespace EnergyPlus {
                         }     // BRANCH LOOP
                     }         // LOOPSIDE
                 }             // PLANT LOOP
-                for (auto &e : PlantReport) {
-                    e.CoolingDemand = 0.0;
-                    e.HeatingDemand = 0.0;
-                    e.DemandNotDispatched = 0.0;
-                    e.UnmetDemand = 0.0;
-                    e.LastLoopSideSimulated = 0;
-                    e.InletNodeFlowrate = 0.0;
-                    e.InletNodeTemperature = 0.0;
-                    e.OutletNodeFlowrate = 0.0;
-                    e.OutletNodeTemperature = 0.0;
+                for (auto &loop : PlantLoop) {
+                    loop.CoolingDemand = 0.0;
+                    loop.HeatingDemand = 0.0;
+                    loop.DemandNotDispatched = 0.0;
+                    loop.UnmetDemand = 0.0;
+                    loop.LastLoopSideSimulated = 0;
+                    loop.InletNodeFlowrate = 0.0;
+                    loop.InletNodeTemperature = 0.0;
+                    loop.OutletNodeFlowrate = 0.0;
+                    loop.OutletNodeTemperature = 0.0;
                 }
 
                 MyEnvrnFlag = false;
