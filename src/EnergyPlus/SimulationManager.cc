@@ -1157,13 +1157,19 @@ namespace SimulationManager {
             DoWeathSim = true;
         }
 
-        auto const instances = inputProcessor->epJSON.find("PerformancePrecisionTradeoffs");
+        CurrentModuleObject = "PerformancePrecisionTradeoffs";
+        auto const instances = inputProcessor->epJSON.find(CurrentModuleObject);
+        Num = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        if (Num > 1) {
+            ErrorsFound = true;
+            ShowFatalError("GetProjectData: Only one (\"1\") " + CurrentModuleObject + " object per simulation is allowed.");
+        }
         if (instances != inputProcessor->epJSON.end()) {
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
                 auto const &fields = instance.value();
-                auto const &thisObjectName = UtilityRoutines::MakeUPPERCase(instance.key());
-                inputProcessor->markObjectAsUsed("PerformancePrecisionTradeoffs", thisObjectName);
+                auto const &thisObjectName = instance.key();
+                inputProcessor->markObjectAsUsed(CurrentModuleObject, thisObjectName);
                 if (fields.find("use_coil_direct_solutions") != fields.end()) {
                     if (UtilityRoutines::MakeUPPERCase(fields.at("use_coil_direct_solutions")) == "YES") {
                         DoCoilDirectSolutions = true;
