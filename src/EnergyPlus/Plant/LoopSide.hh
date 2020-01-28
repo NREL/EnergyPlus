@@ -171,6 +171,21 @@ namespace DataPlant {
 
         void TurnOnAllLoopSideBranches();
 
+        void DisableAnyBranchPumpsConnectedToUnloadedEquipment();
+
+        void DoFlowAndLoadSolutionPass(int OtherSide, int ThisSideInletNode, bool FirstHVACIteration);
+
+        Real64 CalcOtherSideDemand(Real64 ThisLoopSideFlow);
+
+        Real64 SetupLoopFlowRequest(int OtherSide);
+
+        Real64 EvaluateLoopSetPointLoad(int FirstBranchNum,
+                                        int LastBranchNum,
+                                        Real64 ThisLoopSideFlow,
+                                        Array1S_int LastComponentSimulated);
+
+        void ResolveParallelFlows(Real64 ThisLoopSideFlow, bool FirstHVACIteration);
+
         void SimulateSinglePump(PlantLocation SpecificPumpLocation, Real64 & SpecificPumpFlowRate);
 
         void UpdateAnyLoopDemandAlterations(int BranchNum, int CompNum);

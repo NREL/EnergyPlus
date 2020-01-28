@@ -64,27 +64,6 @@ namespace PlantLoopSolver {
     struct PlantLoopSolverClass
     {
 
-        Real64 SetupLoopFlowRequest(int LoopNum, int ThisSide, int OtherSide);
-
-        Real64 CalcOtherSideDemand(int LoopNum, int ThisSide, Real64 ThisLoopSideFlow);
-
-        void DisableAnyBranchPumpsConnectedToUnloadedEquipment(int LoopNum, int ThisSide);
-
-        void DoFlowAndLoadSolutionPass(int LoopNum, int ThisSide, int OtherSide, int ThisSideInletNode, bool FirstHVACIteration);
-
-        Real64 EvaluateLoopSetPointLoad(int LoopNum,
-                                        int LoopSideNum,
-                                        int FirstBranchNum,
-                                        int LastBranchNum,
-                                        Real64 ThisLoopSideFlow,
-                                        Array1S_int LastComponentSimulated);
-
-        void ResolveParallelFlows(int LoopNum,             // plant loop number that we are balancing flow for
-                                  int LoopSideNum,         // plant loop number that we are balancing flow for
-                                  Real64 ThisLoopSideFlow, // [kg/s]  total flow to be split
-                                  bool FirstHVACIteration  // TRUE if First HVAC iteration of Time step
-        );
-
         void UpdateLoopSideReportVars(int LoopNum,
                                       int LoopSide,
                                       Real64 OtherSideDemand,   // This is the 'other side' demand, based on other side flow
