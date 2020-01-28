@@ -84,6 +84,7 @@
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
@@ -5281,7 +5282,7 @@ namespace HVACVariableRefrigerantFlow {
         // Size TU
         if (MySizeFlag(VRFTUNum)) {
             if (!ZoneSizingCalc && !SysSizingCalc) {
-                SizeVRF(VRFTUNum);
+                SizeVRF(OutputFiles::getSingleton(), VRFTUNum);
                 TerminalUnitList(TUListIndex).TerminalUnitNotSizedYet(IndexToTUInTUList) = false;
                 MySizeFlag(VRFTUNum) = false;
             } // IF ( .NOT. ZoneSizingCalc) THEN
@@ -6283,7 +6284,7 @@ namespace HVACVariableRefrigerantFlow {
         }
     }
 
-    void SizeVRF(int const VRFTUNum)
+    void SizeVRF(OutputFiles &outputFiles, int const VRFTUNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -6368,12 +6369,6 @@ namespace HVACVariableRefrigerantFlow {
         int CapSizingMethod(0); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
                                 // FractionOfAutosizedHeatingCapacity )
 
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_990(
-            "('! <VRF System Information>, VRF System Type, VRF System Name, ','VRF System Cooling Combination Ratio, VRF "
-            "System Heating Combination Ratio, ','VRF System Cooling Piping Correction Factor, VRF System Heating Piping "
-            "Correction Factor')");
-        static ObjexxFCL::gio::Fmt Format_991("(' VRF System Information',6(', ',A))");
 
         VRFCond = VRFTU(VRFTUNum).VRFSysNum;
         IsAutoSize = false;
@@ -7325,13 +7320,22 @@ namespace HVACVariableRefrigerantFlow {
 
                 // Report to eio other information not related to autosizing
                 if (MyOneTimeEIOFlag) {
-                    ObjexxFCL::gio::write(OutputFileInits, Format_990);
+                    static constexpr auto Format_990(
+                        "! <VRF System Information>, VRF System Type, VRF System Name, VRF System Cooling Combination Ratio, VRF "
+                        "System Heating Combination Ratio, VRF System Cooling Piping Correction Factor, VRF System Heating Piping "
+                        "Correction Factor\n");
+                    print(outputFiles.eio, Format_990);
                     MyOneTimeEIOFlag = false;
                 }
-                ObjexxFCL::gio::write(OutputFileInits, Format_991)
-                    << cVRFTypes(VRF(VRFCond).VRFSystemTypeNum) << VRF(VRFCond).Name << RoundSigDigits(VRF(VRFCond).CoolingCombinationRatio, 5)
-                    << RoundSigDigits(VRF(VRFCond).HeatingCombinationRatio, 5) << RoundSigDigits(VRF(VRFCond).PipingCorrectionCooling, 5)
-                    << RoundSigDigits(VRF(VRFCond).PipingCorrectionHeating, 5);
+                static constexpr auto Format_991(" VRF System Information, {}, {}, {:.5R}, {:.5R}, {:.5R}, {:.5R}\n");
+                print(outputFiles.eio,
+                      Format_991,
+                      cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
+                      VRF(VRFCond).Name,
+                      VRF(VRFCond).CoolingCombinationRatio,
+                      VRF(VRFCond).HeatingCombinationRatio,
+                      VRF(VRFCond).PipingCorrectionCooling,
+                      VRF(VRFCond).PipingCorrectionHeating);
 
                 CheckVRFCombinationRatio(VRFCond) = false;
             }

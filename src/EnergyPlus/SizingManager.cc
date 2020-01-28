@@ -146,7 +146,7 @@ namespace SizingManager {
         NumAirLoops = 0;
     }
 
-    void ManageSizing()
+    void ManageSizing(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -232,7 +232,7 @@ namespace SizingManager {
         GetZoneAirDistribution(); // get zone air distribution objects
         GetZoneHVACSizing();      // get zone HVAC sizing object
         GetAirTerminalSizing();   // get air terminal sizing object
-        GetSizingParams();        // get the building level sizing paramets
+        GetSizingParams(outputFiles);        // get the building level sizing paramets
         GetZoneSizingInput();     // get the Zone Sizing input
         GetSystemSizingInput();   // get the System Sizing input
         GetPlantSizingInput();    // get the Plant Sizing input
@@ -701,7 +701,8 @@ namespace SizingManager {
                         DOASHeatGainRateAtClPk = 0.0;
                         TStatSetPtAtPk = 0.0;
                     }
-                    ReportZoneSizing(FinalZoneSizing(CtrlZoneNum).ZoneName,
+                    ReportZoneSizing(outputFiles,
+                                     FinalZoneSizing(CtrlZoneNum).ZoneName,
                                      "Cooling",
                                      CalcFinalZoneSizing(CtrlZoneNum).DesCoolLoad,
                                      FinalZoneSizing(CtrlZoneNum).DesCoolLoad,
@@ -747,7 +748,8 @@ namespace SizingManager {
                         DOASHeatGainRateAtHtPk = 0.0;
                         TStatSetPtAtPk = 0.0;
                     }
-                    ReportZoneSizing(FinalZoneSizing(CtrlZoneNum).ZoneName,
+                    ReportZoneSizing(outputFiles,
+                                     FinalZoneSizing(CtrlZoneNum).ZoneName,
                                      "Heating",
                                      CalcFinalZoneSizing(CtrlZoneNum).DesHeatLoad,
                                      FinalZoneSizing(CtrlZoneNum).DesHeatLoad,
@@ -816,7 +818,8 @@ namespace SizingManager {
                     coolCap = FinalSysSizing(AirLoopNum).TotCoolCap;
                 }
                 if (coolPeakDD > 0) {
-                    ReportSysSizing(curName,
+                    ReportSysSizing(outputFiles,
+                                    curName,
                                     "Cooling",
                                     coolPeakLoadKind,
                                     coolCap,
@@ -826,7 +829,8 @@ namespace SizingManager {
                                     coolPeakDDDate,
                                     SysSizPeakDDNum(AirLoopNum).TimeStepAtHeatPk(coolPeakDD));
                 } else {
-                    ReportSysSizing(curName,
+                    ReportSysSizing(outputFiles,
+                                    curName,
                                     "Cooling",
                                     coolPeakLoadKind,
                                     coolCap,
@@ -838,7 +842,8 @@ namespace SizingManager {
                 }
                 int heatPeakDD = SysSizPeakDDNum(AirLoopNum).HeatPeakDD;
                 if (heatPeakDD > 0) {
-                    ReportSysSizing(curName,
+                    ReportSysSizing(outputFiles,
+                                    curName,
                                     "Heating",
                                     "Sensible",
                                     FinalSysSizing(AirLoopNum).HeatCap,
@@ -848,7 +853,8 @@ namespace SizingManager {
                                     SysSizPeakDDNum(AirLoopNum).cHeatPeakDDDate,
                                     SysSizPeakDDNum(AirLoopNum).TimeStepAtHeatPk(heatPeakDD));
                 } else {
-                    ReportSysSizing(curName,
+                    ReportSysSizing(outputFiles,
+                                    curName,
                                     "Heating",
                                     "Sensible",
                                     FinalSysSizing(AirLoopNum).HeatCap,
@@ -2489,7 +2495,7 @@ namespace SizingManager {
         }
     }
 
-    void GetSizingParams()
+    void GetSizingParams(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2508,9 +2514,6 @@ namespace SizingManager {
         // Using/Aliasing
         using namespace DataIPShortCuts;
         using General::RoundSigDigits;
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
@@ -2595,8 +2598,8 @@ namespace SizingManager {
                                  "\", Commas will be used to separate fields.");
                 cAlphaArgs(1) = "Comma";
             }
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Sizing Output Files>,Style";
-            ObjexxFCL::gio::write(OutputFileInits, "('Sizing Output Files,',A)") << cAlphaArgs(1);
+            print(outputFiles.eio, "! <Sizing Output Files>,Style");
+            print(outputFiles.eio,  "Sizing Output Files,{}", cAlphaArgs(1));
         }
     }
 
@@ -4021,7 +4024,8 @@ namespace SizingManager {
         } // ... End environment loop.
     }
 
-    void ReportZoneSizing(std::string const &ZoneName,   // the name of the zone
+    void ReportZoneSizing(OutputFiles &outputFiles,
+                          std::string const &ZoneName,   // the name of the zone
                           std::string const &LoadType,   // the description of the input variable
                           Real64 const CalcDesLoad,      // the value from the sizing calculation [W]
                           Real64 const UserDesLoad,      // the value from the sizing calculation modified by user input [W]
@@ -4055,7 +4059,6 @@ namespace SizingManager {
 
         // Using/Aliasing
         using namespace DataPrecisionGlobals;
-        using DataGlobals::OutputFileInits;
         using DataStringGlobals::VerString;
         using General::RoundSigDigits;
 
@@ -4073,23 +4076,32 @@ namespace SizingManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool MyOneTimeFlag(true);
 
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_990("('! <Zone Sizing Information>, Zone Name, Load Type, Calc Des Load {W}, User Des Load {W}, ','Calc Des Air Flow "
-                                   "Rate {m3/s}, ','User Des Air Flow Rate {m3/s}, Design Day Name, Date/Time of Peak, Temperature at Peak {C}, "
-                                   "','Humidity Ratio at Peak {kgWater/kgDryAir}, Floor Area {m2}, # Occupants, Calc Outdoor Air Flow Rate {m3/s}, "
-                                   "Calc DOAS Heat Addition Rate {W}')");
-        static ObjexxFCL::gio::Fmt Format_991("(' Zone Sizing Information',14(', ',A))");
-
         if (MyOneTimeFlag) {
-            ObjexxFCL::gio::write(OutputFileInits, Format_990);
+            static constexpr auto Format_990("! <Zone Sizing Information>, Zone Name, Load Type, Calc Des Load {W}, User Des Load {W}, Calc Des Air Flow "
+                                                  "Rate {m3/s}, User Des Air Flow Rate {m3/s}, Design Day Name, Date/Time of Peak, Temperature at Peak {C}, "
+                                                  "Humidity Ratio at Peak {kgWater/kgDryAir}, Floor Area {m2}, # Occupants, Calc Outdoor Air Flow Rate {m3/s}, "
+                                                  "Calc DOAS Heat Addition Rate {W}");
+            print(outputFiles.eio, "{}\n", Format_990);
             MyOneTimeFlag = false;
         }
 
-        ObjexxFCL::gio::write(OutputFileInits, Format_991) << ZoneName << LoadType << RoundSigDigits(CalcDesLoad, 5) << RoundSigDigits(UserDesLoad, 5)
-                                                << RoundSigDigits(CalcDesFlow, 5) << RoundSigDigits(UserDesFlow, 5) << DesDayName << PeakHrMin
-                                                << RoundSigDigits(PeakTemp, 5) << RoundSigDigits(PeakHumRat, 5) << RoundSigDigits(FloorArea, 5)
-                                                << RoundSigDigits(TotOccs, 5) << RoundSigDigits(MinOAVolFlow, 5)
-                                                << RoundSigDigits(DOASHeatAddRate, 5);
+        static constexpr auto Format_991(" Zone Sizing Information,{},{},{:.5R},{:.5R},{:.5R},{:.5R},{},{},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R}\n");
+        print(outputFiles.eio,
+              Format_991,
+              ZoneName,
+              LoadType,
+              CalcDesLoad,
+              UserDesLoad,
+              CalcDesFlow,
+              UserDesFlow,
+              DesDayName,
+              PeakHrMin,
+              PeakTemp,
+              PeakHumRat,
+              FloorArea,
+              TotOccs,
+              MinOAVolFlow,
+              DOASHeatAddRate);
 
         // BSLLC Start
         if (sqlite) {
@@ -4110,7 +4122,8 @@ namespace SizingManager {
     }
 
     // Writes system sizing data to EIO file using one row per system
-    void ReportSysSizing(std::string const &SysName,      // the name of the zone
+    void ReportSysSizing(OutputFiles &outputFiles,
+                         std::string const &SysName,      // the name of the zone
                          std::string const &LoadType,     // either "Cooling" or "Heating"
                          std::string const &PeakLoadKind, // either "Sensible" or "Total"
                          Real64 const &UserDesCap,        // User  Design Capacity
@@ -4122,21 +4135,27 @@ namespace SizingManager {
     )
     {
         using namespace DataPrecisionGlobals;
-        using DataGlobals::OutputFileInits;
         using General::RoundSigDigits;
 
         static bool MyOneTimeFlag(true);
 
         if (MyOneTimeFlag) {
-            ObjexxFCL::gio::write(OutputFileInits,
-                       "('! <System Sizing Information>, System Name, Load Type, Peak Load Kind, User Design Capacity, Calc Des Air "
-                       "Flow Rate [m3/s], User Des Air Flow Rate [m3/s], Design Day Name, Date/Time of Peak')");
+            print(outputFiles.eio, "{}\n",
+                       "! <System Sizing Information>, System Name, Load Type, Peak Load Kind, User Design Capacity, Calc Des Air "
+                       "Flow Rate [m3/s], User Des Air Flow Rate [m3/s], Design Day Name, Date/Time of Peak");
             MyOneTimeFlag = false;
         }
         std::string dateHrMin = DesDayDate + " " + TimeIndexToHrMinString(TimeStepIndex);
-        ObjexxFCL::gio::write(OutputFileInits, "(' System Sizing Information, ',A, 7(', ',A))")
-            << SysName << LoadType << PeakLoadKind << RoundSigDigits(UserDesCap, 2) << RoundSigDigits(CalcDesVolFlow, 5)
-            << RoundSigDigits(UserDesVolFlow, 5) << DesDayName << dateHrMin;
+        print(outputFiles.eio,
+              " System Sizing Information, {}, {}, {}, {:.2R}, {:.5R}, {:.5R}, {}, {}\n",
+              SysName,
+              LoadType,
+              PeakLoadKind,
+              UserDesCap,
+              CalcDesVolFlow,
+              UserDesVolFlow,
+              DesDayName,
+              dateHrMin);
 
         // BSLLC Start
         if (sqlite)

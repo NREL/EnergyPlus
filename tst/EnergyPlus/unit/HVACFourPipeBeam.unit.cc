@@ -1729,7 +1729,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     createFacilityElectricPowerServiceObject();
     BranchInputManager::ManageBranchInput(); // just gets input and returns.
     DataGlobals::DoingSizing = true;
-    SizingManager::ManageSizing();
+    SizingManager::ManageSizing(OutputFiles::getSingleton());
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
@@ -3302,7 +3302,7 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
     createFacilityElectricPowerServiceObject();
     BranchInputManager::ManageBranchInput(); // just gets input and returns.
     DataGlobals::DoingSizing = true;
-    SizingManager::ManageSizing();
+    SizingManager::ManageSizing(OutputFiles::getSingleton());
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 

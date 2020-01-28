@@ -360,7 +360,7 @@ namespace SimulationManager {
         ManageBranchInput(); // just gets input and returns.
 
         DoingSizing = true;
-        ManageSizing();
+        ManageSizing(OutputFiles::getSingleton());
 
         BeginFullSimFlag = true;
         SimsDone = false;
@@ -462,7 +462,7 @@ namespace SimulationManager {
 
         // if user requested HVAC Sizing Simulation, call HVAC sizing simulation manager
         if (DoHVACSizingSimulation) {
-            ManageHVACSizingSimulation(ErrorsFound);
+            ManageHVACSizingSimulation(OutputFiles::getSingleton(), ErrorsFound);
         }
 
         ShowMessage("Beginning Simulation");
@@ -576,7 +576,7 @@ namespace SimulationManager {
 
                     for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
                         if (AnySlabsInModel || AnyBasementsInModel) {
-                            SimulateGroundDomains(false);
+                            SimulateGroundDomains(OutputFiles::getSingleton(), false);
                         }
 
                         if (AnyUnderwaterBoundaries) {
@@ -1987,7 +1987,7 @@ namespace SimulationManager {
         } // ... End environment loop.
 
         if (AnySlabsInModel || AnyBasementsInModel) {
-            SimulateGroundDomains(true);
+            SimulateGroundDomains(OutputFiles::getSingleton(), true);
         }
 
         if (!ErrorsFound) SimCostEstimate(); // basically will get and check input

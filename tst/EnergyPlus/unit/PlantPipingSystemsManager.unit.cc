@@ -1754,7 +1754,7 @@ TEST_F(EnergyPlusFixture, PipingSystemFullSimulation) {
     // we can also try to call from the Domain side
     DataGlobals::BeginSimFlag = true;
     DataGlobals::BeginEnvrnFlag = true;
-    PlantPipingSystemsManager::SimulateGroundDomains(false);
+    PlantPipingSystemsManager::SimulateGroundDomains(OutputFiles::getSingleton(), false);
 }
 
 /*

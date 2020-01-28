@@ -716,7 +716,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
-    OutputProcessor::GetReportVariableInput();
+    OutputProcessor::GetReportVariableInput(OutputFiles::getSingleton());
     PlantManager::CheckIfAnyPlant();
 
     BranchInputManager::ManageBranchInput(); // just gets input and
@@ -1466,11 +1466,11 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
     OutputProcessor::SetupTimePointers("Zone", DataGlobals::TimeStepZone); // Set up Time pointer for HB/Zone Simulation
     OutputProcessor::SetupTimePointers("HVAC", DataHVACGlobals::TimeStepSys);
     createFacilityElectricPowerServiceObject();
-    OutputProcessor::GetReportVariableInput();
+    OutputProcessor::GetReportVariableInput(OutputFiles::getSingleton());
     PlantManager::CheckIfAnyPlant();
 
     BranchInputManager::ManageBranchInput(); // just gets input and
-    SizingManager::ManageSizing();
+    SizingManager::ManageSizing(OutputFiles::getSingleton());
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 

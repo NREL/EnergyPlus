@@ -77,6 +77,7 @@
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
@@ -176,7 +177,7 @@ namespace DualDuct {
 
         // Obtains and Allocates Damper related parameters from input file
         if (GetDualDuctInputFlag) { // First time subroutine has been entered
-            GetDualDuctInput();
+            GetDualDuctInput(OutputFiles::getSingleton());
             GetDualDuctInputFlag = false;
         }
 
@@ -238,7 +239,7 @@ namespace DualDuct {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetDualDuctInput()
+    void GetDualDuctInput(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -890,7 +891,7 @@ namespace DualDuct {
 
         if (!SysSizingCalc && MySizeFlag(DamperNum)) {
 
-            SizeDualDuct(DamperNum);
+            SizeDualDuct(OutputFiles::getSingleton(), DamperNum);
 
             MySizeFlag(DamperNum) = false;
         }
@@ -1100,7 +1101,7 @@ namespace DualDuct {
         }
     }
 
-    void SizeDualDuct(int const DamperNum)
+    void SizeDualDuct(OutputFiles &outputFiles, int const DamperNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2162,8 +2163,9 @@ namespace DualDuct {
         // Formats
         static ObjexxFCL::gio::Fmt Format_100("('! <#Dual Duct Damper Connections>,<Number of Dual Duct Damper Connections>')");
         static ObjexxFCL::gio::Fmt Format_101("(A)");
-        static ObjexxFCL::gio::Fmt Format_102("('! <Dual Duct Damper>,<Dual Duct Damper Count>,<Dual Duct Damper Name>,<Inlet Node>,','<Outlet Node>,<Inlet "
-                                   "Node Type>,<AirLoopHVAC Name>')");
+        static ObjexxFCL::gio::Fmt Format_102(
+            "('! <Dual Duct Damper>,<Dual Duct Damper Count>,<Dual Duct Damper Name>,<Inlet Node>,','<Outlet Node>,<Inlet "
+            "Node Type>,<AirLoopHVAC Name>')");
         static ObjexxFCL::gio::Fmt fmtLD("*");
 
         if (!allocated(Damper))
@@ -2225,20 +2227,20 @@ namespace DualDuct {
             }
 
             if ((Damper(Count1).DamperType == DualDuct_ConstantVolume) || (Damper(Count1).DamperType == DualDuct_VariableVolume)) {
-                ObjexxFCL::gio::write(OutputFileBNDetails, Format_101) << " Dual Duct Damper," + stripped(ChrOut) + ',' + DamperType + ',' +
-                                                                   Damper(Count1).DamperName + ',' + NodeID(Damper(Count1).HotAirInletNodeNum) + ',' +
-                                                                   NodeID(Damper(Count1).OutletNodeNum) + ",Hot Air," + ChrName;
+                ObjexxFCL::gio::write(OutputFileBNDetails, Format_101)
+                    << " Dual Duct Damper," + stripped(ChrOut) + ',' + DamperType + ',' + Damper(Count1).DamperName + ',' +
+                           NodeID(Damper(Count1).HotAirInletNodeNum) + ',' + NodeID(Damper(Count1).OutletNodeNum) + ",Hot Air," + ChrName;
 
-                ObjexxFCL::gio::write(OutputFileBNDetails, Format_101) << " Dual Duct Damper," + stripped(ChrOut) + ',' + DamperType + ',' +
-                                                                   Damper(Count1).DamperName + ',' + NodeID(Damper(Count1).ColdAirInletNodeNum) +
-                                                                   ',' + NodeID(Damper(Count1).OutletNodeNum) + ",Cold Air," + ChrName;
+                ObjexxFCL::gio::write(OutputFileBNDetails, Format_101)
+                    << " Dual Duct Damper," + stripped(ChrOut) + ',' + DamperType + ',' + Damper(Count1).DamperName + ',' +
+                           NodeID(Damper(Count1).ColdAirInletNodeNum) + ',' + NodeID(Damper(Count1).OutletNodeNum) + ",Cold Air," + ChrName;
             } else if (Damper(Count1).DamperType == DualDuct_OutdoorAir) {
-                ObjexxFCL::gio::write(OutputFileBNDetails, Format_101) << "Dual Duct Damper, " + stripped(ChrOut) + ',' + DamperType + ',' +
-                                                                   Damper(Count1).DamperName + ',' + NodeID(Damper(Count1).OAInletNodeNum) + ',' +
-                                                                   NodeID(Damper(Count1).OutletNodeNum) + ",Outdoor Air," + ChrName;
-                ObjexxFCL::gio::write(OutputFileBNDetails, Format_101) << "Dual Duct Damper, " + stripped(ChrOut) + ',' + DamperType + ',' +
-                                                                   Damper(Count1).DamperName + ',' + NodeID(Damper(Count1).RecircAirInletNodeNum) +
-                                                                   ',' + NodeID(Damper(Count1).OutletNodeNum) + ",Recirculated Air," + ChrName;
+                ObjexxFCL::gio::write(OutputFileBNDetails, Format_101)
+                    << "Dual Duct Damper, " + stripped(ChrOut) + ',' + DamperType + ',' + Damper(Count1).DamperName + ',' +
+                           NodeID(Damper(Count1).OAInletNodeNum) + ',' + NodeID(Damper(Count1).OutletNodeNum) + ",Outdoor Air," + ChrName;
+                ObjexxFCL::gio::write(OutputFileBNDetails, Format_101)
+                    << "Dual Duct Damper, " + stripped(ChrOut) + ',' + DamperType + ',' + Damper(Count1).DamperName + ',' +
+                           NodeID(Damper(Count1).RecircAirInletNodeNum) + ',' + NodeID(Damper(Count1).OutletNodeNum) + ",Recirculated Air," + ChrName;
             }
         }
     }

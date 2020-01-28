@@ -51,7 +51,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
@@ -76,6 +75,7 @@
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/PlantUtilities.hh>
@@ -300,7 +300,7 @@ namespace WaterCoils {
         }
 
         // With the correct CoilNum Initialize
-        InitWaterCoil(CoilNum, FirstHVACIteration); // Initialize all WaterCoil related parameters
+        InitWaterCoil(OutputFiles::getSingleton(), CoilNum, FirstHVACIteration); // Initialize all WaterCoil related parameters
 
         if (present(FanOpMode)) {
             OpMode = FanOpMode;
@@ -971,7 +971,8 @@ namespace WaterCoils {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitWaterCoil(int const CoilNum,
+    void InitWaterCoil(OutputFiles &outputFiles,
+                       int const CoilNum,
                        bool const FirstHVACIteration // unused1208
     )
     {
@@ -1011,7 +1012,6 @@ namespace WaterCoils {
         int const itmax(10);
         int const MaxIte(500); // Maximum number of iterations
         static std::string const RoutineName("InitWaterCoil");
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int tempCoilNum;                   // loop variable
@@ -1706,8 +1706,7 @@ namespace WaterCoils {
                     auto const SELECT_CASE_var(WaterCoil(CoilNum).WaterCoilType_Num);
                     if (SELECT_CASE_var == WaterCoil_SimpleHeating) {
                         if (RptCoilHeaderFlag(1)) {
-                            ObjexxFCL::gio::write(OutputFileInits, fmtA)
-                                << "! <Water Heating Coil Capacity Information>,Component Type,Name,Nominal Total Capacity {W}";
+                            print(outputFiles.eio, "{}", "! <Water Heating Coil Capacity Information>,Component Type,Name,Nominal Total Capacity {W}\n");
                             RptCoilHeaderFlag(1) = false;
                         }
                         PreDefTableEntry(pdchHeatCoilType, WaterCoil(CoilNum).Name, "Coil:Heating:Water");
@@ -1717,8 +1716,11 @@ namespace WaterCoils {
                         addFootNoteSubTable(
                             pdstHeatCoil,
                             "Nominal values are gross at rated conditions, i.e., the supply air fan heat and electric power NOT accounted for.");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Water Heating Coil Capacity Information,Coil:Heating:Water," + WaterCoil(CoilNum).Name +
-                                                                 ',' + RoundSigDigits(WaterCoil(CoilNum).TotWaterHeatingCoilRate, 2);
+                        print(outputFiles.eio,
+                              "{},{},{:.2R}\n",
+                              "Water Heating Coil Capacity Information,Coil:Heating:Water",
+                              WaterCoil(CoilNum).Name,
+                              WaterCoil(CoilNum).TotWaterHeatingCoilRate);
                         coilSelectionReportObj->setCoilAirFlow(WaterCoil(CoilNum).Name,
                                                                "Coil:Heating:Water",
                                                                WaterCoil(CoilNum).DesAirVolFlowRate,
@@ -1732,9 +1734,11 @@ namespace WaterCoils {
                                                                                    WaterCoil(CoilNum).WaterLoopNum); // coil report
                     } else if (SELECT_CASE_var == WaterCoil_DetFlatFinCooling) {
                         if (RptCoilHeaderFlag(2)) {
-                            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Water Cooling Coil Capacity Information>,Component Type,Name,Nominal Total "
-                                                                 "Capacity {W},Nominal Sensible Capacity {W},Nominal Latent Capacity {W},Nominal "
-                                                                 "Sensible Heat Ratio";
+                            print(outputFiles.eio,
+                                  "{}\n",
+                                  "! <Water Cooling Coil Capacity Information>,Component Type,Name,Nominal Total "
+                                  "Capacity {W},Nominal Sensible Capacity {W},Nominal Latent Capacity {W},Nominal "
+                                  "Sensible Heat Ratio");
                             RptCoilHeaderFlag(2) = false;
                         }
                         RatedLatentCapacity = WaterCoil(CoilNum).TotWaterCoolingCoilRate - WaterCoil(CoilNum).SenWaterCoolingCoilRate;
@@ -1749,11 +1753,14 @@ namespace WaterCoils {
                         addFootNoteSubTable(
                             pdstCoolCoil,
                             "Nominal values are gross at rated conditions, i.e., the supply air fan heat and electric power NOT accounted for.");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Water Cooling Coil Capacity Information,Coil:Cooling:Water:DetailedGeometry," +
-                                                                 WaterCoil(CoilNum).Name + ',' +
-                                                                 RoundSigDigits(WaterCoil(CoilNum).TotWaterCoolingCoilRate, 2) + ',' +
-                                                                 RoundSigDigits(WaterCoil(CoilNum).SenWaterCoolingCoilRate, 2) + ',' +
-                                                                 RoundSigDigits(RatedLatentCapacity, 2) + ',' + RoundSigDigits(RatedSHR, 2);
+                        print(outputFiles.eio,
+                              "{},{},{:.2R},{:.2R},{:.2R},{:.2R}\n",
+                              "Water Cooling Coil Capacity Information,Coil:Cooling:Water:DetailedGeometry",
+                              WaterCoil(CoilNum).Name,
+                              WaterCoil(CoilNum).TotWaterCoolingCoilRate,
+                              WaterCoil(CoilNum).SenWaterCoolingCoilRate,
+                              RatedLatentCapacity,
+                              RatedSHR);
                         coilSelectionReportObj->setCoilAirFlow(WaterCoil(CoilNum).Name,
                                                                "Coil:Cooling:Water:DetailedGeometry",
                                                                WaterCoil(CoilNum).DesAirVolFlowRate,
@@ -1767,9 +1774,11 @@ namespace WaterCoils {
                                                                             WaterCoil(CoilNum).WaterLoopNum); // Coil Report
                     } else if (SELECT_CASE_var == WaterCoil_Cooling) {
                         if (RptCoilHeaderFlag(2)) {
-                            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Water Cooling Coil Capacity Information>,Component Type,Name,Nominal Total "
-                                                                 "Capacity {W},Nominal Sensible Capacity {W},Nominal Latent Capacity {W},Nominal "
-                                                                 "Sensible Heat Ratio, Nominal Coil UA Value {W/C}, Nominal Coil Surface Area {m2}";
+                            print(outputFiles.eio,
+                                  "{}\n",
+                                  "! <Water Cooling Coil Capacity Information>,Component Type,Name,Nominal Total "
+                                  "Capacity {W},Nominal Sensible Capacity {W},Nominal Latent Capacity {W},Nominal "
+                                  "Sensible Heat Ratio, Nominal Coil UA Value {W/C}, Nominal Coil Surface Area {m2}");
                             RptCoilHeaderFlag(2) = false;
                         }
                         RatedLatentCapacity = WaterCoil(CoilNum).TotWaterCoolingCoilRate - WaterCoil(CoilNum).SenWaterCoolingCoilRate;
@@ -1786,11 +1795,16 @@ namespace WaterCoils {
                         addFootNoteSubTable(
                             pdstCoolCoil,
                             "Nominal values are gross at rated conditions, i.e., the supply air fan heat and electric power NOT accounted for.");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Water Cooling Coil Capacity Information,Coil:Cooling:Water," + WaterCoil(CoilNum).Name +
-                                                                 ',' + RoundSigDigits(WaterCoil(CoilNum).TotWaterCoolingCoilRate, 2) + ',' +
-                                                                 RoundSigDigits(WaterCoil(CoilNum).SenWaterCoolingCoilRate, 2) + ',' +
-                                                                 RoundSigDigits(RatedLatentCapacity, 2) + ',' + RoundSigDigits(RatedSHR, 2) + ',' +
-                                                                 RoundSigDigits(UATotal, 2) + ',' + RoundSigDigits(SurfaceArea, 2);
+                        print(outputFiles.eio,
+                              "{},{},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n",
+                              "Water Cooling Coil Capacity Information,Coil:Cooling:Water",
+                              WaterCoil(CoilNum).Name,
+                              WaterCoil(CoilNum).TotWaterCoolingCoilRate,
+                              WaterCoil(CoilNum).SenWaterCoolingCoilRate,
+                              RatedLatentCapacity,
+                              RatedSHR,
+                              UATotal,
+                              SurfaceArea);
                         coilSelectionReportObj->setCoilAirFlow(WaterCoil(CoilNum).Name,
                                                                "Coil:Cooling:Water",
                                                                WaterCoil(CoilNum).DesAirVolFlowRate,
