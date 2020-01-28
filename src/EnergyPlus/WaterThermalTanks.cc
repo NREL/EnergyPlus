@@ -11671,7 +11671,8 @@ namespace WaterThermalTanks {
             } else {
                 RecoveryEfficiency = 0.0;
                 EnergyFactor = 0.0;
-                if (HPWaterHeater.empty() || !HPWaterHeater(HPNum).bIsIHP) {
+                // If this a regular tank, or an HPWH that's not an Integrated one
+                if ((this->HeatPumpNum == 0) || !HPWaterHeater(this->HeatPumpNum).bIsIHP) {
                     ShowWarningError("Water heater = " + this->Name +
                                      ":  Recovery Efficiency and Energy Factor could not be calculated during the test for standard ratings");
                     ShowContinueError("Setpoint was never recovered and/or heater never turned on");
