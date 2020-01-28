@@ -5224,7 +5224,7 @@ namespace WaterThermalTanks {
         if (this->TypeNum == DataPlant::TypeOf_WtrHeaterStratified) {
 
             for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
-                static constexpr auto Format_723("Water Heater Stratified Node Information,{},{:.4G},{:.4G},{:.3G},{:.4G},{:4G},{},{}\n");
+                static constexpr auto Format_723("Water Heater Stratified Node Information,{},{:.4T},{:.4T},{:.3T},{:.4T},{:4T},{},{}\n");
                 print(outputFiles.eio,
                       Format_723,
                       NodeNum,
@@ -11732,7 +11732,7 @@ namespace WaterThermalTanks {
                 MaxCapacity_loc = this->MaxCapacity;
             }
 
-            static constexpr auto Format_720("Water Heater Information,{},{},{:.4R},{:.1R},{:.3R},{:.4R}\n");
+            static constexpr auto Format_720("Water Heater Information,{},{},{:.4T},{:.1T},{:.3T},{:.4T}\n");
             print(outputFiles.eio,
                   Format_720,
                   this->Type,
@@ -11742,7 +11742,7 @@ namespace WaterThermalTanks {
                   RecoveryEfficiency,
                   EnergyFactor);
         } else {
-            static constexpr auto Format_721("Heat Pump Water Heater Information,{},{},{:.4G},{:.1G},{:.3G},{:.4G},{:.0G}\n");
+            static constexpr auto Format_721("Heat Pump Water Heater Information,{},{},{:.4T},{:.1T},{:.3T},{:.4T},{:.0T}\n");
             print(outputFiles.eio,
                   Format_721,
                   HPWaterHeater(this->HeatPumpNum).Type,
@@ -11779,7 +11779,7 @@ namespace WaterThermalTanks {
             return;
         }
 
-        static constexpr auto Format_728("Chilled Water Tank Information,{},{},{:.4G},{:.4G},{:.4G}\n");
+        static constexpr auto Format_728("Chilled Water Tank Information,{},{},{:.4T},{:.4T},{:.4T}\n");
         print(outputFiles.eio,
               Format_728,
               this->Type,

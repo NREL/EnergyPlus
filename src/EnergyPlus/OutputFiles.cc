@@ -128,7 +128,7 @@ public:
     iterator operator()(Real64 const value)
     {
         if (specs()) {
-            if (specs()->type == 'T') {
+            if (specs()->type == 'N') {
 
                 if (should_be_fixed_output(value) && fixed_will_fit(value, specs()->width - 5)) {
                     specs()->type = 'F';
@@ -220,7 +220,34 @@ public:
 
                     return write_string(str);
                 }
+            } else if (specs()->type == 'T') {
+                const auto fixed_output = should_be_fixed_output(value);
+
+                if (fixed_output) {
+                    specs()->type = 'F';
+                    if (specs()->width > 0) { ++specs()->width; }
+                    ++specs()->precision;
+                    auto str = write_to_string(value, *specs());
+                    str.pop_back();
+                    return write_string(str);
+                } else {
+                    specs()->type = 'E';
+
+                    // write the `E` formatted float to a std::string
+                    auto str = write_to_string(value, *specs());
+
+                    // if necessary, pad the exponent with a 0 to match the old formatting from Objexx
+                    if (str.size() > 3) {
+                        if (!std::isdigit(str[str.size() - 3])) {
+                            // wants a 0 inserted
+                            str.insert(str.size() - 2, "0");
+                        }
+                    }
+
+                    return write_string(str);
+                }
             }
+
         }
         return arg_formatter::operator()(value);
     }

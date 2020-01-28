@@ -193,7 +193,7 @@ namespace DualDuct {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetDualDuctInput(OutputFiles &outputFiles);
+    void GetDualDuctInput();
 
     // End of Get Input subroutines for the Module
     //******************************************************************************
@@ -203,7 +203,7 @@ namespace DualDuct {
 
     void InitDualDuct(int const DamperNum, bool const FirstHVACIteration);
 
-    void SizeDualDuct(OutputFiles &outputFiles, int const DamperNum);
+    void SizeDualDuct(int const DamperNum);
 
     // End Initialization Section of the Module
     //******************************************************************************

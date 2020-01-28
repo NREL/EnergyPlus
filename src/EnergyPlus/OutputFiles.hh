@@ -81,8 +81,11 @@ std::string vprint(fmt::string_view format_str, fmt::format_args args, const std
 // on the value being printed.
 // This is necessary for parity with the old "RoundSigDigits" utility function
 //
-// Defines a custom formatting type 'T' that behaves like Fortran's G type.
-// (The T was chosen because it was unused and fits with "forTran")
+// Defines a custom formatting type 'N' that behaves like Fortran's G type.
+// 'N' was chosen for "Number"
+//
+// Defines a custom formatting type 'T' that that truncates the value
+// to match the behavior of TrimSigDigits utility function
 //
 template <typename... Args>
 void print(std::ostream &os, fmt::string_view format_str, const Args &... args)

@@ -177,7 +177,7 @@ namespace DualDuct {
 
         // Obtains and Allocates Damper related parameters from input file
         if (GetDualDuctInputFlag) { // First time subroutine has been entered
-            GetDualDuctInput(OutputFiles::getSingleton());
+            GetDualDuctInput();
             GetDualDuctInputFlag = false;
         }
 
@@ -239,7 +239,7 @@ namespace DualDuct {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetDualDuctInput(OutputFiles &outputFiles)
+    void GetDualDuctInput()
     {
 
         // SUBROUTINE INFORMATION:
@@ -891,7 +891,7 @@ namespace DualDuct {
 
         if (!SysSizingCalc && MySizeFlag(DamperNum)) {
 
-            SizeDualDuct(OutputFiles::getSingleton(), DamperNum);
+            SizeDualDuct(DamperNum);
 
             MySizeFlag(DamperNum) = false;
         }
@@ -1101,7 +1101,7 @@ namespace DualDuct {
         }
     }
 
-    void SizeDualDuct(OutputFiles &outputFiles, int const DamperNum)
+    void SizeDualDuct(int const DamperNum)
     {
 
         // SUBROUTINE INFORMATION:
