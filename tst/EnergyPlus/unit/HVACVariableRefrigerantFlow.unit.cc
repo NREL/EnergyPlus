@@ -12355,10 +12355,6 @@ TEST_F(HVACVRFFixture, VRFTest_CondenserCalcTest_HREIRFTHeat)
 
     CoolingLoad.allocate(1);
     HeatingLoad.allocate(1);
-    CoolingLoad(VRFCond) = false;
-    HeatingLoad(VRFCond) = false;
-    LastModeCooling(VRFCond) = false;
-    LastModeHeating(VRFCond) = false;
 
     DXCoilCoolInletAirWBTemp.allocate(10);
     DXCoilHeatInletAirDBTemp.allocate(10);
@@ -12379,47 +12375,22 @@ TEST_F(HVACVRFFixture, VRFTest_CondenserCalcTest_HREIRFTHeat)
     DataGlobals::DayOfSim = 1;
     DataGlobals::CurrentTime = 0.25;
     DataGlobals::TimeStepZone = 0.25;
+    DataHVACGlobals::TimeStepSys = 0.25;
     DataHVACGlobals::SysTimeElapsed = 0.0;
     DataEnvironment::OutDryBulbTemp = 35.0;
     DataEnvironment::OutHumRat = 0.01;
     DataEnvironment::OutBaroPress = 101325.0;
     DataEnvironment::OutWetBulbTemp = 21.1340575;
 
+    // increment time step
+    DataGlobals::CurrentTime += DataGlobals::TimeStepZone; // 0.5
 
-    // TU's are in heating mode only
+     // set TU's to request both cooling and heating
     CoolingLoad(VRFCond) = false;
     HeatingLoad(VRFCond) = true;
     LastModeCooling(VRFCond) = false;
     LastModeHeating(VRFCond) = true;
-    TerminalUnitList(1).TotalCoolLoad(1) = 0.0;
-    TerminalUnitList(1).TotalCoolLoad(2) = 0.0;
-    TerminalUnitList(1).TotalCoolLoad(3) = 0.0;
-    TerminalUnitList(1).TotalCoolLoad(4) = 0.0;
-    TerminalUnitList(1).TotalCoolLoad(5) = 0.0;
-    TerminalUnitList(1).TotalHeatLoad(1) = 1000.0;
-    TerminalUnitList(1).TotalHeatLoad(2) = 1000.0;
-    TerminalUnitList(1).TotalHeatLoad(3) = 1000.0;
-    TerminalUnitList(1).TotalHeatLoad(4) = 1000.0;
-    TerminalUnitList(1).TotalHeatLoad(5) = 1000.0;
 
-    CalcVRFCondenser(VRFCond, false);
-    EXPECT_FALSE(VRF(VRFCond).HRHeatingActive);
-    EXPECT_FALSE(VRF(VRFCond).HRCoolingActive);
-    EXPECT_EQ(VRF(VRFCond).TotalCoolingCapacity, 0.0);
-    EXPECT_EQ(VRF(VRFCond).TUCoolingLoad, 0.0);
-    EXPECT_EQ(VRF(VRFCond).TotalHeatingCapacity, 5000.0);
-    EXPECT_EQ(VRF(VRFCond).TUHeatingLoad, 5000.0);
-    EXPECT_EQ(VRF(VRFCond).VRFCondPLR, 0.25);
-    EXPECT_EQ(VRF(VRFCond).VRFCondRTF, 1.0); // unit is not cycling below min PLR
-    EXPECT_EQ(VRF(VRFCond).SUMultiplier, 1.0);
-    EXPECT_FALSE(VRF(VRFCond).ModeChange);
-    EXPECT_FALSE(VRF(VRFCond).HRModeChange);
-    EXPECT_EQ(VRF(VRFCond).ElecCoolingPower, 0.0);
-    EXPECT_EQ(VRF(VRFCond).ElecHeatingPower, VRF(VRFCond).RatedHeatingPower * VRF(VRFCond).VRFCondPLR);
-
-    // increment time step
-    DataGlobals::CurrentTime += DataGlobals::TimeStepZone; // 0.5
-    // set TU's to request both cooling and heating
     TerminalUnitList(1).TotalCoolLoad(1) = 0.0;
     TerminalUnitList(1).HRCoolRequest(1) = false;
     TerminalUnitList(1).TotalCoolLoad(2) = 1000.0;
@@ -12444,8 +12415,12 @@ TEST_F(HVACVRFFixture, VRFTest_CondenserCalcTest_HREIRFTHeat)
 
     // set heat recovery time constant to non-zero value (means mode change will degrade performance)
     VRF(VRFCond).HRHeatCapTC = 0.25; // 15 min exponential rise
+    // VRF(VRFCond).HRHeatEIRTC = 0.0; // (default)
     // last operating mode was heating
     CalcVRFCondenser(VRFCond, false);
+    EXPECT_TRUE(VRF(VRFCond).ModeChange);
+    EXPECT_FALSE(VRF(VRFCond).HRModeChange);
+    EXPECT_EQ(VRF(VRFCond).OperatingMode, 2); // ModeHeatingOnly
     EXPECT_TRUE(VRF(VRFCond).HRHeatingActive);
     EXPECT_FALSE(VRF(VRFCond).HRCoolingActive);
     EXPECT_EQ(VRF(VRFCond).TotalCoolingCapacity, 0.0);
@@ -12454,25 +12429,36 @@ TEST_F(HVACVRFFixture, VRFTest_CondenserCalcTest_HREIRFTHeat)
     EXPECT_EQ(VRF(VRFCond).TUHeatingLoad, 3000.0);
     EXPECT_NEAR(VRF(VRFCond).VRFCondPLR, 0.1875, 0.00001);
     EXPECT_EQ(VRF(VRFCond).VRFCondRTF, 1.0); // unit is not cycling below min PLR
+
+    // CurrentEndTime = 0.25
+    // HRTimer = CurrentEndTimeLast = 0
+    // HRTime = (CurrentEndTime - HRTimer) = 0.25 - = 0.25
+    // SUMultiplier = min(1, 1 - exp(-HRTime / HRHeatCapTC)) = 1 - exp(-1) = 0.6321205588285577
     EXPECT_NEAR(VRF(VRFCond).SUMultiplier, 0.63212, 0.00001);
-    EXPECT_TRUE(VRF(VRFCond).ModeChange);
-    EXPECT_FALSE(VRF(VRFCond).HRModeChange);
     EXPECT_EQ(VRF(VRFCond).ElecCoolingPower, 0.0);
 
     // make adjustment for heat recovery startup degradation
     // Ensure HREIRFTConst / HRCAPFTHeatConst are assigned the right curve ouput
     Real64 HREIRFTConst = VRF(VRFCond).HREIRFTHeatConst;
-    EXPECT_EQ(HREIRFTConst, 0.9);
+    EXPECT_EQ(HREIRFTConst, 0.9); // It's normal that it works, it's the internal variable that's messed up
     EXPECT_EQ(VRF(VRFCond).HRCAPFTHeatConst, 0.8);
     Real64 HRInitialEIRFrac = VRF(VRFCond).HRInitialHeatEIRFrac;
     EXPECT_EQ(HRInitialEIRFrac, 1.0);
+    // Internally, it uses a local variable HREIRFTConst, which was wrongly set to HRCAPFTHeatConst = 0.9
     Real64 HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * VRF(VRFCond).SUMultiplier;
-
+    // Before fix, =1 + (0.8 - 1) * 0.63212 = 0.873576
+    EXPECT_NEAR(HREIRAdjustment, 0.936788, 0.00001); // =1 + (0.9 - 1) * 0.63212
+    // InletAirDryBulbC = 20, InletAirWetBulbC = 17
+    // TotalCondHeatingCapacity = TotalTUHeatingCapacity = 20000
+    // HeatingPLR = 0.25  (TUHeatingLoad = 3000, 3000/20000 = 0.15)
+    // HeatingPLR = 0.1875
+    //
     // VRF(VRFCond).ElecHeatingPower = (VRF(VRFCond).RatedHeatingPower * TotHeatCapTempModFac)
     //                                  * TotHeatEIRTempModFac * EIRFPLRModFac *
     //                                  * HREIRAdjustment * VRFRTF * InputPowerMultiplier;
     //
-    // TotHeatCapTempModFac and TotHeatEIRTempModFac are 1 because CAPFT/EIRFT curves aren't assigned
+    // TotHeatCapTempModFac and TotHeatEIRTempModFac are 1 because CAPFT/EIRFT curves aren't assigned,
+    // and anyways they wouldn't be used since VRF(VRFCond).HeatingPerformanceOATType isn't specifyied
     // VRFRTF = 1.0 because not cycling below min PLR
     // EIRFPLRModFac is 1 because EIRFPLR curve output is constant as 1.0 above
     // InputPowerMultiplier is 1 because no defrost
