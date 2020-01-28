@@ -161,7 +161,6 @@ namespace EnergyPlus {
         Array1D_int SupplySideInletNode;  // Node number for the supply side inlet
         Array1D_int SupplySideOutletNode; // Node number for the supply side outlet
         Array1D_int DemandSideInletNode;  // Inlet node on the demand side
-        TempLoopData TempLoop;            // =(' ',' ',' ',0, , , ,.FALSE.,.FALSE.,.FALSE.,.FALSE.,.FALSE.)
 
         void clear_state() {
             InitLoopEquip = true;
@@ -169,7 +168,6 @@ namespace EnergyPlus {
             SupplySideInletNode.deallocate();
             SupplySideOutletNode.deallocate();
             DemandSideInletNode.deallocate();
-            TempLoop = TempLoopData();
         }
 
         void ManagePlantLoops(bool const FirstHVACIteration,
@@ -819,17 +817,15 @@ namespace EnergyPlus {
             NumCondPipes = 0;
             HalfLoopNum = 0;
 
-            for (LoopNum = 1; LoopNum <=
-                              TotNumLoops; ++LoopNum) { // Begin demand side loops ... When condenser is added becomes NumLoops
-                TempLoop.LoopHasConnectionComp = false;
-                TempLoop.Name = PlantLoop(LoopNum).Name;
+            for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
+                PlantLoop(LoopNum).LoopHasConnectionComp = false;
 
                 for (LoopSideNum = DemandSide; LoopSideNum <= SupplySide; ++LoopSideNum) {
                     ASeriesBranchHasPump = false;
                     AParallelBranchHasPump = false;
                     NumOfPipesInLoop = 0; // Initialization
                     ++HalfLoopNum;
-                    TempLoop.BypassExists = false;
+                    PlantLoop(LoopNum).LoopSide(LoopSideNum).BypassExists = false;
                     if (PlantLoop(LoopNum).TypeOfLoop == Plant && LoopSideNum == DemandSide) {
                         LoopIdentifier = "Plant Demand";
                     } else if (PlantLoop(LoopNum).TypeOfLoop == Plant && LoopSideNum == SupplySide) {
@@ -840,39 +836,34 @@ namespace EnergyPlus {
                         LoopIdentifier = "Condenser Supply";
                     }
 
-                    TempLoop.BranchList = PlantLoop(LoopNum).LoopSide(LoopSideNum).BranchList;
-                    TempLoop.ConnectList = PlantLoop(LoopNum).LoopSide(LoopSideNum).ConnectList;
-
                     // Get the branch list and size the Branch portion of the Loop derived type
-                    TempLoop.TotalBranches = NumBranchesInBranchList(TempLoop.BranchList);
-                    BranchNames.allocate(TempLoop.TotalBranches);
+                    PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches = NumBranchesInBranchList(PlantLoop(LoopNum).LoopSide(LoopSideNum).BranchList);
+                    BranchNames.allocate(PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches);
                     BranchNames = "";
-                    GetBranchList(TempLoop.Name, TempLoop.BranchList, TempLoop.TotalBranches, BranchNames,
+                    GetBranchList(PlantLoop(LoopNum).Name, PlantLoop(LoopNum).LoopSide(LoopSideNum).BranchList, PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches, BranchNames,
                                   LoopIdentifier);
-                    TempLoop.Branch.allocate(TempLoop.TotalBranches);
+                    PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch.allocate(PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches);
 
                     // Cycle through all of the branches and set up the node data
-                    for (BranchNum = 1; BranchNum <= TempLoop.TotalBranches; ++BranchNum) {
+                    for (BranchNum = 1; BranchNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
 
-                        TempLoop.Branch(BranchNum).Name = BranchNames(BranchNum);
+                        PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Name = BranchNames(BranchNum);
+                        PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents = NumCompsInBranch(BranchNames(BranchNum));
+                        PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).IsBypass = false;
 
-                        TempLoop.Branch(BranchNum).TotalComponents = NumCompsInBranch(BranchNames(BranchNum));
+                        CompTypes.allocate(PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents);
+                        CompNames.allocate(PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents);
+                        CompCtrls.dimension(PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents, 0);
+                        InletNodeNames.allocate(PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents);
+                        InletNodeNumbers.dimension(PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents, 0);
+                        OutletNodeNames.allocate(PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents);
+                        OutletNodeNumbers.dimension(PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents, 0);
 
-                        TempLoop.Branch(BranchNum).IsBypass = false;
-
-                        CompTypes.allocate(TempLoop.Branch(BranchNum).TotalComponents);
-                        CompNames.allocate(TempLoop.Branch(BranchNum).TotalComponents);
-                        CompCtrls.dimension(TempLoop.Branch(BranchNum).TotalComponents, 0);
-                        InletNodeNames.allocate(TempLoop.Branch(BranchNum).TotalComponents);
-                        InletNodeNumbers.dimension(TempLoop.Branch(BranchNum).TotalComponents, 0);
-                        OutletNodeNames.allocate(TempLoop.Branch(BranchNum).TotalComponents);
-                        OutletNodeNumbers.dimension(TempLoop.Branch(BranchNum).TotalComponents, 0);
-
-                        GetBranchData(TempLoop.Name,
+                        GetBranchData(PlantLoop(LoopNum).Name,
                                       BranchNames(BranchNum),
-                                      TempLoop.Branch(BranchNum).PressureCurveType,
-                                      TempLoop.Branch(BranchNum).PressureCurveIndex,
-                                      TempLoop.Branch(BranchNum).TotalComponents,
+                                      PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).PressureCurveType,
+                                      PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).PressureCurveIndex,
+                                      PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents,
                                       CompTypes,
                                       CompNames,
                                       InletNodeNames,
@@ -881,12 +872,12 @@ namespace EnergyPlus {
                                       OutletNodeNumbers,
                                       ErrorsFound);
 
-                        TempLoop.Branch(BranchNum).Comp.allocate(TempLoop.Branch(BranchNum).TotalComponents);
+                        PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp.allocate(PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents);
 
-                        for (CompNum = 1; CompNum <= TempLoop.Branch(BranchNum).TotalComponents; ++CompNum) {
+                        for (CompNum = 1; CompNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents; ++CompNum) {
                             // set up some references
                             auto &this_comp_type(CompTypes(CompNum));
-                            auto &this_comp(TempLoop.Branch(BranchNum).Comp(CompNum));
+                            auto &this_comp(PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum));
 
                             this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
                             this_comp.TypeOf = this_comp_type;
@@ -947,14 +938,19 @@ namespace EnergyPlus {
                                 }
                                 this_comp.GeneralEquipType = GenEquipTypes_Pump;
                                 this_comp.CurOpSchemeType = PumpOpSchemeType;
-                                if (BranchNum == 1 || BranchNum == TempLoop.TotalBranches) {
+                                if (BranchNum == 1 || BranchNum == PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches) {
                                     ASeriesBranchHasPump = true;
                                 } else {
                                     AParallelBranchHasPump = true;
                                 }
-                                StoreAPumpOnCurrentTempLoop(
-                                        LoopNum, LoopSideNum, BranchNum, CompNum, CompNames(CompNum),
-                                        OutletNodeNumbers(CompNum), AParallelBranchHasPump);
+                                LoopSidePumpInformation p;
+                                p.PumpName = CompNames(CompNum);
+                                p.BranchNum = BranchNum;
+                                p.CompNum = CompNum;
+                                p.PumpOutletNode = OutletNodeNumbers(CompNum);
+                                DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).BranchPumpsExist = AParallelBranchHasPump;
+                                DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).Pumps.push_back(p);
+                                DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalPumps++;
                             } else if (UtilityRoutines::SameString(this_comp_type, "WaterHeater:Mixed")) {
                                 this_comp.TypeOf_Num = TypeOf_WtrHeaterMixed;
                                 this_comp.GeneralEquipType = GenEquipTypes_WaterThermalTank;
@@ -1539,12 +1535,12 @@ namespace EnergyPlus {
                                 ++NumPipes;
                             }
 
-                            TempLoop.Branch(BranchNum).NodeNumIn = TempLoop.Branch(BranchNum).Comp(1).NodeNumIn;
+                            PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).NodeNumIn = PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(1).NodeNumIn;
 
                             // find branch outlet node
-                            TempLoop.Branch(BranchNum).NodeNumOut =
-                                    TempLoop.Branch(BranchNum).Comp(
-                                            TempLoop.Branch(BranchNum).TotalComponents).NodeNumOut;
+                            PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).NodeNumOut =
+                                PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(
+                                    PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents).NodeNumOut;
                         }
 
                         CompTypes.deallocate();
@@ -1560,31 +1556,31 @@ namespace EnergyPlus {
 
                     if (ASeriesBranchHasPump && AParallelBranchHasPump) {
                         ShowSevereError("Current version does not support Loop pumps and branch pumps together");
-                        ShowContinueError("Occurs in loop " + TempLoop.Name);
+                        ShowContinueError("Occurs in loop " + PlantLoop(LoopNum).Name);
                         ErrorsFound = true;
                     }
 
                     // Obtain the Splitter and Mixer information
-                    if (TempLoop.ConnectList.empty()) {
+                    if (PlantLoop(LoopNum).LoopSide(LoopSideNum).ConnectList.empty()) {
                         NumofSplitters = 0;
                         NumofMixers = 0;
                     } else {
                         errFlag = false;
-                        GetNumSplitterMixerInConntrList(TempLoop.Name, TempLoop.ConnectList, NumofSplitters,
+                        GetNumSplitterMixerInConntrList(PlantLoop(LoopNum).Name, PlantLoop(LoopNum).LoopSide(LoopSideNum).ConnectList, NumofSplitters,
                                                         NumofMixers, errFlag);
                         if (errFlag) {
                             ErrorsFound = true;
                         }
                         if (NumofSplitters != NumofMixers) {
-                            ShowSevereError("GetPlantInput: Loop Name=" + TempLoop.Name + ", ConnectorList=" +
-                                            TempLoop.ConnectList +
+                            ShowSevereError("GetPlantInput: Loop Name=" + PlantLoop(LoopNum).Name + ", ConnectorList=" +
+                                                PlantLoop(LoopNum).LoopSide(LoopSideNum).ConnectList +
                                             ", unequal number of splitters and mixers");
                             ErrorsFound = true;
                         }
                     }
 
-                    TempLoop.SplitterExists = NumofSplitters > 0;
-                    TempLoop.MixerExists = NumofMixers > 0;
+                    PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.Exists = NumofSplitters > 0;
+                    PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.Exists = NumofMixers > 0;
 
                     if (ErrorsFound) {
                         ShowFatalError("GetPlantInput: Previous Severe errors cause termination.");
@@ -1597,13 +1593,13 @@ namespace EnergyPlus {
                         if (SplitNum > NumofSplitters) break;
                         OutletNodeNames.allocate(MaxNumAlphas);
                         OutletNodeNumbers.allocate(MaxNumAlphas);
-                        GetLoopSplitter(TempLoop.Name,
-                                        TempLoop.ConnectList,
-                                        TempLoop.Splitter.Name,
-                                        TempLoop.Splitter.Exists,
-                                        TempLoop.Splitter.NodeNameIn,
-                                        TempLoop.Splitter.NodeNumIn,
-                                        TempLoop.Splitter.TotalOutletNodes,
+                        GetLoopSplitter(PlantLoop(LoopNum).Name,
+                                        PlantLoop(LoopNum).LoopSide(LoopSideNum).ConnectList,
+                                        PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.Name,
+                                        PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.Exists,
+                                        PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.NodeNameIn,
+                                        PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.NodeNumIn,
+                                        PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.TotalOutletNodes,
                                         OutletNodeNames,
                                         OutletNodeNumbers,
                                         ErrorsFound,
@@ -1617,54 +1613,54 @@ namespace EnergyPlus {
                         }
 
                         // Map the inlet node to the splitter to a branch number
-                        if (TempLoop.Splitter.Exists) {
+                        if (PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.Exists) {
                             // Map the inlet node to the splitter to a branch number
                             SplitInBranch = false;
-                            for (BranchNum = 1; BranchNum <= TempLoop.TotalBranches; ++BranchNum) {
-                                CompNum = TempLoop.Branch(BranchNum).TotalComponents;
-                                if (TempLoop.Splitter.NodeNumIn ==
-                                    TempLoop.Branch(BranchNum).Comp(CompNum).NodeNumOut) {
-                                    TempLoop.Splitter.BranchNumIn = BranchNum;
+                            for (BranchNum = 1; BranchNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
+                                CompNum = PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents;
+                                if (PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.NodeNumIn ==
+                                    PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).NodeNumOut) {
+                                    PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.BranchNumIn = BranchNum;
                                     SplitInBranch = true;
                                     break; // BranchNum DO loop
                                 }
                             }
                             if (!SplitInBranch) {
-                                ShowSevereError("Splitter Inlet Branch not found, Splitter=" + TempLoop.Splitter.Name);
-                                ShowContinueError("Splitter Branch Inlet name=" + TempLoop.Splitter.NodeNameIn);
-                                ShowContinueError("In Loop=" + TempLoop.Name);
+                                ShowSevereError("Splitter Inlet Branch not found, Splitter=" + PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.Name);
+                                ShowContinueError("Splitter Branch Inlet name=" + PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.NodeNameIn);
+                                ShowContinueError("In Loop=" + PlantLoop(LoopNum).Name);
                                 ErrorsFound = true;
                             }
 
-                            TempLoop.Splitter.NodeNameOut.allocate(TempLoop.Splitter.TotalOutletNodes);
-                            TempLoop.Splitter.NodeNumOut.dimension(TempLoop.Splitter.TotalOutletNodes, 0);
-                            TempLoop.Splitter.BranchNumOut.dimension(TempLoop.Splitter.TotalOutletNodes, 0);
+                            PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.NodeNameOut.allocate(PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.TotalOutletNodes);
+                            PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.NodeNumOut.dimension(PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.TotalOutletNodes, 0);
+                            PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.BranchNumOut.dimension(PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.TotalOutletNodes, 0);
 
-                            SplitOutBranch.allocate(TempLoop.Splitter.TotalOutletNodes);
+                            SplitOutBranch.allocate(PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.TotalOutletNodes);
                             SplitOutBranch = false;
-                            for (NodeNum = 1; NodeNum <= TempLoop.Splitter.TotalOutletNodes; ++NodeNum) {
-                                TempLoop.Splitter.NodeNameOut(NodeNum) = OutletNodeNames(NodeNum);
-                                TempLoop.Splitter.NodeNumOut(NodeNum) = OutletNodeNumbers(NodeNum);
+                            for (NodeNum = 1; NodeNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.TotalOutletNodes; ++NodeNum) {
+                                PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.NodeNameOut(NodeNum) = OutletNodeNames(NodeNum);
+                                PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.NodeNumOut(NodeNum) = OutletNodeNumbers(NodeNum);
                                 // The following DO loop series is intended to store the branch number for each outlet
                                 // branch of the splitter
-                                for (BranchNum = 1; BranchNum <= TempLoop.TotalBranches; ++BranchNum) {
-                                    if (TempLoop.Splitter.NodeNumOut(NodeNum) ==
-                                        TempLoop.Branch(BranchNum).Comp(1).NodeNumIn) {
-                                        TempLoop.Splitter.BranchNumOut(NodeNum) = BranchNum;
+                                for (BranchNum = 1; BranchNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
+                                    if (PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.NodeNumOut(NodeNum) ==
+                                        PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(1).NodeNumIn) {
+                                        PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.BranchNumOut(NodeNum) = BranchNum;
                                         SplitOutBranch(NodeNum) = true;
                                         break; // BranchNum DO loop
                                     }
                                 }
                             }
 
-                            for (Outlet = 1; Outlet <= TempLoop.Splitter.TotalOutletNodes; ++Outlet) {
+                            for (Outlet = 1; Outlet <= PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.TotalOutletNodes; ++Outlet) {
                                 if (SplitOutBranch(Outlet)) continue;
-                                ShowSevereError("Splitter Outlet Branch not found, Splitter=" + TempLoop.Splitter.Name);
+                                ShowSevereError("Splitter Outlet Branch not found, Splitter=" + PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.Name);
                                 ShowContinueError(
-                                        "Splitter Branch Outlet node name=" + TempLoop.Splitter.NodeNameOut(Outlet));
-                                ShowContinueError("In Loop=" + TempLoop.Name);
-                                ShowContinueError("Loop BranchList=" + TempLoop.BranchList);
-                                ShowContinueError("Loop ConnectorList=" + TempLoop.ConnectList);
+                                        "Splitter Branch Outlet node name=" + PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter.NodeNameOut(Outlet));
+                                ShowContinueError("In Loop=" + PlantLoop(LoopNum).Name);
+                                ShowContinueError("Loop BranchList=" + PlantLoop(LoopNum).LoopSide(LoopSideNum).BranchList);
+                                ShowContinueError("Loop ConnectorList=" + PlantLoop(LoopNum).LoopSide(LoopSideNum).ConnectList);
                                 ErrorsFound = true;
                             }
 
@@ -1681,13 +1677,13 @@ namespace EnergyPlus {
                         if (MixNum > NumofMixers) break;
                         InletNodeNames.allocate(MaxNumAlphas);
                         InletNodeNumbers.allocate(MaxNumAlphas);
-                        GetLoopMixer(TempLoop.Name,
-                                     TempLoop.ConnectList,
-                                     TempLoop.Mixer.Name,
-                                     TempLoop.Mixer.Exists,
-                                     TempLoop.Mixer.NodeNameOut,
-                                     TempLoop.Mixer.NodeNumOut,
-                                     TempLoop.Mixer.TotalInletNodes,
+                        GetLoopMixer(PlantLoop(LoopNum).Name,
+                                     PlantLoop(LoopNum).LoopSide(LoopSideNum).ConnectList,
+                                     PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.Name,
+                                     PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.Exists,
+                                     PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.NodeNameOut,
+                                     PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.NodeNumOut,
+                                     PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.TotalInletNodes,
                                      InletNodeNames,
                                      InletNodeNumbers,
                                      ErrorsFound,
@@ -1700,50 +1696,50 @@ namespace EnergyPlus {
                             continue;
                         }
                         // Map the outlet node of the mixer to a branch number
-                        if (TempLoop.Mixer.Exists) {
+                        if (PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.Exists) {
                             // Map the outlet node of the mixer to a branch number
                             MixerOutBranch = false;
-                            for (BranchNum = 1; BranchNum <= TempLoop.TotalBranches; ++BranchNum) {
-                                if (TempLoop.Mixer.NodeNumOut == TempLoop.Branch(BranchNum).Comp(1).NodeNumIn) {
-                                    TempLoop.Mixer.BranchNumOut = BranchNum;
+                            for (BranchNum = 1; BranchNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
+                                if (PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.NodeNumOut == PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(1).NodeNumIn) {
+                                    PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.BranchNumOut = BranchNum;
                                     MixerOutBranch = true;
                                     break; // BranchNum DO loop
                                 }
                             }
                             if (!MixerOutBranch) {
-                                ShowSevereError("Mixer Outlet Branch not found, Mixer=" + TempLoop.Mixer.Name);
+                                ShowSevereError("Mixer Outlet Branch not found, Mixer=" + PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.Name);
                                 ErrorsFound = true;
                             }
 
-                            TempLoop.Mixer.NodeNameIn.allocate(TempLoop.Mixer.TotalInletNodes);
-                            TempLoop.Mixer.NodeNumIn.dimension(TempLoop.Mixer.TotalInletNodes, 0);
-                            TempLoop.Mixer.BranchNumIn.dimension(TempLoop.Mixer.TotalInletNodes, 0);
+                            PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.NodeNameIn.allocate(PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.TotalInletNodes);
+                            PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.NodeNumIn.dimension(PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.TotalInletNodes, 0);
+                            PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.BranchNumIn.dimension(PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.TotalInletNodes, 0);
 
-                            MixerInBranch.allocate(TempLoop.Mixer.TotalInletNodes);
+                            MixerInBranch.allocate(PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.TotalInletNodes);
                             MixerInBranch = false;
-                            for (NodeNum = 1; NodeNum <= TempLoop.Mixer.TotalInletNodes; ++NodeNum) {
-                                TempLoop.Mixer.NodeNameIn(NodeNum) = InletNodeNames(NodeNum);
-                                TempLoop.Mixer.NodeNumIn(NodeNum) = InletNodeNumbers(NodeNum);
+                            for (NodeNum = 1; NodeNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.TotalInletNodes; ++NodeNum) {
+                                PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.NodeNameIn(NodeNum) = InletNodeNames(NodeNum);
+                                PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.NodeNumIn(NodeNum) = InletNodeNumbers(NodeNum);
                                 // The following DO loop series is intended to store the branch number for each inlet
                                 // branch of the mixer
-                                for (BranchNum = 1; BranchNum <= TempLoop.TotalBranches; ++BranchNum) {
-                                    CompNum = TempLoop.Branch(BranchNum).TotalComponents;
-                                    if (TempLoop.Mixer.NodeNumIn(NodeNum) ==
-                                        TempLoop.Branch(BranchNum).Comp(CompNum).NodeNumOut) {
-                                        TempLoop.Mixer.BranchNumIn(NodeNum) = BranchNum;
+                                for (BranchNum = 1; BranchNum <= PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++BranchNum) {
+                                    CompNum = PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).TotalComponents;
+                                    if (PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.NodeNumIn(NodeNum) ==
+                                        PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(BranchNum).Comp(CompNum).NodeNumOut) {
+                                        PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.BranchNumIn(NodeNum) = BranchNum;
                                         MixerInBranch(NodeNum) = true;
                                         break; // BranchNum DO loop
                                     }
                                 }
                             }
 
-                            for (Inlet = 1; Inlet <= TempLoop.Mixer.TotalInletNodes; ++Inlet) {
+                            for (Inlet = 1; Inlet <= PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.TotalInletNodes; ++Inlet) {
                                 if (MixerInBranch(Inlet)) continue;
-                                ShowSevereError("Mixer Inlet Branch not found, Mixer=" + TempLoop.Mixer.Name);
-                                ShowContinueError("Mixer Branch Inlet name=" + TempLoop.Mixer.NodeNameIn(Inlet));
-                                ShowContinueError("In Loop=" + TempLoop.Name);
-                                ShowContinueError("Loop BranchList=" + TempLoop.BranchList);
-                                ShowContinueError("Loop ConnectorList=" + TempLoop.ConnectList);
+                                ShowSevereError("Mixer Inlet Branch not found, Mixer=" + PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.Name);
+                                ShowContinueError("Mixer Branch Inlet name=" + PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.NodeNameIn(Inlet));
+                                ShowContinueError("In Loop=" + PlantLoop(LoopNum).Name);
+                                ShowContinueError("Loop BranchList=" + PlantLoop(LoopNum).LoopSide(LoopSideNum).BranchList);
+                                ShowContinueError("Loop ConnectorList=" + PlantLoop(LoopNum).LoopSide(LoopSideNum).ConnectList);
                                 ErrorsFound = true;
                             }
 
@@ -1753,31 +1749,16 @@ namespace EnergyPlus {
                         InletNodeNumbers.deallocate();
                     }
 
-                    PlantLoop(LoopNum).LoopSide(LoopSideNum).SplitterExists = TempLoop.SplitterExists;
-                    PlantLoop(LoopNum).LoopSide(LoopSideNum).MixerExists = TempLoop.MixerExists;
-                    PlantLoop(LoopNum).LoopSide(LoopSideNum).BypassExists = TempLoop.BypassExists;
-
-                    PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch.allocate(TempLoop.TotalBranches);
-                    PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches = TempLoop.TotalBranches;
-                    PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch = TempLoop.Branch;
-
-                    PlantLoop(LoopNum).LoopSide(LoopSideNum).Splitter = TempLoop.Splitter;
-                    PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer = TempLoop.Mixer;
-
-                    PlantLoop(LoopNum).LoopSide(LoopSideNum).noLoadConstantSpeedBranchFlowRateSteps.allocate(
-                            TempLoop.TotalBranches - 2);
+                    PlantLoop(LoopNum).LoopSide(LoopSideNum).noLoadConstantSpeedBranchFlowRateSteps.allocate(PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches - 2);
 
                     // TODO: this is just intended to be temporary
                     PlantLoop(LoopNum).LoopSide(LoopSideNum).myLoopNum = LoopNum;
                     PlantLoop(LoopNum).LoopSide(LoopSideNum).myLoopSideNum = LoopSideNum;
+                    PlantLoop(LoopNum).LoopSide(LoopSideNum).myOtherLoopSideNum = 3 - LoopSideNum;
 
-                    //   Add condenser CASE statement when required.
-
-                    TempLoop.Branch.deallocate();
 
                 } // ... end LoopSideNum=DemandSide,SupplySide
 
-                PlantLoop(LoopNum).LoopHasConnectionComp = TempLoop.LoopHasConnectionComp;
                 PlantLoop(LoopNum).LoopSide(1).loopSideDescription = PlantLoop(LoopNum).Name + " - Demand Side";
                 PlantLoop(LoopNum).LoopSide(2).loopSideDescription = PlantLoop(LoopNum).Name + " - Supply Side";
 
@@ -1804,8 +1785,7 @@ namespace EnergyPlus {
 
                 // set up some pump indexing for convenience later
                 for (int LoopSideCounter = 1; LoopSideCounter <= 2; ++LoopSideCounter) {
-                    for (int PumpCounter = 1; PumpCounter <= DataPlant::PlantLoop(LoopNum).LoopSide(
-                            LoopSideCounter).TotalPumps; ++PumpCounter) {
+                    for (int PumpCounter = 1; PumpCounter <= DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideCounter).TotalPumps; ++PumpCounter) {
                         int const PumpBranchNum = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideCounter).Pumps(
                                 PumpCounter).BranchNum;
                         int const PumpCompNum = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideCounter).Pumps(
@@ -3057,7 +3037,7 @@ namespace EnergyPlus {
             for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
                 numLoopSides = 2;
                 for (SideNum = 1; SideNum <= numLoopSides; ++SideNum) {
-                    if (!(PlantLoop(LoopNum).LoopSide(SideNum).SplitterExists)) continue;
+                    if (!(PlantLoop(LoopNum).LoopSide(SideNum).Splitter.Exists)) continue;
 
                     for (ParalBranchNum = 1;
                          ParalBranchNum <= PlantLoop(LoopNum).LoopSide(SideNum).Splitter.TotalOutletNodes;
@@ -3830,44 +3810,6 @@ namespace EnergyPlus {
             return CallingIndex;
         }
 
-        void StoreAPumpOnCurrentTempLoop(int const LoopNum,
-                                         int const LoopSideNum,
-                                         int const BranchNum,
-                                         int const CompNum,
-                                         std::string const &PumpName,
-                                         int const PumpOutletNode,
-                                         bool const HasBranchPumps) {
-
-            // SUBROUTINE INFORMATION:
-            //       AUTHOR         Edwin Lee
-            //       DATE WRITTEN   April 2010
-            //       MODIFIED       na
-            //       RE-ENGINEERED  na
-
-            // PURPOSE OF THIS SUBROUTINE:
-            // This routine reallocates the pumps data structure in the LoopSide data structure
-            //  and adds the pump data passed in as the next pump
-
-            // METHODOLOGY EMPLOYED:
-            // Fills the following location items in the pump data structure which resides on the LoopSide
-            // TYPE LoopSidePumpInformation
-            //   CHARACTER(len=MaxNameLength)     :: PumpName              = ' '
-            //   INTEGER                          :: PumpTypeOf            = 0
-            //   INTEGER                          :: BranchNum             = 0
-            //   INTEGER                          :: CompNum               = 0
-            //   ...
-
-            auto &loop_side(PlantLoop(LoopNum).LoopSide(LoopSideNum));
-            auto &pumps(loop_side.Pumps);
-            int const nPumpsAfterIncrement = loop_side.TotalPumps = pumps.size() + 1;
-            pumps.redimension(nPumpsAfterIncrement);
-            pumps(nPumpsAfterIncrement).PumpName = PumpName;
-            pumps(nPumpsAfterIncrement).BranchNum = BranchNum;
-            pumps(nPumpsAfterIncrement).CompNum = CompNum;
-            pumps(nPumpsAfterIncrement).PumpOutletNode = PumpOutletNode;
-            loop_side.BranchPumpsExist = HasBranchPumps;
-        }
-
         void SetupBranchControlTypes() {
 
             // SUBROUTINE INFORMATION:
@@ -3912,7 +3854,7 @@ namespace EnergyPlus {
                          BranchCtr <= PlantLoop(LoopCtr).LoopSide(LoopSideCtr).TotalBranches; ++BranchCtr) {
                         BranchIsInSplitterMixer = false;
                         // test if this branch is inside a splitter/mixer
-                        if (PlantLoop(LoopCtr).LoopSide(LoopSideCtr).SplitterExists) {
+                        if (PlantLoop(LoopCtr).LoopSide(LoopSideCtr).Splitter.Exists) {
                             if ((BranchCtr > 1) &&
                                 (BranchCtr < PlantLoop(LoopCtr).LoopSide(LoopSideCtr).TotalBranches)) {
                                 BranchIsInSplitterMixer = true;

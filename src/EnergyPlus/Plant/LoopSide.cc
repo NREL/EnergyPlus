@@ -92,35 +92,31 @@ namespace DataPlant {
         // the flow resolver and locking those flows down.  Available components are then re-simulated using the
         // corrected flow rates.
 
-        // Initialize variables
-        int OtherSide = 3 - this->myLoopSideNum; // will give us 1 if thisside is 2, or 2 if thisside is 1
-
         auto &thisPlantLoop = DataPlant::PlantLoop(this->myLoopNum);
-        auto &thisLoopSide = thisPlantLoop.LoopSide(this->myLoopSideNum);
-        int ThisSideInletNode = thisLoopSide.NodeNumIn;
+        int ThisSideInletNode = this->NodeNumIn;
 
-        thisLoopSide.InitialDemandToLoopSetPoint = 0.0;
-        thisLoopSide.CurrentAlterationsToDemand = 0.0;
-        thisLoopSide.UpdatedDemandToLoopSetPoint = 0.0;
+        this->InitialDemandToLoopSetPoint = 0.0;
+        this->CurrentAlterationsToDemand = 0.0;
+        this->UpdatedDemandToLoopSetPoint = 0.0;
 
         // The following block is related to validating the flow control paths of the loop side
         // Since the control types are scheduled, I think BeginTimeStep should be a decent check frequency
-        if (DataGlobals::BeginTimeStepFlag && thisLoopSide.OncePerTimeStepOperations) {
+        if (DataGlobals::BeginTimeStepFlag && this->OncePerTimeStepOperations) {
 
             // Initialize loop side controls -- could just be done for one loop since this routine inherently
             //  loops over all plant/condenser loops.  Not sure if the penalty is worth investigating.
             PlantCondLoopOperation::InitLoadDistribution(FirstHVACIteration);
 
             // Now that the op scheme types are updated, do LoopSide validation
-            thisLoopSide.ValidateFlowControlPaths();
+            this->ValidateFlowControlPaths();
 
             // Set the flag to false so we won't do these again this time step
-            thisLoopSide.OncePerTimeStepOperations = false;
+            this->OncePerTimeStepOperations = false;
 
         } else {
 
             // Set the flag to true so that it is activated for the next time step
-            thisLoopSide.OncePerTimeStepOperations = true;
+            this->OncePerTimeStepOperations = true;
         }
 
         // Do pressure system initialize if this is the demand side (therefore once per whole loop)
@@ -128,16 +124,16 @@ namespace DataPlant {
             PlantPressureSystem::SimPressureDropSystem(this->myLoopNum, FirstHVACIteration, DataPlant::PressureCall_Init);
 
         // Turn on any previously disabled branches due to constant speed branch pump issue
-        thisLoopSide.TurnOnAllLoopSideBranches();
+        this->TurnOnAllLoopSideBranches();
 
         // Do the actual simulation here every time
-        thisLoopSide.DoFlowAndLoadSolutionPass(OtherSide, ThisSideInletNode, FirstHVACIteration);
+        this->DoFlowAndLoadSolutionPass(this->myOtherLoopSideNum, ThisSideInletNode, FirstHVACIteration);
 
         // On constant speed branch pump loop sides we need to resimulate
-        if (thisLoopSide.hasConstSpeedBranchPumps) {
+        if (this->hasConstSpeedBranchPumps) {
             // turn off any pumps connected to unloaded equipment and re-do the flow/load solution pass
-            thisLoopSide.DisableAnyBranchPumpsConnectedToUnloadedEquipment();
-            thisLoopSide.DoFlowAndLoadSolutionPass(OtherSide, ThisSideInletNode, FirstHVACIteration);
+            this->DisableAnyBranchPumpsConnectedToUnloadedEquipment();
+            this->DoFlowAndLoadSolutionPass(this->myOtherLoopSideNum, ThisSideInletNode, FirstHVACIteration);
         }
 
         // A couple things are specific to which LoopSide we are on  // TODO: This whole block needs to be moved up to the loop level
@@ -1225,9 +1221,7 @@ namespace DataPlant {
     
         // We also need to establish a baseline "other-side-based" loop demand based on this possible flow rate
         this->InitialDemandToLoopSetPoint = this->CalcOtherSideDemand(ThisLoopSideFlow);
-    
         this->UpdatedDemandToLoopSetPoint = this->InitialDemandToLoopSetPoint;
-    
         this->LoadToLoopSetPointThatWasntMet = 0.0;
     
         // We now have a loop side flow request, along with inlet min/max avails.
@@ -1349,7 +1343,7 @@ namespace DataPlant {
         int CompOutletNode;
 
         // If there is no splitter then there is no continuity to enforce.
-        if (!this->SplitterExists) {
+        if (!this->Splitter.Exists) {
 
             // If there's only one branch, then RETURN
             if (this->TotalBranches == 1) {
@@ -1375,7 +1369,7 @@ namespace DataPlant {
         }
 
         // If a splitter/mixer combination exist on the loop
-        if (this->SplitterExists && this->MixerExists) {
+        if (this->Splitter.Exists && this->Mixer.Exists) {
 
             // Zero out local variables
             TotParallelBranchFlowReq = 0.0;
@@ -2266,7 +2260,7 @@ namespace DataPlant {
         // Set the outlet conditions of the splitter
 
         // Update Temperatures across splitter
-        if (this->SplitterExists) {
+        if (this->Splitter.Exists) {
 
             // Set branch number at splitter inlet
             int const SplitterInletNode = this->Splitter.NodeNumIn;

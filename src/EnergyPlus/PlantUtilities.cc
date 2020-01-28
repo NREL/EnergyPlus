@@ -590,7 +590,7 @@ namespace PlantUtilities {
         // Similar to CheckPlantMixerSplitterConsistency, but used to decide if plant needs to iterate again
         for (int LoopNum = 1; LoopNum <= DataPlant::TotNumLoops; ++LoopNum) {
             for (int LoopSide = DataPlant::DemandSide; LoopSide <= DataPlant::SupplySide; ++LoopSide) {
-                if (DataPlant::PlantLoop(LoopNum).LoopSide(LoopSide).SplitterExists) {
+                if (DataPlant::PlantLoop(LoopNum).LoopSide(LoopSide).Splitter.Exists) {
                     int const SplitterInletNode = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSide).Splitter.NodeNumIn;
                     // loop across branch outlet nodes and check mass continuity
                     int const NumSplitterOutlets = DataPlant::PlantLoop(LoopNum).LoopSide(LoopSide).Splitter.TotalOutletNodes;
@@ -648,7 +648,7 @@ namespace PlantUtilities {
         int LastNodeOnBranch;
 
         if (!PlantLoop(LoopNum).LoopHasConnectionComp) {
-            if (!DoingSizing && !WarmupFlag && PlantLoop(LoopNum).LoopSide(LoopSideNum).MixerExists && !FirstHVACIteration) {
+            if (!DoingSizing && !WarmupFlag && PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.Exists && !FirstHVACIteration) {
                 // Find mixer outlet node number
                 MixerOutletNode = PlantLoop(LoopNum).LoopSide(LoopSideNum).Mixer.NodeNumOut;
                 // Find splitter inlet node number

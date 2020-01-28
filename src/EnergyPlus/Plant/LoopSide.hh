@@ -86,8 +86,6 @@ namespace DataPlant {
         std::string NodeNameIn;  // Node name for the inlet to this loop
         int NodeNumOut;          // Node number for the outlet to this loop
         std::string NodeNameOut; // Node name for the outlet to this loop
-        bool SplitterExists;     // Logical Flag indication splitter exists in the half loop
-        bool MixerExists;        // Logical Flag indication mixer exists in the half loop
         int TotalPumps;          // total number of pumps on the half loop
         bool BranchPumpsExist;   // logical flag indication branch pumps exist on half loop
         Array1D<LoopSidePumpInformation> Pumps;
@@ -139,6 +137,7 @@ namespace DataPlant {
         // these are intended to be temporary
         int myLoopNum;
         int myLoopSideNum;
+        int myOtherLoopSideNum;
 
         // Default Constructor
         HalfLoopData()
@@ -146,7 +145,7 @@ namespace DataPlant {
               OncePerTimeStepOperations(true), TimeElapsed(0.0), FlowRequest(0.0), FlowRequestTemperature(0.0),
               TempSetPoint(DataLoopNode::SensedNodeFlagValue), TempSetPointHi(DataLoopNode::SensedNodeFlagValue),
               TempSetPointLo(DataLoopNode::SensedNodeFlagValue), TempInterfaceTankOutlet(0.0), LastTempInterfaceTankOutlet(0.0), TotalBranches(0),
-              NodeNumIn(0), NodeNumOut(0), SplitterExists(false), MixerExists(false), TotalPumps(0),
+              NodeNumIn(0), NodeNumOut(0), TotalPumps(0),
               BranchPumpsExist(false), TotalPumpHeat(0.0), BypassExists(false), InletNodeSetPt(false), OutletNodeSetPt(false), EMSCtrl(false), EMSValue(0.0),
               FlowRestrictionFlag(false), FlowLock(0), TotalConnected(0), HasPressureComponents(false), HasParallelPressComps(false),
               PressureDrop(0.0), PressureEffectiveK(0.0), errCount_LoadWasntDist(0), errIndex_LoadWasntDist(0), errCount_LoadRemains(0),
@@ -154,7 +153,7 @@ namespace DataPlant {
               LoopSideInlet_CapExcessStorageTime(0.0), LoopSideInlet_CapExcessStorageTimeReport(0.0), LoopSideInlet_TotalTime(0.0),
               InletNode(0.0, 0.0), OutletNode(0.0, 0.0), flowRequestNeedIfOn(0.0), flowRequestNeedAndTurnOn(0.0), flowRequestFinal(0.0),
               hasConstSpeedBranchPumps(false), InitialDemandToLoopSetPoint(0.0), CurrentAlterationsToDemand(0.0), UpdatedDemandToLoopSetPoint(0.0),
-              LoadToLoopSetPointThatWasntMet(0.0), InitialDemandToLoopSetPointSAVED(0.0), refrigIndex(0), LoopSetPtDemandAtInlet(0.0), ThisSideLoadAlterations(0.0), myLoopNum(0), myLoopSideNum(0)
+              LoadToLoopSetPointThatWasntMet(0.0), InitialDemandToLoopSetPointSAVED(0.0), refrigIndex(0), LoopSetPtDemandAtInlet(0.0), ThisSideLoadAlterations(0.0), myLoopNum(0), myLoopSideNum(0), myOtherLoopSideNum(0)
         {
         }
 

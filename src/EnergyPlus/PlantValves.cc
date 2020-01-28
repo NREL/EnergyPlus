@@ -303,7 +303,7 @@ namespace PlantValves {
                                     if (thisBranch.ControlType == DataBranchAirLoopPlant::ControlType_Active) IsBranchActive = true;
 
                                     // is Valve inlet node an outlet node of a splitter
-                                    if (thisLoopSide.SplitterExists) {
+                                    if (thisLoopSide.Splitter.Exists) {
                                         if (allocated(thisLoopSide.Splitter.NodeNumOut)) {
                                             if (any_eq(thisLoopSide.Splitter.NodeNumOut, this->PltInletNodeNum)) {
                                                 InNodeOnSplitter = true;
@@ -317,7 +317,7 @@ namespace PlantValves {
                                     }  // has splitter
 
                                     // is stream 2 node an inlet to the mixer ?
-                                    if (thisLoopSide.MixerExists) {
+                                    if (thisLoopSide.Mixer.Exists) {
                                         if (any_eq(thisLoopSide.Mixer.NodeNumIn, this->PltStream2NodeNum)) {
                                             int thisInnerBranchCtr = 0;
                                             for (auto & thisInnerBranch : thisLoopSide.Branch) {

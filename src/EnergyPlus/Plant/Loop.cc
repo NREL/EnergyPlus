@@ -244,7 +244,6 @@ namespace DataPlant {
         using DataGlobals::WarmupFlag;
         using DataLoopNode::Node;
         using DataLoopNode::NodeID;
-        using DataPlant::DemandSide;
         using DataPlant::SupplySide;
         using General::RoundSigDigits;
 
