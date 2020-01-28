@@ -132,6 +132,8 @@ namespace DataPlant {
         Real64 LoadToLoopSetPointThatWasntMet; // Unmet Demand
         Real64 InitialDemandToLoopSetPointSAVED;
         std::string loopSideDescription;
+        int refrigIndex; // Index denoting refrigerant used (possibly steam)
+
         // these are intended to be temporary
         int myLoopNum;
         int myLoopSideNum;
@@ -150,7 +152,7 @@ namespace DataPlant {
               LoopSideInlet_CapExcessStorageTime(0.0), LoopSideInlet_CapExcessStorageTimeReport(0.0), LoopSideInlet_TotalTime(0.0),
               InletNode(0.0, 0.0), OutletNode(0.0, 0.0), flowRequestNeedIfOn(0.0), flowRequestNeedAndTurnOn(0.0), flowRequestFinal(0.0),
               hasConstSpeedBranchPumps(false), InitialDemandToLoopSetPoint(0.0), CurrentAlterationsToDemand(0.0), UpdatedDemandToLoopSetPoint(0.0),
-              LoadToLoopSetPointThatWasntMet(0.0), InitialDemandToLoopSetPointSAVED(0.0), myLoopNum(0), myLoopSideNum(0)
+              LoadToLoopSetPointThatWasntMet(0.0), InitialDemandToLoopSetPointSAVED(0.0), refrigIndex(0), myLoopNum(0), myLoopSideNum(0)
         {
         }
 
@@ -208,8 +210,6 @@ namespace DataPlant {
         );
 
         bool CheckPlantConvergence(bool FirstHVACIteration);
-
-        static void clear_state();
 
         void solve(bool FirstHVACIteration, bool &ReSimOtherSideNeeded);
 

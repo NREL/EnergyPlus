@@ -65,13 +65,7 @@
 namespace EnergyPlus {
 namespace DataPlant {
 
-    int RefrigIndex(0); // Index denoting refrigerant used (possibly steam)
     static std::string const fluidNameSteam("STEAM");
-
-    // Functions
-    void HalfLoopData::clear_state() {
-        RefrigIndex = 0; // Index denoting refrigerant used (possibly steam)
-    }
 
     void HalfLoopData::solve(bool const FirstHVACIteration, bool &ReSimOtherSideNeeded) {
 
@@ -294,9 +288,9 @@ namespace DataPlant {
                     DeltaTemp = LoopSetPointTemperature - TargetTemp;
 
                     EnthalpySteamSatVapor = GetSatEnthalpyRefrig(fluidNameSteam, LoopSetPointTemperature, 1.0,
-                                                                 RefrigIndex, RoutineNameAlt);
+                                                                 this->refrigIndex, RoutineNameAlt);
                     EnthalpySteamSatLiquid = GetSatEnthalpyRefrig(fluidNameSteam, LoopSetPointTemperature, 0.0,
-                                                                  RefrigIndex, RoutineNameAlt);
+                                                                  this->refrigIndex, RoutineNameAlt);
 
                     LatentHeatSteam = EnthalpySteamSatVapor - EnthalpySteamSatLiquid;
 
@@ -313,7 +307,6 @@ namespace DataPlant {
 
         PlantReport(this->myLoopNum).UnmetDemand = LoadToLoopSetPoint;
     }
-
 
     void HalfLoopData::ValidateFlowControlPaths()
     {
@@ -895,7 +888,6 @@ namespace DataPlant {
         }
     }
 
-
     Real64 HalfLoopData::EvaluateLoopSetPointLoad(int const FirstBranchNum,
                                                           int const LastBranchNum,
                                                           Real64 ThisLoopSideFlow,
@@ -1056,10 +1048,10 @@ namespace DataPlant {
 
                     Real64 EnthalpySteamSatVapor =
                         FluidProperties::GetSatEnthalpyRefrig(fluidNameSteam, LoopSetPointTemperature, 1.0,
-                                                              RefrigIndex, RoutineNameAlt);
+                                                              this->refrigIndex, RoutineNameAlt);
                     Real64 EnthalpySteamSatLiquid =
                         FluidProperties::GetSatEnthalpyRefrig(fluidNameSteam, LoopSetPointTemperature, 0.0,
-                                                              RefrigIndex, RoutineNameAlt);
+                                                              this->refrigIndex, RoutineNameAlt);
 
                     Real64 LatentHeatSteam = EnthalpySteamSatVapor - EnthalpySteamSatLiquid;
 
@@ -1461,7 +1453,7 @@ namespace DataPlant {
     }
 
 
-void HalfLoopData::DoFlowAndLoadSolutionPass(int OtherSide, int ThisSideInletNode, bool FirstHVACIteration) {
+    void HalfLoopData::DoFlowAndLoadSolutionPass(int OtherSide, int ThisSideInletNode, bool FirstHVACIteration) {
     
         // This is passed in-out deep down into the depths where the load op manager calls EMS and EMS can shut down pumps
         bool LoopShutDownFlag = false;
@@ -2383,8 +2375,7 @@ void HalfLoopData::DoFlowAndLoadSolutionPass(int OtherSide, int ThisSideInletNod
         }
     }
 
-
-Real64 HalfLoopData::DetermineLoopSideFlowRate(int ThisSideInletNode, Real64 ThisSideLoopFlowRequest)
+    Real64 HalfLoopData::DetermineLoopSideFlowRate(int ThisSideInletNode, Real64 ThisSideLoopFlowRequest)
     {
         Real64 ThisLoopSideFlow = ThisSideLoopFlowRequest;
         Real64 TotalPumpMinAvailFlow = 0.0;
