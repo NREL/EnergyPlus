@@ -379,7 +379,8 @@ namespace DataPlant {
                 if ((SELECT_CASE_var >= DataPlant::LoadRangeBasedMin) && (SELECT_CASE_var <= DataPlant::LoadRangeBasedMax)) { //~ load range based
                     if (EncounteredNonLRBAfterLRB) {
                         // We must have already encountered a LRB, then a non-LRB, and now another LRB, this is bad
-                        ShowSevereError("Plant Topology Problem: Load range based components are separated by other control type components.");
+                        ShowSevereError("Plant topology problem on \"" + this->loopSideDescription + "\"");
+                        ShowContinueError("PlaLoad range based components are separated by other control type components.");
                         ShowContinueError("Load Range Based should be grouped together on each flow path.");
                         ShowFatalError("Plant topology issue causes program termination");
                     } else {
@@ -440,8 +441,8 @@ namespace DataPlant {
                             (SELECT_CASE_var <= DataPlant::LoadRangeBasedMax)) { //~ load range based
                             if (EncounteredNonLRBAfterLRB) {
                                 // We must have already encountered a LRB, then a non-LRB, and now another LRB, this is bad
-                                ShowSevereError(
-                                    "Plant Topology Problem: Load range based components are separated by other control type components.");
+                                ShowSevereError("Plant topology problem on \"" + this->loopSideDescription + "\"");
+                                ShowContinueError("Load range based components are separated by other control type components.");
                                 ShowContinueError("Load Range Based should be grouped together on each flow path.");
                                 ShowFatalError("Plant topology issue causes program termination");
                             } else {
@@ -1614,7 +1615,7 @@ void HalfLoopData::DoFlowAndLoadSolutionPass(int OtherSide, int ThisSideInletNod
                 // now with flow locked, this single branch will just ran at the specified flow rate, so we are done
                 return;
             } else {
-                ShowSevereError("Plant topology problem");
+                ShowSevereError("Plant topology problem on \"" + this->loopSideDescription + "\"");
                 ShowContinueError(
                     "There are multiple branches, yet no splitter.  This is an invalid configuration.");
                 ShowContinueError("Add a set of connectors, use put components on a single branch.");
@@ -1630,7 +1631,7 @@ void HalfLoopData::DoFlowAndLoadSolutionPass(int OtherSide, int ThisSideInletNod
             TotParallelBranchFlowReq = 0.0;
             NumSplitOutlets = this->Splitter.TotalOutletNodes;
             if (NumSplitOutlets < 1) {
-                ShowSevereError("Plant topology problem"); // for PlantLoop: " + PlantLoop(LoopNum).Name + ", " + LoopSideName(LoopSideNum) + " side.");
+                ShowSevereError("Plant topology problem on \"" + this->loopSideDescription + "\"");
                 ShowContinueError("Diagnostic error in PlantLoopSolver::ResolveParallelFlows.");
                 ShowContinueError("Splitter improperly specified, no splitter outlets.");
                 ShowFatalError("Invalid plant topology causes program termination.");

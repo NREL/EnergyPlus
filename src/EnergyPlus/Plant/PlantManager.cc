@@ -1768,6 +1768,8 @@ namespace EnergyPlus {
                 } // ... end LoopSideNum=DemandSide,SupplySide
 
                 PlantLoop(LoopNum).LoopHasConnectionComp = TempLoop.LoopHasConnectionComp;
+                PlantLoop(LoopNum).LoopSide(1).loopSideDescription = PlantLoop(LoopNum).Name + " - Demand Side";
+                PlantLoop(LoopNum).LoopSide(2).loopSideDescription = PlantLoop(LoopNum).Name + " - Supply Side";
 
                 // a nice little spot to report out bad pump/common-pipe configurations
                 bool const ThisSideHasPumps = (PlantLoop(LoopNum).LoopSide(1).TotalPumps > 0);

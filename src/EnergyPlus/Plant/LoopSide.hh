@@ -131,6 +131,7 @@ namespace DataPlant {
         Real64 UpdatedDemandToLoopSetPoint;
         Real64 LoadToLoopSetPointThatWasntMet; // Unmet Demand
         Real64 InitialDemandToLoopSetPointSAVED;
+        std::string loopSideDescription;
         // these are intended to be temporary
         int myLoopNum;
         int myLoopSideNum;
