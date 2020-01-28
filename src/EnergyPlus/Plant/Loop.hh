@@ -49,7 +49,6 @@
 #define PlantTopologyLoop_hh_INCLUDED
 
 #include <EnergyPlus/Plant/LoopSide.hh>
-#include <EnergyPlus/Plant/PlantLoopSolver.hh>
 
 namespace EnergyPlus {
 namespace DataPlant {
@@ -106,7 +105,6 @@ namespace DataPlant {
         Real64 PressureDrop;
         bool UsePressureForPumpCalcs;
         Real64 PressureEffectiveK;
-        PlantLoopSolver::PlantLoopSolverClass loopSolver;
 
         // Default Constructor
         PlantLoopData()
@@ -119,7 +117,6 @@ namespace DataPlant {
               EconBranch(0), EconComp(0), EconControlTempDiff(0.0), LoopHasConnectionComp(false), TypeOfLoop(0), PressureSimType(1),
               HasPressureComponents(false), PressureDrop(0.0), UsePressureForPumpCalcs(false), PressureEffectiveK(0.0)
         {
-            this->loopSolver = PlantLoopSolver::PlantLoopSolverClass();
         }
     };
 } // namespace DataPlant

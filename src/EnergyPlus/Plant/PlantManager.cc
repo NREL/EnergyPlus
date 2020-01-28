@@ -97,7 +97,6 @@
 #include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
 #include <EnergyPlus/PipeHeatTransfer.hh>
 #include <EnergyPlus/Pipes.hh>
-#include <EnergyPlus/Plant/PlantLoopSolver.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/PlantCentralGSHP.hh>
 #include <EnergyPlus/PlantChillers.hh>
@@ -149,7 +148,6 @@ namespace EnergyPlus {
         using namespace DataBranchAirLoopPlant;
         using namespace DataLoopNode;
         using namespace FluidProperties;
-        using PlantLoopSolver::PlantHalfLoopSolver;
 
         // MODULE PARAMETER DEFINITIONS
         int const Plant(1);
@@ -245,7 +243,7 @@ namespace EnergyPlus {
 
                     if (SimHalfLoopFlag || IterPlant <= CurntMinPlantSubIterations) {
 
-                        PlantHalfLoopSolver(FirstHVACIteration, LoopSide, LoopNum, other_loop_side.SimLoopSideNeeded);
+                        this_loop_side.solve(FirstHVACIteration, other_loop_side.SimLoopSideNeeded);
 
                         // Always set this side to false,  so that it won't keep being turned on just because of first hvac
                         this_loop_side.SimLoopSideNeeded = false;

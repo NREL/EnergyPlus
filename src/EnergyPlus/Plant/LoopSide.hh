@@ -184,6 +184,12 @@ namespace DataPlant {
                                         Real64 ThisLoopSideFlow,
                                         Array1S_int LastComponentSimulated);
 
+        void UpdateLoopSideReportVars(Real64 OtherSideDemand, Real64 LocalRemLoopDemand);
+
+        void CheckLoopExitNode(bool FirstHVACIteration);
+
+        void CalcUnmetPlantDemand();
+
         void ResolveParallelFlows(Real64 ThisLoopSideFlow, bool FirstHVACIteration);
 
         void SimulateSinglePump(PlantLocation SpecificPumpLocation, Real64 & SpecificPumpFlowRate);
@@ -201,6 +207,10 @@ namespace DataPlant {
         );
 
         bool CheckPlantConvergence(bool FirstHVACIteration);
+
+        static void clear_state();
+
+        void solve(bool FirstHVACIteration, bool &ReSimOtherSideNeeded);
 
     };
 } // namespace DataPlant

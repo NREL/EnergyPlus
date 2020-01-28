@@ -177,7 +177,7 @@
 #include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
 #include <EnergyPlus/PipeHeatTransfer.hh>
 #include <EnergyPlus/Pipes.hh>
-#include <EnergyPlus/Plant/PlantLoopSolver.hh>
+#include <EnergyPlus/Plant/LoopSide.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/PlantCentralGSHP.hh>
 #include <EnergyPlus/PlantChillers.hh>
@@ -435,7 +435,7 @@ void EnergyPlusFixture::clear_all_states()
     PlantCondLoopOperation::clear_state();
     PlantHeatExchangerFluidToFluid::clear_state();
     PlantLoadProfile::clear_state();
-    PlantLoopSolver::clear_state();
+    DataPlant::HalfLoopData::clear_state();
     PlantManager::clear_state();
     PlantPipingSystemsManager::clear_state();
     PlantPipingSystemsManager::clear_state();

@@ -436,8 +436,6 @@ SET( SRC
   PlantLoadProfile.cc
   PlantLoadProfile.hh
   Plant/PlantLocation.hh
-  Plant/PlantLoopSolver.cc
-  Plant/PlantLoopSolver.hh
   Plant/PlantManager.cc
   Plant/PlantManager.hh
   PlantPipingSystemsManager.cc
