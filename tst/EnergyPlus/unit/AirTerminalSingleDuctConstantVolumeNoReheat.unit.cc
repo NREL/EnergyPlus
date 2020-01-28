@@ -534,11 +534,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
     Node(ZoneAirNodeNum).Temp = 20.0;
     Node(ZoneAirNodeNum).HumRat = 0.0075;
     Node(ZoneAirNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(ZoneAirNodeNum).Temp, Node(ZoneAirNodeNum).HumRat);
-    ;
-    // calculate the heating rate provided by TA unit
-    Real64 CpAir =
-        PsyCpAirFnWTdb(0.5 * (Node(InletNode).HumRat + Node(ZoneAirNodeNum).HumRat), 0.5 * (Node(InletNode).Temp + Node(ZoneAirNodeNum).Temp));
-    Real64 SensHeatRateProvided = MassFlowRateMaxAvail * CpAir * (Node(InletNode).Temp - Node(ZoneAirNodeNum).Temp);
 
     // set inlet mass flow rate to zero
     Node(InletNode).MassFlowRateMaxAvail = 0.0;
