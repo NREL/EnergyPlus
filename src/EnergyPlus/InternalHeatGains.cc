@@ -709,7 +709,7 @@ namespace InternalHeatGains {
                         MustInpSch = false;
                         UsingThermalComfort = false;
                         lastOption = NumAlpha;
-                        
+
                         // check to see if the user has specified schedules for air velocity, clothing insulation, and/or work efficiency
                         // but have NOT made a selection for a thermal comfort model.  If so, then the schedules are reported as unused
                         // which could cause confusion.  The solution is for the user to either remove those schedules or pick a thermal
@@ -3958,7 +3958,6 @@ namespace InternalHeatGains {
                     if (FanPowerAtDesign + CPUPowerAtDesign > ZoneITEq(Loop).DesignTotalPower) {
                         ZoneITEq(Loop).DesignTotalPower = FanPowerAtDesign + CPUPowerAtDesign;
                     }
-//                    ZoneITEq(Loop).DesignAirVolFlowRate = IHGNumbers(5) * ZoneITEq(Loop).DesignTotalPower;
                 }
 
                 // Object report variables
@@ -6193,13 +6192,13 @@ namespace InternalHeatGains {
         Real64 CPULoadSchedFrac;                          // CPU loading schedule fraction
         Real64 AirConnection;                             // Air connection type
         Real64 TSupply;                                   // Supply air temperature [C]
-        Real64 WSupply;                                   // Supply air humidity ratio [kgWater/kgdryair]
+        Real64 WSupply;                                   // Supply air humidity ratio [kgWater/kgDryair]
         Real64 RecircFrac;                                // Recirulation fraction - current
         Real64 TRecirc;                                   // Recirulation air temperature [C]
-        Real64 WRecirc;                                   // Recirulation air humidity ratio [kgWater/kgdryair]
+        Real64 WRecirc;                                   // Recirulation air humidity ratio [kgWater/kgDryair]
         Real64 TAirIn;                                    // Entering air dry-bulb temperature [C]
         Real64 TAirInDesign;                              // Design entering air dry-bulb temperature [C]
-        Real64 WAirIn;                                    // Entering air humidity ratio [kgWater/kgdryair]
+        Real64 WAirIn;                                    // Entering air humidity ratio [kgWater/kgDryair]
         Real64 TDPAirIn;                                  // Entering air dewpoint temperature [C]
         Real64 RHAirIn;                                   // Entering air relative humidity [%]
         Real64 SupplyHeatIndex;                           // Supply heat index
@@ -6440,7 +6439,6 @@ namespace InternalHeatGains {
             if (AirConnection == ITEInletAdjustedSupply || AirConnection == ITEInletZoneAirNode) {
                 // If not a room air model, then all ITEquip power input is a convective heat gain to the zone heat balance, plus UPS heat gain
                 ZoneITEq(Loop).ConGainRateToZone = CPUPower + FanPower + UPSHeatGain;
-
             } else if (AirConnection == ITEInletRoomAirModel) {
                 // Room air model option not implemented yet - set room air model outlet node conditions here
                 // If a room air model, then the only convective heat gain to the zone heat balance is the UPS heat gain

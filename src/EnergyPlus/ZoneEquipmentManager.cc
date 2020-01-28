@@ -3433,7 +3433,6 @@ namespace ZoneEquipmentManager {
         using ZoneAirLoopEquipmentManager::ManageZoneAirLoopEquipment;
         using ZoneDehumidifier::SimZoneDehumidifier;
         using ZonePlenum::SimAirZonePlenum;
-        using DataLoopNode::Node;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4000,7 +3999,6 @@ namespace ZoneEquipmentManager {
         CalcZoneLeavingConditions(FirstHVACIteration);
 
         SimReturnAirPath();
-
     }
 
     void SetZoneEquipSimOrder(int const ControlledZoneNum, int const ActualZoneNum)
@@ -5342,11 +5340,6 @@ namespace ZoneEquipmentManager {
                         } else {
                             Node(ReturnNode).Temp = TempRetAir;
                         }
-                        // Overwrite heat-to-return from ITE objects, other return air flow from window or lights are not allowed in this situation
-//                        if (Zone(ActualZoneNum).HasAdjustedReturnTempByITE && !(DataGlobals::BeginSimFlag)) {
-//                            TempRetAir = Zone(ActualZoneNum).AdjustedReturnTempByITE;
-//                            Node(ReturnNode).Temp = TempRetAir;
-//                        }
                     } else { // No return air flow
                         // Assign all heat-to-return from window gap airflow to zone air
                         if (WinGapFlowToRA > 0.0) SysDepZoneLoads(ActualZoneNum) += WinGapFlowToRA * CpAir * (WinGapTtoRA - TempZoneAir);

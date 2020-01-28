@@ -3797,7 +3797,6 @@ namespace ZoneTempPredictorCorrector {
             }
 
             // Calculate the predicted zone load to be provided by the system with the given desired zone air temperature
-
             CalcPredictedSystemLoad(ZoneNum, RAFNFrac);
 
             // Calculate the predicted zone load to be provided by the system with the given desired humidity ratio
