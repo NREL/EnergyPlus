@@ -4085,7 +4085,7 @@ namespace SizingManager {
             MyOneTimeFlag = false;
         }
 
-        static constexpr auto Format_991(" Zone Sizing Information,{},{},{:.5R},{:.5R},{:.5R},{:.5R},{},{},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R}\n");
+        static constexpr auto Format_991(" Zone Sizing Information, {}, {}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {}, {}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {:.5R}, {:.5R}\n");
         print(outputFiles.eio,
               Format_991,
               ZoneName,

@@ -11732,7 +11732,7 @@ namespace WaterThermalTanks {
                 MaxCapacity_loc = this->MaxCapacity;
             }
 
-            static constexpr auto Format_720("Water Heater Information,{},{},{:.4G},{:.1G},{:.3G},{:.4G}\n");
+            static constexpr auto Format_720("Water Heater Information,{},{},{:.4R},{:.1R},{:.3R},{:.4R}\n");
             print(outputFiles.eio,
                   Format_720,
                   this->Type,

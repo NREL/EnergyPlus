@@ -869,7 +869,7 @@ namespace SolarShading {
               "! <Shadowing/Sun Position Calculations Annual Simulations>, Calculation Method, Value {days}, "
               "Allowable Number Figures in Shadow Overlap {}, Polygon Clipping Algorithm, Sky Diffuse Modeling "
               "Algorithm, External Shading Calculation Method, Output External Shading Calculation Results, Disable "
-              "Self-Shading Within Shading Zone Groups, Disable Self-Shading From Shading Zone Groups to Other Zones");
+              "Self-Shading Within Shading Zone Groups, Disable Self-Shading From Shading Zone Groups to Other Zones\n");
         print(outputFiles.eio,
               "Shadowing/Sun Position Calculations Annual Simulations,{},{},{},{},{},{},{},{},{}\n",
               cAlphaArgs(1),
