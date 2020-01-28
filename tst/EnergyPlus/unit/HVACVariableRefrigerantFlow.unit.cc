@@ -12756,13 +12756,11 @@ TEST_F(HVACVRFFixture, VRF_BlowthroughFanPlacement_InputTest)
     GetVRFInput();
     // set pointer to components
     auto &thisVRFTU(VRFTU(1));
-    auto &thisFan(HVACFan::fanObjs[0]);
     auto &thisDXCoolingCoil(DXCoil(1));
     auto &thisDXHeatingCoil(DXCoil(2));
     auto &thisSuppHeatingCoil(HeatingCoil(1));
     // check model inputs
     ASSERT_EQ(1, NumVRFTU);
-    ASSERT_EQ(1, HVACFan::fanObjs.size());
     ASSERT_EQ(2, NumDXCoils);
     ASSERT_EQ(1, NumHeatingCoils);
     EXPECT_TRUE(thisVRFTU.OAMixerUsed);
