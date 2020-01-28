@@ -1735,68 +1735,6 @@ namespace PlantUtilities {
         }
     }
 
-    bool CheckPlantConvergence(int const ThisLoopNum, int const ThisLoopSide, bool const FirstHVACIteration)
-    {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Edwin Lee
-        //       DATE WRITTEN   Summer 2011
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This routine checks the history values in the convergence arrays of this loop/LoopSide combination
-
-        // METHODOLOGY EMPLOYED:
-        // On FirstHVAC, we are not converged yet, thus forcing at least two iterations
-        // Calculate the average of each related variable history (generalized: could be any number of history terms)
-        // If any of the history terms do not match this average, then at least one value is different, so not converged
-        // Although this routine appears to check for convergence, it is also used to check for stuck (max iteration) conditions
-        //  in cases where demand side (air loop, for example) equipment is "fighting" with the plant loop
-        // The result of this routine can help the plant "lock-in" and take action to stop the iteration
-
-        // Using/Aliasing
-        using namespace DataPlant;
-        using namespace DataLoopNode;
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        Real64 InletAvgTemp;
-        Real64 InletAvgMdot;
-        Real64 OutletAvgTemp;
-        Real64 OutletAvgMdot;
-
-        if (FirstHVACIteration) {
-            return false;
-        }
-
-        InletAvgTemp = sum(PlantLoop(ThisLoopNum).LoopSide(ThisLoopSide).InletNode.TemperatureHistory) /
-                       size(PlantLoop(ThisLoopNum).LoopSide(ThisLoopSide).InletNode.TemperatureHistory);
-        if (any_ne(PlantLoop(ThisLoopNum).LoopSide(ThisLoopSide).InletNode.TemperatureHistory, InletAvgTemp)) {
-            return false;
-        }
-
-        InletAvgMdot = sum(PlantLoop(ThisLoopNum).LoopSide(ThisLoopSide).InletNode.MassFlowRateHistory) /
-                       size(PlantLoop(ThisLoopNum).LoopSide(ThisLoopSide).InletNode.MassFlowRateHistory);
-        if (any_ne(PlantLoop(ThisLoopNum).LoopSide(ThisLoopSide).InletNode.MassFlowRateHistory, InletAvgMdot)) {
-            return false;
-        }
-
-        OutletAvgTemp = sum(PlantLoop(ThisLoopNum).LoopSide(ThisLoopSide).OutletNode.TemperatureHistory) /
-                        size(PlantLoop(ThisLoopNum).LoopSide(ThisLoopSide).OutletNode.TemperatureHistory);
-        if (any_ne(PlantLoop(ThisLoopNum).LoopSide(ThisLoopSide).OutletNode.TemperatureHistory, OutletAvgTemp)) {
-            return false;
-        }
-
-        OutletAvgMdot = sum(PlantLoop(ThisLoopNum).LoopSide(ThisLoopSide).OutletNode.MassFlowRateHistory) /
-                        size(PlantLoop(ThisLoopNum).LoopSide(ThisLoopSide).OutletNode.MassFlowRateHistory);
-        if (any_ne(PlantLoop(ThisLoopNum).LoopSide(ThisLoopSide).OutletNode.MassFlowRateHistory, OutletAvgMdot)) {
-            return false;
-        }
-
-        // If we made it this far, we're good!
-        return true;
-    }
-
     void ScanPlantLoopsForObject(std::string const &CompName,
                                  int const CompType,
                                  int &LoopNum,

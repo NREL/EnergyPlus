@@ -176,6 +176,15 @@ namespace DataPlant {
         void SimulateAllLoopSidePumps(Optional<PlantLocation const> SpecificPumpLocation = _,
                                       Optional<Real64 const> SpecificPumpFlowRate = _);
 
+        void AdjustPumpFlowRequestByEMSControls(int BranchNum, int CompNum, Real64 &FlowToRequest);
+
+        void PushBranchFlowCharacteristics(int BranchNum,
+                                           Real64 ValueToPush,
+                                           bool FirstHVACIteration // TRUE if First HVAC iteration of Time step
+        );
+
+        bool CheckPlantConvergence(bool FirstHVACIteration);
+
     };
 } // namespace DataPlant
 } // namespace EnergyPlus

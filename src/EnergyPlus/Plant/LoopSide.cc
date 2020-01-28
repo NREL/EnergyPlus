@@ -222,7 +222,208 @@ namespace DataPlant {
         } //~ Parallel Paths
     }
 
-    void HalfLoopData::SimulateAllLoopSideBranches(Real64 const ThisLoopSideFlow, bool const FirstHVACIteration, bool &LoopShutDownFlag)
+    bool HalfLoopData::CheckPlantConvergence(bool const FirstHVACIteration) {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Edwin Lee
+        //       DATE WRITTEN   Summer 2011
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // This routine checks the history values in the convergence arrays of this loop/LoopSide combination
+
+        // METHODOLOGY EMPLOYED:
+        // On FirstHVAC, we are not converged yet, thus forcing at least two iterations
+        // Calculate the average of each related variable history (generalized: could be any number of history terms)
+        // If any of the history terms do not match this average, then at least one value is different, so not converged
+        // Although this routine appears to check for convergence, it is also used to check for stuck (max iteration) conditions
+        //  in cases where demand side (air loop, for example) equipment is "fighting" with the plant loop
+        // The result of this routine can help the plant "lock-in" and take action to stop the iteration
+
+        // Using/Aliasing
+        using namespace DataPlant;
+        using namespace DataLoopNode;
+
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        Real64 InletAvgTemp;
+        Real64 InletAvgMdot;
+        Real64 OutletAvgTemp;
+        Real64 OutletAvgMdot;
+
+        if (FirstHVACIteration) {
+            return false;
+        }
+
+        InletAvgTemp = sum(this->InletNode.TemperatureHistory) /
+                       size(this->InletNode.TemperatureHistory);
+        if (any_ne(this->InletNode.TemperatureHistory, InletAvgTemp)) {
+            return false;
+        }
+
+        InletAvgMdot = sum(this->InletNode.MassFlowRateHistory) /
+                       size(this->InletNode.MassFlowRateHistory);
+        if (any_ne(this->InletNode.MassFlowRateHistory, InletAvgMdot)) {
+            return false;
+        }
+
+        OutletAvgTemp = sum(this->OutletNode.TemperatureHistory) /
+                        size(this->OutletNode.TemperatureHistory);
+        if (any_ne(this->OutletNode.TemperatureHistory, OutletAvgTemp)) {
+            return false;
+        }
+
+        OutletAvgMdot = sum(this->OutletNode.MassFlowRateHistory) /
+                        size(this->OutletNode.MassFlowRateHistory);
+        if (any_ne(this->OutletNode.MassFlowRateHistory, OutletAvgMdot)) {
+            return false;
+        }
+
+        // If we made it this far, we're good!
+        return true;
+    }
+
+    void HalfLoopData::PushBranchFlowCharacteristics(int const BranchNum,
+                                                             Real64 const ValueToPush,
+                                                             bool const FirstHVACIteration // TRUE if First HVAC iteration of Time step
+    ) {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Edwin Lee
+        //       DATE WRITTEN   September 2010
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This routine takes the flow resolved flow rate and pushes it
+        //  down a branch.  In the process, if an externally connected
+        //  component (air-water coil for example) is found to have a
+        //  differing flow rate, the air sim flag is tripped to true, but
+        //  the flow resolved flow rate is pushed down the loop to allow
+        //  the plant to finish successfully.
+
+        // METHODOLOGY EMPLOYED:
+        // Push mass flow rate and max avail down each branch.  If the component
+        //  is connected (or could be, for now) to an external loop such as
+        //  an air loop, the current component outlet mass flow is checked
+        //  vs the current resolved mass flow.  If the mass flow doesn't match,
+        //  the air sim flag is tripped to true.
+
+        // Currently this routine is only performed for starved branches, when
+        //  the coil is requesting too much flow, more than the plant can provide.
+        // If this were moved to every call type, including a minimum plant flow,
+        //  you would need to provide a mass flow and min/max avail to push
+        //  down the branch as well.
+
+        // Using/Aliasing
+        using namespace DataPlant; // Use the entire module to allow all TypeOf's, would be a huge ONLY list
+        using DataLoopNode::Node;
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int CompCounter;
+        int BranchInletNode;
+        int ComponentInletNode;
+        int ComponentOutletNode;
+        int ComponentTypeOfNum;
+        Real64 MassFlowRateFound;
+        Real64 MassFlow;
+        bool PlantIsRigid;
+
+        auto &this_branch(this->Branch(BranchNum));
+
+        BranchInletNode = this_branch.NodeNumIn;
+
+        //~ Possible error handling if needed
+        if (ValueToPush != Node(BranchInletNode).MassFlowRate) {
+            // Diagnostic problem, flow resolver isn't calling this routine properly
+        }
+
+        //~ This section would really be useful more later on if this routine has more logic regarding what to push down the branch
+        MassFlow = ValueToPush;
+        // MinAvail = ValueToPush
+        // MaxAvail = ValueToPush
+
+        PlantIsRigid = this->CheckPlantConvergence(FirstHVACIteration);
+
+        //~ Loop across all component outlet nodes and update their mass flow and max avail
+        for (CompCounter = 1; CompCounter <= this_branch.TotalComponents; ++CompCounter) {
+
+            auto &this_comp(this_branch.Comp(CompCounter));
+
+            //~ Pick up some values for convenience
+            ComponentInletNode = this_comp.NodeNumIn;
+            ComponentOutletNode = this_comp.NodeNumOut;
+            MassFlowRateFound = Node(ComponentOutletNode).MassFlowRate;
+            ComponentTypeOfNum = this_comp.TypeOf_Num;
+
+            //~ Push the values through
+            Node(ComponentOutletNode).MassFlowRate = MassFlow;
+
+            if (PlantIsRigid) {
+                Node(ComponentInletNode).MassFlowRateMinAvail = MassFlow;
+                Node(ComponentInletNode).MassFlowRateMaxAvail = MassFlow;
+                Node(ComponentOutletNode).MassFlowRateMinAvail = MassFlow;
+                Node(ComponentOutletNode).MassFlowRateMaxAvail = MassFlow;
+            }
+            // Node(ComponentOutletNode)%MassFlowRateMinAvail = MinAvail
+            // no this is 2-way valve which messes up flow options
+            //      for demand components Node(ComponentOutletNode)%MassFlowRateMaxAvail = MaxAvail
+
+            //~ If this value matches then we are good to move to the next component
+            if (std::abs(MassFlow - MassFlowRateFound) < CriteriaDelta_MassFlowRate) continue;
+            //~ Since there is a difference, we have to decide what to do based on the component type:
+            //~  For plant connections, don't do anything, it SHOULD work itself out
+            //~  For air connections, trip the LoopSide air flag
+            //~  Similar for zone, none zone, and electric load center
+            {
+                auto const SELECT_CASE_var(ComponentTypeOfNum);
+
+                // possibly air-connected components
+                if ((SELECT_CASE_var == TypeOf_CoilWaterCooling) ||
+                    (SELECT_CASE_var == TypeOf_CoilWaterDetailedFlatCooling) ||
+                    (SELECT_CASE_var == TypeOf_CoilWaterSimpleHeating) ||
+                    (SELECT_CASE_var == TypeOf_CoilSteamAirHeating) ||
+                    (SELECT_CASE_var == TypeOf_CoilWAHPHeatingEquationFit) ||
+                    (SELECT_CASE_var == TypeOf_CoilWAHPCoolingEquationFit) ||
+                    (SELECT_CASE_var == TypeOf_CoilWAHPHeatingParamEst) ||
+                    (SELECT_CASE_var == TypeOf_CoilWAHPCoolingParamEst) ||
+                    (SELECT_CASE_var == TypeOf_CoilUserDefined) ||
+                    (SELECT_CASE_var == TypeOf_CoilVSWAHPCoolingEquationFit) ||
+                    (SELECT_CASE_var == TypeOf_CoilVSWAHPHeatingEquationFit) ||
+                    (SELECT_CASE_var == TypeOf_PackagedTESCoolingCoil)) {
+
+                    this->SimAirLoopsNeeded = true;
+                    // sometimes these coils are children in ZoneHVAC equipment
+                    // PlantLoop(LoopNum)%LoopSide(LoopSideNum)%SimZoneEquipNeeded= .TRUE.
+
+                } else if ((SELECT_CASE_var == TypeOf_CoolingPanel_Simple) ||
+                           (SELECT_CASE_var == TypeOf_Baseboard_Conv_Water) ||
+                           (SELECT_CASE_var == TypeOf_Baseboard_Rad_Conv_Steam) ||
+                           (SELECT_CASE_var == TypeOf_Baseboard_Rad_Conv_Water) ||
+                           (SELECT_CASE_var == TypeOf_LowTempRadiant_VarFlow) ||
+                           (SELECT_CASE_var == TypeOf_LowTempRadiant_ConstFlow) ||
+                           (SELECT_CASE_var == TypeOf_CooledBeamAirTerminal) ||
+                           (SELECT_CASE_var == TypeOf_ZoneHVACAirUserDefined) ||
+                           (SELECT_CASE_var == TypeOf_AirTerminalUserDefined) ||
+                           (SELECT_CASE_var == TypeOf_FourPipeBeamAirTerminal)) { // zone connected components
+
+                    this->SimZoneEquipNeeded = true;
+
+                } else if ((SELECT_CASE_var == TypeOf_Generator_FCExhaust) ||
+                           (SELECT_CASE_var == TypeOf_Generator_FCStackCooler) ||
+                           (SELECT_CASE_var == TypeOf_Generator_MicroCHP) ||
+                           (SELECT_CASE_var == TypeOf_Generator_MicroTurbine) ||
+                           (SELECT_CASE_var == TypeOf_Generator_ICEngine) ||
+                           (SELECT_CASE_var == TypeOf_Generator_CTurbine)) { // electric center connected components
+
+                    this->SimElectLoadCentrNeeded = true;
+                }
+            }
+        }
+    }
+
+
+void HalfLoopData::SimulateAllLoopSideBranches(Real64 const ThisLoopSideFlow, bool const FirstHVACIteration, bool &LoopShutDownFlag)
     {
 
         // SUBROUTINE INFORMATION:
@@ -276,6 +477,38 @@ namespace DataPlant {
             case OutletBranch:
                 this->SimulateLoopSideBranchGroup(this->TotalBranches, this->TotalBranches, ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag);
                 break;
+            }
+        }
+    }
+
+    void HalfLoopData::AdjustPumpFlowRequestByEMSControls(int const BranchNum, int const CompNum, Real64 &FlowToRequest) {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Brent Griffith
+        //       DATE WRITTEN   April 2012
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // modify flow request to pump simulation if EMS is overriding pump component
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        auto &this_branch(this->Branch(BranchNum));
+        auto &this_comp(this_branch.Comp(CompNum));
+
+        if ((this->EMSCtrl) && (this->EMSValue <= 0.0)) {
+            FlowToRequest = 0.0;
+            return;
+        }
+
+        if ((this_branch.EMSCtrlOverrideOn) && (this_branch.EMSCtrlOverrideValue <= 0.0)) {
+            FlowToRequest = 0.0;
+            return;
+        }
+
+        if (this_comp.EMSLoadOverrideOn) {
+            if (this_comp.EMSLoadOverrideValue == 0.0) {
+                FlowToRequest = 0.0;
             }
         }
     }
@@ -635,10 +868,7 @@ namespace DataPlant {
         int const PumpIndex = comp.IndexInLoopSidePumps;
         auto &pump(loop_side.Pumps(PumpIndex));
 
-        DataPlant::PlantLoop(SpecificPumpLocation.loopNum)
-            .loopSolver.AdjustPumpFlowRequestByEMSControls(SpecificPumpLocation.loopNum,
-                                                           SpecificPumpLocation.loopSideNum,
-                                                           SpecificPumpLocation.branchNum,
+        this->AdjustPumpFlowRequestByEMSControls(SpecificPumpLocation.branchNum,
                                                            SpecificPumpLocation.compNum,
                                                            SpecificPumpFlowRate);
 
@@ -710,8 +940,7 @@ namespace DataPlant {
             int const PumpCompNum = pump.CompNum;
             int const PumpOutletNode = pump.PumpOutletNode;
 
-            DataPlant::PlantLoop(this->myLoopNum).loopSolver.AdjustPumpFlowRequestByEMSControls(
-                PumpLoopNum, PumpLoopSideNum, PumpBranchNum, PumpCompNum, FlowToRequest);
+            this->AdjustPumpFlowRequestByEMSControls(PumpBranchNum, PumpCompNum, FlowToRequest);
 
             // Call SimPumps, routine takes a flow request, and returns some info about the status of the pump
             bool DummyThisPumpRunning;

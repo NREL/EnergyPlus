@@ -1084,9 +1084,7 @@ namespace EnergyPlus {
                     if (this_loopside.Branch(SplitterBranchOut).ControlType != ControlType_Active &&
                         this_loopside.Branch(SplitterBranchOut).ControlType != ControlType_SeriesActive) {
                         Node(FirstNodeOnBranch).MassFlowRate = 0.0;
-                        DataPlant::PlantLoop(LoopNum).loopSolver.PushBranchFlowCharacteristics(
-                                LoopNum, LoopSideNum, SplitterBranchOut, Node(FirstNodeOnBranch).MassFlowRate,
-                                FirstHVACIteration);
+                        this_loopside.PushBranchFlowCharacteristics(SplitterBranchOut, Node(FirstNodeOnBranch).MassFlowRate, FirstHVACIteration);
                     }
                 }
 
@@ -1120,9 +1118,7 @@ namespace EnergyPlus {
                                                                        FlowRemaining);
                             if (Node(FirstNodeOnBranch).MassFlowRate < MassFlowTolerance)
                                 Node(FirstNodeOnBranch).MassFlowRate = 0.0;
-                            DataPlant::PlantLoop(LoopNum).loopSolver.PushBranchFlowCharacteristics(
-                                    LoopNum, LoopSideNum, SplitterBranchOut, Node(FirstNodeOnBranch).MassFlowRate,
-                                    FirstHVACIteration);
+                            this_loopside.PushBranchFlowCharacteristics(SplitterBranchOut, Node(FirstNodeOnBranch).MassFlowRate, FirstHVACIteration);
                             FlowRemaining -= Node(FirstNodeOnBranch).MassFlowRate;
                             if (FlowRemaining < MassFlowTolerance) FlowRemaining = 0.0;
                         }
@@ -1161,9 +1157,7 @@ namespace EnergyPlus {
                                             Node(FirstNodeOnBranch).MassFlowRateMaxAvail, FlowRemaining);
                                     FlowRemaining -= Node(FirstNodeOnBranch).MassFlowRate;
                                 }
-                                DataPlant::PlantLoop(LoopNum).loopSolver.PushBranchFlowCharacteristics(
-                                        LoopNum, LoopSideNum, SplitterBranchOut, Node(FirstNodeOnBranch).MassFlowRate,
-                                        FirstHVACIteration);
+                                this_loopside.PushBranchFlowCharacteristics(SplitterBranchOut, Node(FirstNodeOnBranch).MassFlowRate, FirstHVACIteration);
                             }
                         }
                     } // totalMax <=0 and flow should be assigned to active branches
@@ -1177,9 +1171,7 @@ namespace EnergyPlus {
                         if (this_loopside.Branch(SplitterBranchOut).ControlType == ControlType_Bypass) {
                             Node(FirstNodeOnBranch).MassFlowRate = min(FlowRemaining,
                                                                        Node(FirstNodeOnBranch).MassFlowRateMaxAvail);
-                            DataPlant::PlantLoop(LoopNum).loopSolver.PushBranchFlowCharacteristics(
-                                    LoopNum, LoopSideNum, SplitterBranchOut, Node(FirstNodeOnBranch).MassFlowRate,
-                                    FirstHVACIteration);
+                            this_loopside.PushBranchFlowCharacteristics(SplitterBranchOut, Node(FirstNodeOnBranch).MassFlowRate, FirstHVACIteration);
                             FlowRemaining -= Node(FirstNodeOnBranch).MassFlowRate;
                         }
                     }
@@ -1203,9 +1195,7 @@ namespace EnergyPlus {
                                 Node(FirstNodeOnBranch).MassFlowRate =
                                         min((Node(FirstNodeOnBranch).MassFlowRate + ActiveFlowRate),
                                             Node(FirstNodeOnBranch).MassFlowRateMaxAvail);
-                                DataPlant::PlantLoop(LoopNum).loopSolver.PushBranchFlowCharacteristics(
-                                        LoopNum, LoopSideNum, SplitterBranchOut, Node(FirstNodeOnBranch).MassFlowRate,
-                                        FirstHVACIteration);
+                                this_loopside.PushBranchFlowCharacteristics(SplitterBranchOut, Node(FirstNodeOnBranch).MassFlowRate, FirstHVACIteration);
                                 // adjust the remaining flow
                                 FlowRemaining -= (Node(FirstNodeOnBranch).MassFlowRate - StartingFlowRate);
                             }
@@ -1225,9 +1215,7 @@ namespace EnergyPlus {
                                                      (Node(FirstNodeOnBranch).MassFlowRateMaxAvail - StartingFlowRate));
                                 FlowRemaining -= ActiveFlowRate;
                                 Node(FirstNodeOnBranch).MassFlowRate = StartingFlowRate + ActiveFlowRate;
-                                DataPlant::PlantLoop(LoopNum).loopSolver.PushBranchFlowCharacteristics(
-                                        LoopNum, LoopSideNum, SplitterBranchOut, Node(FirstNodeOnBranch).MassFlowRate,
-                                        FirstHVACIteration);
+                                this_loopside.PushBranchFlowCharacteristics(SplitterBranchOut, Node(FirstNodeOnBranch).MassFlowRate, FirstHVACIteration);
                             }
                         }
                     }
@@ -1247,14 +1235,12 @@ namespace EnergyPlus {
                     SplitterBranchIn = this_loopside.Splitter.BranchNumIn;
                     FirstNodeOnBranchIn = this_loopside.Branch(SplitterBranchIn).NodeNumIn;
                     Node(FirstNodeOnBranchIn).MassFlowRate = TotParallelBranchFlowReq;
-                    PushBranchFlowCharacteristics(LoopNum, LoopSideNum, SplitterBranchIn,
-                                                  Node(FirstNodeOnBranchIn).MassFlowRate, FirstHVACIteration);
+                    this_loopside.PushBranchFlowCharacteristics(SplitterBranchIn, Node(FirstNodeOnBranchIn).MassFlowRate, FirstHVACIteration);
                     // Reset the flow on the Mixer outlet branch
                     MixerBranchOut = this_loopside.Mixer.BranchNumOut;
                     FirstNodeOnBranchOut = this_loopside.Branch(MixerBranchOut).NodeNumIn;
                     Node(FirstNodeOnBranchOut).MassFlowRate = TotParallelBranchFlowReq;
-                    PushBranchFlowCharacteristics(LoopNum, LoopSideNum, MixerBranchOut,
-                                                  Node(FirstNodeOnBranchOut).MassFlowRate, FirstHVACIteration);
+                    this_loopside.PushBranchFlowCharacteristics(MixerBranchOut, Node(FirstNodeOnBranchOut).MassFlowRate, FirstHVACIteration);
                     return;
 
                     // IF INSUFFICIENT FLOW TO MEET ALL PARALLEL BRANCH FLOW REQUESTS
@@ -1293,9 +1279,7 @@ namespace EnergyPlus {
                             //    FracFlow = Node(FirstNodeOnBranch)%MassFlowRate/TotParallelBranchFlowReq
                             //    Node(FirstNodeOnBranch)%MassFlowRate = MIN((FracFlow * Node(FirstNodeOnBranch)%MassFlowRate),FlowRemaining)
                             Node(FirstNodeOnBranch).MassFlowRate = ThisBranchRequestFrac * ThisLoopSideFlow;
-                            DataPlant::PlantLoop(LoopNum).loopSolver.PushBranchFlowCharacteristics(
-                                    LoopNum, LoopSideNum, SplitterBranchOut, Node(FirstNodeOnBranch).MassFlowRate,
-                                    FirstHVACIteration);
+                            this_loopside.PushBranchFlowCharacteristics(SplitterBranchOut, Node(FirstNodeOnBranch).MassFlowRate, FirstHVACIteration);
                             FlowRemaining -= Node(FirstNodeOnBranch).MassFlowRate;
                         }
                     }
@@ -1315,9 +1299,7 @@ namespace EnergyPlus {
                     MixerBranchOut = this_loopside.Mixer.BranchNumOut;
                     FirstNodeOnBranchOut = this_loopside.Branch(MixerBranchOut).NodeNumIn;
                     Node(FirstNodeOnBranchOut).MassFlowRate = TotParallelBranchFlowReq;
-                    DataPlant::PlantLoop(LoopNum).loopSolver.PushBranchFlowCharacteristics(
-                            LoopNum, LoopSideNum, MixerBranchOut, Node(FirstNodeOnBranchOut).MassFlowRate,
-                            FirstHVACIteration);
+                    this_loopside.PushBranchFlowCharacteristics(MixerBranchOut, Node(FirstNodeOnBranchOut).MassFlowRate, FirstHVACIteration);
 
                 } // Total flow requested >= or < Total parallel request
 
@@ -1419,150 +1401,6 @@ namespace EnergyPlus {
 //            }
 
 
-        }
-
-        void PlantLoopSolverClass::PushBranchFlowCharacteristics(int const LoopNum,
-                                                                 int const LoopSideNum,
-                                                                 int const BranchNum,
-                                                                 Real64 const ValueToPush,
-                                                                 bool const FirstHVACIteration // TRUE if First HVAC iteration of Time step
-        ) {
-
-            // SUBROUTINE INFORMATION:
-            //       AUTHOR         Edwin Lee
-            //       DATE WRITTEN   September 2010
-            //       MODIFIED       na
-            //       RE-ENGINEERED  na
-
-            // PURPOSE OF THIS SUBROUTINE:
-            // This routine takes the flow resolved flow rate and pushes it
-            //  down a branch.  In the process, if an externally connected
-            //  component (air-water coil for example) is found to have a
-            //  differing flow rate, the air sim flag is tripped to true, but
-            //  the flow resolved flow rate is pushed down the loop to allow
-            //  the plant to finish successfully.
-
-            // METHODOLOGY EMPLOYED:
-            // Push mass flow rate and max avail down each branch.  If the component
-            //  is connected (or could be, for now) to an external loop such as
-            //  an air loop, the current component outlet mass flow is checked
-            //  vs the current resolved mass flow.  If the mass flow doesn't match,
-            //  the air sim flag is tripped to true.
-
-            // Currently this routine is only performed for starved branches, when
-            //  the coil is requesting too much flow, more than the plant can provide.
-            // If this were moved to every call type, including a minimum plant flow,
-            //  you would need to provide a mass flow and min/max avail to push
-            //  down the branch as well.
-
-            // Using/Aliasing
-            using namespace DataPlant; // Use the entire module to allow all TypeOf's, would be a huge ONLY list
-            using DataBranchAirLoopPlant::MassFlowTolerance;
-            using DataLoopNode::Node;
-            using PlantUtilities::CheckPlantConvergence;
-
-            // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-            int CompCounter;
-            int BranchInletNode;
-            int ComponentInletNode;
-            int ComponentOutletNode;
-            int ComponentTypeOfNum;
-            Real64 MassFlowRateFound;
-            Real64 MassFlow;
-            bool PlantIsRigid;
-
-            auto &this_loopside(PlantLoop(LoopNum).LoopSide(LoopSideNum));
-            auto &this_branch(this_loopside.Branch(BranchNum));
-
-            BranchInletNode = this_branch.NodeNumIn;
-
-            //~ Possible error handling if needed
-            if (ValueToPush != Node(BranchInletNode).MassFlowRate) {
-                // Diagnostic problem, flow resolver isn't calling this routine properly
-            }
-
-            //~ This section would really be useful more later on if this routine has more logic regarding what to push down the branch
-            MassFlow = ValueToPush;
-            // MinAvail = ValueToPush
-            // MaxAvail = ValueToPush
-
-            PlantIsRigid = CheckPlantConvergence(LoopNum, LoopSideNum, FirstHVACIteration);
-
-            //~ Loop across all component outlet nodes and update their mass flow and max avail
-            for (CompCounter = 1; CompCounter <= this_branch.TotalComponents; ++CompCounter) {
-
-                auto &this_comp(this_branch.Comp(CompCounter));
-
-                //~ Pick up some values for convenience
-                ComponentInletNode = this_comp.NodeNumIn;
-                ComponentOutletNode = this_comp.NodeNumOut;
-                MassFlowRateFound = Node(ComponentOutletNode).MassFlowRate;
-                ComponentTypeOfNum = this_comp.TypeOf_Num;
-
-                //~ Push the values through
-                Node(ComponentOutletNode).MassFlowRate = MassFlow;
-
-                if (PlantIsRigid) {
-                    Node(ComponentInletNode).MassFlowRateMinAvail = MassFlow;
-                    Node(ComponentInletNode).MassFlowRateMaxAvail = MassFlow;
-                    Node(ComponentOutletNode).MassFlowRateMinAvail = MassFlow;
-                    Node(ComponentOutletNode).MassFlowRateMaxAvail = MassFlow;
-                }
-                // Node(ComponentOutletNode)%MassFlowRateMinAvail = MinAvail
-                // no this is 2-way valve which messes up flow options
-                //      for demand components Node(ComponentOutletNode)%MassFlowRateMaxAvail = MaxAvail
-
-                //~ If this value matches then we are good to move to the next component
-                if (std::abs(MassFlow - MassFlowRateFound) < CriteriaDelta_MassFlowRate) continue;
-                //~ Since there is a difference, we have to decide what to do based on the component type:
-                //~  For plant connections, don't do anything, it SHOULD work itself out
-                //~  For air connections, trip the LoopSide air flag
-                //~  Similar for zone, none zone, and electric load center
-                {
-                    auto const SELECT_CASE_var(ComponentTypeOfNum);
-
-                    // possibly air-connected components
-                    if ((SELECT_CASE_var == TypeOf_CoilWaterCooling) ||
-                        (SELECT_CASE_var == TypeOf_CoilWaterDetailedFlatCooling) ||
-                        (SELECT_CASE_var == TypeOf_CoilWaterSimpleHeating) ||
-                        (SELECT_CASE_var == TypeOf_CoilSteamAirHeating) ||
-                        (SELECT_CASE_var == TypeOf_CoilWAHPHeatingEquationFit) ||
-                        (SELECT_CASE_var == TypeOf_CoilWAHPCoolingEquationFit) ||
-                        (SELECT_CASE_var == TypeOf_CoilWAHPHeatingParamEst) ||
-                        (SELECT_CASE_var == TypeOf_CoilWAHPCoolingParamEst) ||
-                        (SELECT_CASE_var == TypeOf_CoilUserDefined) ||
-                        (SELECT_CASE_var == TypeOf_CoilVSWAHPCoolingEquationFit) ||
-                        (SELECT_CASE_var == TypeOf_CoilVSWAHPHeatingEquationFit) ||
-                        (SELECT_CASE_var == TypeOf_PackagedTESCoolingCoil)) {
-
-                        this_loopside.SimAirLoopsNeeded = true;
-                        // sometimes these coils are children in ZoneHVAC equipment
-                        // PlantLoop(LoopNum)%LoopSide(LoopSideNum)%SimZoneEquipNeeded= .TRUE.
-
-                    } else if ((SELECT_CASE_var == TypeOf_CoolingPanel_Simple) ||
-                               (SELECT_CASE_var == TypeOf_Baseboard_Conv_Water) ||
-                               (SELECT_CASE_var == TypeOf_Baseboard_Rad_Conv_Steam) ||
-                               (SELECT_CASE_var == TypeOf_Baseboard_Rad_Conv_Water) ||
-                               (SELECT_CASE_var == TypeOf_LowTempRadiant_VarFlow) ||
-                               (SELECT_CASE_var == TypeOf_LowTempRadiant_ConstFlow) ||
-                               (SELECT_CASE_var == TypeOf_CooledBeamAirTerminal) ||
-                               (SELECT_CASE_var == TypeOf_ZoneHVACAirUserDefined) ||
-                               (SELECT_CASE_var == TypeOf_AirTerminalUserDefined) ||
-                               (SELECT_CASE_var == TypeOf_FourPipeBeamAirTerminal)) { // zone connected components
-
-                        this_loopside.SimZoneEquipNeeded = true;
-
-                    } else if ((SELECT_CASE_var == TypeOf_Generator_FCExhaust) ||
-                               (SELECT_CASE_var == TypeOf_Generator_FCStackCooler) ||
-                               (SELECT_CASE_var == TypeOf_Generator_MicroCHP) ||
-                               (SELECT_CASE_var == TypeOf_Generator_MicroTurbine) ||
-                               (SELECT_CASE_var == TypeOf_Generator_ICEngine) ||
-                               (SELECT_CASE_var == TypeOf_Generator_CTurbine)) { // electric center connected components
-
-                        this_loopside.SimElectLoadCentrNeeded = true;
-                    }
-                }
-            }
         }
 
         void PlantLoopSolverClass::UpdateLoopSideReportVars(
@@ -1814,42 +1652,6 @@ namespace EnergyPlus {
             // Reset Max loop flow rate based on pump performance
             Node(LoopOutlet).MassFlowRateMax = Node(LoopInlet).MassFlowRateMax;
         }
-
-        void PlantLoopSolverClass::AdjustPumpFlowRequestByEMSControls(
-                int const LoopNum, int const LoopSideNum, int const BranchNum, int const CompNum,
-                Real64 &FlowToRequest) {
-
-            // SUBROUTINE INFORMATION:
-            //       AUTHOR         Brent Griffith
-            //       DATE WRITTEN   April 2012
-            //       MODIFIED       na
-            //       RE-ENGINEERED  na
-
-            // PURPOSE OF THIS SUBROUTINE:
-            // modify flow request to pump simulation if EMS is overriding pump component
-
-            // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-            auto &this_loopside(DataPlant::PlantLoop(LoopNum).LoopSide(LoopSideNum));
-            auto &this_branch(this_loopside.Branch(BranchNum));
-            auto &this_comp(this_branch.Comp(CompNum));
-
-            if ((this_loopside.EMSCtrl) && (this_loopside.EMSValue <= 0.0)) {
-                FlowToRequest = 0.0;
-                return;
-            }
-
-            if ((this_branch.EMSCtrlOverrideOn) && (this_branch.EMSCtrlOverrideValue <= 0.0)) {
-                FlowToRequest = 0.0;
-                return;
-            }
-
-            if (this_comp.EMSLoadOverrideOn) {
-                if (this_comp.EMSLoadOverrideValue == 0.0) {
-                    FlowToRequest = 0.0;
-                }
-            }
-        }
-
     } // namespace PlantLoopSolver
 
 } // namespace EnergyPlus

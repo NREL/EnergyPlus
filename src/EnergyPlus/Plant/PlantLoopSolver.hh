@@ -95,21 +95,12 @@ namespace PlantLoopSolver {
                                       Real64 LocalRemLoopDemand // Unmet Demand after equipment has been simulated (report variable)
         );
 
-        void PushBranchFlowCharacteristics(int LoopNum,
-                                           int LoopSideNum,
-                                           int BranchNum,
-                                           Real64 ValueToPush,
-                                           bool FirstHVACIteration // TRUE if First HVAC iteration of Time step
-        );
-
         void CalcUnmetPlantDemand(int LoopNum, int LoopSideNum);
 
         void CheckLoopExitNode(int LoopNum,            // plant loop counter
                                bool FirstHVACIteration // TRUE if First HVAC iteration of Time step
         );
 
-        void
-        AdjustPumpFlowRequestByEMSControls(int LoopNum, int LoopSideNum, int BranchNum, int CompNum, Real64 &FlowToRequest);
     };
 
     void clear_state();

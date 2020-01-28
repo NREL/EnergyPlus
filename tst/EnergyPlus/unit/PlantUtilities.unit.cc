@@ -382,58 +382,58 @@ TEST_F(EnergyPlusFixture, TestCheckPlantConvergence)
     EXPECT_NEAR(0.0, sum(DataPlant::PlantLoop(1).LoopSide(1).OutletNode.MassFlowRateHistory), 0.001);
 
     // If we check the plant convergence right now with first hvac true, it should require a resimulation
-    EXPECT_FALSE(PlantUtilities::CheckPlantConvergence(1, 1, true));
+    EXPECT_FALSE(DataPlant::PlantLoop(1).LoopSide(1).CheckPlantConvergence(true));
 
     // But if we check it with first hvac false, everything should be stable and pass
-    EXPECT_TRUE(PlantUtilities::CheckPlantConvergence(1, 1, false));
+    EXPECT_TRUE(DataPlant::PlantLoop(1).LoopSide(1).CheckPlantConvergence(false));
 
     // Now let's introduce a disturbance by changing the inlet node temperature and logging it
     inNode.Temp = roomTemp;
     PlantUtilities::LogPlantConvergencePoints(false);
     // We expect it to be false here since the temperature changed
-    EXPECT_FALSE(PlantUtilities::CheckPlantConvergence(1, 1, false));
+    EXPECT_FALSE(DataPlant::PlantLoop(1).LoopSide(1).CheckPlantConvergence(false));
     // But if we run it 4 more times and let the value propagate, we expect it to be stable and pass
     // Need to call it 5 times total to fully initialize the history
     for (int i = 1; i < 5; ++i) {
         PlantUtilities::LogPlantConvergencePoints(false);
     }
-    EXPECT_TRUE(PlantUtilities::CheckPlantConvergence(1, 1, false));
+    EXPECT_TRUE(DataPlant::PlantLoop(1).LoopSide(1).CheckPlantConvergence(false));
 
     // Repeat this for the outlet node temperature
     outNode.Temp = roomTemp;
     PlantUtilities::LogPlantConvergencePoints(false);
     // We expect it to be false here since the temperature changed
-    EXPECT_FALSE(PlantUtilities::CheckPlantConvergence(1, 1, false));
+    EXPECT_FALSE(DataPlant::PlantLoop(1).LoopSide(1).CheckPlantConvergence(false));
     // But if we run it 4 more times and let the value propagate, we expect it to be stable and pass
     // Need to call it 5 times total to fully initialize the history
     for (int i = 1; i < 5; ++i) {
         PlantUtilities::LogPlantConvergencePoints(false);
     }
-    EXPECT_TRUE(PlantUtilities::CheckPlantConvergence(1, 1, false));
+    EXPECT_TRUE(DataPlant::PlantLoop(1).LoopSide(1).CheckPlantConvergence(false));
 
     // Repeat this for the inlet node mass flow rate
     inNode.MassFlowRate = nonZeroFlow;
     PlantUtilities::LogPlantConvergencePoints(false);
     // We expect it to be false here since the temperature changed
-    EXPECT_FALSE(PlantUtilities::CheckPlantConvergence(1, 1, false));
+    EXPECT_FALSE(DataPlant::PlantLoop(1).LoopSide(1).CheckPlantConvergence(false));
     // But if we run it 4 more times and let the value propagate, we expect it to be stable and pass
     // Need to call it 5 times total to fully initialize the history
     for (int i = 1; i < 5; ++i) {
         PlantUtilities::LogPlantConvergencePoints(false);
     }
-    EXPECT_TRUE(PlantUtilities::CheckPlantConvergence(1, 1, false));
+    EXPECT_TRUE(DataPlant::PlantLoop(1).LoopSide(1).CheckPlantConvergence(false));
 
     // And finally the outlet node mass flow rate
     outNode.MassFlowRate = nonZeroFlow;
     PlantUtilities::LogPlantConvergencePoints(false);
     // We expect it to be false here since the temperature changed
-    EXPECT_FALSE(PlantUtilities::CheckPlantConvergence(1, 1, false));
+    EXPECT_FALSE(DataPlant::PlantLoop(1).LoopSide(1).CheckPlantConvergence(false));
     // But if we run it 4 more times and let the value propagate, we expect it to be stable and pass
     // Need to call it 5 times total to fully initialize the history
     for (int i = 1; i < 5; ++i) {
         PlantUtilities::LogPlantConvergencePoints(false);
     }
-    EXPECT_TRUE(PlantUtilities::CheckPlantConvergence(1, 1, false));
+    EXPECT_TRUE(DataPlant::PlantLoop(1).LoopSide(1).CheckPlantConvergence(false));
 }
 
 TEST_F(EnergyPlusFixture, TestScanPlantLoopsErrorFlagReturnType) {

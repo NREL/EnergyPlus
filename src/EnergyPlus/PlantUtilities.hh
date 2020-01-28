@@ -174,8 +174,6 @@ namespace PlantUtilities {
 
     void LogPlantConvergencePoints(bool const FirstHVACIteration);
 
-    bool CheckPlantConvergence(int const ThisLoopNum, int const ThisLoopSide, bool const FirstHVACIteration);
-
     void ScanPlantLoopsForObject(std::string const &CompName,
                                  int const CompType,
                                  int &LoopNum,
