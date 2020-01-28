@@ -11334,7 +11334,7 @@ namespace WaterThermalTanks {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates the water heater standard ratings, such as Energy Factor and Recovery Efficiency.  Results are written
-        // to the EIO file.  Standard ratings are not calculated for storage-only tanks, i.e., MaxCapacity = 0.
+        // to the EIO file.  Standard ratings are not calculated for storage-only tanks, i.e., MaxCapacity = 0, nor for Integrated Heat Pumps
 
         // METHODOLOGY EMPLOYED:
         // Water heater inputs are set to the specified test conditions. For HPWHs, the heating capacity and COP are assumed
@@ -11378,7 +11378,6 @@ namespace WaterThermalTanks {
             FirstTimeFlag = true;
 
             int TimeStepPerHour = int(1.0 / DataHVACGlobals::TimeStepSys);
-            int HPNum = 0;
             // Simulate 24 hour test
             for (int Step = 1; Step <= TimeStepPerHour * 24; ++Step) {
 
@@ -11417,7 +11416,7 @@ namespace WaterThermalTanks {
 
                 } else {
 
-                    HPNum = this->HeatPumpNum;
+                    int HPNum = this->HeatPumpNum; // Convenience variable
                     Real64 AmbientHumRat = 0.00717; // Humidity ratio at 67.5 F / 50% RH
 
                     //       set the heat pump air- and water-side mass flow rate
@@ -11679,7 +11678,8 @@ namespace WaterThermalTanks {
             } else {
                 RecoveryEfficiency = 0.0;
                 EnergyFactor = 0.0;
-                if (HPWaterHeater.empty() || !HPWaterHeater(HPNum).bIsIHP) {
+                // If this a regular tank, or an HPWH that's not an Integrated one
+                if ((this->HeatPumpNum == 0) || !HPWaterHeater(this->HeatPumpNum).bIsIHP) {
                     ShowWarningError("Water heater = " + this->Name +
                                      ":  Recovery Efficiency and Energy Factor could not be calculated during the test for standard ratings");
                     ShowContinueError("Setpoint was never recovered and/or heater never turned on");
