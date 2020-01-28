@@ -1954,8 +1954,6 @@ namespace SingleDuct {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard J. Liesen
         //       DATE WRITTEN   January 2000
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine is for  initializations of the Sys Components.
@@ -1963,7 +1961,6 @@ namespace SingleDuct {
         // METHODOLOGY EMPLOYED:
         // Uses the status flags to trigger events.
 
-        // Using/Aliasing
         using DataDefineEquip::AirDistUnit;
         using DataGlobals::AnyPlantInModel;
         using DataPlant::PlantLoop;
@@ -1976,11 +1973,9 @@ namespace SingleDuct {
         using PlantUtilities::ScanPlantLoopsForObject;
         auto &GetHeatingCoilCapacity(HeatingCoils::GetCoilCapacity);
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("InitSys");
         static std::string const RoutineNameFull("InitHVACSingleDuct");
 
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InletNode;
         int OutletNode;
         int SysIndex;
@@ -1994,8 +1989,6 @@ namespace SingleDuct {
         bool errFlag;
 
         static Array1D_bool PlantLoopScanFlag;
-
-        // FLOW:
 
         // Do the Begin Simulation initializations
         if (InitSysFlag) {
@@ -2011,17 +2004,19 @@ namespace SingleDuct {
             InitSysFlag = false;
         }
 
+        auto &thisSys(Sys(SysNum));
+
         if (PlantLoopScanFlag(SysNum) && allocated(PlantLoop)) {
-            if ((Sys(SysNum).ReheatComp_PlantType == TypeOf_CoilWaterSimpleHeating) ||
-                (Sys(SysNum).ReheatComp_PlantType == TypeOf_CoilSteamAirHeating)) {
+            if ((thisSys.ReheatComp_PlantType == TypeOf_CoilWaterSimpleHeating) ||
+                (thisSys.ReheatComp_PlantType == TypeOf_CoilSteamAirHeating)) {
                 // setup plant topology indices for plant fed heating coils
                 errFlag = false;
-                ScanPlantLoopsForObject(Sys(SysNum).ReheatName,
-                                        Sys(SysNum).ReheatComp_PlantType,
-                                        Sys(SysNum).HWLoopNum,
-                                        Sys(SysNum).HWLoopSide,
-                                        Sys(SysNum).HWBranchIndex,
-                                        Sys(SysNum).HWCompIndex,
+                ScanPlantLoopsForObject(thisSys.ReheatName,
+                                        thisSys.ReheatComp_PlantType,
+                                        thisSys.HWLoopNum,
+                                        thisSys.HWLoopSide,
+                                        thisSys.HWBranchIndex,
+                                        thisSys.HWCompIndex,
                                         errFlag,
                                         _,
                                         _,
@@ -2030,14 +2025,14 @@ namespace SingleDuct {
                                         _);
 
                 if (errFlag) {
-                    ShowContinueError("Reference Unit=\"" + Sys(SysNum).SysName + "\", type=" + Sys(SysNum).SysType);
+                    ShowContinueError("Reference Unit=\"" + thisSys.SysName + "\", type=" + thisSys.SysType);
                     ShowFatalError("InitSys: Program terminated for previous conditions.");
                 }
 
-                Sys(SysNum).ReheatCoilOutletNode = PlantLoop(Sys(SysNum).HWLoopNum)
-                                                       .LoopSide(Sys(SysNum).HWLoopSide)
-                                                       .Branch(Sys(SysNum).HWBranchIndex)
-                                                       .Comp(Sys(SysNum).HWCompIndex)
+                thisSys.ReheatCoilOutletNode = PlantLoop(thisSys.HWLoopNum)
+                                                       .LoopSide(thisSys.HWLoopSide)
+                                                       .Branch(thisSys.HWBranchIndex)
+                                                       .Comp(thisSys.HWCompIndex)
                                                        .NodeNumOut;
 
                 PlantLoopScanFlag(SysNum) = false;
@@ -2068,13 +2063,13 @@ namespace SingleDuct {
         }
 
         if (GetGasElecHeatCoilCap(SysNum)) {
-            if (Sys(SysNum).ReheatComp_Num == HCoilType_Electric || Sys(SysNum).ReheatComp_Num == HCoilType_Gas) {
-                if (Sys(SysNum).ReheatCoilMaxCapacity == AutoSize) {
+            if (thisSys.ReheatComp_Num == HCoilType_Electric || thisSys.ReheatComp_Num == HCoilType_Gas) {
+                if (thisSys.ReheatCoilMaxCapacity == AutoSize) {
                     errFlag = false;
-                    Sys(SysNum).ReheatCoilMaxCapacity = GetHeatingCoilCapacity(Sys(SysNum).ReheatComp, Sys(SysNum).ReheatName, errFlag);
-                    if (errFlag) ShowContinueError("Occurs for terminal unit " + Sys(SysNum).SysType + " = " + Sys(SysNum).SysName);
+                    thisSys.ReheatCoilMaxCapacity = GetHeatingCoilCapacity(thisSys.ReheatComp, thisSys.ReheatName, errFlag);
+                    if (errFlag) ShowContinueError("Occurs for terminal unit " + thisSys.SysType + " = " + thisSys.SysName);
                 }
-                if (Sys(SysNum).ReheatCoilMaxCapacity != AutoSize) {
+                if (thisSys.ReheatCoilMaxCapacity != AutoSize) {
                     GetGasElecHeatCoilCap(SysNum) = false;
                 }
             } else {
@@ -2085,74 +2080,74 @@ namespace SingleDuct {
         if (BeginEnvrnFlag && MyEnvrnFlag(SysNum)) {
 
             // Set the outlet node max mass flow rate to the Max Air Flow specified for the Sys
-            OutletNode = Sys(SysNum).OutletNodeNum;
-            InletNode = Sys(SysNum).InletNodeNum;
-            Node(OutletNode).MassFlowRateMax = Sys(SysNum).MaxAirVolFlowRate * StdRhoAir;
-            Sys(SysNum).AirMassFlowRateMax = Sys(SysNum).MaxAirVolFlowRate * StdRhoAir;
-            Sys(SysNum).HeatAirMassFlowRateMax = Sys(SysNum).MaxHeatAirVolFlowRate * StdRhoAir;
-            Node(InletNode).MassFlowRateMax = Sys(SysNum).MaxAirVolFlowRate * StdRhoAir;
-            MassFlowDiff(SysNum) = 1.0e-10 * Sys(SysNum).AirMassFlowRateMax;
+            auto &inletNode(Node(thisSys.InletNodeNum));
+            auto &outletNode(Node(thisSys.OutletNodeNum));
+            outletNode.MassFlowRateMax = thisSys.MaxAirVolFlowRate * StdRhoAir;
+            thisSys.AirMassFlowRateMax = thisSys.MaxAirVolFlowRate * StdRhoAir;
+            thisSys.HeatAirMassFlowRateMax = thisSys.MaxHeatAirVolFlowRate * StdRhoAir;
+            inletNode.MassFlowRateMax = thisSys.MaxAirVolFlowRate * StdRhoAir;
+            MassFlowDiff(SysNum) = 1.0e-10 * thisSys.AirMassFlowRateMax;
 
-            if (Sys(SysNum).HWLoopNum > 0 && Sys(SysNum).ReheatComp_Num != HCoilType_SteamAirHeating) { // protect early calls before plant is setup
-                rho = GetDensityGlycol(PlantLoop(Sys(SysNum).HWLoopNum).FluidName,
+            if (thisSys.HWLoopNum > 0 && thisSys.ReheatComp_Num != HCoilType_SteamAirHeating) { // protect early calls before plant is setup
+                rho = GetDensityGlycol(PlantLoop(thisSys.HWLoopNum).FluidName,
                                        DataGlobals::HWInitConvTemp,
-                                       PlantLoop(Sys(SysNum).HWLoopNum).FluidIndex,
+                                       PlantLoop(thisSys.HWLoopNum).FluidIndex,
                                        RoutineName);
             } else {
                 rho = 1000.0;
             }
 
-            Sys(SysNum).MaxReheatWaterFlow = rho * Sys(SysNum).MaxReheatWaterVolFlow;
-            Sys(SysNum).MinReheatWaterFlow = rho * Sys(SysNum).MinReheatWaterVolFlow;
+            thisSys.MaxReheatWaterFlow = rho * thisSys.MaxReheatWaterVolFlow;
+            thisSys.MinReheatWaterFlow = rho * thisSys.MinReheatWaterVolFlow;
 
-            Sys(SysNum).AirMassFlowDuringReheatMax = Sys(SysNum).MaxAirVolFlowRateDuringReheat * StdRhoAir;
+            thisSys.AirMassFlowDuringReheatMax = thisSys.MaxAirVolFlowRateDuringReheat * StdRhoAir;
 
             // set the upstream leakage flowrate - remove from here - done in ZoneAirLoopEquipmentManager::SimZoneAirLoopEquipment
 
-            if (Sys(SysNum).ReheatComp_Num == HCoilType_SteamAirHeating) {
+            if (thisSys.ReheatComp_Num == HCoilType_SteamAirHeating) {
                 SteamTemp = 100.0;
-                SteamDensity = GetSatDensityRefrig(fluidNameSteam, SteamTemp, 1.0, Sys(SysNum).FluidIndex, RoutineNameFull);
-                Sys(SysNum).MaxReheatSteamFlow = SteamDensity * Sys(SysNum).MaxReheatSteamVolFlow;
-                Sys(SysNum).MinReheatSteamFlow = SteamDensity * Sys(SysNum).MinReheatSteamVolFlow;
+                SteamDensity = GetSatDensityRefrig(fluidNameSteam, SteamTemp, 1.0, thisSys.FluidIndex, RoutineNameFull);
+                thisSys.MaxReheatSteamFlow = SteamDensity * thisSys.MaxReheatSteamVolFlow;
+                thisSys.MinReheatSteamFlow = SteamDensity * thisSys.MinReheatSteamVolFlow;
             }
 
-            if ((Sys(SysNum).SysType_Num == SingleDuctVAVReheat || Sys(SysNum).SysType_Num == SingleDuctCBVAVReheat) ||
-                (Sys(SysNum).SysType_Num == SingleDuctCBVAVNoReheat)) {
+            if ((thisSys.SysType_Num == SingleDuctVAVReheat || thisSys.SysType_Num == SingleDuctCBVAVReheat) ||
+                (thisSys.SysType_Num == SingleDuctCBVAVNoReheat)) {
                 // need the lowest schedule value
-                if (Sys(SysNum).ZoneMinAirFracMethod == ScheduledMinFrac) {
-                    Sys(SysNum).ZoneMinAirFrac = GetScheduleMinValue(Sys(SysNum).ZoneMinAirFracSchPtr);
+                if (thisSys.ZoneMinAirFracMethod == ScheduledMinFrac) {
+                    thisSys.ZoneMinAirFrac = GetScheduleMinValue(thisSys.ZoneMinAirFracSchPtr);
                 }
-                Node(OutletNode).MassFlowRateMin = Node(OutletNode).MassFlowRateMax * Sys(SysNum).ZoneMinAirFrac;
-                Node(InletNode).MassFlowRateMin = Node(InletNode).MassFlowRateMax * Sys(SysNum).ZoneMinAirFrac;
+                outletNode.MassFlowRateMin = outletNode.MassFlowRateMax * thisSys.ZoneMinAirFrac;
+                inletNode.MassFlowRateMin = inletNode.MassFlowRateMax * thisSys.ZoneMinAirFrac;
             } else {
-                Node(OutletNode).MassFlowRateMin = 0.0;
-                Node(InletNode).MassFlowRateMin = 0.0;
+                outletNode.MassFlowRateMin = 0.0;
+                inletNode.MassFlowRateMin = 0.0;
             }
-            if ((Sys(SysNum).ReheatControlNode > 0) && !PlantLoopScanFlag(SysNum)) {
-                if (Sys(SysNum).ReheatComp_Num == HCoilType_SteamAirHeating) {
-                    InitComponentNodes(Sys(SysNum).MinReheatSteamFlow,
-                                       Sys(SysNum).MaxReheatSteamFlow,
-                                       Sys(SysNum).ReheatControlNode,
-                                       Sys(SysNum).ReheatCoilOutletNode,
-                                       Sys(SysNum).HWLoopNum,
-                                       Sys(SysNum).HWLoopSide,
-                                       Sys(SysNum).HWBranchIndex,
-                                       Sys(SysNum).HWCompIndex);
+            if ((thisSys.ReheatControlNode > 0) && !PlantLoopScanFlag(SysNum)) {
+                if (thisSys.ReheatComp_Num == HCoilType_SteamAirHeating) {
+                    InitComponentNodes(thisSys.MinReheatSteamFlow,
+                                       thisSys.MaxReheatSteamFlow,
+                                       thisSys.ReheatControlNode,
+                                       thisSys.ReheatCoilOutletNode,
+                                       thisSys.HWLoopNum,
+                                       thisSys.HWLoopSide,
+                                       thisSys.HWBranchIndex,
+                                       thisSys.HWCompIndex);
                 } else {
-                    InitComponentNodes(Sys(SysNum).MinReheatWaterFlow,
-                                       Sys(SysNum).MaxReheatWaterFlow,
-                                       Sys(SysNum).ReheatControlNode,
-                                       Sys(SysNum).ReheatCoilOutletNode,
-                                       Sys(SysNum).HWLoopNum,
-                                       Sys(SysNum).HWLoopSide,
-                                       Sys(SysNum).HWBranchIndex,
-                                       Sys(SysNum).HWCompIndex);
+                    InitComponentNodes(thisSys.MinReheatWaterFlow,
+                                       thisSys.MaxReheatWaterFlow,
+                                       thisSys.ReheatControlNode,
+                                       thisSys.ReheatCoilOutletNode,
+                                       thisSys.HWLoopNum,
+                                       thisSys.HWLoopSide,
+                                       thisSys.HWBranchIndex,
+                                       thisSys.HWCompIndex);
                 }
             }
             // Find air loop associated with terminal unit
-            if ((Sys(SysNum).CtrlZoneNum > 0) && (Sys(SysNum).CtrlZoneInNodeIndex > 0)) {
-                Sys(SysNum).AirLoopNum = ZoneEquipConfig(Sys(SysNum).CtrlZoneNum).InletNodeAirLoopNum(Sys(SysNum).CtrlZoneInNodeIndex);
-                AirDistUnit(Sys(SysNum).ADUNum).AirLoopNum = Sys(SysNum).AirLoopNum;
+            if ((thisSys.CtrlZoneNum > 0) && (thisSys.CtrlZoneInNodeIndex > 0)) {
+                thisSys.AirLoopNum = ZoneEquipConfig(thisSys.CtrlZoneNum).InletNodeAirLoopNum(thisSys.CtrlZoneInNodeIndex);
+                AirDistUnit(thisSys.ADUNum).AirLoopNum = thisSys.AirLoopNum;
             }
 
             MyEnvrnFlag(SysNum) = false;
@@ -2163,81 +2158,70 @@ namespace SingleDuct {
         }
 
         // Initialize the Inlet Nodes of the air side of air terminal
-        InletNode = Sys(SysNum).InletNodeNum;
-        OutletNode = Sys(SysNum).OutletNodeNum;
+        auto &inletNode(Node(thisSys.InletNodeNum));
 
         Real64 mDotFromOARequirement(0.0);
 
-        if (Sys(SysNum).SysType_Num == SingleDuctConstVolNoReheat) {
-            /*Real64 mDotFromOARequirement( 0.0 );*/
-            if (!Sys(SysNum).NoOAFlowInputFromUser) {
-                mDotFromOARequirement = Sys(SysNum).AirMassFlowRateMax;
-                int airLoopNum(0);
-                Real64 airLoopOAFrac(0.0);
-                airLoopNum = Sys(SysNum).AirLoopNum;
+        if (thisSys.SysType_Num == SingleDuctConstVolNoReheat) {
+            if (!thisSys.NoOAFlowInputFromUser) {
+                mDotFromOARequirement = thisSys.AirMassFlowRateMax;
+                int airLoopNum = thisSys.AirLoopNum;
                 if (airLoopNum > 0) {
-                    airLoopOAFrac = DataAirLoop::AirLoopFlow(airLoopNum).OAFrac;
-                    bool UseOccSchFlag = false;
-                    if (Sys(SysNum).OAPerPersonMode == DataZoneEquipment::PerPersonDCVByCurrentLevel) UseOccSchFlag = true;
+                    Real64 airLoopOAFrac = DataAirLoop::AirLoopFlow(airLoopNum).OAFrac;
+                    bool UseOccSchFlag = (thisSys.OAPerPersonMode == DataZoneEquipment::PerPersonDCVByCurrentLevel);
                     if (airLoopOAFrac > 0.0) {
                         Real64 vDotOAReq = DataZoneEquipment::CalcDesignSpecificationOutdoorAir(
-                            Sys(SysNum).OARequirementsPtr, Sys(SysNum).CtrlZoneNum, UseOccSchFlag, true);
+                            thisSys.OARequirementsPtr, thisSys.CtrlZoneNum, UseOccSchFlag, true);
                         mDotFromOARequirement = vDotOAReq * DataEnvironment::StdRhoAir / airLoopOAFrac;
-                        mDotFromOARequirement = min(mDotFromOARequirement, Sys(SysNum).AirMassFlowRateMax);
+                        mDotFromOARequirement = min(mDotFromOARequirement, thisSys.AirMassFlowRateMax);
                     } else {
-                        mDotFromOARequirement = Sys(SysNum).AirMassFlowRateMax;
+                        mDotFromOARequirement = thisSys.AirMassFlowRateMax;
                     }
                 }
             }
         }
 
-        if (Sys(SysNum).ZoneMinAirFracMethod == ScheduledMinFrac) {
-            Sys(SysNum).ZoneMinAirFrac = GetCurrentScheduleValue(Sys(SysNum).ZoneMinAirFracSchPtr);
+        if (thisSys.ZoneMinAirFracMethod == ScheduledMinFrac) {
+            thisSys.ZoneMinAirFrac = GetCurrentScheduleValue(thisSys.ZoneMinAirFracSchPtr);
             // now reset inlet node min avail
-            Node(InletNode).MassFlowRateMinAvail = Sys(SysNum).AirMassFlowRateMax * Sys(SysNum).ZoneMinAirFrac;
+            inletNode.MassFlowRateMinAvail = thisSys.AirMassFlowRateMax * thisSys.ZoneMinAirFrac;
         }
 
         if (FirstHVACIteration) {
             // The first time through set the mass flow rate to the Max
-            if ((Node(InletNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue(Sys(SysNum).SchedPtr) > 0.0)) {
+            if ((inletNode.MassFlowRate > 0.0) && (GetCurrentScheduleValue(thisSys.SchedPtr) > 0.0)) {
                 if (!(AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone &&
                       AirflowNetwork::AirflowNetworkFanActivated)) {
-                    Node(InletNode).MassFlowRate = Sys(SysNum).AirMassFlowRateMax;
-                }
+                    inletNode.MassFlowRate = thisSys.AirMassFlowRateMax;
+                    inletNode.MassFlowRateMinAvail = thisSys.AirMassFlowRateMax * thisSys.ZoneMinAirFrac;
+               }
             } else {
-                Node(InletNode).MassFlowRate = 0.0;
+                inletNode.MassFlowRate = 0.0;
+                inletNode.MassFlowRateMinAvail = 0.0;
             }
-            if ((Node(InletNode).MassFlowRateMaxAvail > 0.0) && (GetCurrentScheduleValue(Sys(SysNum).SchedPtr) > 0.0)) {
+            if ((inletNode.MassFlowRateMaxAvail > 0.0) && (GetCurrentScheduleValue(thisSys.SchedPtr) > 0.0)) {
                 if (!(AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone &&
                       AirflowNetwork::AirflowNetworkFanActivated)) {
-                    if (Sys(SysNum).SysType_Num == SingleDuctConstVolNoReheat) {
-                        if (Sys(SysNum).NoOAFlowInputFromUser) {
-                            Node(InletNode).MassFlowRate = Sys(SysNum).AirMassFlowRateMax;
-                            Node(InletNode).MassFlowRateMaxAvail = Sys(SysNum).AirMassFlowRateMax;
+                    if (thisSys.SysType_Num == SingleDuctConstVolNoReheat) {
+                        if (thisSys.NoOAFlowInputFromUser) {
+                            inletNode.MassFlowRate = thisSys.AirMassFlowRateMax;
+                            inletNode.MassFlowRateMaxAvail = thisSys.AirMassFlowRateMax;
                         } else {
-                            Node(InletNode).MassFlowRate = mDotFromOARequirement;
-                            Node(InletNode).MassFlowRateMaxAvail = mDotFromOARequirement;
+                            inletNode.MassFlowRate = mDotFromOARequirement;
+                            inletNode.MassFlowRateMaxAvail = mDotFromOARequirement;
                         }
-                        if (Sys(SysNum).EMSOverrideAirFlow) {
-                            Node(InletNode).MassFlowRate = Sys(SysNum).EMSMassFlowRateValue;
-                            Node(InletNode).MassFlowRateMaxAvail = Sys(SysNum).EMSMassFlowRateValue;
+                        if (thisSys.EMSOverrideAirFlow) {
+                            inletNode.MassFlowRate = thisSys.EMSMassFlowRateValue;
+                            inletNode.MassFlowRateMaxAvail = thisSys.EMSMassFlowRateValue;
                         }
                     } else {
-                        Node(InletNode).MassFlowRateMaxAvail = Sys(SysNum).AirMassFlowRateMax;
+                        inletNode.MassFlowRateMaxAvail = thisSys.AirMassFlowRateMax;
                     }
                 }
             } else {
-                Node(InletNode).MassFlowRateMaxAvail = 0.0;
+                inletNode.MassFlowRateMaxAvail = 0.0;
             }
 
-            if ((Node(InletNode).MassFlowRate > 0.0) && (GetCurrentScheduleValue(Sys(SysNum).SchedPtr) > 0.0)) {
-                if (!(AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone &&
-                      AirflowNetwork::AirflowNetworkFanActivated)) {
-                    Node(InletNode).MassFlowRateMinAvail = Sys(SysNum).AirMassFlowRateMax * Sys(SysNum).ZoneMinAirFrac;
-                }
-            } else {
-                Node(InletNode).MassFlowRateMinAvail = 0.0;
-            }
             // reset the mass flow rate histories
             MassFlow1(SysNum) = 0.0;
             MassFlow2(SysNum) = 0.0;
@@ -2245,59 +2229,59 @@ namespace SingleDuct {
             MassFlow3(SysNum) = 0.0;
 
         } else {
-            if (Sys(SysNum).SysType_Num == SingleDuctConstVolNoReheat) {
-                if (!Sys(SysNum).EMSOverrideAirFlow) {
-                    if ((Node(InletNode).MassFlowRateMaxAvail > 0.0) && (GetCurrentScheduleValue(Sys(SysNum).SchedPtr) > 0.0)) {
-                        if (Sys(SysNum).NoOAFlowInputFromUser) {
-                            if (Node(InletNode).MassFlowRateMaxAvail < Node(InletNode).MassFlowRateMax) {
-                                Node(InletNode).MassFlowRate = Node(InletNode).MassFlowRateMaxAvail;
-                            } else if (Node(InletNode).MassFlowRateMinAvail > Node(InletNode).MassFlowRateMin) {
-                                Node(InletNode).MassFlowRate = Node(InletNode).MassFlowRateMinAvail;
+            if (thisSys.SysType_Num == SingleDuctConstVolNoReheat) {
+                if (!thisSys.EMSOverrideAirFlow) {
+                    if ((inletNode.MassFlowRateMaxAvail > 0.0) && (GetCurrentScheduleValue(thisSys.SchedPtr) > 0.0)) {
+                        if (thisSys.NoOAFlowInputFromUser) {
+                            if (inletNode.MassFlowRateMaxAvail < inletNode.MassFlowRateMax) {
+                                inletNode.MassFlowRate = inletNode.MassFlowRateMaxAvail;
+                            } else if (inletNode.MassFlowRateMinAvail > inletNode.MassFlowRateMin) {
+                                inletNode.MassFlowRate = inletNode.MassFlowRateMinAvail;
                             } else {
-                                Node(InletNode).MassFlowRate = Node(InletNode).MassFlowRateMaxAvail;
+                                inletNode.MassFlowRate = inletNode.MassFlowRateMaxAvail;
                             }
                         } else {
-                            Node(InletNode).MassFlowRate = mDotFromOARequirement;
+                            inletNode.MassFlowRate = mDotFromOARequirement;
                             // but also apply constraints
-                            Node(InletNode).MassFlowRate = min(Node(InletNode).MassFlowRate, Node(InletNode).MassFlowRateMaxAvail);
-                            Node(InletNode).MassFlowRate = min(Node(InletNode).MassFlowRate, Node(InletNode).MassFlowRateMax);
-                            Node(InletNode).MassFlowRate = max(Node(InletNode).MassFlowRate, Node(InletNode).MassFlowRateMinAvail);
-                            Node(InletNode).MassFlowRate = max(Node(InletNode).MassFlowRate, Node(InletNode).MassFlowRateMin);
+                            inletNode.MassFlowRate = min(inletNode.MassFlowRate, inletNode.MassFlowRateMaxAvail);
+                            inletNode.MassFlowRate = min(inletNode.MassFlowRate, inletNode.MassFlowRateMax);
+                            inletNode.MassFlowRate = max(inletNode.MassFlowRate, inletNode.MassFlowRateMinAvail);
+                            inletNode.MassFlowRate = max(inletNode.MassFlowRate, inletNode.MassFlowRateMin);
                         }
                     } else {
-                        Node(InletNode).MassFlowRate = 0.0;
-                        Node(InletNode).MassFlowRateMaxAvail = 0.0;
-                        Node(InletNode).MassFlowRateMinAvail = 0.0;
+                        inletNode.MassFlowRate = 0.0;
+                        inletNode.MassFlowRateMaxAvail = 0.0;
+                        inletNode.MassFlowRateMinAvail = 0.0;
                     }
                 } else { // EMS override on
-                    Node(InletNode).MassFlowRate = Sys(SysNum).EMSMassFlowRateValue;
+                    inletNode.MassFlowRate = thisSys.EMSMassFlowRateValue;
                     // but also apply constraints
-                    Node(InletNode).MassFlowRate = min(Node(InletNode).MassFlowRate, Node(InletNode).MassFlowRateMaxAvail);
-                    Node(InletNode).MassFlowRate = min(Node(InletNode).MassFlowRate, Node(InletNode).MassFlowRateMax);
-                    Node(InletNode).MassFlowRate = max(Node(InletNode).MassFlowRate, Node(InletNode).MassFlowRateMinAvail);
-                    Node(InletNode).MassFlowRate = max(Node(InletNode).MassFlowRate, Node(InletNode).MassFlowRateMin);
+                    inletNode.MassFlowRate = min(inletNode.MassFlowRate, inletNode.MassFlowRateMaxAvail);
+                    inletNode.MassFlowRate = min(inletNode.MassFlowRate, inletNode.MassFlowRateMax);
+                    inletNode.MassFlowRate = max(inletNode.MassFlowRate, inletNode.MassFlowRateMinAvail);
+                    inletNode.MassFlowRate = max(inletNode.MassFlowRate, inletNode.MassFlowRateMin);
                 }
             }
         }
 
         // Do a check and make sure that the max and min available(control) flow is
         //  between the physical max and min while operating.
-        SysInlet(SysNum).AirMassFlowRateMaxAvail = min(Sys(SysNum).AirMassFlowRateMax, Node(InletNode).MassFlowRateMaxAvail);
+        SysInlet(SysNum).AirMassFlowRateMaxAvail = min(thisSys.AirMassFlowRateMax, inletNode.MassFlowRateMaxAvail);
         SysInlet(SysNum).AirMassFlowRateMinAvail =
-            min(max(Node(OutletNode).MassFlowRateMin, Node(InletNode).MassFlowRateMinAvail), SysInlet(SysNum).AirMassFlowRateMaxAvail);
+            min(max(Node(thisSys.OutletNodeNum).MassFlowRateMin, inletNode.MassFlowRateMinAvail), SysInlet(SysNum).AirMassFlowRateMaxAvail);
 
         // Do the following initializations (every time step): This should be the info from
         // the previous components outlets or the node data in this section.
         // Load the node data in this section for the component simulation
-        SysInlet(SysNum).AirMassFlowRate = Node(InletNode).MassFlowRate;
-        SysInlet(SysNum).AirTemp = Node(InletNode).Temp;
-        SysInlet(SysNum).AirHumRat = Node(InletNode).HumRat;
-        SysInlet(SysNum).AirEnthalpy = Node(InletNode).Enthalpy;
+        SysInlet(SysNum).AirMassFlowRate = inletNode.MassFlowRate;
+        SysInlet(SysNum).AirTemp = inletNode.Temp;
+        SysInlet(SysNum).AirHumRat = inletNode.HumRat;
+        SysInlet(SysNum).AirEnthalpy = inletNode.Enthalpy;
         // set to zero, now it is used for constant volume with no reheat air terminal
-        Sys(SysNum).HeatRate = 0.0;
-        Sys(SysNum).CoolRate = 0.0;
-        Sys(SysNum).HeatEnergy = 0.0;
-        Sys(SysNum).CoolEnergy = 0.0;
+        thisSys.HeatRate = 0.0;
+        thisSys.CoolRate = 0.0;
+        thisSys.HeatEnergy = 0.0;
+        thisSys.CoolEnergy = 0.0;
     }
 
     void SizeSys(int const SysNum)
