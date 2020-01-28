@@ -88,107 +88,112 @@ include(GetPrerequisites)
 # When configured properly, the python executable we want to use will be in the build directory
 # However, it was previously just found on the system
 # We should carefully proceed to decide what actions to take
-if("${PYTHON_EXECUTABLE}" STREQUAL "")
-  # no python executable has been found, this is probably the initial configure so we need to find the system python
-  find_package(PythonInterp 3 REQUIRED)
-endif()
+#if("${PYTHON_EXECUTABLE}" STREQUAL "")
+#  # no python executable has been found, this is probably the initial configure so we need to find the system python
+#  find_package(PythonInterp 3 REQUIRED)
+#  find_package(PythonLibs 3 REQUIRED)
+#  include_directories(${PYTHON_INCLUDE_DIRS})
+#endif()
 
-message("Python configuration (1): Got Python Executable: \n  Executable: ${PYTHON_EXECUTABLE} \n  Version String: ${PYTHONLIBS_VERSION_STRING}")
+find_package(PythonInterp 3 REQUIRED)
+find_package(PythonLibs 3 REQUIRED)
+include_directories(${PYTHON_INCLUDE_DIRS})
 
-# At this point, we should have *a* Python executable, so we can make sure we also have a virtual environment in the build tree
-if(EXISTS ${CMAKE_BINARY_DIR}/Products/pythonenv)
-  message("Found Python Virtual Environment at ${CMAKE_BINARY_DIR}/Products/pythonenv")
-else()
-  message("Creating virtual environment")
-  execute_process(
-          COMMAND "${PYTHON_EXECUTABLE}" "-m" "venv" "${CMAKE_BINARY_DIR}/Products/pythonenv"
-          TIMEOUT 30
-          RESULT_VARIABLE ENV_EXIT_CODE
-          OUTPUT_VARIABLE CREATION_OUTPUT
-  )
-  message("${CREATION_OUTPUT}")
-  set(EXE_EXTENSION "")
-  if(WIN32)
-    set(EXE_EXTENSION ".EXE")
-  endif()
-  message("Cleaning up virtual environment")
-  file(REMOVE ${CMAKE_BINARY_DIR}/Products/pythonenv/bin/activate)
-  file(REMOVE ${CMAKE_BINARY_DIR}/Products/pythonenv/bin/activate.csh)
-  file(REMOVE ${CMAKE_BINARY_DIR}/Products/pythonenv/bin/activate.fish)
-  file(REMOVE ${CMAKE_BINARY_DIR}/Products/pythonenv/bin/easy_install)
-  file(REMOVE ${CMAKE_BINARY_DIR}/Products/pythonenv/bin/easy_install-3.7)
-  file(REMOVE ${CMAKE_BINARY_DIR}/Products/pythonenv/bin/pip)
-  file(REMOVE ${CMAKE_BINARY_DIR}/Products/pythonenv/bin/pip3.7)
-  file(REMOVE ${CMAKE_BINARY_DIR}/Products/pythonenv/bin/python)
-  file(REMOVE_RECURSE ${CMAKE_BINARY_DIR}/Products/pythonenv/include)
-  file(REMOVE ${CMAKE_BINARY_DIR}/Products/pythonenv/pyvenv.cfg)
-endif()
+message("Python configuration (1): Got Python Executable: \n  Executable: ${PYTHON_EXECUTABLE} \n  Include Dirs: ${PYTHON_INCLUDE_DIRS}")
 
-message("Python configuration (2): Got Python Executable: \n  Executable: ${PYTHON_EXECUTABLE} \n  Version String: ${PYTHONLIBS_VERSION_STRING}")
-
-# Now we need to try to make sure the Python executable is the right one, it should point to the one in the build env
-get_filename_component(ACTUALEXELOCATION "${PYTHON_EXECUTABLE}" ABSOLUTE)
-set(EXE_EXTENSION "")
-if(WIN32)
-  set(EXE_EXTENSION ".EXE")
-  get_filename_component(IDEALEXELOCATION "${CMAKE_BINARY_DIR}/PRODUCTS/PYTHONENV/BIN/PYTHON3.EXE" ABSOLUTE)
-  string(TOUPPER ACTUALEXELOCATION "${ACTUALEXELOCATION}")  # TODO: Will this work?
-else()
-  get_filename_component(IDEALEXELOCATION "${CMAKE_BINARY_DIR}/Products/pythonenv/bin/python3" ABSOLUTE)
-endif()
-
-message("Python configuration (3): \n  Actual Python EXE: ${ACTUALEXELOCATION}\n  Ideal Python EXE: ${IDEALEXELOCATION}")
-
-if("${ACTUALEXELOCATION}" STREQUAL "${IDEALEXELOCATION}")
-  # great, we have one in the build env, carry on
-else()
-  # we have an external Python executable -- need to point to the one in the build env
-  set(PYTHON_EXECUTABLE "${IDEALEXELOCATION}")
-  find_package(PythonInterp 3 REQUIRED)
-  # we should now have the ideal python, in the build tree, but we need to be *very* sure
-  if ("${PYTHON_EXECUTABLE}" STREQUAL "${IDEALEXELOCATION}")
-    # I am using IDEAL location in the fixup call because I never want to accidentally "fixup" a system python executable
-    message("Fixing up Python executable")
-    #fixup_executable(${IDEALEXELOCATION})
-
-    get_prerequisites("${IDEALEXELOCATION}" PREREQUISITES 1 1 "" "")
-
-    foreach(PREREQ IN LISTS PREREQUISITES)
-      gp_resolve_item("" "${PREREQ}" "" "${LIBRARY_SEARCH_DIRECTORY}" resolved_item_var)
-      get_filename_component(BASE_PATH "${IDEALEXELOCATION}" DIRECTORY)
-      message("${CMAKE_COMMAND} -E copy ${resolved_item_var} ${BASE_PATH}")
-      # execute_process(COMMAND "${CMAKE_COMMAND}" -E copy "${resolved_item_var}" "${BASE_PATH}")
-      if(APPLE)
-        get_filename_component(PREREQNAME "${resolved_item_var}" NAME)
-        message("install_name_tool -change ${PREREQ} @executable_path/${PREREQNAME} ${IDEALEXELOCATION}")
-        # execute_process(COMMAND "install_name_tool" -change "${PREREQ}" "@executable_path/${PREREQNAME}" "${IDEALEXELOCATION}")
-#        foreach(PR IN LISTS PREREQUISITES)
-#          gp_resolve_item("" ${PR} "" "" PRPATH)
-#          get_filename_component( PRNAME ${PRPATH} NAME)
-#          message("install_name_tool -change ${PR} @loader_path/${PRNAME} ${BASE_PATH}/${PREREQNAME}")
-#          #execute_process(COMMAND "install_name_tool" -change "${PR}" "@loader_path/${PRNAME}" "${BASE_PATH}/${PREREQNAME}")
-#        endforeach()
-      endif()
-    endforeach()
-
-    # this is currently resulting in an invalid Python executable
-  else()
-    error("Did not find Python executable in ideal location -- problem!")
-  endif()
-
-  # TODO: then hint the library finder to the build env
-  execute_process(
-          COMMAND "${PYTHON_EXECUTABLE}" "-c" "\"import distutils.sysconfig as sysconfig; print(sysconfig.get_config_var('LIBDIR'))\""
-          OUTPUT_VARIABLE THIS_OUTPUT
-  )
-  set(PYTHON_LIBRARY ${THIS_OUTPUT})
-  find_package(PythonLibs 3 REQUIRED)
-  include_directories(${PYTHON_INCLUDE_DIRS})
-endif()
+## At this point, we should have *a* Python executable, so we can make sure we also have a virtual environment in the build tree
+#if(EXISTS ${CMAKE_BINARY_DIR}/Products/pythonenv)
+#  message("Found Python Virtual Environment at ${CMAKE_BINARY_DIR}/Products/pythonenv")
+#else()
+#  message("Creating virtual environment")
+#  execute_process(
+#          COMMAND "${PYTHON_EXECUTABLE}" "-m" "venv" "${CMAKE_BINARY_DIR}/Products/pythonenv"
+#          TIMEOUT 30
+#          RESULT_VARIABLE ENV_EXIT_CODE
+#          OUTPUT_VARIABLE CREATION_OUTPUT
+#  )
+#  message("${CREATION_OUTPUT}")
+#  set(EXE_EXTENSION "")
+#  if(WIN32)
+#    set(EXE_EXTENSION ".EXE")
+#  endif()
+#  message("Cleaning up virtual environment")
+#  file(REMOVE ${CMAKE_BINARY_DIR}/Products/pythonenv/bin/activate)
+#  file(REMOVE ${CMAKE_BINARY_DIR}/Products/pythonenv/bin/activate.csh)
+#  file(REMOVE ${CMAKE_BINARY_DIR}/Products/pythonenv/bin/activate.fish)
+#  file(REMOVE ${CMAKE_BINARY_DIR}/Products/pythonenv/bin/easy_install)
+#  file(REMOVE ${CMAKE_BINARY_DIR}/Products/pythonenv/bin/easy_install-3.7)
+#  file(REMOVE ${CMAKE_BINARY_DIR}/Products/pythonenv/bin/pip)
+#  file(REMOVE ${CMAKE_BINARY_DIR}/Products/pythonenv/bin/pip3.7)
+#  file(REMOVE ${CMAKE_BINARY_DIR}/Products/pythonenv/bin/python)
+#  file(REMOVE_RECURSE ${CMAKE_BINARY_DIR}/Products/pythonenv/include)
+#  file(REMOVE ${CMAKE_BINARY_DIR}/Products/pythonenv/pyvenv.cfg)
+#endif()
+#
+#message("Python configuration (2): Got Python Executable: \n  Executable: ${PYTHON_EXECUTABLE} \n  Version String: ${PYTHONLIBS_VERSION_STRING}")
+#
+## Now we need to try to make sure the Python executable is the right one, it should point to the one in the build env
+#get_filename_component(ACTUALEXELOCATION "${PYTHON_EXECUTABLE}" ABSOLUTE)
+#set(EXE_EXTENSION "")
+#if(WIN32)
+#  set(EXE_EXTENSION ".EXE")
+#  get_filename_component(IDEALEXELOCATION "${CMAKE_BINARY_DIR}/PRODUCTS/PYTHONENV/BIN/PYTHON3.EXE" ABSOLUTE)
+#  string(TOUPPER ACTUALEXELOCATION "${ACTUALEXELOCATION}")  # TODO: Will this work?
+#else()
+#  get_filename_component(IDEALEXELOCATION "${CMAKE_BINARY_DIR}/Products/pythonenv/bin/python3" ABSOLUTE)
+#endif()
+#
+#message("Python configuration (3): \n  Actual Python EXE: ${ACTUALEXELOCATION}\n  Ideal Python EXE: ${IDEALEXELOCATION}")
+#
+#if("${ACTUALEXELOCATION}" STREQUAL "${IDEALEXELOCATION}")
+#  # great, we have one in the build env, carry on
+#else()
+#  # we have an external Python executable -- need to point to the one in the build env
+#  set(PYTHON_EXECUTABLE "${IDEALEXELOCATION}")
+#  find_package(PythonInterp 3 REQUIRED)
+#  # we should now have the ideal python, in the build tree, but we need to be *very* sure
+#  if ("${PYTHON_EXECUTABLE}" STREQUAL "${IDEALEXELOCATION}")
+#    # I am using IDEAL location in the fixup call because I never want to accidentally "fixup" a system python executable
+#    message("Fixing up Python executable")
+#    #fixup_executable(${IDEALEXELOCATION})
+#
+#    get_prerequisites("${IDEALEXELOCATION}" PREREQUISITES 1 1 "" "")
+#
+#    foreach(PREREQ IN LISTS PREREQUISITES)
+#      gp_resolve_item("" "${PREREQ}" "" "${LIBRARY_SEARCH_DIRECTORY}" resolved_item_var)
+#      get_filename_component(BASE_PATH "${IDEALEXELOCATION}" DIRECTORY)
+#      message("${CMAKE_COMMAND} -E copy ${resolved_item_var} ${BASE_PATH}")
+#      # execute_process(COMMAND "${CMAKE_COMMAND}" -E copy "${resolved_item_var}" "${BASE_PATH}")
+#      if(APPLE)
+#        get_filename_component(PREREQNAME "${resolved_item_var}" NAME)
+#        message("install_name_tool -change ${PREREQ} @executable_path/${PREREQNAME} ${IDEALEXELOCATION}")
+#        # execute_process(COMMAND "install_name_tool" -change "${PREREQ}" "@executable_path/${PREREQNAME}" "${IDEALEXELOCATION}")
+##        foreach(PR IN LISTS PREREQUISITES)
+##          gp_resolve_item("" ${PR} "" "" PRPATH)
+##          get_filename_component( PRNAME ${PRPATH} NAME)
+##          message("install_name_tool -change ${PR} @loader_path/${PRNAME} ${BASE_PATH}/${PREREQNAME}")
+##          #execute_process(COMMAND "install_name_tool" -change "${PR}" "@loader_path/${PRNAME}" "${BASE_PATH}/${PREREQNAME}")
+##        endforeach()
+#      endif()
+#    endforeach()
+#
+#    # this is currently resulting in an invalid Python executable
+#  else()
+#    error("Did not find Python executable in ideal location -- problem!")
+#  endif()
+#
+#  # TODO: then hint the library finder to the build env
+#  execute_process(
+#          COMMAND "${PYTHON_EXECUTABLE}" "-c" "\"import distutils.sysconfig as sysconfig; print(sysconfig.get_config_var('LIBDIR'))\""
+#          OUTPUT_VARIABLE THIS_OUTPUT
+#  )
+#  set(PYTHON_LIBRARY ${THIS_OUTPUT})
+#  find_package(PythonLibs 3 REQUIRED)
+#  include_directories(${PYTHON_INCLUDE_DIRS})
+#endif()
 
 # Now we should have a PYTHON_EXECUTABLE that points to the desired locale in the build tree, fixed up, and with libs as well
 message("Python configuration (4): \n  Executable: ${PYTHON_EXECUTABLE} \n  Include Dirs: ${PYTHON_INCLUDE_DIRS} \n  Version String: ${PYTHONLIBS_VERSION_STRING} \n  Library: ${PYTHON_LIBRARIES}")
-
 
 if( BUILD_TESTING )
   option( ENABLE_REGRESSION_TESTING "Enable Regression Tests" OFF )
