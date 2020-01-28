@@ -171,6 +171,22 @@ namespace OutputProcessor {
                                    "WinterDesignDay",
                                    "CustomDay1",
                                    "CustomDay2"});
+
+    std::vector<std::string> const endUseCategoryNames = {"HEATING",
+                                                          "COOLING",
+                                                          "INTERIORLIGHTS",
+                                                          "EXTERIORLIGHTS",
+                                                          "INTERIOREQUIPMENT",
+                                                          "EXTERIOREQUIPMENT",
+                                                          "FANS",
+                                                          "PUMPS",
+                                                          "HEATREJECTION",
+                                                          "HUMIDIFIER",
+                                                          "HEATRECOVERY",
+                                                          "WATERSYSTEMS",
+                                                          "REFRIGERATION",
+                                                          "COGENERATION"};
+
     static std::string const BlankString;
     int const UnitsStringLength(16);
 
@@ -3968,46 +3984,46 @@ namespace OutputProcessor {
         }
 
         // resolve use of EndUseNames that are not in standard list but widely used to define output variables.
-        if (!Found) {
-            if (EndUseSubName == "General") {
-                if (EndUseName == "Baseboard" ||
-                    EndUseName == "Boilers" || 
-                    EndUseName == "CarbonEquivalentEmissions" ||
-                    EndUseName == "Chillers" || 
-                    EndUseName == "CoalEmissions" ||
-                    EndUseName == "ColdStorageCharge" ||
-                    EndUseName == "ColdStorageDischarge" ||
-                    EndUseName == "Condensate" ||
-                    EndUseName == "CoolingCoils" || 
-                    EndUseName == "CoolingPanel" ||
-                    EndUseName == "DieselEmissions" ||
-                    EndUseName == "ElectricEmissions" ||
-                    EndUseName == "ElectricStorage" ||
-                    EndUseName == "Freecooling" ||
-                    EndUseName == "FuelOil#1Emissions" ||
-                    EndUseName == "FuelOil#2Emissions" ||
-                    EndUseName == "GasolineEmissions" ||
-                    EndUseName == "HeatProduced" ||
-                    EndUseName == "HeatRecoveryForCooling" ||
-                    EndUseName == "HeatRecoveryForHeating" ||
-                    EndUseName == "HeatingCoils" || 
-                    EndUseName == "LoopToLoop" ||
-                    EndUseName == "MainsWater" ||
-                    EndUseName == "NaturalGasEmissions" ||
-                    EndUseName == "OtherFuel1Emissions" ||
-                    EndUseName == "OtherFuel2Emissions" ||
-                    EndUseName == "Photovoltaic" || 
-                    EndUseName == "PowerConversion" || 
-                    EndUseName == "PropaneEmissions" ||
-                    EndUseName == "PurchasedElectricEmissions" ||
-                    EndUseName == "Rainwater" ||
-                    EndUseName == "SoldElectricEmissions" ||
-                    EndUseName == "Wellwater" ||
-                    EndUseName == "WindTurbine" ) {
-                    Found = true;
-                }
-            }
-        }
+        //if (!Found) {
+        //    if (EndUseSubName == "General") {
+        //        if (EndUseName == "Baseboard" ||
+        //            EndUseName == "Boilers" || 
+        //            EndUseName == "CarbonEquivalentEmissions" ||
+        //            EndUseName == "Chillers" || 
+        //            EndUseName == "CoalEmissions" ||
+        //            EndUseName == "ColdStorageCharge" ||
+        //            EndUseName == "ColdStorageDischarge" ||
+        //            EndUseName == "Condensate" ||
+        //            EndUseName == "CoolingCoils" || 
+        //            EndUseName == "CoolingPanel" ||
+        //            EndUseName == "DieselEmissions" ||
+        //            EndUseName == "ElectricEmissions" ||
+        //            EndUseName == "ElectricStorage" ||
+        //            EndUseName == "Freecooling" ||
+        //            EndUseName == "FuelOil#1Emissions" ||
+        //            EndUseName == "FuelOil#2Emissions" ||
+        //            EndUseName == "GasolineEmissions" ||
+        //            EndUseName == "HeatProduced" ||
+        //            EndUseName == "HeatRecoveryForCooling" ||
+        //            EndUseName == "HeatRecoveryForHeating" ||
+        //            EndUseName == "HeatingCoils" || 
+        //            EndUseName == "LoopToLoop" ||
+        //            EndUseName == "MainsWater" ||
+        //            EndUseName == "NaturalGasEmissions" ||
+        //            EndUseName == "OtherFuel1Emissions" ||
+        //            EndUseName == "OtherFuel2Emissions" ||
+        //            EndUseName == "Photovoltaic" || 
+        //            EndUseName == "PowerConversion" || 
+        //            EndUseName == "PropaneEmissions" ||
+        //            EndUseName == "PurchasedElectricEmissions" ||
+        //            EndUseName == "Rainwater" ||
+        //            EndUseName == "SoldElectricEmissions" ||
+        //            EndUseName == "Wellwater" ||
+        //            EndUseName == "WindTurbine" ) {
+        //            Found = true;
+        //        }
+        //    }
+        //}
 
         if (!Found) {
             ShowSevereError("Nonexistent end use passed to AddEndUseSubcategory=" + EndUseName);
@@ -5686,7 +5702,12 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
                 EndUseSub = EndUseSubKey;
                 OnMeter = true;
             } else {
-                EndUseSub = "General";
+                 EndUseSub = "";
+                 if (present(EndUseKey)) {
+                    if (std::find(endUseCategoryNames.begin(), endUseCategoryNames.end(), UtilityRoutines::MakeUPPERCase(EndUseKey)) != endUseCategoryNames.end()) {
+                        EndUseSub = "General";
+                    } 
+                }
             }
             if (present(GroupKey)) {
                 Group = GroupKey;
