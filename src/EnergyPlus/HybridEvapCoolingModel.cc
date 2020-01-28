@@ -1472,9 +1472,6 @@ namespace HybridEvapCoolingModel {
                         solutionspace.PointX[point_number]; // fractions of rated mass flow rate, so for some modes this might be low but others hi
                     OSAF = solutionspace.PointY[point_number];
                     UnscaledMsa = ModelNormalizationReference * MsaRatio;
-                    if (StepIns.RequestedCoolingLoad < 0 && StepIns.RequestedHeatingLoad > 0) {
-                        ScaledSystemMaximumSupplyAirMassFlowRate = MinOA_Msa / MsaRatio;
-                    }
                     ScaledMsa = ScaledSystemMaximumSupplyAirMassFlowRate * MsaRatio;
                     Real64 Supply_Air_Ventilation_Volume = 0;
                     // Calculate the ventilation mass flow rate
@@ -1519,10 +1516,13 @@ namespace HybridEvapCoolingModel {
                             CandidateSetting.Outdoor_Air_Fraction = OSAF;
                             CandidateSetting.Supply_Air_Mass_Flow_Rate_Ratio = MsaRatio;
                             CandidateSetting.Unscaled_Supply_Air_Mass_Flow_Rate = UnscaledMsa;
-                            CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate =
-                                MsaRatio *
-                                ScaledSystemMaximumSupplyAirMassFlowRate; // spencer is this the same as Correction? If so make them the same.
-                            CandidateSetting.ScaledSupply_Air_Ventilation_Volume = MsaRatio * ScaledSystemMaximumSupplyAirMassFlowRate / StdRhoAir;
+                            if (!CoolingRequested && !HeatingRequested && !DehumidificationRequested && !HumidificationRequested) {
+                                CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate = min(MinOA_Msa, MsaRatio * ScaledSystemMaximumSupplyAirMassFlowRate);
+                                CandidateSetting.ScaledSupply_Air_Ventilation_Volume = min(MinOA_Msa, MsaRatio * ScaledSystemMaximumSupplyAirMassFlowRate) / StdRhoAir;
+                            } else {
+                                CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate = MsaRatio * ScaledSystemMaximumSupplyAirMassFlowRate; // spencer is this the same as Correction? If so make them the same.
+                                CandidateSetting.ScaledSupply_Air_Ventilation_Volume = MsaRatio * ScaledSystemMaximumSupplyAirMassFlowRate / StdRhoAir;
+                            }                           
                             CandidateSetting.oMode = Mode;
                             CandidateSetting.SupplyAirTemperature = Tsa;
                             CandidateSetting.SupplyAirW = CheckVal_W(Wsa, Tsa, OutletPressure);
