@@ -79,6 +79,7 @@
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RefrigeratedCase.hh>
@@ -314,7 +315,7 @@ namespace WaterThermalTanks {
         return CompNum;
     }
 
-    void WaterThermalTankData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+    void WaterThermalTankData::simulate(const PlantLocation &calledFromLocation,
                                         bool FirstHVACIteration,
                                         Real64 &CurLoad,
                                         bool EP_UNUSED(RunFlag))
@@ -324,6 +325,9 @@ namespace WaterThermalTanks {
         //       DATE WRITTEN   May 2000
         //       MODIFIED       FSEC, July 2005
         //       RE-ENGINEERED  na
+
+        // set the caller loop num to mimic what was happening in plant loop equip
+        this->callerLoopNum = calledFromLocation.loopNum;
 
         if (this->myOneTimeInitFlag) {
             this->setupOutputVars();
@@ -357,6 +361,8 @@ namespace WaterThermalTanks {
         }
         this->UpdateWaterThermalTank();
         this->ReportWaterThermalTank();
+        // reset the caller loop num to mimic what was happening in PlantLoopEquip
+        this->callerLoopNum = 0;
     }
 
     PlantComponent *HeatPumpWaterHeaterData::factory(std::string const &objectName)
@@ -395,7 +401,7 @@ namespace WaterThermalTanks {
         OptLoad = this->Capacity;
     }
 
-    void HeatPumpWaterHeaterData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+    void HeatPumpWaterHeaterData::simulate(const PlantLocation &calledFromLocation,
                                            bool FirstHVACIteration,
                                            Real64 &CurLoad,
                                            bool EP_UNUSED(RunFlag))
@@ -407,6 +413,9 @@ namespace WaterThermalTanks {
         //       RE-ENGINEERED  na
 
         auto &Tank = WaterThermalTank(this->WaterHeaterTankNum);
+
+        // set caller loop num to mimic what plantloopequip was doing
+        Tank.callerLoopNum = calledFromLocation.loopNum;
 
         if (this->myOneTimeInitFlag) {
             if (Tank.myOneTimeInitFlag) {
@@ -478,6 +487,8 @@ namespace WaterThermalTanks {
         this->FanNum = IHPFanIndexSav;
         this->FanName = IHPFanNameSave;
         this->FanPlacement = IHPFanplaceSav;
+        // reset caller loop num to 0 to mimic what plantloopequip was doing
+        Tank.callerLoopNum = 0;
     }
 
     void SimulateWaterHeaterStandAlone(int const WaterHeaterNum, bool const FirstHVACIteration)
