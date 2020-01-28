@@ -485,7 +485,6 @@ namespace GroundHeatExchangers {
 
         // some statics pulled out into member variables
         bool firstTime;
-        int numErrorCalls;
         Real64 ToutNew;
         int PrevN;             // The saved value of N at previous time step
         bool updateCurSimTime; // Used to reset the CurSimTime to reset after WarmupFlag
@@ -496,7 +495,7 @@ namespace GroundHeatExchangers {
             : inletNodeNum(0), outletNodeNum(0), designFlow(0.0),
               designMassFlow(0.0), tempGround(0.0), prevHour(1), AGG(0), SubAGG(0), bhTemp(0.0), massFlowRate(0.0), outletTemp(0.0), inletTemp(0.0),
               aveFluidTemp(0.0), QGLHE(0.0), myFlag(true), myEnvrnFlag(true), gFunctionsExist(false), lastQnSubHr(0.0), HXResistance(0.0),
-              totalTubeLength(0.0), timeSS(0.0), timeSSFactor(0.0), firstTime(true), numErrorCalls(0), ToutNew(19.375), PrevN(1),
+              totalTubeLength(0.0), timeSS(0.0), timeSSFactor(0.0), firstTime(true), ToutNew(19.375), PrevN(1),
               updateCurSimTime(true), triggerDesignDayReset(false)
         {
         }
@@ -507,8 +506,6 @@ namespace GroundHeatExchangers {
         virtual void calcGFunctions() = 0;
 
         void calcAggregateLoad();
-
-        void updateGHX();
 
         void calcGroundHeatExchanger();
 
@@ -619,6 +616,8 @@ namespace GroundHeatExchangers {
         Real64 designFlow;
         std::shared_ptr<BaseGroundTempsModel> groundTempModel;
         ThermoProps soil;
+        std::vector<std::pair<Real64, Real64>> gFn;
+        std::vector<std::pair<Real64, Real64>> gbFn;
 
         // default constructor
         EnhancedGHE() : inletNodeNum(0), outletNodeNum(0), designFlow(0.0)
