@@ -416,6 +416,7 @@ SET( SRC
   Plant/Component.hh
   Plant/ConnectedLoopData.hh
   Plant/Connection.hh
+  Plant/Loop.cc
   Plant/Loop.hh
   Plant/LoopSide.cc
   Plant/LoopSide.hh

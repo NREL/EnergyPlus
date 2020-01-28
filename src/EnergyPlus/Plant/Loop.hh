@@ -131,6 +131,14 @@ namespace DataPlant {
               InletNodeFlowrate(0.0), InletNodeTemperature(0.0), OutletNodeFlowrate(0.0), OutletNodeTemperature(0.0), LastLoopSideSimulated(0)
         {
         }
+
+
+        void UpdateLoopSideReportVars(Real64 OtherSideDemand, Real64 LocalRemLoopDemand);
+
+        void CheckLoopExitNode(bool FirstHVACIteration);
+
+        void CalcUnmetPlantDemand();
+
     };
 } // namespace DataPlant
 } // namespace EnergyPlus
