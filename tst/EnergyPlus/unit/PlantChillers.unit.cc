@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -64,17 +64,17 @@ TEST_F(EnergyPlusFixture, GTChiller_HeatRecoveryAutosizeTest)
     // unit test for autosizing heat recovery in Chiller:CombustionTurbine
     PlantChillers::GTChiller.allocate(1);
 
-    PlantChillers::GTChiller(1).Base.SizFac = 1.0;
+    PlantChillers::GTChiller(1).SizFac = 1.0;
     PlantChillers::GTChiller(1).DesignHeatRecVolFlowRateWasAutoSized = true;
     PlantChillers::GTChiller(1).HeatRecCapacityFraction = 0.5;
     PlantChillers::GTChiller(1).HeatRecActive = true;
-    PlantChillers::GTChiller(1).Base.CondenserType = PlantChillers::WaterCooled;
-    PlantChillers::GTChiller(1).Base.CWLoopNum = 1;
-    PlantChillers::GTChiller(1).Base.CDLoopNum = 2;
-    PlantChillers::GTChiller(1).Base.EvapVolFlowRate = 1.0;
-    PlantChillers::GTChiller(1).Base.CondVolFlowRate = 1.0;
-    PlantChillers::GTChiller(1).Base.NomCap = 10000;
-    PlantChillers::GTChiller(1).Base.COP = 3.0;
+    PlantChillers::GTChiller(1).CondenserType = PlantChillers::WaterCooled;
+    PlantChillers::GTChiller(1).CWLoopNum = 1;
+    PlantChillers::GTChiller(1).CDLoopNum = 2;
+    PlantChillers::GTChiller(1).EvapVolFlowRate = 1.0;
+    PlantChillers::GTChiller(1).CondVolFlowRate = 1.0;
+    PlantChillers::GTChiller(1).NomCap = 10000;
+    PlantChillers::GTChiller(1).COP = 3.0;
     PlantChillers::GTChiller(1).engineCapacityScalar = 1.0;
 
     DataPlant::PlantLoop.allocate(2);
@@ -87,7 +87,7 @@ TEST_F(EnergyPlusFixture, GTChiller_HeatRecoveryAutosizeTest)
     DataPlant::PlantFirstSizesOkayToFinalize = true;
 
     // now call sizing routine
-    PlantChillers::SizeGTChiller(1);
+    PlantChillers::GTChiller(1).size();
     // see if heat recovery flow rate is as expected
     EXPECT_NEAR(PlantChillers::GTChiller(1).DesignHeatRecVolFlowRate, 0.5, 0.00001);
 
@@ -101,17 +101,17 @@ TEST_F(EnergyPlusFixture, EngineDrivenChiller_HeatRecoveryAutosizeTest)
     // unit test for autosizing heat recovery in Chiller:EngineDriven
     PlantChillers::EngineDrivenChiller.allocate(1);
 
-    PlantChillers::EngineDrivenChiller(1).Base.SizFac = 1.0;
+    PlantChillers::EngineDrivenChiller(1).SizFac = 1.0;
     PlantChillers::EngineDrivenChiller(1).DesignHeatRecVolFlowRateWasAutoSized = true;
     PlantChillers::EngineDrivenChiller(1).HeatRecCapacityFraction = 0.5;
     PlantChillers::EngineDrivenChiller(1).HeatRecActive = true;
-    PlantChillers::EngineDrivenChiller(1).Base.CondenserType = PlantChillers::WaterCooled;
-    PlantChillers::EngineDrivenChiller(1).Base.CWLoopNum = 1;
-    PlantChillers::EngineDrivenChiller(1).Base.CDLoopNum = 2;
-    PlantChillers::EngineDrivenChiller(1).Base.EvapVolFlowRate = 1.0;
-    PlantChillers::EngineDrivenChiller(1).Base.CondVolFlowRate = 1.0;
-    PlantChillers::EngineDrivenChiller(1).Base.NomCap = 10000;
-    PlantChillers::EngineDrivenChiller(1).Base.COP = 3.0;
+    PlantChillers::EngineDrivenChiller(1).CondenserType = PlantChillers::WaterCooled;
+    PlantChillers::EngineDrivenChiller(1).CWLoopNum = 1;
+    PlantChillers::EngineDrivenChiller(1).CDLoopNum = 2;
+    PlantChillers::EngineDrivenChiller(1).EvapVolFlowRate = 1.0;
+    PlantChillers::EngineDrivenChiller(1).CondVolFlowRate = 1.0;
+    PlantChillers::EngineDrivenChiller(1).NomCap = 10000;
+    PlantChillers::EngineDrivenChiller(1).COP = 3.0;
 
     DataPlant::PlantLoop.allocate(2);
     DataSizing::PlantSizData.allocate(1);
@@ -123,7 +123,7 @@ TEST_F(EnergyPlusFixture, EngineDrivenChiller_HeatRecoveryAutosizeTest)
     DataPlant::PlantFirstSizesOkayToFinalize = true;
 
     // now call sizing routine
-    PlantChillers::SizeEngineDrivenChiller(1);
+    PlantChillers::EngineDrivenChiller(1).size();
     // see if heat recovery flow rate is as expected
     EXPECT_NEAR(PlantChillers::EngineDrivenChiller(1).DesignHeatRecVolFlowRate, 0.5, 0.00001);
 

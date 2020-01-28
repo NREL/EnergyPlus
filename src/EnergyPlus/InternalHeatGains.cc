@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -708,7 +708,7 @@ namespace InternalHeatGains {
                         MustInpSch = false;
                         UsingThermalComfort = false;
                         lastOption = NumAlpha;
-                        
+
                         // check to see if the user has specified schedules for air velocity, clothing insulation, and/or work efficiency
                         // but have NOT made a selection for a thermal comfort model.  If so, then the schedules are reported as unused
                         // which could cause confusion.  The solution is for the user to either remove those schedules or pick a thermal
@@ -6162,13 +6162,13 @@ namespace InternalHeatGains {
         Real64 CPULoadSchedFrac;                          // CPU loading schedule fraction
         Real64 AirConnection;                             // Air connection type
         Real64 TSupply;                                   // Supply air temperature [C]
-        Real64 WSupply;                                   // Supply air humidity ratio [kgH2O/kgdryair]
+        Real64 WSupply;                                   // Supply air humidity ratio [kgWater/kgDryAir]
         Real64 RecircFrac;                                // Recirulation fraction - current
         Real64 TRecirc;                                   // Recirulation air temperature [C]
-        Real64 WRecirc;                                   // Recirulation air humidity ratio [kgH2O/kgdryair]
+        Real64 WRecirc;                                   // Recirulation air humidity ratio [kgWater/kgDryAir]
         Real64 TAirIn;                                    // Entering air dry-bulb temperature [C]
         Real64 TAirInDesign;                              // Design entering air dry-bulb temperature [C]
-        Real64 WAirIn;                                    // Entering air humidity ratio [kgH2O/kgdryair]
+        Real64 WAirIn;                                    // Entering air humidity ratio [kgWater/kgDryAir]
         Real64 TDPAirIn;                                  // Entering air dewpoint temperature [C]
         Real64 RHAirIn;                                   // Entering air relative humidity [%]
         Real64 SupplyHeatIndex;                           // Supply heat index
@@ -6826,20 +6826,20 @@ namespace InternalHeatGains {
 
         return DesignLightingLevelSum;
     }
-    
+
     bool CheckThermalComfortSchedules(bool const WorkEffSch, // Blank work efficiency schedule = true
                                       bool const CloInsSch,  // Blank clothing insulation schedule = true
                                       bool const AirVeloSch) // Blank air velocity schedule = true
     {
         bool TCSchedsPresent = false;
-        
+
         if ( !WorkEffSch || !CloInsSch || !AirVeloSch ) {
             TCSchedsPresent = true;
         }
-        
+
         return TCSchedsPresent;
     }
-    
+
     void CheckLightsReplaceableMinMaxForZone(int const WhichZone) // Zone Number
     {
 

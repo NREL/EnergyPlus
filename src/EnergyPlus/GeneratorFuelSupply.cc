@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -289,7 +289,7 @@ namespace GeneratorFuelSupply {
         Real64 HHVfuel;               // higher heating value of fuel, working var
         Real64 O2Stoic;               // stochiometric oxygen coef in chemical equation (15)
         Real64 CO2ProdStoic;          // product gases carbon dioxide coeff
-        Real64 H20ProdStoic;          // product gases water coeff
+        Real64 H2OProdStoic;          // product gases water coeff
         int i;                        // loop index
         std::string thisName;         // working string var
         int thisGasID;                // working index in Gas phase data structure
@@ -623,7 +623,7 @@ namespace GeneratorFuelSupply {
             // sum over each constituent
             O2Stoic = 0.0;
             CO2ProdStoic = 0.0;
-            H20ProdStoic = 0.0;
+            H2OProdStoic = 0.0;
             CO2dataID = 1;   // hard-coded above
             WaterDataID = 4; // hard-coded above
             // Loop over fuel constituents and do one-time setup
@@ -646,12 +646,12 @@ namespace GeneratorFuelSupply {
 
                 CO2ProdStoic += FuelSupply(FuelSupplyNum).ConstitMolalFract(i) * GasPhaseThermoChemistryData(thisGasID).NumCarbons;
 
-                H20ProdStoic += FuelSupply(FuelSupplyNum).ConstitMolalFract(i) * GasPhaseThermoChemistryData(thisGasID).NumHydrogens / 2.0;
+                H2OProdStoic += FuelSupply(FuelSupplyNum).ConstitMolalFract(i) * GasPhaseThermoChemistryData(thisGasID).NumHydrogens / 2.0;
             }
 
             FuelSupply(FuelSupplyNum).StoicOxygenRate = O2Stoic;
             FuelSupply(FuelSupplyNum).CO2ProductGasCoef = CO2ProdStoic;
-            FuelSupply(FuelSupplyNum).H20ProductGasCoef = H20ProdStoic;
+            FuelSupply(FuelSupplyNum).H2OProductGasCoef = H2OProdStoic;
 
             // Calculate LHV for an NdotFuel of 1.0
             LHVfuel = 0.0;

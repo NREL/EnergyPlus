@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2037,9 +2037,20 @@ namespace PlantCentralGSHP {
                 ChillerEIRFT =
                     max(0.0, CurveManager::CurveValue(this->ChillerHeater(ChillerHeaterNum).ChillerEIRFTIDX, EvapOutletTemp, CondTempforCurve));
                 ChillerEIRFPLR = max(0.0, CurveManager::CurveValue(this->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRIDX, PartLoadRat));
-                CHPower = (AvailChillerCap / ReferenceCOP) * ChillerEIRFPLR * ChillerEIRFT * FRAC;
+
+                if (ReferenceCOP <= 0.0) {
+                    CHPower = 0.0;
+                } else {
+                    CHPower = (AvailChillerCap / ReferenceCOP) * ChillerEIRFPLR * ChillerEIRFT * FRAC;
+                }
+
                 QCondenser = CHPower * this->ChillerHeater(ChillerHeaterNum).OpenMotorEff + QEvaporator + ChillerFalseLoadRate;
-                ActualCOP = (QEvaporator + ChillerFalseLoadRate) / CHPower;
+
+                if (CHPower == 0.0) {
+                    ActualCOP = 0.0;
+                } else {
+                    ActualCOP = (QEvaporator + ChillerFalseLoadRate) / CHPower;
+                }
 
                 if (CondMassFlowRate > DataBranchAirLoopPlant::MassFlowTolerance) {
                     Cp = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->GLHELoopNum).FluidName,
@@ -2487,7 +2498,13 @@ namespace PlantCentralGSHP {
                         max(0.0, CurveManager::CurveValue(this->ChillerHeater(ChillerHeaterNum).ChillerEIRFTIDX, EvapOutletTemp, CondTempforCurve));
                     ChillerEIRFPLR = max(0.0, CurveManager::CurveValue(this->ChillerHeater(ChillerHeaterNum).ChillerEIRFPLRIDX, PartLoadRat));
                     CHPower = (AvailChillerCap / ReferenceCOP) * ChillerEIRFPLR * ChillerEIRFT * FRAC;
-                    ActualCOP = (QEvaporator + ChillerFalseLoadRate) / CHPower;
+
+                    if (CHPower <= 0.0) {
+                        ActualCOP = 0.0;
+                    } else {
+                        ActualCOP = (QEvaporator + ChillerFalseLoadRate) / CHPower;
+                    }
+
                     QCondenser = CHPower * this->ChillerHeater(ChillerHeaterNum).OpenMotorEff + QEvaporator + ChillerFalseLoadRate;
 
                     // Determine heating load for this heater and pass the remaining load to the next chiller heater

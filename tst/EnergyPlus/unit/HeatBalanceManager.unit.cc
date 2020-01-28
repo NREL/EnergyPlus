@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -163,7 +163,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names)
 
     bool ErrorsFound(false);
 
-    GetMaterialData(ErrorsFound);
+    GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 }
@@ -200,7 +200,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_WindowMaterial_Gap_Duplicate_Names_
 
     bool ErrorsFound(false);
 
-    GetMaterialData(ErrorsFound);
+    GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 }
@@ -392,7 +392,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData1)
 
     // call to process input
     ErrorsFound = false;
-    GetProjectControlData(ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
+    GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(ZoneAirMassFlow.EnforceZoneMassBalance);
     EXPECT_TRUE(ZoneAirMassFlow.BalanceMixing);
@@ -454,7 +454,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     // call to process input
     ProcessScheduleInput();
     ErrorsFound = false;
-    GetProjectControlData(ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
+    GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     EXPECT_TRUE(ZoneAirMassFlow.EnforceZoneMassBalance);
     EXPECT_FALSE(ZoneAirMassFlow.BalanceMixing);
@@ -600,7 +600,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData3)
 
     // call to process input
     ErrorsFound = false;
-    GetProjectControlData(ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
+    GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     EXPECT_FALSE(ZoneAirMassFlow.EnforceZoneMassBalance);
     EXPECT_FALSE(ZoneAirMassFlow.BalanceMixing);
@@ -660,7 +660,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationReportVa
 
     // call to process input
     ErrorsFound = false;
-    GetProjectControlData(ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
+    GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
     NumOfZones = 2;
     ZoneReOrder.allocate(NumOfZones);
@@ -706,7 +706,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialRoofVegetation)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    GetMaterialData(ErrorsFound);
+    GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // check the "Material:RoofVegetation" names
@@ -1206,11 +1206,11 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
 
     ScheduleManager::ProcessScheduleInput();
 
-    HeatBalanceManager::GetProjectControlData(ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -1327,7 +1327,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmInput
 
     bool ErrorsFound(false); // If errors detected in input
     ErrorsFound = false;
-    GetProjectControlData(ErrorsFound); // returns ErrorsFound false
+    GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound); // returns ErrorsFound false
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(DataHVACGlobals::HVACSystemRootFinding.Algorithm, "REGULAFALSITHENBISECTION");
 }
@@ -1358,7 +1358,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmNoInp
 
     bool ErrorsFound(false); // If errors detected in input
     ErrorsFound = false;
-    GetProjectControlData(ErrorsFound); // returns ErrorsFound false
+    GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound); // returns ErrorsFound false
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(DataHVACGlobals::HVACSystemRootFinding.Algorithm, "RegulaFalsi");
 }
@@ -1616,7 +1616,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_Default)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetProjectControlData(errorsfound);
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsfound);
     EXPECT_FALSE(errorsfound);
     EXPECT_TRUE(DataHeatBalance::AnyCTF);
     EXPECT_FALSE(DataHeatBalance::AnyEMPD);
@@ -1643,7 +1643,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CTF)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetProjectControlData(errorsfound);
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsfound);
     EXPECT_FALSE(errorsfound);
     EXPECT_TRUE(DataHeatBalance::AnyCTF);
     EXPECT_FALSE(DataHeatBalance::AnyEMPD);
@@ -1669,7 +1669,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_EMPD)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetProjectControlData(errorsfound);
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsfound);
     EXPECT_FALSE(errorsfound);
     EXPECT_FALSE(DataHeatBalance::AnyCTF);
     EXPECT_TRUE(DataHeatBalance::AnyEMPD);
@@ -1692,7 +1692,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_CondFD)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetProjectControlData(errorsfound);
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsfound);
     EXPECT_FALSE(errorsfound);
     EXPECT_FALSE(DataHeatBalance::AnyCTF);
     EXPECT_FALSE(DataHeatBalance::AnyEMPD);
@@ -1715,7 +1715,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HeatBalanceAlgorithm_HAMT)
 
     EXPECT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetProjectControlData(errorsfound);
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsfound);
     EXPECT_FALSE(errorsfound);
     EXPECT_FALSE(DataHeatBalance::AnyCTF);
     EXPECT_FALSE(DataHeatBalance::AnyEMPD);
@@ -1763,8 +1763,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GlazingEquivalentLayer_RValue)
     });
     
     EXPECT_TRUE(process_idf(idf_objects));
-    
-    HeatBalanceManager::GetMaterialData(errorsfound);
+
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errorsfound);
 
     EXPECT_FALSE(errorsfound);
     EXPECT_NEAR(DataHeatBalance::Material(1).Resistance,0.158,0.0001);
@@ -1809,7 +1809,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
 
     // call get material data to auto-generate IRTSurface material
     ErrorsFound = false;
-    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(DataHeatBalance::TotMaterials, 1);
     int MaterNum = 1;
@@ -1952,7 +1952,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetMaterialData_IRTSurfaces)
     
     bool ErrorsFound(false); // If errors detected in input
 
-    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
     
     ASSERT_FALSE(ErrorsFound);
     
@@ -2048,7 +2048,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_HVACSystemRootFindingAlgorithmBisec
 
     bool ErrorsFound(false); // If errors detected in input
     ErrorsFound = false;
-    GetProjectControlData(ErrorsFound); // returns ErrorsFound false
+    GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound); // returns ErrorsFound false
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(DataHVACGlobals::HVACSystemRootFinding.Algorithm, "BISECTION");
 }
