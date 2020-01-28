@@ -2598,8 +2598,8 @@ namespace SizingManager {
                                  "\", Commas will be used to separate fields.");
                 cAlphaArgs(1) = "Comma";
             }
-            print(outputFiles.eio, "! <Sizing Output Files>,Style");
-            print(outputFiles.eio,  "Sizing Output Files,{}", cAlphaArgs(1));
+            print(outputFiles.eio, "! <Sizing Output Files>,Style\n");
+            print(outputFiles.eio,  "Sizing Output Files,{}\n", cAlphaArgs(1));
         }
     }
 

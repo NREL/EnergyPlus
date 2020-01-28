@@ -550,7 +550,7 @@ void PlantCoinicidentAnalysis::ResolveDesignFlowRate(OutputFiles &outputFiles, i
         print(outputFiles.eio,"{}", "! <Plant Coincident Sizing Algorithm>,Plant Loop Name,Sizing Pass {#},Measured Mass "
                                              "Flow{kg/s},Measured Demand {W},Demand Calculated Mass Flow{kg/s},Sizes Changed {Yes/No},Previous "
                                              "Volume Flow Rate {m3/s},New Volume Flow Rate {m3/s},Demand Check Applied {Yes/No},Sizing Factor "
-                                             "{},Normalized Change {},Specific Heat{J/kg-K},Density {kg/m3}");
+                                             "{},Normalized Change {},Specific Heat{J/kg-K},Density {kg/m3}\n");
         eioHeaderDoneOnce = true;
     }
     chIteration = TrimSigDigits(HVACSizingIterCount);

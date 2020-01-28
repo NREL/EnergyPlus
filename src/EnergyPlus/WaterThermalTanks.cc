@@ -4819,7 +4819,7 @@ namespace WaterThermalTanks {
         if (this->TypeNum == DataPlant::TypeOf_ChilledWaterTankStratified) {
 
             for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
-                static constexpr auto Format_724("Chilled Water Tank Stratified Node Information,{},{:.4G},{:.4G},{:.4G},{},{}\n");
+                static constexpr auto Format_724("Chilled Water Tank Stratified Node Information,{},{:.4T},{:.4T},{:.4T},{},{}\n");
 
                 print(outputFiles.eio,
                       Format_724,

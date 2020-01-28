@@ -1067,7 +1067,7 @@ namespace HeatBalanceHAMTManager {
 
             for (MaterNum = 1; MaterNum <= TotMaterials; ++MaterNum) {
 
-                static constexpr auto Format_111("Material Nominal Resistance's,{},{:.4R}\n");
+                static constexpr auto Format_111("Material Nominal Resistance,{},{:.4R}\n");
                 print(outputFiles.eio, Format_111, Material(MaterNum).Name, NominalR(MaterNum));
             }
         }
