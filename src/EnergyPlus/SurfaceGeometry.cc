@@ -12800,6 +12800,10 @@ namespace SurfaceGeometry {
                                             "This surface enclosure num=" + General::RoundSigDigits(thisSideEnclosureNum) +
                                             ". Other side enclosure num=" + General::RoundSigDigits(otherSideEnclosureNum));
                         }
+                    } else if (constr.TypeIsAirBoundaryInteriorWindow) {
+                        // Override surface class for interior window
+                        surf.Class = SurfaceClass_Window;
+                        Zone(surf.Zone).HasInterZoneWindow = true;
                     }
                     if (constr.TypeIsAirBoundaryMixing) {
                         int zoneNum1 = min(surf.Zone, Surface(surf.ExtBoundCond).Zone);

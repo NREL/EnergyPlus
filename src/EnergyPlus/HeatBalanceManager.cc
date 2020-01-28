@@ -5893,7 +5893,7 @@ namespace HeatBalanceManager {
             auto &thisSurface(DataSurfaces::Surface(SurfNum));
             if (thisSurface.Class == DataSurfaces::SurfaceClass_Window) {
                 auto &thisConstruct(thisSurface.Construction);
-                if (!Construct(thisConstruct).WindowTypeBSDF) {
+                if (!Construct(thisConstruct).WindowTypeBSDF && !Construct(thisConstruct).TypeIsAirBoundaryInteriorWindow) {
                     FenLaySurfTempFront(1, SurfNum) = TH(1, 1, SurfNum);
                     FenLaySurfTempBack(Construct(thisConstruct).TotLayers,SurfNum) = TH(2, 1, SurfNum);
                 }
