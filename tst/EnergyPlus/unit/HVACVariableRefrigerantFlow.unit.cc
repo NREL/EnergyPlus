@@ -6020,7 +6020,7 @@ TEST_F(HVACVRFFixture, VRFTest_CondenserCalcTest)
     EXPECT_EQ(VRF(VRFCond).ElecCoolingPower, 0.0);
 
     // make adjustment for heat recovery startup degradation
-    Real64 HREIRFTConst = VRF(VRFCond).HRCAPFTHeatConst;
+    Real64 HREIRFTConst = VRF(VRFCond).HREIRFTHeatConst;
     Real64 HRInitialEIRFrac = VRF(VRFCond).HRInitialHeatEIRFrac;
     Real64 HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * VRF(VRFCond).SUMultiplier;
 
@@ -6063,7 +6063,7 @@ TEST_F(HVACVRFFixture, VRFTest_CondenserCalcTest)
 
     EXPECT_NEAR(VRF(VRFCond).SUMultiplier, 0.86466, 0.00001); // will exponentially rise towards 1.0
     EXPECT_EQ(VRF(VRFCond).ElecHeatingPower, VRF(VRFCond).RatedHeatingPower * VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
-    EXPECT_NEAR(HREIRAdjustment, 1.08646, 0.00001); // will exponentially rise towards VRF( VRFCond ).HRCAPFTHeatConst = 1.1
+    EXPECT_NEAR(HREIRAdjustment, 1.08646, 0.00001); // will exponentially rise towards VRF( VRFCond ).HREIRFTHeatConst = 1.1
 
     // simulate again and see that power has exponential changed from previous time step
     DataGlobals::CurrentTime += DataGlobals::TimeStepZone; // 1.25
@@ -6071,7 +6071,7 @@ TEST_F(HVACVRFFixture, VRFTest_CondenserCalcTest)
     HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * VRF(VRFCond).SUMultiplier;
     EXPECT_NEAR(VRF(VRFCond).SUMultiplier, 0.95021, 0.00001); // will exponentially rise towards 1.0
     EXPECT_EQ(VRF(VRFCond).ElecHeatingPower, VRF(VRFCond).RatedHeatingPower * VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
-    EXPECT_NEAR(HREIRAdjustment, 1.09502, 0.00001); // will exponentially rise towards VRF( VRFCond ).HRCAPFTHeatConst = 1.1
+    EXPECT_NEAR(HREIRAdjustment, 1.09502, 0.00001); // will exponentially rise towards VRF( VRFCond ).HREIRFTHeatConst = 1.1
 
     // simulate again and see that power has exponential changed from previous time step
     DataGlobals::CurrentTime += DataGlobals::TimeStepZone; // 1.5
@@ -6079,7 +6079,7 @@ TEST_F(HVACVRFFixture, VRFTest_CondenserCalcTest)
     HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * VRF(VRFCond).SUMultiplier;
     EXPECT_NEAR(VRF(VRFCond).SUMultiplier, 0.98168, 0.00001); // will exponentially rise towards 1.0
     EXPECT_EQ(VRF(VRFCond).ElecHeatingPower, VRF(VRFCond).RatedHeatingPower * VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
-    EXPECT_NEAR(HREIRAdjustment, 1.09817, 0.00001); // will exponentially rise towards VRF( VRFCond ).HRCAPFTHeatConst = 1.1
+    EXPECT_NEAR(HREIRAdjustment, 1.09817, 0.00001); // will exponentially rise towards VRF( VRFCond ).HREIRFTHeatConst = 1.1
 
     // simulate again and see that power has exponential changed from previous time step
     DataGlobals::CurrentTime += DataGlobals::TimeStepZone; // 1.75
@@ -6087,10 +6087,10 @@ TEST_F(HVACVRFFixture, VRFTest_CondenserCalcTest)
     HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * VRF(VRFCond).SUMultiplier;
     EXPECT_NEAR(VRF(VRFCond).SUMultiplier, 1.0, 0.00001); // will exponentially rise towards 1.0
     EXPECT_EQ(VRF(VRFCond).ElecHeatingPower, VRF(VRFCond).RatedHeatingPower * VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
-    EXPECT_NEAR(HREIRAdjustment, 1.1, 0.00001); // will exponentially rise towards VRF( VRFCond ).HRCAPFTHeatConst = 1.1
+    EXPECT_NEAR(HREIRAdjustment, 1.1, 0.00001); // will exponentially rise towards VRF( VRFCond ).HREIRFTHeatConst = 1.1
 
-    // at end of exponential decay (when SUMultiplier = 1), HREIRAdjustment = VRF( VRFCond ).HRCAPFTHeatConst
-    EXPECT_EQ(HREIRAdjustment, VRF(VRFCond).HRCAPFTHeatConst);
+    // at end of exponential decay (when SUMultiplier = 1), HREIRAdjustment = VRF( VRFCond ).HREIRFTHeatConst
+    EXPECT_EQ(HREIRAdjustment, VRF(VRFCond).HREIRFTHeatConst);
 }
 
 TEST_F(HVACVRFFixture, VRFTU_SupplementalHeatingCoilGetInput)
@@ -10528,7 +10528,7 @@ TEST_F(HVACVRFFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     EXPECT_NEAR(368.1510, thisFan.FanPower, 0.0001);
     EXPECT_NEAR(thisDXCoolingCoil.TotalCoolingEnergyRate, (thisVRFTU.TotalCoolingRate + thisFan.FanPower), 0.0001);
 }
-  
+
 TEST_F(HVACVRFFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
 {
     //   PURPOSE OF THIS TEST:
@@ -12194,7 +12194,7 @@ TEST_F(HVACVRFFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     Node(thisZoneEquip.ZoneNode).Temp = 24.0;
     Node(thisZoneEquip.ZoneNode).HumRat = 0.0075;
     Node(thisZoneEquip.ZoneNode).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(thisZoneEquip.ZoneNode).Temp, Node(thisZoneEquip.ZoneNode).HumRat);
-    
+
     auto &thisVRFTU(VRFTU(1));
     Node(thisVRFTU.VRFTUInletNodeNum).Temp = 24.0;
     Node(thisVRFTU.VRFTUInletNodeNum).HumRat = 0.0075;
@@ -12239,4 +12239,231 @@ TEST_F(HVACVRFFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     EXPECT_NEAR(125.2266, thisFan.FanPower, 0.0001);
     EXPECT_NEAR(thisDXCoolingCoil.TotalCoolingEnergyRate, (thisVRFTU.TotalCoolingRate + thisFan.FanPower), 0.0001);
 }
+
+// Test for #7648: HREIRFTHeat wrongly used HRCAPFTHeatConst. Occurs only if you have Heat Recovery
+TEST_F(HVACVRFFixture, VRFTest_CondenserCalcTest_HREIRFTHeat)
+{
+
+    std::string const idf_objects = delimited_string({
+
+        "  Curve:Biquadratic,",
+        "    EIRorCapFT,              !- Name",
+        "    1.0,                     !- Coefficient1 Constant",
+        "    0,                       !- Coefficient2 x",
+        "    0,                       !- Coefficient3 x**2",
+        "    0,                       !- Coefficient4 y",
+        "    0,                       !- Coefficient5 y**2",
+        "    0,                       !- Coefficient6 x*y",
+        "    -100,                    !- Minimum Value of x",
+        "    100,                     !- Maximum Value of x",
+        "    -100,                    !- Minimum Value of y",
+        "    100,                     !- Maximum Value of y",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Temperature,             !- Input Unit Type for X",
+        "    Temperature,             !- Input Unit Type for Y",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Cubic,",
+        "    EIRorCapfPLR,            !- Name",
+        "    0.0,                     !- Coefficient1 Constant",
+        "    1.0,                     !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.0,                     !- Coefficient4 x**3",
+        "    0,                       !- Minimum Value of x",
+        "    1,                       !- Maximum Value of x",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Cubic,",
+        "    HRCAPFTHeat,             !- Name",
+        "    0.8,                     !- Coefficient1 Constant",
+        "    0.0,                     !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.0,                     !- Coefficient4 x**3",
+        "    0,                       !- Minimum Value of x",
+        "    1,                       !- Maximum Value of x",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Dimensionless;           !- Output Unit Type",
+
+        "  Curve:Cubic,",
+        "    HREIRFTHeat,             !- Name",
+        "    0.9,                     !- Coefficient1 Constant",
+        "    0.0,                     !- Coefficient2 x",
+        "    0.0,                     !- Coefficient3 x**2",
+        "    0.0,                     !- Coefficient4 x**3",
+        "    0,                       !- Minimum Value of x",
+        "    1,                       !- Maximum Value of x",
+        "    ,                        !- Minimum Curve Output",
+        "    ,                        !- Maximum Curve Output",
+        "    Dimensionless,           !- Input Unit Type for X",
+        "    Dimensionless;           !- Output Unit Type",
+    });
+
+
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    CurveManager::GetCurveInput();
+
+    int VRFCond = 1;
+    VRF.allocate(1);
+    VRF(VRFCond).CondenserNodeNum = 0;
+    VRF(VRFCond).CondenserType = 1; // DataHVACGlobals::AirCooled
+    VRF(VRFCond).ZoneTUListPtr = 1;
+    VRF(VRFCond).CoolingCapacity = 20000.0;
+    VRF(VRFCond).HeatingCapacity = 20000.0;
+    VRF(VRFCond).CoolingCOP = 3.0;
+    VRF(VRFCond).HeatingCOP = 3.0;
+    VRF(VRFCond).RatedCoolingPower = VRF(VRFCond).CoolingCapacity / VRF(VRFCond).CoolingCOP;
+    VRF(VRFCond).RatedHeatingPower = VRF(VRFCond).HeatingCapacity / VRF(VRFCond).HeatingCOP;
+    VRF(VRFCond).PipingCorrectionCooling = 1.0;
+    VRF(VRFCond).PipingCorrectionHeating = 1.0;
+    // Curve Indices, including HR curves (3 & 4)
+    VRF(VRFCond).CoolCapFT = 1;
+    VRF(VRFCond).CoolEIRFT = 1;
+    VRF(VRFCond).CoolEIRFPLR1 = 2;
+    VRF(VRFCond).HeatEIRFPLR1 = 2;
+    VRF(VRFCond).HRCAPFTHeat = 3;
+    VRF(VRFCond).HREIRFTHeat = 4;
+
+    CoolCombinationRatio.allocate(1);
+    CoolCombinationRatio(VRFCond) = 1.0;
+    HeatCombinationRatio.allocate(1);
+    HeatCombinationRatio(VRFCond) = 1.0;
+    LastModeCooling.allocate(1);
+    LastModeHeating.allocate(1);
+
+    TerminalUnitList.allocate(1);
+    TerminalUnitList(1).NumTUInList = 5;
+    TerminalUnitList(1).TotalCoolLoad.allocate(5);
+    TerminalUnitList(1).TotalHeatLoad.allocate(5);
+    TerminalUnitList(1).ZoneTUPtr.allocate(5);
+    TerminalUnitList(1).HRCoolRequest.allocate(5);
+    TerminalUnitList(1).HRHeatRequest.allocate(5);
+    TerminalUnitList(1).HRCoolRequest = false;
+    TerminalUnitList(1).HRHeatRequest = false;
+
+    TerminalUnitList(1).CoolingCoilAvailable.allocate(5);
+    TerminalUnitList(1).HeatingCoilAvailable.allocate(5);
+    // all TU coils are available
+    TerminalUnitList(1).CoolingCoilAvailable = true;
+    TerminalUnitList(1).HeatingCoilAvailable = true;
+
+    CoolingLoad.allocate(1);
+    HeatingLoad.allocate(1);
+
+    DXCoilCoolInletAirWBTemp.allocate(10);
+    DXCoilHeatInletAirDBTemp.allocate(10);
+    DXCoilHeatInletAirWBTemp.allocate(10);
+
+    VRFTU.allocate(5);
+    for (int NumTU = 1; NumTU <= TerminalUnitList(1).NumTUInList; ++NumTU) {
+        VRFTU(NumTU).CoolCoilIndex = NumTU;
+        VRFTU(NumTU).HeatCoilIndex = TerminalUnitList(1).NumTUInList + NumTU;
+        TerminalUnitList(1).ZoneTUPtr(NumTU) = NumTU;
+        // initialize DX coil inlet conditions
+        DXCoilCoolInletAirWBTemp(NumTU) = 19.4;
+        DXCoilHeatInletAirDBTemp(TerminalUnitList(1).NumTUInList + NumTU) = 20.0;
+        DXCoilHeatInletAirWBTemp(TerminalUnitList(1).NumTUInList + NumTU) = 17.0;
+    }
+
+    // set up environment
+    DataGlobals::DayOfSim = 1;
+    DataGlobals::CurrentTime = 0.25;
+    DataGlobals::TimeStepZone = 0.25;
+    DataHVACGlobals::TimeStepSys = 0.25;
+    DataHVACGlobals::SysTimeElapsed = 0.0;
+    DataEnvironment::OutDryBulbTemp = 35.0;
+    DataEnvironment::OutHumRat = 0.01;
+    DataEnvironment::OutBaroPress = 101325.0;
+    DataEnvironment::OutWetBulbTemp = 21.1340575;
+
+    // increment time step
+    DataGlobals::CurrentTime += DataGlobals::TimeStepZone; // 0.5
+
+     // set TU's to request both cooling and heating
+    CoolingLoad(VRFCond) = false;
+    HeatingLoad(VRFCond) = true;
+    LastModeCooling(VRFCond) = false;
+    LastModeHeating(VRFCond) = true;
+
+    TerminalUnitList(1).TotalCoolLoad(1) = 0.0;
+    TerminalUnitList(1).HRCoolRequest(1) = false;
+    TerminalUnitList(1).TotalCoolLoad(2) = 1000.0;
+    TerminalUnitList(1).HRCoolRequest(2) = true;
+    TerminalUnitList(1).TotalCoolLoad(3) = 0.0;
+    TerminalUnitList(1).HRCoolRequest(3) = false;
+    TerminalUnitList(1).TotalCoolLoad(4) = 1000.0;
+    TerminalUnitList(1).HRCoolRequest(4) = true;
+    TerminalUnitList(1).TotalCoolLoad(5) = 0.0;
+    TerminalUnitList(1).HRCoolRequest(5) = false;
+    TerminalUnitList(1).TotalHeatLoad(1) = 1000.0;
+    TerminalUnitList(1).HRHeatRequest(1) = true;
+    TerminalUnitList(1).TotalHeatLoad(2) = 0.0;
+    TerminalUnitList(1).HRHeatRequest(2) = false;
+    TerminalUnitList(1).TotalHeatLoad(3) = 1000.0;
+    TerminalUnitList(1).HRHeatRequest(3) = true;
+    TerminalUnitList(1).TotalHeatLoad(4) = 0.0;
+    TerminalUnitList(1).HRHeatRequest(4) = false;
+    TerminalUnitList(1).TotalHeatLoad(5) = 1000.0;
+    TerminalUnitList(1).HRHeatRequest(5) = true;
+    VRF(VRFCond).HeatRecoveryUsed = true;
+
+    // set heat recovery time constant to non-zero value (means mode change will degrade performance)
+    VRF(VRFCond).HRHeatCapTC = 0.25; // 15 min exponential rise
+    // VRF(VRFCond).HRHeatEIRTC = 0.0; // (default)
+    // last operating mode was heating
+    CalcVRFCondenser(VRFCond, false);
+    EXPECT_TRUE(VRF(VRFCond).ModeChange);
+    EXPECT_FALSE(VRF(VRFCond).HRModeChange);
+    EXPECT_EQ(VRF(VRFCond).OperatingMode, 2); // ModeHeatingOnly
+    EXPECT_TRUE(VRF(VRFCond).HRHeatingActive);
+    EXPECT_FALSE(VRF(VRFCond).HRCoolingActive);
+    EXPECT_EQ(VRF(VRFCond).TotalCoolingCapacity, 0.0);
+    EXPECT_EQ(VRF(VRFCond).TUCoolingLoad, 2000.0);
+    EXPECT_EQ(VRF(VRFCond).TotalHeatingCapacity, 3000.0);
+    EXPECT_EQ(VRF(VRFCond).TUHeatingLoad, 3000.0);
+    EXPECT_NEAR(VRF(VRFCond).VRFCondPLR, 0.1875, 0.00001);
+    EXPECT_EQ(VRF(VRFCond).VRFCondRTF, 1.0); // unit is not cycling below min PLR
+
+    // CurrentEndTime = 0.25
+    // HRTimer = CurrentEndTimeLast = 0
+    // HRTime = (CurrentEndTime - HRTimer) = 0.25 - = 0.25
+    // SUMultiplier = min(1, 1 - exp(-HRTime / HRHeatCapTC)) = 1 - exp(-1) = 0.6321205588285577
+    EXPECT_NEAR(VRF(VRFCond).SUMultiplier, 0.63212, 0.00001);
+    EXPECT_EQ(VRF(VRFCond).ElecCoolingPower, 0.0);
+
+    // make adjustment for heat recovery startup degradation
+    // Ensure HREIRFTConst / HRCAPFTHeatConst are assigned the right curve ouput
+    Real64 HREIRFTConst = VRF(VRFCond).HREIRFTHeatConst;
+    EXPECT_EQ(HREIRFTConst, 0.9); // It's normal that it works, it's the internal variable that's messed up
+    EXPECT_EQ(VRF(VRFCond).HRCAPFTHeatConst, 0.8);
+    Real64 HRInitialEIRFrac = VRF(VRFCond).HRInitialHeatEIRFrac;
+    EXPECT_EQ(HRInitialEIRFrac, 1.0);
+    // Internally, it uses a local variable HREIRFTConst, which was wrongly set to HRCAPFTHeatConst = 0.9
+    Real64 HREIRAdjustment = HRInitialEIRFrac + (HREIRFTConst - HRInitialEIRFrac) * VRF(VRFCond).SUMultiplier;
+    // Before fix, =1 + (0.8 - 1) * 0.63212 = 0.873576
+    EXPECT_NEAR(HREIRAdjustment, 0.936788, 0.00001); // =1 + (0.9 - 1) * 0.63212
+    // InletAirDryBulbC = 20, InletAirWetBulbC = 17
+    // TotalCondHeatingCapacity = TotalTUHeatingCapacity = 20000
+    // HeatingPLR = 0.25  (TUHeatingLoad = 3000, 3000/20000 = 0.15)
+    // HeatingPLR = 0.1875
+    //
+    // VRF(VRFCond).ElecHeatingPower = (VRF(VRFCond).RatedHeatingPower * TotHeatCapTempModFac)
+    //                                  * TotHeatEIRTempModFac * EIRFPLRModFac *
+    //                                  * HREIRAdjustment * VRFRTF * InputPowerMultiplier;
+    //
+    // TotHeatCapTempModFac and TotHeatEIRTempModFac are 1 because CAPFT/EIRFT curves aren't assigned,
+    // and anyways they wouldn't be used since VRF(VRFCond).HeatingPerformanceOATType isn't specifyied
+    // VRFRTF = 1.0 because not cycling below min PLR
+    // EIRFPLRModFac is 1 because EIRFPLR curve output is constant as 1.0 above
+    // InputPowerMultiplier is 1 because no defrost
+    EXPECT_EQ(VRF(VRFCond).ElecHeatingPower, VRF(VRFCond).RatedHeatingPower * VRF(VRFCond).VRFCondPLR * HREIRAdjustment);
+
 }
+
+} // end of namespace EnergyPlus
