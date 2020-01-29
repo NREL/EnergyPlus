@@ -5213,7 +5213,7 @@ namespace HeatBalanceManager {
             InitEquivalentLayerWindowCalculations(); // Initialize the EQL window optical properties
             // InitGlassOpticalCalculations(); // Initialize the window optical properties
             InitWindowOpticalCalculations();
-            InitDaylightingDevices(); // Initialize any daylighting devices
+            InitDaylightingDevices(OutputFiles::getSingleton()); // Initialize any daylighting devices
             DisplayString("Initializing Solar Calculations");
             InitSolarCalculations(); // Initialize the shadowing calculations
         }

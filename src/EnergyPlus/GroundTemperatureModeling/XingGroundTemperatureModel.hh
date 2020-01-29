@@ -71,16 +71,11 @@ public:
 
     static std::shared_ptr<XingGroundTempsModel> XingGTMFactory(int objectType, std::string objectName);
 
-    Real64 getGroundTemp();
+    Real64 getGroundTemp() override;
 
-    Real64 getGroundTempAtTimeInSeconds(Real64 const depth, Real64 const timeInSecondsOfSim);
+    Real64 getGroundTempAtTimeInSeconds(Real64 const depth, Real64 const timeInSecondsOfSim) override;
 
-    Real64 getGroundTempAtTimeInMonths(Real64 const depth, int const monthOfSim);
-
-    // Destructor
-    ~XingGroundTempsModel()
-    {
-    }
+    Real64 getGroundTempAtTimeInMonths(Real64 const depth, int const monthOfSim) override;
 };
 
 } // namespace EnergyPlus

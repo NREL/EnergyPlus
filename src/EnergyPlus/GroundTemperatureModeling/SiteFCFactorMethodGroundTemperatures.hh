@@ -57,6 +57,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
+#include <EnergyPlus/OutputFiles.hh>
 
 namespace EnergyPlus {
 
@@ -69,22 +70,17 @@ public:
 
     // Default Constructor
     SiteFCFactorMethodGroundTemps() : timeOfSimInMonths(0), fcFactorGroundTemps(12, 13.0)
-
     {
     }
 
-    static std::shared_ptr<SiteFCFactorMethodGroundTemps> FCFactorGTMFactory(int objectType, std::string objectName);
+    static std::shared_ptr<SiteFCFactorMethodGroundTemps> FCFactorGTMFactory(OutputFiles &outputFiles, int objectType, std::string objectName);
 
-    Real64 getGroundTemp();
+    Real64 getGroundTemp() override;
 
-    Real64 getGroundTempAtTimeInSeconds(Real64 const depth, Real64 const timeInSecondsOfSim);
+    Real64 getGroundTempAtTimeInSeconds(Real64 const depth, Real64 const timeInSecondsOfSim) override;
 
-    Real64 getGroundTempAtTimeInMonths(Real64 const depth, int const monthOfSim);
+    Real64 getGroundTempAtTimeInMonths(Real64 const depth, int const monthOfSim) override;
 
-    // Destructor
-    ~SiteFCFactorMethodGroundTemps()
-    {
-    }
 };
 
 } // namespace EnergyPlus
