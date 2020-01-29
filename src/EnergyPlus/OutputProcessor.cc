@@ -2266,7 +2266,6 @@ namespace OutputProcessor {
             }
 
             // End use subcategory
-            //            if (!EndUseSub.empty() && !UtilityRoutines::SameString(EndUseSub, "General")) {
             if (!EndUseSub.empty()) {
                 Found = UtilityRoutines::FindItem(EndUseSub + ':' + EndUse + ':' + ResourceType, EnergyMeters);
                 if (Found != 0) {
@@ -3982,48 +3981,6 @@ namespace OutputProcessor {
                 break;
             }
         }
-
-        // resolve use of EndUseNames that are not in standard list but widely used to define output variables.
-        //if (!Found) {
-        //    if (EndUseSubName == "General") {
-        //        if (EndUseName == "Baseboard" ||
-        //            EndUseName == "Boilers" || 
-        //            EndUseName == "CarbonEquivalentEmissions" ||
-        //            EndUseName == "Chillers" || 
-        //            EndUseName == "CoalEmissions" ||
-        //            EndUseName == "ColdStorageCharge" ||
-        //            EndUseName == "ColdStorageDischarge" ||
-        //            EndUseName == "Condensate" ||
-        //            EndUseName == "CoolingCoils" || 
-        //            EndUseName == "CoolingPanel" ||
-        //            EndUseName == "DieselEmissions" ||
-        //            EndUseName == "ElectricEmissions" ||
-        //            EndUseName == "ElectricStorage" ||
-        //            EndUseName == "Freecooling" ||
-        //            EndUseName == "FuelOil#1Emissions" ||
-        //            EndUseName == "FuelOil#2Emissions" ||
-        //            EndUseName == "GasolineEmissions" ||
-        //            EndUseName == "HeatProduced" ||
-        //            EndUseName == "HeatRecoveryForCooling" ||
-        //            EndUseName == "HeatRecoveryForHeating" ||
-        //            EndUseName == "HeatingCoils" || 
-        //            EndUseName == "LoopToLoop" ||
-        //            EndUseName == "MainsWater" ||
-        //            EndUseName == "NaturalGasEmissions" ||
-        //            EndUseName == "OtherFuel1Emissions" ||
-        //            EndUseName == "OtherFuel2Emissions" ||
-        //            EndUseName == "Photovoltaic" || 
-        //            EndUseName == "PowerConversion" || 
-        //            EndUseName == "PropaneEmissions" ||
-        //            EndUseName == "PurchasedElectricEmissions" ||
-        //            EndUseName == "Rainwater" ||
-        //            EndUseName == "SoldElectricEmissions" ||
-        //            EndUseName == "Wellwater" ||
-        //            EndUseName == "WindTurbine" ) {
-        //            Found = true;
-        //        }
-        //    }
-        //}
 
         if (!Found) {
             ShowSevereError("Nonexistent end use passed to AddEndUseSubcategory=" + EndUseName);
