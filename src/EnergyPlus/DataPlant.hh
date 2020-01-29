@@ -249,34 +249,6 @@ namespace DataPlant {
     extern int const TypeOf_HeatPumpEIRCooling;
     extern int const TypeOf_HeatPumpEIRHeating;
 
-    // Parameters for General Equipment Types
-    extern int const NumGeneralEquipTypes;
-    extern Array1D_string const GeneralEquipTypes;
-
-    extern int const GenEquipTypes_Boiler;
-    extern int const GenEquipTypes_Chiller;
-    extern int const GenEquipTypes_CoolingTower;
-    extern int const GenEquipTypes_Generator;
-    extern int const GenEquipTypes_HeatExchanger;
-    extern int const GenEquipTypes_HeatPump;
-    extern int const GenEquipTypes_Pipe;
-    extern int const GenEquipTypes_Pump;
-    extern int const GenEquipTypes_Purchased;
-    extern int const GenEquipTypes_ThermalStorage;
-    extern int const GenEquipTypes_Valve;
-    extern int const GenEquipTypes_WaterThermalTank;
-    extern int const GenEquipTypes_WaterUse;
-    extern int const GenEquipTypes_DemandCoil;
-    extern int const GenEquipTypes_SolarCollector;
-    extern int const GenEquipTypes_LoadProfile;
-    extern int const GenEquipTypes_FluidCooler;
-    extern int const GenEquipTypes_EvapFluidCooler;
-    extern int const GenEquipTypes_GroundHeatExchanger;
-    extern int const GenEquipTypes_ZoneHVACDemand;
-    extern int const GenEquipTypes_Refrigeration;
-    extern int const GenEquipTypes_PlantComponent;
-    extern int const GenEquipTypes_CentralHeatPumpSystem;
-
     extern Array1D<Real64> const ConvergenceHistoryARR;
     extern Real64 const sum_ConvergenceHistoryARR;
     extern Real64 const square_sum_ConvergenceHistoryARR;

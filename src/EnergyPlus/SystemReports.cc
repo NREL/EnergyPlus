@@ -3198,7 +3198,6 @@ namespace SystemReports {
                             // Get complete list of components for complex branches
                             if (IsParentObject(TypeOfComp, NameOfComp)) {
 
-                                thisComp.Parent = true;
                                 NumChildren = GetNumChildren(TypeOfComp, NameOfComp);
 
                                 SubCompTypes.allocate(NumChildren);
@@ -3238,7 +3237,6 @@ namespace SystemReports {
 
                             } else {
                                 NumChildren = 0;
-                                thisComp.Parent = false;
                             }
                             thisComp.NumSubComps = NumChildren;
 

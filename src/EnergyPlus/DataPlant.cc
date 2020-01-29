@@ -452,57 +452,6 @@ namespace DataPlant {
     int const TypeOf_HeatPumpEIRCooling(95);
     int const TypeOf_HeatPumpEIRHeating(96);
 
-    // Parameters for General Equipment Types
-    int const NumGeneralEquipTypes(23);
-    Array1D_string const GeneralEquipTypes(NumGeneralEquipTypes,
-                                           {"BOILER",
-                                            "CHILLER",
-                                            "COOLINGTOWER",
-                                            "GENERATOR",
-                                            "HEATEXCHANGER",
-                                            "HEATPUMP",
-                                            "PIPE",
-                                            "PUMP",
-                                            "DISTRICT",
-                                            "THERMALSTORAGE",
-                                            "TEMPERINGVALVE",
-                                            "WATERHEATER",
-                                            "WATERUSE",
-                                            "DEMANDCOIL",
-                                            "SOLARCOLLECTOR",
-                                            "LOADPROFILE",
-                                            "FLUIDCOOLER",
-                                            "EVAPORATIVEFLUIDCOOLER",
-                                            "GROUNDHEATEXCHANGER",
-                                            "ZONEHVACDEMAND",
-                                            "REFRIGERATION",
-                                            "PLANTCOMPONENT",
-                                            "CENTRALHEATPUMPSYSTEM"});
-
-    int const GenEquipTypes_Boiler(1);
-    int const GenEquipTypes_Chiller(2);
-    int const GenEquipTypes_CoolingTower(3);
-    int const GenEquipTypes_Generator(4);
-    int const GenEquipTypes_HeatExchanger(5);
-    int const GenEquipTypes_HeatPump(6);
-    int const GenEquipTypes_Pipe(7);
-    int const GenEquipTypes_Pump(8);
-    int const GenEquipTypes_Purchased(9);
-    int const GenEquipTypes_ThermalStorage(10);
-    int const GenEquipTypes_Valve(11);
-    int const GenEquipTypes_WaterThermalTank(12);
-    int const GenEquipTypes_WaterUse(13);
-    int const GenEquipTypes_DemandCoil(14);
-    int const GenEquipTypes_SolarCollector(15);
-    int const GenEquipTypes_LoadProfile(16);
-    int const GenEquipTypes_FluidCooler(17);
-    int const GenEquipTypes_EvapFluidCooler(18);
-    int const GenEquipTypes_GroundHeatExchanger(19);
-    int const GenEquipTypes_ZoneHVACDemand(20);
-    int const GenEquipTypes_Refrigeration(21);
-    int const GenEquipTypes_PlantComponent(22);
-    int const GenEquipTypes_CentralHeatPumpSystem(23);
-
     Array1D<Real64> const ConvergenceHistoryARR(DataPlant::NumConvergenceHistoryTerms, {0.0, -1.0, -2.0, -3.0, -4.0});
     Real64 const sum_ConvergenceHistoryARR(sum(ConvergenceHistoryARR));
     Real64 const square_sum_ConvergenceHistoryARR(pow_2(sum_ConvergenceHistoryARR));
