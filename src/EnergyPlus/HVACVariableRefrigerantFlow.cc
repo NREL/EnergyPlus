@@ -235,15 +235,6 @@ namespace HVACVariableRefrigerantFlow {
     Array1D<TerminalUnitListData> TerminalUnitList;    // zoneTerminalUnitList object
     Array1D<VRFTUNumericFieldData> VRFTUNumericFields; // holds VRF TU numeric input fields character field name
 
-    namespace {
-        // These were static variables within different functions. They were pulled out into the namespace
-        // to facilitate easier unit testing of those functions.
-        // These are purposefully not in the header file as an extern variable. No one outside of this should
-        // use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
-        // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
-        Real64 CurrentEndTimeLast(0.0);         // end time of last time step
-    } // namespace
-
     void SimulateVRF(std::string const &CompName,
                      int const ZoneNum,
                      bool const FirstHVACIteration,
@@ -512,6 +503,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 HRInitialEIRFrac;          // Fractional cooling degradation at the start of heat recovery from cooling mode
         Real64 HREIRTC;                   // Time constant used to recover from initial degradation in cooling heat recovery
         static Real64 CurrentEndTime;     // end time of current time step
+        static Real64 CurrentEndTimeLast; // end time of last time step
         static Real64 TimeStepSysLast;    // system time step on last time step
         Real64 SUMultiplier;              // multiplier for simulating mode changes
         Real64 CondPower;                 // condenser power [W]
@@ -13354,7 +13346,7 @@ namespace HVACVariableRefrigerantFlow {
         LoopDXCoolCoilRTF = 0.0;
         LoopDXHeatCoilRTF = 0.0;
         CondenserWaterMassFlowRate = 0.0;
-        CurrentEndTimeLast = 0.0;
+
         GetVRFInputFlag = true;
         MyOneTimeFlag = true;
         MyOneTimeSizeFlag = true;
