@@ -108,9 +108,9 @@
 !                                 A variable air volume supply fan is used. The minimum flow rate of each terminal is 20% of the desing
 !                                 air flow rate.
 !
-! Zonal Equipment:                West Zone - AIR DISTRIBUTION UNIT with AirTerminal:SingleDuct:Uncontrolled
+! Zonal Equipment:                West Zone - AIR DISTRIBUTION UNIT with AirTerminal:SingleDuct:ConstantVolume:NoReheat
 !                                 East Zone - AIR DISTRIBUTION UNIT with AirTerminal:SingleDuct:ConstantVolume:Reheat
-!                                 North Zone - AIR DISTRIBUTION UNIT with AirTerminal:SingleDuct:Uncontrolled
+!                                 North Zone - AIR DISTRIBUTION UNIT with AirTerminal:SingleDuct:ContantVolume:NoReheat
 ! Central Air Handling Equipment: Yes using a constant volume supply fan in the first AIrLoop and an On/Off fan in the second AirLoop
 ! System Equipment Autosize:      Yes
 ! Purchased Cooling:              No

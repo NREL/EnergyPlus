@@ -75,7 +75,7 @@
 ! HVAC:                           3 zone central system using two air loops. Central gas heating coils.
 !                                 Thermostat setting at 20 C in winter with 15 C set back temperature.
 !
-! Zonal Equipment:                AirTerminal:SingleDuct:Uncontrolled
+! Zonal Equipment:                AirTerminal:SingleDuct:ContantVolume:NoReheat
 ! Central Air Handling Equipment: Yes
 ! System Equipment Autosize:      No
 ! Purchased Cooling:              No
