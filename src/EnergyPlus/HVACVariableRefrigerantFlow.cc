@@ -203,7 +203,6 @@ namespace HVACVariableRefrigerantFlow {
     Real64 CompOnFlowRatio(0.0);            // fan flow ratio when coil on
     Real64 CompOffFlowRatio(0.0);           // fan flow ratio when coil off
     Real64 FanSpeedRatio(0.0);              // ratio of air flow ratio passed to fan object
-    Real64 CurrentEndTimeLast(0.0);         // end time of last time step
     Real64 LoopDXCoolCoilRTF(0.0);          // holds value of DX cooling coil RTF
     Real64 LoopDXHeatCoilRTF(0.0);          // holds value of DX heating coil RTF
     Real64 CondenserWaterMassFlowRate(0.0); // VRF water-cooled condenser mass flow rate (kg/s)
@@ -235,6 +234,15 @@ namespace HVACVariableRefrigerantFlow {
     Array1D<VRFTerminalUnitEquipment> VRFTU;           // ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object
     Array1D<TerminalUnitListData> TerminalUnitList;    // zoneTerminalUnitList object
     Array1D<VRFTUNumericFieldData> VRFTUNumericFields; // holds VRF TU numeric input fields character field name
+
+    namespace {
+        // These were static variables within different functions. They were pulled out into the namespace
+        // to facilitate easier unit testing of those functions.
+        // These are purposefully not in the header file as an extern variable. No one outside of this should
+        // use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
+        // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
+        Real64 CurrentEndTimeLast(0.0);         // end time of last time step
+    } // namespace
 
     void SimulateVRF(std::string const &CompName,
                      int const ZoneNum,
