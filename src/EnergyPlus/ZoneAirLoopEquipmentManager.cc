@@ -773,43 +773,45 @@ namespace ZoneAirLoopEquipmentManager {
             }
 
             // do leak mass flow calcs
-            // if (InNodeNum > 0) { // InNodeNum should be known by now for this ADU
-            InNodeNum = AirDistUnit(AirDistUnitNum).InletNodeNum;
-            if (AirDistUnit(AirDistUnitNum).UpStreamLeak) {
-                Node(InNodeNum).MassFlowRateMaxAvail = MassFlowRateMaxAvail;
-                Node(InNodeNum).MassFlowRateMinAvail = MassFlowRateMinAvail;
-            }
-            if ((AirDistUnit(AirDistUnitNum).UpStreamLeak || AirDistUnit(AirDistUnitNum).DownStreamLeak) && MassFlowRateMaxAvail > 0.0) {
-                AirDistUnit(AirDistUnitNum).MassFlowRateTU = Node(InNodeNum).MassFlowRate;
-                AirDistUnit(AirDistUnitNum).MassFlowRateZSup =
-                    AirDistUnit(AirDistUnitNum).MassFlowRateTU * (1.0 - AirDistUnit(AirDistUnitNum).DownStreamLeakFrac);
-                AirDistUnit(AirDistUnitNum).MassFlowRateDnStrLk =
-                    AirDistUnit(AirDistUnitNum).MassFlowRateTU * AirDistUnit(AirDistUnitNum).DownStreamLeakFrac;
-                AirDistUnit(AirDistUnitNum).MassFlowRateSup =
-                    AirDistUnit(AirDistUnitNum).MassFlowRateTU + AirDistUnit(AirDistUnitNum).MassFlowRateUpStrLk;
-                Node(InNodeNum).MassFlowRate = AirDistUnit(AirDistUnitNum).MassFlowRateSup;
-                Node(OutNodeNum).MassFlowRate = AirDistUnit(AirDistUnitNum).MassFlowRateZSup;
-                Node(OutNodeNum).MassFlowRateMaxAvail = max(
-                    0.0, MassFlowRateMaxAvail - AirDistUnit(AirDistUnitNum).MassFlowRateDnStrLk - AirDistUnit(AirDistUnitNum).MassFlowRateUpStrLk);
-                Node(OutNodeNum).MassFlowRateMinAvail = max(
-                    0.0, MassFlowRateMinAvail - AirDistUnit(AirDistUnitNum).MassFlowRateDnStrLk - AirDistUnit(AirDistUnitNum).MassFlowRateUpStrLk);
-                AirDistUnit(AirDistUnitNum).MaxAvailDelta = MassFlowRateMaxAvail - Node(OutNodeNum).MassFlowRateMaxAvail;
-                AirDistUnit(AirDistUnitNum).MinAvailDelta = MassFlowRateMinAvail - Node(OutNodeNum).MassFlowRateMinAvail;
-            } else {
-                // if no leaks, or a terminal unit type not supported for leaks
-                int termUnitType = AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompNum);
-                if ((termUnitType == DualDuctConstVolume) || (termUnitType == DualDuctVAV) || (termUnitType == DualDuctVAVOutdoorAir)) {
-                    // Use ADU outlet node flow for dual duct terminal units (which don't support leaks)
-                    AirDistUnit(AirDistUnitNum).MassFlowRateTU = Node(OutNodeNum).MassFlowRate;
-                    AirDistUnit(AirDistUnitNum).MassFlowRateZSup = Node(OutNodeNum).MassFlowRate;
-                    AirDistUnit(AirDistUnitNum).MassFlowRateSup = Node(OutNodeNum).MassFlowRate;
-                } else {
+            if (InNodeNum > 0) { // InNodeNum is not always known when this is called, eg FPIU
+                InNodeNum = AirDistUnit(AirDistUnitNum).InletNodeNum;
+                if (AirDistUnit(AirDistUnitNum).UpStreamLeak) {
+                    Node(InNodeNum).MassFlowRateMaxAvail = MassFlowRateMaxAvail;
+                    Node(InNodeNum).MassFlowRateMinAvail = MassFlowRateMinAvail;
+                }
+                if ((AirDistUnit(AirDistUnitNum).UpStreamLeak || AirDistUnit(AirDistUnitNum).DownStreamLeak) && MassFlowRateMaxAvail > 0.0) {
                     AirDistUnit(AirDistUnitNum).MassFlowRateTU = Node(InNodeNum).MassFlowRate;
-                    AirDistUnit(AirDistUnitNum).MassFlowRateZSup = Node(InNodeNum).MassFlowRate;
-                    AirDistUnit(AirDistUnitNum).MassFlowRateSup = Node(InNodeNum).MassFlowRate;
+                    AirDistUnit(AirDistUnitNum).MassFlowRateZSup =
+                        AirDistUnit(AirDistUnitNum).MassFlowRateTU * (1.0 - AirDistUnit(AirDistUnitNum).DownStreamLeakFrac);
+                    AirDistUnit(AirDistUnitNum).MassFlowRateDnStrLk =
+                        AirDistUnit(AirDistUnitNum).MassFlowRateTU * AirDistUnit(AirDistUnitNum).DownStreamLeakFrac;
+                    AirDistUnit(AirDistUnitNum).MassFlowRateSup =
+                        AirDistUnit(AirDistUnitNum).MassFlowRateTU + AirDistUnit(AirDistUnitNum).MassFlowRateUpStrLk;
+                    Node(InNodeNum).MassFlowRate = AirDistUnit(AirDistUnitNum).MassFlowRateSup;
+                    Node(OutNodeNum).MassFlowRate = AirDistUnit(AirDistUnitNum).MassFlowRateZSup;
+                    Node(OutNodeNum).MassFlowRateMaxAvail =
+                        max(0.0,
+                            MassFlowRateMaxAvail - AirDistUnit(AirDistUnitNum).MassFlowRateDnStrLk - AirDistUnit(AirDistUnitNum).MassFlowRateUpStrLk);
+                    Node(OutNodeNum).MassFlowRateMinAvail =
+                        max(0.0,
+                            MassFlowRateMinAvail - AirDistUnit(AirDistUnitNum).MassFlowRateDnStrLk - AirDistUnit(AirDistUnitNum).MassFlowRateUpStrLk);
+                    AirDistUnit(AirDistUnitNum).MaxAvailDelta = MassFlowRateMaxAvail - Node(OutNodeNum).MassFlowRateMaxAvail;
+                    AirDistUnit(AirDistUnitNum).MinAvailDelta = MassFlowRateMinAvail - Node(OutNodeNum).MassFlowRateMinAvail;
+                } else {
+                    // if no leaks, or a terminal unit type not supported for leaks
+                    int termUnitType = AirDistUnit(AirDistUnitNum).EquipType_Num(AirDistCompNum);
+                    if ((termUnitType == DualDuctConstVolume) || (termUnitType == DualDuctVAV) || (termUnitType == DualDuctVAVOutdoorAir)) {
+                        // Use ADU outlet node flow for dual duct terminal units (which don't support leaks)
+                        AirDistUnit(AirDistUnitNum).MassFlowRateTU = Node(OutNodeNum).MassFlowRate;
+                        AirDistUnit(AirDistUnitNum).MassFlowRateZSup = Node(OutNodeNum).MassFlowRate;
+                        AirDistUnit(AirDistUnitNum).MassFlowRateSup = Node(OutNodeNum).MassFlowRate;
+                    } else {
+                        AirDistUnit(AirDistUnitNum).MassFlowRateTU = Node(InNodeNum).MassFlowRate;
+                        AirDistUnit(AirDistUnitNum).MassFlowRateZSup = Node(InNodeNum).MassFlowRate;
+                        AirDistUnit(AirDistUnitNum).MassFlowRateSup = Node(InNodeNum).MassFlowRate;
+                    }
                 }
             }
-            //}
         }
         if (ProvideSysOutput) {
             // Sign convention: SysOutputProvided <0 Zone is cooled
