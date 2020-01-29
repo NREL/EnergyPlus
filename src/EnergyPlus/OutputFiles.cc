@@ -84,7 +84,7 @@ public:
 
     static constexpr bool should_be_fixed_output(const Real64 value)
     {
-        return (value >= 0.1 || value <= -0.1) || (value == 0.0);
+        return (value >= 0.099999999999999995 || value <= -0.099999999999999995) || (value == 0.0) || (value == -0.0);
     }
 
     static bool fixed_will_fit(const Real64 value, const int places)
