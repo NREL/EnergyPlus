@@ -792,7 +792,7 @@ namespace MoistureBalanceEMPDManager {
               "{}",
               "! <Construction EMPD>, Construction Name, Inside Layer Material Name, Vapor Resistance Factor, a, b, "
               "c, d, Surface Penetration Depth {m}, Deep Penetration Depth {m}, Coating Vapor Resistance Factor, "
-              "Coating Thickness {m}");
+              "Coating Thickness {m}\n");
 
         for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
             if (Construct(ConstrNum).TypeIsWindow) continue;

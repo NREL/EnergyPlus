@@ -229,9 +229,15 @@ public:
                     ++specs()->precision;
                     auto str = write_to_string(value, *specs());
                     str.pop_back();
+                    if (specs()->precision == 1) {
+                        //precision was initially 0
+                        //let's remove the now dangling decimal
+                        str.pop_back();
+                    }
                     return write_string(str);
                 } else {
                     specs()->type = 'E';
+                    ++specs()->precision;
 
                     // write the `E` formatted float to a std::string
                     auto str = write_to_string(value, *specs());
@@ -242,6 +248,11 @@ public:
                             // wants a 0 inserted
                             str.insert(str.size() - 2, "0");
                         }
+                    }
+
+                    const auto E_itr = std::find(begin(str), end(str), 'E');
+                    if (E_itr != str.end()) {
+                        str.erase(std::prev(E_itr));
                     }
 
                     return write_string(str);

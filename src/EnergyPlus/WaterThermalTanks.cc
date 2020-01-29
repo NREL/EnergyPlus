@@ -5224,7 +5224,7 @@ namespace WaterThermalTanks {
         if (this->TypeNum == DataPlant::TypeOf_WtrHeaterStratified) {
 
             for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
-                static constexpr auto Format_723("Water Heater Stratified Node Information,{},{:.4T},{:.4T},{:.3T},{:.4T},{:4T},{},{}\n");
+                static constexpr auto Format_723("Water Heater Stratified Node Information,{},{:.4T},{:.4T},{:.3T},{:.4T},{:.4T},{},{}\n");
                 print(outputFiles.eio,
                       Format_723,
                       NodeNum,
