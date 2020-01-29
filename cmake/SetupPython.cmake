@@ -1,3 +1,15 @@
+# Steps we need to follow for now:
+#  Use finder to get Python executable
+#  Use finder to get Python library and include paths
+#  Add Python include path to include_directories
+#  Link E+ against Python library
+#  At install time find the Python library and copy it into the install tree
+#  At install time find the Python site-packages folder and copy it into the install tree
+#  In E+ need to setPath before calling PyInitialize so we can get all the site_packages
+# Now we should also consider whether we want to try to build *without* Python
+#  I can imagine doing this on the 32 bit Windows, for example.
+#  And this would *not* exclude calling E+ as a library from C or Python -- it would just disable Python Plugins
+#  If we don't do this then we'll need to install both 32 and 64 bit Python on Windows and get the right one
 
 # We need to connect up to python for a couple reasons.
 # 1. We use Python in our testing scripts
