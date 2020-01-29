@@ -203,6 +203,7 @@ namespace HVACVariableRefrigerantFlow {
     Real64 CompOnFlowRatio(0.0);            // fan flow ratio when coil on
     Real64 CompOffFlowRatio(0.0);           // fan flow ratio when coil off
     Real64 FanSpeedRatio(0.0);              // ratio of air flow ratio passed to fan object
+    Real64 CurrentEndTimeLast(0.0);         // end time of last time step
     Real64 LoopDXCoolCoilRTF(0.0);          // holds value of DX cooling coil RTF
     Real64 LoopDXHeatCoilRTF(0.0);          // holds value of DX heating coil RTF
     Real64 CondenserWaterMassFlowRate(0.0); // VRF water-cooled condenser mass flow rate (kg/s)
@@ -503,7 +504,6 @@ namespace HVACVariableRefrigerantFlow {
         Real64 HRInitialEIRFrac;          // Fractional cooling degradation at the start of heat recovery from cooling mode
         Real64 HREIRTC;                   // Time constant used to recover from initial degradation in cooling heat recovery
         static Real64 CurrentEndTime;     // end time of current time step
-        static Real64 CurrentEndTimeLast; // end time of last time step
         static Real64 TimeStepSysLast;    // system time step on last time step
         Real64 SUMultiplier;              // multiplier for simulating mode changes
         Real64 CondPower;                 // condenser power [W]
@@ -13346,7 +13346,7 @@ namespace HVACVariableRefrigerantFlow {
         LoopDXCoolCoilRTF = 0.0;
         LoopDXHeatCoilRTF = 0.0;
         CondenserWaterMassFlowRate = 0.0;
-
+        CurrentEndTimeLast = 0.0;
         GetVRFInputFlag = true;
         MyOneTimeFlag = true;
         MyOneTimeSizeFlag = true;

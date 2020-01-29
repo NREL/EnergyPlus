@@ -137,6 +137,7 @@ namespace HVACVariableRefrigerantFlow {
     extern Real64 CompOnFlowRatio;               // fan flow ratio when coil on
     extern Real64 CompOffFlowRatio;              // fan flow ratio when coil off
     extern Real64 FanSpeedRatio;                 // ratio of air flow ratio passed to fan object
+    extern Real64 CurrentEndTimeLast;            // end time of last time step
     extern Array1D_bool HeatingLoad;             // defines a heating load on VRFTerminalUnits
     extern Array1D_bool CoolingLoad;             // defines a cooling load on VRFTerminalUnits
     extern Array1D_bool LastModeHeating;         // defines last mode was heating mode
