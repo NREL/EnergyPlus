@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,7 +50,7 @@
 // ObjexxFCL Headers
 
 // EnergyPlus Headers
-#include <InputProcessing/InputValidation.hh>
+#include <EnergyPlus/InputProcessing/InputValidation.hh>
 #include <valijson/adapters/nlohmann_json_adapter.hpp>
 #include <valijson/schema.hpp>
 #include <valijson/schema_parser.hpp>
@@ -100,7 +100,9 @@ bool Validation::validate(json const &parsed_input)
                     context += *it;
 
                 errors_.emplace_back(context + " - " + error.description);
-                if (max_context == 2 && error.description == "Object contains properties that could not be validated using 'properties' or 'additionalProperties' constraints") {
+                if (max_context == 2 &&
+                    error.description ==
+                        "Object contains properties that could not be validated using 'properties' or 'additionalProperties' constraints") {
                     errors_.emplace_back(context + " - Object name is required and cannot be blank or whitespace");
                 }
             }

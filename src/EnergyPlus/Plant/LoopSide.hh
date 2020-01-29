@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,13 +48,13 @@
 #ifndef PlantTopologyLoopSide_hh_INCLUDED
 #define PlantTopologyLoopSide_hh_INCLUDED
 
-#include <DataLoopNode.hh>
-#include <Plant/Branch.hh>
-#include <Plant/ConnectedLoopData.hh>
-#include <Plant/LoopSidePumpInformation.hh>
-#include <Plant/MixerData.hh>
-#include <Plant/PlantConvergencePoint.hh>
-#include <Plant/SplitterData.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/Plant/Branch.hh>
+#include <EnergyPlus/Plant/ConnectedLoopData.hh>
+#include <EnergyPlus/Plant/LoopSidePumpInformation.hh>
+#include <EnergyPlus/Plant/MixerData.hh>
+#include <EnergyPlus/Plant/PlantConvergencePoint.hh>
+#include <EnergyPlus/Plant/SplitterData.hh>
 
 namespace EnergyPlus {
 namespace DataPlant {

@@ -100,7 +100,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.2;
+  Version,9.3;
 
   Building,
     Building,                !- Name
@@ -132,7 +132,7 @@
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
-    1,                      !- End Month
+    1,                       !- End Month
     31,                      !- End Day of Month
     ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
@@ -147,7 +147,7 @@
     4,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
-    4,                      !- End Month
+    4,                       !- End Month
     30,                      !- End Day of Month
     ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
@@ -156,12 +156,13 @@
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
+
   RunPeriod,
     Run Period 7,            !- Name
     7,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
-    7,                      !- End Month
+    7,                       !- End Month
     31,                      !- End Day of Month
     ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
@@ -2367,8 +2368,8 @@
     Zone1UnitVent,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone2Equipment,          !- Name
@@ -2377,8 +2378,8 @@
     Zone2UnitVent,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone3Equipment,          !- Name
@@ -2387,8 +2388,8 @@
     Zone3UnitVent,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone4Equipment,          !- Name
@@ -2397,8 +2398,8 @@
     Zone4UnitVent,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Zone5Equipment,          !- Name
@@ -2407,8 +2408,8 @@
     Zone5UnitVent,           !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:UnitVentilator,
     Zone1UnitVent,           !- Name
@@ -2427,7 +2428,7 @@
     Fan:SystemModel,         !- Supply Air Fan Object Type
     Zone1UnitVentFan,        !- Supply Air Fan Name
     HeatingAndCooling,       !- Coil Option
-    ,                !- Supply Air Fan Operating Mode Schedule Name
+    ,                        !- Supply Air Fan Operating Mode Schedule Name
     Coil:Heating:Water,      !- Heating Coil Object Type
     Zone1UnitVentHeatingCoil,!- Heating Coil Name
     0.001,                   !- Heating Convergence Tolerance
@@ -2436,6 +2437,7 @@
     0.001;                   !- Cooling Convergence Tolerance
 
   Schedule:Constant,always_0,,0.0;
+
   Schedule:Constant,always_1,,1.0;
 
   OutdoorAir:Node,
@@ -2935,12 +2937,21 @@
   Output:Table:SummaryReports,
     AllSummary;              !- Report 1 Name
 
-Output:Variable,*,Heating Coil Heating Rate,detailed; !- HVAC Average [W]
-Output:Variable,*,Cooling Coil Total Cooling Rate,detailed; !- HVAC Average [W]
-Output:Variable,*,Cooling Coil Sensible Cooling Rate,detailed; !- HVAC Average [W]
-Output:Variable,*,Zone Thermostat Heating Setpoint Temperature,detailed; !- HVAC Average [C]
-Output:Variable,*,Zone Thermostat Cooling Setpoint Temperature,detailed; !- HVAC Average [C]
-Output:Variable,*,Zone Predicted Sensible Load to Heating Setpoint Heat Transfer Rate,detailed; !- HVAC Average [W]
-Output:Variable,*,Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate,detailed; !- HVAC Average [W]
-Output:Variable,*,Zone Heating Setpoint Not Met While Occupied Time,detailed; !- Zone Sum [hr]
-Output:Variable,*,Zone Cooling Setpoint Not Met While Occupied Time,detailed; !- Zone Sum [hr]
+  Output:Variable,*,Heating Coil Heating Rate,detailed;
+
+  Output:Variable,*,Cooling Coil Total Cooling Rate,detailed;
+
+  Output:Variable,*,Cooling Coil Sensible Cooling Rate,detailed;
+
+  Output:Variable,*,Zone Thermostat Heating Setpoint Temperature,detailed;
+
+  Output:Variable,*,Zone Thermostat Cooling Setpoint Temperature,detailed;
+
+  Output:Variable,*,Zone Predicted Sensible Load to Heating Setpoint Heat Transfer Rate,detailed;
+
+  Output:Variable,*,Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate,detailed;
+
+  Output:Variable,*,Zone Heating Setpoint Not Met While Occupied Time,detailed;
+
+  Output:Variable,*,Zone Cooling Setpoint Not Met While Occupied Time,detailed;
+

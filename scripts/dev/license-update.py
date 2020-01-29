@@ -37,9 +37,6 @@
 # Finally, change the "dryrun" parameter back to "True".
 #
 
-import os
-import glob
-import json
 import licensetext
 
 TOOL_NAME = 'license-update'
@@ -72,9 +69,6 @@ replacer = licensetext.Replacer(previous, current, dryrun=dryrun)
 
 # Check files
 for base in dirs:
-    #subdirs = glob.glob(base + '*/')
-    replacer.check(base)
-    #for sub in subdirs:
-    #    replacer.check(sub)
+    replacer.visit(base)
 
 print(replacer.summary())

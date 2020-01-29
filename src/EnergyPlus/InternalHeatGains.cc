@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,46 +57,46 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include <CurveManager.hh>
-#include <DataContaminantBalance.hh>
-#include <DataDaylighting.hh>
-#include <DataEnvironment.hh>
-#include <DataGlobalConstants.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataRoomAirModel.hh>
-#include <DataSizing.hh>
-#include <DataSurfaces.hh>
-#include <DataViewFactorInformation.hh>
-#include <DataZoneEquipment.hh>
-#include <DaylightingDevices.hh>
-#include <EMSManager.hh>
-#include <ElectricPowerServiceManager.hh>
-#include <ExteriorEnergyUse.hh>
-#include <FuelCellElectricGenerator.hh>
-#include <General.hh>
-#include <HeatBalanceInternalHeatGains.hh>
-#include <HybridModel.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <InternalHeatGains.hh>
-#include <MicroCHPElectricGenerator.hh>
-#include <NodeInputManager.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportPredefined.hh>
-#include <OutputReportTabular.hh>
-#include <PipeHeatTransfer.hh>
-#include <Psychrometrics.hh>
-#include <RefrigeratedCase.hh>
-#include <ScheduleManager.hh>
-#include <UtilityRoutines.hh>
-#include <WaterThermalTanks.hh>
-#include <WaterUse.hh>
-#include <ZonePlenum.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataDaylighting.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataRoomAirModel.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataViewFactorInformation.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DaylightingDevices.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
+#include <EnergyPlus/ExteriorEnergyUse.hh>
+#include <EnergyPlus/FuelCellElectricGenerator.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
+#include <EnergyPlus/HybridModel.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/MicroCHPElectricGenerator.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
+#include <EnergyPlus/PipeHeatTransfer.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/RefrigeratedCase.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WaterThermalTanks.hh>
+#include <EnergyPlus/WaterUse.hh>
+#include <EnergyPlus/ZonePlenum.hh>
 
 namespace EnergyPlus {
 
@@ -708,7 +708,7 @@ namespace InternalHeatGains {
                         MustInpSch = false;
                         UsingThermalComfort = false;
                         lastOption = NumAlpha;
-                        
+
                         // check to see if the user has specified schedules for air velocity, clothing insulation, and/or work efficiency
                         // but have NOT made a selection for a thermal comfort model.  If so, then the schedules are reported as unused
                         // which could cause confusion.  The solution is for the user to either remove those schedules or pick a thermal
@@ -6162,13 +6162,13 @@ namespace InternalHeatGains {
         Real64 CPULoadSchedFrac;                          // CPU loading schedule fraction
         Real64 AirConnection;                             // Air connection type
         Real64 TSupply;                                   // Supply air temperature [C]
-        Real64 WSupply;                                   // Supply air humidity ratio [kgH2O/kgdryair]
+        Real64 WSupply;                                   // Supply air humidity ratio [kgWater/kgDryAir]
         Real64 RecircFrac;                                // Recirulation fraction - current
         Real64 TRecirc;                                   // Recirulation air temperature [C]
-        Real64 WRecirc;                                   // Recirulation air humidity ratio [kgH2O/kgdryair]
+        Real64 WRecirc;                                   // Recirulation air humidity ratio [kgWater/kgDryAir]
         Real64 TAirIn;                                    // Entering air dry-bulb temperature [C]
         Real64 TAirInDesign;                              // Design entering air dry-bulb temperature [C]
-        Real64 WAirIn;                                    // Entering air humidity ratio [kgH2O/kgdryair]
+        Real64 WAirIn;                                    // Entering air humidity ratio [kgWater/kgDryAir]
         Real64 TDPAirIn;                                  // Entering air dewpoint temperature [C]
         Real64 RHAirIn;                                   // Entering air relative humidity [%]
         Real64 SupplyHeatIndex;                           // Supply heat index
@@ -6826,20 +6826,20 @@ namespace InternalHeatGains {
 
         return DesignLightingLevelSum;
     }
-    
+
     bool CheckThermalComfortSchedules(bool const WorkEffSch, // Blank work efficiency schedule = true
                                       bool const CloInsSch,  // Blank clothing insulation schedule = true
                                       bool const AirVeloSch) // Blank air velocity schedule = true
     {
         bool TCSchedsPresent = false;
-        
+
         if ( !WorkEffSch || !CloInsSch || !AirVeloSch ) {
             TCSchedsPresent = true;
         }
-        
+
         return TCSchedsPresent;
     }
-    
+
     void CheckLightsReplaceableMinMaxForZone(int const WhichZone) // Zone Number
     {
 

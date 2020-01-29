@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,44 +54,44 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <AirTerminalUnit.hh>
-#include <CommandLineInterface.hh>
-#include <CostEstimateManager.hh>
-#include <DataAirLoop.hh>
-#include <DataAirSystems.hh>
-#include <DataContaminantBalance.hh>
-#include <DataDefineEquip.hh>
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSizing.hh>
-#include <DataStringGlobals.hh>
-#include <DataZoneEquipment.hh>
-#include <DirectAirManager.hh>
-#include <DisplayRoutines.hh>
-#include <DualDuct.hh>
-#include <EMSManager.hh>
-#include <General.hh>
-#include <HVACCooledBeam.hh>
-#include <HVACFourPipeBeam.hh>
-#include <HVACSingleDuctInduc.hh>
-#include <HeatBalanceManager.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <OutputReportPredefined.hh>
-#include <OutputReportTabular.hh>
-#include <PoweredInductionUnits.hh>
-#include <ReportSizingManager.hh>
-#include <SQLiteProcedures.hh>
-#include <ScheduleManager.hh>
-#include <SimAirServingZones.hh>
-#include <SimulationManager.hh>
-#include <SingleDuct.hh>
-#include <SizingManager.hh>
-#include <UtilityRoutines.hh>
-#include <WeatherManager.hh>
-#include <ZoneEquipmentManager.hh>
+#include <EnergyPlus/AirTerminalUnit.hh>
+#include <EnergyPlus/CommandLineInterface.hh>
+#include <EnergyPlus/CostEstimateManager.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataDefineEquip.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DirectAirManager.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/DualDuct.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/HVACCooledBeam.hh>
+#include <EnergyPlus/HVACFourPipeBeam.hh>
+#include <EnergyPlus/HVACSingleDuctInduc.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
+#include <EnergyPlus/PoweredInductionUnits.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
+#include <EnergyPlus/SQLiteProcedures.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SimAirServingZones.hh>
+#include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SingleDuct.hh>
+#include <EnergyPlus/SizingManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/ZoneEquipmentManager.hh>
 
 namespace EnergyPlus {
 
@@ -356,6 +356,14 @@ namespace SizingManager {
                     ++NumSizingPeriodsPerformed;
 
                     BeginEnvrnFlag = true;
+                    if ((KindOfSim == ksDesignDay) && (WeatherManager::DesDayInput(Environment(Envrn).DesignDayNum).suppressBegEnvReset)) {
+                        // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can
+                        // more easily converge fewer warmup days are allowed
+                        DisplayString("Suppressing Initialization of New Environment Parameters");
+                        DataGlobals::beginEnvrnWarmStartFlag = true;
+                    } else {
+                        DataGlobals::beginEnvrnWarmStartFlag = false;
+                    }
                     EndEnvrnFlag = false;
                     EndMonthFlag = false;
                     WarmupFlag = true;
@@ -571,6 +579,14 @@ namespace SizingManager {
                 ++NumSizingPeriodsPerformed;
 
                 BeginEnvrnFlag = true;
+                if ((KindOfSim == ksDesignDay) && (WeatherManager::DesDayInput(Environment(Envrn).DesignDayNum).suppressBegEnvReset)) {
+                    // user has input in SizingPeriod:DesignDay directing to skip begin environment rests, for accuracy-with-speed as zones can more
+                    // easily converge fewer warmup days are allowed
+                    DisplayString("Suppressing Initialization of New Environment Parameters");
+                    DataGlobals::beginEnvrnWarmStartFlag = true;
+                } else {
+                    DataGlobals::beginEnvrnWarmStartFlag = false;
+                }
                 EndEnvrnFlag = false;
                 WarmupFlag = false;
                 DayOfSim = 0;
@@ -2852,7 +2868,7 @@ namespace SizingManager {
                     //      \required-field
                     //      \minimum 0.0
                     //      \type real
-                    //      \units kg-H2O/kg-air
+                    //      \units kgWater/kgDryAir
                     if (lNumericFieldBlanks(5)) {
                         ZoneSizingInput(ZoneSizIndex).CoolDesHumRat = 0.0;
                     } else if (rNumericArgs(5) < 0.0) {
@@ -2866,7 +2882,7 @@ namespace SizingManager {
                     //      \required-field
                     //      \minimum 0.0
                     //      \type real
-                    //      \units kg-H2O/kg-air
+                    //      \units kgWater/kgDryAir
                     if (lNumericFieldBlanks(6)) {
                         ZoneSizingInput(ZoneSizIndex).HeatDesHumRat = 0.0;
                     } else if (rNumericArgs(6) < 0.0) {

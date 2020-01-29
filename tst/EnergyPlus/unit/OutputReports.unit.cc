@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,13 +53,13 @@
 #include <ObjexxFCL/Array1D.hh>
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
-#include <DataHeatBalance.hh>
-#include <HeatBalanceManager.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
 //#include <OutputReportData.hh>
 //#include <UtilityRoutines.hh>
 //#include <EnergyPlus/OutputProcessor.hh>
-#include <OutputReports.hh>
-#include <SurfaceGeometry.hh>
+#include <EnergyPlus/OutputReports.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
 
 using namespace EnergyPlus;
 using namespace ObjexxFCL;
@@ -123,10 +123,10 @@ TEST_F(EnergyPlusFixture, OutputReports_SurfaceDetailsReport)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool foundErrors(false);
-    HeatBalanceManager::GetProjectControlData(foundErrors); // read project control data
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), foundErrors); // read project control data
     EXPECT_FALSE(foundErrors);                              // expect no errors
 
-    HeatBalanceManager::GetMaterialData(foundErrors); // read material data
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), foundErrors); // read material data
     EXPECT_FALSE(foundErrors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(foundErrors); // read construction data
