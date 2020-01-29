@@ -22272,7 +22272,7 @@
     0.001,                   !- Heating Convergence Tolerance
     ;                        !- Availability Manager List Name
 
-!-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:UNCONTROLLED ===========
+!-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:NOREHEAT ===========
 
   AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     FrontLoungeFlr1 Direct Air,  !- Name

@@ -83,7 +83,7 @@
 !                                 The diffrent comfort controls may not be realistic. The purpose is to show how these control
 !                                 objects work in this example input file.
 !
-! Zonal Equipment:                AirTerminal:SingleDuct:Uncontrolled
+! Zonal Equipment:                AirTerminal:SingleDuct:ContantVolume:NoReheat
 ! Central Air Handling Equipment: Yes
 ! System Equipment Autosize:      No (chilled water loop volume is autosized although not used)
 ! Purchased Cooling:              No

@@ -51,7 +51,7 @@
 !                                 evaporative coolers and one demonstrates just an direct cooler.  These are the
 !                                 "ResearchSpecial" coolers that modulate to meet setpoints.
 !
-! Zonal Equipment:                AirTerminal:SingleDuct:Uncontrolled
+! Zonal Equipment:                AirTerminal:SingleDuct:ContantVolume:NoReheat
 ! Central Air Handling Equipment: No.
 ! System Equipment Autosize:      Yes
 ! Purchased Cooling:              None

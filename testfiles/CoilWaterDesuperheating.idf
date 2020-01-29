@@ -76,7 +76,7 @@
 !                                 with 30 C set back temperature. Cooling coil off in winter, heating coil on all year.
 !                                 Water heater reclaims waste heat from the DX air conditioner.
 !
-! Zonal Equipment:                AirTerminal:SingleDuct:Uncontrolled
+! Zonal Equipment:                AirTerminal:SingleDuct:ContantVolume:NoReheat
 ! Central Air Handling Equipment: Yes
 ! System Equipment Autosize:      No (chilled water loop volume is autosized although not used)
 ! Purchased Cooling:              No

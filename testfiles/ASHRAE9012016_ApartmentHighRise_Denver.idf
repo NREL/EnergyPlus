@@ -27172,7 +27172,7 @@
     HTGSETP_OFF_SCH_Yes_Optimum,  !- Heating Setpoint Temperature Schedule Name
     CLGSETP_OFF_SCH_Yes_Optimum;  !- Cooling Setpoint Temperature Schedule Name
 
-!-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:UNCONTROLLED ===========
+!-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:NOREHEAT ===========
 
   AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     G SW Apartment Direct Air,  !- Name
