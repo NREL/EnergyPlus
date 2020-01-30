@@ -61,6 +61,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class OutputFiles;
 
 namespace DaylightingManager {
 
@@ -128,7 +129,7 @@ namespace DaylightingManager {
 
     void DayltgAveInteriorReflectance(int &ZoneNum); // Zone number
 
-    void CalcDayltgCoefficients();
+    void CalcDayltgCoefficients(OutputFiles &outputFiles);
 
     void CalcDayltgCoeffsRefMapPoints(int const ZoneNum);
 
@@ -335,7 +336,7 @@ namespace DaylightingManager {
 
     void GetDaylightingParametersInput();
 
-    void GetInputIlluminanceMap(bool &ErrorsFound);
+    void GetInputIlluminanceMap(OutputFiles &outputFiles, bool &ErrorsFound);
 
     void GetDaylightingControls(int const TotDaylightingControls, // Total daylighting controls inputs
                                 bool &ErrorsFound);
@@ -469,7 +470,7 @@ namespace DaylightingManager {
 
     void CloseDFSFile();
 
-    void DayltgSetupAdjZoneListsAndPointers();
+    void DayltgSetupAdjZoneListsAndPointers(OutputFiles &outputFiles);
 
     void CreateShadeDeploymentOrder(int &ZoneNum);
 
