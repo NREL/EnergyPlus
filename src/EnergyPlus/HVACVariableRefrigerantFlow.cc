@@ -973,7 +973,7 @@ namespace HVACVariableRefrigerantFlow {
                     HREIRFT = VRF(VRFCond).HREIRFTCool; // Index to cool EIR as a function of temperature curve for heat recovery
                     if (HREIRFT > 0) {
                         //         VRF(VRFCond)%HREIRFTCoolConst = 1.1d0 ! initialized to 1.1
-                        if (CurveManager::PerfCurve(VRF(VRFCond).HREIRFTCool).NumDims == 2) { // Curve type for HRCAPFTCool
+                        if (CurveManager::PerfCurve(VRF(VRFCond).HREIRFTCool).NumDims == 2) { // Curve type for HREIRFTCool
                             VRF(VRFCond).HREIRFTCoolConst = CurveValue(HREIRFT, InletAirWetBulbC, CondInletTemp);
                         } else {
                             VRF(VRFCond).HREIRFTCoolConst = CurveValue(HREIRFT, VRF(VRFCond).VRFCondPLR);
@@ -1015,7 +1015,7 @@ namespace HVACVariableRefrigerantFlow {
                     HREIRFT = VRF(VRFCond).HREIRFTHeat; // Index to cool EIR as a function of temperature curve for heat recovery
                     if (HREIRFT > 0) {
                         //         VRF(VRFCond)%HREIRFTCoolConst = 1.1d0 ! initialized to 1.1
-                        if (CurveManager::PerfCurve(VRF(VRFCond).HREIRFTHeat).NumDims == 2) { // Curve type for HRCAPFTHeat
+                        if (CurveManager::PerfCurve(VRF(VRFCond).HREIRFTHeat).NumDims == 2) { // Curve type for HREIRFTHeat
                             {
                                 auto const SELECT_CASE_var(VRF(VRFCond).HeatingPerformanceOATType);
                                 if (SELECT_CASE_var == DataHVACGlobals::DryBulbIndicator) {
@@ -1030,7 +1030,7 @@ namespace HVACVariableRefrigerantFlow {
                             VRF(VRFCond).HREIRFTHeatConst = CurveValue(HREIRFT, VRF(VRFCond).VRFCondPLR);
                         }
                     }
-                    HREIRFTConst = VRF(VRFCond).HRCAPFTHeatConst;
+                    HREIRFTConst = VRF(VRFCond).HREIRFTHeatConst;
                     HRInitialEIRFrac =
                         VRF(VRFCond).HRInitialHeatEIRFrac; // Fractional heating degradation at the start of heat recovery from heating mode
                     HREIRTC = VRF(VRFCond).HRHeatEIRTC;    // Time constant used to recover from initial degradation in heating heat recovery
