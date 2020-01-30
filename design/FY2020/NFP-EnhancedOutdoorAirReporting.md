@@ -10,6 +10,7 @@ Enhance Outdoor Air Reporting
  - January 23, 2020 - remove ACH (air changes per hour) tables and columns, remove minimum outdoor air during occupancy tables, 
  move and rename the required airflow rate based on 62.1 computed each timestep to Voz-dyn and the associated times,
  added Time Above Zero When Unoccupied 
+ - January 27, 2020 - changed "Dynamic Zone Outdoor Airflow - Voz-dyn" to "Dynamic Target Ventilation - Voz-dyn"
  
 
 ## Justification for New Feature ##
@@ -230,7 +231,7 @@ will appear as shown below.
     <td align="right">Zone Volume [ft3]</td>
     <td align="right">Zone Area [ft2]</td>
     <td align="right">Design Zone Outdoor Airflow - Voz [ft3/min]</td>
-    <td align="right">Minimum Dynamic Zone Outdoor Airflow - Voz-dyn-min [ft3/min]</td>
+    <td align="right">Minimum Dynamic Target Ventilation - Voz-dyn-min [ft3/min]</td>
   </tr>
   <tr>
     <td align="right">SPACE1-1</td>
@@ -305,7 +306,7 @@ will appear as shown below.
     <td align="right">Total Ventilation [ft3]</td>
     <td align="right">Infiltration [ft3]</td>
     <td align="right">Total Ventilation and Infiltration [ft3]</td>
-    <td align="right">Dynamic Zone Outdoor Airflow - Voz-dyn [ft3]</td>
+    <td align="right">Dynamic Target Ventilation - Voz-dyn [ft3]</td>
     <td align="right">Time Below Voz-dyn [Hours]</td>
     <td align="right">Time At Voz-dyn [Hours]</td>
     <td align="right">Time Above Voz-dyn [Hours]</td>
@@ -401,7 +402,7 @@ will appear as shown below.
     <td align="right">Total Ventilation [ft3/min]</td>
     <td align="right">Infiltration [ft3/min]</td>
     <td align="right">Total Ventilation and Infiltration [ft3/min]</td>
-    <td align="right">Dynamic Zone Outdoor Airflow - Voz-dyn [ft3/min]</td>
+    <td align="right">Dynamic Target Ventilation - Voz-dyn [ft3/min]</td>
     <td align="right">Time Below Voz-dyn [Hours]</td>
     <td align="right">Time At Voz-dyn [Hours]</td>
     <td align="right">Time Above Voz-dyn [Hours]</td>
@@ -487,7 +488,7 @@ will appear as shown below.
 <table border="1" cellpadding="4" cellspacing="0">
   <tr><td></td>
     <td align="right">Mechanical Ventilation [ft3]</td>
-    <td align="right">Sum Dynamic Zone Outdoor Airflow - Voz-sum-dyn [ft3]</td>
+    <td align="right">Sum Zone Dynamic Target Ventilation - Voz-sum-dyn [ft3]</td>
     <td align="right">Time Below Voz-sum-dyn [Hours]</td>
     <td align="right">Time At Voz-sum-dyn [Hours]</td>
     <td align="right">Time Above Voz-sum-dyn [Hours]</td>
@@ -529,7 +530,7 @@ will appear as shown below.
 <table border="1" cellpadding="4" cellspacing="0">
   <tr><td></td>
     <td align="right">Mechanical Ventilation [ft3/min]</td>
-    <td align="right">Sum Dynamic Zone Outdoor Airflow - Voz-sum-dyn [ft3/min]</td>
+    <td align="right">Sum Zone Dynamic Zone Outdoor Airflow - Voz-sum-dyn [ft3/min]</td>
     <td align="right">Time Below Voz-sum-dyn [Hours]</td>
     <td align="right">Time At Voz-sum-dyn [Hours]</td>
     <td align="right">Time Above Voz-sum-dyn [Hours]</td>
