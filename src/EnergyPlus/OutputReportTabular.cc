@@ -181,7 +181,6 @@ namespace OutputReportTabular {
     using DataGlobals::ksRunPeriodWeather;
     using DataGlobals::NumOfZones;
     using DataGlobals::OutputFileDebug;
-    using DataGlobals::OutputFileInits;
     using DataGlobals::SecInHour;
     using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZone;
@@ -768,7 +767,7 @@ namespace OutputReportTabular {
             OutputReportTabularAnnual::GetInputTabularAnnual();
             OutputReportTabularAnnual::checkAggregationOrderForAnnual();
             GetInputTabularTimeBins();
-            GetInputTabularStyle();
+            GetInputTabularStyle(OutputFiles::getSingleton());
             GetInputOutputTableSummaryReports();
             // noel -- noticed this was called once and very slow -- sped up a little by caching keys
             InitializeTabularMonthly();
@@ -1741,7 +1740,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void GetInputTabularStyle()
+    void GetInputTabularStyle(OutputFiles &outputFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -1896,13 +1895,13 @@ namespace OutputReportTabular {
         }
 
         if (WriteTabularFiles) {
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Tabular Report>,Style,Unit Conversion";
+            print(outputFiles.eio, "! <Tabular Report>,Style,Unit Conversion\n");
             if (AlphArray(1) != "HTML") {
                 ConvertCaseToLower(AlphArray(1), AlphArray(2));
                 AlphArray(1).erase(1);
                 AlphArray(1) += AlphArray(2).substr(1);
             }
-            ObjexxFCL::gio::write(OutputFileInits, "('Tabular Report,',A,',',A)") << AlphArray(1) << AlphArray(2);
+            print(outputFiles.eio, "Tabular Report,{},{}\n", AlphArray(1), AlphArray(2));
         }
     }
 
@@ -5695,7 +5694,7 @@ namespace OutputReportTabular {
             WriteSurfaceShadowing();
             WriteCompCostTable();
             WriteAdaptiveComfortTable();
-            WriteEioTables();
+            WriteEioTables(OutputFiles::getSingleton());
             WriteLoadComponentSummaryTables();
             WriteHeatEmissionTable();
 
@@ -11821,7 +11820,7 @@ namespace OutputReportTabular {
 
     // Parses the contents of the EIO (initializations) file and creates subtables for each type of record in the tabular output files
     // Glazer - November 2016
-    void WriteEioTables()
+    void WriteEioTables(OutputFiles &outputFiles)
     {
 
         if (displayEioSummary) {
@@ -11835,7 +11834,7 @@ namespace OutputReportTabular {
             WriteReportHeaders("Initialization Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
 
             // since the EIO initilization file is open at this point must close it to read it and then reopen afterward.
-            ObjexxFCL::gio::close(OutputFileInits);
+            outputFiles.eio.close();
 
             std::ifstream eioFile;
             eioFile.open(DataStringGlobals::outputEioFileName);
@@ -11932,16 +11931,9 @@ namespace OutputReportTabular {
                 }
             }
 
-            // reopen the EIO initilization file and position it at the end of the file so that additional writes continue to be added at the end.
-            int write_stat;
-            {
-                IOFlags flags;
-                flags.ACTION("write");
-                flags.STATUS("UNKNOWN");
-                flags.POSITION("APPEND");
-                ObjexxFCL::gio::open(OutputFileInits, DataStringGlobals::outputEioFileName, flags);
-                write_stat = flags.ios();
-            }
+            // reopen the EIO initialization file and position it at the end of the file so that additional writes continue to be added at the end.
+            outputFiles.eio.open_at_end();
+
             // as of Oct 2016 only the <Program Control Information:Threads/Parallel Sims> section is written after this point
         }
     }
@@ -12204,7 +12196,7 @@ namespace OutputReportTabular {
         // need for reporting  DEALLOCATE(decayCurveHeat)
     }
 
-    void ComputeLoadComponentDecayCurve()
+    void ComputeLoadComponentDecayCurve(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -12305,53 +12297,27 @@ namespace OutputReportTabular {
 
         if (ShowDecayCurvesInEIO) {
             // show the line definition for the decay curves
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Radiant to Convective Decay Curves for Cooling>,Zone Name, Surface Name, Time "
-                                                 "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36";
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Radiant to Convective Decay Curves for Heating>,Zone Name, Surface Name, Time "
-                                                 "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36";
+            print(outputFiles.eio,  "! <Radiant to Convective Decay Curves for Cooling>,Zone Name, Surface Name, Time "
+                                    "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36");
             // Put the decay curve into the EIO file
             for (int iZone = 1; iZone <= NumOfZones; ++iZone) {
                 ZoneData &zd(Zone(iZone));
                 for (int kSurf = zd.SurfaceFirst; kSurf <= zd.SurfaceLast; ++kSurf) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, "(4A)", flags)
-                            << "Radiant to Convective Decay Curves for Cooling," << Zone(iZone).Name << ',' << Surface(kSurf).Name;
-                    }
+                    print(outputFiles.eio, "{},{},{}", "Radiant to Convective Decay Curves for Cooling", Zone(iZone).Name, Surface(kSurf).Name);
                     for (int jTime = 1; jTime <= min(NumOfTimeStepInHour * 24, 36); ++jTime) {
-                        {
-                            IOFlags flags;
-                            flags.ADVANCE("NO");
-                            ObjexxFCL::gio::write(OutputFileInits, "(A,F6.3)", flags) << ',' << decayCurveCool(jTime, kSurf);
-                        }
+                        print(outputFiles.eio, ",{:6.3F}", decayCurveCool(jTime, kSurf));
                     }
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("YES");
-                        ObjexxFCL::gio::write(OutputFileInits, "()", flags);
-                    } // put a line feed at the end of the line
+                    // put a line feed at the end of the line
+                    print(outputFiles.eio, "\n");
                 }
 
                 for (int kSurf = zd.SurfaceFirst; kSurf <= zd.SurfaceLast; ++kSurf) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, "(4A)", flags)
-                            << "Radiant to Convective Decay Curves for Heating," << Zone(iZone).Name << ',' << Surface(kSurf).Name;
-                    }
+                    print(outputFiles.eio, "{},{},{}", "Radiant to Convective Decay Curves for Heating", Zone(iZone).Name, Surface(kSurf).Name);
                     for (int jTime = 1; jTime <= min(NumOfTimeStepInHour * 24, 36); ++jTime) {
-                        {
-                            IOFlags flags;
-                            flags.ADVANCE("NO");
-                            ObjexxFCL::gio::write(OutputFileInits, "(A,F6.3)", flags) << ',' << decayCurveHeat(jTime, kSurf);
-                        }
+                        print(outputFiles.eio, ",{:6.3F}", decayCurveHeat(jTime, kSurf));
                     }
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("YES");
-                        ObjexxFCL::gio::write(OutputFileInits, "()", flags);
-                    } // put a line feed at the end of the line
+                    // put a line feed at the end of the line
+                    print(outputFiles.eio, "\n");
                 }
             }
         }

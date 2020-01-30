@@ -498,7 +498,7 @@ namespace SizingManager {
             // both the pulse and normal zone sizing is complete so now post processing of the results is performed
             if (CompLoadReportIsReq) {
                 // call the routine that computes the decay curve
-                ComputeLoadComponentDecayCurve();
+                ComputeLoadComponentDecayCurve(OutputFiles::getSingleton());
                 // remove some of the arrays used to derive the decay curves
                 DeallocateLoadComponentArrays();
             }

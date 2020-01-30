@@ -48,7 +48,6 @@
 #ifndef OutputFiles_hh_INCLUDED
 #define OutputFiles_hh_INCLUDED
 
-
 #include "DataGlobals.hh"
 #include <ObjexxFCL/gio.hh>
 #include <fmt/format.h>
@@ -59,8 +58,22 @@ namespace EnergyPlus {
 class OutputFiles
 {
 public:
-    std::ostream &eio;
+    class OutputFile
+    {
+    public:
+        void close();
+        void open_at_end();
 
+    private:
+        explicit OutputFile(int const FileID, std::string FileName);
+        int fileID;
+        std::string fileName;
+        std::reference_wrapper<std::ostream> os;
+        template <typename... Args> friend void print(OutputFiles::OutputFile &of, fmt::string_view format_str, const Args &... args);
+        friend class OutputFiles;
+    };
+
+    OutputFile eio;
     static OutputFiles makeOutputFiles();
     static OutputFiles &getSingleton();
 
@@ -70,7 +83,6 @@ private:
 
 void vprint(std::ostream &os, fmt::string_view format_str, fmt::format_args args, const std::size_t count);
 std::string vprint(fmt::string_view format_str, fmt::format_args args, const std::size_t count);
-
 
 // Uses lib {fmt} (which has been accepted for C++20)
 // Formatting syntax guide is here: https://fmt.dev/latest/syntax.html
@@ -87,14 +99,17 @@ std::string vprint(fmt::string_view format_str, fmt::format_args args, const std
 // Defines a custom formatting type 'T' that that truncates the value
 // to match the behavior of TrimSigDigits utility function
 //
-template <typename... Args>
-void print(std::ostream &os, fmt::string_view format_str, const Args &... args)
+template <typename... Args> void print(std::ostream &os, fmt::string_view format_str, const Args &... args)
 {
     EnergyPlus::vprint(os, format_str, fmt::make_format_args(args...), sizeof...(Args));
 }
 
-template <typename... Args>
-std::string print_to_string(fmt::string_view format_str, const Args &... args)
+template <typename... Args> void print(OutputFiles::OutputFile &outputFile, fmt::string_view format_str, const Args &... args)
+{
+    EnergyPlus::vprint(outputFile.os, format_str, fmt::make_format_args(args...), sizeof...(Args));
+}
+
+template <typename... Args> std::string format(fmt::string_view format_str, const Args &... args)
 {
     return EnergyPlus::vprint(format_str, fmt::make_format_args(args...), sizeof...(Args));
 }
@@ -102,4 +117,3 @@ std::string print_to_string(fmt::string_view format_str, const Args &... args)
 } // namespace EnergyPlus
 
 #endif
-

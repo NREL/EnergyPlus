@@ -59,6 +59,7 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -784,7 +785,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
 
     //EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
-    OutputReportTabular::WriteEioTables();
+    OutputReportTabular::WriteEioTables(OutputFiles::getSingleton());
     EnergyPlus::sqlite->sqliteCommit();
 
     std::vector<std::tuple<std::string, std::string>> results_strings({

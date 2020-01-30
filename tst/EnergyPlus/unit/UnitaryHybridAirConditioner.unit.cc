@@ -163,7 +163,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     DataHeatBalance::ZoneIntGain.allocate(1);
 
     SizingManager::GetOARequirements();
-    GetOAControllerInputs();
+    GetOAControllerInputs(OutputFiles::getSingleton());
     using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
 
     // Setup performnace tables

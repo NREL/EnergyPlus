@@ -48,18 +48,45 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/OutputFiles.hh>
 
+#include "DataStringGlobals.hh"
 #include <ObjexxFCL/gio.hh>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
 namespace EnergyPlus {
+
+std::ostream &get_out_stream(int const FileID)
+{
+    assert(ObjexxFCL::gio::out_stream(FileID));
+    return *ObjexxFCL::gio::out_stream(FileID);
+}
+
+OutputFiles::OutputFile::OutputFile(int const FileID, std::string FileName)
+    : fileID{FileID}, fileName{std::move(FileName)}, os{get_out_stream(FileID)}
+{
+}
+
+void OutputFiles::OutputFile::close()
+{
+    ObjexxFCL::gio::close(fileID);
+}
+
+void OutputFiles::OutputFile::open_at_end()
+{
+    IOFlags flags;
+    flags.ACTION("write");
+    flags.STATUS("UNKNOWN");
+    flags.POSITION("APPEND");
+    ObjexxFCL::gio::open(fileID, fileName, flags);
+    os = get_out_stream(fileID);
+}
+
 OutputFiles OutputFiles::makeOutputFiles()
 {
-    assert(ObjexxFCL::gio::out_stream(EnergyPlus::DataGlobals::OutputFileInits));
     return OutputFiles();
 }
 
-OutputFiles::OutputFiles() : eio{*ObjexxFCL::gio::out_stream(EnergyPlus::DataGlobals::OutputFileInits)}
+OutputFiles::OutputFiles() : eio{EnergyPlus::DataGlobals::OutputFileInits, EnergyPlus::DataStringGlobals::outputEioFileName}
 {
 }
 
@@ -225,13 +252,15 @@ public:
 
                 if (fixed_output) {
                     specs()->type = 'F';
-                    if (specs()->width > 0) { ++specs()->width; }
+                    if (specs()->width > 0) {
+                        ++specs()->width;
+                    }
                     ++specs()->precision;
                     auto str = write_to_string(value, *specs());
                     str.pop_back();
                     if (specs()->precision == 1) {
-                        //precision was initially 0
-                        //let's remove the now dangling decimal
+                        // precision was initially 0
+                        // let's remove the now dangling decimal
                         str.pop_back();
                     }
                     return write_string(str);
@@ -258,7 +287,6 @@ public:
                     return write_string(str);
                 }
             }
-
         }
         return arg_formatter::operator()(value);
     }
