@@ -392,7 +392,8 @@ namespace GroundHeatExchangers {
         Real64 dl_i;                                // length between points
         Real64 dl_ii;                               // length between points
         Real64 dl_j;                                // length between points
-        std::shared_ptr<BHPropsStruct> props;      // Properties
+        std::shared_ptr<BHPropsStruct> propsPtr;    // Properties pointer
+        BHPropsStruct props;                        // Properties
         std::vector<MyCartesian> pointLocations_i;  // Point locations for when computing temperature response of other boreholes on this bh
         std::vector<MyCartesian> pointLocations_ii; // Point locations for when computing temperature response of this bh on itself
         std::vector<MyCartesian> pointLocations_j;  // Point locations for when other bh are computing the temperature response of this bh on themselves
