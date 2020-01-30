@@ -281,7 +281,7 @@ namespace SimulationManager {
         using SizingManager::ManageSizing;
         using SystemReports::CreateEnergyReportStructure;
         using SystemReports::ReportAirLoopConnections;
-        using SystemReports::AllocateAndSetUpVentReports;
+//        using SystemReports::AllocateAndSetUpVentReports;
         using namespace DataTimings;
         using DataSystemVariables::FullAnnualRun;
         using FaultsManager::CheckAndReadFaults;
@@ -411,7 +411,7 @@ namespace SimulationManager {
             SetupNodeVarsForReporting();
             MetersHaveBeenInitialized = true;
             SetupPollutionMeterReporting();
-            AllocateAndSetUpVentReports();
+            SystemReports::AllocateAndSetUpVentReports();
             UpdateMeterReporting();
             CheckPollutionMeterReporting();
             facilityElectricServiceObj->verifyCustomMetersElecPowerMgr();
