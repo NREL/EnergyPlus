@@ -84,7 +84,6 @@ public:
 
     // Default constructor
     FiniteDiffGroundTempsModel() : minDailyAirTemp(100.0), maxDailyAirTemp(-100.0), dayOfMinDailyAirTemp(1)
-
     {
     }
 
@@ -156,11 +155,11 @@ public:
 
     void doStartOfTimeStepInits();
 
-    Real64 getGroundTemp();
+    Real64 getGroundTemp() override;
 
-    Real64 getGroundTempAtTimeInSeconds(Real64 const depth, Real64 const timeInSecondsOfSim);
+    Real64 getGroundTempAtTimeInSeconds(Real64 const depth, Real64 const timeInSecondsOfSim) override;
 
-    Real64 getGroundTempAtTimeInMonths(Real64 const depth, int const monthOfSim);
+    Real64 getGroundTempAtTimeInMonths(Real64 const depth, int const monthOfSim) override;
 
     void evaluateSoilRhoCp(Optional<int const> cell = _, Optional_bool_const InitOnly = _);
 
@@ -177,10 +176,6 @@ public:
         surfaceCoverType_longGrass = 3
     };
 
-    // Destructor
-    ~FiniteDiffGroundTempsModel()
-    {
-    }
 };
 
 } // namespace EnergyPlus
