@@ -910,6 +910,7 @@ namespace HVACVariableRefrigerantFlow {
     int GetVRFTUZoneInletAirNode(int VRFTUNum);
 
     int GetVRFTUMixedAirNode(int VRFTUNum);
+
     int GetVRFTUOutAirNodeFromName(std::string const VRFTUName, bool &errorsFound);
 
     int GetVRFTUInAirNodeFromName(std::string const VRFTUName, bool &errorsFound);
@@ -923,6 +924,8 @@ namespace HVACVariableRefrigerantFlow {
     void ReportVRFCondenser(int VRFCond); // index to VRF condensing unit
 
     void UpdateVRFCondenser(int VRFCond); // index to VRF condensing unit
+
+    void isVRFCoilPresent(std::string const VRFTUName, bool &CoolCoilPresent, bool & HeatCoilPresent);
 
     Real64 PLRResidual(Real64 PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                        Array1<Real64> const &Par   // par(1) = VRFTUNum

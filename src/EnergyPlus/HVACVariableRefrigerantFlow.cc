@@ -5275,7 +5275,7 @@ namespace HVACVariableRefrigerantFlow {
                     }
 
                     // Find the number of zones (zone Inlet nodes) attached to an air loop from the air loop number
-                    if (AirLoopFound) {
+                    if (AirLoopFound || VRFTU(TUIndex).isInAirLoop) {
                         int NumAirLoopZones = 0;
                         bool initLoadBasedControlFlowFracFlagReady = false;
                         Real64 initLoadBasedControlCntrlZoneTerminalUnitMassFlowRateMax = 0.0;
@@ -5290,6 +5290,13 @@ namespace HVACVariableRefrigerantFlow {
                                     if (DataAirLoop::AirToZoneNodeInfo(VRFTU(TUIndex).airLoopNum).TermUnitCoolInletNodes(ZoneInSysIndex) == -999) {
                                         // the data structure for the zones inlet nodes has not been filled
                                         initLoadBasedControlFlowFracFlagReady = false;
+                                    } else {
+                                        int ZoneInletNodeNum =
+                                            DataAirLoop::AirToZoneNodeInfo(VRFTU(TUIndex).airLoopNum).TermUnitCoolInletNodes(ZoneInSysIndex);
+                                        if (DataLoopNode::Node(ZoneInletNodeNum).MassFlowRateMax == -999.0) {
+                                            // the node mass flow rate has not been set
+                                            initLoadBasedControlFlowFracFlagReady = false;
+                                        }
                                     }
                                 }
                                 // zone inlet nodes for heating
@@ -5297,6 +5304,13 @@ namespace HVACVariableRefrigerantFlow {
                                     if (DataAirLoop::AirToZoneNodeInfo(VRFTU(TUIndex).airLoopNum).TermUnitHeatInletNodes(ZoneInSysIndex) == -999) {
                                         // the data structure for the zones inlet nodes has not been filled
                                         initLoadBasedControlFlowFracFlagReady = false;
+                                    } else {
+                                        int ZoneInletNodeNum =
+                                            DataAirLoop::AirToZoneNodeInfo(VRFTU(TUIndex).airLoopNum).TermUnitHeatInletNodes(ZoneInSysIndex);
+                                        if (DataLoopNode::Node(ZoneInletNodeNum).MassFlowRateMax == -999.0) {
+                                            // the node mass flow rate has not been set
+                                            initLoadBasedControlFlowFracFlagReady = false;
+                                        }
                                     }
                                 }
                             }
@@ -5320,7 +5334,7 @@ namespace HVACVariableRefrigerantFlow {
                                                                             VRFTU(TUIndex).Name,
                                                                             "Fraction of Supply Air Flow That Goes Through the Controlling Zone",
                                                                             VRFTU(TUIndex).controlZoneMassFlowFrac);
-                                    VRFTU(TUIndex).isSetPointControlled = false;
+                                    VRFTU(TUIndex).isSetPointControlled = false; // redundant
                                 } else {
                                     if (VRFTU(TUIndex).isInAirLoop && VRFTU(TUIndex).ZoneNum == 0 && VRFTU(TUIndex).ZoneAirNode == 0) {
                                         // TU must be set point controlled and use constant fan mode (or coil out T won't change with PLR/air flow)
@@ -5382,7 +5396,7 @@ namespace HVACVariableRefrigerantFlow {
                             ShowSevereError("ZoneHVAC:TerminalUnit:VariableRefrigerantFlow: Missing temperature setpoint for " +
                                             VRFTU(TUIndex).Name);
                             ShowContinueError("  use a Setpoint Manager to establish a setpoint at the coil control node.");
-                            SetPointErrorFlag = true;
+                           ErrorsFound = true;
                         } else {
                             bool SPNotFound = false;
                             EMSManager::CheckIfNodeSetPointManagedByEMS(
@@ -5399,6 +5413,7 @@ namespace HVACVariableRefrigerantFlow {
                                                 VRFTU(TUIndex).Name);
                                 ShowContinueError("  use a Setpoint Manager to establish a setpoint at the coil control node.");
                                 ShowContinueError("  or use an EMS actuator to establish a temperature setpoint at the coil control node.");
+                                ErrorsFound = true;
                             }
                         }
                     }
@@ -5672,7 +5687,7 @@ namespace HVACVariableRefrigerantFlow {
                 DataLoopNode::Node(OutsideAirNode).MassFlowRateMin = 0.0;
                 DataLoopNode::Node(OutsideAirNode).MassFlowRateMinAvail = 0.0;
             }
-            DataLoopNode::Node(OutNode).MassFlowRateMax = max(VRFTU(VRFTUNum).MaxCoolAirMassFlow, VRFTU(VRFTUNum).MaxHeatAirMassFlow);
+            DataLoopNode::Node(OutNode).MassFlowRateMax = max(VRFTU(VRFTUNum).MaxCoolAirMassFlow, VRFTU(VRFTUNum).MaxCoolAirMassFlow);
             DataLoopNode::Node(OutNode).MassFlowRateMin = 0.0;
             DataLoopNode::Node(OutNode).MassFlowRateMinAvail = 0.0;
             DataLoopNode::Node(InNode).MassFlowRateMax = max(VRFTU(VRFTUNum).MaxCoolAirMassFlow, VRFTU(VRFTUNum).MaxHeatAirMassFlow);
@@ -5967,7 +5982,7 @@ namespace HVACVariableRefrigerantFlow {
             // Determine operating mode prior to simulating any terminal units connected to a VRF condenser
             // this should happen at the beginning of a time step where all TU's are polled to see what
             // mode the heat pump condenser will operate in
-            if (!any(TerminalUnitList(TUListIndex).IsSimulated)) {
+            if (!any(TerminalUnitList(TUListIndex).IsSimulated) && FirstHVACIteration) {
                 InitializeOperatingMode(FirstHVACIteration, VRFCond, TUListIndex, OnOffAirFlowRatio);
             }
             //*** End of Operating Mode Initialization done at beginning of each iteration ***!
@@ -8662,6 +8677,23 @@ namespace HVACVariableRefrigerantFlow {
         DataLoopNode::Node(CondenserOutletNode).MassFlowRate = CondenserWaterMassFlowRate;
         DataLoopNode::Node(CondenserOutletNode).MassFlowRateMaxAvail = DataLoopNode::Node(CondenserOutletNode).MassFlowRateMaxAvail;
         DataLoopNode::Node(CondenserOutletNode).MassFlowRateMinAvail = DataLoopNode::Node(CondenserOutletNode).MassFlowRateMinAvail;
+    }
+
+    void isVRFCoilPresent(std::string const VRFTUName, bool& CoolCoilPresent, bool& HeatCoilPresent) {
+
+        if (GetVRFInputFlag) {
+            GetVRFInput();
+            GetVRFInputFlag = false;
+        }
+
+        int WhichVRFTU = UtilityRoutines::FindItemInList(VRFTUName, VRFTU, &VRFTerminalUnitEquipment::Name, NumVRFTU);
+        if (WhichVRFTU != 0) {
+            CoolCoilPresent = VRFTU(WhichVRFTU).CoolingCoilPresent;
+            HeatCoilPresent = VRFTU(WhichVRFTU).HeatingCoilPresent;
+        } else {
+            ShowSevereError("isVRFCoilPresent: Could not find VRF TU = \"" + VRFTUName + "\"");
+        }
+
     }
 
     //        End of Reporting subroutines for the Module

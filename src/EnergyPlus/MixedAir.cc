@@ -858,25 +858,29 @@ namespace MixedAir {
                 }
 
             } else if (SELECT_CASE_var == VRFTerminalUnit) { // 'ZoneHVAC:TerminalUnit:VariableRefrigerantFlow'
-                int ControlledZoneNum = 0;
-                bool HeatingActive = false;
-                bool CoolingActive = false;
-                int const OAUnitNum = 0;
-                Real64 const OAUCoilOutTemp = 0.0;
-                bool const ZoneEquipment = false;
-                Real64 sysOut = 0.0;
-                Real64 latOut = 0.0;
-                HVACVariableRefrigerantFlow::SimulateVRF(CompName,
-                    FirstHVACIteration,
-                    ControlledZoneNum,
-                    CompIndex,
-                    HeatingActive,
-                    CoolingActive,
-                    OAUnitNum,
-                    OAUCoilOutTemp,
-                    ZoneEquipment,
-                    sysOut,
-                    latOut);
+                if (Sim) {
+                    int ControlledZoneNum = 0;
+                    bool HeatingActive = false;
+                    bool CoolingActive = false;
+                    int const OAUnitNum = 0;
+                    Real64 const OAUCoilOutTemp = 0.0;
+                    bool const ZoneEquipment = false;
+                    Real64 sysOut = 0.0;
+                    Real64 latOut = 0.0;
+                    HVACVariableRefrigerantFlow::SimulateVRF(CompName,
+                        FirstHVACIteration,
+                        ControlledZoneNum,
+                        CompIndex,
+                        HeatingActive,
+                        CoolingActive,
+                        OAUnitNum,
+                        OAUCoilOutTemp,
+                        ZoneEquipment,
+                        sysOut,
+                        latOut);
+                } else {
+                    HVACVariableRefrigerantFlow::isVRFCoilPresent(CompName, OACoolingCoil, OAHeatingCoil);
+                }
 
             } else {
                 ShowFatalError("Invalid Outside Air Component=" + CompType);

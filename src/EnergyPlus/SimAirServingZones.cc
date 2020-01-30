@@ -3548,16 +3548,14 @@ namespace SimAirServingZones {
 
         // SUBROUTINE LOCAL VARIABLE DEFINITIONS:
         Real64 QActual;
-        bool CoolingActive;
-        bool HeatingActive;
         int OAUnitNum = 0;           // used only for UnitarySystem call
         Real64 OAUCoilOutTemp = 0.0; // used only for UnitarySystem call
         bool ZoneEquipFlag = false;  // used only for UnitarySystem call
 
         // FLOW:
 
-        CoolingActive = false;
-        HeatingActive = false;
+        bool CoolingActive = false;
+        bool HeatingActive = false;
 
         {
             auto const SELECT_CASE_var(CompType_Num);
@@ -3691,8 +3689,6 @@ namespace SimAirServingZones {
                 // Ducts
             } else if (SELECT_CASE_var == ZoneVRFasAirLoopEquip) { // 'ZoneHVAC:TerminalUnit:VariableRefrigerantFlow'
                 int ControlledZoneNum = 0;
-                bool HeatingActive = false;
-                bool CoolingActive = false;
                 int const OAUnitNum = 0;
                 Real64 const OAUCoilOutTemp = 0.0;
                 bool const ZoneEquipment = false;
