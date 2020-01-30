@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -366,7 +366,7 @@ namespace FuelCellElectricGenerator {
         GeneratorFuelSupply::GetGeneratorFuelSupplyInput();
 
         for (int FuelSupNum = 1; FuelSupNum <= DataGenerators::NumGeneratorFuelSups; ++FuelSupNum) {
-            GeneratorFuelSupply::SetupFuelConstituentData(FuelSupNum, ErrorsFound);
+            GeneratorFuelSupply::SetupFuelConstituentData(OutputFiles::getSingleton(), FuelSupNum, ErrorsFound);
         }
 
         // set fuel supply ID in Fuel cell structure
@@ -774,6 +774,7 @@ namespace FuelCellElectricGenerator {
             int thisFuelCell = UtilityRoutines::FindItemInList(AlphArray(1), FuelCell, &FCDataStruct::NameExhaustHX);
 
             if (thisFuelCell > 0) {
+                FuelCell(thisFuelCell).TypeOf = DataPlant::TypeOf_Generator_FCExhaust;
                 FuelCell(thisFuelCell).ExhaustHX.Name = AlphArray(1);
                 FuelCell(thisFuelCell).ExhaustHX.WaterInNodeName = AlphArray(2);
                 FuelCell(thisFuelCell).ExhaustHX.WaterOutNodeName = AlphArray(3);
@@ -989,6 +990,7 @@ namespace FuelCellElectricGenerator {
                 int thisFuelCell = UtilityRoutines::FindItemInList(AlphArray(1), FuelCell, &FCDataStruct::NameStackCooler);
 
                 if (thisFuelCell > 0) {
+                    FuelCell(thisFuelCell).TypeOf = DataPlant::TypeOf_Generator_FCStackCooler;
                     FuelCell(thisFuelCell).StackCooler.Name = AlphArray(1);
                     FuelCell(thisFuelCell).StackCooler.WaterInNodeName = AlphArray(2);
 
@@ -1696,13 +1698,13 @@ namespace FuelCellElectricGenerator {
             Real64 NdotCO2ProdGas = this->FCPM.NdotFuel * DataGenerators::FuelSupply(this->FuelSupNum).CO2ProductGasCoef;
 
             // Water from reaction
-            Real64 NdotH20ProdGas = this->FCPM.NdotFuel * DataGenerators::FuelSupply(this->FuelSupNum).H20ProductGasCoef;
+            Real64 NdotH2OProdGas = this->FCPM.NdotFuel * DataGenerators::FuelSupply(this->FuelSupNum).H2OProductGasCoef;
 
             //  set product gas constituent fractions  (assume five usual components)
             Real64 NdotCO2 = 0.0; // temp CO2 molar rate coef product gas stream
             Real64 NdotN2 = 0.0;  // temp Nitrogen rate coef product gas stream
             Real64 Ndot02 = 0.0;  // temp Oxygen rate coef product gas stream
-            Real64 NdotH20 = 0.0; // temp Water rate coef product gas stream
+            Real64 NdotH2O = 0.0; // temp Water rate coef product gas stream
             Real64 NdotAr = 0.0;  // temp Argon rate coef product gas stream
 
             // Product gas constituents are fixed (not a user defined thing)
@@ -1725,8 +1727,8 @@ namespace FuelCellElectricGenerator {
                         Ndot02 = NdotExcessAir * this->AirSup.ConstitMolalFract(thisGas);
 
                     } else if (SELECT_CASE_var == 4) {
-                        // all the H20 coming in plus the new H20 from reactions and the H20 from water used in reforming
-                        NdotH20 = NdotH20ProdGas + this->AirSup.ConstitMolalFract(thisGas) * this->FCPM.NdotAir;
+                        // all the H2O coming in plus the new H2O from reactions and the H2O from water used in reforming
+                        NdotH2O = NdotH2OProdGas + this->AirSup.ConstitMolalFract(thisGas) * this->FCPM.NdotAir;
 
                     } else if (SELECT_CASE_var == 5) {
                         // all the argon coming in.
@@ -1737,7 +1739,7 @@ namespace FuelCellElectricGenerator {
                 }
             }
 
-            this->FCPM.NdotProdGas = NdotCO2 + NdotN2 + Ndot02 + NdotH20 + NdotAr;
+            this->FCPM.NdotProdGas = NdotCO2 + NdotN2 + Ndot02 + NdotH2O + NdotAr;
 
             // now that we have the total, figure molar fractions
 
@@ -1749,8 +1751,8 @@ namespace FuelCellElectricGenerator {
             // all the oxygen in the excess air stream
             this->FCPM.ConstitMolalFract(3) = Ndot02 / this->FCPM.NdotProdGas;
 
-            // all the H20 comming in plus the new H20 from reactions and the H20 from water used in reforming
-            this->FCPM.ConstitMolalFract(4) = NdotH20 / this->FCPM.NdotProdGas;
+            // all the H2O comming in plus the new H2O from reactions and the H2O from water used in reforming
+            this->FCPM.ConstitMolalFract(4) = NdotH2O / this->FCPM.NdotProdGas;
 
             // all the argon coming in.
             this->FCPM.ConstitMolalFract(5) = NdotAr / this->FCPM.NdotProdGas;

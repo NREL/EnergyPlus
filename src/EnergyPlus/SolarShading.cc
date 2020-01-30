@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -8660,7 +8660,7 @@ namespace SolarShading {
             }
 
             //  Calculate daylighting coefficients
-            CalcDayltgCoefficients();
+            CalcDayltgCoefficients(OutputFiles::getSingleton());
         }
 
         if (!WarmupFlag) {
@@ -8670,7 +8670,7 @@ namespace SolarShading {
         // Recalculate daylighting coefficients if storm window has been added
         // or removed from one or more windows at beginning of day
         if (TotWindowsWithDayl > 0 && !BeginSimFlag && !BeginEnvrnFlag && !WarmupFlag && TotStormWin > 0 && StormWinChangeThisDay) {
-            CalcDayltgCoefficients();
+            CalcDayltgCoefficients(OutputFiles::getSingleton());
         }
     }
 

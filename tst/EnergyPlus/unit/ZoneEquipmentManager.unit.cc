@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -126,7 +126,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest)
     AllocateHeatBalArrays();
     GetZoneEquipmentData1();
     ZoneEquipInputsFilled = true;
-    GetSimpleAirModelInputs(ErrorsFound);
+    GetSimpleAirModelInputs(OutputFiles::getSingleton(), ErrorsFound);
     int ZoneNum = 1;
     int NodeNum;
     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
@@ -380,7 +380,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_MultiCrossMixingTest)
     GetZoneData(ErrorsFound);
     DataHeatBalFanSys::ZoneReOrder.allocate(NumOfZones);
 
-    GetSimpleAirModelInputs(ErrorsFound);
+    GetSimpleAirModelInputs(OutputFiles::getSingleton(), ErrorsFound);
 
     EXPECT_FALSE(ErrorsFound);
 
@@ -512,7 +512,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest2)
     AllocateHeatBalArrays();
     GetZoneEquipmentData1();
     ZoneEquipInputsFilled = true;
-    GetSimpleAirModelInputs(ErrorsFound);
+    GetSimpleAirModelInputs(OutputFiles::getSingleton(), ErrorsFound);
 
     int ZoneNum = 1;
     for (int NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
@@ -648,7 +648,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest3)
     AllocateHeatBalArrays();
     GetZoneEquipmentData1();
     ZoneEquipInputsFilled = true;
-    GetSimpleAirModelInputs(ErrorsFound);
+    GetSimpleAirModelInputs(OutputFiles::getSingleton(), ErrorsFound);
     int ZoneNum = 1;
     int NodeNum;
     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
@@ -750,7 +750,7 @@ TEST_F(EnergyPlusFixture, ZoneEquipmentManager_CalcZoneMassBalanceTest4)
     AllocateHeatBalArrays();
     GetZoneEquipmentData1();
     ZoneEquipInputsFilled = true;
-    GetSimpleAirModelInputs(ErrorsFound);
+    GetSimpleAirModelInputs(OutputFiles::getSingleton(), ErrorsFound);
 
     int ZoneNum = 1;
     for (int NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneNum).NumInletNodes; ++NodeNum) {
