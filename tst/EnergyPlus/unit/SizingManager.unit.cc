@@ -389,3 +389,64 @@ TEST_F(EnergyPlusFixture, SizingManager_DOASControlStrategyDefaultSpecificationT
     ASSERT_EQ(21.1, ZoneSizingInput(1).DOASLowSetpoint);
     ASSERT_EQ(23.9, ZoneSizingInput(1).DOASHighSetpoint);
 }
+
+TEST_F(EnergyPlusFixture, SizingManager_CalcdoLoadComponentPulseNowTest)
+{
+
+    bool Answer;
+    bool PulseSizing;
+    bool Warmup;
+    int HourNum;
+    int TimeStepNum;
+
+    //Tests for when to do a pulse test for the Load Component Output Report
+
+    //Test 1: Everything as it should be to set this to true-->result should be true
+    PulseSizing = true;
+    Warmup = false;
+    HourNum = 10;
+    TimeStepNum = 1;
+    Answer = CalcdoLoadComponentPulseNow(PulseSizing,Warmup,HourNum,TimeStepNum);
+    ASSERT_TRUE(Answer);
+    
+    //Test 2: PulseSizing is false-->result should be false
+    PulseSizing = false;
+    Warmup = false;
+    HourNum = 10;
+    TimeStepNum = 1;
+    Answer = CalcdoLoadComponentPulseNow(PulseSizing,Warmup,HourNum,TimeStepNum);
+    ASSERT_FALSE(Answer);
+
+    //Test 3: Warmup is true-->result should be false
+    PulseSizing = false;
+    Warmup = false;
+    HourNum = 10;
+    TimeStepNum = 1;
+    Answer = CalcdoLoadComponentPulseNow(PulseSizing,Warmup,HourNum,TimeStepNum);
+    ASSERT_FALSE(Answer);
+
+    //Test 4: HourNum not 10-->result should be false
+    PulseSizing = true;
+    Warmup = false;
+    HourNum = 7;
+    TimeStepNum = 1;
+    Answer = CalcdoLoadComponentPulseNow(PulseSizing,Warmup,HourNum,TimeStepNum);
+    ASSERT_FALSE(Answer);
+
+    //Test 5: TimeStepNum not 1-->result should be false
+    PulseSizing = true;
+    Warmup = false;
+    HourNum = 10;
+    TimeStepNum = 2;
+    Answer = CalcdoLoadComponentPulseNow(PulseSizing,Warmup,HourNum,TimeStepNum);
+    ASSERT_FALSE(Answer);
+
+    //Test 5: everything set to make the answer false
+    PulseSizing = false;
+    Warmup = true;
+    HourNum = 2;
+    TimeStepNum = 7;
+    Answer = CalcdoLoadComponentPulseNow(PulseSizing,Warmup,HourNum,TimeStepNum);
+    ASSERT_FALSE(Answer);
+    
+}
