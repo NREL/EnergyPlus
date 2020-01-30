@@ -4,6 +4,8 @@ Performance Overrides and Reporting
 **Jason Glazer, GARD Analytics**
 
  - January 29, 2020
+ - January 30, 2020 - Try "single knob" approach for input, include minimum number of warmup days,
+add warning message for PerformancePrecisionTradeoffs
  
 
 ## Justification for New Feature ##
@@ -17,16 +19,19 @@ None
 
 ## Overview ##
 
-Add to the PerformancePrecisionTradeoffs object to override:
+Add a single field to the PerformancePrecisionTradeoffs object to override:
 
  - Zone Time Step
  - Zone Air Heat Balance Algorithm
+ - Minimum Number of Warmup Days
  - Harwired and user set convergence parameters
  
 Add reporting of the PerformancePrecisionTradeoffs object into the EIO file and Tabular Initialization 
 Summary. Also include in the EIO report other performance oriented options that exist such as the 
 recent sizing speed up work from TRANE [#7567](https://github.com/NREL/EnergyPlus/pull/7567) and 
 the CarrollMRT method [#7534](https://github.com/NREL/EnergyPlus/pull/7567).
+
+When using the PerformancePrecisionTradeoffs, issue a warning message [#7646](https://github.com/NREL/EnergyPlus/issues/7646)
 
 Add new output variables for:
 
@@ -39,7 +44,8 @@ simulation of the same file. The file would be comma delimitted and would show t
 parameters described above as well as total energy by energy type, peak electrical demand, the oscillation 
 variables. It would also include the total number of objects and fields to indicate if the input file
 changed between simulations. The intention is that the user could review this after successive simulations 
-when testing out the various performance parameters.
+when testing out the various performance parameters. The file would be generated whenever the 
+PerformancePrecisionTradeoffs object is present in the file.
  
 
 ## Approach ##
@@ -52,7 +58,34 @@ insert text
 
 ## Input Output Reference Documentation ##
 
-insert text
+The Override Mode field would be added to the Input Output Reference including the following table
+
+|Mode   | Description |
+|-----  |-------------|
+|Normal | no overrides   |
+|Mode01 | Zone Time step (TimeStep object) will be set to one timestep per hour|
+|Mode02 | Mode01 plus ZoneAirHeatBalanceAlgorithm will be set to Euler |
+|Mode03 | Mode02 plus Minimum Number of Warmup Days will be set to 1 |
+|Mode04 | Mode03 plus Begin Environment Reset Mode will be set to SuppressAllBeginEnvironmentResets|
+|Mode05 | Mode04 plus Loads Convergence Tolerance Value will be set to Y|
+|Mode06 | Mode05 plus Temperature Convergence Tolerance Value will be set to Y|
+|Mode07 | Mode06 plus internal variable MaxZoneTempDiff will be set to Y|
+|Mode08 | Mode07 plus internal variable ConvrgLim will be set to Y|
+|Mode09 | Mode08 plus internal variable MaxAllowedDelTempCondFD will be set to Y|
+|Mode10 | Mode09 plus internal variable MassFlowTolerance will be set to Y|
+|AdvancedA| MaxZoneTempDiff will be set to Y |
+|AdvancedB| ConvrgLim will be set to Y |
+|AdvancedC| MaxAllowedDelTempCondFD will be set to Y |
+|AdvancedD| MassFlowTolerance will be set to Y |
+|AdvancedAB| A + B |
+|AdvancedBC| B + C|
+|AdvancedABC| A + B + C |
+|AdvancedCD| C + D |
+|AdvancedABCD| A + B + C + D |
+  
+NOTE: The exact layout of this table and the various Y values and list of internal variables will be determined
+based on analysis not yet completed. There may be more or fewer modes in the final table.
+  
 
 ## Input Description ##
 
@@ -71,7 +104,8 @@ PerformancePrecisionTradeoffs,
       \key No
       \default No
   A2; \field Zone Radiant Exchange Algorithm
-      \note Determines which algorithm will be used to solve long wave radiant exchange among surfaces within a zone.
+      \note Determines which algorithm will be used to solve long wave radiant exchange among 
+      \note surfaces within a zone.
       \type choice
       \key ScriptF
       \key CarrollMRT
@@ -93,40 +127,38 @@ PerformancePrecisionTradeoffs,
       \key No
       \default No
   A2, \field Zone Radiant Exchange Algorithm
-      \note Determines which algorithm will be used to solve long wave radiant exchange among surfaces within a zone.
+      \note Determines which algorithm will be used to solve long wave radiant exchange among 
+      \note surfaces within a zone.
       \type choice
       \key ScriptF
       \key CarrollMRT
       \default ScriptF
-  A3, \field Override Zone Time Step
-      \note If Yes, the zone time step (TimeStep object) will be set to one timestep per hour
-      \type choice
-      \key Yes
-      \key No
-      \default No
-  A4, \field Override Zone Air Heat Balance Algorithm
-      \note If Yes, the zone air heat balance algorithm (ZoneAirHeatBalanceAlgorithm object) will be set to Euler
-      \type choice
-      \key Yes
-      \key No
-      \default No
-  A5, \field Convergence Parameter Choice
-      \note Normal uses the normal input values. Low medium and high provide three different sets of convergence 
-      \note parameter overrides
+  A3, \field Override Mode
+      \note The increasing mode number roughly correspond with increased speed. Advanced 
+      \note overrides are also available. A description of each mode and advanced overrides
+      \note are shown in the documentation.
       \type choice
       \key Normal
-      \key Low
-      \key Medium
-      \key High
+      \key Mode01
+      \key Mode02
+      \key Mode03
+      \key Mode04
+      \key Mode05
+      \key Mode06
+      \key Mode07
+      \key Mode08
+      \key Mode09
+      \key Mode10
+      \key AdvancedA
+      \key AdvancedB
+      \key AdvancedC
+      \key AdvancedD
+      \key AdvancedAB
+      \key AdvancedBC
+      \key AdvancedABC
+      \key AdvancedCD
+      \key AdvancedABCD
       \default Normal
-  A4, \field Create Performance Log File
-      \note If Yes, a log file with perflog extension is created that is appended to each 
-      \note simulation with performance related settings and results
-      \type choice
-      \key Yes
-      \key No
-      \default No
-
 ```
 
 
@@ -154,7 +186,8 @@ object. It could also include other performance oriented options that exist such
 recent sizing speed up work from TRANE [#7567](https://github.com/NREL/EnergyPlus/pull/7567) and 
 the CarrollMRT method [#7534](https://github.com/NREL/EnergyPlus/pull/7567).
 
-A new output file with the extension .perflog would be created. This log file would consist of the new EIO 
+A new output file with the extension .perflog would be created whenever the PerformancePrecisionTradeoffs
+object is present. This log file would consist of the new EIO 
 output and some simple overall building energy and demand results as well as oscillation outputs. The perflog
 file would be appended to instead of replaced each time to facilitate evaluation of the performance objects to 
 the user determine which combination is best for their particular input file. It would include a timestamp
