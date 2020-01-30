@@ -128,17 +128,28 @@ TEST_F(EnergyPlusFixture, OutputFiles_Expected_Formatting_Tests)
     // EXPECT_EQ(format("{:.3R}", 6.41750000000000013576E-005), "6.417E-005");
 
 
-    // T formatting simulates the 'G' from Fortran
+    // N formatting simulates the 'G' from Fortran
     // Always has a leading 0 if printing in fixed notation
-    EXPECT_EQ(format("{:20.8T}", -0.23111252E-04), "     -0.23111252E-04");
-    EXPECT_EQ(format("{:20.8T}", -0.0), "      -0.0000000    ");
-    EXPECT_EQ(format("{:20.8T}", 0.0), "       0.0000000    ");
-    EXPECT_EQ(format("{:20.8T}", 2.13608134), "       2.1360813    ");
-    EXPECT_EQ(format("{:20.8T}", 213608134.0), "      213608134.    ");
-    EXPECT_EQ(format("{:20.8T}", 213608139.6), "      213608140.    ");
-    EXPECT_EQ(format("{:20.8T}", 0.213608134), "      0.21360813    ");
-    EXPECT_EQ(format("{:13.6T}", 0.803434E+09), " 0.803434E+09");
-    //    EXPECT_EQ(format("{:20.8T}", -0.23111252), "     -0.23111252    ");
-    //    EXPECT_EQ(format("{:20.8T}", -0.23111252), "     -0.23111252    ");
+    EXPECT_EQ(format("{:20.8N}", -0.23111252E-04), "     -0.23111252E-04");
+    EXPECT_EQ(format("{:20.8N}", -0.0), "      -0.0000000    ");
+    EXPECT_EQ(format("{:20.8N}", 0.0), "       0.0000000    ");
+    EXPECT_EQ(format("{:20.8N}", 2.13608134), "       2.1360813    ");
+    EXPECT_EQ(format("{:20.8N}", 213608134.0), "      213608134.    ");
+    EXPECT_EQ(format("{:20.8N}", 213608139.6), "      213608140.    ");
+    EXPECT_EQ(format("{:20.8N}", 0.213608134), "      0.21360813    ");
+    EXPECT_EQ(format("{:13.6N}", 0.803434E+09), " 0.803434E+09");
+    //    EXPECT_EQ(format("{:20.8N}", -0.23111252), "     -0.23111252    ");
+    //    EXPECT_EQ(format("{:20.8N}", -0.23111252), "     -0.23111252    ");
+
+    // T formatting is like R, but it trims instead of rounding
+    EXPECT_EQ(format("{:.3T}", 7.63142731775999418747E-003), "7.631E-003");
+    EXPECT_EQ(format("{:.3T}", 1.28349999999999948505E-004), "1.283E-004");
+    EXPECT_EQ(format("{:.3T}", 2.56700000000000005430E-004), "2.567E-004");
+    EXPECT_EQ(format("{:.3T}", 0.15159450340364988286), "0.151");
+
+    EXPECT_EQ(format("{:.3T}", 2.14633893312000043063E-002), "2.146E-002");
+    EXPECT_EQ(format("{:.3T}", 8.55666666666666278192E-005), "8.556E-005");
+    EXPECT_EQ(format("{:.3T}", 6.41749999999999878051E-005), "6.417E-005");
+    EXPECT_EQ(format("{:.3T}", 0.10106298657208269420), "0.101");
 }
 } // namespace EnergyPlus

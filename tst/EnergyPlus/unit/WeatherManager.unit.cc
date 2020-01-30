@@ -772,8 +772,6 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     }
     EXPECT_TRUE(n_RH_not100 > 0) << "Expected at least one hour with RH below 100%";
 
-    SimulationManager::CloseOutputFiles();
-
     // This actually doesn't end up in the EIO stream yet, it's written to a gio::out_stream
     // That's why I used SQLiteFixture instead
     //std::string const eiooutput = delimited_string({
@@ -786,6 +784,10 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     //EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 
     OutputReportTabular::WriteEioTables(OutputFiles::getSingleton());
+
+    // Close output files *after* the EIO has been written to
+    SimulationManager::CloseOutputFiles();
+
     EnergyPlus::sqlite->sqliteCommit();
 
     std::vector<std::tuple<std::string, std::string>> results_strings({
@@ -811,5 +813,6 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
         // Add informative message if failed
         EXPECT_EQ(value, expectedValue) << "Failed for ColumnName=" << columnName;
     }
+
 
 }

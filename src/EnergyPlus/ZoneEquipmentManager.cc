@@ -1738,7 +1738,7 @@ namespace ZoneEquipmentManager {
         static constexpr auto Format_891(" Load Timesteps in Zone Design Calculation Averaging Window, {:4}\n");
         print(outputFiles.eio, Format_891, NumTimeStepsInAvg);
         print(outputFiles.eio, "! <Heating Sizing Factor Information>, Sizing Factor ID, Value\n");
-        static constexpr auto Format_991(" Heating Sizing Factor Information, Global, {:.12.5N}\n");
+        static constexpr auto Format_991(" Heating Sizing Factor Information, Global, {:12.5N}\n");
         print(outputFiles.eio, Format_991, GlobalHeatSizingFactor);
         for (CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
             if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
@@ -1753,7 +1753,7 @@ namespace ZoneEquipmentManager {
         for (CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
             if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
             if (FinalZoneSizing(CtrlZoneNum).CoolSizingFactor != 1.0) {
-                static constexpr auto Format_995(" Cooling Sizing Factor Information, Zone {}, {:12.5G}\n");
+                static constexpr auto Format_995(" Cooling Sizing Factor Information, Zone {}, {:12.5N}\n");
                 print(outputFiles.eio, Format_995, FinalZoneSizing(CtrlZoneNum).ZoneName, FinalZoneSizing(CtrlZoneNum).CoolSizingFactor);
             }
         }

@@ -1236,7 +1236,7 @@ namespace HeatBalFiniteDiffManager {
               "! <ConductionFiniteDifference HeatBalanceSettings>,Scheme Type,Space Discretization Constant,Relaxation Factor,Inside Face Surface "
               "Temperature Convergence Criteria");
         print(outputFiles.eio,
-              " ConductionFiniteDifference HeatBalanceSettings,{},{:.2R},{:.2R},{.4R}\n",
+              " ConductionFiniteDifference HeatBalanceSettings,{},{:.2R},{:.2R},{:.4R}\n",
               cCondFDSchemeType(CondFDSchemeType),
               SpaceDescritConstant,
               CondFDRelaxFactorInput,
