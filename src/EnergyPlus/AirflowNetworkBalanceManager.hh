@@ -53,6 +53,7 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
+#include "OutputFiles.hh"
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -169,7 +170,7 @@ namespace AirflowNetworkBalanceManager {
                                      Optional_bool ResimulateAirZone = _         // True when solution technique on third iteration
     );
 
-    void GetAirflowNetworkInput();
+    void GetAirflowNetworkInput(EnergyPlus::OutputFiles &outputFiles);
 
     void InitAirflowNetwork();
 

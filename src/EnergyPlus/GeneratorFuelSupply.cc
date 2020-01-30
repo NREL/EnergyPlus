@@ -52,15 +52,13 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
+#include "OutputFiles.hh"
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataGenerators.hh>
-#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneratorFuelSupply.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -102,10 +100,8 @@ namespace GeneratorFuelSupply {
     // na
 
     // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataGenerators;
     using DataGlobals::HoursInDay;
-    using DataGlobals::OutputFileInits;
 
     // <use statements for access to subroutines in other modules>
 
@@ -255,7 +251,7 @@ namespace GeneratorFuelSupply {
             // now make calls to Setup
 
             for (FuelSupNum = 1; FuelSupNum <= NumGeneratorFuelSups; ++FuelSupNum) {
-                SetupFuelConstituentData(FuelSupNum, ErrorsFound);
+                SetupFuelConstituentData(OutputFiles::getSingleton(), FuelSupNum, ErrorsFound);
             }
 
             if (ErrorsFound) {
@@ -268,7 +264,7 @@ namespace GeneratorFuelSupply {
 
     //******************************************************************************
 
-    void SetupFuelConstituentData(int const FuelSupplyNum, bool &ErrorsFound)
+    void SetupFuelConstituentData(OutputFiles &outputFiles, int const FuelSupplyNum, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -303,9 +299,6 @@ namespace GeneratorFuelSupply {
         // unused  REAL(r64) :: h_i
         // unused  REAL(r64) :: LHV
 
-        // Formats
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
-        static ObjexxFCL::gio::Fmt Format_501("(' Fuel Supply, ',A,',',G13.6E2,',',G13.6E2,',',G13.6E2,',',G13.6E2)");
 
         NumHardCodedConstituents = 14;
 
@@ -705,11 +698,16 @@ namespace GeneratorFuelSupply {
         }
 
         // report Heating Values in EIO.
-        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Fuel Supply>, Fuel Supply Name, Lower Heating Value [J/kmol], Lower Heating Value [kJ/kg], Higher "
-                                             "Heating Value [KJ/kg],  Molecular Weight [g/mol] ";
-        ObjexxFCL::gio::write(OutputFileInits, Format_501) << FuelSupply(FuelSupplyNum).Name << FuelSupply(FuelSupplyNum).LHV * 1000000.0
-                                                << FuelSupply(FuelSupplyNum).LHVJperkg / 1000.0 << FuelSupply(FuelSupplyNum).HHV / 1000.0
-                                                << FuelSupply(FuelSupplyNum).MW;
+        print(outputFiles.eio, "! <Fuel Supply>, Fuel Supply Name, Lower Heating Value [J/kmol], Lower Heating Value [kJ/kg], Higher "
+                                             "Heating Value [KJ/kg],  Molecular Weight [g/mol] \n");
+        static constexpr auto Format_501(" Fuel Supply, {},{:13.6T},{:13.6T},{:13.6T},{:13.6T}\n");
+        print(outputFiles.eio,
+              Format_501,
+              FuelSupply(FuelSupplyNum).Name,
+              FuelSupply(FuelSupplyNum).LHV * 1000000.0,
+              FuelSupply(FuelSupplyNum).LHVJperkg / 1000.0,
+              FuelSupply(FuelSupplyNum).HHV / 1000.0,
+              FuelSupply(FuelSupplyNum).MW);
     }
 
 } // namespace GeneratorFuelSupply
