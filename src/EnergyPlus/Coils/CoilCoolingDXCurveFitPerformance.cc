@@ -202,6 +202,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &in
         Real64 modeRatio;
 
         this->recoveredEnergyRate = 0.0;
+        this->NormalSHR = 0.0;
         this->calculate(this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
 
         //this->OperatingMode = 1;
@@ -211,6 +212,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &in
                       (Psychrometrics::PsyHFnTdbW(inletNode.Temp, minAirHumRat) - Psychrometrics::PsyHFnTdbW(outletNode.Temp, minAirHumRat));
         if (totalCoolingRate > 1.0E-10) {
             this->OperatingMode = 1;
+            this->NormalSHR = sensNorRate / totalCoolingRate;
         }
 
         if (PLR == 0.0) return;

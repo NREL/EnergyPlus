@@ -137,6 +137,7 @@ struct CoilCoolingDXCurveFitPerformance
     int OperatingMode = 0;
     Real64 ModeRatio = 0.0;
     Real64 recoveredEnergyRate = 0.0;
+    Real64 NormalSHR = 0.0;
 
     CoilCoolingDXCurveFitOperatingMode normalMode;
     int hasAlternateMode = 0; // 0 Normal, 1 Enhanced, 2 SubcoolReheat
