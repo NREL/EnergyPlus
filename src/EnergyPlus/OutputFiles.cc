@@ -218,17 +218,13 @@ public:
 
                 if (value != 0.0) {
                     // we're looking for a reasonable place to push up the rounding, based on
-                    // how many places are displayed
-                    if (fixed_output) {
-                        adjusted += std::pow(10, -(specs()->precision + 10));
-                    } else {
-                        adjusted = (std::nextafter(adjusted, static_cast<Real64>(1)));
-                    }
+                    adjusted = (std::nextafter(adjusted, static_cast<Real64>(1)));
                 }
 
                 if (fixed_output) {
                     const auto magnitude = std::pow(10, specs()->precision);
-                    const auto rounded = std::round(adjusted * magnitude) / magnitude;
+                    const auto incremented = (adjusted * magnitude) + 0.0001;
+                    const auto rounded = std::round(incremented) / magnitude;
                     specs()->type = 'F';
                     return (*this)(rounded);
                 } else {
