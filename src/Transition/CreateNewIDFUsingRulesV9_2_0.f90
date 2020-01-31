@@ -772,7 +772,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 POutArgs(2) = TRIM(InArgs(1))//'_IndependentVariableList'
 
                 ! Normalization Value
-                IF (InArgs(13) == Blank) THEN
+                IF (InArgs(9) == Blank) THEN
                   POutArgs(3) = Blank
                   POutArgs(4) = Blank
                 ELSE
