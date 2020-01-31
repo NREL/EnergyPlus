@@ -907,7 +907,7 @@ namespace HVACVariableRefrigerantFlow {
 
     int GetVRFTUOutAirNode(int VRFTUNum);
 
-    int GetVRFTUZoneInletAirNode(int VRFTUNum);
+    int GetVRFTUInletAirNode(int VRFTUNum);
 
     int GetVRFTUMixedAirNode(int VRFTUNum);
 

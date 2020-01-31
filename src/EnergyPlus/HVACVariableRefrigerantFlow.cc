@@ -3362,11 +3362,9 @@ namespace HVACVariableRefrigerantFlow {
                     DataLoopNode::NodeID(FanOutletNodeNum));
 
             } else if (lAlphaFieldBlanks(7) || lAlphaFieldBlanks(8)) {
-                if (VRFTU(VRFTUNum).FanPlace ==DataHVACGlobals::BlowThru || VRFTU(VRFTUNum).FanPlace ==DataHVACGlobals::DrawThru) {
-                    ShowWarningError(cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
-                    ShowContinueError("Supply Air Fan Placement is not required when no fan is used.");
-                    VRFTU(VRFTUNum).FanPlace = 0;
-                }
+                VRFTU(VRFTUNum).FanPlace = 0; // reset fan placement when fan is not used so as not to call the fan
+            } else {
+                VRFTU(VRFTUNum).FanPlace = 0;
             }
 
             // Get OA mixer data
@@ -5496,7 +5494,7 @@ namespace HVACVariableRefrigerantFlow {
             int CCoilOutletNodeNum = DXCoils::getCoilOutNodeIndex(VRFTU(VRFTUNum).CoolCoilIndex, errFlag);
             int HCoilInletNodeNum = DXCoils::getCoilInNodeIndex(VRFTU(VRFTUNum).HeatCoilIndex, errFlag);
             int HCoilOutletNodeNum = DXCoils::getCoilOutNodeIndex(VRFTU(VRFTUNum).HeatCoilIndex, errFlag);
-            if (VRFTU(VRFTUNum).isInZone && VRFTU(VRFTUNum).FanPlace ==DataHVACGlobals::BlowThru) {
+            if (VRFTU(VRFTUNum).isInZone && VRFTU(VRFTUNum).FanPlace == DataHVACGlobals::BlowThru) {
                 if (!VRFTU(VRFTUNum).ATMixerExists && VRFTU(VRFTUNum).OAMixerUsed) {
                     Array1D_int OANodeNums = MixedAir::GetOAMixerNodeNumbers(VRFTU(VRFTUNum).OAMixerName, errFlag);
                     if (FanInletNodeNum != OANodeNums(4)) {
@@ -5562,7 +5560,7 @@ namespace HVACVariableRefrigerantFlow {
                         ErrorsFound = true;
                     }
                 }
-            } else if (VRFTU(VRFTUNum).isInZone && VRFTU(VRFTUNum).FanPlace ==DataHVACGlobals::DrawThru) {
+            } else if (VRFTU(VRFTUNum).isInZone && VRFTU(VRFTUNum).FanPlace == DataHVACGlobals::DrawThru) {
                 if (VRFTU(VRFTUNum).CoolingCoilPresent) {
                     if (!VRFTU(VRFTUNum).OAMixerUsed) {
                         if (VRFTU(VRFTUNum).VRFTUInletNodeNum != CCoilInletNodeNum) {
@@ -9413,7 +9411,7 @@ namespace HVACVariableRefrigerantFlow {
         }
     }
 
-    int GetVRFTUZoneInletAirNode(int const VRFTUNum)
+    int GetVRFTUInletAirNode(int const VRFTUNum)
     {
 
         // FUNCTION INFORMATION:

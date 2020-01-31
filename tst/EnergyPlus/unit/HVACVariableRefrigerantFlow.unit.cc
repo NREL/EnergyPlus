@@ -290,8 +290,7 @@ protected:
         finalZoneSizing.TimeStepNumAtCoolMax = 1;
         finalZoneSizing.CoolDDNum = 1;
 
-        int airloopNum1 = 1;
-        auto &finalSysSizing(DataSizing::FinalSysSizing(airloopNum1));
+        auto &finalSysSizing(DataSizing::FinalSysSizing(thisAirLoop));
         finalSysSizing.DesCoolVolFlow = 0.566337; // 400 cfm * 3 tons = 1200 cfm
         finalSysSizing.DesHeatVolFlow = 0.566337;
         finalSysSizing.CoolSupTemp = 12.7;
@@ -307,17 +306,15 @@ protected:
         finalSysSizing.MixHumRatAtCoolPeak = 0.009;
 
         // set up air loop
-        int airLoopNum = 1; // index to air loop #1
-        int NumBranches = 1;
-        DataAirSystems::PrimaryAirSystem(1).NumBranches = 1;
-        DataAirSystems::PrimaryAirSystem(1).NumInletBranches = 1;
-        DataAirSystems::PrimaryAirSystem(1).InletBranchNum.allocate(1);
-        DataAirSystems::PrimaryAirSystem(1).InletBranchNum(1) = 1;
-        DataAirSystems::PrimaryAirSystem(1).NumOutletBranches = 1;
-        DataAirSystems::PrimaryAirSystem(1).OutletBranchNum.allocate(1);
-        DataAirSystems::PrimaryAirSystem(1).OutletBranchNum(1) = 1;
-        DataAirSystems::PrimaryAirSystem(1).Branch.allocate(1);
-        DataAirSystems::PrimaryAirSystem(1).Branch(1).TotalComponents = 1;
+        DataAirSystems::PrimaryAirSystem(thisAirLoop).NumBranches = 1;
+        DataAirSystems::PrimaryAirSystem(thisAirLoop).NumInletBranches = 1;
+        DataAirSystems::PrimaryAirSystem(thisAirLoop).InletBranchNum.allocate(1);
+        DataAirSystems::PrimaryAirSystem(thisAirLoop).InletBranchNum(1) = 1;
+        DataAirSystems::PrimaryAirSystem(thisAirLoop).NumOutletBranches = 1;
+        DataAirSystems::PrimaryAirSystem(thisAirLoop).OutletBranchNum.allocate(1);
+        DataAirSystems::PrimaryAirSystem(thisAirLoop).OutletBranchNum(1) = 1;
+        DataAirSystems::PrimaryAirSystem(thisAirLoop).Branch.allocate(1);
+        DataAirSystems::PrimaryAirSystem(thisAirLoop).Branch(1).TotalComponents = 1;
         DataAirSystems::PrimaryAirSystem(thisAirLoop).Branch(1).Comp.allocate(1);
         DataAirSystems::PrimaryAirSystem(thisAirLoop).Branch(1).Comp(1).Name = "VRFTU1";
         DataAirSystems::PrimaryAirSystem(thisAirLoop).Branch(1).Comp(1).TypeOf = "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW";
@@ -547,7 +544,7 @@ TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
     HVACVariableRefrigerantFlow::GetVRFInputFlag = false;
     DXCoils::GetCoilsInputFlag = false;
     // trigger a mining function (will bypass GetInput)
-    int TUInletAirNode = GetVRFTUZoneInletAirNode(1);
+    int TUInletAirNode = GetVRFTUInletAirNode(1);
     auto &thisTU(HVACVariableRefrigerantFlow::VRFTU(curTUNum));
     // node number set up in fixture
     EXPECT_EQ(TUInletAirNode, thisTU.VRFTUInletNodeNum);
@@ -577,11 +574,6 @@ TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
     Node(VRFTUOAMixerRetNodeNum).Enthalpy = PsyHFnTdbW(Node(VRFTUOAMixerRetNodeNum).Temp, Node(VRFTUOAMixerRetNodeNum).HumRat);
     Node(VRFTUOAMixerRetNodeNum).Press = DataEnvironment::OutBaroPress;
 
-    bool HeatingActive = false;
-    bool CoolingActive = false;
-    int OAUnitNum = 0;
-    Real64 OAUCoilOutTemp = 0.0;
-    bool ZoneEquipment = true;
     bool FirstHVACIteration = true;
     Real64 SysOutputProvided = 0.0;
     Real64 LatOutputProvided = 0.0;
@@ -3141,7 +3133,7 @@ TEST_F(HVACVRFFixture, VRFTest_SysCurve)
     int VRFTUNum(1);               // index to VRF terminal unit
     int EquipPtr(1);               // index to equipment list
     int CurZoneNum(1);             // index to zone
-    int ZoneInletAirNode(0);       // zone inlet node number
+    int TUInletAirNode(0);       // zone inlet node number
     Real64 DefrostWatts(0.0);      // calculation of VRF defrost power [W]
     Real64 SysOutputProvided(0.0); // function returns sensible capacity [W]
     Real64 LatOutputProvided(0.0); // function returns latent capacity [W]
@@ -3736,7 +3728,7 @@ TEST_F(HVACVRFFixture, VRFTest_SysCurve)
     EXPECT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData();                                // read equipment list and connections
-    ZoneInletAirNode = GetVRFTUZoneInletAirNode(VRFTUNum); // trigger GetVRFInput by calling a mining function
+    TUInletAirNode = GetVRFTUInletAirNode(VRFTUNum); // trigger GetVRFInput by calling a mining function
 
     Schedule(VRF(VRFCond).SchedPtr).CurrentValue = 1.0;             // enable the VRF condenser
     Schedule(VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;          // enable the terminal unit
@@ -3784,8 +3776,8 @@ TEST_F(HVACVRFFixture, VRFTest_SysCurve)
                 LatOutputProvided);
 
     ASSERT_EQ(1, NumVRFCond);
-    ASSERT_EQ(ZoneInletAirNode,
-              ZoneEquipConfig(VRFTU(VRFTUNum).ZoneNum).InletNode(1)); // only 1 inlet node specified above in ZoneHVAC:EquipmentConnections
+    ASSERT_EQ(TUInletAirNode,
+              ZoneEquipConfig(VRFTU(VRFTUNum).ZoneNum).ExhaustNode(1)); // only 1 exhaust node specified above in ZoneHVAC:EquipmentConnections
     ASSERT_EQ(1.0, VRF(VRFCond).CoolingCombinationRatio);
     EXPECT_NEAR(11176.29, VRF(VRFCond).CoolingCapacity, 0.01);
     EXPECT_NEAR(11176.29, VRF(VRFCond).HeatingCapacity, 0.01);
@@ -5577,7 +5569,7 @@ TEST_F(HVACVRFFixture, VRFTest_SysCurve_WaterCooled)
     PlantManager::GetPlantInput();
 
     HVACVariableRefrigerantFlow::MyEnvrnFlag = true;
-    ZoneInletAirNode = GetVRFTUZoneInletAirNode(VRFTUNum); // trigger GetVRFInput by calling a mining function
+    ZoneInletAirNode = GetVRFTUInletAirNode(VRFTUNum); // trigger GetVRFInput by calling a mining function
     DataAirLoop::AirLoopInputsFilled = true;
 
     Schedule(VRF(VRFCond).SchedPtr).CurrentValue = 1.0;             // enable the VRF condenser
@@ -6439,7 +6431,7 @@ TEST_F(HVACVRFFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
     DataZoneEquipment::GetZoneEquipmentData(); // read equipment list and connections
     DataAirLoop::AirLoopInputsFilled = true;
     HVACVariableRefrigerantFlow::MyEnvrnFlag = true;
-    ZoneInletAirNode = GetVRFTUZoneInletAirNode(VRFTUNum);  // trigger GetVRFInput by calling a mining function
+    ZoneInletAirNode = GetVRFTUInletAirNode(VRFTUNum);  // trigger GetVRFInput by calling a mining function
     OutsideAirNode = VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum; // outside air air inlet node num
     DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
     DataZoneEnergyDemands::ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = 0.0;    // No load
@@ -11157,7 +11149,7 @@ TEST_F(HVACVRFFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     EXPECT_FALSE(ErrorsFound);
     // get zone input and connections
     GetZoneEquipmentData();
-    ZoneInletAirNode = GetVRFTUZoneInletAirNode(VRFTUNum);
+    ZoneInletAirNode = GetVRFTUInletAirNode(VRFTUNum);
     Schedule(VRF(VRFCond).SchedPtr).CurrentValue = 1.0;
     Schedule(VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;
     Schedule(VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0;
@@ -12886,7 +12878,6 @@ TEST_F(HVACVRFFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     EXPECT_FALSE(ErrorsFound);
     // get zone input and connections
     GetZoneEquipmentData();
-    // ZoneInletAirNode = GetVRFTUZoneInletAirNode(VRFTUNum);
     GetVRFInput();
     GetVRFInputFlag = false;
     Schedule(VRF(VRFCond).SchedPtr).CurrentValue = 1.0;
@@ -13116,7 +13107,7 @@ TEST_F(HVACVRFFixture, VRFTest_CondenserCalcTest_HREIRFTHeat)
     TerminalUnitList(1).HRCoolRequest = false;
     TerminalUnitList(1).TotalHeatLoad = 0.0;
     TerminalUnitList(1).HRHeatRequest = false;
-    CalcVRFCondenser(VRFCond, false);
+    CalcVRFCondenser(VRFCond);
 
     // increment time step
     DataGlobals::CurrentTime += DataGlobals::TimeStepZone; // 0.5
@@ -13153,7 +13144,7 @@ TEST_F(HVACVRFFixture, VRFTest_CondenserCalcTest_HREIRFTHeat)
     VRF(VRFCond).HRHeatCapTC = 0.25; // 15 min exponential rise
     // VRF(VRFCond).HRHeatEIRTC = 0.0; // (default)
     // last operating mode was heating
-    CalcVRFCondenser(VRFCond, false);
+    CalcVRFCondenser(VRFCond);
     EXPECT_TRUE(VRF(VRFCond).ModeChange);
     EXPECT_FALSE(VRF(VRFCond).HRModeChange);
     EXPECT_EQ(VRF(VRFCond).OperatingMode, 2); // ModeHeatingOnly
