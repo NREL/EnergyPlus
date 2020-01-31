@@ -1,8 +1,7 @@
 9.2.0,9.3.0,Transition notes
 12,12,These numbers should be the number of report variables in the following list (including deletes). Two columns/numbers.
-old variable name,new variable name,-- add variable names (before this line) and leave off units -- <DELETE> to delete
 Water to Water Heat Pump Load Side Heat Transfer Rate,Heat Pump Load Side Heat Transfer Rate,
-Water to Water Heat Pump Load Side Heat Transfer Energy,EIR Heat Pump Load Side Heat Transfer Energy,
+Water to Water Heat Pump Load Side Heat Transfer Energy,Heat Pump Load Side Heat Transfer Energy,
 Water to Water Heat Pump Source Side Heat Transfer Rate,Heat Pump Source Side Heat Transfer Rate,
 Water to Water Heat Pump Source Side Heat Transfer Energy,Heat Pump Source Side Heat Transfer Energy,
 Water to Water Heat Pump Load Side Inlet Temperature,Heat Pump Load Side Inlet Temperature,
@@ -13,3 +12,4 @@ Water to Water Heat Pump Electric Power,Heat Pump Electric Power,
 Water to Water Heat Pump Electric Energy,Heat Pump Electric Energy,
 Water to Water Heat Pump Load Side Mass Flow Rate,Heat Pump Load Side Mass Flow Rate,
 Water to Water Heat Pump Source Side Mass Flow Rate,Heat Pump Source Side Mass Flow Rate,
+old variable name,new variable name,-- add variable names (before this line) and leave off units -- <DELETE> to delete
