@@ -123,6 +123,19 @@ public:
         }
     }
 
+    static std::string zero_pad_exponent(std::string str)
+    {
+        // if necessary, pad the exponent with a 0 to match the old formatting from Objexx
+        if (str.size() > 3) {
+            if (!std::isdigit(str[str.size() - 3])) {
+                // wants a 0 inserted
+                str.insert(str.size() - 2, "0");
+            }
+        }
+        return str;
+    }
+
+
     static std::string write_to_string(const Real64 value, fmt::format_specs &specs)
     {
         std::string str;
@@ -202,7 +215,7 @@ public:
                     auto str = write_to_string(value * 10, *specs());
 
                     // swap around the first few characters and add in the leading
-                    // 0 that we need to get the same formatting behavor on the rounded
+                    // 0 that we need to get the same formatting behavior on the rounded
                     // value that was acquired from the reduction in precision
                     auto begin = std::next(std::begin(str), specs()->width - (specs()->precision + 8));
                     std::swap(*begin, *std::next(begin));
@@ -213,9 +226,9 @@ public:
                 }
             } else if (specs()->type == 'R') {
                 // push the value up a tad to get the same rounding behavior as Objexx
-                auto adjusted = value;
                 const auto fixed_output = should_be_fixed_output(value);
 
+                auto adjusted = value;
                 if (value != 0.0) {
                     // we're looking for a reasonable place to push up the rounding, based on
                     adjusted = (std::nextafter(adjusted, static_cast<Real64>(1)));
@@ -229,52 +242,25 @@ public:
                     return (*this)(rounded);
                 } else {
                     specs()->type = 'E';
-
-                    // write the `E` formatted float to a std::string
-                    auto str = write_to_string(adjusted, *specs());
-
-                    // if necessary, pad the exponent with a 0 to match the old formatting from Objexx
-                    if (str.size() > 3) {
-                        if (!std::isdigit(str[str.size() - 3])) {
-                            // wants a 0 inserted
-                            str.insert(str.size() - 2, "0");
-                        }
-                    }
-
-                    return write_string(str);
+                    return write_string(zero_pad_exponent(write_to_string(adjusted, *specs())));
                 }
             } else if (specs()->type == 'T') {
                 const auto fixed_output = should_be_fixed_output(value);
 
                 if (fixed_output) {
+                   const auto magnitude = std::pow(10, specs()->precision);
+                    const auto adjusted = (value * magnitude) + 0.0001;
+                    const auto truncated = std::trunc(adjusted) / magnitude;
                     specs()->type = 'F';
-                    if (specs()->width > 0) {
-                        ++specs()->width;
-                    }
-                    ++specs()->precision;
-                    auto str = write_to_string(value, *specs());
-                    str.pop_back();
-                    if (specs()->precision == 1) {
-                        // precision was initially 0
-                        // let's remove the now dangling decimal
-                        str.pop_back();
-                    }
-                    return write_string(str);
+                    return (*this)(truncated);
                 } else {
                     specs()->type = 'E';
                     ++specs()->precision;
 
                     // write the `E` formatted float to a std::string
-                    auto str = write_to_string(value, *specs());
+                    auto str = zero_pad_exponent(write_to_string(value, *specs()));
 
-                    // if necessary, pad the exponent with a 0 to match the old formatting from Objexx
-                    if (str.size() > 3) {
-                        if (!std::isdigit(str[str.size() - 3])) {
-                            // wants a 0 inserted
-                            str.insert(str.size() - 2, "0");
-                        }
-                    }
-
+                    // Erase last number to truncate the value
                     const auto E_itr = std::find(begin(str), end(str), 'E');
                     if (E_itr != str.end()) {
                         str.erase(std::prev(E_itr));
