@@ -5986,7 +5986,7 @@ namespace UnitarySystems {
                                 ShowContinueError("Heating Supply Air Flow Rate Per Floor Area field is blank.");
                                 ShowContinueError("Heating Fraction of Autosized Heating Supply Air Flow Rate field is blank.");
                                 ShowContinueError("Heating Supply Air Flow Rate Per Unit of Capacity field is blank.");
-                                ShowContinueError("Blank field not allowed for all four heating supply air flow rate calcultion methods when heating "
+                                ShowContinueError("Blank field not allowed for all four heating supply air flow rate calculation methods when heating "
                                                   "coil is present.");
                             }
                         }
