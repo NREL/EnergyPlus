@@ -7996,11 +7996,10 @@ namespace HVACVariableRefrigerantFlow {
         // The RETURNS here will jump back to SimVRF where the CalcVRF routine will simulate with latest PLR
 
         // do nothing else if TU is scheduled off
-         if (ScheduleManager::GetCurrentScheduleValue(this->SchedPtr) == 0.0) return;
+        if (ScheduleManager::GetCurrentScheduleValue(this->SchedPtr) == 0.0) return;
 
         // do nothing if TU has no load (TU will be modeled using PLR=0)
-         if (QZnReq == 0.0) return;
-//         if (QZnReq == 0.0 && !this->isSetPointControlled) return;
+        if (QZnReq == 0.0) return;
 
         // Set EMS value for PLR and return
         if (this->EMSOverridePartLoadFrac) {
@@ -9411,7 +9410,7 @@ namespace HVACVariableRefrigerantFlow {
         }
     }
 
-    int GetVRFTUInletAirNode(int const VRFTUNum)
+    int GetVRFTUZoneInletAirNode(int const VRFTUNum)
     {
 
         // FUNCTION INFORMATION:
@@ -9429,7 +9428,7 @@ namespace HVACVariableRefrigerantFlow {
         }
 
         if (VRFTUNum > 0 && VRFTUNum <= NumVRFTU) {
-            return VRFTU(VRFTUNum).VRFTUInletNodeNum;
+            return VRFTU(VRFTUNum).VRFTUOutletNodeNum;
         } else {
             return 0;
         }

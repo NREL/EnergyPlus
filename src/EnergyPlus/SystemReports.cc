@@ -4392,7 +4392,7 @@ namespace SystemReports {
         using HVACVariableRefrigerantFlow::GetVRFTUMixedAirNode;
         using HVACVariableRefrigerantFlow::GetVRFTUOutAirNode;
         using HVACVariableRefrigerantFlow::GetVRFTUReturnAirNode;
-        using HVACVariableRefrigerantFlow::GetVRFTUInletAirNode;
+        using HVACVariableRefrigerantFlow::GetVRFTUZoneInletAirNode;
         using OutdoorAirUnit::GetOutdoorAirUnitOutAirNode;
         using OutdoorAirUnit::GetOutdoorAirUnitReturnAirNode;
         using OutdoorAirUnit::GetOutdoorAirUnitZoneInletNode;
@@ -4524,7 +4524,7 @@ namespace SystemReports {
                         OutAirNode = GetVRFTUOutAirNode(ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
                         ZoneInletAirNode =
-                            GetVRFTUInletAirNode(ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetVRFTUZoneInletAirNode(ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
                         MixedAirNode = GetVRFTUMixedAirNode(ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         ReturnAirNode =

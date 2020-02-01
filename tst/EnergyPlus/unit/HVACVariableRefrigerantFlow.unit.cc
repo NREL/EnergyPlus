@@ -544,10 +544,10 @@ TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
     HVACVariableRefrigerantFlow::GetVRFInputFlag = false;
     DXCoils::GetCoilsInputFlag = false;
     // trigger a mining function (will bypass GetInput)
-    int TUInletAirNode = GetVRFTUInletAirNode(1);
+    int ZoneInletAirNode = GetVRFTUZoneInletAirNode(1);
     auto &thisTU(HVACVariableRefrigerantFlow::VRFTU(curTUNum));
     // node number set up in fixture
-    EXPECT_EQ(TUInletAirNode, thisTU.VRFTUInletNodeNum);
+    EXPECT_EQ(ZoneInletAirNode, thisTU.VRFTUOutletNodeNum);
 
     Schedule(VRF(curSysNum).SchedPtr).CurrentValue = 1.0;  // enable the VRF condenser
     Schedule(thisTU.SchedPtr).CurrentValue = 1.0;          // enable the terminal unit
@@ -580,7 +580,7 @@ TEST_F(AirLoopFixture, VRF_SysModel_inAirloop)
     Real64 OnOffAirFlowRatio = 1.0;
     Real64 QZnReq = ZoneSysEnergyDemand(curZoneNum).RemainingOutputRequired;
 
-    auto &tuInletNode(DataLoopNode::Node(TUInletAirNode));
+    auto &tuInletNode(DataLoopNode::Node(thisTU.VRFTUInletNodeNum));
     tuInletNode.Temp = 24.0;
     tuInletNode.HumRat = 0.01;
     tuInletNode.Enthalpy = PsyHFnTdbW(tuInletNode.Temp, tuInletNode.HumRat);
@@ -3133,7 +3133,7 @@ TEST_F(HVACVRFFixture, VRFTest_SysCurve)
     int VRFTUNum(1);               // index to VRF terminal unit
     int EquipPtr(1);               // index to equipment list
     int CurZoneNum(1);             // index to zone
-    int TUInletAirNode(0);       // zone inlet node number
+    int ZoneInletAirNode(0);       // zone inlet node number
     Real64 DefrostWatts(0.0);      // calculation of VRF defrost power [W]
     Real64 SysOutputProvided(0.0); // function returns sensible capacity [W]
     Real64 LatOutputProvided(0.0); // function returns latent capacity [W]
@@ -3728,7 +3728,7 @@ TEST_F(HVACVRFFixture, VRFTest_SysCurve)
     EXPECT_FALSE(ErrorsFound);
 
     GetZoneEquipmentData();                                // read equipment list and connections
-    TUInletAirNode = GetVRFTUInletAirNode(VRFTUNum); // trigger GetVRFInput by calling a mining function
+    ZoneInletAirNode = GetVRFTUZoneInletAirNode(VRFTUNum); // trigger GetVRFInput by calling a mining function
 
     Schedule(VRF(VRFCond).SchedPtr).CurrentValue = 1.0;             // enable the VRF condenser
     Schedule(VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;          // enable the terminal unit
@@ -3776,8 +3776,8 @@ TEST_F(HVACVRFFixture, VRFTest_SysCurve)
                 LatOutputProvided);
 
     ASSERT_EQ(1, NumVRFCond);
-    ASSERT_EQ(TUInletAirNode,
-              ZoneEquipConfig(VRFTU(VRFTUNum).ZoneNum).ExhaustNode(1)); // only 1 exhaust node specified above in ZoneHVAC:EquipmentConnections
+    ASSERT_EQ(ZoneInletAirNode,
+              ZoneEquipConfig(VRFTU(VRFTUNum).ZoneNum).InletNode(1)); // only 1 inlet node specified above in ZoneHVAC:EquipmentConnections
     ASSERT_EQ(1.0, VRF(VRFCond).CoolingCombinationRatio);
     EXPECT_NEAR(11176.29, VRF(VRFCond).CoolingCapacity, 0.01);
     EXPECT_NEAR(11176.29, VRF(VRFCond).HeatingCapacity, 0.01);
@@ -5569,7 +5569,7 @@ TEST_F(HVACVRFFixture, VRFTest_SysCurve_WaterCooled)
     PlantManager::GetPlantInput();
 
     HVACVariableRefrigerantFlow::MyEnvrnFlag = true;
-    ZoneInletAirNode = GetVRFTUInletAirNode(VRFTUNum); // trigger GetVRFInput by calling a mining function
+    ZoneInletAirNode = GetVRFTUZoneInletAirNode(VRFTUNum); // trigger GetVRFInput by calling a mining function
     DataAirLoop::AirLoopInputsFilled = true;
 
     Schedule(VRF(VRFCond).SchedPtr).CurrentValue = 1.0;             // enable the VRF condenser
@@ -6431,7 +6431,7 @@ TEST_F(HVACVRFFixture, VRFTest_TU_NoLoad_OAMassFlowRateTest)
     DataZoneEquipment::GetZoneEquipmentData(); // read equipment list and connections
     DataAirLoop::AirLoopInputsFilled = true;
     HVACVariableRefrigerantFlow::MyEnvrnFlag = true;
-    ZoneInletAirNode = GetVRFTUInletAirNode(VRFTUNum);  // trigger GetVRFInput by calling a mining function
+    ZoneInletAirNode = GetVRFTUZoneInletAirNode(VRFTUNum);  // trigger GetVRFInput by calling a mining function
     OutsideAirNode = VRFTU(VRFTUNum).VRFTUOAMixerOANodeNum; // outside air air inlet node num
     DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
     DataZoneEnergyDemands::ZoneSysEnergyDemand(CurZoneNum).RemainingOutputRequired = 0.0;    // No load
@@ -11149,7 +11149,7 @@ TEST_F(HVACVRFFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     EXPECT_FALSE(ErrorsFound);
     // get zone input and connections
     GetZoneEquipmentData();
-    ZoneInletAirNode = GetVRFTUInletAirNode(VRFTUNum);
+    ZoneInletAirNode = GetVRFTUZoneInletAirNode(VRFTUNum);
     Schedule(VRF(VRFCond).SchedPtr).CurrentValue = 1.0;
     Schedule(VRFTU(VRFTUNum).SchedPtr).CurrentValue = 1.0;
     Schedule(VRFTU(VRFTUNum).FanAvailSchedPtr).CurrentValue = 1.0;
