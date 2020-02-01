@@ -48,9 +48,6 @@
 // C++ Headers
 #include <memory>
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/gio.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
@@ -58,18 +55,16 @@
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/GroundTemperatureModeling/SiteDeepGroundTemperatures.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
 
-static ObjexxFCL::gio::Fmt fmtA("(A)");
-static ObjexxFCL::gio::Fmt fmtAN("(A,$)");
-
 //******************************************************************************
 
 // Site:GroundTemperature:Deep factory
-std::shared_ptr<SiteDeepGroundTemps> SiteDeepGroundTemps::DeepGTMFactory(int objectType, std::string objectName)
+std::shared_ptr<SiteDeepGroundTemps> SiteDeepGroundTemps::DeepGTMFactory(OutputFiles &outputFiles, int objectType, std::string objectName)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -82,14 +77,12 @@ std::shared_ptr<SiteDeepGroundTemps> SiteDeepGroundTemps::DeepGTMFactory(int obj
 
     // USE STATEMENTS:
     using DataEnvironment::GroundTemp_DeepObjInput;
-    using DataGlobals::OutputFileInits;
     using namespace DataIPShortCuts;
     using namespace GroundTemperatureManager;
     using namespace ObjexxFCL::gio;
 
     // Locals
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    bool found = false;
     int NumNums;
     int NumAlphas;
     int IOStat;
@@ -129,17 +122,9 @@ std::shared_ptr<SiteDeepGroundTemps> SiteDeepGroundTemps::DeepGTMFactory(int obj
     }
 
     // Write Final Ground Temp Information to the initialization output file
-    ObjexxFCL::gio::write(OutputFileInits, fmtA)
-        << "! <Site:GroundTemperature:Deep>,Jan{C},Feb{C},Mar{C},Apr{C},May{C},Jun{C},Jul{C},Aug{C},Sep{C},Oct{C},Nov{C},Dec{C}";
-    ObjexxFCL::gio::write(OutputFileInits, fmtAN) << " Site:GroundTemperature:Deep";
-    for (int i = 1; i <= 12; ++i) {
-        ObjexxFCL::gio::write(OutputFileInits, "(', ',F6.2,$)") << thisModel->deepGroundTemps(i);
-    }
-    ObjexxFCL::gio::write(OutputFileInits);
+    write_ground_temps(outputFiles.eio, "Deep", thisModel->deepGroundTemps);
 
-    found = true;
-
-    if (found && !thisModel->errorsFound) {
+    if (!thisModel->errorsFound) {
         groundTempModels.push_back(thisModel);
         return thisModel;
     } else {

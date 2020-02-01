@@ -170,7 +170,6 @@ namespace DaylightingDevices {
     using namespace DataPrecisionGlobals;
     using DataGlobals::DegToRadians;
     using DataGlobals::NumOfZones;
-    using DataGlobals::OutputFileInits;
     using DataGlobals::Pi;
     using DataGlobals::PiOvr2;
     using DataHeatBalance::Construct;
@@ -204,7 +203,7 @@ namespace DaylightingDevices {
 
     // Functions
 
-    void InitDaylightingDevices()
+    void InitDaylightingDevices(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -231,7 +230,6 @@ namespace DaylightingDevices {
 
         // DERIVED TYPE DEFINITIONS:
 
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int PipeNum;   // TDD pipe object number
@@ -443,13 +441,17 @@ namespace DaylightingDevices {
 
                 // Report calculated view factor so that user knows what to make the view factor to ground
                 if (!ShelfReported) {
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA)
-                        << "! <Shelf Details>,Name,View Factor to Outside Shelf,Window Name,Window View Factor to Sky,Window View Factor to Ground";
+                    print(outputFiles.eio,
+                        "! <Shelf Details>,Name,View Factor to Outside Shelf,Window Name,Window View Factor to Sky,Window View Factor to Ground\n");
                     ShelfReported = true;
                 }
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << Shelf(ShelfNum).Name + ',' + RoundSigDigits(Shelf(ShelfNum).ViewFactor, 2) + ',' +
-                                                         Surface(WinSurf).Name + ',' + RoundSigDigits(Surface(WinSurf).ViewFactorSky, 2) + ',' +
-                                                         RoundSigDigits(Surface(WinSurf).ViewFactorGround, 2);
+                print(outputFiles.eio,
+                      "{},{:.2R},{},{:.2R},{:.2R}\n",
+                      Shelf(ShelfNum).Name,
+                      Shelf(ShelfNum).ViewFactor,
+                      Surface(WinSurf).Name,
+                      Surface(WinSurf).ViewFactorSky,
+                      Surface(WinSurf).ViewFactorGround);
                 //      CALL SetupOutputVariable('View Factor To Outside Shelf []', &
                 //        Shelf(ShelfNum)%ViewFactor,'Zone','Average',Shelf(ShelfNum)%Name)
             }

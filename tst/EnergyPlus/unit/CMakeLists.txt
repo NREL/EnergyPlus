@@ -112,6 +112,7 @@ set( test_src
   OASystemHWPreheatCoil.unit.cc
   OutAirNodeManager.unit.cc
   OutdoorAirUnit.unit.cc
+  OutputFiles.unit.cc
   OutputProcessor.unit.cc
   OutputReportData.unit.cc
   OutputReports.unit.cc
