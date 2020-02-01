@@ -684,7 +684,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_MakeMirrorSurface)
     GetConstructData(FoundError);
     GetZoneData(FoundError); // Read Zone data from input file
     DataHeatBalance::AnyCTF = true;
-    SetupZoneGeometry(FoundError); // this calls GetSurfaceData()
+    SetupZoneGeometry(<#initializer #>, FoundError); // this calls GetSurfaceData()
 
     EXPECT_FALSE(FoundError);
 
@@ -3018,7 +3018,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_VertexNumberMismatchTest)
     Array1D_int const BaseSurfIDs(3, {1, 2, 3});
     int NeedToAddSurfaces;
 
-    GetGeometryParameters(ErrorsFound);
+    GetGeometryParameters(<#initializer #>, ErrorsFound);
     CosZoneRelNorth.allocate(2);
     SinZoneRelNorth.allocate(2);
 
@@ -3706,7 +3706,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_SurfaceReferencesNonExistingSurface)
     Array1D_int const BaseSurfIDs(3, {1, 2, 3});
     int NeedToAddSurfaces;
 
-    GetGeometryParameters(ErrorsFound);
+    GetGeometryParameters(<#initializer #>, ErrorsFound);
     CosZoneRelNorth.allocate(1);
     SinZoneRelNorth.allocate(1);
 
@@ -4459,7 +4459,7 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test1)
     Zone(1).OriginY = 0;
     Zone(1).OriginZ = 0;
 
-    GetGeometryParameters(ErrorsFound);
+    GetGeometryParameters(<#initializer #>, ErrorsFound);
     EXPECT_FALSE(has_err_output(true));
 }
 
@@ -4489,7 +4489,7 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test2)
     Zone(1).OriginY = 0;
     Zone(1).OriginZ = 0;
 
-    GetGeometryParameters(ErrorsFound);
+    GetGeometryParameters(<#initializer #>, ErrorsFound);
     EXPECT_FALSE(has_err_output(true));
 }
 
@@ -4519,7 +4519,7 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test3)
     Zone(1).OriginY = 6;
     Zone(1).OriginZ = 0;
 
-    GetGeometryParameters(ErrorsFound);
+    GetGeometryParameters(<#initializer #>, ErrorsFound);
     EXPECT_TRUE(has_err_output(false));
     
     std::string error_string = delimited_string({
@@ -4554,7 +4554,7 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test4)
     Zone(1).OriginY = 6;
     Zone(1).OriginZ = 0;
 
-    GetGeometryParameters(ErrorsFound);
+    GetGeometryParameters(<#initializer #>, ErrorsFound);
     EXPECT_TRUE(has_err_output(false));
 
     std::string error_string = delimited_string({
@@ -4824,7 +4824,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresNoAirBoundari
     GetZoneData(ErrorsFound);  // read zone data
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
-    SetupZoneGeometry(ErrorsFound); 
+    SetupZoneGeometry(<#initializer #>, ErrorsFound);
     // SetupZoneGeometry calls SurfaceGeometry::GetSurfaceData
     // SetupZoneGeometry calls SurfaceGeometry::SetupSolarEnclosuresAndAirBoundaries
     // SetupZoneGeometry calls SurfaceGeometry::SetupRadiantEnclosuresAndAirBoundaries
@@ -4962,7 +4962,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     GetZoneData(ErrorsFound);  // read zone data
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
-    SetupZoneGeometry(ErrorsFound);
+    SetupZoneGeometry(<#initializer #>, ErrorsFound);
     // SetupZoneGeometry calls SurfaceGeometry::GetSurfaceData
     // SetupZoneGeometry calls SurfaceGeometry::SetupSolarEnclosuresAndAirBoundaries
     // SetupZoneGeometry calls SurfaceGeometry::SetupRadiantEnclosuresAndAirBoundaries
@@ -5103,7 +5103,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     GetZoneData(ErrorsFound);  // read zone data
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
-    SetupZoneGeometry(ErrorsFound);
+    SetupZoneGeometry(<#initializer #>, ErrorsFound);
     // SetupZoneGeometry calls SurfaceGeometry::GetSurfaceData
     // SetupZoneGeometry calls SurfaceGeometry::SetupSolarEnclosuresAndAirBoundaries
     // SetupZoneGeometry calls SurfaceGeometry::SetupRadiantEnclosuresAndAirBoundaries

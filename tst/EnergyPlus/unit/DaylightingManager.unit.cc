@@ -824,7 +824,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     SurfaceGeometry::GetSurfaceData(foundErrors); // setup zone geometry and get zone data
     EXPECT_FALSE(foundErrors);                    // expect no errors
 
-    SurfaceGeometry::SetupZoneGeometry(foundErrors); // this calls GetSurfaceData()
+    SurfaceGeometry::SetupZoneGeometry(<#initializer #>, foundErrors); // this calls GetSurfaceData()
     EXPECT_FALSE(foundErrors);                       // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors();
 
@@ -1324,7 +1324,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     HeatBalanceManager::GetZoneData(foundErrors); // read zone data
     EXPECT_FALSE(foundErrors);                    // expect no errors
 
-    SurfaceGeometry::SetupZoneGeometry(foundErrors); // this calls GetSurfaceData()
+    SurfaceGeometry::SetupZoneGeometry(<#initializer #>, foundErrors); // this calls GetSurfaceData()
     EXPECT_FALSE(foundErrors);                       // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors();
 

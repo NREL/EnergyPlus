@@ -2243,7 +2243,7 @@ TEST_F(EnergyPlusFixture, TestAFNPressureStat)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(<#initializer #>, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
@@ -4417,7 +4417,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AFNUserDefinedDuctViewFac
     HeatBalanceManager::AllocateHeatBalArrays();
     DataEnvironment::OutBaroPress = 101000;
     DataHVACGlobals::TimeStepSys = DataGlobals::TimeStepZone;
-    SurfaceGeometry::GetGeometryParameters(ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(<#initializer #>, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
@@ -8881,7 +8881,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithLocalAirNode)
     HeatBalanceManager::GetHeatBalanceInput();
     HeatBalanceManager::AllocateHeatBalArrays();
     DataHVACGlobals::TimeStepSys = DataGlobals::TimeStepZone;
-    SurfaceGeometry::GetGeometryParameters(ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(<#initializer #>, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // Magic to get surfaces read in correctly
@@ -12886,7 +12886,7 @@ TEST_F(EnergyPlusFixture, MultiAirLoopTest)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(<#initializer #>, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
@@ -15338,7 +15338,7 @@ TEST_F(EnergyPlusFixture, TestAFNFanModel)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(<#initializer #>, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;

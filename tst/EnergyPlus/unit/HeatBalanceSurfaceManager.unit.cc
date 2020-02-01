@@ -699,7 +699,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(<#initializer #>, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
@@ -1232,12 +1232,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(<#initializer #>, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::SetupZoneGeometry(ErrorsFound);
+    SurfaceGeometry::SetupZoneGeometry(<#initializer #>, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     HeatBalanceIntRadExchange::InitSolarViewFactors();
@@ -1811,12 +1811,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(<#initializer #>, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::SetupZoneGeometry(ErrorsFound);
+    SurfaceGeometry::SetupZoneGeometry(<#initializer #>, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     HeatBalanceIntRadExchange::InitSolarViewFactors();
@@ -2374,12 +2374,12 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(<#initializer #>, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::SetupZoneGeometry(ErrorsFound);
+    SurfaceGeometry::SetupZoneGeometry(<#initializer #>, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // Clear schedule type warnings

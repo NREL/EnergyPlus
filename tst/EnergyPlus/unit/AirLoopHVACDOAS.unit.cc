@@ -3925,7 +3925,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(<#initializer #>, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;

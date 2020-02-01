@@ -244,7 +244,7 @@ TEST_F(EnergyPlusFixture, SurfaceControlMovableInsulation_InvalidWindowSimpleGla
     EXPECT_EQ(1, DataHeatBalance::TotConstructs);
     EXPECT_FALSE(ErrorsFound);
     // set relative coordinate
-    SurfaceGeometry::GetGeometryParameters(ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(<#initializer #>, ErrorsFound);
     SurfaceGeometry::CosZoneRelNorth.allocate(2);
     SurfaceGeometry::SinZoneRelNorth.allocate(2);
     SurfaceGeometry::CosZoneRelNorth = 1.0;

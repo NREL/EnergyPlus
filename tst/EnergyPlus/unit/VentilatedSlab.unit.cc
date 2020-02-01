@@ -2316,7 +2316,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
-    SetupZoneGeometry(ErrorsFound); // read zone geometry data
+    SetupZoneGeometry(<#initializer #>, ErrorsFound); // read zone geometry data
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;

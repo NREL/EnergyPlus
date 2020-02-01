@@ -825,11 +825,12 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
     ErrorsFound = false;
-    SurfaceGeometry::GetGeometryParameters(ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(<#initializer #>, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
-    SurfaceGeometry::SetupZoneGeometry(ErrorsFound); // this calls GetSurfaceData() and SetFlagForWindowConstructionWithShadeOrBlindLayer()
+    SurfaceGeometry::SetupZoneGeometry(<#initializer #>,
+                                       ErrorsFound); // this calls GetSurfaceData() and SetFlagForWindowConstructionWithShadeOrBlindLayer()
     EXPECT_FALSE(ErrorsFound);
 
     EXPECT_EQ(Construct(4).Name, "WIN-CON-DOUBLEPANE"); // glass, air gap, glass

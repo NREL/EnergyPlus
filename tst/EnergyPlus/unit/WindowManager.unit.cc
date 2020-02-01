@@ -2472,7 +2472,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
     HeatBalanceManager::GetZoneData(FoundError); // Read Zone data from input file
     EXPECT_FALSE(FoundError);
 
-    SurfaceGeometry::GetGeometryParameters(FoundError);
+    SurfaceGeometry::GetGeometryParameters(<#initializer #>, FoundError);
     EXPECT_FALSE(FoundError);
 
     SurfaceGeometry::CosZoneRelNorth.allocate(4);

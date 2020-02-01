@@ -424,7 +424,7 @@ TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_DynamicIntConvSurfaceClassi
     HeatBalanceManager::GetZoneData(errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::SetupZoneGeometry(errorsFound);
+    SurfaceGeometry::SetupZoneGeometry(<#initializer #>, errorsFound);
     ASSERT_FALSE(errorsFound);
     HeatBalanceManager::AllocateHeatBalArrays();
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
