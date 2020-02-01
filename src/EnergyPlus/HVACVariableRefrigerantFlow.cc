@@ -5685,7 +5685,7 @@ namespace HVACVariableRefrigerantFlow {
                 DataLoopNode::Node(OutsideAirNode).MassFlowRateMin = 0.0;
                 DataLoopNode::Node(OutsideAirNode).MassFlowRateMinAvail = 0.0;
             }
-            DataLoopNode::Node(OutNode).MassFlowRateMax = max(VRFTU(VRFTUNum).MaxCoolAirMassFlow, VRFTU(VRFTUNum).MaxCoolAirMassFlow);
+            DataLoopNode::Node(OutNode).MassFlowRateMax = max(VRFTU(VRFTUNum).MaxCoolAirMassFlow, VRFTU(VRFTUNum).MaxHeatAirMassFlow);
             DataLoopNode::Node(OutNode).MassFlowRateMin = 0.0;
             DataLoopNode::Node(OutNode).MassFlowRateMinAvail = 0.0;
             DataLoopNode::Node(InNode).MassFlowRateMax = max(VRFTU(VRFTUNum).MaxCoolAirMassFlow, VRFTU(VRFTUNum).MaxHeatAirMassFlow);
