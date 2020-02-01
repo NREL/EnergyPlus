@@ -6193,7 +6193,7 @@ namespace HVACVariableRefrigerantFlow {
         // TerminalUnitList(TUListIndex)%HRCoolRequest(IndexToTUInTUList) - TU will operate in this mode if heat recovery is used
         // TerminalUnitList(TUListIndex)%HRHeatRequest(IndexToTUInTUList) - TU will operate in this mode if heat recovery is used
 
-        if (VRFTU(VRFTUNum).zoneSequenceCoolingNum > 0 && VRFTU(VRFTUNum).zoneSequenceHeatingNum > 0 and VRFTU(VRFTUNum).isInAirLoop) {
+        if (VRFTU(VRFTUNum).zoneSequenceCoolingNum > 0 && VRFTU(VRFTUNum).zoneSequenceHeatingNum > 0 && VRFTU(VRFTUNum).isInAirLoop) {
             // air loop equipment uses sequenced variables
             QZnReq =
                 DataZoneEnergyDemands::ZoneSysEnergyDemand(VRFTU(VRFTUNum).ZoneNum).SequencedOutputRequired(VRFTU(VRFTUNum).zoneSequenceCoolingNum) /
