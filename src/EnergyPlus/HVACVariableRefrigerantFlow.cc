@@ -1564,6 +1564,7 @@ namespace HVACVariableRefrigerantFlow {
             TerminalUnitList(VRFNum).CoolingCoilPresent.allocate(TerminalUnitList(VRFNum).NumTUInList);
             TerminalUnitList(VRFNum).HeatingCoilPresent.allocate(TerminalUnitList(VRFNum).NumTUInList);
             TerminalUnitList(VRFNum).TerminalUnitNotSizedYet.allocate(TerminalUnitList(VRFNum).NumTUInList);
+            TerminalUnitList(VRFNum).isInAirLoop.allocate(TerminalUnitList(VRFNum).NumTUInList);
             TerminalUnitList(VRFNum).HRHeatRequest.allocate(TerminalUnitList(VRFNum).NumTUInList);
             TerminalUnitList(VRFNum).HRCoolRequest.allocate(TerminalUnitList(VRFNum).NumTUInList);
             TerminalUnitList(VRFNum).CoolingCoilAvailable.allocate(TerminalUnitList(VRFNum).NumTUInList);
@@ -1577,6 +1578,7 @@ namespace HVACVariableRefrigerantFlow {
             TerminalUnitList(VRFNum).CoolingCoilPresent = true;
             TerminalUnitList(VRFNum).HeatingCoilPresent = true;
             TerminalUnitList(VRFNum).TerminalUnitNotSizedYet = true;
+            TerminalUnitList(VRFNum).isInAirLoop = false;
             TerminalUnitList(VRFNum).HRHeatRequest = false;
             TerminalUnitList(VRFNum).HRCoolRequest = false;
             TerminalUnitList(VRFNum).CoolingCoilAvailable = false;
@@ -5167,6 +5169,7 @@ namespace HVACVariableRefrigerantFlow {
                                         VRFTU(TUIndex).airLoopNum = AirLoopNum;
                                         AirLoopFound = true;
                                         VRFTU(TUIndex).isInAirLoop = true;
+                                        TerminalUnitList(VRFTU(TUIndex).IndexToTUInTUList).isInAirLoop = true;
                                         BranchNodeConnections::TestCompSet(cCurrentModuleObject,
                                             thisObjectName,
                                             DataLoopNode::NodeID(VRFTU(TUIndex).VRFTUInletNodeNum),
@@ -5220,6 +5223,7 @@ namespace HVACVariableRefrigerantFlow {
                                     continue;
                                 VRFTU(TUIndex).airLoopNum = 0; // need air loop number here?
                                 VRFTU(TUIndex).isInOASys = true;
+                                TerminalUnitList(VRFTU(TUIndex).IndexToTUInTUList).isInAirLoop = true;
                                 AirLoopFound = true;
                                 VRFTU(TUIndex).isSetPointControlled = true;
                                 BranchNodeConnections::TestCompSet(cCurrentModuleObject,
@@ -5980,7 +5984,7 @@ namespace HVACVariableRefrigerantFlow {
             // Determine operating mode prior to simulating any terminal units connected to a VRF condenser
             // this should happen at the beginning of a time step where all TU's are polled to see what
             // mode the heat pump condenser will operate in
-            if (!any(TerminalUnitList(TUListIndex).IsSimulated) && FirstHVACIteration) {
+            if (!any(TerminalUnitList(TUListIndex).IsSimulated)) {
                 InitializeOperatingMode(FirstHVACIteration, VRFCond, TUListIndex, OnOffAirFlowRatio);
             }
             //*** End of Operating Mode Initialization done at beginning of each iteration ***!
@@ -8878,6 +8882,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 TempOutput;       // terminal unit output [W]
         Real64 SuppHeatCoilLoad; // supplemental heating coil load
 
+        if (!FirstHVACIteration && any(TerminalUnitList(TUListNum).isInAirLoop)) return;
         MaxDeltaT = 0.0;
         MinDeltaT = 0.0;
         NumCoolingLoads = 0;
@@ -9072,7 +9077,7 @@ namespace HVACVariableRefrigerantFlow {
 
                                         // recalculate using correct flow rate
                                         if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
-                                            // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
+                                            // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
                                             VRFTU(TUIndex).CalcVRF_FluidTCtrl(
                                                 TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                                         } else {
@@ -9117,7 +9122,7 @@ namespace HVACVariableRefrigerantFlow {
                                         }
 
                                         if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
-                                            // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
+                                            // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
                                             VRFTU(TUIndex).CalcVRF_FluidTCtrl(
                                                 TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                                         } else {

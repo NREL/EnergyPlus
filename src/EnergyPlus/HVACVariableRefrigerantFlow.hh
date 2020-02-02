@@ -610,6 +610,7 @@ namespace HVACVariableRefrigerantFlow {
         Array1D_bool HeatingCoilPresent;      // FALSE if coil not present
         Array1D_bool SuppHeatingCoilPresent;  // FALSE if supplemental heating coil not present
         Array1D_bool TerminalUnitNotSizedYet; // TRUE if terminal unit not sized
+        Array1D_bool isInAirLoop;             // TRUE if terminal unit is in air loop or outside air system
         Array1D_bool HRHeatRequest;           // defines a heating load on VRFTerminalUnits when QZnReq < 0
         Array1D_bool HRCoolRequest;           // defines a cooling load on VRFTerminalUnits when QZnReq > 0
         Array1D_bool CoolingCoilAvailable;    // cooling coil availability scheduled on
