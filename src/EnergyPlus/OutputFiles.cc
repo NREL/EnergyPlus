@@ -236,7 +236,7 @@ public:
                 if (fixed_output) {
                    specs()->type = 'F';
 
-                    if (value > 1000.0) {
+                    if (value > 100000.0) {
                         const auto digits10 = static_cast<int>(std::log10(value));
                         // we cannot represent this value to the require precision, truncate the floating
                         // point portion
@@ -250,7 +250,7 @@ public:
                         }
                     } else {
                         // nudge up to next rounded value
-                        return (*this)(next_float(next_float(value)));
+                        return (*this)(next_float(next_float(next_float(next_float(value)))));
                     }
                 } else {
                     specs()->type = 'E';

@@ -135,6 +135,10 @@ TEST_F(EnergyPlusFixture, OutputFiles_Expected_Formatting_Tests)
     EXPECT_EQ(format("{:.3R}", 0.16149998966664602662), "0.161");
     EXPECT_EQ(format("{:.3R}", 23.989999896666461154), "23.990");
 
+    EXPECT_EQ(format("{:.2R}", 42.734999999999985221), "42.74");
+
+    EXPECT_EQ(format("{:.3R}", 14391.882499999999709), "14391.883");
+
     // kept in the code for the sake of documentation
     // code is expected to not round up with the old version, but clearly it should
     // EXPECT_EQ(format("{:.3R}", 6.41750000000000013576E-005), "6.417E-005");
