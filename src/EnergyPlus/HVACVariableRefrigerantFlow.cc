@@ -9044,7 +9044,7 @@ namespace HVACVariableRefrigerantFlow {
                         SetCompFlowRate(TUIndex, VRFCond);
 
                         if (VRF(VRFCond).VRFAlgorithmTypeNum == AlgorithmTypeFluidTCtrl) {
-                            // Algorithm Type: VRF model based on physics, appliable for Fluid Temperature Control
+                            // Algorithm Type: VRF model based on physics, applicable for Fluid Temperature Control
                             VRFTU(TUIndex).CalcVRF_FluidTCtrl(TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                         } else {
                             // Algorithm Type: VRF model based on system curve
