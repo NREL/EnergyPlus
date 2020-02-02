@@ -167,5 +167,19 @@ TEST_F(EnergyPlusFixture, OutputFiles_Expected_Formatting_Tests)
     EXPECT_EQ(format("{:.3T}", 8.55666666666666278192E-005), "8.556E-005");
     EXPECT_EQ(format("{:.3T}", 6.41749999999999878051E-005), "6.417E-005");
     EXPECT_EQ(format("{:.3T}", 0.10106298657208269420), "0.101");
+
+
+    EXPECT_EQ(format("{:.4T}", 0.14999999999999999445), "0.1500");
+    EXPECT_EQ(format("{:.3T}", 4500.0), "4500.000");
+    EXPECT_EQ(format("{:.4T}", 7.1846416734478406596), "7.1846");
+    EXPECT_EQ(format("{:.4T}", 1.1846416734478406596), "1.1846");
+    EXPECT_EQ(format("{:.4T}", 6.2565195738294026029), "6.2565");
+    EXPECT_EQ(format("{:.4T}", 0.25651957382940215879), "0.2565");
+
+    // kept in the code for the sake of documentation
+    // code is expected to round down with the old version, but clearly it should not
+    // for the case of "Trim"
+    // EXPECT_EQ(format("{:.4T}", 0.096970000000000000639), "9.6969E-002");
+
 }
 } // namespace EnergyPlus

@@ -267,15 +267,15 @@ public:
                     return (*this)(truncated);
                 } else {
                     specs()->type = 'E';
-                    ++specs()->precision;
+                    specs()->precision+=2;
 
                     // write the `E` formatted float to a std::string
                     auto str = zero_pad_exponent(write_to_string(value, *specs()));
 
-                    // Erase last number to truncate the value
+                    // Erase last 2 numbers to truncate the value
                     const auto E_itr = std::find(begin(str), end(str), 'E');
                     if (E_itr != str.end()) {
-                        str.erase(std::prev(E_itr));
+                        str.erase(std::prev(E_itr, 2), E_itr);
                     }
 
                     return write_string(str);
