@@ -125,6 +125,20 @@ TEST_F(EnergyPlusFixture, OutputFiles_Expected_Formatting_Tests)
 
     EXPECT_EQ(format("{:.8R}", 3299120.2346041048876941), "3299120.23460410");
 
+    EXPECT_EQ(format("{:.5R}", 8678.2915949994276161), "8678.29159");
+    EXPECT_EQ(format("{:.5R}", 1000000000000000.00000), "1000000000000000.");
+    EXPECT_EQ(format("{:.5R}", 2070.8390649997299988), "2070.83906");
+
+    EXPECT_EQ(format("{:.2R}", 166.60499927514288743), "166.60");
+    EXPECT_EQ(format("{:.5R}", 245.90393499959708379), "245.90393");
+
+    EXPECT_EQ(format("{:.3R}", 0.16149998966664602662), "0.161");
+    EXPECT_EQ(format("{:.3R}", 23.989999896666461154), "23.990");
+
+    EXPECT_EQ(format("{:.2R}", 42.734999999999985221), "42.74");
+
+    EXPECT_EQ(format("{:.3R}", 14391.882499999999709), "14391.883");
+
     // kept in the code for the sake of documentation
     // code is expected to not round up with the old version, but clearly it should
     // EXPECT_EQ(format("{:.3R}", 6.41750000000000013576E-005), "6.417E-005");
@@ -153,5 +167,19 @@ TEST_F(EnergyPlusFixture, OutputFiles_Expected_Formatting_Tests)
     EXPECT_EQ(format("{:.3T}", 8.55666666666666278192E-005), "8.556E-005");
     EXPECT_EQ(format("{:.3T}", 6.41749999999999878051E-005), "6.417E-005");
     EXPECT_EQ(format("{:.3T}", 0.10106298657208269420), "0.101");
+
+
+    EXPECT_EQ(format("{:.4T}", 0.14999999999999999445), "0.1500");
+    EXPECT_EQ(format("{:.3T}", 4500.0), "4500.000");
+    EXPECT_EQ(format("{:.4T}", 7.1846416734478406596), "7.1846");
+    EXPECT_EQ(format("{:.4T}", 1.1846416734478406596), "1.1846");
+    EXPECT_EQ(format("{:.4T}", 6.2565195738294026029), "6.2565");
+    EXPECT_EQ(format("{:.4T}", 0.25651957382940215879), "0.2565");
+
+    // kept in the code for the sake of documentation
+    // code is expected to round down with the old version, but clearly it should not
+    // for the case of "Trim"
+    // EXPECT_EQ(format("{:.4T}", 0.096970000000000000639), "9.6969E-002");
+
 }
 } // namespace EnergyPlus

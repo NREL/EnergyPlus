@@ -168,6 +168,11 @@ public:
     iterator operator()(Real64 const value)
     {
         if (specs()) {
+            const auto next_float = [](const Real64 value){
+              return std::nextafter(value, std::numeric_limits<decltype(value)>::max());
+            };
+
+            // matches Fortran's 'G' format
             if (specs()->type == 'N') {
 
                 if (should_be_fixed_output(value) && fixed_will_fit(value, specs()->width - 5)) {
@@ -224,46 +229,53 @@ public:
                     *begin = '0';
                     return write_string(str);
                 }
-            } else if (specs()->type == 'R') {
+            } else if (specs()->type == 'R') { // matches RoundSigDigits() behavior
                 // push the value up a tad to get the same rounding behavior as Objexx
                 const auto fixed_output = should_be_fixed_output(value);
 
-                auto adjusted = value;
-                if (value != 0.0) {
-                    // we're looking for a reasonable place to push up the rounding, based on
-                    adjusted = (std::nextafter(adjusted, static_cast<Real64>(1)));
-                }
-
                 if (fixed_output) {
-                    const auto magnitude = std::pow(10, specs()->precision);
-                    const auto incremented = (adjusted * magnitude) + 0.0001;
-                    const auto rounded = std::round(incremented) / magnitude;
-                    specs()->type = 'F';
-                    return (*this)(rounded);
+                   specs()->type = 'F';
+
+                    if (value > 100000.0) {
+                        const auto digits10 = static_cast<int>(std::log10(value));
+                        // we cannot represent this value to the require precision, truncate the floating
+                        // point portion
+                        if (digits10 + specs()->precision >= std::numeric_limits<decltype(value)>::max_digits10){
+                            specs()->precision=0;
+                            // add '.' to match old RoundSigDigits
+                            const auto str = write_to_string(value, *specs()) + '.';
+                            return write_string(str);
+                        } else {
+                            return (*this)(value);
+                        }
+                    } else {
+                        // nudge up to next rounded value
+                        return (*this)(next_float(next_float(next_float(next_float(value)))));
+                    }
                 } else {
                     specs()->type = 'E';
-                    return write_string(zero_pad_exponent(write_to_string(adjusted, *specs())));
+                    return write_string(zero_pad_exponent(write_to_string(next_float(value), *specs())));
                 }
-            } else if (specs()->type == 'T') {
+            } else if (specs()->type == 'T') { // matches TrimSigDigits behavior
                 const auto fixed_output = should_be_fixed_output(value);
 
                 if (fixed_output) {
-                   const auto magnitude = std::pow(10, specs()->precision);
+                    const auto magnitude = std::pow(10, specs()->precision);
                     const auto adjusted = (value * magnitude) + 0.0001;
                     const auto truncated = std::trunc(adjusted) / magnitude;
                     specs()->type = 'F';
                     return (*this)(truncated);
                 } else {
                     specs()->type = 'E';
-                    ++specs()->precision;
+                    specs()->precision+=2;
 
                     // write the `E` formatted float to a std::string
                     auto str = zero_pad_exponent(write_to_string(value, *specs()));
 
-                    // Erase last number to truncate the value
+                    // Erase last 2 numbers to truncate the value
                     const auto E_itr = std::find(begin(str), end(str), 'E');
                     if (E_itr != str.end()) {
-                        str.erase(std::prev(E_itr));
+                        str.erase(std::prev(E_itr, 2), E_itr);
                     }
 
                     return write_string(str);
