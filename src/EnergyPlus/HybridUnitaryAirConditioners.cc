@@ -460,6 +460,7 @@ namespace HybridUnitaryAirConditioners {
         // na
 
         // Using/Aliasing
+        using ReportSizingManager::ReportSizingOutput;
         using BranchNodeConnections::TestCompSet;
         using namespace ScheduleManager;
         using BranchNodeConnections::SetUpCompSets;
@@ -607,12 +608,12 @@ namespace HybridUnitaryAirConditioners {
                 // N3, \field Scaling Factor
                 ZoneHybridUnitaryAirConditioner(UnitLoop).ScalingFactor = Numbers(3);
                 // the two numbers above are used to generate a overal scaling factor
+                ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirVolumeFlowRate = Numbers(1) * Numbers(3);
                 if (DataEnvironment::StdRhoAir > 1) {
                     // SystemMaximumSupplyAirFlowRate*ScalingFactor*AirDensity;
-                    ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirMassFlowRate =
-                        Numbers(1) * Numbers(3) * DataEnvironment::StdRhoAir;
+                    ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirMassFlowRate = ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirVolumeFlowRate * DataEnvironment::StdRhoAir;
                 } else {
-                    ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirMassFlowRate = Numbers(1) * Numbers(3) * 1.225;
+                    ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirMassFlowRate = ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirVolumeFlowRate * 1.225;
                 }
 
                 // N4, \field Number of Operating Modes
@@ -650,8 +651,11 @@ namespace HybridUnitaryAirConditioners {
                         break;
                     }
                 }
+                ReportSizingOutput(CurrentModuleObject, ZoneHybridUnitaryAirConditioner(UnitLoop).Name, "Scaled Maximum Supply Air Volume Flow Rate [m3/s]", ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirVolumeFlowRate);
             }
         }
+
+
         // setup output variables
         for (UnitLoop = 1; UnitLoop <= NumZoneHybridEvap; ++UnitLoop) {
 
