@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -242,8 +242,8 @@ namespace DataPlant {
                                              "WATERHEATER:HEATPUMP:WRAPPEDCONDENSER",
                                              "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:FOURPIPEBEAM",
                                              "ZONEHVAC:COOLINGPANEL:RADIANTCONVECTIVE:WATER",
-                                             "HEATPUMP:WATERTOWATER:EIR:COOLING",
-                                             "HEATPUMP:WATERTOWATER:EIR:HEATING"});
+                                             "HEATPUMP:PLANTLOOP:EIR:COOLING",
+                                             "HEATPUMP:PLANTLOOP:EIR:HEATING"});
 
     Array1D_string const ccSimPlantEquipTypes(NumSimPlantEquipTypes,
                                               {"Boiler:HotWater",
@@ -340,8 +340,8 @@ namespace DataPlant {
                                                "WaterHeater:HeatPump:WrappedCondenser",
                                                "AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam",
                                                "ZoneHVAC:CoolingPanel:RadiantConvective:Water",
-                                               "HeatPump:WaterToWater:EIR:Cooling",
-                                               "HeatPump:WaterToWater:EIR:Heating"});
+                                               "HeatPump:PlantLoop:EIR:Cooling",
+                                               "HeatPump:PlantLoop:EIR:Heating"});
 
     Array1D_int const ValidLoopEquipTypes(
         NumSimPlantEquipTypes,
