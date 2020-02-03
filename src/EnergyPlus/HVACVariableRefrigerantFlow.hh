@@ -601,6 +601,7 @@ namespace HVACVariableRefrigerantFlow {
         // Members
         std::string Name;                     // Name of the VRF Terminal Unit List
         int NumTUInList;                      // Number of VRF Terminal Units in List
+        bool reset_isSimulatedFlags;           // used to align simulate flags with order of each TU in simulation
         Array1D_int ZoneTUPtr;                // index to VRF Terminal Unit
         Array1D_string ZoneTUName;            // Name of the VRF Terminal Unit
         Array1D_bool IsSimulated;             // TRUE if TU has been simulated
@@ -610,7 +611,6 @@ namespace HVACVariableRefrigerantFlow {
         Array1D_bool HeatingCoilPresent;      // FALSE if coil not present
         Array1D_bool SuppHeatingCoilPresent;  // FALSE if supplemental heating coil not present
         Array1D_bool TerminalUnitNotSizedYet; // TRUE if terminal unit not sized
-        Array1D_bool isInAirLoop;             // TRUE if terminal unit is in air loop or outside air system
         Array1D_bool HRHeatRequest;           // defines a heating load on VRFTerminalUnits when QZnReq < 0
         Array1D_bool HRCoolRequest;           // defines a cooling load on VRFTerminalUnits when QZnReq > 0
         Array1D_bool CoolingCoilAvailable;    // cooling coil availability scheduled on
@@ -619,7 +619,7 @@ namespace HVACVariableRefrigerantFlow {
         Array1D_int HeatingCoilAvailSchPtr;   // heating coil availability schedule index
 
         // Default Constructor
-        TerminalUnitListData() : NumTUInList(0)
+        TerminalUnitListData() : NumTUInList(0), reset_isSimulatedFlags(true)
         {
         }
     };

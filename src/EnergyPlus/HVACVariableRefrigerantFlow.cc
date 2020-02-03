@@ -1564,7 +1564,6 @@ namespace HVACVariableRefrigerantFlow {
             TerminalUnitList(VRFNum).CoolingCoilPresent.allocate(TerminalUnitList(VRFNum).NumTUInList);
             TerminalUnitList(VRFNum).HeatingCoilPresent.allocate(TerminalUnitList(VRFNum).NumTUInList);
             TerminalUnitList(VRFNum).TerminalUnitNotSizedYet.allocate(TerminalUnitList(VRFNum).NumTUInList);
-            TerminalUnitList(VRFNum).isInAirLoop.allocate(TerminalUnitList(VRFNum).NumTUInList);
             TerminalUnitList(VRFNum).HRHeatRequest.allocate(TerminalUnitList(VRFNum).NumTUInList);
             TerminalUnitList(VRFNum).HRCoolRequest.allocate(TerminalUnitList(VRFNum).NumTUInList);
             TerminalUnitList(VRFNum).CoolingCoilAvailable.allocate(TerminalUnitList(VRFNum).NumTUInList);
@@ -1578,7 +1577,6 @@ namespace HVACVariableRefrigerantFlow {
             TerminalUnitList(VRFNum).CoolingCoilPresent = true;
             TerminalUnitList(VRFNum).HeatingCoilPresent = true;
             TerminalUnitList(VRFNum).TerminalUnitNotSizedYet = true;
-            TerminalUnitList(VRFNum).isInAirLoop = false;
             TerminalUnitList(VRFNum).HRHeatRequest = false;
             TerminalUnitList(VRFNum).HRCoolRequest = false;
             TerminalUnitList(VRFNum).CoolingCoilAvailable = false;
@@ -5079,25 +5077,6 @@ namespace HVACVariableRefrigerantFlow {
             VRFTU(VRFTUNum).MySuppCoilPlantScanFlag = false;
         }
 
-        // If all VRF Terminal Units on this VRF AC System have been simulated, reset the IsSimulated flag
-        // The condenser will be simulated after all terminal units have been simulated (see Sub SimulateVRF)
-        if (all(TerminalUnitList(TUListIndex).IsSimulated)) {
-            //   this should be the first time through on the next iteration. All TU's and condenser have been simulated.
-            //   reset simulation flag for each terminal unit
-            TerminalUnitList(TUListIndex).IsSimulated = false;
-            //     after all TU's have been simulated, reset operating mode flag if necessary
-            if (LastModeHeating(VRFCond) && CoolingLoad(VRFCond)) {
-                LastModeCooling(VRFCond) = true;
-                LastModeHeating(VRFCond) = false;
-                //        SwitchedMode(VRFCond)    = .TRUE.
-            }
-            if (LastModeCooling(VRFCond) && HeatingLoad(VRFCond)) {
-                LastModeHeating(VRFCond) = true;
-                LastModeCooling(VRFCond) = false;
-                //        SwitchedMode(VRFCond)    = .TRUE.
-            }
-        } // IF(ALL(TerminalUnitList(VRFTU(VRFTUNum)%TUListIndex)%IsSimulated))THEN
-
         // one-time check to see if VRF TU's are on ZoneHVAC:EquipmentList or AirloopHVAC or issue warning
         if (ZoneEquipmentListNotChecked) {
             if (DataAirLoop::AirLoopInputsFilled) ZoneEquipmentListNotChecked = false;
@@ -5169,7 +5148,6 @@ namespace HVACVariableRefrigerantFlow {
                                         VRFTU(TUIndex).airLoopNum = AirLoopNum;
                                         AirLoopFound = true;
                                         VRFTU(TUIndex).isInAirLoop = true;
-                                        TerminalUnitList(VRFTU(TUIndex).IndexToTUInTUList).isInAirLoop = true;
                                         BranchNodeConnections::TestCompSet(cCurrentModuleObject,
                                             thisObjectName,
                                             DataLoopNode::NodeID(VRFTU(TUIndex).VRFTUInletNodeNum),
@@ -5223,7 +5201,6 @@ namespace HVACVariableRefrigerantFlow {
                                     continue;
                                 VRFTU(TUIndex).airLoopNum = 0; // need air loop number here?
                                 VRFTU(TUIndex).isInOASys = true;
-                                TerminalUnitList(VRFTU(TUIndex).IndexToTUInTUList).isInAirLoop = true;
                                 AirLoopFound = true;
                                 VRFTU(TUIndex).isSetPointControlled = true;
                                 BranchNodeConnections::TestCompSet(cCurrentModuleObject,
@@ -5764,13 +5741,47 @@ namespace HVACVariableRefrigerantFlow {
                                    VRFTU(VRFTUNum).SuppHeatCoilBranchNum,
                                    VRFTU(VRFTUNum).SuppHeatCoilCompNum);
             }
+
+            // the first time an air loop VRF TU is simulated set isSimulated = true so that the TU initialization
+            // will occur with the first TU simulated this time step. Zone VRF TUs are called during sizing which, if air
+            // loop TUs are included, alters when all TUs appear to have been simulated. Also, BeginEnvrnFlag is true multiple
+            // times during the simulation, reset each time to avoid a different order during sizing and simulation
+            if (TerminalUnitList(VRFTU(VRFTUNum).TUListIndex).reset_isSimulatedFlags) {
+                // if no TUs are in the air loop or outdoor air system they will all be simulated during ManageZoneEquipment
+                // and there is no need to adjust the order of simulation (i.e., when isSimulated are all true for a given system)
+                if (VRFTU(VRFTUNum).isInAirLoop || VRFTU(VRFTUNum).isInOASys) {
+                    TerminalUnitList(VRFTU(VRFTUNum).TUListIndex).IsSimulated = true;
+                    TerminalUnitList(VRFTU(VRFTUNum).TUListIndex).reset_isSimulatedFlags = false;
+                }
+            }
+
         } // IF (BeginEnvrnFlag .and. MyEnvrnFlag(VRFTUNum)) THEN
 
         // reset environment flag for next environment
         if (!BeginEnvrnFlag) {
             MyEnvrnFlag(VRFTUNum) = true;
             MyVRFCondFlag(VRFCond) = true;
+            TerminalUnitList(VRFTU(VRFTUNum).TUListIndex).reset_isSimulatedFlags = true;
         }
+
+        // If all VRF Terminal Units on this VRF AC System have been simulated, reset the IsSimulated flag
+        // The condenser will be simulated after all terminal units have been simulated (see Sub SimulateVRF)
+        if (all(TerminalUnitList(TUListIndex).IsSimulated)) {
+            //   this should be the first time through on the next iteration. All TU's and condenser have been simulated.
+            //   reset simulation flag for each terminal unit
+            TerminalUnitList(TUListIndex).IsSimulated = false;
+            //     after all TU's have been simulated, reset operating mode flag if necessary
+            if (LastModeHeating(VRFCond) && CoolingLoad(VRFCond)) {
+                LastModeCooling(VRFCond) = true;
+                LastModeHeating(VRFCond) = false;
+                //        SwitchedMode(VRFCond)    = .TRUE.
+            }
+            if (LastModeCooling(VRFCond) && HeatingLoad(VRFCond)) {
+                LastModeHeating(VRFCond) = true;
+                LastModeCooling(VRFCond) = false;
+                //        SwitchedMode(VRFCond)    = .TRUE.
+            }
+        } // IF(ALL(TerminalUnitList(VRFTU(VRFTUNum)%TUListIndex)%IsSimulated))THEN
 
         // get operating capacity of water and steam coil
         if (FirstHVACIteration) {
@@ -6199,15 +6210,27 @@ namespace HVACVariableRefrigerantFlow {
 
         if (VRFTU(VRFTUNum).zoneSequenceCoolingNum > 0 && VRFTU(VRFTUNum).zoneSequenceHeatingNum > 0 && VRFTU(VRFTUNum).isInAirLoop) {
             // air loop equipment uses sequenced variables
-            QZnReq =
-                DataZoneEnergyDemands::ZoneSysEnergyDemand(VRFTU(VRFTUNum).ZoneNum).SequencedOutputRequired(VRFTU(VRFTUNum).zoneSequenceCoolingNum) /
-                VRFTU(VRFTUNum).controlZoneMassFlowFrac;
             LoadToCoolingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(VRFTU(VRFTUNum).ZoneNum)
                                   .SequencedOutputRequiredToCoolingSP(VRFTU(VRFTUNum).zoneSequenceCoolingNum) /
                               VRFTU(VRFTUNum).controlZoneMassFlowFrac;
             LoadToHeatingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(VRFTU(VRFTUNum).ZoneNum)
                                   .SequencedOutputRequiredToHeatingSP(VRFTU(VRFTUNum).zoneSequenceHeatingNum) /
                               VRFTU(VRFTUNum).controlZoneMassFlowFrac;
+            if (LoadToHeatingSP > 0.0 && LoadToCoolingSP > 0.0 &&
+                TempControlType(VRFTU(VRFTUNum).ZoneNum) != DataHVACGlobals::SingleCoolingSetPoint ) {
+                QZnReq = LoadToHeatingSP;
+            } else if (LoadToHeatingSP > 0.0 && LoadToCoolingSP > 0.0 &&
+                TempControlType(VRFTU(VRFTUNum).ZoneNum) == DataHVACGlobals::SingleCoolingSetPoint ) {
+                QZnReq = 0.0;
+            } else if (LoadToHeatingSP < 0.0 && LoadToCoolingSP < 0.0 &&
+                TempControlType(VRFTU(VRFTUNum).ZoneNum) != DataHVACGlobals::SingleHeatingSetPoint ) {
+                QZnReq = LoadToCoolingSP;
+            } else if (LoadToHeatingSP < 0.0 && LoadToCoolingSP < 0.0 &&
+                TempControlType(VRFTU(VRFTUNum).ZoneNum) == DataHVACGlobals::SingleHeatingSetPoint ) {
+                QZnReq = 0.0;
+            } else if (LoadToHeatingSP <= 0.0 && LoadToCoolingSP >= 0.0 ) {
+                QZnReq = 0.0;
+            }
         } else if (VRFTU(VRFTUNum).ZoneNum > 0) {
             // zone equipment uses Remaining* variables
             QZnReq = ZoneSysEnergyDemand(VRFTU(VRFTUNum).ZoneNum).RemainingOutputRequired;
@@ -8882,7 +8905,6 @@ namespace HVACVariableRefrigerantFlow {
         Real64 TempOutput;       // terminal unit output [W]
         Real64 SuppHeatCoilLoad; // supplemental heating coil load
 
-        if (!FirstHVACIteration && any(TerminalUnitList(TUListNum).isInAirLoop)) return;
         MaxDeltaT = 0.0;
         MinDeltaT = 0.0;
         NumCoolingLoads = 0;
@@ -9007,7 +9029,33 @@ namespace HVACVariableRefrigerantFlow {
             } else { // else is not set point controlled
                 //     Constant fan systems are tested for ventilation load to determine if load to be met changes.
                 //     more logic may be needed here, what is the OA flow rate, was last mode heating or cooling, what control is used, etc...
-                if (ThisZoneNum > 0) ZoneLoad = ZoneSysEnergyDemand(ThisZoneNum).RemainingOutputRequired / VRFTU(TUIndex).controlZoneMassFlowFrac;
+                if (VRFTU(TUIndex).zoneSequenceCoolingNum > 0 && VRFTU(TUIndex).zoneSequenceHeatingNum > 0 && VRFTU(TUIndex).isInAirLoop) {
+                    // air loop equipment uses sequenced variables
+                    LoadToCoolingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(ThisZoneNum)
+                                          .SequencedOutputRequiredToCoolingSP(VRFTU(TUIndex).zoneSequenceCoolingNum) /
+                                      VRFTU(TUIndex).controlZoneMassFlowFrac;
+                    LoadToHeatingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(ThisZoneNum)
+                                          .SequencedOutputRequiredToHeatingSP(VRFTU(TUIndex).zoneSequenceHeatingNum) /
+                                      VRFTU(TUIndex).controlZoneMassFlowFrac;
+                    if (LoadToHeatingSP > 0.0 && LoadToCoolingSP > 0.0 &&
+                        TempControlType(VRFTU(TUIndex).ZoneNum) != DataHVACGlobals::SingleCoolingSetPoint) {
+                        ZoneLoad = LoadToHeatingSP;
+                    } else if (LoadToHeatingSP > 0.0 && LoadToCoolingSP > 0.0 &&
+                               TempControlType(VRFTU(TUIndex).ZoneNum) == DataHVACGlobals::SingleCoolingSetPoint) {
+                        ZoneLoad = 0.0;
+                    } else if (LoadToHeatingSP < 0.0 && LoadToCoolingSP < 0.0 &&
+                               TempControlType(VRFTU(TUIndex).ZoneNum) != DataHVACGlobals::SingleHeatingSetPoint) {
+                        ZoneLoad = LoadToCoolingSP;
+                    } else if (LoadToHeatingSP < 0.0 && LoadToCoolingSP < 0.0 &&
+                               TempControlType(VRFTU(TUIndex).ZoneNum) == DataHVACGlobals::SingleHeatingSetPoint) {
+                        ZoneLoad = 0.0;
+                    } else if (LoadToHeatingSP <= 0.0 && LoadToCoolingSP >= 0.0) {
+                        ZoneLoad = 0.0;
+                    }
+                } else if (ThisZoneNum > 0) {
+                    // zone equipment uses Remaining* variables
+                    ZoneLoad = ZoneSysEnergyDemand(ThisZoneNum).RemainingOutputRequired / VRFTU(TUIndex).controlZoneMassFlowFrac;
+                }
                 if (VRF(VRFCond).ThermostatPriority == ThermostatOffsetPriority) {
                     //         for TSTATPriority, just check difference between zone temp and thermostat setpoint
                     if (ThisZoneNum > 0) {
@@ -9056,8 +9104,8 @@ namespace HVACVariableRefrigerantFlow {
                             VRFTU(TUIndex).CalcVRF(TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                         }
 
-                        LoadToCoolingSP = ZoneSysEnergyDemand(ThisZoneNum).OutputRequiredToCoolingSP;
-                        LoadToHeatingSP = ZoneSysEnergyDemand(ThisZoneNum).OutputRequiredToHeatingSP;
+                        LoadToCoolingSP = ZoneSysEnergyDemand(ThisZoneNum).OutputRequiredToCoolingSP / VRFTU(TUIndex).controlZoneMassFlowFrac;
+                        LoadToHeatingSP = ZoneSysEnergyDemand(ThisZoneNum).OutputRequiredToHeatingSP / VRFTU(TUIndex).controlZoneMassFlowFrac;
                         //           If the Terminal Unit has a net cooling capacity (NoCompOutput < 0) and
                         //           the zone temp is above the Tstat heating setpoint (QToHeatSetPt < 0)
                         if (TempOutput < 0.0 && LoadToHeatingSP < 0.0) {
