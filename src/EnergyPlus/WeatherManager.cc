@@ -314,6 +314,7 @@ namespace WeatherManager {
     Real64 SolarAzimuthAngle(0.0);                        // Angle of Solar Azimuth (degrees)
     Real64 HorizIRSky(0.0);                               // Horizontal Infrared Radiation Intensity (W/m2)
     Real64 TimeStepFraction(0.0);                         // Fraction of hour each time step represents
+    Real64 virtualIRHoriz(0.0);
     Array1D<Real64> SPSiteDryBulbRangeModScheduleValue;   // reporting Drybulb Temperature Range Modifier Schedule Value
     Array1D<Real64> SPSiteHumidityConditionScheduleValue; // reporting Humidity Condition Schedule Value
     Array1D<Real64> SPSiteBeamSolarScheduleValue;         // reporting Beam Solar Schedule Value
@@ -2588,7 +2589,11 @@ namespace WeatherManager {
         if (EMSWindSpeedOverrideOn) WindSpeed = EMSWindSpeedOverrideValue;
         WindDir = TodayWindDir(TimeStep, HourOfDay);
         if (EMSWindDirOverrideOn) WindDir = EMSWindDirOverrideValue;
-        HorizIRSky = TodayHorizIRSky(TimeStep, HourOfDay);
+        if (TodayHorizIRSky(TimeStep, HourOfDay)==9999){
+            HorizIRSky= virtualIRHoriz;
+        } else {
+            HorizIRSky = TodayHorizIRSky(TimeStep, HourOfDay);
+        }
         SkyTemp = TodaySkyTemp(TimeStep, HourOfDay);
         SkyTempKelvin = SkyTemp + KelvinConv;
         DifSolarRad = TodayDifSolarRad(TimeStep, HourOfDay);
@@ -3259,7 +3264,7 @@ namespace WeatherManager {
                     //         Set possible missing values
                     if (ETHoriz < 0.0) ETHoriz = 9999.0;
                     if (ETDirect < 0.0) ETDirect = 9999.0;
-                    if (IRHoriz < 0.0) IRHoriz = 9999.0;
+                    if (IRHoriz <= 0.0) IRHoriz = 9999.0;
                     if (GLBHoriz < 0.0) GLBHoriz = 9999.0;
                     if (DisplayWeatherMissingDataWarnings) {
                         if (DirectRad >= 9999.0) {
@@ -3466,6 +3471,9 @@ namespace WeatherManager {
                             TDewK = min(DryBulb, DewPoint) + TKelvin;
                             ESky = (0.787 + 0.764 * std::log(TDewK / TKelvin)) * (1.0 + 0.0224 * OSky - 0.0035 * pow_2(OSky) + 0.00028 * pow_3(OSky));
                             SkyTemp = (DryBulb + TKelvin) * root_4(ESky) - TKelvin;
+
+                            // Backwards calculate IRHoriz for output reporting purposes. Not used for calculations.
+                            virtualIRHoriz = (pow((DryBulb + TKelvin), 4.0) * ESky) * Sigma;
                         } else { // Valid IR from Sky
                             SkyTemp = root_4(IRHoriz / Sigma) - TKelvin;
                         }
