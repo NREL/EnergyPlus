@@ -147,7 +147,6 @@ namespace AirflowNetworkBalanceManager {
     using DataGlobals::DisplayExtraWarnings;
     using DataGlobals::NumOfZones;
     using DataGlobals::OutputFileBNDetails;
-    using DataGlobals::OutputFileInits;
     using DataGlobals::Pi;
     using DataGlobals::ScheduleAlwaysOn;
     using DataGlobals::SecInHour;

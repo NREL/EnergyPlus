@@ -371,7 +371,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetInputOutputIlluminanceMap_Test)
     GetZoneData(foundErrors);
     ASSERT_FALSE(foundErrors);
 
-    GetInputIlluminanceMap(foundErrors);
+    GetInputIlluminanceMap(OutputFiles::getSingleton(), foundErrors);
     // compare_err_stream(""); // expecting errors because zone is not really defined
 
     EXPECT_EQ(1, TotIllumMaps);
@@ -843,7 +843,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues();
-    InternalHeatGains::GetInternalHeatGainsInput();
+    InternalHeatGains::GetInternalHeatGainsInput(OutputFiles::getSingleton());
     InternalHeatGains::GetInternalHeatGainsInputFlag = false;
 
     GetDaylightingParametersInput();
@@ -873,7 +873,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     DataGlobals::BeginSimFlag = true;
     DataGlobals::WeightNow = 1.0;
     DataGlobals::WeightPreviousHour = 0.0;
-    CalcDayltgCoefficients();
+    CalcDayltgCoefficients(OutputFiles::getSingleton());
     int zoneNum = 1;
     // test that tmp arrays are allocated to correct dimension
     // zone 1 has only 1 daylighting reference point
@@ -1329,7 +1329,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     HeatBalanceIntRadExchange::InitSolarViewFactors();
 
     int ZoneNum = UtilityRoutines::FindItemInList("EAST ZONE", DataHeatBalance::Zone);
-    InternalHeatGains::GetInternalHeatGainsInput();
+    InternalHeatGains::GetInternalHeatGainsInput(OutputFiles::getSingleton());
     InternalHeatGains::GetInternalHeatGainsInputFlag = false;
     DaylightingManager::GetInputDayliteRefPt(foundErrors);
     DaylightingManager::GetDaylightingParametersInput();
