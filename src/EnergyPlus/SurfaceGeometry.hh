@@ -118,7 +118,7 @@ namespace SurfaceGeometry {
 
     void AllocateModuleArrays();
 
-    void GetSurfaceData(bool &ErrorsFound); // If errors found in input
+    void GetSurfaceData(OutputFiles &outputFiles, bool &ErrorsFound); // If errors found in input
 
     void checkSubSurfAzTiltNorm(SurfaceData &baseSurface, // Base surface data (in)
                                 SurfaceData &subSurface,  // Subsurface data (in)
@@ -139,7 +139,8 @@ namespace SurfaceGeometry {
                                   int const TotRectDetachedBldg   // Number of Building Detached Shading Surfaces to obtain
     );
 
-    void GetHTSurfaceData(bool &ErrorsFound,                // Error flag indicator (true if errors found)
+    void GetHTSurfaceData(OutputFiles &outputFiles,
+                          bool &ErrorsFound,                // Error flag indicator (true if errors found)
                           int &SurfNum,                     // Count of Current SurfaceNumber
                           int const TotHTSurfs,             // Number of Heat Transfer Base Surfaces to obtain
                           int const TotDetailedWalls,       // Number of Wall:Detailed items to obtain
@@ -147,8 +148,7 @@ namespace SurfaceGeometry {
                           int const TotDetailedFloors,      // Number of Floor:Detailed items to obtain
                           Array1S_string const BaseSurfCls, // Valid Classes for Base Surfaces
                           Array1S_int const BaseSurfIDs,
-                          int &NeedToAddSurfaces // Number of surfaces to add, based on unentered IZ surfaces
-    );
+                          int &NeedToAddSurfaces);
 
     void GetRectSurfaces(bool &ErrorsFound,             // Error flag indicator (true if errors found)
                          int &SurfNum,                  // Count of Current SurfaceNumber

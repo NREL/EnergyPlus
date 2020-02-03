@@ -293,7 +293,7 @@ namespace SurfaceGeometry {
             CosZoneRelNorth(ZoneNum) = std::cos(-Zone(ZoneNum).RelNorth * DegToRadians);
             SinZoneRelNorth(ZoneNum) = std::sin(-Zone(ZoneNum).RelNorth * DegToRadians);
         }
-        GetSurfaceData(ErrorsFound);
+        GetSurfaceData(OutputFiles::getSingleton(), ErrorsFound);
 
         if (ErrorsFound) {
             CosZoneRelNorth.deallocate();
@@ -786,7 +786,7 @@ namespace SurfaceGeometry {
         AWinCFOverlap.dimension(MaxSolidWinLayers, TotSurfaces, 0.0);
     }
 
-    void GetSurfaceData(bool &ErrorsFound) // If errors found in input
+    void GetSurfaceData(OutputFiles &outputFiles, bool &ErrorsFound) // If errors found in input
     {
 
         // SUBROUTINE INFORMATION:
@@ -982,7 +982,7 @@ namespace SurfaceGeometry {
             GetSurfaceDataOneTimeFlag = true;
         }
 
-        GetGeometryParameters(<#initializer #>, ErrorsFound);
+        GetGeometryParameters(outputFiles, ErrorsFound);
 
         if (WorldCoordSystem) {
             if (BuildingAzimuth != 0.0) RelWarning = true;
@@ -1062,8 +1062,16 @@ namespace SurfaceGeometry {
 
         GetRectDetShdSurfaceData(ErrorsFound, SurfNum, TotRectDetachedFixed, TotRectDetachedBldg);
 
-        GetHTSurfaceData(
-            ErrorsFound, SurfNum, TotHTSurfs, TotDetailedWalls, TotDetailedRoofs, TotDetailedFloors, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
+        GetHTSurfaceData(OutputFiles::getSingleton(),
+                      ErrorsFound,
+                         SurfNum,
+                         TotHTSurfs,
+                         TotDetailedWalls,
+                         TotDetailedRoofs,
+                         TotDetailedFloors,
+                         BaseSurfCls,
+                         BaseSurfIDs,
+                         NeedToAddSurfaces);
 
         GetRectSurfaces(ErrorsFound,
                         SurfNum,
@@ -1102,7 +1110,7 @@ namespace SurfaceGeometry {
 
         GetMovableInsulationData(ErrorsFound);
 
-        if (CalcSolRefl) GetShadingSurfReflectanceData(<#initializer #>, ErrorsFound);
+        if (CalcSolRefl) GetShadingSurfReflectanceData(outputFiles, ErrorsFound);
 
         TotSurfaces = SurfNum + AddedSubSurfaces + NeedToAddSurfaces + NeedToAddSubSurfaces;
 
@@ -2078,7 +2086,7 @@ namespace SurfaceGeometry {
 
         exposedFoundationPerimeter.getData(ErrorsFound);
 
-        GetSurfaceHeatTransferAlgorithmOverrides(<#initializer #>, ErrorsFound);
+        GetSurfaceHeatTransferAlgorithmOverrides(outputFiles, ErrorsFound);
 
         // Set up enclosures, process Air Boundaries if any
         SetupRadiantEnclosuresAndAirBoundaries(ErrorsFound);
@@ -2726,7 +2734,8 @@ namespace SurfaceGeometry {
         } // Item Loop
     }
 
-    void GetHTSurfaceData(bool &ErrorsFound,                // Error flag indicator (true if errors found)
+    void GetHTSurfaceData(OutputFiles &outputFiles,
+                          bool &ErrorsFound,                // Error flag indicator (true if errors found)
                           int &SurfNum,                     // Count of Current SurfaceNumber
                           int const TotHTSurfs,             // Number of Heat Transfer Base Surfaces to obtain
                           int const TotDetailedWalls,       // Number of Wall:Detailed items to obtain
@@ -2734,8 +2743,7 @@ namespace SurfaceGeometry {
                           int const TotDetailedFloors,      // Number of Floor:Detailed items to obtain
                           Array1S_string const BaseSurfCls, // Valid Classes for Base Surfaces
                           Array1S_int const BaseSurfIDs,
-                          int &NeedToAddSurfaces // Number of surfaces to add, based on unentered IZ surfaces
-    )
+                          int &NeedToAddSurfaces)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2871,8 +2879,8 @@ namespace SurfaceGeometry {
         int ArgPointer;
         int numSides;
 
-        GetOSCData(<#initializer #>, ErrorsFound);
-        GetOSCMData(<#initializer #>, ErrorsFound);
+        GetOSCData(outputFiles, ErrorsFound);
+        GetOSCMData(outputFiles, ErrorsFound);
         GetFoundationData(ErrorsFound);
 
         NeedToAddSurfaces = 0;
