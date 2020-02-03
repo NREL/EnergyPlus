@@ -135,19 +135,21 @@ namespace GroundTemperatureManager {
             }
         }
 
+        auto &outputFiles = OutputFiles::getSingleton();
+
         // If not found, create new instance of the model
         if (objectType == objectType_KusudaGroundTemp) {
             return KusudaGroundTempsModel::KusudaGTMFactory(objectType, objectName);
         } else if (objectType == objectType_FiniteDiffGroundTemp) {
             return FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(objectType, objectName);
         } else if (objectType == objectType_SiteBuildingSurfaceGroundTemp) {
-            return SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(objectType, objectName);
+            return SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(outputFiles, objectType, objectName);
         } else if (objectType == objectType_SiteShallowGroundTemp) {
-            return SiteShallowGroundTemps::ShallowGTMFactory(objectType, objectName);
+            return SiteShallowGroundTemps::ShallowGTMFactory(outputFiles, objectType, objectName);
         } else if (objectType == objectType_SiteDeepGroundTemp) {
-            return SiteDeepGroundTemps::DeepGTMFactory(objectType, objectName);
+            return SiteDeepGroundTemps::DeepGTMFactory(outputFiles, objectType, objectName);
         } else if (objectType == objectType_SiteFCFactorMethodGroundTemp) {
-            return SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(objectType, objectName);
+            return SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(outputFiles, objectType, objectName);
         } else if (objectType == objectType_XingGroundTemp) {
             return XingGroundTempsModel::XingGTMFactory(objectType, objectName);
         } else {
