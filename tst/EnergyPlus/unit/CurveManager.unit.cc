@@ -75,8 +75,6 @@ TEST_F(EnergyPlusFixture, CurveExponentialSkewNormal_MaximumCurveOutputTest)
         "  1.;                      !- Maximum Curve Output",
     });
 
-    //documentation input output reference should tell me how to plot this equation
-
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_EQ(0, CurveManager::NumCurves);
     CurveManager::GetCurveInput();
