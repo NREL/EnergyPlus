@@ -154,15 +154,10 @@ TEST_F(EnergyPlusFixture, SkyEmissivityTest)
 {
     // setup environment state
     Environment.allocate(4);
-    Environment(1).WP_Type1 = 0;
-    Environment(2).WP_Type1 = 1;
-    Environment(3).WP_Type1 = 2;
-    Environment(4).WP_Type1 = 3;
-
-    WPSkyTemperature.allocate(3);
-    WPSkyTemperature(1).CalculationType = WP_BruntModel;
-    WPSkyTemperature(2).CalculationType = WP_IdsoModel;
-    WPSkyTemperature(3).CalculationType = WP_MartinBerdahlModel;
+    Environment(1).SkyTempModel = WP_ClarkAllenModel;
+    Environment(2).SkyTempModel = WP_BruntModel;
+    Environment(3).SkyTempModel = WP_IdsoModel;
+    Environment(4).SkyTempModel = WP_BerdahlMartinModel;
 
     // init local variables
     Real64 OpagueSkyCover(0.0);
@@ -170,17 +165,19 @@ TEST_F(EnergyPlusFixture, SkyEmissivityTest)
     Real64 DewPoint(16.7);
     Real64 RelHum(0.6);
 
-    EXPECT_NEAR(0.832, CalcSkyEmissivity(1, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
-    EXPECT_NEAR(0.862, CalcSkyEmissivity(2, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
-    EXPECT_NEAR(0.867, CalcSkyEmissivity(3, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
-    EXPECT_NEAR(0.862, CalcSkyEmissivity(4, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.832, CalcSkyEmissivity(Environment(1).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.862, CalcSkyEmissivity(Environment(2).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.867, CalcSkyEmissivity(Environment(3).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.862, CalcSkyEmissivity(Environment(4).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
 
     DryBulb = 5.0;
     DewPoint = -2.13;
-    EXPECT_NEAR(0.781, CalcSkyEmissivity(1, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
-    EXPECT_NEAR(0.746, CalcSkyEmissivity(2, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
-    EXPECT_NEAR(0.760, CalcSkyEmissivity(3, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
-    EXPECT_NEAR(0.747, CalcSkyEmissivity(4, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.781, CalcSkyEmissivity(Environment(1).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.746, CalcSkyEmissivity(Environment(2).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.760, CalcSkyEmissivity(Environment(3).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+    EXPECT_NEAR(0.747, CalcSkyEmissivity(Environment(4).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
+
+    Environment.deallocate();
 
 }
 

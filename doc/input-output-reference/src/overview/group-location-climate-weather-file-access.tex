@@ -839,7 +839,9 @@ Of course, these could not all appear in the same IDF as only one DaylightSaving
 
 \subsection{WeatherProperty:SkyTemperature}\label{weatherpropertyskytemperature}
 
-Sky Temperature, or radiative sky temperature, is internally calculated by EnergyPlus using an algorithm using (1) horizontal infrared radiation or (2) an empirical model using sky cloudiness factors and current clear sky emissivity. By default, EnergyPlus calculates clear sky emissivity using Clark-Allen model, and its algorithm is fully described in the Engineering Reference document. For flexibility, the following object can be entered to adopt alternative sky emissivity calculation methods, or to override the entire internal sky temperature calculation from schedule import. Alternative methods of sky emissivity calculation include the calibrated forms of Martin \& Berdahl, Brunt, and Idso model, and their algorithms are described in the Engineering Reference as well. Much of the literature describes the sky temperature as relative to water vapor pressure, drybulb or dewpoint temperature.
+Sky Temperature, or radiative sky temperature, is internally calculated by EnergyPlus with an empirical model using sky cloudiness factors and current clear sky emissivity. In Weather File Run Periods, the sky temperature is derived by the horizontal infrared radiation if presented in the weather file input. For flexibility, the following object can be entered to override the entire internal sky temperature calculation from schedule import.
+
+By default, EnergyPlus calculates clear sky emissivity using Clark-Allen model. The following object can also be entered to adopt alternative sky emissivity calculation methods. Alternative methods of sky emissivity calculation include the calibrated forms of Berdahl \& Martin, Brunt, and Idso model. Their algorithms are all described in the Engineering Reference document. Much of the literature describes the sky temperature as relative to water vapor pressure, drybulb or dewpoint temperature.
 
 \subsubsection{Inputs}\label{inputs-8-011}
 
@@ -849,21 +851,23 @@ This name references an existing design period (i.e., \hyperref[sizingperioddesi
 
 \paragraph{Field: Calculation Type}\label{field-calculation-type}
 
-Allowable entries here are: \textbf{ScheduleValue}, \textbf{DifferenceScheduleDryBulbValue}, \textbf{DifferenceScheduleDewPointValue}, \textbf{UseBruntModel}, \textbf{UseIdsoModel}, or \textbf{UseBerdahlMartinModel}.
+Allowable entries here are: \textbf{ClarkAllen}, \textbf{Brunt}, \textbf{Idso}, \textbf{BerdahlMartin}, \textbf{ScheduleValue}, \textbf{DifferenceScheduleDryBulbValue}, or \textbf{DifferenceScheduleDewPointValue}.
 
 In the case of \textbf{ScheduleValue}, \textbf{DifferenceScheduleDryBulbValue} and \textbf{DifferenceScheduleDewPointValue} the following field must specify a valid schedule name.
+
+\textbf{ClarkAllen} -- the clear sky emissivity are calculated using Clark and Allen model. This is the default model to calculate clear sky emissivity.
+
+\textbf{Brunt} -- the clear sky emissivity are calculated using Brunt model.
+
+\textbf{Idso} -- the clear sky emissivity are calculated using Idso model.
+
+\textbf{BerdahlMartin} -- the clear sky emissivity are calculated using Berdahl & Martin model.
 
 \textbf{ScheduleValue} -- the values in the schedule are used as the sky temperature.
 
 \textbf{DifferenceScheduleDryBulbValue} -- the values in the schedule are \emph{subtracted} from the drybulb temperature value (+values would then be less than the drybulb temperature, -values would then be greater than the drybulb temperature) for the resulting sky temperature value.
 
 \textbf{DifferenceScheduleDewPointValue} -- the values in the schedule are \emph{subtracted} from the dewpoint temperature value (+values would then be less than the dewpoint temperature, -values would then be greater than the dewpoint temperature) for the resulting sky temperature value.
-
-\textbf{UseBruntModel} -- the clear sky emissivity are calculated using Brunt model.
-
-\textbf{UseIdsoModel} -- the clear sky emissivity are calculated using Idso model.
-
-\textbf{UseBerdahlMartinModel} -- the clear sky emissivity are calculated using Berdahl & Martin model.
 
 \paragraph{Field: ScheduleName}\label{field-schedulename}
 
