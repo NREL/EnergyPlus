@@ -1826,7 +1826,7 @@ namespace WaterCoils {
                 WaterCoil(CoilNum).InletWaterEnthalpy = cp * WaterCoil(CoilNum).InletWaterTemp;
 
                 WaterCoil(CoilNum).UACoilVariable = WaterCoil(CoilNum).UACoil;
-                WaterCoil(CoilNum).FoulingFactor = 0.0;
+                WaterCoil(CoilNum).FaultyCoilFoulingFactor = 0.0;
                 Real64 holdOutBaroPress = DataEnvironment::OutBaroPress;
                 DataEnvironment::OutBaroPress = DataEnvironment::StdPressureSeaLevel; // assume rating is for sea level.
                 CalcAdjustedCoilUA(CoilNum);
@@ -1911,38 +1911,19 @@ namespace WaterCoils {
 
         WaterCoil(CoilNum).UACoilVariable = WaterCoil(CoilNum).UACoil;
 
-        // added for fouling coils
-        WaterCoil(CoilNum).FoulingFactor = 0.0;
-        if (((WaterCoil(CoilNum).WaterCoilType_Num == WaterCoil_SimpleHeating) || (WaterCoil(CoilNum).WaterCoilType_Num == WaterCoil_Cooling)) &&
-            (!(MyUAAndFlowCalcFlag(CoilNum)))) {
 
-            for (i = 1; i <= NumFouledCoil; ++i) {
-                if (FouledCoils(i).FouledCoilID == CoilNum) {
-                    // Check faults availability and severity schedules
-                    rSchVal = 0.0;
-                    if (GetCurrentScheduleValue(FouledCoils(i).AvaiSchedPtr) > 0.0) {
-                        rSchVal = 1.0;
-                        if (FouledCoils(i).SeveritySchedPtr > 0) {
-                            rSchVal = GetCurrentScheduleValue(FouledCoils(i).SeveritySchedPtr);
-                        }
-                    }
+        // calculate the Faulty Coil Fouling (thermal insulance) Factor using fault information
+        if (WaterCoil(CoilNum).FaultyCoilFoulingFlag &&
+            // The fault shouldn't apply during sizing. TODO: check if needed or included in MYyUAAndFlowCalcFlag
+            (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+            // This was preexisting
+            !(MyUAAndFlowCalcFlag(CoilNum)))
+        {
+            int FaultIndex = WaterCoil(CoilNum).FaultyCoilFoulingIndex;
+            WaterCoil(CoilNum).FaultyCoilFoulingFactor = FaultsManager::FouledCoils(FaultIndex).CalFaultyCoilFoulingFactor();
 
-                    if (FouledCoils(i).FoulingInputMethod == iFouledCoil_UARated) {
-                        if (WaterCoil(CoilNum).WaterCoilType_Num == WaterCoil_SimpleHeating) {
-                            WaterCoil(CoilNum).FoulingFactor = rSchVal * (1.0 / FouledCoils(i).UAFouled - 1.0 / WaterCoil(CoilNum).UACoil);
-                        } else {
-                            WaterCoil(CoilNum).FoulingFactor = rSchVal * (1.0 / FouledCoils(i).UAFouled - 1.0 / WaterCoil(CoilNum).UACoilTotal);
-                        }
-                    } else {
-                        WaterCoil(CoilNum).FoulingFactor =
-                            rSchVal * (FouledCoils(i).Rfw / (FouledCoils(i).Aratio * FouledCoils(i).Aout) + FouledCoils(i).Rfa / FouledCoils(i).Aout);
-                    }
-
-                    if (WaterCoil(CoilNum).FoulingFactor < 0.0) WaterCoil(CoilNum).FoulingFactor = 0.0;
-
-                    break;
-                }
-            }
+        } else {
+            WaterCoil(CoilNum).FaultyCoilFoulingFactor = 0;
         }
 
         CalcAdjustedCoilUA(CoilNum);
@@ -1980,10 +1961,10 @@ namespace WaterCoils {
                 WaterConvectTerm = 0.0;
             }
             if ((AirConvectTerm > 0.0) && (WaterConvectTerm > 0.0)) {
-                WaterCoil(CoilNum).UACoilVariable = 1.0 / ((1.0 / WaterConvectTerm) + WaterCoil(CoilNum).FoulingFactor + (1.0 / AirConvectTerm));
+                WaterCoil(CoilNum).UACoilVariable = 1.0 / ((1.0 / WaterConvectTerm) + WaterCoil(CoilNum).FaultyCoilFoulingFactor + (1.0 / AirConvectTerm));
             } else {
                 // use nominal UA since variable UA cannot be calculated
-                WaterCoil(CoilNum).UACoilVariable = 1.0 / (1.0 / WaterCoil(CoilNum).UACoil + WaterCoil(CoilNum).FoulingFactor);
+                WaterCoil(CoilNum).UACoilVariable = 1.0 / (1.0 / WaterCoil(CoilNum).UACoil + WaterCoil(CoilNum).FaultyCoilFoulingFactor);
             }
         }
 
@@ -2008,12 +1989,12 @@ namespace WaterCoils {
             }
             if (WaterCoil(CoilNum).UACoilInternal > 0.0 && WaterCoil(CoilNum).UACoilExternal > 0.0) {
                 WaterCoil(CoilNum).UACoilTotal =
-                    1.0 / (1.0 / WaterCoil(CoilNum).UACoilExternal + WaterCoil(CoilNum).FoulingFactor + 1.0 / WaterCoil(CoilNum).UACoilInternal);
+                    1.0 / (1.0 / WaterCoil(CoilNum).UACoilExternal + WaterCoil(CoilNum).FaultyCoilFoulingFactor + 1.0 / WaterCoil(CoilNum).UACoilInternal);
             } else {
                 WaterCoil(CoilNum).UACoilInternal = WaterCoil(CoilNum).UACoilInternalDes;
                 WaterCoil(CoilNum).UACoilExternal = WaterCoil(CoilNum).UACoilExternalDes;
                 WaterCoil(CoilNum).UACoilTotal =
-                    1.0 / (1.0 / WaterCoil(CoilNum).UACoilExternal + WaterCoil(CoilNum).FoulingFactor + 1.0 / WaterCoil(CoilNum).UACoilInternal);
+                    1.0 / (1.0 / WaterCoil(CoilNum).UACoilExternal + WaterCoil(CoilNum).FaultyCoilFoulingFactor + 1.0 / WaterCoil(CoilNum).UACoilInternal);
             }
             WaterCoil(CoilNum).UACoilInternalPerUnitArea = WaterCoil(CoilNum).UACoilInternal / WaterCoil(CoilNum).TotCoilOutsideSurfArea;
             WaterCoil(CoilNum).UAWetExtPerUnitArea = WaterCoil(CoilNum).UACoilExternal / WaterCoil(CoilNum).TotCoilOutsideSurfArea;
