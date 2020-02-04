@@ -18,21 +18,38 @@
 # We are going to create a local virtual environment that is portable so we can package it and install it
 # Users will not need to have Python installed, and it will come with a Python.exe and a Pip.exe for installing libraries
 
-# When configured properly, the python executable we want to use will be in the build directory
-# However, it was previously just found on the system
-# We should carefully proceed to decide what actions to take
-#if("${PYTHON_EXECUTABLE}" STREQUAL "")
-#  # no python executable has been found, this is probably the initial configure so we need to find the system python
-#  find_package(PythonInterp 3 REQUIRED)
-#  find_package(PythonLibs 3 REQUIRED)
-#  include_directories(${PYTHON_INCLUDE_DIRS})
-#endif()
+function(setup_python_dependencies EXECUTABLE_PATH ORIGINAL_PYTHON_LIB_PATH RESOLVED_PYTHON_LIB)
+  message("**Inside setup_python_dependencies**")
+  include(GetPrerequisites)
+  get_filename_component(PYTHON_LIB_FILENAME "${RESOLVED_PYTHON_LIB}" NAME)
+  get_filename_component(BASE_PATH "${EXECUTABLE_PATH}" DIRECTORY)
+  execute_process(COMMAND "${CMAKE_COMMAND}" -E copy "${RESOLVED_PYTHON_LIB}" "${BASE_PATH}")
+  get_prerequisites("${EXECUTABLE_PATH}" PREREQUISITES 1 1 "" "")
+  foreach(PREREQ IN LISTS PREREQUISITES)
+    string(TOLOWER "${PREREQ}" PREREQ_LOWERCASE )
+    string(FIND "${PREREQ_LOWERCASE}" "python" PYTHON_IN_PREREQ)
+    if (NOT PYTHON_IN_PREREQ EQUAL -1)
+      gp_resolve_item("" "${PREREQ}" "" "${LIBRARY_SEARCH_DIRECTORY}" resolved_item_var)
+      if(APPLE)
+        execute_process(COMMAND "install_name_tool" -change "${PREREQ}" "@executable_path/${PYTHON_LIB_FILENAME}" "${EXECUTABLE_PATH}")
+      endif()
+    endif()
+  endforeach()
+endfunction()
 
-find_package(PythonInterp 3 REQUIRED)
-find_package(PythonLibs 3 REQUIRED)
-include_directories(${PYTHON_INCLUDE_DIRS})
+function(install_python_dependencies INITIAL_FOUND_LIBRARY RESOLVED_LIBRARY)
+  message("**Inside install_python_dependencies**")
+  install(CODE "
+    include(\"${CMAKE_CURRENT_SOURCE_DIR}/cmake/SetupPython.cmake\")
+    setup_python_dependencies(
+      \"/eplus/repos/myoldmopar/cmake-build-debug/_CPack_Packages/Darwin/IFW/EnergyPlus-9.3.0-4039bc2f81-Darwin-x86_64-Debug/packages/Unspecified/data/energyplus-9.3.0\"
+      \"${INITIAL_FOUND_LIBRARY}\"
+      \"${RESOLVED_LIBRARY}\"
+    )
+  ")
+endfunction()
 
-message("Python configuration (1): Got Python Executable: \n  Executable: ${PYTHON_EXECUTABLE} \n  Include Dirs: ${PYTHON_INCLUDE_DIRS}")
+# message("Python configuration (1): Got Python Executable: \n  Executable: ${PYTHON_EXECUTABLE} \n  Include Dirs: ${PYTHON_INCLUDE_DIRS}")
 
 ## At this point, we should have *a* Python executable, so we can make sure we also have a virtual environment in the build tree
 #if(EXISTS ${CMAKE_BINARY_DIR}/Products/pythonenv)

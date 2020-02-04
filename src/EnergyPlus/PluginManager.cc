@@ -377,11 +377,18 @@ namespace PluginManagement {
 
     PluginManager::PluginManager()
     {
+
+        auto a = Py_DecodeLocale("/eplus/repos/myoldmopar/cmake-build-debug/_CPack_Packages/Darwin/IFW/EnergyPlus-9.3.0-4039bc2f81-Darwin-x86_64-Debug/packages/Unspecified/data/pypackages", nullptr);
+        Py_SetPath(a);
+
         // from https://docs.python.org/3/c-api/init.html
         // If arg 0, it skips init registration of signal handlers, which might be useful when Python is embedded.
         Py_InitializeEx(0);
 
         PyRun_SimpleString("import sys"); // allows us to report sys.path later
+
+        std::string libDirDynLoad = PluginManager::sanitizedPath("/usr/local/opt/python/Frameworks/Python.framework/Versions/3.7/lib/python3.7/lib-dynload");
+        PluginManager::addToPythonPath(libDirDynLoad, false);
 
         // we'll always want to add the program executable directory to PATH so that Python can find the installed pyenergyplus package
         // we will then optionally add the current working directory to allow Python to find scripts in the current directory

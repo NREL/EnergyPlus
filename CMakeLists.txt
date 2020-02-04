@@ -134,6 +134,14 @@ set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
 
 include(cmake/CompilerFlags.cmake)
 
+find_package(PythonInterp 3 REQUIRED)
+find_package(PythonLibs 3 REQUIRED)
+include_directories("${PYTHON_INCLUDE_DIRS}")
+get_filename_component(RESOLVED_PYTHON_LIBRARY "${PYTHON_LIBRARIES}" REALPATH)
+if (BUILD_PACKAGE)
+  install_python_dependencies("${PYTHON_LIBRARIES}" "${RESOLVED_PYTHON_LIBRARY}")
+endif()
+
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/btwxt/src )
