@@ -89,8 +89,6 @@ SET( INCLUDED_TEX
   ${CMAKE_SOURCE_DIR}/doc/auxiliary-programs/src/parametric-spreadsheets/g-function-spreadsheet.tex
   ${CMAKE_SOURCE_DIR}/doc/auxiliary-programs/src/parametricpreprocessor.tex
   ${CMAKE_SOURCE_DIR}/doc/auxiliary-programs/src/appgpostprocess-appendix-g-postprocessing.tex
-  ${CMAKE_SOURCE_DIR}/doc/auxiliary-programs/src/blasttranslator.tex
-  ${CMAKE_SOURCE_DIR}/doc/auxiliary-programs/src/doe2translator.tex
   ${CMAKE_SOURCE_DIR}/doc/auxiliary-programs/src/running-console-applications.tex
   ${CMAKE_SOURCE_DIR}/doc/auxiliary-programs/src/running-console-applications/modifying-the-batch-file.tex
   ${CMAKE_SOURCE_DIR}/doc/auxiliary-programs/src/technical-details-of-running-energyplus.tex
