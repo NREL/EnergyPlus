@@ -102,7 +102,7 @@ Reduced overall heat transfer coefficient (UA) causes reduced coil capacity, res
 The coil fouling fault is described in the object FaultModel:Fouling:Coil. The fault model currently applies only to the `simple' water coils: Coil:Heating:Water and Coil:Cooling:Water. The FaultModel:Fouling:Coil object allows the user to describe the fouling information in either of the two methods: FouledUARated or FoulingFactor. Using FouledUARated method, user specifies the value of UAfouled directly. Using FoulingFactor method user specifies air/water side fouling factor, and the UAfouled value is further calculated via the equations shown below.
 
 \begin{equation}
-UA_{fouled} = [UA_{air} - 1  +  R_{foul}  + UA_{water} - 1]-1
+    UA_{fouled} = [\frac{1}{UA_{air}} + R_{foul} + \frac{1}{UA_{water}}]^{-1}
 \end{equation}
 
 where:
@@ -113,12 +113,12 @@ where:
 
 \(UA_{water}\) is the heat transfer coefficient of the coil on the water side, W/K
 
-\(R_{foul}\) is the fouling factor, K/W.
+\(R_{foul}\) is the fouling thermal insulance factor (the reciprocal of a heat transfer coefficient), K/W.
 
 \(R_{foul}\) is determined by:
 
 \begin{equation}
-R_{foul} = r_{air}/A_{air} + r_{water} / A_{water}
+    R_{foul} = \frac{r_{air}}{A_{air}} + \frac{r_{water}}{A_{water}}
 \end{equation}
 
 where:
@@ -131,7 +131,22 @@ where:
 
 \(A_{water}\) is the water side coil surface area, m\(^{2}\).
 
+Given the input of the object based on the outside coil surface area and the inside to outside coil surface area ratio, this results in:
+
+\begin{equation}
+    R_{foul} = \frac{r_{water}}{A_{out}*A_{ratio}} + \frac{r_{air}}{A_{out}}
+\end{equation}
+
+where:
+
+\(A_{out}\) is the Outside Coil Surface Area (in contact with the air), m\(^{2}\).
+
+\(A_{ratio}\) is the Inside to Outside Coil Surface Area Ratio.
+
 The pressure drop associated with the fouling is ignored in the current implementation.
+
+An availablity schedule is used to schedule the fault on or off.
+A Severity Schedule is also used to represent the severity of the fault, or Fault Fraction. Schedule value of 1 (default) means that the fault is applied as is.
 
 \subsection{Air Filter Fouling}\label{air-filter-fouling}
 
