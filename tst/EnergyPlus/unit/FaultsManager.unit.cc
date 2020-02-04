@@ -480,4 +480,43 @@ TEST_F(EnergyPlusFixture, FaultsManager_EconomizerFaultGetInput)
     EXPECT_EQ(MixedAir::OAController(2).EconmizerFaultNum(1), 4);
     EXPECT_EQ(MixedAir::OAController(2).EconmizerFaultNum(2), 5);
 }
+
+
+TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_CoilNotFound)
+{
+    // Test that an error is raised when coil not found
+    std::string const idf_objects = delimited_string({
+
+        "Schedule:Compact,                                             ",
+        "   AvailSched,         !- Name                                ",
+        "   ,                   !- Schedule Type Limits Name           ",
+        "   Through: 12/31,     !- Field 1                             ",
+        "   For: AllDays,       !- Field 2                             ",
+        "   Until: 24:00, 1.0;  !- Field 3                             ",
+
+        "FaultModel:Fouling:Coil,",
+        "  FouledHeatingCoil,       !- Name",
+        "  Non Existent Cooling Coil, !- Coil Name",
+        "  ,                        !- Availability Schedule Name",
+        "  ,                        !- Severity Schedule Name",
+        "  FouledUARated,           !- Fouling Input Method",
+        "  3.32;                    !- UAFouled {W/K}",
+
+    });
+
+    // Process inputs
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    ASSERT_THROW(FaultsManager::CheckAndReadFaults(), std::runtime_error);
+
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** FaultModel:Fouling:Coil = \"FOULEDHEATINGCOIL\". Referenced Coil named \"NON EXISTENT COOLING COIL\" was not found.",
+        "   **  Fatal  ** CheckAndReadFaults: Errors found in getting FaultModel input data. Preceding condition(s) cause termination.",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=1",
+        "   ..... Last severe error=FaultModel:Fouling:Coil = \"FOULEDHEATINGCOIL\". Referenced Coil named \"NON EXISTENT COOLING COIL\" was not found.",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
 } // namespace EnergyPlus
