@@ -314,7 +314,6 @@ namespace WeatherManager {
     Real64 SolarAzimuthAngle(0.0);                        // Angle of Solar Azimuth (degrees)
     Real64 HorizIRSky(0.0);                               // Horizontal Infrared Radiation Intensity (W/m2)
     Real64 TimeStepFraction(0.0);                         // Fraction of hour each time step represents
-    Real64 virtualIRHoriz(0.0);
     Array1D<Real64> SPSiteDryBulbRangeModScheduleValue;   // reporting Drybulb Temperature Range Modifier Schedule Value
     Array1D<Real64> SPSiteHumidityConditionScheduleValue; // reporting Humidity Condition Schedule Value
     Array1D<Real64> SPSiteBeamSolarScheduleValue;         // reporting Beam Solar Schedule Value
@@ -2589,11 +2588,7 @@ namespace WeatherManager {
         if (EMSWindSpeedOverrideOn) WindSpeed = EMSWindSpeedOverrideValue;
         WindDir = TodayWindDir(TimeStep, HourOfDay);
         if (EMSWindDirOverrideOn) WindDir = EMSWindDirOverrideValue;
-        if (TodayHorizIRSky(TimeStep, HourOfDay)==9999){
-            HorizIRSky= virtualIRHoriz;
-        } else {
-            HorizIRSky = TodayHorizIRSky(TimeStep, HourOfDay);
-        }
+        HorizIRSky = TodayHorizIRSky(TimeStep, HourOfDay);
         SkyTemp = TodaySkyTemp(TimeStep, HourOfDay);
         SkyTempKelvin = SkyTemp + KelvinConv;
         DifSolarRad = TodayDifSolarRad(TimeStep, HourOfDay);
@@ -3461,7 +3456,6 @@ namespace WeatherManager {
                     TomorrowWindSpeed(CurTimeStep, Hour) = WindSpeed;
                     TomorrowWindDir(CurTimeStep, Hour) = WindDir;
                     TomorrowLiquidPrecip(CurTimeStep, Hour) = LiquidPrecip;
-                    TomorrowHorizIRSky(CurTimeStep, Hour) = IRHoriz;
 
                     if (Environment(Envrn).WP_Type1 == 0) {
                         // Calculate sky temperature, use IRHoriz if not missing
@@ -3473,7 +3467,7 @@ namespace WeatherManager {
                             SkyTemp = (DryBulb + TKelvin) * root_4(ESky) - TKelvin;
 
                             // Backwards calculate IRHoriz for output reporting purposes. Not used for calculations.
-                            virtualIRHoriz = (pow((DryBulb + TKelvin), 4.0) * ESky) * Sigma;
+                            IRHoriz = pow((DryBulb + TKelvin), 4.0) * ESky * Sigma;
                         } else { // Valid IR from Sky
                             SkyTemp = root_4(IRHoriz / Sigma) - TKelvin;
                         }
@@ -3481,6 +3475,7 @@ namespace WeatherManager {
                         SkyTemp = 0.0; // dealt with later
                     }
 
+                    TomorrowHorizIRSky(CurTimeStep, Hour) = IRHoriz;
                     TomorrowSkyTemp(CurTimeStep, Hour) = SkyTemp;
 
                     if (ETHoriz >= 9999.0) ETHoriz = 0.0;
