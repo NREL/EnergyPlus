@@ -62,6 +62,8 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FaultsManager.hh>
@@ -70,6 +72,7 @@
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SetPointManager.hh>
+#include <EnergyPlus/WaterCoils.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -584,4 +587,219 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_BadCoilType)
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
+
+TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
+{
+    // Initial problem: WaterCoils::GetWaterCoilInput tries to add an index 'FouledCoilID 'to FouledCoils arrays here
+    // https://github.com/NREL/EnergyPlus/blob/8478cc45d5cb3988fb9b0025d33cc6a701afc21d/src/EnergyPlus/WaterCoils.cc#L944-L954
+    // Problem is that when this happens, FaultsManager::CheckAndReadFaults() hasn't been called the the FouledCoils array is always empty
+    // so no fault are actually registered, ever.
+    //
+    // Really, the Coil should be referencing the fault model too, to match other usages (Boiler, Chillers, EvapCoolers, etc) and so that you avoid
+    // having to constantly loop on all FouledCoils to find if there's one referenced your object.
+    // Also, FaultPropertiesFouling::CalFoulingFactor() should be leveraged to keep code dry instead of redoing  the same thing in WaterCoils
+
+    std::string const idf_objects = delimited_string({
+
+        "ScheduleTypeLimits,",
+        "  Fraction,                !- Name",
+        "  0,                       !- Lower Limit Value",
+        "  1,                       !- Upper Limit Value",
+        "  Continuous;              !- Numeric Type",
+
+        "Schedule:Compact,",
+        "  AvailSched,              !- Name",
+        "  Fraction,                !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,1.00;       !- Field 3",
+
+        "Schedule:Compact,",
+        "  SeveritySched,           !- Name",
+        "  Fraction,                !- Schedule Type Limits Name",
+        "  Through: 12/31,          !- Field 1",
+        "  For: AllDays,            !- Field 2",
+        "  Until: 24:00,0.75;       !- Field 3",
+
+        "Coil:Heating:Water,",
+        "  AHU HW Heating Coil,     !- Name",
+        "  AvailSched,              !- Availability Schedule Name",
+        "  6.64,                    !- U-Factor Times Area Value {W/K}",
+        "  0.000010,                !- Maximum Water Flow Rate {m3/s}",
+        "  AHU HW Heating Coil Water Inlet Node,  !- Water Inlet Node Name",
+        "  AHU HW Heating Coil Water Outlet Node,  !- Water Outlet Node Name",
+        "  Air Loop Referenz AHU Cooling Coil Air Outlet Node,  !- Air Inlet Node Name",
+        "  AHU HW Heating Coil Air Outlet Node,  !- Air Outlet Node Name",
+        "  UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method",
+        "  438.32,                  !- Rated Capacity {W}",
+        "  80,                      !- Rated Inlet Water Temperature {C}",
+        "  16,                      !- Rated Inlet Air Temperature {C}",
+        "  70,                      !- Rated Outlet Water Temperature {C}",
+        "  35,                      !- Rated Outlet Air Temperature {C}",
+        "  0.50;                    !- Rated Ratio for Air and Water Convection",
+
+        "FaultModel:Fouling:Coil,",
+        "  FouledHeatingCoil,       !- Name",
+        "  AHU HW Heating Coil,     !- Coil Name",
+        "  ,                        !- Availability Schedule Name",
+        "  SeveritySched,           !- Severity Schedule Name",
+        "  FouledUARated,           !- Fouling Input Method",
+        "  3.32;                    !- UAFouled {W/K}",
+
+        "Coil:Cooling:Water,",
+        "   AHU CHW Cooling Coil,   !- Name",
+        "   AvailSched,             !- Availability Schedule Name",
+        "   autosize,               !- Design Water Flow Rate {m3/s}",
+        "   autosize,               !- Design Air Flow Rate {m3/s}",
+        "   autosize,               !- Design Inlet Water Temperature {C}",
+        "   autosize,               !- Design Inlet Air Temperature {C}",
+        "   autosize,               !- Design Outlet Air Temperature {C}",
+        "   autosize,               !- Design Inlet Air Humidity Ratio {-}",
+        "   autosize,               !- Design Outlet Air Humidity Ratio {-}",
+        "   Water Inlet Node,       !- Water Inlet Node Name",
+        "   Water Outlet Node,      !- Water Outlet Node Name",
+        "   Air Inlet Node,         !- Air Inlet Node Name",
+        "   Air Outlet Node,        !- Air Outlet Node Name",
+        "   SimpleAnalysis,         !- Type of Analysis",
+        "   CrossFlow;              !- Heat Exchanger Configuration",
+
+        "FaultModel:Fouling:Coil,",
+        "  FouledCoolingCoil,       !- Name",
+        "  AHU CHW Cooling Coil,    !- Coil Name",
+        "  AvailSched,              !- Availability Schedule Name",
+        "  SeveritySched,           !- Severity Schedule Name",
+        "  FoulingFactor,           !- Fouling Input Method",
+        "  ,                        !- UAFouled {W/K}",
+        // Note: don't mind these values, there are plain bogus/unresearched
+        "  0.0005,                  !- Water Side Fouling Factor, m2-K/W",
+        "  0.0001,                  !- Air Side Fouling Factor, m2-K/W",
+        "  100.0,                   !- Outside Coil Surface Area, m2",
+        "  0.1;                     !- Inside to Outside Coil Surface Area Ratio",
+
+        "Coil:Cooling:Water,",
+        "   AHU CHW Coil With no fault, !- Name",
+        "   AvailSched,             !- Availability Schedule Name",
+        "   autosize,               !- Design Water Flow Rate {m3/s}",
+        "   autosize,               !- Design Air Flow Rate {m3/s}",
+        "   autosize,               !- Design Inlet Water Temperature {C}",
+        "   autosize,               !- Design Inlet Air Temperature {C}",
+        "   autosize,               !- Design Outlet Air Temperature {C}",
+        "   autosize,               !- Design Inlet Air Humidity Ratio {-}",
+        "   autosize,               !- Design Outlet Air Humidity Ratio {-}",
+        "   Water 2 Inlet Node,     !- Water Inlet Node Name",
+        "   Water 2 Outlet Node,    !- Water Outlet Node Name",
+        "   Air 2 Inlet Node,       !- Air Inlet Node Name",
+        "   Air 2 Outlet Node,      !- Air Outlet Node Name",
+        "   SimpleAnalysis,         !- Type of Analysis",
+        "   CrossFlow;              !- Heat Exchanger Configuration",
+    });
+
+    // Process inputs
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    DataHVACGlobals::TimeStepSys = 1;
+    DataGlobals::NumOfTimeStepInHour = 4;
+    DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
+
+    ScheduleManager::ProcessScheduleInput();  // read schedule data
+    int avaiSchedIndex = ScheduleManager::GetScheduleIndex("AVAILSCHED");
+    EXPECT_EQ(1, avaiSchedIndex);
+    int severitySchedIndex = ScheduleManager::GetScheduleIndex("SEVERITYSCHED");
+    EXPECT_EQ(2, severitySchedIndex);
+
+
+    // Readin inputs
+    //SetPointManager::GetSetPointManagerInputs();
+    //HVACControllers::GetControllerInput();
+
+    // Run
+    ASSERT_NO_THROW(FaultsManager::CheckAndReadFaults());
+
+    // Read schedule values
+    DataGlobals::TimeStep = 1;
+    DataGlobals::HourOfDay = 1;
+    DataEnvironment::DayOfWeek = 1;
+    DataEnvironment::DayOfYear_Schedule = 1;
+    ScheduleManager::UpdateScheduleValues();
+
+    EXPECT_EQ(2, FaultsManager::NumFouledCoil);
+    // This should also have called WaterCoil::GetWaterCoilInput
+    EXPECT_EQ(3, WaterCoils::NumWaterCoils);
+
+
+    // Check that fault association actually happened
+    {
+        int CoilNum = 1;
+        int FaultIndex = 1;
+        EXPECT_EQ("AHU HW HEATING COIL", WaterCoils::WaterCoil(CoilNum).Name);
+        EXPECT_NEAR(6.64, WaterCoils::WaterCoil(CoilNum).UACoil, 0.0001);
+        EXPECT_EQ(WaterCoils::WaterCoil_SimpleHeating, WaterCoils::WaterCoil(CoilNum).WaterCoilType_Num);
+
+        EXPECT_EQ(CoilNum, FaultsManager::FouledCoils(FaultIndex).FouledCoilNum);
+        EXPECT_EQ(WaterCoils::WaterCoil_SimpleHeating, FaultsManager::FouledCoils(FaultIndex).FouledCoiledType);
+
+        EXPECT_TRUE(WaterCoils::WaterCoil(CoilNum).FaultyCoilFoulingFlag);
+        EXPECT_EQ(FaultIndex, WaterCoils::WaterCoil(CoilNum).FaultyCoilFoulingIndex);
+
+        // Doesn't have an Availability Schedule
+        EXPECT_EQ(-1, FaultsManager::FouledCoils(FaultIndex).AvaiSchedPtr);
+        // Has a Severity Schedule
+        EXPECT_EQ("SEVERITYSCHED", FaultsManager::FouledCoils(FaultIndex).SeveritySchedule);
+        EXPECT_EQ(severitySchedIndex, FaultsManager::FouledCoils(FaultIndex).SeveritySchedPtr);
+
+        EXPECT_EQ(FaultsManager::iFouledCoil_UARated, FaultsManager::FouledCoils(FaultIndex).FoulingInputMethod);
+        EXPECT_NEAR(3.32, FaultsManager::FouledCoils(FaultIndex).UAFouled, 0.0001);
+
+        // Check calculation
+        // Expected FaultFrac * (1/UAfouled - 1 / UACoilTotal)
+        Real64 expectedFoulingFactor = 0.75 * ((1.0 / 3.32) - (1.0 / 6.64));
+        EXPECT_NEAR(expectedFoulingFactor, FaultsManager::FouledCoils(FaultIndex).CalFaultyCoilFoulingFactor(), 0.0001);
+    }
+
+    // Cooling Coil, method is "FoulingFactor"
+    {
+        int CoilNum = 2;
+        int FaultIndex = 2;
+        EXPECT_EQ("AHU CHW COOLING COIL", WaterCoils::WaterCoil(CoilNum).Name);
+        EXPECT_EQ(WaterCoils::WaterCoil_Cooling, WaterCoils::WaterCoil(CoilNum).WaterCoilType_Num);
+
+        EXPECT_EQ(CoilNum, FaultsManager::FouledCoils(FaultIndex).FouledCoilNum);
+        EXPECT_EQ(WaterCoils::WaterCoil_Cooling, FaultsManager::FouledCoils(FaultIndex).FouledCoiledType);
+
+        EXPECT_TRUE(WaterCoils::WaterCoil(CoilNum).FaultyCoilFoulingFlag);
+        EXPECT_EQ(FaultIndex, WaterCoils::WaterCoil(CoilNum).FaultyCoilFoulingIndex);
+
+        // Has an Availabity Schedule
+        EXPECT_EQ("AVAILSCHED", FaultsManager::FouledCoils(FaultIndex).AvaiSchedule);
+        EXPECT_EQ(avaiSchedIndex, FaultsManager::FouledCoils(FaultIndex).AvaiSchedPtr);
+        // Has a Severity Schedule
+        EXPECT_EQ("SEVERITYSCHED", FaultsManager::FouledCoils(FaultIndex).SeveritySchedule);
+        EXPECT_EQ(severitySchedIndex, FaultsManager::FouledCoils(FaultIndex).SeveritySchedPtr);
+
+        EXPECT_EQ(FaultsManager::iFouledCoil_FoulingFactor, FaultsManager::FouledCoils(FaultIndex).FoulingInputMethod);
+        EXPECT_NEAR(0.0005, FaultsManager::FouledCoils(FaultIndex).Rfw, 0.0001);
+        EXPECT_NEAR(0.0001, FaultsManager::FouledCoils(FaultIndex).Rfa, 0.0001);
+        EXPECT_NEAR(100.0, FaultsManager::FouledCoils(FaultIndex).Aout, 0.01);
+        EXPECT_NEAR(0.1, FaultsManager::FouledCoils(FaultIndex).Aratio, 0.0001);
+
+        // Check calculation
+        Real64 waterTerm = 0.0005 / (100.0*0.1); // Rf_water/A_water = Rfw / (Aout * Aratio)
+        Real64 airTerm = 0.0001 / 100.0;         // Rf_air/A_air = Rfa / Aout
+        // Expected FaultFrac * (waterTerm + airTerm)
+        Real64 expectedFoulingFactor = 0.75 * (waterTerm + airTerm);
+        EXPECT_NEAR(expectedFoulingFactor, FaultsManager::FouledCoils(FaultIndex).CalFaultyCoilFoulingFactor(), 0.0001);
+    }
+
+    // No association if not meant!
+    {
+        int CoilNum = 3;
+        EXPECT_EQ("AHU CHW COIL WITH NO FAULT", WaterCoils::WaterCoil(CoilNum).Name);
+        EXPECT_EQ(WaterCoils::WaterCoil_Cooling, WaterCoils::WaterCoil(CoilNum).WaterCoilType_Num);
+
+        EXPECT_FALSE(WaterCoils::WaterCoil(CoilNum).FaultyCoilFoulingFlag);
+        EXPECT_EQ(0, WaterCoils::WaterCoil(CoilNum).FaultyCoilFoulingIndex);
+    }
+
+}
+
 } // namespace EnergyPlus
