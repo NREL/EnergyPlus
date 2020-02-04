@@ -941,18 +941,6 @@ namespace WaterCoils {
             }
         }
 
-        // added to store FouledCoilID for simple water heating and cooling coils
-        for (CoilNum = 1; CoilNum <= NumWaterCoils; ++CoilNum) {
-            if (WaterCoil(CoilNum).WaterCoilType_Num == WaterCoil_Cooling || WaterCoil(CoilNum).WaterCoilType_Num == WaterCoil_SimpleHeating) {
-                for (j1 = 1; j1 <= NumFouledCoil; ++j1) {
-                    if (UtilityRoutines::SameString(WaterCoil(CoilNum).Name, FouledCoils(j1).FouledCoilName)) {
-                        FouledCoils(j1).FouledCoilID = CoilNum;
-                        break;
-                    }
-                }
-            }
-        }
-
         if (ErrorsFound) {
             ShowFatalError(RoutineName + "Errors found in getting input.");
         }

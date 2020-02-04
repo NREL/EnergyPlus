@@ -1764,6 +1764,41 @@ namespace FaultsManager {
             FouledCoils(jFault_FoulingCoil).Rfa = rNumericArgs(3);
             FouledCoils(jFault_FoulingCoil).Aout = rNumericArgs(4);
             FouledCoils(jFault_FoulingCoil).Aratio = rNumericArgs(5);
+
+
+            // Coil check and link
+            {
+                // Obtains and Allocates WaterCoil related parameters from input file
+                if (WaterCoils::GetWaterCoilsInputFlag) {
+                    WaterCoils::GetWaterCoilInput();
+                    WaterCoils::GetWaterCoilsInputFlag = false;
+                }
+
+                // Check the coil name and type
+                int CoilNum = UtilityRoutines::FindItemInList(FouledCoils(jFault_FoulingCoil).FouledCoilName, WaterCoils::WaterCoil);
+                if (CoilNum <= 0) {
+                    ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\". Referenced Coil named \"" +
+                                    FouledCoils(jFault_FoulingCoil).FouledCoilName + "\" was not found.");
+                    ErrorsFound = true;
+                } else {
+                    // Coil is found: check if the right type
+                    if ( (WaterCoils::WaterCoil(CoilNum).WaterCoilType_Num == WaterCoils::WaterCoil_SimpleHeating) ||
+                         (WaterCoils::WaterCoil(CoilNum).WaterCoilType_Num == WaterCoils::WaterCoil_Cooling) )
+                    {
+                        // Link the Coil with the fault model
+                        WaterCoils::WaterCoil(CoilNum).FaultyCoilFoulingFlag = true;
+                        WaterCoils::WaterCoil(CoilNum).FaultyCoilFoulingIndex = jFault_FoulingCoil;
+
+                        FouledCoils(jFault_FoulingCoil).FouledCoiledType = WaterCoils::WaterCoil(CoilNum).WaterCoilType_Num;
+                        FouledCoils(jFault_FoulingCoil).FouledCoilNum = CoilNum;
+                    } else {
+                        ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid "
+                                       + cAlphaFieldNames(2) + " = \"" + cAlphaArgs(2) + "\".");
+                        ShowContinueError("Coil was found but it is not one of the supported types (\"Coil:Cooling:Water\" or \"Coil:Heating:Water\").");
+                        ErrorsFound = true;
+                    }
+                }
+            }
         }
 
         // read faults input: Fault_type 101-105, which are related with economizer sensors
@@ -1850,7 +1885,7 @@ namespace FaultsManager {
         RunFaultMgrOnceFlag = true;
 
         if (ErrorsFound) {
-            ShowFatalError("Errors getting FaultModel input data.  Preceding condition(s) cause termination.");
+            ShowFatalError("CheckAndReadFaults: Errors found in getting FaultModel input data. Preceding condition(s) cause termination.");
         }
     }
 
