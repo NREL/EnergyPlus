@@ -378,7 +378,7 @@ namespace PluginManagement {
     PluginManager::PluginManager()
     {
 
-        auto a = Py_DecodeLocale("/eplus/repos/myoldmopar/cmake-build-debug/_CPack_Packages/Darwin/IFW/EnergyPlus-9.3.0-4039bc2f81-Darwin-x86_64-Debug/packages/Unspecified/data/pypackages", nullptr);
+        auto a = Py_DecodeLocale("/eplus/repos/myoldmopar/cmake-build-debug/_CPack_Packages/Darwin/IFW/EnergyPlus-9.3.0-66943131ca-Darwin-x86_64-Debug/packages/Unspecified/data/pypackages/python3.7", nullptr);
         Py_SetPath(a);
 
         // from https://docs.python.org/3/c-api/init.html

@@ -42,11 +42,15 @@ function(install_python_dependencies INITIAL_FOUND_LIBRARY RESOLVED_LIBRARY)
   install(CODE "
     include(\"${CMAKE_CURRENT_SOURCE_DIR}/cmake/SetupPython.cmake\")
     setup_python_dependencies(
-      \"/eplus/repos/myoldmopar/cmake-build-debug/_CPack_Packages/Darwin/IFW/EnergyPlus-9.3.0-4039bc2f81-Darwin-x86_64-Debug/packages/Unspecified/data/energyplus-9.3.0\"
+      \"/eplus/repos/myoldmopar/cmake-build-debug/_CPack_Packages/Darwin/IFW/EnergyPlus-9.3.0-66943131ca-Darwin-x86_64-Debug/packages/Unspecified/data/energyplus-9.3.0\"
       \"${INITIAL_FOUND_LIBRARY}\"
       \"${RESOLVED_LIBRARY}\"
     )
   ")
+  install(DIRECTORY "/usr/local/opt/python/Frameworks/Python.framework/Versions/3.7/lib/python3.7"
+          DESTINATION "./pypackages")
+  install(DIRECTORY "/eplus/repos/myoldmopar/cmake-build-debug/Products/pyenergyplus/"
+          DESTINATION "./pyenergyplus")
 endfunction()
 
 # message("Python configuration (1): Got Python Executable: \n  Executable: ${PYTHON_EXECUTABLE} \n  Include Dirs: ${PYTHON_INCLUDE_DIRS}")
