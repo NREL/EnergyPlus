@@ -9,6 +9,35 @@ configure_file( DataStringGlobals.in.cc "${CMAKE_CURRENT_BINARY_DIR}/DataStringG
 configure_file( ConfiguredFunctions.in.cc "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.cc" )
 file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc" "Will be filled in later by GenerateEmbeddedEpJSONSchema" )
 
+# include("${CMAKE_SOURCE_DIR}/cmake/SetupPython.cmake")
+find_package(PythonLibs 3 REQUIRED)
+include_directories("${PYTHON_INCLUDE_DIRS}")
+
+if (MSVC)
+  # copy things into both the debug and release folders for convenience, first debug
+  if (NOT EXISTS "${CMAKE_BINARY_DIR}/Products/Debug")
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/Products/Debug")
+  endif()
+  if (NOT EXISTS "${CMAKE_BINARY_DIR}/Products/Debug/pyenergyplus")
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/Products/Debug/pyenergyplus")
+  endif()
+  file(COPY "/usr/local/opt/python/Frameworks/Python.framework/Versions/3.7/lib/python3.7" DESTINATION "${CMAKE_BINARY_DIR}/Products/Debug/pypackages")
+  # then release
+  if (NOT EXISTS "${CMAKE_BINARY_DIR}/Products/Release")
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/Products/Release")
+  endif()
+  if (NOT EXISTS "${CMAKE_BINARY_DIR}/Products/Release/pyenergyplus")
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/Products/Release/pyenergyplus")
+  endif()
+  file(COPY "/usr/local/opt/python/Frameworks/Python.framework/Versions/3.7/lib/python3.7" DESTINATION "${CMAKE_BINARY_DIR}/Products/Release/pypackages")
+else()
+  # assuming a single-products dir, like regular makefile type
+  if (NOT EXISTS "${CMAKE_BINARY_DIR}/Products/pyenergyplus")
+    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/Products/pyenergyplus")
+  endif()
+  file(COPY "/usr/local/opt/python/Frameworks/Python.framework/Versions/3.7/lib/python3.7" DESTINATION "${CMAKE_BINARY_DIR}/Products/pypackages")
+endif()
+
 SET( SRC
   "${CMAKE_SOURCE_DIR}/third_party/milo/dtoa.h"
   "${CMAKE_SOURCE_DIR}/third_party/milo/itoa.h"
@@ -750,6 +779,24 @@ target_link_libraries( energyplus energyplusapi )
 
 set_target_properties(energyplus PROPERTIES VERSION ${ENERGYPLUS_VERSION})
 set_target_properties(energyplusapi PROPERTIES VERSION ${ENERGYPLUS_VERSION})
+
+get_filename_component(RESOLVED_PYTHON_LIBRARY "${PYTHON_LIBRARIES}" REALPATH)
+get_filename_component(PYTHON_LIB_FILENAME "${RESOLVED_PYTHON_LIBRARY}" NAME)
+add_custom_command(
+  TARGET energyplus POST_BUILD
+  COMMAND ${CMAKE_COMMAND}
+        -DRESOLVED_PYTHON_LIB=${RESOLVED_PYTHON_LIBRARY}
+        -DEXECUTABLE_PATH=$<TARGET_FILE:energyplus>
+        -DPYTHON_LIB_FILENAME=${PYTHON_LIB_FILENAME}
+        -P ${CMAKE_SOURCE_DIR}/cmake/SetupPython.cmake
+)
+
+if (BUILD_PACKAGE)
+  install(DIRECTORY "/usr/local/opt/python/Frameworks/Python.framework/Versions/3.7/lib/python3.7"
+          DESTINATION "./pypackages")
+  install(DIRECTORY "${CMAKE_BINARY_DIR}/Products/pyenergyplus/" # TODO: Platform independent
+          DESTINATION "./pyenergyplus")
+endif()
 
 install( TARGETS energyplus energyplusapi DESTINATION ./ )
 

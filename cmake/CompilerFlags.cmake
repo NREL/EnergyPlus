@@ -1,4 +1,6 @@
 
+include(cmake/ProjectMacros.cmake)
+
 # Compiler-agnostic compiler flags first
 ADD_CXX_DEFINITIONS("-DOBJEXXFCL_ALIGN=64") # Align ObjexxFCL arrays to 64B
 ADD_CXX_DEBUG_DEFINITIONS("-DOBJEXXFCL_ARRAY_INIT_DEBUG") # Initialize ObjexxFCL arrays to aid debugging

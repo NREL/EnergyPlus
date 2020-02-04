@@ -75,10 +75,6 @@ option( ENABLE_INSTALL_REMOTE "Enable install_remote and install_remote_plist co
 
 mark_as_advanced( ENABLE_INSTALL_REMOTE )
 
-include(cmake/ProjectMacros.cmake)
-include(GetPrerequisites)
-include(cmake/SetupPython.cmake)
-
 if( BUILD_TESTING )
   option( ENABLE_REGRESSION_TESTING "Enable Regression Tests" OFF )
   option( BUILD_WCE_TESTING "Build testing targets for Windows Calculation Engine" OFF )
@@ -135,40 +131,6 @@ set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
 include(cmake/CompilerFlags.cmake)
 
 find_package(PythonInterp 3 REQUIRED)
-find_package(PythonLibs 3 REQUIRED)
-include_directories("${PYTHON_INCLUDE_DIRS}")
-get_filename_component(RESOLVED_PYTHON_LIBRARY "${PYTHON_LIBRARIES}" REALPATH)
-if (BUILD_PACKAGE)
-  install_python_dependencies("${PYTHON_LIBRARIES}" "${RESOLVED_PYTHON_LIBRARY}")
-endif()
-
-if (MSVC)
-  # copy things into both the debug and release folders for convenience, first debug
-  if (NOT EXISTS "${CMAKE_BINARY_DIR}/Products/Debug")
-    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/Products/Debug")
-  endif()
-  if (NOT EXISTS "${CMAKE_BINARY_DIR}/Products/Debug/pyenergyplus")
-    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/Products/Debug/pyenergyplus")
-  endif()
-  file(COPY "/usr/local/opt/python/Frameworks/Python.framework/Versions/3.7/lib/python3.7" DESTINATION "${CMAKE_BINARY_DIR}/Products/Debug/pypackages")
-  file(COPY "/eplus/repos/myoldmopar/cmake-build-debug/Products/pyenergyplus/" DESTINATION "${CMAKE_BINARY_DIR}/Products/Debug/pyenergyplus")
-  # then release
-  if (NOT EXISTS "${CMAKE_BINARY_DIR}/Products/Release")
-    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/Products/Release")
-  endif()
-  if (NOT EXISTS "${CMAKE_BINARY_DIR}/Products/Release/pyenergyplus")
-    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/Products/Release/pyenergyplus")
-  endif()
-  file(COPY "/usr/local/opt/python/Frameworks/Python.framework/Versions/3.7/lib/python3.7" DESTINATION "${CMAKE_BINARY_DIR}/Products/Release/pypackages")
-  file(COPY "/eplus/repos/myoldmopar/cmake-build-debug/Products/pyenergyplus/" DESTINATION "${CMAKE_BINARY_DIR}/Products/Release/pyenergyplus")
-else()
-  # assuming a single-products dir, like regular makefile type
-  if (NOT EXISTS "${CMAKE_BINARY_DIR}/Products/pyenergyplus")
-    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/Products/pyenergyplus")
-  endif()
-  file(COPY "/usr/local/opt/python/Frameworks/Python.framework/Versions/3.7/lib/python3.7" DESTINATION "${CMAKE_BINARY_DIR}/Products/pypackages")
-  file(COPY "/eplus/repos/myoldmopar/cmake-build-debug/Products/pyenergyplus/" DESTINATION "${CMAKE_BINARY_DIR}/Products/pyenergyplus")
-endif()
 
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party )
