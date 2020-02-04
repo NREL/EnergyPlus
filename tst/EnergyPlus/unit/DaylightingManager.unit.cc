@@ -827,7 +827,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
 
     SurfaceGeometry::SetupZoneGeometry(OutputFiles::getSingleton(), foundErrors); // this calls GetSurfaceData()
     EXPECT_FALSE(foundErrors);                       // expect no errors
-    HeatBalanceIntRadExchange::InitSolarViewFactors();
+    HeatBalanceIntRadExchange::InitSolarViewFactors(OutputFiles::getSingleton());
 
     DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
@@ -1327,7 +1327,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
 
     SurfaceGeometry::SetupZoneGeometry(OutputFiles::getSingleton(), foundErrors); // this calls GetSurfaceData()
     EXPECT_FALSE(foundErrors);                       // expect no errors
-    HeatBalanceIntRadExchange::InitSolarViewFactors();
+    HeatBalanceIntRadExchange::InitSolarViewFactors(OutputFiles::getSingleton());
 
     int ZoneNum = UtilityRoutines::FindItemInList("EAST ZONE", DataHeatBalance::Zone);
     InternalHeatGains::GetInternalHeatGainsInput(OutputFiles::getSingleton());

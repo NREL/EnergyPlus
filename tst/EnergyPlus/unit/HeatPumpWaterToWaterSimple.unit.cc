@@ -709,7 +709,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
 
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
@@ -726,7 +726,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(ErrorsFound);
+    SimulationManager::SetupSimulation(OutputFiles::getSingleton(), ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
     int EnvCount = 0;
@@ -735,7 +735,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
 
     while (Available) {
 
-        WeatherManager::GetNextEnvironment(Available, ErrorsFound);
+        WeatherManager::GetNextEnvironment(OutputFiles::getSingleton(), Available, ErrorsFound);
 
         if (!Available) break;
         if (ErrorsFound) break;
@@ -1459,7 +1459,7 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
 
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
@@ -1476,7 +1476,7 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(ErrorsFound);
+    SimulationManager::SetupSimulation(OutputFiles::getSingleton(), ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
     // should be sized now

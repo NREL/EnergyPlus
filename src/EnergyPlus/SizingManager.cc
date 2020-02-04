@@ -344,7 +344,7 @@ namespace SizingManager {
                 NumSizingPeriodsPerformed = 0;
                 while (Available) { // loop over environments
 
-                    GetNextEnvironment(Available, ErrorsFound); // get an environment
+                    GetNextEnvironment(outputFiles, Available, ErrorsFound); // get an environment
 
                     if (!Available) break;
                     if (ErrorsFound) break;
@@ -567,7 +567,7 @@ namespace SizingManager {
             NumSizingPeriodsPerformed = 0;
             while (Available) { // loop over environments
 
-                GetNextEnvironment(Available, ErrorsFound); // get an environment
+                GetNextEnvironment(outputFiles, Available, ErrorsFound); // get an environment
 
                 // check that environment is one of the design days
                 if (KindOfSim == ksRunPeriodWeather) {
@@ -3965,7 +3965,7 @@ namespace SizingManager {
         CurOverallSimDay = 0;
         while (Available) { // do for each environment
 
-            GetNextEnvironment(Available, ErrorsFound);
+            GetNextEnvironment(OutputFiles::getSingleton(), Available, ErrorsFound);
 
             if (!Available) break;
             if (ErrorsFound) break;

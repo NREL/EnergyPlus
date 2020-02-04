@@ -200,7 +200,7 @@ void HVACSizingSimulationManager::RedoKickOffAndResize()
     RedoSizesHVACSimulation = true;
 
     ResetEnvironmentCounter();
-    SetupSimulation(ErrorsFound);
+    SetupSimulation(OutputFiles::getSingleton(), ErrorsFound);
 
     KickOffSimulation = false;
     RedoSizesHVACSimulation = false;
@@ -264,7 +264,7 @@ void ManageHVACSizingSimulation(OutputFiles &outputFiles, bool &ErrorsFound)
         Available = true;
         for (int i = 1; i <= NumOfEnvrn; ++i) { // loop over environments
 
-            GetNextEnvironment(Available, ErrorsFound);
+            GetNextEnvironment(OutputFiles::getSingleton(), Available, ErrorsFound);
             if (ErrorsFound) break;
             if (!Available) continue;
 

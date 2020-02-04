@@ -334,7 +334,7 @@ namespace HeatBalanceManager {
         // Get the heat balance input at the beginning of the simulation only
         if (ManageHeatBalanceGetInputFlag) {
             GetHeatBalanceInput(); // Obtains heat balance related parameters from input file
-            HeatBalanceIntRadExchange::InitSolarViewFactors();
+            HeatBalanceIntRadExchange::InitSolarViewFactors(OutputFiles::getSingleton());
 
             // Surface octree setup
             //  The surface octree holds live references to surfaces so it must be updated

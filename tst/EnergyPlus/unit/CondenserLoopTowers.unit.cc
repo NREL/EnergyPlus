@@ -489,7 +489,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelNoCooling)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
     OutputReportPredefined::SetPredefinedTables();
 
     // OutputProcessor::TimeValue.allocate(2);
@@ -504,7 +504,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelNoCooling)
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(ErrorsFound);
+    SimulationManager::SetupSimulation(OutputFiles::getSingleton(), ErrorsFound);
     CondenserLoopTowers::GetTowerInput();
 
     CondenserLoopTowers::towers(1).initialize();
@@ -881,7 +881,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
     OutputReportPredefined::SetPredefinedTables();
 
     // OutputProcessor::TimeValue.allocate(2);
@@ -896,7 +896,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedSizing)
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(ErrorsFound);
+    SimulationManager::SetupSimulation(OutputFiles::getSingleton(), ErrorsFound);
     CondenserLoopTowers::GetTowerInput();
 
     CondenserLoopTowers::towers(1).initialize();
@@ -1312,7 +1312,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUserInputTowerSizing)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
     OutputReportPredefined::SetPredefinedTables();
 
     // OutputProcessor::TimeValue.allocate(2);
@@ -1327,7 +1327,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUserInputTowerSizing)
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(ErrorsFound);
+    SimulationManager::SetupSimulation(OutputFiles::getSingleton(), ErrorsFound);
     CondenserLoopTowers::GetTowerInput();
 
     // sized using user inputs in cooling tower instead of plant sizing object
@@ -1727,7 +1727,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedUserInputTowerSizing)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
     OutputReportPredefined::SetPredefinedTables();
 
     // OutputProcessor::TimeValue.allocate(2);
@@ -1742,7 +1742,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedUserInputTowerSizing)
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(ErrorsFound);
+    SimulationManager::SetupSimulation(OutputFiles::getSingleton(), ErrorsFound);
     CondenserLoopTowers::GetTowerInput();
 
     // sized using user inputs in cooling tower instead of plant sizing object
@@ -2211,7 +2211,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelUserInputTowerSizing)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
     OutputReportPredefined::SetPredefinedTables();
 
     // OutputProcessor::TimeValue.allocate(2);
@@ -2226,7 +2226,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_MerkelUserInputTowerSizing)
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(ErrorsFound);
+    SimulationManager::SetupSimulation(OutputFiles::getSingleton(), ErrorsFound);
     CondenserLoopTowers::GetTowerInput();
 
     // sized using user inputs in cooling tower instead of plant sizing object
@@ -2638,7 +2638,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedTowerLowSpeedNomCapSizing)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
     OutputReportPredefined::SetPredefinedTables();
 
     // OutputProcessor::TimeValue.allocate(2);
@@ -2653,7 +2653,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_TwoSpeedTowerLowSpeedNomCapSizing)
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(ErrorsFound);
+    SimulationManager::SetupSimulation(OutputFiles::getSingleton(), ErrorsFound);
 
     // get inputs of cooling tower object
     CondenserLoopTowers::GetTowerInput();
@@ -3027,7 +3027,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_Sizing
     SimulationManager::PostIPProcessing();
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
     OutputReportPredefined::SetPredefinedTables();
 
     // OutputProcessor::TimeValue.allocate(2);
@@ -3421,7 +3421,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_UserSp
     SimulationManager::PostIPProcessing();
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
     OutputReportPredefined::SetPredefinedTables();
 
     // OutputProcessor::TimeValue.allocate(2);

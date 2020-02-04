@@ -1116,7 +1116,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    GetProjectData();
+    GetProjectData(OutputFiles::getSingleton());
     OutputReportPredefined::SetPredefinedTables();
     SetPreConstructionInputParameters(); // establish array bounds for constructions early
 
@@ -2429,7 +2429,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment)
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    ManageSimulation();
+    ManageSimulation(OutputFiles::getSingleton());
 
     EXPECT_EQ(ZoneEquipList(1).NumOfEquipTypes, 2);
     // first priority zone equipment is zone ADU

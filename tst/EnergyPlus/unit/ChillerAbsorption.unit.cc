@@ -57,6 +57,7 @@
 #include <EnergyPlus/ChillerAbsorption.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/SimulationManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -1775,7 +1776,7 @@ TEST_F(EnergyPlusFixture, ChillerAbsorption_Calc)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::ManageSimulation(); // run the design day
+    SimulationManager::ManageSimulation(OutputFiles::getSingleton()); // run the design day
 
     // set conditions for test
     int AbsChillNum = 1;

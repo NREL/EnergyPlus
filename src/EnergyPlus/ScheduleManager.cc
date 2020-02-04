@@ -2479,7 +2479,7 @@ namespace ScheduleManager {
                 }
                 print(outputFiles.eio, SchWFmt);
                 static constexpr auto SchSFmt("! <Schedule>,Name,ScheduleType,{Until Date,WeekSchedule}** Repeated until Dec 31");
-                print(outputFiles.eio, SchSFmt);
+                print(outputFiles.eio, "{}\n", SchSFmt);
 
                 for (Count = 1; Count <= NumScheduleTypes; ++Count) {
                     if (ScheduleType(Count).Limited) {
@@ -2569,7 +2569,7 @@ namespace ScheduleManager {
                     print(outputFiles.eio, "Schedule,{},{}",Schedule(Count).Name, ScheduleType(Schedule(Count).ScheduleTypePtr).Name);
                     while (NumF <= 366) {
                         TS = Schedule(Count).WeekSchedulePointer(NumF);
-                        static constexpr auto ThruFmt(",Through {} {:2.2},{}");
+                        static constexpr auto ThruFmt(",Through {} {:02},{}");
                         while (Schedule(Count).WeekSchedulePointer(NumF) == TS && NumF <= 366) {
                             if (NumF == 366) {
                                 General::InvOrdinalDay(NumF, PMon, PDay, 1);

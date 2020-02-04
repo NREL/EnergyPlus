@@ -1241,7 +1241,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     SurfaceGeometry::SetupZoneGeometry(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    HeatBalanceIntRadExchange::InitSolarViewFactors();
+    HeatBalanceIntRadExchange::InitSolarViewFactors(OutputFiles::getSingleton());
     EXPECT_FALSE(has_err_output(true));
 
     EXPECT_TRUE(DataGlobals::AnyLocalEnvironmentsInModel);
@@ -1820,7 +1820,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     SurfaceGeometry::SetupZoneGeometry(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    HeatBalanceIntRadExchange::InitSolarViewFactors();
+    HeatBalanceIntRadExchange::InitSolarViewFactors(OutputFiles::getSingleton());
     EXPECT_FALSE(has_err_output(true));
 
     EXPECT_TRUE(DataGlobals::AnyLocalEnvironmentsInModel);
@@ -2386,7 +2386,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     // Clear schedule type warnings
     EXPECT_TRUE(has_err_output(true));
 
-    HeatBalanceIntRadExchange::InitSolarViewFactors();
+    HeatBalanceIntRadExchange::InitSolarViewFactors(OutputFiles::getSingleton());
     EXPECT_TRUE(compare_err_stream(""));
     EXPECT_FALSE(has_err_output(true));
 

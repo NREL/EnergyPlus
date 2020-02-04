@@ -642,7 +642,7 @@ TEST_F(EnergyPlusFixture, UnitaryBypassVAV_GetInputZoneEquipment)
     bool ErrorsFound = false;
     bool firstHVACIteration = true;
     // Read objects
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
     HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);

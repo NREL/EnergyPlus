@@ -1719,7 +1719,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
 
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
@@ -1736,7 +1736,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
 
     WeatherManager::ResetEnvironmentCounter();
     TestAirPathIntegrity(ErrorsFound); // Needed to initialize return node connections to airloops and inlet nodes
-    SimulationManager::SetupSimulation(ErrorsFound);
+    SimulationManager::SetupSimulation(OutputFiles::getSingleton(), ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
     DataHVACGlobals::SimZoneEquipmentFlag = true;
@@ -3292,7 +3292,7 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
 
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
@@ -3309,7 +3309,7 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
 
     WeatherManager::ResetEnvironmentCounter();
 
-    ASSERT_ANY_THROW(SimulationManager::SetupSimulation(ErrorsFound));
+    ASSERT_ANY_THROW(SimulationManager::SetupSimulation(OutputFiles::getSingleton(), ErrorsFound));
 }
 
 } // namespace EnergyPlus

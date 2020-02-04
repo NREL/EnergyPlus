@@ -1065,7 +1065,7 @@ TEST_F(PlantHXFixture, PlantHXModulatedDualDeadDefectFileHi)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
 
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
@@ -1079,7 +1079,7 @@ TEST_F(PlantHXFixture, PlantHXModulatedDualDeadDefectFileHi)
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(ErrorsFound);
+    SimulationManager::SetupSimulation(OutputFiles::getSingleton(), ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
     int EnvCount = 0;
@@ -1088,7 +1088,7 @@ TEST_F(PlantHXFixture, PlantHXModulatedDualDeadDefectFileHi)
 
     while (Available) {
 
-        WeatherManager::GetNextEnvironment(Available, ErrorsFound);
+        WeatherManager::GetNextEnvironment(OutputFiles::getSingleton(), Available, ErrorsFound);
 
         if (!Available) break;
         if (ErrorsFound) break;
@@ -2156,7 +2156,7 @@ TEST_F(PlantHXFixture, PlantHXModulatedDualDeadDefectFileLo)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
 
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
@@ -2170,7 +2170,7 @@ TEST_F(PlantHXFixture, PlantHXModulatedDualDeadDefectFileLo)
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(ErrorsFound);
+    SimulationManager::SetupSimulation(OutputFiles::getSingleton(), ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
     int EnvCount = 0;
@@ -2179,7 +2179,7 @@ TEST_F(PlantHXFixture, PlantHXModulatedDualDeadDefectFileLo)
 
     while (Available) {
 
-        WeatherManager::GetNextEnvironment(Available, ErrorsFound);
+        WeatherManager::GetNextEnvironment(OutputFiles::getSingleton(), Available, ErrorsFound);
 
         if (!Available) break;
         if (ErrorsFound) break;

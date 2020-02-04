@@ -666,7 +666,7 @@ TEST_F(EnergyPlusFixture, WeatherManager_NoLocation) {
 
     bool Available{false};
     bool ErrorsFound{false};
-    ASSERT_THROW(WeatherManager::GetNextEnvironment(Available, ErrorsFound), std::runtime_error);
+    ASSERT_THROW(WeatherManager::GetNextEnvironment(OutputFiles::getSingleton(), Available, ErrorsFound), std::runtime_error);
     ASSERT_TRUE(ErrorsFound);
 
     std::string const error_string = delimited_string({
@@ -755,8 +755,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     WeatherManager::GetDesignDayData(DataEnvironment::TotDesDays, ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-
-    WeatherManager::SetUpDesignDay(1);
+    WeatherManager::SetUpDesignDay(OutputFiles::getSingleton(), 1);
     EXPECT_EQ(WeatherManager::DesDayInput(1).HumIndType, DDHumIndType_Enthalpy);
     EXPECT_EQ(WeatherManager::DesDayInput(1).HumIndValue, 90500.0);
 
@@ -786,7 +785,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     OutputReportTabular::WriteEioTables(OutputFiles::getSingleton());
 
     // Close output files *after* the EIO has been written to
-    SimulationManager::CloseOutputFiles();
+    SimulationManager::CloseOutputFiles(OutputFiles::getSingleton());
 
     EnergyPlus::sqlite->sqliteCommit();
 

@@ -4403,7 +4403,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AFNUserDefinedDuctViewFac
 
     bool ErrorsFound = false;
     // Read objects
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
     HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
@@ -8868,7 +8868,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithLocalAirNode)
 
     bool ErrorsFound = false;
     // Read objects
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
     HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);

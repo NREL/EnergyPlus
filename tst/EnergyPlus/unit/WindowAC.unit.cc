@@ -441,7 +441,7 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
 
@@ -452,7 +452,7 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
 
     SizingManager::ManageSizing(OutputFiles::getSingleton());
 
-    SimulationManager::SetupSimulation(errorsFound);
+    SimulationManager::SetupSimulation(OutputFiles::getSingleton(), errorsFound);
     //
 
     Real64 qDotMet(0.0);    // Watts total cap

@@ -70,6 +70,7 @@
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceMovableInsulation.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Timer.h>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WindowEquivalentLayer.hh>
@@ -120,8 +121,6 @@ namespace HeatBalanceIntRadExchange {
     // MODULE PARAMETER DEFINITIONS
     static ObjexxFCL::gio::Fmt fmtLD("*");
     static ObjexxFCL::gio::Fmt fmtA("(A)");
-    static ObjexxFCL::gio::Fmt fmtx("(A,I4,1x,A,1x,6f16.8)");
-    static ObjexxFCL::gio::Fmt fmty("(A,1x,6f16.8)");
 
     // DERIVED TYPE DEFINITIONS
     // na
@@ -502,7 +501,7 @@ namespace HeatBalanceIntRadExchange {
         }
     }
 
-    void InitInteriorRadExchange()
+    void InitInteriorRadExchange(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -521,7 +520,6 @@ namespace HeatBalanceIntRadExchange {
         using General::ScanForReports;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt AFormat("(A)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Findex;                   // index to print view factors
@@ -543,23 +541,25 @@ namespace HeatBalanceIntRadExchange {
         ScanForReports("ViewFactorInfo", ViewFactorReport, _, Option1);
 
         if (ViewFactorReport) { // Print heading
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Surface View Factor and Grey Interchange Information>";
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <View Factor - Zone/Enclosure Information>,Zone/Enclosure Name,Number of Surfaces";
-            ObjexxFCL::gio::write(OutputFileInits, fmtA)
-                << "! <View Factor - Surface Information>,Surface Name,Surface Class,Area {m2},Azimuth,Tilt,Thermal Emissivity,#Sides,Vertices";
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <View Factor / Grey Interchange Type>,Surface Name(s)";
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <View Factor>,Surface Name,Surface Class,Row Sum,View Factors for each Surface";
+            print(outputFiles.eio, "{}\n", "! <Surface View Factor and Grey Interchange Information>");
+            print(outputFiles.eio, "{}\n", "! <View Factor - Zone/Enclosure Information>,Zone/Enclosure Name,Number of Surfaces");
+            print(outputFiles.eio,
+                  "{}\n",
+                  "! <View Factor - Surface Information>,Surface Name,Surface Class,Area {m2},Azimuth,Tilt,Thermal Emissivity,#Sides,Vertices");
+            print(outputFiles.eio, "{}\n", "! <View Factor / Grey Interchange Type>,Surface Name(s)");
+            print(outputFiles.eio, "{}\n", "! <View Factor>,Surface Name,Surface Class,Row Sum,View Factors for each Surface");
         }
 
         MaxNumOfRadEnclosureSurfs = 0;
         for (int enclosureNum = 1; enclosureNum <= DataViewFactorInformation::NumOfRadiantEnclosures; ++enclosureNum) {
             auto &thisEnclosure(DataViewFactorInformation::ZoneRadiantInfo(enclosureNum));
             if (enclosureNum == 1) {
-                if (DisplayAdvancedReportVariables)
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA)
-                        << "! <Surface View Factor Check Values>,Zone/Enclosure Name,Original Check Value,Calculated Fixed Check "
-                           "Value,Final Check Value,Number of Iterations,Fixed RowSum Convergence,Used RowSum "
-                           "Convergence";
+                if (DisplayAdvancedReportVariables) {
+                    print(outputFiles.eio,
+                          "{}\n",
+                          "! <Surface View Factor Check Values>,Zone/Enclosure Name,Original Check Value,Calculated Fixed Check Value,Final Check "
+                          "Value,Number of Iterations,Fixed RowSum Convergence,Used RowSum Convergence");
+                }
             }
             int numEnclosureSurfaces = 0;
             for (int zoneNum : thisEnclosure.ZoneNums) {
@@ -607,7 +607,7 @@ namespace HeatBalanceIntRadExchange {
                 thisEnclosure.Fp = 0.0;
                 thisEnclosure.FMRT = 0.0;
                 if (DisplayAdvancedReportVariables)
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Surface View Factor Check Values," + thisEnclosure.Name + ",0,0,0,-1,0,0";
+                    print(outputFiles.eio, "Surface View Factor Check Values,{},0,0,0,-1,0,0\n", thisEnclosure.Name);
                 continue; // Go to the next enclosure in the loop
             }
 
@@ -669,60 +669,66 @@ namespace HeatBalanceIntRadExchange {
                 CalcScriptF(thisEnclosure.NumOfSurfaces, thisEnclosure.Area, thisEnclosure.F, thisEnclosure.Emissivity, thisEnclosure.ScriptF);
                 if (ViewFactorReport) { // Write to SurfInfo File
                     // Zone Surface Information Output
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA)
-                        << "Surface View Factor - Zone/Enclosure Information," + thisEnclosure.Name + ',' + RoundSigDigits(thisEnclosure.NumOfSurfaces);
+                    print(
+                        outputFiles.eio, "Surface View Factor - Zone/Enclosure Information,{},{}\n", thisEnclosure.Name, thisEnclosure.NumOfSurfaces);
 
                     for (int SurfNum = 1; SurfNum <= thisEnclosure.NumOfSurfaces; ++SurfNum) {
-                        ObjexxFCL::gio::write(OutputFileInits, "(A,',',A,$)")
-                            << "Surface View Factor - Surface Information," + Surface(thisEnclosure.SurfacePtr(SurfNum)).Name + ',' +
-                                cSurfaceClass(Surface(thisEnclosure.SurfacePtr(SurfNum)).Class)
-                            << RoundSigDigits(thisEnclosure.Area(SurfNum), 4) + ',' + RoundSigDigits(thisEnclosure.Azimuth(SurfNum), 4) + ',' +
-                                RoundSigDigits(thisEnclosure.Tilt(SurfNum), 4) + ',' + RoundSigDigits(thisEnclosure.Emissivity(SurfNum), 4) + ',' +
-                                RoundSigDigits(Surface(thisEnclosure.SurfacePtr(SurfNum)).Sides);
+                        print(outputFiles.eio,
+                              "Surface View Factor - Surface Information,{},{},{:.4R},{:.4R},{:.4R},{:.4R},{}\n",
+                              Surface(thisEnclosure.SurfacePtr(SurfNum)).Name,
+                              cSurfaceClass(Surface(thisEnclosure.SurfacePtr(SurfNum)).Class),
+                              thisEnclosure.Area(SurfNum),
+                              thisEnclosure.Azimuth(SurfNum),
+                              thisEnclosure.Tilt(SurfNum),
+                              thisEnclosure.Emissivity(SurfNum),
+                              Surface(thisEnclosure.SurfacePtr(SurfNum)).Sides);
                         for (Vindex = 1; Vindex <= Surface(thisEnclosure.SurfacePtr(SurfNum)).Sides; ++Vindex) {
                             auto &Vertex = Surface(thisEnclosure.SurfacePtr(SurfNum)).Vertex(Vindex);
-                            ObjexxFCL::gio::write(OutputFileInits, "(3(',',A),$)")
-                                << RoundSigDigits(Vertex.x, 4) << RoundSigDigits(Vertex.y, 4) << RoundSigDigits(Vertex.z, 4);
+                            print(outputFiles.eio, ",{:.4R},{:.4R},{:.4R}", Vertex.x, Vertex.y, Vertex.z);
                         }
-                        ObjexxFCL::gio::write(OutputFileInits);
+                        print(outputFiles.eio, "\n");
                     }
 
-                    ObjexxFCL::gio::write(OutputFileInits, "(A,A,$)") << "Approximate or User Input ViewFactors"
-                                                                      << ",To Surface,Surface Class,RowSum";
+                    print(outputFiles.eio, "Approximate or User Input ViewFactors,To Surface,Surface Class,RowSum");
                     for (int SurfNum = 1; SurfNum <= thisEnclosure.NumOfSurfaces; ++SurfNum) {
-                        ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << Surface(thisEnclosure.SurfacePtr(SurfNum)).Name;
+                        print(outputFiles.eio, ",{}", Surface(thisEnclosure.SurfacePtr(SurfNum)).Name);
                     }
-                    ObjexxFCL::gio::write(OutputFileInits);
+                    print(outputFiles.eio, "\n");
 
                     for (Findex = 1; Findex <= thisEnclosure.NumOfSurfaces; ++Findex) {
                         RowSum = sum(SaveApproximateViewFactors(_, Findex));
-                        ObjexxFCL::gio::write(OutputFileInits, "(A,3(',',A),$)")
-                            << "View Factor" << Surface(thisEnclosure.SurfacePtr(Findex)).Name
-                            << cSurfaceClass(Surface(thisEnclosure.SurfacePtr(Findex)).Class) << RoundSigDigits(RowSum, 4);
+                        print(outputFiles.eio,
+                              "{},{},{},{:.4R}",
+                              "View Factor",
+                              Surface(thisEnclosure.SurfacePtr(Findex)).Name,
+                              cSurfaceClass(Surface(thisEnclosure.SurfacePtr(Findex)).Class),
+                              RowSum);
                         for (int SurfNum = 1; SurfNum <= thisEnclosure.NumOfSurfaces; ++SurfNum) {
-                            ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << RoundSigDigits(SaveApproximateViewFactors(SurfNum, Findex), 4);
+                            print(outputFiles.eio, ",{:.4R}", SaveApproximateViewFactors(SurfNum, Findex));
                         }
-                        ObjexxFCL::gio::write(OutputFileInits);
+                        print(outputFiles.eio, "\n");
                     }
                 }
 
                 if (ViewFactorReport) {
-                    ObjexxFCL::gio::write(OutputFileInits, "(A,A,$)") << "Final ViewFactors"
-                                                                      << ",To Surface,Surface Class,RowSum";
+                    print(outputFiles.eio, "Final ViewFactors,To Surface,Surface Class,RowSum");
                     for (int SurfNum = 1; SurfNum <= thisEnclosure.NumOfSurfaces; ++SurfNum) {
-                        ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << Surface(thisEnclosure.SurfacePtr(SurfNum)).Name;
+                        print(outputFiles.eio, ",{}", Surface(thisEnclosure.SurfacePtr(SurfNum)).Name);
                     }
-                    ObjexxFCL::gio::write(OutputFileInits);
+                    print(outputFiles.eio, "\n");
 
                     for (Findex = 1; Findex <= thisEnclosure.NumOfSurfaces; ++Findex) {
                         RowSum = sum(thisEnclosure.F(_, Findex));
-                        ObjexxFCL::gio::write(OutputFileInits, "(A,3(',',A),$)")
-                            << "View Factor" << Surface(thisEnclosure.SurfacePtr(Findex)).Name
-                            << cSurfaceClass(Surface(thisEnclosure.SurfacePtr(Findex)).Class) << RoundSigDigits(RowSum, 4);
+                        print(outputFiles.eio,
+                              "{},{},{},{:.4R}",
+                              "View Factor",
+                              Surface(thisEnclosure.SurfacePtr(Findex)).Name,
+                              cSurfaceClass(Surface(thisEnclosure.SurfacePtr(Findex)).Class),
+                              RowSum);
                         for (int SurfNum = 1; SurfNum <= thisEnclosure.NumOfSurfaces; ++SurfNum) {
-                            ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << RoundSigDigits(thisEnclosure.F(SurfNum, Findex), 4);
+                            print(outputFiles.eio, ",{:.4R}", thisEnclosure.F(SurfNum, Findex));
                         }
-                        ObjexxFCL::gio::write(OutputFileInits);
+                        print(outputFiles.eio, "\n");
                     }
 
                     if (Option1 == "IDF") {
@@ -763,18 +769,17 @@ namespace HeatBalanceIntRadExchange {
                 }
 
                 if (ViewFactorReport) {
-                    ObjexxFCL::gio::write(OutputFileInits, "(A,A,$)") << "Script F Factors"
-                                                                      << ",X Surface";
+                    print(outputFiles.eio, "Script F Factors,X Surface");
                     for (int SurfNum = 1; SurfNum <= thisEnclosure.NumOfSurfaces; ++SurfNum) {
-                        ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << Surface(thisEnclosure.SurfacePtr(SurfNum)).Name;
+                        print(outputFiles.eio, ",{}", Surface(thisEnclosure.SurfacePtr(SurfNum)).Name);
                     }
-                    ObjexxFCL::gio::write(OutputFileInits);
+                    print(outputFiles.eio, "\n");
                     for (Findex = 1; Findex <= thisEnclosure.NumOfSurfaces; ++Findex) {
-                        ObjexxFCL::gio::write(OutputFileInits, "(A,',',A,$)") << "Script F Factor" << Surface(thisEnclosure.SurfacePtr(Findex)).Name;
+                        print(outputFiles.eio, "{},{}", "Script F Factor", Surface(thisEnclosure.SurfacePtr(Findex)).Name);
                         for (int SurfNum = 1; SurfNum <= thisEnclosure.NumOfSurfaces; ++SurfNum) {
-                            ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << RoundSigDigits(thisEnclosure.ScriptF(Findex, SurfNum), 4);
+                            print(outputFiles.eio,  ",{:.4R}", thisEnclosure.ScriptF(Findex, SurfNum));
                         }
-                        ObjexxFCL::gio::write(OutputFileInits);
+                        print(outputFiles.eio, "\n");
                     }
                 }
 
@@ -789,12 +794,16 @@ namespace HeatBalanceIntRadExchange {
                 RowSum = std::abs(RowSum - thisEnclosure.NumOfSurfaces);
                 FixedRowSum = std::abs(FixedRowSum - thisEnclosure.NumOfSurfaces);
                 if (DisplayAdvancedReportVariables) {
-                    ObjexxFCL::gio::write(OutputFileInits, "(8A)") << "Surface View Factor Check Values," + thisEnclosure.Name + ',' +
-                        RoundSigDigits(CheckValue1, 6) + ',' + RoundSigDigits(CheckValue2, 6) + ',' +
-                        RoundSigDigits(FinalCheckValue, 6) + ',' + RoundSigDigits(NumIterations) + ',' +
-                        RoundSigDigits(FixedRowSum, 6) + ',' + RoundSigDigits(RowSum, 6);
+                    print(outputFiles.eio,
+                          "Surface View Factor Check Values,{},{:.6R},{:.6R},{:.6R},{},{:.6R},{:.6R}\n",
+                          thisEnclosure.Name,
+                          CheckValue1,
+                          CheckValue2,
+                          FinalCheckValue,
+                          NumIterations,
+                          FixedRowSum,
+                          RowSum);
                 }
-
             }
 
         }
@@ -804,12 +813,10 @@ namespace HeatBalanceIntRadExchange {
         }
     }
 
-    void InitSolarViewFactors()
+    void InitSolarViewFactors(OutputFiles &outputFiles)
     {
 
         // Initializes view factors for diffuse solar distribution between surfaces in an enclosure.
-
-        static ObjexxFCL::gio::Fmt AFormat("(A)");
 
         Array2D<Real64> SaveApproximateViewFactors; // Save for View Factor reporting
         std::string Option1;                        // view factor report option
@@ -819,13 +826,11 @@ namespace HeatBalanceIntRadExchange {
         General::ScanForReports("ViewFactorInfo", ViewFactorReport, _, Option1);
 
         if (ViewFactorReport) { // Print heading
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Solar View Factor Information>";
-            ObjexxFCL::gio::write(OutputFileInits, fmtA)
-                << "! <Solar View Factor - Zone/Enclosure Information>,Zone/Enclosure Name,Number of Surfaces";
-            ObjexxFCL::gio::write(OutputFileInits, fmtA)
-                << "! <Solar View Factor - Surface Information>,Surface Name,Surface Class,Area {m2},Azimuth,Tilt,Solar Absorbtance,#Sides,Vertices";
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Solar View Factor / Interchange Type>,Surface Name(s)";
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Solar View Factor>,Surface Name,Surface Class,Row Sum,View Factors for each Surface";
+            print(outputFiles.eio, "{}\n", "! <Solar View Factor Information>");
+            print(outputFiles.eio, "{}\n", "! <Solar View Factor - Zone/Enclosure Information>,Zone/Enclosure Name,Number of Surfaces");
+            print(outputFiles.eio, "{}\n", "! <Solar View Factor - Surface Information>,Surface Name,Surface Class,Area {m2},Azimuth,Tilt,Solar Absorbtance,#Sides,Vertices");
+            print(outputFiles.eio, "{}\n", "! <Solar View Factor / Interchange Type>,Surface Name(s)");
+            print(outputFiles.eio, "{}\n", "! <Solar View Factor>,Surface Name,Surface Class,Row Sum,View Factors for each Surface");
         }
 
         std::string cCurrentModuleObject = "ZoneProperty:UserViewFactors:bySurfaceName";
@@ -836,10 +841,9 @@ namespace HeatBalanceIntRadExchange {
             auto &thisEnclosure(DataViewFactorInformation::ZoneSolarInfo(enclosureNum));
             if (enclosureNum == 1) {
                 if (DisplayAdvancedReportVariables)
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA)
-                        << "! <Solar View Factor Check Values>,Zone/Enclosure Name,Original Check Value,Calculated Fixed Check "
+                    print(outputFiles.eio, "{}\n", "! <Solar View Factor Check Values>,Zone/Enclosure Name,Original Check Value,Calculated Fixed Check "
                            "Value,Final Check Value,Number of Iterations,Fixed RowSum Convergence,Used RowSum "
-                           "Convergence";
+                           "Convergence");
             }
             int numEnclosureSurfaces = 0;
             for (int zoneNum : thisEnclosure.ZoneNums) {
@@ -897,7 +901,7 @@ namespace HeatBalanceIntRadExchange {
             if (thisEnclosure.NumOfSurfaces == 1) {
                 // If there is only one surface in a zone, then there is no solar distribution
                 if (DisplayAdvancedReportVariables)
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Solar View Factor Check Values," + thisEnclosure.Name + ",0,0,0,-1,0,0";
+                    print(outputFiles.eio, "Solar View Factor Check Values,{},0,0,0,-1,0,0\n", thisEnclosure.Name);
                 continue; // Go to the next enclosure in the loop
             }
 
@@ -950,63 +954,65 @@ namespace HeatBalanceIntRadExchange {
 
             if (ViewFactorReport) { // Write to SurfInfo File
                 // Zone Surface Information Output
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Solar View Factor - Zone/Enclosure Information," + thisEnclosure.Name + ',' +
-                                                                    General::RoundSigDigits(thisEnclosure.NumOfSurfaces);
+                print(outputFiles.eio, "Solar View Factor - Zone/Enclosure Information,{},{}\n", thisEnclosure.Name, thisEnclosure.NumOfSurfaces);
 
                 for (int SurfNum = 1; SurfNum <= thisEnclosure.NumOfSurfaces; ++SurfNum) {
-                    ObjexxFCL::gio::write(OutputFileInits, "(A,',',A,$)")
-                        << "Solar View Factor - Surface Information," + Surface(thisEnclosure.SurfacePtr(SurfNum)).Name + ',' +
-                               cSurfaceClass(Surface(thisEnclosure.SurfacePtr(SurfNum)).Class)
-                        << General::RoundSigDigits(thisEnclosure.Area(SurfNum), 4) + ',' +
-                               General::RoundSigDigits(thisEnclosure.Azimuth(SurfNum), 4) + ',' +
-                               General::RoundSigDigits(thisEnclosure.Tilt(SurfNum), 4) + ',' +
-                               General::RoundSigDigits(thisEnclosure.SolAbsorptance(SurfNum), 4) + ',' +
-                               General::RoundSigDigits(Surface(thisEnclosure.SurfacePtr(SurfNum)).Sides);
+                    print(outputFiles.eio,
+                          "Solar View Factor - Surface Information,{},{},{:.4R},{:.4R},{:.4R},{:.4R},{}\n",
+                          Surface(thisEnclosure.SurfacePtr(SurfNum)).Name,
+                          cSurfaceClass(Surface(thisEnclosure.SurfacePtr(SurfNum)).Class),
+                          thisEnclosure.Area(SurfNum),
+                          thisEnclosure.Azimuth(SurfNum),
+                          thisEnclosure.Tilt(SurfNum),
+                          thisEnclosure.SolAbsorptance(SurfNum),
+                          Surface(thisEnclosure.SurfacePtr(SurfNum)).Sides);
+
                     for (int Vindex = 1; Vindex <= Surface(thisEnclosure.SurfacePtr(SurfNum)).Sides; ++Vindex) {
                         auto &Vertex = Surface(thisEnclosure.SurfacePtr(SurfNum)).Vertex(Vindex);
-                        ObjexxFCL::gio::write(OutputFileInits, "(3(',',A),$)")
-                            << General::RoundSigDigits(Vertex.x, 4) << General::RoundSigDigits(Vertex.y, 4) << General::RoundSigDigits(Vertex.z, 4);
+                        print(outputFiles.eio, ",{:.4R},{:.4R},{:.4R}", Vertex.x, Vertex.y, Vertex.z);
                     }
-                    ObjexxFCL::gio::write(OutputFileInits);
+                    print(outputFiles.eio, "\n");
                 }
 
-                ObjexxFCL::gio::write(OutputFileInits, "(A,A,$)") << "Approximate or User Input Solar ViewFactors"
-                                                                  << ",To Surface,Surface Class,RowSum";
+                print(outputFiles.eio, "Approximate or User Input Solar ViewFactors,To Surface,Surface Class,RowSum");
                 for (int SurfNum = 1; SurfNum <= thisEnclosure.NumOfSurfaces; ++SurfNum) {
-                    ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << Surface(thisEnclosure.SurfacePtr(SurfNum)).Name;
+                    print(outputFiles.eio, ",{}", Surface(thisEnclosure.SurfacePtr(SurfNum)).Name);
                 }
-                ObjexxFCL::gio::write(OutputFileInits);
+                print(outputFiles.eio, "\n");
 
                 for (int Findex = 1; Findex <= thisEnclosure.NumOfSurfaces; ++Findex) {
                     Real64 RowSum = sum(SaveApproximateViewFactors(_, Findex));
-                    ObjexxFCL::gio::write(OutputFileInits, "(A,3(',',A),$)")
-                        << "Solar View Factor" << Surface(thisEnclosure.SurfacePtr(Findex)).Name
-                        << cSurfaceClass(Surface(thisEnclosure.SurfacePtr(Findex)).Class) << General::RoundSigDigits(RowSum, 4);
+                    print(outputFiles.eio,
+                          "Solar View Factor,{},{},{:.4R}",
+                          Surface(thisEnclosure.SurfacePtr(Findex)).Name,
+                          cSurfaceClass(Surface(thisEnclosure.SurfacePtr(Findex)).Class),
+                          RowSum);
                     for (int SurfNum = 1; SurfNum <= thisEnclosure.NumOfSurfaces; ++SurfNum) {
-                        ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)")
-                            << General::RoundSigDigits(SaveApproximateViewFactors(SurfNum, Findex), 4);
+                        print(outputFiles.eio, ",{:.4R}", SaveApproximateViewFactors(SurfNum, Findex));
                     }
-                    ObjexxFCL::gio::write(OutputFileInits);
+                    print(outputFiles.eio, "\n");
                 }
             }
 
             if (ViewFactorReport) {
-                ObjexxFCL::gio::write(OutputFileInits, "(A,A,$)") << "Final Solar ViewFactors"
-                                                                  << ",To Surface,Surface Class,RowSum";
+                print(outputFiles.eio, "Final Solar ViewFactors,To Surface,Surface Class,RowSum");
                 for (int SurfNum = 1; SurfNum <= thisEnclosure.NumOfSurfaces; ++SurfNum) {
-                    ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << Surface(thisEnclosure.SurfacePtr(SurfNum)).Name;
+                    print(outputFiles.eio, ",{}", Surface(thisEnclosure.SurfacePtr(SurfNum)).Name);
                 }
-                ObjexxFCL::gio::write(OutputFileInits);
+                print(outputFiles.eio, "\n");
 
                 for (int Findex = 1; Findex <= thisEnclosure.NumOfSurfaces; ++Findex) {
                     Real64 RowSum = sum(thisEnclosure.F(_, Findex));
-                    ObjexxFCL::gio::write(OutputFileInits, "(A,3(',',A),$)")
-                        << "Solar View Factor" << Surface(thisEnclosure.SurfacePtr(Findex)).Name
-                        << cSurfaceClass(Surface(thisEnclosure.SurfacePtr(Findex)).Class) << General::RoundSigDigits(RowSum, 4);
+                    print(outputFiles.eio,
+                          "{},{},{},{:.4R}",
+                          "Solar View Factor",
+                          Surface(thisEnclosure.SurfacePtr(Findex)).Name,
+                          cSurfaceClass(Surface(thisEnclosure.SurfacePtr(Findex)).Class),
+                          RowSum);
                     for (int SurfNum = 1; SurfNum <= thisEnclosure.NumOfSurfaces; ++SurfNum) {
-                        ObjexxFCL::gio::write(OutputFileInits, "(',',A,$)") << General::RoundSigDigits(thisEnclosure.F(SurfNum, Findex), 4);
+                        print(outputFiles.eio, ",{:.4R}", thisEnclosure.F(SurfNum, Findex));
                     }
-                    ObjexxFCL::gio::write(OutputFileInits);
+                    print(outputFiles.eio, "\n");
                 }
 
                 if (Option1 == "IDF") {
@@ -1057,11 +1063,15 @@ namespace HeatBalanceIntRadExchange {
             RowSum = std::abs(RowSum - thisEnclosure.NumOfSurfaces);
             FixedRowSum = std::abs(FixedRowSum - thisEnclosure.NumOfSurfaces);
             if (DisplayAdvancedReportVariables) {
-                ObjexxFCL::gio::write(OutputFileInits, "(8A)")
-                    << "Solar View Factor Check Values," + thisEnclosure.Name + ',' + General::RoundSigDigits(CheckValue1, 6) + ',' +
-                           General::RoundSigDigits(CheckValue2, 6) + ',' + General::RoundSigDigits(FinalCheckValue, 6) + ',' +
-                           General::RoundSigDigits(NumIterations) + ',' + General::RoundSigDigits(FixedRowSum, 6) + ',' +
-                           General::RoundSigDigits(RowSum, 6);
+                print(outputFiles.eio,
+                      "Solar View Factor Check Values,{},{:.6R},{:.6R},{:.6R},{},{:.6R},{:.6R}\n",
+                      thisEnclosure.Name,
+                      CheckValue1,
+                      CheckValue2,
+                      FinalCheckValue,
+                      NumIterations,
+                      FixedRowSum,
+                      RowSum);
             }
         }
 

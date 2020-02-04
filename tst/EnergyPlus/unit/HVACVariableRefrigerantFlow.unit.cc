@@ -9854,7 +9854,7 @@ TEST_F(HVACVRFFixture, VRFFluidControl_FanSysModel_OnOffModeTest)
         });
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::ManageSimulation();
+    SimulationManager::ManageSimulation(OutputFiles::getSingleton());
 
     int VRFCond(1);
     int ZoneNum(1);

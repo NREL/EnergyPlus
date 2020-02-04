@@ -609,7 +609,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_FigureSolarBeamAtTimestep)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
     bool FoundError = false;
 
     HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), FoundError); // read project control data
@@ -1003,7 +1003,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_ExternalShadingIO)
 
     SolarShading::clear_state();
 
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
     bool FoundError = false;
 
     HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), FoundError); // read project control data
@@ -1409,7 +1409,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
 
     SolarShading::clear_state();
 
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
     bool FoundError = false;
 
     HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), FoundError); // read project control data

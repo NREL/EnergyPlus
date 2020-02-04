@@ -52,6 +52,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class OutputFiles;
+
 namespace SimulationManager {
 
     // Data
@@ -73,9 +75,9 @@ namespace SimulationManager {
     // Functions
     void clear_state();
 
-    void ManageSimulation();
+    void ManageSimulation(OutputFiles &outputFiles);
 
-    void GetProjectData();
+    void GetProjectData(OutputFiles &outputFiles);
 
     void CheckForMisMatchedEnvironmentSpecifications();
 
@@ -87,9 +89,9 @@ namespace SimulationManager {
 
     void OpenOutputJsonFiles();
 
-    void CloseOutputFiles();
+    void CloseOutputFiles(OutputFiles &outputFiles);
 
-    void SetupSimulation(bool &ErrorsFound);
+    void SetupSimulation(OutputFiles &outputFiles, bool &ErrorsFound);
 
     void ReportNodeConnections();
 
