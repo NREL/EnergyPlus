@@ -1257,7 +1257,7 @@ namespace SimulationManager {
               "{}\n",
               "! <Output Reporting Tolerances>, Tolerance for Time Heating Setpoint Not Met, Tolerance for Zone Cooling Setpoint Not Met Time");
         // Formats
-        static constexpr auto Format_751(" Output Reporting Tolerances, {:.3R}, {:.3R},\n");
+        static constexpr auto Format_751(" Output Reporting Tolerances, {:.3R}, {:.3R}, \n");
 
         print(outputFiles.eio, Format_751, std::abs(deviationFromSetPtThresholdHtg), deviationFromSetPtThresholdClg);
 
