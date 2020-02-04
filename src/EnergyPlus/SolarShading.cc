@@ -8660,7 +8660,7 @@ namespace SolarShading {
             }
 
             //  Calculate daylighting coefficients
-            CalcDayltgCoefficients();
+            CalcDayltgCoefficients(OutputFiles::getSingleton());
         }
 
         if (!WarmupFlag) {
@@ -8670,7 +8670,7 @@ namespace SolarShading {
         // Recalculate daylighting coefficients if storm window has been added
         // or removed from one or more windows at beginning of day
         if (TotWindowsWithDayl > 0 && !BeginSimFlag && !BeginEnvrnFlag && !WarmupFlag && TotStormWin > 0 && StormWinChangeThisDay) {
-            CalcDayltgCoefficients();
+            CalcDayltgCoefficients(OutputFiles::getSingleton());
         }
     }
 

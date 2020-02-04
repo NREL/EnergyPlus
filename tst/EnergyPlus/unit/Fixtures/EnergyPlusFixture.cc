@@ -53,8 +53,8 @@
 
 // EnergyPlus Headers
 #include "EnergyPlusFixture.hh"
+
 #include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
@@ -65,6 +65,7 @@
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/UnitarySystem.hh>
+#include <nlohmann/json.hpp>
 #include <EnergyPlus/StateManagement.hh>
 #include <algorithm>
 #include <fstream>
