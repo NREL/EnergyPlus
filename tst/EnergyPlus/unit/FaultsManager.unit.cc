@@ -590,15 +590,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_BadCoilType)
 
 TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
 {
-    // Initial problem: WaterCoils::GetWaterCoilInput tries to add an index 'FouledCoilID 'to FouledCoils arrays here
-    // https://github.com/NREL/EnergyPlus/blob/8478cc45d5cb3988fb9b0025d33cc6a701afc21d/src/EnergyPlus/WaterCoils.cc#L944-L954
-    // Problem is that when this happens, FaultsManager::CheckAndReadFaults() hasn't been called the the FouledCoils array is always empty
-    // so no fault are actually registered, ever.
-    //
-    // Really, the Coil should be referencing the fault model too, to match other usages (Boiler, Chillers, EvapCoolers, etc) and so that you avoid
-    // having to constantly loop on all FouledCoils to find if there's one referenced your object.
-    // Also, FaultPropertiesFouling::CalFoulingFactor() should be leveraged to keep code dry instead of redoing  the same thing in WaterCoils
-
+    // Test for #6313. Ensure Faults and coils are correctly linked, fault input is properly read, and CalFaultyCoilFoulingFactor correctly works
     std::string const idf_objects = delimited_string({
 
         "ScheduleTypeLimits,",
