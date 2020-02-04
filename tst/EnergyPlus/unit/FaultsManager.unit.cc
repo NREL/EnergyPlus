@@ -519,4 +519,69 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_CoilNotFound)
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
+
+TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_BadCoilType)
+{
+    // Test that an error is raised if the coil is found, but it's not one of the supported types
+    // Note JM 2020-02-04: As of today, only Simple Heating / Cooling water coils are supported
+
+    std::string const idf_objects = delimited_string({
+
+        "Schedule:Compact,                                             ",
+        "   AvailSched,         !- Name                                ",
+        "   ,                   !- Schedule Type Limits Name           ",
+        "   Through: 12/31,     !- Field 1                             ",
+        "   For: AllDays,       !- Field 2                             ",
+        "   Until: 24:00, 1.0;  !- Field 3                             ",
+
+        "  Coil:Cooling:Water:DetailedGeometry,",
+        "    Detailed Pre Cooling Coil, !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    autosize,                !- Maximum Water Flow Rate {m3/s}",
+        "    autosize,                !- Tube Outside Surface Area {m2}",
+        "    autosize,                !- Total Tube Inside Area {m2}",
+        "    autosize,                !- Fin Surface Area {m2}",
+        "    autosize,                !- Minimum Airflow Area {m2}",
+        "    autosize,                !- Coil Depth {m}",
+        "    autosize,                !- Fin Diameter {m}",
+        "    ,                        !- Fin Thickness {m}",
+        "    ,                        !- Tube Inside Diameter {m}",
+        "    ,                        !- Tube Outside Diameter {m}",
+        "    ,                        !- Tube Thermal Conductivity {W/m-K}",
+        "    ,                        !- Fin Thermal Conductivity {W/m-K}",
+        "    ,                        !- Fin Spacing {m}",
+        "    ,                        !- Tube Depth Spacing {m}",
+        "    ,                        !- Number of Tube Rows",
+        "    autosize,                !- Number of Tubes per Row",
+        "    Main Cooling Coil 1 Water Inlet Node,  !- Water Inlet Node Name",
+        "    Main Cooling Coil 1 Water Outlet Node,  !- Water Outlet Node Name",
+        "    Main Cooling Coil 1 Inlet Node,  !- Air Inlet Node Name",
+        "    Main Cooling Coil 1 Outlet Node;  !- Air Outlet Node Name",
+
+        "FaultModel:Fouling:Coil,",
+        "  FouledHeatingCoil,       !- Name",
+        "  Detailed Pre Cooling Coil, !- Coil Name",
+        "  ,                        !- Availability Schedule Name",
+        "  ,                        !- Severity Schedule Name",
+        "  FouledUARated,           !- Fouling Input Method",
+        "  3.32;                    !- UAFouled {W/K}",
+
+    });
+
+    // Process inputs
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    ASSERT_THROW(FaultsManager::CheckAndReadFaults(), std::runtime_error);
+
+    std::string const error_string = delimited_string({
+        "   ** Severe  ** FaultModel:Fouling:Coil = \"FOULEDHEATINGCOIL\" invalid Coil Name = \"DETAILED PRE COOLING COIL\".",
+        "   **   ~~~   ** Coil was found but it is not one of the supported types (\"Coil:Cooling:Water\" or \"Coil:Heating:Water\").",
+        "   **  Fatal  ** CheckAndReadFaults: Errors found in getting FaultModel input data. Preceding condition(s) cause termination.",
+        "   ...Summary of Errors that led to program termination:",
+        "   ..... Reference severe error count=1",
+        "   ..... Last severe error=FaultModel:Fouling:Coil = \"FOULEDHEATINGCOIL\" invalid Coil Name = \"DETAILED PRE COOLING COIL\".",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
 } // namespace EnergyPlus
