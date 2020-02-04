@@ -75,7 +75,7 @@ namespace SimulationManager {
     // Functions
     void clear_state();
 
-    void ManageSimulation(OutputFiles &outputFiles);
+    void ManageSimulation();
 
     void GetProjectData(OutputFiles &outputFiles);
 

@@ -465,7 +465,7 @@ int RunEnergyPlus(std::string const & filepath)
 
         ResultsFramework::OutputSchema->setupOutputOptions();
 
-        ManageSimulation(OutputFiles::getSingleton());
+        ManageSimulation();
 
         ShowMessage("Simulation Error Summary *************");
 

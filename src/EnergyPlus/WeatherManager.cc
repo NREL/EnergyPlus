@@ -4300,11 +4300,11 @@ namespace WeatherManager {
             static constexpr auto EnvDDHdFormat(
                 "! <Environment:Design Day Data>, Max Dry-Bulb Temp {C}, Temp Range {dC}, Temp Range Ind Type, "
                 "Hum Ind Type, Hum Ind Value at Max Temp, Hum Ind Units, Pressure {Pa}, Wind Direction {deg CW from N}, Wind "
-                "Speed {m/s}, Clearness, Rain, Snow\n");
+                "Speed {m/s}, Clearness, Rain, Snow");
             print(outputFiles.eio, "{}\n", EnvDDHdFormat);
             static constexpr auto DDayMiscHdFormat(
                 "! <Environment:Design Day Misc>,DayOfYear,ASHRAE A Coeff,ASHRAE B Coeff,ASHRAE C Coeff,Solar "
-                "Constant-Annual Variation,Eq of Time {minutes}, Solar Declination Angle {deg}, Solar Model\n");
+                "Constant-Annual Variation,Eq of Time {minutes}, Solar Declination Angle {deg}, Solar Model");
             print(outputFiles.eio, "{}\n", DDayMiscHdFormat);
             PrintDDHeader = false;
         }

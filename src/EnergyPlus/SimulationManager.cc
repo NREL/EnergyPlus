@@ -214,7 +214,7 @@ namespace SimulationManager {
         PreP_Fatal = false;
     }
 
-    void ManageSimulation(OutputFiles &outputFiles)
+    void ManageSimulation()
     {
 
         // SUBROUTINE INFORMATION:
@@ -339,6 +339,7 @@ namespace SimulationManager {
         AskForConnectionsReport = false; // set to false until sizing is finished
 
         OpenOutputFiles();
+        auto &outputFiles = OutputFiles::getSingleton();
         GetProjectData(outputFiles);
         CheckForMisMatchedEnvironmentSpecifications();
         CheckForRequestedReporting();
@@ -1629,7 +1630,7 @@ namespace SimulationManager {
             write_stat = flags.ios();
         }
         if (write_stat != 0) {
-            ShowFatalError("OpenOutputFiles: Could not open file " + DataStringGlobals::outputEsoFileName + " for output (write).");
+           ShowFatalError("OpenOutputFiles: Could not open file " + DataStringGlobals::outputEsoFileName + " for output (write).");
         }
         eso_stream = ObjexxFCL::gio::out_stream(OutputFileStandard);
         ObjexxFCL::gio::write(OutputFileStandard, fmtA) << "Program Version," + VerString;
@@ -1737,7 +1738,7 @@ namespace SimulationManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static constexpr auto EndOfDataFormat("\"End of Data\"\n"); // Signifies the end of the data block in the output file
+        static constexpr auto EndOfDataFormat("End of Data\n"); // Signifies the end of the data block in the output file
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -1833,7 +1834,7 @@ namespace SimulationManager {
                                               "Threads, Number of Threads Used (Interior Radiant Exchange), Number Nominal Surfaces, Number "
                                               "Parallel Sims\n");
         print(outputFiles.eio, "{}\n", ThreadingHeader);
-        static constexpr auto ThreadReport("Program Control:Threads/Parallel Sims, {}, {}, {}, {}, {}, {}, {}, {}\n");
+        static constexpr auto ThreadReport("Program Control:Threads/Parallel Sims, {},{}, {}, {}, {}, {}, {}, {}\n");
         if (Threading) {
             if (iEnvSetThreads == 0) {
                 cEnvSetThreads = "Not Set";

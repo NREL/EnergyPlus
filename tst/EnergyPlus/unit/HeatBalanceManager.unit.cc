@@ -1566,7 +1566,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2);
-    SimulationManager::ManageSimulation(OutputFiles::getSingleton());
+    SimulationManager::ManageSimulation();
     DataGlobals::DayOfSim = 2; // avoid array bounds problem in RecKeepHeatBalance
     WeatherManager::Envrn = 1;
 
