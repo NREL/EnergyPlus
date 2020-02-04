@@ -49,7 +49,7 @@ function(install_python_dependencies INITIAL_FOUND_LIBRARY RESOLVED_LIBRARY)
   ")
   install(DIRECTORY "/usr/local/opt/python/Frameworks/Python.framework/Versions/3.7/lib/python3.7"
           DESTINATION "./pypackages")
-  install(DIRECTORY "/eplus/repos/myoldmopar/cmake-build-debug/Products/pyenergyplus/"
+  install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/Products/pyenergyplus/" # TODO: Platform independent
           DESTINATION "./pyenergyplus")
 endfunction()
 
