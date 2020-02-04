@@ -377,27 +377,37 @@ namespace PluginManagement {
 
     PluginManager::PluginManager()
     {
+        // we'll need the program directory for a few things so get it once here at the top and sanitize it
+        std::string programPath = FileSystem::getProgramPath();
+        std::string programDir = FileSystem::getParentDirectoryPath(programPath);
+        std::string sanitizedProgramDir = PluginManager::sanitizedPath(programDir);
 
-        auto a = Py_DecodeLocale("/eplus/repos/myoldmopar/cmake-build-debug/_CPack_Packages/Darwin/IFW/EnergyPlus-9.3.0-66943131ca-Darwin-x86_64-Debug/packages/Unspecified/data/pypackages/python3.7", nullptr);
+        // we need to set the python path before initializing the library -- I THINK
+        // make this relative to the binary
+        std::string pathToPythonPackages = sanitizedProgramDir + "/pypackages/python3.7"; // TODO: platform independent
+        auto a = Py_DecodeLocale(pathToPythonPackages.c_str(), nullptr);
         Py_SetPath(a);
 
+        // now that we have set the path, we can initialize python
         // from https://docs.python.org/3/c-api/init.html
         // If arg 0, it skips init registration of signal handlers, which might be useful when Python is embedded.
         Py_InitializeEx(0);
 
         PyRun_SimpleString("import sys"); // allows us to report sys.path later
 
-        std::string libDirDynLoad = PluginManager::sanitizedPath("/usr/local/opt/python/Frameworks/Python.framework/Versions/3.7/lib/python3.7/lib-dynload");
+        // we also need to set an extra import path to find some dynamic library loading stuff, again make it relative to the binary
+        std::string pathToDynLoad = sanitizedProgramDir + "/pypackages/python3.7/lib-dynload"; // TODO: platform independent
+        std::string libDirDynLoad = PluginManager::sanitizedPath(pathToDynLoad);
         PluginManager::addToPythonPath(libDirDynLoad, false);
 
+        // now for additional paths:
         // we'll always want to add the program executable directory to PATH so that Python can find the installed pyenergyplus package
         // we will then optionally add the current working directory to allow Python to find scripts in the current directory
         // we will then optionally add the directory of the running IDF to allow Python to find scripts kept next to the IDF
         // we will then optionally add any additional paths the user specifies on the search paths object
-        std::string programPath = FileSystem::getProgramPath();
-        std::string programDir = FileSystem::getParentDirectoryPath(programPath);
-        std::string sanitizedDir = PluginManager::sanitizedPath(programDir);
-        PluginManager::addToPythonPath(sanitizedDir, false);
+
+        // so add the executable directory here
+        PluginManager::addToPythonPath(sanitizedProgramDir, false);
 
         // Read all the additional search paths next
         std::string const sPaths = "PythonPlugin:SearchPaths";

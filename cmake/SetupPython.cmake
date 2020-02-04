@@ -53,6 +53,8 @@ function(install_python_dependencies INITIAL_FOUND_LIBRARY RESOLVED_LIBRARY)
           DESTINATION "./pyenergyplus")
 endfunction()
 
+
+
 # message("Python configuration (1): Got Python Executable: \n  Executable: ${PYTHON_EXECUTABLE} \n  Include Dirs: ${PYTHON_INCLUDE_DIRS}")
 
 ## At this point, we should have *a* Python executable, so we can make sure we also have a virtual environment in the build tree
@@ -147,4 +149,4 @@ endfunction()
 #endif()
 
 # Now we should have a PYTHON_EXECUTABLE that points to the desired locale in the build tree, fixed up, and with libs as well
-message("Python configuration (4): \n  Executable: ${PYTHON_EXECUTABLE} \n  Include Dirs: ${PYTHON_INCLUDE_DIRS} \n  Version String: ${PYTHONLIBS_VERSION_STRING} \n  Library: ${PYTHON_LIBRARIES}")
+# message("Python configuration (4): \n  Executable: ${PYTHON_EXECUTABLE} \n  Include Dirs: ${PYTHON_INCLUDE_DIRS} \n  Version String: ${PYTHONLIBS_VERSION_STRING} \n  Library: ${PYTHON_LIBRARIES}")

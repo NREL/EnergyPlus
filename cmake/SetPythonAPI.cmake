@@ -3,10 +3,10 @@
 
 if (MSVC)
     # copy things into both the debug and release folders for convenience
-    if (NOT EXISTS "${CMAKE_BINARY_DIR}/Produces/Debug")
+    if (NOT EXISTS "${CMAKE_BINARY_DIR}/Products/Debug")
         file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/Products/Debug")
     endif()
-    if (NOT EXISTS "${CMAKE_BINARY_DIR}/Produces/Debug/pyenergyplus")
+    if (NOT EXISTS "${CMAKE_BINARY_DIR}/Products/Debug/pyenergyplus")
         file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/Products/Debug/pyenergyplus")
     endif()
     set(API_SOURCE_DIR "${REPO_ROOT}/src/EnergyPlus/api")
@@ -38,7 +38,7 @@ if (MSVC)
     configure_file( "${API_SOURCE_DIR}/__init__.py" "${API_TARGET_DIR}/__init__.py" )
 else()
     # assuming a single-products dir, like regular makefile type
-    if (NOT EXISTS "${CMAKE_BINARY_DIR}/Produces/pyenergyplus")
+    if (NOT EXISTS "${CMAKE_BINARY_DIR}/Products/pyenergyplus")
         file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/Products/pyenergyplus")
     endif()
     set(API_SOURCE_DIR "${REPO_ROOT}/src/EnergyPlus/api")
