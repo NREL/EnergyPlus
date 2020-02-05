@@ -9,9 +9,22 @@ configure_file( DataStringGlobals.in.cc "${CMAKE_CURRENT_BINARY_DIR}/DataStringG
 configure_file( ConfiguredFunctions.in.cc "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.cc" )
 file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc" "Will be filled in later by GenerateEmbeddedEpJSONSchema" )
 
-# include("${CMAKE_SOURCE_DIR}/cmake/SetupPython.cmake")
 find_package(PythonLibs 3 REQUIRED)
 include_directories("${PYTHON_INCLUDE_DIRS}")
+
+# now we need to find the path to the standard library
+# an easy way is to find the __init__ file for a known standard lib package and go two parents up
+#import os
+#import ctypes
+#package_init_file = os.path.abspath(ctypes.__file__)
+#package_dir = os.path.dirname(package_init_file)
+#standard_lib_dir = os.path.dirname(package_dir)
+#print(standard_lib_dir)
+#/usr/lib/python3.7/
+# or shortened:
+# python3 -c 'import os; import ctypes; print(os.path.dirname(os.path.dirname(os.path.abspath(ctypes.__file__))))'
+execute_process(COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/cmake/GetStandardLib.py" OUTPUT_VARIABLE STANDARD_LIB_PATH_RAW)
+string(STRIP ${STANDARD_LIB_PATH_RAW} STANDARD_LIB_PATH)
 
 if (MSVC)
   # copy things into both the debug and release folders for convenience, first debug
@@ -21,7 +34,7 @@ if (MSVC)
   if (NOT EXISTS "${CMAKE_BINARY_DIR}/Products/Debug/pyenergyplus")
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/Products/Debug/pyenergyplus")
   endif()
-  file(COPY "/usr/local/opt/python/Frameworks/Python.framework/Versions/3.7/lib/python3.7" DESTINATION "${CMAKE_BINARY_DIR}/Products/Debug/pypackages")
+  file(COPY "${STANDARD_LIB_PATH}" DESTINATION "${CMAKE_BINARY_DIR}/Products/Debug/pypackages")
   # then release
   if (NOT EXISTS "${CMAKE_BINARY_DIR}/Products/Release")
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/Products/Release")
@@ -29,13 +42,13 @@ if (MSVC)
   if (NOT EXISTS "${CMAKE_BINARY_DIR}/Products/Release/pyenergyplus")
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/Products/Release/pyenergyplus")
   endif()
-  file(COPY "/usr/local/opt/python/Frameworks/Python.framework/Versions/3.7/lib/python3.7" DESTINATION "${CMAKE_BINARY_DIR}/Products/Release/pypackages")
+  file(COPY "${STANDARD_LIB_PATH}" DESTINATION "${CMAKE_BINARY_DIR}/Products/Release/pypackages")
 else()
   # assuming a single-products dir, like regular makefile type
   if (NOT EXISTS "${CMAKE_BINARY_DIR}/Products/pyenergyplus")
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/Products/pyenergyplus")
   endif()
-  file(COPY "/usr/local/opt/python/Frameworks/Python.framework/Versions/3.7/lib/python3.7" DESTINATION "${CMAKE_BINARY_DIR}/Products/pypackages")
+  file(COPY "${STANDARD_LIB_PATH}" DESTINATION "${CMAKE_BINARY_DIR}/Products/pypackages")
 endif()
 
 SET( SRC
