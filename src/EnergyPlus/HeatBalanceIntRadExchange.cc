@@ -958,7 +958,7 @@ namespace HeatBalanceIntRadExchange {
 
                 for (int SurfNum = 1; SurfNum <= thisEnclosure.NumOfSurfaces; ++SurfNum) {
                     print(outputFiles.eio,
-                          "Solar View Factor - Surface Information,{},{},{:.4R},{:.4R},{:.4R},{:.4R},{}\n",
+                          "Solar View Factor - Surface Information,{},{},{:.4R},{:.4R},{:.4R},{:.4R},{}",
                           Surface(thisEnclosure.SurfacePtr(SurfNum)).Name,
                           cSurfaceClass(Surface(thisEnclosure.SurfacePtr(SurfNum)).Class),
                           thisEnclosure.Area(SurfNum),
