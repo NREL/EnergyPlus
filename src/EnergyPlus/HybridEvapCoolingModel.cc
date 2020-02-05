@@ -50,6 +50,8 @@
 
 #include <EnergyPlus/UtilityRoutines.hh>
 
+#include <cmath>
+#include <string>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
@@ -59,8 +61,6 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
-#include <cmath>
-#include <string>
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
@@ -255,7 +255,7 @@ namespace HybridEvapCoolingModel {
 
             if (ValidPointer(HRsa_curve_pointer)) {
                 Y_val = NormalizationReference * CurveValue(HRsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
-                Y_val = max(min(Y_val, 1.0), 0.0);
+                Y_val = max(min(Y_val,1.0),0.0);
             } else {
                 Y_val = X_4; // return HR
             }
@@ -1533,8 +1533,8 @@ namespace HybridEvapCoolingModel {
                 }
             }
             if (!WarmupFlag) {
-                // Keep an account of the number of times the supply air temperature and humidity constraints were not met for a given mode but
-                // only do this when its not warmup.
+                // Keep an account of the number of times the supply air temperature and humidity constraints were not met for a given mode but only
+                // do this when its not warmup.
                 if (!SAT_OC_MetinMode) {
                     SAT_OC_MetinMode_v[Mode.ModeID] = SAT_OC_MetinMode_v[Mode.ModeID] + 1;
                 }
@@ -1760,8 +1760,8 @@ namespace HybridEvapCoolingModel {
         Real64 TimeElapsed = DataGlobals::HourOfDay + DataGlobals::TimeStep * DataGlobals::TimeStepZone + SysTimeElapsed;
 
         // Use the elapsed time to only give a summary of warnings related to the number of Timesteps environmental conditions, or supply air
-        // temperature constraints were not met for a given day. ideally there would be a clear flag that indicates "this is the last timestep of
-        // the day, so report", but that doesn't seem to exist.
+        // temperature constraints were not met for a given day. ideally there would be a clear flag that indicates "this is the last timestep of the
+        // day, so report", but that doesn't seem to exist.
         if ((TimeElapsed > 24) && WarnOnceFlag && !WarmupFlag) {
             if (count_EnvironmentConditionsNotMet > 0)
                 ShowWarningError("In day " + RoundSigDigits((Real64)DayOfSim, 1) + " of simulation, " + Name.c_str() + " was unable to operate for " +
@@ -1887,8 +1887,8 @@ namespace HybridEvapCoolingModel {
         }
     }
 
-    // doStep is passed some variables that could have just used the class members, but this adds clarity about whats needed, especially helpful
-    // in unit testing
+    // doStep is passed some variables that could have just used the class members, but this adds clarity about whats needed, especially helpful in
+    // unit testing
     void Model::doStep(Real64 RequestedCoolingLoad,       // in joules, cooling load as negitive
                        Real64 RequestedHeatingLoad,       // in joules, heating load as positive
                        Real64 OutputRequiredToHumidify,   // Load required to meet humidifying setpoint (>0 = a humidify load) [kgWater/s]
@@ -1933,8 +1933,8 @@ namespace HybridEvapCoolingModel {
 
         MinOA_Msa = DesignMinVR; // as mass flow kg/s
 
-        // Collate all the inputs required for calculation into one local data structure CStepInputs, this helps with the unit tests so we always
-        // know what values need to be set
+        // Collate all the inputs required for calculation into one local data structure CStepInputs, this helps with the unit tests so we always know
+        // what values need to be set
         CStepInputs StepIns;
         StepIns.Tosa = SecInletTemp; // degrees C
         StepIns.Tra = InletTemp;     // degrees C
