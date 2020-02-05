@@ -818,7 +818,7 @@ namespace WeatherManager {
         static ObjexxFCL::gio::Fmt EnvironFormat(
             "('! <Environment>,Environment Name,Environment Type, Start Date, End Date,',    ' Start DayOfWeek, Duration "
             "{#days}, Source:Start DayOfWeek, ',        ' Use Daylight Saving, Use Holidays, Apply Weekend Holiday Rule, "
-            "',    ' Use Rain Values, Use Snow Values',/,                                 '! <Environment:Special Days>, "
+            "',    ' Use Rain Values, Use Snow Values, Sky Temperature Model',/,                                 '! <Environment:Special Days>, "
             "Special Day Name, Special Day Type, Source, ',  'Start Date, Duration {#days}',/,                             "
             "         '! <Environment:Daylight Saving>, Daylight Saving Indicator, Source,',           ' Start Date, End "
             "Date',/,                                           '! <Environment:WarmupDays>, NumberofWarmupDays')");
@@ -842,7 +842,14 @@ namespace WeatherManager {
                                                    "WinterDesignDay",
                                                    "CustomDay1",
                                                    "CustomDay2"});
-
+        static Array1D_string const SkyTempModelNames(7,
+                                                      {"Clark and Allen",
+                                                       "Schedule Value",
+                                                       "DryBulb Difference Schedule Value",
+                                                       "Dewpoint Difference Schedule Value",
+                                                       "Brunt",
+                                                       "Idso",
+                                                       "Berdahl and Martin"});
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         //////////// hoisted into namespace changed to GetBranchInputOneTimeFlag////////////
         //	static bool GetInputFlag( true ); // Set to true before execution starts changed to GetEnvironmentInputOneTimeFlag
@@ -854,6 +861,7 @@ namespace WeatherManager {
         std::string EnDate;
         std::string string;
         std::string cTotalEnvDays;
+        std::string skyTempModel;
         int DSTActStMon;
         int DSTActStDay;
         int DSTActEnMon;
@@ -1224,10 +1232,11 @@ namespace WeatherManager {
                                     AlpUseSnow = "No";
                                 }
                                 cTotalEnvDays = RoundSigDigits(Environment(Envrn).TotalDays);
+                                skyTempModel = SkyTempModelNames(Environment(Envrn).SkyTempModel + 1);
 
                                 ObjexxFCL::gio::write(OutputFileInits, EnvNameFormat)
                                     << Environment(Envrn).Title << kindOfRunPeriod << StDate << EnDate << ValidDayNames(TWeekDay) << cTotalEnvDays
-                                    << "Use RunPeriod Specified Day" << AlpUseDST << AlpUseSpec << ApWkRule << AlpUseRain << AlpUseSnow;
+                                    << "Use RunPeriod Specified Day" << AlpUseDST << AlpUseSpec << ApWkRule << AlpUseRain << AlpUseSnow << skyTempModel;
                             }
 
                             if (!DoingSizing && !KickOffSimulation) {
