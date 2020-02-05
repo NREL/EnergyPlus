@@ -812,3 +812,118 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
     }
 
 }
+
+
+
+
+std::vector<std::string> getAllLinesInFile2(std::string filePath)
+{
+    std::ifstream infile(filePath);
+    std::vector<std::string> lines;
+    std::string line;
+    while (std::getline(infile, line)) {
+        lines.push_back(line);
+    }
+    return lines;
+}
+
+TEST_F(EnergyPlusFixture, WeatherManager_NoIRHoriz) {
+
+    //std::vector<std::string> snippet = getAllLinesInFile2(EnergyPlus::configured_source_directory() + "/tst/EnergyPlus/unit/UnitaryHybridUnitTest_DOSA.idf");
+
+//    std::vector<std::string> snippet = getAllLinesInFile2("/Users/tony-scimone/Projects/EnergyPlus/tst/EnergyPlus/unit/WeatherManagerIROutputTest.idf");
+//
+//    std::string idf_objects = delimited_string(snippet);
+//    ASSERT_TRUE(process_idf(idf_objects));
+
+    std::string const idf_objects = delimited_string({
+                                                             "SimulationControl, NO, NO, NO, YES, YES;",
+                                                             "Timestep,4;",
+                                                             "RunPeriod,",
+                                                             "RP1,                     !- Name",
+                                                             "2,                       !- Begin Month",
+                                                             "27,                      !- Begin Day of Month",
+                                                             ",                        !- Begin Year",
+                                                             "3,                       !- End Month",
+                                                             "3,                       !- End Day of Month",
+                                                             ",                        !- End Year",
+                                                             "Tuesday,                 !- Day of Week for Start Day",
+                                                             "Yes,                     !- Use Weather File Holidays and Special Days",
+                                                             "Yes,                     !- Use Weather File Daylight Saving Period",
+                                                             "No,                      !- Apply Weekend Holiday Rule",
+                                                             "Yes,                     !- Use Weather File Rain Indicators",
+                                                             "Yes;                     !- Use Weather File Snow Indicators",
+                                                             "BUILDING, Simple One Zone (Wireframe DXF), 0.0, Suburbs, .04, .004, MinimalShadowing, 30, 6;",
+                                                             "Schedule:Compact,",
+                                                             "TskySchedule,                !- Name",
+                                                             ",              !- Schedule Type Limits Name",
+                                                             "Through: 2/26, For: AllOtherDays,  Until: 24:00, 2.26,",
+                                                             "Through: 2/27, For: AllOtherDays,  Until: 24:00, 2.27,",
+                                                             "Through: 2/28, For: AllOtherDays,  Until: 24:00, 2.28,",
+                                                             "Through: 3/1, For: AllOtherDays,  Until: 24:00, 3.01,",
+                                                             "Through: 3/2, For: AllOtherDays,  Until: 24:00, 3.02,",
+                                                             "Through: 12/31, For: AllOtherDays,  Until: 24:00, 12.31;",
+                                                             "WeatherProperty:SkyTemperature,",
+                                                             ",                        !- Name",
+                                                             "ScheduleValue,           !- Calculation Type",
+                                                             "TskySchedule;                  !- Schedule Name",
+                                                             "Site:WaterMainsTemperature,",
+                                                             "Schedule,             !- Calculation Method",
+                                                             "TskySchedule,                        !- Temperature Schedule Name",
+                                                             ",                   !- Annual Average Outdoor Air Temperature{ C }",
+                                                             ";                   !- Maximum Difference In Monthly Average Outdoor Air Temperatures{ deltaC }",
+                                                             "Output:Variable,*,Schedule Value,hourly;",
+                                                             "Output:Variable,*,Site Sky Temperature,hourly;",
+                                                             "Output:Variable,*,Site Mains Water Temperature,hourly; !- Zone Average[C]",
+                                                             "  Site:Location,",
+                                                             "    USA IL-CHICAGO-OHARE,    !- Name",
+                                                             "    41.77,                   !- Latitude {deg}",
+                                                             "    -87.75,                  !- Longitude {deg}",
+                                                             "    -6.00,                   !- Time Zone {hr}",
+                                                             "    190;                     !- Elevation {m}",
+                                                     });
+
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // Set an actual weather file to Chicago EPW
+    WeatherManager::WeatherFileExists = true;
+    //DataStringGlobals::inputWeatherFileName = configured_source_directory() + "/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw";
+
+    DataStringGlobals::inputWeatherFileName = "/Users/tony-scimone/Projects/EnergyPlus/tst/EnergyPlus/unit/WeatherManagerIROutputTest.epw";
+
+    // Read the project data, such as Timestep
+    DataGlobals::BeginSimFlag = true;
+    SimulationManager::GetProjectData();
+    EXPECT_EQ(DataGlobals::NumOfTimeStepInHour, 4);
+
+    Array2D<Real64> TomorrowSkyTemp; // Sky temperature
+    DataGlobals::NumOfTimeStepInHour = 4;
+    DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
+    TomorrowSkyTemp.allocate(DataGlobals::NumOfTimeStepInHour, 24);
+    TomorrowSkyTemp = 0.0;
+
+
+    ScheduleManager::GetSingleDayScheduleValues(1, TomorrowSkyTemp);
+    EXPECT_NEAR(2.26, TomorrowSkyTemp(1, 1), .001);
+
+
+
+    //EXPECT_NEAR(2.26, TodayHorizIRSky(1, 1), .001);
+
+    DataEnvironment::DayOfYear = 202; // July 21st
+    WeatherManager::CalcWaterMainsTemp();
+
+//    // March 1
+//    ScheduleManager::GetScheduleValuesForDay(1, TomorrowSkyTemp, 60, 5);
+//    EXPECT_NEAR(3.01, TomorrowSkyTemp(1, 1), .001);
+//
+//    // Not March 2, this "Day" is ignored unless its a leap year, otherwise same data as March 1
+//    ScheduleManager::GetScheduleValuesForDay(1, TomorrowSkyTemp, 61, 6);
+//    EXPECT_NEAR(3.01, TomorrowSkyTemp(1, 1), .001);
+//
+//    // March 2
+//    ScheduleManager::GetScheduleValuesForDay(1, TomorrowSkyTemp, 62, 6);
+//    EXPECT_NEAR(3.02, TomorrowSkyTemp(1, 1), .001);
+
+}
