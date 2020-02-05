@@ -12924,7 +12924,7 @@ namespace RefrigeratedCase {
                 for (int WalkInNum = 1; WalkInNum <= RefrigRack(RackNum).NumWalkIns; ++WalkInNum) {
                     int WalkInID = RefrigRack(RackNum).WalkInNum(WalkInNum);
                     print(outputFiles.eio,
-                          " Refrigeration Walk In Cooler,  {},{},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{}\n",
+                          "   Refrigeration Walk In Cooler,  {},{},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{}\n",
                           WalkInID,
                           WalkIn(WalkInID).Name,
                           WalkIn(WalkInID).DesignRatedCap,
@@ -13001,7 +13001,7 @@ namespace RefrigeratedCase {
                 for (int WalkInNum = 1; WalkInNum <= System(SystemNum).NumWalkIns; ++WalkInNum) {
                     int WalkInID = System(SystemNum).WalkInNum(WalkInNum);
                     print(outputFiles.eio,
-                          " Refrigeration Walk In Cooler,{},{},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{}\n",
+                          "   Refrigeration Walk In Cooler,{},{},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{}\n",
                           WalkInID,
                           WalkIn(WalkInID).Name,
                           WalkIn(WalkInID).DesignRatedCap,
@@ -13056,14 +13056,14 @@ namespace RefrigeratedCase {
                     for (int CompressorNum = 1; CompressorNum <= System(SystemNum).NumCompressors; ++CompressorNum) {
                         int CompID = System(SystemNum).CompressorNum(CompressorNum);
                         print(
-                            outputFiles.eio, " Refrigeration Compressor,{},{},{:.0R}\n", CompID, Compressor(CompID).Name, Compressor(CompID).NomCap);
+                            outputFiles.eio, "   Refrigeration Compressor,{},{},{:.0R}\n", CompID, Compressor(CompID).Name, Compressor(CompID).NomCap);
                     }                                          // NumCompressors
                 } else if (System(SystemNum).NumStages == 2) { // Two-stage compression system
                     // Low-stage compressors
                     for (int CompressorNum = 1; CompressorNum <= System(SystemNum).NumCompressors; ++CompressorNum) {
                         int CompID = System(SystemNum).CompressorNum(CompressorNum);
                         print(outputFiles.eio,
-                              " Refrigeration Low-Stage Compressor,{},{},{:.0R}\n",
+                              "   Refrigeration Low-Stage Compressor,{},{},{:.0R}\n",
                               CompID,
                               Compressor(CompID).Name,
                               Compressor(CompID).NomCap);
@@ -13072,7 +13072,7 @@ namespace RefrigeratedCase {
                     for (int CompressorNum = 1; CompressorNum <= System(SystemNum).NumHiStageCompressors; ++CompressorNum) {
                         int CompID = System(SystemNum).HiStageCompressorNum(CompressorNum);
                         print(outputFiles.eio,
-                              " Refrigeration High-Stage Compressor,{},{},{:.0R}\n",
+                              "   Refrigeration High-Stage Compressor,{},{},{:.0R}\n",
                               CompID,
                               Compressor(CompID).Name,
                               Compressor(CompID).NomCap);
@@ -13084,7 +13084,7 @@ namespace RefrigeratedCase {
                     auto const SELECT_CASE_var(Condenser(CondID).CondenserType);
                     if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserTypeAir) {
                         print(outputFiles.eio,
-                              " Refrigeration Condenser:Air-Cooled,{},{},{:.1R},{:.1R},{:.1R}\n",
+                              "   Refrigeration Condenser:Air-Cooled,{},{},{:.1R},{:.1R},{:.1R}\n",
                               CondID,
                               Condenser(CondID).Name,
                               Condenser(CondID).RatedTCondense,
@@ -13092,14 +13092,14 @@ namespace RefrigeratedCase {
                               Condenser(CondID).RatedFanPower);
                     } else if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserTypeEvap) {
                         print(outputFiles.eio,
-                              " Refrigeration Condenser:Evaporative-Cooled,{},{},{:.1R},{:.1R}",
+                              "   Refrigeration Condenser:Evaporative-Cooled,{},{},{:.1R},{:.1R}",
                               CondID,
                               Condenser(CondID).Name,
                               Condenser(CondID).RatedCapacity,
                               Condenser(CondID).RatedFanPower);
                     } else if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserTypeWater) {
                         print(outputFiles.eio,
-                              " Refrigeration Condenser:Water-Cooled,{},{},{:.1R},{:.1R},{:.1R},{:.1R}\n",
+                              "   Refrigeration Condenser:Water-Cooled,{},{},{:.1R},{:.1R},{:.1R},{:.1R}\n",
                               CondID,
                               Condenser(CondID).Name,
                               Condenser(CondID).RatedTCondense,
@@ -13117,7 +13117,7 @@ namespace RefrigeratedCase {
                             }
                         } // cascade temperature control
                         print(outputFiles.eio,
-                              " Refrigeration Condenser:Cascade,{},{},{},{:.1R},{:.1R},{:.1R}\n",
+                              "   Refrigeration Condenser:Cascade,{},{},{},{:.1R},{:.1R},{:.1R}\n",
                               CondID,
                               Condenser(CondID).Name,
                               ChrOut,
@@ -13133,7 +13133,7 @@ namespace RefrigeratedCase {
                         auto const SELECT_CASE_var(Subcooler(SubcoolerID).SubcoolerType);
                         if (SELECT_CASE_var == LiquidSuction) {
                             print(outputFiles.eio,
-                                  " Refrigeration Liquid Suction Subcooler,{},{},{:.1R},{:.1R},{:.1R}\n",
+                                  "   Refrigeration Liquid Suction Subcooler,{},{},{:.1R},{:.1R},{:.1R}\n",
                                   SubcoolerID,
                                   Subcooler(SubcoolerID).Name,
                                   Subcooler(SubcoolerID).LiqSuctDesignDelT,
@@ -13141,7 +13141,7 @@ namespace RefrigeratedCase {
                                   Subcooler(SubcoolerID).LiqSuctDesignTvapIn);
                         } else if (SELECT_CASE_var == Mechanical) {
                             print(outputFiles.eio,
-                                  " Refrigeration Mechanical Subcooler,{},{},{},{:.1R}\n",
+                                  "   Refrigeration Mechanical Subcooler,{},{},{},{:.1R}\n",
                                   SubcoolerID,
                                   Subcooler(SubcoolerID).Name,
                                   Subcooler(SubcoolerID).MechSourceSys,
@@ -13211,7 +13211,7 @@ namespace RefrigeratedCase {
                 for (int WalkInNum = 1; WalkInNum <= TransSystem(TransSystemNum).NumWalkInsMT; ++WalkInNum) {
                     int WalkInID = TransSystem(TransSystemNum).WalkInNumMT(WalkInNum);
                     print(outputFiles.eio,
-                          " Medium Temperature Refrigeration Walk In Cooler,{},{},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{}\n",
+                          "   Medium Temperature Refrigeration Walk In Cooler,{},{},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{}\n",
                           WalkInID,
                           WalkIn(WalkInID).Name,
                           WalkIn(WalkInID).DesignRatedCap,
@@ -13239,7 +13239,7 @@ namespace RefrigeratedCase {
                 for (int WalkInNum = 1; WalkInNum <= TransSystem(TransSystemNum).NumWalkInsLT; ++WalkInNum) {
                     int WalkInID = TransSystem(TransSystemNum).WalkInNumLT(WalkInNum);
                     print(outputFiles.eio,
-                          " Low Temperature Refrigeration Walk In Cooler,{},{},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{}\n",
+                          "   Low Temperature Refrigeration Walk In Cooler,{},{},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{}\n",
                           WalkInID,
                           WalkIn(WalkInID).Name,
                           WalkIn(WalkInID).DesignRatedCap,
