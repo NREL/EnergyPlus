@@ -806,7 +806,7 @@ add_custom_command(
 
 if (BUILD_PACKAGE)
   install(FILES "${RESOLVED_PYTHON_LIBRARY}" DESTINATION "./")
-  install(DIRECTORY "/usr/local/opt/python/Frameworks/Python.framework/Versions/3.7/lib/python3.7"
+  install(DIRECTORY "${CMAKE_BINARY_DIR}/Products/pypackages/"
           DESTINATION "./pypackages")
   install(DIRECTORY "${CMAKE_BINARY_DIR}/Products/pyenergyplus/" # TODO: Platform independent
           DESTINATION "./pyenergyplus")
