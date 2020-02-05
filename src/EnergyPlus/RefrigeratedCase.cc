@@ -12739,10 +12739,6 @@ namespace RefrigeratedCase {
         std::string ChrOut;
         std::string ChrOut2;
 
-        static constexpr auto Format_101("{}\n");
-        static constexpr auto Format_102("    {}\n");
-        static constexpr auto Format_103("  {}\n");
-
         static constexpr auto Format_104("! <Refrigeration Compressor Rack>,Compressor Rack Name, # Refrigerated Cases Connected,# WalkIn Coolers "
                                          "Connected, Heat Rejection Location, Condenser Type, COP");
         static constexpr auto Format_105("!  <Refrigeration Case>,Refrigeration Case Number, Refrigeration Case Name,Zone Name,Zone Node #,Zone "

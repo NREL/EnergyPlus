@@ -7839,7 +7839,7 @@ namespace WindowManager {
                                 //! fw CASE(WindowGasMixture)
 
                             } else if (SELECT_CASE_var == Shade) {
-                                static constexpr auto Format_703(" WindowMaterial:Shade,{},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
+                                static constexpr auto Format_703(" WindowMaterial:Shade,,{},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R},{:.3R}\n");
                                 print(outputFiles.eio,
                                       Format_703,
                                       Material(Layer).Name,

@@ -169,7 +169,11 @@ public:
     {
         if (specs()) {
             const auto next_float = [](const Real64 value){
-              return std::nextafter(value, std::numeric_limits<decltype(value)>::max());
+                if (std::signbit(value)) {
+                    return std::nextafter(value, std::numeric_limits<decltype(value)>::lowest());
+                } else {
+                    return std::nextafter(value, std::numeric_limits<decltype(value)>::max());
+                }
             };
 
             // matches Fortran's 'G' format

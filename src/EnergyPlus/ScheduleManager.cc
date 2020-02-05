@@ -2563,7 +2563,7 @@ namespace ScheduleManager {
                     print(outputFiles.eio, "Schedule,{},{}",Schedule(Count).Name, ScheduleType(Schedule(Count).ScheduleTypePtr).Name);
                     while (NumF <= 366) {
                         TS = Schedule(Count).WeekSchedulePointer(NumF);
-                        static constexpr auto ThruFmt(",Through {} {:02},{}\n");
+                        static constexpr auto ThruFmt(",Through {} {:02},{}");
                         while (Schedule(Count).WeekSchedulePointer(NumF) == TS && NumF <= 366) {
                             if (NumF == 366) {
                                 General::InvOrdinalDay(NumF, PMon, PDay, 1);
@@ -2577,7 +2577,7 @@ namespace ScheduleManager {
                             print(outputFiles.eio, ThruFmt, Months(PMon), PDay, WeekSchedule(TS).Name);
                         }
                     }
-                    print(outputFiles.eio, " ");
+                    print(outputFiles.eio, "\n");
                 }
 
             } else if (SELECT_CASE_var == 3) {
