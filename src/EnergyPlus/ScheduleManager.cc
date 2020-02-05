@@ -2405,8 +2405,6 @@ namespace ScheduleManager {
         Array1D_string ShowMinute;
         int CurMinute;
         Array1D_string TimeHHMM;
-        std::string SchDFmt;
-        std::string SchDFmtdata;
         std::string NoAverageLinear;
         std::string YesNo2;
         std::string Num1;
@@ -2446,16 +2444,12 @@ namespace ScheduleManager {
 
                 // SchTFmt Schedule Types Header
                 static constexpr auto SchTFmt0("! Schedule Details Report={} =====================\n");
+                static constexpr auto SchDFmt{",{}"};
+                static constexpr auto SchDFmtdata{",{}"};
                 if (LevelOfDetail == 1) {
                     print(outputFiles.eio, SchTFmt0, "Hourly");
-                    SchDFmt = ",{}";
-                    SchDFmtdata = ",{}";
                 } else {
                     print(outputFiles.eio, SchTFmt0, "Timestep");
-                    ObjexxFCL::gio::write(Num1, fmtLD) << NumOfTimeStepInHour * 24;
-                    strip(Num1);
-                    SchDFmt = Num1 + ",{}";
-                    SchDFmtdata = Num1 + ",{}";
                 }
 
                 static constexpr auto SchTFmt("! <ScheduleType>,Name,Limited? {Yes/No},Minimum,Maximum,Continuous? {Yes/No - Discrete}");
@@ -2477,7 +2471,7 @@ namespace ScheduleManager {
                 for (Count = 1; Count <= MaxDayTypes; ++Count) {
                     SchWFmt += "," + ValidDayTypes(Count);
                 }
-                print(outputFiles.eio, SchWFmt);
+                print(outputFiles.eio, "{}\n", SchWFmt);
                 static constexpr auto SchSFmt("! <Schedule>,Name,ScheduleType,{Until Date,WeekSchedule}** Repeated until Dec 31");
                 print(outputFiles.eio, "{}\n", SchSFmt);
 
@@ -2569,7 +2563,7 @@ namespace ScheduleManager {
                     print(outputFiles.eio, "Schedule,{},{}",Schedule(Count).Name, ScheduleType(Schedule(Count).ScheduleTypePtr).Name);
                     while (NumF <= 366) {
                         TS = Schedule(Count).WeekSchedulePointer(NumF);
-                        static constexpr auto ThruFmt(",Through {} {:02},{}");
+                        static constexpr auto ThruFmt(",Through {} {:02},{}\n");
                         while (Schedule(Count).WeekSchedulePointer(NumF) == TS && NumF <= 366) {
                             if (NumF == 366) {
                                 General::InvOrdinalDay(NumF, PMon, PDay, 1);
