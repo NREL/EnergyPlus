@@ -219,26 +219,11 @@ TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_Scenario1_HighCooling)
     pZoneHybridUnitaryAirConditioner->doStep(RequestedCooling, Requestedheating, Requested_Humidification, Requested_Dehumidification, DesignMinVR);
     // output results
     modenumber = pZoneHybridUnitaryAirConditioner->PrimaryMode;
-    Real64 primaryRuntime = pZoneHybridUnitaryAirConditioner->PrimaryModeRuntimeFraction;
     Real64 Tsa = pZoneHybridUnitaryAirConditioner->OutletTemp;
-    Real64 Wsa = pZoneHybridUnitaryAirConditioner->OutletHumRat;
     Real64 Msa = pZoneHybridUnitaryAirConditioner->OutletMassFlowRate;
-    Real64 Y_val = pZoneHybridUnitaryAirConditioner->FinalElectricalPower / 1000;
-    Real64 ErrorCode = pZoneHybridUnitaryAirConditioner->ErrorCode;
     Real64 deliveredSC = pZoneHybridUnitaryAirConditioner->UnitSensibleCoolingRate;
     Real64 deliveredSH = pZoneHybridUnitaryAirConditioner->UnitSensibleHeatingRate;
-    Real64 Ventilation = pZoneHybridUnitaryAirConditioner->SupplyVentilationAir;
     Real64 returnOSAF = pZoneHybridUnitaryAirConditioner->averageOSAF;
-    Real64 ElectricPower = pZoneHybridUnitaryAirConditioner->FinalElectricalPower;
-    Real64 SupplyFanElectricPower = pZoneHybridUnitaryAirConditioner->SupplyFanElectricPower;             //
-    Real64 SupplyFanElectricEnergy = pZoneHybridUnitaryAirConditioner->SupplyFanElectricEnergy;           //
-    Real64 SecondaryFuelConsumptionRate = pZoneHybridUnitaryAirConditioner->SecondaryFuelConsumptionRate; ///
-    Real64 SecondaryFuelConsumption = pZoneHybridUnitaryAirConditioner->SecondaryFuelConsumption;         //
-    Real64 ThirdFuelConsumptionRate = pZoneHybridUnitaryAirConditioner->ThirdFuelConsumptionRate;         //
-    Real64 ThirdFuelConsumption = pZoneHybridUnitaryAirConditioner->ThirdFuelConsumption;                 //
-    Real64 WaterConsumptionRate = pZoneHybridUnitaryAirConditioner->WaterConsumptionRate;                 //
-    Real64 WaterConsumption = pZoneHybridUnitaryAirConditioner->WaterConsumption;                         //
-    Real64 ExternalStaticPressure = pZoneHybridUnitaryAirConditioner->ExternalStaticPressure;             //
     pZoneHybridUnitaryAirConditioner->Initialize(1);
     // checks
     EXPECT_NEAR(1.0, returnOSAF, 0.001);
@@ -337,26 +322,12 @@ TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_Scenario2_HighCoolingLarge
 
     // output results
     modenumber = pZoneHybridUnitaryAirConditioner->PrimaryMode;
-    Real64 primaryRuntime = pZoneHybridUnitaryAirConditioner->PrimaryModeRuntimeFraction;
     Real64 Tsa = pZoneHybridUnitaryAirConditioner->OutletTemp;
-    Real64 Wsa = pZoneHybridUnitaryAirConditioner->OutletHumRat;
     Real64 Msa = pZoneHybridUnitaryAirConditioner->OutletMassFlowRate;
     // double Msa_setting0= (pZoneHybridUnitaryAirConditioner->CurrentOperatingSettings[0].Supply_Air_Mass_Flow_Rate);
-    Real64 Y_val = pZoneHybridUnitaryAirConditioner->FinalElectricalPower / 1000;
-    Real64 ErrorCode = pZoneHybridUnitaryAirConditioner->ErrorCode;
     Real64 deliveredSC = pZoneHybridUnitaryAirConditioner->UnitSensibleCoolingRate;
     Real64 deliveredSH = pZoneHybridUnitaryAirConditioner->UnitSensibleHeatingRate;
-    Real64 Ventilation = pZoneHybridUnitaryAirConditioner->SupplyVentilationAir;
     Real64 returnOSAF = pZoneHybridUnitaryAirConditioner->averageOSAF;
-    Real64 SupplyFanElectricPower = pZoneHybridUnitaryAirConditioner->SupplyFanElectricPower;             //
-    Real64 SupplyFanElectricEnergy = pZoneHybridUnitaryAirConditioner->SupplyFanElectricEnergy;    //
-    Real64 SecondaryFuelConsumptionRate = pZoneHybridUnitaryAirConditioner->SecondaryFuelConsumptionRate; ///
-    Real64 SecondaryFuelConsumption = pZoneHybridUnitaryAirConditioner->SecondaryFuelConsumption;         //
-    Real64 ThirdFuelConsumptionRate = pZoneHybridUnitaryAirConditioner->ThirdFuelConsumptionRate;         //
-    Real64 ThirdFuelConsumption = pZoneHybridUnitaryAirConditioner->ThirdFuelConsumption;                 //
-    Real64 WaterConsumptionRate = pZoneHybridUnitaryAirConditioner->WaterConsumptionRate;                 //
-    Real64 WaterConsumption = pZoneHybridUnitaryAirConditioner->WaterConsumption;                         //
-    Real64 ExternalStaticPressure = pZoneHybridUnitaryAirConditioner->ExternalStaticPressure;             //
     // checks
     EXPECT_NEAR(1.0, returnOSAF, 0.001);
     EXPECT_GT(deliveredSC, 0);
@@ -448,7 +419,6 @@ TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_Scenario3_OutsideEnvCondit
 
     pZoneHybridUnitaryAirConditioner->doStep(RequestedCooling, Requestedheating, Requested_Humidification, Requested_Dehumidification, DesignMinVR);
     modenumber = pZoneHybridUnitaryAirConditioner->PrimaryMode;
-    Real64 ElectricPower = pZoneHybridUnitaryAirConditioner->FinalElectricalPower;
     // checks
     EXPECT_EQ(0, modenumber);
 }
@@ -542,15 +512,9 @@ TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_Scenario4_LowCooling)
 
     // output results
     modenumber = pZoneHybridUnitaryAirConditioner->PrimaryMode;
-    Real64 primaryRuntime = pZoneHybridUnitaryAirConditioner->PrimaryModeRuntimeFraction;
     Real64 Tsa = pZoneHybridUnitaryAirConditioner->OutletTemp;
-    Real64 Wsa = pZoneHybridUnitaryAirConditioner->OutletHumRat;
-    Real64 Msa = pZoneHybridUnitaryAirConditioner->OutletMassFlowRate;
-    Real64 Y_val = pZoneHybridUnitaryAirConditioner->FinalElectricalPower / 1000;
-    Real64 ErrorCode = pZoneHybridUnitaryAirConditioner->ErrorCode;
     Real64 deliveredSC = pZoneHybridUnitaryAirConditioner->UnitSensibleCoolingRate;
     Real64 deliveredSH = pZoneHybridUnitaryAirConditioner->UnitSensibleHeatingRate;
-    Real64 Ventilation = pZoneHybridUnitaryAirConditioner->SupplyVentilationAir;
     Real64 returnOSAF = pZoneHybridUnitaryAirConditioner->averageOSAF;
     // checks
     EXPECT_NEAR(1.0, returnOSAF, 0.001);
@@ -640,20 +604,10 @@ TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_Scenario5_NoHeatingCooling
 
     // output results
     modenumber = pZoneHybridUnitaryAirConditioner->PrimaryMode;
-    Real64 primaryRuntime = pZoneHybridUnitaryAirConditioner->PrimaryModeRuntimeFraction;
     Real64 Tsa = pZoneHybridUnitaryAirConditioner->OutletTemp;
-    Real64 Wsa = pZoneHybridUnitaryAirConditioner->OutletHumRat;
     Real64 Msa = pZoneHybridUnitaryAirConditioner->OutletMassFlowRate;
-    Real64 Y_val = pZoneHybridUnitaryAirConditioner->FinalElectricalPower / 1000;
-    Real64 ErrorCode = pZoneHybridUnitaryAirConditioner->ErrorCode;
-    Real64 deliveredSC = pZoneHybridUnitaryAirConditioner->UnitSensibleCoolingRate;
-    Real64 deliveredSH = pZoneHybridUnitaryAirConditioner->UnitSensibleHeatingRate;
-    Real64 Ventilation = pZoneHybridUnitaryAirConditioner->SupplyVentilationAir;
-    Real64 returnOSAF = pZoneHybridUnitaryAirConditioner->averageOSAF;
     // checks
     EXPECT_NEAR(Tsa, Tosa, 1.0);
-
-    //Msa and DesignMinVr should be close. If no heating or cooling is needed, the mass flow rate should be near the designed minimum flow rate
     EXPECT_NEAR(Msa, DesignMinVR, 0.001);
 
 }
