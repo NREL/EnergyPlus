@@ -86,6 +86,7 @@ public:
     // constructor for test fixture class
     SizingAnalysisObjectsTest()
     {
+        OutputFiles::getSingleton().eio.open_as_stringstream();
         // fill in test log data values
         lowLogVal = 50.0;
         midLogVal = 75.0;

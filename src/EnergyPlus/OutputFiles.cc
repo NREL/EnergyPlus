@@ -85,10 +85,6 @@ bool OutputFiles::OutputFile::good() const
 
 void OutputFiles::OutputFile::close()
 {
-    auto *ofs = dynamic_cast<std::fstream*>(os.get());
-    if (ofs) {
-        ofs->close();
-    }
     os.reset();
 }
 
@@ -107,9 +103,7 @@ std::string OutputFiles::OutputFile::get_output()
     }
 }
 
-
-OutputFiles::OutputFile::OutputFile(std::string FileName)
-  : fileName(std::move(FileName))
+OutputFiles::OutputFile::OutputFile(std::string FileName) : fileName(std::move(FileName))
 {
 }
 
@@ -128,16 +122,18 @@ std::vector<std::string> OutputFiles::OutputFile::getLines()
         while (std::getline(*os, line)) {
             lines.push_back(line);
         }
+        // after getline is done, we're at eof/fail bit
+        os->clear();
         os->seekg(last_pos);
         return lines;
     }
     return std::vector<std::string>();
 }
 
-void OutputFiles::OutputFile::open_at_end() {
-    os = std::unique_ptr<std::iostream>(new std::fstream(fileName.c_str(), std::ios_base::in |std::ios_base::out | std::ios_base::ate));
+void OutputFiles::OutputFile::open_at_end()
+{
+    os = std::unique_ptr<std::iostream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::out | std::ios_base::ate));
 }
-
 
 OutputFiles::GIOOutputFile::GIOOutputFile(int const FileID, std::string FileName)
     : fileID{FileID}, fileName{std::move(FileName)}, os{get_out_stream(FileID, FileName)}
@@ -148,7 +144,6 @@ void OutputFiles::GIOOutputFile::close()
 {
     ObjexxFCL::gio::close(fileID);
 }
-
 
 void OutputFiles::GIOOutputFile::open_at_end()
 {
@@ -169,7 +164,6 @@ OutputFiles &OutputFiles::getSingleton()
     static OutputFiles ofs{makeOutputFiles()};
     return ofs;
 }
-
 
 using arg_formatter = fmt::arg_formatter<fmt::buffer_range<char>>;
 
@@ -378,6 +372,7 @@ public:
 
 void vprint(std::ostream &os, fmt::string_view format_str, fmt::format_args args, const std::size_t count)
 {
+    assert(os.good());
     fmt::memory_buffer buffer;
     try {
         // Pass custom argument formatter as a template arg to vformat_to.
