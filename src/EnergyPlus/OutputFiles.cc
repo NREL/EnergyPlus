@@ -55,30 +55,104 @@
 
 namespace EnergyPlus {
 
-std::ostream &get_out_stream(int const FileID)
-{
-    assert(ObjexxFCL::gio::out_stream(FileID));
-    return *ObjexxFCL::gio::out_stream(FileID);
-}
-
-OutputFiles::OutputFile::OutputFile(int const FileID, std::string FileName)
-    : fileID{FileID}, fileName{std::move(FileName)}, os{get_out_stream(FileID)}
-{
-}
-
-void OutputFiles::OutputFile::close()
-{
-    ObjexxFCL::gio::close(fileID);
-}
-
-void OutputFiles::OutputFile::open_at_end()
+std::ostream &open_out_stream(int const fileID, const std::string &fileName)
 {
     IOFlags flags;
     flags.ACTION("write");
     flags.STATUS("UNKNOWN");
     flags.POSITION("APPEND");
     ObjexxFCL::gio::open(fileID, fileName, flags);
-    os = get_out_stream(fileID);
+    return *ObjexxFCL::gio::out_stream(fileID);
+}
+
+std::ostream &get_out_stream(int const FileID, const std::string &fileName)
+{
+    if (!ObjexxFCL::gio::out_stream(FileID)) {
+        return open_out_stream(FileID, fileName);
+    } else {
+        return *ObjexxFCL::gio::out_stream(FileID);
+    }
+}
+
+bool OutputFiles::OutputFile::good() const
+{
+    if (os) {
+        return os->good();
+    } else {
+        return false;
+    }
+}
+
+void OutputFiles::OutputFile::close()
+{
+    auto *ofs = dynamic_cast<std::fstream*>(os.get());
+    if (ofs) {
+        ofs->close();
+    }
+    os.reset();
+}
+
+void OutputFiles::OutputFile::open_as_stringstream()
+{
+    os = std::unique_ptr<std::iostream>(new std::stringstream());
+}
+
+std::string OutputFiles::OutputFile::get_output()
+{
+    auto *ss = dynamic_cast<std::stringstream *>(os.get());
+    if (ss) {
+        return ss->str();
+    } else {
+        return "";
+    }
+}
+
+
+OutputFiles::OutputFile::OutputFile(std::string FileName)
+  : fileName(std::move(FileName))
+{
+}
+
+void OutputFiles::OutputFile::open()
+{
+    os = std::unique_ptr<std::iostream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::out | std::ios_base::trunc));
+}
+
+std::vector<std::string> OutputFiles::OutputFile::getLines()
+{
+    if (os) {
+        os->flush();
+        const auto last_pos = os->tellg();
+        std::string line;
+        std::vector<std::string> lines;
+        while (std::getline(*os, line)) {
+            lines.push_back(line);
+        }
+        os->seekg(last_pos);
+        return lines;
+    }
+    return std::vector<std::string>();
+}
+
+void OutputFiles::OutputFile::open_at_end() {
+    os = std::unique_ptr<std::iostream>(new std::fstream(fileName.c_str(), std::ios_base::in |std::ios_base::out | std::ios_base::ate));
+}
+
+
+OutputFiles::GIOOutputFile::GIOOutputFile(int const FileID, std::string FileName)
+    : fileID{FileID}, fileName{std::move(FileName)}, os{get_out_stream(FileID, FileName)}
+{
+}
+
+void OutputFiles::GIOOutputFile::close()
+{
+    ObjexxFCL::gio::close(fileID);
+}
+
+
+void OutputFiles::GIOOutputFile::open_at_end()
+{
+    os = open_out_stream(fileID, fileName);
 }
 
 OutputFiles OutputFiles::makeOutputFiles()
@@ -86,7 +160,7 @@ OutputFiles OutputFiles::makeOutputFiles()
     return OutputFiles();
 }
 
-OutputFiles::OutputFiles() : eio{EnergyPlus::DataGlobals::OutputFileInits, EnergyPlus::DataStringGlobals::outputEioFileName}
+OutputFiles::OutputFiles()
 {
 }
 
@@ -95,6 +169,7 @@ OutputFiles &OutputFiles::getSingleton()
     static OutputFiles ofs{makeOutputFiles()};
     return ofs;
 }
+
 
 using arg_formatter = fmt::arg_formatter<fmt::buffer_range<char>>;
 
@@ -135,7 +210,6 @@ public:
         return str;
     }
 
-
     static std::string write_to_string(const Real64 value, fmt::format_specs &specs)
     {
         std::string str;
@@ -168,11 +242,19 @@ public:
     iterator operator()(Real64 const value)
     {
         if (specs()) {
-            const auto next_float = [](const Real64 value){
+            const auto next_float = [](const Real64 value) {
                 if (std::signbit(value)) {
-                    return std::nextafter(value, std::numeric_limits<decltype(value)>::lowest());
+                    if (value == -0.0) {
+                        return value;
+                    } else {
+                        return std::nextafter(value, std::numeric_limits<decltype(value)>::lowest());
+                    }
                 } else {
-                    return std::nextafter(value, std::numeric_limits<decltype(value)>::max());
+                    if (value == 0.0) {
+                        return value;
+                    } else {
+                        return std::nextafter(value, std::numeric_limits<decltype(value)>::max());
+                    }
                 }
             };
 
@@ -238,14 +320,14 @@ public:
                 const auto fixed_output = should_be_fixed_output(value);
 
                 if (fixed_output) {
-                   specs()->type = 'F';
+                    specs()->type = 'F';
 
                     if (value > 100000.0) {
                         const auto digits10 = static_cast<int>(std::log10(value));
                         // we cannot represent this value to the require precision, truncate the floating
                         // point portion
-                        if (digits10 + specs()->precision >= std::numeric_limits<decltype(value)>::max_digits10){
-                            specs()->precision=0;
+                        if (digits10 + specs()->precision >= std::numeric_limits<decltype(value)>::max_digits10) {
+                            specs()->precision = 0;
                             // add '.' to match old RoundSigDigits
                             const auto str = write_to_string(value, *specs()) + '.';
                             return write_string(str);
@@ -253,8 +335,12 @@ public:
                             return (*this)(value);
                         }
                     } else {
-                        // nudge up to next rounded value
-                        return (*this)(next_float(next_float(next_float(next_float(value)))));
+                        if (value == 0.0 || value == -0.0) {
+                            return (*this)(0.0);
+                        } else {
+                            // nudge up to next rounded value
+                            return (*this)(next_float(next_float(next_float(next_float(value)))));
+                        }
                     }
                 } else {
                     specs()->type = 'E';
@@ -271,7 +357,7 @@ public:
                     return (*this)(truncated);
                 } else {
                     specs()->type = 'E';
-                    specs()->precision+=2;
+                    specs()->precision += 2;
 
                     // write the `E` formatted float to a std::string
                     auto str = zero_pad_exponent(write_to_string(value, *specs()));

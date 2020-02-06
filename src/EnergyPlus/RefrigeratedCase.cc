@@ -12953,7 +12953,7 @@ namespace RefrigeratedCase {
 
                 for (int CoilNum = 1; CoilNum <= RefrigRack(RackNum).NumCoils; ++CoilNum) {
                     int CoilID = RefrigRack(RackNum).CoilNum(CoilNum);
-                    print(outputFiles.eio, " Air Chiller Load,{},{},{}\n", WarehouseCoil(CoilID).Name, CoilID, WarehouseCoil(CoilID).ZoneName);
+                    print(outputFiles.eio, "   Air Chiller Load,{},{},{}\n", WarehouseCoil(CoilID).Name, CoilID, WarehouseCoil(CoilID).ZoneName);
                 } // numairchillers
             }     // numracks
         }         //(NumRefrigeratedRacks > 0)
@@ -13029,7 +13029,7 @@ namespace RefrigeratedCase {
 
                 for (int CoilNum = 1; CoilNum <= System(SystemNum).NumCoils; ++CoilNum) {
                     int CoilID = System(SystemNum).CoilNum(CoilNum);
-                    print(outputFiles.eio, " Air Chiller Load,{},{},{}\n", WarehouseCoil(CoilID).Name, CoilID, WarehouseCoil(CoilID).ZoneName);
+                    print(outputFiles.eio, "   Air Chiller Load,{},{},{}\n", WarehouseCoil(CoilID).Name, CoilID, WarehouseCoil(CoilID).ZoneName);
                 } // numairchillers
 
                 for (int CascadeLoadNum = 1; CascadeLoadNum <= System(SystemNum).NumCascadeLoads; ++CascadeLoadNum) {
@@ -13382,7 +13382,7 @@ namespace RefrigeratedCase {
 
                 for (int CoilNum = 1; CoilNum <= Secondary(SecondaryID).NumCoils; ++CoilNum) {
                     int CoilID = Secondary(SecondaryID).CoilNum(CoilNum);
-                    print(outputFiles.eio, " Air Chiller Load,{},{},{}\n", WarehouseCoil(CoilID).Name, CoilID, WarehouseCoil(CoilID).ZoneName);
+                    print(outputFiles.eio, "   Air Chiller Load,{},{},{}\n", WarehouseCoil(CoilID).Name, CoilID, WarehouseCoil(CoilID).ZoneName);
                 } // numairchillers
             }     // secondary
         }         // numsimulationsecondarys
@@ -13400,7 +13400,7 @@ namespace RefrigeratedCase {
                 for (int CoilNum = 1; CoilNum <= AirChillerSet(ChillerSetNum).NumCoils; ++CoilNum) {
                     int CoilID = AirChillerSet(ChillerSetNum).CoilNum(CoilNum);
                     print(outputFiles.eio,
-                          " Refrigeration Air Chiller,{},{},{},{},{},{:.1R},{:.2R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R}\n",
+                          "   Refrigeration Air Chiller,{},{},{},{},{},{:.1R},{:.2R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R}\n",
                           CoilID,
                           WarehouseCoil(CoilID).Name,
                           WarehouseCoil(CoilID).ZoneName,

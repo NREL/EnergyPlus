@@ -147,7 +147,7 @@ TEST_F(EnergyPlusFixture, OutputReports_SurfaceDetailsReport)
     EXPECT_FALSE(foundErrors);                    // expect no errors
 
     // reset eio stream
-    compare_eio_stream("", true);
+    has_eio_output(true);
 
     DetailsForSurfaces(10); // 10 = Details Only, Surface details report
     std::string const eiooutput = delimited_string(

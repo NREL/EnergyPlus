@@ -1636,18 +1636,10 @@ namespace SimulationManager {
         ObjexxFCL::gio::write(OutputFileStandard, fmtA) << "Program Version," + VerString;
 
         // Open the Initialization Output File
-        OutputFileInits = GetNewUnitNumber();
-        {
-            IOFlags flags;
-            flags.ACTION("write");
-            flags.STATUS("UNKNOWN");
-            ObjexxFCL::gio::open(OutputFileInits, DataStringGlobals::outputEioFileName, flags);
-            write_stat = flags.ios();
+        OutputFiles::getSingleton().eio.open();
+        if (!OutputFiles::getSingleton().eio.good()) {
+            ShowFatalError("OpenOutputFiles: Could not open file " + OutputFiles::getSingleton().eio.fileName + " for output (write).");
         }
-        if (write_stat != 0) {
-            ShowFatalError("OpenOutputFiles: Could not open file " + DataStringGlobals::outputEioFileName + " for output (write).");
-        }
-        eio_stream = ObjexxFCL::gio::out_stream(OutputFileInits);
 
         print(OutputFiles::getSingleton().eio, "Program Version,{}\n", VerString);
 
@@ -1885,7 +1877,6 @@ namespace SimulationManager {
         // Close the Initialization Output File
         print(outputFiles.eio, EndOfDataFormat);
         outputFiles.eio.close();
-        eio_stream = nullptr;
 
         // Close the Meters Output File
         ObjexxFCL::gio::write(OutputFileMeters, EndOfDataFormat);

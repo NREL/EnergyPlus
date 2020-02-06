@@ -67,6 +67,7 @@
 #include <EnergyPlus/DataSurfaceColors.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -1767,7 +1768,6 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
     using namespace DataHeatBalance;
     using namespace DataSurfaces;
     using DataGlobals::NumOfZones;
-    using DataGlobals::OutputFileInits;
     using General::RoundSigDigits;
     using General::TrimSigDigits;
     using ScheduleManager::GetScheduleMaxValue;
@@ -1811,10 +1811,8 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
         return;
     }
 
-    unit = OutputFileInits;
-    if (!DataGlobals::eio_stream) return;
-    std::ostream *eiostream = DataGlobals::eio_stream;
-
+    std::stringstream ss;
+    auto *eiostream = &ss;
     //!!!    Write Header lines for report
     if (RptType == 10) {                                                                                          // Details only
         *eiostream << "! <Zone Surfaces>,Zone Name,# Surfaces" + DataStringGlobals::NL;                           // Format_700
@@ -2242,6 +2240,8 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
             }
         } // surfaces
     }     // zones
+
+    print(OutputFiles::getSingleton().eio, "{}", eiostream->str());
 }
 
 void CostInfoOut()

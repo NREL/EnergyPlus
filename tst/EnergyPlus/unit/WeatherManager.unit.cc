@@ -476,7 +476,6 @@ TEST_F(EnergyPlusFixture, WaterMainsOutputReports_CorrelationFromWeatherFileTest
     EXPECT_EQ(WeatherManager::WaterMainsTempsAnnualAvgAirTemp, 0.0);
     EXPECT_EQ(WeatherManager::WaterMainsTempsMaxDiffAirTemp, 0.0);
 
-    DataGlobals::OutputFileInits = GetNewUnitNumber();
     // set water mains temp parameters for CorrelationFromWeatherFile method
     OADryBulbAverage.AnnualAvgOADryBulbTemp = 9.99;
     OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff = 28.78;
@@ -773,16 +772,17 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
 
     // This actually doesn't end up in the EIO stream yet, it's written to a gio::out_stream
     // That's why I used SQLiteFixture instead
-    //std::string const eiooutput = delimited_string({
-        //"! <Environment:Design Day Data>, Max Dry-Bulb Temp {C}, Temp Range {dC}, Temp Range Ind Type, Hum Ind Type, Hum Ind Value at Max Temp, Pressure {Pa}, Wind Direction {deg CW from N}, Wind Speed {m/s}, Clearness, Rain, Snow",
-        //"! <Environment:Design Day Misc>,DayOfYear,ASHRAE A Coeff,ASHRAE B Coeff,ASHRAE C Coeff,Solar Constant-Annual Variation,Eq of Time {minutes}, Solar Declination Angle {deg}, Solar Model",
-        //"Environment:Design Day Data,33.00,6.60,DefaultMultipliers,Enthalpy,90500.00 {J/kg},100511,220,3.2,0.00,No,No",
-        //"Environment:Design Day Misc,202,1084.4,0.2082,0.1365,1.0,-6.23,20.6,ASHRAETau",
-    //});
+    std::string const eiooutput = delimited_string({
+        "! <Environment:Design Day Data>, Max Dry-Bulb Temp {C}, Temp Range {dC}, Temp Range Ind Type, Hum Ind Type, Hum Ind Value at Max Temp, Hum Ind Units, Pressure {Pa}, Wind Direction {deg CW from N}, Wind Speed {m/s}, Clearness, Rain, Snow",
+        "! <Environment:Design Day Misc>,DayOfYear,ASHRAE A Coeff,ASHRAE B Coeff,ASHRAE C Coeff,Solar Constant-Annual Variation,Eq of Time {minutes}, Solar Declination Angle {deg}, Solar Model",
+        "Environment:Design Day Data,33.00,6.60,DefaultMultipliers,Enthalpy,90500.00,{J/kgDryAir},100511,220,3.2,0.00,No,No",
+        "Environment:Design Day Misc,202,1084.4,0.2082,0.1365,1.0,-6.23,20.6,ASHRAETau",
+    });
 
-    //EXPECT_TRUE(compare_eio_stream(eiooutput, true));
+    EXPECT_TRUE(compare_eio_stream(eiooutput, false));
 
     OutputReportTabular::WriteEioTables(OutputFiles::getSingleton());
+
 
     // Close output files *after* the EIO has been written to
     SimulationManager::CloseOutputFiles(OutputFiles::getSingleton());

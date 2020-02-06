@@ -10689,8 +10689,12 @@ namespace WeatherManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D_string const cCalculationMethod({1, 3}, {"Schedule", "Correlation", "CorrelationFromWeatherFile"});
 
-        if (!DataGlobals::eio_stream) return;
-        std::ostream *eiostream = DataGlobals::eio_stream;
+        if (!OutputFiles::getSingleton().eio.good()) {
+            return;
+        }
+
+        std::stringstream ss;
+        auto *eiostream = &ss;
 
         // Write annual average OA temperature and maximum difference in monthly-daily average outdoor air temperature
         *eiostream << "! <Site Water Mains Temperature Information>"
@@ -10747,6 +10751,8 @@ namespace WeatherManager {
                            << "," << RoundSigDigits(10.0, 1) << DataStringGlobals::NL;
             }
         }
+
+        print(OutputFiles::getSingleton().eio, "{}", ss.str());
     }
 } // namespace WeatherManager
 

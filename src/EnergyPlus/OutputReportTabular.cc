@@ -11834,26 +11834,19 @@ namespace OutputReportTabular {
             // setting up  report header
             WriteReportHeaders("Initialization Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
 
-            // since the EIO initilization file is open at this point must close it to read it and then reopen afterward.
-            outputFiles.eio.close();
-
-            std::ifstream eioFile;
-            eioFile.open(DataStringGlobals::outputEioFileName);
             std::vector<std::string> headerLines; // holds the lines that describe each type of records - each starts with ! symbol
             std::vector<std::string> bodyLines;   // holds the data records only
-            std::string line;
-            while (std::getline(eioFile, line)) {
+            for (auto const &line : outputFiles.eio.getLines()) {
                 if (line.at(0) == '!') {
                     headerLines.push_back(line);
                 } else {
                     if (line.at(0) == ' ') {
-                        bodyLines.push_back(line.erase(0, 1)); // remove leading space
+                        bodyLines.push_back(line.substr(1)); // remove leading space
                     } else {
                         bodyLines.push_back(line);
                     }
                 }
             }
-            eioFile.close();
 
             // now go through each header and create a report for each one
             for (auto headerLine : headerLines) {
@@ -11931,9 +11924,6 @@ namespace OutputReportTabular {
                     }
                 }
             }
-
-            // reopen the EIO initialization file and position it at the end of the file so that additional writes continue to be added at the end.
-            outputFiles.eio.open_at_end();
 
             // as of Oct 2016 only the <Program Control Information:Threads/Parallel Sims> section is written after this point
         }

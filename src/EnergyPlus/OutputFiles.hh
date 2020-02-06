@@ -62,18 +62,37 @@ public:
     {
     public:
         void close();
+        bool good() const;
         void open_at_end();
+        std::string fileName;
+        void open();
+        std::vector<std::string> getLines();
+        void open_as_stringstream();
+        std::string get_output();
 
     private:
-        explicit OutputFile(int const FileID, std::string FileName);
-        int fileID;
-        std::string fileName;
-        std::reference_wrapper<std::ostream> os;
+        explicit OutputFile(std::string FileName);
+        std::unique_ptr<std::iostream> os;
         template <typename... Args> friend void print(OutputFiles::OutputFile &of, fmt::string_view format_str, const Args &... args);
         friend class OutputFiles;
     };
 
-    OutputFile eio;
+    class GIOOutputFile
+    {
+    public:
+        void close();
+        void open_at_end();
+
+    private:
+        explicit GIOOutputFile(int const FileID, std::string FileName);
+        int fileID;
+        std::string fileName;
+        std::reference_wrapper<std::ostream> os;
+        template <typename... Args> friend void print(OutputFiles::GIOOutputFile &of, fmt::string_view format_str, const Args &... args);
+        friend class OutputFiles;
+    };
+
+    OutputFile eio{"eplusout.eio"};
     static OutputFiles makeOutputFiles();
     static OutputFiles &getSingleton();
 
@@ -104,9 +123,15 @@ template <typename... Args> void print(std::ostream &os, fmt::string_view format
     EnergyPlus::vprint(os, format_str, fmt::make_format_args(args...), sizeof...(Args));
 }
 
-template <typename... Args> void print(OutputFiles::OutputFile &outputFile, fmt::string_view format_str, const Args &... args)
+template <typename... Args> void print(OutputFiles::GIOOutputFile &outputFile, fmt::string_view format_str, const Args &... args)
 {
     EnergyPlus::vprint(outputFile.os, format_str, fmt::make_format_args(args...), sizeof...(Args));
+}
+
+template <typename... Args> void print(OutputFiles::OutputFile &outputFile, fmt::string_view format_str, const Args &... args)
+{
+    assert(outputFile.os);
+    EnergyPlus::vprint(*outputFile.os, format_str, fmt::make_format_args(args...), sizeof...(Args));
 }
 
 template <typename... Args> std::string format(fmt::string_view format_str, const Args &... args)

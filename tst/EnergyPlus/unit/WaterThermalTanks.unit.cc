@@ -1036,7 +1036,6 @@ TEST_F(WaterThermalTanksFixture, HPWHSizing)
     Real64 LatLoadMet = 0;
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    DataGlobals::OutputFileInits = GetNewUnitNumber();
     DataHVACGlobals::TimeStepSys = 1;
     SetPredefinedTables();
     DataHeatBalFanSys::MAT.allocate(1);
@@ -1394,7 +1393,6 @@ TEST_F(WaterThermalTanksFixture, HPWHTestSPControl)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::OutputFileInits = GetNewUnitNumber();
     DataHVACGlobals::TimeStepSys = 1;
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
