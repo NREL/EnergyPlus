@@ -1700,7 +1700,7 @@ TEST_F(WaterThermalTanksFixture, StratifiedTankSourceTemperatures)
     HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
-    InternalHeatGains::GetInternalHeatGainsInput();
+    InternalHeatGains::GetInternalHeatGainsInput(OutputFiles::getSingleton());
 
     DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
@@ -1822,7 +1822,7 @@ TEST_F(WaterThermalTanksFixture, MixedTankTimeNeededCalc)
     HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
-    InternalHeatGains::GetInternalHeatGainsInput();
+    InternalHeatGains::GetInternalHeatGainsInput(OutputFiles::getSingleton());
     EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput());
 
     int TankNum(1);
@@ -1940,7 +1940,7 @@ TEST_F(WaterThermalTanksFixture, StratifiedTankCalc)
     HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
-    InternalHeatGains::GetInternalHeatGainsInput();
+    InternalHeatGains::GetInternalHeatGainsInput(OutputFiles::getSingleton());
     EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput());
 
     HourOfDay = 0;
@@ -2142,7 +2142,7 @@ TEST_F(WaterThermalTanksFixture, StratifiedTankSourceFlowRateCalc)
     HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
 
-    InternalHeatGains::GetInternalHeatGainsInput();
+    InternalHeatGains::GetInternalHeatGainsInput(OutputFiles::getSingleton());
 
     EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput());
     const int TankNum = 1;
