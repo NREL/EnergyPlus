@@ -9,6 +9,13 @@ configure_file( DataStringGlobals.in.cc "${CMAKE_CURRENT_BINARY_DIR}/DataStringG
 configure_file( ConfiguredFunctions.in.cc "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.cc" )
 file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc" "Will be filled in later by GenerateEmbeddedEpJSONSchema" )
 
+option( LINK_WITH_PYTHON "Build package" OFF )
+if (LINK_WITH_PYTHON)
+  add_definitions("-DLINK_WITH_PYTHON=1")
+else()
+  add_definitions("-DLINK_WITH_PYTHON=0")
+endif()
+
 SET( SRC
   "${CMAKE_SOURCE_DIR}/third_party/milo/dtoa.h"
   "${CMAKE_SOURCE_DIR}/third_party/milo/itoa.h"
@@ -669,46 +676,49 @@ add_custom_target( GenerateEmbeddedEpJSONSchema
 
 add_subdirectory(AirflowNetwork)
 
-# check the python bit version here...if we are building against Python it has to match up bitwise
-# if we aren't, then the identified interpreter can be whatever bit it wants
-execute_process(COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/cmake/PythonGetBitSize.py" OUTPUT_VARIABLE PYTHON_BIT_SIZE)
-if (MSVC)
+if(LINK_WITH_PYTHON)
+  # check the python bit version here...if we are building against Python it has to match up bitwise
+  # if we aren't, then the identified interpreter can be whatever bit it wants
   execute_process(COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/cmake/PythonGetBitSize.py" OUTPUT_VARIABLE PYTHON_BIT_SIZE)
-  if(("${PYTHON_BIT_SIZE}" STREQUAL "64") AND NOT ("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "Win64"))
-    message(SEND_ERROR "Found 64-bit Python but attempting to generate 32-bit EnergyPlus; this is invalid")
+  if (MSVC)
+    execute_process(COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/cmake/PythonGetBitSize.py" OUTPUT_VARIABLE PYTHON_BIT_SIZE)
+    if(("${PYTHON_BIT_SIZE}" STREQUAL "64") AND NOT ("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "Win64"))
+      message(SEND_ERROR "Found 64-bit Python but attempting to generate 32-bit EnergyPlus; this is invalid")
+    endif()
+    if(("${PYTHON_BIT_SIZE}" STREQUAL "32") AND ("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "Win64"))
+      message(SEND_ERROR "Found 32-bit Python but attempting to generate 64-bit EnergyPlus; this is invalid")
+    endif()
   endif()
-  if(("${PYTHON_BIT_SIZE}" STREQUAL "32") AND ("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "Win64"))
-    message(SEND_ERROR "Found 32-bit Python but attempting to generate 64-bit EnergyPlus; this is invalid")
-  endif()
-endif()
 
-# now we need to get the Python libs, and also copy in the standard library, we set up a script for doing this, and it is called from out here
-# so that we can easily manage the MSVC build type paths from the other generators
-find_package(PythonLibs 3 REQUIRED)
-include_directories("${PYTHON_INCLUDE_DIRS}")
-if (MSVC)
-  # for now copy it into the debug and release folders both
-  execute_process(COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/cmake/PythonCopyStandardLib.py" "${CMAKE_BINARY_DIR}/Products/Debug/python_standard_lib" RESULT_VARIABLE CPRESULT)
-  execute_process(COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/cmake/PythonCopyStandardLib.py" "${CMAKE_BINARY_DIR}/Products/Release/python_standard_lib" RESULT_VARIABLE CPRESULT)
-else()
-  # assuming a single-products dir, like regular makefile type
-  execute_process(COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/cmake/PythonCopyStandardLib.py" "${CMAKE_BINARY_DIR}/Products/python_standard_lib" RESULT_VARIABLE CPRESULT)
+  # now we need to get the Python libs, and also copy in the standard library, we set up a script for doing this, and it is called from out here
+  # so that we can easily manage the MSVC build type paths from the other generators
+  find_package(PythonLibs 3 REQUIRED)
+  include_directories("${PYTHON_INCLUDE_DIRS}")
+  if (MSVC)
+    # for now copy it into the debug and release folders both
+    execute_process(COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/cmake/PythonCopyStandardLib.py" "${CMAKE_BINARY_DIR}/Products/Debug/python_standard_lib" RESULT_VARIABLE CPRESULT)
+    execute_process(COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/cmake/PythonCopyStandardLib.py" "${CMAKE_BINARY_DIR}/Products/Release/python_standard_lib" RESULT_VARIABLE CPRESULT)
+  else()
+    # assuming a single-products dir, like regular makefile type
+    execute_process(COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/cmake/PythonCopyStandardLib.py" "${CMAKE_BINARY_DIR}/Products/python_standard_lib" RESULT_VARIABLE CPRESULT)
+  endif()
+  # TODO: Check CPRESULT value
+
 endif()
-# TODO: Check CPRESULT value
 
 add_custom_target(
-        pythonapi
-        ALL
-        COMMAND ${CMAKE_COMMAND}
-        -DREPO_ROOT="${CMAKE_SOURCE_DIR}"
-        -DBUILD_DIR="${CMAKE_BINARY_DIR}"
-        -DCMAKE_VERSION_MAJOR="${CMAKE_VERSION_MAJOR}"
-        -DCMAKE_VERSION_MINOR="${CMAKE_VERSION_MINOR}"
-        -DCMAKE_VERSION_PATCH="${CMAKE_VERSION_PATCH}"
-        -DCMAKE_VERSION_BUILD="${CMAKE_VERSION_BUILD}"
-        -DPYTHON_API_VERSION_MAJOR="${PYTHON_API_VERSION_MAJOR}"
-        -DPYTHON_API_VERSION_MINOR="${PYTHON_API_VERSION_MINOR}"
-        -P "${CMAKE_SOURCE_DIR}/cmake/SetPythonAPI.cmake"
+  pythonapi
+  ALL
+  COMMAND ${CMAKE_COMMAND}
+  -DREPO_ROOT="${CMAKE_SOURCE_DIR}"
+  -DBUILD_DIR="${CMAKE_BINARY_DIR}"
+  -DCMAKE_VERSION_MAJOR="${CMAKE_VERSION_MAJOR}"
+  -DCMAKE_VERSION_MINOR="${CMAKE_VERSION_MINOR}"
+  -DCMAKE_VERSION_PATCH="${CMAKE_VERSION_PATCH}"
+  -DCMAKE_VERSION_BUILD="${CMAKE_VERSION_BUILD}"
+  -DPYTHON_API_VERSION_MAJOR="${PYTHON_API_VERSION_MAJOR}"
+  -DPYTHON_API_VERSION_MINOR="${PYTHON_API_VERSION_MINOR}"
+  -P "${CMAKE_SOURCE_DIR}/cmake/SetPythonAPI.cmake"
 )
 
 add_library( energyplusparser STATIC ${INPUTPARSING_SRC} )
@@ -724,7 +734,7 @@ endif()
 # first we will create a static library of EnergyPlus
 # this will be linked statically to create the DLL and also the unit tests
 add_library( energypluslib STATIC ${SRC} )
-target_link_libraries( energypluslib fmt::fmt objexx sqlite bcvtb epexpat epfmiimport re2 DElight libkiva btwxt Windows-CalcEngine airflownetworklib ${PYTHON_LIBRARIES})
+target_link_libraries( energypluslib fmt::fmt objexx sqlite bcvtb epexpat epfmiimport re2 DElight libkiva btwxt Windows-CalcEngine airflownetworklib )
 add_dependencies( energypluslib GenerateEmbeddedEpJSONSchema)
 if(BUILD_GROUND_PLOT)
   set_source_files_properties(HeatBalanceKivaManager.cc PROPERTIES COMPILE_DEFINITIONS GROUND_PLOT)
@@ -735,6 +745,9 @@ if(UNIX AND NOT APPLE)
 endif()
 if (WIN32)
   target_link_libraries( energypluslib Shlwapi )
+endif()
+if(LINK_WITH_PYTHON)
+  target_link_libraries( energypluslib ${PYTHON_LIBRARIES} )
 endif()
 
 # second we will create the shared library that is actually packaged with EnergyPlus
@@ -778,21 +791,25 @@ target_link_libraries( energyplus energyplusapi )
 set_target_properties(energyplus PROPERTIES VERSION ${ENERGYPLUS_VERSION})
 set_target_properties(energyplusapi PROPERTIES VERSION ${ENERGYPLUS_VERSION})
 
-get_filename_component(RESOLVED_PYTHON_LIBRARY "${PYTHON_LIBRARIES}" REALPATH)
-get_filename_component(PYTHON_LIB_FILENAME "${RESOLVED_PYTHON_LIBRARY}" NAME)
-add_custom_command(
-  TARGET energyplus POST_BUILD
-  COMMAND ${CMAKE_COMMAND}
-        -DRESOLVED_PYTHON_LIB=${RESOLVED_PYTHON_LIBRARY}
-        -DEXECUTABLE_PATH=$<TARGET_FILE:energyplus>
-        -DPYTHON_LIB_FILENAME=${PYTHON_LIB_FILENAME}
-        -P ${CMAKE_SOURCE_DIR}/cmake/SetupPython.cmake
-)
+if(LINK_WITH_PYTHON)
+  get_filename_component(RESOLVED_PYTHON_LIBRARY "${PYTHON_LIBRARIES}" REALPATH)
+  get_filename_component(PYTHON_LIB_FILENAME "${RESOLVED_PYTHON_LIBRARY}" NAME)
+  add_custom_command(
+    TARGET energyplus POST_BUILD
+    COMMAND ${CMAKE_COMMAND}
+          -DRESOLVED_PYTHON_LIB=${RESOLVED_PYTHON_LIBRARY}
+          -DEXECUTABLE_PATH=$<TARGET_FILE:energyplus>
+          -DPYTHON_LIB_FILENAME=${PYTHON_LIB_FILENAME}
+          -P ${CMAKE_SOURCE_DIR}/cmake/SetupPython.cmake
+  )
+endif()
 
 if (BUILD_PACKAGE)
-  install(FILES "${RESOLVED_PYTHON_LIBRARY}" DESTINATION "./")
-  install(DIRECTORY "${CMAKE_BINARY_DIR}/Products/python_standard_lib/"
-          DESTINATION "./python_standard_lib")
+  if(LINK_WITH_PYTHON)
+    install(FILES "${RESOLVED_PYTHON_LIBRARY}" DESTINATION "./")
+    install(DIRECTORY "${CMAKE_BINARY_DIR}/Products/python_standard_lib/"
+            DESTINATION "./python_standard_lib")
+  endif()
   install(DIRECTORY "${CMAKE_BINARY_DIR}/Products/pyenergyplus/"
           DESTINATION "./pyenergyplus")
 endif()

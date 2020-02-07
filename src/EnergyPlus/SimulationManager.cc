@@ -473,7 +473,7 @@ namespace SimulationManager {
         if (EnergyPlus::PluginManagement::pluginManager) {
             EnergyPlus::PluginManagement::pluginManager->setupOutputVariables();
         }
-        
+
         GetInputForLifeCycleCost(); // must be prior to WriteTabularReports -- do here before big simulation stuff.
 
         // check for variable latitude/location/etc

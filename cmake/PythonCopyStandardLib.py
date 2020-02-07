@@ -6,7 +6,6 @@
 # this script must be called with a target directory to copy this into
 import ctypes
 import os
-import pathlib
 import shutil
 import sys
 

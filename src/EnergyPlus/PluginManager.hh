@@ -54,6 +54,7 @@
 #include <vector>
 #include <EnergyPlus/EnergyPlus.hh>
 
+#if LINK_WITH_PYTHON
 #ifdef _DEBUG
 // We don't want to try to import a debug build of Python here
 // so if we are building a Debug build of the C++ code, we need
@@ -64,6 +65,7 @@
   #define _DEBUG
 #else
 #include <Python.h>
+#endif
 #endif
 
 namespace EnergyPlus {
@@ -91,8 +93,10 @@ namespace PluginManagement {
         std::string emsAlias;
         bool runDuringWarmup;
         std::string stringIdentifier; // for diagnostic reporting
+#if LINK_WITH_PYTHON
         PyObject *pModule = nullptr;  // reference to module
         PyObject *pClassInstance = nullptr; // reference to instantiated class -- *don't decref until the end of the simulation*
+#endif
 
         // setup/shutdown should only be called once construction is completely done, i.e., setup() should only be called once the vector holding all the
         // instances is done for the day, and shutdown should only be called when you are ready to destruct all the instances.  The things that happen
@@ -146,7 +150,9 @@ namespace PluginManagement {
     public:
         PluginManager();
         ~PluginManager() {
+#if LINK_WITH_PYTHON
             Py_FinalizeEx();
+#endif
         }
         static void addToPythonPath(const std::string& path, bool userDefinedPath);
         static std::string sanitizedPath(std::string path); // intentionally not a const& string

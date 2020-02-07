@@ -55,6 +55,7 @@
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
+#if LINK_WITH_PYTHON == 1
 #ifdef _DEBUG
 // We don't want to try to import a debug build of Python here
 // so if we are building a Debug build of the C++ code, we need
@@ -65,6 +66,7 @@
 #define _DEBUG
 #else
 #include <Python.h>
+#endif
 #endif
 
 namespace EnergyPlus {
@@ -92,15 +94,18 @@ namespace PluginManagement {
             cb();
             anyRan = true;
         }
+#if LINK_WITH_PYTHON == 1
         for (auto &plugin : plugins) {
             if (plugin.runDuringWarmup || !DataGlobals::WarmupFlag) {
                 plugin.run(iCalledFrom);
                 anyRan = true;
             }
         }
+#endif
     }
 
     void PluginManager::setupOutputVariables() {
+#if LINK_WITH_PYTHON == 1
         // with the PythonPlugin:Variables all set in memory, we can now set them up as outputs as needed
         std::string const sOutputVariable = "PythonPlugin:OutputVariable";
         int outputVarInstances = inputProcessor->getNumObjectsFound(sOutputVariable);
@@ -362,27 +367,31 @@ namespace PluginManagement {
                 }
             }
         }
+#endif
     }
 
     void clear_state()
     {
         callbacks.clear();
+#if LINK_WITH_PYTHON == 1
         for (auto & plugin: plugins) {
             plugin.shutdown(); // clear unmanaged memory first
         }
         plugins.clear();
         pluginManager.reset(); // delete the current plugin manager instance, which was created in simulation manager, this clean up Python
         PluginManagement::fullyReady = false;
+#endif
     }
 
     PluginManager::PluginManager()
     {
+#if LINK_WITH_PYTHON == 1
         // we'll need the program directory for a few things so get it once here at the top and sanitize it
         std::string programPath = FileSystem::getProgramPath();
         std::string programDir = FileSystem::getParentDirectoryPath(programPath);
         std::string sanitizedProgramDir = PluginManager::sanitizedPath(programDir);
 
-        // we need to set the python path before initializing the library -- I THINK
+        // I think we need to set the python path before initializing the library
         // make this relative to the binary
         std::string pathToPythonPackages = sanitizedProgramDir + "/python_standard_lib";
         FileSystem::makeNativePath(pathToPythonPackages);
@@ -555,11 +564,14 @@ namespace PluginManagement {
         }
 
         // setting up output variables deferred until later in the simulation setup process
-
+#else
+        EnergyPlus::ShowWarningMessage("EnergyPlus was not built with Python Plugins Enabled, PythonPlugin:* objects are ignored");
+#endif
     }
 
     std::string PluginManager::sanitizedPath(std::string path)
     {
+#if LINK_WITH_PYTHON == 1
         // there are parts of this program that need to write out a string to execute in Python
         // because of that, escaped backslashes actually need double escaping
         // plus, the string cannot end with a backslash
@@ -581,9 +593,11 @@ namespace PluginManagement {
             }
         }
         return sanitizedDir;
+#endif
     }
 
     void PluginInstance::reportPythonError() {
+#if LINK_WITH_PYTHON == 1
         PyObject *exc_type = nullptr, *exc_value = nullptr, *exc_tb = nullptr;
         PyErr_Fetch(&exc_type, &exc_value, &exc_tb);
         PyObject* str_exc_value = PyObject_Repr(exc_value); //Now a unicode object
@@ -591,10 +605,12 @@ namespace PluginManagement {
         char *strExcValue =  PyBytes_AS_STRING(pyStr2); // NOLINT(hicpp-signed-bitwise)
         EnergyPlus::ShowContinueError("Python error description follows: ");
         EnergyPlus::ShowContinueError(strExcValue);
+#endif
     }
 
     void PluginInstance::setup()
     {
+#if LINK_WITH_PYTHON == 1
         // this first section is really all about just ultimately getting a full Python class instance
         // this answer helped with a few things: https://ru.stackoverflow.com/a/785927
 
@@ -753,15 +769,19 @@ namespace PluginManagement {
         }
         // PyList_Size returns a borrowed reference, do not decrement
         Py_DECREF(pFunctionResponse); // PyObject_CallFunction returns new reference, decrement
+#endif
     }
 
     void PluginInstance::shutdown() {
+#if LINK_WITH_PYTHON == 1
         Py_DECREF(this->pClassInstance);
         Py_DECREF(this->pModule); // PyImport_Import returns a new reference, decrement it
+#endif
     }
 
     void PluginInstance::run(int iCalledFrom)
     {
+#if LINK_WITH_PYTHON == 1
         const char *functionName = nullptr;
         if (iCalledFrom == DataGlobals::emsCallFromBeginNewEvironment) {
             if (this->bHasBeginNewEnvironment) {
@@ -863,10 +883,12 @@ namespace PluginManagement {
                                        ", make sure it returns an integer exit code, either zero (success) or one (failure)");
         }
         Py_DECREF(pFunctionResponse); // PyObject_CallFunction returns new reference, decrement
+#endif
     }
 
     void PluginManager::addToPythonPath(const std::string &path, bool userDefinedPath)
     {
+#if LINK_WITH_PYTHON == 1
         std::string command = "sys.path.insert(0, \"" + path + "\")";
         if (PyRun_SimpleString(command.c_str()) == 0) {
             if (userDefinedPath) {
@@ -876,15 +898,19 @@ namespace PluginManagement {
         } else {
             EnergyPlus::ShowFatalError("ERROR adding \"" + path + "\" to the sys.path in Python");
         }
+#endif
     }
 
     void PluginManager::addGlobalVariable(const std::string &name) {
+#if LINK_WITH_PYTHON == 1
         std::string const varNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(name);
         PluginManagement::globalVariableNames.push_back(varNameUC);
         PluginManagement::globalVariableValues.push_back(Real64());
+#endif
     }
 
     int PluginManager::getGlobalVariableHandle(const std::string& name, bool const suppress_warning) { // note zero is a valid handle
+#if LINK_WITH_PYTHON == 1
         std::string const varNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(name);
         auto const it = std::find(PluginManagement::globalVariableNames.begin(), PluginManagement::globalVariableNames.end(), varNameUC);
         if (it != PluginManagement::globalVariableNames.end()) {
@@ -902,9 +928,11 @@ namespace PluginManagement {
                 return -1; // hush the compiler warning
             }
         }
+#endif
     }
 
     int PluginManager::getTrendVariableHandle(const std::string& name) {
+#if LINK_WITH_PYTHON == 1
         std::string const varNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(name);
         for (size_t i = 0; i < trends.size(); i++) {
             auto & thisTrend = trends[i];
@@ -913,25 +941,33 @@ namespace PluginManagement {
             }
         }
         return -1;
+#endif
     }
 
     Real64 PluginManager::getTrendVariableValue(int handle, int timeIndex) {
+#if LINK_WITH_PYTHON == 1
         return trends[handle].values[timeIndex];
+#endif
     }
 
     size_t PluginManager::getTrendVariableHistorySize(int handle) {
+#if LINK_WITH_PYTHON == 1
         return trends[handle].values.size();
+#endif
     }
 
     void PluginManager::updatePluginValues() {
+#if LINK_WITH_PYTHON == 1
         for (auto & trend : trends) {
             Real64 newVarValue = this->getGlobalVariableValue(trend.indexOfPluginVariable);
             trend.values.push_front(newVarValue);
             trend.values.pop_back();
         }
+#endif
     }
 
     Real64 PluginManager::getGlobalVariableValue(int handle) {
+#if LINK_WITH_PYTHON == 1
         if (PluginManagement::globalVariableValues.empty()) {
             EnergyPlus::ShowFatalError("Tried to access plugin global variable but it looks like there aren't any; use the PythonPlugin:GlobalVariables object to declare them.");
         }
@@ -942,10 +978,12 @@ namespace PluginManagement {
             EnergyPlus::ShowContinueError("Available handles range from 0 to " + std::to_string(PluginManagement::globalVariableValues.size()-1));
             EnergyPlus::ShowFatalError("Plugin global variable problem causes program termination");
         }
-        return 0;
+        return 0.0;
+#endif
     }
 
     void PluginManager::setGlobalVariableValue(int handle, Real64 value) {
+#if LINK_WITH_PYTHON == 1
         if (PluginManagement::globalVariableValues.empty()) {
             EnergyPlus::ShowFatalError("Tried to set plugin global variable but it looks like there aren't any; use the PythonPlugin:GlobalVariables object to declare them.");
         }
@@ -956,9 +994,11 @@ namespace PluginManagement {
             EnergyPlus::ShowContinueError("Available handles range from 0 to " + std::to_string(PluginManagement::globalVariableValues.size()-1));
             EnergyPlus::ShowFatalError("Plugin global variable problem causes program termination");
         }
+#endif
     }
 
     int PluginManager::getLocationOfUserDefinedPlugin(std::string const &programName) {
+#if LINK_WITH_PYTHON == 1
         for (size_t handle = 0; handle < plugins.size(); handle++) {
             auto const thisPlugin = plugins[handle];
             if (EnergyPlus::UtilityRoutines::MakeUPPERCase(thisPlugin.emsAlias) == EnergyPlus::UtilityRoutines::MakeUPPERCase(programName)) {
@@ -966,10 +1006,13 @@ namespace PluginManagement {
             }
         }
         return -1;
+#endif
     }
 
     void PluginManager::runSingleUserDefinedPlugin(int index) {
+#if LINK_WITH_PYTHON == 1
         plugins[index].run(DataGlobals::emsCallFromUserDefinedComponentModel);
+#endif
     }
 
 } // namespace PluginManagement

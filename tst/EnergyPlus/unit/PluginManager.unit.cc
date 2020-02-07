@@ -59,8 +59,8 @@ TEST_F(EnergyPlusFixture, TestTrendVariable)
     EnergyPlus::PluginManagement::PluginManager pluginManager;
 
     // first create a plugin variable
-    pluginManager.addGlobalVariable("my_var");
-    int globalVarIndex = pluginManager.getGlobalVariableHandle("my_var", true);
+    EnergyPlus::PluginManagement::PluginManager::addGlobalVariable("my_var");
+    int globalVarIndex = EnergyPlus::PluginManagement::PluginManager::getGlobalVariableHandle("my_var", true);
     EXPECT_EQ(0, globalVarIndex);
 
     // now create a trend variable to track it
@@ -78,7 +78,7 @@ TEST_F(EnergyPlusFixture, TestTrendVariable)
     // now pretend to run through a few simulation time steps, setting the value a few times and updating the trend
     std::vector<Real64> fakeValues = {3.14, 2.78, 12.0};
     for (int i = 0; i < 3; i++) {
-        pluginManager.setGlobalVariableValue(globalVarIndex, fakeValues[i]);
+        EnergyPlus::PluginManagement::PluginManager::setGlobalVariableValue(globalVarIndex, fakeValues[i]);
         pluginManager.updatePluginValues();
     }
 
