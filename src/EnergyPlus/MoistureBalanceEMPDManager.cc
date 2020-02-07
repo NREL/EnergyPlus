@@ -460,7 +460,7 @@ namespace MoistureBalanceEMPDManager {
 
         // Using/Aliasing
         using DataMoistureBalanceEMPD::Lam;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyPsatFnTemp;
         using Psychrometrics::PsyRhFnTdbRhov;
         using Psychrometrics::PsyRhFnTdbRhovLBnd0C;
