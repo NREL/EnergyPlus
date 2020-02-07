@@ -9,48 +9,6 @@ configure_file( DataStringGlobals.in.cc "${CMAKE_CURRENT_BINARY_DIR}/DataStringG
 configure_file( ConfiguredFunctions.in.cc "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.cc" )
 file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc" "Will be filled in later by GenerateEmbeddedEpJSONSchema" )
 
-find_package(PythonLibs 3 REQUIRED)
-include_directories("${PYTHON_INCLUDE_DIRS}")
-
-# now we need to find the path to the standard library
-# an easy way is to find the __init__ file for a known standard lib package and go two parents up
-#import os
-#import ctypes
-#package_init_file = os.path.abspath(ctypes.__file__)
-#package_dir = os.path.dirname(package_init_file)
-#standard_lib_dir = os.path.dirname(package_dir)
-#print(standard_lib_dir)
-#/usr/lib/python3.7/
-# or shortened:
-# python3 -c 'import os; import ctypes; print(os.path.dirname(os.path.dirname(os.path.abspath(ctypes.__file__))))'
-execute_process(COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/cmake/GetStandardLib.py" OUTPUT_VARIABLE STANDARD_LIB_PATH_RAW)
-string(STRIP ${STANDARD_LIB_PATH_RAW} STANDARD_LIB_PATH)
-
-if (MSVC)
-  # copy things into both the debug and release folders for convenience, first debug
-  if (NOT EXISTS "${CMAKE_BINARY_DIR}/Products/Debug")
-    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/Products/Debug")
-  endif()
-  if (NOT EXISTS "${CMAKE_BINARY_DIR}/Products/Debug/pyenergyplus")
-    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/Products/Debug/pyenergyplus")
-  endif()
-  file(COPY "${STANDARD_LIB_PATH}" DESTINATION "${CMAKE_BINARY_DIR}/Products/Debug/pypackages")
-  # then release
-  if (NOT EXISTS "${CMAKE_BINARY_DIR}/Products/Release")
-    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/Products/Release")
-  endif()
-  if (NOT EXISTS "${CMAKE_BINARY_DIR}/Products/Release/pyenergyplus")
-    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/Products/Release/pyenergyplus")
-  endif()
-  file(COPY "${STANDARD_LIB_PATH}" DESTINATION "${CMAKE_BINARY_DIR}/Products/Release/pypackages")
-else()
-  # assuming a single-products dir, like regular makefile type
-  if (NOT EXISTS "${CMAKE_BINARY_DIR}/Products/pyenergyplus")
-    file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/Products/pyenergyplus")
-  endif()
-  file(COPY "${STANDARD_LIB_PATH}" DESTINATION "${CMAKE_BINARY_DIR}/Products/pypackages")
-endif()
-
 SET( SRC
   "${CMAKE_SOURCE_DIR}/third_party/milo/dtoa.h"
   "${CMAKE_SOURCE_DIR}/third_party/milo/itoa.h"
@@ -711,6 +669,33 @@ add_custom_target( GenerateEmbeddedEpJSONSchema
 
 add_subdirectory(AirflowNetwork)
 
+# check the python bit version here...if we are building against Python it has to match up bitwise
+# if we aren't, then the identified interpreter can be whatever bit it wants
+execute_process(COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/cmake/PythonGetBitSize.py" OUTPUT_VARIABLE PYTHON_BIT_SIZE)
+if (MSVC)
+  execute_process(COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/cmake/PythonGetBitSize.py" OUTPUT_VARIABLE PYTHON_BIT_SIZE)
+  if(("${PYTHON_BIT_SIZE}" STREQUAL "64") AND NOT ("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "Win64"))
+    message(SEND_ERROR "Found 64-bit Python but attempting to generate 32-bit EnergyPlus; this is invalid")
+  endif()
+  if(("${PYTHON_BIT_SIZE}" STREQUAL "32") AND ("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "Win64"))
+    message(SEND_ERROR "Found 32-bit Python but attempting to generate 64-bit EnergyPlus; this is invalid")
+  endif()
+endif()
+
+# now we need to get the Python libs, and also copy in the standard library, we set up a script for doing this, and it is called from out here
+# so that we can easily manage the MSVC build type paths from the other generators
+find_package(PythonLibs 3 REQUIRED)
+include_directories("${PYTHON_INCLUDE_DIRS}")
+if (MSVC)
+  # for now copy it into the debug and release folders both
+  execute_process(COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/cmake/PythonCopyStandardLib.py" "${CMAKE_BINARY_DIR}/Products/Debug/python_standard_lib" RESULT_VARIABLE CPRESULT)
+  execute_process(COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/cmake/PythonCopyStandardLib.py" "${CMAKE_BINARY_DIR}/Products/Release/python_standard_lib" RESULT_VARIABLE CPRESULT)
+else()
+  # assuming a single-products dir, like regular makefile type
+  execute_process(COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/cmake/PythonCopyStandardLib.py" "${CMAKE_BINARY_DIR}/Products/python_standard_lib" RESULT_VARIABLE CPRESULT)
+endif()
+# TODO: Check CPRESULT value
+
 add_custom_target(
         pythonapi
         ALL
@@ -806,9 +791,9 @@ add_custom_command(
 
 if (BUILD_PACKAGE)
   install(FILES "${RESOLVED_PYTHON_LIBRARY}" DESTINATION "./")
-  install(DIRECTORY "${CMAKE_BINARY_DIR}/Products/pypackages/"
-          DESTINATION "./pypackages")
-  install(DIRECTORY "${CMAKE_BINARY_DIR}/Products/pyenergyplus/" # TODO: Platform independent
+  install(DIRECTORY "${CMAKE_BINARY_DIR}/Products/python_standard_lib/"
+          DESTINATION "./python_standard_lib")
+  install(DIRECTORY "${CMAKE_BINARY_DIR}/Products/pyenergyplus/"
           DESTINATION "./pyenergyplus")
 endif()
 

@@ -384,7 +384,8 @@ namespace PluginManagement {
 
         // we need to set the python path before initializing the library -- I THINK
         // make this relative to the binary
-        std::string pathToPythonPackages = sanitizedProgramDir + "/pypackages/python3.7"; // TODO: platform independent
+        std::string pathToPythonPackages = sanitizedProgramDir + "/python_standard_lib";
+        FileSystem::makeNativePath(pathToPythonPackages);
         auto a = Py_DecodeLocale(pathToPythonPackages.c_str(), nullptr);
         Py_SetPath(a);
 
@@ -396,7 +397,8 @@ namespace PluginManagement {
         PyRun_SimpleString("import sys"); // allows us to report sys.path later
 
         // we also need to set an extra import path to find some dynamic library loading stuff, again make it relative to the binary
-        std::string pathToDynLoad = sanitizedProgramDir + "/pypackages/python3.7/lib-dynload"; // TODO: platform independent
+        std::string pathToDynLoad = sanitizedProgramDir + "/python_standard_lib/lib-dynload";
+        FileSystem::makeNativePath(pathToDynLoad);
         std::string libDirDynLoad = PluginManager::sanitizedPath(pathToDynLoad);
         PluginManager::addToPythonPath(libDirDynLoad, false);
 
