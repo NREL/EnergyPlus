@@ -146,10 +146,13 @@ TEST_F(EnergyPlusFixture, OutputFiles_Expected_Formatting_Tests)
 
     EXPECT_EQ(format("{:.2R}", -0.0), "0.00");
 
+
+
     // kept in the code for the sake of documentation
     // code is expected to not round up with the old version, but clearly it should
     // EXPECT_EQ(format("{:.3R}", 6.41750000000000013576E-005), "6.417E-005");
-
+    // this code should round up as well to match behavior of others
+    // EXPECT_EQ(format("{:.5R}", 0.059576949999999996577), "5.95769E-002");
 
     // N formatting simulates the 'G' from Fortran
     // Always has a leading 0 if printing in fixed notation

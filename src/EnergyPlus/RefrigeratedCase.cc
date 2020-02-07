@@ -13035,7 +13035,7 @@ namespace RefrigeratedCase {
                 for (int CascadeLoadNum = 1; CascadeLoadNum <= System(SystemNum).NumCascadeLoads; ++CascadeLoadNum) {
                     int CascadeLoadID = System(SystemNum).CascadeLoadNum(CascadeLoadNum);
                     print(outputFiles.eio,
-                          " Cascade Load,{},{},{}\n",
+                          "   Cascade Load,{},{},{}\n",
                           System(Condenser(CascadeLoadID).CascadeSysID).Name,
                           CascadeLoadID,
                           Condenser(CascadeLoadID).Name);
@@ -13049,7 +13049,7 @@ namespace RefrigeratedCase {
                 for (int SubcoolerNum = 1; SubcoolerNum <= NumSimulationSubcoolers; ++SubcoolerNum) {
                     if (Subcooler(SubcoolerNum).MechSourceSysID != SystemNum) continue;
                     print(
-                        outputFiles.eio, " Mechanical Subcooler Load, {},{}\n", General::RoundSigDigits(SubcoolerNum), Subcooler(SubcoolerNum).Name);
+                        outputFiles.eio, "   Mechanical Subcooler Load, {},{}\n", General::RoundSigDigits(SubcoolerNum), Subcooler(SubcoolerNum).Name);
                 } // Num sim subcoolers, looking only for NumSMech Subcoolers served by this system
 
                 if (System(SystemNum).NumStages == 1) { // Single-stage compression system
@@ -13092,7 +13092,7 @@ namespace RefrigeratedCase {
                               Condenser(CondID).RatedFanPower);
                     } else if (SELECT_CASE_var == DataHeatBalance::RefrigCondenserTypeEvap) {
                         print(outputFiles.eio,
-                              "   Refrigeration Condenser:Evaporative-Cooled,{},{},{:.1R},{:.1R}",
+                              "   Refrigeration Condenser:Evaporative-Cooled,{},{},{:.1R},{:.1R}\n",
                               CondID,
                               Condenser(CondID).Name,
                               Condenser(CondID).RatedCapacity,
@@ -13154,7 +13154,7 @@ namespace RefrigeratedCase {
         }     //(NumRefrigSystems > 0)
 
         if (NumTransRefrigSystems > 0) {
-            print(outputFiles.eio, "#Detailed Transcritical Refrigeration Systems,", NumTransRefrigSystems);
+            print(outputFiles.eio, "#Detailed Transcritical Refrigeration Systems,{}\n", NumTransRefrigSystems);
             for (int TransSystemNum = 1; TransSystemNum <= NumTransRefrigSystems; ++TransSystemNum) {
                 print(outputFiles.eio,
                       " Detailed Transcritical Refrigeration System,{},{},{},{},{},{},{},{},{:.1R}\n",
@@ -13172,7 +13172,7 @@ namespace RefrigeratedCase {
                     int CaseID = TransSystem(TransSystemNum).CaseNumMT(CaseNum);
                     if (RefrigCase(CaseID).ZoneNodeNum > 0) {
                         print(outputFiles.eio,
-                              " Medium Temperature Refrigeration Case,{},{},{},{},{},{:.1R},{:.2R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R}\n",
+                              "   Medium Temperature Refrigeration Case,{},{},{},{},{},{:.1R},{:.2R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R}\n",
                               CaseID,
                               RefrigCase(CaseID).Name,
                               RefrigCase(CaseID).ZoneName,
@@ -13192,7 +13192,7 @@ namespace RefrigeratedCase {
                     int CaseID = TransSystem(TransSystemNum).CaseNumLT(CaseNum);
                     if (RefrigCase(CaseID).ZoneNodeNum > 0) {
                         print(outputFiles.eio,
-                              " Low Temperature Refrigeration Case,{},{},{},{}{},{:.1R},{:.2R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R}\n",
+                              "   Low Temperature Refrigeration Case,{},{},{},{}{},{:.1R},{:.2R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R}\n",
                               CaseID,
                               RefrigCase(CaseID).Name,
                               RefrigCase(CaseID).ZoneName,
@@ -13224,7 +13224,7 @@ namespace RefrigeratedCase {
                           WalkIn(WalkInID).NumZones);
                     for (int ZoneID = 1; ZoneID <= WalkIn(WalkInID).NumZones; ++ZoneID) {
                         print(outputFiles.eio,
-                              "      Walk-In Surfaces Facing Zone,{},{:.1R},{:.4R},{:.2R},{:.2R},{:.4R},{:.2R},{:.2R},{:.4R}\n",
+                              "       Walk-In Surfaces Facing Zone,{},{:.1R},{:.4R},{:.2R},{:.2R},{:.4R},{:.2R},{:.2R},{:.4R}\n",
                               WalkIn(WalkInID).ZoneName(ZoneID),
                               WalkIn(WalkInID).SurfaceArea(ZoneID),
                               WalkIn(WalkInID).UValue(ZoneID),
@@ -13268,7 +13268,7 @@ namespace RefrigeratedCase {
                 for (int CompressorNum = 1; CompressorNum <= TransSystem(TransSystemNum).NumCompressorsHP; ++CompressorNum) {
                     int CompID = TransSystem(TransSystemNum).CompressorNumHP(CompressorNum);
                     print(outputFiles.eio,
-                          " High Pressure Refrigeration Compressor,{},{},{:.0R}\n",
+                          "   High Pressure Refrigeration Compressor,{},{},{:.0R}\n",
                           CompID,
                           Compressor(CompID).Name,
                           Compressor(CompID).NomCap);
@@ -13276,7 +13276,7 @@ namespace RefrigeratedCase {
                 for (int CompressorNum = 1; CompressorNum <= TransSystem(TransSystemNum).NumCompressorsLP; ++CompressorNum) {
                     int CompID = TransSystem(TransSystemNum).CompressorNumLP(CompressorNum);
                     print(outputFiles.eio,
-                          " Low Pressure Refrigeration Compressor,{},{},{:.0R}\n",
+                          "   Low Pressure Refrigeration Compressor,{},{},{:.0R}\n",
                           CompID,
                           Compressor(CompID).Name,
                           Compressor(CompID).NomCap);
@@ -13335,7 +13335,7 @@ namespace RefrigeratedCase {
                     int CaseID = Secondary(SecondaryID).CaseNum(CaseNum);
                     if (RefrigCase(CaseID).ZoneNodeNum > 0) {
                         print(outputFiles.eio,
-                              " Refrigeration Case,{},{},{},{},{},{:.1R},{:.2R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R}\n",
+                              "  Refrigeration Case,{},{},{},{},{},{:.1R},{:.2R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R}\n",
                               CaseID,
                               RefrigCase(CaseID).Name,
                               RefrigCase(CaseID).ZoneName,

@@ -7895,7 +7895,7 @@ namespace WindowManager {
                                                        PerfCurve(Material(Layer).GlassSpecAngFRefleDataPtr).Name + ", " +
                                                        PerfCurve(Material(Layer).GlassSpecAngBRefleDataPtr).Name;
                                 }
-                                static constexpr auto Format_707(" WindowMaterial:Glazing,{},{},{},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{:.5R},{"
+                                static constexpr auto Format_707(" WindowMaterial:Glazing,{},{},{},{:.5R},{:.5R},{:.20G},{:.5R},{:.5R},{:.5R},{:.5R},{"
                                                                  ":.5R},{:.5R},{:.5R},{:.5R},{:.5R},{}\n");
                                 print(outputFiles.eio,
                                       Format_707,

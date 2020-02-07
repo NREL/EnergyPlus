@@ -333,7 +333,7 @@ public:
                             return (*this)(0.0);
                         } else {
                             // nudge up to next rounded value
-                            return (*this)(next_float(next_float(next_float(next_float(value)))));
+                            return (*this)(next_float(next_float(next_float(value))));
                         }
                     }
                 } else {
