@@ -5920,7 +5920,7 @@ namespace SurfaceGeometry {
                   SurfaceTmp(SurfNum).Class == SurfaceClass_Fin))
                 continue;
 
-            constexpr auto fmt{"ShadingProperty Reflectance,{},{},{:.2R},{:.2R},{:.2R},{}\n"};
+            constexpr auto fmt{"ShadingProperty Reflectance,{},{},{:.2R},{:.2R},{:.2R}, {}\n"};
             if (SurfaceTmp(SurfNum).ShadowSurfGlazingConstruct != 0) {
                 print(outputFiles.eio,
                       fmt,

@@ -12786,7 +12786,7 @@ namespace RefrigeratedCase {
         static constexpr auto Format_146(
             "! <Secondary Refrigeration System: Liquid Overfeed>, Secondary Number, Secondary Name, # Refrigerated Cases "
             "Connected, # WalkIn Coolers Connected, #Air Coils Connected Fluid Name, Capacity (W),Evap Temperature in "
-            "Secondary Evaporator (C),',' Approach Temperature Difference (DeltaC), Circulating Rate, TotalPumpPower (W)");
+            "Secondary Evaporator (C), Approach Temperature Difference (DeltaC), Circulating Rate, TotalPumpPower (W)");
         static constexpr auto Format_148("! <#ZoneHVAC/Refrigeration Air Chiller Sets>,Number of ZoneHVAC/Refrigeration Air Chiller Sets");
         static constexpr auto Format_149("! <ZoneHVAC/Refrigeration Air Chiller Set>,Chiller Set Name, # Air Chillers Connected, Zone Location");
         static constexpr auto Format_151(
@@ -13043,7 +13043,7 @@ namespace RefrigeratedCase {
 
                 for (int SecondaryNum = 1; SecondaryNum <= System(SystemNum).NumSecondarys; ++SecondaryNum) {
                     int SecondaryID = System(SystemNum).SecondaryNum(SecondaryNum);
-                    print(outputFiles.eio, " Secondary Load,{},{}\n", Secondary(SecondaryID).Name, SecondaryID);
+                    print(outputFiles.eio, "   Secondary Load,{},{}\n", Secondary(SecondaryID).Name, SecondaryID);
                 } // secondary load on detailed system
 
                 for (int SubcoolerNum = 1; SubcoolerNum <= NumSimulationSubcoolers; ++SubcoolerNum) {
@@ -13335,7 +13335,7 @@ namespace RefrigeratedCase {
                     int CaseID = Secondary(SecondaryID).CaseNum(CaseNum);
                     if (RefrigCase(CaseID).ZoneNodeNum > 0) {
                         print(outputFiles.eio,
-                              "   Refrigeration Case,{},{},{},{},{},{:.1R},{:.2R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R}\n",
+                              " Refrigeration Case,{},{},{},{},{},{:.1R},{:.2R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R}\n",
                               CaseID,
                               RefrigCase(CaseID).Name,
                               RefrigCase(CaseID).ZoneName,
@@ -13355,7 +13355,7 @@ namespace RefrigeratedCase {
                 for (int WalkInNum = 1; WalkInNum <= Secondary(SecondaryID).NumWalkIns; ++WalkInNum) {
                     int WalkInID = Secondary(SecondaryID).WalkInNum(WalkInNum);
                     print(outputFiles.eio,
-                          "Walk In,{},{},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R}\n",
+                          "  Walk In,{},{},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R},{:.1R}\n",
                           WalkInID,
                           WalkIn(WalkInID).Name,
                           WalkIn(WalkInID).DesignRatedCap,
@@ -13367,7 +13367,7 @@ namespace RefrigeratedCase {
                           WalkIn(WalkInID).DefrostCapacity);
                     for (int ZoneID = 1; ZoneID <= WalkIn(WalkInID).NumZones; ++ZoneID) {
                         print(outputFiles.eio,
-                              "Walk In Surfaces Facing Zone,{},{:.1R},{:.4R},{:.2R},{:.2R},{:.4R},{:.2R},{:.2R},{:.4R}\n",
+                              "    Walk In Surfaces Facing Zone,{},{:.1R},{:.4R},{:.2R},{:.2R},{:.4R},{:.2R},{:.2R},{:.4R}\n",
                               WalkIn(WalkInID).ZoneName(ZoneID),
                               WalkIn(WalkInID).SurfaceArea(ZoneID),
                               WalkIn(WalkInID).UValue(ZoneID),
