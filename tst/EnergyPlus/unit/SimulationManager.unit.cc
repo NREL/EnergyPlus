@@ -92,4 +92,28 @@ TEST_F(EnergyPlusFixture, Test_PerformancePrecisionTradeoffs_DirectSolution_Mess
     });
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
+
+TEST_F(EnergyPlusFixture, Test_PerformancePrecisionTradeoffs)
+{
+    std::string const idf_objects = delimited_string({
+        "  Version,9.3;",
+
+        "  SimulationControl,",
+        "    No,                      !- Do Zone Sizing Calculation",
+        "    No,                      !- Do System Sizing Calculation",
+        "    No,                      !- Do Plant Sizing Calculation",
+        "    No,                      !- Run Simulation for Sizing Periods",
+        "    Yes;                     !- Run Simulation for Weather File Run Periods",
+
+        "  PerformancePrecisionTradeoffs,",
+        "    Yes;       ! - Use Coil Direct Solutions",
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects));
+
+    SimulationManager::GetProjectData();
+
+    // no error message from PerformancePrecisionTradeoffs objects
+    EXPECT_TRUE(compare_err_stream("", true));
+  
 }
