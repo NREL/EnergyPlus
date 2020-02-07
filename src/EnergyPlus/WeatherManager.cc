@@ -10702,8 +10702,7 @@ namespace WeatherManager {
                       ",Water Mains Temperature Schedule Name{}"
                       ",Annual Average Outdoor Air Temperature{C}"
                       ",Maximum Difference In Monthly Average Outdoor Air Temperatures{deltaC}"
-                      ",Fixed Default Water Mains Temperature{C}" +
-                          DataStringGlobals::NL;
+                      ",Fixed Default Water Mains Temperature{C}\n";
 
         {
             auto const SELECT_CASE_var(WaterMainsTempsMethod);
@@ -10711,14 +10710,14 @@ namespace WeatherManager {
                 *eiostream << "Site Water Mains Temperature Information,";
                 *eiostream << cCalculationMethod(WaterMainsTempsMethod) << "," << WaterMainsTempsScheduleName << ",";
                 *eiostream << RoundSigDigits(WaterMainsTempsAnnualAvgAirTemp, 2) << "," << RoundSigDigits(WaterMainsTempsMaxDiffAirTemp, 2) << ",";
-                *eiostream << "NA" << DataStringGlobals::NL;
+                *eiostream << "NA\n";
             } else if (SELECT_CASE_var == CorrelationMethod) {
                 *eiostream << "Site Water Mains Temperature Information,";
                 *eiostream << cCalculationMethod(WaterMainsTempsMethod) << ","
                            << "NA"
                            << ",";
                 *eiostream << RoundSigDigits(WaterMainsTempsAnnualAvgAirTemp, 2) << "," << RoundSigDigits(WaterMainsTempsMaxDiffAirTemp, 2) << ",";
-                *eiostream << "NA" << DataStringGlobals::NL;
+                *eiostream << "NA\n";
             } else if (SELECT_CASE_var == CorrelationFromWeatherFileMethod) {
                 if (OADryBulbAverage.OADryBulbWeatherDataProcessed) {
                     *eiostream << "Site Water Mains Temperature Information,";
@@ -10727,7 +10726,7 @@ namespace WeatherManager {
                                << ",";
                     *eiostream << RoundSigDigits(OADryBulbAverage.AnnualAvgOADryBulbTemp, 2) << ","
                                << RoundSigDigits(OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff, 2) << ","
-                               << "NA" << DataStringGlobals::NL;
+                               << "NA\n";
                 } else {
                     *eiostream << "Site Water Mains Temperature Information,";
                     *eiostream << "FixedDefault"
@@ -10737,7 +10736,7 @@ namespace WeatherManager {
                                << "NA"
                                << ","
                                << "NA"
-                               << "," << RoundSigDigits(10.0, 1) << DataStringGlobals::NL;
+                               << "," << RoundSigDigits(10.0, 1) << '\n';
                 }
             } else {
                 *eiostream << "Site Water Mains Temperature Information,";
@@ -10748,7 +10747,7 @@ namespace WeatherManager {
                            << "NA"
                            << ","
                            << "NA"
-                           << "," << RoundSigDigits(10.0, 1) << DataStringGlobals::NL;
+                           << "," << RoundSigDigits(10.0, 1) << '\n';
             }
         }
 
