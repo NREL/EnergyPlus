@@ -1183,6 +1183,14 @@ namespace SimulationManager {
             }
         }
 
+        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <PerformancePrecisionTradeoffs:DirectSolution>, Simulation {{Yes/No}}, Direct Solution";
+        if (DoCoilDirectSolutions) {
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << " Direct Solution Simulation, Yes";
+            ShowWarningError("PerformancePrecisionTradeoffs: Direct Solution Simulation is selected.");
+        } else {
+            ObjexxFCL::gio::write(OutputFileInits, fmtA) << " Direct Solution Simulation, No";
+        }
+
         if (ErrorsFound) {
             ShowFatalError("Errors found getting Project Input");
         }
