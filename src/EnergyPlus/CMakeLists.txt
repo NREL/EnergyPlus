@@ -718,7 +718,7 @@ add_custom_target(
   -DCMAKE_VERSION_BUILD="${CMAKE_VERSION_BUILD}"
   -DPYTHON_API_VERSION_MAJOR="${PYTHON_API_VERSION_MAJOR}"
   -DPYTHON_API_VERSION_MINOR="${PYTHON_API_VERSION_MINOR}"
-  -P "${CMAKE_SOURCE_DIR}/cmake/SetPythonAPI.cmake"
+  -P "${CMAKE_SOURCE_DIR}/cmake/PythonSetupAPIinBuild.cmake"
 )
 
 add_library( energyplusparser STATIC ${INPUTPARSING_SRC} )
@@ -800,7 +800,7 @@ if(LINK_WITH_PYTHON)
           -DRESOLVED_PYTHON_LIB=${RESOLVED_PYTHON_LIBRARY}
           -DEXECUTABLE_PATH=$<TARGET_FILE:energyplus>
           -DPYTHON_LIB_FILENAME=${PYTHON_LIB_FILENAME}
-          -P ${CMAKE_SOURCE_DIR}/cmake/SetupPython.cmake
+          -P ${CMAKE_SOURCE_DIR}/cmake/PythonGetLibAndLinkUp.cmake
   )
 endif()
 

@@ -40,7 +40,7 @@ class EnergyPlusAPI:
 
     In a makefile-style build, the API library (dll) should be in Products; for example: `/path_to_build/Products`.
     For Visual Studio, the DLL is inside of a Debug or Release folder inside that Products directory.  At build time,
-    the cmake/SetPythonAPI.cmake script is executed (the energyplusapi target depends on it).  At build time, the
+    the cmake/PythonSetupAPIinBuild.cmake script is executed (the energyplusapi target depends on it).  At build time, the
     Python API files are placed inside of the Products directory on Makefile builds, and copied into *both* the Release
     and Debug folders on Visual Studio builds.  The API scripts are put into a pyenergyplus directory, so in all cases,
     the dynamic library will simply be in the current script's parent directory. In an installation, the library will be
