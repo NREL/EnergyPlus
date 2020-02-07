@@ -442,6 +442,66 @@ namespace Psychrometrics {
         return cpa;
     }
 
+    inline Real64 PsyCpAirFnW(Real64 const dw // humidity ratio {kgWater/kgDryAir}
+    )
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         J. C. VanderZee
+        //       DATE WRITTEN   Feb. 1994
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // This function provides the heat capacity of air {J/kg-C} as function of humidity ratio.
+
+        // METHODOLOGY EMPLOYED:
+        // take numerical derivative of PsyHFnTdbW function
+
+        // REFERENCES:
+        // see PsyHFnTdbW ref. to ASHRAE Fundamentals
+        // USAGE:  cpa = PsyCpAirFnW(w)
+
+        // Static locals
+        static Real64 dwSave(-100.0);
+        static Real64 cpaSave(-100.0);
+
+        // check if last call had the same input and if it did just use the saved output
+        if (dwSave == dw) return cpaSave;
+
+        // compute heat capacity of air
+        Real64 const w(max(dw, 1.0e-5));
+        Real64 const cpa((1.00484e3 + w * 1.85895e3)); // result => heat capacity of moist air {J/kg-C}
+
+        // save values for next call
+        dwSave = dw;
+        cpaSave = cpa;
+
+        return cpa;
+    }
+
+    inline Real64 PsyCpAirFnW_fast(Real64 const dw // humidity ratio {kgWater/kgDryAir}
+    )
+    {
+        // Faster version with humidity ratio already adjusted
+        assert(dw >= 1.0e-5);
+
+        // Static locals
+        static Real64 dwSave(-100.0);
+        static Real64 cpaSave(-100.0);
+
+        // check if last call had the same input and if it did just use the saved output
+        if (dwSave == dw) return cpaSave;
+
+        // compute heat capacity of air
+        Real64 const cpa((1.00484e3 + dw * 1.85895e3)); // result => heat capacity of moist air {J/kg-C}
+
+        // save values for next call
+        dwSave = dw;
+        cpaSave = cpa;
+
+        return cpa;
+    }
+
     inline Real64 PsyTdbFnHW(Real64 const H, // enthalpy {J/kg}
                              Real64 const dW // humidity ratio
     )
@@ -722,8 +782,7 @@ namespace Psychrometrics {
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
 
-        Int64 const Tdb_tag(
-            bit_shift(bit_transfer(T, Grid_Shift), -Grid_Shift)); // Note that 2nd arg to TRANSFER is not used: Only type matters
+        Int64 const Tdb_tag(bit_shift(bit_transfer(T, Grid_Shift), -Grid_Shift)); // Note that 2nd arg to TRANSFER is not used: Only type matters
         //		Int64 const hash( bit::bit_and( Tdb_tag, psatcache_mask ) ); //Tuned Replaced by below
         Int64 const hash(Tdb_tag & psatcache_mask);
         auto &cPsat(cached_Psat(hash));
@@ -746,18 +805,16 @@ namespace Psychrometrics {
 
 #endif
 
-
 #ifdef EP_cache_PsyTsatFnHPb
     Real64 PsyTsatFnHPb_raw(Real64 const H,                              // enthalpy {J/kg}
                             Real64 const PB,                             // barometric pressure {Pascals}
                             std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
     );
     inline Real64 PsyTsatFnHPb(Real64 const H,
-                               Real64 const Pb,              // barometric pressure {Pascals}
+                               Real64 const Pb,                             // barometric pressure {Pascals}
                                std::string const &CalledFrom = blank_string // routine this function was called from (error messages)
     )
     {
-
 
         Real64 Tsat_result; // result=> Sat-Temp {C}
 
@@ -1301,9 +1358,9 @@ namespace Psychrometrics {
     }
 
     inline Real64 PsyDeltaHSenFnTdb2W2Tdb1W1(Real64 const TDB2, // dry-bulb temperature at state 2 {C}
-        Real64 const dW2,   // humidity ratio at  at state 2
-        Real64 const TDB1, // dry-bulb temperature at  at state 1 {C}
-        Real64 const dW1   // humidity ratio  at state 1
+                                             Real64 const dW2,  // humidity ratio at  at state 2
+                                             Real64 const TDB1, // dry-bulb temperature at  at state 1 {C}
+                                             Real64 const dW1   // humidity ratio  at state 1
     )
     {
         // returns sensible enthalpy difference of moist air going from state 1 to state 2
@@ -1312,7 +1369,7 @@ namespace Psychrometrics {
     }
 
     inline Real64 PsyHfgAvgFnTdb2Tdb1(Real64 const TDB2, // dry-bulb temperature at  at state 2 {C}
-        Real64 const TDB1 // dry-bulb temperature at  at state 1 {C}
+                                      Real64 const TDB1  // dry-bulb temperature at  at state 1 {C}
     )
     {
         // calculate average latent heat of vaporization of water vapor in moist air
