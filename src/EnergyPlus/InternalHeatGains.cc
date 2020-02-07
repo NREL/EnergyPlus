@@ -5870,7 +5870,7 @@ namespace InternalHeatGains {
 
             AirMassFlowRate = AirVolFlowRate * PsyRhoAirFnPbTdbW(StdBaroPress, TAirIn, WAirIn, RoutineName);
             if (AirMassFlowRate > 0.0) {
-                TAirOut = TAirIn + (CPUPower + FanPower) / AirMassFlowRate / PsyCpAirFnWTdb(WAirIn, TAirIn);
+                TAirOut = TAirIn + (CPUPower + FanPower) / AirMassFlowRate / PsyCpAirFnW(WAirIn);
             } else {
                 TAirOut = TAirIn;
             }

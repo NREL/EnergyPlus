@@ -614,9 +614,9 @@ namespace PondGroundHeatExchanger {
         // get air properties
         Real64 HumRatioAir = Psychrometrics::PsyWFnTdbTwbPb(OutDryBulb, OutWetBulb, DataEnvironment::OutBaroPress);
 
-        Real64 // humidity ratio at pond surface/film temperature
-            HumRatioFilm = Psychrometrics::PsyWFnTdbTwbPb(PondBulkTemp, PondBulkTemp, DataEnvironment::OutBaroPress);
-        Real64 SpecHeatAir = Psychrometrics::PsyCpAirFnWTdb(HumRatioAir, OutDryBulb);
+        // humidity ratio at pond surface/film temperature
+        Real64 HumRatioFilm = Psychrometrics::PsyWFnTdbTwbPb(PondBulkTemp, PondBulkTemp, DataEnvironment::OutBaroPress);
+        Real64 SpecHeatAir = Psychrometrics::PsyCpAirFnW(HumRatioAir);
         Real64 LatentHeatAir = Psychrometrics::PsyHfgAirFnWTdb(HumRatioAir, OutDryBulb);
 
         // evaporative heat flux
