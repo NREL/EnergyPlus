@@ -198,7 +198,7 @@ namespace DataStringGlobals {
     std::string inStatFileName;
     std::string eplusADSFileName;
     std::string idfFileNameOnly;
-    std::string idfDirPathName; // NOT USED ANYWHERE?  MAYBE OTHERS HERE ARE ALSO UNUSED?
+    std::string idfDirPathName;
     std::string outDirPathName;
     std::string inputFileNameOnly;
     std::string inputDirPathName;

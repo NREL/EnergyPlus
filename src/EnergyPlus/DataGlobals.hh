@@ -299,9 +299,7 @@ namespace DataGlobals {
     extern bool AnySlabsInModel;         // true if there are any zone-coupled ground domains in the input file
     extern bool AnyBasementsInModel;     // true if there are any basements in the input file
     extern bool DoCoilDirectSolutions;        //true if use coil direction solutions
-
     extern int Progress;
-    // these are the old ones
     extern void (*fProgressPtr)(int const);
     extern void (*fMessagePtr)(std::string const &);
     // these are the new ones

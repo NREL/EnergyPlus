@@ -10,7 +10,7 @@ configure_file( ConfiguredFunctions.in.cc "${CMAKE_CURRENT_BINARY_DIR}/Configure
 file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc" "Will be filled in later by GenerateEmbeddedEpJSONSchema" )
 
 option( LINK_WITH_PYTHON "Build package" OFF )
-if (LINK_WITH_PYTHON)
+if(LINK_WITH_PYTHON)
   add_definitions("-DLINK_WITH_PYTHON=1")
 else()
   add_definitions("-DLINK_WITH_PYTHON=0")
@@ -680,7 +680,7 @@ if(LINK_WITH_PYTHON)
   # check the python bit version here...if we are building against Python it has to match up bitwise
   # if we aren't, then the identified interpreter can be whatever bit it wants
   execute_process(COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/cmake/PythonGetBitSize.py" OUTPUT_VARIABLE PYTHON_BIT_SIZE)
-  if (MSVC)
+  if(MSVC)
     execute_process(COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/cmake/PythonGetBitSize.py" OUTPUT_VARIABLE PYTHON_BIT_SIZE)
     if(("${PYTHON_BIT_SIZE}" STREQUAL "64") AND NOT ("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "Win64"))
       message(SEND_ERROR "Found 64-bit Python but attempting to generate 32-bit EnergyPlus; this is invalid")
@@ -694,7 +694,7 @@ if(LINK_WITH_PYTHON)
   # so that we can easily manage the MSVC build type paths from the other generators
   find_package(PythonLibs 3 REQUIRED)
   include_directories("${PYTHON_INCLUDE_DIRS}")
-  if (MSVC)
+  if(MSVC)
     # for now copy it into the debug and release folders both
     execute_process(COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/cmake/PythonCopyStandardLib.py" "${CMAKE_BINARY_DIR}/Products/Debug/python_standard_lib" RESULT_VARIABLE CPRESULT)
     execute_process(COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/cmake/PythonCopyStandardLib.py" "${CMAKE_BINARY_DIR}/Products/Release/python_standard_lib" RESULT_VARIABLE CPRESULT)
@@ -735,7 +735,7 @@ endif()
 # this will be linked statically to create the DLL and also the unit tests
 add_library( energypluslib STATIC ${SRC} )
 target_link_libraries( energypluslib fmt::fmt objexx sqlite bcvtb epexpat epfmiimport re2 DElight libkiva btwxt Windows-CalcEngine airflownetworklib )
-add_dependencies( energypluslib GenerateEmbeddedEpJSONSchema)
+add_dependencies( energypluslib GenerateEmbeddedEpJSONSchema )
 if(BUILD_GROUND_PLOT)
   set_source_files_properties(HeatBalanceKivaManager.cc PROPERTIES COMPILE_DEFINITIONS GROUND_PLOT)
   target_link_libraries( energypluslib groundplot )
@@ -762,13 +762,13 @@ SET( API_CORE_SRC
   api/EnergyPlusPgm.cc
 )
 
-if (APPLE OR UNIX)
+if(APPLE OR UNIX)
   add_library( energyplusapi SHARED CommandLineInterface.hh CommandLineInterface.cc ${API_CORE_SRC})
 else()  # windows
   add_library( energyplusapi SHARED CommandLineInterface.hh CommandLineInterface.cc ${API_CORE_SRC} "${CMAKE_CURRENT_BINARY_DIR}/energyplusapi.rc" )
 endif()
 target_link_libraries( energyplusapi energypluslib )
-add_dependencies( energyplusapi pythonapi)
+add_dependencies( energyplusapi pythonapi )
 
 set_target_properties(
   energyplusapi
@@ -804,7 +804,7 @@ if(LINK_WITH_PYTHON)
   )
 endif()
 
-if (BUILD_PACKAGE)
+if(BUILD_PACKAGE)
   if(LINK_WITH_PYTHON)
     install(FILES "${RESOLVED_PYTHON_LIBRARY}" DESTINATION "./")
     install(DIRECTORY "${CMAKE_BINARY_DIR}/Products/python_standard_lib/"
@@ -851,7 +851,7 @@ if( BUILD_TESTING )
 
   # This is tricky, the test scripts should be copied into the Products/<config> directory, but add_test has to be
   # called so early, it's hard to figure that out ahead of time.  I dunno.  Just skipping these on MSVC builds for now.
-  if (NOT MSVC)
+  if(NOT MSVC)
     set(API_TEST_TARGET_DIR "${CMAKE_BINARY_DIR}/Products")
 
     configure_file( "${CMAKE_SOURCE_DIR}/tst/EnergyPlus/api/TestFunctional.py" "${API_TEST_TARGET_DIR}/TestFunctional.py" )
