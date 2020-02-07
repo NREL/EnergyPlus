@@ -4311,14 +4311,25 @@ namespace HVACVariableRefrigerantFlow {
         //   perform additional error checking
         for (NumList = 1; NumList <= NumVRFTULists; ++NumList) {
             for (VRFNum = 1; VRFNum <= TerminalUnitList(NumList).NumTUInList; ++VRFNum) {
-                if (TerminalUnitList(NumList).ZoneTUPtr(VRFNum) > 0) continue;
-                // TU name in zone terminal unit list not found
-                ShowSevereError("ZoneTerminalUnitList \"" + TerminalUnitList(NumList).Name + "\"");
-                ShowContinueError("...Zone Terminal Unit = " + TerminalUnitList(NumList).ZoneTUName(VRFNum) + " improperly connected to system.");
-                ShowContinueError("...either the ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object does not exist,");
-                ShowContinueError("...the ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object name is misspelled,");
-                ShowContinueError("...or the ZoneTerminalUnitList object is not named in an AirConditioner:VariableRefrigerantFlow object.");
-                ErrorsFound = true;
+                if (TerminalUnitList(NumList).ZoneTUPtr(VRFNum) == 0) {
+                    // TU name in zone terminal unit list not found
+                    ShowSevereError("ZoneTerminalUnitList \"" + TerminalUnitList(NumList).Name + "\"");
+                    ShowContinueError("...Zone Terminal Unit = " + TerminalUnitList(NumList).ZoneTUName(VRFNum) + " improperly connected to system.");
+                    ShowContinueError("...either the ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object does not exist,");
+                    ShowContinueError("...the ZoneHVAC:TerminalUnit:VariableRefrigerantFlow object name is misspelled,");
+                    ShowContinueError("...or the ZoneTerminalUnitList object is not named in an AirConditioner:VariableRefrigerantFlow object.");
+                    ErrorsFound = true;
+                }
+                if (VRFTU(VRFNum).VRFSysNum > 0) {
+                    if (TerminalUnitList(NumList).NumTUInList == 1 && VRF(VRFTU(VRFNum).VRFSysNum).VRFAlgorithmTypeNum == AlgorithmTypeSysCurve) {
+                        if (VRF(VRFTU(VRFNum).VRFSysNum).HeatRecoveryUsed) {
+                            ShowWarningError("ZoneTerminalUnitList \"" + TerminalUnitList(NumList).Name + "\"");
+                            ShowWarningError("...Only 1 Terminal Unit connected to system and heat recovery is selected.");
+                            ShowContinueError("...Heat recovery will be disabled.");
+                            VRF(VRFNum).HeatRecoveryUsed = false;
+                        }
+                    }
+                }
             }
         }
 
@@ -5203,6 +5214,9 @@ namespace HVACVariableRefrigerantFlow {
                                 VRFTU(TUIndex).isInOASys = true;
                                 AirLoopFound = true;
                                 VRFTU(TUIndex).isSetPointControlled = true;
+                                // user may have inadvertantly entered a zone name in the OA system TU object
+                                VRFTU(TUIndex).ZoneNum = 0;
+                                VRFTU(TUIndex).ZoneAirNode = 0;
                                 BranchNodeConnections::TestCompSet(cCurrentModuleObject,
                                     thisObjectName,
                                     DataLoopNode::NodeID(VRFTU(TUIndex).VRFTUInletNodeNum),
@@ -5347,7 +5361,7 @@ namespace HVACVariableRefrigerantFlow {
                         }
                     }
 
-                    if (VRFTU(TUIndex).isInZone) {
+                    if (VRFTU(TUIndex).isInZone && DataAirLoop::AirLoopInputsFilled) {
                         if (VRFTU(TUIndex).FanPlace == 0) {
                             ShowSevereError("ZoneHVAC:TerminalUnit:VariableRefrigerantFlow = " + VRFTU(TUIndex).Name);
                             ShowContinueError("Illegal Supply Air Fan Placement.");
@@ -5367,32 +5381,56 @@ namespace HVACVariableRefrigerantFlow {
                             }
                         }
                     }
-                    if (DataLoopNode::Node(VRFTU(TUIndex).VRFTUOutletNodeNum).TempSetPoint == DataLoopNode::SensedNodeFlagValue &&
-                        DataLoopNode::Node(VRFTU(TUIndex).coolCoilAirOutNode).TempSetPoint == DataLoopNode::SensedNodeFlagValue &&
-                        DataLoopNode::Node(VRFTU(TUIndex).heatCoilAirOutNode).TempSetPoint == DataLoopNode::SensedNodeFlagValue &&
-                        VRFTU(TUIndex).isSetPointControlled) {
-                        if (!DataGlobals::AnyEnergyManagementSystemInModel) {
-                            ShowSevereError("ZoneHVAC:TerminalUnit:VariableRefrigerantFlow: Missing temperature setpoint for " +
-                                            VRFTU(TUIndex).Name);
-                            ShowContinueError("  use a Setpoint Manager to establish a setpoint at the coil control node.");
-                           ErrorsFound = true;
+
+                    if (VRFTU(VRFTUNum).isSetPointControlled && DataAirLoop::AirLoopInputsFilled) {
+                        bool missingSetPoint = false;
+                        Real64 TUOutNodeSP = DataLoopNode::Node(VRFTU(TUIndex).VRFTUOutletNodeNum).TempSetPoint;
+                        Real64 coolCoilOutNodeSP = DataLoopNode::Node(VRFTU(TUIndex).coolCoilAirOutNode).TempSetPoint;
+                        Real64 heatCoilOutNodeSP = DataLoopNode::Node(VRFTU(TUIndex).heatCoilAirOutNode).TempSetPoint;
+                        // SP can be at outlet of TU or at outlet of coils
+                        // if supp heat coil is present, a SP must be at the outlet of the TU
+                        if (VRFTU(VRFTUNum).SuppHeatingCoilPresent) {
+                            if (TUOutNodeSP == DataLoopNode::SensedNodeFlagValue) missingSetPoint = true;
                         } else {
-                            bool SPNotFound = false;
-                            EMSManager::CheckIfNodeSetPointManagedByEMS(
-                                VRFTU(TUIndex).VRFTUOutletNodeNum, EMSManager::iTemperatureSetPoint, SetPointErrorFlag);
-                            SPNotFound = SPNotFound || SetPointErrorFlag;
-                            EMSManager::CheckIfNodeSetPointManagedByEMS(
-                                VRFTU(TUIndex).coolCoilAirOutNode, EMSManager::iTemperatureSetPoint, SetPointErrorFlag);
-                            SPNotFound = SPNotFound || SetPointErrorFlag;
-                            EMSManager::CheckIfNodeSetPointManagedByEMS(
-                                VRFTU(TUIndex).heatCoilAirOutNode, EMSManager::iTemperatureSetPoint, SetPointErrorFlag);
-                            SPNotFound = SPNotFound || SetPointErrorFlag;
-                            if (SPNotFound && DataAirLoop::AirLoopInputsFilled) {
-                                ShowSevereError("ZoneHVAC:TerminalUnit:VariableRefrigerantFlow: Missing temperature setpoint for unitary system = " +
+                            if (VRFTU(VRFTUNum).FanPlace == DataHVACGlobals::DrawThru) {
+                                // then SP must be at TU outlet
+                                if (TUOutNodeSP == DataLoopNode::SensedNodeFlagValue) missingSetPoint = true;
+                                // or at coil outlet nodes
+                                if (missingSetPoint) {
+                                    if (coolCoilOutNodeSP != DataLoopNode::SensedNodeFlagValue &&
+                                        heatCoilOutNodeSP != DataLoopNode::SensedNodeFlagValue)
+                                        missingSetPoint = false;
+                                }
+                            } else {
+                                // else fan is blow thru or missing
+                                if (TUOutNodeSP == DataLoopNode::SensedNodeFlagValue) missingSetPoint = true;
+                            }
+                        }
+                        if (missingSetPoint) {
+                            if (!DataGlobals::AnyEnergyManagementSystemInModel) {
+                                ShowSevereError("ZoneHVAC:TerminalUnit:VariableRefrigerantFlow: Missing temperature setpoint for " +
                                                 VRFTU(TUIndex).Name);
-                                ShowContinueError("  use a Setpoint Manager to establish a setpoint at the coil control node.");
-                                ShowContinueError("  or use an EMS actuator to establish a temperature setpoint at the coil control node.");
+                                ShowContinueError("...use a Setpoint Manager to establish a setpoint at the TU or coil(s) outlet node.");
                                 ErrorsFound = true;
+                            } else if (DataGlobals::AnyEnergyManagementSystemInModel) {
+                                bool SPNotFound = false;
+                                EMSManager::CheckIfNodeSetPointManagedByEMS(
+                                    VRFTU(TUIndex).VRFTUOutletNodeNum, EMSManager::iTemperatureSetPoint, SetPointErrorFlag);
+                                SPNotFound = SPNotFound || SetPointErrorFlag;
+                                EMSManager::CheckIfNodeSetPointManagedByEMS(
+                                    VRFTU(TUIndex).coolCoilAirOutNode, EMSManager::iTemperatureSetPoint, SetPointErrorFlag);
+                                SPNotFound = SPNotFound || SetPointErrorFlag;
+                                EMSManager::CheckIfNodeSetPointManagedByEMS(
+                                    VRFTU(TUIndex).heatCoilAirOutNode, EMSManager::iTemperatureSetPoint, SetPointErrorFlag);
+                                SPNotFound = SPNotFound || SetPointErrorFlag;
+                                if (SPNotFound && DataAirLoop::AirLoopInputsFilled) {
+                                    ShowSevereError(
+                                        "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow: Missing temperature setpoint for unitary system = " +
+                                        VRFTU(TUIndex).Name);
+                                    ShowContinueError("...use a Setpoint Manager to establish a setpoint at the TU or coil(s) outlet node.");
+                                    ShowContinueError("...or use an EMS actuator to establish a temperature setpoint at the coil control node.");
+                                    ErrorsFound = true;
+                                }
                             }
                         }
                     }
@@ -6157,14 +6195,14 @@ namespace HVACVariableRefrigerantFlow {
                 DataLoopNode::Node(VRFTU(VRFTUNum).VRFTUOAMixerRetNodeNum).MassFlowRate = VRFTU(VRFTUNum).MaxHeatAirMassFlow;
                 DataLoopNode::Node(OutsideAirNode).MassFlowRate = VRFTU(VRFTUNum).HeatOutAirMassFlow;
             } else {
-                DataLoopNode::Node(InNode).MassFlowRate = VRFTU(VRFTUNum).MaxHeatAirMassFlow;
+                if (!VRFTU(VRFTUNum).isInOASys) DataLoopNode::Node(InNode).MassFlowRate = VRFTU(VRFTUNum).MaxHeatAirMassFlow;
             }
         } else if (CoolingLoad(VRFCond) || (VRF(VRFCond).HeatRecoveryUsed && TerminalUnitList(TUListIndex).HRCoolRequest(IndexToTUInTUList))) {
             if (VRFTU(VRFTUNum).OAMixerUsed) {
                 DataLoopNode::Node(VRFTU(VRFTUNum).VRFTUOAMixerRetNodeNum).MassFlowRate = VRFTU(VRFTUNum).MaxCoolAirMassFlow;
                 DataLoopNode::Node(OutsideAirNode).MassFlowRate = VRFTU(VRFTUNum).CoolOutAirMassFlow;
             } else {
-                DataLoopNode::Node(InNode).MassFlowRate = VRFTU(VRFTUNum).MaxCoolAirMassFlow;
+                if (!VRFTU(VRFTUNum).isInOASys) DataLoopNode::Node(InNode).MassFlowRate = VRFTU(VRFTUNum).MaxCoolAirMassFlow;
             }
         } else {
             if (LastModeCooling(VRFCond)) {
@@ -6172,14 +6210,14 @@ namespace HVACVariableRefrigerantFlow {
                     DataLoopNode::Node(VRFTU(VRFTUNum).VRFTUOAMixerRetNodeNum).MassFlowRate = VRFTU(VRFTUNum).MaxNoCoolAirMassFlow;
                     DataLoopNode::Node(OutsideAirNode).MassFlowRate = VRFTU(VRFTUNum).NoCoolHeatOutAirMassFlow;
                 } else {
-                    DataLoopNode::Node(InNode).MassFlowRate = VRFTU(VRFTUNum).MaxNoCoolAirMassFlow;
+                    if (!VRFTU(VRFTUNum).isInOASys) DataLoopNode::Node(InNode).MassFlowRate = VRFTU(VRFTUNum).MaxNoCoolAirMassFlow;
                 }
             } else if (LastModeHeating(VRFCond)) {
                 if (VRFTU(VRFTUNum).OAMixerUsed) {
                     DataLoopNode::Node(VRFTU(VRFTUNum).VRFTUOAMixerRetNodeNum).MassFlowRate = VRFTU(VRFTUNum).MaxNoHeatAirMassFlow;
                     DataLoopNode::Node(OutsideAirNode).MassFlowRate = VRFTU(VRFTUNum).NoCoolHeatOutAirMassFlow;
                 } else {
-                    DataLoopNode::Node(InNode).MassFlowRate = VRFTU(VRFTUNum).MaxNoHeatAirMassFlow;
+                    if (!VRFTU(VRFTUNum).isInOASys) DataLoopNode::Node(InNode).MassFlowRate = VRFTU(VRFTUNum).MaxNoHeatAirMassFlow;
                 }
             }
         }
@@ -6208,44 +6246,8 @@ namespace HVACVariableRefrigerantFlow {
         // TerminalUnitList(TUListIndex)%HRCoolRequest(IndexToTUInTUList) - TU will operate in this mode if heat recovery is used
         // TerminalUnitList(TUListIndex)%HRHeatRequest(IndexToTUInTUList) - TU will operate in this mode if heat recovery is used
 
-        if (VRFTU(VRFTUNum).zoneSequenceCoolingNum > 0 && VRFTU(VRFTUNum).zoneSequenceHeatingNum > 0 && VRFTU(VRFTUNum).isInAirLoop) {
-            // air loop equipment uses sequenced variables
-            LoadToCoolingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(VRFTU(VRFTUNum).ZoneNum)
-                                  .SequencedOutputRequiredToCoolingSP(VRFTU(VRFTUNum).zoneSequenceCoolingNum) /
-                              VRFTU(VRFTUNum).controlZoneMassFlowFrac;
-            LoadToHeatingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(VRFTU(VRFTUNum).ZoneNum)
-                                  .SequencedOutputRequiredToHeatingSP(VRFTU(VRFTUNum).zoneSequenceHeatingNum) /
-                              VRFTU(VRFTUNum).controlZoneMassFlowFrac;
-            if (LoadToHeatingSP > 0.0 && LoadToCoolingSP > 0.0 &&
-                TempControlType(VRFTU(VRFTUNum).ZoneNum) != DataHVACGlobals::SingleCoolingSetPoint ) {
-                QZnReq = LoadToHeatingSP;
-            } else if (LoadToHeatingSP > 0.0 && LoadToCoolingSP > 0.0 &&
-                TempControlType(VRFTU(VRFTUNum).ZoneNum) == DataHVACGlobals::SingleCoolingSetPoint ) {
-                QZnReq = 0.0;
-            } else if (LoadToHeatingSP < 0.0 && LoadToCoolingSP < 0.0 &&
-                TempControlType(VRFTU(VRFTUNum).ZoneNum) != DataHVACGlobals::SingleHeatingSetPoint ) {
-                QZnReq = LoadToCoolingSP;
-            } else if (LoadToHeatingSP < 0.0 && LoadToCoolingSP < 0.0 &&
-                TempControlType(VRFTU(VRFTUNum).ZoneNum) == DataHVACGlobals::SingleHeatingSetPoint ) {
-                QZnReq = 0.0;
-            } else if (LoadToHeatingSP <= 0.0 && LoadToCoolingSP >= 0.0 ) {
-                QZnReq = 0.0;
-            }
-        } else if (VRFTU(VRFTUNum).ZoneNum > 0) {
-            // zone equipment uses Remaining* variables
-            QZnReq = ZoneSysEnergyDemand(VRFTU(VRFTUNum).ZoneNum).RemainingOutputRequired;
-            LoadToCoolingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(VRFTU(VRFTUNum).ZoneNum).RemainingOutputReqToCoolSP;
-            LoadToHeatingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(VRFTU(VRFTUNum).ZoneNum).RemainingOutputReqToHeatSP;
-        } else if (VRFTU(VRFTUNum).isSetPointControlled) {
-            if (VRFTU(VRFTUNum).coolSPActive) {
-                LoadToCoolingSP = VRFTU(VRFTUNum).coolLoadToSP;
-                QZnReq = LoadToCoolingSP;
-            }
-            if (VRFTU(VRFTUNum).heatSPActive) {
-                LoadToHeatingSP = VRFTU(VRFTUNum).heatLoadToSP;
-                QZnReq = LoadToHeatingSP;
-            }
-        }
+        getVRFTUZoneLoad(VRFTUNum, QZnReq, LoadToHeatingSP, LoadToCoolingSP);
+
         if (std::abs(QZnReq) < DataHVACGlobals::SmallLoad) QZnReq = 0.0;
         // set initial terminal unit operating mode for heat recovery
         // operating mode for non-heat recovery set above using CoolingLoad(VRFCond) or HeatingLoad(VRFCond) variables
@@ -8110,25 +8112,43 @@ namespace HVACVariableRefrigerantFlow {
         }
 
         // set supplemental heating coil calculation if the condition requires
-        if (this->SuppHeatingCoilPresent && QZnReq > DataHVACGlobals::SmallLoad && QZnReq > FullOutput) {
-            Real64 LoadToHeatingSP = ZoneSysEnergyDemand(this->ZoneNum).RemainingOutputReqToHeatSP;
-            if ((FullOutput < (LoadToHeatingSP - DataHVACGlobals::SmallLoad)) && !FirstHVACIteration) {
-                SuppHeatCoilLoad = max(0.0, LoadToHeatingSP - FullOutput);
-                this->SuppHeatingCoilLoad = SuppHeatCoilLoad;
-                if (this->DesignSuppHeatingCapacity > 0.0) {
-                    this->SuppHeatPartLoadRatio = min(1.0, SuppHeatCoilLoad / this->DesignSuppHeatingCapacity);
+        if (this->SuppHeatingCoilPresent) {
+            if ((QZnReq > DataHVACGlobals::SmallLoad && QZnReq > FullOutput) ||
+                (this->isSetPointControlled && this->suppTempSetPoint > DataLoopNode::Node(this->SuppHeatCoilAirInletNode).Temp)) {
+                Real64 ZoneLoad = 0.0;
+                Real64 LoadToHeatingSP = 0.0;
+                Real64 LoadToCoolingSP = 0.0;
+                if (this->isSetPointControlled) {
+                    Real64 mDot = DataLoopNode::Node(this->SuppHeatCoilAirInletNode).MassFlowRate;
+                    Real64 Tin = DataLoopNode::Node(this->SuppHeatCoilAirInletNode).Temp;
+                    Real64 Win = DataLoopNode::Node(this->SuppHeatCoilAirInletNode).HumRat;
+                    Real64 CpAirIn = Psychrometrics::PsyCpAirFnWTdb(Win, Tin);
+                    SuppHeatCoilLoad = mDot * CpAirIn * (this->suppTempSetPoint - Tin);
+                    this->SuppHeatingCoilLoad = SuppHeatCoilLoad;
+                    if (this->DesignSuppHeatingCapacity > 0.0) {
+                        this->SuppHeatPartLoadRatio = min(1.0, SuppHeatCoilLoad / this->DesignSuppHeatingCapacity);
+                    }
+                } else {
+                    getVRFTUZoneLoad(VRFTUNum, ZoneLoad, LoadToHeatingSP, LoadToCoolingSP);
+                    if ((FullOutput < (LoadToHeatingSP - DataHVACGlobals::SmallLoad)) && !FirstHVACIteration) {
+                        SuppHeatCoilLoad = max(0.0, LoadToHeatingSP - FullOutput);
+                        this->SuppHeatingCoilLoad = SuppHeatCoilLoad;
+                        if (this->DesignSuppHeatingCapacity > 0.0) {
+                            this->SuppHeatPartLoadRatio = min(1.0, SuppHeatCoilLoad / this->DesignSuppHeatingCapacity);
+                        }
+                    } else {
+                        SuppHeatCoilLoad = 0.0;
+                        this->SuppHeatPartLoadRatio = 0.0;
+                    }
                 }
-                // should return here since we know everything needed to simulate TU: PLR and supp heat PLR
             } else {
                 SuppHeatCoilLoad = 0.0;
                 this->SuppHeatPartLoadRatio = 0.0;
             }
-        } else {
+        } else { // does it matter what these are if there is no supp heater?
             SuppHeatCoilLoad = 0.0;
             this->SuppHeatPartLoadRatio = 0.0;
         }
-
-        PartLoadRatio = 0.0;
 
         if ((VRFCoolingMode && !VRF(VRFCond).HeatRecoveryUsed) || (VRF(VRFCond).HeatRecoveryUsed && HRCoolingMode)) {
             // Since we are cooling, we expect FullOutput < NoCompOutput
@@ -8138,10 +8158,13 @@ namespace HVACVariableRefrigerantFlow {
                 if (VRFTU(VRFTUNum).CoolingCoilPresent) {
                     PartLoadRatio = 1.0;
                     // the zone set point could be exceeded if set point control is used so protect against that
-                    if (!this->isSetPointControlled ||
-                        (this->isSetPointControlled && DataLoopNode::Node(this->coolCoilAirOutNode).Temp > this->coilTempSetPoint))
+                    if (this->isSetPointControlled) {
+                        if (DataLoopNode::Node(this->coolCoilAirOutNode).Temp > this->coilTempSetPoint) return;
+                    } else {
                         return;
+                    }
                 } else {
+                    PartLoadRatio = 0.0;
                     return;
                 }
             }
@@ -8153,16 +8176,20 @@ namespace HVACVariableRefrigerantFlow {
                 if (this->HeatingCoilPresent) {
                     PartLoadRatio = 1.0;
                     // the zone set point could be exceeded if set point control is used so protect against that
-                    if (!this->isSetPointControlled ||
-                        (this->isSetPointControlled && DataLoopNode::Node(this->heatCoilAirOutNode).Temp < this->coilTempSetPoint))
+                    if (this->isSetPointControlled) {
+                        if (DataLoopNode::Node(this->heatCoilAirOutNode).Temp < this->coilTempSetPoint) return;
+                    } else {
                         return;
+                    }
                 } else {
+                    PartLoadRatio = 0.0;
                     return;
                 }
             }
         } else {
-            // VRF terminal unit is off, PLR already set to 0 above
+            // VRF terminal unit is off
             // shouldn't actually get here
+            PartLoadRatio = 0.0;
             return;
         }
 
@@ -8860,7 +8887,7 @@ namespace HVACVariableRefrigerantFlow {
 
         } else { // terminal unit and/or fan is off
 
-            DataLoopNode::Node(InletNode).MassFlowRate = 0.0;
+            if (!VRFTU(VRFTUNum).isInOASys) DataLoopNode::Node(InletNode).MassFlowRate = 0.0;
             if (OutsideAirNode > 0) {
                 DataLoopNode::Node(OutsideAirNode).MassFlowRate = 0.0;
                 DataLoopNode::Node(AirRelNode).MassFlowRate = 0.0;
@@ -8927,7 +8954,6 @@ namespace HVACVariableRefrigerantFlow {
         // loop through all TU's to find operating mode. Be careful not to mix loop counters with current TU/Cond index
         for (NumTU = 1; NumTU <= TerminalUnitList(TUListNum).NumTUInList; ++NumTU) {
             // make sure TU's have been sized before looping through each one of them to determine operating mode
-            // (which would size all coils based on the zone that called this specific VRF terminal unit)
             if (any(TerminalUnitList(TUListNum).TerminalUnitNotSizedYet)) break;
             TUIndex = TerminalUnitList(TUListNum).ZoneTUPtr(NumTU);
             ThisZoneNum = VRFTU(TUIndex).ZoneNum;
@@ -8951,6 +8977,7 @@ namespace HVACVariableRefrigerantFlow {
             if (VRFTU(TUIndex).isSetPointControlled) {
                 // set point temperature may only reside at the TU outlet node
                 Real64 coolCoilTempSetPoint = DataLoopNode::Node(VRFTU(TUIndex).VRFTUOutletNodeNum).TempSetPoint;
+                VRFTU(TUIndex).suppTempSetPoint = coolCoilTempSetPoint;
                 Real64 heatCoilTempSetPoint = coolCoilTempSetPoint;
                 // adjust coil control for fan heat when set point is at outlet node
                 Real64 coolfanDeltaT = 0.0;
@@ -9014,7 +9041,7 @@ namespace HVACVariableRefrigerantFlow {
                     VRFTU(TUIndex).heatLoadToSP = ZoneLoad;
                     ++NumHeatingLoads(VRFCond);
                     SumHeatingLoads(VRFCond) += ZoneLoad;
-                    MinDeltaT(VRFCond) = -1.0;
+                    MinDeltaT(VRFCond) = min(MinDeltaT(VRFCond), -1.0);
                     VRFTU(TUIndex).coilTempSetPoint = heatCoilTempSetPoint - heatfanDeltaT;
                 } else if ((coilInletTemp - coolCoilTempSetPoint - coolfanDeltaT) > DataHVACGlobals::SmallTempDiff) { // cooling
                     Real64 CpAirIn = Psychrometrics::PsyCpAirFnWTdb(coilInletHumRat, coilInletTemp);
@@ -9023,39 +9050,15 @@ namespace HVACVariableRefrigerantFlow {
                     VRFTU(TUIndex).coolLoadToSP = ZoneLoad;
                     ++NumCoolingLoads(VRFCond);
                     SumCoolingLoads(VRFCond) += ZoneLoad;
-                    MinDeltaT(VRFCond) = -1.0;
+                    MaxDeltaT(VRFCond) = max(MaxDeltaT(VRFCond), 1.0);
                     VRFTU(TUIndex).coilTempSetPoint = coolCoilTempSetPoint - coolfanDeltaT;
                 }
             } else { // else is not set point controlled
                 //     Constant fan systems are tested for ventilation load to determine if load to be met changes.
                 //     more logic may be needed here, what is the OA flow rate, was last mode heating or cooling, what control is used, etc...
-                if (VRFTU(TUIndex).zoneSequenceCoolingNum > 0 && VRFTU(TUIndex).zoneSequenceHeatingNum > 0 && VRFTU(TUIndex).isInAirLoop) {
-                    // air loop equipment uses sequenced variables
-                    LoadToCoolingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(ThisZoneNum)
-                                          .SequencedOutputRequiredToCoolingSP(VRFTU(TUIndex).zoneSequenceCoolingNum) /
-                                      VRFTU(TUIndex).controlZoneMassFlowFrac;
-                    LoadToHeatingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(ThisZoneNum)
-                                          .SequencedOutputRequiredToHeatingSP(VRFTU(TUIndex).zoneSequenceHeatingNum) /
-                                      VRFTU(TUIndex).controlZoneMassFlowFrac;
-                    if (LoadToHeatingSP > 0.0 && LoadToCoolingSP > 0.0 &&
-                        TempControlType(VRFTU(TUIndex).ZoneNum) != DataHVACGlobals::SingleCoolingSetPoint) {
-                        ZoneLoad = LoadToHeatingSP;
-                    } else if (LoadToHeatingSP > 0.0 && LoadToCoolingSP > 0.0 &&
-                               TempControlType(VRFTU(TUIndex).ZoneNum) == DataHVACGlobals::SingleCoolingSetPoint) {
-                        ZoneLoad = 0.0;
-                    } else if (LoadToHeatingSP < 0.0 && LoadToCoolingSP < 0.0 &&
-                               TempControlType(VRFTU(TUIndex).ZoneNum) != DataHVACGlobals::SingleHeatingSetPoint) {
-                        ZoneLoad = LoadToCoolingSP;
-                    } else if (LoadToHeatingSP < 0.0 && LoadToCoolingSP < 0.0 &&
-                               TempControlType(VRFTU(TUIndex).ZoneNum) == DataHVACGlobals::SingleHeatingSetPoint) {
-                        ZoneLoad = 0.0;
-                    } else if (LoadToHeatingSP <= 0.0 && LoadToCoolingSP >= 0.0) {
-                        ZoneLoad = 0.0;
-                    }
-                } else if (ThisZoneNum > 0) {
-                    // zone equipment uses Remaining* variables
-                    ZoneLoad = ZoneSysEnergyDemand(ThisZoneNum).RemainingOutputRequired / VRFTU(TUIndex).controlZoneMassFlowFrac;
-                }
+
+                getVRFTUZoneLoad(TUIndex, ZoneLoad, LoadToHeatingSP, LoadToCoolingSP);
+
                 if (VRF(VRFCond).ThermostatPriority == ThermostatOffsetPriority) {
                     //         for TSTATPriority, just check difference between zone temp and thermostat setpoint
                     if (ThisZoneNum > 0) {
@@ -9104,8 +9107,6 @@ namespace HVACVariableRefrigerantFlow {
                             VRFTU(TUIndex).CalcVRF(TUIndex, FirstHVACIteration, 0.0, TempOutput, OnOffAirFlowRatio, SuppHeatCoilLoad);
                         }
 
-                        LoadToCoolingSP = ZoneSysEnergyDemand(ThisZoneNum).OutputRequiredToCoolingSP / VRFTU(TUIndex).controlZoneMassFlowFrac;
-                        LoadToHeatingSP = ZoneSysEnergyDemand(ThisZoneNum).OutputRequiredToHeatingSP / VRFTU(TUIndex).controlZoneMassFlowFrac;
                         //           If the Terminal Unit has a net cooling capacity (NoCompOutput < 0) and
                         //           the zone temp is above the Tstat heating setpoint (QToHeatSetPt < 0)
                         if (TempOutput < 0.0 && LoadToHeatingSP < 0.0) {
@@ -9572,6 +9573,59 @@ namespace HVACVariableRefrigerantFlow {
             return VRFTU(VRFTUNum).VRFTUOAMixerRetNodeNum;
         } else {
             return 0;
+        }
+    }
+
+    void getVRFTUZoneLoad(int const VRFTUNum, Real64 &zoneLoad, Real64 &LoadToHeatingSP, Real64 &LoadToCoolingSP)
+    {
+
+        //if (!HeatingLoad(VRFTU(VRFTUNum).VRFSysNum) && !CoolingLoad(VRFTU(VRFTUNum).VRFSysNum)) {
+        //    zoneLoad = 0.0;
+        //    LoadToHeatingSP = 0.0;
+        //    LoadToCoolingSP = 0.0;
+        //    return;
+        //}
+        if (VRFTU(VRFTUNum).zoneSequenceCoolingNum > 0 && VRFTU(VRFTUNum).zoneSequenceHeatingNum > 0 && VRFTU(VRFTUNum).isInAirLoop) {
+            // air loop equipment uses sequenced variables
+            LoadToCoolingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(VRFTU(VRFTUNum).ZoneNum)
+                                  .SequencedOutputRequiredToCoolingSP(VRFTU(VRFTUNum).zoneSequenceCoolingNum) /
+                              VRFTU(VRFTUNum).controlZoneMassFlowFrac;
+            LoadToHeatingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(VRFTU(VRFTUNum).ZoneNum)
+                                  .SequencedOutputRequiredToHeatingSP(VRFTU(VRFTUNum).zoneSequenceHeatingNum) /
+                              VRFTU(VRFTUNum).controlZoneMassFlowFrac;
+            if (LoadToHeatingSP > 0.0 && LoadToCoolingSP > 0.0 &&
+                DataHeatBalFanSys::TempControlType(VRFTU(VRFTUNum).ZoneNum) != DataHVACGlobals::SingleCoolingSetPoint) {
+                zoneLoad = LoadToHeatingSP;
+            } else if (LoadToHeatingSP > 0.0 && LoadToCoolingSP > 0.0 &&
+                       DataHeatBalFanSys::TempControlType(VRFTU(VRFTUNum).ZoneNum) == DataHVACGlobals::SingleCoolingSetPoint) {
+                zoneLoad = 0.0;
+            } else if (LoadToHeatingSP < 0.0 && LoadToCoolingSP < 0.0 &&
+                       DataHeatBalFanSys::TempControlType(VRFTU(VRFTUNum).ZoneNum) != DataHVACGlobals::SingleHeatingSetPoint) {
+                zoneLoad = LoadToCoolingSP;
+            } else if (LoadToHeatingSP < 0.0 && LoadToCoolingSP < 0.0 &&
+                       DataHeatBalFanSys::TempControlType(VRFTU(VRFTUNum).ZoneNum) == DataHVACGlobals::SingleHeatingSetPoint) {
+                zoneLoad = 0.0;
+            } else if (LoadToHeatingSP <= 0.0 && LoadToCoolingSP >= 0.0) {
+                zoneLoad = 0.0;
+            }
+        } else if (VRFTU(VRFTUNum).ZoneNum > 0) {
+            // zone equipment uses Remaining* variables
+            zoneLoad = ZoneSysEnergyDemand(VRFTU(VRFTUNum).ZoneNum).RemainingOutputRequired / VRFTU(VRFTUNum).controlZoneMassFlowFrac;
+            LoadToCoolingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(VRFTU(VRFTUNum).ZoneNum).RemainingOutputReqToCoolSP /
+                              VRFTU(VRFTUNum).controlZoneMassFlowFrac;
+            LoadToHeatingSP = DataZoneEnergyDemands::ZoneSysEnergyDemand(VRFTU(VRFTUNum).ZoneNum).RemainingOutputReqToHeatSP /
+                              VRFTU(VRFTUNum).controlZoneMassFlowFrac;
+        } else if (VRFTU(VRFTUNum).isSetPointControlled) {
+            if (VRFTU(VRFTUNum).coolSPActive) {
+                LoadToCoolingSP = VRFTU(VRFTUNum).coolLoadToSP;
+                zoneLoad = LoadToCoolingSP;
+                LoadToHeatingSP = 0.0;
+            }
+            if (VRFTU(VRFTUNum).heatSPActive) {
+                LoadToHeatingSP = VRFTU(VRFTUNum).heatLoadToSP;
+                zoneLoad = LoadToHeatingSP;
+                LoadToCoolingSP = 0.0;
+            }
         }
     }
 
@@ -11192,14 +11246,36 @@ namespace HVACVariableRefrigerantFlow {
             this->coilInNodeT = DataLoopNode::Node(DXCoils::DXCoil(this->HeatCoilIndex).AirInNode).Temp;
             this->coilInNodeW = DataLoopNode::Node(DXCoils::DXCoil(this->HeatCoilIndex).AirInNode).HumRat;
         }
+
         // set supplemental heating coil calculation if the condition requires
-        if (this->SuppHeatingCoilPresent && QZnReq > DataHVACGlobals::SmallLoad && QZnReq > FullOutput) {
-            Real64 LoadToHeatingSP = ZoneSysEnergyDemand(this->ZoneNum).RemainingOutputReqToHeatSP;
-            if ((FullOutput < (LoadToHeatingSP - DataHVACGlobals::SmallLoad)) && !FirstHVACIteration) {
-                SuppHeatCoilLoad = max(0.0, LoadToHeatingSP - FullOutput);
-                this->SuppHeatingCoilLoad = SuppHeatCoilLoad;
-                if (this->DesignSuppHeatingCapacity > 0.0) {
-                    this->SuppHeatPartLoadRatio = min(1.0, SuppHeatCoilLoad / this->DesignSuppHeatingCapacity);
+        if (this->SuppHeatingCoilPresent) {
+            if ((QZnReq > DataHVACGlobals::SmallLoad && QZnReq > FullOutput) ||
+                (this->isSetPointControlled && this->suppTempSetPoint > DataLoopNode::Node(this->SuppHeatCoilAirInletNode).Temp)) {
+                Real64 ZoneLoad = 0.0;
+                Real64 LoadToHeatingSP = 0.0;
+                Real64 LoadToCoolingSP = 0.0;
+                if (this->isSetPointControlled) {
+                    Real64 mDot = DataLoopNode::Node(this->SuppHeatCoilAirInletNode).MassFlowRate;
+                    Real64 Tin = DataLoopNode::Node(this->SuppHeatCoilAirInletNode).Temp;
+                    Real64 Win = DataLoopNode::Node(this->SuppHeatCoilAirInletNode).HumRat;
+                    Real64 CpAirIn = Psychrometrics::PsyCpAirFnWTdb(Win, Tin);
+                    SuppHeatCoilLoad = mDot * CpAirIn * (this->suppTempSetPoint - Tin);
+                    this->SuppHeatingCoilLoad = SuppHeatCoilLoad;
+                    if (this->DesignSuppHeatingCapacity > 0.0) {
+                        this->SuppHeatPartLoadRatio = min(1.0, SuppHeatCoilLoad / this->DesignSuppHeatingCapacity);
+                    }
+                } else {
+                    getVRFTUZoneLoad(VRFTUNum, ZoneLoad, LoadToHeatingSP, LoadToCoolingSP);
+                    if ((FullOutput < (LoadToHeatingSP - DataHVACGlobals::SmallLoad)) && !FirstHVACIteration) {
+                        SuppHeatCoilLoad = max(0.0, LoadToHeatingSP - FullOutput);
+                        this->SuppHeatingCoilLoad = SuppHeatCoilLoad;
+                        if (this->DesignSuppHeatingCapacity > 0.0) {
+                            this->SuppHeatPartLoadRatio = min(1.0, SuppHeatCoilLoad / this->DesignSuppHeatingCapacity);
+                        }
+                    } else {
+                        SuppHeatCoilLoad = 0.0;
+                        this->SuppHeatPartLoadRatio = 0.0;
+                    }
                 }
             } else {
                 SuppHeatCoilLoad = 0.0;

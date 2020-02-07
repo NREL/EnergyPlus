@@ -712,7 +712,6 @@ namespace HVACVariableRefrigerantFlow {
         Real64 EMSValueForPartLoadFrac;  // user defined value for EMS function
         int IterLimitExceeded;           // index used for warning messages
         int FirstIterfailed;             // index used for warning messages
-        int ZonePtr;                     // pointer to a zone served by a VRF terminal unit
         int HVACSizingIndex;             // index of a HVACSizing object for a VRF terminal
         bool ATMixerExists;              // True if there is an ATMixer
         std::string ATMixerName;         // name of air terminal mixer
@@ -745,6 +744,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 coolLoadToSP;             // load to set point in cooling mode
         Real64 heatLoadToSP;             // load to set point in heating mode
         Real64 coilTempSetPoint;         // coil control temperature
+        Real64 suppTempSetPoint;         // supplemental heating coil control temperature
         Real64 controlZoneMassFlowFrac;  // ratio of control zone air mass flow rate to total zone air mass flow rate
         int zoneSequenceCoolingNum;      // zone equipment cooling sequence
         int zoneSequenceHeatingNum;      // zone equipment heating sequence
@@ -769,12 +769,12 @@ namespace HVACVariableRefrigerantFlow {
               TotalCoolingRate(0.0), TotalHeatingRate(0.0), SensibleCoolingRate(0.0), SensibleHeatingRate(0.0), LatentCoolingRate(0.0),
               LatentHeatingRate(0.0), TotalCoolingEnergy(0.0), TotalHeatingEnergy(0.0), SensibleCoolingEnergy(0.0), SensibleHeatingEnergy(0.0),
               LatentCoolingEnergy(0.0), LatentHeatingEnergy(0.0), EMSOverridePartLoadFrac(false), EMSValueForPartLoadFrac(0.0), IterLimitExceeded(0),
-              FirstIterfailed(0), ZonePtr(0), HVACSizingIndex(0), ATMixerExists(false), ATMixerIndex(0), ATMixerType(0), ATMixerPriNode(0),
-              ATMixerSecNode(0), ATMixerOutNode(0), SuppHeatCoilAirInletNode(0), SuppHeatCoilAirOutletNode(0), SuppHeatCoilFluidInletNode(0),
+              FirstIterfailed(0), HVACSizingIndex(0), ATMixerExists(false), ATMixerIndex(0), ATMixerType(0), ATMixerPriNode(0), ATMixerSecNode(0),
+              ATMixerOutNode(0), SuppHeatCoilAirInletNode(0), SuppHeatCoilAirOutletNode(0), SuppHeatCoilFluidInletNode(0),
               SuppHeatCoilFluidOutletNode(0), firstPass(true), SuppHeatCoilLoopNum(), SuppHeatCoilLoopSide(), SuppHeatCoilBranchNum(),
               SuppHeatCoilCompNum(), coilInNodeT(0.0), coilInNodeW(0.0), fanInletNode(0), fanOutletNode(0), MySuppCoilPlantScanFlag(true),
               airLoopNum(0), isInOASys(false), isInAirLoop(false), isInZone(false), isSetPointControlled(false), coolSPActive(false),
-              heatSPActive(false), coolLoadToSP(0.0), heatLoadToSP(0.0), coilTempSetPoint(0.0), controlZoneMassFlowFrac(1.0),
+              heatSPActive(false), coolLoadToSP(0.0), heatLoadToSP(0.0), coilTempSetPoint(0.0), suppTempSetPoint(0.0), controlZoneMassFlowFrac(1.0),
               zoneSequenceCoolingNum(0), zoneSequenceHeatingNum(0), coolCoilAirInNode(0), coolCoilAirOutNode(0), heatCoilAirInNode(0),
               heatCoilAirOutNode(0)
         {
@@ -918,7 +918,9 @@ namespace HVACVariableRefrigerantFlow {
 
     int GetVRFTUMixedAirNode(int const VRFTUNum);
 
-    int GetVRFTUReturnAirNode(int VRFTUNum);
+    int GetVRFTUReturnAirNode(int const VRFTUNum);
+
+    void getVRFTUZoneLoad(int const VRFTUNum, Real64 &zoneLoad, Real64 &LoadToHeatingSP, Real64 &LoadToCoolingSP);
 
     void ReportVRFTerminalUnit(int VRFTUNum); // index to VRF terminal unit
 
