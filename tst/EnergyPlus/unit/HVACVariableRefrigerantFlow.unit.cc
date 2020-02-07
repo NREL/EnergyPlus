@@ -217,7 +217,6 @@ protected:
 
         // set up zone 1
 
-        int zone1 = 1;
         int zoneNum = 1;
         // zone nodes
         int zoneNode = 1;
@@ -478,6 +477,7 @@ protected:
         VRFTU.DXHeatCoilType_Num = DataHVACGlobals::CoilVRF_Heating;
         VRFTU.CoolingCoilPresent = true;
         VRFTU.HeatingCoilPresent = true;
+        VRFTU.ZoneNum = zoneNum;
         VRFTU.HVACSizingIndex = 0;
 
         // DX coil set up
