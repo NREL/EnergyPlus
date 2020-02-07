@@ -7130,7 +7130,12 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
         EXPECT_EQ(std::get<2>(v), oa_db) << "Failed for TableName=" << tableName << "; ReportName=" << reportName;
     }
 
+	std::string query_2("SELECT Value From TabularDataWithStrings"
+	                    "  WHERE ReportName = 'Heating Peak Conditions'"
+	                    "  AND TableName = 'Engineering Checks for Heating'"
+	                    "  AND RowName = 'Airflow per Floor Area';");
 
+	auto result = queryResult(query_2, "TabularDataWithStrings");
 }
 
 
