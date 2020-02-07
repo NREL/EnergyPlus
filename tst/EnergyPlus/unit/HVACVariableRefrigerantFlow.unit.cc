@@ -477,7 +477,6 @@ protected:
         VRFTU.DXHeatCoilType_Num = DataHVACGlobals::CoilVRF_Heating;
         VRFTU.CoolingCoilPresent = true;
         VRFTU.HeatingCoilPresent = true;
-        VRFTU.ZoneNum = zoneNum;
         VRFTU.HVACSizingIndex = 0;
 
         // DX coil set up
