@@ -490,7 +490,7 @@ TEST_F(EnergyPlusFixture, WaterMainsOutputReports_CorrelationFromWeatherFileTest
                                                     "Annual Average Outdoor Air Temperature{C},"
                                                     "Maximum Difference In Monthly Average Outdoor Air Temperatures{deltaC},"
                                                     "Fixed Default Water Mains Temperature{C}",
-                                                    "Site Water Mains Temperature Information,CorrelationFromWeatherFile,NA,9.99,28.78,NA"});
+                                                    "Site Water Mains Temperature Information,CorrelationFromWeatherFile,NA,9.99,28.78,NA"}, "\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 }
@@ -777,7 +777,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
         "! <Environment:Design Day Misc>,DayOfYear,ASHRAE A Coeff,ASHRAE B Coeff,ASHRAE C Coeff,Solar Constant-Annual Variation,Eq of Time {minutes}, Solar Declination Angle {deg}, Solar Model",
         "Environment:Design Day Data,33.00,6.60,DefaultMultipliers,Enthalpy,90500.00,{J/kgDryAir},100511,220,3.2,0.00,No,No",
         "Environment:Design Day Misc,202,1084.4,0.2082,0.1365,1.0,-6.23,20.6,ASHRAETau",
-    });
+    }, "\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, false));
 
