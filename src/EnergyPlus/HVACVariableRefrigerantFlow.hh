@@ -919,7 +919,7 @@ namespace HVACVariableRefrigerantFlow {
 
     int GetVRFTUReturnAirNode(int const VRFTUNum);
 
-    void getVRFTUZoneLoad(int const VRFTUNum, Real64 &zoneLoad, Real64 &LoadToHeatingSP, Real64 &LoadToCoolingSP);
+    void getVRFTUZoneLoad(int const VRFTUNum, Real64 &zoneLoad, Real64 &LoadToHeatingSP, Real64 &LoadToCoolingSP, bool const InitFlag);
 
     void ReportVRFTerminalUnit(int VRFTUNum); // index to VRF terminal unit
 
