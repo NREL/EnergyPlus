@@ -10117,6 +10117,14 @@ namespace HVACVariableRefrigerantFlow {
             HRCoolRequestFlag = false;
         }
 
+        // identifies a logic error in finding CoolingLoad = true where TU_CoolingLoad = 0
+        // logic error needs to be identified and corrected (using VariableRefrigerantFlow_FluidTCtrl_wSuppHeater_5Zone)
+        // to see logic error resulting in divide by 0, change to this: 
+        // bool coolingLoad = CoolingLoad(VRFCond);
+        // bool heatingLoad = HeatingLoad(VRFCond);
+        bool coolingLoad = CoolingLoad(VRFCond) && (TU_CoolingLoad > 0.0);
+        bool heatingLoad = HeatingLoad(VRFCond) && (TU_HeatingLoad > 0.0);
+
         // Initialization for Ncomp iterations
         NumOfCompSpdInput = this->CompressorSpeed.size();
         CompEvaporatingPWRSpd.dimension(NumOfCompSpdInput);
@@ -10124,7 +10132,7 @@ namespace HVACVariableRefrigerantFlow {
         this->OperatingMode = 0; // report variable for heating or cooling mode
 
         // 1. VRF-HP Cooling Mode .OR. VRF-HR Mode_1
-        if ((!this->HeatRecoveryUsed && CoolingLoad(VRFCond)) || (this->HeatRecoveryUsed && !HRHeatRequestFlag && HRCoolRequestFlag)) {
+        if ((!this->HeatRecoveryUsed && coolingLoad ) || (this->HeatRecoveryUsed && !HRHeatRequestFlag && HRCoolRequestFlag)) {
 
             this->OperatingMode = ModeCoolingOnly;
             this->VRFOperationSimPath = 10;
@@ -10344,7 +10352,7 @@ namespace HVACVariableRefrigerantFlow {
             this->IUEvapHeatRate = TU_CoolingLoad;
 
             // 2. VRF-HP Heating Mode .OR. VRF-HR Mode_6
-        } else if ((!this->HeatRecoveryUsed && HeatingLoad(VRFCond)) || (this->HeatRecoveryUsed && !HRCoolRequestFlag && HRHeatRequestFlag)) {
+        } else if ((!this->HeatRecoveryUsed && heatingLoad ) || (this->HeatRecoveryUsed && !HRCoolRequestFlag && HRHeatRequestFlag)) {
 
             this->OperatingMode = ModeHeatingOnly;
             this->VRFOperationSimPath = 60;
@@ -10789,7 +10797,7 @@ namespace HVACVariableRefrigerantFlow {
         }
 
         // calculate capacities and energy use
-        if (((!this->HeatRecoveryUsed && CoolingLoad(VRFCond)) || (this->HeatRecoveryUsed && HRCoolRequestFlag)) &&
+        if (((!this->HeatRecoveryUsed && coolingLoad) || (this->HeatRecoveryUsed && HRCoolRequestFlag)) &&
             TerminalUnitList(TUListNum).CoolingCoilPresent(NumTUInList)) {
             InletAirWetBulbC = SumCoolInletWB;
 
@@ -10803,7 +10811,7 @@ namespace HVACVariableRefrigerantFlow {
                 CoolingPLR = 0.0;
             }
         }
-        if (((!this->HeatRecoveryUsed && HeatingLoad(VRFCond)) || (this->HeatRecoveryUsed && HRHeatRequestFlag)) &&
+        if (((!this->HeatRecoveryUsed && heatingLoad) || (this->HeatRecoveryUsed && HRHeatRequestFlag)) &&
             TerminalUnitList(TUListNum).HeatingCoilPresent(NumTUInList)) {
             InletAirDryBulbC = SumHeatInletDB;
             InletAirWetBulbC = SumHeatInletWB;
@@ -10898,7 +10906,7 @@ namespace HVACVariableRefrigerantFlow {
                 if (!this->HRCoolingActive && !this->HRHeatingActive) {
                     this->ModeChange = true;
                 }
-                if (CoolingLoad(VRFCond)) {
+                if (coolingLoad) {
                     if (this->HRHeatingActive && !this->HRCoolingActive) {
                         this->HRModeChange = true;
                     }
@@ -10911,7 +10919,7 @@ namespace HVACVariableRefrigerantFlow {
                     HRInitialEIRFrac = this->HRInitialCoolEIRFrac; // Fractional cooling degradation at the start of heat recovery from cooling mode
                     HREIRTC = this->HRCoolEIRTC;                   // Time constant used to recover from initial degradation in cooling heat recovery
 
-                } else if (HeatingLoad(VRFCond)) {
+                } else if (heatingLoad) {
                     if (!this->HRHeatingActive && this->HRCoolingActive) {
                         this->HRModeChange = true;
                     }
@@ -11077,7 +11085,7 @@ namespace HVACVariableRefrigerantFlow {
         // if ( this->CondenserType == DataHVACGlobals::EvapCooled )
 
         // Calculate OperatingHeatingCOP & OperatingCoolingCOP: VRF Heat Pump Operating COP []
-        if (CoolingLoad(VRFCond) && CoolingPLR > 0.0) {
+        if (coolingLoad && CoolingPLR > 0.0) {
             if (this->ElecCoolingPower != 0.0) {
                 // this calc should use delivered capacity, not condenser capacity, use VRF(VRFCond).TUCoolingLoad
                 this->OperatingCoolingCOP = (this->TotalCoolingCapacity) /
@@ -11086,7 +11094,7 @@ namespace HVACVariableRefrigerantFlow {
                 this->OperatingCoolingCOP = 0.0;
             }
         }
-        if (HeatingLoad(VRFCond) && HeatingPLR > 0.0) {
+        if (heatingLoad && HeatingPLR > 0.0) {
             // this calc should use delivered capacity, not condenser capacity, use VRF(VRFCond).TUHeatingLoad
             if (this->ElecHeatingPower != 0.0) {
                 this->OperatingHeatingCOP = (this->TotalHeatingCapacity) /
@@ -11106,7 +11114,7 @@ namespace HVACVariableRefrigerantFlow {
         // limit the TU capacity when the condenser is maxed out on capacity
         // I think this next line will make the max cap report variable match the coil objects, will probably change the answer though
         //  IF(CoolingLoad(VRFCond) .AND. NumTUInCoolingMode .GT. 0 .AND. MaxCoolingCapacity(VRFCond) == MaxCap)THEN
-        if (CoolingLoad(VRFCond) && NumTUInCoolingMode > 0) {
+        if (coolingLoad && NumTUInCoolingMode > 0) {
 
             //   IF TU capacity is greater than condenser capacity find maximum allowed TU capacity (i.e., conserve energy)
             if (TU_CoolingLoad > TotalTUCoolingCapacity) {
@@ -11119,7 +11127,7 @@ namespace HVACVariableRefrigerantFlow {
                                 TerminalUnitList(TUListNum).TotalHeatLoad,
                                 MaxHeatingCapacity(VRFCond));
             }
-        } else if (HeatingLoad(VRFCond) && NumTUInHeatingMode > 0) {
+        } else if (heatingLoad && NumTUInHeatingMode > 0) {
             //   IF TU capacity is greater than condenser capacity
             if (TU_HeatingLoad > TotalTUHeatingCapacity) {
                 LimitTUCapacity(VRFCond,
