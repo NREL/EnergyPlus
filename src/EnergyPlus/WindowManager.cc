@@ -7829,17 +7829,12 @@ namespace WindowManager {
                         {
                             auto const SELECT_CASE_var(Material(Layer).Group);
                             if (SELECT_CASE_var == WindowGas) {
-<<<<<<< HEAD
                                 static constexpr auto Format_702(" WindowMaterial:Gas,{},{},{:.3R}\n");
                                 print(outputFiles.eio,
                                       Format_702,
                                       Material(Layer).Name,
                                       GasTypeName(Material(Layer).GasType(1)),
                                       Material(Layer).Thickness);
-=======
-                                ObjexxFCL::gio::write(OutputFileInits, Format_702) << Material(Layer).Name << GasTypeName(Material(Layer).GasType(1))
-                                                                                   << RoundSigDigits(Material(Layer).Thickness, 3);
->>>>>>> origin/develop
 
                                 //! fw CASE(WindowGasMixture)
 
@@ -8026,7 +8021,6 @@ namespace WindowManager {
                                 } else if (Material(Layer).GapVentType == 3) {
                                     GapVentType = "VentedOutdoor";
                                 }
-<<<<<<< HEAD
                                 static constexpr auto Format_713(" WindowMaterial:Gap:EquivalentLayer,{},{},{:.3R},{}\n");
                                 print(outputFiles.eio,
                                       Format_713,
@@ -8034,10 +8028,6 @@ namespace WindowManager {
                                       GasTypeName(Material(Layer).GasType(1)),
                                       Material(Layer).Thickness,
                                       GapVentType);
-=======
-                                ObjexxFCL::gio::write(OutputFileInits, Format_713) << Material(Layer).Name << GasTypeName(Material(Layer).GasType(1))
-                                                                                   << RoundSigDigits(Material(Layer).Thickness, 3) << GapVentType;
->>>>>>> origin/develop
                             }
                         }
                     }
