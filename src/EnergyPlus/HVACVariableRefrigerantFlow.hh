@@ -851,9 +851,8 @@ namespace HVACVariableRefrigerantFlow {
         );
 
         static Real64
-        HeatingCoilCapacityLimit(Real64 HeatCoilAirInletNode,  // supplemental heating coil air inlet node
-                                 Real64 HeatCoilAirOutletNode, // supplemental heating coil air outlet node
-                                 Real64 HeatCoilMaxSATAllowed  // supplemental heating coil maximum supply air temperature allowed [C]
+        HeatingCoilCapacityLimit(Real64 const HeatCoilAirInletNode, // supplemental heating coil air inlet node
+                                 Real64 const HeatCoilMaxSATAllowed // supplemental heating coil maximum supply air temperature allowed [C]
         );
     };
 

@@ -165,7 +165,7 @@ namespace ZoneEquipmentManager {
     using DataEnvironment::TotRunDesPersDays;
     using namespace DataZoneEquipment;
     // Use statements for access to subroutines in other modules
-    using Psychrometrics::PsyCpAirFnWTdb;
+    using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyHFnTdbW;
     using Psychrometrics::PsyHgAirFnWTdb;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -670,7 +670,7 @@ namespace ZoneEquipmentManager {
                                           HR90L,
                                           DOASSupplyTemp,
                                           DOASSupplyHumRat);
-                DOASCpAir = PsyCpAirFnWTdb(DOASSupplyHumRat, DOASSupplyTemp);
+                DOASCpAir = PsyCpAirFnW(DOASSupplyHumRat);
                 DOASSysOutputProvided = DOASMassFlowRate * DOASCpAir * (DOASSupplyTemp - Node(ZoneNode).Temp);
                 TotDOASSysOutputProvided =
                     DOASMassFlowRate * (PsyHFnTdbW(DOASSupplyTemp, DOASSupplyHumRat) - PsyHFnTdbW(Node(ZoneNode).Temp, Node(ZoneNode).HumRat));
@@ -741,7 +741,7 @@ namespace ZoneEquipmentManager {
 
                 Enthalpy = PsyHFnTdbW(Temp, HumRat);
                 SysOutputProvided = ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputRequired;
-                CpAir = PsyCpAirFnWTdb(HumRat, Temp);
+                CpAir = PsyCpAirFnW(HumRat);
                 if (std::abs(DeltaTemp) > SmallTempDiff) {
                     //!!PH/WFB/LKL (UCDV model)        MassFlowRate = SysOutputProvided / (CpAir*DeltaTemp)
                     MassFlowRate = max(SysOutputProvided / (CpAir * DeltaTemp), 0.0);
@@ -5322,7 +5322,7 @@ namespace ZoneEquipmentManager {
                 // cases the heat to return air is treated as a zone heat gain and dealt with in CalcZoneSums in
                 // MODULE ZoneTempPredictorCorrector.
                 if (!Zone(ActualZoneNum).NoHeatToReturnAir) {
-                    CpAir = PsyCpAirFnWTdb(Node(ZoneNode).HumRat, Node(ZoneNode).Temp);
+                    CpAir = PsyCpAirFnW(Node(ZoneNode).HumRat);
                     if (MassFlowRA > 0.0) {
                         if (WinGapFlowToRA > 0.0) {
                             // Add heat-to-return from window gap airflow
@@ -5540,7 +5540,7 @@ namespace ZoneEquipmentManager {
         using DataZoneEquipment::ZMAT;
         using DataZoneEquipment::ZoneEquipAvail;
         using EarthTube::ManageEarthTube;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::PsyTdbFnHW;
         using Psychrometrics::PsyWFnTdbTwbPb;
@@ -5720,10 +5720,10 @@ namespace ZoneEquipmentManager {
                 EnthalpyExt = OutEnthalpy;
             }
             AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, TempExt, HumRatExt);
-            CpAir = PsyCpAirFnWTdb(HumRatExt, TempExt);
+            CpAir = PsyCpAirFnW(HumRatExt);
             // CR7751 should maybe use code below, indoor conditions instead of outdoor conditions
             //   AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, ZMAT(NZ), ZHumRat(NZ))
-            //   CpAir = PsyCpAirFnWTdb(ZHumRat(NZ),ZMAT(NZ))
+            //   CpAir = PsyCpAirFnW(ZHumRat(NZ),ZMAT(NZ))
             // Hybrid ventilation global control
             if (Ventilation(j).HybridControlType == HybridControlTypeGlobal && Ventilation(j).HybridControlMasterNum > 0) {
                 I = Ventilation(j).HybridControlMasterNum;
@@ -6027,9 +6027,9 @@ namespace ZoneEquipmentManager {
                 if (TZM < TZN + TD) {
                     //            Per Jan 17, 2008 conference call, agreed to use average conditions for Rho, Cp and Hfg
                     //             RhoAirM = PsyRhoAirFnPbTdbW(OutBaroPress,tzm,ZHumRat(m))
-                    //             MCP=Mixing(J)%DesiredAirFlowRate * PsyCpAirFnWTdb(ZHumRat(m),tzm) * RhoAirM
+                    //             MCP=Mixing(J)%DesiredAirFlowRate * PsyCpAirFnW(ZHumRat(m),tzm) * RhoAirM
                     AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, (TZN + TZM) / 2.0, (ZHumRat(n) + ZHumRat(m)) / 2.0);
-                    CpAir = PsyCpAirFnWTdb((ZHumRat(n) + ZHumRat(m)) / 2.0, (TZN + TZM) / 2.0); // Use average conditions
+                    CpAir = PsyCpAirFnW((ZHumRat(n) + ZHumRat(m)) / 2.0); // Use average conditions
 
                     Mixing(j).DesiredAirFlowRate = Mixing(j).DesiredAirFlowRateSaved;
                     if (ZoneMassBalanceFlag(n) && AdjustZoneMassFlowFlag) {
@@ -6058,9 +6058,9 @@ namespace ZoneEquipmentManager {
             if (TD > 0.0) {
                 if (TZM > TZN + TD) {
                     //             RhoAirM = PsyRhoAirFnPbTdbW(OutBaroPress,tzm,ZHumRat(m))
-                    //             MCP=Mixing(J)%DesiredAirFlowRate * PsyCpAirFnWTdb(ZHumRat(m),tzm) * RhoAirM
+                    //             MCP=Mixing(J)%DesiredAirFlowRate * PsyCpAirFnW(ZHumRat(m),tzm) * RhoAirM
                     AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, (TZN + TZM) / 2.0, (ZHumRat(n) + ZHumRat(m)) / 2.0); // Use avg conditions
-                    CpAir = PsyCpAirFnWTdb((ZHumRat(n) + ZHumRat(m)) / 2.0, (TZN + TZM) / 2.0);                       // Use average conditions
+                    CpAir = PsyCpAirFnW((ZHumRat(n) + ZHumRat(m)) / 2.0);                                             // Use average conditions
 
                     Mixing(j).DesiredAirFlowRate = Mixing(j).DesiredAirFlowRateSaved;
                     if (ZoneMassBalanceFlag(n) && AdjustZoneMassFlowFlag) {
@@ -6087,10 +6087,10 @@ namespace ZoneEquipmentManager {
             }
             if (TD == 0.0) {
                 //          RhoAirM = PsyRhoAirFnPbTdbW(OutBaroPress,tzm,ZHumRat(m))
-                //          MCP=Mixing(J)%DesiredAirFlowRate * PsyCpAirFnWTdb(ZHumRat(m),tzm) * RhoAirM
+                //          MCP=Mixing(J)%DesiredAirFlowRate * PsyCpAirFnW(ZHumRat(m),tzm) * RhoAirM
                 AirDensity =
                     PsyRhoAirFnPbTdbW(OutBaroPress, (TZN + TZM) / 2.0, (ZHumRat(n) + ZHumRat(m)) / 2.0, RoutineNameMixing); // Use avg conditions
-                CpAir = PsyCpAirFnWTdb((ZHumRat(n) + ZHumRat(m)) / 2.0, (TZN + TZM) / 2.0);                                 // Use average conditions
+                CpAir = PsyCpAirFnW((ZHumRat(n) + ZHumRat(m)) / 2.0);                                                       // Use average conditions
 
                 Mixing(j).DesiredAirFlowRate = Mixing(j).DesiredAirFlowRateSaved;
                 if (ZoneMassBalanceFlag(n) && AdjustZoneMassFlowFlag) {
@@ -6225,7 +6225,7 @@ namespace ZoneEquipmentManager {
                     Tavg = (TZN + TZM) / 2.0;
                     Wavg = (ZHumRat(n) + ZHumRat(m)) / 2.0;
                     AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Tavg, Wavg, RoutineNameCrossMixing);
-                    CpAir = PsyCpAirFnWTdb(Wavg, Tavg);
+                    CpAir = PsyCpAirFnW(Wavg);
                     MCPxN = CrossMixing(j).DesiredAirFlowRate * CpAir * AirDensity;
                     MCPM(n) += MCPxN;
 
@@ -6265,9 +6265,9 @@ namespace ZoneEquipmentManager {
                     HumRatZoneA = ZHumRat(ZoneA);
                     HumRatZoneB = ZHumRat(ZoneB);
                     AirDensityZoneA = PsyRhoAirFnPbTdbW(OutBaroPress, TZoneA, HumRatZoneA, RoutineNameRefrigerationDoorMixing);
-                    CpAirZoneA = PsyCpAirFnWTdb(HumRatZoneA, TZoneA);
+                    CpAirZoneA = PsyCpAirFnW(HumRatZoneA);
                     AirDensityZoneB = PsyRhoAirFnPbTdbW(OutBaroPress, TZoneB, HumRatZoneB, RoutineNameRefrigerationDoorMixing);
-                    CpAirZoneB = PsyCpAirFnWTdb(HumRatZoneB, TZoneB);
+                    CpAirZoneB = PsyCpAirFnW(HumRatZoneB);
                     Tavg = (TZoneA + TZoneB) / 2.0;
                     Wavg = (HumRatZoneA + HumRatZoneB) / 2.0;
                     AirDensityAvg = PsyRhoAirFnPbTdbW(OutBaroPress, Tavg, Wavg, RoutineNameRefrigerationDoorMixing);
@@ -6352,11 +6352,11 @@ namespace ZoneEquipmentManager {
             }
 
             AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, TempExt, HumRatExt, RoutineNameInfiltration);
-            CpAir = PsyCpAirFnWTdb(HumRatExt, TempExt);
+            CpAir = PsyCpAirFnW(HumRatExt);
 
             // CR7751  should maybe use code below, indoor conditions instead of outdoor conditions
             //   AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, ZMAT(NZ), ZHumRat(NZ))
-            //   CpAir = PsyCpAirFnWTdb(ZHumRat(NZ),ZMAT(NZ))
+            //   CpAir = PsyCpAirFnW(ZHumRat(NZ),ZMAT(NZ))
             {
                 auto const SELECT_CASE_var(Infiltration(j).ModelType);
 
@@ -6474,7 +6474,7 @@ namespace ZoneEquipmentManager {
                 }
                 NZ = ZoneAirBalance(j).ZonePtr;
                 AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Zone(NZ).OutDryBulbTemp, HumRatExt, RoutineNameZoneAirBalance);
-                CpAir = PsyCpAirFnWTdb(HumRatExt, Zone(NZ).OutDryBulbTemp);
+                CpAir = PsyCpAirFnW(HumRatExt);
                 ZoneAirBalance(j).ERVMassFlowRate *= AirDensity;
                 MDotOA(NZ) =
                     std::sqrt(pow_2(ZoneAirBalance(j).NatMassFlowRate) + pow_2(ZoneAirBalance(j).IntMassFlowRate) +

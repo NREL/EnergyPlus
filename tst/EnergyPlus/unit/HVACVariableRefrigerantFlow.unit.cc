@@ -8260,10 +8260,9 @@ TEST_F(HVACVRFFixture, VRFTU_SupplementalHeatingCoilCapacityLimitTest)
     thisVRFTU.MaxSATFromSuppHeatCoil = 50.0;
     Real64 ExpectedResult = 1.0 * 1017.8526499999862 * 30.0; // m_dot * Cp_avg * DeltaT
 
-    Real64 SuppHeatCoilCapMax =
-        thisVRFTU.HeatingCoilCapacityLimit(thisVRFTU.SuppHeatCoilAirInletNode, thisVRFTU.SuppHeatCoilAirOutletNode, thisVRFTU.MaxSATFromSuppHeatCoil);
+    Real64 SuppHeatCoilCapMax = thisVRFTU.HeatingCoilCapacityLimit(thisVRFTU.SuppHeatCoilAirInletNode, thisVRFTU.MaxSATFromSuppHeatCoil);
 
-    EXPECT_EQ(ExpectedResult, SuppHeatCoilCapMax);
+    EXPECT_NEAR(ExpectedResult, SuppHeatCoilCapMax, 0.0001);
 }
 
 TEST_F(HVACVRFFixture, VRFFluidControl_FanSysModel_OnOffModeTest)
@@ -10525,7 +10524,7 @@ TEST_F(HVACVRFFixture, VRFFluidControl_FanSysModel_OnOffModeTest)
         "     ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction",
         "     ;                        !- Zone Equipment 1 Sequential Heating Load Fraction",
 
-        });
+    });
     ASSERT_TRUE(process_idf(idf_objects));
 
     SimulationManager::ManageSimulation();
@@ -11121,7 +11120,7 @@ TEST_F(HVACVRFFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
         "  1.5,                     !- Maximum Curve Output",
         "  Temperature,             !- Input Unit Type for X",
         "  Dimensionless;           !- Output Unit Type",
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -11166,7 +11165,8 @@ TEST_F(HVACVRFFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     auto &thisVRFTU(VRFTU(1));
     Node(thisVRFTU.VRFTUInletNodeNum).Temp = 24.0;
     Node(thisVRFTU.VRFTUInletNodeNum).HumRat = 0.0075;
-    Node(thisVRFTU.VRFTUInletNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(thisVRFTU.VRFTUInletNodeNum).Temp, Node(thisVRFTU.VRFTUInletNodeNum).HumRat);
+    Node(thisVRFTU.VRFTUInletNodeNum).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(Node(thisVRFTU.VRFTUInletNodeNum).Temp, Node(thisVRFTU.VRFTUInletNodeNum).HumRat);
     Node(thisVRFTU.ZoneAirNode).Temp = 24.0;
     Node(thisVRFTU.ZoneAirNode).HumRat = 0.0075;
     Node(thisVRFTU.ZoneAirNode).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(thisVRFTU.VRFTUInletNodeNum).Temp, Node(thisVRFTU.VRFTUInletNodeNum).HumRat);
@@ -11445,35 +11445,35 @@ TEST_F(HVACVRFFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
         " Dimensionless;           !- Output Unit Type        ",
 
         "Zone,",
-         "  SPACE1-1,                !- Name",
-         "  0,                       !- Direction of Relative North {deg}",
-         "  0,                       !- X Origin {m}",
-         "  0,                       !- Y Origin {m}",
-         "  0,                       !- Z Origin {m}",
-         "  1,                       !- Type",
-         "  1,                       !- Multiplier",
-         "  2.438400269,             !- Ceiling Height {m}",
-         "  239.247360229;           !- Volume {m3}",
+        "  SPACE1-1,                !- Name",
+        "  0,                       !- Direction of Relative North {deg}",
+        "  0,                       !- X Origin {m}",
+        "  0,                       !- Y Origin {m}",
+        "  0,                       !- Z Origin {m}",
+        "  1,                       !- Type",
+        "  1,                       !- Multiplier",
+        "  2.438400269,             !- Ceiling Height {m}",
+        "  239.247360229;           !- Volume {m3}",
 
-         "ZoneHVAC:EquipmentConnections,",
-         "  SPACE1-1,                !- Zone Name",
-         "  SPACE1-1 Eq,             !- Zone Conditioning Equipment List Name",
-         "  TU1 Outlet Node,         !- Zone Air Inlet Node or NodeList Name",
-         "  TU1 Inlet Node,          !- Zone Air Exhaust Node or NodeList Name",
-         "  SPACE1-1 Node,           !- Zone Air Node Name",
-         "  SPACE1-1 Out Node;       !- Zone Return Air Node Name", // not used anywhere else in the example file
+        "ZoneHVAC:EquipmentConnections,",
+        "  SPACE1-1,                !- Zone Name",
+        "  SPACE1-1 Eq,             !- Zone Conditioning Equipment List Name",
+        "  TU1 Outlet Node,         !- Zone Air Inlet Node or NodeList Name",
+        "  TU1 Inlet Node,          !- Zone Air Exhaust Node or NodeList Name",
+        "  SPACE1-1 Node,           !- Zone Air Node Name",
+        "  SPACE1-1 Out Node;       !- Zone Return Air Node Name", // not used anywhere else in the example file
 
-         "ZoneHVAC:EquipmentList,",
-         "  SPACE1-1 Eq,             !- Name",
-         "  SequentialLoad,          !- Load Distribution Scheme",
-         "  ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type",
-         "  TU1,                     !- Zone Equipment 1 Name",
-         "  1,                       !- Zone Equipment 1 Cooling Sequence",
-         "  1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
+        "ZoneHVAC:EquipmentList,",
+        "  SPACE1-1 Eq,             !- Name",
+        "  SequentialLoad,          !- Load Distribution Scheme",
+        "  ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,  !- Zone Equipment 1 Object Type",
+        "  TU1,                     !- Zone Equipment 1 Name",
+        "  1,                       !- Zone Equipment 1 Cooling Sequence",
+        "  1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
 
-         "ZoneTerminalUnitList,",
-         "  VRF Heat Pump TU List,    !- Zone Terminal Unit List Name",
-         "  TU1;                      !- Zone Terminal Unit Name 1",
+        "ZoneTerminalUnitList,",
+        "  VRF Heat Pump TU List,    !- Zone Terminal Unit List Name",
+        "  TU1;                      !- Zone Terminal Unit Name 1",
 
         "ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,",
         "  TU1,                      !- Zone Terminal Unit Name",
@@ -11580,7 +11580,6 @@ TEST_F(HVACVRFFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
         "    TU1 VRF DX HCoil Outlet Node,  !- Air Inlet Node Name",
         "    TU1 Outlet Node,         !- Air Outlet Node Name",
         "    General;                 !- End-Use Subcategory",
-
 
         " !-   ===========  ALL OBJECTS IN CLASS: FLUIDPROPERTIES:NAME ===========            ",
         "                                                                                     ",
@@ -12850,7 +12849,7 @@ TEST_F(HVACVRFFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
         "     0.0000E+00,3.1758E+02;                                                          ",
         "                                                                                     ",
         " !***************************************************************************        ",
-        });
+    });
 
     ASSERT_TRUE(process_idf(idf_objects));
 
@@ -12896,7 +12895,8 @@ TEST_F(HVACVRFFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     auto &thisVRFTU(VRFTU(1));
     Node(thisVRFTU.VRFTUInletNodeNum).Temp = 24.0;
     Node(thisVRFTU.VRFTUInletNodeNum).HumRat = 0.0075;
-    Node(thisVRFTU.VRFTUInletNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(thisVRFTU.VRFTUInletNodeNum).Temp, Node(thisVRFTU.VRFTUInletNodeNum).HumRat);
+    Node(thisVRFTU.VRFTUInletNodeNum).Enthalpy =
+        Psychrometrics::PsyHFnTdbW(Node(thisVRFTU.VRFTUInletNodeNum).Temp, Node(thisVRFTU.VRFTUInletNodeNum).HumRat);
     Node(thisVRFTU.ZoneAirNode).Temp = 24.0;
     Node(thisVRFTU.ZoneAirNode).HumRat = 0.0075;
     Node(thisVRFTU.ZoneAirNode).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(thisVRFTU.VRFTUInletNodeNum).Temp, Node(thisVRFTU.VRFTUInletNodeNum).HumRat);
