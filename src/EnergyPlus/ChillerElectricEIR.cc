@@ -2174,9 +2174,9 @@ namespace ChillerElectricEIR {
             // If Heat Recovery specified for this vapor compression chiller, then Qcondenser will be adjusted by this subroutine
             if (this->HeatRecActive) this->calcHeatRecovery(this->QCondenser, this->CondMassFlowRate, condInletTemp, this->QHeatRecovered);
 
-            if (this->CondMassFlowRate > 0.0) {
-                Cp = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(this->CondInletNodeNum).HumRat, condInletTemp);
-                this->CondOutletTemp = condInletTemp + this->QCondenser / this->CondMassFlowRate / Cp;
+            if (CondMassFlowRate > 0.0) {
+                Cp = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(this->CondInletNodeNum).HumRat);
+                CondOutletTemp = CondInletTemp + QCondenser / CondMassFlowRate / Cp;
             } else {
                 this->CondOutletTemp = condInletTemp;
             }

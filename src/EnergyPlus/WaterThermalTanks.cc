@@ -6820,7 +6820,6 @@ namespace WaterThermalTanks {
         Qfuel = Efuel / SecInTimeStep;
 
         this->Mode = Mode_loc; // Operating mode for carry-over to next DataGlobals::TimeStep
-
         this->TankTemp = TankTemp_loc;       // Final tank temperature for carry-over to next DataGlobals::TimeStep
         this->TankTempAvg = TankTempAvg_loc; // Average tank temperature over the DataGlobals::TimeStep for reporting
 
@@ -7657,7 +7656,7 @@ namespace WaterThermalTanks {
                 } else {
                     if (this->SourceOutletStratNode > 0) {
                         return this->SourceEffectiveness * this->SourceMassFlowRate * Cp *
-                               (this->SourceInletTemp - Tavg[this->SourceOutletStratNode - 1]);
+                        (this->SourceInletTemp - Tavg[this->SourceOutletStratNode - 1]);
                     } else {
                         return 0.0;
                     }
@@ -9520,7 +9519,7 @@ namespace WaterThermalTanks {
 
                 //   calculate sensible capacity to zone for inlet air configuration equals Zone Only or Zone And Outdoor Air configurations
             } else {
-                Real64 CpAir = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(HPAirInletNode).HumRat, DataLoopNode::Node(HPAirInletNode).Temp);
+                Real64 CpAir = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(HPAirInletNode).HumRat);
 
                 //     add parasitics to zone heat balance if parasitic heat load is to zone otherwise neglect parasitics
                 if (HeatPump.ParasiticTempIndicator == AmbientTempEnum::TempZone) {
@@ -9749,6 +9748,7 @@ namespace WaterThermalTanks {
 
     Real64 WaterThermalTankData::PLRResidualWaterThermalTank(Real64 const HPPartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                                              Array1<Real64> const &Par     // par(1) = HP set point temperature [C]
+
     )
     {
         // FUNCTION INFORMATION:

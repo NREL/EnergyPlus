@@ -14486,18 +14486,11 @@ namespace RefrigeratedCase {
                 SensLoadRequestedGross = SensLoadRequested + HeaterLoad + FanPowerRated;
                 Real64 ZoneMixedAirDryBulb = DataLoopNode::Node(this->ZoneNodeNum).Temp;    // (C)
                 Real64 ZoneMixedAirHumRatio = DataLoopNode::Node(this->ZoneNodeNum).HumRat; // kg water/kg air in the zone mixed air
-                Real64 ZoneMixedAirRHFrac =
-                    Psychrometrics::PsyRhFnTdbWPb(ZoneMixedAirDryBulb,
-                                                  ZoneMixedAirHumRatio,
-                                                  DataEnvironment::OutBaroPress,
-                                                  TrackMessage); // relative humidity of mixed air in the zone expressed as a fraction from 0 to 1
-                Real64 ZoneMixedAirEnthalpy =
-                    Psychrometrics::PsyHFnTdbRhPb(ZoneMixedAirDryBulb, ZoneMixedAirRHFrac, DataEnvironment::OutBaroPress, TrackMessage); // J/kg
-                Real64 ZoneMixedAirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(
-                    DataEnvironment::OutBaroPress, ZoneMixedAirDryBulb, ZoneMixedAirHumRatio, TrackMessage); // kg/m3
-                Real64 ZoneDryAirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(
-                    DataEnvironment::OutBaroPress, ZoneMixedAirDryBulb, 0.0, TrackMessage); // Dry air density at mixed zone conditions
-                Real64 DryAirMassFlowRated = AirVolumeFlowRated * ZoneDryAirDensity;        // Rated volume flow rate times dry air density
+                Real64 ZoneMixedAirRHFrac = Psychrometrics::PsyRhFnTdbWPb(ZoneMixedAirDryBulb, ZoneMixedAirHumRatio, DataEnvironment::OutBaroPress, TrackMessage);
+                Real64 ZoneMixedAirEnthalpy = Psychrometrics::PsyHFnTdbRhPb(ZoneMixedAirDryBulb, ZoneMixedAirRHFrac, DataEnvironment::OutBaroPress, TrackMessage);
+                Real64 ZoneMixedAirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, ZoneMixedAirDryBulb, ZoneMixedAirHumRatio, TrackMessage);
+                Real64 ZoneDryAirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, ZoneMixedAirDryBulb, 0.0, TrackMessage);
+                Real64 DryAirMassFlowRated = AirVolumeFlowRated * ZoneDryAirDensity;
                 // calc t inlet to coil assuming at middle/mixed point in room  bbb -
                 //    later need to do for hottest/coolest in room where Tin /= Tzonemixed
                 // calc RH inlet to coil assuming at middle/mixed point in room
@@ -14513,7 +14506,7 @@ namespace RefrigeratedCase {
                     CoilInletRHFrac = ZoneMixedAirRHFrac;
                     CoilInletDensity = ZoneMixedAirDensity;
                     CoilInletHumRatio = ZoneMixedAirHumRatio;
-                    CoilInletDryAirCp = Psychrometrics::PsyCpAirFnWTdb(0.0, CoilInletTemp);
+                    CoilInletDryAirCp = Psychrometrics::PsyCpAirFnW(0.0);
                     break;
                 }
                 AirVolumeFlowMax = AirVolumeFlowRated * (1.0 - DefrostDripDownSchedule) * CoilSchedule;

@@ -1199,7 +1199,7 @@ namespace DualDuct {
         using namespace DataZoneEnergyDemands;
         // unused0909   USE DataHeatBalFanSys, ONLY: Mat
         using DataHVACGlobals::SmallTempDiff;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyTdbFnHW;
 
         // Locals
@@ -1236,14 +1236,14 @@ namespace DualDuct {
         // If there is massflow then need to provide the correct amount of total
         //  required zone energy
         if (MassFlow > SmallMassFlow) {
-            CpAirZn = PsyCpAirFnWTdb(Node(ZoneNodeNum).HumRat, Node(ZoneNodeNum).Temp);
+            CpAirZn = PsyCpAirFnW(Node(ZoneNodeNum).HumRat);
             QZnReq = QTotLoad + MassFlow * CpAirZn * Node(ZoneNodeNum).Temp;
             // If the enthalpy is the same for the hot and cold duct then there would be a
             //  divide by zero so for heating or cooling set the damper to one max flow
             //  or the other.
             if (std::abs(DamperColdAirInlet(DamperNum).AirTemp - DamperHotAirInlet(DamperNum).AirTemp) > SmallTempDiff) {
-                // CpAirSysHot = PsyCpAirFnWTdb(DamperHotAirInlet(DamperNum)%AirHumRat,DamperHotAirInlet(DamperNum)%AirTemp)
-                // CpAirSysCold= PsyCpAirFnWTdb(DamperColdAirInlet(DamperNum)%AirHumRat,DamperColdAirInlet(DamperNum)%AirTemp)
+                // CpAirSysHot = PsyCpAirFnW(DamperHotAirInlet(DamperNum)%AirHumRat,DamperHotAirInlet(DamperNum)%AirTemp)
+                // CpAirSysCold= PsyCpAirFnW(DamperColdAirInlet(DamperNum)%AirHumRat,DamperColdAirInlet(DamperNum)%AirTemp)
                 CpAirSysHot = CpAirZn;
                 CpAirSysCold = CpAirZn;
                 // Determine the Cold Air Mass Flow Rate
@@ -1335,7 +1335,7 @@ namespace DualDuct {
         using namespace DataZoneEnergyDemands;
         // unused0909   USE DataHeatBalFanSys, ONLY: Mat
         using DataHVACGlobals::SmallTempDiff;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyTdbFnHW;
 
         // Locals
@@ -1366,9 +1366,9 @@ namespace DualDuct {
         // The calculated load from the Heat Balance
         QTotLoad = ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
         // Calculate all of the required Cp's
-        CpAirZn = PsyCpAirFnWTdb(Node(ZoneNodeNum).HumRat, Node(ZoneNodeNum).Temp);
-        // CpAirSysHot = PsyCpAirFnWTdb(DamperHotAirInlet(DamperNum)%AirHumRat,DamperHotAirInlet(DamperNum)%AirTemp)
-        // CpAirSysCold= PsyCpAirFnWTdb(DamperColdAirInlet(DamperNum)%AirHumRat,DamperColdAirInlet(DamperNum)%AirTemp)
+        CpAirZn = PsyCpAirFnW(Node(ZoneNodeNum).HumRat);
+        // CpAirSysHot = PsyCpAirFnW(DamperHotAirInlet(DamperNum)%AirHumRat,DamperHotAirInlet(DamperNum)%AirTemp)
+        // CpAirSysCold= PsyCpAirFnW(DamperColdAirInlet(DamperNum)%AirHumRat,DamperColdAirInlet(DamperNum)%AirTemp)
         CpAirSysHot = CpAirZn;
         CpAirSysCold = CpAirZn;
 
@@ -1557,7 +1557,7 @@ namespace DualDuct {
 
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyTdbFnHW;
         using namespace DataGlobals;
         using DataHeatBalFanSys::ZoneThermostatSetPointHi;
@@ -1613,9 +1613,9 @@ namespace DualDuct {
         QtoCoolSPRemain = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
 
         // Calculate all of the required Cp's
-        CpAirZn = PsyCpAirFnWTdb(Node(ZoneNodeNum).HumRat, Node(ZoneNodeNum).Temp);
-        CpAirSysOA = PsyCpAirFnWTdb(Node(OAInletNodeNum).HumRat, Node(OAInletNodeNum).Temp);
-        if (Damper(DamperNum).RecircIsUsed) CpAirSysRA = PsyCpAirFnWTdb(Node(RecircInletNodeNum).HumRat, Node(RecircInletNodeNum).Temp);
+        CpAirZn = PsyCpAirFnW(Node(ZoneNodeNum).HumRat);
+        CpAirSysOA = PsyCpAirFnW(Node(OAInletNodeNum).HumRat);
+        if (Damper(DamperNum).RecircIsUsed) CpAirSysRA = PsyCpAirFnW(Node(RecircInletNodeNum).HumRat);
 
         // Set the OA Damper to the calculated ventilation flow rate
         DamperOAInlet(DamperNum).AirMassFlowRate = OAMassFlow;

@@ -86,9 +86,9 @@
 #include <EnergyPlus/WindowComplexManager.hh>
 #include <EnergyPlus/WindowEquivalentLayer.hh>
 #include <EnergyPlus/WindowManager.hh>
+#include <EnergyPlus/WindowManagerExteriorData.hh>
 #include <EnergyPlus/WindowManagerExteriorOptical.hh>
 #include <EnergyPlus/WindowManagerExteriorThermal.hh>
-#include <EnergyPlus/WindowManagerExteriorData.hh>
 #include <EnergyPlus/WindowModel.hh>
 
 namespace EnergyPlus {
@@ -891,9 +891,9 @@ namespace WindowManager {
                         for (ILam = 1; ILam <= (int)wle.size(); ++ILam) {
                             auto lam = wle(ILam);
                             wlt(IGlass, ILam) = lam;
-                            t(IGlass, ILam) = CurveManager::CurveValue(Material(LayPtr).GlassSpecAngTransDataPtr,0.0,lam);
-                            rff(IGlass, ILam) = CurveManager::CurveValue(Material(LayPtr).GlassSpecAngFRefleDataPtr,0.0,lam);
-                            rbb(IGlass, ILam) = CurveManager::CurveValue(Material(LayPtr).GlassSpecAngBRefleDataPtr,0.0,lam);
+                            t(IGlass, ILam) = CurveManager::CurveValue(Material(LayPtr).GlassSpecAngTransDataPtr, 0.0, lam);
+                            rff(IGlass, ILam) = CurveManager::CurveValue(Material(LayPtr).GlassSpecAngFRefleDataPtr, 0.0, lam);
+                            rbb(IGlass, ILam) = CurveManager::CurveValue(Material(LayPtr).GlassSpecAngBRefleDataPtr, 0.0, lam);
                         }
                         SolarSprectrumAverage(t, tmpTrans);
                         SolarSprectrumAverage(rff, tmpReflectSolBeamFront);
@@ -2466,7 +2466,7 @@ namespace WindowManager {
         using DataLoopNode::Node;
         using DataZoneEquipment::ZoneEquipConfig;
         using General::InterpSlatAng; // Function for slat angle interpolation
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyTdpFnWPb;
         // unused0909  USE DataEnvironment, ONLY: CurMnDyHr
         using ScheduleManager::GetCurrentScheduleValue;
@@ -2685,7 +2685,7 @@ namespace WindowManager {
                     for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
                         NodeTemp = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
                         MassFlowRate = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
-                        CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), NodeTemp);
+                        CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
                         SumSysMCp += MassFlowRate * CpAir;
                         SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                     }
@@ -2907,7 +2907,7 @@ namespace WindowManager {
                         for (NodeNum = 1; NodeNum <= ZoneEquipConfig(ZoneEquipConfigNum).NumInletNodes; ++NodeNum) {
                             NodeTemp = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
                             MassFlowRate = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
-                            CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNumAdj), NodeTemp);
+                            CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNumAdj));
                             SumSysMCp += MassFlowRate * CpAir;
                             SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                         }
@@ -3278,7 +3278,7 @@ namespace WindowManager {
         using General::InterpSw;
         using General::RoundSigDigits;
         using General::TrimSigDigits;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::PsyTdbFnHW;
@@ -3940,8 +3940,8 @@ namespace WindowManager {
                         InletAirHumRat = OutHumRat;
                     }
                     ZoneTemp = MAT(ZoneNum); // this should be Tin (account for different reference temps)
-                    CpAirOutlet = PsyCpAirFnWTdb(InletAirHumRat, TAirflowGapOutletC);
-                    CpAirZone = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), ZoneTemp);
+                    CpAirOutlet = PsyCpAirFnW(InletAirHumRat);
+                    CpAirZone = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
                     ConvHeatGainToZoneAir = TotAirflowGap * (CpAirOutlet * (TAirflowGapOutletC)-CpAirZone * ZoneTemp);
                     if (SurfaceWindow(SurfNum).AirflowDestination == AirFlowWindow_Destination_IndoorAir) {
                         SurfaceWindow(SurfNum).ConvHeatGainToZoneAir = ConvHeatGainToZoneAir;
@@ -7829,12 +7829,17 @@ namespace WindowManager {
                         {
                             auto const SELECT_CASE_var(Material(Layer).Group);
                             if (SELECT_CASE_var == WindowGas) {
+<<<<<<< HEAD
                                 static constexpr auto Format_702(" WindowMaterial:Gas,{},{},{:.3R}\n");
                                 print(outputFiles.eio,
                                       Format_702,
                                       Material(Layer).Name,
                                       GasTypeName(Material(Layer).GasType(1)),
                                       Material(Layer).Thickness);
+=======
+                                ObjexxFCL::gio::write(OutputFileInits, Format_702) << Material(Layer).Name << GasTypeName(Material(Layer).GasType(1))
+                                                                                   << RoundSigDigits(Material(Layer).Thickness, 3);
+>>>>>>> origin/develop
 
                                 //! fw CASE(WindowGasMixture)
 
@@ -8021,6 +8026,7 @@ namespace WindowManager {
                                 } else if (Material(Layer).GapVentType == 3) {
                                     GapVentType = "VentedOutdoor";
                                 }
+<<<<<<< HEAD
                                 static constexpr auto Format_713(" WindowMaterial:Gap:EquivalentLayer,{},{},{:.3R},{}\n");
                                 print(outputFiles.eio,
                                       Format_713,
@@ -8028,6 +8034,10 @@ namespace WindowManager {
                                       GasTypeName(Material(Layer).GasType(1)),
                                       Material(Layer).Thickness,
                                       GapVentType);
+=======
+                                ObjexxFCL::gio::write(OutputFileInits, Format_713) << Material(Layer).Name << GasTypeName(Material(Layer).GasType(1))
+                                                                                   << RoundSigDigits(Material(Layer).Thickness, 3) << GapVentType;
+>>>>>>> origin/develop
                             }
                         }
                     }
@@ -8476,9 +8486,11 @@ namespace WindowManager {
                         }
                     }
 
-                    ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA) << "MATERIAL:WINDOWSCREEN:" + Material(SurfaceScreens(ScreenNum).MaterialNumber).Name;
-                    ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA) << "Tabular data for beam solar transmittance at varying \"relative\" azimuth (row) and "
-                                                           "altitude (column) angles (deg) [relative to surface normal].";
+                    ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA)
+                        << "MATERIAL:WINDOWSCREEN:" + Material(SurfaceScreens(ScreenNum).MaterialNumber).Name;
+                    ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA)
+                        << "Tabular data for beam solar transmittance at varying \"relative\" azimuth (row) and "
+                           "altitude (column) angles (deg) [relative to surface normal].";
                     {
                         IOFlags flags;
                         flags.ADVANCE("No");
@@ -8488,7 +8500,8 @@ namespace WindowManager {
                         {
                             IOFlags flags;
                             flags.ADVANCE("No");
-                            ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA, flags) << "," + RoundSigDigits(((i - 1) * Material(MatNum).ScreenMapResolution));
+                            ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA, flags)
+                                << "," + RoundSigDigits(((i - 1) * Material(MatNum).ScreenMapResolution));
                         }
                     }
                     ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA) << ",0";
@@ -8511,14 +8524,17 @@ namespace WindowManager {
                     ObjexxFCL::gio::write(ScreenTransUnitNo);
                     ObjexxFCL::gio::write(ScreenTransUnitNo);
 
-                    ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA) << "MATERIAL:WINDOWSCREEN:" + Material(SurfaceScreens(ScreenNum).MaterialNumber).Name;
-                    ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA) << "Tabular data for scattered solar transmittance at varying \"relative\" azimuth (row) and "
-                                                           "altitude (column) angles (deg) [relative to surface normal].";
+                    ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA)
+                        << "MATERIAL:WINDOWSCREEN:" + Material(SurfaceScreens(ScreenNum).MaterialNumber).Name;
+                    ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA)
+                        << "Tabular data for scattered solar transmittance at varying \"relative\" azimuth (row) and "
+                           "altitude (column) angles (deg) [relative to surface normal].";
                     for (i = 1; i <= 90 / Material(MatNum).ScreenMapResolution; ++i) {
                         {
                             IOFlags flags;
                             flags.ADVANCE("No");
-                            ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA, flags) << "," + RoundSigDigits(((i - 1) * Material(MatNum).ScreenMapResolution));
+                            ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA, flags)
+                                << "," + RoundSigDigits(((i - 1) * Material(MatNum).ScreenMapResolution));
                         }
                     }
                     ObjexxFCL::gio::write(ScreenTransUnitNo, fmtA) << "," + RoundSigDigits(((i - 1) * Material(MatNum).ScreenMapResolution));
