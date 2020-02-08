@@ -706,21 +706,6 @@ if(LINK_WITH_PYTHON)
 
 endif()
 
-add_custom_target(
-  pythonapi
-  ALL
-  COMMAND ${CMAKE_COMMAND}
-  -DREPO_ROOT="${CMAKE_SOURCE_DIR}"
-  -DBUILD_DIR="${CMAKE_BINARY_DIR}"
-  -DCMAKE_VERSION_MAJOR="${CMAKE_VERSION_MAJOR}"
-  -DCMAKE_VERSION_MINOR="${CMAKE_VERSION_MINOR}"
-  -DCMAKE_VERSION_PATCH="${CMAKE_VERSION_PATCH}"
-  -DCMAKE_VERSION_BUILD="${CMAKE_VERSION_BUILD}"
-  -DPYTHON_API_VERSION_MAJOR="${PYTHON_API_VERSION_MAJOR}"
-  -DPYTHON_API_VERSION_MINOR="${PYTHON_API_VERSION_MINOR}"
-  -P "${CMAKE_SOURCE_DIR}/cmake/PythonSetupAPIinBuild.cmake"
-)
-
 add_library( energyplusparser STATIC ${INPUTPARSING_SRC} )
 add_dependencies( energyplusparser GenerateEmbeddedEpJSONSchema )
 target_link_libraries( energyplusparser re2 )
@@ -768,7 +753,6 @@ else()  # windows
   add_library( energyplusapi SHARED CommandLineInterface.hh CommandLineInterface.cc ${API_CORE_SRC} "${CMAKE_CURRENT_BINARY_DIR}/energyplusapi.rc" )
 endif()
 target_link_libraries( energyplusapi energypluslib )
-add_dependencies( energyplusapi pythonapi )
 
 set_target_properties(
   energyplusapi
@@ -791,11 +775,29 @@ target_link_libraries( energyplus energyplusapi )
 set_target_properties(energyplus PROPERTIES VERSION ${ENERGYPLUS_VERSION})
 set_target_properties(energyplusapi PROPERTIES VERSION ${ENERGYPLUS_VERSION})
 
+# bring in the Python API layer right next to the executable
+add_custom_command(
+        TARGET energyplus
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND}
+        -DREPO_ROOT="${CMAKE_SOURCE_DIR}"
+        -DEXECUTABLE_PATH="$<TARGET_FILE:energyplus>"
+        -DCMAKE_VERSION_MAJOR="${CMAKE_VERSION_MAJOR}"
+        -DCMAKE_VERSION_MINOR="${CMAKE_VERSION_MINOR}"
+        -DCMAKE_VERSION_PATCH="${CMAKE_VERSION_PATCH}"
+        -DCMAKE_VERSION_BUILD="${CMAKE_VERSION_BUILD}"
+        -DPYTHON_API_VERSION_MAJOR="${PYTHON_API_VERSION_MAJOR}"
+        -DPYTHON_API_VERSION_MINOR="${PYTHON_API_VERSION_MINOR}"
+        -P "${CMAKE_SOURCE_DIR}/cmake/PythonSetupAPIinBuild.cmake"
+)
+
 if(LINK_WITH_PYTHON)
+  # link the executable to the dll and bring it in
   get_filename_component(RESOLVED_PYTHON_LIBRARY "${PYTHON_LIBRARIES}" REALPATH)
   get_filename_component(PYTHON_LIB_FILENAME "${RESOLVED_PYTHON_LIBRARY}" NAME)
   add_custom_command(
-    TARGET energyplus POST_BUILD
+    TARGET energyplus
+    POST_BUILD
     COMMAND ${CMAKE_COMMAND}
           -DRESOLVED_PYTHON_LIB=${RESOLVED_PYTHON_LIBRARY}
           -DEXECUTABLE_PATH=$<TARGET_FILE:energyplus>
