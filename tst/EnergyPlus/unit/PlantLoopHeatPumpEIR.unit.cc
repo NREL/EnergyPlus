@@ -63,6 +63,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/PlantLoopHeatPumpEIR.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::EIRPlantLoopHeatPumps;
@@ -2620,31 +2621,19 @@ TEST_F(EIRPLHPFixture, CoolingMetering)
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     thisCoolingPLHP->onInitLoopEquip(myLoadLocation);
 
-    std::string TypeOfComp;
-    std::string NameOfComp;
-
-    Array1D_int VarIndexes;                     // Variable Numbers
-    Array1D_int VarTypes;                       // Variable Types (1=integer, 2=real, 3=meter)
-    Array1D<OutputProcessor::TimeStepType> IndexTypes;                     // Variable Index Types (1=Zone,2=HVAC)
-    Array1D<OutputProcessor::Unit> unitsForVar; // units from enum for each variable
-    Array1D_int ResourceTypes;                  // ResourceTypes for each variable
-    Array1D_string EndUses;                     // EndUses for each variable
-    Array1D_string Groups;                      // Groups for each variable
-    Array1D_string Names;                       // Variable Names for each variable
-    int NumVariables;
     int NumFound;
 
-    TypeOfComp = "HeatPump:PlantLoop:EIR:Cooling";
-    NameOfComp = "HP COOLING SIDE";
-    NumVariables = GetNumMeteredVariables(TypeOfComp, NameOfComp);
-    VarIndexes.allocate(NumVariables);
-    VarTypes.allocate(NumVariables);
-    IndexTypes.allocate(NumVariables);
-    unitsForVar.allocate(NumVariables);
-    ResourceTypes.allocate(NumVariables);
-    EndUses.allocate(NumVariables);
-    Groups.allocate(NumVariables);
-    Names.allocate(NumVariables);
+    std::string TypeOfComp = "HeatPump:PlantLoop:EIR:Cooling";
+    std::string NameOfComp = thisCoolingPLHP->name;
+    int NumVariables = GetNumMeteredVariables(TypeOfComp, NameOfComp);
+    Array1D_int VarIndexes(NumVariables);                     // Variable Numbers
+    Array1D_int VarTypes(NumVariables);                       // Variable Types (1=integer, 2=real, 3=meter)
+    Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables);                     // Variable Index Types (1=Zone,2=HVAC)
+    Array1D<OutputProcessor::Unit> unitsForVar(NumVariables); // units from enum for each variable
+    Array1D_int ResourceTypes(NumVariables);                  // ResourceTypes for each variable
+    Array1D_string EndUses(NumVariables);                     // EndUses for each variable
+    Array1D_string Groups(NumVariables);                      // Groups for each variable
+    Array1D_string Names(NumVariables);                       // Variable Names for each variable
 
     GetMeteredVariables(TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
 
@@ -2728,31 +2717,19 @@ TEST_F(EIRPLHPFixture, HeatingMetering)
     DataPlant::PlantFirstSizesOkayToFinalize = true;
     thisHeatingPLHP->onInitLoopEquip(myLoadLocation);
 
-    std::string TypeOfComp;
-    std::string NameOfComp;
-
-    Array1D_int VarIndexes;                     // Variable Numbers
-    Array1D_int VarTypes;                       // Variable Types (1=integer, 2=real, 3=meter)
-    Array1D<OutputProcessor::TimeStepType> IndexTypes;                     // Variable Index Types (1=Zone,2=HVAC)
-    Array1D<OutputProcessor::Unit> unitsForVar; // units from enum for each variable
-    Array1D_int ResourceTypes;                  // ResourceTypes for each variable
-    Array1D_string EndUses;                     // EndUses for each variable
-    Array1D_string Groups;                      // Groups for each variable
-    Array1D_string Names;                       // Variable Names for each variable
-    int NumVariables;
     int NumFound;
 
-    TypeOfComp = "HeatPump:PlantLoop:EIR:Heating";
-    NameOfComp = "HP HEATING SIDE";
-    NumVariables = GetNumMeteredVariables(TypeOfComp, NameOfComp);
-    VarIndexes.allocate(NumVariables);
-    VarTypes.allocate(NumVariables);
-    IndexTypes.allocate(NumVariables);
-    unitsForVar.allocate(NumVariables);
-    ResourceTypes.allocate(NumVariables);
-    EndUses.allocate(NumVariables);
-    Groups.allocate(NumVariables);
-    Names.allocate(NumVariables);
+    std::string TypeOfComp = "HeatPump:PlantLoop:EIR:Heating";
+    std::string NameOfComp = thisHeatingPLHP->name;
+    int NumVariables = GetNumMeteredVariables(TypeOfComp, NameOfComp);
+    Array1D_int VarIndexes(NumVariables);                     // Variable Numbers
+    Array1D_int VarTypes(NumVariables);                       // Variable Types (1=integer, 2=real, 3=meter)
+    Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables);                     // Variable Index Types (1=Zone,2=HVAC)
+    Array1D<OutputProcessor::Unit> unitsForVar(NumVariables); // units from enum for each variable
+    Array1D_int ResourceTypes(NumVariables);                  // ResourceTypes for each variable
+    Array1D_string EndUses(NumVariables);                     // EndUses for each variable
+    Array1D_string Groups(NumVariables);                      // Groups for each variable
+    Array1D_string Names(NumVariables);                       // Variable Names for each variable
 
     GetMeteredVariables(TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
 
