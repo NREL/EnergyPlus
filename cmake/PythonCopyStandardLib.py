@@ -9,11 +9,15 @@ import os
 import shutil
 import sys
 
-if len(sys.argv) == 2:
-    target_dir = sys.argv[1]
+if len(sys.argv) == 3:
+    exe_path = sys.argv[1]
+    folder_name = sys.argv[2]
 else:
-    print("Must call " + sys.argv[0] + " with one command line argument: the target directory")
+    print("Must call " + sys.argv[0] + "with two command line arguments: the path to the energyplus exe and the name "
+                                       "of the new library directory")
     sys.exit(1)
+exe_dir = os.path.dirname(exe_path)
+target_dir = os.path.join(exe_dir, folder_name)
 if os.path.exists(target_dir):
     sys.exit(0)
 

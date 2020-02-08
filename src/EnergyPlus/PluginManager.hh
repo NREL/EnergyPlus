@@ -73,12 +73,9 @@ namespace EnergyPlus {
 namespace PluginManagement {
 
     void registerNewCallback(int iCalledFrom, void (*f)());
-
     void runAnyRegisteredCallbacks(int iCalledFrom, bool &anyRan);
 
     void clear_state();
-
-    // STUFF RELATED TO PYTHON PLUGINS DOWN HERE
 
     struct PluginInstance {
         PluginInstance(std::string moduleName, std::string className, std::string emsName, bool runPluginDuringWarmup) :

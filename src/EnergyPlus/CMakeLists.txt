@@ -690,20 +690,9 @@ if(LINK_WITH_PYTHON)
     endif()
   endif()
 
-  # now we need to get the Python libs, and also copy in the standard library, we set up a script for doing this, and it is called from out here
-  # so that we can easily manage the MSVC build type paths from the other generators
+  # now we need to get the Python libs and add the include path for further compiling
   find_package(PythonLibs 3 REQUIRED)
   include_directories("${PYTHON_INCLUDE_DIRS}")
-  if(MSVC)
-    # for now copy it into the debug and release folders both
-    execute_process(COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/cmake/PythonCopyStandardLib.py" "${CMAKE_BINARY_DIR}/Products/Debug/python_standard_lib" RESULT_VARIABLE CPRESULT)
-    execute_process(COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/cmake/PythonCopyStandardLib.py" "${CMAKE_BINARY_DIR}/Products/Release/python_standard_lib" RESULT_VARIABLE CPRESULT)
-  else()
-    # assuming a single-products dir, like regular makefile type
-    execute_process(COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/cmake/PythonCopyStandardLib.py" "${CMAKE_BINARY_DIR}/Products/python_standard_lib" RESULT_VARIABLE CPRESULT)
-  endif()
-  # TODO: Check CPRESULT value
-
 endif()
 
 add_library( energyplusparser STATIC ${INPUTPARSING_SRC} )
@@ -803,6 +792,12 @@ if(LINK_WITH_PYTHON)
           -DEXECUTABLE_PATH=$<TARGET_FILE:energyplus>
           -DPYTHON_LIB_FILENAME=${PYTHON_LIB_FILENAME}
           -P ${CMAKE_SOURCE_DIR}/cmake/PythonGetLibAndLinkUp.cmake
+  )
+  # along with the python standard lib
+  add_custom_command(
+          TARGET energyplus
+          POST_BUILD
+          COMMAND ${PYTHON_EXECUTABLE} "${CMAKE_SOURCE_DIR}/cmake/PythonCopyStandardLib.py" "$<TARGET_FILE:energyplus>" "python_standard_lib"
   )
 endif()
 
