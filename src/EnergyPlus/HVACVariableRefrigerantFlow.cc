@@ -7905,8 +7905,7 @@ namespace HVACVariableRefrigerantFlow {
             this->CalcVRFSuppHeatingCoil(VRFTUNum, FirstHVACIteration, SuppPLR, SuppHeatCoilLoad);
             if ((DataLoopNode::Node(this->SuppHeatCoilAirOutletNode).Temp > this->MaxSATFromSuppHeatCoil) && SuppPLR > 0.0) {
                 // adjust the heating load to maximum allowed
-                Real64 MaxHeatCoilLoad =
-                    this->HeatingCoilCapacityLimit(this->SuppHeatCoilAirInletNode, this->SuppHeatCoilAirOutletNode, this->MaxSATFromSuppHeatCoil);
+                Real64 MaxHeatCoilLoad = this->HeatingCoilCapacityLimit(this->SuppHeatCoilAirInletNode, this->MaxSATFromSuppHeatCoil);
                 this->CalcVRFSuppHeatingCoil(VRFTUNum, FirstHVACIteration, SuppPLR, MaxHeatCoilLoad);
                 SuppHeatCoilLoad = MaxHeatCoilLoad;
             }
@@ -7923,7 +7922,7 @@ namespace HVACVariableRefrigerantFlow {
                 TempIn = DataLoopNode::Node(ZoneNode).Temp;
                 SpecHumOut = DataLoopNode::Node(ATMixOutNode).HumRat;
                 SpecHumIn = DataLoopNode::Node(ZoneNode).HumRat;
-                AirMassFlow = DataLoopNode::Node( ATMixOutNode ).MassFlowRate;
+                AirMassFlow = DataLoopNode::Node(ATMixOutNode).MassFlowRate;
             } else {
                 // Air terminal inlet side mixer
                 TempOut = DataLoopNode::Node(VRFTUOutletNodeNum).Temp;
@@ -10759,8 +10758,7 @@ namespace HVACVariableRefrigerantFlow {
             this->CalcVRFSuppHeatingCoil(VRFTUNum, FirstHVACIteration, SuppPLR, SuppHeatCoilLoad);
             if ((DataLoopNode::Node(this->SuppHeatCoilAirOutletNode).Temp > this->MaxSATFromSuppHeatCoil) && SuppPLR > 0.0) {
                 // adjust the heating load to maximum allowed
-                Real64 MaxHeatCoilLoad =
-                    this->HeatingCoilCapacityLimit(this->SuppHeatCoilAirInletNode, this->SuppHeatCoilAirOutletNode, this->MaxSATFromSuppHeatCoil);
+                Real64 MaxHeatCoilLoad = this->HeatingCoilCapacityLimit(this->SuppHeatCoilAirInletNode, this->MaxSATFromSuppHeatCoil);
                 this->CalcVRFSuppHeatingCoil(VRFTUNum, FirstHVACIteration, SuppPLR, MaxHeatCoilLoad);
                 SuppHeatCoilLoad = MaxHeatCoilLoad;
             }
@@ -10777,7 +10775,7 @@ namespace HVACVariableRefrigerantFlow {
                 TempIn = DataLoopNode::Node(ZoneNode).Temp;
                 SpecHumOut = DataLoopNode::Node(ATMixOutNode).HumRat;
                 SpecHumIn = DataLoopNode::Node(ZoneNode).HumRat;
-                AirMassFlow = DataLoopNode::Node( ATMixOutNode ).MassFlowRate;
+                AirMassFlow = DataLoopNode::Node(ATMixOutNode).MassFlowRate;
             } else {
                 // Air terminal inlet side mixer
                 TempOut = DataLoopNode::Node(VRFTUOutletNodeNum).Temp;
@@ -10795,7 +10793,6 @@ namespace HVACVariableRefrigerantFlow {
         LoadMet = AirMassFlow * PsyDeltaHSenFnTdb2W2Tdb1W1(TempOut, SpecHumOut, TempIn, SpecHumIn); // sensible {W}
         LatentLoadMet = AirMassFlow * (SpecHumOut - SpecHumIn); // latent {kgWater/s}
         if (present(LatOutputProvided)) {
-            //   CR9155 Remove specific humidity calculations
             LatOutputProvided = LatentLoadMet;
         }
     }
@@ -13302,9 +13299,8 @@ namespace HVACVariableRefrigerantFlow {
     }
 
     Real64 VRFTerminalUnitEquipment::HeatingCoilCapacityLimit(
-        Real64 const HeatCoilAirInletNode,  // supplemental heating coil air inlet node
-        Real64 const HeatCoilAirOutletNode, // supplemental heating coil air outlet node
-        Real64 const HeatCoilMaxSATAllowed  // supplemental heating coil maximum supply air temperature allowed [C]
+        Real64 const HeatCoilAirInletNode, // supplemental heating coil air inlet node
+        Real64 const HeatCoilMaxSATAllowed // supplemental heating coil maximum supply air temperature allowed [C]
     )
     {
         // PURPOSE OF THIS FUNCTION:
@@ -13318,13 +13314,9 @@ namespace HVACVariableRefrigerantFlow {
         Real64 HeatCoilCapacityAllowed; // heating coil maximum capacity that can be deleivered at current time [W]
 
         Real64 MDotAir = DataLoopNode::Node(HeatCoilAirInletNode).MassFlowRate;
-        Real64 CpAirIn =
-            Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(HeatCoilAirInletNode).HumRat, DataLoopNode::Node(HeatCoilAirInletNode).Temp);
-        Real64 CpAirOut =
-            Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(HeatCoilAirInletNode).HumRat, DataLoopNode::Node(HeatCoilAirOutletNode).Temp);
-        Real64 CpAirAvg = (CpAirIn + CpAirOut) / 2;
+        Real64 CpAirIn = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(HeatCoilAirInletNode).HumRat);
         Real64 HCDeltaT = max(0.0, HeatCoilMaxSATAllowed - DataLoopNode::Node(HeatCoilAirInletNode).Temp);
-        HeatCoilCapacityAllowed = MDotAir * CpAirAvg * HCDeltaT;
+        HeatCoilCapacityAllowed = MDotAir * CpAirIn * HCDeltaT;
 
         return HeatCoilCapacityAllowed;
     }

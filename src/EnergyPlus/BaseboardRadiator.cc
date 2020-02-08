@@ -118,7 +118,7 @@ namespace BaseboardRadiator {
     using namespace ScheduleManager;
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSpecificHeatGlycol;
-    using Psychrometrics::PsyCpAirFnWTdb;
+    using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
 
     // Data
@@ -1156,7 +1156,7 @@ namespace BaseboardRadiator {
 
         CpWater = GetSpecificHeatGlycol(
             PlantLoop(Baseboard(BaseboardNum).LoopNum).FluidName, WaterInletTemp, PlantLoop(Baseboard(BaseboardNum).LoopNum).FluidIndex, RoutineName);
-        CpAir = PsyCpAirFnWTdb(Baseboard(BaseboardNum).AirInletHumRat, AirInletTemp);
+        CpAir = PsyCpAirFnW(Baseboard(BaseboardNum).AirInletHumRat);
 
         if (Baseboard(BaseboardNum).DesAirMassFlowRate > 0.0) { // If UA is autosized, assign design condition
             AirMassFlowRate = Baseboard(BaseboardNum).DesAirMassFlowRate;
