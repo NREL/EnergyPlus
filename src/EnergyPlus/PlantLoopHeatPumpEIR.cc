@@ -1090,18 +1090,18 @@ namespace EIRPlantLoopHeatPumps {
                                         "; entered curve name: " + capFtName.get<std::string>());
                         errorsFound = true;
                     }
-                    auto &capEIRtName = fields.at("electric_input_to_output_ratio_modifier_function_of_temperature_curve_name");
-                    thisPLHP.powerRatioFuncTempCurveIndex = CurveManager::GetCurveIndex(UtilityRoutines::MakeUPPERCase(capEIRtName));
+                    auto &eirFtName = fields.at("electric_input_to_output_ratio_modifier_function_of_temperature_curve_name");
+                    thisPLHP.powerRatioFuncTempCurveIndex = CurveManager::GetCurveIndex(UtilityRoutines::MakeUPPERCase(eirFtName));
                     if (thisPLHP.capFuncTempCurveIndex == 0) {
                         ShowSevereError("Invalid curve name for EIR PLHP (name=" + thisPLHP.name +
-                                        "; entered curve name: " + capEIRtName.get<std::string>());
+                                        "; entered curve name: " + eirFtName.get<std::string>());
                         errorsFound = true;
                     }
-                    auto &capEIRplrName = fields.at("electric_input_to_output_ratio_modifier_function_of_temperature_curve_name");
-                    thisPLHP.powerRatioFuncPLRCurveIndex = CurveManager::GetCurveIndex(UtilityRoutines::MakeUPPERCase(capEIRplrName));
+                    auto &eirFplrName = fields.at("electric_input_to_output_ratio_modifier_function_of_part_load_ratio_curve_name");
+                    thisPLHP.powerRatioFuncPLRCurveIndex = CurveManager::GetCurveIndex(UtilityRoutines::MakeUPPERCase(eirFplrName));
                     if (thisPLHP.capFuncTempCurveIndex == 0) {
                         ShowSevereError("Invalid curve name for EIR PLHP (name=" + thisPLHP.name +
-                                        "; entered curve name: " + capEIRplrName.get<std::string>());
+                                        "; entered curve name: " + eirFplrName.get<std::string>());
                         errorsFound = true;
                     }
 
