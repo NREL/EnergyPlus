@@ -97,3 +97,24 @@ TEST_F(EnergyPlusFixture, Test_PerformancePrecisionTradeoffs)
     EXPECT_TRUE(compare_err_stream("", true));
   
 }
+
+TEST_F(EnergyPlusFixture, Test_PerformancePrecisionTradeoffs_DirectSolution_Message)
+{
+    // issue 7646
+    std::string const idf_objects = delimited_string({
+        "  Version,9.3;",
+        "  PerformancePrecisionTradeoffs,",
+        "     Yes; ! - Use Coil Direct Solutions",
+
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects, false));
+
+    SimulationManager::GetProjectData();
+
+    std::string const error_string = delimited_string({
+        "   ** Warning ** PerformancePrecisionTradeoffs: Direct Solution Simulation is selected.",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
