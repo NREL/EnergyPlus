@@ -301,10 +301,10 @@ TEST_F(EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Tes
 
     bool foundErrors = false;
 
-    HeatBalanceManager::GetProjectControlData(foundErrors); // read project control data
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), foundErrors); // read project control data
     EXPECT_FALSE(foundErrors);                              // expect no errors
 
-    HeatBalanceManager::GetMaterialData(foundErrors); // read material data
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), foundErrors); // read material data
     EXPECT_FALSE(foundErrors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(foundErrors); // read construction data
@@ -342,7 +342,7 @@ TEST_F(EnergyPlusFixture, DElightManagerF_GetInputDElightComplexFenestration_Tes
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues();
-    InternalHeatGains::GetInternalHeatGainsInput();
+    InternalHeatGains::GetInternalHeatGainsInput(OutputFiles::getSingleton());
     InternalHeatGains::GetInternalHeatGainsInputFlag = false;
 
     GetInputDElightComplexFenestration(foundErrors);

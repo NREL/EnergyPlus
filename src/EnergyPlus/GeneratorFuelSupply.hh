@@ -49,6 +49,7 @@
 #define GeneratorFuelSupply_hh_INCLUDED
 
 // EnergyPlus Headers
+#include "OutputFiles.hh"
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -75,7 +76,7 @@ namespace GeneratorFuelSupply {
 
     //******************************************************************************
 
-    void SetupFuelConstituentData(int const FuelSupplyNum, bool &ErrorsFound);
+    void SetupFuelConstituentData(EnergyPlus::OutputFiles &outputFiles, int const FuelSupplyNum, bool &ErrorsFound);
 
 } // namespace GeneratorFuelSupply
 

@@ -431,9 +431,9 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
 
     createFacilityElectricPowerServiceObject();
     HeatBalanceManager::SetPreConstructionInputParameters();
-    HeatBalanceManager::GetProjectControlData(ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound);
     HeatBalanceManager::GetFrameAndDividerData(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     HeatBalanceManager::GetBuildingData(ErrorsFound);
 
@@ -2451,7 +2451,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
     SimulationManager::GetProjectData();
     bool FoundError = false;
 
-    HeatBalanceManager::GetProjectControlData(FoundError); // read project control data
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), FoundError); // read project control data
     EXPECT_FALSE(FoundError);                              // expect no errors
 
     HeatBalanceManager::SetPreConstructionInputParameters();
@@ -2460,7 +2460,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
 
     HeatBalanceManager::GetWindowGlassSpectralData(FoundError);
     EXPECT_FALSE(FoundError);
-    HeatBalanceManager::GetMaterialData(FoundError);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(FoundError);
@@ -2653,9 +2653,9 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
 
     createFacilityElectricPowerServiceObject();
     HeatBalanceManager::SetPreConstructionInputParameters();
-    HeatBalanceManager::GetProjectControlData(ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound);
     HeatBalanceManager::GetFrameAndDividerData(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     HeatBalanceManager::GetBuildingData(ErrorsFound);
 

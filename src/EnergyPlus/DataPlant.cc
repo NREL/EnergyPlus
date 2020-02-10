@@ -242,8 +242,8 @@ namespace DataPlant {
                                              "WATERHEATER:HEATPUMP:WRAPPEDCONDENSER",
                                              "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:FOURPIPEBEAM",
                                              "ZONEHVAC:COOLINGPANEL:RADIANTCONVECTIVE:WATER",
-                                             "HEATPUMP:WATERTOWATER:EIR:COOLING",
-                                             "HEATPUMP:WATERTOWATER:EIR:HEATING"});
+                                             "HEATPUMP:PLANTLOOP:EIR:COOLING",
+                                             "HEATPUMP:PLANTLOOP:EIR:HEATING"});
 
     Array1D_string const ccSimPlantEquipTypes(NumSimPlantEquipTypes,
                                               {"Boiler:HotWater",
@@ -340,8 +340,8 @@ namespace DataPlant {
                                                "WaterHeater:HeatPump:WrappedCondenser",
                                                "AirTerminal:SingleDuct:ConstantVolume:FourPipeBeam",
                                                "ZoneHVAC:CoolingPanel:RadiantConvective:Water",
-                                               "HeatPump:WaterToWater:EIR:Cooling",
-                                               "HeatPump:WaterToWater:EIR:Heating"});
+                                               "HeatPump:PlantLoop:EIR:Cooling",
+                                               "HeatPump:PlantLoop:EIR:Heating"});
 
     Array1D_int const ValidLoopEquipTypes(
         NumSimPlantEquipTypes,

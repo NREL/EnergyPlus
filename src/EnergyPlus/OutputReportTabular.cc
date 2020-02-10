@@ -4790,10 +4790,8 @@ namespace OutputReportTabular {
         using Boilers::Boiler;
         using Boilers::NumBoilers;
         using ChillerElectricEIR::ElectricEIRChiller;
-        using ChillerElectricEIR::ElectricEIRChillerReport;
         using ChillerElectricEIR::NumElectricEIRChillers;
         using ChillerReformulatedEIR::ElecReformEIRChiller;
-        using ChillerReformulatedEIR::ElecReformEIRChillerReport;
         using ChillerReformulatedEIR::NumElecReformEIRChillers;
         using CondenserLoopTowers::NumSimpleTowers;
         using CondenserLoopTowers::towers;
@@ -4827,13 +4825,9 @@ namespace OutputReportTabular {
         using PackagedThermalStorageCoil::NumTESCoils;
         using PackagedThermalStorageCoil::TESCoil;
         using PlantChillers::ConstCOPChiller;
-        using PlantChillers::ConstCOPChillerReport;
         using PlantChillers::ElectricChiller;
-        using PlantChillers::ElectricChillerReport;
         using PlantChillers::EngineDrivenChiller;
-        using PlantChillers::EngineDrivenChillerReport;
         using PlantChillers::GTChiller;
-        using PlantChillers::GTChillerReport;
         using PlantChillers::NumConstCOPChillers;
         using PlantChillers::NumElectricChillers;
         using PlantChillers::NumEngineDrivenChillers;
@@ -4842,8 +4836,6 @@ namespace OutputReportTabular {
         using RefrigeratedCase::Condenser;
         using VariableSpeedCoils::NumVarSpeedCoils;
         using VariableSpeedCoils::VarSpeedCoil;
-        using WaterThermalTanks::AmbientTempOutsideAir;
-        using WaterThermalTanks::NumWaterThermalTank;
         using WaterThermalTanks::WaterThermalTank;
 
         static int iOACtrl(0);
@@ -4893,33 +4885,33 @@ namespace OutputReportTabular {
 
         // Air- and Evap-cooled chiller
         for (iChiller = 1; iChiller <= NumElectricChillers; ++iChiller) {
-            if (ElectricChiller(iChiller).Base.CondenserType != WaterCooled) {
-                SysTotalHVACRejectHeatLoss += ElectricChillerReport(iChiller).Base.CondEnergy;
+            if (ElectricChiller(iChiller).CondenserType != WaterCooled) {
+                SysTotalHVACRejectHeatLoss += ElectricChiller(iChiller).CondenserEnergy;
             }
         }
         for (iChiller = 1; iChiller <= NumEngineDrivenChillers; ++iChiller) {
-            if (EngineDrivenChiller(iChiller).Base.CondenserType != WaterCooled) {
-                SysTotalHVACRejectHeatLoss += EngineDrivenChillerReport(iChiller).Base.CondEnergy;
+            if (EngineDrivenChiller(iChiller).CondenserType != WaterCooled) {
+                SysTotalHVACRejectHeatLoss += ElectricChiller(iChiller).CondenserEnergy;
             }
         }
         for (iChiller = 1; iChiller <= NumGTChillers; ++iChiller) {
-            if (GTChiller(iChiller).Base.CondenserType != WaterCooled) {
-                SysTotalHVACRejectHeatLoss += GTChillerReport(iChiller).Base.CondEnergy;
+            if (GTChiller(iChiller).CondenserType != WaterCooled) {
+                SysTotalHVACRejectHeatLoss += ElectricChiller(iChiller).CondenserEnergy;
             }
         }
         for (iChiller = 1; iChiller <= NumConstCOPChillers; ++iChiller) {
-            if (ConstCOPChiller(iChiller).Base.CondenserType != WaterCooled) {
-                SysTotalHVACRejectHeatLoss += ConstCOPChillerReport(iChiller).Base.CondEnergy;
+            if (ConstCOPChiller(iChiller).CondenserType != WaterCooled) {
+                SysTotalHVACRejectHeatLoss += ElectricChiller(iChiller).CondenserEnergy;
             }
         }
         for (iChiller = 1; iChiller <= NumElectricEIRChillers; ++iChiller) {
             if (ElectricEIRChiller(iChiller).CondenserType != WaterCooled) {
-                SysTotalHVACRejectHeatLoss += ElectricEIRChillerReport(iChiller).CondEnergy;
+                SysTotalHVACRejectHeatLoss += ElectricEIRChiller(iChiller).CondEnergy;
             }
         }
         for (iChiller = 1; iChiller <= NumElecReformEIRChillers; ++iChiller) {
             if (ElecReformEIRChiller(iChiller).CondenserType != WaterCooled) {
-                SysTotalHVACRejectHeatLoss += ElecReformEIRChillerReport(iChiller).CondEnergy;
+                SysTotalHVACRejectHeatLoss += ElecReformEIRChiller(iChiller).CondEnergy;
             }
         }
 
@@ -4988,8 +4980,8 @@ namespace OutputReportTabular {
         }
 
         // Water heater and thermal storage
-        for (iTank = 1; iTank <= NumWaterThermalTank; ++iTank) {
-            if (WaterThermalTank(iTank).AmbientTempIndicator == AmbientTempOutsideAir) {
+        for (iTank = 1; iTank <= WaterThermalTanks::numWaterThermalTank; ++iTank) {
+            if (WaterThermalTank(iTank).AmbientTempIndicator == WaterThermalTanks::AmbientTempEnum::OutsideAir) {
                 SysTotalHVACRejectHeatLoss += WaterThermalTank(iTank).FuelEnergy - WaterThermalTank(iTank).TotalDemandEnergy;
             }
         }
