@@ -75,6 +75,7 @@ The Override Mode field would be added to the Input Output Reference including t
 |Mode08 | Mode07 plus internal variable ConvrgLim will be set to Y|
 |Mode09 | Mode08 plus internal variable MaxAllowedDelTempCondFD will be set to Y|
 |Mode10 | Mode09 plus internal variable MassFlowTolerance will be set to Y|
+|Advanced| Allow direct input of convergence field values|
   
 NOTE: The exact layout of this table and the various Y values and list of internal variables will be determined
 based on analysis not yet completed. There may be more or fewer modes in the final table.
