@@ -86,7 +86,7 @@ TEST_F(EnergyPlusFixture, Test_PerformancePrecisionTradeoffs)
         "    Yes;                     !- Run Simulation for Weather File Run Periods",
 
         "  PerformancePrecisionTradeoffs,",
-        "    Yes;       ! - Use Coil Direct Solutions",
+        "    No;       ! - Use Coil Direct Solutions",
     });
 
     EXPECT_TRUE(process_idf(idf_objects));
