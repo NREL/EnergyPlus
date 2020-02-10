@@ -69,20 +69,31 @@ private:
 };
 
 void vprint(std::ostream &os, fmt::string_view format_str, fmt::format_args args, const std::size_t count);
+std::string vprint(fmt::string_view format_str, fmt::format_args args, const std::size_t count);
+
 
 // Uses lib {fmt} (which has been accepted for C++20)
 // Formatting syntax guide is here: https://fmt.dev/latest/syntax.html
 // The syntax is similar to printf, but uses {} to indicate parameters to be formatted
 // you must escape any {} that you want with {}, like `{{}}`
 //
-// Defines a custom formatting type `R` (round_ which chooses between `E` and `G` depending
+// Defines a custom formatting type 'R' (round_ which chooses between `E` and `G` depending
 // on the value being printed.
-//
 // This is necessary for parity with the old "RoundSigDigits" utility function
+//
+// Defines a custom formatting type 'T' that behaves like Fortran's G type.
+// (The T was chosen because it was unused and fits with "forTran")
+//
 template <typename... Args>
 void print(std::ostream &os, fmt::string_view format_str, const Args &... args)
 {
     EnergyPlus::vprint(os, format_str, fmt::make_format_args(args...), sizeof...(Args));
+}
+
+template <typename... Args>
+std::string print_to_string(fmt::string_view format_str, const Args &... args)
+{
+    return EnergyPlus::vprint(format_str, fmt::make_format_args(args...), sizeof...(Args));
 }
 
 } // namespace EnergyPlus
