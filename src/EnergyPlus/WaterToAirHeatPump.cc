@@ -1114,7 +1114,7 @@ namespace WaterToAirHeatPump {
         using DataPlant::PlantLoop;
         using General::RoundSigDigits;
         using General::SolveRoot;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW; // ,PsyHFnTdbRhPb,PsyWFnTdpPb
         using Psychrometrics::PsyTdbFnHW;
         using Psychrometrics::PsyTsatFnHPb;
@@ -1287,7 +1287,7 @@ namespace WaterToAirHeatPump {
         // Set indoor air conditions to the actual condition
         LoadSideInletDBTemp_Unit = WatertoAirHP(HPNum).InletAirDBTemp;
         LoadSideInletHumRat_Unit = WatertoAirHP(HPNum).InletAirHumRat;
-        CpAir = PsyCpAirFnWTdb(LoadSideInletHumRat_Unit, LoadSideInletDBTemp_Unit);
+        CpAir = PsyCpAirFnW(LoadSideInletHumRat_Unit);
         LoadSideAirInletEnth_Unit = PsyHFnTdbW(LoadSideInletDBTemp_Unit, LoadSideInletHumRat_Unit);
 
         SourceSideInletTemp = WatertoAirHP(HPNum).InletWaterTemp;
@@ -1783,7 +1783,7 @@ namespace WaterToAirHeatPump {
 
         // Using/Aliasing
         using namespace FluidProperties;
-        using Psychrometrics::PsyCpAirFnWTdb; // ,PsyHFnTdbRhPb,PsyWFnTdpPb
+        using Psychrometrics::PsyCpAirFnW; // ,PsyHFnTdbRhPb,PsyWFnTdpPb
         using Psychrometrics::PsyTdbFnHW;
         using Psychrometrics::PsyWFnTdbH;
         //  USE DataZoneEnergyDemands
@@ -1920,7 +1920,7 @@ namespace WaterToAirHeatPump {
         LoadSideMassFlowRate = WatertoAirHP(HPNum).InletAirMassFlowRate;
         LoadSideInletDBTemp = WatertoAirHP(HPNum).InletAirDBTemp;
         LoadSideInletHumRat = WatertoAirHP(HPNum).InletAirHumRat;
-        CpAir = PsyCpAirFnWTdb(LoadSideInletHumRat, LoadSideInletDBTemp);
+        CpAir = PsyCpAirFnW(LoadSideInletHumRat);
 
         SourceSideInletTemp = WatertoAirHP(HPNum).InletWaterTemp;
         SourceSideWaterInletEnth = WatertoAirHP(HPNum).InletWaterEnthalpy;
