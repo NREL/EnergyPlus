@@ -628,11 +628,14 @@ namespace HybridUnitaryAirConditioners {
                 }
                 // N5, \field Minimum Time Between Mode Change
                 // A13, \field First fuel type
+                ZoneHybridUnitaryAirConditioner(UnitLoop).FirstFuelType = Alphas(13);
                 // A14, \field Second fuel type
+                ZoneHybridUnitaryAirConditioner(UnitLoop).SecondFuelType = Alphas(14);
                 // A15, \field Third fuel type
+                ZoneHybridUnitaryAirConditioner(UnitLoop).ThirdFuelType = Alphas(15);
                 // A16, \field Objective Function Minimizes
 
-                // A17, \ OA requiremnt pointer
+                // A17, \ OA requirement pointer
                 ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr = UtilityRoutines::FindItemInList(Alphas(17), OARequirements);
                 if (ZoneHybridUnitaryAirConditioner(UnitLoop).OARequirementsPtr == 0) {
                     ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + Alphas(1) + " invalid data");
@@ -1108,7 +1111,12 @@ namespace HybridUnitaryAirConditioners {
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).SecondaryFuelConsumption,
                                 "System",
                                 "Average",
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
+                                _,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).SecondFuelType,
+                                "Cooling",
+                                "Hybrid HVAC Cooling",
+                                "System");
             SetupOutputVariable("Zone Hybrid Unitary HVAC Third Fuel Consumption Rate",
                                 OutputProcessor::Unit::W,
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).ThirdFuelConsumptionRate,
@@ -1120,7 +1128,12 @@ namespace HybridUnitaryAirConditioners {
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).ThirdFuelConsumption,
                                 "System",
                                 "Average",
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
+                                _,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).ThirdFuelType,
+                                "Cooling",
+                                "Hybrid HVAC Cooling",
+                                "System");
             SetupOutputVariable("Zone Hybrid Unitary HVAC Water Consumption Rate",
                                 OutputProcessor::Unit::kgWater_s,
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).WaterConsumptionRate,
@@ -1133,7 +1146,7 @@ namespace HybridUnitaryAirConditioners {
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).WaterConsumption,
                                 "System",
                                 "Average",
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name),
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
                                 _,
                                 "Water",
                                 "Cooling",

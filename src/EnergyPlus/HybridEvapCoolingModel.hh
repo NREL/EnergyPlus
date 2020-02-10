@@ -249,6 +249,9 @@ namespace HybridEvapCoolingModel {
         Real64 ScalingFactor;                            // taken from IDF N3, linear scaling factor.
         Real64 ScaledSystemMaximumSupplyAirMassFlowRate; // the scaled system max supply mass flow rate in m3/s.
         Real64 ScaledSystemMaximumSupplyAirVolumeFlowRate; // the scaled system max supply volume flow rate in m3/s.
+        std::string FirstFuelType;             // First fuel type, currently electricity is only option
+        std::string SecondFuelType;             // Second fuel type
+        std::string ThirdFuelType;             // Third fuel type
 
         int UnitOn;                          // feels like it should be a bool but its an output and I couldn't get it to work as a bool
         Real64 UnitTotalCoolingRate;         // unit output to zone, total cooling rate [W]
