@@ -1133,7 +1133,12 @@ namespace HybridUnitaryAirConditioners {
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).WaterConsumption,
                                 "System",
                                 "Average",
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name),
+                                _,
+                                "Water",
+                                "Cooling",
+                                _,
+                                "System");
             SetupOutputVariable("Zone Hybrid Unitary HVAC External Static Pressure",
                                 OutputProcessor::Unit::Pa,
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).ExternalStaticPressure,
