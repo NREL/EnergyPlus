@@ -54,7 +54,7 @@ USE DataGlobals,~~~~ ONLY: SetupOutputVariable, BeginEnvrnFlag, BeginDayFlag, Ma
 
 Use DataEnvironment, ONLY: StdBaroPress, DayofMonth, Month, StdRhoAir
 
-USE Psychrometrics,~ ONLY:PsyRhoAirFnPbTdbW, PsyTdbFnHW, PsyCpAirFnWTdb
+USE Psychrometrics,~ ONLY:PsyRhoAirFnPbTdbW, PsyTdbFnHW, PsyCpAirFnW
 
 ~ ! Use statements for access to subroutines in other modules
 
@@ -2018,7 +2018,7 @@ CONTAINS
 
 ~~ Fan(FanNum)\%OutletAirMassFlowRate = MassFlow
 
-!~~ Fan(FanNum)\%OutletAirTemp = Tin + PowerLossToAir/(MassFlow*PsyCpAirFnWTdb(Win,Tin))
+!~~ Fan(FanNum)\%OutletAirTemp = Tin + PowerLossToAir/(MassFlow*PsyCpAirFnW(Win))
 
 ~~ Fan(FanNum)\%OutletAirTemp = PsyTdbFnHW(Fan(FanNum)\%OutletAirEnthalpy,Fan(FanNum)\%OutletAirHumRat)
 

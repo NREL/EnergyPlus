@@ -380,6 +380,11 @@ namespace Psychrometrics {
                                  Real64 const T   // input temperature {Celsius}
     )
     {
+
+    	//// NOTE: THIS FUNCTION IS DEPRECATED AND USED FOR TESTING PURPOSES ONLY
+    	////       USE FUNCTION "PsyCpAirFnW" INSTEAD
+
+
         // FUNCTION INFORMATION:
         //       AUTHOR         J. C. VanderZee
         //       DATE WRITTEN   Feb. 1994
@@ -407,32 +412,6 @@ namespace Psychrometrics {
         // compute heat capacity of air
         Real64 const w(max(dw, 1.0e-5));
         Real64 const cpa((PsyHFnTdbW(T + 0.1, w) - PsyHFnTdbW(T, w)) * 10.0); // result => heat capacity of air {J/kg-C}
-
-        // save values for next call
-        dwSave = dw;
-        Tsave = T;
-        cpaSave = cpa;
-
-        return cpa;
-    }
-
-    inline Real64 PsyCpAirFnWTdb_fast(Real64 const dw, // humidity ratio {kgWater/kgDryAir}
-                                      Real64 const T   // input temperature {Celsius}
-    )
-    {
-        // Faster version with humidity ratio already adjusted
-        assert(dw >= 1.0e-5);
-
-        // Static locals
-        static Real64 dwSave(-100.0);
-        static Real64 Tsave(-100.0);
-        static Real64 cpaSave(-100.0);
-
-        // check if last call had the same input and if it did just use the saved output
-        if ((Tsave == T) && (dwSave == dw)) return cpaSave;
-
-        // compute heat capacity of air
-        Real64 const cpa((PsyHFnTdbW_fast(T + 0.1, dw) - PsyHFnTdbW_fast(T, dw)) * 10.0); // result => heat capacity of air {J/kg-C}
 
         // save values for next call
         dwSave = dw;

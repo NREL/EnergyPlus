@@ -3360,7 +3360,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_GetInput)
     SimUnitarySystem(UnitarySystem(1).Name, FirstHVACIteration, UnitarySystem(1).ControlZoneNum, ZoneEquipList(1).EquipIndex(1), _, _, _, _, true);
 
     ZoneTemp = Node(ControlZoneNum).Temp;
-    CpAir = PsyCpAirFnWTdb(Node(InletNode).HumRat, Node(InletNode).Temp);
+    CpAir = PsyCpAirFnW(Node(InletNode).HumRat, Node(InletNode).Temp);
 
     // calculation at end of CalcUnitarySystemToLoad():
     //	SensOutput = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, MinHumRatio ) - PsyHFnTdbW( ZoneTemp, MinHumRatio ) ) - UnitarySystem(
@@ -3396,7 +3396,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_GetInput)
     SimUnitarySystem(UnitarySystem(1).Name, FirstHVACIteration, UnitarySystem(1).ControlZoneNum, ZoneEquipList(1).EquipIndex(1), _, _, _, _, true);
 
     ZoneTemp = Node(ControlZoneNum).Temp;
-    CpAir = PsyCpAirFnWTdb(Node(InletNode).HumRat, Node(InletNode).Temp);
+    CpAir = PsyCpAirFnW(Node(InletNode).HumRat, Node(InletNode).Temp);
 
     // calculation at end of CalcUnitarySystemToLoad():
     //	SensOutput = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, MinHumRatio ) - PsyHFnTdbW( ZoneTemp, MinHumRatio ) ) - UnitarySystem(
@@ -4176,7 +4176,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_VarSpeedCoils)
     SimUnitarySystem(UnitarySystem(1).Name, FirstHVACIteration, UnitarySystem(1).ControlZoneNum, ZoneEquipList(1).EquipIndex(1), _, _, _, _, true);
 
     ZoneTemp = Node(ControlZoneNum).Temp;
-    CpAir = PsyCpAirFnWTdb(Node(InletNode).HumRat, Node(InletNode).Temp);
+    CpAir = PsyCpAirFnW(Node(InletNode).HumRat, Node(InletNode).Temp);
 
     // calculation at end of CalcUnitarySystemToLoad():
     //	SensOutput = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, MinHumRatio ) - PsyHFnTdbW( ZoneTemp, MinHumRatio ) ) - UnitarySystem(
@@ -4208,7 +4208,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_VarSpeedCoils)
     SimUnitarySystem(UnitarySystem(1).Name, FirstHVACIteration, UnitarySystem(1).ControlZoneNum, ZoneEquipList(1).EquipIndex(1), _, _, _, _, true);
 
     ZoneTemp = Node(ControlZoneNum).Temp;
-    CpAir = PsyCpAirFnWTdb(Node(InletNode).HumRat, Node(InletNode).Temp);
+    CpAir = PsyCpAirFnW(Node(InletNode).HumRat, Node(InletNode).Temp);
 
     // calculation at end of CalcUnitarySystemToLoad():
     //	SensOutput = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, MinHumRatio ) - PsyHFnTdbW( ZoneTemp, MinHumRatio ) ) - UnitarySystem(
@@ -4606,7 +4606,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_VarSpeedCoils_CyclingFan)
     SimUnitarySystem(UnitarySystem(1).Name, FirstHVACIteration, UnitarySystem(1).ControlZoneNum, ZoneEquipList(1).EquipIndex(1), _, _, _, _, true);
 
     ZoneTemp = Node(ControlZoneNum).Temp;
-    CpAir = PsyCpAirFnWTdb(Node(InletNode).HumRat, Node(InletNode).Temp);
+    CpAir = PsyCpAirFnW(Node(InletNode).HumRat, Node(InletNode).Temp);
 
     // calculation at end of CalcUnitarySystemToLoad():
     //	SensOutput = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, MinHumRatio ) - PsyHFnTdbW( ZoneTemp, MinHumRatio ) ) - UnitarySystem(
@@ -4645,7 +4645,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_VarSpeedCoils_CyclingFan)
     SimUnitarySystem(UnitarySystem(1).Name, FirstHVACIteration, UnitarySystem(1).ControlZoneNum, ZoneEquipList(1).EquipIndex(1), _, _, _, _, true);
 
     ZoneTemp = Node(ControlZoneNum).Temp;
-    CpAir = PsyCpAirFnWTdb(Node(InletNode).HumRat, Node(InletNode).Temp);
+    CpAir = PsyCpAirFnW(Node(InletNode).HumRat, Node(InletNode).Temp);
 
     // calculation at end of CalcUnitarySystemToLoad():
     //	SensOutput = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, MinHumRatio ) - PsyHFnTdbW( ZoneTemp, MinHumRatio ) ) - UnitarySystem(
@@ -8220,7 +8220,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_WaterToAirHeatPump)
     SimUnitarySystem(UnitarySystem(1).Name, FirstHVACIteration, UnitarySystem(1).ControlZoneNum, ZoneEquipList(1).EquipIndex(1), _, _, _, _, true);
 
     ZoneTemp = Node(ControlZoneNum).Temp;
-    CpAir = PsyCpAirFnWTdb(Node(InletNode).HumRat, Node(InletNode).Temp);
+    CpAir = PsyCpAirFnW(Node(InletNode).HumRat, Node(InletNode).Temp);
 
     // calculation at end of CalcUnitarySystemToLoad():
     //	SensOutput = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, MinHumRatio ) - PsyHFnTdbW( ZoneTemp, MinHumRatio ) ) - UnitarySystem(
@@ -8253,7 +8253,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_WaterToAirHeatPump)
     SimUnitarySystem(UnitarySystem(1).Name, FirstHVACIteration, UnitarySystem(1).ControlZoneNum, ZoneEquipList(1).EquipIndex(1), _, _, _, _, true);
 
     ZoneTemp = Node(ControlZoneNum).Temp;
-    CpAir = PsyCpAirFnWTdb(Node(InletNode).HumRat, Node(InletNode).Temp);
+    CpAir = PsyCpAirFnW(Node(InletNode).HumRat, Node(InletNode).Temp);
 
     // calculation at end of CalcUnitarySystemToLoad():
     //	SensOutput = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, MinHumRatio ) - PsyHFnTdbW( ZoneTemp, MinHumRatio ) ) - UnitarySystem(
@@ -8541,7 +8541,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_ASHRAEModel_WaterCoils)
     SimUnitarySystem(UnitarySystem(1).Name, FirstHVACIteration, UnitarySystem(1).ControlZoneNum, ZoneEquipList(1).EquipIndex(1), _, _, _, _, true);
 
     ZoneTemp = Node(ControlZoneNum).Temp;
-    CpAir = PsyCpAirFnWTdb(Node(InletNode).HumRat, Node(InletNode).Temp);
+    CpAir = PsyCpAirFnW(Node(InletNode).HumRat, Node(InletNode).Temp);
 
     // calculation at end of CalcUnitarySystemToLoad():
     //	SensOutput = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, MinHumRatio ) - PsyHFnTdbW( ZoneTemp, MinHumRatio ) ) - UnitarySystem(
@@ -8577,7 +8577,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_ASHRAEModel_WaterCoils)
     SimUnitarySystem(UnitarySystem(1).Name, FirstHVACIteration, UnitarySystem(1).ControlZoneNum, ZoneEquipList(1).EquipIndex(1), _, _, _, _, true);
 
     ZoneTemp = Node(ControlZoneNum).Temp;
-    CpAir = PsyCpAirFnWTdb(Node(InletNode).HumRat, Node(InletNode).Temp);
+    CpAir = PsyCpAirFnW(Node(InletNode).HumRat, Node(InletNode).Temp);
     MinHumRatio = Node(ControlZoneNum).HumRat;                                                    // zone humidity ratio
     if (Node(OutletNode).Temp < Node(ControlZoneNum).Temp) MinHumRatio = Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
     Qsens_sys = Node(InletNode).MassFlowRate * (PsyHFnTdbW(Node(OutletNode).Temp, MinHumRatio) - PsyHFnTdbW(ZoneTemp, MinHumRatio));
@@ -8606,7 +8606,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_ASHRAEModel_WaterCoils)
     SimUnitarySystem(UnitarySystem(1).Name, FirstHVACIteration, UnitarySystem(1).ControlZoneNum, ZoneEquipList(1).EquipIndex(1), _, _, _, _, true);
 
     ZoneTemp = Node(ControlZoneNum).Temp;
-    CpAir = PsyCpAirFnWTdb(Node(InletNode).HumRat, Node(InletNode).Temp);
+    CpAir = PsyCpAirFnW(Node(InletNode).HumRat, Node(InletNode).Temp);
     MinHumRatio = Node(ControlZoneNum).HumRat;                                                    // zone humidity ratio
     if (Node(OutletNode).Temp < Node(ControlZoneNum).Temp) MinHumRatio = Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
     Qsens_sys = Node(InletNode).MassFlowRate * (PsyHFnTdbW(Node(OutletNode).Temp, MinHumRatio) - PsyHFnTdbW(ZoneTemp, MinHumRatio));
@@ -8631,7 +8631,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_ASHRAEModel_WaterCoils)
     SimUnitarySystem(UnitarySystem(1).Name, FirstHVACIteration, UnitarySystem(1).ControlZoneNum, ZoneEquipList(1).EquipIndex(1), _, _, _, _, true);
 
     ZoneTemp = Node(ControlZoneNum).Temp;
-    CpAir = PsyCpAirFnWTdb(Node(InletNode).HumRat, Node(InletNode).Temp);
+    CpAir = PsyCpAirFnW(Node(InletNode).HumRat, Node(InletNode).Temp);
     MinHumRatio = Node(ControlZoneNum).HumRat;                                                    // zone humidity ratio
     if (Node(OutletNode).Temp < Node(ControlZoneNum).Temp) MinHumRatio = Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
     Qsens_sys = Node(InletNode).MassFlowRate * (PsyHFnTdbW(Node(OutletNode).Temp, MinHumRatio) - PsyHFnTdbW(ZoneTemp, MinHumRatio));
@@ -8671,7 +8671,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_ASHRAEModel_WaterCoils)
     SimUnitarySystem(UnitarySystem(1).Name, FirstHVACIteration, UnitarySystem(1).ControlZoneNum, ZoneEquipList(1).EquipIndex(1), _, _, _, _, true);
 
     ZoneTemp = Node(ControlZoneNum).Temp;
-    CpAir = PsyCpAirFnWTdb(Node(InletNode).HumRat, Node(InletNode).Temp);
+    CpAir = PsyCpAirFnW(Node(InletNode).HumRat, Node(InletNode).Temp);
 
     // calculation at end of CalcUnitarySystemToLoad():
     //	SensOutput = AirMassFlow * ( PsyHFnTdbW( Node( OutletNode ).Temp, MinHumRatio ) - PsyHFnTdbW( ZoneTemp, MinHumRatio ) ) - UnitarySystem(
@@ -8703,7 +8703,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_ASHRAEModel_WaterCoils)
     SimUnitarySystem(UnitarySystem(1).Name, FirstHVACIteration, UnitarySystem(1).ControlZoneNum, ZoneEquipList(1).EquipIndex(1), _, _, _, _, true);
 
     ZoneTemp = Node(ControlZoneNum).Temp;
-    CpAir = PsyCpAirFnWTdb(Node(InletNode).HumRat, Node(InletNode).Temp);
+    CpAir = PsyCpAirFnW(Node(InletNode).HumRat, Node(InletNode).Temp);
     MinHumRatio = Node(ControlZoneNum).HumRat;                                                    // zone humidity ratio
     if (Node(OutletNode).Temp < Node(ControlZoneNum).Temp) MinHumRatio = Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
     Qsens_sys = Node(InletNode).MassFlowRate * (PsyHFnTdbW(Node(OutletNode).Temp, MinHumRatio) - PsyHFnTdbW(ZoneTemp, MinHumRatio));
@@ -8729,7 +8729,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_ASHRAEModel_WaterCoils)
     SimUnitarySystem(UnitarySystem(1).Name, FirstHVACIteration, UnitarySystem(1).ControlZoneNum, ZoneEquipList(1).EquipIndex(1), _, _, _, _, true);
 
     ZoneTemp = Node(ControlZoneNum).Temp;
-    CpAir = PsyCpAirFnWTdb(Node(InletNode).HumRat, Node(InletNode).Temp);
+    CpAir = PsyCpAirFnW(Node(InletNode).HumRat, Node(InletNode).Temp);
     MinHumRatio = Node(ControlZoneNum).HumRat;                                                    // zone humidity ratio
     if (Node(OutletNode).Temp < Node(ControlZoneNum).Temp) MinHumRatio = Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
     Qsens_sys = Node(InletNode).MassFlowRate * (PsyHFnTdbW(Node(OutletNode).Temp, MinHumRatio) - PsyHFnTdbW(ZoneTemp, MinHumRatio));
@@ -8754,7 +8754,7 @@ TEST_F(EnergyPlusFixture, UnitarySystem_ASHRAEModel_WaterCoils)
     SimUnitarySystem(UnitarySystem(1).Name, FirstHVACIteration, UnitarySystem(1).ControlZoneNum, ZoneEquipList(1).EquipIndex(1), _, _, _, _, true);
 
     ZoneTemp = Node(ControlZoneNum).Temp;
-    CpAir = PsyCpAirFnWTdb(Node(InletNode).HumRat, Node(InletNode).Temp);
+    CpAir = PsyCpAirFnW(Node(InletNode).HumRat, Node(InletNode).Temp);
     MinHumRatio = Node(ControlZoneNum).HumRat;                                                    // zone humidity ratio
     if (Node(OutletNode).Temp < Node(ControlZoneNum).Temp) MinHumRatio = Node(OutletNode).HumRat; // use lower of zone and outlet humidity ratio
     Qsens_sys = Node(InletNode).MassFlowRate * (PsyHFnTdbW(Node(OutletNode).Temp, MinHumRatio) - PsyHFnTdbW(ZoneTemp, MinHumRatio));

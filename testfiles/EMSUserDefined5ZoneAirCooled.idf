@@ -4338,7 +4338,7 @@
     Set HeatZoneSAT    = 50.0,  !- <none>
     Set AvgSAT = (HeatCentralSAT + HeatZoneSAT) / 2,  !- <none>
     Set HeatingZoneW      = 0.004,  !- <none>
-    Set HeatingAir_CP     = @CpAirFnWTdb HeatingZoneW AvgSAT,  !- <none>
+    Set HeatingAir_CP     = @CpAirFnW HeatingZoneW,  !- <none>
     Set HWCoil_DesLoad = (HeatingAir_CP * Space1ATU_DesignAirMdot) * (HeatZoneSAT - HeatCentralSAT),  !- <none>
     Set Space1ATU_HW_DesignVdot = HWCoil_DesLoad / (( HW_rho * HW_CP) * HWLoopDeltaTemp),  !- <none>
     Set Space1ATU_HW_MdotMin = 0.0,  !- <none>
@@ -4537,7 +4537,7 @@
     Set HeatZoneSAT    = 50.0,  !- <none>
     Set AvgSAT = (HeatCentralSAT + HeatZoneSAT) / 2,  !- <none>
     Set HeatingZoneW      = 0.004,  !- <none>
-    Set HeatingAir_CP     = @CpAirFnWTdb HeatingZoneW AvgSAT,  !- <none>
+    Set HeatingAir_CP     = @CpAirFnW HeatingZoneW,  !- <none>
     Set HWCoil_DesLoad = (HeatingAir_CP * Space2ATU_DesignAirMdot) * (HeatZoneSAT - HeatCentralSAT),  !- <none>
     Set Space2ATU_HW_DesignVdot = HWCoil_DesLoad / (( HW_rho * HW_CP) * HWLoopDeltaTemp),  !- <none>
     Set Space2ATU_HW_MdotMin = 0.0,  !- <none>
@@ -4736,7 +4736,7 @@
     Set HeatZoneSAT    = 50.0,  !- <none>
     Set AvgSAT = (HeatCentralSAT + HeatZoneSAT) / 2,  !- <none>
     Set HeatingZoneW      = 0.004,  !- <none>
-    Set HeatingAir_CP     = @CpAirFnWTdb HeatingZoneW AvgSAT,  !- <none>
+    Set HeatingAir_CP     = @CpAirFnW HeatingZoneW,  !- <none>
     Set HWCoil_DesLoad = (HeatingAir_CP * Space3ATU_DesignAirMdot) * (HeatZoneSAT - HeatCentralSAT),  !- <none>
     Set Space3ATU_HW_DesignVdot = HWCoil_DesLoad / (( HW_rho * HW_CP) * HWLoopDeltaTemp),  !- <none>
     Set Space3ATU_HW_MdotMin = 0.0,  !- <none>
@@ -4935,7 +4935,7 @@
     Set HeatZoneSAT    = 50.0,  !- <none>
     Set AvgSAT = (HeatCentralSAT + HeatZoneSAT) / 2,  !- <none>
     Set HeatingZoneW      = 0.004,  !- <none>
-    Set HeatingAir_CP     = @CpAirFnWTdb HeatingZoneW AvgSAT,  !- <none>
+    Set HeatingAir_CP     = @CpAirFnW HeatingZoneW,  !- <none>
     Set HWCoil_DesLoad = (HeatingAir_CP * Space4ATU_DesignAirMdot) * (HeatZoneSAT - HeatCentralSAT),  !- <none>
     Set Space4ATU_HW_DesignVdot = HWCoil_DesLoad / (( HW_rho * HW_CP) * HWLoopDeltaTemp),  !- <none>
     Set Space4ATU_HW_MdotMin = 0.0,  !- <none>
@@ -5134,7 +5134,7 @@
     Set HeatZoneSAT    = 50.0,  !- <none>
     Set AvgSAT = (HeatCentralSAT + HeatZoneSAT) / 2,  !- <none>
     Set HeatingZoneW      = 0.004,  !- <none>
-    Set HeatingAir_CP     = @CpAirFnWTdb HeatingZoneW AvgSAT,  !- <none>
+    Set HeatingAir_CP     = @CpAirFnW HeatingZoneW,  !- <none>
     Set HWCoil_DesLoad = (HeatingAir_CP * Space4ATU_DesignAirMdot) * (HeatZoneSAT - HeatCentralSAT),  !- <none>
     Set Space5ATU_HW_DesignVdot = HWCoil_DesLoad / (( HW_rho * HW_CP) * HWLoopDeltaTemp),  !- <none>
     Set Space5ATU_HW_MdotMin = 0.0,  !- <none>
