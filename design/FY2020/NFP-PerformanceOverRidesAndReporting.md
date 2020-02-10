@@ -6,6 +6,8 @@ Performance Overrides and Reporting
  - January 29, 2020
  - January 30, 2020 - Try "single knob" approach for input, include minimum number of warmup days,
 add warning message for PerformancePrecisionTradeoffs
+ - February 10, 2020 - Use single knob approach but also have separate fields for other 
+ convergence inputs
  
 
 ## Justification for New Feature ##
@@ -73,15 +75,6 @@ The Override Mode field would be added to the Input Output Reference including t
 |Mode08 | Mode07 plus internal variable ConvrgLim will be set to Y|
 |Mode09 | Mode08 plus internal variable MaxAllowedDelTempCondFD will be set to Y|
 |Mode10 | Mode09 plus internal variable MassFlowTolerance will be set to Y|
-|AdvancedA| MaxZoneTempDiff will be set to Y |
-|AdvancedB| ConvrgLim will be set to Y |
-|AdvancedC| MaxAllowedDelTempCondFD will be set to Y |
-|AdvancedD| MassFlowTolerance will be set to Y |
-|AdvancedAB| A + B |
-|AdvancedBC| B + C|
-|AdvancedABC| A + B + C |
-|AdvancedCD| C + D |
-|AdvancedABCD| A + B + C + D |
   
 NOTE: The exact layout of this table and the various Y values and list of internal variables will be determined
 based on analysis not yet completed. There may be more or fewer modes in the final table.
@@ -134,9 +127,8 @@ PerformancePrecisionTradeoffs,
       \key CarrollMRT
       \default ScriptF
   A3, \field Override Mode
-      \note The increasing mode number roughly correspond with increased speed. Advanced 
-      \note overrides are also available. A description of each mode and advanced overrides
-      \note are shown in the documentation.
+      \note The increasing mode number roughly correspond with increased speed. A description of each mode 
+      \note are shown in the documentation. When Advanced is selected the N1 to N6 field values are used.
       \type choice
       \key Normal
       \key Mode01
@@ -149,17 +141,48 @@ PerformancePrecisionTradeoffs,
       \key Mode08
       \key Mode09
       \key Mode10
-      \key AdvancedA
-      \key AdvancedB
-      \key AdvancedC
-      \key AdvancedD
-      \key AdvancedAB
-      \key AdvancedBC
-      \key AdvancedABC
-      \key AdvancedCD
-      \key AdvancedABCD
+      \key Advanced
       \default Normal
+  N1, \field Loads Convergence Tolerance Value
+      \note Only used when Override Mode is set to Advanced
+      \type real
+      \minimum X
+      \maximum Y
+      \default Z
+  N2, \field Temperature Convergence Tolerance Value
+      \note Only used when Override Mode is set to Advanced
+      \type real
+      \minimum X
+      \maximum Y
+      \default Z
+  N3, \field MaxZoneTempDiff
+      \note Only used when Override Mode is set to Advanced
+      \type real
+      \minimum X
+      \maximum Y
+      \default Z
+  N4, \field ConvrgLim
+      \note Only used when Override Mode is set to Advanced
+      \type real
+      \minimum X
+      \maximum Y
+      \default Z
+  N5, \field MaxAllowedDelTempCondFD
+      \note Only used when Override Mode is set to Advanced
+      \type real
+      \minimum X
+      \maximum Y
+      \default Z
+  N6; \field MassFlowTolerance
+      \note Only used when Override Mode is set to Advanced
+      \type real
+      \minimum X
+      \maximum Y
+      \default Z
 ```
+
+NOTE: The exact number of convergence parameters (N1 to N6 shown above) may change due to on going testing of the 
+impacts of these parameters.
 
 
 ## Outputs Description ##
