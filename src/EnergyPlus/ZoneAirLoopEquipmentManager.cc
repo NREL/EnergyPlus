@@ -662,7 +662,7 @@ namespace ZoneAirLoopEquipmentManager {
         using HVACCooledBeam::SimCoolBeam;
         using HVACSingleDuctInduc::SimIndUnit;
         using PoweredInductionUnits::SimPIU;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using SingleDuct::GetATMixers;
         using SingleDuct::SimulateSingleDuct;
         using UserDefinedComponents::SimAirTerminalUserDefined;
@@ -891,9 +891,7 @@ namespace ZoneAirLoopEquipmentManager {
             //                  SysOutputProvided >0 Zone is heated
             SpecHumOut = Node(AirDistUnit(AirDistUnitNum).OutletNodeNum).HumRat;
             SpecHumIn = Node(ZoneEquipConfig(ControlledZoneNum).ZoneNode).HumRat;
-            Real64 CpAirAvg =
-                PsyCpAirFnWTdb(0.5 * (SpecHumOut + SpecHumOut),
-                               0.5 * (Node(AirDistUnit(AirDistUnitNum).OutletNodeNum).Temp + Node(ZoneEquipConfig(ControlledZoneNum).ZoneNode).Temp));
+            Real64 CpAirAvg = PsyCpAirFnW(0.5 * (SpecHumOut + SpecHumOut));
             SysOutputProvided = Node(AirDistUnit(AirDistUnitNum).OutletNodeNum).MassFlowRate * CpAirAvg *
                                 (Node(AirDistUnit(AirDistUnitNum).OutletNodeNum).Temp - Node(ZoneEquipConfig(ControlledZoneNum).ZoneNode).Temp);
             // AirDistUnit( AirDistUnitNum ).HeatRate = max( 0.0, SysOutputProvided );
