@@ -457,9 +457,6 @@ namespace DataPlant {
     Real64 const square_sum_ConvergenceHistoryARR(pow_2(sum_ConvergenceHistoryARR));
     Real64 const sum_square_ConvergenceHistoryARR(sum(pow(ConvergenceHistoryARR, 2)));
 
-    int NumPipes(0);        // Total number of pipes
-    int NumPlantPipes(0);   // Total number of plant pipes
-    int NumCondPipes(0);    // Total number of condenser pipes
     int TotNumLoops(0);     // number of plant and condenser loops
     int TotNumHalfLoops(0); // number of half loops (2 * TotNumLoops)
     bool PlantFirstSizeCompleted(false);
@@ -468,11 +465,6 @@ namespace DataPlant {
     bool PlantFirstSizesOkayToReport(false);
     bool PlantFinalSizesOkayToReport(false);
     bool AnyEMSPlantOpSchemesInModel(false);
-
-    Array1D_int EconBranchNum; // Branch num on which economizer is placed
-    Array1D_int EconCompNum;   // Component num of economizer in the economizer branch
-
-    Array1D_bool LoadChangeDownStream; // sim control flag.
 
     int PlantManageSubIterations(0); // tracks plant iterations to characterize solver
     int PlantManageHalfLoopCalls(0); // tracks number of half loop calls
@@ -490,9 +482,6 @@ namespace DataPlant {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        NumPipes = 0;
-        NumPlantPipes = 0;
-        NumCondPipes = 0;
         TotNumLoops = 0;
         TotNumHalfLoops = 0;
         PlantFirstSizeCompleted = false;
@@ -501,9 +490,6 @@ namespace DataPlant {
         PlantFirstSizesOkayToReport = false;
         PlantFinalSizesOkayToReport = false;
         AnyEMSPlantOpSchemesInModel = false;
-        EconBranchNum.deallocate();
-        EconCompNum.deallocate();
-        LoadChangeDownStream.deallocate();
         PlantManageSubIterations = 0;
         PlantManageHalfLoopCalls = 0;
         PlantLoop.deallocate();

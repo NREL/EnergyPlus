@@ -254,9 +254,6 @@ namespace DataPlant {
     extern Real64 const square_sum_ConvergenceHistoryARR;
     extern Real64 const sum_square_ConvergenceHistoryARR;
 
-    extern int NumPipes;                       // Total number of pipes
-    extern int NumPlantPipes;                  // Total number of plant pipes
-    extern int NumCondPipes;                   // Total number of condenser pipes
     extern int TotNumLoops;                    // number of plant and condenser loops
     extern int TotNumHalfLoops;                // number of half loops (2 * TotNumLoops)
     extern bool PlantFirstSizeCompleted;       // true if first-pass sizing is still going on and not finished
@@ -266,11 +263,6 @@ namespace DataPlant {
     extern bool PlantReSizingCompleted;
 
     extern bool AnyEMSPlantOpSchemesInModel;
-
-    extern Array1D_int EconBranchNum; // Branch num on which economizer is placed
-    extern Array1D_int EconCompNum;   // Component num of economizer in the economizer branch
-
-    extern Array1D_bool LoadChangeDownStream; // sim control flag.
 
     extern int PlantManageSubIterations; // tracks plant iterations to characterize solver
     extern int PlantManageHalfLoopCalls; // tracks number of half loop calls

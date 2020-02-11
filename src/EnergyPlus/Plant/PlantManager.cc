@@ -812,9 +812,6 @@ namespace EnergyPlus {
             MaxNumAlphas = NumAlphas;
             inputProcessor->getObjectDefMaxArgs("Connector:Mixer", NumParams, NumAlphas, NumNumbers);
             MaxNumAlphas = max(MaxNumAlphas, NumAlphas);
-            NumPipes = 0;
-            NumPlantPipes = 0;
-            NumCondPipes = 0;
             HalfLoopNum = 0;
 
             for (LoopNum = 1; LoopNum <= TotNumLoops; ++LoopNum) {
@@ -1429,20 +1426,6 @@ namespace EnergyPlus {
                             this_comp.NodeNumIn = InletNodeNumbers(CompNum);
                             this_comp.NodeNameOut = OutletNodeNames(CompNum);
                             this_comp.NodeNumOut = OutletNodeNumbers(CompNum);
-
-                            // Increment pipe counter if component is a pipe
-                            if (this_comp.TypeOf_Num == TypeOf_Pipe || this_comp.TypeOf_Num == TypeOf_PipeInterior ||
-                                this_comp.TypeOf_Num == TypeOf_PipeExterior ||
-                                this_comp.TypeOf_Num == TypeOf_PipeUnderground ||
-                                this_comp.TypeOf_Num == TypeOf_PipeSteam) {
-                                ++NumOfPipesInLoop;
-                                if (PlantLoop(LoopNum).TypeOfLoop == Plant) {
-                                    ++NumPlantPipes;
-                                } else if (PlantLoop(LoopNum).TypeOfLoop == Condenser) {
-                                    ++NumCondPipes;
-                                }
-                                ++NumPipes;
-                            }
 
                         }
 
@@ -3459,8 +3442,6 @@ namespace EnergyPlus {
                 PlantCallingOrderInfo(OrderIndex).LoopSide = SupplySide;
             }
 
-            // legacy one-time calling control stuff moved here from manager routine, hopefully remove
-            if (!allocated(LoadChangeDownStream)) LoadChangeDownStream.allocate(TotNumLoops);
         }
 
         void RevisePlantCallingOrder() {

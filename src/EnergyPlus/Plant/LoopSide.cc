@@ -120,8 +120,9 @@ namespace DataPlant {
         }
 
         // Do pressure system initialize if this is the demand side (therefore once per whole loop)
-        if (this->myLoopSideNum == DataPlant::DemandSide)
+        if (this->myLoopSideNum == DataPlant::DemandSide) {
             PlantPressureSystem::SimPressureDropSystem(this->myLoopNum, FirstHVACIteration, DataPlant::PressureCall_Init);
+        }
 
         // Turn on any previously disabled branches due to constant speed branch pump issue
         this->TurnOnAllLoopSideBranches();
@@ -129,7 +130,7 @@ namespace DataPlant {
         // Do the actual simulation here every time
         this->DoFlowAndLoadSolutionPass(this->myOtherLoopSideNum, ThisSideInletNode, FirstHVACIteration);
 
-        // On constant speed branch pump loop sides we need to resimulate
+        // On constant speed branch pump loop sides we need to re-simulate
         if (this->hasConstSpeedBranchPumps) {
             // turn off any pumps connected to unloaded equipment and re-do the flow/load solution pass
             this->DisableAnyBranchPumpsConnectedToUnloadedEquipment();
