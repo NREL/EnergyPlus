@@ -333,7 +333,8 @@ namespace WaterCoils {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitWaterCoil(int const CoilNum,
+    void InitWaterCoil(OutputFiles &outputFiles,
+                       int const CoilNum,
                        bool const FirstHVACIteration // unused1208
     );
 

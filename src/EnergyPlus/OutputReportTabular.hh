@@ -693,7 +693,7 @@ namespace OutputReportTabular {
 
     bool warningAboutKeyNotFound(int foundIndex, int inObjIndex, std::string const &moduleName);
 
-    void GetInputTabularStyle();
+    void GetInputTabularStyle(OutputFiles &outputFiles);
 
     int SetUnitsStyleFromString(std::string const &unitStringIn);
 
@@ -791,7 +791,7 @@ namespace OutputReportTabular {
 
     void WriteSurfaceShadowing();
 
-    void WriteEioTables();
+    void WriteEioTables(OutputFiles &outputFiles);
 
     int unitsFromHeading(std::string &heading);
 
@@ -803,7 +803,7 @@ namespace OutputReportTabular {
 
     void DeallocateLoadComponentArrays();
 
-    void ComputeLoadComponentDecayCurve();
+    void ComputeLoadComponentDecayCurve(OutputFiles &outputFiles);
 
     void GatherComponentLoadsSurface();
 

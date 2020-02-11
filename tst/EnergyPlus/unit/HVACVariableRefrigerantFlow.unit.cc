@@ -79,6 +79,7 @@
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -1715,7 +1716,7 @@ TEST_F(HVACVRFFixture, VRF_FluidTCtrl_VRFOU_Compressor)
     StdRhoAir = PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress, 20.0, 0.0);
 
     // Read in IDF
-    ProcessScheduleInput();                    // read schedules
+    ProcessScheduleInput(OutputFiles::getSingleton());                    // read schedules
     CurveManager::GetCurveInput();             // read curves
     FluidProperties::GetFluidPropertiesData(); // read refrigerant properties
 
@@ -3183,7 +3184,7 @@ TEST_F(HVACVRFFixture, VRFTest_SysCurve)
 
     ZoneSysEnergyDemand.allocate(1);
 
-    ProcessScheduleInput();   // read schedules
+    ProcessScheduleInput(OutputFiles::getSingleton());   // read schedules
     GetCurveInput();          // read curves
     GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
@@ -4083,7 +4084,7 @@ TEST_F(HVACVRFFixture, VRFTest_SysCurve_GetInputFailers)
 
     ZoneSysEnergyDemand.allocate(1);
 
-    ProcessScheduleInput();   // read schedules
+    ProcessScheduleInput(OutputFiles::getSingleton());   // read schedules
     GetCurveInput();          // read curves
     GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
@@ -10462,7 +10463,7 @@ TEST_F(HVACVRFFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 0.566337;
 
     ZoneSysEnergyDemand.allocate(1);
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     GetCurveInput();
     GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -12171,7 +12172,7 @@ TEST_F(HVACVRFFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow = 0.566337;
 
     ZoneSysEnergyDemand.allocate(1);
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     GetCurveInput();
     GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
