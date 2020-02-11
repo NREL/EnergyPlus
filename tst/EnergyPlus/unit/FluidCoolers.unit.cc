@@ -322,34 +322,51 @@ TEST_F(EnergyPlusFixture, SingleSpeedFluidCoolerInput_Test5)
 }
 
 TEST_F(EnergyPlusFixture, SizeFunctionTestWhenPlantSizingIndexIsZero)
-{   
+{  
+    int StringArraySize = 20;
+    Array1D_string cNumericFieldNames;
+    cNumericFieldNames.allocate(StringArraySize);
+    Array1D_string cAlphaFieldNames;
+    cAlphaFieldNames.allocate(StringArraySize);
+    Array1D_string AlphArray;
+    AlphArray.allocate(StringArraySize);
+    for (int i = 1; i <= StringArraySize; ++i) {
+        cAlphaFieldNames(i) = "AlphaField";
+        cNumericFieldNames(i) = "NumerField";
+        AlphArray(i) = "FieldValues";
+    }
+    std::string const cCurrentModuleObject("FluidCooler:SingleSpeed");
     int FluidCoolerNum(1);
+    SimpleFluidCooler.allocate(FluidCoolerNum);
 
-    std::string const idf_objects = delimited_string({
-        "   FluidCooler:SingleSpeed,",
-        "     Dry Cooler,              !- Name",
-        "     Dry Cooler Inlet Node,   !- Water Inlet Node Name",
-        "     Dry Cooler Outlet Node,  !- Water Outlet Node Name",
-        "     NominalCapacity,         !- Performance Input Method",
-        "     ,                        !- Design Air Flow Rate U-factor Times Area Value {W/K}",
-        "     58601,                   !- Nominal Capacity {W}",
-        "     50,                      !- Design Entering Water Temperature {C}",
-        "     35,                      !- Design Entering Air Temperature {C}",
-        "     25,                      !- Design Entering Air Wetbulb Temperature {C}",
-        "     0.001262,                !- Design Water Flow Rate {m3/s}",
-        "     2.124,                   !- Design Air Flow Rate {m3/s}",
-        "     1491;                    !- Design Air Flow Rate Fan Power {W}",
-    });
+    SimpleFluidCooler(FluidCoolerNum).Name = "Dry Cooler";
+    SimpleFluidCooler(FluidCoolerNum).FluidCoolerMassFlowRateMultiplier = 2.5;
+    SimpleFluidCooler(FluidCoolerNum).PerformanceInputMethod_Num = PerfInputMethod::NOMINAL_CAPACITY;
+    SimpleFluidCooler(FluidCoolerNum).WaterInletNodeNum = 1;
+    SimpleFluidCooler(FluidCoolerNum).WaterOutletNodeNum = 1;
+    AlphArray(4) = "NominalCapacity";
+    SimpleFluidCooler(FluidCoolerNum).FluidCoolerNominalCapacity = 58601;
+    SimpleFluidCooler(FluidCoolerNum).DesignEnteringWaterTemp = 50;
+    SimpleFluidCooler(FluidCoolerNum).DesignEnteringAirTemp = 35;
+    SimpleFluidCooler(FluidCoolerNum).DesignEnteringAirWetBulbTemp = 25;
+    SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRate = 0.001262;
+    SimpleFluidCooler(FluidCoolerNum).HighSpeedAirFlowRate = 2.124;
+    SimpleFluidCooler(FluidCoolerNum).HighSpeedFanPower = 1491;
 
-    ASSERT_TRUE(process_idf(idf_objects));
-    
-    //FluidCoolerspecs::factory(DataPlant::TypeOf_FluidCooler_SingleSpd, "Dry Cooler");
-    
     auto &thisFluidCooler = FluidCoolers::SimpleFluidCooler(FluidCoolerNum);
-    DataPlant::PlantLoop.allocate(1);
-    DataPlant::PlantLoop(1).PlantSizNum = 0;
-    SimpleFluidCooler.allocate(1);
-    SimpleFluidCooler(1).LoopNum = 1;
+
+    DataPlant::PlantLoop.allocate(FluidCoolerNum);
+    SimpleFluidCooler.allocate(FluidCoolerNum);
+    SimpleFluidCooler(FluidCoolerNum).LoopNum = 1;
+    DataPlant::PlantLoop(FluidCoolerNum).PlantSizNum = 0;
+    DataPlant::PlantLoop(FluidCoolerNum).FluidName = "WATER";
+    DataPlant::PlantLoop(FluidCoolerNum).FluidIndex = 1;
     
+    SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRateWasAutoSized = false;
+    SimpleFluidCooler(FluidCoolerNum).HighSpeedFanPowerWasAutoSized = false;
+    SimpleFluidCooler(FluidCoolerNum).HighSpeedAirFlowRateWasAutoSized = false;
+    SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUAWasAutoSized = false;
+    static std::string const CalledFrom("SizeFluidCooler");
+
     thisFluidCooler.size();
 }
