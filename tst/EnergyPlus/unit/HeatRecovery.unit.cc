@@ -60,6 +60,7 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/HeatRecovery.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReturnAirPathManager.hh>

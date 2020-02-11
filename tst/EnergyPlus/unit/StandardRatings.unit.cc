@@ -55,6 +55,7 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/StandardRatings.hh>
 #include <EnergyPlus/ChillerElectricEIR.hh>
@@ -315,16 +316,20 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTest)
     ChillerElectricEIR::ElectricEIRChiller(1).ChillerEIRFPLRIndex = 3;
 
     Real64 IPLV;
-    CalcChillerIPLV(ChillerElectricEIR::ElectricEIRChiller(1).Name,
-                    TypeOf_Chiller_ElectricEIR, 
-                    ChillerElectricEIR::ElectricEIRChiller(1).RefCap, 
-                    ChillerElectricEIR::ElectricEIRChiller(1).RefCOP, 
+    CalcChillerIPLV(OutputFiles::getSingleton(),
+                    ChillerElectricEIR::ElectricEIRChiller(1).Name,
+                    TypeOf_Chiller_ElectricEIR,
+                    ChillerElectricEIR::ElectricEIRChiller(1).RefCap,
+                    ChillerElectricEIR::ElectricEIRChiller(1).RefCOP,
                     ChillerElectricEIR::ElectricEIRChiller(1).CondenserType,
                     ChillerElectricEIR::ElectricEIRChiller(1).ChillerCapFTIndex,
                     ChillerElectricEIR::ElectricEIRChiller(1).ChillerEIRFTIndex,
                     ChillerElectricEIR::ElectricEIRChiller(1).ChillerEIRFPLRIndex,
                     ChillerElectricEIR::ElectricEIRChiller(1).MinUnloadRat,
-                    IPLV);
+                    IPLV,
+                    Optional<const Real64>(),
+                    ObjexxFCL::Optional_int_const(),
+                    Optional<const Real64>());
 
     EXPECT_DOUBLE_EQ(round(IPLV * 100) / 100, 3.87); // 13.20 IPLV
 

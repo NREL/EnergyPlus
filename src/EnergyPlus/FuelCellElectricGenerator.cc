@@ -72,6 +72,7 @@
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -366,7 +367,7 @@ namespace FuelCellElectricGenerator {
         GeneratorFuelSupply::GetGeneratorFuelSupplyInput();
 
         for (int FuelSupNum = 1; FuelSupNum <= DataGenerators::NumGeneratorFuelSups; ++FuelSupNum) {
-            GeneratorFuelSupply::SetupFuelConstituentData(FuelSupNum, ErrorsFound);
+            GeneratorFuelSupply::SetupFuelConstituentData(OutputFiles::getSingleton(), FuelSupNum, ErrorsFound);
         }
 
         // set fuel supply ID in Fuel cell structure

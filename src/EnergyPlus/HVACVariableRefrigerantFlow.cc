@@ -84,6 +84,7 @@
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantUtilities.hh>
@@ -973,7 +974,7 @@ namespace HVACVariableRefrigerantFlow {
                     HREIRFT = VRF(VRFCond).HREIRFTCool; // Index to cool EIR as a function of temperature curve for heat recovery
                     if (HREIRFT > 0) {
                         //         VRF(VRFCond)%HREIRFTCoolConst = 1.1d0 ! initialized to 1.1
-                        if (CurveManager::PerfCurve(VRF(VRFCond).HREIRFTCool).NumDims == 2) { // Curve type for HRCAPFTCool
+                        if (CurveManager::PerfCurve(VRF(VRFCond).HREIRFTCool).NumDims == 2) { // Curve type for HREIRFTCool
                             VRF(VRFCond).HREIRFTCoolConst = CurveValue(HREIRFT, InletAirWetBulbC, CondInletTemp);
                         } else {
                             VRF(VRFCond).HREIRFTCoolConst = CurveValue(HREIRFT, VRF(VRFCond).VRFCondPLR);
@@ -1015,7 +1016,7 @@ namespace HVACVariableRefrigerantFlow {
                     HREIRFT = VRF(VRFCond).HREIRFTHeat; // Index to cool EIR as a function of temperature curve for heat recovery
                     if (HREIRFT > 0) {
                         //         VRF(VRFCond)%HREIRFTCoolConst = 1.1d0 ! initialized to 1.1
-                        if (CurveManager::PerfCurve(VRF(VRFCond).HREIRFTHeat).NumDims == 2) { // Curve type for HRCAPFTHeat
+                        if (CurveManager::PerfCurve(VRF(VRFCond).HREIRFTHeat).NumDims == 2) { // Curve type for HREIRFTHeat
                             {
                                 auto const SELECT_CASE_var(VRF(VRFCond).HeatingPerformanceOATType);
                                 if (SELECT_CASE_var == DataHVACGlobals::DryBulbIndicator) {
@@ -1030,7 +1031,7 @@ namespace HVACVariableRefrigerantFlow {
                             VRF(VRFCond).HREIRFTHeatConst = CurveValue(HREIRFT, VRF(VRFCond).VRFCondPLR);
                         }
                     }
-                    HREIRFTConst = VRF(VRFCond).HRCAPFTHeatConst;
+                    HREIRFTConst = VRF(VRFCond).HREIRFTHeatConst;
                     HRInitialEIRFrac =
                         VRF(VRFCond).HRInitialHeatEIRFrac; // Fractional heating degradation at the start of heat recovery from heating mode
                     HREIRTC = VRF(VRFCond).HRHeatEIRTC;    // Time constant used to recover from initial degradation in heating heat recovery
@@ -5281,7 +5282,7 @@ namespace HVACVariableRefrigerantFlow {
         // Size TU
         if (MySizeFlag(VRFTUNum)) {
             if (!ZoneSizingCalc && !SysSizingCalc) {
-                SizeVRF(VRFTUNum);
+                SizeVRF(OutputFiles::getSingleton(), VRFTUNum);
                 TerminalUnitList(TUListIndex).TerminalUnitNotSizedYet(IndexToTUInTUList) = false;
                 MySizeFlag(VRFTUNum) = false;
             } // IF ( .NOT. ZoneSizingCalc) THEN
@@ -6283,7 +6284,7 @@ namespace HVACVariableRefrigerantFlow {
         }
     }
 
-    void SizeVRF(int const VRFTUNum)
+    void SizeVRF(OutputFiles &outputFiles, int const VRFTUNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -6368,12 +6369,6 @@ namespace HVACVariableRefrigerantFlow {
         int CapSizingMethod(0); // capacity sizing methods (HeatingDesignCapacity, CapacityPerFloorArea, FractionOfAutosizedCoolingCapacity, and
                                 // FractionOfAutosizedHeatingCapacity )
 
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_990(
-            "('! <VRF System Information>, VRF System Type, VRF System Name, ','VRF System Cooling Combination Ratio, VRF "
-            "System Heating Combination Ratio, ','VRF System Cooling Piping Correction Factor, VRF System Heating Piping "
-            "Correction Factor')");
-        static ObjexxFCL::gio::Fmt Format_991("(' VRF System Information',6(', ',A))");
 
         VRFCond = VRFTU(VRFTUNum).VRFSysNum;
         IsAutoSize = false;
@@ -7325,13 +7320,22 @@ namespace HVACVariableRefrigerantFlow {
 
                 // Report to eio other information not related to autosizing
                 if (MyOneTimeEIOFlag) {
-                    ObjexxFCL::gio::write(OutputFileInits, Format_990);
+                    static constexpr auto Format_990(
+                        "! <VRF System Information>, VRF System Type, VRF System Name, VRF System Cooling Combination Ratio, VRF "
+                        "System Heating Combination Ratio, VRF System Cooling Piping Correction Factor, VRF System Heating Piping "
+                        "Correction Factor\n");
+                    print(outputFiles.eio, Format_990);
                     MyOneTimeEIOFlag = false;
                 }
-                ObjexxFCL::gio::write(OutputFileInits, Format_991)
-                    << cVRFTypes(VRF(VRFCond).VRFSystemTypeNum) << VRF(VRFCond).Name << RoundSigDigits(VRF(VRFCond).CoolingCombinationRatio, 5)
-                    << RoundSigDigits(VRF(VRFCond).HeatingCombinationRatio, 5) << RoundSigDigits(VRF(VRFCond).PipingCorrectionCooling, 5)
-                    << RoundSigDigits(VRF(VRFCond).PipingCorrectionHeating, 5);
+                static constexpr auto Format_991(" VRF System Information, {}, {}, {:.5R}, {:.5R}, {:.5R}, {:.5R}\n");
+                print(outputFiles.eio,
+                      Format_991,
+                      cVRFTypes(VRF(VRFCond).VRFSystemTypeNum),
+                      VRF(VRFCond).Name,
+                      VRF(VRFCond).CoolingCombinationRatio,
+                      VRF(VRFCond).HeatingCombinationRatio,
+                      VRF(VRFCond).PipingCorrectionCooling,
+                      VRF(VRFCond).PipingCorrectionHeating);
 
                 CheckVRFCombinationRatio(VRFCond) = false;
             }
@@ -7905,8 +7909,7 @@ namespace HVACVariableRefrigerantFlow {
             this->CalcVRFSuppHeatingCoil(VRFTUNum, FirstHVACIteration, SuppPLR, SuppHeatCoilLoad);
             if ((DataLoopNode::Node(this->SuppHeatCoilAirOutletNode).Temp > this->MaxSATFromSuppHeatCoil) && SuppPLR > 0.0) {
                 // adjust the heating load to maximum allowed
-                Real64 MaxHeatCoilLoad =
-                    this->HeatingCoilCapacityLimit(this->SuppHeatCoilAirInletNode, this->SuppHeatCoilAirOutletNode, this->MaxSATFromSuppHeatCoil);
+                Real64 MaxHeatCoilLoad = this->HeatingCoilCapacityLimit(this->SuppHeatCoilAirInletNode, this->MaxSATFromSuppHeatCoil);
                 this->CalcVRFSuppHeatingCoil(VRFTUNum, FirstHVACIteration, SuppPLR, MaxHeatCoilLoad);
                 SuppHeatCoilLoad = MaxHeatCoilLoad;
             }
@@ -7923,7 +7926,7 @@ namespace HVACVariableRefrigerantFlow {
                 TempIn = DataLoopNode::Node(ZoneNode).Temp;
                 SpecHumOut = DataLoopNode::Node(ATMixOutNode).HumRat;
                 SpecHumIn = DataLoopNode::Node(ZoneNode).HumRat;
-                AirMassFlow = DataLoopNode::Node( ATMixOutNode ).MassFlowRate;
+                AirMassFlow = DataLoopNode::Node(ATMixOutNode).MassFlowRate;
             } else {
                 // Air terminal inlet side mixer
                 TempOut = DataLoopNode::Node(VRFTUOutletNodeNum).Temp;
@@ -10759,8 +10762,7 @@ namespace HVACVariableRefrigerantFlow {
             this->CalcVRFSuppHeatingCoil(VRFTUNum, FirstHVACIteration, SuppPLR, SuppHeatCoilLoad);
             if ((DataLoopNode::Node(this->SuppHeatCoilAirOutletNode).Temp > this->MaxSATFromSuppHeatCoil) && SuppPLR > 0.0) {
                 // adjust the heating load to maximum allowed
-                Real64 MaxHeatCoilLoad =
-                    this->HeatingCoilCapacityLimit(this->SuppHeatCoilAirInletNode, this->SuppHeatCoilAirOutletNode, this->MaxSATFromSuppHeatCoil);
+                Real64 MaxHeatCoilLoad = this->HeatingCoilCapacityLimit(this->SuppHeatCoilAirInletNode, this->MaxSATFromSuppHeatCoil);
                 this->CalcVRFSuppHeatingCoil(VRFTUNum, FirstHVACIteration, SuppPLR, MaxHeatCoilLoad);
                 SuppHeatCoilLoad = MaxHeatCoilLoad;
             }
@@ -10777,7 +10779,7 @@ namespace HVACVariableRefrigerantFlow {
                 TempIn = DataLoopNode::Node(ZoneNode).Temp;
                 SpecHumOut = DataLoopNode::Node(ATMixOutNode).HumRat;
                 SpecHumIn = DataLoopNode::Node(ZoneNode).HumRat;
-                AirMassFlow = DataLoopNode::Node( ATMixOutNode ).MassFlowRate;
+                AirMassFlow = DataLoopNode::Node(ATMixOutNode).MassFlowRate;
             } else {
                 // Air terminal inlet side mixer
                 TempOut = DataLoopNode::Node(VRFTUOutletNodeNum).Temp;
@@ -10795,7 +10797,6 @@ namespace HVACVariableRefrigerantFlow {
         LoadMet = AirMassFlow * PsyDeltaHSenFnTdb2W2Tdb1W1(TempOut, SpecHumOut, TempIn, SpecHumIn); // sensible {W}
         LatentLoadMet = AirMassFlow * (SpecHumOut - SpecHumIn); // latent {kgWater/s}
         if (present(LatOutputProvided)) {
-            //   CR9155 Remove specific humidity calculations
             LatOutputProvided = LatentLoadMet;
         }
     }
@@ -13302,9 +13303,8 @@ namespace HVACVariableRefrigerantFlow {
     }
 
     Real64 VRFTerminalUnitEquipment::HeatingCoilCapacityLimit(
-        Real64 const HeatCoilAirInletNode,  // supplemental heating coil air inlet node
-        Real64 const HeatCoilAirOutletNode, // supplemental heating coil air outlet node
-        Real64 const HeatCoilMaxSATAllowed  // supplemental heating coil maximum supply air temperature allowed [C]
+        Real64 const HeatCoilAirInletNode, // supplemental heating coil air inlet node
+        Real64 const HeatCoilMaxSATAllowed // supplemental heating coil maximum supply air temperature allowed [C]
     )
     {
         // PURPOSE OF THIS FUNCTION:
@@ -13318,13 +13318,9 @@ namespace HVACVariableRefrigerantFlow {
         Real64 HeatCoilCapacityAllowed; // heating coil maximum capacity that can be deleivered at current time [W]
 
         Real64 MDotAir = DataLoopNode::Node(HeatCoilAirInletNode).MassFlowRate;
-        Real64 CpAirIn =
-            Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(HeatCoilAirInletNode).HumRat, DataLoopNode::Node(HeatCoilAirInletNode).Temp);
-        Real64 CpAirOut =
-            Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(HeatCoilAirInletNode).HumRat, DataLoopNode::Node(HeatCoilAirOutletNode).Temp);
-        Real64 CpAirAvg = (CpAirIn + CpAirOut) / 2;
+        Real64 CpAirIn = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(HeatCoilAirInletNode).HumRat);
         Real64 HCDeltaT = max(0.0, HeatCoilMaxSATAllowed - DataLoopNode::Node(HeatCoilAirInletNode).Temp);
-        HeatCoilCapacityAllowed = MDotAir * CpAirAvg * HCDeltaT;
+        HeatCoilCapacityAllowed = MDotAir * CpAirIn * HCDeltaT;
 
         return HeatCoilCapacityAllowed;
     }

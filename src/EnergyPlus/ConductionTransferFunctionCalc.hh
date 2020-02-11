@@ -57,6 +57,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class OutputFiles;
 
 namespace ConductionTransferFunctionCalc {
 
@@ -117,7 +118,7 @@ namespace ConductionTransferFunctionCalc {
                        int const SolutionDimensions // Integer relating whether a 1- or 2-D solution is required
     );
 
-    void ReportCTFs(bool const DoReportBecauseError);
+    void ReportCTFs(EnergyPlus::OutputFiles &outputFiles, bool const DoReportBecauseError);
 
 } // namespace ConductionTransferFunctionCalc
 

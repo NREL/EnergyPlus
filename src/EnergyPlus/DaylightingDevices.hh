@@ -55,6 +55,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class OutputFiles;
 
 namespace DaylightingDevices {
 
@@ -70,7 +71,7 @@ namespace DaylightingDevices {
 
     // Functions
 
-    void InitDaylightingDevices();
+    void InitDaylightingDevices(OutputFiles &outputFiles);
 
     void GetTDDInput();
 
