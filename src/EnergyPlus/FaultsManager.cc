@@ -1791,6 +1791,24 @@ namespace FaultsManager {
 
                         FouledCoils(jFault_FoulingCoil).FouledCoiledType = WaterCoils::WaterCoil(CoilNum).WaterCoilType_Num;
                         FouledCoils(jFault_FoulingCoil).FouledCoilNum = CoilNum;
+
+                        SetupOutputVariable("Coil Fouling Factor",
+                                    OutputProcessor::Unit::K_W,
+                                    WaterCoils::WaterCoil(CoilNum).FaultyCoilFoulingFactor,
+                                    "System",
+                                    "Average",
+                                    WaterCoils::WaterCoil(CoilNum).Name);
+
+                        // Coil:Cooling:Water doesn't report UA because it's not variable,
+                        // but here, it's useful since we do change it via fouling, so report it
+                        if (WaterCoils::WaterCoil(CoilNum).WaterCoilType_Num == WaterCoils::WaterCoil_Cooling) {
+                            SetupOutputVariable("Cooling Coil U Factor Times Area Value",
+                                    OutputProcessor::Unit::W_K,
+                                    WaterCoils::WaterCoil(CoilNum).UACoilTotal,
+                                    "System",
+                                    "Average",
+                                    WaterCoils::WaterCoil(CoilNum).Name);
+                        }
                     } else {
                         ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid "
                                        + cAlphaFieldNames(2) + " = \"" + cAlphaArgs(2) + "\".");
