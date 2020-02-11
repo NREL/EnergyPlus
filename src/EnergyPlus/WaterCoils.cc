@@ -389,7 +389,6 @@ namespace WaterCoils {
         static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
         //  certain object in the input file
         static bool ErrorsFound(false); // If errors detected in input
-        static int j1(0);
 
         // Flow
         NumSimpHeat = inputProcessor->getNumObjectsFound("Coil:Heating:Water");
@@ -1076,8 +1075,6 @@ namespace WaterCoils {
         bool errFlag;
         static Real64 EnthCorrFrac(0.0); // enthalpy correction factor
         static Real64 TempCorrFrac(0.0); // temperature correction factor
-        int i;
-        static Real64 rSchVal(0.0);
 
         // FLOW:
 
