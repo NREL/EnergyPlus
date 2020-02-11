@@ -58,6 +58,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class OutputFiles;
 
 namespace MixedAir {
 
@@ -458,7 +459,7 @@ namespace MixedAir {
 
     void GetOutsideAirSysInputs();
 
-    void GetOAControllerInputs();
+    void GetOAControllerInputs(OutputFiles &outputFiles);
 
     void AllocateOAControllers();
 

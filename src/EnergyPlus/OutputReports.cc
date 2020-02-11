@@ -67,6 +67,7 @@
 #include <EnergyPlus/DataSurfaceColors.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -1767,7 +1768,6 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
     using namespace DataHeatBalance;
     using namespace DataSurfaces;
     using DataGlobals::NumOfZones;
-    using DataGlobals::OutputFileInits;
     using General::RoundSigDigits;
     using General::TrimSigDigits;
     using ScheduleManager::GetScheduleMaxValue;
@@ -1788,7 +1788,6 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
     // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int unit;    // Unit number on which to write file
     int surf;    // Loop variable for surfaces
     int vert;    // Loop counter
     int ZoneNum; // Loop counter
@@ -1811,75 +1810,61 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
         return;
     }
 
-    unit = OutputFileInits;
-    if (!DataGlobals::eio_stream) return;
-    std::ostream *eiostream = DataGlobals::eio_stream;
-
+    std::stringstream ss;
+    auto *eiostream = &ss;
     //!!!    Write Header lines for report
     if (RptType == 10) {                                                                                          // Details only
-        *eiostream << "! <Zone Surfaces>,Zone Name,# Surfaces" + DataStringGlobals::NL;                           // Format_700
-        *eiostream << "! <Shading Surfaces>,Number of Shading Surfaces,# Surfaces" + DataStringGlobals::NL;       // Format_700b
+        *eiostream << "! <Zone Surfaces>,Zone Name,# Surfaces\n";                           // Format_700
+        *eiostream << "! <Shading Surfaces>,Number of Shading Surfaces,# Surfaces\n";       // Format_700b
         *eiostream << "! <HeatTransfer Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm"; // Format_701
         *eiostream << ",Construction,Nominal U (w/o film coefs) {W/m2-K},Nominal U (with film coefs) {W/m2-K},Solar Diffusing,Area (Net) {m2},Area "
                       "(Gross) {m2},Area (Sunlit Calc) {m2},Azimuth {deg},Tilt {deg},~Width {m},~Height {m},Reveal "
                       "{m},ExtBoundCondition,ExtConvCoeffCalc,IntConvCoeffCalc,SunExposure,WindExposure,ViewFactorToGround,ViewFactorToSky,"
-                      "ViewFactorToGround-IR,ViewFactorToSky-IR,#Sides" +
-                          DataStringGlobals::NL;                                                             // Format_7011
+                      "ViewFactorToGround-IR,ViewFactorToSky-IR,#Sides\n";                                                             // Format_7011
         *eiostream << "! <Shading Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm"; // Format_701b
         *eiostream << ",Transmittance Schedule,Min Schedule Value,Max Schedule Value,Solar Diffusing,Area (Net) {m2},Area (Gross) {m2},Area (Sunlit "
                       "Calc) {m2},Azimuth {deg},Tilt {deg},~Width {m},~Height {m},Reveal "
                       "{m},ExtBoundCondition,ExtConvCoeffCalc,IntConvCoeffCalc,SunExposure,WindExposure,ViewFactorToGround,ViewFactorToSky,"
-                      "ViewFactorToGround-IR,ViewFactorToSky-IR,#Sides" +
-                          DataStringGlobals::NL;                                                                   // Format_7011b
+                      "ViewFactorToGround-IR,ViewFactorToSky-IR,#Sides\n";                                                                   // Format_7011b
         *eiostream << "! <Frame/Divider Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm"; // Format_701c
         *eiostream << ",Construction,Nominal U (w/o film coefs) {W/m2-K},Nominal U (with film coefs) {W/m2-K},Solar Diffusing,Area (Net) {m2},Area "
-                      "(Gross) {m2},Area (Sunlit Calc) {m2},Azimuth {deg},Tilt {deg},~Width {m},~Height {m},Reveal {m}" +
-                          DataStringGlobals::NL;                // Format_7011c
+                      "(Gross) {m2},Area (Sunlit Calc) {m2},Azimuth {deg},Tilt {deg},~Width {m},~Height {m},Reveal {m}\n";                // Format_7011c
     } else if (RptType == 11) {                                 // Details with Vertices
         *eiostream << "! <Zone Surfaces>,Zone Name,# Surfaces"; // Format_700
-        *eiostream << ", Vertices are shown starting at Upper-Left-Corner => Counter-Clockwise => World Coordinates" +
-                          DataStringGlobals::NL;                                    // Format_710
+        *eiostream << ", Vertices are shown starting at Upper-Left-Corner => Counter-Clockwise => World Coordinates\n";                                    // Format_710
         *eiostream << "! <Shading Surfaces>,Number of Shading Surfaces,# Surfaces"; // Format_700b
-        *eiostream << ", Vertices are shown starting at Upper-Left-Corner => Counter-Clockwise => World Coordinates" +
-                          DataStringGlobals::NL;                                                                  // Format_710
+        *eiostream << ", Vertices are shown starting at Upper-Left-Corner => Counter-Clockwise => World Coordinates\n";                                                                  // Format_710
         *eiostream << "! <HeatTransfer Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm"; // Format_701
         *eiostream << ",Construction,Nominal U (w/o film coefs) {W/m2-K},Nominal U (with film coefs) {W/m2-K},Solar Diffusing,Area (Net) {m2},Area "
                       "(Gross) {m2},Area (Sunlit Calc) {m2},Azimuth {deg},Tilt {deg},~Width {m},~Height {m},Reveal "
                       "{m},ExtBoundCondition,ExtConvCoeffCalc,IntConvCoeffCalc,SunExposure,WindExposure,ViewFactorToGround,ViewFactorToSky,"
                       "ViewFactorToGround-IR,ViewFactorToSky-IR,#Sides"; // Format_7011
         *eiostream << ",Vertex 1 X {m},Vertex 1 Y {m},Vertex 1 Z {m},Vertex 2 X {m},Vertex 2 Y {m},Vertex 2 Z {m},Vertex 3 X {m},Vertex 3 Y "
-                      "{m},Vertex 3 Z {m},Vertex 4 X {m},Vertex 4 Z {m},Vertex 4 Z {m},{etc}" +
-                          DataStringGlobals::NL;                                                             // Format_707
+                      "{m},Vertex 3 Z {m},Vertex 4 X {m},Vertex 4 Z {m},Vertex 4 Z {m},{etc}\n";                                                             // Format_707
         *eiostream << "! <Shading Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm"; // Format_701b
         *eiostream << ",Transmittance Schedule,Min Schedule Value,Max Schedule Value,Solar Diffusing,Area (Net) {m2},Area (Gross) {m2},Area (Sunlit "
                       "Calc) {m2},Azimuth {deg},Tilt {deg},~Width {m},~Height {m},Reveal "
                       "{m},ExtBoundCondition,ExtConvCoeffCalc,IntConvCoeffCalc,SunExposure,WindExposure,ViewFactorToGround,ViewFactorToSky,"
                       "ViewFactorToGround-IR,ViewFactorToSky-IR,#Sides"; // Format_7011b
         *eiostream << ",Vertex 1 X {m},Vertex 1 Y {m},Vertex 1 Z {m},Vertex 2 X {m},Vertex 2 Y {m},Vertex 2 Z {m},Vertex 3 X {m},Vertex 3 Y "
-                      "{m},Vertex 3 Z {m},Vertex 4 X {m},Vertex 4 Z {m},Vertex 4 Z {m},{etc}" +
-                          DataStringGlobals::NL;                                                                   // Format_707
+                      "{m},Vertex 3 Z {m},Vertex 4 X {m},Vertex 4 Z {m},Vertex 4 Z {m},{etc}\n";                                                                   // Format_707
         *eiostream << "! <Frame/Divider Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm"; // Format_701c
         // Vertices are not applicable for window frame and divider, so skip 707
         *eiostream << ",Construction,Nominal U (w/o film coefs) {W/m2-K},Nominal U (with film coefs) {W/m2-K},Solar Diffusing,Area (Net) {m2},Area "
-                      "(Gross) {m2},Area (Sunlit Calc) {m2},Azimuth {deg},Tilt {deg},~Width {m},~Height {m},Reveal {m}" +
-                          DataStringGlobals::NL;                // Format_7011c
+                      "(Gross) {m2},Area (Sunlit Calc) {m2},Azimuth {deg},Tilt {deg},~Width {m},~Height {m},Reveal {m}\n";                // Format_7011c
     } else {                                                    // Vertices only
         *eiostream << "! <Zone Surfaces>,Zone Name,# Surfaces"; // Format_700
-        *eiostream << ", Vertices are shown starting at Upper-Left-Corner => Counter-Clockwise => World Coordinates" +
-                          DataStringGlobals::NL;                                    // Format_710
+        *eiostream << ", Vertices are shown starting at Upper-Left-Corner => Counter-Clockwise => World Coordinates\n";                                    // Format_710
         *eiostream << "! <Shading Surfaces>,Number of Shading Surfaces,# Surfaces"; // Format_700b
-        *eiostream << ", Vertices are shown starting at Upper-Left-Corner => Counter-Clockwise => World Coordinates" +
-                          DataStringGlobals::NL;                                                                  // Format_710
+        *eiostream << ", Vertices are shown starting at Upper-Left-Corner => Counter-Clockwise => World Coordinates\n";                                                                  // Format_710
         *eiostream << "! <HeatTransfer Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm"; // Format_701
         *eiostream << ",#Sides";                                                                                  // Format_7012
         *eiostream << ",Vertex 1 X {m},Vertex 1 Y {m},Vertex 1 Z {m},Vertex 2 X {m},Vertex 2 Y {m},Vertex 2 Z {m},Vertex 3 X {m},Vertex 3 Y "
-                      "{m},Vertex 3 Z {m},Vertex 4 X {m},Vertex 4 Z {m},Vertex 4 Z {m},{etc}" +
-                          DataStringGlobals::NL;                                                             // Format_707
+                      "{m},Vertex 3 Z {m},Vertex 4 X {m},Vertex 4 Z {m},Vertex 4 Z {m},{etc}\n";                                                             // Format_707
         *eiostream << "! <Shading Surface>,Surface Name,Surface Class,Base Surface,Heat Transfer Algorithm"; // Format_701b
         *eiostream << ",#Sides";                                                                             // Format_7012
         *eiostream << ",Vertex 1 X {m},Vertex 1 Y {m},Vertex 1 Z {m},Vertex 2 X {m},Vertex 2 Y {m},Vertex 2 Z {m},Vertex 3 X {m},Vertex 3 Y "
-                      "{m},Vertex 3 Z {m},Vertex 4 X {m},Vertex 4 Z {m},Vertex 4 Z {m},{etc}" +
-                          DataStringGlobals::NL; // Format_707
+                      "{m},Vertex 3 Z {m},Vertex 4 X {m},Vertex 4 Z {m},Vertex 4 Z {m},{etc}\n"; // Format_707
         // Vertices are not applicable for window frame and divider, so skip 701c here
     }
 
@@ -1889,7 +1874,7 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
     }
     if ((surf - 1) > 0) {
         *eiostream << "Shading Surfaces,"
-                   << "Number of Shading Surfaces," << surf - 1 << DataStringGlobals::NL;
+                   << "Number of Shading Surfaces," << surf - 1 << '\n';
         for (surf = 1; surf <= TotSurfaces; ++surf) {
             if (Surface(surf).Zone != 0) break;
             AlgoName = "None";
@@ -1909,7 +1894,7 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
                            << "," << RoundSigDigits(Surface(surf).GrossArea, 2) << "," << RoundSigDigits(Surface(surf).NetAreaShadowCalc, 2) << ","
                            << RoundSigDigits(Surface(surf).Azimuth, 2) << "," << RoundSigDigits(Surface(surf).Tilt, 2) << ","
                            << RoundSigDigits(Surface(surf).Width, 2) << "," << RoundSigDigits(Surface(surf).Height, 2) << ",";
-                *eiostream << ",,,,,,,,,," << TrimSigDigits(Surface(surf).Sides) << DataStringGlobals::NL;
+                *eiostream << ",,,,,,,,,," << TrimSigDigits(Surface(surf).Sides) << '\n';
             } else if (RptType == 1) {
                 *eiostream << TrimSigDigits(Surface(surf).Sides) << ",";
             } else {
@@ -1935,17 +1920,17 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
                                << RoundSigDigits(Surface(surf).Vertex(vert).z, 2) << ",";
                 } else {
                     *eiostream << RoundSigDigits(Surface(surf).Vertex(vert).x, 2) << "," << RoundSigDigits(Surface(surf).Vertex(vert).y, 2) << ","
-                               << RoundSigDigits(Surface(surf).Vertex(vert).z, 2) << DataStringGlobals::NL;
+                               << RoundSigDigits(Surface(surf).Vertex(vert).z, 2) << '\n';
                 }
             }
             //  This shouldn't happen with shading surface -- always have vertices
-            if (Surface(surf).Sides == 0) *eiostream << DataStringGlobals::NL;
+            if (Surface(surf).Sides == 0) *eiostream << '\n';
         }
     }
 
     for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
         *eiostream << "Zone Surfaces," << Zone(ZoneNum).Name << "," << (Zone(ZoneNum).SurfaceLast - Zone(ZoneNum).SurfaceFirst + 1)
-                   << DataStringGlobals::NL;
+                   << '\n';
         for (surf = 1; surf <= TotSurfaces; ++surf) {
             if (Surface(surf).Zone != ZoneNum) continue;
             SolarDiffusing = "";
@@ -2133,7 +2118,7 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
                 if (RptType == 10) {
                     *eiostream << RoundSigDigits(Surface(surf).ViewFactorGround, 2) << "," << RoundSigDigits(Surface(surf).ViewFactorSky, 2) << ","
                                << RoundSigDigits(Surface(surf).ViewFactorGroundIR, 2) << "," << RoundSigDigits(Surface(surf).ViewFactorSkyIR, 2)
-                               << "," << TrimSigDigits(Surface(surf).Sides) << DataStringGlobals::NL;
+                               << "," << TrimSigDigits(Surface(surf).Sides) << '\n';
                 } else {
                     *eiostream << RoundSigDigits(Surface(surf).ViewFactorGround, 2) << "," << RoundSigDigits(Surface(surf).ViewFactorSky, 2) << ","
                                << RoundSigDigits(Surface(surf).ViewFactorGroundIR, 2) << "," << RoundSigDigits(Surface(surf).ViewFactorSkyIR, 2)
@@ -2144,10 +2129,10 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
                                        << "," << RoundSigDigits(Surface(surf).Vertex(vert).z, 2) << ",";
                         } else {
                             *eiostream << RoundSigDigits(Surface(surf).Vertex(vert).x, 2) << "," << RoundSigDigits(Surface(surf).Vertex(vert).y, 2)
-                                       << "," << RoundSigDigits(Surface(surf).Vertex(vert).z, 2) << DataStringGlobals::NL;
+                                       << "," << RoundSigDigits(Surface(surf).Vertex(vert).z, 2) << '\n';
                         }
                     }
-                    if (Surface(surf).Sides == 0) *eiostream << DataStringGlobals::NL;
+                    if (Surface(surf).Sides == 0) *eiostream << '\n';
                 }
                 // if window, report frame/divider as appropriate
                 if (Surface(surf).FrameDivider > 0) {
@@ -2180,7 +2165,7 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
                         *eiostream << ",N/A,N/A,," << RoundSigDigits(SurfaceWindow(surf).FrameArea, 2) << ","
                                    << RoundSigDigits(SurfaceWindow(surf).FrameArea / Surface(surf).Multiplier, 2) << ",*"
                                    << ",N/A"
-                                   << ",N/A," << RoundSigDigits(FrameDivider(fd).FrameWidth, 2) << ",N/A" << DataStringGlobals::NL;
+                                   << ",N/A," << RoundSigDigits(FrameDivider(fd).FrameWidth, 2) << ",N/A" << '\n';
                     }
                     if (FrameDivider(fd).DividerWidth > 0.0) {
                         if (FrameDivider(fd).DividerType == DividedLite) {
@@ -2193,7 +2178,7 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
                         *eiostream << ",N/A,N/A,," << RoundSigDigits(SurfaceWindow(surf).DividerArea, 2) << ","
                                    << RoundSigDigits(SurfaceWindow(surf).DividerArea / Surface(surf).Multiplier, 2) << ",*"
                                    << ",N/A"
-                                   << ",N/A," << RoundSigDigits(FrameDivider(fd).DividerWidth, 2) << ",N/A" << DataStringGlobals::NL;
+                                   << ",N/A," << RoundSigDigits(FrameDivider(fd).DividerWidth, 2) << ",N/A" << '\n';
                     }
                 }
             } else { // RptType=1  Vertices only
@@ -2235,13 +2220,15 @@ void DetailsForSurfaces(int const RptType) // (1=Vertices only, 10=Details only,
                                    << RoundSigDigits(Surface(surf).Vertex(vert).z, 2) << ",";
                     } else {
                         *eiostream << RoundSigDigits(Surface(surf).Vertex(vert).x, 2) << "," << RoundSigDigits(Surface(surf).Vertex(vert).y, 2) << ","
-                                   << RoundSigDigits(Surface(surf).Vertex(vert).z, 2) << DataStringGlobals::NL;
+                                   << RoundSigDigits(Surface(surf).Vertex(vert).z, 2) << '\n';
                     }
                 }
-                if (Surface(surf).Sides == 0) *eiostream << DataStringGlobals::NL;
+                if (Surface(surf).Sides == 0) *eiostream << '\n';
             }
         } // surfaces
     }     // zones
+
+    print(OutputFiles::getSingleton().eio, "{}", eiostream->str());
 }
 
 void CostInfoOut()
