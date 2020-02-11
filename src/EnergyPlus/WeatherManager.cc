@@ -816,18 +816,6 @@ namespace WeatherManager {
         static constexpr auto EnvNameFormat("Environment,{},{},{},{},{},{},{},{},{},{},{},{}\n");
         static constexpr auto EnvDSTNFormat("Environment:Daylight Saving,No,{}\n");
         static constexpr auto EnvDSTYFormat("Environment:Daylight Saving,Yes,{},{},{}\n");
-       static ObjexxFCL::gio::Fmt DateFormat("(I2.2,'/',I2.2)");
-        static ObjexxFCL::gio::Fmt EnvironFormat(
-            "('! <Environment>,Environment Name,Environment Type, Start Date, End Date,',    ' Start DayOfWeek, Duration "
-            "{#days}, Source:Start DayOfWeek, ',        ' Use Daylight Saving, Use Holidays, Apply Weekend Holiday Rule, "
-            "',    ' Use Rain Values, Use Snow Values, Sky Temperature Model',/,                                 '! <Environment:Special Days>, "
-            "Special Day Name, Special Day Type, Source, ',  'Start Date, Duration {#days}',/,                             "
-            "         '! <Environment:Daylight Saving>, Daylight Saving Indicator, Source,',           ' Start Date, End "
-            "Date',/,                                           '! <Environment:WarmupDays>, NumberofWarmupDays')");
-        static ObjexxFCL::gio::Fmt EnvNameFormat("('Environment',12(',',A))");
-        static ObjexxFCL::gio::Fmt EnvDSTNFormat("('Environment:Daylight Saving,No,',A)");
-        static ObjexxFCL::gio::Fmt EnvDSTYFormat("('Environment:Daylight Saving,Yes',3(',',A))");
-        static ObjexxFCL::gio::Fmt EnvSpDyFormat("('Environment:Special Days',4(',',A),',',I3)");
         static ObjexxFCL::gio::Fmt DateFormat("(I2.2,'/',I2.2)");
         static ObjexxFCL::gio::Fmt DateFormatwithYear("(I2.2,'/',I2.2,'/',I4.4)");
         static Array1D_string const SpecialDayNames(5, {"Holiday", "SummerDesignDay", "WinterDesignDay", "CustomDay1", "CustomDay2"});
@@ -1073,7 +1061,7 @@ namespace WeatherManager {
                         static constexpr auto EnvironFormat(
                             "! <Environment>,Environment Name,Environment Type, Start Date, End Date, Start DayOfWeek, Duration {#days}, "
                             "Source:Start DayOfWeek,  Use Daylight Saving, Use Holidays, Apply Weekend Holiday Rule,  Use Rain Values, Use Snow "
-                            "Values\n! <Environment:Special Days>, Special Day Name, Special Day Type, Source, Start Date, Duration {#days}\n! "
+                            "Values, Sky Temperature Model\n! <Environment:Special Days>, Special Day Name, Special Day Type, Source, Start Date, Duration {#days}\n! "
                             "<Environment:Daylight Saving>, Daylight Saving Indicator, Source, Start Date, End Date\n! <Environment:WarmupDays>, "
                             "NumberofWarmupDays");
                         print(outputFiles.eio, "{}\n", EnvironFormat);
@@ -1255,10 +1243,8 @@ namespace WeatherManager {
                                       AlpUseSpec,
                                       ApWkRule,
                                       AlpUseRain,
-                                      AlpUseSnow);
-                                ObjexxFCL::gio::write(OutputFileInits, EnvNameFormat)
-                                    << Environment(Envrn).Title << kindOfRunPeriod << StDate << EnDate << ValidDayNames(TWeekDay) << cTotalEnvDays
-                                    << "Use RunPeriod Specified Day" << AlpUseDST << AlpUseSpec << ApWkRule << AlpUseRain << AlpUseSnow << skyTempModel;
+                                      AlpUseSnow,
+                                      skyTempModel);
                             }
 
                             if (!DoingSizing && !KickOffSimulation) {
