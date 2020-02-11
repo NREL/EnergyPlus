@@ -1538,7 +1538,7 @@ namespace RefrigeratedCase {
                                   Optional_string_const ThisObjectType = _,
                                   const Optional_bool_const &SuppressWarning = _);
 
-    void ReportRefrigerationComponents();
+    void ReportRefrigerationComponents(OutputFiles &outputFiles);
 
     void SumZoneImpacts();
 
