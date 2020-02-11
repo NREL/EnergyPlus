@@ -208,6 +208,12 @@ namespace DataPlant {
 
         void solve(bool FirstHVACIteration, bool &ReSimOtherSideNeeded);
 
+        void UpdateLoopSideReportVars(Real64 OtherSideDemand, Real64 LocalRemLoopDemand);
+
+        void CheckLoopExitNode(bool FirstHVACIteration);
+
+        void CalcUnmetPlantDemand();
+
     };
 } // namespace DataPlant
 } // namespace EnergyPlus
