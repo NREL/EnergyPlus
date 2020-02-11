@@ -55,38 +55,38 @@
 namespace EnergyPlus {
 namespace DataPlant {
 
-//    void PlantLoopData::UpdateLoopSideReportVars(
-//        Real64 const OtherSideDemand,   // This is the 'other side' demand, based on other side flow
-//        Real64 const LocalRemLoopDemand // Unmet Demand after equipment has been simulated (report variable)
-//    ) {
-//
-//        // SUBROUTINE INFORMATION:
-//        //       AUTHOR         Dan Fisher
-//        //       DATE WRITTEN   July 1998
-//        //       MODIFIED       Aug 2010 Edwin Lee -- add per LoopSide variable support
-//        //       RE-ENGINEERED  na
-//
-//        // Using/Aliasing
-//        using DataLoopNode::Node;
-//
-//        this->InletNodeFlowrate = Node(this->LoopSide(DataPlant::SupplySide).NodeNumIn).MassFlowRate;
-//        this->InletNodeTemperature = Node(this->LoopSide(DataPlant::SupplySide).NodeNumIn).Temp;
-//        this->OutletNodeFlowrate = Node(this->LoopSide(DataPlant::SupplySide).NodeNumOut).MassFlowRate;
-//        this->OutletNodeTemperature = Node(this->LoopSide(DataPlant::SupplySide).NodeNumOut).Temp;
-//
-//        // In the baseline code, only reported supply side demand. so putting in "SupplySide" IF block for now but might expand later
-//        if (OtherSideDemand < 0.0) {
-//            this->CoolingDemand = std::abs(OtherSideDemand);
-//            this->HeatingDemand = 0.0;
-//            this->DemandNotDispatched = -LocalRemLoopDemand; //  Setting sign based on old logic for now
-//        } else {
-//            this->HeatingDemand = OtherSideDemand;
-//            this->CoolingDemand = 0.0;
-//            this->DemandNotDispatched = LocalRemLoopDemand; //  Setting sign based on old logic for now
-//        }
-//
-//        this->CalcUnmetPlantDemand();
-//    }
+    void PlantLoopData::UpdateLoopSideReportVars(
+        Real64 const OtherSideDemand,   // This is the 'other side' demand, based on other side flow
+        Real64 const LocalRemLoopDemand // Unmet Demand after equipment has been simulated (report variable)
+    ) {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Dan Fisher
+        //       DATE WRITTEN   July 1998
+        //       MODIFIED       Aug 2010 Edwin Lee -- add per LoopSide variable support
+        //       RE-ENGINEERED  na
+
+        // Using/Aliasing
+        using DataLoopNode::Node;
+
+        this->InletNodeFlowrate = Node(this->LoopSide(DataPlant::SupplySide).NodeNumIn).MassFlowRate;
+        this->InletNodeTemperature = Node(this->LoopSide(DataPlant::SupplySide).NodeNumIn).Temp;
+        this->OutletNodeFlowrate = Node(this->LoopSide(DataPlant::SupplySide).NodeNumOut).MassFlowRate;
+        this->OutletNodeTemperature = Node(this->LoopSide(DataPlant::SupplySide).NodeNumOut).Temp;
+
+        // In the baseline code, only reported supply side demand. so putting in "SupplySide" IF block for now but might expand later
+        if (OtherSideDemand < 0.0) {
+            this->CoolingDemand = std::abs(OtherSideDemand);
+            this->HeatingDemand = 0.0;
+            this->DemandNotDispatched = -LocalRemLoopDemand; //  Setting sign based on old logic for now
+        } else {
+            this->HeatingDemand = OtherSideDemand;
+            this->CoolingDemand = 0.0;
+            this->DemandNotDispatched = LocalRemLoopDemand; //  Setting sign based on old logic for now
+        }
+
+        this->LoopSide(DataPlant::SupplySide).CalcUnmetPlantDemand();
+    }
 
 
 //    void PlantLoopData::CalcUnmetPlantDemand() {

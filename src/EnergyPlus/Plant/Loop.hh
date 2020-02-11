@@ -133,7 +133,7 @@ namespace DataPlant {
         }
 
 
-//        void UpdateLoopSideReportVars(Real64 OtherSideDemand, Real64 LocalRemLoopDemand);
+        void UpdateLoopSideReportVars(Real64 OtherSideDemand, Real64 LocalRemLoopDemand);
 //
 //        void CheckLoopExitNode(bool FirstHVACIteration);
 //

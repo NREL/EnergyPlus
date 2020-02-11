@@ -163,9 +163,11 @@ namespace DataPlant {
             // Update the loop outlet node conditions
             this->CheckLoopExitNode(FirstHVACIteration); // TODO: This is a loop level check, move out
 
+            DataPlant::PlantLoop(this->myLoopNum).UpdateLoopSideReportVars(this->InitialDemandToLoopSetPointSAVED,
+                                                                           this->LoadToLoopSetPointThatWasntMet);
+
         }
 
-        this->UpdateLoopSideReportVars(this->InitialDemandToLoopSetPointSAVED, this->LoadToLoopSetPointThatWasntMet); // TODO: This is a loop level check, move out
     }
 
 void HalfLoopData::CalcUnmetPlantDemand() {
@@ -302,44 +304,7 @@ void HalfLoopData::CalcUnmetPlantDemand() {
 
     this_loop.UnmetDemand = LoadToLoopSetPoint;
 }
-void HalfLoopData::UpdateLoopSideReportVars(
-    Real64 const OtherSideDemand,   // This is the 'other side' demand, based on other side flow
-    Real64 const LocalRemLoopDemand // Unmet Demand after equipment has been simulated (report variable)
-) {
 
-    // SUBROUTINE INFORMATION:
-    //       AUTHOR         Dan Fisher
-    //       DATE WRITTEN   July 1998
-    //       MODIFIED       Aug 2010 Edwin Lee -- add per LoopSide variable support
-    //       RE-ENGINEERED  na
-
-    // Using/Aliasing
-    using DataLoopNode::Node;
-    using DataPlant::PlantLoop;
-    using DataPlant::SupplySide;
-
-    if (this->myLoopSideNum == SupplySide) {
-        auto &this_loop(PlantLoop(this->myLoopNum));
-
-        this_loop.InletNodeFlowrate = Node(this->NodeNumIn).MassFlowRate;
-        this_loop.InletNodeTemperature = Node(this->NodeNumIn).Temp;
-        this_loop.OutletNodeFlowrate = Node(this->NodeNumOut).MassFlowRate;
-        this_loop.OutletNodeTemperature = Node(this->NodeNumOut).Temp;
-
-        // In the baseline code, only reported supply side demand. so putting in "SupplySide" IF block for now but might expand later
-        if (OtherSideDemand < 0.0) {
-            this_loop.CoolingDemand = std::abs(OtherSideDemand);
-            this_loop.HeatingDemand = 0.0;
-            this_loop.DemandNotDispatched = -LocalRemLoopDemand; //  Setting sign based on old logic for now
-        } else {
-            this_loop.HeatingDemand = OtherSideDemand;
-            this_loop.CoolingDemand = 0.0;
-            this_loop.DemandNotDispatched = LocalRemLoopDemand; //  Setting sign based on old logic for now
-        }
-
-        this->CalcUnmetPlantDemand();
-    }
-}
 void HalfLoopData::CheckLoopExitNode(bool const FirstHVACIteration) {
 
     // SUBROUTINE INFORMATION:

@@ -250,8 +250,11 @@ namespace EnergyPlus {
 //
 //                        }
 //
-//                        // Update some reporting information at Plant half loop level
-//                        this_loop.UpdateLoopSideReportVars(this_loop_side.InitialDemandToLoopSetPointSAVED, this_loop_side.LoadToLoopSetPointThatWasntMet);
+//                        if (LoopSide == SupplySide) {
+//                            // Update some reporting information at Plant half loop level
+//                            this_loop.UpdateLoopSideReportVars(this_loop_side.InitialDemandToLoopSetPointSAVED,
+//                                                               this_loop_side.LoadToLoopSetPointThatWasntMet);
+//                        }
 
                         // Always set this side to false,  so that it won't keep being turned on just because of first hvac
                         this_loop_side.SimLoopSideNeeded = false;
