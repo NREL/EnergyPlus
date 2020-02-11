@@ -121,7 +121,7 @@ namespace AirflowNetwork {
             T = UpperLimit;
         }
 
-        return airThermConductivity(T) / (AIRCP(W, T) * AIRDENSITY(P, T, W));
+        return airThermConductivity(T) / (AIRCP(W) * AIRDENSITY(P, T, W));
     }
 
     Real64 airPrandtl(Real64 T, // Temperature in Celsius
