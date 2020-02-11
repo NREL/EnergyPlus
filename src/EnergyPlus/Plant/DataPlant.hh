@@ -113,11 +113,6 @@ namespace DataPlant {
     extern int const DemandSide;
     extern int const SupplySide;
 
-    // Parameters for economizer
-    extern int const Integrated;
-    extern int const NonIntegrated;
-    extern int const None;
-
     // Parameters for tolerance
     extern Real64 const LoopDemandTol; // minimum significant loop cooling or heating demand
     extern Real64 const DeltaTempTol;  // minimum significant loop temperature difference

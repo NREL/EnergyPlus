@@ -127,8 +127,6 @@ SET( SRC
   DataOutputs.hh
   DataPhotovoltaics.cc
   DataPhotovoltaics.hh
-  DataPlant.cc
-  DataPlant.hh
   DataPrecisionGlobals.cc
   DataPrecisionGlobals.hh
   DataReportingFlags.cc
@@ -399,6 +397,8 @@ SET( SRC
   Pipes.cc
   Pipes.hh
   Plant/CallingOrder.hh
+  Plant/DataPlant.cc
+  Plant/DataPlant.hh
   Plant/Enums.hh
   Plant/EquipAndOperations.hh
   Plant/LoopSidePumpInformation.hh

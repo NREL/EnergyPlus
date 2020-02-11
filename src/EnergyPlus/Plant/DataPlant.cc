@@ -49,19 +49,13 @@
 #include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/Plant/PlantConvergencePoint.hh>
 
 namespace EnergyPlus {
 
 namespace DataPlant {
-
-    // MODULE INFORMATION:
-    //       AUTHOR         Plant code authors?
-    //       DATE WRITTEN
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
     // This data-only module contains the structures for various parts of the Plant and
@@ -108,11 +102,6 @@ namespace DataPlant {
     int const DemandSupply_No(0);
     int const DemandSide(1);
     int const SupplySide(2);
-
-    // Parameters for economizer
-    int const Integrated(1);
-    int const NonIntegrated(2);
-    int const None(3);
 
     // Parameters for tolerance
     Real64 const LoopDemandTol(0.1);   // minimum significant loop cooling or heating demand
