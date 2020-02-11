@@ -351,15 +351,10 @@ TEST_F(EnergyPlusFixture, SizeFunctionTestWhenPlantSizingIndexIsZero)
     SimpleFluidCooler.allocate(FluidCoolerNum);
     SimpleFluidCooler(FluidCoolerNum).LoopNum = 1;
     DataPlant::PlantLoop(FluidCoolerNum).PlantSizNum = 0;
-    DataPlant::PlantLoop(FluidCoolerNum).FluidName = "WATER";
-    DataPlant::PlantLoop(FluidCoolerNum).FluidIndex = 1;
-
-    SimpleFluidCooler(FluidCoolerNum).Name = "Dry Cooler";
-    SimpleFluidCooler(FluidCoolerNum).DesignWaterFlowRateWasAutoSized = false;
-    SimpleFluidCooler(FluidCoolerNum).HighSpeedFanPowerWasAutoSized = false;
-    SimpleFluidCooler(FluidCoolerNum).HighSpeedAirFlowRateWasAutoSized = false;
-    SimpleFluidCooler(FluidCoolerNum).HighSpeedFluidCoolerUAWasAutoSized = false;
-    static std::string const CalledFrom("SizeFluidCooler");
-
+    
+    EXPECT_FALSE(thisFluidCooler.HighSpeedFanPowerWasAutoSized);
+    EXPECT_FALSE(thisFluidCooler.HighSpeedAirFlowRateWasAutoSized);
+    EXPECT_FALSE(thisFluidCooler.HighSpeedFluidCoolerUAWasAutoSized);
+    
     thisFluidCooler.size();
 }
