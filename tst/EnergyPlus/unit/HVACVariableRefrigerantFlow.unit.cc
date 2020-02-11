@@ -3045,10 +3045,10 @@ TEST_F(HVACVRFFixture, VRF_FluidTCtrl_CalcVRFIUTeTc)
     CoolingLoad(1) = true;
     HeatingLoad(1) = false;
     DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(2);
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = -100.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -200.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(2).OutputRequiredToCoolingSP = -1100.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(2).OutputRequiredToHeatingSP = -1200.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -100.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -200.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(2).RemainingOutputReqToCoolSP = -1100.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(2).RemainingOutputReqToHeatSP = -1200.0;
 
     CompOnMassFlow = 0.0; // system is off
     // Run and Check
@@ -3089,10 +3089,10 @@ TEST_F(HVACVRFFixture, VRF_FluidTCtrl_CalcVRFIUTeTc)
     VRFTU(2).coilInNodeW = Node(2).HumRat;
     CoolingLoad(1) = false;
     HeatingLoad(1) = true;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 300.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 200.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(2).OutputRequiredToCoolingSP = 2000.0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(2).OutputRequiredToHeatingSP = 1900.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 300.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 200.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(2).RemainingOutputReqToCoolSP = 2000.0;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(2).RemainingOutputReqToHeatSP = 1900.0;
     // system is on in heating mode
     VRF(IndexVRFCondenser).CalcVRFIUTeTc_FluidTCtrl();
     // default value, coil inlet temps higher than default
@@ -10547,7 +10547,9 @@ TEST_F(HVACVRFFixture, VRFFluidControl_FanSysModel_OnOffModeTest)
     // test cooling mode fan operation
     ZoneSysEnergyDemand(1).RemainingOutputRequired = -5000.0;
     ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -5000.0;
+    ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = -5000.0;
     ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = -7000.0;
+    ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -7000.0;
     ZoneEqSizing.allocate(1);
     DataAirLoop::AirLoopInputsFilled = true;
     InitVRF(VRFTUNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
@@ -10557,14 +10559,16 @@ TEST_F(HVACVRFFixture, VRFFluidControl_FanSysModel_OnOffModeTest)
     Real64 Result_AirMassFlowRateDesign = HVACFan::fanObjs[0]->maxAirMassFlowRate();
     EXPECT_NEAR(Result_AirMassFlowRateDesign, 0.347040, 0.000001);
     Real64 Result_AirMassFlowRate = DataLoopNode::Node(HVACFan::fanObjs[0]->outletNodeNum).MassFlowRate;
-    EXPECT_NEAR(Result_AirMassFlowRate, 0.347040, 0.000001);
+    EXPECT_NEAR(Result_AirMassFlowRate, DXCoils::DXCoil(1).RatedAirMassFlowRate(1), 0.000001);
     Real64 Result_FanPower = HVACFan::fanObjs[0]->fanPower();
-    EXPECT_NEAR(Result_FanPower, 41.22, 0.001);
+    EXPECT_NEAR(Result_FanPower, 39.588, 0.001);
 
     // test no load mode fan operation
     ZoneSysEnergyDemand(1).RemainingOutputRequired = 0.0;
     ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = 0.0;
+    ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 0.0;
     ZoneSysEnergyDemand(1).RemainingOutputReqToHeatSP = 0.0;
+    ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 0.0;
     QZnReq = ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP;
     InitVRF(VRFTUNum, ZoneNum, FirstHVACIteration, OnOffAirFlowRatio, QZnReq);
     EXPECT_EQ(QZnReq, 0.0);
