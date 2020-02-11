@@ -1180,6 +1180,17 @@ namespace SimulationManager {
                     HeatBalanceIntRadExchange::CarrollMethod =
                         UtilityRoutines::MakeUPPERCase(fields.at("zone_radiant_exchange_algorithm"))=="CARROLLMRT";
                 }
+                if (fields.find("override_zone_time_step") != fields.end()) {
+                    if (UtilityRoutines::MakeUPPERCase(fields.at("override_zone_time_step")) == "YES") {
+                        ShowWarningError("Due to PerformancePrecisionTradeoffs the Number of TimeSteps has been changed to 1.");
+                        NumOfTimeStepInHour = 1;
+                    }
+                }
+                if (fields.find("override_zone_air_heat_balance_algorithm") != fields.end()) {
+                    if (UtilityRoutines::MakeUPPERCase(fields.at("override_zone_air_heat_balance_algorithm")) == "YES") {
+                        DataHeatBalance::OverrideZoneAirSolutionAlgo = true;
+                    }
+                }
             }
         }
 
