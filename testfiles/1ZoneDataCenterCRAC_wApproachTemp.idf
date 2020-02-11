@@ -1122,12 +1122,7 @@
     Mdot_SupplyFan,          !- Name
     Supply Outlet Node,      !- Output:Variable or Output:Meter Index Key Name
     System Node Mass Flow Rate;  !- Output:Variable or Output:Meter Name
-
-  EnergyManagementSystem:Sensor,
-    Tout_SupplyFan,          !- Name
-    Supply Outlet Node,      !- Output:Variable or Output:Meter Index Key Name
-    System Node Temperature; !- Output:Variable or Output:Meter Name
-
+    
   EnergyManagementSystem:Sensor,
     Wout_SupplyFan,          !- Name
     Supply Outlet Node,      !- Output:Variable or Output:Meter Index Key Name
@@ -1222,4 +1217,3 @@
     ENDIF;                   !- <none>
 
   Output:Variable,*,PUE,Hourly;
-

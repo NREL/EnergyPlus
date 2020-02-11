@@ -1487,10 +1487,10 @@ namespace RuntimeLanguageProcessor {
                         Token(NumTokens).String = String.substr(Pos, 15);
                         Pos += 14;
                     } else if (UtilityRoutines::SameString(String.substr(Pos, 9), "@CpAirFnW")) {
-                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 12) + "\"";
+                        if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 9) + "\"";
                         Token(NumTokens).Operator = FuncCpAirFnW;
                         Token(NumTokens).String = String.substr(Pos, 9);
-                        Pos += 10;
+                        Pos += 8;
                     } else if (UtilityRoutines::SameString(String.substr(Pos, 13), "@HfgAirFnWTdb")) {
                         if (DeveloperFlag) ObjexxFCL::gio::write(OutputFileDebug, fmtA) << "FUNCTION \"" + String.substr(Pos, 13) + "\"";
                         Token(NumTokens).Operator = FuncHfgAirFnWTdb;
