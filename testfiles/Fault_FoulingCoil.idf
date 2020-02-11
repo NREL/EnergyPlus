@@ -1,8 +1,13 @@
+! Fault_FoulingCoil.idf
+!
+! Highlights:  Illustrates the modeling of operational fault of coil fouling, `FaultModel:Fouling:Coil`
+!
+! Modified from 5ZoneAirCooled.idf
+!
 !-Generator IDFEditor 1.34
 !-Option OriginalOrderTop UseSpecialFormat
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
-! 5ZoneAirCooled.idf
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
 !
 ! Highlights:              Electric chiller with air cooled condenser; autosized preheating and precooling water coils in the
@@ -81,6 +86,9 @@
 !                                 boiler, electric compression chiller with air cooled condenser.
 !                                 All equipment is autosized. HW and ChW coils are used in the outside air
 !                                 stream to precondition the outside air.
+! **HVAC Fouling**:               The VAV Central heating and cooling coils have `FaultModel:Fouling:Coil` objects.
+!                                 The Heating coil is fouled via the `FouledUARated` method, and the cooling coil
+!                                 via the `FoulingFactor` method
 !
 ! Zonal Equipment:                AirTerminal:SingleDuct:VAV:Reheat
 ! Central Air Handling Equipment: Yes
@@ -160,12 +168,27 @@
     CONTINUOUS;              !- Numeric Type
 
   RunPeriod,
-    Run Period 1,            !- Name
+    Winter Week,             !- Name
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
-    12,                      !- End Month
-    31,                      !- End Day of Month
+    1,                       !- End Month
+    7,                       !- End Day of Month
+    ,                        !- End Year
+    Tuesday,                 !- Day of Week for Start Day
+    Yes,                     !- Use Weather File Holidays and Special Days
+    Yes,                     !- Use Weather File Daylight Saving Period
+    No,                      !- Apply Weekend Holiday Rule
+    Yes,                     !- Use Weather File Rain Indicators
+    Yes;                     !- Use Weather File Snow Indicators
+
+  RunPeriod,
+    Summer Week,             !- Name
+    7,                       !- Begin Month
+    1,                       !- Begin Day of Month
+    ,                        !- Begin Year
+    7,                       !- End Month
+    7,                       !- End Day of Month
     ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
     Yes,                     !- Use Weather File Holidays and Special Days
@@ -2585,6 +2608,45 @@
     ,                        !- Rated Ratio for Air and Water Convection
     11;                      !- Design Water Temperature Difference {deltaC}
 
+!*** OPERATIONAL FAULTS ***
+
+  Schedule:Compact,
+    Fouling Availability Schedule,   !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,1.0;        !- Field 3
+
+  Schedule:Compact,
+    Fouling Severity Schedule,   !- Name
+    Fraction,                !- Schedule Type Limits Name
+    Through: 12/31,          !- Field 1
+    For: AllDays,            !- Field 2
+    Until: 24:00,1.0;        !- Field 3
+
+! Main Heating Coil 1 gets autosized to a UA of 56 W/K
+  FaultModel:Fouling:Coil,
+    Main Heating Coil 1 Fouling, !- Name
+    Main Heating Coil 1,     !- Coil Name
+    Fouling Availability Schedule, !- Availability Schedule Name
+    Fouling Severity Schedule,     !- Severity Schedule Name
+    FouledUARated,           !- Fouling Input Method
+    30.0;                    !- UAFouled {W/K}
+
+! Main Cooling Coil 1 reports a nominal UA of 2452 W/K
+  FaultModel:Fouling:Coil,
+    Main Cooling Coil 1 Fouling, !- Name
+    Main Cooling Coil 1,     !- Coil Name
+    Fouling Availability Schedule, !- Availability Schedule Name
+    Fouling Severity Schedule,     !- Severity Schedule Name
+    FoulingFactor,           !- Fouling Input Method
+    ,                        !- UAFouled {W/K}
+    0.0005,                  !- Water Side Fouling Factor {m2-K/W}
+    0.0001,                  !- Air Side Fouling Factor {m2-K/W}
+    25.0,                    !- Outside Coil Surface Area {m2}
+    0.1;                     !- Inside to Outside Coil Surface Area Ratio
+
+
   Fan:VariableVolume,
     Supply Fan 1,            !- Name
     FanAvailSched,           !- Availability Schedule Name
@@ -3260,167 +3322,20 @@
     INTERMITTENT,            !- Pump Control Type
     CoolingPumpAvailSched;   !- Pump Flow Rate Schedule Name
 
-  Output:Variable,*,Site Outdoor Air Drybulb Temperature,hourly;
 
-  Output:Variable,*,Zone Air Temperature,hourly;
+  Output:Variable,Main Heating Coil 1,Heating Coil U Factor Times Area Value,Detailed;
 
-  Output:Variable,*,Zone Mean Air Dewpoint Temperature,hourly;
+  Output:Variable,Main Heating Coil 1,Heating Coil Heating Rate,Detailed;
 
-  Output:Variable,*,Zone Air System Sensible Cooling Rate,hourly;
+  ! Only available if Coil:Cooling:Water has a FaultModel:Fouling:Coil object attached
+  Output:Variable,Main Cooling Coil 1,Cooling Coil U Factor Times Area Value,Detailed;
 
-  Output:Variable,*,Zone Air System Sensible Heating Rate,hourly;
+  Output:Variable,Main Cooling Coil 1,Cooling Coil Total Cooling Rate,Detailed;
 
-  Output:Variable,OA Mixing Box 1 Inlet Node,System Node Temperature,hourly;
+  Output:Variable,*,Coil Fouling Factor,Detailed;
 
-  Output:Variable,OA Mixing Box 1 Inlet Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,OA Mixing Box 1 Inlet Node,System Node Setpoint Temperature,hourly;
-
-  Output:Variable,OA Mixing Box 1 Inlet Node,System Node Humidity Ratio,hourly;
-
-  Output:Variable,OA Heating Coil 1 Air Outlet Node,System Node Temperature,hourly;
-
-  Output:Variable,OA Heating Coil 1 Air Outlet Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,OA Heating Coil 1 Air Outlet Node,System Node Setpoint Temperature,hourly;
-
-  Output:Variable,OA Heating Coil 1 Air Outlet Node,System Node Humidity Ratio,hourly;
-
-  Output:Variable,Mixed Air Node 1,System Node Temperature,hourly;
-
-  Output:Variable,Mixed Air Node 1,System Node Humidity Ratio,hourly;
-
-  Output:Variable,Mixed Air Node 1,System Node Dewpoint Temperature,hourly;
-
-  Output:Variable,VAV Sys 1 Outlet Node,System Node Temperature,hourly;
-
-  Output:Variable,VAV Sys 1 Outlet Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,VAV Sys 1 Outlet Node,System Node Humidity Ratio,hourly;
-
-  Output:Variable,VAV Sys 1 Outlet Node,System Node Setpoint Temperature,hourly;
-
-  Output:Variable,OA Cooling Coil 1 Water Inlet Node,System Node Temperature,hourly;
-
-  Output:Variable,OA Cooling Coil 1 Water Inlet Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,Main Cooling Coil 1 Water Inlet Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,OA Heating Coil 1 Water Inlet Node,System Node Temperature,hourly;
-
-  Output:Variable,OA Heating Coil 1 Water Inlet Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,Main Heating Coil 1 Water Inlet Node,System Node Mass Flow Rate,hourly;
-
-  Output:Variable,*,Heating Coil Heating Rate,hourly;
-
-  Output:Variable,*,Cooling Coil Total Cooling Rate,hourly;
-
-  Output:Variable,*,Cooling Coil Sensible Cooling Rate,hourly;
-
-  Output:Variable,*,Plant Supply Side Cooling Demand Rate,hourly;
-
-  Output:Variable,*,Plant Supply Side Heating Demand Rate,hourly;
-
-  Output:Variable,*,Boiler Gas Rate,hourly;
-
-  Output:Variable,*,Boiler Heating Rate,hourly;
-
-  Output:Variable,*,Chiller Electric Power,hourly;
-
-  Output:Variable,*,Chiller Evaporator Cooling Rate,hourly;
-
-  Output:Variable,*,Chiller Evaporator Inlet Temperature,hourly;
-
-  Output:Variable,*,Chiller Evaporator Outlet Temperature,hourly;
-
-  Output:Variable,*,Chiller Evaporator Mass Flow Rate,hourly;
-
-  Output:Variable,*,Chiller Condenser Heat Transfer Rate,hourly;
-
-  Output:Variable,*,Pump Mass Flow Rate,hourly;
-
-  Output:Variable,*,Pump Outlet Temperature,hourly;
-
-  Output:VariableDictionary,Regular;
-
-  Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
-
-  Output:Meter:MeterFileOnly,Electricity:Building,monthly;
-
-  Output:Meter:MeterFileOnly,InteriorLights:Electricity,monthly;
-
-  Output:Meter:MeterFileOnly,Electricity:HVAC,monthly;
-
-  Output:Meter:MeterFileOnly,Electricity:Plant,monthly;
-
-  Output:Meter:MeterFileOnly,Gas:Facility,monthly;
-
-  Output:Meter:MeterFileOnly,Gas:Plant,monthly;
-
-  Output:Meter:MeterFileOnly,Electricity:Facility,runperiod;
-
-  Output:Meter:MeterFileOnly,Electricity:Building,runperiod;
-
-  Output:Meter:MeterFileOnly,InteriorLights:Electricity,runperiod;
-
-  Output:Meter:MeterFileOnly,Electricity:HVAC,runperiod;
-
-  Output:Meter:MeterFileOnly,Electricity:Plant,runperiod;
-
-  Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
-
-  Output:Meter:MeterFileOnly,Gas:Plant,runperiod;
-
-  Output:Meter:MeterFileOnly,MyGeneralLights,monthly;
-
-  Output:Meter:MeterFileOnly,MyGeneralLights,runperiod;
-
-  Output:Meter:MeterFileOnly,MyBuildingElectric,monthly;
-
-  Output:Meter:MeterFileOnly,MyBuildingElectric,runperiod;
-
-  Output:Meter:MeterFileOnly,MyBuildingOther,monthly;
-
-  Output:Meter:MeterFileOnly,MyBuildingOther,runperiod;
-
-! The following custom meters are set up to illustrate the capabilities
-! of custom meters.
-! Custom Meter "MyGeneralLights" duplicates the InteriorLights:Electricity meter.
-! Custom Meter "MyBuildingElectric" duplicates the Electricity:Building meter (by specifying that meter).
-! Custom Meter (Decrement) "MyBuildingOther" uses Electricity:Building as its source meter
-!   and subtracts out the values for MyGeneralLights (aka InteriorLights:Electricity).  The
-!   resultant value for MyBuildingOther should be equal to the value for the meters
-!   Electricity:Building - InteriorLights:Electricity (aka MyGeneralLights)
-
-  Meter:Custom,
-    MyGeneralLights,         !- Name
-    Electricity,             !- Fuel Type
-    SPACE1-1 Lights 1,       !- Key Name 1
-    Lights Electric Energy,  !- Output Variable or Meter Name 1
-    SPACE2-1 Lights 1,       !- Key Name 2
-    Lights Electric Energy,  !- Output Variable or Meter Name 2
-    SPACE3-1 Lights 1,       !- Key Name 3
-    Lights Electric Energy,  !- Output Variable or Meter Name 3
-    SPACE4-1 Lights 1,       !- Key Name 4
-    Lights Electric Energy,  !- Output Variable or Meter Name 4
-    SPACE5-1 Lights 1,       !- Key Name 5
-    Lights Electric Energy;  !- Output Variable or Meter Name 5
-
-  Meter:Custom,
-    MyBuildingElectric,      !- Name
-    Electricity,             !- Fuel Type
-    ,                        !- Key Name 1
-    Electricity:Building;    !- Output Variable or Meter Name 1
-
-  Meter:CustomDecrement,
-    MyBuildingOther,         !- Name
-    Electricity,             !- Fuel Type
-    Electricity:Building,    !- Source Meter Name
-    ,                        !- Key Name 1
-    MyGeneralLights;         !- Output Variable or Meter Name 1
-
-  Output:Surfaces:Drawing,VRML;
+  Output:SQLite,
+    SimpleAndTabular;        !- Option Type
 
   OutputControl:Table:Style,
     HTML;                    !- Column Separator
@@ -3429,5 +3344,4 @@
     AllSummary,              !- Report 1 Name
     ZoneComponentLoadSummary;!- Report 2 Name
 
-  Output:Surfaces:List,Details;
-
+  Output:VariableDictionary,IDF;
