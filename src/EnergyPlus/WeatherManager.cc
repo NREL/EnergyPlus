@@ -1342,7 +1342,7 @@ namespace WeatherManager {
                                 for (Loop = 1; Loop <= NumSpecialDays; ++Loop) {
                                     static constexpr auto EnvSpDyFormat("Environment:Special Days,{},{},{},{},{:3}");
                                     if (SpecialDays(Loop).WthrFile && UseSpecialDays && DoWeatherInitReporting) {
-                                        ObjexxFCL::gio::write(StDate, DateFormat), SpecialDays(Loop).ActStMon, SpecialDays(Loop).ActStDay;
+                                        ObjexxFCL::gio::write(StDate, DateFormat) << SpecialDays(Loop).ActStMon << SpecialDays(Loop).ActStDay;
                                         print(outputFiles.eio,
                                               EnvSpDyFormat,
                                               SpecialDays(Loop).Name,
@@ -1352,7 +1352,7 @@ namespace WeatherManager {
                                               SpecialDays(Loop).Duration);
                                     }
                                     if (!SpecialDays(Loop).WthrFile && DoWeatherInitReporting) {
-                                        ObjexxFCL::gio::write(StDate, DateFormat), SpecialDays(Loop).ActStMon, SpecialDays(Loop).ActStDay;
+                                        ObjexxFCL::gio::write(StDate, DateFormat) << SpecialDays(Loop).ActStMon << SpecialDays(Loop).ActStDay;
                                         print(outputFiles.eio,
                                               EnvSpDyFormat,
                                               SpecialDays(Loop).Name,
