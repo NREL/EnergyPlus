@@ -97,6 +97,12 @@ class DataExchange:
         self.api.getPluginTrendVariableHandle.restype = c_int
         self.api.getPluginTrendVariableValue.argtypes = [c_int, c_int]
         self.api.getPluginTrendVariableValue.restype = RealEP
+        self.api.getPluginTrendVariableAverage.argtypes = [c_int, c_int]
+        self.api.getPluginTrendVariableAverage.restype = RealEP
+        self.api.getPluginTrendVariableMin.argtypes = [c_int, c_int]
+        self.api.getPluginTrendVariableMin.restype = RealEP
+        self.api.getPluginTrendVariableMax.argtypes = [c_int, c_int]
+        self.api.getPluginTrendVariableMax.restype = RealEP
 
     def list_available_api_data_csv(self) -> str:
         """
@@ -375,6 +381,21 @@ class DataExchange:
         if not self.running_as_python_plugin:
             raise EnergyPlusException("get_trend_value is only available as part of a Python Plugin workflow")
         return self.api.getPluginTrendVariableValue(trend_handle, time_index)
+
+    def get_trend_average(self, trend_handle: int, count: int) -> RealEP:
+        if not self.running_as_python_plugin:
+            raise EnergyPlusException("get_trend_average is only available as part of a Python Plugin workflow")
+        return self.api.getPluginTrendVariableAverage(trend_handle, count)
+
+    def get_trend_min(self, trend_handle: int, count: int) -> RealEP:
+        if not self.running_as_python_plugin:
+            raise EnergyPlusException("get_trend_min is only available as part of a Python Plugin workflow")
+        return self.api.getPluginTrendVariableMin(trend_handle, count)
+
+    def get_trend_max(self, trend_handle: int, count: int) -> RealEP:
+        if not self.running_as_python_plugin:
+            raise EnergyPlusException("get_trend_max is only available as part of a Python Plugin workflow")
+        return self.api.getPluginTrendVariableMax(trend_handle, count)
 
     def year(self) -> int:
         """

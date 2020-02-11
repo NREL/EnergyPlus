@@ -950,6 +950,40 @@ namespace PluginManagement {
 #endif
     }
 
+    Real64 PluginManager::getTrendVariableAverage(int handle, int count) {
+    #if LINK_WITH_PYTHON == 1
+        Real64 sum = 0;
+        for (int i = 0; i < count; i++) {
+            sum += trends[handle].values[i];
+        }
+        return sum / count;
+    #endif
+    }
+
+    Real64 PluginManager::getTrendVariableMin(int handle, int count) {
+    #if LINK_WITH_PYTHON == 1
+        Real64 minimumValue = 9999999999999;
+        for (int i = 0; i < count; i++) {
+            if (trends[handle].values[i] < minimumValue) {
+                minimumValue = trends[handle].values[i];
+            }
+        }
+        return minimumValue;
+    #endif
+    }
+
+    Real64 PluginManager::getTrendVariableMax(int handle, int count) {
+    #if LINK_WITH_PYTHON == 1
+        Real64 maximumValue = -9999999999999;
+        for (int i = 0; i < count; i++) {
+            if (trends[handle].values[i] > maximumValue) {
+                maximumValue = trends[handle].values[i];
+            }
+        }
+        return maximumValue;
+    #endif
+    }
+
     size_t PluginManager::getTrendVariableHistorySize(int handle) {
 #if LINK_WITH_PYTHON == 1
         return trends[handle].values.size();

@@ -163,6 +163,9 @@ namespace PluginManagement {
         int getTrendVariableHandle(const std::string& name);
         Real64 getTrendVariableValue(int handle, int timeIndex);
         static size_t getTrendVariableHistorySize(int handle);
+        Real64 getTrendVariableAverage(int handle, int count);
+        Real64 getTrendVariableMin(int handle, int count);
+        Real64 getTrendVariableMax(int handle, int count);
         void updatePluginValues();
 
         static int getLocationOfUserDefinedPlugin(std::string const &programName);
