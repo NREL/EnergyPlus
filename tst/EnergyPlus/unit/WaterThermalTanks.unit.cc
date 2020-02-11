@@ -3886,7 +3886,7 @@ TEST_F(WaterThermalTanksFixture, HPWH_Both_Pumped_and_Wrapped_InputProcessing)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    EXPECT_TRUE(WaterThermalTanks::GetWaterThermalTankInput());
+    EXPECT_TRUE(WaterThermalTanks::GetWaterThermalTankInput(OutputFiles::getSingleton()));
 
     EXPECT_EQ(WaterThermalTanks::HPWaterHeater.size(), 2u);
     EXPECT_EQ(WaterThermalTanks::numHeatPumpWaterHeater, 2);
@@ -4106,7 +4106,6 @@ TEST_F(WaterThermalTanksFixture, CrashCalcStandardRatings_HPWH_and_Standalone)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    DataGlobals::OutputFileInits = GetNewUnitNumber();
     DataHVACGlobals::TimeStepSys = 1;
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
@@ -4117,7 +4116,7 @@ TEST_F(WaterThermalTanksFixture, CrashCalcStandardRatings_HPWH_and_Standalone)
     SetPredefinedTables();
     ScheduleManager::UpdateScheduleValues();
 
-    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput());
+    EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(OutputFiles::getSingleton()));
 
     {
         auto &HPWH = WaterThermalTanks::HPWaterHeater(1);
