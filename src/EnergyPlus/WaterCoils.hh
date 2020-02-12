@@ -264,6 +264,9 @@ namespace WaterCoils {
         bool FaultyCoilFoulingFlag;     // True if the coil has fouling fault
         int FaultyCoilFoulingIndex;     // Index of the fault object corresponding to the coil
         Real64 FaultyCoilFoulingFactor; // Coil fouling factor [m2K/W]
+        Real64 OriginalUACoilVariable;
+        Real64 OriginalUACoilExternal;
+        Real64 OriginalUACoilInternal;
 
         bool DesiccantRegenerationCoil; // true if it is a regeneration air heating coil defined in Desiccant Dehumidifier system
         int DesiccantDehumNum;          // index to desiccant dehumidifier object

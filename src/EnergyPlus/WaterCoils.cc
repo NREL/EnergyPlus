@@ -1908,21 +1908,6 @@ namespace WaterCoils {
 
         WaterCoil(CoilNum).UACoilVariable = WaterCoil(CoilNum).UACoil;
 
-
-        // calculate the Faulty Coil Fouling (thermal insulance) Factor using fault information
-        if (WaterCoil(CoilNum).FaultyCoilFoulingFlag &&
-            // The fault shouldn't apply during sizing. TODO: check if needed or included in MYyUAAndFlowCalcFlag
-            (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
-            // This was preexisting
-            !(MyUAAndFlowCalcFlag(CoilNum)))
-        {
-            int FaultIndex = WaterCoil(CoilNum).FaultyCoilFoulingIndex;
-            WaterCoil(CoilNum).FaultyCoilFoulingFactor = FaultsManager::FouledCoils(FaultIndex).CalFaultyCoilFoulingFactor();
-
-        } else {
-            WaterCoil(CoilNum).FaultyCoilFoulingFactor = 0;
-        }
-
         CalcAdjustedCoilUA(CoilNum);
 
         WaterCoil(CoilNum).TotWaterHeatingCoilRate = 0.0;
@@ -1940,6 +1925,8 @@ namespace WaterCoils {
         Real64 AirConvectTerm;       // result of Eq.71 in Wetter 1999
         Real64 WaterConvectTerm;     // result of Eq.73 in Wetter 1999
         Real64 WaterConvSensitivity; // "s" in Wetter 1999, temperature sensitivity in water side convection
+
+        // Coil:Heating:Water
         if ((WaterCoil(CoilNum).WaterCoilType_Num == WaterCoil_SimpleHeating) &&
             (!(MyUAAndFlowCalcFlag(CoilNum)))) { // update Coil UA based on inlet mass flows and temps
             x_a = 1.0 + 4.769E-3 * (WaterCoil(CoilNum).InletAirTemp - WaterCoil(CoilNum).DesInletAirTemp);
@@ -1958,41 +1945,150 @@ namespace WaterCoils {
                 WaterConvectTerm = 0.0;
             }
             if ((AirConvectTerm > 0.0) && (WaterConvectTerm > 0.0)) {
-                WaterCoil(CoilNum).UACoilVariable = 1.0 / ((1.0 / WaterConvectTerm) + WaterCoil(CoilNum).FaultyCoilFoulingFactor + (1.0 / AirConvectTerm));
+                WaterCoil(CoilNum).UACoilVariable = 1.0 / ((1.0 / WaterConvectTerm) + (1.0 / AirConvectTerm));
             } else {
                 // use nominal UA since variable UA cannot be calculated
-                WaterCoil(CoilNum).UACoilVariable = 1.0 / (1.0 / WaterCoil(CoilNum).UACoil + WaterCoil(CoilNum).FaultyCoilFoulingFactor);
+                WaterCoil(CoilNum).UACoilVariable = WaterCoil(CoilNum).UACoil;
+            }
+
+            // calculate the Faulty Coil Fouling (thermal insulance) Factor using fault information
+            if (WaterCoil(CoilNum).FaultyCoilFoulingFlag &&
+                // The fault shouldn't apply during sizing.
+                (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+                // This was preexisting
+                !(MyUAAndFlowCalcFlag(CoilNum)))
+            {
+                // Store original value
+                WaterCoil(CoilNum).OriginalUACoilVariable = WaterCoil(CoilNum).UACoilVariable;
+
+                int FaultIndex = WaterCoil(CoilNum).FaultyCoilFoulingIndex;
+                FaultsManager::FaultPropertiesFoulingCoil &fouling = FaultsManager::FouledCoils(FaultIndex);
+                Real64 FaultFrac = fouling.FaultFraction();
+
+                if (fouling.FoulingInputMethod == FaultsManager::iFouledCoil_UARated) {
+                    // 1/UA' = Frac * (1/UAFouled) + (1-Frac) / UA
+                    WaterCoil(CoilNum).UACoilVariable = 1 / (FaultFrac / (fouling.UAFouled) + (1 - FaultFrac) / WaterCoil(CoilNum).UACoilVariable);
+                } else {
+                    // R' = R + Rfoul
+                    // Rfoul = r_air/A_air + r_water/A_water (FoulingFactor = thermal insulance [K/W, A] = Area [m2], r=fouling factor [m2.K/W]
+                    Real64 FoulingFactor = FaultFrac * (fouling.Rfw / (fouling.Aratio * fouling.Aout) + fouling.Rfa / fouling.Aout);
+                    WaterCoil(CoilNum).UACoilVariable = 1.0 / ( (1.0 / WaterCoil(CoilNum).UACoilVariable) + FoulingFactor);
+                }
+
+                // Do not allow improving coil performance
+                WaterCoil(CoilNum).UACoilVariable = min(WaterCoil(CoilNum).UACoilVariable, WaterCoil(CoilNum).OriginalUACoilVariable);
+
+                // Only for reporting purposes
+                WaterCoil(CoilNum).FaultyCoilFoulingFactor = (1.0 / WaterCoil(CoilNum).UACoilVariable) -
+                                                             (1.0 / WaterCoil(CoilNum).OriginalUACoilVariable);
+            } else {
+                WaterCoil(CoilNum).FaultyCoilFoulingFactor = 0;
             }
         }
 
+        // Coil:Cooling:Water
         // update Coil UA based on inlet mass flows and temps
         if (WaterCoil(CoilNum).WaterCoilType_Num == WaterCoil_Cooling && (!MyCoilDesignFlag(CoilNum))) {
-            x_a = 1.0 + 4.769E-3 * (WaterCoil(CoilNum).InletAirTemp - WaterCoil(CoilNum).DesInletAirTemp);
             if (WaterCoil(CoilNum).DesAirMassFlowRate > 0.0) {
+                x_a = 1.0 + 4.769E-3 * (WaterCoil(CoilNum).InletAirTemp - WaterCoil(CoilNum).DesInletAirTemp);
                 WaterCoil(CoilNum).UACoilExternal = x_a *
                                                     std::pow(WaterCoil(CoilNum).InletAirMassFlowRate / WaterCoil(CoilNum).DesAirMassFlowRate, 0.8) *
                                                     WaterCoil(CoilNum).UACoilExternalDes;
             } else {
                 WaterCoil(CoilNum).UACoilExternal = WaterCoil(CoilNum).UACoilExternalDes;
             }
-            WaterConvSensitivity = 0.014 / (1.0 + 0.014 * WaterCoil(CoilNum).DesInletWaterTemp);
-            x_w = 1.0 + WaterConvSensitivity * (WaterCoil(CoilNum).InletWaterTemp - WaterCoil(CoilNum).DesInletWaterTemp);
+
             if (WaterCoil(CoilNum).MaxWaterMassFlowRate > 0.0) {
+                WaterConvSensitivity = 0.014 / (1.0 + 0.014 * WaterCoil(CoilNum).DesInletWaterTemp);
+                x_w = 1.0 + WaterConvSensitivity * (WaterCoil(CoilNum).InletWaterTemp - WaterCoil(CoilNum).DesInletWaterTemp);
                 WaterCoil(CoilNum).UACoilInternal =
                     x_w * std::pow(WaterCoil(CoilNum).InletWaterMassFlowRate / WaterCoil(CoilNum).MaxWaterMassFlowRate, 0.85) *
                     WaterCoil(CoilNum).UACoilInternalDes;
             } else {
                 WaterCoil(CoilNum).UACoilInternal = WaterCoil(CoilNum).UACoilInternalDes;
             }
-            if (WaterCoil(CoilNum).UACoilInternal > 0.0 && WaterCoil(CoilNum).UACoilExternal > 0.0) {
-                WaterCoil(CoilNum).UACoilTotal =
-                    1.0 / (1.0 / WaterCoil(CoilNum).UACoilExternal + WaterCoil(CoilNum).FaultyCoilFoulingFactor + 1.0 / WaterCoil(CoilNum).UACoilInternal);
-            } else {
+
+            if (!(WaterCoil(CoilNum).UACoilInternal > 0.0 && WaterCoil(CoilNum).UACoilExternal > 0.0)) {
                 WaterCoil(CoilNum).UACoilInternal = WaterCoil(CoilNum).UACoilInternalDes;
                 WaterCoil(CoilNum).UACoilExternal = WaterCoil(CoilNum).UACoilExternalDes;
-                WaterCoil(CoilNum).UACoilTotal =
-                    1.0 / (1.0 / WaterCoil(CoilNum).UACoilExternal + WaterCoil(CoilNum).FaultyCoilFoulingFactor + 1.0 / WaterCoil(CoilNum).UACoilInternal);
             }
+
+            // If Fouling
+            if (WaterCoil(CoilNum).FaultyCoilFoulingFlag &&
+                // The fault shouldn't apply during sizing.
+                (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+                // This was preexisting
+                !(MyUAAndFlowCalcFlag(CoilNum)))
+            {
+                // Store original value
+                // This is really UACoilTotal technically, but I don't see the point of declaring another Real on the struct just for that
+                WaterCoil(CoilNum).OriginalUACoilVariable = 1.0 /
+                    (1.0 / WaterCoil(CoilNum).UACoilExternal + 1.0 / WaterCoil(CoilNum).UACoilInternal);
+
+                WaterCoil(CoilNum).OriginalUACoilExternal = WaterCoil(CoilNum).UACoilExternal;
+                WaterCoil(CoilNum).OriginalUACoilInternal = WaterCoil(CoilNum).UACoilInternal;
+
+                int FaultIndex = WaterCoil(CoilNum).FaultyCoilFoulingIndex;
+
+                FaultsManager::FaultPropertiesFoulingCoil &fouling = FaultsManager::FouledCoils(FaultIndex);
+                Real64 FaultFrac = fouling.FaultFraction();
+
+                if (fouling.FoulingInputMethod == FaultsManager::iFouledCoil_FoulingFactor) {
+                    // Adjust the External (air) UA and Internal (water) UA accordingly
+                    Real64 Rfoul_air = FaultFrac * (fouling.Rfa / fouling.Aout);
+                    Real64 Rfoul_water = FaultFrac * (fouling.Rfw / (fouling.Aratio * fouling.Aout));
+
+                    WaterCoil(CoilNum).UACoilInternal = 1.0 / (1.0 / WaterCoil(CoilNum).UACoilInternal + Rfoul_water);
+                    WaterCoil(CoilNum).UACoilExternal = 1.0 / (1.0 / WaterCoil(CoilNum).UACoilExternal + Rfoul_air);
+                    //
+                } else { // iFouledCoil_UARated
+                    // FouledUARated is supposed to be the overall UA. So we need to split between Internal and External UAs
+
+                    // How should I split fouling between internal/external?
+                    // We can actually use the current ratio before fouling...
+                    // splitRatio = UACoilInternal/UACoilExternal
+                    // UACoilInternal = UACoilExternal * splitRatio
+
+                    // UACoilTotal = 1 / (1 / UACoilExternal + 1 / UACoilInternal)
+                    // UACoilTotal = 1 / (1 / UACoilExternal + 1 / (UACoilExernal * splitRatio))
+                    // UACoilTotal = UACoilExternal / (1 + 1 / splitRatio) = UACoilExternal  * splitRatio / (1 + splitRatio)
+                    // UACoilExternal = UACoilTotal * (1 + splitRatio) / splitRatio
+                    // UACoilInternal = UACoilTotal * (1 + splitRatio)
+
+                    // Adding in FaultFrac:
+                    // UACoilExternal = FaultFrac * [UAFouled * (1+splitRatio) / splitRatio] + (1-FaultFrac) * UACoilExternal
+                    // UACoilInternal = FaultFrac * [UAFouled * splitRatio] + (1-FaultFrac) * UACoilInternal
+
+                    Real64 splitRatio = WaterCoil(CoilNum).UACoilInternal / WaterCoil(CoilNum).UACoilExternal;
+
+                    WaterCoil(CoilNum).UACoilExternal =   1.0 /
+                        ( (FaultFrac * splitRatio) / ((1 + splitRatio) * fouling.UAFouled) +
+                          (1-FaultFrac) / WaterCoil(CoilNum).UACoilExternal);
+
+                    //WaterCoil(CoilNum).UACoilInternal =   1.0 /
+                        //( FaultFrac / ((1 + splitRatio) * fouling.UAFouled) +
+                          //(1-FaultFrac) / WaterCoil(CoilNum).UACoilInternal);
+
+                    WaterCoil(CoilNum).UACoilInternal = splitRatio * WaterCoil(CoilNum).UACoilExternal;
+
+                }
+
+                // Do not allow improving coil performance
+                WaterCoil(CoilNum).UACoilExternal = min(WaterCoil(CoilNum).UACoilExternal, WaterCoil(CoilNum).OriginalUACoilExternal);
+                WaterCoil(CoilNum).UACoilInternal = min(WaterCoil(CoilNum).UACoilInternal, WaterCoil(CoilNum).OriginalUACoilInternal);
+
+                // Only for reporting purposes
+                WaterCoil(CoilNum).FaultyCoilFoulingFactor = (1.0 / WaterCoil(CoilNum).UACoilExternal) -
+                                                             (1.0 / WaterCoil(CoilNum).OriginalUACoilExternal) +
+                                                             (1.0 / WaterCoil(CoilNum).UACoilInternal) -
+                                                             (1.0 / WaterCoil(CoilNum).OriginalUACoilInternal);
+            } else {
+                WaterCoil(CoilNum).FaultyCoilFoulingFactor = 0;
+            }
+
+            WaterCoil(CoilNum).UACoilTotal = 1.0 /
+                (1.0 / WaterCoil(CoilNum).UACoilExternal + 1.0 / WaterCoil(CoilNum).UACoilInternal);
+
             WaterCoil(CoilNum).UACoilInternalPerUnitArea = WaterCoil(CoilNum).UACoilInternal / WaterCoil(CoilNum).TotCoilOutsideSurfArea;
             WaterCoil(CoilNum).UAWetExtPerUnitArea = WaterCoil(CoilNum).UACoilExternal / WaterCoil(CoilNum).TotCoilOutsideSurfArea;
             WaterCoil(CoilNum).UADryExtPerUnitArea = WaterCoil(CoilNum).UAWetExtPerUnitArea;
