@@ -404,12 +404,10 @@ SET( SRC
   Plant/LoopSidePumpInformation.hh
   Plant/PlantAvailManager.hh
   Plant/PlantConvergencePoint.hh
-  Plant/LoopSideReportVars.hh
   Plant/MeterData.hh
   Plant/ReportBranchData.hh
   Plant/ReportCompData.hh
   Plant/ReportLoopData.hh
-  Plant/ReportVars.hh
   Plant/Branch.cc
   Plant/Branch.hh
   Plant/Component.cc

@@ -63,7 +63,6 @@
 #include <EnergyPlus/Plant/Loop.hh>
 #include <EnergyPlus/Plant/PlantAvailManager.hh>
 #include <EnergyPlus/Plant/ReportLoopData.hh>
-#include <EnergyPlus/Plant/ReportVars.hh>
 
 namespace EnergyPlus {
 
