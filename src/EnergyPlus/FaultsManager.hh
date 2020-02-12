@@ -249,7 +249,10 @@ namespace FaultsManager {
         virtual ~FaultPropertiesFoulingCoil() = default;
       public:
         // Calculate the fouling thermal insulance factor (the reciprocal of a heat transfert coefficient) due to fouling in a coil
-        Real64 CalFaultyCoilFoulingFactor();
+        // Real64 CalFaultyCoilFoulingFactor();
+
+        // Calculate the Fault Fraction based on Availability and Severity Schedules
+        Real64 FaultFraction();
     };
 
     struct FaultPropertiesAirFilter : public FaultProperties // Class for FaultModel:Fouling:AirFilter, derived from FaultProperties

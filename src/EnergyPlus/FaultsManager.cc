@@ -1802,12 +1802,55 @@ namespace FaultsManager {
                         // Coil:Cooling:Water doesn't report UA because it's not variable,
                         // but here, it's useful since we do change it via fouling, so report it
                         if (WaterCoils::WaterCoil(CoilNum).WaterCoilType_Num == WaterCoils::WaterCoil_Cooling) {
-                            SetupOutputVariable("Cooling Coil U Factor Times Area Value",
+                            SetupOutputVariable("Cooling Coil Total U Factor Times Area Value",
                                     OutputProcessor::Unit::W_K,
                                     WaterCoils::WaterCoil(CoilNum).UACoilTotal,
                                     "System",
                                     "Average",
                                     WaterCoils::WaterCoil(CoilNum).Name);
+
+                            SetupOutputVariable("Cooling Coil External U Factor Times Area Value",
+                                    OutputProcessor::Unit::W_K,
+                                    WaterCoils::WaterCoil(CoilNum).UACoilExternal,
+                                    "System",
+                                    "Average",
+                                    WaterCoils::WaterCoil(CoilNum).Name);
+
+                            SetupOutputVariable("Cooling Coil Internal U Factor Times Area Value",
+                                    OutputProcessor::Unit::W_K,
+                                    WaterCoils::WaterCoil(CoilNum).UACoilInternal,
+                                    "System",
+                                    "Average",
+                                    WaterCoils::WaterCoil(CoilNum).Name);
+
+                            SetupOutputVariable("Cooling Coil Total U Factor Times Area Value Before Fouling",
+                                    OutputProcessor::Unit::W_K,
+                                    WaterCoils::WaterCoil(CoilNum).OriginalUACoilVariable,
+                                    "System",
+                                    "Average",
+                                    WaterCoils::WaterCoil(CoilNum).Name);
+
+                            SetupOutputVariable("Cooling Coil External U Factor Times Area Value Before Fouling",
+                                    OutputProcessor::Unit::W_K,
+                                    WaterCoils::WaterCoil(CoilNum).OriginalUACoilExternal,
+                                    "System",
+                                    "Average",
+                                    WaterCoils::WaterCoil(CoilNum).Name);
+
+                            SetupOutputVariable("Cooling Coil Internal U Factor Times Area Value Before Fouling",
+                                    OutputProcessor::Unit::W_K,
+                                    WaterCoils::WaterCoil(CoilNum).OriginalUACoilInternal,
+                                    "System",
+                                    "Average",
+                                    WaterCoils::WaterCoil(CoilNum).Name);
+
+                        } else {
+                            SetupOutputVariable("Heating Coil U Factor Times Area Value Before Fouling",
+                                OutputProcessor::Unit::W_K,
+                                WaterCoils::WaterCoil(CoilNum).OriginalUACoilVariable,
+                                "System",
+                                "Average",
+                                WaterCoils::WaterCoil(CoilNum).Name);
                         }
                     } else {
                         ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\" invalid "
@@ -2018,45 +2061,61 @@ namespace FaultsManager {
         return UAReductionFactorAct;
     }
 
-    Real64 FaultPropertiesFoulingCoil::CalFaultyCoilFoulingFactor()
+    Real64 FaultPropertiesFoulingCoil::FaultFraction()
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Julien Marrec, EffiBEM
         //       DATE WRITTEN   Feb. 2020
 
         // PURPOSE OF THIS SUBROUTINE:
-        // Calculate the fouling thermal insulance factor (the reciprocal of a heat transfert coefficient) due to fouling in a coil
+        // Calculate the Fault Fraction based on Availability and Severity Schedules
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 FoulingFactor(0.0); // Fouling Thermal Insulance Factor (K/W)
+        Real64 FaultFrac(0.0); // Fault Fraction
 
         // Check fault availability schedules
         if (ScheduleManager::GetCurrentScheduleValue(this->AvaiSchedPtr) > 0.0) {
 
             // Check fault severity schedules (Ptr initialized to -1, so would return a FaultFrac of 1 if not set)
-            Real64 FaultFrac = ScheduleManager::GetCurrentScheduleValue(this->SeveritySchedPtr);
-
-            // If severity is zero, there's no fouling
-            if (FaultFrac > 0.0) {
-
-                // If "FouledUARated", and coil is autosized, this requires sizing, so I cannot store the UA of the coil on this Fault object here
-                // I have to use an index
-                if (this->FoulingInputMethod == iFouledCoil_UARated) {
-                    if (this->FouledCoiledType == WaterCoils::WaterCoil_SimpleHeating) {
-                        FoulingFactor = FaultFrac * (1.0 / this->UAFouled - 1.0 / WaterCoils::WaterCoil(this->FouledCoilNum).UACoil);
-                    } else { // WaterCoils::WaterCoil_Cooling
-                        FoulingFactor = FaultFrac * (1.0 / this->UAFouled - 1.0 / WaterCoils::WaterCoil(this->FouledCoilNum).UACoilTotal);
-                    }
-                } else {
-                    // This case is simpler, doesn't require knowledge of the Coil object
-                    FoulingFactor = FaultFrac * (this->Rfw / (this->Aratio * this->Aout) + this->Rfa / this->Aout);
-                }
-            }
+            FaultFrac = ScheduleManager::GetCurrentScheduleValue(this->SeveritySchedPtr);
         }
 
-        // Do not allow improving coil performance
-        return max(FoulingFactor, 0.0);
+        return FaultFrac;
     }
+
+    //Real64 FaultPropertiesFoulingCoil::CalFaultyCoilFoulingFactor()
+    //{
+        //// SUBROUTINE INFORMATION:
+        ////       AUTHOR         Julien Marrec, EffiBEM
+        ////       DATE WRITTEN   Feb. 2020
+
+        //// PURPOSE OF THIS SUBROUTINE:
+        //// Calculate the fouling thermal insulance factor (the reciprocal of a heat transfert coefficient) due to fouling in a coil
+
+        //// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        //Real64 FoulingFactor(0.0); // Fouling Thermal Insulance Factor (K/W)
+
+        //Real64 FaultFrac = this->FaultFraction();
+        //// If severity is zero, there's no fouling
+        //if (FaultFrac > 0.0) {
+
+            //// If "FouledUARated", and coil is autosized, this requires sizing, so I cannot store the UA of the coil on this Fault object here
+            //// I have to use an index
+            //if (this->FoulingInputMethod == iFouledCoil_UARated) {
+                //if (this->FouledCoiledType == WaterCoils::WaterCoil_SimpleHeating) {
+                    //FoulingFactor = FaultFrac * (1.0 / this->UAFouled - 1.0 / WaterCoils::WaterCoil(this->FouledCoilNum).UACoil);
+                //} else { // WaterCoils::WaterCoil_Cooling
+                    //FoulingFactor = FaultFrac * (1.0 / this->UAFouled - 1.0 / WaterCoils::WaterCoil(this->FouledCoilNum).UACoilTotal);
+                //}
+            //} else {
+                //// This case is simpler, doesn't require knowledge of the Coil object
+                //FoulingFactor = FaultFrac * (this->Rfw / (this->Aratio * this->Aout) + this->Rfa / this->Aout);
+            //}
+        //}
+
+        //// Do not allow improving coil performance
+        //return max(FoulingFactor, 0.0);
+    //}
 
     void FaultPropertiesChillerSWT::CalFaultChillerSWT(bool FlagVariableFlow, // True if chiller is variable flow and false if it is constant flow
                                                        Real64 FaultyChillerSWTOffset, // Faulty chiller SWT sensor offset
