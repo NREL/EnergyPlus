@@ -3156,10 +3156,17 @@
 
   Output:Variable,Main Heating Coil 1,Heating Coil Heating Rate,Detailed;
 
-  ! Only available if Coil:Cooling:Water has a FaultModel:Fouling:Coil object attached
-  Output:Variable,Main Cooling Coil 1,Cooling Coil U Factor Times Area Value,Detailed;
+  ! Only available if Coil:Heating:Water has a FaultModel:Fouling:Coil object attached
+  Output:Variable,Main Heating Coil 1,Heating Coil U Factor Times Area Value Before Fouling,Detailed;
 
   Output:Variable,Main Cooling Coil 1,Cooling Coil Total Cooling Rate,Detailed;
+  ! Only available if Coil:Cooling:Water has a FaultModel:Fouling:Coil object attached
+  Output:Variable,Main Cooling Coil 1,Cooling Coil Total U Factor Times Area Value,Detailed;
+  Output:Variable,Main Cooling Coil 1,Cooling Coil External U Factor Times Area Value,Detailed;
+  Output:Variable,Main Cooling Coil 1,Cooling Coil Internal U Factor Times Area Value,Detailed;
+  Output:Variable,Main Cooling Coil 1,Cooling Coil Total U Factor Times Area Value Before Fouling,Detailed;
+  Output:Variable,Main Cooling Coil 1,Cooling Coil External U Factor Times Area Value Before Fouling,Detailed;
+  Output:Variable,Main Cooling Coil 1,Cooling Coil Internal U Factor Times Area Value Before Fouling,Detailed;
 
   Output:Variable,*,Coil Fouling Factor,Detailed;
 
