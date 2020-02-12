@@ -1375,7 +1375,8 @@ namespace WeatherManager {
                                     << "N/A"
                                     << "N/A"
                                     << "N/A"
-                                    << "N/A";
+                                    << "N/A"
+                                    << SkyTempModelNames(Environment(Envrn).SkyTempModel + 1);
                             } else if (DoWeatherInitReporting) {
                                 ObjexxFCL::gio::write(OutputFileInits, EnvNameFormat)
                                     << Environment(Envrn).Title << "SizingPeriod:DesignDay" << StDate << EnDate
@@ -1385,7 +1386,8 @@ namespace WeatherManager {
                                     << "N/A"
                                     << "N/A"
                                     << "N/A"
-                                    << "N/A";
+                                    << "N/A"
+                                    << SkyTempModelNames(Environment(Envrn).SkyTempModel + 1);
                             }
                             if (DesDayInput(Environment(Envrn).DesignDayNum).DSTIndicator == 0 && DoWeatherInitReporting) {
                                 ObjexxFCL::gio::write(OutputFileInits, EnvDSTNFormat) << "SizingPeriod:DesignDay";
