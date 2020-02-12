@@ -114,18 +114,18 @@ namespace SurfaceGeometry {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void SetupZoneGeometry(bool &ErrorsFound);
+    void SetupZoneGeometry(OutputFiles &outputFiles, bool &ErrorsFound);
 
     void AllocateModuleArrays();
 
-    void GetSurfaceData(bool &ErrorsFound); // If errors found in input
+    void GetSurfaceData(OutputFiles &outputFiles, bool &ErrorsFound); // If errors found in input
 
     void checkSubSurfAzTiltNorm(SurfaceData &baseSurface, // Base surface data (in)
                                 SurfaceData &subSurface,  // Subsurface data (in)
                                 bool &surfaceError        // True if there is subsurface error that requires a fatal
     );
 
-    void GetGeometryParameters(bool &ErrorsFound); // set to true if errors found during input
+    void GetGeometryParameters(OutputFiles &outputFiles, bool &ErrorsFound); // set to true if errors found during input
 
     void GetDetShdSurfaceData(bool &ErrorsFound,          // Error flag indicator (true if errors found)
                               int &SurfNum,               // Count of Current SurfaceNumber
@@ -139,7 +139,8 @@ namespace SurfaceGeometry {
                                   int const TotRectDetachedBldg   // Number of Building Detached Shading Surfaces to obtain
     );
 
-    void GetHTSurfaceData(bool &ErrorsFound,                // Error flag indicator (true if errors found)
+    void GetHTSurfaceData(OutputFiles &outputFiles,
+                          bool &ErrorsFound,                // Error flag indicator (true if errors found)
                           int &SurfNum,                     // Count of Current SurfaceNumber
                           int const TotHTSurfs,             // Number of Heat Transfer Base Surfaces to obtain
                           int const TotDetailedWalls,       // Number of Wall:Detailed items to obtain
@@ -239,7 +240,7 @@ namespace SurfaceGeometry {
 
     int GetNumIntMassSurfaces(); // Number of Internal Mass Surfaces to obtain
 
-    void GetShadingSurfReflectanceData(bool &ErrorsFound); // If errors found in input
+    void GetShadingSurfReflectanceData(OutputFiles &outputFiles, bool &ErrorsFound); // If errors found in input
 
     void GetSurfaceSrdSurfsData(bool &ErrorsFound); // Error flag indicator (true if errors found)
 
@@ -247,7 +248,7 @@ namespace SurfaceGeometry {
 
     void GetHTSurfExtVentedCavityData(bool &ErrorsFound); // Error flag indicator (true if errors found)
 
-    void GetSurfaceHeatTransferAlgorithmOverrides(bool &ErrorsFound);
+    void GetSurfaceHeatTransferAlgorithmOverrides(OutputFiles &outputFiles, bool &ErrorsFound);
 
     class ExposedFoundationPerimeter
     {
@@ -287,9 +288,9 @@ namespace SurfaceGeometry {
 
     void GetWindowGapAirflowControlData(bool &ErrorsFound); // If errors found in input
 
-    void GetOSCData(bool &ErrorsFound);
+    void GetOSCData(OutputFiles &outputFiles, bool &ErrorsFound);
 
-    void GetOSCMData(bool &ErrorsFound);
+    void GetOSCMData(OutputFiles &outputFiles, bool &ErrorsFound);
 
     void GetFoundationData(bool &ErrorsFound);
 

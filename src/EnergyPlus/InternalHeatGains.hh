@@ -56,6 +56,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+  class OutputFiles;
 
 namespace InternalHeatGains {
 
@@ -79,7 +80,7 @@ namespace InternalHeatGains {
 
     void ManageInternalHeatGains(Optional_bool_const InitOnly = _); // when true, just calls the get input, if appropriate and returns.
 
-    void GetInternalHeatGainsInput();
+    void GetInternalHeatGainsInput(OutputFiles &outputFiles);
 
     void InitInternalHeatGains();
 
