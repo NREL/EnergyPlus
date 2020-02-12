@@ -697,9 +697,14 @@ namespace OutputProcessor {
 
     void UpdateMeterValues(Real64 const TimeStepValue,                    // Value of this variable at the current time step.
                            int const NumOnMeters,                         // Number of meters this variable is "on".
-                           Array1S_int const OnMeters,                    // Which meters this variable is on (index values)
-                           Optional_int_const NumOnCustomMeters = _,      // Number of custom meters this variable is "on".
-                           Optional<Array1S_int const> OnCustomMeters = _ // Which custom meters this variable is on (index values)
+                           const Array1D_int &OnMeters                     // Which meters this variable is on (index values)
+    );
+
+    void UpdateMeterValues(Real64 const TimeStepValue,                    // Value of this variable at the current time step.
+                           int const NumOnMeters,                         // Number of meters this variable is "on".
+                           const Array1D_int &OnMeters,                    // Which meters this variable is on (index values)
+                           int const NumOnCustomMeters,                   // Number of custom meters this variable is "on".
+                           const Array1D_int &OnCustomMeters              // Which custom meters this variable is on (index values)
     );
 
     void UpdateMeters(int const TimeStamp); // Current TimeStamp (for max/min)
@@ -971,7 +976,7 @@ int GetNumMeteredVariables(std::string const &ComponentType, // Given Component 
                            std::string const &ComponentName  // Given Component Name (user defined)
 );
 
-void GetMeteredVariables(std::string const &ComponentType,           // Given Component Type
+void GetMeteredVariablesOptional(std::string const &ComponentType,   // Given Component Type
                          std::string const &ComponentName,           // Given Component Name (user defined)
                          Array1S_int VarIndexes,                     // Variable Numbers
                          Array1S_int VarTypes,                       // Variable Types (1=integer, 2=real, 3=meter)
@@ -983,6 +988,32 @@ void GetMeteredVariables(std::string const &ComponentType,           // Given Co
                          Optional<Array1S_string> Names = _,         // Variable Names for each variable
                          Optional_int NumFound = _,                  // Number Found
                          Optional<Array1S_int> VarIDs = _            // Variable Report Numbers
+);
+
+void GetMeteredVariables(std::string const &ComponentType,                     // Given Component Type
+                         std::string const &ComponentName,                     // Given Component Name (user defined)
+                         Array1S_int VarIndexes,                               // Variable Numbers
+                         Array1S_int VarTypes,                                 // Variable Types (1=integer, 2=real, 3=meter)
+                         Array1A<OutputProcessor::TimeStepType> TimeStepTypes, // Variable Index Types (1=Zone,2=HVAC),
+                         Array1A<OutputProcessor::Unit> unitsForVar,           // units from enum for each variable
+                         Array1S_int ResourceTypes,                            // ResourceTypes for each variable
+                         Array1S_string EndUses,                               // EndUses for each variable
+                         Array1S_string Groups,                                // Groups for each variable
+                         Array1S_string Names,                                 // Variable Names for each variable
+                         int &NumFound                                         // Number Found
+);
+
+void GetMeteredVariables(std::string const &ComponentType,                      // Given Component Type
+                         std::string const &ComponentName,                      // Given Component Name (user defined)
+                         Array1S_int VarIndexes,                                // Variable Numbers
+                         Array1S_int VarTypes,                                  // Variable Types (1=integer, 2=real, 3=meter)
+                         Array1A<OutputProcessor::TimeStepType> TimeStepTypes,  // Variable Index Types (1=Zone,2=HVAC),
+                         Array1A<OutputProcessor::Unit> unitsForVar,            // units from enum for each variable
+                         Array1S_int ResourceTypes,                             // ResourceTypes for each variable
+                         Array1S_string EndUses,                                // EndUses for each variable
+                         Array1S_string Groups,                                 // Groups for each variable
+                         Array1S_string Names,                                  // Variable Names for each variable
+                         Array1S_int VarIDs                                     // Variable Report Numbers
 );
 
 void GetVariableKeyCountandType(std::string const &varName,            // Standard variable name

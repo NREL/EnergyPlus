@@ -2863,7 +2863,6 @@ namespace SimulationManager {
                                 EndUses,
                                 Groups,
                                 VarNames,
-                                _,
                                 VarIDs);
             for (Loop1 = 1; Loop1 <= NumVariables; ++Loop1) {
                 ObjexxFCL::gio::write(OutputFileDebug, "(1X,'RepVar,',I5,',',I5,',',A,',[',A,'],',A,',',A,',',A,',',I5)")
