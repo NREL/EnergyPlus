@@ -57,9 +57,9 @@
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
-#include <EnergyPlus/OutputFiles.hh>
 
 namespace EnergyPlus {
+class OutputFiles;
 
 // Derived class for Site:GroundTemperature:FCFactorMethod
 class SiteFCFactorMethodGroundTemps : public BaseGroundTempsModel
