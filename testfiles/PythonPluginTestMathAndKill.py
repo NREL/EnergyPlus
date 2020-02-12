@@ -2,7 +2,7 @@
 from pyenergyplus.plugin import EnergyPlusPlugin
 
 
-class AveragePMVAndTests(EnergyPlusPlugin):
+class AverageZoneTempAndTests(EnergyPlusPlugin):
 
     def __init__(self):
         super().__init__()
@@ -19,27 +19,41 @@ class AveragePMVAndTests(EnergyPlusPlugin):
         if not self.api.exchange.api_data_fully_ready():
             return 0
         if self.do_setup:
-            self.data["core_zone_pmv_handle"] = self.api.exchange.get_variable_handle(
-                "Zone Thermal Comfort Fanger Model PMV", "Core_ZN"
-            )
-            self.data["pmv_avg_handle"] = self.api.exchange.get_global_handle("PMVrunningAvg")
-            self.data["trend_handle"] = self.api.exchange.get_trend_handle("PMVtrendLog1")
+            self.data['h_zone_temp_var'] = self.api.exchange.get_global_handle('AverageZoneTemp')
+            self.data['h_zone_temp_running_avg'] = self.api.exchange.get_global_handle('RunningAveragedZoneTemp')
+            self.data["h_trend"] = self.api.exchange.get_trend_handle("ZoneTempTrend")
+            self.data['h_zone_temp'] = self.api.exchange.get_variable_handle('Zone Mean Air Temperature', 'Core_ZN')
+            self.data['count'] = 0
             self.do_setup = False
-        current_pmv = self.api.exchange.get_variable_value(self.data["core_zone_pmv_handle"])
-        self.api.exchange.set_global_value(self.data["pmv_avg_handle"], current_pmv)
-        self.do_trend_tests()
+        current_zone_temp = self.api.exchange.get_variable_value(self.data["h_zone_temp"])
+        self.api.exchange.set_global_value(self.data['h_zone_temp_var'], current_zone_temp)
+
+        if not self.do_trend_tests():
+            return 1
         if not self.do_curve_and_table_tests():
             return 1
         if not self.do_psychrometric_tests():
             return 1
-        trend_avg = self.api.exchange.get_trend_average(self.data["trend_handle"], 12)
-        self.api.exchange.set_global_value(self.data["pmv_avg_handle"], trend_avg)
-        if not self.kill_run_if_uncomfortable():
+        if not self.kill_run_later():
             return 1
         return 0
 
-    def do_trend_tests(self) -> None:
-        pass
+    def do_trend_tests(self) -> bool:
+        trend_avg = self.api.exchange.get_trend_average(self.data["h_trend"], 5)
+        self.api.exchange.set_global_value(self.data['h_zone_temp_running_avg'], trend_avg)
+        try:
+            trend_min = self.api.exchange.get_trend_min(self.data["h_trend"], 5)
+            trend_max = self.api.exchange.get_trend_max(self.data['h_trend'], 5)
+        except:
+            self.api.runtime.issue_severe("Problem getting trend min/max values, aborting")
+            return False
+        if trend_min > trend_max:
+            self.api.runtime.issue_severe("Trend problem, min greater than max, aborting")
+            return False
+        elif trend_min > trend_avg:
+            self.api.runtime.issue_severe('Trend problem, min greater than average, aborting')
+            return False
+        return True
         # EnergyManagementSystem:Subroutine,
         # DoTrendTests,            !- Name
         # Set p1 = @TrendValue PMVtrendLog1 1,  !- Program Line 1
@@ -107,13 +121,8 @@ class AveragePMVAndTests(EnergyPlusPlugin):
             return False
         return True
 
-    def kill_run_if_uncomfortable(self) -> bool:
-        current_value = self.api.exchange.get_global_value(self.data["pmv_avg_handle"])
-        print("Current value of PMV: " + str(current_value))
-        if current_value > 2.5:
-            self.api.runtime.issue_severe("Error -- PMV > 2.5")
-            return False
-        elif current_value < -1.3:
-            self.api.runtime.issue_severe("Error -- PMV < -1.3")
+    def kill_run_later(self) -> bool:
+        self.data['count'] += 1
+        if self.data['count'] > 8:
             return False
         return True

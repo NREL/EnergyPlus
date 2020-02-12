@@ -78,10 +78,12 @@ namespace PluginManagement {
     void clear_state();
 
     struct PluginInstance {
-        PluginInstance(std::string moduleName, std::string className, std::string emsName, bool runPluginDuringWarmup) :
-                moduleName(std::move(moduleName)), className(std::move(className)), emsAlias(std::move(emsName)), runDuringWarmup(runPluginDuringWarmup)
+        PluginInstance(std::string _moduleName, std::string _className, std::string emsName, bool runPluginDuringWarmup) :
+                emsAlias(std::move(emsName)), runDuringWarmup(runPluginDuringWarmup)
         {
-            this->stringIdentifier = moduleName + "." + className;
+            this->moduleName = _moduleName;
+            this->className = _className;
+            this->stringIdentifier = _moduleName + "." + _className;
         }
 
         // members

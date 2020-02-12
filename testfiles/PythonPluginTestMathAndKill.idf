@@ -6208,32 +6208,34 @@
 
   Output:Variable,*,Zone Mean Air Temperature,timestep;
 
-  Output:Variable,*,Weighted Average Building Zone Air Temperature,timestep;
-
-  Output:Variable,Core_ZN,Zone Thermal Comfort Fanger Model PMV,timestep;
-
   PythonPlugin:Instance,
-    AveragePMVAndTests,
+    AverageZoneTempAndTests,
     No,
     PythonPluginTestMathAndKill,
-    AveragePMVAndTests;
+    AverageZoneTempAndTests;
 
   PythonPlugin:Variables,
     PluginVars,
-    PMVrunningAvg;           !- Erl Variable 1 Name
+    AverageZoneTemp,         !- Variable 1 Name
+    RunningAveragedZoneTemp; !- Variable 2 Name
 
   PythonPlugin:TrendVariable,
-    PMVtrendLog1,            !- Name
-    PMVrunningAvg,           !- EMS Variable Name
-    300;                     !- Number of Timesteps to be Logged
+    ZoneTempTrend,           !- Name
+    AverageZoneTemp,         !- Variable Name
+    10;                      !- Number of Timesteps to be Logged
 
   PythonPlugin:OutputVariable,
-    Running Two Hour Average PMV,  !- Name
-    PMVrunningAvg,           !- EMS Variable Name
+    Average Zone Temperature,  !- Name
+    AverageZoneTemp,         !- EMS Variable Name
     Averaged,                !- Type of Data in Variable
-    ZoneTimeStep,            !- Update Frequency
-    PMVunits;                !- Units
+    ZoneTimeStep;            !- Update Frequency
 
-  Output:Variable,*,Running Two Hour Average PMV,timestep;
+  PythonPlugin:OutputVariable,
+    Running Average Zone Temp,  !- Name
+    RunningAveragedZoneTemp, !- EMS Variable Name
+    Averaged,                !- Type of Data in Variable
+    ZoneTimeStep;            !- Update Frequency
 
+  Output:Variable,*,Average Zone Temperature,timestep;
 
+  Output:Variable,*,Running Average Zone Temp,timestep;
