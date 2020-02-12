@@ -2508,7 +2508,7 @@
     For: AllDays,            !- Field 2
     Until: 24:00,1.0;        !- Field 3
 
-! Main Heating Coil 1 gets autosized to a UA of 56 W/K
+! Main Heating Coil 1 gets autosized to a UA of 144 W/K
   FaultModel:Fouling:Coil,
     Main Heating Coil 1 Fouling, !- Name
     Main Heating Coil 1,     !- Coil Name
@@ -2517,7 +2517,7 @@
     FouledUARated,           !- Fouling Input Method
     30.0;                    !- UAFouled {W/K}
 
-! Main Cooling Coil 1 reports a nominal UA of 2452 W/K
+! Main Cooling Coil 1 reports a nominal UA of 3005 W/K, Nominal Coil Surface Area of 30.48 m2
 ! Temporarily switch to 'FouledUARated' instead of 'FoulingFactor' for easier investigation
   FaultModel:Fouling:Coil,
     Main Cooling Coil 1 Fouling, !- Name
@@ -2528,7 +2528,7 @@
     500,                     !- UAFouled {W/K}
     0.0005,                  !- Water Side Fouling Factor {m2-K/W}
     0.0001,                  !- Air Side Fouling Factor {m2-K/W}
-    25.0,                    !- Outside Coil Surface Area {m2}
+    30.0,                    !- Outside Coil Surface Area {m2}
     0.1;                     !- Inside to Outside Coil Surface Area Ratio
 
 
