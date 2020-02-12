@@ -821,9 +821,8 @@ namespace HVACVariableRefrigerantFlow {
         );
 
         static Real64
-        HeatingCoilCapacityLimit(Real64 HeatCoilAirInletNode,  // supplemental heating coil air inlet node
-                                 Real64 HeatCoilAirOutletNode, // supplemental heating coil air outlet node
-                                 Real64 HeatCoilMaxSATAllowed  // supplemental heating coil maximum supply air temperature allowed [C]
+        HeatingCoilCapacityLimit(Real64 const HeatCoilAirInletNode, // supplemental heating coil air inlet node
+                                 Real64 const HeatCoilMaxSATAllowed // supplemental heating coil maximum supply air temperature allowed [C]
         );
     };
 
@@ -864,7 +863,7 @@ namespace HVACVariableRefrigerantFlow {
 
     void SetCompFlowRate(int VRFTUNum, int VRFCond, Optional_bool_const UseCurrentMode = _);
 
-    void SizeVRF(int VRFTUNum);
+    void SizeVRF(OutputFiles &outputFiles, int const VRFTUNum);
 
     void SimVRF(int VRFTUNum,
                 bool FirstHVACIteration,
