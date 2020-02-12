@@ -10,8 +10,7 @@
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 ! Basic file description:  1 story building divided into 4 exterior and one interior conditioned zones and return plenum.
 !
-! Highlights:              Electric chiller with air cooled condenser; autosized preheating and precooling water coils in the
-!                          outside air stream controlled to preheat and precool setpoints.
+! Highlights:              Electric chiller with air cooled condenser
 !
 ! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods (one week January and one July),
 !                          Run Control executes the run periods using the weather file
@@ -84,8 +83,7 @@
 ! HVAC:                           Standard VAV system with outside air, hot water reheat coils,
 !                                 central chilled water cooling coil. Central Plant is single hot water
 !                                 boiler, electric compression chiller with air cooled condenser.
-!                                 All equipment is autosized. HW and ChW coils are used in the outside air
-!                                 stream to precondition the outside air.
+!                                 All equipment is autosized.
 ! **HVAC Fouling**:               The VAV Central heating and cooling coils have `FaultModel:Fouling:Coil` objects.
 !                                 The Heating coil is fouled via the `FouledUARated` method, and the cooling coil
 !                                 via the `FoulingFactor` method
@@ -552,8 +550,6 @@
     Through: 12/31,          !- Field 1
     For: AllDays,            !- Field 2
     Until: 24:00,117.239997864; !- Field 3
-
-                             !- Field 4
 
   Schedule:Compact,
     ShadeTransSch,           !- Name
@@ -1919,63 +1915,17 @@
     For: AllOtherDays,       !- Field 9
     Until: 24:00,0.02;       !- Field 10
 
-  Schedule:Compact,
-    FanAvailSched,           !- Name
-    Fraction,                !- Schedule Type Limits Name
-    Through: 3/31,           !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,1.0,        !- Field 3
-    Through: 9/30,           !- Field 5
-    For: WeekDays,           !- Field 6
-    Until: 6:00,0.0,         !- Field 7
-    Until: 20:00,1.0,        !- Field 9
-    Until: 24:00,0.0,        !- Field 11
-    For: SummerDesignDay WinterDesignDay, !- Field 13
-    Until: 24:00,1.0,        !- Field 14
-    For: AllOtherDays,       !- Field 16
-    Until: 24:00,0.0,        !- Field 17
-    Through: 12/31,          !- Field 19
-    For: AllDays,            !- Field 20
-    Until: 24:00,1.0;        !- Field 21
+  ScheduleTypeLimits,
+    OnOff,                   !- Name
+    0,                       !- Lower Limit Value {BasedOnField A3}
+    1,                       !- Upper Limit Value {BasedOnField A3}
+    Discrete,                !- Numeric Type
+    availability;            !- Unit Type
 
-  Schedule:Compact,
-    CoolingCoilAvailSched,   !- Name
-    Fraction,                !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: WeekDays,           !- Field 2
-    Until: 6:00,0.0,         !- Field 3
-    Until: 20:00,1.0,        !- Field 5
-    Until: 24:00,0.0,        !- Field 7
-    For: SummerDesignDay WinterDesignDay, !- Field 9
-    Until: 24:00,1.0,        !- Field 10
-    For: AllOtherDays,       !- Field 12
-    Until: 24:00,0.0;        !- Field 13
-
-  Schedule:Compact,
-    CoolingPumpAvailSched,   !- Name
-    Fraction,                !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,1.0;        !- Field 3
-
-  Schedule:Compact,
-    ReheatCoilAvailSched,    !- Name
-    Fraction,                !- Schedule Type Limits Name
-    Through: 3/31,           !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,1.0,        !- Field 3
-    Through: 9/30,           !- Field 5
-    For: WeekDays,           !- Field 6
-    Until: 6:00,0.0,         !- Field 7
-    Until: 20:00,1.0,        !- Field 9
-    Until: 24:00,0.0,        !- Field 11
-    For: SummerDesignDay WinterDesignDay, !- Field 13
-    Until: 24:00,1.0,        !- Field 14
-    For: AllOtherDays,       !- Field 16
-    Until: 24:00,0.0,        !- Field 17
-    Through: 12/31,          !- Field 19
-    For: AllDays,            !- Field 20
-    Until: 24:00,1.0;        !- Field 21
+  Schedule:Constant,
+    Always On Discrete,      !- Name
+    OnOff,                   !- Schedule Type Limits Name
+    1;                       !- Hourly Value
 
   Schedule:Compact,
     CW Loop Temp Schedule,   !- Name
@@ -1992,13 +1942,6 @@
     Until: 24:00,82;         !- Field 3
 
   Schedule:Compact,
-    PlantOnSched,            !- Name
-    Fraction,                !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,1.0;        !- Field 3
-
-  Schedule:Compact,
     Seasonal Reset Supply Air Temp Sch,  !- Name
     Temperature,             !- Schedule Type Limits Name
     Through: 3/31,           !- Field 1
@@ -2010,20 +1953,6 @@
     Through: 12/31,          !- Field 9
     For: AllDays,            !- Field 10
     Until: 24:00,16.0;       !- Field 11
-
-  Schedule:Compact,
-    OA Cooling Supply Air Temp Sch,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,11.5;       !- Field 3
-
-  Schedule:Compact,
-    OA Heating Supply Air Temp Sch,  !- Name
-    Temperature,             !- Schedule Type Limits Name
-    Through: 12/31,          !- Field 1
-    For: AllDays,            !- Field 2
-    Until: 24:00,4.5;        !- Field 3
 
   OutdoorAir:NodeList,
     OutsideAirInletNodes;    !- Node or NodeList Name 1
@@ -2230,7 +2159,7 @@
 
   AirTerminal:SingleDuct:VAV:Reheat,
     SPACE1-1 VAV Reheat,     !- Name
-    ReheatCoilAvailSched,    !- Availability Schedule Name
+    Always On Discrete,      !- Availability Schedule Name
     SPACE1-1 Zone Coil Air In Node,  !- Damper Air Outlet Node Name
     SPACE1-1 ATU In Node,    !- Air Inlet Node Name
     autosize,                !- Maximum Air Flow Rate {m3/s}
@@ -2250,7 +2179,7 @@
 
   AirTerminal:SingleDuct:VAV:Reheat,
     SPACE2-1 VAV Reheat,     !- Name
-    ReheatCoilAvailSched,    !- Availability Schedule Name
+    Always On Discrete,      !- Availability Schedule Name
     SPACE2-1 Zone Coil Air In Node,  !- Damper Air Outlet Node Name
     SPACE2-1 ATU In Node,    !- Air Inlet Node Name
     autosize,                !- Maximum Air Flow Rate {m3/s}
@@ -2270,7 +2199,7 @@
 
   AirTerminal:SingleDuct:VAV:Reheat,
     SPACE3-1 VAV Reheat,     !- Name
-    ReheatCoilAvailSched,    !- Availability Schedule Name
+    Always On Discrete,      !- Availability Schedule Name
     SPACE3-1 Zone Coil Air In Node,  !- Damper Air Outlet Node Name
     SPACE3-1 ATU In Node,    !- Air Inlet Node Name
     autosize,                !- Maximum Air Flow Rate {m3/s}
@@ -2290,7 +2219,7 @@
 
   AirTerminal:SingleDuct:VAV:Reheat,
     SPACE4-1 VAV Reheat,     !- Name
-    ReheatCoilAvailSched,    !- Availability Schedule Name
+    Always On Discrete,      !- Availability Schedule Name
     SPACE4-1 Zone Coil Air In Node,  !- Damper Air Outlet Node Name
     SPACE4-1 ATU In Node,    !- Air Inlet Node Name
     autosize,                !- Maximum Air Flow Rate {m3/s}
@@ -2310,7 +2239,7 @@
 
   AirTerminal:SingleDuct:VAV:Reheat,
     SPACE5-1 VAV Reheat,     !- Name
-    ReheatCoilAvailSched,    !- Availability Schedule Name
+    Always On Discrete,      !- Availability Schedule Name
     SPACE5-1 Zone Coil Air In Node,  !- Damper Air Outlet Node Name
     SPACE5-1 ATU In Node,    !- Air Inlet Node Name
     autosize,                !- Maximum Air Flow Rate {m3/s}
@@ -2330,7 +2259,7 @@
 
   Coil:Heating:Water,
     SPACE1-1 Zone Coil,      !- Name
-    ReheatCoilAvailSched,    !- Availability Schedule Name
+    Always On Discrete,      !- Availability Schedule Name
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize,                !- Maximum Water Flow Rate {m3/s}
     SPACE1-1 Zone Coil Water In Node,  !- Water Inlet Node Name
@@ -2348,7 +2277,7 @@
 
   Coil:Heating:Water,
     SPACE2-1 Zone Coil,      !- Name
-    ReheatCoilAvailSched,    !- Availability Schedule Name
+    Always On Discrete,      !- Availability Schedule Name
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize,                !- Maximum Water Flow Rate {m3/s}
     SPACE2-1 Zone Coil Water In Node,  !- Water Inlet Node Name
@@ -2366,7 +2295,7 @@
 
   Coil:Heating:Water,
     SPACE3-1 Zone Coil,      !- Name
-    ReheatCoilAvailSched,    !- Availability Schedule Name
+    Always On Discrete,      !- Availability Schedule Name
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize,                !- Maximum Water Flow Rate {m3/s}
     SPACE3-1 Zone Coil Water In Node,  !- Water Inlet Node Name
@@ -2384,7 +2313,7 @@
 
   Coil:Heating:Water,
     SPACE4-1 Zone Coil,      !- Name
-    ReheatCoilAvailSched,    !- Availability Schedule Name
+    Always On Discrete,      !- Availability Schedule Name
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize,                !- Maximum Water Flow Rate {m3/s}
     SPACE4-1 Zone Coil Water In Node,  !- Water Inlet Node Name
@@ -2402,7 +2331,7 @@
 
   Coil:Heating:Water,
     SPACE5-1 Zone Coil,      !- Name
-    ReheatCoilAvailSched,    !- Availability Schedule Name
+    Always On Discrete,      !- Availability Schedule Name
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize,                !- Maximum Water Flow Rate {m3/s}
     SPACE5-1 Zone Coil Water In Node,  !- Water Inlet Node Name
@@ -2477,7 +2406,7 @@
 
   AvailabilityManager:Scheduled,
     VAV Sys 1 Avail,         !- Name
-    FanAvailSched;           !- Schedule Name
+    Always On Discrete;           !- Schedule Name
 
   BranchList,
     VAV Sys 1 Branches,      !- Name
@@ -2512,68 +2441,23 @@
   AirLoopHVAC:ControllerList,
     OA Sys 1 Controllers,    !- Name
     Controller:OutdoorAir,   !- Controller 1 Object Type
-    OA Controller 1,         !- Controller 1 Name
-    Controller:WaterCoil,    !- Controller 2 Object Type
-    OA CC Controller 1,      !- Controller 2 Name
-    Controller:WaterCoil,    !- Controller 3 Object Type
-    OA HC Controller 1;      !- Controller 3 Name
+    OA Controller 1;         !- Controller 1 Name
 
   AirLoopHVAC:OutdoorAirSystem:EquipmentList,
     OA Sys 1 Equipment,      !- Name
-    Coil:Heating:Water,      !- Component 1 Object Type
-    OA Heating Coil 1,       !- Component 1 Name
-    Coil:Cooling:Water,      !- Component 2 Object Type
-    OA Cooling Coil 1,       !- Component 2 Name
-    OutdoorAir:Mixer,        !- Component 3 Object Type
-    OA Mixing Box 1;         !- Component 3 Name
-
-  Coil:Heating:Water,
-    OA Heating Coil 1,       !- Name
-    CoolingCoilAvailSched,   !- Availability Schedule Name
-    autosize,                !- U-Factor Times Area Value {W/K}
-    autosize,                !- Maximum Water Flow Rate {m3/s}
-    OA Heating Coil 1 Water Inlet Node,  !- Water Inlet Node Name
-    OA Heating Coil 1 Water Outlet Node,  !- Water Outlet Node Name
-    Outside Air Inlet Node 1,!- Air Inlet Node Name
-    OA Heating Coil 1 Air Outlet Node,  !- Air Outlet Node Name
-    UFactorTimesAreaAndDesignWaterFlowRate,  !- Performance Input Method
-    autosize,                !- Rated Capacity {W}
-    82.2,                    !- Rated Inlet Water Temperature {C}
-    16.6,                    !- Rated Inlet Air Temperature {C}
-    71.1,                    !- Rated Outlet Water Temperature {C}
-    32.2,                    !- Rated Outlet Air Temperature {C}
-    ,                        !- Rated Ratio for Air and Water Convection
-    11;                      !- Design Water Temperature Difference {deltaC}
-
-  Coil:Cooling:Water,
-    OA Cooling Coil 1,       !- Name
-    CoolingCoilAvailSched,   !- Availability Schedule Name
-    autosize,                !- Design Water Flow Rate {m3/s}
-    autosize,                !- Design Air Flow Rate {m3/s}
-    autosize,                !- Design Inlet Water Temperature {C}
-    autosize,                !- Design Inlet Air Temperature {C}
-    autosize,                !- Design Outlet Air Temperature {C}
-    autosize,                !- Design Inlet Air Humidity Ratio {kgWater/kgDryAir}
-    autosize,                !- Design Outlet Air Humidity Ratio {kgWater/kgDryAir}
-    OA Cooling Coil 1 Water Inlet Node,  !- Water Inlet Node Name
-    OA Cooling Coil 1 Water Outlet Node,  !- Water Outlet Node Name
-    OA Heating Coil 1 Air Outlet Node,  !- Air Inlet Node Name
-    OA Mixing Box 1 Inlet Node,  !- Air Outlet Node Name
-    SimpleAnalysis,          !- Type of Analysis
-    CrossFlow,               !- Heat Exchanger Configuration
-    ,                        !- Condensate Collection Water Storage Tank Name
-    4.0;                     !- Design Water Temperature Difference {deltaC}
+    OutdoorAir:Mixer,        !- Component 1 Object Type
+    OA Mixing Box 1;         !- Component 1 Name
 
   OutdoorAir:Mixer,
     OA Mixing Box 1,         !- Name
     Mixed Air Node 1,        !- Mixed Air Node Name
-    OA Mixing Box 1 Inlet Node,  !- Outdoor Air Stream Node Name
+    Outside Air Inlet Node 1,!- Outdoor Air Stream Node Name
     Relief Air Outlet Node 1,!- Relief Air Stream Node Name
     VAV Sys 1 Inlet Node;    !- Return Air Stream Node Name
 
   Coil:Cooling:Water,
     Main Cooling Coil 1,     !- Name
-    CoolingCoilAvailSched,   !- Availability Schedule Name
+    Always On Discrete,      !- Availability Schedule Name
     autosize,                !- Design Water Flow Rate {m3/s}
     autosize,                !- Design Air Flow Rate {m3/s}
     autosize,                !- Design Inlet Water Temperature {C}
@@ -2592,7 +2476,7 @@
 
   Coil:Heating:Water,
     Main Heating Coil 1,     !- Name
-    ReheatCoilAvailSched,    !- Availability Schedule Name
+    Always On Discrete,      !- Availability Schedule Name
     autosize,                !- U-Factor Times Area Value {W/K}
     autosize,                !- Maximum Water Flow Rate {m3/s}
     Main Heating Coil 1 Water Inlet Node,  !- Water Inlet Node Name
@@ -2650,7 +2534,7 @@
 
   Fan:VariableVolume,
     Supply Fan 1,            !- Name
-    FanAvailSched,           !- Availability Schedule Name
+    Always On Discrete,      !- Availability Schedule Name
     0.7,                     !- Fan Total Efficiency
     600.0,                   !- Pressure Rise {Pa}
     autosize,                !- Maximum Flow Rate {m3/s}
@@ -2666,28 +2550,6 @@
     0.000,                   !- Fan Power Coefficient 5
     Main Heating Coil 1 Outlet Node,  !- Air Inlet Node Name
     VAV Sys 1 Outlet Node;   !- Air Outlet Node Name
-
-  Controller:WaterCoil,
-    OA HC Controller 1,      !- Name
-    Temperature,             !- Control Variable
-    Normal,                  !- Action
-    FLOW,                    !- Actuator Variable
-    OA Heating Coil 1 Air Outlet Node,  !- Sensor Node Name
-    OA Heating Coil 1 Water Inlet Node,  !- Actuator Node Name
-    0.002,                   !- Controller Convergence Tolerance {deltaC}
-    autosize,                !- Maximum Actuated Flow {m3/s}
-    0.0;                     !- Minimum Actuated Flow {m3/s}
-
-  Controller:WaterCoil,
-    OA CC Controller 1,      !- Name
-    Temperature,             !- Control Variable
-    Reverse,                 !- Action
-    FLOW,                    !- Actuator Variable
-    OA Mixing Box 1 Inlet Node,  !- Sensor Node Name
-    OA Cooling Coil 1 Water Inlet Node,  !- Actuator Node Name
-    0.002,                   !- Controller Convergence Tolerance {deltaC}
-    autosize,                !- Maximum Actuated Flow {m3/s}
-    0.0;                     !- Minimum Actuated Flow {m3/s}
 
   Controller:WaterCoil,
     Central Cooling Coil Controller 1,  !- Name
@@ -2735,18 +2597,6 @@
     Temperature,             !- Control Variable
     Seasonal Reset Supply Air Temp Sch,  !- Schedule Name
     VAV Sys 1 Outlet Node;   !- Setpoint Node or NodeList Name
-
-  SetpointManager:Scheduled,
-    OA Air Temp Manager 1,   !- Name
-    Temperature,             !- Control Variable
-    OA Cooling Supply Air Temp Sch,  !- Schedule Name
-    OA Mixing Box 1 Inlet Node;  !- Setpoint Node or NodeList Name
-
-  SetpointManager:Scheduled,
-    OA Air Temp Manager 2,   !- Name
-    Temperature,             !- Control Variable
-    OA Heating Supply Air Temp Sch,  !- Schedule Name
-    OA Heating Coil 1 Air Outlet Node;  !- Setpoint Node or NodeList Name
 
   SetpointManager:MixedAir,
     Mixed Air Temp Manager 1,!- Name
@@ -2853,10 +2703,9 @@
     SPACE3-1 Reheat Branch,  !- Branch 4 Name
     SPACE4-1 Reheat Branch,  !- Branch 5 Name
     SPACE5-1 Reheat Branch,  !- Branch 6 Name
-    OA Heating Coil Branch,  !- Branch 7 Name
-    Main Heating Coil 1 Branch,  !- Branch 8 Name
-    Heating Demand Bypass Branch,  !- Branch 9 Name
-    Heating Demand Outlet Branch;  !- Branch 10 Name
+    Main Heating Coil 1 Branch,  !- Branch 7 Name
+    Heating Demand Bypass Branch,  !- Branch 8 Name
+    Heating Demand Outlet Branch;  !- Branch 9 Name
 
   ConnectorList,
     Heating Demand Side Connectors,  !- Name
@@ -2932,14 +2781,6 @@
     SPACE5-1 Zone Coil Water Out Node;  !- Component 1 Outlet Node Name
 
   Branch,
-    OA Heating Coil Branch,  !- Name
-    ,                        !- Pressure Drop Curve Name
-    Coil:Heating:Water,      !- Component 1 Object Type
-    OA Heating Coil 1,       !- Component 1 Name
-    OA Heating Coil 1 Water Inlet Node,  !- Component 1 Inlet Node Name
-    OA Heating Coil 1 Water Outlet Node;  !- Component 1 Outlet Node Name
-
-  Branch,
     Main Heating Coil 1 Branch,  !- Name
     ,                        !- Pressure Drop Curve Name
     Coil:Heating:Water,      !- Component 1 Object Type
@@ -2968,9 +2809,8 @@
     SPACE3-1 Reheat Branch,  !- Outlet Branch 3 Name
     SPACE4-1 Reheat Branch,  !- Outlet Branch 4 Name
     SPACE5-1 Reheat Branch,  !- Outlet Branch 5 Name
-    OA Heating Coil Branch,  !- Outlet Branch 6 Name
-    Main Heating Coil 1 Branch,  !- Outlet Branch 7 Name
-    Heating Demand Bypass Branch;  !- Outlet Branch 8 Name
+    Main Heating Coil 1 Branch,  !- Outlet Branch 6 Name
+    Heating Demand Bypass Branch;  !- Outlet Branch 7 Name
 
   Connector:Mixer,
     Heating Demand Mixer,    !- Name
@@ -2980,9 +2820,8 @@
     SPACE3-1 Reheat Branch,  !- Inlet Branch 3 Name
     SPACE4-1 Reheat Branch,  !- Inlet Branch 4 Name
     SPACE5-1 Reheat Branch,  !- Inlet Branch 5 Name
-    OA Heating Coil Branch,  !- Inlet Branch 6 Name
-    Main Heating Coil 1 Branch,  !- Inlet Branch 7 Name
-    Heating Demand Bypass Branch;  !- Inlet Branch 8 Name
+    Main Heating Coil 1 Branch,  !- Inlet Branch 6 Name
+    Heating Demand Bypass Branch;  !- Inlet Branch 7 Name
 
   Connector:Splitter,
     Heating Supply Splitter, !- Name
@@ -3000,7 +2839,7 @@
     Hot Loop Operation,      !- Name
     PlantEquipmentOperation:HeatingLoad,  !- Control Scheme 1 Object Type
     Central Boiler Only,     !- Control Scheme 1 Name
-    PlantOnSched;            !- Control Scheme 1 Schedule Name
+    Always On Discrete;            !- Control Scheme 1 Schedule Name
 
   PlantEquipmentOperation:HeatingLoad,
     Central Boiler Only,     !- Name
@@ -3090,7 +2929,7 @@
     CW Low Temp Limit,       !- Name
     Outside Air Inlet Node 1,!- Sensor Node Name
     2.0,                     !- Temperature {C}
-    CoolingPumpAvailSched;   !- Applicability Schedule Name
+    Always On Discrete;   !- Applicability Schedule Name
 
   SetpointManager:Scheduled,
     Chilled Water Loop Setpoint Manager,  !- Name
@@ -3109,9 +2948,8 @@
     Cooling Demand Side Branches,  !- Name
     Cooling Demand Inlet,    !- Branch 1 Name
     Cooling Coil Branch,     !- Branch 2 Name
-    OA Cooling Coil Branch,  !- Branch 3 Name
-    Cooling Demand Bypass Branch,  !- Branch 4 Name
-    Cooling Demand Outlet;   !- Branch 5 Name
+    Cooling Demand Bypass Branch,  !- Branch 3 Name
+    Cooling Demand Outlet;   !- Branch 4 Name
 
   ConnectorList,
     Cooling Supply Side Connectors,  !- Name
@@ -3147,14 +2985,6 @@
     Main Cooling Coil 1,     !- Component 1 Name
     Main Cooling Coil 1 Water Inlet Node,  !- Component 1 Inlet Node Name
     Main Cooling Coil 1 Water Outlet Node;  !- Component 1 Outlet Node Name
-
-  Branch,
-    OA Cooling Coil Branch,  !- Name
-    ,                        !- Pressure Drop Curve Name
-    Coil:Cooling:Water,      !- Component 1 Object Type
-    OA Cooling Coil 1,       !- Component 1 Name
-    OA Cooling Coil 1 Water Inlet Node,  !- Component 1 Inlet Node Name
-    OA Cooling Coil 1 Water Outlet Node;  !- Component 1 Outlet Node Name
 
   Branch,
     Cooling Demand Bypass Branch,  !- Name
@@ -3240,21 +3070,19 @@
     CW Demand Splitter,      !- Name
     Cooling Demand Inlet,    !- Inlet Branch Name
     Cooling Coil Branch,     !- Outlet Branch 1 Name
-    OA Cooling Coil Branch,  !- Outlet Branch 2 Name
-    Cooling Demand Bypass Branch;  !- Outlet Branch 3 Name
+    Cooling Demand Bypass Branch;  !- Outlet Branch 2 Name
 
   Connector:Mixer,
     CW Demand Mixer,         !- Name
     Cooling Demand Outlet,   !- Outlet Branch Name
     Cooling Coil Branch,     !- Inlet Branch 1 Name
-    OA Cooling Coil Branch,  !- Inlet Branch 2 Name
-    Cooling Demand Bypass Branch;  !- Inlet Branch 3 Name
+    Cooling Demand Bypass Branch;  !- Inlet Branch 2 Name
 
   PlantEquipmentOperationSchemes,
     CW Loop Operation,       !- Name
     PlantEquipmentOperation:CoolingLoad,  !- Control Scheme 1 Object Type
     Central Chiller Only,    !- Control Scheme 1 Name
-    PlantOnSched;            !- Control Scheme 1 Schedule Name
+    Always On Discrete;      !- Control Scheme 1 Schedule Name
 
   PlantEquipmentOperation:CoolingLoad,
     Central Chiller Only,    !- Name
@@ -3321,7 +3149,7 @@
     0,                       !- Coefficient 4 of the Part Load Performance Curve
     0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT,            !- Pump Control Type
-    CoolingPumpAvailSched;   !- Pump Flow Rate Schedule Name
+    Always On Discrete;      !- Pump Flow Rate Schedule Name
 
 
   Output:Variable,Main Heating Coil 1,Heating Coil U Factor Times Area Value,Detailed;
