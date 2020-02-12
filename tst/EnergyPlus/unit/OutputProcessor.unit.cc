@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
@@ -2296,7 +2297,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
 
         NumOfReqVariables = inputProcessor->getNumObjectsFound("Output:Variable");
 
@@ -2351,7 +2352,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
 
         auto const keyed_value = "ENVIRONMENT";
         auto const var_name = "SITE OUTDOOR AIR DRYBULB TEMPERATURE";
@@ -2440,7 +2441,7 @@ namespace OutputProcessor {
         EXPECT_EQ(OutputReportTabular::MonthlyInputCount, 1);
         OutputReportTabular::InitializeTabularMonthly();
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
 
         NumExtraVars = 0;
         BuildKeyVarList("LIVING", "ZONE TOTAL INTERNAL LATENT GAIN RATE", 1, 3);
@@ -2497,7 +2498,7 @@ namespace OutputProcessor {
         EXPECT_EQ(OutputReportTabular::MonthlyInputCount, 1);
         OutputReportTabular::InitializeTabularMonthly();
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
 
         NumExtraVars = 0;
         BuildKeyVarList("LIVING1", "ZONE TOTAL INTERNAL LATENT GAIN RATE", 1, 2);
@@ -2522,7 +2523,7 @@ namespace OutputProcessor {
 
         InitializeOutput();
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
 
         auto const var_name = "Site Outdoor Air Drybulb Temperature";
 
@@ -2658,7 +2659,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
         SetupOutputVariable("Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average",
                             "Environment");
 
@@ -2691,7 +2692,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
         Real64 fuel_used = 999;
         SetupOutputVariable("Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1");
         SetupOutputVariable("Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler2");
@@ -2722,7 +2723,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
         Real64 fuel_used = 999;
         SetupOutputVariable("Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1");
         SetupOutputVariable("Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler2");
@@ -2751,7 +2752,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
         Real64 fuel_used = 999;
         SetupOutputVariable("Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1");
         SetupOutputVariable("Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler2");
@@ -2782,7 +2783,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
         Real64 vol_flow = 999;
         SetupOutputVariable("AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average",
                             "Zn003:Wall001");
@@ -2823,7 +2824,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
         Real64 vol_flow = 999;
         SetupOutputVariable("AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average",
                             "ZN003:WALL001");
@@ -2873,7 +2874,7 @@ namespace OutputProcessor {
 
         InitializeOutput();
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
         CheckReportVariable(keyed_value, var_name);
 
         EXPECT_EQ(5, NumOfReqVariables);
@@ -3109,7 +3110,7 @@ namespace OutputProcessor {
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
         SetupOutputVariable("Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average",
                             "Environment");
         Real64 light_consumption = 999;
@@ -3293,7 +3294,7 @@ namespace OutputProcessor {
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
         SetupOutputVariable("Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average",
                             "Environment");
         Real64 light_consumption = 999;
@@ -3490,7 +3491,7 @@ namespace OutputProcessor {
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
         SetupOutputVariable("Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average",
                             "Environment");
         Real64 light_consumption = 999;
@@ -3636,7 +3637,7 @@ namespace OutputProcessor {
 
         ReportOutputFileHeaders();
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
         Array1D<ZonePurchasedAir> PurchAir; // Used to specify purchased air parameters
         PurchAir.allocate(1);
         SetupOutputVariable("Zone Ideal Loads Supply Air Total Heating Energy", OutputProcessor::Unit::J, PurchAir(1).TotHeatEnergy, "System", "Sum",
@@ -3760,7 +3761,7 @@ namespace OutputProcessor {
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
         SetupOutputVariable("Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average",
                             "Environment");
         Real64 light_consumption = 999;
@@ -3829,7 +3830,7 @@ namespace OutputProcessor {
         OutputReportTabular::GetInputTabularMonthly();
         OutputReportTabular::InitializeTabularMonthly();
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
         SetupOutputVariable("Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average",
                             "Environment");
         Real64 light_consumption = 999;

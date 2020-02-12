@@ -102,7 +102,7 @@ private:
 
 extern std::unique_ptr<HVACSizingSimulationManager> hvacSizingSimulationManager;
 
-void ManageHVACSizingSimulation(bool &ErrorsFound);
+void ManageHVACSizingSimulation(OutputFiles &outputFiles, bool &ErrorsFound);
 
 } // namespace EnergyPlus
 

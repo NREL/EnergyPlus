@@ -2176,7 +2176,7 @@ namespace ConductionTransferFunctionCalc {
 
                 if (!Construct(ThisNum).IsUsedCTF) continue;
 
-                static constexpr auto Format_700{" Construction CTF,{},{:4},{:4},{:4},{:8.3F},{:15.4T},{:8.3F},{:8.3F},{:8.3F},{:8.3F},{}\n"};
+                static constexpr auto Format_700{" Construction CTF,{},{:4},{:4},{:4},{:8.3F},{:15.4N},{:8.3F},{:8.3F},{:8.3F},{:8.3F},{}\n"};
                 print(outputFiles.eio,
                       Format_700,
                       Construct(ThisNum).Name,
@@ -2196,10 +2196,10 @@ namespace ConductionTransferFunctionCalc {
                     {
                         auto const SELECT_CASE_var(Material(Layer).Group);
                         if (SELECT_CASE_var == Air) {
-                            static constexpr auto Format_702(" Material:Air,{},{:12.4T}\n");
+                            static constexpr auto Format_702(" Material:Air,{},{:12.4N}\n");
                             print(outputFiles.eio, Format_702, Material(Layer).Name, Material(Layer).Resistance);
                         } else {
-                            static constexpr auto Format_701(" Material CTF Summary,{},{:8.4F},{:14.3F},{:11.3F},{:13.3F},{:12.4T}\n");
+                            static constexpr auto Format_701(" Material CTF Summary,{},{:8.4F},{:14.3F},{:11.3F},{:13.3F},{:12.4N}\n");
                             print(outputFiles.eio,
                                   Format_701,
                                   Material(Layer).Name,
@@ -2214,7 +2214,7 @@ namespace ConductionTransferFunctionCalc {
 
                 for (I = Construct(ThisNum).NumCTFTerms; I >= 0; --I) {
                     if (I != 0) {
-                        static constexpr auto Format_703(" CTF,{:4},{:20.8T},{:20.8T},{:20.8T},{:20.8T}\n");
+                        static constexpr auto Format_703(" CTF,{:4},{:20.8N},{:20.8N},{:20.8N},{:20.8N}\n");
                         print(outputFiles.eio,
                               Format_703,
                               I,
@@ -2223,7 +2223,7 @@ namespace ConductionTransferFunctionCalc {
                               Construct(ThisNum).CTFInside(I),
                               Construct(ThisNum).CTFFlux(I));
                     } else {
-                        static constexpr auto Format_704(" CTF,{:4},{:20.8T},{:20.8T},{:20.8T}\n");
+                        static constexpr auto Format_704(" CTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
                         print(outputFiles.eio,
                               Format_704,
                               I,
@@ -2236,12 +2236,12 @@ namespace ConductionTransferFunctionCalc {
                 if (Construct(ThisNum).SourceSinkPresent) {
                     // QTFs...
                     for (I = Construct(ThisNum).NumCTFTerms; I >= 0; --I) {
-                        static constexpr auto Format_705(" QTF,{:4},{:20.8T},{:20.8T}\n");
+                        static constexpr auto Format_705(" QTF,{:4},{:20.8N},{:20.8N}\n");
                         print(outputFiles.eio, Format_705, I, Construct(ThisNum).CTFSourceOut(I), Construct(ThisNum).CTFSourceIn(I));
                     }
                     // QTFs for source/sink location temperature calculation...
                     for (I = Construct(ThisNum).NumCTFTerms; I >= 0; --I) {
-                        static constexpr auto Format_706(" Source/Sink Loc Internal Temp QTF,{:4},{:20.8T},{:20.8T},{:20.8T}\n");
+                        static constexpr auto Format_706(" Source/Sink Loc Internal Temp QTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
                         print(outputFiles.eio,
                               Format_706,
                               I,
@@ -2252,7 +2252,7 @@ namespace ConductionTransferFunctionCalc {
                     if (Construct(ThisNum).TempAfterLayer != 0) {
                         // QTFs for user specified interior temperature calculation...
                         for (I = Construct(ThisNum).NumCTFTerms; I >= 0; --I) {
-                            static constexpr auto Format_707(" User Loc Internal Temp QTF,{:4},{:20.8T},{:20.8T},{:20.8T}\n");
+                            static constexpr auto Format_707(" User Loc Internal Temp QTF,{:4},{:20.8N},{:20.8N},{:20.8N}\n");
                             print(outputFiles.eio,
                                   Format_707,
                                   I,

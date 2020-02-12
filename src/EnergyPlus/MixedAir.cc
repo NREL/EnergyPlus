@@ -91,6 +91,7 @@
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
@@ -150,7 +151,6 @@ namespace MixedAir {
     using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DoZoneSizing;
     using DataGlobals::NumOfZones;
-    using DataGlobals::OutputFileInits;
     using DataGlobals::ScheduleAlwaysOn;
     using DataGlobals::SysSizingCalc;
     using namespace DataEnvironment;
@@ -904,7 +904,7 @@ namespace MixedAir {
         int OAControllerNum;
 
         if ((GetOAControllerInputFlag) && (AirLoopNum > 0)) { // Gets input for object  first time Sim routine is called from an airloop
-            GetOAControllerInputs();
+            GetOAControllerInputs(OutputFiles::getSingleton());
             GetOAControllerInputFlag = false;
         }
 
@@ -1297,7 +1297,7 @@ namespace MixedAir {
         GetOASysInputFlag = false;
     }
 
-    void GetOAControllerInputs()
+    void GetOAControllerInputs(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1369,10 +1369,7 @@ namespace MixedAir {
         int i;
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_700(
-            "('!<Controller:MechanicalVentilation>,Name,Availability Schedule Name,Demand Controlled Ventilation "
-            "{Yes/No},','System Outdoor Air Method,Zone Maximum Outdoor Air Fraction,Number of Zones,Zone Name,DSOA "
-            "Name,DSZAD Name')");
+
         static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // First, call other get input routines in this module to make sure data is filled during this routine.
@@ -1970,109 +1967,59 @@ namespace MixedAir {
             }
 
             // write to .eio file
-            ObjexxFCL::gio::write(OutputFileInits, Format_700);
+            static constexpr auto Format_700(
+                "!<Controller:MechanicalVentilation>,Name,Availability Schedule Name,Demand Controlled Ventilation "
+                "{Yes/No},System Outdoor Air Method,Zone Maximum Outdoor Air Fraction,Number of Zones,Zone Name,DSOA "
+                "Name,DSZAD Name");
+            print(outputFiles.eio, "{}\n", Format_700);
             for (VentMechNum = 1; VentMechNum <= NumVentMechControllers; ++VentMechNum) {
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("NO");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << " Controller:MechanicalVentilation," +
-                                                                               VentilationMechanical(VentMechNum).Name + ',' +
-                                                                               VentilationMechanical(VentMechNum).SchName + ',';
-                }
+                print(outputFiles.eio,
+                      " Controller:MechanicalVentilation,{},{},",
+                      VentilationMechanical(VentMechNum).Name,
+                      VentilationMechanical(VentMechNum).SchName);
+
                 if (VentilationMechanical(VentMechNum).DCVFlag) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "Yes,";
-                    }
+                    print(outputFiles.eio, "Yes,");
                 } else {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "No,";
-                    }
+                    print(outputFiles.eio, "No,");
                 }
+
                 if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ZoneSum) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "ZoneSum,";
-                    }
+                    print(outputFiles.eio, "ZoneSum,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_VRP) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "VentilationRateProcedure,";
-                    }
+                    print(outputFiles.eio, "VentilationRateProcedure,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_IAQP) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "IndoorAirQualityProcedure,";
-                    }
+                    print(outputFiles.eio, "IndoorAirQualityProcedure,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ProportionalControlSchOcc) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "ProportionalControlBasedonOccupancySchedule,";
-                    }
+                    print(outputFiles.eio, "ProportionalControlBasedonOccupancySchedule,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ProportionalControlDesOcc) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "ProportionalControlBasedOnDesignOccupancy,";
-                    }
+                    print(outputFiles.eio, "ProportionalControlBasedOnDesignOccupancy,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ProportionalControlDesOARate) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "ProportionalControlBasedOnDesignOARate,";
-                    }
+                    print(outputFiles.eio, "ProportionalControlBasedOnDesignOARate,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_IAQPGC) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "IndoorAirQualityGenericContaminant,";
-                    }
+                    print(outputFiles.eio, "IndoorAirQualityGenericContaminant,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_IAQPCOM) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "IndoorAirQualityProcedureCombined,";
-                    }
+                    print(outputFiles.eio, "IndoorAirQualityProcedureCombined,");
                 } else {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "Invalid/Unknown,";
-                    }
+                    print(outputFiles.eio, "Invalid/Unknown,");
                 }
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("NO");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags)
-                        << RoundSigDigits(VentilationMechanical(VentMechNum).ZoneMaxOAFraction, 2) + ',';
-                }
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("NO");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags)
-                        << RoundSigDigits(VentilationMechanical(VentMechNum).NumofVentMechZones) + ',';
-                }
+
+                print(outputFiles.eio, "{:.2R},", VentilationMechanical(VentMechNum).ZoneMaxOAFraction);
+                print(outputFiles.eio, "{},", VentilationMechanical(VentMechNum).NumofVentMechZones);
+
                 for (jZone = 1; jZone <= VentilationMechanical(VentMechNum).NumofVentMechZones; ++jZone) {
                     if (jZone < VentilationMechanical(VentMechNum).NumofVentMechZones) {
-                        {
-                            IOFlags flags;
-                            flags.ADVANCE("NO");
-                            ObjexxFCL::gio::write(OutputFileInits, fmtA, flags)
-                                << Zone(VentilationMechanical(VentMechNum).VentMechZone(jZone)).Name + ',' +
-                                       VentilationMechanical(VentMechNum).ZoneDesignSpecOAObjName(jZone) + ',' +
-                                       VentilationMechanical(VentMechNum).ZoneDesignSpecADObjName(jZone) + ',';
-                        }
+                        print(outputFiles.eio,
+                              "{},{},{},",
+                              Zone(VentilationMechanical(VentMechNum).VentMechZone(jZone)).Name,
+                              VentilationMechanical(VentMechNum).ZoneDesignSpecOAObjName(jZone),
+                              VentilationMechanical(VentMechNum).ZoneDesignSpecADObjName(jZone));
                     } else {
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA) << VentilationMechanical(VentMechNum).VentMechZoneName(jZone) + ',' +
-                                                                            VentilationMechanical(VentMechNum).ZoneDesignSpecOAObjName(jZone) + ',' +
-                                                                            VentilationMechanical(VentMechNum).ZoneDesignSpecADObjName(jZone);
+                        print(outputFiles.eio,
+                              "{},{},{}\n",
+                              Zone(VentilationMechanical(VentMechNum).VentMechZone(jZone)).Name,
+                              VentilationMechanical(VentMechNum).ZoneDesignSpecOAObjName(jZone),
+                              VentilationMechanical(VentMechNum).ZoneDesignSpecADObjName(jZone));
                     }
                 }
             }
@@ -3839,7 +3786,7 @@ namespace MixedAir {
         }
         this->RelTemp = this->RetTemp;
         this->RelEnth = this->RetEnth;
-        this->RelSensiLossRate = this->RelMassFlow * Psychrometrics::PsyCpAirFnWTdb(OutHumRat, OutDryBulbTemp) * (this->RelTemp - OutDryBulbTemp);
+        this->RelSensiLossRate = this->RelMassFlow * Psychrometrics::PsyCpAirFnW(OutHumRat) * (this->RelTemp - OutDryBulbTemp);
         this->RelTotalLossRate = this->RelMassFlow * (this->RelEnth - OutEnthalpy);
         this->RelLatentLossRate = this->RelTotalLossRate - this->RelSensiLossRate;
     }
