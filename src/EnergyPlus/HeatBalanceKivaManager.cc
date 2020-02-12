@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,27 +57,28 @@
 #endif
 
 // EnergyPlus Headers
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalSurface.hh>
-#include <DataHeatBalance.hh>
-#include <DataStringGlobals.hh>
-#include <DataSurfaces.hh>
-#include <DataSystemVariables.hh>
-#include <DataVectorTypes.hh>
-#include <DataZoneControls.hh>
-#include <DisplayRoutines.hh>
-#include <General.hh>
-#include <HeatBalanceKivaManager.hh>
-#include <ScheduleManager.hh>
-#include <SurfaceGeometry.hh>
-#include <ThermalComfort.hh> // MRT Weighting
-#include <UtilityRoutines.hh>
-#include <Vectors.hh>
-#include <WeatherManager.hh>
-#include <ZoneTempPredictorCorrector.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/DataZoneControls.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/HeatBalanceKivaManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
+#include <EnergyPlus/ThermalComfort.hh> // MRT Weighting
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/Vectors.hh>
+#include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 namespace HeatBalanceKivaManager {
@@ -101,9 +102,9 @@ namespace HeatBalanceKivaManager {
     }
 
     KivaInstanceMap::KivaInstanceMap(
-        Kiva::Foundation &foundation, int floorSurface, std::vector<int> wallSurfaces, int zoneNum, Real64 floorWeight, int constructionNum, KivaManager* kmPtr)
+        Kiva::Foundation &foundation, int floorSurface, std::vector<int> wallSurfaces, int zoneNum, Real64 zoneAssumedTemperature, Real64 floorWeight, int constructionNum, KivaManager* kmPtr)
         : instance(foundation), floorSurface(floorSurface), wallSurfaces(wallSurfaces), zoneNum(zoneNum), zoneControlType(KIVAZONE_UNCONTROLLED),
-          zoneControlNum(0), floorWeight(floorWeight), constructionNum(constructionNum), kmPtr(kmPtr)
+          zoneControlNum(0), zoneAssumedTemperature(zoneAssumedTemperature), floorWeight(floorWeight), constructionNum(constructionNum), kmPtr(kmPtr)
     {
 
         for (int i = 1; i <= DataZoneControls::NumTempControlledZones; ++i) {
@@ -228,60 +229,94 @@ namespace HeatBalanceKivaManager {
         bcs->deepGroundTemperature = kivaWeather.annualAverageDrybulbTemp + DataGlobals::KelvinConv;
 
         // Estimate indoor temperature
+        static const Real64 defaultFlagTemp = -999; // default sets this below -999 at -9999 so uses value if entered
         const Real64 standardTemp = 22;            // degC
         Real64 assumedFloatingTemp = standardTemp; // degC (somewhat arbitrary assumption--not knowing anything else
                                                    // about the building at this point)
 
         Real64 Tin;
-        switch (zoneControlType) {
-        case KIVAZONE_UNCONTROLLED: {
-            Tin = assumedFloatingTemp + DataGlobals::KelvinConv;
-            break;
-        }
-        case KIVAZONE_TEMPCONTROL: {
-
-            int controlTypeSchId = DataZoneControls::TempControlledZone(zoneControlNum).CTSchedIndex;
-            int controlType = ScheduleManager::LookUpScheduleValue(controlTypeSchId, hour, timestep);
-
-            if (controlType == 0) { // Uncontrolled
-
+        if (zoneAssumedTemperature > defaultFlagTemp) {
+            Tin = zoneAssumedTemperature + DataGlobals::KelvinConv;
+        } else {
+            switch (zoneControlType) {
+            case KIVAZONE_UNCONTROLLED: {
                 Tin = assumedFloatingTemp + DataGlobals::KelvinConv;
+                break;
+            }
+            case KIVAZONE_TEMPCONTROL: {
 
-            } else if (controlType == DataHVACGlobals::SingleHeatingSetPoint) {
+                int controlTypeSchId = DataZoneControls::TempControlledZone(zoneControlNum).CTSchedIndex;
+                int controlType = ScheduleManager::LookUpScheduleValue(controlTypeSchId, hour, timestep);
 
-                int schNameId = DataZoneControls::TempControlledZone(zoneControlNum).SchIndx_SingleHeatSetPoint;
-                int schTypeId = DataZoneControls::TempControlledZone(zoneControlNum).ControlTypeSchIndx(schNameId);
-                int spSchId = ZoneTempPredictorCorrector::SetPointSingleHeating(schTypeId).TempSchedIndex;
-                Real64 setpoint = ScheduleManager::LookUpScheduleValue(spSchId, hour, timestep);
-                Tin = setpoint + DataGlobals::KelvinConv;
+                if (controlType == 0) { // Uncontrolled
 
-            } else if (controlType == DataHVACGlobals::SingleCoolingSetPoint) {
+                    Tin = assumedFloatingTemp + DataGlobals::KelvinConv;
 
-                int schNameId = DataZoneControls::TempControlledZone(zoneControlNum).SchIndx_SingleCoolSetPoint;
-                int schTypeId = DataZoneControls::TempControlledZone(zoneControlNum).ControlTypeSchIndx(schNameId);
-                int spSchId = ZoneTempPredictorCorrector::SetPointSingleCooling(schTypeId).TempSchedIndex;
-                Real64 setpoint = ScheduleManager::LookUpScheduleValue(spSchId, hour, timestep);
-                Tin = setpoint + DataGlobals::KelvinConv;
+                } else if (controlType == DataHVACGlobals::SingleHeatingSetPoint) {
 
-            } else if (controlType == DataHVACGlobals::SingleHeatCoolSetPoint) {
+                    int schNameId = DataZoneControls::TempControlledZone(zoneControlNum).SchIndx_SingleHeatSetPoint;
+                    int schTypeId = DataZoneControls::TempControlledZone(zoneControlNum).ControlTypeSchIndx(schNameId);
+                    int spSchId = ZoneTempPredictorCorrector::SetPointSingleHeating(schTypeId).TempSchedIndex;
+                    Real64 setpoint = ScheduleManager::LookUpScheduleValue(spSchId, hour, timestep);
+                    Tin = setpoint + DataGlobals::KelvinConv;
 
-                int schNameId = DataZoneControls::TempControlledZone(zoneControlNum).SchIndx_SingleHeatCoolSetPoint;
-                int schTypeId = DataZoneControls::TempControlledZone(zoneControlNum).ControlTypeSchIndx(schNameId);
-                int spSchId = ZoneTempPredictorCorrector::SetPointSingleHeatCool(schTypeId).TempSchedIndex;
-                Real64 setpoint = ScheduleManager::LookUpScheduleValue(spSchId, hour, timestep);
-                Tin = setpoint + DataGlobals::KelvinConv;
+                } else if (controlType == DataHVACGlobals::SingleCoolingSetPoint) {
 
-            } else if (controlType == DataHVACGlobals::DualSetPointWithDeadBand) {
+                    int schNameId = DataZoneControls::TempControlledZone(zoneControlNum).SchIndx_SingleCoolSetPoint;
+                    int schTypeId = DataZoneControls::TempControlledZone(zoneControlNum).ControlTypeSchIndx(schNameId);
+                    int spSchId = ZoneTempPredictorCorrector::SetPointSingleCooling(schTypeId).TempSchedIndex;
+                    Real64 setpoint = ScheduleManager::LookUpScheduleValue(spSchId, hour, timestep);
+                    Tin = setpoint + DataGlobals::KelvinConv;
 
-                int schNameId = DataZoneControls::TempControlledZone(zoneControlNum).SchIndx_DualSetPointWDeadBand;
-                int schTypeId = DataZoneControls::TempControlledZone(zoneControlNum).ControlTypeSchIndx(schNameId);
-                int heatSpSchId = ZoneTempPredictorCorrector::SetPointDualHeatCool(schTypeId).HeatTempSchedIndex;
-                int coolSpSchId = ZoneTempPredictorCorrector::SetPointDualHeatCool(schTypeId).CoolTempSchedIndex;
+                } else if (controlType == DataHVACGlobals::SingleHeatCoolSetPoint) {
+
+                    int schNameId = DataZoneControls::TempControlledZone(zoneControlNum).SchIndx_SingleHeatCoolSetPoint;
+                    int schTypeId = DataZoneControls::TempControlledZone(zoneControlNum).ControlTypeSchIndx(schNameId);
+                    int spSchId = ZoneTempPredictorCorrector::SetPointSingleHeatCool(schTypeId).TempSchedIndex;
+                    Real64 setpoint = ScheduleManager::LookUpScheduleValue(spSchId, hour, timestep);
+                    Tin = setpoint + DataGlobals::KelvinConv;
+
+                } else if (controlType == DataHVACGlobals::DualSetPointWithDeadBand) {
+
+                    int schNameId = DataZoneControls::TempControlledZone(zoneControlNum).SchIndx_DualSetPointWDeadBand;
+                    int schTypeId = DataZoneControls::TempControlledZone(zoneControlNum).ControlTypeSchIndx(schNameId);
+                    int heatSpSchId = ZoneTempPredictorCorrector::SetPointDualHeatCool(schTypeId).HeatTempSchedIndex;
+                    int coolSpSchId = ZoneTempPredictorCorrector::SetPointDualHeatCool(schTypeId).CoolTempSchedIndex;
+                    Real64 heatSetpoint = ScheduleManager::LookUpScheduleValue(heatSpSchId, hour, timestep);
+                    Real64 coolSetpoint = ScheduleManager::LookUpScheduleValue(coolSpSchId, hour, timestep);
+                    const Real64 heatBalanceTemp = 10.0; // (assumed) degC
+                    const Real64 coolBalanceTemp = 15.0; // (assumed) degC
+
+                    if (bcs->outdoorTemp < heatBalanceTemp) {
+                        Tin = heatSetpoint + DataGlobals::KelvinConv;
+                    } else if (bcs->outdoorTemp > coolBalanceTemp) {
+                        Tin = coolSetpoint + DataGlobals::KelvinConv;
+                    } else {
+                        Real64 weight = (coolBalanceTemp - bcs->outdoorTemp) / (coolBalanceTemp - heatBalanceTemp);
+                        Tin = heatSetpoint * weight + coolSetpoint * (1.0 - weight) + DataGlobals::KelvinConv;
+                    }
+
+                } else {
+                    Tin = 0.0;
+                    ShowSevereError("Illegal control type for Zone=" + DataHeatBalance::Zone(zoneNum).Name +
+                                    ", Found value=" + General::TrimSigDigits(controlType) +
+                                    ", in Schedule=" + DataZoneControls::TempControlledZone(zoneControlNum).ControlTypeSchedName);
+                }
+                break;
+            }
+            case KIVAZONE_COMFORTCONTROL: {
+
+                Tin = standardTemp + DataGlobals::KelvinConv;
+                break;
+            }
+            case KIVAZONE_STAGEDCONTROL: {
+
+                int heatSpSchId = DataZoneControls::StageControlledZone(zoneControlNum).HSBchedIndex;
+                int coolSpSchId = DataZoneControls::StageControlledZone(zoneControlNum).CSBchedIndex;
                 Real64 heatSetpoint = ScheduleManager::LookUpScheduleValue(heatSpSchId, hour, timestep);
                 Real64 coolSetpoint = ScheduleManager::LookUpScheduleValue(coolSpSchId, hour, timestep);
                 const Real64 heatBalanceTemp = 10.0; // (assumed) degC
                 const Real64 coolBalanceTemp = 15.0; // (assumed) degC
-
                 if (bcs->outdoorTemp < heatBalanceTemp) {
                     Tin = heatSetpoint + DataGlobals::KelvinConv;
                 } else if (bcs->outdoorTemp > coolBalanceTemp) {
@@ -290,43 +325,14 @@ namespace HeatBalanceKivaManager {
                     Real64 weight = (coolBalanceTemp - bcs->outdoorTemp) / (coolBalanceTemp - heatBalanceTemp);
                     Tin = heatSetpoint * weight + coolSetpoint * (1.0 - weight) + DataGlobals::KelvinConv;
                 }
-
-            } else {
-                Tin = 0.0;
-                ShowSevereError("Illegal control type for Zone=" + DataHeatBalance::Zone(zoneNum).Name +
-                                ", Found value=" + General::TrimSigDigits(controlType) +
-                                ", in Schedule=" + DataZoneControls::TempControlledZone(zoneControlNum).ControlTypeSchedName);
+                break;
             }
-            break;
-        }
-        case KIVAZONE_COMFORTCONTROL: {
-
-            Tin = standardTemp + DataGlobals::KelvinConv;
-            break;
-        }
-        case KIVAZONE_STAGEDCONTROL: {
-
-            int heatSpSchId = DataZoneControls::StageControlledZone(zoneControlNum).HSBchedIndex;
-            int coolSpSchId = DataZoneControls::StageControlledZone(zoneControlNum).CSBchedIndex;
-            Real64 heatSetpoint = ScheduleManager::LookUpScheduleValue(heatSpSchId, hour, timestep);
-            Real64 coolSetpoint = ScheduleManager::LookUpScheduleValue(coolSpSchId, hour, timestep);
-            const Real64 heatBalanceTemp = 10.0; // (assumed) degC
-            const Real64 coolBalanceTemp = 15.0; // (assumed) degC
-            if (bcs->outdoorTemp < heatBalanceTemp) {
-                Tin = heatSetpoint + DataGlobals::KelvinConv;
-            } else if (bcs->outdoorTemp > coolBalanceTemp) {
-                Tin = coolSetpoint + DataGlobals::KelvinConv;
-            } else {
-                Real64 weight = (coolBalanceTemp - bcs->outdoorTemp) / (coolBalanceTemp - heatBalanceTemp);
-                Tin = heatSetpoint * weight + coolSetpoint * (1.0 - weight) + DataGlobals::KelvinConv;
+            default: {
+                // error?
+                Tin = assumedFloatingTemp + DataGlobals::KelvinConv;
+                break;
             }
-            break;
-        }
-        default: {
-            // error?
-            Tin = assumedFloatingTemp + DataGlobals::KelvinConv;
-            break;
-        }
+            }
         }
         bcs->slabConvectiveTemp = bcs->wallConvectiveTemp = bcs->slabRadiantTemp = bcs->wallRadiantTemp = Tin;
 
@@ -641,13 +647,13 @@ namespace HeatBalanceKivaManager {
         ObjexxFCL::gio::close(kivaWeatherFileUnitNumber);
     }
 
-    bool KivaManager::setupKivaInstances()
+    bool KivaManager::setupKivaInstances(OutputFiles &outputFiles)
     {
         Kiva::setMessageCallback(kivaErrorCallback, nullptr);
         bool ErrorsFound = false;
 
         if (DataZoneControls::GetZoneAirStatsInputFlag) {
-            ZoneTempPredictorCorrector::GetZoneAirSetPoints();
+            ZoneTempPredictorCorrector::GetZoneAirSetPoints(OutputFiles::getSingleton());
             DataZoneControls::GetZoneAirStatsInputFlag = false;
         }
 
@@ -996,7 +1002,7 @@ namespace HeatBalanceKivaManager {
                     fnd.polygon = floorPolygon;
 
                     // point surface to associated ground intance(s)
-                    kivaInstances.emplace_back(fnd, surfNum, wallIDs, surface.Zone, floorWeight, constructionNum, this);
+                    kivaInstances.emplace_back(fnd, surfNum, wallIDs, surface.Zone, foundationInputs[surface.OSCPtr].assumedIndoorTemperature, floorWeight, constructionNum, this);
 
                     // Floors can point to any number of foundaiton surfaces
                     floorAggregator.add_instance(kivaInstances[inst].instance.ground.get(), floorWeight);
@@ -1058,10 +1064,10 @@ namespace HeatBalanceKivaManager {
             }
         }
 
-        ObjexxFCL::gio::write(DataGlobals::OutputFileInits, "(A)") << "! <Kiva Foundation Name>, Horizontal Cells, Vertical Cells, Total Cells, Total Exposed "
+        print(outputFiles.eio, "{}", "! <Kiva Foundation Name>, Horizontal Cells, Vertical Cells, Total Cells, Total Exposed "
                                                            "Perimeter, Perimeter Fraction, Wall Height, Wall Construction, Floor Surface, Wall "
-                                                           "Surface(s)";
-        std::string fmt = "(A,',',I0',',I0',',I0',',A',',A',',A',',A',',A,A)";
+                                                           "Surface(s)\n");
+
         for (auto &kv : kivaInstances) {
             auto grnd = kv.instance.ground.get();
 
@@ -1076,11 +1082,20 @@ namespace HeatBalanceKivaManager {
             for (auto &wl : kv.wallSurfaces) {
                 wallSurfaceString += "," + DataSurfaces::Surface(wl).Name;
             }
-            ObjexxFCL::gio::write(DataGlobals::OutputFileInits, fmt)
-                << foundationInputs[DataSurfaces::Surface(kv.floorSurface).OSCPtr].name << grnd->nX << grnd->nZ << grnd->nX * grnd->nZ
-                << General::RoundSigDigits(grnd->foundation.netPerimeter, 2) << General::RoundSigDigits(kv.floorWeight, 2)
-                << General::RoundSigDigits(grnd->foundation.foundationDepth, 2) << constructionName << DataSurfaces::Surface(kv.floorSurface).Name
-                << wallSurfaceString;
+
+            static constexpr auto fmt = "{},{},{},{},{:.2R},{:.2R},{:.2R},{},{}{}\n";
+            print(outputFiles.eio,
+                  fmt,
+                  foundationInputs[DataSurfaces::Surface(kv.floorSurface).OSCPtr].name,
+                  grnd->nX,
+                  grnd->nZ,
+                  grnd->nX * grnd->nZ,
+                  grnd->foundation.netPerimeter,
+                  kv.floorWeight,
+                  grnd->foundation.foundationDepth,
+                  constructionName,
+                  DataSurfaces::Surface(kv.floorSurface).Name,
+                  wallSurfaceString);
         }
 
         return ErrorsFound;
@@ -1265,6 +1280,7 @@ namespace HeatBalanceKivaManager {
 
         defaultFoundation.foundation = defFnd;
         defaultFoundation.name = "<Default Foundation>";
+        defaultFoundation.assumedIndoorTemperature = -9999;
     }
 
     void KivaManager::addDefaultFoundation()

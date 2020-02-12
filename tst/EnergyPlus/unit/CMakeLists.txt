@@ -1,6 +1,3 @@
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src/EnergyPlus )
-INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR} )
 
 set( test_src
   TestHelpers/IdfParser.cc
@@ -15,6 +12,7 @@ set( test_src
   AirflowNetworkSimulationControl.unit.cc
   AirflowNetworkBalanceManager.unit.cc
   AirflowNetworkSolver.unit.cc
+  AirLoopHVACDOAS.unit.cc
   AirTerminalSingleDuct.unit.cc
   AirTerminalSingleDuctConstantVolumeNoReheat.unit.cc
   AirTerminalSingleDuctMixer.unit.cc
@@ -38,6 +36,7 @@ set( test_src
   CrossVentMgr.unit.cc
   CurveManager.unit.cc
   DataEnvironment.unit.cc
+  DataGlobalConstants.unit.cc
   DataHeatBalance.unit.cc
   DataPlant.unit.cc
   Datasets.unit.cc
@@ -72,6 +71,7 @@ set( test_src
   GeneralRoutines.unit.cc
   GroundHeatExchangers.unit.cc
   HeatBalanceAirManager.unit.cc
+  HeatBalanceKivaManager.unit.cc
   HeatBalanceManager.unit.cc
   HeatBalanceMovableInsulation.unit.cc
   HeatBalanceIntRadExchange.unit.cc
@@ -112,6 +112,7 @@ set( test_src
   OASystemHWPreheatCoil.unit.cc
   OutAirNodeManager.unit.cc
   OutdoorAirUnit.unit.cc
+  OutputFiles.unit.cc
   OutputProcessor.unit.cc
   OutputReportData.unit.cc
   OutputReports.unit.cc
@@ -130,8 +131,10 @@ set( test_src
   PlantComponentTemperatureSources.unit.cc
   PlantChillers.unit.cc
   PlantCondLoopOperation.unit.cc
+  PlantLoopHeatPumpEIR.unit.cc
   PlantUtilities.unit.cc
   PoweredInductionUnits.unit.cc
+  Psychrometrics.unit.cc
   Pumps.unit.cc
   PurchasedAirManager.unit.cc
   PVWatts.unit.cc
@@ -189,7 +192,6 @@ set( test_src
   WaterThermalTanks.unit.cc
   WaterToAirHeatPump.unit.cc
   WaterToAirHeatPumpSimple.unit.cc
-  WaterToWaterHeatPumpEIR.unit.cc
   WeatherManager.unit.cc
   WinCalcEngine.unit.cc
   WindowAC.unit.cc

@@ -47,9 +47,7 @@
 
 #include <gtest/gtest.h>
 
-#include <Scheduling/Manager.hh>
-#include <Scheduling/SchedulingFixture.hh>
-#include <Scheduling/TypeLimits.hh>
+#include "../Scheduling/SchedulingFixture.hh"
 
 namespace EnergyPlus {
 

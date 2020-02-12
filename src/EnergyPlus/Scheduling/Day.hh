@@ -53,9 +53,9 @@
 
 #include <nlohmann/json.hpp>
 
-#include <EnergyPlus.hh>
-#include <Scheduling/Base.hh>
-#include <Scheduling/TypeLimits.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Scheduling/Base.hh>
+#include <EnergyPlus/Scheduling/TypeLimits.hh>
 
 namespace Scheduling {
 

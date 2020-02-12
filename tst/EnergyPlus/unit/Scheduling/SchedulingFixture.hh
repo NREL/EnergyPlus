@@ -48,7 +48,7 @@
 #ifndef EPLUS6_SCHEDULINGFIXTURE_HH
 #define EPLUS6_SCHEDULINGFIXTURE_HH
 
-#include <Fixtures/EnergyPlusFixture.hh>
+#include "../Fixtures/EnergyPlusFixture.hh"
 
 namespace EnergyPlus {
 

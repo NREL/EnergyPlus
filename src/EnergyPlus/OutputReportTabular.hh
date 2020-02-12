@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -61,9 +61,9 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
-#include <OutputProcessor.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/OutputProcessor.hh>
 
 namespace EnergyPlus {
 
@@ -325,7 +325,6 @@ namespace OutputReportTabular {
     extern int DesignDayCount;
 
     // arrays related to pulse and load component reporting
-    extern Array2D<Real64> radiantPulseUsed;
     extern Array2D_int radiantPulseTimestep;
     extern Array2D<Real64> radiantPulseReceived;
     extern Array3D<Real64> loadConvectedNormal;
@@ -410,7 +409,7 @@ namespace OutputReportTabular {
         int numTables;
         int typeOfVar;                     // 0=not found, 1=integer, 2=real, 3=meter
         OutputProcessor::StoreType avgSum; // Variable  is Averaged=1 or Summed=2
-        int stepType;                      // Variable time step is Zone=1 or HVAC=2
+        OutputProcessor::TimeStepType stepType;                      // Variable time step is Zone=1 or HVAC=2
         OutputProcessor::Unit units;       // the units enumeration
         std::string ScheduleName;          // the name of the schedule
         int scheduleIndex;                 // index to the schedule specified - if no schedule use zero
@@ -418,7 +417,7 @@ namespace OutputReportTabular {
         // Default Constructor
         OutputTableBinnedType()
             : intervalStart(0.0), intervalSize(0.0), intervalCount(0), resIndex(0), numTables(0), typeOfVar(0),
-              avgSum(OutputProcessor::StoreType::Averaged), stepType(0), scheduleIndex(0)
+              avgSum(OutputProcessor::StoreType::Averaged), stepType(OutputProcessor::TimeStepType::TimeStepZone), scheduleIndex(0)
         {
         }
     };
@@ -501,14 +500,14 @@ namespace OutputReportTabular {
         int typeOfVar;                        // 0=not found, 1=integer, 2=real, 3=meter
         int keyCount;                         // noel
         OutputProcessor::StoreType varAvgSum; // Variable  is Averaged=1 or Summed=2
-        int varStepType;                      // Variable time step is Zone=1 or HVAC=2
+        OutputProcessor::TimeStepType varStepType;                      // Variable time step is Zone=1 or HVAC=2
         Array1D_string NamesOfKeys;           // keyNames !noel
         Array1D_int IndexesForKeyVar;         // keyVarIndexes !noel
 
         // Default Constructor
         MonthlyFieldSetInputType()
             : aggregate(0), varUnits(OutputProcessor::Unit::None), typeOfVar(0), keyCount(0), varAvgSum(OutputProcessor::StoreType::Averaged),
-              varStepType(1)
+              varStepType(OutputProcessor::TimeStepType::TimeStepZone)
         {
         }
     };
@@ -534,7 +533,7 @@ namespace OutputReportTabular {
         int varNum;                        // variable or meter number
         int typeOfVar;                     // 0=not found, 1=integer, 2=real, 3=meter
         OutputProcessor::StoreType avgSum; // Variable  is Averaged=1 or Summed=2
-        int stepType;                      // Variable time step is Zone=1 or HVAC=2
+        OutputProcessor::TimeStepType stepType;                      // Variable time step is Zone=1 or HVAC=2
         OutputProcessor::Unit units;       // the units string, may be blank
         int aggType;                       // index to the type of aggregation (see list of parameters)
         Array1D<Real64> reslt;             // monthly results
@@ -545,7 +544,7 @@ namespace OutputReportTabular {
 
         // Default Constructor
         MonthlyColumnsType()
-            : varNum(0), typeOfVar(0), avgSum(OutputProcessor::StoreType::Averaged), stepType(0), units(OutputProcessor::Unit::None), aggType(0),
+            : varNum(0), typeOfVar(0), avgSum(OutputProcessor::StoreType::Averaged), stepType(OutputProcessor::TimeStepType::TimeStepZone), units(OutputProcessor::Unit::None), aggType(0),
               reslt(12, 0.0), duration(12, 0.0), timeStamp(12, 0), aggForStep(0.0)
         {
         }
@@ -670,7 +669,7 @@ namespace OutputReportTabular {
     // Functions
     void clear_state();
 
-    void UpdateTabularReports(int const IndexTypeKey); // What kind of data to update (Zone, HVAC)
+    void UpdateTabularReports(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
     //======================================================================================================================
     //======================================================================================================================
@@ -694,7 +693,7 @@ namespace OutputReportTabular {
 
     bool warningAboutKeyNotFound(int foundIndex, int inObjIndex, std::string const &moduleName);
 
-    void GetInputTabularStyle();
+    void GetInputTabularStyle(OutputFiles &outputFiles);
 
     int SetUnitsStyleFromString(std::string const &unitStringIn);
 
@@ -732,19 +731,19 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void GatherBinResultsForTimestep(int const IndexTypeKey); // What kind of data to update (Zone, HVAC)
+    void GatherBinResultsForTimestep(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
-    void GatherMonthlyResultsForTimestep(int const IndexTypeKey); // What kind of data to update (Zone, HVAC)
+    void GatherMonthlyResultsForTimestep(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
-    void GatherBEPSResultsForTimestep(int const IndexTypeKey); // What kind of data to update (Zone, HVAC)
+    void GatherBEPSResultsForTimestep(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
-    void GatherSourceEnergyEndUseResultsForTimestep(int const IndexTypeKey); // What kind of data to update (Zone, HVAC)
+    void GatherSourceEnergyEndUseResultsForTimestep(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
-    void GatherPeakDemandForTimestep(int const IndexTypeKey); // What kind of data to update (Zone, HVAC)
+    void GatherPeakDemandForTimestep(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
-    void GatherHeatGainReport(int const IndexTypeKey); // What kind of data to update (Zone, HVAC)
+    void GatherHeatGainReport(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
-    void GatherHeatEmissionReport(int const IndexTypeKey);
+    void GatherHeatEmissionReport(OutputProcessor::TimeStepType t_timeStepType);
 
     //======================================================================================================================
     //======================================================================================================================
@@ -792,7 +791,7 @@ namespace OutputReportTabular {
 
     void WriteSurfaceShadowing();
 
-    void WriteEioTables();
+    void WriteEioTables(OutputFiles &outputFiles);
 
     int unitsFromHeading(std::string &heading);
 
@@ -804,7 +803,7 @@ namespace OutputReportTabular {
 
     void DeallocateLoadComponentArrays();
 
-    void ComputeLoadComponentDecayCurve();
+    void ComputeLoadComponentDecayCurve(OutputFiles &outputFiles);
 
     void GatherComponentLoadsSurface();
 
@@ -890,6 +889,10 @@ namespace OutputReportTabular {
     std::string ConvertToEscaped(std::string const &inString); // Input String
 
     void DetermineBuildingFloorArea();
+
+    /* Tables with Subcategories in particular have a blank for rowHead for display in the HTML output.
+     * This routine will fill up the blanks for output to Sql in particular */
+    void FillRowHead(Array1D_string & rowHead);
 
     //======================================================================================================================
     //======================================================================================================================

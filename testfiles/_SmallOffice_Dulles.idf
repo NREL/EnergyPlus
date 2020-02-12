@@ -126,7 +126,7 @@
 ! Report Variables:            All available in RDD (442 requested, monthly and annual results)
 !
 
-  Version,9.2;
+  Version,9.3;
 
   Building,
     Small Office 2 Story 4 zone 550 m2,  !- Name
@@ -1038,7 +1038,9 @@
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     CounterClockWise,        !- Vertex Entry Direction
-    World;                   !- Coordinate System
+    World,                   !- Coordinate System
+    ,                        !- Daylighting Reference Point Coordinate System
+    World;                   !- Rectangular Surface Coordinate System
 
   Wall:Detailed,
     EastWall_SouthZone_1stFloor,  !- Name
@@ -1583,25 +1585,25 @@
   InternalMass,
     InternalMass_SouthZone_1stFloor,  !- Name
     FURNITURE,               !- Construction Name
-    SouthZone_1stFloor,      !- Zone Name
+    SouthZone_1stFloor,      !- Zone or ZoneList Name
     77;                      !- Surface Area {m2}
 
   InternalMass,
     InternalMass_NorthZone_1stFloor,  !- Name
     FURNITURE,               !- Construction Name
-    NorthZone_1stFloor,      !- Zone Name
+    NorthZone_1stFloor,      !- Zone or ZoneList Name
     77;                      !- Surface Area {m2}
 
   InternalMass,
     InternalMass_SouthZone_2ndFloor,  !- Name
     FURNITURE,               !- Construction Name
-    SouthZone_2ndFloor,      !- Zone Name
+    SouthZone_2ndFloor,      !- Zone or ZoneList Name
     77;                      !- Surface Area {m2}
 
   InternalMass,
     InternalMass_NorthZone_2ndFloor,  !- Name
     FURNITURE,               !- Construction Name
-    NorthZone_2ndFloor,      !- Zone Name
+    NorthZone_2ndFloor,      !- Zone or ZoneList Name
     77;                      !- Surface Area {m2}
 
   ScheduleTypeLimits,
@@ -2843,8 +2845,8 @@
     DirectAir_SouthZone_1stFloor,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Equipment_NorthZone_1stFloor,  !- Name
@@ -2853,8 +2855,8 @@
     DirectAir_NorthZone_1stFloor,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Equipment_SouthZone_2ndFloor,  !- Name
@@ -2863,8 +2865,8 @@
     DirectAir_SouthZone_2ndFloor,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Equipment_NorthZone_2ndFloor,  !- Name
@@ -2873,8 +2875,8 @@
     DirectAir_NorthZone_2ndFloor,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   AirLoopHVAC:UnitaryHeatCool,
     UnitarySystem_SouthZone_1stFloor,  !- Name

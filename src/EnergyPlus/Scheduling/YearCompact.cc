@@ -49,14 +49,14 @@
 #include <regex>
 #include <bitset>
 
-#include <DataEnvironment.hh>
-#include <EnergyPlus.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <OutputProcessor.hh>
-#include <Scheduling/Base.hh>
-#include <Scheduling/YearCompact.hh>
-#include <UtilityRoutines.hh>
-#include <WeatherManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Scheduling/Base.hh>
+#include <EnergyPlus/Scheduling/YearCompact.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 namespace Scheduling {
 

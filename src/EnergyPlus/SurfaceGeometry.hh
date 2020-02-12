@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,10 +53,10 @@
 #include <ObjexxFCL/Array1S.hh>
 
 // EnergyPlus Headers
-#include <DataSurfaces.hh>
-#include <DataVectorTypes.hh>
-#include <EnergyPlus.hh>
-#include <HeatBalanceKivaManager.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/HeatBalanceKivaManager.hh>
 
 // C++ Headers
 #include <map>
@@ -114,18 +114,18 @@ namespace SurfaceGeometry {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void SetupZoneGeometry(bool &ErrorsFound);
+    void SetupZoneGeometry(OutputFiles &outputFiles, bool &ErrorsFound);
 
     void AllocateModuleArrays();
 
-    void GetSurfaceData(bool &ErrorsFound); // If errors found in input
+    void GetSurfaceData(OutputFiles &outputFiles, bool &ErrorsFound); // If errors found in input
 
     void checkSubSurfAzTiltNorm(SurfaceData &baseSurface, // Base surface data (in)
                                 SurfaceData &subSurface,  // Subsurface data (in)
                                 bool &surfaceError        // True if there is subsurface error that requires a fatal
     );
 
-    void GetGeometryParameters(bool &ErrorsFound); // set to true if errors found during input
+    void GetGeometryParameters(OutputFiles &outputFiles, bool &ErrorsFound); // set to true if errors found during input
 
     void GetDetShdSurfaceData(bool &ErrorsFound,          // Error flag indicator (true if errors found)
                               int &SurfNum,               // Count of Current SurfaceNumber
@@ -139,7 +139,8 @@ namespace SurfaceGeometry {
                                   int const TotRectDetachedBldg   // Number of Building Detached Shading Surfaces to obtain
     );
 
-    void GetHTSurfaceData(bool &ErrorsFound,                // Error flag indicator (true if errors found)
+    void GetHTSurfaceData(OutputFiles &outputFiles,
+                          bool &ErrorsFound,                // Error flag indicator (true if errors found)
                           int &SurfNum,                     // Count of Current SurfaceNumber
                           int const TotHTSurfs,             // Number of Heat Transfer Base Surfaces to obtain
                           int const TotDetailedWalls,       // Number of Wall:Detailed items to obtain
@@ -147,8 +148,7 @@ namespace SurfaceGeometry {
                           int const TotDetailedFloors,      // Number of Floor:Detailed items to obtain
                           Array1S_string const BaseSurfCls, // Valid Classes for Base Surfaces
                           Array1S_int const BaseSurfIDs,
-                          int &NeedToAddSurfaces // Number of surfaces to add, based on unentered IZ surfaces
-    );
+                          int &NeedToAddSurfaces);
 
     void GetRectSurfaces(bool &ErrorsFound,             // Error flag indicator (true if errors found)
                          int &SurfNum,                  // Count of Current SurfaceNumber
@@ -239,7 +239,7 @@ namespace SurfaceGeometry {
 
     int GetNumIntMassSurfaces(); // Number of Internal Mass Surfaces to obtain
 
-    void GetShadingSurfReflectanceData(bool &ErrorsFound); // If errors found in input
+    void GetShadingSurfReflectanceData(OutputFiles &outputFiles, bool &ErrorsFound); // If errors found in input
 
     void GetSurfaceSrdSurfsData(bool &ErrorsFound); // Error flag indicator (true if errors found)
 
@@ -247,7 +247,7 @@ namespace SurfaceGeometry {
 
     void GetHTSurfExtVentedCavityData(bool &ErrorsFound); // Error flag indicator (true if errors found)
 
-    void GetSurfaceHeatTransferAlgorithmOverrides(bool &ErrorsFound);
+    void GetSurfaceHeatTransferAlgorithmOverrides(OutputFiles &outputFiles, bool &ErrorsFound);
 
     class ExposedFoundationPerimeter
     {
@@ -287,9 +287,9 @@ namespace SurfaceGeometry {
 
     void GetWindowGapAirflowControlData(bool &ErrorsFound); // If errors found in input
 
-    void GetOSCData(bool &ErrorsFound);
+    void GetOSCData(OutputFiles &outputFiles, bool &ErrorsFound);
 
-    void GetOSCMData(bool &ErrorsFound);
+    void GetOSCMData(OutputFiles &outputFiles, bool &ErrorsFound);
 
     void GetFoundationData(bool &ErrorsFound);
 
@@ -378,6 +378,10 @@ namespace SurfaceGeometry {
 
     void SetupShadeSurfacesForSolarCalcs();
 
+    void SetupRadiantEnclosuresAndAirBoundaries(bool &ErrorsFound); // Set to true if errors found
+
+    void SetupSolarEnclosuresAndAirBoundaries(bool &ErrorsFound); // Set to true if errors found
+
     void CheckConvexity(int const SurfNum, // Current surface number
                         int const NSides   // Number of sides to figure
     );
@@ -385,6 +389,12 @@ namespace SurfaceGeometry {
     bool isRectangle(int const ThisSurf // Current surface number
     );
 
+    void CheckForReversedLayers(bool &RevLayerDiffs,    // true when differences are discovered in interzone constructions
+                                int const ConstrNum,    // construction index
+                                int const ConstrNumRev, // construction index for reversed construction
+                                int const TotalLayers   // total layers for construction definition
+    );
+    
 } // namespace SurfaceGeometry
 
 } // namespace EnergyPlus

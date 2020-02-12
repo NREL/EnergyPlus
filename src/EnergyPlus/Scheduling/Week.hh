@@ -55,8 +55,8 @@
 
 #include <nlohmann/json.hpp>
 
-#include <UtilityRoutines.hh>
-#include <Scheduling/Day.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/Scheduling/Day.hh>
 
 namespace Scheduling {
 

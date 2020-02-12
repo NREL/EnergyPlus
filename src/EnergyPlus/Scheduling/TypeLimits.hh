@@ -48,7 +48,7 @@
 #ifndef SRC_ENERGYPLUS_SCHEDULING_TYPELIMITS_HH
 #define SRC_ENERGYPLUS_SCHEDULING_TYPELIMITS_HH
 
-#include <EnergyPlus.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 #include <string>
 #include <vector>

@@ -48,7 +48,7 @@
 #include <gtest/gtest.h>
 
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
-#include <Fixtures/EnergyPlusFixture.hh>
+#include "../Fixtures/EnergyPlusFixture.hh"
 
 namespace EnergyPlus {
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,12 +49,12 @@
 #define DataSurfaces_hh_INCLUDED
 
 // EnergyPlus Headers
-#include <DataBSDFWindow.hh>
-#include <DataGlobals.hh>
-#include <DataVectorTypes.hh>
-#include <EnergyPlus.hh>
-#include <Shape.hh>
-#include <Scheduling/Base.hh>
+#include <EnergyPlus/DataBSDFWindow.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Scheduling/Base.hh>
+#include <EnergyPlus/Shape.hh>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -168,6 +168,7 @@ namespace DataSurfaces {
     extern int const HeatTransferModel_ComplexFenestration; // BSDF
     extern int const HeatTransferModel_TDD;                 // tubular daylighting device
     extern int const HeatTransferModel_Kiva;                // Kiva ground calculations
+    extern int const HeatTransferModel_AirBoundaryNoHT;     // Construction:AirBoundary - not IRT or interior window
 
     // Parameters for classification of outside face of surfaces
     extern int const OutConvClass_WindwardVertWall;
@@ -771,6 +772,9 @@ namespace DataSurfaces {
         bool PartOfVentSlabOrRadiantSurface; // surface cannot be part of both a radiant surface & ventilated slab group
         // LG added 1/6/12
         Real64 GenericContam; // [ppm] Surface generic contaminant as a storage term for
+        // Air boundaries
+        int SolarEnclIndex;     // Pointer to solar enclosure this surface belongs to
+        int SolarEnclSurfIndex; //  Pointer to solar enclosure surface data, ZoneSolarInfo(n).SurfacePtr(RadEnclSurfIndex) points to this surface
 
         std::vector<int> DisabledShadowingZoneList; // Array of all disabled shadowing zone number to the current surface
                                                     // the surface diffusion model
@@ -805,7 +809,7 @@ namespace DataSurfaces {
               OutConvClassification(0), OutConvHfModelEq(0), OutConvHfUserCurveIndex(0), OutConvHnModelEq(0), OutConvHnUserCurveIndex(0),
               OutConvFaceArea(0.0), OutConvFacePerimeter(0.0), OutConvFaceHeight(0.0), IntConvZoneWallHeight(0.0), IntConvZonePerimLength(0.0),
               IntConvZoneHorizHydrDiam(0.0), IntConvWindowWallRatio(0.0), IntConvWindowLocation(InConvWinLoc_NotSet),
-              IntConvSurfGetsRadiantHeat(false), IntConvSurfHasActiveInIt(false), PartOfVentSlabOrRadiantSurface(false), GenericContam(0.0)
+              IntConvSurfGetsRadiantHeat(false), IntConvSurfHasActiveInIt(false), PartOfVentSlabOrRadiantSurface(false), GenericContam(0.0), SolarEnclIndex(0), SolarEnclSurfIndex(0)
         {
         }
 
@@ -1000,8 +1004,8 @@ namespace DataSurfaces {
         Real64 FrameTempSurfIn;    // Frame inside surface temperature (C)
         Real64 FrameTempSurfInOld; // Previous value of frame inside surface temperature (C)
         Real64 FrameTempSurfOut;   // Frame outside surface temperature (C)
-        
-        
+
+
 
         Real64 ProjCorrFrOut;      // Correction factor to absorbed radiation due to frame outside projection
         Real64 ProjCorrFrIn;       // Correction factor to absorbed radiation due to frame inside projection
@@ -1081,9 +1085,8 @@ namespace DataSurfaces {
         Real64 VentingOpenFactorMultRep;        // Window/door opening modulation multiplier on venting open factor, for reporting
         Real64 InsideTempForVentingRep;         // Inside air temp used to control window/door venting, for reporting (C)
         Real64 VentingAvailabilityRep;          // Venting availability schedule value (0.0/1.0 = no venting allowed/not allowed)
-        Array1D<Real64> IllumFromWinAtRefPtRep; // Illuminance from window at reference point #1 [lux]
-        Array1D<Real64> LumWinFromRefPtRep;     // Window luminance as viewed from reference point #1 [cd/m2]
-        Real64 LumWinFromRefPt2Rep;             // Window luminance as viewed from reference point #2 [cd/m2]
+        Array1D<Real64> IllumFromWinAtRefPtRep; // Illuminance from window at reference point N [lux]
+        Array1D<Real64> LumWinFromRefPtRep;     // Window luminance as viewed from reference point N [cd/m2]
         // for shadowing of ground by building and obstructions [W/m2]
         Real64 SkyGndSolarInc; // Incident diffuse solar from ground-reflected sky radiation; used for
         // Complex Fen; if CalcSolRefl is true, accounts for shadowing of ground by building and obstructions [W/m2]
@@ -1149,7 +1152,7 @@ namespace DataSurfaces {
               AirflowDestination(0), AirflowReturnNodePtr(0), MaxAirflow(0.0), AirflowControlType(0), AirflowHasSchedule(false),
               AirflowSchedulePtr(0), AirflowThisTS(0.0), TAirflowGapOutlet(0.0), WindowCalcIterationsRep(0),
               VentingOpenFactorRep(0.0), VentingOpenFactorMultRep(0.0), InsideTempForVentingRep(0.0), VentingAvailabilityRep(0.0),
-              LumWinFromRefPt2Rep(0.0), SkyGndSolarInc(0.0), BmGndSolarInc(0.0), ZoneAreaMinusThisSurf(3, 0.0), ZoneAreaReflProdMinusThisSurf(3, 0.0),
+              SkyGndSolarInc(0.0), BmGndSolarInc(0.0), ZoneAreaMinusThisSurf(3, 0.0), ZoneAreaReflProdMinusThisSurf(3, 0.0),
               LightWellEff(1.0), SolarDiffusing(false), FrameHeatGain(0.0), FrameHeatLoss(0.0), DividerHeatLoss(0.0),
               TCLayerTemp(0.0), SpecTemp(0.0), WindowModelType(Window5DetailedModel), TDDPipeNum(0)
         {

@@ -45,10 +45,10 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Scheduling/Base.hh>
-#include <Scheduling/TypeLimits.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/Scheduling/Base.hh>
+#include <EnergyPlus/Scheduling/TypeLimits.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace Scheduling {
 std::vector<ScheduleTypeData> scheduleTypeLimits;

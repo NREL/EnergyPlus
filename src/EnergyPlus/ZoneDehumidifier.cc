@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,24 +52,24 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <CurveManager.hh>
-#include <DataContaminantBalance.hh>
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataWater.hh>
-#include <DataZoneEnergyDemands.hh>
-#include <DataZoneEquipment.hh>
-#include <General.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <OutputProcessor.hh>
-#include <Psychrometrics.hh>
-#include <ScheduleManager.hh>
-#include <UtilityRoutines.hh>
-#include <WaterManager.hh>
-#include <ZoneDehumidifier.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataWater.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WaterManager.hh>
+#include <EnergyPlus/ZoneDehumidifier.hh>
 
 namespace EnergyPlus {
 
@@ -399,13 +399,12 @@ namespace ZoneDehumidifier {
                 ErrorsFound = true;
             } else {
                 // Verify Curve object, only legal type is BiQuadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    ZoneDehumid(ZoneDehumidIndex).WaterRemovalCurveIndex,   // Curve index
-                    {2},                            // Valid dimensions
-                    RoutineName,                    // Routine name
-                    CurrentModuleObject,            // Object Type
-                    ZoneDehumid(ZoneDehumidIndex).Name,   // Object Name
-                    cAlphaFields(5));  // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(ZoneDehumid(ZoneDehumidIndex).WaterRemovalCurveIndex, // Curve index
+                                                            {2},                                                  // Valid dimensions
+                                                            RoutineName,                                          // Routine name
+                                                            CurrentModuleObject,                                  // Object Type
+                                                            ZoneDehumid(ZoneDehumidIndex).Name,                   // Object Name
+                                                            cAlphaFields(5));                                     // Field Name
 
                 if (!ErrorsFound) {
                     CurveVal = CurveValue(ZoneDehumid(ZoneDehumidIndex).WaterRemovalCurveIndex, RatedInletAirTemp, RatedInletAirRH);
@@ -430,13 +429,12 @@ namespace ZoneDehumidifier {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, only legal type is BiQuadratic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    ZoneDehumid(ZoneDehumidIndex).EnergyFactorCurveIndex,   // Curve index
-                    {2},                            // Valid dimensions
-                    RoutineName,                    // Routine name
-                    CurrentModuleObject,            // Object Type
-                    ZoneDehumid(ZoneDehumidIndex).Name,   // Object Name
-                    cAlphaFields(6));  // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(ZoneDehumid(ZoneDehumidIndex).EnergyFactorCurveIndex, // Curve index
+                                                            {2},                                                  // Valid dimensions
+                                                            RoutineName,                                          // Routine name
+                                                            CurrentModuleObject,                                  // Object Type
+                                                            ZoneDehumid(ZoneDehumidIndex).Name,                   // Object Name
+                                                            cAlphaFields(6));                                     // Field Name
 
                 if (!ErrorsFound) {
                     CurveVal = CurveValue(ZoneDehumid(ZoneDehumidIndex).EnergyFactorCurveIndex, RatedInletAirTemp, RatedInletAirRH);
@@ -461,13 +459,12 @@ namespace ZoneDehumidifier {
                 ErrorsFound = true;
             } else {
                 // Verify Curve Object, legal types are Quadratic and Cubic
-                ErrorsFound |= CurveManager::CheckCurveDims(
-                    ZoneDehumid(ZoneDehumidIndex).PartLoadCurveIndex,   // Curve index
-                    {1},                            // Valid dimensions
-                    RoutineName,                    // Routine name
-                    CurrentModuleObject,            // Object Type
-                    ZoneDehumid(ZoneDehumidIndex).Name,   // Object Name
-                    cAlphaFields(7));  // Field Name
+                ErrorsFound |= CurveManager::CheckCurveDims(ZoneDehumid(ZoneDehumidIndex).PartLoadCurveIndex, // Curve index
+                                                            {1},                                              // Valid dimensions
+                                                            RoutineName,                                      // Routine name
+                                                            CurrentModuleObject,                              // Object Type
+                                                            ZoneDehumid(ZoneDehumidIndex).Name,               // Object Name
+                                                            cAlphaFields(7));                                 // Field Name
             }
 
             // N4,  \field Minimum Dry-Bulb Temperature for Dehumidifier Operation
@@ -790,7 +787,7 @@ namespace ZoneDehumidifier {
 
         // Using/Aliasing
         using CurveManager::CurveValue;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHfgAirFnWTdb;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhFnTdbWPb;
@@ -1001,7 +998,7 @@ namespace ZoneDehumidifier {
 
             Node(AirInletNodeNum).MassFlowRate = ZoneDehumid(ZoneDehumNum).RatedAirMassFlow * PLR;
             AirMassFlowRate = Node(AirInletNodeNum).MassFlowRate; // Average air mass flow for this timestep
-            Cp = PsyCpAirFnWTdb(InletAirHumRat, InletAirTemp);    // Heat capacity of air
+            Cp = PsyCpAirFnW(InletAirHumRat);                     // Heat capacity of air
             if (AirMassFlowRate > 0.0 && Cp > 0.0) {
                 OutletAirTemp =
                     InletAirTemp + (ElectricPowerOnCycle + (WaterRemovalMassRate * hfg)) / (ZoneDehumid(ZoneDehumNum).RatedAirMassFlow * Cp);

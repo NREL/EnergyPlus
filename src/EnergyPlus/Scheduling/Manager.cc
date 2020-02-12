@@ -45,17 +45,17 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus.hh>
-#include <DisplayRoutines.hh>
-#include <Scheduling/Manager.hh>
-#include <Scheduling/Base.hh>
-#include <Scheduling/Day.hh>
-#include <Scheduling/TypeLimits.hh>
-#include <Scheduling/Week.hh>
-#include <Scheduling/YearConstant.hh>
-#include <Scheduling/YearCompact.hh>
-#include <Scheduling/YearWeekly.hh>
-#include <Scheduling/YearFile.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/Scheduling/Manager.hh>
+#include <EnergyPlus/Scheduling/Base.hh>
+#include <EnergyPlus/Scheduling/Day.hh>
+#include <EnergyPlus/Scheduling/TypeLimits.hh>
+#include <EnergyPlus/Scheduling/Week.hh>
+#include <EnergyPlus/Scheduling/YearConstant.hh>
+#include <EnergyPlus/Scheduling/YearCompact.hh>
+#include <EnergyPlus/Scheduling/YearWeekly.hh>
+#include <EnergyPlus/Scheduling/YearFile.hh>
 
 namespace Scheduling {
 std::vector<IndexBasedScheduleData> indexToSubtypeMap;
@@ -81,7 +81,7 @@ int GetScheduleIndex(const std::string &scheduleName)
 {
     // check if input has been processed yet for schedules, if not then call it now
     if (!scheduleInputProcessed) {
-        processAllSchedules();
+        processAllSchedules(EnergyPlus::OutputFiles::getSingleton());
     }
     // then just ignore zero and look through each of the types and return the index in the subtype map
     for (size_t mappingIndex = 1; mappingIndex < indexToSubtypeMap.size(); mappingIndex++) {
@@ -96,7 +96,7 @@ ScheduleBase *getScheduleReference(const std::string &scheduleName)
 {
     // check if input has been processed yet for schedules, if not then call it now
     if (!scheduleInputProcessed) {
-        processAllSchedules();
+        processAllSchedules(EnergyPlus::OutputFiles::getSingleton());
     }
     // then just look through each of the types and return a direct reference
     for (auto const &mapping : indexToSubtypeMap) {
@@ -144,7 +144,7 @@ void updateAllSchedules(int const simTime)
 void prepareSchedulesForNewEnvironment()
 {
     if (!scheduleInputProcessed) {
-        processAllSchedules();
+        processAllSchedules(EnergyPlus::OutputFiles::getSingleton());
     }
     // right now Schedule:Constant objects are not stored as time-series for efficiency
     for (auto &thisSchedule : scheduleConstants) {
@@ -184,7 +184,7 @@ void resetAllTimeStartIndex()
     }
 }
 
-void processAllSchedules()
+void processAllSchedules(EnergyPlus::OutputFiles &outputFiles)
 {
     // This function will process all schedule related inputs.  Start with type limits, then call each derived type.
     // ok, so a zero schedule index is a magic value for always returning zero from schedule manager for some reason

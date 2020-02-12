@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -68,9 +68,11 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/General.hh>
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -179,7 +181,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVReheat_GetInputTest)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput();  // read schedules
+    ProcessScheduleInput(OutputFiles::getSingleton());  // read schedules
 
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -309,7 +311,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuct4PipeInduction_GetInputTest)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput();  // read schedules
+    ProcessScheduleInput(OutputFiles::getSingleton());  // read schedules
 
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -398,7 +400,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVHeatCool_GetInputTest)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput();  // read schedules
+    ProcessScheduleInput(OutputFiles::getSingleton());  // read schedules
 
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -521,7 +523,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheatVarSpeedFan_GetInputTest
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput();  // read schedules
+    ProcessScheduleInput(OutputFiles::getSingleton());  // read schedules
 
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -618,7 +620,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheat_NormalActionTest)
 
     NumOfTimeStepInHour = 1;
     MinutesPerTimeStep = 60;
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     bool ErrorsFound(false);
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -680,6 +682,182 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheat_NormalActionTest)
     EXPECT_EQ(expectedMassFlowAirReheatMin, Node(InletNode).MassFlowRate);
     EXPECT_EQ(expectedMassFlowAirReheatMin, Node(OutletNode).MassFlowRate);
     EXPECT_EQ(1.0, Sys(SysNum).AirMassFlowRateMax);
+}
+
+TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFan_DamperPositionTest)
+{
+    std::string const idf_objects = delimited_string({
+        "   Zone,",
+        "    Thermal Zone;               !- Name",
+
+        "   ZoneHVAC:EquipmentConnections,",
+        "     Thermal Zone,              !- Zone Name",
+        "     Thermal Zone Equipment,    !- Zone Conditioning Equipment List Name",
+        "     Zone 1 In Node,            !- Zone Air Inlet Node or NodeList Name",
+        "     ,                          !- Zone Air Exhaust Node or NodeList Name",
+        "     Zone 1 Air Node,           !- Zone Air Node Name",
+        "     Zone 1 Return Node;        !- Zone Return Air Node Name",
+
+        "   ZoneHVAC:EquipmentList,",
+        "     Thermal Zone Equipment,    !- Name",
+        "     SequentialLoad,            !- Load Distribution Scheme",
+        "     ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+        "     ADU VAV Rht VS Fan,        !- Zone Equipment 1 Name",
+        "     1,                         !- Zone Equipment 1 Cooling Sequence",
+        "     1;                         !- Zone Equipment 1 Heating or No-Load Sequence",
+
+        "   ZoneHVAC:AirDistributionUnit,",
+        "     ADU VAV Rht VS Fan,      !- Name",
+        "     Zone 1 In Node,          !- Air Distribution Unit Outlet Node Name",
+        "     AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan,  !- Air Terminal Object Type",
+        "     VAV Rht VS Fan AirTerm;  !- Air Terminal Name",
+
+        "   AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan,",
+        "     VAV Rht VS Fan AirTerm,  !- Name",
+        "     ,                        !- Availability Schedule Name",
+        "     1.0,                     !- Maximum Cooling Air Flow Rate {m3/s}",
+        "     0.5,                     !- Maximum Heating Air Flow Rate {m3/s}",
+        "     0.05,                    !- Zone Minimum Air Flow Fraction",
+        "     Zone 1 ATU In Node,      !- Air Inlet Node Name",
+        "     Zone 1 In Node,          !- Air Outlet Node Name",
+        "     Fan:SystemModel,         !- Fan Object Type",
+        "     Zone 1 VS Fan,           !- Fan Name",
+        "     Coil:Heating:Electric,   !- Heating Coil Object Type",
+        "     Zone 1 Reheat Coil,      !- Heating Coil Name",
+        "     autosize,                !- Maximum Hot Water or Steam Flow Rate {m3/s}",
+        "     0.0,                     !- Minimum Hot Water or Steam Flow Rate {m3/s}",
+        "     0.001;                   !- Heating Convergence Tolerance",
+
+        "   Coil:Heating:Electric,",
+        "     Zone 1 Reheat Coil,      !- Name",
+        "     ,                        !- Availability Schedule Name",
+        "     1.0,                     !- Efficiency",
+        "     autosize,                !- Nominal Capacity {W}",
+        "     Reheat Air Inlet Node,   !- Air Inlet Node Name",
+        "     Zone 1 In Node;          !- Air Outlet Node Name",
+
+        "   Fan:SystemModel,",
+        "     Zone 1 VS Fan,           !- Name",
+        "     ,                        !- Availability Schedule Name",
+        "     Zone 1 ATU In Node,      !- Air Inlet Node Name",
+        "     Reheat Air Inlet Node,   !- Air Outlet Node Name",
+        "     1.0,                     !- Design Maximum Air Flow Rate {m3/s}",
+        "     Continuous,              !- Speed Control Method",
+        "     0.0,                     !- Electric Power Minimum Flow Rate Fraction",
+        "     125.0,                   !- Design Pressure Rise {Pa}",
+        "     0.9,                     !- Motor Efficiency",
+        "     1.0,                     !- Motor In Air Stream Fraction",
+        "     AUTOSIZE,                !- Design Electric Power Consumption {W}",
+        "     TotalEfficiencyAndPressure,  !- Design Power Sizing Method",
+        "     ,                        !- Electric Power Per Unit Flow Rate {W/(m3/s)}",
+        "     ,                        !- Electric Power Per Unit Flow Rate Per Unit Pressure {W/((m3/s)-Pa)}",
+        "     0.7,                     !- Fan Total Efficiency",
+        "     VAV Fan Curve,           !- Electric Power Function of Flow Fraction Curve Name",
+        "     ,                        !- Night Ventilation Mode Pressure Rise {Pa}",
+        "     ,                        !- Night Ventilation Mode Flow Fraction",
+        "     ,                        !- Motor Loss Zone Name",
+        "     ,                        !- Motor Loss Radiative Fraction",
+        "     ATU Fan Energy;          !- End-Use Subcategory",
+
+        "   Curve:Quartic,",
+        "     VAV Fan Curve,           !- Name",
+        "     0.00153028,              !- Coefficient1 Constant",
+        "     0.00520806,              !- Coefficient2 x",
+        "     1.1086242,               !- Coefficient3 x**2",
+        "     -.11635563,              !- Coefficient4 x**3",
+        "     0.0,                     !- Coefficient5 x**4",
+        "     0.0,                     !- Minimum Value of x",
+        "     1.0,                     !- Maximum Value of x",
+        "     0.0,                     !- Minimum Curve Output",
+        "     1.0,                     !- Maximum Curve Output",
+        "     Dimensionless,           !- Input Unit Type for X",
+        "     Dimensionless;           !- Output Unit Type",
+        });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    // setup variables for VAV Reheat VS Fan
+    int SysNum = 1;
+    int ZoneNum = 1;
+    int ZoneNodeNum = 1;
+    int InletNodeNum = 5;
+    bool ErrorsFound = false;
+    bool FirstHVACIteration = true;
+
+    DataGlobals::NumOfTimeStepInHour = 1;
+    DataGlobals::MinutesPerTimeStep = 60;
+    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
+    ScheduleManager::ScheduleInputProcessed = true;
+    DataEnvironment::Month = 1;
+    DataEnvironment::DayOfMonth = 21;
+    DataGlobals::HourOfDay = 1;
+    DataGlobals::TimeStep = 1;
+    DataEnvironment::DSTIndicator = 0;
+    DataEnvironment::DayOfWeek = 2;
+    DataEnvironment::HolidayIndex = 0;
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
+    DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0);
+    ScheduleManager::UpdateScheduleValues();
+    DataZoneEnergyDemands::ZoneSysEnergyDemand.allocate(1);
+    DataHeatBalFanSys::TempControlType.allocate(1);
+    DataHeatBalFanSys::TempControlType(1) = DataHVACGlobals::DualSetPointWithDeadBand;
+    HeatBalanceManager::GetZoneData(ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+    DataZoneEquipment::GetZoneEquipmentData1();
+    ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
+    SingleDuct::GetSysInput();
+    EXPECT_TRUE(compare_err_stream(""));
+
+    auto &thisAirTerminal = SingleDuct::Sys(SysNum);
+    auto &thisAirTerminalOutlet = SingleDuct::SysOutlet(SysNum);
+
+    // check VAV reheat VS Fan air terminal inputs
+    EXPECT_EQ("AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan", thisAirTerminal.SysType);
+    EXPECT_EQ("VAV RHT VS FAN AIRTERM", thisAirTerminal.SysName); 
+    EXPECT_EQ("COIL:HEATING:ELECTRIC", thisAirTerminal.ReheatComp);
+    EXPECT_EQ("ZONE 1 REHEAT COIL", thisAirTerminal.ReheatName);
+    EXPECT_EQ("FAN:SYSTEMMODEL", thisAirTerminal.FanType);
+    EXPECT_EQ("ZONE 1 VS FAN", thisAirTerminal.FanName);
+    EXPECT_EQ(thisAirTerminal.ZoneMinAirFrac, 0.05);
+    EXPECT_EQ(thisAirTerminal.MaxAirVolFlowRate, 1.0);
+    // test 1: 0.05 fraction damper position
+    Real64 SysMinMassFlowRes = 1.0 * DataEnvironment::StdRhoAir * 0.05; 
+    Real64 SysMaxMassFlowRes = 1.0 * DataEnvironment::StdRhoAir;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = 0.0;
+    DataLoopNode::Node(InletNodeNum).MassFlowRate = SysMaxMassFlowRes;
+    DataLoopNode::Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlowRes;
+    CurDeadBandOrSetback.allocate(1);
+    CurDeadBandOrSetback(1) = false;
+    DataGlobals::BeginEnvrnFlag = true;
+    FirstHVACIteration = true;
+    SingleDuct::InitSys(SysNum, FirstHVACIteration);
+    DataGlobals::BeginEnvrnFlag = false;
+    FirstHVACIteration = false;
+    SingleDuct::InitSys(SysNum, FirstHVACIteration);
+    SingleDuct::SimVAVVS(SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum);
+    // check inputs and calculated values for zone air fraction 0.05
+    EXPECT_EQ(0.05,thisAirTerminal.ZoneMinAirFrac);  // user input
+    EXPECT_EQ(0.05, thisAirTerminal.DamperPosition);
+    EXPECT_EQ(SysMinMassFlowRes, thisAirTerminal.AirMassFlowRateMax * thisAirTerminal.ZoneMinAirFrac);
+    EXPECT_EQ(SysMinMassFlowRes, thisAirTerminalOutlet.AirMassFlowRate);
+
+    // test 2: 0.10 fraction damper position
+    thisAirTerminal.ZoneMinAirFrac = 0.10; // modified user input
+    SysMinMassFlowRes = 1.0 * DataEnvironment::StdRhoAir * 0.10; 
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = 0.0;
+    DataLoopNode::Node(InletNodeNum).MassFlowRate = SysMaxMassFlowRes;
+    DataLoopNode::Node(InletNodeNum).MassFlowRateMaxAvail = SysMaxMassFlowRes;
+    DataGlobals::BeginEnvrnFlag = true;
+    FirstHVACIteration = true;
+    SingleDuct::InitSys(SysNum, FirstHVACIteration);
+    DataGlobals::BeginEnvrnFlag = false;
+    FirstHVACIteration = false;
+    SingleDuct::InitSys(SysNum, FirstHVACIteration);
+    SingleDuct::SimVAVVS(SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum);
+    // check inputs and calculated values for zone air fraction 0.10
+    EXPECT_EQ(0.10, thisAirTerminal.ZoneMinAirFrac);
+    EXPECT_EQ(0.10, thisAirTerminal.DamperPosition);
+    EXPECT_EQ(SysMinMassFlowRes, thisAirTerminal.AirMassFlowRateMax * thisAirTerminal.ZoneMinAirFrac);
+    EXPECT_EQ(SysMinMassFlowRes, thisAirTerminalOutlet.AirMassFlowRate);
 }
 
 } // namespace EnergyPlus

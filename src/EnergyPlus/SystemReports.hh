@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,7 +52,7 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -135,7 +135,7 @@ namespace SystemReports {
     extern Array1D<Real64> SysHCCompHTNG;
     extern Array1D<Real64> SysHCCompGas;
     extern Array1D<Real64> SysHCCompSteam;
-    extern Array1D<Real64> SysDomesticH20;
+    extern Array1D<Real64> SysDomesticH2O;
 
     extern Array1D<Real64> ZoneOAMassFlow;       // zone mech vent mass flow rate {kg/s}
     extern Array1D<Real64> ZoneOAMass;           // zone mech vent total mass for time {kg}

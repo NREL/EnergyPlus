@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -64,70 +64,71 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
-#include <AirflowNetworkBalanceManager.hh>
-#include <Boilers.hh>
-#include <ChillerElectricEIR.hh>
-#include <ChillerReformulatedEIR.hh>
-#include <CommandLineInterface.hh>
-#include <CondenserLoopTowers.hh>
-#include <DXCoils.hh>
-#include <DataAirLoop.hh>
-#include <DataCostEstimate.hh>
-#include <DataDefineEquip.hh>
-#include <DataEnvironment.hh>
-#include <DataErrorTracking.hh>
-#include <DataGlobalConstants.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalSurface.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataOutputs.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataShadowingCombinations.hh>
-#include <DataSizing.hh>
-#include <DataStringGlobals.hh>
-#include <DataSurfaces.hh>
-#include <DataWater.hh>
-#include <DataZoneEquipment.hh>
-#include <DirectAirManager.hh>
-#include <DisplayRoutines.hh>
-#include <EconomicLifeCycleCost.hh>
-#include <ElectricPowerServiceManager.hh>
-#include <EvaporativeCoolers.hh>
-#include <EvaporativeFluidCoolers.hh>
-#include <ExteriorEnergyUse.hh>
-#include <FluidCoolers.hh>
-#include <General.hh>
-#include <HVACVariableRefrigerantFlow.hh>
-#include <HeatingCoils.hh>
-#include <HybridModel.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <InternalHeatGains.hh>
-#include <LowTempRadiantSystem.hh>
-#include <MixedAir.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportPredefined.hh>
-#include <OutputReportTabular.hh>
-#include <OutputReportTabularAnnual.hh>
-#include <PackagedThermalStorageCoil.hh>
-#include <PlantChillers.hh>
-#include <PollutionModule.hh>
-#include <Psychrometrics.hh>
-#include <RefrigeratedCase.hh>
-#include <ReportCoilSelection.hh>
-#include <ResultsSchema.hh>
-#include <Scheduling/Manager.hh>
-#include <SQLiteProcedures.hh>
-#include <ScheduleManager.hh>
-#include <ThermalComfort.hh>
-#include <UtilityRoutines.hh>
-#include <VariableSpeedCoils.hh>
-#include <VentilatedSlab.hh>
-#include <WaterThermalTanks.hh>
-#include <WeatherManager.hh>
-#include <ZonePlenum.hh>
-#include <ZoneTempPredictorCorrector.hh>
+#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
+#include <EnergyPlus/Boilers.hh>
+#include <EnergyPlus/ChillerElectricEIR.hh>
+#include <EnergyPlus/ChillerReformulatedEIR.hh>
+#include <EnergyPlus/CommandLineInterface.hh>
+#include <EnergyPlus/CondenserLoopTowers.hh>
+#include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataCostEstimate.hh>
+#include <EnergyPlus/DataDefineEquip.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataOutputs.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataShadowingCombinations.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataWater.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DirectAirManager.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/EconomicLifeCycleCost.hh>
+#include <EnergyPlus/ElectricPowerServiceManager.hh>
+#include <EnergyPlus/EvaporativeCoolers.hh>
+#include <EnergyPlus/EvaporativeFluidCoolers.hh>
+#include <EnergyPlus/ExteriorEnergyUse.hh>
+#include <EnergyPlus/FluidCoolers.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
+#include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/HybridModel.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/LowTempRadiantSystem.hh>
+#include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
+#include <EnergyPlus/OutputReportTabularAnnual.hh>
+#include <EnergyPlus/PackagedThermalStorageCoil.hh>
+#include <EnergyPlus/PlantChillers.hh>
+#include <EnergyPlus/PollutionModule.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/RefrigeratedCase.hh>
+#include <EnergyPlus/ReportCoilSelection.hh>
+#include <EnergyPlus/ResultsSchema.hh>
+#include <EnergyPlus/SQLiteProcedures.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/Scheduling/Manager.hh>
+#include <EnergyPlus/ThermalComfort.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/VariableSpeedCoils.hh>
+#include <EnergyPlus/VentilatedSlab.hh>
+#include <EnergyPlus/WaterThermalTanks.hh>
+#include <EnergyPlus/WeatherManager.hh>
+#include <EnergyPlus/ZonePlenum.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 
@@ -176,19 +177,16 @@ namespace OutputReportTabular {
     using DataGlobals::DoOutputReporting;
     using DataGlobals::DoWeathSim;
     using DataGlobals::HourOfDay;
-    using DataGlobals::HVACTSReporting;
     using DataGlobals::KindOfSim;
     using DataGlobals::ksDesignDay;
     using DataGlobals::ksRunPeriodDesign;
     using DataGlobals::ksRunPeriodWeather;
     using DataGlobals::NumOfZones;
     using DataGlobals::OutputFileDebug;
-    using DataGlobals::OutputFileInits;
     using DataGlobals::SecInHour;
     using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZone;
     using DataGlobals::TimeStepZoneSec;
-    using DataGlobals::ZoneTSReporting;
     using namespace DataGlobalConstants;
     using namespace OutputReportPredefined;
     using namespace DataHeatBalance;
@@ -226,9 +224,6 @@ namespace OutputReportTabular {
     int const unitsStyleJtoGJ(3);
     int const unitsStyleInchPound(4);
     int const unitsStyleNotFound(5);
-
-    int const stepTypeZone(ZoneTSReporting);
-    int const stepTypeHVAC(HVACTSReporting);
 
     // BEPS Report Related Variables
     // From Report:Table:Predefined - BEPS
@@ -419,7 +414,6 @@ namespace OutputReportTabular {
     int DesignDayCount(0);
 
     // arrays related to pulse and load component reporting
-    Array2D<Real64> radiantPulseUsed;
     Array2D_int radiantPulseTimestep;
     Array2D<Real64> radiantPulseReceived;
     Array3D<Real64> loadConvectedNormal;
@@ -677,7 +671,6 @@ namespace OutputReportTabular {
         sourceFactorOtherFuel2 = 0.0;
         DesignDayName.deallocate();
         DesignDayCount = 0;
-        radiantPulseUsed.deallocate();
         radiantPulseTimestep.deallocate();
         radiantPulseReceived.deallocate();
         loadConvectedNormal.deallocate();
@@ -732,7 +725,7 @@ namespace OutputReportTabular {
         OutputReportTabular::ResetTabularReports();
     }
 
-    void UpdateTabularReports(int const IndexTypeKey) // What kind of data to update (Zone, HVAC)
+    void UpdateTabularReports(OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -767,7 +760,7 @@ namespace OutputReportTabular {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        if (IndexTypeKey != ZoneTSReporting && IndexTypeKey != HVACTSReporting) {
+        if (t_timeStepType != OutputProcessor::TimeStepType::TimeStepZone && t_timeStepType != OutputProcessor::TimeStepType::TimeStepSystem) {
             ShowFatalError("Invalid reporting requested -- UpdateTabularReports");
         }
 
@@ -776,7 +769,7 @@ namespace OutputReportTabular {
             OutputReportTabularAnnual::GetInputTabularAnnual();
             OutputReportTabularAnnual::checkAggregationOrderForAnnual();
             GetInputTabularTimeBins();
-            GetInputTabularStyle();
+            GetInputTabularStyle(OutputFiles::getSingleton());
             GetInputOutputTableSummaryReports();
             // noel -- noticed this was called once and very slow -- sped up a little by caching keys
             InitializeTabularMonthly();
@@ -790,18 +783,18 @@ namespace OutputReportTabular {
             date_and_time(_, _, _, td);
         }
         if (DoOutputReporting && WriteTabularFiles && (KindOfSim == ksRunPeriodWeather)) {
-            if (IndexTypeKey == stepTypeZone) {
+            if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone) {
                 gatherElapsedTimeBEPS += TimeStepZone;
             }
             if (DoWeathSim) {
-                GatherMonthlyResultsForTimestep(IndexTypeKey);
-                OutputReportTabularAnnual::GatherAnnualResultsForTimeStep(IndexTypeKey);
-                GatherBinResultsForTimestep(IndexTypeKey);
-                GatherBEPSResultsForTimestep(IndexTypeKey);
-                GatherSourceEnergyEndUseResultsForTimestep(IndexTypeKey);
-                GatherPeakDemandForTimestep(IndexTypeKey);
-                GatherHeatGainReport(IndexTypeKey);
-                GatherHeatEmissionReport(IndexTypeKey);
+                GatherMonthlyResultsForTimestep(t_timeStepType);
+                OutputReportTabularAnnual::GatherAnnualResultsForTimeStep(t_timeStepType);
+                GatherBinResultsForTimestep(t_timeStepType);
+                GatherBEPSResultsForTimestep(t_timeStepType);
+                GatherSourceEnergyEndUseResultsForTimestep(t_timeStepType);
+                GatherPeakDemandForTimestep(t_timeStepType);
+                GatherHeatGainReport(t_timeStepType);
+                GatherHeatEmissionReport(t_timeStepType);
             }
         }
     }
@@ -1100,7 +1093,7 @@ namespace OutputReportTabular {
         int KeyCount;
         int TypeVar;
         OutputProcessor::StoreType AvgSumVar;
-        int StepTypeVar;
+        OutputProcessor::TimeStepType StepTypeVar;
         OutputProcessor::Unit UnitsVar(OutputProcessor::Unit::None); // Units enum
         // CHARACTER(len=MaxNameLength), DIMENSION(:), ALLOCATABLE :: NamesOfKeys      ! Specific key name
         // INTEGER, DIMENSION(:) , ALLOCATABLE                     :: IndexesForKeyVar ! Array index
@@ -1245,7 +1238,7 @@ namespace OutputReportTabular {
             e.varNum = 0;
             e.typeOfVar = 0;
             e.avgSum = OutputProcessor::StoreType::Averaged;
-            e.stepType = 0;
+            e.stepType = OutputProcessor::TimeStepType::TimeStepZone;
             e.units = OutputProcessor::Unit::None;
             e.aggType = 0;
         }
@@ -1460,7 +1453,7 @@ namespace OutputReportTabular {
                         MonthlyColumns(mColumn).varNum = 0;
                         MonthlyColumns(mColumn).typeOfVar = 0;
                         MonthlyColumns(mColumn).avgSum = OutputProcessor::StoreType::Averaged;
-                        MonthlyColumns(mColumn).stepType = 0;
+                        MonthlyColumns(mColumn).stepType = OutputProcessor::TimeStepType::TimeStepZone;
                         MonthlyColumns(mColumn).units = OutputProcessor::Unit::None;
                         MonthlyColumns(mColumn).aggType = aggTypeSumOrAvg;
                     }
@@ -1749,7 +1742,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void GetInputTabularStyle()
+    void GetInputTabularStyle(OutputFiles &outputFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -1904,13 +1897,13 @@ namespace OutputReportTabular {
         }
 
         if (WriteTabularFiles) {
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Tabular Report>,Style,Unit Conversion";
+            print(outputFiles.eio, "! <Tabular Report>,Style,Unit Conversion\n");
             if (AlphArray(1) != "HTML") {
                 ConvertCaseToLower(AlphArray(1), AlphArray(2));
                 AlphArray(1).erase(1);
                 AlphArray(1) += AlphArray(2).substr(1);
             }
-            ObjexxFCL::gio::write(OutputFileInits, "('Tabular Report,',A,',',A)") << AlphArray(1) << AlphArray(2);
+            print(outputFiles.eio, "Tabular Report,{},{}\n", AlphArray(1), AlphArray(2));
         }
     }
 
@@ -2013,15 +2006,7 @@ namespace OutputReportTabular {
                 nameFound = false;
                 if (AlphArray(iReport).empty()) {
                     ShowFatalError("Blank report name in Oputput:Table:SummaryReports");
-                } else if (UtilityRoutines::SameString(AlphArray(iReport), "ABUPS")) {
-                    displayTabularBEPS = true;
-                    WriteTabularFiles = true;
-                    nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "AnnualBuildingUtilityPerformanceSummary")) {
-                    displayTabularBEPS = true;
-                    WriteTabularFiles = true;
-                    nameFound = true;
-                } else if (UtilityRoutines::SameString(AlphArray(iReport), "BEPS")) {
                     displayTabularBEPS = true;
                     WriteTabularFiles = true;
                     nameFound = true;
@@ -2033,23 +2018,11 @@ namespace OutputReportTabular {
                     displayTabularVeriSum = true;
                     WriteTabularFiles = true;
                     nameFound = true;
-                } else if (UtilityRoutines::SameString(AlphArray(iReport), "IVRS")) {
-                    displayTabularVeriSum = true;
-                    WriteTabularFiles = true;
-                    nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "ComponentSizingSummary")) {
                     displayComponentSizing = true;
                     WriteTabularFiles = true;
                     nameFound = true;
-                } else if (UtilityRoutines::SameString(AlphArray(iReport), "CSS")) {
-                    displayComponentSizing = true;
-                    WriteTabularFiles = true;
-                    nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "SurfaceShadowingSummary")) {
-                    displaySurfaceShadowing = true;
-                    WriteTabularFiles = true;
-                    nameFound = true;
-                } else if (UtilityRoutines::SameString(AlphArray(iReport), "SHAD")) {
                     displaySurfaceShadowing = true;
                     WriteTabularFiles = true;
                     nameFound = true;
@@ -2099,10 +2072,6 @@ namespace OutputReportTabular {
                     nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "EnergyMeters")) {
                     WriteTabularFiles = true;
-                    nameFound = true;
-                } else if (UtilityRoutines::SameString(AlphArray(iReport), "EIO")) {
-                    WriteTabularFiles = true;
-                    displayEioSummary = true;
                     nameFound = true;
                 } else if (UtilityRoutines::SameString(AlphArray(iReport), "InitializationSummary")) {
                     WriteTabularFiles = true;
@@ -3356,7 +3325,7 @@ namespace OutputReportTabular {
             ffSchedIndex(2) = ffScheduleIndex;
         }
 
-        GetFuelFactorInfo("ResidualOil", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+        GetFuelFactorInfo("FuelOil#2", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
             sourceFactorFuelOil2 = curSourceFactor;
             fuelfactorsused(7) = true;
@@ -3369,7 +3338,7 @@ namespace OutputReportTabular {
             ffSchedIndex(11) = ffScheduleIndex;
         }
 
-        GetFuelFactorInfo("DistillateOil", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
+        GetFuelFactorInfo("FuelOil#1", fuelFactorUsed, curSourceFactor, fFScheduleUsed, ffScheduleIndex);
         if (fuelFactorUsed) {
             sourceFactorFuelOil1 = curSourceFactor;
             fuelfactorsused(6) = true;
@@ -3918,7 +3887,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void GatherBinResultsForTimestep(int const IndexTypeKey) // What kind of data to update (Zone, HVAC)
+    void GatherBinResultsForTimestep(OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -3964,7 +3933,7 @@ namespace OutputReportTabular {
         Real64 topValue;
         int binNum;
         int repIndex;
-        int curStepType;
+        OutputProcessor::TimeStepType curStepType;
 
         // REAL(r64), external :: GetInternalVariableValue
 
@@ -3995,12 +3964,12 @@ namespace OutputReportTabular {
             if (gatherThisTime) {
                 for (jTable = 1; jTable <= curNumTables; ++jTable) {
                     repIndex = curResIndex + (jTable - 1);
-                    if (((curStepType == stepTypeZone) && (IndexTypeKey == ZoneTSReporting)) ||
-                        ((curStepType == stepTypeHVAC) && (IndexTypeKey == HVACTSReporting))) {
+                    if (((curStepType == OutputProcessor::TimeStepType::TimeStepZone) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) ||
+                        ((curStepType == OutputProcessor::TimeStepType::TimeStepSystem) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem))) {
                         // put actual value from OutputProcesser arrays
                         curValue = GetInternalVariableValue(curTypeOfVar, BinObjVarID(repIndex).varMeterNum);
                         // per MJW when a summed variable is used divide it by the length of the time step
-                        if (IndexTypeKey == HVACTSReporting) {
+                        if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
                             elapsedTime = TimeStepSys;
                         } else {
                             elapsedTime = TimeStepZone;
@@ -4046,7 +4015,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void GatherMonthlyResultsForTimestep(int const IndexTypeKey) // What kind of data to update (Zone, HVAC)
+    void GatherMonthlyResultsForTimestep(OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -4096,7 +4065,7 @@ namespace OutputReportTabular {
         // LOGICAL,SAVE  :: activeHoursShown=.FALSE.  !fix by LKL addressing CR6482
         bool activeHoursShown;
         bool activeNewValue;
-        int curStepType;
+        OutputProcessor::TimeStepType curStepType;
         int minuteCalculated;
         int kOtherColumn; // variable used in loop to scan through additional columns
         int scanColumn;
@@ -4108,7 +4077,7 @@ namespace OutputReportTabular {
         // profiling showed that they were slow.
 
         static Array1D_int MonthlyColumnsTypeOfVar;
-        static Array1D_int MonthlyColumnsStepType;
+        static Array1D<OutputProcessor::TimeStepType> MonthlyColumnsStepType;
         static Array1D_int MonthlyColumnsAggType;
         static Array1D_int MonthlyColumnsVarNum;
         static Array1D_int MonthlyTablesNumColumns;
@@ -4142,7 +4111,7 @@ namespace OutputReportTabular {
         }
 
         elapsedTime = TimeStepSys;
-        if (IndexTypeKey == HVACTSReporting) {
+        if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
             elapsedTime = TimeStepSys;
         } else {
             elapsedTime = TimeStepZone;
@@ -4156,8 +4125,8 @@ namespace OutputReportTabular {
                 curCol = jColumn + curFirstColumn - 1;
                 curTypeOfVar = MonthlyColumnsTypeOfVar(curCol);
                 curStepType = MonthlyColumnsStepType(curCol);
-                if (((curStepType == stepTypeZone) && (IndexTypeKey == ZoneTSReporting)) ||
-                    ((curStepType == stepTypeHVAC) && (IndexTypeKey == HVACTSReporting))) {
+                if (((curStepType == OutputProcessor::TimeStepType::TimeStepZone) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) ||
+                    ((curStepType == OutputProcessor::TimeStepType::TimeStepSystem) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem))) {
                     //  the above condition used to include the following prior to new scan method
                     //  (MonthlyColumns(curCol)%aggType .EQ. aggTypeValueWhenMaxMin)
                     curVarNum = MonthlyColumnsVarNum(curCol);
@@ -4172,9 +4141,9 @@ namespace OutputReportTabular {
                     newDuration = 0.0;
                     activeNewValue = false;
                     // the current timestamp
-                    minuteCalculated = DetermineMinuteForReporting(IndexTypeKey);
+                    minuteCalculated = DetermineMinuteForReporting(t_timeStepType);
                     //      minuteCalculated = (CurrentTime - INT(CurrentTime))*60
-                    //      IF (IndexTypeKey .EQ. stepTypeHVAC) minuteCalculated = minuteCalculated + SysTimeElapsed * 60
+                    //      IF (t_timeStepType .EQ. OutputProcessor::TimeStepType::TimeStepSystem) minuteCalculated = minuteCalculated + SysTimeElapsed * 60
                     //      minuteCalculated = INT((TimeStep-1) * TimeStepZone * 60) + INT((SysTimeElapsed + TimeStepSys) * 60)
                     EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, HourOfDay, minuteCalculated);
                     // perform the selected aggregation type
@@ -4192,7 +4161,7 @@ namespace OutputReportTabular {
                         } else if (SELECT_CASE_var == aggTypeMaximum) {
                             // per MJW when a summed variable is used divide it by the length of the time step
                             if (MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                                if (IndexTypeKey == HVACTSReporting) {
+                                if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
                                     curValue /= (TimeStepSys * SecInHour);
                                 } else {
                                     curValue /= TimeStepZoneSec;
@@ -4209,7 +4178,7 @@ namespace OutputReportTabular {
                         } else if (SELECT_CASE_var == aggTypeMinimum) {
                             // per MJW when a summed variable is used divide it by the length of the time step
                             if (MonthlyColumns(curCol).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                                if (IndexTypeKey == HVACTSReporting) {
+                                if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
                                     curValue /= (TimeStepSys * SecInHour);
                                 } else {
                                     curValue /= TimeStepZoneSec;
@@ -4306,7 +4275,7 @@ namespace OutputReportTabular {
                                     scanValue = GetInternalVariableValue(scanTypeOfVar, scanVarNum);
                                     // When a summed variable is used divide it by the length of the time step
                                     if (MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                                        if (IndexTypeKey == HVACTSReporting) {
+                                        if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
                                             scanValue /= (TimeStepSys * SecInHour);
                                         } else {
                                             scanValue /= TimeStepZoneSec;
@@ -4350,7 +4319,7 @@ namespace OutputReportTabular {
                                     MonthlyColumns(scanColumn).duration(Month) += elapsedTime;
                                 } else if (SELECT_CASE_var == aggTypeMaximumDuringHoursShown) {
                                     if (MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                                        if (IndexTypeKey == HVACTSReporting) {
+                                        if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
                                             scanValue /= (TimeStepSys * SecInHour);
                                         } else {
                                             scanValue /= TimeStepZoneSec;
@@ -4362,7 +4331,7 @@ namespace OutputReportTabular {
                                     }
                                 } else if (SELECT_CASE_var == aggTypeMinimumDuringHoursShown) {
                                     if (MonthlyColumns(scanColumn).avgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
-                                        if (IndexTypeKey == HVACTSReporting) {
+                                        if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepSystem) {
                                             scanValue /= (TimeStepSys * SecInHour);
                                         } else {
                                             scanValue /= TimeStepZoneSec;
@@ -4384,7 +4353,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void GatherBEPSResultsForTimestep(int const IndexTypeKey) // What kind of data to update (Zone, HVAC)
+    void GatherBEPSResultsForTimestep(OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -4464,7 +4433,7 @@ namespace OutputReportTabular {
 
         // if no beps report is called then skip
 
-        if ((displayTabularBEPS || displayLEEDSummary) && (IndexTypeKey == stepTypeZone)) {
+        if ((displayTabularBEPS || displayLEEDSummary) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) {
             // add the current time to the total elapsed time
             // FOLLOWING LINE MOVED TO UPDATETABULARREPORTS because used even when beps is not called
             // gatherElapsedTimeBEPS = gatherElapsedTimeBEPS + TimeStepZone
@@ -4536,7 +4505,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void GatherSourceEnergyEndUseResultsForTimestep(int const IndexTypeKey) // What kind of data to update (Zone, HVAC)
+    void GatherSourceEnergyEndUseResultsForTimestep(OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Mangesh Basarkar
@@ -4625,7 +4594,7 @@ namespace OutputReportTabular {
 
         // if no beps by source report is called then skip
 
-        if ((displaySourceEnergyEndUseSummary) && (IndexTypeKey == stepTypeZone)) {
+        if ((displaySourceEnergyEndUseSummary) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) {
             // loop through all of the resources and end uses for the entire facility
             for (iResource = 1; iResource <= numResourceTypes; ++iResource) {
 
@@ -4664,7 +4633,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void GatherPeakDemandForTimestep(int const IndexTypeKey) // What kind of data to update (Zone, HVAC)
+    void GatherPeakDemandForTimestep(OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -4749,7 +4718,7 @@ namespace OutputReportTabular {
         int minuteCalculated;
         int timestepTimeStamp;
 
-        if ((displayDemandEndUse) && (IndexTypeKey == stepTypeZone)) {
+        if ((displayDemandEndUse) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) {
             // loop through all of the resources and end uses for the entire facility
             for (iResource = 1; iResource <= numResourceTypes; ++iResource) {
                 curMeterNumber = meterNumTotalsBEPS(iResource);
@@ -4760,7 +4729,7 @@ namespace OutputReportTabular {
                         gatherDemandTotal(iResource) = curDemandValue;
                         // save the time that the peak demand occurred
                         //        minuteCalculated = (CurrentTime - INT(CurrentTime))*60
-                        minuteCalculated = DetermineMinuteForReporting(IndexTypeKey);
+                        minuteCalculated = DetermineMinuteForReporting(t_timeStepType);
                         EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, HourOfDay, minuteCalculated);
                         gatherDemandTimeStamp(iResource) = timestepTimeStamp;
                         // if new peak demand is set, then gather all of the end use values at this particular
@@ -4785,7 +4754,7 @@ namespace OutputReportTabular {
         }
 
         // gather the peak demands of each individual enduse subcategory for the LEED report
-        if ((displayLEEDSummary) && (IndexTypeKey == stepTypeZone)) {
+        if ((displayLEEDSummary) && (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone)) {
             // loop through all of the resources and end uses for the entire facility
             for (iResource = 1; iResource <= numResourceTypes; ++iResource) {
                 for (jEndUse = 1; jEndUse <= NumEndUses; ++jEndUse) {
@@ -4811,7 +4780,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void GatherHeatEmissionReport(int const IndexTypeKey)
+    void GatherHeatEmissionReport(OutputProcessor::TimeStepType t_timeStepType)
     {
         // PURPOSE OF THIS SUBROUTINE:
         // Gathers the data each zone timestep for the heat gain report.
@@ -4822,13 +4791,11 @@ namespace OutputReportTabular {
         using Boilers::Boiler;
         using Boilers::NumBoilers;
         using ChillerElectricEIR::ElectricEIRChiller;
-        using ChillerElectricEIR::ElectricEIRChillerReport;
         using ChillerElectricEIR::NumElectricEIRChillers;
         using ChillerReformulatedEIR::ElecReformEIRChiller;
-        using ChillerReformulatedEIR::ElecReformEIRChillerReport;
         using ChillerReformulatedEIR::NumElecReformEIRChillers;
         using CondenserLoopTowers::NumSimpleTowers;
-        using CondenserLoopTowers::SimpleTowerReport;
+        using CondenserLoopTowers::towers;
         using DataEnvironment::WeatherFileLocationTitle;
         using DataGlobals::convertJtoGJ;
         using DataHeatBalance::BuildingPreDefRep;
@@ -4848,7 +4815,7 @@ namespace OutputReportTabular {
         using EvaporativeCoolers::EvapCond;
         using EvaporativeCoolers::NumEvapCool;
         using EvaporativeFluidCoolers::NumSimpleEvapFluidCoolers;
-        using EvaporativeFluidCoolers::SimpleEvapFluidCoolerReport;
+        using EvaporativeFluidCoolers::SimpleEvapFluidCooler;
         using FluidCoolers::SimpleFluidCooler;
         using HeatingCoils::HeatingCoil;
         using HeatingCoils::NumHeatingCoils;
@@ -4859,13 +4826,9 @@ namespace OutputReportTabular {
         using PackagedThermalStorageCoil::NumTESCoils;
         using PackagedThermalStorageCoil::TESCoil;
         using PlantChillers::ConstCOPChiller;
-        using PlantChillers::ConstCOPChillerReport;
         using PlantChillers::ElectricChiller;
-        using PlantChillers::ElectricChillerReport;
         using PlantChillers::EngineDrivenChiller;
-        using PlantChillers::EngineDrivenChillerReport;
         using PlantChillers::GTChiller;
-        using PlantChillers::GTChillerReport;
         using PlantChillers::NumConstCOPChillers;
         using PlantChillers::NumElectricChillers;
         using PlantChillers::NumEngineDrivenChillers;
@@ -4874,8 +4837,6 @@ namespace OutputReportTabular {
         using RefrigeratedCase::Condenser;
         using VariableSpeedCoils::NumVarSpeedCoils;
         using VariableSpeedCoils::VarSpeedCoil;
-        using WaterThermalTanks::AmbientTempOutsideAir;
-        using WaterThermalTanks::NumWaterThermalTank;
         using WaterThermalTanks::WaterThermalTank;
 
         static int iOACtrl(0);
@@ -4895,7 +4856,7 @@ namespace OutputReportTabular {
         if (!displayHeatEmissionsSummary) return; // don't gather data if report isn't requested
 
         // Only gather zone report at zone time steps
-        if (IndexTypeKey == stepTypeZone) {
+        if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone) {
             BuildingPreDefRep.emiEnvelopConv += SumSurfaceHeatEmission * convertJtoGJ;
             return;
         }
@@ -4912,12 +4873,12 @@ namespace OutputReportTabular {
 
         // Condenser water loop
         for (iCooler = 1; iCooler <= NumSimpleTowers; ++iCooler) {
-            SysTotalHVACRejectHeatLoss += SimpleTowerReport(iCooler).Qactual * TimeStepSysSec + SimpleTowerReport(iCooler).FanEnergy +
-                                          SimpleTowerReport(iCooler).BasinHeaterConsumption;
+            SysTotalHVACRejectHeatLoss += towers(iCooler).Qactual * TimeStepSysSec + towers(iCooler).FanEnergy +
+                                          towers(iCooler).BasinHeaterConsumption;
         }
         for (iCooler = 1; iCooler <= NumSimpleEvapFluidCoolers; ++iCooler) {
             SysTotalHVACRejectHeatLoss +=
-                SimpleEvapFluidCoolerReport(iCooler).Qactual * TimeStepSysSec + SimpleEvapFluidCoolerReport(iCooler).FanEnergy;
+                    SimpleEvapFluidCooler(iCooler).Qactual * TimeStepSysSec + SimpleEvapFluidCooler(iCooler).FanEnergy;
         }
         for (auto & cooler : SimpleFluidCooler) {
             SysTotalHVACRejectHeatLoss += cooler.Qactual * TimeStepSysSec + cooler.FanEnergy;
@@ -4925,33 +4886,33 @@ namespace OutputReportTabular {
 
         // Air- and Evap-cooled chiller
         for (iChiller = 1; iChiller <= NumElectricChillers; ++iChiller) {
-            if (ElectricChiller(iChiller).Base.CondenserType != WaterCooled) {
-                SysTotalHVACRejectHeatLoss += ElectricChillerReport(iChiller).Base.CondEnergy;
+            if (ElectricChiller(iChiller).CondenserType != WaterCooled) {
+                SysTotalHVACRejectHeatLoss += ElectricChiller(iChiller).CondenserEnergy;
             }
         }
         for (iChiller = 1; iChiller <= NumEngineDrivenChillers; ++iChiller) {
-            if (EngineDrivenChiller(iChiller).Base.CondenserType != WaterCooled) {
-                SysTotalHVACRejectHeatLoss += EngineDrivenChillerReport(iChiller).Base.CondEnergy;
+            if (EngineDrivenChiller(iChiller).CondenserType != WaterCooled) {
+                SysTotalHVACRejectHeatLoss += ElectricChiller(iChiller).CondenserEnergy;
             }
         }
         for (iChiller = 1; iChiller <= NumGTChillers; ++iChiller) {
-            if (GTChiller(iChiller).Base.CondenserType != WaterCooled) {
-                SysTotalHVACRejectHeatLoss += GTChillerReport(iChiller).Base.CondEnergy;
+            if (GTChiller(iChiller).CondenserType != WaterCooled) {
+                SysTotalHVACRejectHeatLoss += ElectricChiller(iChiller).CondenserEnergy;
             }
         }
         for (iChiller = 1; iChiller <= NumConstCOPChillers; ++iChiller) {
-            if (ConstCOPChiller(iChiller).Base.CondenserType != WaterCooled) {
-                SysTotalHVACRejectHeatLoss += ConstCOPChillerReport(iChiller).Base.CondEnergy;
+            if (ConstCOPChiller(iChiller).CondenserType != WaterCooled) {
+                SysTotalHVACRejectHeatLoss += ElectricChiller(iChiller).CondenserEnergy;
             }
         }
         for (iChiller = 1; iChiller <= NumElectricEIRChillers; ++iChiller) {
             if (ElectricEIRChiller(iChiller).CondenserType != WaterCooled) {
-                SysTotalHVACRejectHeatLoss += ElectricEIRChillerReport(iChiller).CondEnergy;
+                SysTotalHVACRejectHeatLoss += ElectricEIRChiller(iChiller).CondEnergy;
             }
         }
         for (iChiller = 1; iChiller <= NumElecReformEIRChillers; ++iChiller) {
             if (ElecReformEIRChiller(iChiller).CondenserType != WaterCooled) {
-                SysTotalHVACRejectHeatLoss += ElecReformEIRChillerReport(iChiller).CondEnergy;
+                SysTotalHVACRejectHeatLoss += ElecReformEIRChiller(iChiller).CondEnergy;
             }
         }
 
@@ -5020,8 +4981,8 @@ namespace OutputReportTabular {
         }
 
         // Water heater and thermal storage
-        for (iTank = 1; iTank <= NumWaterThermalTank; ++iTank) {
-            if (WaterThermalTank(iTank).AmbientTempIndicator == AmbientTempOutsideAir) {
+        for (iTank = 1; iTank <= WaterThermalTanks::numWaterThermalTank; ++iTank) {
+            if (WaterThermalTank(iTank).AmbientTempIndicator == WaterThermalTanks::AmbientTempEnum::OutsideAir) {
                 SysTotalHVACRejectHeatLoss += WaterThermalTank(iTank).FuelEnergy - WaterThermalTank(iTank).TotalDemandEnergy;
             }
         }
@@ -5068,7 +5029,7 @@ namespace OutputReportTabular {
                                        BuildingPreDefRep.emiHVACRelief + BuildingPreDefRep.emiHVACReject;
     }
 
-    void GatherHeatGainReport(int const IndexTypeKey) // What kind of data to update (Zone, HVAC)
+    void GatherHeatGainReport(OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -5196,7 +5157,7 @@ namespace OutputReportTabular {
 
         if (!reportName(pdrSensibleGain).show) return; // don't gather data if report isn't requested
 
-        if (IndexTypeKey == stepTypeZone) return; // only add values over the HVAC timestep basis
+        if (t_timeStepType == OutputProcessor::TimeStepType::TimeStepZone) return; // only add values over the HVAC timestep basis
 
         if (GatherHeatGainReportfirstTime) {
             radiantHeat.allocate(NumOfZones);
@@ -5356,7 +5317,7 @@ namespace OutputReportTabular {
                     //      ActualtimeE = ActualTimeS+TimeStepSys
                     //      ActualTimeHrS=INT(ActualTimeS)
                     //      ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
-                    ActualTimeMin = DetermineMinuteForReporting(IndexTypeKey);
+                    ActualTimeMin = DetermineMinuteForReporting(t_timeStepType);
                     EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, HourOfDay, ActualTimeMin);
                     ZonePreDefRep(iZone).htPtTimeStamp = timestepTimeStamp;
                     // HVAC Input Sensible Air Heating
@@ -5435,7 +5396,7 @@ namespace OutputReportTabular {
                     //      ActualtimeE = ActualTimeS+TimeStepSys
                     //      ActualTimeHrS=INT(ActualTimeS)
                     //      ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
-                    ActualTimeMin = DetermineMinuteForReporting(IndexTypeKey);
+                    ActualTimeMin = DetermineMinuteForReporting(t_timeStepType);
                     EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, HourOfDay, ActualTimeMin);
                     ZonePreDefRep(iZone).clPtTimeStamp = timestepTimeStamp;
                     // HVAC Input Sensible Air Heating
@@ -5526,7 +5487,7 @@ namespace OutputReportTabular {
             //  ActualtimeE = ActualTimeS+TimeStepSys
             //  ActualTimeHrS=INT(ActualTimeS)
             //  ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
-            ActualTimeMin = DetermineMinuteForReporting(IndexTypeKey);
+            ActualTimeMin = DetermineMinuteForReporting(t_timeStepType);
             EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, HourOfDay, ActualTimeMin);
             BuildingPreDefRep.htPtTimeStamp = timestepTimeStamp;
             // reset building level results to zero prior to accumulating across zones
@@ -5614,7 +5575,7 @@ namespace OutputReportTabular {
             //  ActualtimeE = ActualTimeS+TimeStepSys
             //  ActualTimeHrS=INT(ActualTimeS)
             //  ActualTimeMin=NINT((ActualtimeE - ActualTimeHrS)*FracToMin)
-            ActualTimeMin = DetermineMinuteForReporting(IndexTypeKey);
+            ActualTimeMin = DetermineMinuteForReporting(t_timeStepType);
             EncodeMonDayHrMin(timestepTimeStamp, Month, DayOfMonth, HourOfDay, ActualTimeMin);
             BuildingPreDefRep.clPtTimeStamp = timestepTimeStamp;
             // reset building level results to zero prior to accumulating across zones
@@ -5735,7 +5696,7 @@ namespace OutputReportTabular {
             WriteSurfaceShadowing();
             WriteCompCostTable();
             WriteAdaptiveComfortTable();
-            WriteEioTables();
+            WriteEioTables(OutputFiles::getSingleton());
             WriteLoadComponentSummaryTables();
             WriteHeatEmissionTable();
 
@@ -8496,8 +8457,7 @@ namespace OutputReportTabular {
             columnHead.allocate(7);
             columnWidth.allocate(7);
             columnWidth = 14; // array assignment - same for all columns
-            tableBody.allocate(7, numRows);
-
+            tableBody.allocate(7, numRows); // TODO: this appears to be (column, row)...
             rowHead = "";
             tableBody = "";
 
@@ -8573,14 +8533,31 @@ namespace OutputReportTabular {
             if (displayTabularBEPS) {
                 WriteSubtitle("End Uses By Subcategory");
                 WriteTable(tableBody, rowHead, columnHead, columnWidth);
+
+                Array1D_string rowHeadTemp(rowHead);
+                // Before outputing to SQL, we forward fill the End use column (rowHead) (cf #7481)
+                // for better sql queries
+                FillRowHead(rowHeadTemp);
+
+                for (int i = 1; i <= numRows; ++i) {
+                    rowHeadTemp(i) = rowHeadTemp(i) + ":" + tableBody(1, i);
+                }
+
+                // Erase the SubCategory (first column), using slicing
+                Array2D_string tableBodyTemp(tableBody({2, _, _ }, {_, _, _}));
+                Array1D_string columnHeadTemp(columnHead({2, _, _ }));
+
                 if (sqlite) {
                     sqlite->createSQLiteTabularDataRecords(
-                        tableBody, rowHead, columnHead, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses By Subcategory");
+                        tableBodyTemp, rowHeadTemp, columnHeadTemp, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses By Subcategory");
                 }
                 if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
                     ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
-                        tableBody, rowHead, columnHead, "Annual Building Utility Performance Summary", "Entire Facility", "End Uses By Subcategory");
+                        tableBodyTemp, rowHeadTemp, columnHeadTemp, "Annual Building Utility Performance Summary", "Entire Facility", "End Uses By Subcategory");
                 }
+                rowHeadTemp.deallocate();
+                tableBodyTemp.deallocate();
+                columnHeadTemp.deallocate();
             }
 
             // EAp2-4/5. Performance Rating Method Compliance
@@ -9161,7 +9138,6 @@ namespace OutputReportTabular {
         int jEndUse;
         Real64 largeConversionFactor;
         Real64 areaConversionFactor;
-        Real64 convBldgCondFloorArea;
 
         if (displaySourceEnergyEndUseSummary) {
             // show the headers of the report
@@ -9216,9 +9192,6 @@ namespace OutputReportTabular {
                     areaConversionFactor = 1.0;
                 }
             }
-
-            // convert floor areas
-            convBldgCondFloorArea = buildingConditionedFloorArea / areaConversionFactor;
 
             // convert units into MJ (divide by 1,000,000) if J otherwise kWh
             for (iResource = 1; iResource <= 5; ++iResource) { // don't do water
@@ -9325,7 +9298,8 @@ namespace OutputReportTabular {
                                                                                         "Source Energy End Use Components Summary");
             }
 
-            //---- Normalized by Conditioned Area Sub-Table
+
+            // Normalized by Area tables
 
             {
                 auto const SELECT_CASE_var(unitsStyle);
@@ -9350,69 +9324,79 @@ namespace OutputReportTabular {
                 }
             }
 
-            tableBody = "";
-            if (convBldgCondFloorArea > 0) {
-                for (iResource = 1; iResource <= 5; ++iResource) {
-                    for (jEndUse = 1; jEndUse <= 14; ++jEndUse) {
-                        tableBody(iResource, jEndUse) = RealToStr(useVal(iResource, jEndUse) / convBldgCondFloorArea, 2);
+            //---- Normalized by Conditioned Area Sub-Table
+            {
+                tableBody = "";
+                // convert floor area
+                Real64 convBldgCondFloorArea = buildingConditionedFloorArea / areaConversionFactor;
+                if (convBldgCondFloorArea > 0) {
+                    for (iResource = 1; iResource <= 5; ++iResource) {
+                        for (jEndUse = 1; jEndUse <= 14; ++jEndUse) {
+                            tableBody(iResource, jEndUse) = RealToStr(useVal(iResource, jEndUse) / convBldgCondFloorArea, 2);
+                        }
+                        tableBody(iResource, 16) = RealToStr(useVal(iResource, 15) / convBldgCondFloorArea, 2);
                     }
-                    tableBody(iResource, 16) = RealToStr(useVal(iResource, 15) / convBldgCondFloorArea, 2);
                 }
-            }
 
-            WriteTextLine("Normalized Metrics", true);
+                WriteTextLine("Normalized Metrics", true);
 
-            // heading for the entire sub-table
-            WriteSubtitle("Source Energy End Use Components Per Conditioned Floor Area");
-            WriteTable(tableBody, rowHead, columnHead, columnWidth);
-            if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody,
-                                                       rowHead,
-                                                       columnHead,
-                                                       "SourceEnergyEndUseComponentsSummary",
-                                                       "Entire Facility",
-                                                       "Source Energy End Use Component Per Conditioned Floor Area");
-            }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
-                                                                                        rowHead,
-                                                                                        columnHead,
-                                                                                        "Source Energy End Use Components Summary",
-                                                                                        "Entire Facility",
-                                                                                        "Source Energy End Use Component Per Conditioned Floor Area");
-            }
+                // heading for the entire sub-table
+                WriteSubtitle("Source Energy End Use Components Per Conditioned Floor Area");
+                WriteTable(tableBody, rowHead, columnHead, columnWidth);
+                if (sqlite) {
+                    sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                           rowHead,
+                                                           columnHead,
+                                                           "SourceEnergyEndUseComponentsSummary",
+                                                           "Entire Facility",
+                                                           "Source Energy End Use Component Per Conditioned Floor Area");
+                }
+                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
+                                                                                            rowHead,
+                                                                                            columnHead,
+                                                                                            "Source Energy End Use Components Summary",
+                                                                                            "Entire Facility",
+                                                                                            "Source Energy End Use Component Per Conditioned Floor Area");
+                }
+            } // End of Normalized by Conditioned Area
 
             //---- Normalized by Total Area Sub-Table
-            tableBody = "";
-            if (convBldgCondFloorArea > 0) {
-                for (iResource = 1; iResource <= 5; ++iResource) {
-                    for (jEndUse = 1; jEndUse <= 14; ++jEndUse) {
-                        tableBody(iResource, jEndUse) = RealToStr(useVal(iResource, jEndUse) / convBldgCondFloorArea, 2);
-                    }
-                    tableBody(iResource, 16) = RealToStr(useVal(iResource, 15) / convBldgCondFloorArea, 2);
-                }
-            }
+            {
+                tableBody = "";
+                Real64 convBldgGrossFloorArea = buildingGrossFloorArea / areaConversionFactor;
 
-            // heading for the entire sub-table
-            WriteSubtitle("Source Energy End Use Components Per Total Floor Area");
-            WriteTable(tableBody, rowHead, columnHead, columnWidth);
-            if (sqlite) {
-                sqlite->createSQLiteTabularDataRecords(tableBody,
-                                                       rowHead,
-                                                       columnHead,
-                                                       "SourceEnergyEndUseComponentsSummary",
-                                                       "Entire Facility",
-                                                       "Source Energy End Use Components Per Total Floor Area");
-            }
-            if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
-                                                                                        rowHead,
-                                                                                        columnHead,
-                                                                                        "Source Energy End Use Components Summary",
-                                                                                        "Entire Facility",
-                                                                                        "Source Energy End Use Components Per Total Floor Area");
-            }
-        }
+                if (convBldgGrossFloorArea > 0) {
+                    for (iResource = 1; iResource <= 5; ++iResource) {
+                        for (jEndUse = 1; jEndUse <= 14; ++jEndUse) {
+                            tableBody(iResource, jEndUse) = RealToStr(useVal(iResource, jEndUse) / convBldgGrossFloorArea, 2);
+                        }
+                        tableBody(iResource, 16) = RealToStr(useVal(iResource, 15) / convBldgGrossFloorArea, 2);
+                    }
+                }
+
+                // heading for the entire sub-table
+                WriteSubtitle("Source Energy End Use Components Per Total Floor Area");
+                WriteTable(tableBody, rowHead, columnHead, columnWidth);
+                if (sqlite) {
+                    sqlite->createSQLiteTabularDataRecords(tableBody,
+                                                           rowHead,
+                                                           columnHead,
+                                                           "SourceEnergyEndUseComponentsSummary",
+                                                           "Entire Facility",
+                                                           "Source Energy End Use Components Per Total Floor Area");
+                }
+                if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
+                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBody,
+                                                                                            rowHead,
+                                                                                            columnHead,
+                                                                                            "Source Energy End Use Components Summary",
+                                                                                            "Entire Facility",
+                                                                                            "Source Energy End Use Components Per Total Floor Area");
+                }
+            } // End of Normalized by Total Area
+
+        } // end if displaySourceEnergyEndUseSummary
     }
 
     void WriteDemandEndUseSummary()
@@ -9894,14 +9878,31 @@ namespace OutputReportTabular {
             // heading for the entire sub-table
             WriteSubtitle("End Uses By Subcategory");
             WriteTable(tableBody, rowHead, columnHead, columnWidth, false, footnote);
+
+            Array1D_string rowHeadTemp(rowHead);
+            // Before outputing to SQL, we forward fill the End use column (rowHead) (cf #7481)
+            // for better sql queries
+            FillRowHead(rowHeadTemp);
+
+            for (int i = 1; i <= numRows; ++i) {
+                rowHeadTemp(i) = rowHeadTemp(i) + ":" + tableBody(1, i);
+            }
+
+            // Erase the SubCategory (first column), using slicing
+            Array2D_string tableBodyTemp(tableBody({2, _, _ }, {_, _, _}));
+            Array1D_string columnHeadTemp(columnHead({2, _, _ }));
+
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(
-                    tableBody, rowHead, columnHead, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses By Subcategory");
+                    tableBodyTemp, rowHeadTemp, columnHeadTemp, "DemandEndUseComponentsSummary", "Entire Facility", "End Uses By Subcategory");
             }
             if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
                 ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
-                    tableBody, rowHead, columnHead, "Demand End Use Components Summary", "Entire Facility", "End Uses By Subcategory");
+                    tableBodyTemp, rowHeadTemp, columnHeadTemp, "Demand End Use Components Summary", "Entire Facility", "End Uses By Subcategory");
             }
+            rowHeadTemp.deallocate();
+            tableBodyTemp.deallocate();
+            columnHeadTemp.deallocate();
 
             // EAp2-4/5. Performance Rating Method Compliance
             for (iResource = 1; iResource <= 6; ++iResource) {
@@ -11821,7 +11822,7 @@ namespace OutputReportTabular {
 
     // Parses the contents of the EIO (initializations) file and creates subtables for each type of record in the tabular output files
     // Glazer - November 2016
-    void WriteEioTables()
+    void WriteEioTables(OutputFiles &outputFiles)
     {
 
         if (displayEioSummary) {
@@ -11834,26 +11835,19 @@ namespace OutputReportTabular {
             // setting up  report header
             WriteReportHeaders("Initialization Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
 
-            // since the EIO initilization file is open at this point must close it to read it and then reopen afterward.
-            ObjexxFCL::gio::close(OutputFileInits);
-
-            std::ifstream eioFile;
-            eioFile.open(DataStringGlobals::outputEioFileName);
             std::vector<std::string> headerLines; // holds the lines that describe each type of records - each starts with ! symbol
             std::vector<std::string> bodyLines;   // holds the data records only
-            std::string line;
-            while (std::getline(eioFile, line)) {
+            for (auto const &line : outputFiles.eio.getLines()) {
                 if (line.at(0) == '!') {
                     headerLines.push_back(line);
                 } else {
                     if (line.at(0) == ' ') {
-                        bodyLines.push_back(line.erase(0, 1)); // remove leading space
+                        bodyLines.push_back(line.substr(1)); // remove leading space
                     } else {
                         bodyLines.push_back(line);
                     }
                 }
             }
-            eioFile.close();
 
             // now go through each header and create a report for each one
             for (auto headerLine : headerLines) {
@@ -11932,16 +11926,6 @@ namespace OutputReportTabular {
                 }
             }
 
-            // reopen the EIO initilization file and position it at the end of the file so that additional writes continue to be added at the end.
-            int write_stat;
-            {
-                IOFlags flags;
-                flags.ACTION("write");
-                flags.STATUS("UNKNOWN");
-                flags.POSITION("APPEND");
-                ObjexxFCL::gio::open(OutputFileInits, DataStringGlobals::outputEioFileName, flags);
-                write_stat = flags.ios();
-            }
             // as of Oct 2016 only the <Program Control Information:Threads/Parallel Sims> section is written after this point
         }
     }
@@ -12078,8 +12062,6 @@ namespace OutputReportTabular {
 
         if (AllocateLoadComponentArraysDoAllocate) {
             // For many of the following arrays the last dimension is the number of environments and is same as sizing arrays
-            radiantPulseUsed.allocate({0, TotDesDays + TotRunDesPersDays}, NumOfZones);
-            radiantPulseUsed = 0.0;
             radiantPulseTimestep.allocate({0, TotDesDays + TotRunDesPersDays}, NumOfZones);
             radiantPulseTimestep = 0;
             radiantPulseReceived.allocate({0, TotDesDays + TotRunDesPersDays}, TotSurfaces);
@@ -12198,7 +12180,6 @@ namespace OutputReportTabular {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        radiantPulseUsed.deallocate();
         radiantPulseTimestep.deallocate();
         radiantPulseReceived.deallocate();
         // need for reporting  DEALLOCATE(loadConvectedNormal)
@@ -12207,7 +12188,7 @@ namespace OutputReportTabular {
         // need for reporting  DEALLOCATE(decayCurveHeat)
     }
 
-    void ComputeLoadComponentDecayCurve()
+    void ComputeLoadComponentDecayCurve(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -12308,53 +12289,27 @@ namespace OutputReportTabular {
 
         if (ShowDecayCurvesInEIO) {
             // show the line definition for the decay curves
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Radiant to Convective Decay Curves for Cooling>,Zone Name, Surface Name, Time "
-                                                 "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36";
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Radiant to Convective Decay Curves for Heating>,Zone Name, Surface Name, Time "
-                                                 "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36";
+            print(outputFiles.eio,  "! <Radiant to Convective Decay Curves for Cooling>,Zone Name, Surface Name, Time "
+                                    "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36");
             // Put the decay curve into the EIO file
             for (int iZone = 1; iZone <= NumOfZones; ++iZone) {
                 ZoneData &zd(Zone(iZone));
                 for (int kSurf = zd.SurfaceFirst; kSurf <= zd.SurfaceLast; ++kSurf) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, "(4A)", flags)
-                            << "Radiant to Convective Decay Curves for Cooling," << Zone(iZone).Name << ',' << Surface(kSurf).Name;
-                    }
+                    print(outputFiles.eio, "{},{},{}", "Radiant to Convective Decay Curves for Cooling", Zone(iZone).Name, Surface(kSurf).Name);
                     for (int jTime = 1; jTime <= min(NumOfTimeStepInHour * 24, 36); ++jTime) {
-                        {
-                            IOFlags flags;
-                            flags.ADVANCE("NO");
-                            ObjexxFCL::gio::write(OutputFileInits, "(A,F6.3)", flags) << ',' << decayCurveCool(jTime, kSurf);
-                        }
+                        print(outputFiles.eio, ",{:6.3F}", decayCurveCool(jTime, kSurf));
                     }
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("YES");
-                        ObjexxFCL::gio::write(OutputFileInits, "()", flags);
-                    } // put a line feed at the end of the line
+                    // put a line feed at the end of the line
+                    print(outputFiles.eio, "\n");
                 }
 
                 for (int kSurf = zd.SurfaceFirst; kSurf <= zd.SurfaceLast; ++kSurf) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, "(4A)", flags)
-                            << "Radiant to Convective Decay Curves for Heating," << Zone(iZone).Name << ',' << Surface(kSurf).Name;
-                    }
+                    print(outputFiles.eio, "{},{},{}", "Radiant to Convective Decay Curves for Heating", Zone(iZone).Name, Surface(kSurf).Name);
                     for (int jTime = 1; jTime <= min(NumOfTimeStepInHour * 24, 36); ++jTime) {
-                        {
-                            IOFlags flags;
-                            flags.ADVANCE("NO");
-                            ObjexxFCL::gio::write(OutputFileInits, "(A,F6.3)", flags) << ',' << decayCurveHeat(jTime, kSurf);
-                        }
+                        print(outputFiles.eio, ",{:6.3F}", decayCurveHeat(jTime, kSurf));
                     }
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("YES");
-                        ObjexxFCL::gio::write(OutputFileInits, "()", flags);
-                    } // put a line feed at the end of the line
+                    // put a line feed at the end of the line
+                    print(outputFiles.eio, "\n");
                 }
             }
         }
@@ -12541,7 +12496,7 @@ namespace OutputReportTabular {
         // The overall methodology is explained below:
         //
         // Determine decay curve - Pulse of radiant heat which is about 5% of lighting and
-        //   equipment input [radiantPulseUsed(iZone)] for a single timestep a few hours after
+        //   equipment input for a single timestep a few hours after
         //   cooling or heat is scheduled on for each zone [radiantPulseTimestep(iZone)].
         //   The radiant heat received on each wall is stored [radiantPulseReceived(jSurface)].
         //   The load convected in the normal case [loadConvectedNormal(jSurface, kTime, mode)]
@@ -13184,6 +13139,7 @@ namespace OutputReportTabular {
         powerGenRadIntoSurf = 0.;
         lightLWRadIntoSurf.allocate(NumOfTimeStepInHour * 24);
         lightLWRadIntoSurf = 0.;
+        int radEnclosureNum = Zone(zoneIndex).RadiantEnclosureNum;
 
         if (desDaySelected != 0) {
 
@@ -13210,7 +13166,7 @@ namespace OutputReportTabular {
 
                     // determine for each timestep the amount of radiant heat for each end use absorbed in each surface
                     Real64 QRadThermInAbsMult =
-                        TMULTseq(desDaySelected, kTimeStep, zoneIndex) * ITABSFseq(desDaySelected, kTimeStep, jSurf) * Surface(jSurf).Area;
+                        TMULTseq(desDaySelected, kTimeStep, radEnclosureNum) * ITABSFseq(desDaySelected, kTimeStep, jSurf) * Surface(jSurf).Area;
                     peopleRadIntoSurf(kTimeStep) = peopleRadSeq(desDaySelected, kTimeStep, zoneIndex) * QRadThermInAbsMult;
                     equipRadIntoSurf(kTimeStep) = equipRadSeq(desDaySelected, kTimeStep, zoneIndex) * QRadThermInAbsMult;
                     hvacLossRadIntoSurf(kTimeStep) = hvacLossRadSeq(desDaySelected, kTimeStep, zoneIndex) * QRadThermInAbsMult;
@@ -14099,10 +14055,10 @@ namespace OutputReportTabular {
                     rowHead(1) = "Time of Peak Load";
                     rowHead(2) = "Outside Dry Bulb Temperature [C]";
                     rowHead(3) = "Outside Wet Bulb Temperature [C]";
-                    rowHead(4) = "Outside Humidity Ratio at Peak [kgWater/kgAir]";
+                    rowHead(4) = "Outside Humidity Ratio at Peak [kgWater/kgDryAir]";
                     rowHead(5) = "Zone Dry Bulb Temperature [C]";
                     rowHead(6) = "Zone Relative Humidity [%]";
-                    rowHead(7) = "Zone Humidity Ratio at Peak [kgWater/kgAir]";
+                    rowHead(7) = "Zone Humidity Ratio at Peak [kgWater/kgDryAir]";
 
                     rowHead(8) = "Supply Air Temperature [C]";
                     rowHead(9) = "Mixed Air Temperature [C]";
@@ -15154,6 +15110,21 @@ namespace OutputReportTabular {
         }
     }
 
+    void FillRowHead(Array1D_string & rowHead)
+    {
+        // Forward fill the blanks in rowHead (eg End use column)
+        std::string currentEndUseName;
+        for (size_t i = 1; i <= rowHead.size(); ++i) {
+            std::string thisEndUseName = rowHead(i);
+            if (thisEndUseName.empty()) {
+                rowHead(i) = currentEndUseName;
+            } else {
+                currentEndUseName = thisEndUseName;
+            }
+        }
+    }
+
+
     //======================================================================================================================
     //======================================================================================================================
 
@@ -15920,7 +15891,7 @@ namespace OutputReportTabular {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         //    na
-        UnitConvSize = 117;
+        UnitConvSize = 115;
         UnitConv.allocate(UnitConvSize);
         UnitConv(1).siName = "%";
         UnitConv(2).siName = "°C";
@@ -15947,14 +15918,14 @@ namespace OutputReportTabular {
         UnitConv(23).siName = "J";
         UnitConv(24).siName = "J";
         UnitConv(25).siName = "J/KG";
-        UnitConv(26).siName = "J/KG H2O";
+        UnitConv(26).siName = "J/KGWATER";
         UnitConv(27).siName = "J/M2";
         UnitConv(28).siName = "K/M";
         UnitConv(29).siName = "KG";
         UnitConv(30).siName = "KG/KG";
         UnitConv(31).siName = "KG/M3";
         UnitConv(32).siName = "KG/S";
-        UnitConv(33).siName = "KGWATER/KGAIR";
+        UnitConv(33).siName = "KGWATER/KGDRYAIR";
         UnitConv(34).siName = "KGWATER/SEC";
         UnitConv(35).siName = "KMOL/S";
         UnitConv(36).siName = "KMOL/SEC";
@@ -15993,7 +15964,7 @@ namespace OutputReportTabular {
         UnitConv(69).siName = "W";
         UnitConv(70).siName = "W";
         UnitConv(71).siName = "W/KG";
-        UnitConv(72).siName = "W/KG H2O";
+        UnitConv(72).siName = "W/KG H2O";   // TODO: replace with W/kgWater? or rather just remove
         UnitConv(73).siName = "W/K";
         UnitConv(74).siName = "W/M2";
         UnitConv(75).siName = "W/M2";
@@ -16026,19 +15997,17 @@ namespace OutputReportTabular {
         UnitConv(102).siName = "$";
         UnitConv(103).siName = "$/UNIT ENERGY";
         UnitConv(104).siName = "KW";
-        UnitConv(105).siName = "KGWATER/KGDRYAIR";
-        UnitConv(106).siName = " ";
-        UnitConv(107).siName = "AH";
-        UnitConv(108).siName = "CLO";
-        UnitConv(109).siName = "J/KG-K";
-        UnitConv(110).siName = "J/KGWATER";
-        UnitConv(111).siName = "KGWATER/S";
-        UnitConv(112).siName = "PPM";
-        UnitConv(113).siName = "RAD";
-        UnitConv(114).siName = "REV/MIN";
-        UnitConv(115).siName = "NM";
-        UnitConv(116).siName = "BTU/W-H"; // Used for AHRI rating metrics (e.g. SEER)
-        UnitConv(117).siName = "PERSON/M2";
+        UnitConv(105).siName = " ";
+        UnitConv(106).siName = "AH";
+        UnitConv(107).siName = "CLO";
+        UnitConv(108).siName = "J/KG-K";
+        UnitConv(109).siName = "KGWATER/S";
+        UnitConv(110).siName = "PPM";
+        UnitConv(111).siName = "RAD";
+        UnitConv(112).siName = "REV/MIN";
+        UnitConv(113).siName = "NM";
+        UnitConv(114).siName = "BTU/W-H"; // Used for AHRI rating metrics (e.g. SEER)
+        UnitConv(115).siName = "PERSON/M2";
 
         UnitConv(1).ipName = "%";
         UnitConv(2).ipName = "F";
@@ -16072,7 +16041,7 @@ namespace OutputReportTabular {
         UnitConv(30).ipName = "lb/lb";
         UnitConv(31).ipName = "lb/ft3";
         UnitConv(32).ipName = "lb/s";
-        UnitConv(33).ipName = "lbWater/lbAir";
+        UnitConv(33).ipName = "lbWater/lbDryAir";
         UnitConv(34).ipName = "lbWater/s";
         UnitConv(35).ipName = "kmol/s";
         UnitConv(36).ipName = "kmol/sec";
@@ -16144,19 +16113,17 @@ namespace OutputReportTabular {
         UnitConv(102).ipName = "$";
         UnitConv(103).ipName = "$/unit energy";
         UnitConv(104).ipName = "kW";
-        UnitConv(105).ipName = "lbWater/lbDryAir";
-        UnitConv(106).ipName = " ";
-        UnitConv(107).ipName = "Ah";
-        UnitConv(108).ipName = "clo";
-        UnitConv(109).ipName = "Btu/lbm-R";
-        UnitConv(110).ipName = "Btu/lbWater";
-        UnitConv(111).ipName = "lbWater/s";
-        UnitConv(112).ipName = "ppm";
-        UnitConv(113).ipName = "rad";
-        UnitConv(114).ipName = "rev/min";
-        UnitConv(115).ipName = "lbf-ft";
-        UnitConv(116).ipName = "Btu/W-h";
-        UnitConv(117).ipName = "person/ft2";
+        UnitConv(105).ipName = " ";
+        UnitConv(106).ipName = "Ah";
+        UnitConv(107).ipName = "clo";
+        UnitConv(108).ipName = "Btu/lbm-R";
+        UnitConv(109).ipName = "lbWater/s";
+        UnitConv(110).ipName = "ppm";
+        UnitConv(111).ipName = "rad";
+        UnitConv(112).ipName = "rev/min";
+        UnitConv(113).ipName = "lbf-ft";
+        UnitConv(114).ipName = "Btu/W-h";
+        UnitConv(115).ipName = "person/ft2";
 
         UnitConv(1).mult = 1.0;
         UnitConv(2).mult = 1.8;
@@ -16265,16 +16232,14 @@ namespace OutputReportTabular {
         UnitConv(105).mult = 1.0;
         UnitConv(106).mult = 1.0;
         UnitConv(107).mult = 1.0;
-        UnitConv(108).mult = 1.0;
-        UnitConv(109).mult = 0.000238845896627;
-        UnitConv(110).mult = 0.0000004302105;
-        UnitConv(111).mult = 2.2046;
+        UnitConv(108).mult = 0.000238845896627;
+        UnitConv(109).mult = 2.2046;
+        UnitConv(110).mult = 1.0;
+        UnitConv(111).mult = 1.0;
         UnitConv(112).mult = 1.0;
-        UnitConv(113).mult = 1.0;
+        UnitConv(113).mult = 0.737562149277;
         UnitConv(114).mult = 1.0;
-        UnitConv(115).mult = 0.737562149277;
-        UnitConv(116).mult = 1.0;
-        UnitConv(117).mult = 0.09290304;
+        UnitConv(115).mult = 0.09290304;
 
         UnitConv(2).offset = 32.0;
         UnitConv(11).offset = 32.0;

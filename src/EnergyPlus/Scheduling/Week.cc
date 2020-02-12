@@ -45,11 +45,11 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <Scheduling/Base.hh>
-#include <Scheduling/Week.hh>
-#include <Scheduling/Day.hh>
-#include <UtilityRoutines.hh>
-#include <InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/Scheduling/Base.hh>
+#include <EnergyPlus/Scheduling/Week.hh>
+#include <EnergyPlus/Scheduling/Day.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
 
 #include <nlohmann/json.hpp>
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,46 +56,46 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <BranchNodeConnections.hh>
-#include <DXCoils.hh>
-#include <DataAirLoop.hh>
-#include <DataAirSystems.hh>
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalance.hh>
-#include <DataLoopNode.hh>
-#include <DataPlant.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSizing.hh>
-#include <DataZoneEnergyDemands.hh>
-#include <DataZoneEquipment.hh>
-#include <Fans.hh>
-#include <FluidProperties.hh>
-#include <General.hh>
-#include <GeneralRoutines.hh>
-#include <GlobalNames.hh>
-#include <HVACFan.hh>
-#include <HVACHXAssistedCoolingCoil.hh>
-#include <HeatingCoils.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <MixedAir.hh>
-#include <NodeInputManager.hh>
-#include <OutAirNodeManager.hh>
-#include <OutputProcessor.hh>
-#include <PackagedTerminalHeatPump.hh>
-#include <PlantUtilities.hh>
-#include <Psychrometrics.hh>
-#include <ReportCoilSelection.hh>
-#include <ReportSizingManager.hh>
-#include <SZVAVModel.hh>
-#include <ScheduleManager.hh>
-#include <SingleDuct.hh>
-#include <SteamCoils.hh>
-#include <UtilityRoutines.hh>
-#include <WaterCoils.hh>
-#include <WaterToAirHeatPump.hh>
-#include <WaterToAirHeatPumpSimple.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/HVACFan.hh>
+#include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
+#include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/PackagedTerminalHeatPump.hh>
+#include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ReportCoilSelection.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
+#include <EnergyPlus/SZVAVModel.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SingleDuct.hh>
+#include <EnergyPlus/SteamCoils.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WaterCoils.hh>
+#include <EnergyPlus/WaterToAirHeatPump.hh>
+#include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
 
 namespace EnergyPlus {
 
@@ -979,10 +979,8 @@ namespace PackagedTerminalHeatPump {
             SetMinOATCompressor(PTUnitNum,
                                 PTUnit(PTUnitNum).Name,
                                 CurrentModuleObject,
-                                PTUnit(PTUnitNum).DXCoolCoilType,
-                                PTUnit(PTUnitNum).DXCoolCoilName,
-                                PTUnit(PTUnitNum).DXHeatCoilType,
-                                PTUnit(PTUnitNum).DXHeatCoilName,
+                                PTUnit(PTUnitNum).DXCoolCoilIndexNum,
+                                PTUnit(PTUnitNum).DXHeatCoilIndexNum,
                                 ErrorsFound);
 
             SuppHeatCoilType = Alphas(13);
@@ -1905,10 +1903,8 @@ namespace PackagedTerminalHeatPump {
             SetMinOATCompressor(PTUnitNum,
                                 PTUnit(PTUnitNum).Name,
                                 CurrentModuleObject,
-                                PTUnit(PTUnitNum).DXCoolCoilType,
-                                PTUnit(PTUnitNum).DXCoolCoilName,
-                                PTUnit(PTUnitNum).DXHeatCoilType,
-                                PTUnit(PTUnitNum).DXHeatCoilName,
+                                PTUnit(PTUnitNum).DXCoolCoilIndexNum,
+                                PTUnit(PTUnitNum).DXHeatCoilIndexNum,
                                 ErrorsFound);
 
             // Get AirTerminal mixer data
@@ -2634,10 +2630,8 @@ namespace PackagedTerminalHeatPump {
             SetMinOATCompressor(PTUnitNum,
                                 PTUnit(PTUnitNum).Name,
                                 CurrentModuleObject,
-                                PTUnit(PTUnitNum).DXCoolCoilType,
-                                PTUnit(PTUnitNum).DXCoolCoilName,
-                                PTUnit(PTUnitNum).DXHeatCoilType,
-                                PTUnit(PTUnitNum).DXHeatCoilName,
+                                PTUnit(PTUnitNum).DXCoolCoilIndexNum,
+                                PTUnit(PTUnitNum).DXHeatCoilIndexNum,
                                 ErrorsFound);
 
             // Get supplemental heating coil information
@@ -4243,17 +4237,30 @@ namespace PackagedTerminalHeatPump {
 
             //   set fluid-side hardware limits
             if (PTUnit(PTUnitNum).HeatCoilFluidInletNode > 0) {
-                // If water coil max water flow rate is autosized, simulate once in order to mine max water flow rate
+                // If coil max fluid flow rate is autosized, simulate once in order to mine max flow rate
                 if (PTUnit(PTUnitNum).MaxHeatCoilFluidFlow == AutoSize) {
-                    SimulateWaterCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).ACHeatCoilIndex);
-                    CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate("Coil:Heating:Water", PTUnit(PTUnitNum).ACHeatCoilName, ErrorsFound);
-                    if (CoilMaxVolFlowRate != AutoSize) {
-
-                        rho = GetDensityGlycol(PlantLoop(PTUnit(PTUnitNum).HeatCoilLoopNum).FluidName,
-                                               DataGlobals::HWInitConvTemp,
-                                               PlantLoop(PTUnit(PTUnitNum).HeatCoilLoopNum).FluidIndex,
-                                               RoutineNameSpace);
-                        PTUnit(PTUnitNum).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * rho;
+                    if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingWater) {
+                        SimulateWaterCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).ACHeatCoilIndex);
+                        CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate("Coil:Heating:Water", PTUnit(PTUnitNum).ACHeatCoilName, ErrorsFound);
+                        if (CoilMaxVolFlowRate != AutoSize) {
+                            rho = GetDensityGlycol(PlantLoop(PTUnit(PTUnitNum).HeatCoilLoopNum).FluidName,
+                                                   DataGlobals::HWInitConvTemp,
+                                                   PlantLoop(PTUnit(PTUnitNum).HeatCoilLoopNum).FluidIndex,
+                                                   RoutineNameSpace);
+                            PTUnit(PTUnitNum).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * rho;
+                        }
+                    } else if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingSteam) {
+                        SimulateSteamCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName,
+                                                    FirstHVACIteration,
+                                                    PTUnit(PTUnitNum).ACHeatCoilIndex,
+                                                    1.0,
+                                                    QActual); // QCoilReq, simulate any load > 0 to get max capacity of steam coil
+                        CoilMaxVolFlowRate = GetCoilMaxSteamFlowRate(PTUnit(PTUnitNum).ACHeatCoilIndex, ErrorsFound);
+                        if (CoilMaxVolFlowRate != AutoSize) {
+                            SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
+                            SteamDensity = GetSatDensityRefrig(fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName);
+                            PTUnit(PTUnitNum).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * SteamDensity;
+                        }
                     }
                 }
                 InitComponentNodes(0.0,
@@ -4267,16 +4274,31 @@ namespace PackagedTerminalHeatPump {
             }
 
             if (PTUnit(PTUnitNum).SuppCoilFluidInletNode > 0) {
-
+                // If coil max fluid flow rate is autosized, simulate once in order to mine max flow rate
                 if (PTUnit(PTUnitNum).MaxSuppCoilFluidFlow == AutoSize) {
-                    SimulateWaterCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).SuppHeatCoilIndex);
-                    CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate("Coil:Heating:Water", PTUnit(PTUnitNum).SuppHeatCoilName, ErrorsFound);
-                    if (CoilMaxVolFlowRate != AutoSize) {
-                        rho = GetDensityGlycol(PlantLoop(PTUnit(PTUnitNum).SuppCoilLoopNum).FluidName,
-                                               DataGlobals::HWInitConvTemp,
-                                               PlantLoop(PTUnit(PTUnitNum).SuppCoilLoopNum).FluidIndex,
-                                               RoutineNameSpace);
-                        PTUnit(PTUnitNum).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * rho;
+                    if (PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingWater) {
+                        SimulateWaterCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).SuppHeatCoilIndex);
+                        CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate("Coil:Heating:Water", PTUnit(PTUnitNum).SuppHeatCoilName, ErrorsFound);
+                        if (CoilMaxVolFlowRate != AutoSize) {
+                            rho = GetDensityGlycol(PlantLoop(PTUnit(PTUnitNum).SuppCoilLoopNum).FluidName,
+                                                   DataGlobals::HWInitConvTemp,
+                                                   PlantLoop(PTUnit(PTUnitNum).SuppCoilLoopNum).FluidIndex,
+                                                   RoutineNameSpace);
+                            PTUnit(PTUnitNum).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * rho;
+                        }
+                    } else if (PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingSteam) {
+                        SimulateSteamCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName,
+                                                    FirstHVACIteration,
+                                                    PTUnit(PTUnitNum).SuppHeatCoilIndex,
+                                                    1.0,
+                                                    QActual); // QCoilReq, simulate any load > 0 to get max capacity of steam coil
+                        CoilMaxVolFlowRate = GetCoilMaxSteamFlowRate(PTUnit(PTUnitNum).SuppHeatCoilIndex, ErrorsFound);
+
+                        if (CoilMaxVolFlowRate != AutoSize) {
+                            SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
+                            SteamDensity = GetSatDensityRefrig(fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName);
+                            PTUnit(PTUnitNum).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * SteamDensity;
+                        }
                     }
                 }
                 InitComponentNodes(0.0,
@@ -4287,57 +4309,6 @@ namespace PackagedTerminalHeatPump {
                                    PTUnit(PTUnitNum).SuppCoilLoopSide,
                                    PTUnit(PTUnitNum).SuppCoilBranchNum,
                                    PTUnit(PTUnitNum).SuppCoilCompNum);
-            }
-            if (PTUnit(PTUnitNum).HeatCoilFluidInletNode > 0) {
-                //     If steam coil max steam flow rate is autosized, simulate once in order to mine max steam flow rate
-                if (PTUnit(PTUnitNum).MaxHeatCoilFluidFlow == AutoSize) {
-                    SimulateSteamCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName,
-                                                FirstHVACIteration,
-                                                PTUnit(PTUnitNum).ACHeatCoilIndex,
-                                                1.0,
-                                                QActual); // QCoilReq, simulate any load > 0 to get max capacity of steam coil
-                    CoilMaxVolFlowRate = GetCoilMaxSteamFlowRate(PTUnit(PTUnitNum).ACHeatCoilIndex, ErrorsFound);
-
-                    if (CoilMaxVolFlowRate != AutoSize) {
-                        SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-                        SteamDensity = GetSatDensityRefrig(fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName);
-                        PTUnit(PTUnitNum).MaxHeatCoilFluidFlow = CoilMaxVolFlowRate * SteamDensity;
-                    }
-                    // why is this inside the autosize IF block? Shouldn't the fluid flow rate be initialized all the time?
-                    InitComponentNodes(0.0,
-                                       PTUnit(PTUnitNum).MaxHeatCoilFluidFlow,
-                                       PTUnit(PTUnitNum).HeatCoilFluidInletNode,
-                                       PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                       PTUnit(PTUnitNum).HeatCoilLoopNum,
-                                       PTUnit(PTUnitNum).HeatCoilLoopSide,
-                                       PTUnit(PTUnitNum).HeatCoilBranchNum,
-                                       PTUnit(PTUnitNum).HeatCoilCompNum);
-                }
-            }
-            if (PTUnit(PTUnitNum).SuppCoilFluidInletNode > 0) {
-                if (PTUnit(PTUnitNum).MaxSuppCoilFluidFlow == AutoSize) {
-                    SimulateSteamCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName,
-                                                FirstHVACIteration,
-                                                PTUnit(PTUnitNum).SuppHeatCoilIndex,
-                                                1.0,
-                                                QActual); // QCoilReq, simulate any load > 0 to get max capacity of steam coil
-                    CoilMaxVolFlowRate = GetCoilMaxSteamFlowRate(PTUnit(PTUnitNum).SuppHeatCoilIndex, ErrorsFound);
-
-                    if (CoilMaxVolFlowRate != AutoSize) {
-                        SteamIndex = 0; // Function GetSatDensityRefrig will look up steam index if 0 is passed
-                        SteamDensity = GetSatDensityRefrig(fluidNameSteam, TempSteamIn, 1.0, SteamIndex, RoutineName);
-                        PTUnit(PTUnitNum).MaxSuppCoilFluidFlow = CoilMaxVolFlowRate * SteamDensity;
-                    }
-                    // why is this inside the autosize IF block? Shouldn't the fluid flow rate be initialized all the time?
-                    InitComponentNodes(0.0,
-                                       PTUnit(PTUnitNum).MaxSuppCoilFluidFlow,
-                                       PTUnit(PTUnitNum).SuppCoilFluidInletNode,
-                                       PTUnit(PTUnitNum).PlantCoilOutletNode,
-                                       PTUnit(PTUnitNum).SuppCoilLoopNum,
-                                       PTUnit(PTUnitNum).SuppCoilLoopSide,
-                                       PTUnit(PTUnitNum).SuppCoilBranchNum,
-                                       PTUnit(PTUnitNum).SuppCoilCompNum);
-                }
             }
         } // end one time inits
 
@@ -5476,7 +5447,7 @@ namespace PackagedTerminalHeatPump {
         using General::TrimSigDigits;
         using HeatingCoils::SimulateHeatingCoilComponents;
         using PlantUtilities::SetComponentFlowRate;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using SteamCoils::SimulateSteamCoilComponents;
         using WaterCoils::SimulateWaterCoilComponents;
 
@@ -5738,7 +5709,7 @@ namespace PackagedTerminalHeatPump {
                 //     use the outlet conditions when the supplemental heater was off (CALL above) as the inlet conditions for the calculation
                 //     of supplemental heater load to just meet the maximum supply air temperature from the supplemental heater.
                 if (Node(PTUnit(PTUnitNum).AirOutNode).Temp < PTUnit(PTUnitNum).MaxSATSupHeat) {
-                    CpAir = PsyCpAirFnWTdb(Node(PTUnit(PTUnitNum).AirOutNode).HumRat, Node(PTUnit(PTUnitNum).AirOutNode).Temp);
+                    CpAir = PsyCpAirFnW(Node(PTUnit(PTUnitNum).AirOutNode).HumRat);
                     SupHeaterLoad = Node(PTUnit(PTUnitNum).AirInNode).MassFlowRate * CpAir *
                                     (PTUnit(PTUnitNum).MaxSATSupHeat - Node(PTUnit(PTUnitNum).AirOutNode).Temp);
 
@@ -5783,7 +5754,7 @@ namespace PackagedTerminalHeatPump {
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using MixedAir::SimOAMixer;
         using PlantUtilities::SetComponentFlowRate;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
         using SingleDuct::SimATMixer;
         using SteamCoils::SimulateSteamCoilComponents;
@@ -7307,7 +7278,7 @@ namespace PackagedTerminalHeatPump {
         using General::TrimSigDigits;
         using HeatingCoils::SimulateHeatingCoilComponents;
         using PlantUtilities::SetComponentFlowRate;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using SteamCoils::SimulateSteamCoilComponents;
         using WaterCoils::SimulateWaterCoilComponents;
 
@@ -7679,7 +7650,7 @@ namespace PackagedTerminalHeatPump {
                 //     use the outlet conditions when the supplemental heater was off (CALL above) as the inlet conditions for the calculation
                 //     of supplemental heater load to just meet the maximum supply air temperature from the supplemental heater.
                 if (Node(PTUnit(PTUnitNum).AirOutNode).Temp < PTUnit(PTUnitNum).MaxSATSupHeat) {
-                    CpAir = PsyCpAirFnWTdb(Node(PTUnit(PTUnitNum).AirOutNode).HumRat, Node(PTUnit(PTUnitNum).AirOutNode).Temp);
+                    CpAir = PsyCpAirFnW(Node(PTUnit(PTUnitNum).AirOutNode).HumRat);
                     SupHeaterLoad = Node(PTUnit(PTUnitNum).AirInNode).MassFlowRate * CpAir *
                                     (PTUnit(PTUnitNum).MaxSATSupHeat - Node(PTUnit(PTUnitNum).AirOutNode).Temp);
 
@@ -7975,7 +7946,7 @@ namespace PackagedTerminalHeatPump {
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using MixedAir::SimOAMixer;
         using PlantUtilities::SetComponentFlowRate;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
         using SingleDuct::SimATMixer;
         using SteamCoils::SimulateSteamCoilComponents;
@@ -8693,20 +8664,14 @@ namespace PackagedTerminalHeatPump {
         SetVSHPAirFlow(PTUnitNum, ZoneNum, PartLoadRatio, OnOffAirFlowRatio);
     }
 
-    void SetMinOATCompressor(int const PTUnitNum,                    // index to furnace
-                             std::string const PTUnitName,           // name of furnace
-                             std::string const cCurrentModuleObject, // type of furnace
-                             std::string const CoolingCoilType,      // type of cooling coil
-                             std::string const CoolingCoilName,      // name of cooling coil
-                             std::string const HeatingCoilType,      // type of heating coil
-                             std::string const HeatingCoilName,      // name of heating coil
-                             bool &ErrorsFound                       // GetInput logical that errors were found
+    void SetMinOATCompressor(int const PTUnitNum,                     // index to furnace
+                             std::string const &PTUnitName,           // name of furnace
+                             std::string const &cCurrentModuleObject, // type of furnace
+                             int const CoolingCoilIndex,              // index of cooling coil
+                             int const HeatingCoilIndex,              // index of heating coil
+                             bool &ErrorsFound                        // GetInput logical that errors were found
     )
     {
-        // Using/Aliasing
-        auto &GetMinOATDXCoilCompressor(DXCoils::GetMinOATCompressor);
-        using DXCoils::GetMinOATCompressorUsingIndex;
-        using VariableSpeedCoils::GetVSCoilMinOATCompressor;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool errFlag;
@@ -8714,11 +8679,11 @@ namespace PackagedTerminalHeatPump {
         // Set minimum OAT for heat pump compressor operation in cooling mode
         errFlag = false;
         if (PTUnit(PTUnitNum).DXCoolCoilType_Num == CoilDX_CoolingSingleSpeed) {
-            PTUnit(PTUnitNum).MinOATCompressorCooling = GetMinOATDXCoilCompressor(CoolingCoilType, CoolingCoilName, errFlag);
+            PTUnit(PTUnitNum).MinOATCompressorCooling = DXCoils::GetMinOATCompressorUsingIndex(CoolingCoilIndex, errFlag);
         } else if (PTUnit(PTUnitNum).DXCoolCoilType_Num == CoilDX_CoolingHXAssisted) {
-            PTUnit(PTUnitNum).MinOATCompressorCooling = GetMinOATCompressorUsingIndex(PTUnit(PTUnitNum).DXCoolCoilIndexNum, errFlag);
+            PTUnit(PTUnitNum).MinOATCompressorCooling = DXCoils::GetMinOATCompressorUsingIndex(PTUnit(PTUnitNum).DXCoolCoilIndexNum, errFlag);
         } else if (PTUnit(PTUnitNum).DXHeatCoilType_Num == Coil_CoolingAirToAirVariableSpeed) {
-            PTUnit(PTUnitNum).MinOATCompressorCooling = GetVSCoilMinOATCompressor(CoolingCoilName, errFlag);
+            PTUnit(PTUnitNum).MinOATCompressorCooling = VariableSpeedCoils::GetVSCoilMinOATCompressorUsingIndex(CoolingCoilIndex, errFlag);
         } else {
             PTUnit(PTUnitNum).MinOATCompressorCooling = -1000.0;
         }
@@ -8730,9 +8695,9 @@ namespace PackagedTerminalHeatPump {
         // Set minimum OAT for heat pump compressor operation in heating mode
         errFlag = false;
         if (PTUnit(PTUnitNum).DXHeatCoilType_Num == Coil_HeatingAirToAirVariableSpeed) {
-            PTUnit(PTUnitNum).MinOATCompressorHeating = GetVSCoilMinOATCompressor(HeatingCoilName, errFlag);
+            PTUnit(PTUnitNum).MinOATCompressorHeating = VariableSpeedCoils::GetVSCoilMinOATCompressorUsingIndex(HeatingCoilIndex, errFlag);
         } else if (PTUnit(PTUnitNum).DXHeatCoilType_Num == CoilDX_HeatingEmpirical) {
-            PTUnit(PTUnitNum).MinOATCompressorHeating = GetMinOATDXCoilCompressor(HeatingCoilType, HeatingCoilName, errFlag);
+            PTUnit(PTUnitNum).MinOATCompressorHeating = DXCoils::GetMinOATCompressorUsingIndex(HeatingCoilIndex, errFlag);
         } else {
             PTUnit(PTUnitNum).MinOATCompressorHeating = -1000.0;
         }

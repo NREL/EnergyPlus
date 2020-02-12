@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,7 +54,7 @@
 #include <ObjexxFCL/Array3D.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -89,6 +89,7 @@ namespace DataHeatBalSurface {
     extern Array1D<Real64> TempSource;            // Temperature at the source location for each heat transfer surface
     extern Array1D<Real64> TempUserLoc;           // Temperature at the user specified location for each heat transfer surface
     extern Array1D<Real64> TempSurfInRep;         // Temperature of the Inside Surface for each heat transfer surface
+    extern Array1D<Real64> TempSurfInMovInsRep;   // Temperature of interior movable insulation on the side facing the zone
     // (report)
     extern Array1D<Real64> QConvInReport; // Surface convection heat gain at inside face [J]
     extern Array1D<Real64> QdotConvInRep; // Surface convection heat transfer rate at inside face surface [W]
@@ -202,7 +203,6 @@ namespace DataHeatBalSurface {
     // Originally QD, now used only for QSDifSol calc for daylighting
     extern Array1D<Real64> QDV; // Diffuse solar radiation in a zone from sky and ground diffuse entering
     // through exterior windows
-    extern Array1D<Real64> TCONV;             // Fraction Of Radiated Thermal Converted To Convection In Interior Shades
     extern Array1D<Real64> VMULT;             // 1/(Sum Of A Zone's Inside Surfaces Area*Absorptance)
     extern Array1D<Real64> VCONV;             // Fraction Of Short-Wave Radiation From Lights Converted To Convection
     extern Array1D<Real64> NetLWRadToSurf;    // Net interior long wavelength radiation to a surface from other surfaces

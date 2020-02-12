@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,55 +55,57 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include <BranchNodeConnections.hh>
-#include <CurveManager.hh>
-#include <DataAirLoop.hh>
-#include <DataAirSystems.hh>
-#include <DataContaminantBalance.hh>
-#include <DataDefineEquip.hh>
-#include <DataEnvironment.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSizing.hh>
-#include <DataZoneControls.hh>
-#include <DataZoneEnergyDemands.hh>
-#include <DataZoneEquipment.hh>
-#include <DesiccantDehumidifiers.hh>
-#include <EMSManager.hh>
-#include <EvaporativeCoolers.hh>
-#include <Fans.hh>
-#include <FaultsManager.hh>
-#include <General.hh>
-#include <GeneralRoutines.hh>
-#include <GlobalNames.hh>
-#include <HVACControllers.hh>
-#include <HVACDXHeatPumpSystem.hh>
-#include <HVACDXSystem.hh>
-#include <HVACFan.hh>
-#include <HVACHXAssistedCoolingCoil.hh>
-#include <HeatRecovery.hh>
-#include <HeatingCoils.hh>
-#include <Humidifiers.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <MixedAir.hh>
-#include <NodeInputManager.hh>
-#include <OutAirNodeManager.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportPredefined.hh>
-#include <PhotovoltaicThermalCollectors.hh>
-#include <Psychrometrics.hh>
-#include <ReportSizingManager.hh>
-#include <ScheduleManager.hh>
-#include <SetPointManager.hh>
-#include <SimAirServingZones.hh>
-#include <SteamCoils.hh>
-#include <TranspiredCollector.hh>
-#include <UserDefinedComponents.hh>
-#include <UtilityRoutines.hh>
-#include <WaterCoils.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataDefineEquip.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataZoneControls.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DesiccantDehumidifiers.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/EvaporativeCoolers.hh>
+#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/FaultsManager.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/HVACControllers.hh>
+#include <EnergyPlus/HVACDXHeatPumpSystem.hh>
+#include <EnergyPlus/HVACDXSystem.hh>
+#include <EnergyPlus/HVACFan.hh>
+#include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
+#include <EnergyPlus/HeatRecovery.hh>
+#include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/Humidifiers.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
+#include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SetPointManager.hh>
+#include <EnergyPlus/SimAirServingZones.hh>
+#include <EnergyPlus/SteamCoils.hh>
+#include <EnergyPlus/TranspiredCollector.hh>
+#include <EnergyPlus/UserDefinedComponents.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WaterCoils.hh>
 
 namespace EnergyPlus {
 
@@ -149,7 +151,6 @@ namespace MixedAir {
     using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DoZoneSizing;
     using DataGlobals::NumOfZones;
-    using DataGlobals::OutputFileInits;
     using DataGlobals::ScheduleAlwaysOn;
     using DataGlobals::SysSizingCalc;
     using namespace DataEnvironment;
@@ -458,7 +459,7 @@ namespace MixedAir {
                                OACoolCoil,
                                OAHX);
             }
-            // now simulate again propogate current temps back through OA system
+            // now simulate again propigate current temps back through OA system
             for (CompNum = 1; CompNum <= OutsideAirSys(OASysNum).NumComponents; ++CompNum) {
                 CompType = OutsideAirSys(OASysNum).ComponentType(CompNum);
                 CompName = OutsideAirSys(OASysNum).ComponentName(CompNum);
@@ -507,7 +508,9 @@ namespace MixedAir {
         //  END DO
         CurOASysNum = OASysNum;
         auto &CurrentOASystem(OutsideAirSys(OASysNum));
-        SimOAController(CurrentOASystem.OAControllerName, CurrentOASystem.OAControllerIndex, FirstHVACIteration, AirLoopNum);
+        if (OutsideAirSys(OASysNum).AirLoopDOASNum == -1) {
+            SimOAController(CurrentOASystem.OAControllerName, CurrentOASystem.OAControllerIndex, FirstHVACIteration, AirLoopNum);
+        }
         SimOASysComponents(OASysNum, FirstHVACIteration, AirLoopNum);
 
         if (MyOneTimeErrorFlag(OASysNum)) {
@@ -549,7 +552,9 @@ namespace MixedAir {
         }
 
         CurOASysNum = 0;
-        AirLoopControlInfo(AirLoopNum).OASysComponentsSimulated = true;
+        if (OutsideAirSys(OASysNum).AirLoopDOASNum == -1) {
+            AirLoopControlInfo(AirLoopNum).OASysComponentsSimulated = true;
+        }
     }
 
     void SimOAComponent(std::string const &CompType, // the component type
@@ -595,8 +600,6 @@ namespace MixedAir {
         using HVACDXSystem::SimDXCoolingSystem;
         using HVACHXAssistedCoolingCoil::HXAssistedCoil;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
-        using PhotovoltaicThermalCollectors::CalledFromOutsideAirSystem;
-        using PhotovoltaicThermalCollectors::SimPVTcollectors;
         using SimAirServingZones::SolveWaterCoilController;
         using SteamCoils::SimulateSteamCoilComponents;
         using TranspiredCollector::SimTranspiredCollector;
@@ -767,30 +770,39 @@ namespace MixedAir {
             } else if (SELECT_CASE_var == HeatXchngr) { // 'HeatExchanger:AirToAir:FlatPlate', 'HeatExchanger:AirToAir:SensibleAndLatent',
                 // 'HeatExchanger:Desiccant:BalancedFlow'
                 if (Sim) {
-                    if (AirLoopControlInfo(AirLoopNum).FanOpMode == DataHVACGlobals::CycFanCycCoil) {
-                        FanOpMode = DataHVACGlobals::CycFanCycCoil;
-                    } else {
-                        FanOpMode = DataHVACGlobals::ContFanCycCoil;
-                    }
-                    if (FanOpMode == DataHVACGlobals::CycFanCycCoil) {
-                        // HX's in the OA system can be troublesome given that the OA flow rate is not necessarily proportional to air loop PLR
-                        // adding that user input for branch flow rate, HX nominal flow rate, OA system min/max flow rate will not necessarily be
-                        // perfectly input, a compromise is used for OA sys HX's as the ratio of flow to max. Issue #4298.
-                        //					AirloopPLR = AirLoopFlow( AirLoopNum ).FanPLR;
-                        AirloopPLR = OAController(OASysNum).OAMassFlow / OAController(OASysNum).MaxOAMassFlowRate;
-                    } else {
+                    if (OutsideAirSys(OASysNum).AirLoopDOASNum > -1) {
                         AirloopPLR = 1.0;
+                        FanOpMode = DataHVACGlobals::ContFanCycCoil;
+                    } else {
+                        if (AirLoopControlInfo(AirLoopNum).FanOpMode == DataHVACGlobals::CycFanCycCoil) {
+                            FanOpMode = DataHVACGlobals::CycFanCycCoil;
+                        } else {
+                            FanOpMode = DataHVACGlobals::ContFanCycCoil;
+                        }
+                        if (FanOpMode == DataHVACGlobals::CycFanCycCoil) {
+                            // HX's in the OA system can be troublesome given that the OA flow rate is not necessarily proportional to air loop PLR
+                            // adding that user input for branch flow rate, HX nominal flow rate, OA system min/max flow rate will not necessarily be
+                            // perfectly input, a compromise is used for OA sys HX's as the ratio of flow to max. Issue #4298.
+                            //					AirloopPLR = AirLoopFlow( AirLoopNum ).FanPLR;
+                            AirloopPLR = OAController(OASysNum).OAMassFlow / OAController(OASysNum).MaxOAMassFlowRate;
+                        } else {
+                            AirloopPLR = 1.0;
+                        }
                     }
-                    SimHeatRecovery(CompName,
-                                    FirstHVACIteration,
-                                    CompIndex,
-                                    FanOpMode,
-                                    AirloopPLR,
-                                    _,
-                                    _,
-                                    _,
-                                    AirLoopControlInfo(AirLoopNum).HeatRecoveryBypass,
-                                    AirLoopControlInfo(AirLoopNum).HighHumCtrlActive);
+                    if (OutsideAirSys(OASysNum).AirLoopDOASNum > -1) {
+                        SimHeatRecovery(CompName, FirstHVACIteration, CompIndex, FanOpMode, AirloopPLR, _, _, _, _, _);
+                    } else {
+                        SimHeatRecovery(CompName,
+                                        FirstHVACIteration,
+                                        CompIndex,
+                                        FanOpMode,
+                                        AirloopPLR,
+                                        _,
+                                        _,
+                                        _,
+                                        AirLoopControlInfo(AirLoopNum).HeatRecoveryBypass,
+                                        AirLoopControlInfo(AirLoopNum).HighHumCtrlActive);
+                    }
                 }
                 OAHX = true;
 
@@ -818,7 +830,10 @@ namespace MixedAir {
                 // Air-based Photovoltaic-thermal flat plate collector
             } else if (SELECT_CASE_var == PVT_AirBased) { // 'SolarCollector:FlatPlate:PhotovoltaicThermal'
                 if (Sim) {
-                    SimPVTcollectors(CompIndex, FirstHVACIteration, CalledFromOutsideAirSystem, CompName);
+                    if (CompIndex == 0) {
+                        CompIndex = PhotovoltaicThermalCollectors::getPVTindexFromName(CompName);
+                    }
+                    PhotovoltaicThermalCollectors::simPVTfromOASys(CompIndex, FirstHVACIteration);
                 }
 
                 // Evaporative Cooler Types
@@ -889,7 +904,7 @@ namespace MixedAir {
         int OAControllerNum;
 
         if ((GetOAControllerInputFlag) && (AirLoopNum > 0)) { // Gets input for object  first time Sim routine is called from an airloop
-            GetOAControllerInputs();
+            GetOAControllerInputs(OutputFiles::getSingleton());
             GetOAControllerInputFlag = false;
         }
 
@@ -1070,7 +1085,9 @@ namespace MixedAir {
                                           cNumericFields);
             UtilityRoutines::IsNameEmpty(AlphArray(1), CurrentModuleObject, ErrorsFound);
             OutsideAirSys(OASysNum).Name = AlphArray(1);
-            GlobalNames::IntraObjUniquenessCheck(AlphArray(2), CurrentModuleObject, cAlphaFields(2), ControllerListUniqueNames, ErrorsFound);
+            if (!AlphArray(2).empty()) {
+                GlobalNames::IntraObjUniquenessCheck(AlphArray(2), CurrentModuleObject, cAlphaFields(2), ControllerListUniqueNames, ErrorsFound);
+            }
             ControllerListName = AlphArray(2);
             OutsideAirSys(OASysNum).ControllerListName = AlphArray(2);
             ComponentListName = AlphArray(3);
@@ -1089,6 +1106,8 @@ namespace MixedAir {
                     OutsideAirSys(OASysNum).ComponentType.allocate(NumInList);
                     OutsideAirSys(OASysNum).ComponentType_Num.dimension(NumInList, 0);
                     OutsideAirSys(OASysNum).ComponentIndex.dimension(NumInList, 0);
+                    OutsideAirSys(OASysNum).InletNodeNum.dimension(NumInList, 0);
+                    OutsideAirSys(OASysNum).OutletNodeNum.dimension(NumInList, 0);
                     OutsideAirSys(OASysNum).compPointer.resize(NumInList + 1, nullptr);
                     for (InListNum = 1; InListNum <= NumInList; ++InListNum) {
                         OutsideAirSys(OASysNum).ComponentName(InListNum) = AlphArray(InListNum * 2 + 1);
@@ -1136,8 +1155,14 @@ namespace MixedAir {
                     ErrorsFound = true;
                 }
             } else {
-                ShowSevereError(CurrentModuleObject + " = \"" + AlphArray(1) + "\" invalid " + cAlphaFields(2) + " is blank and must be entered.");
-                ErrorsFound = true;
+                if (inputProcessor->getNumObjectsFound("AirLoopHVAC:DedicatedOutdoorAirSystem") == 0) {
+                    ShowSevereError(CurrentModuleObject + " = \"" + AlphArray(1) + "\" invalid " + cAlphaFields(2) +
+                                    " is blank and must be entered.");
+                    ErrorsFound = true;
+                } else {
+                    ShowWarningError(CurrentModuleObject + " = \"" + AlphArray(1) + "\": blank " + cAlphaFields(2) +
+                                     " must be used with AirLoopHVAC:DedicatedOutdoorAirSystem.");
+                }
             }
             OutsideAirSys(OASysNum).ControllerListNum = ListNum;
             OutsideAirSys(OASysNum).NumSimpleControllers = NumSimpControllers;
@@ -1272,7 +1297,7 @@ namespace MixedAir {
         GetOASysInputFlag = false;
     }
 
-    void GetOAControllerInputs()
+    void GetOAControllerInputs(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1344,10 +1369,7 @@ namespace MixedAir {
         int i;
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_700(
-            "('!<Controller:MechanicalVentilation>,Name,Availability Schedule Name,Demand Controlled Ventilation "
-            "{Yes/No},','System Outdoor Air Method,Zone Maximum Outdoor Air Fraction,Number of Zones,Zone Name,DSOA "
-            "Name,DSZAD Name')");
+
         static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // First, call other get input routines in this module to make sure data is filled during this routine.
@@ -1945,109 +1967,59 @@ namespace MixedAir {
             }
 
             // write to .eio file
-            ObjexxFCL::gio::write(OutputFileInits, Format_700);
+            static constexpr auto Format_700(
+                "!<Controller:MechanicalVentilation>,Name,Availability Schedule Name,Demand Controlled Ventilation "
+                "{Yes/No},System Outdoor Air Method,Zone Maximum Outdoor Air Fraction,Number of Zones,Zone Name,DSOA "
+                "Name,DSZAD Name");
+            print(outputFiles.eio, "{}\n", Format_700);
             for (VentMechNum = 1; VentMechNum <= NumVentMechControllers; ++VentMechNum) {
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("NO");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << " Controller:MechanicalVentilation," +
-                                                                               VentilationMechanical(VentMechNum).Name + ',' +
-                                                                               VentilationMechanical(VentMechNum).SchName + ',';
-                }
+                print(outputFiles.eio,
+                      " Controller:MechanicalVentilation,{},{},",
+                      VentilationMechanical(VentMechNum).Name,
+                      VentilationMechanical(VentMechNum).SchName);
+
                 if (VentilationMechanical(VentMechNum).DCVFlag) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "Yes,";
-                    }
+                    print(outputFiles.eio, "Yes,");
                 } else {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "No,";
-                    }
+                    print(outputFiles.eio, "No,");
                 }
+
                 if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ZoneSum) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "ZoneSum,";
-                    }
+                    print(outputFiles.eio, "ZoneSum,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_VRP) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "VentilationRateProcedure,";
-                    }
+                    print(outputFiles.eio, "VentilationRateProcedure,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_IAQP) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "IndoorAirQualityProcedure,";
-                    }
+                    print(outputFiles.eio, "IndoorAirQualityProcedure,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ProportionalControlSchOcc) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "ProportionalControlBasedonOccupancySchedule,";
-                    }
+                    print(outputFiles.eio, "ProportionalControlBasedonOccupancySchedule,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ProportionalControlDesOcc) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "ProportionalControlBasedOnDesignOccupancy,";
-                    }
+                    print(outputFiles.eio, "ProportionalControlBasedOnDesignOccupancy,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ProportionalControlDesOARate) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "ProportionalControlBasedOnDesignOARate,";
-                    }
+                    print(outputFiles.eio, "ProportionalControlBasedOnDesignOARate,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_IAQPGC) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "IndoorAirQualityGenericContaminant,";
-                    }
+                    print(outputFiles.eio, "IndoorAirQualityGenericContaminant,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_IAQPCOM) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "IndoorAirQualityProcedureCombined,";
-                    }
+                    print(outputFiles.eio, "IndoorAirQualityProcedureCombined,");
                 } else {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "Invalid/Unknown,";
-                    }
+                    print(outputFiles.eio, "Invalid/Unknown,");
                 }
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("NO");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags)
-                        << RoundSigDigits(VentilationMechanical(VentMechNum).ZoneMaxOAFraction, 2) + ',';
-                }
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("NO");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags)
-                        << RoundSigDigits(VentilationMechanical(VentMechNum).NumofVentMechZones) + ',';
-                }
+
+                print(outputFiles.eio, "{:.2R},", VentilationMechanical(VentMechNum).ZoneMaxOAFraction);
+                print(outputFiles.eio, "{},", VentilationMechanical(VentMechNum).NumofVentMechZones);
+
                 for (jZone = 1; jZone <= VentilationMechanical(VentMechNum).NumofVentMechZones; ++jZone) {
                     if (jZone < VentilationMechanical(VentMechNum).NumofVentMechZones) {
-                        {
-                            IOFlags flags;
-                            flags.ADVANCE("NO");
-                            ObjexxFCL::gio::write(OutputFileInits, fmtA, flags)
-                                << Zone(VentilationMechanical(VentMechNum).VentMechZone(jZone)).Name + ',' +
-                                       VentilationMechanical(VentMechNum).ZoneDesignSpecOAObjName(jZone) + ',' +
-                                       VentilationMechanical(VentMechNum).ZoneDesignSpecADObjName(jZone) + ',';
-                        }
+                        print(outputFiles.eio,
+                              "{},{},{},",
+                              Zone(VentilationMechanical(VentMechNum).VentMechZone(jZone)).Name,
+                              VentilationMechanical(VentMechNum).ZoneDesignSpecOAObjName(jZone),
+                              VentilationMechanical(VentMechNum).ZoneDesignSpecADObjName(jZone));
                     } else {
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA) << VentilationMechanical(VentMechNum).VentMechZoneName(jZone) + ',' +
-                                                                            VentilationMechanical(VentMechNum).ZoneDesignSpecOAObjName(jZone) + ',' +
-                                                                            VentilationMechanical(VentMechNum).ZoneDesignSpecADObjName(jZone);
+                        print(outputFiles.eio,
+                              "{},{},{}\n",
+                              Zone(VentilationMechanical(VentMechNum).VentMechZone(jZone)).Name,
+                              VentilationMechanical(VentMechNum).ZoneDesignSpecOAObjName(jZone),
+                              VentilationMechanical(VentMechNum).ZoneDesignSpecADObjName(jZone));
                     }
                 }
             }
@@ -2618,6 +2590,8 @@ namespace MixedAir {
 
         //		if ( BeginDayFlag ) {
         //		}
+
+        if (OutsideAirSys(OASysNum).AirLoopDOASNum > -1) return;
 
         if (initOASysFlag(OASysNum)) {
             AirLoopControlInfo(AirLoopNum).OASysNum = OASysNum;
@@ -3305,6 +3279,13 @@ namespace MixedAir {
                     thisOAController.MixMassFlow = AirLoopFlow(AirLoopNum).ReqSupplyFrac * AirLoopFlow(AirLoopNum).DesSupply;
                 } else {
                     thisOAController.MixMassFlow = Node(thisOAController.RetNode).MassFlowRate + thisOAController.ExhMassFlow;
+
+                    // The following was commented out after discussion on PR 7382, it can be reopened for discussion anytime
+                    // found this equation results in flow that exceeds the design flow rate when there is exhaust flow rate is greater than
+                    // the design supply air flow rate. Capped the mixed air flow rate at design supply air flow rate, issue #77379
+                    // thisOAController.MixMassFlow = Node(thisOAController.RetNode).MassFlowRate + thisOAController.ExhMassFlow;
+                    // thisOAController.MixMassFlow =
+                    //     min(Node(thisOAController.RetNode).MassFlowRate + thisOAController.ExhMassFlow, AirLoopFlow(AirLoopNum).DesSupply);
                 }
             } else {
                 thisOAController.ExhMassFlow = 0.0;
@@ -3782,6 +3763,8 @@ namespace MixedAir {
                 } else {
                     curAirLoopControlInfo.ResimAirLoopFlag = false;
                 }
+            } else if (curAirLoopControlInfo.HeatingActiveFlag) {
+                this->HRHeatingCoilActive = 1;
             } else {
                 this->HRHeatingCoilActive = 0;
             }
@@ -3803,7 +3786,7 @@ namespace MixedAir {
         }
         this->RelTemp = this->RetTemp;
         this->RelEnth = this->RetEnth;
-        this->RelSensiLossRate = this->RelMassFlow * Psychrometrics::PsyCpAirFnWTdb(OutHumRat, OutDryBulbTemp) * (this->RelTemp - OutDryBulbTemp);
+        this->RelSensiLossRate = this->RelMassFlow * Psychrometrics::PsyCpAirFnW(OutHumRat) * (this->RelTemp - OutDryBulbTemp);
         this->RelTotalLossRate = this->RelMassFlow * (this->RelEnth - OutEnthalpy);
         this->RelLatentLossRate = this->RelTotalLossRate - this->RelSensiLossRate;
     }
@@ -4559,7 +4542,8 @@ namespace MixedAir {
                 if (ZoneSysMoistureDemand(this->HumidistatZoneNum).TotalOutputRequired < 0.0) {
                     //     IF OAController is not allowed to modify air flow during high outdoor humrat condition, then disable modified air flow
                     //     if indoor humrat is less than or equal to outdoor humrat
-                    if (!this->ModifyDuringHighOAMoisture && Node(this->NodeNumofHumidistatZone).HumRat <= this->OAHumRat) {
+                    if (!this->ModifyDuringHighOAMoisture &&
+                        (Node(this->NodeNumofHumidistatZone).HumRat - this->OAHumRat) <= DataHVACGlobals::SmallHumRatDiff) {
                         HighHumidityOperationFlag = false;
                     } else {
                         HighHumidityOperationFlag = true;
@@ -4710,7 +4694,8 @@ namespace MixedAir {
                 } else if (this->HeatRecoveryBypassControlType == BypassWhenOAFlowGreaterThanMinimum) {
                     Real64 OAMassFlowMin = OutAirMinFrac * AirLoopFlow(AirLoopNum).DesSupply;
                     Real64 OAMassFlowActual = OASignal * this->MixMassFlow;
-                    if (OAMassFlowActual > OAMassFlowMin) {
+                    Real64 reasonablySmallMassFlow = 1e-6;
+                    if (OAMassFlowActual > (OAMassFlowMin + reasonablySmallMassFlow)) {
                         AirLoopControlInfo(AirLoopNum).HeatRecoveryBypass = true;
                         this->HeatRecoveryBypassStatus = 1;
                     }

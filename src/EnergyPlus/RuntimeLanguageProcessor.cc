@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -61,20 +61,20 @@
 #include <ObjexxFCL/time.hh>
 
 // EnergyPlus Headers
-#include <CurveManager.hh>
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalance.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSystemVariables.hh>
-#include <EMSManager.hh>
-#include <General.hh>
-#include <GlobalNames.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <OutputProcessor.hh>
-#include <Psychrometrics.hh>
-#include <RuntimeLanguageProcessor.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/RuntimeLanguageProcessor.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -977,7 +977,7 @@ namespace RuntimeLanguageProcessor {
                     WriteTrace(StackNum, InstructionNum, ReturnValue, seriousErrorFound);
 
                 } else if (SELECT_CASE_var == KeywordWhile) {
-                    // evaluate expresssion at while, skip to past endwhile if not true
+                    // evaluate expression at while, skip to past endwhile if not true
                     ExpressionNum = ErlStack(StackNum).Instruction(InstructionNum).Argument1;
                     InstructionNum2 = ErlStack(StackNum).Instruction(InstructionNum).Argument2;
                     ReturnValue = EvaluateExpression(ExpressionNum, seriousErrorFound);
@@ -1069,7 +1069,7 @@ namespace RuntimeLanguageProcessor {
 
         if (!MyOneTimeFlag) {
             ObjexxFCL::gio::write(OutputEMSFileUnitNum, fmtA) << "****  Begin EMS Language Processor Error and Trace Output  *** ";
-            ObjexxFCL::gio::write(OutputEMSFileUnitNum, fmtA) << "<Erl program name, line #, line text, result, occurance timing information ... >";
+            ObjexxFCL::gio::write(OutputEMSFileUnitNum, fmtA) << "<Erl program name, line #, line text, result, occurrence timing information ... >";
             MyOneTimeFlag = true;
         }
         // if have not return'd yet then write out full trace
@@ -1097,8 +1097,8 @@ namespace RuntimeLanguageProcessor {
         TimeString = DuringWarmup + EnvironmentName + ", " + CurMnDy + ' ' + CreateSysTimeIntervalString();
 
         if (OutputFullEMSTrace || (OutputEMSErrors && (ReturnValue.Type == ValueError))) {
-            ObjexxFCL::gio::write(OutputEMSFileUnitNum, fmtA) << NameString + ",Line " + LineNumString + ',' + LineString + ',' + cValueString + ',' +
-                                                          TimeString;
+            ObjexxFCL::gio::write(OutputEMSFileUnitNum, fmtA)
+                << NameString + ",Line " + LineNumString + ',' + LineString + ',' + cValueString + ',' + TimeString;
         }
 
         if (seriousErrorFound) { // throw EnergyPlus severe then fatal
@@ -2346,9 +2346,9 @@ namespace RuntimeLanguageProcessor {
                                                                                                 // (Pa) | drybulb (C) | Humidity ratio (kg water
                                                                                                 // vapor/kg dry air) | called from
                     } else if (SELECT_CASE_var == FuncCpAirFnWTdb) {
-                        ReturnValue = SetErlValueNumber(PsyCpAirFnWTdb(Operand(1).Number, Operand(2).Number)); // result =>   heat capacity of air
-                                                                                                               // {J/kg-C} | Humidity ratio (kg water
-                                                                                                               // vapor/kg dry air) | drybulb (C)
+                        ReturnValue = SetErlValueNumber(PsyCpAirFnW(Operand(1).Number)); // result =>   heat capacity of air
+                                                                                         // {J/kg-C} | Humidity ratio (kg water
+                                                                                         // vapor/kg dry air) | drybulb (C)
                     } else if (SELECT_CASE_var == FuncHfgAirFnWTdb) {
                         // BG comment these two psych funct seems confusing (?) is this the enthalpy of water in the air?
                         ReturnValue = SetErlValueNumber(PsyHfgAirFnWTdb(Operand(1).Number, Operand(2).Number)); // result =>   heat of vaporization
@@ -3550,9 +3550,9 @@ namespace RuntimeLanguageProcessor {
                             ResourceTypeString = "Diesel";
                         } else if (SELECT_CASE_var == "COAL") {
                             ResourceTypeString = "Coal";
-                        } else if (SELECT_CASE_var == "FUELOIL#1") {
+                        } else if (SELECT_CASE_var == "FUELOILNO1") {
                             ResourceTypeString = "FuelOil#1";
-                        } else if (SELECT_CASE_var == "FUELOIL#2") {
+                        } else if (SELECT_CASE_var == "FUELOILNO2") {
                             ResourceTypeString = "FuelOil#2";
                         } else if (SELECT_CASE_var == "OTHERFUEL1") {
                             ResourceTypeString = "OtherFuel1";

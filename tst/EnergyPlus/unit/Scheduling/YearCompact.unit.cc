@@ -49,10 +49,10 @@
 
 #include <nlohmann/json.hpp>
 
-#include <DataEnvironment.hh>
-#include <Scheduling/SchedulingFixture.hh>
-#include <Scheduling/YearCompact.hh>
-#include <WeatherManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/Scheduling/YearCompact.hh>
+#include <EnergyPlus/WeatherManager.hh>
+#include "../Scheduling/SchedulingFixture.hh"
 
 namespace EnergyPlus {
 

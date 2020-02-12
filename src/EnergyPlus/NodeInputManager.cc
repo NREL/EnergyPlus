@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,20 +54,20 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <BranchNodeConnections.hh>
-#include <DataContaminantBalance.hh>
-#include <DataEnvironment.hh>
-#include <DataErrorTracking.hh>
-#include <DataPrecisionGlobals.hh>
-#include <EMSManager.hh>
-#include <FluidProperties.hh>
-#include <General.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <OutputProcessor.hh>
-#include <Psychrometrics.hh>
-#include <ScheduleManager.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -335,7 +335,8 @@ namespace NodeInputManager {
         static ObjexxFCL::gio::Fmt Format_700("('! #Nodes,<Number of Unique Nodes>')");
         static ObjexxFCL::gio::Fmt Format_701("(A)");
         static ObjexxFCL::gio::Fmt Format_702("('! <Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>')");
-        static ObjexxFCL::gio::Fmt Format_703("('! <Suspicious Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>')");
+        static ObjexxFCL::gio::Fmt Format_703(
+            "('! <Suspicious Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>')");
         static ObjexxFCL::gio::Fmt fmtLD("*");
 
         if (!NodeVarsSetup) {
@@ -547,7 +548,8 @@ namespace NodeInputManager {
             // Show suspicious node names on the Branch-Node Details file
             if (Count0 > 0) {
                 ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "! ===============================================================";
-                ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "! Suspicious nodes have 0 references.  It is normal for some nodes, however.";
+                ObjexxFCL::gio::write(OutputFileBNDetails, Format_701)
+                    << "! Suspicious nodes have 0 references.  It is normal for some nodes, however.";
                 ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "! Listing nodes with 0 references (culled from previous list):";
                 ObjexxFCL::gio::write(OutputFileBNDetails, Format_703);
                 for (NumNode = 1; NumNode <= NumOfUniqueNodeNames; ++NumNode) {
@@ -564,7 +566,7 @@ namespace NodeInputManager {
         }
     }
 
-    void GetNodeListsInput(bool &ErrorsFound)       // Set to true when requested Node List not found, unchanged otherwise
+    void GetNodeListsInput(bool &ErrorsFound) // Set to true when requested Node List not found, unchanged otherwise
     {
 
         // SUBROUTINE INFORMATION:
@@ -1151,7 +1153,7 @@ namespace NodeInputManager {
         using OutputProcessor::ReqReportVariables;
         using OutputProcessor::ReqRepVars;
         using Psychrometrics::CPCW;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhFnTdbWPb;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -1312,7 +1314,7 @@ namespace NodeInputManager {
                     MoreNodeInfo(iNode).RelHumidity = 0.0;
                 }
                 if (ReportSpecificHeat) { // only call psych routine if needed.
-                    MoreNodeInfo(iNode).SpecificHeat = PsyCpAirFnWTdb(Node(iNode).HumRat, Node(iNode).Temp);
+                    MoreNodeInfo(iNode).SpecificHeat = PsyCpAirFnW(Node(iNode).HumRat);
                 } else {
                     MoreNodeInfo(iNode).SpecificHeat = 0.0;
                 }
@@ -1366,7 +1368,7 @@ namespace NodeInputManager {
                         MoreNodeInfo(iNode).WetBulbTemp = 0.0;
                     }
                     if (ReportSpecificHeat) {
-                        MoreNodeInfo(iNode).SpecificHeat = PsyCpAirFnWTdb(Node(iNode).HumRat, Node(iNode).Temp);
+                        MoreNodeInfo(iNode).SpecificHeat = PsyCpAirFnW(Node(iNode).HumRat);
                     } else {
                         MoreNodeInfo(iNode).SpecificHeat = 0.0;
                     }

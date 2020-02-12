@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -46,12 +46,12 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // EnergyPlus headers
-#include <DataEnvironment.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalance.hh>
-#include <General.hh>
-#include <UtilityRoutines.hh>
-#include <WindowManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WindowManager.hh>
 
 // Windows library headers
 #include <WCETarcog.hpp>
@@ -220,9 +220,9 @@ namespace WindowManager {
         }
 
         auto TransDiff = construction.TransDiff;
-        WinHeatGain(SurfNum) -= QS(surface.Zone) * surface.Area * TransDiff;
-        WinHeatTransfer(SurfNum) -= QS(surface.Zone) * surface.Area * TransDiff;
-        WinLossSWZoneToOutWinRep(SurfNum) = QS(Surface(SurfNum).Zone) * surface.Area * TransDiff;
+        WinHeatGain(SurfNum) -= QS(surface.SolarEnclIndex) * surface.Area * TransDiff;
+        WinHeatTransfer(SurfNum) -= QS(surface.SolarEnclIndex) * surface.Area * TransDiff;
+        WinLossSWZoneToOutWinRep(SurfNum) = QS(Surface(SurfNum).SolarEnclIndex) * surface.Area * TransDiff;
 
         for (auto k = 1; k <= surface.getTotLayers(); ++k) {
             SurfaceWindow(SurfNum).ThetaFace(2 * k - 1) = thetas(2 * k - 1);

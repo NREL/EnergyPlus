@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -46,22 +46,21 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // C++ Headers
-#include <HybridEvapCoolingModel.hh>
+#include <EnergyPlus/HybridEvapCoolingModel.hh>
 
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 #include <cmath>
 #include <string>
-//#include <windows.h>
-#include <CurveManager.hh>
-#include <DataEnvironment.hh>
-#include <DataGlobalConstants.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DataZoneEquipment.hh>
-#include <General.hh>
-#include <Psychrometrics.hh>
-#include <ScheduleManager.hh>
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
@@ -256,6 +255,7 @@ namespace HybridEvapCoolingModel {
 
             if (ValidPointer(HRsa_curve_pointer)) {
                 Y_val = NormalizationReference * CurveValue(HRsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
+                Y_val = max(min(Y_val, 1.0), 0.0);
             } else {
                 Y_val = X_4; // return HR
             }
@@ -473,6 +473,7 @@ namespace HybridEvapCoolingModel {
     bool CMode::CheckNormalizationReference(int CurveID, std::string cCurrentModuleObject)
     {
 
+        // Note: This is abusing the table normalization value
         Real64 CheckNormalizationReference = GetNormalPoint(CurveID);
         if (NormalizationReference == -1) {
             // should never happen, because to get to this function we need a valid curve but check anyway.
@@ -1563,9 +1564,9 @@ namespace HybridEvapCoolingModel {
             Hsa = 1.006 * Tsa * (2501 + 1.86 * Tsa);
             Hsa = PsyHFnTdbW(Tsa, Wsa);
 
-            Real64 SupplyAirCp = PsyCpAirFnWTdb(Wsa, Tsa);            // J/degreesK.kg
-            Real64 ReturnAirCP = PsyCpAirFnWTdb(Wra, StepIns.Tra);    // J/degreesK.kg
-            Real64 OutdoorAirCP = PsyCpAirFnWTdb(Wosa, StepIns.Tosa); // J/degreesK.kg
+            Real64 SupplyAirCp = PsyCpAirFnW(Wsa);   // J/degreesK.kg
+            Real64 ReturnAirCP = PsyCpAirFnW(Wra);   // J/degreesK.kg
+            Real64 OutdoorAirCP = PsyCpAirFnW(Wosa); // J/degreesK.kg
 
             // Calculations below of system cooling and heating capacity are ultimately reassessed when the resultant part runtime fraction is
             // assessed. However its valuable that they are calculated here to at least provide a check.
@@ -2028,9 +2029,9 @@ namespace HybridEvapCoolingModel {
             // Calculate timestep average unit and system
             PrimaryMode = CurrentPrimaryMode();
             PrimaryModeRuntimeFraction = CurrentPrimaryRuntimeFraction();
-            Real64 Outletcp = PsyCpAirFnWTdb(OutletHumRat, OutletTemp); // J/degreesK.kg
-            Real64 Returncp = PsyCpAirFnWTdb(Wra, StepIns.Tra);         // J/degreesK.kg
-            Real64 Outdoorcp = PsyCpAirFnWTdb(Wosa, StepIns.Tosa);      // J/degreesK.kg
+            Real64 Outletcp = PsyCpAirFnW(OutletHumRat); // J/degreesK.kg
+            Real64 Returncp = PsyCpAirFnW(Wra);          // J/degreesK.kg
+            Real64 Outdoorcp = PsyCpAirFnW(Wosa);        // J/degreesK.kg
             // Zone Sensible Cooling{ W } = m'SA {kg/s} * 0.5*(cpRA+cpSA) {kJ/kg-C} * (T_RA - T_SA) {C}
             // Zone Latent Cooling{ W } = m'SAdryair {kg/s} * L {kJ/kgWater} * (HR_RA - HR_SA) {kgWater/kgDryAir}
             // Zone Total Cooling{ W } = m'SAdryair {kg/s} * (h_RA - h_SA) {kJ/kgDryAir}

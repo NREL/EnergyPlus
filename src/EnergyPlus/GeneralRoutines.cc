@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -59,42 +59,42 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <BaseboardRadiator.hh>
-#include <ConvectionCoefficients.hh>
-#include <DataAirLoop.hh>
-#include <DataBranchAirLoopPlant.hh>
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalSurface.hh>
-#include <DataHeatBalance.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSizing.hh>
-#include <DataSurfaces.hh>
-#include <DataZoneEquipment.hh>
-#include <FanCoilUnits.hh>
-#include <General.hh>
-#include <GeneralRoutines.hh>
-#include <HVACSingleDuctInduc.hh>
-#include <HWBaseboardRadiator.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <MixerComponent.hh>
-#include <OutdoorAirUnit.hh>
-#include <PlantUtilities.hh>
-#include <PoweredInductionUnits.hh>
-#include <Psychrometrics.hh>
-#include <PurchasedAirManager.hh>
-#include <ScheduleManager.hh>
-#include <SolarCollectors.hh>
-#include <SplitterComponent.hh>
-#include <SteamBaseboardRadiator.hh>
-#include <UnitHeater.hh>
-#include <UnitVentilator.hh>
-#include <UtilityRoutines.hh>
-#include <VentilatedSlab.hh>
-#include <WaterCoils.hh>
-#include <ZonePlenum.hh>
+#include <EnergyPlus/BaseboardRadiator.hh>
+#include <EnergyPlus/ConvectionCoefficients.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/FanCoilUnits.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/HVACSingleDuctInduc.hh>
+#include <EnergyPlus/HWBaseboardRadiator.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/MixerComponent.hh>
+#include <EnergyPlus/OutdoorAirUnit.hh>
+#include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/PoweredInductionUnits.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/PurchasedAirManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SolarCollectors.hh>
+#include <EnergyPlus/SplitterComponent.hh>
+#include <EnergyPlus/SteamBaseboardRadiator.hh>
+#include <EnergyPlus/UnitHeater.hh>
+#include <EnergyPlus/UnitVentilator.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/VentilatedSlab.hh>
+#include <EnergyPlus/WaterCoils.hh>
+#include <EnergyPlus/ZonePlenum.hh>
 
 namespace EnergyPlus {
 
@@ -164,7 +164,7 @@ void ControlCompOutput(std::string const &CompName,           // the component N
     using HWBaseboardRadiator::CalcHWBaseboard;
     using OutdoorAirUnit::CalcOAUnitCoilComps;
     using PlantUtilities::SetActuatedBranchFlowRate;
-    using Psychrometrics::PsyCpAirFnWTdb;
+    using Psychrometrics::PsyCpAirFnW;
     using SteamBaseboardRadiator::CalcSteamBaseboard;
     using UnitHeater::CalcUnitHeaterComponents;
     using UnitVentilator::CalcUnitVentilatorComponents;
@@ -502,9 +502,7 @@ void ControlCompOutput(std::string const &CompName,           // the component N
             // simulate series piu reheat coil
             SimulateWaterCoilComponents(CompName, FirstHVACIteration, CompNum);
             // Calculate the control signal (the variable we are forcing to zero)
-            CpAir = PsyCpAirFnWTdb(
-                Node(TempOutNode).HumRat,
-                0.5 * (Node(TempOutNode).Temp + Node(TempInNode).Temp)); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
+            CpAir = PsyCpAirFnW(Node(TempOutNode).HumRat); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
             LoadMet = CpAir * Node(TempOutNode).MassFlowRate *
                       (Node(TempOutNode).Temp - Node(TempInNode).Temp); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
@@ -514,9 +512,7 @@ void ControlCompOutput(std::string const &CompName,           // the component N
             // simulate series piu reheat coil
             SimulateWaterCoilComponents(CompName, FirstHVACIteration, CompNum);
             // Calculate the control signal (the variable we are forcing to zero)
-            CpAir = PsyCpAirFnWTdb(
-                Node(TempOutNode).HumRat,
-                0.5 * (Node(TempOutNode).Temp + Node(TempInNode).Temp)); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
+            CpAir = PsyCpAirFnW(Node(TempOutNode).HumRat); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
             LoadMet = CpAir * Node(TempOutNode).MassFlowRate *
                       (Node(TempOutNode).Temp - Node(TempInNode).Temp); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
@@ -526,7 +522,7 @@ void ControlCompOutput(std::string const &CompName,           // the component N
             // Simulate reheat coil for the VAV system
             SimulateWaterCoilComponents(CompName, FirstHVACIteration, CompNum);
             // Calculate the control signal (the variable we are forcing to zero)
-            CpAir = PsyCpAirFnWTdb(Node(TempOutNode).HumRat, Node(TempOutNode).Temp);
+            CpAir = PsyCpAirFnW(Node(TempOutNode).HumRat);
             if (present(AirMassFlow)) {
                 LoadMet = AirMassFlow * CpAir * Node(TempOutNode).Temp;
                 ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
@@ -1047,7 +1043,7 @@ void CalcPassiveExteriorBaffleGap(Array1S_int const SurfPtrARR, // Array of inde
     using DataHeatBalSurface::TH;
     using DataSurfaces::Surface;
     using DataSurfaces::SurfaceData;
-    using Psychrometrics::PsyCpAirFnWTdb;
+    using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
     using Psychrometrics::PsyWFnTdbTwbPb;
     using SolarCollectors::Collector;
@@ -1132,7 +1128,7 @@ void CalcPassiveExteriorBaffleGap(Array1S_int const SurfPtrARR, // Array of inde
     LocalOutHumRat = PsyWFnTdbTwbPb(LocalOutDryBulbTemp, LocalWetBulbTemp, OutBaroPress, RoutineName);
 
     RhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, LocalOutDryBulbTemp, LocalOutHumRat, RoutineName);
-    CpAir = PsyCpAirFnWTdb(LocalOutHumRat, LocalOutDryBulbTemp);
+    CpAir = PsyCpAirFnW(LocalOutHumRat);
     if (!IsRain) {
         Tamb = LocalOutDryBulbTemp;
     } else { // when raining we use wetbulb not drybulb
@@ -1577,12 +1573,14 @@ void TestSupplyAirPathIntegrity(bool &ErrFound)
     static ObjexxFCL::gio::Fmt Format_701("(A)");
     static ObjexxFCL::gio::Fmt Format_702("('! <Supply Air Path>,<Supply Air Path Count>,<Supply Air Path Name>,<AirLoopHVAC Name>')");
     static ObjexxFCL::gio::Fmt Format_703("('! <#Components on Supply Air Path>,<Number of Components>')");
-    static ObjexxFCL::gio::Fmt Format_704("('! <Supply Air Path Component>,<Component Count>,<Component Type>,<Component Name>,','<AirLoopHVAC Name>')");
+    static ObjexxFCL::gio::Fmt Format_704(
+        "('! <Supply Air Path Component>,<Component Count>,<Component Type>,<Component Name>,','<AirLoopHVAC Name>')");
     static ObjexxFCL::gio::Fmt Format_705("('! <#Nodes on Supply Air Path>,<Number of Nodes>')");
     static ObjexxFCL::gio::Fmt Format_706("('! <Supply Air Path Node>,<Node Type>,<Node Count>,<Node Name>,<AirLoopHVAC Name>')");
     static ObjexxFCL::gio::Fmt Format_707("('! <#Outlet Nodes on Supply Air Path Component>,<Number of Nodes>')");
-    static ObjexxFCL::gio::Fmt Format_708("('! <Supply Air Path Component Nodes>,<Node Count>,<Component Type>,<Component Name>,','<Inlet Node Name>,<Outlet "
-                               "Node Name>,<AirLoopHVAC Name>')");
+    static ObjexxFCL::gio::Fmt Format_708(
+        "('! <Supply Air Path Component Nodes>,<Node Count>,<Component Type>,<Component Name>,','<Inlet Node Name>,<Outlet "
+        "Node Name>,<AirLoopHVAC Name>')");
 
     // Do by Paths
     ShowMessage("Testing Individual Supply Air Path Integrity");
@@ -1628,8 +1626,8 @@ void TestSupplyAirPathIntegrity(bool &ErrFound)
             ObjexxFCL::gio::write(ChrOut, fmtLD) << Count;
             strip(ChrOut);
             ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "   Supply Air Path Component," + ChrOut + ',' +
-                                                               SupplyAirPath(BCount).ComponentType(Count) + ',' +
-                                                               SupplyAirPath(BCount).ComponentName(Count) + ',' + PrimaryAirLoopName;
+                                                                          SupplyAirPath(BCount).ComponentType(Count) + ',' +
+                                                                          SupplyAirPath(BCount).ComponentName(Count) + ',' + PrimaryAirLoopName;
 
             {
                 auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(SupplyAirPath(BCount).ComponentType(Count)));
@@ -1646,7 +1644,8 @@ void TestSupplyAirPathIntegrity(bool &ErrFound)
                             ++NumErr;
                         }
                         ObjexxFCL::gio::write(ChrOut, fmtLD) << ZoneSupPlenCond(Count2).NumOutletNodes;
-                        ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "     #Outlet Nodes on Supply Air Path Component," + stripped(ChrOut);
+                        ObjexxFCL::gio::write(OutputFileBNDetails, Format_701)
+                            << "     #Outlet Nodes on Supply Air Path Component," + stripped(ChrOut);
                         for (Count1 = 1; Count1 <= ZoneSupPlenCond(Count2).NumOutletNodes; ++Count1) {
                             ObjexxFCL::gio::write(ChrOut, fmtLD) << Count1;
                             ObjexxFCL::gio::write(OutputFileBNDetails, Format_701)
@@ -1668,7 +1667,8 @@ void TestSupplyAirPathIntegrity(bool &ErrFound)
                             ++NumErr;
                         }
                         ObjexxFCL::gio::write(ChrOut, fmtLD) << SplitterCond(Count2).NumOutletNodes;
-                        ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "     #Outlet Nodes on Supply Air Path Component," + stripped(ChrOut);
+                        ObjexxFCL::gio::write(OutputFileBNDetails, Format_701)
+                            << "     #Outlet Nodes on Supply Air Path Component," + stripped(ChrOut);
                         for (Count1 = 1; Count1 <= SplitterCond(Count2).NumOutletNodes; ++Count1) {
                             ObjexxFCL::gio::write(ChrOut, fmtLD) << Count1;
                             ObjexxFCL::gio::write(OutputFileBNDetails, Format_701)
@@ -1697,13 +1697,16 @@ void TestSupplyAirPathIntegrity(bool &ErrFound)
                 strip(ChrOut);
                 if (SupplyAirPath(BCount).NodeType(Count2) == PathInlet) {
                     ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "   Supply Air Path Node,Inlet Node," + ChrOut + ',' +
-                                                                       NodeID(SupplyAirPath(BCount).Node(Count2)) + ',' + PrimaryAirLoopName;
+                                                                                  NodeID(SupplyAirPath(BCount).Node(Count2)) + ',' +
+                                                                                  PrimaryAirLoopName;
                 } else if (SupplyAirPath(BCount).NodeType(Count2) == Intermediate) {
                     ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "   Supply Air Path Node,Through Node," + ChrOut + ',' +
-                                                                       NodeID(SupplyAirPath(BCount).Node(Count2)) + ',' + PrimaryAirLoopName;
+                                                                                  NodeID(SupplyAirPath(BCount).Node(Count2)) + ',' +
+                                                                                  PrimaryAirLoopName;
                 } else if (SupplyAirPath(BCount).NodeType(Count2) == Outlet) {
                     ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "   Supply Air Path Node,Outlet Node," + ChrOut + ',' +
-                                                                       NodeID(SupplyAirPath(BCount).Node(Count2)) + ',' + PrimaryAirLoopName;
+                                                                                  NodeID(SupplyAirPath(BCount).Node(Count2)) + ',' +
+                                                                                  PrimaryAirLoopName;
                 }
             }
         }
@@ -1874,8 +1877,9 @@ void TestReturnAirPathIntegrity(bool &ErrFound, Array2S_int ValRetAPaths)
     static ObjexxFCL::gio::Fmt Format_705("('! <#Nodes on Return Air Path>,<Number of Nodes>')");
     static ObjexxFCL::gio::Fmt Format_706("('! <Return Air Path Node>,<Node Type>,<Node Count>,<Node Name>,<AirLoopHVAC Name>')");
     static ObjexxFCL::gio::Fmt Format_707("('! <#Inlet Nodes on Return Air Path Component>,<Number of Nodes>')");
-    static ObjexxFCL::gio::Fmt Format_708("('! <Return Air Path Component Nodes>,<Node Count>,<Component Type>,<Component Name>,','<Inlet Node Name>,<Outlet "
-                               "Node Name>,<AirLoopHVAC Name>')");
+    static ObjexxFCL::gio::Fmt Format_708(
+        "('! <Return Air Path Component Nodes>,<Node Count>,<Component Type>,<Component Name>,','<Inlet Node Name>,<Outlet "
+        "Node Name>,<AirLoopHVAC Name>')");
 
     // Do by Paths
     ShowMessage("Testing Individual Return Air Path Integrity");
@@ -1924,8 +1928,8 @@ void TestReturnAirPathIntegrity(bool &ErrFound, Array2S_int ValRetAPaths)
             ObjexxFCL::gio::write(ChrOut, fmtLD) << Count;
             strip(ChrOut);
             ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "   Return Air Path Component," + ChrOut + ',' +
-                                                               ReturnAirPath(BCount).ComponentType(Count) + ',' +
-                                                               ReturnAirPath(BCount).ComponentName(Count) + ',' + PrimaryAirLoopName;
+                                                                          ReturnAirPath(BCount).ComponentType(Count) + ',' +
+                                                                          ReturnAirPath(BCount).ComponentName(Count) + ',' + PrimaryAirLoopName;
 
             if (UtilityRoutines::SameString(ReturnAirPath(BCount).ComponentType(Count), "AirLoopHVAC:ZoneMixer")) {
                 HasMixer = true;
@@ -1970,7 +1974,8 @@ void TestReturnAirPathIntegrity(bool &ErrFound, Array2S_int ValRetAPaths)
                             }
                         }
                         ObjexxFCL::gio::write(ChrOut, fmtLD) << MixerCond(Count2).NumInletNodes;
-                        ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "     #Inlet Nodes on Return Air Path Component," + stripped(ChrOut);
+                        ObjexxFCL::gio::write(OutputFileBNDetails, Format_701)
+                            << "     #Inlet Nodes on Return Air Path Component," + stripped(ChrOut);
                         for (Count1 = 1; Count1 <= MixerCond(Count2).NumInletNodes; ++Count1) {
                             ObjexxFCL::gio::write(ChrOut, fmtLD) << Count1;
                             ObjexxFCL::gio::write(OutputFileBNDetails, Format_701)
@@ -1999,7 +2004,8 @@ void TestReturnAirPathIntegrity(bool &ErrFound, Array2S_int ValRetAPaths)
                             }
                         }
                         ObjexxFCL::gio::write(ChrOut, fmtLD) << ZoneRetPlenCond(Count2).NumInletNodes;
-                        ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "     #Inlet Nodes on Return Air Path Component," + stripped(ChrOut);
+                        ObjexxFCL::gio::write(OutputFileBNDetails, Format_701)
+                            << "     #Inlet Nodes on Return Air Path Component," + stripped(ChrOut);
                         for (Count1 = 1; Count1 <= ZoneRetPlenCond(Count2).NumInletNodes; ++Count1) {
                             ObjexxFCL::gio::write(ChrOut, fmtLD) << Count1;
                             ObjexxFCL::gio::write(OutputFileBNDetails, Format_701)

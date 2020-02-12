@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,11 +52,11 @@
 #include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-
+    class OutputFiles;
 namespace SizingManager {
 
     // Using/Aliasing
@@ -91,7 +91,7 @@ namespace SizingManager {
     // Functions
     void clear_state();
 
-    void ManageSizing();
+    void ManageSizing(OutputFiles &outputFiles);
 
     void ManageSystemSizingAdjustments();
 
@@ -120,7 +120,7 @@ namespace SizingManager {
 
     void GetAirTerminalSizing();
 
-    void GetSizingParams();
+    void GetSizingParams(OutputFiles &outputFiles);
 
     void GetZoneSizingInput();
 
@@ -133,7 +133,8 @@ namespace SizingManager {
 
     void SetupZoneSizing(bool &ErrorsFound);
 
-    void ReportZoneSizing(std::string const &ZoneName,   // the name of the zone
+    void ReportZoneSizing(OutputFiles &outputFiles,
+                          std::string const &ZoneName,   // the name of the zone
                           std::string const &LoadType,   // the description of the input variable
                           Real64 const CalcDesLoad,      // the value from the sizing calculation [W]
                           Real64 const UserDesLoad,      // the value from the sizing calculation modified by user input [W]
@@ -149,7 +150,8 @@ namespace SizingManager {
                           Real64 const DOASHeatAddRate   // zone design heat addition rate from the DOAS [W]
     );
 
-    void ReportSysSizing(std::string const &SysName,      // the name of the zone
+    void ReportSysSizing(OutputFiles &outputFiles,
+                         std::string const &SysName,      // the name of the zone
                          std::string const &LoadType,     // either "Cooling" or "Heating"
                          std::string const &PeakLoadType, // either "Sensible" or "Total"
                          Real64 const &UserDesCap,        // User  Design Capacity

@@ -51,8 +51,8 @@
 #include <bitset>
 #include <vector>
 
-#include <EnergyPlus.hh>
-#include <Scheduling/Base.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Scheduling/Base.hh>
 #include <nlohmann/json.hpp>
 
 namespace Scheduling {

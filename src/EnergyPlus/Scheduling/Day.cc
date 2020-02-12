@@ -47,11 +47,11 @@
 
 #include <regex>
 
-#include <InputProcessing/InputProcessor.hh>
-#include <Scheduling/Base.hh>
-#include <Scheduling/Day.hh>
-#include <Scheduling/TypeLimits.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/Scheduling/Base.hh>
+#include <EnergyPlus/Scheduling/Day.hh>
+#include <EnergyPlus/Scheduling/TypeLimits.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace Scheduling {
 

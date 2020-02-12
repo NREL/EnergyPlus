@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,10 +57,11 @@
 #include <ObjexxFCL/Vector3.fwd.hh>
 
 // EnergyPlus Headers
-#include <DataBSDFWindow.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataBSDFWindow.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class OutputFiles;
 
 namespace DaylightingManager {
 
@@ -77,6 +78,7 @@ namespace DaylightingManager {
     extern int OutputFileDFS;         // Unit number for daylight factors
     extern Array1D<Real64> DaylIllum; // Daylight illuminance at reference points (lux)
     extern int maxNumRefPtInAnyZone;  // The most number of reference points that any single zone has
+    extern int maxNumRefPtInAnyEncl;  // The most number of reference points that any single enclosure has
     extern Real64 PHSUN;              // Solar altitude (radians)
     extern Real64 SPHSUN;             // Sine of solar altitude
     extern Real64 CPHSUN;             // Cosine of solar altitude
@@ -127,7 +129,7 @@ namespace DaylightingManager {
 
     void DayltgAveInteriorReflectance(int &ZoneNum); // Zone number
 
-    void CalcDayltgCoefficients();
+    void CalcDayltgCoefficients(OutputFiles &outputFiles);
 
     void CalcDayltgCoeffsRefMapPoints(int const ZoneNum);
 
@@ -334,7 +336,7 @@ namespace DaylightingManager {
 
     void GetDaylightingParametersInput();
 
-    void GetInputIlluminanceMap(bool &ErrorsFound);
+    void GetInputIlluminanceMap(OutputFiles &outputFiles, bool &ErrorsFound);
 
     void GetDaylightingControls(int const TotDaylightingControls, // Total daylighting controls inputs
                                 bool &ErrorsFound);
@@ -468,7 +470,7 @@ namespace DaylightingManager {
 
     void CloseDFSFile();
 
-    void DayltgSetupAdjZoneListsAndPointers();
+    void DayltgSetupAdjZoneListsAndPointers(OutputFiles &outputFiles);
 
     void CreateShadeDeploymentOrder(int &ZoneNum);
 

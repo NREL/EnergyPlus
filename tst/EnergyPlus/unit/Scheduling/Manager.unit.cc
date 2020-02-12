@@ -47,8 +47,8 @@
 
 #include <gtest/gtest.h>
 
-#include <Scheduling/Manager.hh>
-#include <Scheduling/SchedulingFixture.hh>
+#include <EnergyPlus/Scheduling/Manager.hh>
+#include "../Scheduling/SchedulingFixture.hh"
 
 namespace EnergyPlus {
 
@@ -62,7 +62,7 @@ TEST_F(SchedulingTestFixture, SchedulingManager_TestGetScheduleIndex)
 {
     std::string const idf_objects = delimited_string({"Schedule:Constant,Always On,,1.0;", "Schedule:Constant,Always Off,,0.0;"});
     ASSERT_TRUE(process_idf(idf_objects));
-    Scheduling::processAllSchedules();
+    Scheduling::processAllSchedules(EnergyPlus::OutputFiles::getSingleton());
     EXPECT_EQ(-1, Scheduling::GetScheduleIndex("my_missing_schedule"));
     EXPECT_EQ(-1, Scheduling::GetScheduleIndex("always on")); // must be capitalized
     EXPECT_EQ(2, Scheduling::GetScheduleIndex("ALWAYS ON")); // must be capitalized
@@ -70,7 +70,7 @@ TEST_F(SchedulingTestFixture, SchedulingManager_TestGetScheduleIndex)
 
 TEST_F(SchedulingTestFixture, SchedulingManager_TestZeroIndexScheduleValue)
 {
-    Scheduling::processAllSchedules();
+    Scheduling::processAllSchedules(EnergyPlus::OutputFiles::getSingleton());
     EXPECT_EQ(0.0, Scheduling::GetScheduleValue(0));
 }
 
@@ -78,7 +78,7 @@ TEST_F(SchedulingTestFixture, SchedulingManager_TestGetScheduleValue)
 {
     std::string const idf_objects = delimited_string({"Schedule:Constant,Always On,,1.0;", "Schedule:Constant,Always Off,,0.0;"});
     ASSERT_TRUE(process_idf(idf_objects));
-    Scheduling::processAllSchedules();
+    Scheduling::processAllSchedules(EnergyPlus::OutputFiles::getSingleton());
     EXPECT_EQ(2, Scheduling::GetScheduleIndex("ALWAYS ON"));
     EXPECT_EQ(1.0, Scheduling::GetScheduleValue(2));
 }
@@ -88,7 +88,7 @@ TEST_F(SchedulingTestFixture, SchedulingManager_TestGetScheduleReference) {
     ASSERT_TRUE(process_idf(idf_objects));
     std::string schedName;
     Scheduling::ScheduleBase *thisReference;
-    Scheduling::processAllSchedules();
+    Scheduling::processAllSchedules(EnergyPlus::OutputFiles::getSingleton());
 
     schedName = "ALWAYS ON";
     thisReference = Scheduling::getScheduleReference(schedName);

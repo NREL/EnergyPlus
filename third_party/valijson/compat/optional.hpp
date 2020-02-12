@@ -993,21 +993,21 @@ namespace std{
         {
             x.swap(y);
         }
-        
-        
+
+
         template <class T>
         constexpr optional<typename decay<T>::type> make_optional(T&& v)
         {
             return optional<typename decay<T>::type>(constexpr_forward<T>(v));
         }
-        
+
         template <class X>
         constexpr optional<X&> make_optional(reference_wrapper<X> v)
         {
             return optional<X&>(v.get());
         }
-        
-        
+
+
     } // namespace experimental
 } // namespace std
 
@@ -1018,18 +1018,18 @@ namespace std
     {
         typedef typename hash<T>::result_type result_type;
         typedef std::experimental::optional<T> argument_type;
-        
+
         constexpr result_type operator()(argument_type const& arg) const {
             return arg ? std::hash<T>{}(*arg) : result_type{};
         }
     };
-    
+
     template <typename T>
     struct hash<std::experimental::optional<T&>>
     {
         typedef typename hash<T>::result_type result_type;
         typedef std::experimental::optional<T&> argument_type;
-        
+
         constexpr result_type operator()(argument_type const& arg) const {
             return arg ? std::hash<T>{}(*arg) : result_type{};
         }

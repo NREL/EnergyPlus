@@ -47,8 +47,8 @@
 
 #include <gtest/gtest.h>
 
-#include <Scheduling/SchedulingFixture.hh>
-#include <Scheduling/YearFile.hh>
+#include <EnergyPlus/Scheduling/YearFile.hh>
+#include "../Scheduling/SchedulingFixture.hh"
 
 namespace EnergyPlus {
 

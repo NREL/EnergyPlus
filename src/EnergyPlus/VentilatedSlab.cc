@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,40 +53,40 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <BranchNodeConnections.hh>
-#include <DataAirSystems.hh>
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalSurface.hh>
-#include <DataHeatBalance.hh>
-#include <DataLoopNode.hh>
-#include <DataPlant.hh>
-#include <DataSizing.hh>
-#include <DataSurfaceLists.hh>
-#include <DataSurfaces.hh>
-#include <DataZoneEnergyDemands.hh>
-#include <DataZoneEquipment.hh>
-#include <Fans.hh>
-#include <FluidProperties.hh>
-#include <General.hh>
-#include <GeneralRoutines.hh>
-#include <HVACFan.hh>
-#include <HVACHXAssistedCoolingCoil.hh>
-#include <HeatBalanceSurfaceManager.hh>
-#include <HeatingCoils.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <OutAirNodeManager.hh>
-#include <OutputProcessor.hh>
-#include <PlantUtilities.hh>
-#include <Psychrometrics.hh>
-#include <ReportSizingManager.hh>
-#include <ScheduleManager.hh>
-#include <SteamCoils.hh>
-#include <UtilityRoutines.hh>
-#include <VentilatedSlab.hh>
-#include <WaterCoils.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataSurfaceLists.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/HVACFan.hh>
+#include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
+#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
+#include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SteamCoils.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/VentilatedSlab.hh>
+#include <EnergyPlus/WaterCoils.hh>
 
 namespace EnergyPlus {
 
@@ -2961,7 +2961,7 @@ namespace VentilatedSlab {
                             VentSlab(Item).FanName, FirstHVACIteration, VentSlab(Item).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
                     }
 
-                    CpFan = PsyCpAirFnWTdb(Node(FanOutletNode).HumRat, Node(FanOutletNode).Temp);
+                    CpFan = PsyCpAirFnW(Node(FanOutletNode).HumRat);
                     QZnReq = (Node(OutletNode).MassFlowRate) * CpFan * (RadInTemp - Node(FanOutletNode).Temp);
 
                     // Setup the coil configuration
@@ -3214,7 +3214,7 @@ namespace VentilatedSlab {
                             VentSlab(Item).FanName, FirstHVACIteration, VentSlab(Item).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
                     }
 
-                    CpFan = PsyCpAirFnWTdb(Node(FanOutletNode).HumRat, Node(FanOutletNode).Temp);
+                    CpFan = PsyCpAirFnW(Node(FanOutletNode).HumRat);
                     QZnReq = (Node(OutletNode).MassFlowRate) * CpFan * (RadInTemp - Node(FanOutletNode).Temp);
 
                     ControlCompOutput(VentSlab(Item).Name,
@@ -3362,7 +3362,7 @@ namespace VentilatedSlab {
                         QCoilReq = 0.0;
                     } else {
                         HCoilInAirNode = VentSlab(Item).FanOutletNode;
-                        CpAirZn = PsyCpAirFnWTdb(Node(HCoilInAirNode).HumRat, Node(HCoilInAirNode).Temp);
+                        CpAirZn = PsyCpAirFnW(Node(HCoilInAirNode).HumRat);
                         QCoilReq = Node(HCoilInAirNode).MassFlowRate * CpAirZn * (Node(VentSlab(Item).RadInNode).Temp) - (Node(HCoilInAirNode).Temp);
                     }
 
@@ -3377,7 +3377,7 @@ namespace VentilatedSlab {
                     } else {
                         HCoilInAirTemp = Node(VentSlab(Item).FanOutletNode).Temp;
                         HCoilOutAirTemp = Node(VentSlab(Item).RadInNode).Temp;
-                        CpAirZn = PsyCpAirFnWTdb(Node(VentSlab(Item).RadInNode).HumRat, Node(VentSlab(Item).RadInNode).Temp);
+                        CpAirZn = PsyCpAirFnW(Node(VentSlab(Item).RadInNode).HumRat);
                         QCoilReq = Node(VentSlab(Item).FanOutletNode).MassFlowRate * CpAirZn * (HCoilOutAirTemp - HCoilInAirTemp);
                     }
 
@@ -3679,7 +3679,7 @@ namespace VentilatedSlab {
                     Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));
 
                     Mdot = AirMassFlow * VentSlab(Item).SurfaceFlowFrac(RadSurfNum);
-                    CpAirZn = PsyCpAirFnWTdb(Node(VentSlab(Item).RadInNode).HumRat, Node(VentSlab(Item).RadInNode).Temp);
+                    CpAirZn = PsyCpAirFnW(Node(VentSlab(Item).RadInNode).HumRat);
 
                     QRadSysSource(SurfNum) =
                         VentSlab(Item).CoreNumbers * EpsMdotCpAirZn * (AirTempIn - Ck) / (1.0 + (EpsMdotCpAirZn * Cl / Surface(SurfNum).Area));
@@ -3818,7 +3818,7 @@ namespace VentilatedSlab {
                 // Return Air temp Check
                 if (VentSlab(Item).SysConfg == SlabOnly) {
                     if (AirMassFlow > 0.0) {
-                        CpAirZn = PsyCpAirFnWTdb(Node(VentSlab(Item).RadInNode).HumRat, Node(VentSlab(Item).RadInNode).Temp);
+                        CpAirZn = PsyCpAirFnW(Node(VentSlab(Item).RadInNode).HumRat);
                         Node(ReturnAirNode).Temp = Node(SlabInNode).Temp - (TotalVentSlabRadPower / (AirMassFlow * CpAirZn));
                         if ((std::abs(Node(ReturnAirNode).Temp - AirOutletTempCheck) > TempCheckLimit) &&
                             (std::abs(TotalVentSlabRadPower) > ZeroSystemResp)) {
@@ -3935,7 +3935,7 @@ namespace VentilatedSlab {
                     Cl = Ch + ((Ci * (Cc + Cb * Cf) + Cj * (Cf + Ce * Cc)) / (1.0 - Ce * Cb));
 
                     Mdot = AirMassFlow * FlowFrac;
-                    CpAirZn = PsyCpAirFnWTdb(Node(VentSlab(Item).RadInNode).HumRat, Node(VentSlab(Item).RadInNode).Temp);
+                    CpAirZn = PsyCpAirFnW(Node(VentSlab(Item).RadInNode).HumRat);
 
                     QRadSysSource(SurfNum) = CNumDS * EpsMdotCpAirZn * (AirTempIn - Ck) / (1.0 + (EpsMdotCpAirZn * Cl / Surface(SurfNum).Area));
 
@@ -4082,7 +4082,7 @@ namespace VentilatedSlab {
 
                     if (AirMassFlow > 0.0) {
 
-                        CpAirZn = PsyCpAirFnWTdb(Node(VentSlab(Item).RadInNode).HumRat, Node(VentSlab(Item).RadInNode).Temp);
+                        CpAirZn = PsyCpAirFnW(Node(VentSlab(Item).RadInNode).HumRat);
 
                         Node(MSlabInletNode).Temp = MSlabAirInTemp;
                         Node(MSlabOutletNode).Temp = Node(MSlabInletNode).Temp - (QRadSysSource(SurfNum) / (AirMassFlow * CpAirZn));
@@ -4096,7 +4096,7 @@ namespace VentilatedSlab {
                 // Return Air temp Check
                 if (AirMassFlow > 0.0) {
 
-                    CpAirZn = PsyCpAirFnWTdb(Node(VentSlab(Item).RadInNode).HumRat, Node(VentSlab(Item).RadInNode).Temp);
+                    CpAirZn = PsyCpAirFnW(Node(VentSlab(Item).RadInNode).HumRat);
                     Node(ReturnAirNode).Temp = Node(SlabInNode).Temp - (TotalVentSlabRadPower / (AirMassFlow * CpAirZn));
 
                     if ((std::abs(Node(ReturnAirNode).Temp - AirOutletTempCheck) > TempCheckLimit) &&
@@ -4314,7 +4314,7 @@ namespace VentilatedSlab {
         FanOutNode = VentSlab(Item).FanOutletNode;
         AirMassFlow = Node(AirOutletNode).MassFlowRate;
         ZoneInletNode = VentSlab(Item).ZoneAirInNode;
-        CpAppAir = PsyCpAirFnWTdb(Node(AirOutletNode).HumRat, Node(AirOutletNode).Temp);
+        CpAppAir = PsyCpAirFnW(Node(AirOutletNode).HumRat);
         AirInletNode = VentSlab(Item).ReturnAirNode;
 
         for (RadSurfNum = 1; RadSurfNum <= TotRadSurfaces; ++RadSurfNum) {
@@ -4512,7 +4512,7 @@ namespace VentilatedSlab {
             PRactual = Pr(Index - 1) + InterpFrac * (Pr(Index) - Pr(Index - 1));
         }
         // arguments are glycol name, temperature, and concentration
-        CpAppAir = PsyCpAirFnWTdb(Node(VentSlab(Item).RadInNode).HumRat, Node(VentSlab(Item).RadInNode).Temp);
+        CpAppAir = PsyCpAirFnW(Node(VentSlab(Item).RadInNode).HumRat);
         SysAirMassFlow = AirMassFlow / CoreNumbers;
 
         // Calculate the Reynold's number from RE=(4*Mdot)/(Pi*Mu*Diameter)

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,32 +56,33 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <BranchNodeConnections.hh>
-#include <DataAirLoop.hh>
-#include <DataContaminantBalance.hh>
-#include <DataConvergParams.hh>
-#include <DataDefineEquip.hh>
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSizing.hh>
-#include <DataZoneEnergyDemands.hh>
-#include <DataZoneEquipment.hh>
-#include <DualDuct.hh>
-#include <General.hh>
-#include <GeneralRoutines.hh>
-#include <GlobalNames.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <OutputProcessor.hh>
-#include <Psychrometrics.hh>
-#include <ReportSizingManager.hh>
-#include <ScheduleManager.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataConvergParams.hh>
+#include <EnergyPlus/DataDefineEquip.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DualDuct.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -1198,7 +1199,7 @@ namespace DualDuct {
         using namespace DataZoneEnergyDemands;
         // unused0909   USE DataHeatBalFanSys, ONLY: Mat
         using DataHVACGlobals::SmallTempDiff;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyTdbFnHW;
 
         // Locals
@@ -1235,14 +1236,14 @@ namespace DualDuct {
         // If there is massflow then need to provide the correct amount of total
         //  required zone energy
         if (MassFlow > SmallMassFlow) {
-            CpAirZn = PsyCpAirFnWTdb(Node(ZoneNodeNum).HumRat, Node(ZoneNodeNum).Temp);
+            CpAirZn = PsyCpAirFnW(Node(ZoneNodeNum).HumRat);
             QZnReq = QTotLoad + MassFlow * CpAirZn * Node(ZoneNodeNum).Temp;
             // If the enthalpy is the same for the hot and cold duct then there would be a
             //  divide by zero so for heating or cooling set the damper to one max flow
             //  or the other.
             if (std::abs(DamperColdAirInlet(DamperNum).AirTemp - DamperHotAirInlet(DamperNum).AirTemp) > SmallTempDiff) {
-                // CpAirSysHot = PsyCpAirFnWTdb(DamperHotAirInlet(DamperNum)%AirHumRat,DamperHotAirInlet(DamperNum)%AirTemp)
-                // CpAirSysCold= PsyCpAirFnWTdb(DamperColdAirInlet(DamperNum)%AirHumRat,DamperColdAirInlet(DamperNum)%AirTemp)
+                // CpAirSysHot = PsyCpAirFnW(DamperHotAirInlet(DamperNum)%AirHumRat,DamperHotAirInlet(DamperNum)%AirTemp)
+                // CpAirSysCold= PsyCpAirFnW(DamperColdAirInlet(DamperNum)%AirHumRat,DamperColdAirInlet(DamperNum)%AirTemp)
                 CpAirSysHot = CpAirZn;
                 CpAirSysCold = CpAirZn;
                 // Determine the Cold Air Mass Flow Rate
@@ -1334,7 +1335,7 @@ namespace DualDuct {
         using namespace DataZoneEnergyDemands;
         // unused0909   USE DataHeatBalFanSys, ONLY: Mat
         using DataHVACGlobals::SmallTempDiff;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyTdbFnHW;
 
         // Locals
@@ -1365,9 +1366,9 @@ namespace DualDuct {
         // The calculated load from the Heat Balance
         QTotLoad = ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
         // Calculate all of the required Cp's
-        CpAirZn = PsyCpAirFnWTdb(Node(ZoneNodeNum).HumRat, Node(ZoneNodeNum).Temp);
-        // CpAirSysHot = PsyCpAirFnWTdb(DamperHotAirInlet(DamperNum)%AirHumRat,DamperHotAirInlet(DamperNum)%AirTemp)
-        // CpAirSysCold= PsyCpAirFnWTdb(DamperColdAirInlet(DamperNum)%AirHumRat,DamperColdAirInlet(DamperNum)%AirTemp)
+        CpAirZn = PsyCpAirFnW(Node(ZoneNodeNum).HumRat);
+        // CpAirSysHot = PsyCpAirFnW(DamperHotAirInlet(DamperNum)%AirHumRat,DamperHotAirInlet(DamperNum)%AirTemp)
+        // CpAirSysCold= PsyCpAirFnW(DamperColdAirInlet(DamperNum)%AirHumRat,DamperColdAirInlet(DamperNum)%AirTemp)
         CpAirSysHot = CpAirZn;
         CpAirSysCold = CpAirZn;
 
@@ -1556,7 +1557,7 @@ namespace DualDuct {
 
         // Using/Aliasing
         using namespace DataZoneEnergyDemands;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyTdbFnHW;
         using namespace DataGlobals;
         using DataHeatBalFanSys::ZoneThermostatSetPointHi;
@@ -1612,9 +1613,9 @@ namespace DualDuct {
         QtoCoolSPRemain = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
 
         // Calculate all of the required Cp's
-        CpAirZn = PsyCpAirFnWTdb(Node(ZoneNodeNum).HumRat, Node(ZoneNodeNum).Temp);
-        CpAirSysOA = PsyCpAirFnWTdb(Node(OAInletNodeNum).HumRat, Node(OAInletNodeNum).Temp);
-        if (Damper(DamperNum).RecircIsUsed) CpAirSysRA = PsyCpAirFnWTdb(Node(RecircInletNodeNum).HumRat, Node(RecircInletNodeNum).Temp);
+        CpAirZn = PsyCpAirFnW(Node(ZoneNodeNum).HumRat);
+        CpAirSysOA = PsyCpAirFnW(Node(OAInletNodeNum).HumRat);
+        if (Damper(DamperNum).RecircIsUsed) CpAirSysRA = PsyCpAirFnW(Node(RecircInletNodeNum).HumRat);
 
         // Set the OA Damper to the calculated ventilation flow rate
         DamperOAInlet(DamperNum).AirMassFlowRate = OAMassFlow;
@@ -2162,8 +2163,9 @@ namespace DualDuct {
         // Formats
         static ObjexxFCL::gio::Fmt Format_100("('! <#Dual Duct Damper Connections>,<Number of Dual Duct Damper Connections>')");
         static ObjexxFCL::gio::Fmt Format_101("(A)");
-        static ObjexxFCL::gio::Fmt Format_102("('! <Dual Duct Damper>,<Dual Duct Damper Count>,<Dual Duct Damper Name>,<Inlet Node>,','<Outlet Node>,<Inlet "
-                                   "Node Type>,<AirLoopHVAC Name>')");
+        static ObjexxFCL::gio::Fmt Format_102(
+            "('! <Dual Duct Damper>,<Dual Duct Damper Count>,<Dual Duct Damper Name>,<Inlet Node>,','<Outlet Node>,<Inlet "
+            "Node Type>,<AirLoopHVAC Name>')");
         static ObjexxFCL::gio::Fmt fmtLD("*");
 
         if (!allocated(Damper))
@@ -2225,20 +2227,20 @@ namespace DualDuct {
             }
 
             if ((Damper(Count1).DamperType == DualDuct_ConstantVolume) || (Damper(Count1).DamperType == DualDuct_VariableVolume)) {
-                ObjexxFCL::gio::write(OutputFileBNDetails, Format_101) << " Dual Duct Damper," + stripped(ChrOut) + ',' + DamperType + ',' +
-                                                                   Damper(Count1).DamperName + ',' + NodeID(Damper(Count1).HotAirInletNodeNum) + ',' +
-                                                                   NodeID(Damper(Count1).OutletNodeNum) + ",Hot Air," + ChrName;
+                ObjexxFCL::gio::write(OutputFileBNDetails, Format_101)
+                    << " Dual Duct Damper," + stripped(ChrOut) + ',' + DamperType + ',' + Damper(Count1).DamperName + ',' +
+                           NodeID(Damper(Count1).HotAirInletNodeNum) + ',' + NodeID(Damper(Count1).OutletNodeNum) + ",Hot Air," + ChrName;
 
-                ObjexxFCL::gio::write(OutputFileBNDetails, Format_101) << " Dual Duct Damper," + stripped(ChrOut) + ',' + DamperType + ',' +
-                                                                   Damper(Count1).DamperName + ',' + NodeID(Damper(Count1).ColdAirInletNodeNum) +
-                                                                   ',' + NodeID(Damper(Count1).OutletNodeNum) + ",Cold Air," + ChrName;
+                ObjexxFCL::gio::write(OutputFileBNDetails, Format_101)
+                    << " Dual Duct Damper," + stripped(ChrOut) + ',' + DamperType + ',' + Damper(Count1).DamperName + ',' +
+                           NodeID(Damper(Count1).ColdAirInletNodeNum) + ',' + NodeID(Damper(Count1).OutletNodeNum) + ",Cold Air," + ChrName;
             } else if (Damper(Count1).DamperType == DualDuct_OutdoorAir) {
-                ObjexxFCL::gio::write(OutputFileBNDetails, Format_101) << "Dual Duct Damper, " + stripped(ChrOut) + ',' + DamperType + ',' +
-                                                                   Damper(Count1).DamperName + ',' + NodeID(Damper(Count1).OAInletNodeNum) + ',' +
-                                                                   NodeID(Damper(Count1).OutletNodeNum) + ",Outdoor Air," + ChrName;
-                ObjexxFCL::gio::write(OutputFileBNDetails, Format_101) << "Dual Duct Damper, " + stripped(ChrOut) + ',' + DamperType + ',' +
-                                                                   Damper(Count1).DamperName + ',' + NodeID(Damper(Count1).RecircAirInletNodeNum) +
-                                                                   ',' + NodeID(Damper(Count1).OutletNodeNum) + ",Recirculated Air," + ChrName;
+                ObjexxFCL::gio::write(OutputFileBNDetails, Format_101)
+                    << "Dual Duct Damper, " + stripped(ChrOut) + ',' + DamperType + ',' + Damper(Count1).DamperName + ',' +
+                           NodeID(Damper(Count1).OAInletNodeNum) + ',' + NodeID(Damper(Count1).OutletNodeNum) + ",Outdoor Air," + ChrName;
+                ObjexxFCL::gio::write(OutputFileBNDetails, Format_101)
+                    << "Dual Duct Damper, " + stripped(ChrOut) + ',' + DamperType + ',' + Damper(Count1).DamperName + ',' +
+                           NodeID(Damper(Count1).RecircAirInletNodeNum) + ',' + NodeID(Damper(Count1).OutletNodeNum) + ",Recirculated Air," + ChrName;
             }
         }
     }

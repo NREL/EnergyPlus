@@ -1,6 +1,4 @@
 #pragma once
-#ifndef __VALIJSON_UTILS_PICOJSON_UTILS_HPP
-#define __VALIJSON_UTILS_PICOJSON_UTILS_HPP
 
 #include <iostream>
 
@@ -33,5 +31,3 @@ inline bool loadDocument(const std::string &path, picojson::value &document)
 
 }  // namespace utils
 }  // namespace valijson
-
-#endif

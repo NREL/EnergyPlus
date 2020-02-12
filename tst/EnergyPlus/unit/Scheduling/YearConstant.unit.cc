@@ -47,11 +47,11 @@
 
 #include <gtest/gtest.h>
 
-#include <DataEnvironment.hh>
-#include <WeatherManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/Scheduling/YearConstant.hh>
-#include <Scheduling/SchedulingFixture.hh>
-#include <Scheduling/Manager.hh>
+#include <EnergyPlus/Scheduling/Manager.hh>
+#include "../Scheduling/SchedulingFixture.hh"
 
 namespace EnergyPlus {
 
@@ -93,7 +93,7 @@ TEST_F(SchedulingTestFixture, ScheduleConstant_TestDuplicateNames)
 {
     std::string const idf_objects = delimited_string({"Schedule:Constant,Always On,,1.0;", "Schedule:Compact,Always On,,1.0;"});
     ASSERT_TRUE(process_idf(idf_objects));
-    ASSERT_THROW(Scheduling::processAllSchedules(), std::runtime_error);
+    ASSERT_THROW(Scheduling::processAllSchedules(EnergyPlus::OutputFiles::getSingleton()), std::runtime_error);
 }
 
 TEST_F(SchedulingTestFixture, ScheduleConstant_UpdateValueAndEMS)
@@ -117,7 +117,7 @@ TEST_F(SchedulingTestFixture, ScheduleConstant_TestValidation)
         "ScheduleTypeLimits,ThisTypeLimit,0.2,0.5,Continuous;"
     });
     ASSERT_TRUE(process_idf(idf_objects));
-    Scheduling::processAllSchedules();
+    Scheduling::processAllSchedules(EnergyPlus::OutputFiles::getSingleton());
     EnergyPlus::DataEnvironment::RunPeriodStartDayOfWeek = 1;
     EnergyPlus::WeatherManager::Envrn = 1;
     EnergyPlus::WeatherManager::Environment.allocate(1);

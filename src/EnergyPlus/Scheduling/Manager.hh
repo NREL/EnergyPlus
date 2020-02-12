@@ -51,8 +51,9 @@
 #include <string>
 #include <vector>
 
-#include <EnergyPlus.hh>
-#include <Scheduling/Base.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/Scheduling/Base.hh>
 
 namespace Scheduling {
 
@@ -81,7 +82,7 @@ int GetScheduleIndex(const std::string &scheduleName);
 
 ScheduleBase *getScheduleReference(const std::string &scheduleName);
 
-void processAllSchedules();
+void processAllSchedules(EnergyPlus::OutputFiles &outputFiles);
 
 void prepareSchedulesForNewEnvironment(); // should be called for each new environment
 

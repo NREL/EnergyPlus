@@ -99,6 +99,17 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   CHARACTER(len=10) :: LocalFileExtension=' '
   LOGICAL :: WildMatch
 
+  ! For Table:Lookup objects
+  INTEGER NumPerimObjs
+  INTEGER PArgs
+
+  INTEGER :: iPt, iPt2, iPt3
+  INTEGER, ALLOCATABLE, DIMENSION(:) :: NumIndVarsVals, CurIndices, Increments, StepSize
+  INTEGER NumOutputVals, NumIndVars, RefIndex, FlatIndex, NumMiniTables, MiniTableSize
+  CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:,:) :: IndVars
+  INTEGER, ALLOCATABLE, DIMENSION(:,:) :: IndVarOrder
+  CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: OutputVals
+
   LOGICAL :: ConnComp
   LOGICAL :: ConnCompCtrl
   LOGICAL :: FileExist
@@ -437,6 +448,14 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with E, insert the rules here
 
               ! If your original object starts with F, insert the rules here
+             CASE('FOUNDATION:KIVA')
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff = .false.
+                 OutArgs(1) = InArgs(1)
+                 OutArgs(2) = Blank
+                 OutArgs(3:CurArgs+1) = InArgs(2:CurArgs)
+                 CurArgs = CurArgs + 1
+                 NoDiff = .false.
 
               ! If your original object starts with G, insert the rules here
 
@@ -486,6 +505,369 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
               ! If your original object starts with T, insert the rules here
 
+              CASE('TABLE:ONEINDEPENDENTVARIABLE')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                ! Delete old object
+                WRITE(Auditf,fmta) 'Object="'//TRIM(ObjectName)//'" is not in the "new" IDD.'
+                WRITE(Auditf,fmta) '... will be listed as comments on the new output file.'
+                CALL WriteOutIDFLinesAsComments(DifLfn,ObjectName,CurArgs,InArgs,FldNames,FldUnits)
+                Written=.true.
+
+                ! Create new Table:IndependentVariable object
+                IF(ALLOCATED(NumIndVarsVals)) DEALLOCATE(NumIndVarsVals)
+                IF(ALLOCATED(IndVars)) DEALLOCATE(IndVars)
+                IF(ALLOCATED(OutputVals)) DEALLOCATE(OutputVals)
+                ALLOCATE(NumIndVarsVals(1))
+
+                NumIndVarsVals(1) = (CurArgs - 10)/2
+                NumOutputVals = NumIndVarsVals(1)
+
+                ALLOCATE(IndVars(1,NumIndVarsVals(1)))
+                ALLOCATE(OutputVals(NumOutputVals))
+
+                PArgs = 10 + NumIndVarsVals(1)
+                CALL GetNewObjectDefInIDD('TABLE:INDEPENDENTVARIABLE',PNumArgs,PAorN,NwReqFld,PObjMinFlds,PFldNames,PFldDefaults,PFldUnits)
+                POutArgs(1) = TRIM(InArgs(1))//'_IndependentVariable1'
+                IF (SameString(InArgs(3),"LINEARINTERPOLATIONOFTABLE")) THEN
+                  POutArgs(2) = "Linear"
+                  POutArgs(3) = "Constant"
+                ELSEIF (SameString(InArgs(3),"LAGRANGEINTERPOLATIONLINEAREXTRAPOLATION")) THEN
+                  POutArgs(2) = "Cubic"
+                  POutArgs(3) = "Linear"
+                ELSE
+                  POutArgs(2) = "Cubic"
+                  POutArgs(3) = "Constant"
+                END IF
+                POutArgs(4:5) = InArgs(4:5)  ! Min/Max
+
+                DO iPt=1,NumIndVarsVals(1)
+                  IndVars(1,iPt) = InArgs(11 + 2*(iPt - 1))
+                  OutputVals(iPt) = InArgs(12 + 2*(iPt - 1))
+                END DO
+
+                POutArgs(6) = Blank
+                POutArgs(7) = InArgs(8)
+                POutArgs(8:10) = Blank
+                POutArgs(11:PArgs) = IndVars(1,1:NumIndVarsVals(1))
+
+                CALL WriteOutIDFLines(DifLfn,'Table:IndependentVariable',PArgs,POutArgs,PFldNames,PFldUnits)
+
+                ! Create new Table:IndependentVariableList object
+                PArgs = 2
+                CALL GetNewObjectDefInIDD('TABLE:INDEPENDENTVARIABLELIST',PNumArgs,PAorN,NwReqFld,PObjMinFlds,PFldNames,PFldDefaults,PFldUnits)
+                POutArgs(1) = TRIM(InArgs(1))//'_IndependentVariableList'
+                POutArgs(2) = TRIM(InArgs(1))//'_IndependentVariable1'
+                CALL WriteOutIDFLines(DifLfn,'Table:IndependentVariableList',PArgs,POutArgs,PFldNames,PFldUnits)
+
+                ! Create new Table:Lookup object
+                PArgs = 10 + NumOutputVals
+                CALL GetNewObjectDefInIDD('TABLE:LOOKUP',PNumArgs,PAorN,NwReqFld,PObjMinFlds,PFldNames,PFldDefaults,PFldUnits)
+                POutArgs(1) = TRIM(InArgs(1))
+                POutArgs(2) = TRIM(InArgs(1))//'_IndependentVariableList'
+
+                ! Normalization Value
+                IF (InArgs(10) == Blank) THEN
+                  POutArgs(3) = Blank
+                  POutArgs(4) = Blank
+                ELSE
+                  POutArgs(3) = 'DivisorOnly'
+                  POutArgs(4) = InArgs(10)
+                END IF
+                POutArgs(5:6) = InArgs(6:7)
+                POutArgs(7) = InArgs(9)
+                POutArgs(8:10) = Blank
+                POutArgs(11:PArgs) = OutputVals(1:NumOutputVals)
+
+                CALL WriteOutIDFLines(DifLfn,'Table:Lookup',PArgs,POutArgs,PFldNames,PFldUnits)
+
+              CASE('TABLE:TWOINDEPENDENTVARIABLES')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                ! Delete old object
+                WRITE(Auditf,fmta) 'Object="'//TRIM(ObjectName)//'" is not in the "new" IDD.'
+                WRITE(Auditf,fmta) '... will be listed as comments on the new output file.'
+                CALL WriteOutIDFLinesAsComments(DifLfn,ObjectName,CurArgs,InArgs,FldNames,FldUnits)
+                Written=.true.
+
+                IF(ALLOCATED(NumIndVarsVals)) DEALLOCATE(NumIndVarsVals)
+                IF(ALLOCATED(IndVars)) DEALLOCATE(IndVars)
+                IF(ALLOCATED(IndVarOrder)) DEALLOCATE(IndVarOrder)
+                IF(ALLOCATED(OutputVals)) DEALLOCATE(OutputVals)
+                ALLOCATE(NumIndVarsVals(2))
+
+                ! Create arrays from data
+                NumOutputVals = (CurArgs - 14)/3
+                ALLOCATE(IndVars(2,NumOutputVals))
+                ALLOCATE(IndVarOrder(2,NumOutputVals))
+                ALLOCATE(OutputVals(NumOutputVals))
+
+                IF (InArgs(14) /= Blank) THEN
+                  CALL writePreprocessorObject(DifLfn,PrognameConversion,'Warning',  &
+                          'Table:TwoIndependentVariables="'//trim(InArgs(1))//  &
+                                  '" references an external file="'//  &
+                                  trim(InArgs(14))//'". External files must be converted to the new format using'//&
+                          'table_convert.py.')
+                  write(diflfn,fmtA) ' '
+                  CALL ShowWarningError('Table:TwoIndependentVariables="'//trim(InArgs(1))//  &
+                          '" references an external file="'//  &
+                          trim(InArgs(14))//'". External files must be converted to the new format using'//&
+                          'table_convert.py or by appending the contents of the external file to the original IDF object.',Auditf)
+                END IF
+
+                DO iPt=1,NumOutputVals
+                  IndVars(1,iPt) = InArgs(15 +3*(iPt - 1))
+                  IndVars(2,iPt) = InArgs(16 +3*(iPt - 1))
+                  OutputVals(iPt) = InArgs(17 +3*(iPt - 1))
+                END DO
+
+                DO iPt=1,2
+                  NumIndVarsVals(iPt) = NumOutputVals
+                  CALL SortUnique(IndVars(iPt,:),NumIndVarsVals(iPt),IndVarOrder(iPt,:))
+
+                  ! Create new Table:IndependentVariable object
+                  PArgs = 10 + NumIndVarsVals(iPt)
+                  CALL GetNewObjectDefInIDD('TABLE:INDEPENDENTVARIABLE',PNumArgs,PAorN,NwReqFld,PObjMinFlds,PFldNames,PFldDefaults,PFldUnits)
+                  POutArgs(1) = TRIM(InArgs(1))//'_IndependentVariable'//RoundSigDigits(iPt)
+                  IF (SameString(InArgs(3),"LINEARINTERPOLATIONOFTABLE")) THEN
+                    POutArgs(2) = "Linear"
+                    POutArgs(3) = "Constant"
+                  ELSEIF (SameString(InArgs(3),"LAGRANGEINTERPOLATIONLINEAREXTRAPOLATION")) THEN
+                    POutArgs(2) = "Cubic"
+                    POutArgs(3) = "Linear"
+                  ELSE
+                    POutArgs(2) = "Cubic"
+                    POutArgs(3) = "Constant"
+                  END IF
+
+                  IF (iPt == 1) THEN
+                    POutArgs(4:5) = InArgs(4:5)  ! Min/Max
+                    POutArgs(7) = InArgs(10)
+                  ELSE
+                    POutArgs(4:5) = InArgs(6:7)  ! Min/Max
+                    POutArgs(7) = InArgs(11)
+                  END IF
+
+                  POutArgs(6) = Blank
+                  POutArgs(8:10) = Blank
+
+                  POutArgs(11:PArgs) = IndVars(iPt,1:NumIndVarsVals(iPt))
+
+                  CALL WriteOutIDFLines(DifLfn,'Table:IndependentVariable',PArgs,POutArgs,PFldNames,PFldUnits)
+                END DO
+
+                IF (NumOutputVals /= NumIndVarsVals(1)*NumIndVarsVals(2)) THEN
+                  PRINT *, "Dimensional Mismatch"
+                END IF
+
+                ! Create new Table:IndependentVariableList object
+                PArgs = 3
+                CALL GetNewObjectDefInIDD('TABLE:INDEPENDENTVARIABLELIST',PNumArgs,PAorN,NwReqFld,PObjMinFlds,PFldNames,PFldDefaults,PFldUnits)
+                POutArgs(1) = TRIM(InArgs(1))//'_IndependentVariableList'
+                POutArgs(2) = TRIM(InArgs(1))//'_IndependentVariable1'
+                POutArgs(3) = TRIM(InArgs(1))//'_IndependentVariable2'
+                CALL WriteOutIDFLines(DifLfn,'Table:IndependentVariableList',PArgs,POutArgs,PFldNames,PFldUnits)
+
+                ! Create new Table:Lookup object
+                PArgs = 10 + NumOutputVals
+                CALL GetNewObjectDefInIDD('TABLE:LOOKUP',PNumArgs,PAorN,NwReqFld,PObjMinFlds,PFldNames,PFldDefaults,PFldUnits)
+                POutArgs(1) = TRIM(InArgs(1))
+                POutArgs(2) = TRIM(InArgs(1))//'_IndependentVariableList'
+
+                ! Normalization Value
+                IF (InArgs(13) == Blank) THEN
+                  POutArgs(3) = Blank
+                  POutArgs(4) = Blank
+                ELSE
+                  POutArgs(3) = 'DivisorOnly'
+                  POutArgs(4) = InArgs(13)
+                END IF
+                POutArgs(5:6) = InArgs(8:9) ! Min/Max
+                POutArgs(7) = InArgs(12)  ! Units
+                POutArgs(8:10) = Blank
+
+                DO iPt=1,NumOutputVals
+                  POutArgs(10+(IndVarOrder(1,iPt) - 1)*NumIndVarsVals(2) + IndVarOrder(2,iPt)) = OutputVals(iPt)
+                END DO
+
+                CALL WriteOutIDFLines(DifLfn,'Table:Lookup',PArgs,POutArgs,PFldNames,PFldUnits)
+
+              CASE('TABLE:MULTIVARIABLELOOKUP')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                ! Delete old object
+                WRITE(Auditf,fmta) 'Object="'//TRIM(ObjectName)//'" is not in the "new" IDD.'
+                WRITE(Auditf,fmta) '... will be listed as comments on the new output file.'
+                CALL WriteOutIDFLinesAsComments(DifLfn,ObjectName,CurArgs,InArgs,FldNames,FldUnits)
+                Written=.true.
+
+                IF(ALLOCATED(NumIndVarsVals)) DEALLOCATE(NumIndVarsVals)
+                IF(ALLOCATED(CurIndices)) DEALLOCATE(CurIndices)
+                IF(ALLOCATED(Increments)) DEALLOCATE(Increments)
+                IF(ALLOCATED(StepSize)) DEALLOCATE(StepSize)
+                IF(ALLOCATED(IndVars)) DEALLOCATE(IndVars)
+                IF(ALLOCATED(IndVarOrder)) DEALLOCATE(IndVarOrder)
+                IF(ALLOCATED(OutputVals)) DEALLOCATE(OutputVals)
+
+                NumIndVars = ProcessNumber(InArgs(31),errFlag)
+
+                ALLOCATE(NumIndVarsVals(NumIndVars))
+                ALLOCATE(CurIndices(NumIndVars))
+                ALLOCATE(Increments(NumIndVars))
+                ALLOCATE(StepSize(NumIndVars))
+                DO iPt=1,NumIndVars
+                  NumIndVarsVals(iPt) = ProcessNumber(InArgs(31 + iPt),errFlag)
+                END DO
+
+                ALLOCATE(IndVars(NumIndVars,MAXVAL(NumIndVarsVals)))
+
+                DO iPt=1,NumIndVars
+                  ! Create new Table:IndependentVariable object
+                  PArgs = 10 + NumIndVarsVals(iPt)
+                  CALL GetNewObjectDefInIDD('TABLE:INDEPENDENTVARIABLE',PNumArgs,PAorN,NwReqFld,PObjMinFlds,PFldNames,PFldDefaults,PFldUnits)
+                  POutArgs(1) = TRIM(InArgs(1))//'_IndependentVariable'//RoundSigDigits(iPt)
+                  IF (SameString(InArgs(2),"LINEARINTERPOLATIONOFTABLE")) THEN
+                    POutArgs(2) = "Linear"
+                    POutArgs(3) = "Constant"
+                  ELSEIF (SameString(InArgs(2),"LAGRANGEINTERPOLATIONLINEAREXTRAPOLATION")) THEN
+                    POutArgs(2) = "Cubic"
+                    POutArgs(3) = "Linear"
+                  ELSE
+                    POutArgs(2) = "Cubic"
+                    POutArgs(3) = "Constant"
+                  END IF
+
+                  POutArgs(4:5) = InArgs(10 + 2*(iPt - 1):11 + 2*(iPt - 1))  ! Min/Max
+                  POutArgs(7) = InArgs(23 + iPt)  ! Unit type
+
+                  POutArgs(6) = Blank
+                  POutArgs(8:10) = Blank
+
+                  RefIndex = 31 + NumIndVars
+                  DO iPt2=1,iPt-1
+                    RefIndex = RefIndex + NumIndVarsVals(iPt2)
+                  END DO
+
+                  IndVars(iPt,1:NumIndVarsVals(iPt)) = InArgs(RefIndex + 1:RefIndex + NumIndVarsVals(iPt))
+
+                  POutArgs(11:PArgs) = IndVars(iPt,1:NumIndVarsVals(iPt))
+
+                  CALL WriteOutIDFLines(DifLfn,'Table:IndependentVariable',PArgs,POutArgs,PFldNames,PFldUnits)
+                END DO
+
+
+
+                ! Create new Table:IndependentVariableList object
+                PArgs = 1 + NumIndVars
+                CALL GetNewObjectDefInIDD('TABLE:INDEPENDENTVARIABLELIST',PNumArgs,PAorN,NwReqFld,PObjMinFlds,PFldNames,PFldDefaults,PFldUnits)
+                POutArgs(1) = TRIM(InArgs(1))//'_IndependentVariableList'
+
+                DO iPt=1,NumIndVars
+                  POutArgs(1 + iPt) = TRIM(InArgs(1))//'_IndependentVariable'//RoundSigDigits(iPt)
+                END DO
+                CALL WriteOutIDFLines(DifLfn,'Table:IndependentVariableList',PArgs,POutArgs,PFldNames,PFldUnits)
+
+
+
+                ! Create new Table:Lookup object
+                CALL GetNewObjectDefInIDD('TABLE:LOOKUP',PNumArgs,PAorN,NwReqFld,PObjMinFlds,PFldNames,PFldDefaults,PFldUnits)
+                POutArgs(1) = TRIM(InArgs(1))
+                POutArgs(2) = TRIM(InArgs(1))//'_IndependentVariableList'
+
+                ! Normalization Value
+                IF (InArgs(9) == Blank) THEN
+                  POutArgs(3) = Blank
+                  POutArgs(4) = Blank
+                ELSE
+                  POutArgs(3) = 'DivisorOnly'
+                  POutArgs(4) = InArgs(9)  ! Normalization Value
+                END IF
+                POutArgs(5:6) = InArgs(22:23) ! Min/Max
+                POutArgs(7) = InArgs(30)  ! Units
+                POutArgs(8:10) = Blank  ! External file
+
+                IF (InArgs(6) /= Blank) THEN
+                  CALL writePreprocessorObject(DifLfn,PrognameConversion,'Warning',  &
+                          'Table:MultivariableLookup="'//trim(InArgs(1))//  &
+                                  '" references an external file="'//  &
+                                  trim(InArgs(6))//'". External files must be converted to the new format using'//&
+                                  'table_convert.py.')
+                  write(diflfn,fmtA) ' '
+                  CALL ShowWarningError('Table:MultivariableLookup="'//trim(InArgs(1))//  &
+                          '" references an external file="'//  &
+                          trim(InArgs(6))//'". External files must be converted to the new format using'//&
+                          'table_convert.py or by appending the contents of the external file to the original IDF object.',Auditf)
+                END IF
+
+                ! Create arrays from data
+                NumOutputVals = NumIndVarsVals(1)
+                RefIndex = 31 + NumIndVars + NumIndVarsVals(1)
+                DO iPt=2,NumIndVars
+                  NumOutputVals = NumOutputVals*NumIndVarsVals(iPt)
+                  RefIndex = RefIndex + NumIndVarsVals(iPt)
+                  CurIndices(iPt) = 1
+                  Increments(iPt) = 1
+                END DO
+
+                StepSize(NumIndVars) = 1
+                DO iPt=NumIndVars-1,1,-1
+                  StepSize(iPt) = StepSize(iPt+1)*NumIndVarsVals(iPt+1)
+                END DO
+
+
+                MiniTableSize = NumIndVarsVals(1)
+
+                IF (SameString(InArgs(7),"ASCENDING")) THEN
+                  CurIndices(1) = 1
+                  Increments(1) = 1
+                ELSE
+                  CurIndices(1) = NumIndVarsVals(1)
+                  Increments(1) = -1
+                END IF
+
+                IF (NumIndVars > 1) THEN
+                  MiniTableSize = MiniTableSize*NumIndVarsVals(2)
+                  IF (SameString(InArgs(8),"ASCENDING")) THEN
+                    CurIndices(2) = 1
+                    Increments(2) = 1
+                  ELSE
+                    CurIndices(2) = NumIndVarsVals(2)
+                    Increments(2) = -1
+                  END IF
+                END IF
+
+                NumMiniTables = NumOutputVals/MiniTableSize
+
+                PArgs = 10 + NumOutputVals
+                ALLOCATE(OutputVals(NumOutputVals))
+
+                ! Loop through inputs and assign to outputs
+                DO iPt=1,NumMiniTables
+                  RefIndex = RefIndex + MAX(0,NumIndVars - 2)
+                  DO iPt2=1,MiniTableSize
+                    FlatIndex = 1
+                    DO iPt3=1,NumIndVars
+                      FlatIndex = FlatIndex + (CurIndices(iPt3) - 1)*(StepSize(iPt3))
+                    END DO
+                    OutputVals(FlatIndex) = InArgs(RefIndex+iPt2)
+                    CurIndices(1) = CurIndices(1) + Increments(1)
+                    DO iPt3=1,NumIndVars - 1
+                      IF (CurIndices(iPt3) == 0 .OR. CurIndices(iPt3) > NumIndVarsVals(iPt3)) THEN
+                        CurIndices(iPt3 + 1) = CurIndices(iPt3 + 1) + Increments(iPt3 + 1)
+                        IF (CurIndices(iPt3) == 0) THEN
+                          CurIndices(iPt3) = NumIndVarsVals(iPt3)
+                        ELSEIF (CurIndices(iPt3) > NumIndVarsVals(iPt3)) THEN
+                          CurIndices(iPt3) = 1
+                        END IF
+                      END IF
+                    END DO
+                  END DO
+                  RefIndex = RefIndex + MiniTableSize
+                END DO
+
+                DO iPt=1,NumOutputVals
+                  POutArgs(11:10+NumOutputVals) = OutputVals
+                END DO
+
+                CALL WriteOutIDFLines(DifLfn,'Table:Lookup',PArgs,POutArgs,PFldNames,PFldUnits)
+
               CASE('THERMALSTORAGE:ICE:DETAILED')
                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                 nodiff=.false.
@@ -505,7 +887,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 ELSE
                   OutArgs(8) = InArgs(8)
                 ENDIF
-                
+
                  OutArgs(9:CurArgs)=InArgs(9:CurArgs)
                  NoDiff = .false.
 
@@ -1115,3 +1497,49 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   RETURN
 
 END SUBROUTINE CreateNewIDFUsingRules
+
+SUBROUTINE SortUnique(StrArray, Size, Order)
+  IMPLICIT NONE    ! Enforce explicit typing of all variables in this routine
+  CHARACTER(len=*), DIMENSION(Size) :: StrArray
+  Integer, DIMENSION(Size) :: Order
+  INTEGER :: Size, InitSize
+
+  REAL, ALLOCATABLE, DIMENSION(:)  :: InNumbers
+  REAL, ALLOCATABLE, DIMENSION(:)  :: OutNumbers
+  INTEGER :: I, I2
+  REAL :: min_val, max_val
+
+  ALLOCATE(InNumbers(Size))
+  ALLOCATE(OutNumbers(Size))
+
+  InitSize = Size
+
+  DO I=1,Size
+    READ(StrArray(I),*) InNumbers(I)
+  END DO
+
+  min_val = minval(InNumbers)-1
+  max_val = maxval(InNumbers)
+
+  Size = 0
+  DO WHILE (min_val<max_val)
+    Size = Size+1
+    min_val = minval(InNumbers, MASK=InNumbers>min_val)
+    OutNumbers(Size) = min_val
+  END DO
+
+  DO I=1,Size
+    WRITE(StrArray(I),'(F0.5)') OutNumbers(I)
+    StrArray(I) =  TRIM(StrArray(I))
+  END DO
+
+  DO I=1,InitSize
+    DO I2=1,Size
+      IF (OutNumbers(I2) == InNumbers(I)) THEN
+        Order(I) = I2
+        EXIT
+      END IF
+    END DO
+  END DO
+
+END SUBROUTINE SortUnique

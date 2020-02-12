@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,32 +50,32 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <AirTerminalUnit.hh>
-#include <BranchNodeConnections.hh>
-#include <DataAirLoop.hh>
-#include <DataDefineEquip.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalance.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSizing.hh>
-#include <DataZoneEquipment.hh>
-#include <DualDuct.hh>
-#include <General.hh>
-#include <GeneralRoutines.hh>
-#include <HVACCooledBeam.hh>
-#include <HVACFourPipeBeam.hh>
-#include <HVACSingleDuctInduc.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <OutputProcessor.hh>
-#include <PoweredInductionUnits.hh>
-#include <Psychrometrics.hh>
-#include <SingleDuct.hh>
-#include <UserDefinedComponents.hh>
-#include <UtilityRoutines.hh>
-#include <ZoneAirLoopEquipmentManager.hh>
+#include <EnergyPlus/AirTerminalUnit.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataDefineEquip.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DualDuct.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/HVACCooledBeam.hh>
+#include <EnergyPlus/HVACFourPipeBeam.hh>
+#include <EnergyPlus/HVACSingleDuctInduc.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/PoweredInductionUnits.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/SingleDuct.hh>
+#include <EnergyPlus/UserDefinedComponents.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 
 namespace EnergyPlus {
 
@@ -662,7 +662,7 @@ namespace ZoneAirLoopEquipmentManager {
         using HVACCooledBeam::SimCoolBeam;
         using HVACSingleDuctInduc::SimIndUnit;
         using PoweredInductionUnits::SimPIU;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using SingleDuct::GetATMixers;
         using SingleDuct::SimulateSingleDuct;
         using UserDefinedComponents::SimAirTerminalUserDefined;
@@ -891,9 +891,7 @@ namespace ZoneAirLoopEquipmentManager {
             //                  SysOutputProvided >0 Zone is heated
             SpecHumOut = Node(AirDistUnit(AirDistUnitNum).OutletNodeNum).HumRat;
             SpecHumIn = Node(ZoneEquipConfig(ControlledZoneNum).ZoneNode).HumRat;
-            Real64 CpAirAvg =
-                PsyCpAirFnWTdb(0.5 * (SpecHumOut + SpecHumOut),
-                               0.5 * (Node(AirDistUnit(AirDistUnitNum).OutletNodeNum).Temp + Node(ZoneEquipConfig(ControlledZoneNum).ZoneNode).Temp));
+            Real64 CpAirAvg = PsyCpAirFnW(0.5 * (SpecHumOut + SpecHumOut));
             SysOutputProvided = Node(AirDistUnit(AirDistUnitNum).OutletNodeNum).MassFlowRate * CpAirAvg *
                                 (Node(AirDistUnit(AirDistUnitNum).OutletNodeNum).Temp - Node(ZoneEquipConfig(ControlledZoneNum).ZoneNode).Temp);
             // AirDistUnit( AirDistUnitNum ).HeatRate = max( 0.0, SysOutputProvided );

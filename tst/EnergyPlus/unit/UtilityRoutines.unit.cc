@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -127,7 +127,6 @@ TEST_F(EnergyPlusFixture, DisplayMessageTest)
     EXPECT_TRUE(has_cout_output(true));
     // Open six files to get unit number beyond 6 - these all get closed later by EnergyPlusFixture
     DataGlobals::OutputFileStandard = FindUnitNumber(DataStringGlobals::outputEsoFileName);
-    DataGlobals::OutputFileInits = FindUnitNumber(DataStringGlobals::outputEioFileName);
     DataGlobals::OutputFileMeters = FindUnitNumber(DataStringGlobals::outputMtrFileName);
     DataGlobals::OutputFileBNDetails = FindUnitNumber(DataStringGlobals::outputBndFileName);
     DataGlobals::OutputFileZoneSizing = FindUnitNumber(DataStringGlobals::outputZszCsvFileName);

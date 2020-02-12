@@ -45,11 +45,11 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <Scheduling/Base.hh>
-#include <Scheduling/YearConstant.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/Scheduling/Base.hh>
+#include <EnergyPlus/Scheduling/YearConstant.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace Scheduling {
 

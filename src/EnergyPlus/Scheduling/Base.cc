@@ -45,11 +45,11 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <EMSManager.hh>
-#include <OutputProcessor.hh>
-#include <Scheduling/Base.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Scheduling/Base.hh>
 
 namespace Scheduling {
 

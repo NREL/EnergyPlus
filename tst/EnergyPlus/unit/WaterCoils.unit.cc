@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -74,9 +74,8 @@
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
-#include <Psychrometrics.hh>
 
-#include <Fixtures/EnergyPlusFixture.hh>
+#include "Fixtures/EnergyPlusFixture.hh"
 
 using namespace EnergyPlus;
 using namespace DataAirLoop;
@@ -477,7 +476,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizing)
     Real64 DesMassFlow = 0.0;
     Real64 DesCoilHeatingLoad = 0.0;
 
-    CpAirStd = PsyCpAirFnWTdb(0.0, 20.0);
+    CpAirStd = PsyCpAirFnW(0.0);
     DesMassFlow = WaterCoil(CoilNum).DesAirVolFlowRate * StdRhoAir;
     DesCoilHeatingLoad = CpAirStd * DesMassFlow * (40.0 - 5.0);
 
@@ -629,7 +628,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterLowAirFlowUASizing)
     Real64 DesMassFlow = 0.0;
     Real64 DesCoilHeatingLoad = 0.0;
 
-    CpAirStd = PsyCpAirFnWTdb(0.0, 20.0);
+    CpAirStd = PsyCpAirFnW(0.0);
     DesMassFlow = WaterCoil(CoilNum).DesAirVolFlowRate * StdRhoAir;
     DesCoilHeatingLoad = CpAirStd * DesMassFlow * (40.0 - 5.0);
 
@@ -786,7 +785,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterUASizingLowHwaterInletTemp)
     Real64 DesMassFlow = 0.0;
     Real64 DesCoilHeatingLoad = 0.0;
 
-    CpAirStd = PsyCpAirFnWTdb(0.0, 20.0);
+    CpAirStd = PsyCpAirFnW(0.0);
     DesMassFlow = WaterCoil(CoilNum).DesAirVolFlowRate * StdRhoAir;
     DesCoilHeatingLoad = CpAirStd * DesMassFlow * (40.0 - 5.0);
 
@@ -1111,7 +1110,7 @@ TEST_F(WaterCoilsTest, CoilHeatingWaterSimpleSizing)
     Real64 DesMassFlow = 0.0;
     Real64 DesCoilHeatingLoad = 0.0;
 
-    CpAirStd = PsyCpAirFnWTdb(0.0, 20.0);
+    CpAirStd = PsyCpAirFnW(0.0);
     DesMassFlow = FinalSysSizing(1).DesMainVolFlow * StdRhoAir;
     DesCoilHeatingLoad = CpAirStd * DesMassFlow * (40.0 - 5.0);
 
@@ -1212,7 +1211,7 @@ TEST_F(WaterCoilsTest, HotWaterHeatingCoilAutoSizeTempTest)
     Real64 DesMassFlow(0.0);
     Real64 DesCoilHeatingLoad(0.0);
 
-    CpAirStd = PsyCpAirFnWTdb(0.0, 20.0);
+    CpAirStd = PsyCpAirFnW(0.0);
     DesMassFlow = WaterCoil(CoilNum).DesAirVolFlowRate * StdRhoAir;
     DesCoilHeatingLoad = DesMassFlow * CpAirStd * (40.0 - 5.0);
 

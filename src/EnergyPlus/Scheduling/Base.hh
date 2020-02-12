@@ -48,9 +48,9 @@
 #ifndef SRC_ENERGYPLUS_SCHEDULING_BASE_HH
 #define SRC_ENERGYPLUS_SCHEDULING_BASE_HH
 
-#include <EnergyPlus.hh>
-#include <Scheduling/TypeLimits.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Scheduling/TypeLimits.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 #include <string>
 
 // TODO: Use this where we need a year: DataGlobals::CalendarYear

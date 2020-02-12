@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1258,10 +1258,10 @@ std::string SQLite::storageType(const int storageTypeIndex)
     std::string result;
 
     switch (storageTypeIndex) {
-    case 1:
+    case 1: // static_cast<int>(OutputProcessor::StoreType::Averaged)
         result = "Avg";
         break;
-    case 2:
+    case 2: // static_cast<int>(OutputProcessor::StoreType::Summed)
         result = "Sum";
         break;
     default:
@@ -1276,11 +1276,11 @@ std::string SQLite::timestepTypeName(const int timestepType)
     std::string result;
 
     switch (timestepType) {
-    case 1:
-        result = "HVAC System";
-        break;
-    case 2:
+    case 1: // static_cast<int>(OutputProcessor::TimeStepType::TimeStepZone)
         result = "Zone";
+        break;
+    case 2: // static_cast<int>(OutputProcessor::TimeStepType::TimeStepSystem)
+        result = "HVAC System";
         break;
     default:
         result = "Unknown!!!";

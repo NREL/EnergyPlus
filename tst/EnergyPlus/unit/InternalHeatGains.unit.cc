@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,21 +51,22 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalance.hh>
-#include <DataLoopNode.hh>
-#include <DataSizing.hh>
-#include <DataZoneEquipment.hh>
-#include <DisplacementVentMgr.hh>
-#include <ExteriorEnergyUse.hh>
-#include <HVACManager.hh>
-#include <HeatBalanceInternalHeatGains.hh>
-#include <HeatBalanceManager.hh>
-#include <InternalHeatGains.hh>
-#include <OutputReportTabular.hh>
-#include <ScheduleManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DisplacementVentMgr.hh>
+#include <EnergyPlus/ExteriorEnergyUse.hh>
+#include <EnergyPlus/HVACManager.hh>
+#include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -95,7 +96,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_CheckFuelType)
 
         "OtherEquipment,",
         "  OtherEq2,",
-        "  PropaneGas,",
+        "  Propane,",
         "  Zone1,",
         "  Schedule1,",
         "  EquipmentLevel,",
@@ -113,12 +114,12 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_CheckFuelType)
 
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(); // read schedules
+    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton()); // read schedules
 
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    InternalHeatGains::GetInternalHeatGainsInput();
+    InternalHeatGains::GetInternalHeatGainsInput(OutputFiles::getSingleton());
 
     ASSERT_EQ(DataHeatBalance::ZoneOtherEq.size(), 2u);
 
@@ -127,7 +128,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_CheckFuelType)
         if (equip.Name == "OTHEREQ1") {
             ASSERT_EQ(equip.OtherEquipFuelType, 0);
         } else if (equip.Name == "OTHEREQ2") {
-            ASSERT_EQ(equip.OtherEquipFuelType, ExteriorEnergyUse::LPGUse);
+            ASSERT_EQ(equip.OtherEquipFuelType, ExteriorEnergyUse::PropaneUse);
         }
     }
 }
@@ -144,7 +145,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_NegativeDesignLevel)
 
         "OtherEquipment,",
         "  OtherEq1,",
-        "  FuelOil#1,",
+        "  FuelOilNo1,",
         "  Zone1,",
         "  Schedule1,",
         "  EquipmentLevel,",
@@ -162,12 +163,12 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_NegativeDesignLevel)
 
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(); // read schedules
+    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton()); // read schedules
 
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    ASSERT_THROW(InternalHeatGains::GetInternalHeatGainsInput(), std::runtime_error);
+    ASSERT_THROW(InternalHeatGains::GetInternalHeatGainsInput(OutputFiles::getSingleton()), std::runtime_error);
 
     std::string const error_string = delimited_string(
         {"   ** Warning ** ProcessScheduleInput: Schedule:Constant=\"SCHEDULE1\", Blank Schedule Type Limits Name input -- will not be validated.",
@@ -203,25 +204,29 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_OtherEquipment_BadFuelType)
 
     });
 
-    ASSERT_TRUE(process_idf(idf_objects));
-    EXPECT_FALSE(has_err_output());
+    ASSERT_FALSE(process_idf(idf_objects, false)); // add false to supress error assertions
+    EXPECT_TRUE(has_err_output(false));
+
+    std::string error_string = delimited_string(
+        { "   ** Severe  ** <root>[OtherEquipment][OtherEq1][fuel_type] - \"Water\" - Failed to match against any enum values." });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
 
     bool ErrorsFound(false);
 
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(); // read schedules
+    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton()); // read schedules
 
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    ASSERT_THROW(InternalHeatGains::GetInternalHeatGainsInput(), std::runtime_error);
+    ASSERT_THROW(InternalHeatGains::GetInternalHeatGainsInput(OutputFiles::getSingleton()), std::runtime_error);
 
-    std::string const error_string = delimited_string(
+    error_string = delimited_string(
         {"   ** Warning ** ProcessScheduleInput: Schedule:Constant=\"SCHEDULE1\", Blank Schedule Type Limits Name input -- will not be validated.",
          "   ** Severe  ** GetInternalHeatGains: OtherEquipment: invalid Fuel Type entered=WATER for Name=OTHEREQ1",
          "   **  Fatal  ** GetInternalHeatGains: Errors found in Getting Internal Gains Input, Program Stopped",
-         "   ...Summary of Errors that led to program termination:", "   ..... Reference severe error count=1",
+         "   ...Summary of Errors that led to program termination:", "   ..... Reference severe error count=2",
          "   ..... Last severe error=GetInternalHeatGains: OtherEquipment: invalid Fuel Type entered=WATER for Name=OTHEREQ1"});
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
@@ -278,7 +283,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AllowBlankFieldsForAdaptiveComfortMo
 
     bool ErrorsFound1(false);
 
-    ScheduleManager::ProcessScheduleInput(); // read schedules
+    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton()); // read schedules
     HeatBalanceManager::GetZoneData(ErrorsFound1);
     ASSERT_FALSE(ErrorsFound1);
 
@@ -295,7 +300,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_AllowBlankFieldsForAdaptiveComfortMo
     ScheduleManager::Schedule(2).MinValue = 131.8;
     ScheduleManager::Schedule(2).MaxValue = 131.8;
     ScheduleManager::Schedule(2).MaxMinSet = true;
-    InternalHeatGains::GetInternalHeatGainsInput();
+    InternalHeatGains::GetInternalHeatGainsInput(OutputFiles::getSingleton());
 
     EXPECT_FALSE(InternalHeatGains::ErrorsFound);
 }
@@ -421,7 +426,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_BeginEnvironmentRes
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
 
-    InternalHeatGains::GetInternalHeatGainsInput();
+    InternalHeatGains::GetInternalHeatGainsInput(OutputFiles::getSingleton());
     InternalHeatGains::CalcZoneITEq();
     Real64 InitialPower = DataHeatBalance::ZoneITEq(1).CPUPower + DataHeatBalance::ZoneITEq(1).FanPower + DataHeatBalance::ZoneITEq(1).UPSPower;
 
@@ -449,7 +454,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_CheckZoneComponentLoadSubtotals)
     bool ErrorsFound(false);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
-    InternalHeatGains::GetInternalHeatGainsInput();
+    InternalHeatGains::GetInternalHeatGainsInput(OutputFiles::getSingleton());
 
     // Set up a simple convective gain for each gain type
     int zoneNum = 1;
@@ -637,7 +642,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_ApproachTemperature
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
 
-    InternalHeatGains::GetInternalHeatGainsInput();
+    InternalHeatGains::GetInternalHeatGainsInput(OutputFiles::getSingleton());
 
     DataLoopNode::Node(1).Temp = 45.0;
     InternalHeatGains::CalcZoneITEq();
@@ -650,7 +655,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_DefaultCurves)
 {
 
     std::string const idf_objects =
-        delimited_string({"Version,9.2;",
+        delimited_string({"Version,9.3;",
 
                           "Zone,Zone1;",
 
@@ -745,7 +750,7 @@ TEST_F(EnergyPlusFixture, InternalHeatGains_ElectricEquipITE_DefaultCurves)
     DataHeatBalFanSys::MAT(1) = 24.0;
     DataHeatBalFanSys::ZoneAirHumRat(1) = 0.008;
 
-    InternalHeatGains::GetInternalHeatGainsInput();
+    InternalHeatGains::GetInternalHeatGainsInput(OutputFiles::getSingleton());
     InternalHeatGains::CalcZoneITEq();
 
     // If Electric Power Supply Efficiency Function of Part Load Ratio Curve Name is blank => always 1, so UPSPower is calculated as such

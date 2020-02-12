@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,24 +51,24 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataMoistureBalance.hh>
-#include <DataMoistureBalanceEMPD.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSurfaces.hh>
-#include <General.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <MoistureBalanceEMPDManager.hh>
-#include <OutputProcessor.hh>
-#include <Psychrometrics.hh>
-#include <UtilityRoutines.hh>
+#include "OutputFiles.hh"
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataMoistureBalance.hh>
+#include <EnergyPlus/DataMoistureBalanceEMPD.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/MoistureBalanceEMPDManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -338,7 +338,7 @@ namespace MoistureBalanceEMPDManager {
 
         EMPDzone.deallocate();
 
-        ReportMoistureBalanceEMPD();
+        ReportMoistureBalanceEMPD(OutputFiles::getSingleton());
 
         if (ErrorsFound) {
             ShowFatalError("GetMoistureBalanceEMPDInput: Errors found getting EMPD material properties, program terminated.");
@@ -460,7 +460,7 @@ namespace MoistureBalanceEMPDManager {
 
         // Using/Aliasing
         using DataMoistureBalanceEMPD::Lam;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyPsatFnTemp;
         using Psychrometrics::PsyRhFnTdbRhov;
         using Psychrometrics::PsyRhFnTdbRhovLBnd0C;
@@ -744,7 +744,7 @@ namespace MoistureBalanceEMPDManager {
         RVSurfLayerOld(SurfNum) = RVSurfLayer(SurfNum);
     }
 
-    void ReportMoistureBalanceEMPD()
+    void ReportMoistureBalanceEMPD(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -771,7 +771,6 @@ namespace MoistureBalanceEMPDManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -785,26 +784,35 @@ namespace MoistureBalanceEMPDManager {
         int ConstrNum;
         int MatNum;
 
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_700("(' Construction EMPD, ',A,', ',F8.4,', ',4(F8.4,', '),F8.4,', ',F8.4,', ',F8.4,', ',F8.4)");
-
         ScanForReports("Constructions", DoReport, "Constructions");
 
         if (!DoReport) return;
         //   Write Descriptions
-        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Construction EMPD>, Construction Name, Inside Layer Material Name, Vapor Resistance Factor, a, b, "
-                                             "c, d, Surface Penetration Depth {m}, Deep Penetration Depth {m}, Coating Vapor Resistance Factor, "
-                                             "Coating Thickness {m}";
+        print(outputFiles.eio,
+              "{}",
+              "! <Construction EMPD>, Construction Name, Inside Layer Material Name, Vapor Resistance Factor, a, b, "
+              "c, d, Surface Penetration Depth {m}, Deep Penetration Depth {m}, Coating Vapor Resistance Factor, "
+              "Coating Thickness {m}\n");
 
         for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
             if (Construct(ConstrNum).TypeIsWindow) continue;
             MatNum = Construct(ConstrNum).LayerPoint(Construct(ConstrNum).TotLayers);
             if (Material(MatNum).EMPDMaterialProps) {
-                ObjexxFCL::gio::write(OutputFileInits, Format_700)
-                    << Construct(ConstrNum).Name << Material(MatNum).Name << Material(MatNum).EMPDmu << Material(MatNum).MoistACoeff
-                    << Material(MatNum).MoistBCoeff << Material(MatNum).MoistCCoeff << Material(MatNum).MoistDCoeff
-                    << Material(MatNum).EMPDSurfaceDepth << Material(MatNum).EMPDDeepDepth << Material(MatNum).EMPDmuCoating
-                    << Material(MatNum).EMPDCoatingThickness;
+                static constexpr auto Format_700(
+                    " Construction EMPD, {}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}, {:8.4F}\n");
+                print(outputFiles.eio,
+                      Format_700,
+                      Construct(ConstrNum).Name,
+                      Material(MatNum).Name,
+                      Material(MatNum).EMPDmu,
+                      Material(MatNum).MoistACoeff,
+                      Material(MatNum).MoistBCoeff,
+                      Material(MatNum).MoistCCoeff,
+                      Material(MatNum).MoistDCoeff,
+                      Material(MatNum).EMPDSurfaceDepth,
+                      Material(MatNum).EMPDDeepDepth,
+                      Material(MatNum).EMPDmuCoating,
+                      Material(MatNum).EMPDCoatingThickness);
             }
         }
     }
