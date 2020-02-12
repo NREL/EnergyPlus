@@ -193,7 +193,7 @@ namespace SolarShading {
 
     void InitSolarCalculations();
 
-    void GetShadowingInput();
+    void GetShadowingInput(OutputFiles &outputFiles);
 
     void AllocateModuleArrays();
 

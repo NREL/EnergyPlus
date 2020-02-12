@@ -52,10 +52,10 @@
 #include <ObjexxFCL/Array1A.hh>
 
 // EnergyPlus Headers
-#include "OutputFiles.hh"
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class OutputFiles;
 
 namespace DaylightingDevices {
 
