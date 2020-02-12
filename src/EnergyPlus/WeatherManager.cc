@@ -2586,7 +2586,7 @@ namespace WeatherManager {
                 SPSiteBeamSolarScheduleValue(envrnDayNum) = DDBeamSolarValues(TimeStep, HourOfDay, envrnDayNum);
                 SPSiteDiffuseSolarScheduleValue(envrnDayNum) = DDDiffuseSolarValues(TimeStep, HourOfDay, envrnDayNum);
             }
-            if (Environment(Envrn).WP_Type1 != 0) {
+            if (Environment(Envrn).SkyTempModel > 3 || Environment(Envrn).SkyTempModel == 0) {
                 SPSiteSkyTemperatureScheduleValue(envrnDayNum) = DDSkyTempScheduleValues(TimeStep, HourOfDay, envrnDayNum);
             }
         } else if (TotDesDays > 0) {
@@ -3634,7 +3634,7 @@ namespace WeatherManager {
                     TomorrowWindSpeed(TS, Hour) = LastHrWindSpeed * WtPrevHour + Wthr.WindSpeed(Hour) * WtNow;
                     TomorrowWindDir(TS, Hour) = interpolateWindDirection(LastHrWindDir, Wthr.WindDir(Hour), WtNow);
                     TomorrowHorizIRSky(TS, Hour) = LastHrHorizIRSky * WtPrevHour + Wthr.HorizIRSky(Hour) * WtNow;
-                    if (Environment(Environ).WP_Type1 == 0) {
+                    if (Environment(Envrn).SkyTempModel > 3 || Environment(Envrn).SkyTempModel == 0) {
                         TomorrowSkyTemp(TS, Hour) = LastHrSkyTemp * WtPrevHour + Wthr.SkyTemp(Hour) * WtNow;
                     }
                     TomorrowDifSolarRad(TS, Hour) =
