@@ -263,6 +263,7 @@ ADD_SIMULATION_TEST(IDF_FILE Fault_ChillerSWTSensorOffset_RefBldgLargeOfficeNew2
 ADD_SIMULATION_TEST(IDF_FILE Fault_CoilSATSensorOffset.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE Fault_CondenserSWTSensorOffset.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE Fault_FoulingAirFilter_RefBldgMediumOfficeNew2004.idf EPW_FILE USA_CO_Golden-NREL.724666_TMY3.epw)
+ADD_SIMULATION_TEST(IDF_FILE Fault_FoulingCoil.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE Fault_FoulingChillerBoiler_RefBldgLargeOfficeNew2004.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE Fault_FoulingCoolingTower.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE Fault_FoulingEvapCooler_StripMallZoneEvapCooler.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)

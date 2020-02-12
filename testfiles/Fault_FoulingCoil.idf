@@ -13,7 +13,7 @@
 ! Highlights:              Electric chiller with air cooled condenser; autosized preheating and precooling water coils in the
 !                          outside air stream controlled to preheat and precool setpoints.
 !
-! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods,
+! Simulation Location/Run: CHICAGO_IL_USA TMY2-94846, 2 design days, 2 run periods (one week January and one July),
 !                          Run Control executes the run periods using the weather file
 !
 ! Location:                Chicago, IL
@@ -21,7 +21,7 @@
 ! Design Days:             CHICAGO_IL_USA Annual Heating 99% Design Conditions DB, MaxDB= -17.3°C
 !                          CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C
 !
-! Run Period (Weather File): 1/1 through 12/31, CHICAGO_IL_USA TMY2-94846
+! Run Period (Weather File): 1/1 through 1/7, 7/1 through 7/7 CHICAGO_IL_USA TMY2-94846
 !
 ! Run Control:             Zone and System sizing with weather file run control (no design days run)
 !
@@ -2634,13 +2634,14 @@
     30.0;                    !- UAFouled {W/K}
 
 ! Main Cooling Coil 1 reports a nominal UA of 2452 W/K
+! Temporarily switch to 'FouledUARated' instead of 'FoulingFactor' for easier investigation
   FaultModel:Fouling:Coil,
     Main Cooling Coil 1 Fouling, !- Name
     Main Cooling Coil 1,     !- Coil Name
     Fouling Availability Schedule, !- Availability Schedule Name
     Fouling Severity Schedule,     !- Severity Schedule Name
-    FoulingFactor,           !- Fouling Input Method
-    ,                        !- UAFouled {W/K}
+    FouledUARated,           !- Fouling Input Method
+    500,                     !- UAFouled {W/K}
     0.0005,                  !- Water Side Fouling Factor {m2-K/W}
     0.0001,                  !- Air Side Fouling Factor {m2-K/W}
     25.0,                    !- Outside Coil Surface Area {m2}
