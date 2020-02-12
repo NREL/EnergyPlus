@@ -428,7 +428,7 @@ namespace SimulationManager {
             if (ErrFound) TerminalError = true;
             CheckControllerLists(ErrFound);
             if (ErrFound) TerminalError = true;
-        
+
             if (DoDesDaySim || DoWeathSim) {
                 ReportLoopConnections();
                 ReportAirLoopConnections();
