@@ -157,14 +157,14 @@ A Severity Schedule is also used to represent the severity of the fault, or Faul
 
 When applied to a \textbf{Coil:Heating:Water}, before the fault is applied, the current, non-fouled, UA (\lstinline!WaterCoil(CoilNum).UACoilVariable!) is first determined
 
-If method \textbf{FouledUARated} is used, we try to set the new $UA'$ to the $UA_{fouled}$ entered in the Fouling Object
+\textbf{FouledUARated}:
+If method \textbf{FouledUARated} is used, we try to set the new $UA'$ to the $UA_{fouled}$ entered in the Fouling Object, adjusting for Fault Severity $FaultFrac$
 
 \begin{equation}
     UA' = [\frac{FaultFrac}{UA_{fouled}}+\frac{(1-FaultFrac)}{UA}]^{-1}
 \end{equation}
 
-Note that we do not allow bettering the coil UA, so the final result is $UA' = min(UA, UA')$
-
+\textbf{FoulingFactor}:
 If method \textbf{FoulingFactor} is used:
 
 \begin{equation}
@@ -175,9 +175,12 @@ If method \textbf{FoulingFactor} is used:
     UA' = [\frac{1}{UA} + R_{foul}]^{-1}
 \end{equation}
 
+Note that we do not allow bettering the coil UA, so the final result in either cases is $UA' = min(UA, UA')$
+
+
 \subsubsection{Modeling Approach - Cooling Coil}\label{modeling-approach-fouling-coil-cooling}
 
-When applied to a \textbf{Coil:Cooling:Water}, before the fault is applied, the current, non-fouled, $UA_{water}$ (WaterCoil(CoilNum).UACoilExternal) and 
+When applied to a \textbf{Coil:Cooling:Water}, before the fault is applied, the current, non-fouled, $UA_{water}$ (\lstinline!WaterCoil(CoilNum).UACoilExternal!) and 
 $UA_{air}$ (\lstinline!WaterCoil(CoilNum).UACoilInternal!) are first determined.
 
 \textbf{FoulingFactor}:
@@ -226,10 +229,12 @@ So we start by calculating the current split ratio $S_R$ between internal and ex
 
 \begin{equation}
 \begin{array}{l}
-    UA'_{air} = [\frac{FaultFrac \cdot S_R}{(S_R+1) \cdot UA_{fouled}}+\frac{(1-FaultFrac)}{UA}]^{-1}
+    UA'_{air} = [\frac{FaultFrac \cdot S_R}{(S_R+1) \cdot UA_{fouled}}+\frac{(1-FaultFrac)}{UA}]^{-1} \\
     UA'_{water} = S_R \cdot UA'_{air}
 \end{array}
 \end{equation}
+
+Note that we do not allow bettering the coil UA, so the final result in either cases is $UA' = min(UA, UA')$
 
 
 \subsection{Air Filter Fouling}\label{air-filter-fouling}
