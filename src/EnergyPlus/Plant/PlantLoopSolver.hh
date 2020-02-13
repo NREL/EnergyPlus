@@ -49,7 +49,6 @@
 #define PlantLoopSolver_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -122,7 +121,7 @@ namespace PlantLoopSolver {
                                         int const FirstBranchNum,
                                         int const LastBranchNum,
                                         Real64 ThisLoopSideFlow,
-                                        Array1S_int LastComponentSimulated);
+                                        const Array1D_int &LastComponentSimulated);
 
         void UpdateAnyLoopDemandAlterations(int const LoopNum, int const LoopSideNum, int const BranchNum, int const CompNum);
 

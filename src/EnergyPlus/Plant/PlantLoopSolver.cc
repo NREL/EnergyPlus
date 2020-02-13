@@ -1396,7 +1396,7 @@ namespace EnergyPlus {
                                                               int const FirstBranchNum,
                                                               int const LastBranchNum,
                                                               Real64 ThisLoopSideFlow,
-                                                              Array1S_int LastComponentSimulated) {
+                                                              const Array1D_int &LastComponentSimulated) {
 
             // FUNCTION INFORMATION:
             //       AUTHOR         Edwin Lee

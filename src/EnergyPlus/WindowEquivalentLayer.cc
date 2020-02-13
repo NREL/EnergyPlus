@@ -4888,9 +4888,9 @@ namespace WindowEquivalentLayer {
         } // END OF CHECK FOR CLOSED BLIND
     }
 
-    void SOLMATS(int const N,         // # of active rows in A
-                 Array2S<Real64> A,   // matrix, minimum required dimensions: A( N, N+2)
-                 Array1S<Real64> XSOL // returned: solution vector, min req dimension: XSOL( N)
+    void SOLMATS(int const N,          // # of active rows in A
+                 Array2S<Real64> A,    // matrix, minimum required dimensions: A( N, N+2)
+                 Array1D<Real64> &XSOL // returned: solution vector, min req dimension: XSOL( N)
     )
     {
         // SUBROUTINE INFORMATION:
@@ -7534,7 +7534,7 @@ namespace WindowEquivalentLayer {
     }
 
     void
-    TDMA_R(Array1S<Real64> X, Array1S<Real64> const AP, Array1S<Real64> const AE, Array1S<Real64> const AW, Array1S<Real64> const BP, int const N)
+    TDMA_R(Array1D<Real64> &X, const Array1D<Real64> &AP, const Array1D<Real64> &AE, const Array1D<Real64> &AW, const Array1D<Real64> &BP, int const N)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         JOHN L. WRIGHT
@@ -7584,7 +7584,7 @@ namespace WindowEquivalentLayer {
         }
     }
 
-    void TDMA(Array1S<Real64> X, Array1S<Real64> const AP, Array1S<Real64> const AE, Array1S<Real64> const AW, Array1S<Real64> const BP, int const N)
+    void TDMA(Array1D<Real64> &X, const Array1D<Real64> &AP, const Array1D<Real64> &AE, const Array1D<Real64> &AW, const Array1D<Real64> &BP, int const N)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         JOHN L. WRIGHT
@@ -7641,7 +7641,7 @@ namespace WindowEquivalentLayer {
         }
     }
 
-    void AUTOTDMA(Array1S<Real64> X, Array1S<Real64> AP, Array1S<Real64> const AE, Array1S<Real64> const AW, Array1S<Real64> const BP, int &N)
+    void AUTOTDMA(Array1D<Real64> &X, Array1D<Real64> &AP, const Array1D<Real64> &AE, const Array1D<Real64> &AW, const Array1D<Real64> &BP, int &N)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         JOHN L. WRIGHT
