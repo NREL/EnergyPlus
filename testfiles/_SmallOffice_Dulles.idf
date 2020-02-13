@@ -2542,6 +2542,10 @@
     OutsideAirNode_NorthZone_2ndFloor,  !- Component 2 Inlet Node Name
     OutletNode_AirLoop_NorthZone_2ndFloor;  !- Component 2 Outlet Node Name
 
+  NodeList,
+    Inlets_SouthZone_1stFloor ATInlet,  !- Name
+    InletNode_SouthZone_1stFloor ATInlet;  !- Node 1 Name
+
   AirLoopHVAC,
     AirLoop_SouthZone_1stFloor,  !- Name
     ,                        !- Controller List Name
@@ -2551,8 +2555,12 @@
     ,                        !- Connector List Name
     InletNode_AirLoop_SouthZone_1stFloor,  !- Supply Side Inlet Node Name
     OutletNode_SouthZone_1stFloor,  !- Demand Side Outlet Node Name
-    Inlets_SouthZone_1stFloor,  !- Demand Side Inlet Node Names
+    Inlets_SouthZone_1stFloor ATInlet,  !- Demand Side Inlet Node Names
     OutletNode_AirLoop_SouthZone_1stFloor;  !- Supply Side Outlet Node Names
+
+  NodeList,
+    Inlets_NorthZone_1stFloor ATInlet,  !- Name
+    InletNode_NorthZone_1stFloor ATInlet;  !- Node 1 Name
 
   AirLoopHVAC,
     AirLoop_NorthZone_1stFloor,  !- Name
@@ -2563,8 +2571,12 @@
     ,                        !- Connector List Name
     InletNode_AirLoop_NorthZone_1stFloor,  !- Supply Side Inlet Node Name
     OutletNode_NorthZone_1stFloor,  !- Demand Side Outlet Node Name
-    Inlets_NorthZone_1stFloor,  !- Demand Side Inlet Node Names
+    Inlets_NorthZone_1stFloor ATInlet,  !- Demand Side Inlet Node Names
     OutletNode_AirLoop_NorthZone_1stFloor;  !- Supply Side Outlet Node Names
+
+  NodeList,
+    Inlets_SouthZone_2ndFloor ATInlet,  !- Name
+    InletNode_SouthZone_2ndFloor ATInlet;  !- Node 1 Name
 
   AirLoopHVAC,
     AirLoop_SouthZone_2ndFloor,  !- Name
@@ -2575,8 +2587,12 @@
     ,                        !- Connector List Name
     InletNode_AirLoop_SouthZone_2ndFloor,  !- Supply Side Inlet Node Name
     OutletNode_SouthZone_2ndFloor,  !- Demand Side Outlet Node Name
-    Inlets_SouthZone_2ndFloor,  !- Demand Side Inlet Node Names
+    Inlets_SouthZone_2ndFloor ATInlet,  !- Demand Side Inlet Node Names
     OutletNode_AirLoop_SouthZone_2ndFloor;  !- Supply Side Outlet Node Names
+
+  NodeList,
+    Inlets_NorthZone_2ndFloor ATInlet,  !- Name
+    InletNode_NorthZone_2ndFloor ATInlet;  !- Node 1 Name
 
   AirLoopHVAC,
     AirLoop_NorthZone_2ndFloor,  !- Name
@@ -2587,7 +2603,7 @@
     ,                        !- Connector List Name
     InletNode_AirLoop_NorthZone_2ndFloor,  !- Supply Side Inlet Node Name
     OutletNode_NorthZone_2ndFloor,  !- Demand Side Outlet Node Name
-    Inlets_NorthZone_2ndFloor,  !- Demand Side Inlet Node Names
+    Inlets_NorthZone_2ndFloor ATInlet,  !- Demand Side Inlet Node Names
     OutletNode_AirLoop_NorthZone_2ndFloor;  !- Supply Side Outlet Node Names
 
   AirLoopHVAC:ControllerList,
@@ -2841,8 +2857,8 @@
   ZoneHVAC:EquipmentList,
     Equipment_SouthZone_1stFloor,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    DirectAir_SouthZone_1stFloor,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    DirectAir_SouthZone_1stFloor ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -2851,8 +2867,8 @@
   ZoneHVAC:EquipmentList,
     Equipment_NorthZone_1stFloor,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    DirectAir_NorthZone_1stFloor,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    DirectAir_NorthZone_1stFloor ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -2861,8 +2877,8 @@
   ZoneHVAC:EquipmentList,
     Equipment_SouthZone_2ndFloor,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    DirectAir_SouthZone_2ndFloor,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    DirectAir_SouthZone_2ndFloor ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -2871,8 +2887,8 @@
   ZoneHVAC:EquipmentList,
     Equipment_NorthZone_2ndFloor,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    DirectAir_NorthZone_2ndFloor,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    DirectAir_NorthZone_2ndFloor ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -2966,29 +2982,77 @@
     Coil:Heating:Fuel,       !- Reheat Coil Object Type
     ReheatCoil_NorthZone_2ndFloor;  !- Reheat Coil Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     DirectAir_SouthZone_1stFloor,  !- Name
     Office HVAC,             !- Availability Schedule Name
-    InletNode_SouthZone_1stFloor,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    InletNode_SouthZone_1stFloor ATInlet,  !- Air Inlet Node Name
+    InletNode_SouthZone_1stFloor,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    DirectAir_SouthZone_1stFloor ADU,  !- Name
+    InletNode_SouthZone_1stFloor,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    DirectAir_SouthZone_1stFloor,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     DirectAir_NorthZone_1stFloor,  !- Name
     Office HVAC,             !- Availability Schedule Name
-    InletNode_NorthZone_1stFloor,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    InletNode_NorthZone_1stFloor ATInlet,  !- Air Inlet Node Name
+    InletNode_NorthZone_1stFloor,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    DirectAir_NorthZone_1stFloor ADU,  !- Name
+    InletNode_NorthZone_1stFloor,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    DirectAir_NorthZone_1stFloor,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     DirectAir_SouthZone_2ndFloor,  !- Name
     Office HVAC,             !- Availability Schedule Name
-    InletNode_SouthZone_2ndFloor,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    InletNode_SouthZone_2ndFloor ATInlet,  !- Air Inlet Node Name
+    InletNode_SouthZone_2ndFloor,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    DirectAir_SouthZone_2ndFloor ADU,  !- Name
+    InletNode_SouthZone_2ndFloor,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    DirectAir_SouthZone_2ndFloor,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     DirectAir_NorthZone_2ndFloor,  !- Name
     Office HVAC,             !- Availability Schedule Name
-    InletNode_NorthZone_2ndFloor,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    InletNode_NorthZone_2ndFloor ATInlet,  !- Air Inlet Node Name
+    InletNode_NorthZone_2ndFloor,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    DirectAir_NorthZone_2ndFloor ADU,  !- Name
+    InletNode_NorthZone_2ndFloor,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    DirectAir_NorthZone_2ndFloor,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   ZoneControl:Humidistat,
     ReheatHumidistat_SouthZone_1stFloor,  !- Name
