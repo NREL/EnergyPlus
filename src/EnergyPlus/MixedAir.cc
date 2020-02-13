@@ -84,6 +84,7 @@
 #include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/Humidifiers.hh>
@@ -103,6 +104,7 @@
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SteamCoils.hh>
 #include <EnergyPlus/TranspiredCollector.hh>
+#include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/UserDefinedComponents.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
@@ -206,6 +208,7 @@ namespace MixedAir {
     int const Humidifier(21);
     int const Fan_System_Object(22);
     int const UnitarySystemModel(23);
+    int const VRFTerminalUnit(24); // new Jan 2020
 
     int const ControllerOutsideAir(2);
     int const ControllerStandAloneERV(3);
@@ -747,8 +750,19 @@ namespace MixedAir {
                     bool CoolingActive = false;
                     Real64 OAUCoilOutTemp = 0.0;
                     bool ZoneEquipFlag = false;
-                    OutsideAirSys(OASysNum).compPointer[CompIndex]->simulate(
-                        CompName, FirstHVACIteration, AirLoopNum, CompIndex, HeatingActive, CoolingActive, CompIndex, OAUCoilOutTemp, ZoneEquipFlag);
+                    Real64 sensOut = 0.0;
+                    Real64 latOut = 0.0;
+                    OutsideAirSys(OASysNum).compPointer[CompIndex]->simulate(CompName,
+                                                                             FirstHVACIteration,
+                                                                             AirLoopNum,
+                                                                             CompIndex,
+                                                                             HeatingActive,
+                                                                             CoolingActive,
+                                                                             CompIndex,
+                                                                             OAUCoilOutTemp,
+                                                                             ZoneEquipFlag,
+                                                                             sensOut,
+                                                                             latOut);
                 }
                 if (AirLoopInputsFilled) UnitarySystems::UnitarySys::getUnitarySysHeatCoolCoil(CompName, OACoolingCoil, OAHeatingCoil, 0);
                 if (MyOneTimeCheckUnitarySysFlag(OASysNum)) {
@@ -841,6 +855,31 @@ namespace MixedAir {
                 // 'EvaporativeCooler:Indirect:WetCoil','EvaporativeCooler:Indirect:ResearchSpecial'
                 if (Sim) {
                     SimEvapCooler(CompName, CompIndex);
+                }
+
+            } else if (SELECT_CASE_var == VRFTerminalUnit) { // 'ZoneHVAC:TerminalUnit:VariableRefrigerantFlow'
+                if (Sim) {
+                    int ControlledZoneNum = 0;
+                    bool HeatingActive = false;
+                    bool CoolingActive = false;
+                    int const OAUnitNum = 0;
+                    Real64 const OAUCoilOutTemp = 0.0;
+                    bool const ZoneEquipment = false;
+                    Real64 sysOut = 0.0;
+                    Real64 latOut = 0.0;
+                    HVACVariableRefrigerantFlow::SimulateVRF(CompName,
+                        FirstHVACIteration,
+                        ControlledZoneNum,
+                        CompIndex,
+                        HeatingActive,
+                        CoolingActive,
+                        OAUnitNum,
+                        OAUCoilOutTemp,
+                        ZoneEquipment,
+                        sysOut,
+                        latOut);
+                } else {
+                    HVACVariableRefrigerantFlow::isVRFCoilPresent(CompName, OACoolingCoil, OAHeatingCoil);
                 }
 
             } else {
@@ -1266,6 +1305,8 @@ namespace MixedAir {
                         OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = EvapCooler;
                     } else if (SELECT_CASE_var == "EVAPORATIVECOOLER:DIRECT:RESEARCHSPECIAL") {
                         OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = EvapCooler;
+                    } else if ( SELECT_CASE_var == "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW" ) {
+                        OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = VRFTerminalUnit;
                     } else {
                         ShowSevereError(CurrentModuleObject + " = \"" + AlphArray(1) + "\" invalid Outside Air Component=\"" +
                                         OutsideAirSys(OASysNum).ComponentType(CompNum) + "\".");

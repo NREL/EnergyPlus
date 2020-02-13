@@ -54,9 +54,9 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/UnitarySystem.hh>
 
 namespace EnergyPlus {
 
@@ -394,7 +394,7 @@ namespace DataZoneEquipment {
         Array1D_int EquipType_Num;
         Array1D_string EquipName;
         Array1D_int EquipIndex;
-        std::vector<UnitarySystems::UnitarySys *> compPointer;
+        std::vector<HVACSystemData *> compPointer;
         Array1D_int CoolingPriority;
         Array1D_int HeatingPriority;
         Array1D_int SequentialCoolingFractionSchedPtr;

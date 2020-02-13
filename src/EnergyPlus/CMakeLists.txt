@@ -109,6 +109,7 @@ SET( SRC
   DataHVACControllers.hh
   DataHVACGlobals.cc
   DataHVACGlobals.hh
+  DataHVACSystems.hh
   DataHeatBalFanSys.cc
   DataHeatBalFanSys.hh
   DataHeatBalSurface.cc
