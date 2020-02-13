@@ -1729,7 +1729,7 @@ namespace SimulationManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static constexpr auto EndOfDataFormat("End of Data\n"); // Signifies the end of the data block in the output file
+        static constexpr auto EndOfDataFormat("End of Data"); // Signifies the end of the data block in the output file
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -1874,7 +1874,7 @@ namespace SimulationManager {
         }
 
         // Close the Initialization Output File
-        print(outputFiles.eio, EndOfDataFormat);
+        print(outputFiles.eio, "{}\n", EndOfDataFormat);
         outputFiles.eio.close();
 
         // Close the Meters Output File
