@@ -1950,7 +1950,7 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcGFunction_Check)
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
     GetPlantLoopData();
     GetPlantInput();
@@ -2429,7 +2429,7 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_calc_pipe_convection_resistanc
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
     GetPlantLoopData();
     GetPlantInput();
@@ -2735,7 +2735,7 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_calc_pipe_resistance)
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
     GetPlantLoopData();
     GetPlantInput();
@@ -3030,7 +3030,7 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_1)
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
     GetPlantLoopData();
     GetPlantInput();
@@ -3328,7 +3328,7 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_2)
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
     GetPlantLoopData();
     GetPlantInput();
@@ -3625,7 +3625,7 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_3)
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
     GetPlantLoopData();
     GetPlantInput();
@@ -3923,7 +3923,7 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResistance_
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
     GetPlantLoopData();
     GetPlantInput();
@@ -4221,7 +4221,7 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResistance_
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
     GetPlantLoopData();
     GetPlantInput();
@@ -4518,7 +4518,7 @@ TEST_F(GHEFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResistance_
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
     GetPlantLoopData();
     GetPlantInput();

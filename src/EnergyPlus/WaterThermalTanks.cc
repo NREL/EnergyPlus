@@ -77,6 +77,7 @@
 #include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
@@ -196,7 +197,7 @@ namespace WaterThermalTanks {
     {
         // Process the input data
         if (getWaterThermalTankInputFlag) {
-            GetWaterThermalTankInput();
+            GetWaterThermalTankInput(OutputFiles::getSingleton());
             getWaterThermalTankInputFlag = false;
         }
 
@@ -234,9 +235,9 @@ namespace WaterThermalTanks {
 
         if (DataPlant::PlantFirstSizesOkayToFinalize) {
             if (!this->IsChilledWaterTank) {
-                this->CalcStandardRatings();
+                this->CalcStandardRatings(OutputFiles::getSingleton());
             } else {
-                this->ReportCWTankInits();
+                this->ReportCWTankInits(OutputFiles::getSingleton());
             }
         }
     }
@@ -252,7 +253,7 @@ namespace WaterThermalTanks {
     int getTankIDX(std::string const &CompName, int &CompIndex)
     {
         if (getWaterThermalTankInputFlag) {
-            GetWaterThermalTankInput();
+            GetWaterThermalTankInput(OutputFiles::getSingleton());
             getWaterThermalTankInputFlag = false;
         }
 
@@ -285,7 +286,7 @@ namespace WaterThermalTanks {
     int getHPTankIDX(std::string const &CompName, int &CompIndex)
     {
         if (getWaterThermalTankInputFlag) {
-            GetWaterThermalTankInput();
+            GetWaterThermalTankInput(OutputFiles::getSingleton());
             getWaterThermalTankInputFlag = false;
         }
 
@@ -369,7 +370,7 @@ namespace WaterThermalTanks {
     {
         // Process the input data
         if (getWaterThermalTankInputFlag) {
-            GetWaterThermalTankInput();
+            GetWaterThermalTankInput(OutputFiles::getSingleton());
             getWaterThermalTankInputFlag = false;
         }
 
@@ -512,7 +513,7 @@ namespace WaterThermalTanks {
         Real64 MyLoad;
 
         if (getWaterThermalTankInputFlag) {
-            GetWaterThermalTankInput();
+            GetWaterThermalTankInput(OutputFiles::getSingleton());
             getWaterThermalTankInputFlag = false;
         }
 
@@ -572,7 +573,7 @@ namespace WaterThermalTanks {
 
         // FLOW:
         if (getWaterThermalTankInputFlag) {
-            GetWaterThermalTankInput();
+            GetWaterThermalTankInput(OutputFiles::getSingleton());
             getWaterThermalTankInputFlag = false;
         }
 
@@ -640,7 +641,7 @@ namespace WaterThermalTanks {
                 return;
             } else {
                 if (getWaterThermalTankInputFlag) {
-                    GetWaterThermalTankInput();
+                    GetWaterThermalTankInput(OutputFiles::getSingleton());
                     getWaterThermalTankInputFlag = false;
                 }
                 if (numWaterThermalTank == 0) return;
@@ -1034,6 +1035,9 @@ namespace WaterThermalTanks {
         int nNumPossibleNumericArgs; // the number of possible numeric arguments in the idd
         int nNumPossibleAlphaArgs;   // the number of possible numeric arguments in the idd
 
+        // For looking up in IDF/epJSON, you need the index that corresponds to the actual object type (Pumped or Wrapped)
+        int HPWaterHeaterNumOfSpecificType;
+
         for (int HPWaterHeaterNum = 1; HPWaterHeaterNum <= numHeatPumpWaterHeater; ++HPWaterHeaterNum) {
 
             // Create reference to current HPWH object in array.
@@ -1042,25 +1046,30 @@ namespace WaterThermalTanks {
             // Initialize the offsets to zero
             nAlphaOffset = 0;
             nNumericOffset = 0;
+
             if (HPWaterHeaterNum <= NumPumpedCondenser) {
                 // Pumped Condenser
                 DataIPShortCuts::cCurrentModuleObject = cHPWHPumpedCondenser;
                 HPWH.TypeNum = DataPlant::TypeOf_HeatPumpWtrHeaterPumped;
                 nNumPossibleAlphaArgs = 29;
                 nNumPossibleNumericArgs = 9;
+                // Actual index of Pumped type
+                HPWaterHeaterNumOfSpecificType = HPWaterHeaterNum;
             } else {
                 // Wrapped Condenser
                 DataIPShortCuts::cCurrentModuleObject = cHPWHWrappedCondenser;
                 HPWH.TypeNum = DataPlant::TypeOf_HeatPumpWtrHeaterWrapped;
                 nNumPossibleAlphaArgs = 27;
                 nNumPossibleNumericArgs = 10;
+                // Actual index of Wrapped type
+                HPWaterHeaterNumOfSpecificType = HPWaterHeaterNum - NumPumpedCondenser;
             }
 
             int NumAlphas;
             int NumNums;
             int IOStat;
             inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
-                                          HPWaterHeaterNum,
+                                          HPWaterHeaterNumOfSpecificType,
                                           DataIPShortCuts::cAlphaArgs,
                                           NumAlphas,
                                           DataIPShortCuts::rNumericArgs,
@@ -3958,7 +3967,7 @@ namespace WaterThermalTanks {
         return ErrorsFound;
     }
 
-    bool GetWaterThermalTankInput()
+    bool GetWaterThermalTankInput(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3978,21 +3987,6 @@ namespace WaterThermalTanks {
         static std::string const RoutineName("GetWaterThermalTankInput: ");
         static std::string const RoutineNameNoColon("GetWaterThermalTankInput");
 
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_720(
-            "('! <Water Heater Information>,Type,Name,Volume {m3},Maximum Capacity {W},Standard Rated Recovery Efficiency, "
-            "','Standard Rated Energy Factor')");
-        static ObjexxFCL::gio::Fmt Format_721(
-            "('! <Heat Pump Water Heater Information>,Type,Name,Volume {m3},Maximum Capacity {W},','Standard Rated Recovery "
-            "Efficiency,Standard Rated Energy Factor,\"DX Coil Total Cooling Rate {W, HPWH Only}\"')");
-        static ObjexxFCL::gio::Fmt Format_722("('! <Water Heater Stratified Node Information>,Node Number,Height {m},Volume {m3},Maximum Capacity "
-                                              "{W},','Off-Cycle UA {W/K},On-Cycle UA {W/K},Number Of Inlets,Number Of Outlets')");
-        static ObjexxFCL::gio::Fmt Format_725(
-            "('! <Chilled Water Tank Information>,Type,Name,Volume {m3},Use Side Design Flow Rate {m3/s}, ','Source Side Design Flow Rate {m3/s}')");
-        static ObjexxFCL::gio::Fmt Format_726(
-            "('! <Chilled Water Tank Stratified Node Information>,Node Number,Height {m},Volume {m3},','UA {W/K},Number Of "
-            "Inlets,Number Of Outlets')");
-
         // Make sure refrigeration input is gotten before this input
         RefrigeratedCase::CheckRefrigerationInput();
 
@@ -4007,12 +4001,27 @@ namespace WaterThermalTanks {
             numWaterHeaterDesuperheater = inputProcessor->getNumObjectsFound(cCoilDesuperheater);
 
             if (numWaterThermalTank > 0) {
+                static constexpr auto Format_720(
+                    "! <Water Heater Information>,Type,Name,Volume {{m3}},Maximum Capacity {{W}},Standard Rated Recovery Efficiency, "
+                    "Standard Rated Energy Factor\n");
+                static constexpr auto Format_721(
+                    "! <Heat Pump Water Heater Information>,Type,Name,Volume {{m3}},Maximum Capacity {{W}},Standard Rated Recovery "
+                    "Efficiency,Standard Rated Energy Factor,\"DX Coil Total Cooling Rate {{W, HPWH Only}}\"\n");
+                static constexpr auto Format_722(
+                    "! <Water Heater Stratified Node Information>,Node Number,Height {{m}},Volume {{m3}},Maximum Capacity "
+                    "{{W}},Off-Cycle UA {{W/K}},On-Cycle UA {{W/K}},Number Of Inlets,Number Of Outlets\n");
+                static constexpr auto Format_725("! <Chilled Water Tank Information>,Type,Name,Volume {{m3}},Use Side Design Flow Rate {{m3/s}}, "
+                                                 "Source Side Design Flow Rate {{m3/s}}\n");
+                static constexpr auto Format_726(
+                    "! <Chilled Water Tank Stratified Node Information>,Node Number,Height {{m}},Volume {{m3}},UA {{W/K}},Number Of "
+                    "Inlets,Number Of Outlets\n");
+
                 // Write water heater header for EIO
-                if ((numWaterHeaterMixed > 0) || (numWaterHeaterStratified > 0)) ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_720);
-                if (numHeatPumpWaterHeater > 0) ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_721);
-                if (numWaterHeaterStratified > 0) ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_722);
-                if (numChilledWaterMixed > 0) ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_725);
-                if (numChilledWaterStratified > 0) ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_726);
+                if ((numWaterHeaterMixed > 0) || (numWaterHeaterStratified > 0)) print(outputFiles.eio, Format_720);
+                if (numHeatPumpWaterHeater > 0) print(outputFiles.eio, Format_721);
+                if (numWaterHeaterStratified > 0) print(outputFiles.eio, Format_722);
+                if (numChilledWaterMixed > 0) print(outputFiles.eio, Format_725);
+                if (numChilledWaterStratified > 0) print(outputFiles.eio, Format_726);
             }
 
             if (numWaterThermalTank > 0) {
@@ -4710,18 +4719,17 @@ namespace WaterThermalTanks {
     void WaterThermalTankData::setupOutputVars()
     {
         if ((this->TypeNum == DataPlant::TypeOf_ChilledWaterTankMixed) || (this->TypeNum == DataPlant::TypeOf_ChilledWaterTankStratified)) {
-            this->setupChilledWaterTankOutputVars();
+            this->setupChilledWaterTankOutputVars(OutputFiles::getSingleton());
         } else {
             // moving setupWaterHeaterOutputVars to here causes big table diffs...
-             this->setupWaterHeaterOutputVars();
+            this->setupWaterHeaterOutputVars(OutputFiles::getSingleton());
         }
         // moving setupZoneInternalGains to here causes math and table diffs...
         // this->setupZoneInternalGains();
     }
 
-    void WaterThermalTankData::setupChilledWaterTankOutputVars()
+    void WaterThermalTankData::setupChilledWaterTankOutputVars(OutputFiles &outputFiles)
     {
-        static ObjexxFCL::gio::Fmt Format_724("('Chilled Water Tank Stratified Node Information',6(',',A))");
 
         // CurrentModuleObject='ThermalStorage:ChilledWater:Mixed/ThermalStorage:ChilledWater:Stratified'
         SetupOutputVariable(
@@ -4819,10 +4827,16 @@ namespace WaterThermalTanks {
         if (this->TypeNum == DataPlant::TypeOf_ChilledWaterTankStratified) {
 
             for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
-                ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_724)
-                    << General::TrimSigDigits(NodeNum) << General::TrimSigDigits(this->Node(NodeNum).Height, 4)
-                    << General::TrimSigDigits(this->Node(NodeNum).Volume, 4) << General::TrimSigDigits(this->Node(NodeNum).OffCycLossCoeff, 4)
-                    << General::TrimSigDigits(this->Node(NodeNum).Inlets) << General::TrimSigDigits(this->Node(NodeNum).Outlets);
+                static constexpr auto Format_724("Chilled Water Tank Stratified Node Information,{},{:.4T},{:.4T},{:.4T},{},{}\n");
+
+                print(outputFiles.eio,
+                      Format_724,
+                      NodeNum,
+                      this->Node(NodeNum).Height,
+                      this->Node(NodeNum).Volume,
+                      this->Node(NodeNum).OffCycLossCoeff,
+                      this->Node(NodeNum).Inlets,
+                      this->Node(NodeNum).Outlets);
             }
         }
     }
@@ -4863,9 +4877,8 @@ namespace WaterThermalTanks {
         }
     }
 
-    void WaterThermalTankData::setupWaterHeaterOutputVars()
+    void WaterThermalTankData::setupWaterHeaterOutputVars(OutputFiles &outputFiles)
     {
-        static ObjexxFCL::gio::Fmt Format_723("('Water Heater Stratified Node Information',8(',',A))");
 
         // Setup report variables for WaterHeater:Mixed
         // CurrentModuleObject='WaterHeater:Mixed'
@@ -5219,11 +5232,17 @@ namespace WaterThermalTanks {
         if (this->TypeNum == DataPlant::TypeOf_WtrHeaterStratified) {
 
             for (int NodeNum = 1; NodeNum <= this->Nodes; ++NodeNum) {
-                ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_723)
-                    << General::TrimSigDigits(NodeNum) << General::TrimSigDigits(this->Node(NodeNum).Height, 4)
-                    << General::TrimSigDigits(this->Node(NodeNum).Volume, 4) << General::TrimSigDigits(this->Node(NodeNum).MaxCapacity, 3)
-                    << General::TrimSigDigits(this->Node(NodeNum).OffCycLossCoeff, 4) << General::TrimSigDigits(this->Node(NodeNum).OnCycLossCoeff, 4)
-                    << General::TrimSigDigits(this->Node(NodeNum).Inlets) << General::TrimSigDigits(this->Node(NodeNum).Outlets);
+                static constexpr auto Format_723("Water Heater Stratified Node Information,{},{:.4T},{:.4T},{:.3T},{:.4T},{:.4T},{},{}\n");
+                print(outputFiles.eio,
+                      Format_723,
+                      NodeNum,
+                      this->Node(NodeNum).Height,
+                      this->Node(NodeNum).Volume,
+                      this->Node(NodeNum).MaxCapacity,
+                      this->Node(NodeNum).OffCycLossCoeff,
+                      this->Node(NodeNum).OnCycLossCoeff,
+                      this->Node(NodeNum).Inlets,
+                      this->Node(NodeNum).Outlets);
             }
         }
     }
@@ -6251,7 +6270,7 @@ namespace WaterThermalTanks {
                 this->AlreadyRated = true;
             } else {
                 if (!DataGlobals::AnyPlantInModel || DataPlant::PlantFirstSizesOkayToReport || this->MaxCapacity > 0.0 || this->HeatPumpNum > 0) {
-                    this->CalcStandardRatings();
+                    this->CalcStandardRatings(OutputFiles::getSingleton());
                 }
             }
         }
@@ -11315,7 +11334,7 @@ namespace WaterThermalTanks {
         this->VolumeConsumed = this->VolFlowRate * SecInTimeStep;
     }
 
-    void WaterThermalTankData::CalcStandardRatings()
+    void WaterThermalTankData::CalcStandardRatings(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -11326,7 +11345,7 @@ namespace WaterThermalTanks {
 
         // PURPOSE OF THIS SUBROUTINE:
         // Calculates the water heater standard ratings, such as Energy Factor and Recovery Efficiency.  Results are written
-        // to the EIO file.  Standard ratings are not calculated for storage-only tanks, i.e., MaxCapacity = 0.
+        // to the EIO file.  Standard ratings are not calculated for storage-only tanks, i.e., MaxCapacity = 0, nor for Integrated Heat Pumps
 
         // METHODOLOGY EMPLOYED:
         // Water heater inputs are set to the specified test conditions. For HPWHs, the heating capacity and COP are assumed
@@ -11337,9 +11356,6 @@ namespace WaterThermalTanks {
         // Title 10, Code of Federal Regulations, Part 430- Energy Conservation Program for Consumer Products, Appendix E to
         // Subpart B- Uniform Test Procedure for Measuring the Energy Consumption of Water Heaters, January 1, 2004.
 
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_720("('Water Heater Information',6(',',A))");
-        static ObjexxFCL::gio::Fmt Format_721("('Heat Pump Water Heater Information',7(',',A))");
 
         if (this->AlreadyRated) { // bail we already did this one
             return;
@@ -11370,7 +11386,6 @@ namespace WaterThermalTanks {
             FirstTimeFlag = true;
 
             int TimeStepPerHour = int(1.0 / DataHVACGlobals::TimeStepSys);
-            int HPNum = 0;
             // Simulate 24 hour test
             for (int Step = 1; Step <= TimeStepPerHour * 24; ++Step) {
 
@@ -11409,7 +11424,7 @@ namespace WaterThermalTanks {
 
                 } else {
 
-                    HPNum = this->HeatPumpNum;
+                    int HPNum = this->HeatPumpNum; // Convenience variable
                     Real64 AmbientHumRat = 0.00717; // Humidity ratio at 67.5 F / 50% RH
 
                     //       set the heat pump air- and water-side mass flow rate
@@ -11671,7 +11686,8 @@ namespace WaterThermalTanks {
             } else {
                 RecoveryEfficiency = 0.0;
                 EnergyFactor = 0.0;
-                if (HPWaterHeater.empty() || !HPWaterHeater(HPNum).bIsIHP) {
+                // If this a regular tank, or an HPWH that's not an Integrated one
+                if ((this->HeatPumpNum == 0) || !HPWaterHeater(this->HeatPumpNum).bIsIHP) {
                     ShowWarningError("Water heater = " + this->Name +
                                      ":  Recovery Efficiency and Energy Factor could not be calculated during the test for standard ratings");
                     ShowContinueError("Setpoint was never recovered and/or heater never turned on");
@@ -11724,20 +11740,32 @@ namespace WaterThermalTanks {
                 MaxCapacity_loc = this->MaxCapacity;
             }
 
-            ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_720)
-                << this->Type << this->Name << General::TrimSigDigits(this->Volume, 4) << General::TrimSigDigits(MaxCapacity_loc, 1)
-                << General::TrimSigDigits(RecoveryEfficiency, 3) << General::TrimSigDigits(EnergyFactor, 4);
+            static constexpr auto Format_720("Water Heater Information,{},{},{:.4T},{:.1T},{:.3T},{:.4T}\n");
+            print(outputFiles.eio,
+                  Format_720,
+                  this->Type,
+                  this->Name,
+                  this->Volume,
+                  MaxCapacity_loc,
+                  RecoveryEfficiency,
+                  EnergyFactor);
         } else {
-            ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_721)
-                << HPWaterHeater(this->HeatPumpNum).Type << HPWaterHeater(this->HeatPumpNum).Name << General::TrimSigDigits(this->Volume, 4)
-                << General::TrimSigDigits(DXCoils::HPWHHeatingCapacity, 1) << General::TrimSigDigits(RecoveryEfficiency, 3)
-                << General::TrimSigDigits(EnergyFactor, 4) << General::TrimSigDigits(RatedDXCoilTotalCapacity, 0);
+            static constexpr auto Format_721("Heat Pump Water Heater Information,{},{},{:.4T},{:.1T},{:.3T},{:.4T},{:.0T}\n");
+            print(outputFiles.eio,
+                  Format_721,
+                  HPWaterHeater(this->HeatPumpNum).Type,
+                  HPWaterHeater(this->HeatPumpNum).Name,
+                  this->Volume,
+                  DXCoils::HPWHHeatingCapacity,
+                  RecoveryEfficiency,
+                  EnergyFactor,
+                  RatedDXCoilTotalCapacity);
         }
 
         this->AlreadyRated = true;
     }
 
-    void WaterThermalTankData::ReportCWTankInits()
+    void WaterThermalTankData::ReportCWTankInits(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -11749,8 +11777,6 @@ namespace WaterThermalTanks {
         // PURPOSE OF THIS SUBROUTINE:
         // send chilled water tank info to EIO
 
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_728("('Chilled Water Tank Information',5(',',A))");
 
         if (this->myOneTimeInitFlag) {
             this->setupOutputVars();
@@ -11761,9 +11787,14 @@ namespace WaterThermalTanks {
             return;
         }
 
-        ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_728)
-            << this->Type << this->Name << General::TrimSigDigits(this->Volume, 4) << General::TrimSigDigits(this->UseDesignVolFlowRate, 4)
-            << General::TrimSigDigits(this->SourceDesignVolFlowRate, 4);
+        static constexpr auto Format_728("Chilled Water Tank Information,{},{},{:.4T},{:.4T},{:.4T}\n");
+        print(outputFiles.eio,
+              Format_728,
+              this->Type,
+              this->Name,
+              this->Volume,
+              this->UseDesignVolFlowRate,
+              this->SourceDesignVolFlowRate);
 
         this->AlreadyReported = true;
     }
