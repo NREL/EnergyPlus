@@ -984,6 +984,27 @@ namespace PluginManagement {
     #endif
     }
 
+    Real64 PluginManager::getTrendVariableSum(int handle, int count) {
+#if LINK_WITH_PYTHON == 1
+        Real64 sum = 0.0;
+        for (int i = 0; i < count; i++) {
+            sum += trends[handle].values[i];
+        }
+        return sum;
+#endif
+    }
+
+    Real64 PluginManager::getTrendDirection(int handle, int count) {
+#if LINK_WITH_PYTHON == 1
+//        auto &trend = trends[handle];
+//        Real64 numerator = sum(trend.TimeARR({1, thisIndex})) * sum(trend.TrendValARR({1, thisIndex})) -
+//                           thisIndex * sum((trend.TimeARR({1, thisIndex}) * trend.TrendValARR({1, thisIndex})));
+//        Real64 denominator = pow_2(sum(trend.TimeARR({1, thisIndex}))) - thisIndex * sum(pow(trend.TimeARR({1, thisIndex}), 2));
+//        return numerator / denominator;
+        return 0;
+#endif
+    }
+
     size_t PluginManager::getTrendVariableHistorySize(int handle) {
 #if LINK_WITH_PYTHON == 1
         return trends[handle].values.size();

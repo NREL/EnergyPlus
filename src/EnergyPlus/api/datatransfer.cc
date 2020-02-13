@@ -276,6 +276,10 @@ Real64 getPluginTrendVariableMax(int handle, int count) {
     return EnergyPlus::PluginManagement::pluginManager->getTrendVariableMax(handle, count);
 }
 
+Real64 getPluginTrendVariableSum(int handle, int count) {
+    return EnergyPlus::PluginManagement::pluginManager->getTrendVariableSum(handle, count);
+}
+
 int year() {
     return EnergyPlus::DataEnvironment::Year;
 }
