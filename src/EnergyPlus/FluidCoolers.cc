@@ -1164,7 +1164,9 @@ namespace FluidCoolers {
                 General::SolveRoot(Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par);
                 if (SolFla == -1) {
                     ShowWarningError("Iteration limit exceeded in calculating fluid cooler UA.");
-                    ShowContinueError("Autosizing of fluid cooler UA failed for fluid cooler = " + this->Name);
+                    if (PltSizCondNum > 0) {
+                        ShowContinueError("Autosizing of fluid cooler UA failed for fluid cooler = " + this->Name);
+                    }
                     ShowContinueError("The final UA value =" + General::RoundSigDigits(UA, 2) + " W/K, and the simulation continues...");
                 } else if (SolFla == -2) {
                     CalcFluidCoolerOutlet(int(Par(2)), Par(3), Par(4), UA0, OutWaterTempAtUA0);
@@ -1199,7 +1201,9 @@ namespace FluidCoolers {
                                       " W/K) = " + General::RoundSigDigits(OutWaterTempAtUA0, 2));
                     ShowContinueError("Calculated water outlet temp at high UA [C] (UA = " + General::RoundSigDigits(UA1, 2) +
                                       " W/K) = " + General::RoundSigDigits(OutWaterTempAtUA1, 2));
-                    ShowFatalError("Autosizing of Fluid Cooler UA failed for fluid cooler = " + this->Name);
+                    if (PltSizCondNum > 0) {
+                        ShowFatalError("Autosizing of Fluid Cooler UA failed for fluid cooler = " + this->Name);
+                    }
                 }
                 if (DataPlant::PlantFirstSizesOkayToFinalize) this->HighSpeedFluidCoolerUA = UA;
             } else {

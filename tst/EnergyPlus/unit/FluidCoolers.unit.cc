@@ -355,6 +355,6 @@ TEST_F(EnergyPlusFixture, SizeFunctionTestWhenPlantSizingIndexIsZero)
     EXPECT_FALSE(thisFluidCooler.HighSpeedFanPowerWasAutoSized);
     EXPECT_FALSE(thisFluidCooler.HighSpeedAirFlowRateWasAutoSized);
     EXPECT_FALSE(thisFluidCooler.HighSpeedFluidCoolerUAWasAutoSized);
-    
+
     thisFluidCooler.size();
 }
