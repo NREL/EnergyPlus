@@ -8148,7 +8148,7 @@ namespace HVACVariableRefrigerantFlow {
                     Real64 mDot = DataLoopNode::Node(this->SuppHeatCoilAirInletNode).MassFlowRate;
                     Real64 Tin = DataLoopNode::Node(this->SuppHeatCoilAirInletNode).Temp;
                     Real64 Win = DataLoopNode::Node(this->SuppHeatCoilAirInletNode).HumRat;
-                    Real64 CpAirIn = Psychrometrics::PsyCpAirFnWTdb(Win, Tin);
+                    Real64 CpAirIn = Psychrometrics::PsyCpAirFnW(Win);
                     SuppHeatCoilLoad = mDot * CpAirIn * (this->suppTempSetPoint - Tin);
                     this->SuppHeatingCoilLoad = SuppHeatCoilLoad;
                     if (this->DesignSuppHeatingCapacity > 0.0) {
@@ -9062,7 +9062,7 @@ namespace HVACVariableRefrigerantFlow {
                 VRFTU(TUIndex).heatSPActive = false;
 
                 if ((heatCoilTempSetPoint - coilInletTemp - heatfanDeltaT) > DataHVACGlobals::SmallTempDiff) { // heating
-                    Real64 CpAirIn = Psychrometrics::PsyCpAirFnWTdb(coilInletHumRat, coilInletTemp);
+                    Real64 CpAirIn = Psychrometrics::PsyCpAirFnW(coilInletHumRat);
                     ZoneLoad = coilInletMassFlow * CpAirIn * (heatCoilTempSetPoint - coilInletTemp - heatfanDeltaT);
                     VRFTU(TUIndex).heatSPActive = true;
                     VRFTU(TUIndex).heatLoadToSP = ZoneLoad;
@@ -9071,7 +9071,7 @@ namespace HVACVariableRefrigerantFlow {
                     MinDeltaT(VRFCond) = min(MinDeltaT(VRFCond), -1.0);
                     VRFTU(TUIndex).coilTempSetPoint = heatCoilTempSetPoint - heatfanDeltaT;
                 } else if ((coilInletTemp - coolCoilTempSetPoint - coolfanDeltaT) > DataHVACGlobals::SmallTempDiff) { // cooling
-                    Real64 CpAirIn = Psychrometrics::PsyCpAirFnWTdb(coilInletHumRat, coilInletTemp);
+                    Real64 CpAirIn = Psychrometrics::PsyCpAirFnW(coilInletHumRat);
                     ZoneLoad = coilInletMassFlow * CpAirIn * (coolCoilTempSetPoint - coilInletTemp - coolfanDeltaT);
                     VRFTU(TUIndex).coolSPActive = true;
                     VRFTU(TUIndex).coolLoadToSP = ZoneLoad;
@@ -11301,7 +11301,7 @@ namespace HVACVariableRefrigerantFlow {
                     Real64 mDot = DataLoopNode::Node(this->SuppHeatCoilAirInletNode).MassFlowRate;
                     Real64 Tin = DataLoopNode::Node(this->SuppHeatCoilAirInletNode).Temp;
                     Real64 Win = DataLoopNode::Node(this->SuppHeatCoilAirInletNode).HumRat;
-                    Real64 CpAirIn = Psychrometrics::PsyCpAirFnWTdb(Win, Tin);
+                    Real64 CpAirIn = Psychrometrics::PsyCpAirFnW(Win);
                     SuppHeatCoilLoad = mDot * CpAirIn * (this->suppTempSetPoint - Tin);
                     this->SuppHeatingCoilLoad = SuppHeatCoilLoad;
                     if (this->DesignSuppHeatingCapacity > 0.0) {
