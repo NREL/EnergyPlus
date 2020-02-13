@@ -298,7 +298,7 @@ namespace SingleDuct {
                 SimConstVol(SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum);
 
             } else if (SELECT_CASE_var == SingleDuctConstVolNoReheat) { // AirTerminal:SingleDuct:ConstantVolume:NoReheat
-                Sys(SysNum).SimConstVolNoReheat(SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum);
+                Sys(SysNum).SimConstVolNoReheat(SysNum, ZoneNodeNum);
 
             } else if (SELECT_CASE_var == SingleDuctVAVReheat) { // SINGLE DUCT:VAV:REHEAT
                 SimVAV(SysNum, FirstHVACIteration, ZoneNum, ZoneNodeNum);
@@ -1289,14 +1289,6 @@ namespace SingleDuct {
                                 "System",
                                 "Average",
                                 Sys(SysNum).SysName);
-            SetupOutputVariable(
-                "Zone Air Terminal Sensible Heating Energy", OutputProcessor::Unit::J, Sys(SysNum).HeatEnergy, "System", "Sum", Sys(SysNum).SysName);
-            SetupOutputVariable(
-                "Zone Air Terminal Sensible Cooling Energy", OutputProcessor::Unit::J, Sys(SysNum).CoolEnergy, "System", "Sum", Sys(SysNum).SysName);
-            SetupOutputVariable(
-                "Zone Air Terminal Sensible Heating Rate", OutputProcessor::Unit::W, Sys(SysNum).HeatRate, "System", "Average", Sys(SysNum).SysName);
-            SetupOutputVariable(
-                "Zone Air Terminal Sensible Cooling Rate", OutputProcessor::Unit::W, Sys(SysNum).CoolRate, "System", "Average", Sys(SysNum).SysName);
 
             if (DataGlobals::AnyEnergyManagementSystemInModel) {
                 // model results related actuators
@@ -3159,10 +3151,8 @@ namespace SingleDuct {
         using HeatingCoils::SimulateHeatingCoilComponents;
         using SteamCoils::SimulateSteamCoilComponents;
         using WaterCoils::SimulateWaterCoilComponents;
-        // unused   USE DataAirLoop,       ONLY: AirLoopControlInfo
         using DataHVACGlobals::SmallLoad;
         using PlantUtilities::SetActuatedBranchFlowRate;
-        // using Psychrometrics::PsyCpAirFnWTdb;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3223,9 +3213,6 @@ namespace SingleDuct {
         SysOutletNode = Sys(SysNum).ReheatAirOutletNode;
         SysInletNode = Sys(SysNum).InletNodeNum;
         CpAirAvg = PsyCpAirFnW(0.5 * (Node(ZoneNodeNum).HumRat + SysInlet(SysNum).AirHumRat));
-        // Real64 CpAirAvg2 =
-        //    PsyCpAirFnWTdb(0.5 * (Node(ZoneNodeNum).HumRat + SysInlet(SysNum).AirHumRat), 0.5 * (Node(ZoneNodeNum).Temp +
-        //    SysInlet(SysNum).AirTemp));
         MinFlowFrac = Sys(SysNum).ZoneMinAirFrac;
         MassFlowBasedOnOA = 0.0;
         ZoneTemp = Node(ZoneNodeNum).Temp;
@@ -4703,54 +4690,19 @@ namespace SingleDuct {
                 }
             }
         }
-
-        // Debugging output for model
-        // If((HourOfDay .ge. 8) .and. (HourOfDay .lt. 15)) Then
-        //      Write(OutputFileDebug,*)  'Day of Sim     Hour of Day    Time'
-        //      Write(OutputFileDebug,*)  DayOfSim, HourOfDay, TimeStep*TimeStepZone
-        //      Write(OutputFileDebug,10)
-        //      Write(OutputFileDebug,20)ZoneNum, SysInlet(SysNum)%AirMassFlowRate, &
-        //                             SysInlet(SysNum)%AirMassFlowRate, &
-        //                              Temperature, Mat(ZoneNum), Node(ZoneNodeNum)%Temp, QTotLoad, &
-        //                             Enthalpy
-        // End If
-        // 10 Format('ZoneNum    SysHot    SysCold   Temp  &
-        //      &    MAT        NodeZoneTemp    QTotLoad  Enthalpy')
-        // 20 Format(1x,I3,3x, 5(2x, F9.4), 2(2x, F9.2))
     }
 
     void SysDesignParams::SimConstVolNoReheat(int const SysNum,
-                                              bool const EP_UNUSED(FirstHVACIteration),
-                                              int const EP_UNUSED(ZoneNum),
                                               int const ZoneNodeNum)
     {
 
         // PURPOSE OF THIS SUBROUTINE:
         // This subroutine simulates the simple single duct constant volume systems with no reheat.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
         using DataGlobals::SecInHour;
         using DataHVACGlobals::TimeStepSys;
         using Psychrometrics::PsyHFnTdbW;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 MassFlow;           // [kg/sec]   mass flow rate at the inlet
         Real64 SensOutputProvided; // heating and cooling provided to the zone [W]
 
@@ -4761,7 +4713,6 @@ namespace SingleDuct {
             SensOutputProvided = MassFlow * CpAir * (Node(this->OutletNodeNum).Temp - Node(ZoneNodeNum).Temp);
         } else {
             SensOutputProvided = 0.0;
-            MassFlow = 0.0;
         }
 
         // set the outlet node air conditions to that of the inlet
@@ -5275,7 +5226,7 @@ namespace SingleDuct {
             Node(OutletNode).Press = Node(InletNode).Press;
         }
 
-        // After all of the Oulets are updated the mass flow information needs to be
+        // After all of the Outlets are updated the mass flow information needs to be
         // passed back to the system inlet.
         Node(InletNode).MassFlowRate = SysOutlet(SysNum).AirMassFlowRate;
         Node(OutletNode).MassFlowRateMaxAvail = min(SysOutlet(SysNum).AirMassFlowRateMaxAvail, Node(OutletNode).MassFlowRateMax);

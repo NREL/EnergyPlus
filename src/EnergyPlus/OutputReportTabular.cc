@@ -90,7 +90,6 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/DirectAirManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EconomicLifeCycleCost.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
@@ -5105,8 +5104,6 @@ namespace OutputReportTabular {
         using DataHeatBalance::ZoneWinHeatLossRep;
         using DataHeatBalance::ZoneWinHeatLossRepEnergy;
         using DataHVACGlobals::TimeStepSys;
-        using DirectAirManager::DirectAir;
-        using DirectAirManager::NumDirectAir;
         using General::DetermineMinuteForReporting;
         using General::EncodeMonDayHrMin;
         using LowTempRadiantSystem::CFloRadSys;
@@ -5231,17 +5228,6 @@ namespace OutputReportTabular {
                 ZonePreDefRep(curZone).SHGSAnHvacATUCl -= AirDistUnit(iunit).CoolGain;
                 ATUHeat(curZone) = AirDistUnit(iunit).HeatRate;
                 ATUCool(curZone) = -AirDistUnit(iunit).CoolRate;
-            }
-        }
-        iunit = 0;
-        for (iunit = 1; iunit <= NumDirectAir; ++iunit) {
-            // HVAC equipment should already have the multipliers included, no "* mult" needed (assumes autosized or multiplied hard-sized air flow).
-            curZone = DirectAir(iunit).ZoneNum;
-            if ((curZone > 0) && (curZone <= NumOfZones)) {
-                ZonePreDefRep(curZone).SHGSAnHvacATUHt += DirectAir(iunit).HeatEnergy;
-                ZonePreDefRep(curZone).SHGSAnHvacATUCl -= DirectAir(iunit).CoolEnergy;
-                ATUHeat(curZone) += DirectAir(iunit).HeatRate;
-                ATUCool(curZone) -= DirectAir(iunit).CoolRate;
             }
         }
         curZone = 0;

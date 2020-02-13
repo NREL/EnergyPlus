@@ -227,6 +227,49 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyWFnTdpPb_Test)
     EXPECT_TRUE(compare_err_stream(error_string1, true));
 }
 
+inline Real64 PsyCpAirFnWTdb(Real64 const dw, // humidity ratio {kgWater/kgDryAir}
+                      Real64 const T   // input temperature {Celsius}
+)
+{
+
+	//// NOTE: THIS FUNCTION IS DEPRECATED AND USED FOR TESTING PURPOSES ONLY
+
+	// FUNCTION INFORMATION:
+	//       AUTHOR         J. C. VanderZee
+	//       DATE WRITTEN   Feb. 1994
+	//       MODIFIED       na
+	//       RE-ENGINEERED  na
+
+	// PURPOSE OF THIS FUNCTION:
+	// This function provides the heat capacity of air {J/kg-C} as function of humidity ratio.
+
+	// METHODOLOGY EMPLOYED:
+	// take numerical derivative of PsyHFnTdbW function
+
+	// REFERENCES:
+	// see PsyHFnTdbW ref. to ASHRAE Fundamentals
+	// USAGE:  cpa = PsyCpAirFnWTdb(w,T)
+
+	// Static locals
+	static Real64 dwSave(-100.0);
+	static Real64 Tsave(-100.0);
+	static Real64 cpaSave(-100.0);
+
+	// check if last call had the same input and if it did just use the saved output
+	if ((Tsave == T) && (dwSave == dw)) return cpaSave;
+
+	// compute heat capacity of air
+	Real64 const w(max(dw, 1.0e-5));
+	Real64 const cpa((PsyHFnTdbW(T + 0.1, w) - PsyHFnTdbW(T, w)) * 10.0); // result => heat capacity of air {J/kg-C}
+
+	// save values for next call
+	dwSave = dw;
+	Tsave = T;
+	cpaSave = cpa;
+
+	return cpa;
+}
+
 TEST_F(EnergyPlusFixture, Psychrometrics_PsyCpAirFn_Test)
 {
 
