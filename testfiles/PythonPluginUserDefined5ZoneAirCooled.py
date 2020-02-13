@@ -3,7 +3,7 @@ from pyenergyplus.plugin import EnergyPlusPlugin
 
 class UserDefinedCoilInit(EnergyPlusPlugin):
 
-    def __init(self):
+    def __init__(self):
         # init parent class
         super().__init__()
 
@@ -74,7 +74,7 @@ class UserDefinedCoilInit(EnergyPlusPlugin):
 
 class UserDefinedCoilSim(EnergyPlusPlugin):
 
-    def __init(self):
+    def __init__(self):
         # init parent class
         super().__init__()
 
