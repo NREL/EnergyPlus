@@ -2668,60 +2668,59 @@ namespace GroundHeatExchangers {
 
                 // Build out new instance and add it to the vector
                 std::shared_ptr<BHPropsStruct> thisProp(new BHPropsStruct);
-				BHPropsStruct thisPropLocal;
+                BHPropsStruct thisPropLocal;
 
                 thisProp->name = DataIPShortCuts::cAlphaArgs(1);
-	            thisPropLocal.name = DataIPShortCuts::cAlphaArgs(1);
+                thisPropLocal.name = DataIPShortCuts::cAlphaArgs(1);
 
-	            thisProp->topDepth = DataIPShortCuts::rNumericArgs(1);
-	            thisPropLocal.topDepth = DataIPShortCuts::rNumericArgs(1);
+                thisProp->topDepth = DataIPShortCuts::rNumericArgs(1);
+                thisPropLocal.topDepth = DataIPShortCuts::rNumericArgs(1);
 
                 thisProp->length = DataIPShortCuts::rNumericArgs(2);
-	            thisPropLocal.length = DataIPShortCuts::rNumericArgs(2);
+                thisPropLocal.length = DataIPShortCuts::rNumericArgs(2);
 
                 thisProp->diameter = DataIPShortCuts::rNumericArgs(3);
-	            thisPropLocal.diameter = DataIPShortCuts::rNumericArgs(3);
+                thisPropLocal.diameter = DataIPShortCuts::rNumericArgs(3);
 
                 thisProp->grout.k = DataIPShortCuts::rNumericArgs(4);
-	            thisPropLocal.grout.k = DataIPShortCuts::rNumericArgs(4);
+                thisPropLocal.grout.k = DataIPShortCuts::rNumericArgs(4);
 
                 thisProp->grout.rhoCp = DataIPShortCuts::rNumericArgs(5);
-	            thisPropLocal.grout.rhoCp = DataIPShortCuts::rNumericArgs(5);
+                thisPropLocal.grout.rhoCp = DataIPShortCuts::rNumericArgs(5);
 
                 thisProp->pipe.k = DataIPShortCuts::rNumericArgs(6);
-	            thisPropLocal.pipe.k = DataIPShortCuts::rNumericArgs(6);
+                thisPropLocal.pipe.k = DataIPShortCuts::rNumericArgs(6);
 
                 thisProp->pipe.rhoCp = DataIPShortCuts::rNumericArgs(7);
-	            thisPropLocal.pipe.rhoCp = DataIPShortCuts::rNumericArgs(7);
+                thisPropLocal.pipe.rhoCp = DataIPShortCuts::rNumericArgs(7);
 
                 thisProp->pipe.outDia = DataIPShortCuts::rNumericArgs(8);
-	            thisPropLocal.pipe.outDia = DataIPShortCuts::rNumericArgs(8);
+                thisPropLocal.pipe.outDia = DataIPShortCuts::rNumericArgs(8);
 
                 thisProp->pipe.thickness = DataIPShortCuts::rNumericArgs(9);
-	            thisPropLocal.pipe.thickness = DataIPShortCuts::rNumericArgs(9);
+                thisPropLocal.pipe.thickness = DataIPShortCuts::rNumericArgs(9);
 
                 thisProp->shankSpace = DataIPShortCuts::rNumericArgs(10);
-	            thisPropLocal.shankSpace = DataIPShortCuts::rNumericArgs(10);
+                thisPropLocal.shankSpace = DataIPShortCuts::rNumericArgs(10);
 
                 if (thisProp->shankSpace < thisProp->pipe.outDia) {
-                    ShowWarningError(
-                        "Borehole shank spacing is less than the pipe diameter. U-tube spacing is reference from the u-tube pipe center.");
+                    ShowWarningError("Borehole shank spacing is less than the pipe diameter. U-tube spacing is reference from the u-tube pipe center.");
                     ShowWarningError("Shank spacing is set to the outer pipe diameter.");
                     thisProp->shankSpace = thisProp->pipe.outDia;
-	                thisPropLocal.shankSpace = thisPropLocal.pipe.outDia;
+                    thisPropLocal.shankSpace = thisPropLocal.pipe.outDia;
                 }
 
                 thisProp->pipe.innerDia = thisProp->pipe.outDia - 2 * thisProp->pipe.thickness;
-	            thisPropLocal.pipe.innerDia = thisPropLocal.pipe.outDia - 2 * thisPropLocal.pipe.thickness;
+                thisPropLocal.pipe.innerDia = thisPropLocal.pipe.outDia - 2 * thisPropLocal.pipe.thickness;
 
                 thisProp->pipe.outRadius = thisProp->pipe.outDia / 2;
-	            thisPropLocal.pipe.outRadius = thisPropLocal.pipe.outDia / 2;
+                thisPropLocal.pipe.outRadius = thisPropLocal.pipe.outDia / 2;
 
                 thisProp->pipe.innerRadius = thisProp->pipe.innerDia / 2;
-	            thisPropLocal.pipe.innerRadius = thisPropLocal.pipe.innerDia / 2;
+                thisPropLocal.pipe.innerRadius = thisPropLocal.pipe.innerDia / 2;
 
                 vertProps.push_back(thisProp);
-	            propsLocal.push_back(thisPropLocal);
+                propsLocal.push_back(thisPropLocal);
             }
         }
 
@@ -2771,19 +2770,19 @@ namespace GroundHeatExchangers {
                 GLHEResponseFactors thisRFLocal;
 
                 thisRF->name = DataIPShortCuts::cAlphaArgs(1);
-	            thisRFLocal.name = DataIPShortCuts::cAlphaArgs(1);
+                thisRFLocal.name = DataIPShortCuts::cAlphaArgs(1);
 
                 thisRF->props = GetVertProps(DataIPShortCuts::cAlphaArgs(2));
-	            thisRFLocal.props = GetVertProps(DataIPShortCuts::cAlphaArgs(2));
+                thisRFLocal.props = GetVertProps(DataIPShortCuts::cAlphaArgs(2));
 
                 thisRF->numBoreholes = DataIPShortCuts::rNumericArgs(1);
-	            thisRFLocal.numBoreholes = DataIPShortCuts::rNumericArgs(1);
+                thisRFLocal.numBoreholes = DataIPShortCuts::rNumericArgs(1);
 
                 thisRF->gRefRatio = DataIPShortCuts::rNumericArgs(2);
-	            thisRFLocal.gRefRatio = DataIPShortCuts::rNumericArgs(2);
+                thisRFLocal.gRefRatio = DataIPShortCuts::rNumericArgs(2);
 
                 thisRF->maxSimYears = DataEnvironment::MaxNumberSimYears;
-	            thisRFLocal.maxSimYears = DataEnvironment::MaxNumberSimYears;
+                thisRFLocal.maxSimYears = DataEnvironment::MaxNumberSimYears;
 
                 int numPreviousFields = 2;
                 int numFields = 0;
@@ -2797,7 +2796,7 @@ namespace GroundHeatExchangers {
 
                 if ((numFields - numPreviousFields) % 2 == 0) {
                     thisRF->numGFuncPairs = (numFields - numPreviousFields) / 2;
-	                thisRFLocal.numGFuncPairs = (numFields - numPreviousFields) / 2;
+                    thisRFLocal.numGFuncPairs = (numFields - numPreviousFields) / 2;
                 } else {
                     errorsFound = true;
                     ShowSevereError("Errors found processing response factor input for Response Factor= " + thisRF->name);
@@ -2805,18 +2804,18 @@ namespace GroundHeatExchangers {
                 }
 
                 thisRF->LNTTS.dimension(thisRF->numGFuncPairs, 0.0);
-	            thisRFLocal.LNTTS.dimension(thisRFLocal.numGFuncPairs, 0.0);
+                thisRFLocal.LNTTS.dimension(thisRFLocal.numGFuncPairs, 0.0);
 
                 thisRF->GFNC.dimension(thisRF->numGFuncPairs, 0.0);
-	            thisRFLocal.GFNC.dimension(thisRFLocal.numGFuncPairs, 0.0);
+                thisRFLocal.GFNC.dimension(thisRFLocal.numGFuncPairs, 0.0);
 
                 int indexNum = 3;
                 for (int pairNum = 1; pairNum <= thisRF->numGFuncPairs; ++pairNum) {
                     thisRF->LNTTS(pairNum) = DataIPShortCuts::rNumericArgs(indexNum);
-	                thisRFLocal.LNTTS(pairNum) = DataIPShortCuts::rNumericArgs(indexNum);
+                    thisRFLocal.LNTTS(pairNum) = DataIPShortCuts::rNumericArgs(indexNum);
 
                     thisRF->GFNC(pairNum) = DataIPShortCuts::rNumericArgs(indexNum + 1);
-	                thisRFLocal.GFNC(pairNum) = DataIPShortCuts::rNumericArgs(indexNum + 1);
+                    thisRFLocal.GFNC(pairNum) = DataIPShortCuts::rNumericArgs(indexNum + 1);
                     indexNum += 2;
                 }
 
@@ -2871,19 +2870,19 @@ namespace GroundHeatExchangers {
                 GLHEVertArray thisArrayLocal;
 
                 thisArray->name = DataIPShortCuts::cAlphaArgs(1);
-	            thisArrayLocal.name = DataIPShortCuts::cAlphaArgs(1);
+                thisArrayLocal.name = DataIPShortCuts::cAlphaArgs(1);
 
                 thisArray->props = GetVertProps(DataIPShortCuts::cAlphaArgs(2));
-	            thisArrayLocal.props = GetVertProps(DataIPShortCuts::cAlphaArgs(2));
+                thisArrayLocal.props = GetVertProps(DataIPShortCuts::cAlphaArgs(2));
 
                 thisArray->numBHinXDirection = DataIPShortCuts::rNumericArgs(1);
-	            thisArrayLocal.numBHinXDirection = DataIPShortCuts::rNumericArgs(1);
+                thisArrayLocal.numBHinXDirection = DataIPShortCuts::rNumericArgs(1);
 
                 thisArray->numBHinYDirection = DataIPShortCuts::rNumericArgs(2);
-	            thisArrayLocal.numBHinYDirection = DataIPShortCuts::rNumericArgs(2);
+                thisArrayLocal.numBHinYDirection = DataIPShortCuts::rNumericArgs(2);
 
                 thisArray->bhSpacing = DataIPShortCuts::rNumericArgs(3);
-	            thisArrayLocal.bhSpacing = DataIPShortCuts::rNumericArgs(3);
+                thisArrayLocal.bhSpacing = DataIPShortCuts::rNumericArgs(3);
 
                 vertArrays.push_back(thisArray);
                 vertArraysLocal.push_back(thisArrayLocal);
