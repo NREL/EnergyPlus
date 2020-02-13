@@ -54,7 +54,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Optional.hh>
 #include <ObjexxFCL/Reference.hh>
@@ -977,44 +976,30 @@ int GetNumMeteredVariables(std::string const &ComponentType, // Given Component 
                            std::string const &ComponentName  // Given Component Name (user defined)
 );
 
-void GetMeteredVariablesOptional(std::string const &ComponentType,   // Given Component Type
-                         std::string const &ComponentName,           // Given Component Name (user defined)
-                         Array1S_int VarIndexes,                     // Variable Numbers
-                         Array1S_int VarTypes,                       // Variable Types (1=integer, 2=real, 3=meter)
-                         Array1A<OutputProcessor::TimeStepType> TimeStepTypes,  // Variable Index Types (1=Zone,2=HVAC),
-                         Array1A<OutputProcessor::Unit> unitsForVar, // units from enum for each variable
-                         Array1S_int ResourceTypes,                  // ResourceTypes for each variable
-                         Optional<Array1S_string> EndUses = _,       // EndUses for each variable
-                         Optional<Array1S_string> Groups = _,        // Groups for each variable
-                         Optional<Array1S_string> Names = _,         // Variable Names for each variable
-                         Optional_int NumFound = _,                  // Number Found
-                         Optional<Array1S_int> VarIDs = _            // Variable Report Numbers
-);
-
 void GetMeteredVariables(std::string const &ComponentType,                     // Given Component Type
                          std::string const &ComponentName,                     // Given Component Name (user defined)
-                         Array1S_int VarIndexes,                               // Variable Numbers
-                         Array1S_int VarTypes,                                 // Variable Types (1=integer, 2=real, 3=meter)
+                         Array1D_int &VarIndexes,                               // Variable Numbers
+                         Array1D_int &VarTypes,                                 // Variable Types (1=integer, 2=real, 3=meter)
                          Array1A<OutputProcessor::TimeStepType> TimeStepTypes, // Variable Index Types (1=Zone,2=HVAC),
                          Array1A<OutputProcessor::Unit> unitsForVar,           // units from enum for each variable
-                         Array1S_int ResourceTypes,                            // ResourceTypes for each variable
-                         Array1S_string EndUses,                               // EndUses for each variable
-                         Array1S_string Groups,                                // Groups for each variable
-                         Array1S_string Names,                                 // Variable Names for each variable
+                         Array1D_int &ResourceTypes,                            // ResourceTypes for each variable
+                         Array1D_string &EndUses,                               // EndUses for each variable
+                         Array1D_string &Groups,                                // Groups for each variable
+                         Array1D_string &Names,                                 // Variable Names for each variable
                          int &NumFound                                         // Number Found
 );
 
 void GetMeteredVariables(std::string const &ComponentType,                      // Given Component Type
                          std::string const &ComponentName,                      // Given Component Name (user defined)
-                         Array1S_int VarIndexes,                                // Variable Numbers
-                         Array1S_int VarTypes,                                  // Variable Types (1=integer, 2=real, 3=meter)
+                         Array1D_int &VarIndexes,                                // Variable Numbers
+                         Array1D_int &VarTypes,                                  // Variable Types (1=integer, 2=real, 3=meter)
                          Array1A<OutputProcessor::TimeStepType> TimeStepTypes,  // Variable Index Types (1=Zone,2=HVAC),
                          Array1A<OutputProcessor::Unit> unitsForVar,            // units from enum for each variable
-                         Array1S_int ResourceTypes,                             // ResourceTypes for each variable
-                         Array1S_string EndUses,                                // EndUses for each variable
-                         Array1S_string Groups,                                 // Groups for each variable
-                         Array1S_string Names,                                  // Variable Names for each variable
-                         Array1S_int VarIDs                                     // Variable Report Numbers
+                         Array1D_int &ResourceTypes,                             // ResourceTypes for each variable
+                         Array1D_string &EndUses,                                // EndUses for each variable
+                         Array1D_string &Groups,                                 // Groups for each variable
+                         Array1D_string &Names,                                  // Variable Names for each variable
+                         Array1D_int &VarIDs                                     // Variable Report Numbers
 );
 
 void GetVariableKeyCountandType(std::string const &varName,            // Standard variable name
@@ -1027,8 +1012,8 @@ void GetVariableKeyCountandType(std::string const &varName,            // Standa
 
 void GetVariableKeys(std::string const &varName, // Standard variable name
                      int const varType,          // 1=integer, 2=real, 3=meter
-                     Array1S_string keyNames,    // Specific key name
-                     Array1S_int keyVarIndexes   // Array index for
+                     Array1D_string &keyNames,   // Specific key name
+                     Array1D_int &keyVarIndexes  // Array index for
 );
 
 bool ReportingThisVariable(std::string const &RepVarName);
