@@ -87,7 +87,7 @@ namespace DataReportingFlags {
     int NumOfWarmupDays(0); // reinitialized for each environment.
     std::string cWarmupDay;
     bool DisplayPerfSimulationFlag(false);        // True when "Performing Simulation" should be displayed
-    bool DoWeatherInitReporting(false);           // Init reporting -- items that go onto OutputFileInits
+    bool DoWeatherInitReporting(false);           // Init reporting -- items that go onto OutputFileInits (eio)
     bool PrintEndDataDictionary(false);           // Flag for printing "End of Data Dictionary" on output files
     bool IgnoreInteriorWindowTransmission(false); // True when section "IgnoreInteriorWindowTransmission" is entered
     bool MakeMirroredDetachedShading(true);       // True (default) when Detached Shading Surfaces should be "mirrored"

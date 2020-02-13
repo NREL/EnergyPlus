@@ -63,7 +63,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-
+    class OutputFiles;
 namespace WeatherManager {
 
     // Using/Aliasing
@@ -686,7 +686,8 @@ namespace WeatherManager {
 
     void ResetEnvironmentCounter();
 
-    void GetNextEnvironment(bool &Available,  // true if there is another environment, false if the end
+    void GetNextEnvironment(OutputFiles &outputFiles,
+                            bool &Available,  // true if there is another environment, false if the end
                             bool &ErrorsFound // will be set to true if severe errors are found in inputs
     );
 
@@ -785,7 +786,7 @@ namespace WeatherManager {
                                   Real64 &RField27       // LiquidPrecip
     );
 
-    void SetUpDesignDay(int const EnvrnNum); // Environment number passed into the routine
+    void SetUpDesignDay(OutputFiles &outputFiles, int const EnvrnNum); // Environment number passed into the routine
 
     //------------------------------------------------------------------------------
 
@@ -833,7 +834,7 @@ namespace WeatherManager {
 
     void CloseWeatherFile();
 
-    void ResolveLocationInformation(bool &ErrorsFound); // Set to true if no location evident
+    void ResolveLocationInformation(OutputFiles &outputFiles, bool &ErrorsFound); // Set to true if no location evident
 
     void CheckLocationValidity();
 
@@ -843,7 +844,7 @@ namespace WeatherManager {
 
     void ReportWeatherAndTimeInformation(bool &PrintEnvrnStamp); // Set to true when the environment header should be printed
 
-    void ReadUserWeatherInput();
+    void ReadUserWeatherInput(OutputFiles &outputFiles);
 
     void GetRunPeriodData(int &TotRunPers, // Total number of Run Periods requested
                           bool &ErrorsFound);
@@ -865,9 +866,9 @@ namespace WeatherManager {
 
     void GetGroundTemps(bool &ErrorsFound);
 
-    void GetGroundReflectances(bool &ErrorsFound);
+    void GetGroundReflectances(OutputFiles &outputFiles, bool &ErrorsFound);
 
-    void GetSnowGroundRefModifiers(bool &ErrorsFound);
+    void GetSnowGroundRefModifiers(OutputFiles &outputFiles, bool &ErrorsFound);
 
     void GetWaterMainsTemperatures(bool &ErrorsFound);
 
@@ -878,7 +879,7 @@ namespace WeatherManager {
                                   Real64 const MonthlyOAAvgDryBulbTempMaxDiff // monthly daily average OA drybulb temperature maximum difference
     );
 
-    void GetWeatherStation(bool &ErrorsFound);
+    void GetWeatherStation(OutputFiles &outputFiles, bool &ErrorsFound);
 
     void DayltgCurrentExtHorizIllum();
 

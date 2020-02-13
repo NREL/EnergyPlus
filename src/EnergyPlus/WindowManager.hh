@@ -58,6 +58,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class OutputFiles;
 
 namespace WindowManager {
 
@@ -456,7 +457,7 @@ namespace WindowManager {
 
     //****************************************************************************
 
-    void ReportGlass();
+    void ReportGlass(OutputFiles &outputFiles);
 
     //*************************************************************************************
 
