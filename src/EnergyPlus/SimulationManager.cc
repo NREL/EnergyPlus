@@ -1170,25 +1170,80 @@ namespace SimulationManager {
         if (instances != inputProcessor->epJSON.end()) {
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
-                auto const &fields = instance.value();
+                auto const& fields = instance.value();
                 inputProcessor->markObjectAsUsed("PerformancePrecisionTradeoffs", instance.key());
                 if (fields.find("use_coil_direct_solutions") != fields.end()) {
                     DoCoilDirectSolutions =
-                        UtilityRoutines::MakeUPPERCase(fields.at("use_coil_direct_solutions"))=="YES";
+                        UtilityRoutines::MakeUPPERCase(fields.at("use_coil_direct_solutions")) == "YES";
                 }
                 if (fields.find("zone_radiant_exchange_algorithm") != fields.end()) {
                     HeatBalanceIntRadExchange::CarrollMethod =
-                        UtilityRoutines::MakeUPPERCase(fields.at("zone_radiant_exchange_algorithm"))=="CARROLLMRT";
+                        UtilityRoutines::MakeUPPERCase(fields.at("zone_radiant_exchange_algorithm")) == "CARROLLMRT";
                 }
-                if (fields.find("override_zone_time_step") != fields.end()) {
-                    if (UtilityRoutines::MakeUPPERCase(fields.at("override_zone_time_step")) == "YES") {
-                        ShowWarningError("Due to PerformancePrecisionTradeoffs the Number of TimeSteps has been changed to 1.");
+                bool overrideTimestep(false);
+                bool overrideZoneAirHeatBalAlg(false);
+                bool overrideMinNumWarmupDays(false);
+                bool overrideBeginEnvResetSuppress(false);
+                if (fields.find("override_mode") != fields.end()) {
+                    auto overrideModeValue = UtilityRoutines::MakeUPPERCase(fields.at("override_mode"));
+                    if (overrideModeValue == "NORMAL") {
+                        // no overrides
+                    }
+                    else if (overrideModeValue == "MODE01") {
+                        // Zone Time step (TimeStep object) will be set to one timestep per hour
+                        overrideTimestep = true;
+                    }
+                    else if (overrideModeValue == "MODE02") {
+                        // Mode01 plus ZoneAirHeatBalanceAlgorithm will be set to Euler
+                        overrideTimestep = true;
+                        overrideZoneAirHeatBalAlg = true;
+                    }
+                    else if (overrideModeValue == "MODE03") {
+                        // Mode02 plus Minimum Number of Warmup Days will be set to 1
+                        overrideTimestep = true;
+                        overrideZoneAirHeatBalAlg = true;
+                        overrideMinNumWarmupDays = true;
+                    }
+                    else if (overrideModeValue == "MODE04") {
+                        // Mode03 plus Begin Environment Reset Mode will be set to SuppressAllBeginEnvironmentResets
+                        overrideTimestep = true;
+                        overrideZoneAirHeatBalAlg = true;
+                        overrideMinNumWarmupDays = true;
+                        overrideBeginEnvResetSuppress = true;
+                    }
+                    else if (overrideModeValue == "MODE05") {
+                    }
+                    else if (overrideModeValue == "MODE06") {
+                    }
+                    else if (overrideModeValue == "MODE07") {
+                    }
+                    else if (overrideModeValue == "MODE08") {
+                    }
+                    else if (overrideModeValue == "MODE09") {
+                    }
+                    else if (overrideModeValue == "MODE10") {
+                    }
+                    else if (overrideModeValue == "ADVANCED") {
+                    }
+                    else {
+                        ShowSevereError("Invalid over ride mode specified in PerformancePrecisionTradeoffs object: " + overrideModeValue);
+                    }
+
+                    if (overrideTimestep) {
+                        ShowWarningError("Due to PerformancePrecisionTradeoffs Override Mode, the Number of TimeSteps has been changed to 1.");
                         NumOfTimeStepInHour = 1;
                     }
-                }
-                if (fields.find("override_zone_air_heat_balance_algorithm") != fields.end()) {
-                    if (UtilityRoutines::MakeUPPERCase(fields.at("override_zone_air_heat_balance_algorithm")) == "YES") {
+                    if (overrideZoneAirHeatBalAlg) {
+                        ShowWarningError("Due to PerformancePrecisionTradeoffs Override Mode, the ZoneAirHeatBalanceAlgorithm has been changed to EulerMethod.");
                         DataHeatBalance::OverrideZoneAirSolutionAlgo = true;
+                    }
+                    if (overrideMinNumWarmupDays) {
+                        ShowWarningError("Due to PerformancePrecisionTradeoffs Override Mode, the Minimum Number of Warmup Days has been changed to 1.");
+                        DataHeatBalance::MinNumberOfWarmupDays = 1;
+                    }
+                    if (overrideBeginEnvResetSuppress) {
+                        ShowWarningError("Due to PerformancePrecisionTradeoffs Override Mode, the Begin Environment Reset Mode has been changed to SuppressAllBeginEnvironmentResets.");
+                        DataEnvironment::forceBeginEnvResetSuppress = true;
                     }
                 }
             }
