@@ -608,7 +608,7 @@ namespace AirLoopHVACDOAS {
                     } else if (SELECT_CASE_var == "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED") {
                         OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) =
                             HVACHXAssistedCoolingCoil::GetCoilInletNode(CompType, CompName, InletNodeErrFlag);
-                        OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) =
+                        OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) =
                             HVACHXAssistedCoolingCoil::GetCoilOutletNode(CompType, CompName, OutletNodeErrFlag);
                     } else if (SELECT_CASE_var == "COILSYSTEM:COOLING:DX") {
                         OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) =
