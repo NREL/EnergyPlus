@@ -59,6 +59,7 @@
 #include <EnergyPlus/VariableSpeedCoils.hh>
 
 namespace EnergyPlus {
+    class OutputFiles;
 
 namespace WaterThermalTanks {
 
@@ -651,9 +652,9 @@ namespace WaterThermalTanks {
 
         void setupZoneInternalGains();
 
-        void setupChilledWaterTankOutputVars();
+        void setupChilledWaterTankOutputVars(OutputFiles &outputFiles);
 
-        void setupWaterHeaterOutputVars();
+        void setupWaterHeaterOutputVars(OutputFiles &outputFiles);
 
         void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
@@ -689,9 +690,9 @@ namespace WaterThermalTanks {
 
         void CalcWaterThermalTankMixed(); // Water Heater being simulated
 
-        void CalcStandardRatings();
+        void CalcStandardRatings(OutputFiles &outputFiles);
 
-        void ReportCWTankInits();
+        void ReportCWTankInits(OutputFiles &outputFiles);
 
         Real64 GetHPWHSensedTankTemp();
 
@@ -897,7 +898,7 @@ namespace WaterThermalTanks {
 
     bool getWaterTankStratifiedInput();
 
-    bool GetWaterThermalTankInput();
+    bool GetWaterThermalTankInput(OutputFiles &outputFiles);
 
     void CalcWaterThermalTankZoneGains();
 
