@@ -816,7 +816,7 @@ namespace WeatherManager {
         static constexpr auto EnvNameFormat("Environment,{},{},{},{},{},{},{},{},{},{},{},{},{}\n");
         static constexpr auto EnvDSTNFormat("Environment:Daylight Saving,No,{}\n");
         static constexpr auto EnvDSTYFormat("Environment:Daylight Saving,Yes,{},{},{}\n");
-       static ObjexxFCL::gio::Fmt DateFormat("(I2.2,'/',I2.2)");
+        static ObjexxFCL::gio::Fmt DateFormat("(I2.2,'/',I2.2)");
         static ObjexxFCL::gio::Fmt DateFormatwithYear("(I2.2,'/',I2.2,'/',I4.4)");
         static Array1D_string const SpecialDayNames(5, {"Holiday", "SummerDesignDay", "WinterDesignDay", "CustomDay1", "CustomDay2"});
         static Array1D_string const ValidDayNames(12,
