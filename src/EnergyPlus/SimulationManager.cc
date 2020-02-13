@@ -410,12 +410,12 @@ namespace SimulationManager {
             SetupNodeVarsForReporting();
             MetersHaveBeenInitialized = true;
             SetupPollutionMeterReporting();
+            SystemReports::AllocateAndSetUpVentReports();
             UpdateMeterReporting();
             CheckPollutionMeterReporting();
             facilityElectricServiceObj->verifyCustomMetersElecPowerMgr();
             SetupPollutionCalculations();
             InitDemandManagers();
-
             TestBranchIntegrity(ErrFound);
             if (ErrFound) TerminalError = true;
             TestAirPathIntegrity(ErrFound);
@@ -437,7 +437,6 @@ namespace SimulationManager {
                 //      CALL ReportCompSetMeterVariables
                 //      CALL ReportParentChildren
             }
-
             CreateEnergyReportStructure();
             bool anyEMSRan;
             ManageEMS(emsCallFromSetupSimulation, anyEMSRan); // point to finish setup processing EMS, sensor ready now
