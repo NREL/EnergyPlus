@@ -7909,7 +7909,8 @@ namespace DXCoils {
         // Call routine that computes AHRI certified rating for single-speed DX Coils
         if ((DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_CoolingSingleSpeed && DXCoil(DXCoilNum).CondenserType(1) == AirCooled) ||
             DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatingEmpirical) {
-            CalcDXCoilStandardRating(DXCoil(DXCoilNum).Name,
+            CalcDXCoilStandardRating(OutputFiles::getSingleton(),
+                                     DXCoil(DXCoilNum).Name,
                                      DXCoil(DXCoilNum).DXCoilType,
                                      DXCoil(DXCoilNum).DXCoilType_Num,
                                      1,
@@ -7931,7 +7932,8 @@ namespace DXCoils {
         }
         // Call routine that computes AHRI certified rating for multi-speed DX cooling Coils
         if (DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_MultiSpeedCooling || DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_MultiSpeedHeating) {
-            CalcDXCoilStandardRating(DXCoil(DXCoilNum).Name,
+            CalcDXCoilStandardRating(OutputFiles::getSingleton(),
+                                     DXCoil(DXCoilNum).Name,
                                      DXCoil(DXCoilNum).DXCoilType,
                                      DXCoil(DXCoilNum).DXCoilType_Num,
                                      DXCoil(DXCoilNum).NumOfSpeeds,
@@ -7948,7 +7950,8 @@ namespace DXCoils {
                                      DXCoil(DXCoilNum).MinOATCompressor,
                                      DXCoil(DXCoilNum).OATempCompressorOn,
                                      DXCoil(DXCoilNum).OATempCompressorOnOffBlank,
-                                     DXCoil(DXCoilNum).DefrostControl);
+                                     DXCoil(DXCoilNum).DefrostControl,
+                                     ObjexxFCL::Optional_bool_const());
         }
 
         // create predefined report entries

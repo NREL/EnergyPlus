@@ -241,7 +241,7 @@ void FiniteDiffGroundTempsModel::getWeatherData()
     WeatherManager::Envrn = originalNumOfEnvn;
     Available = true;
     ErrorsFound = false;
-    GetNextEnvironment(Available, ErrorsFound);
+    GetNextEnvironment(OutputFiles::getSingleton(), Available, ErrorsFound);
     if (ErrorsFound) {
         ShowFatalError("Site:GroundTemperature:Undisturbed:FiniteDifference: error in reading weather file data");
     }

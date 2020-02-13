@@ -896,7 +896,7 @@ namespace HVACVariableRefrigerantFlow {
 
     void SetCompFlowRate(int VRFTUNum, int VRFCond, Optional_bool_const UseCurrentMode = _);
 
-    void SizeVRF(int VRFTUNum);
+    void SizeVRF(OutputFiles &outputFiles, int const VRFTUNum);
 
     void SimVRF(int VRFTUNum,
                 bool FirstHVACIteration,
