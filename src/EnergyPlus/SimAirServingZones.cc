@@ -80,6 +80,8 @@
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
+#include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/Furnaces.hh>
@@ -197,6 +199,7 @@ namespace SimAirServingZones {
     int const CoilUserDefined(27);
     int const Fan_System_Object(28);
     int const UnitarySystemModel(29);
+    int const ZoneVRFasAirLoopEquip(30);
 
     // DERIVED TYPE DEFINITIONS:
     // na
@@ -1363,6 +1366,9 @@ namespace SimAirServingZones {
 
                         } else if (componentType == "AIRLOOPHVAC:UNITARYHEATPUMP:AIRTOAIR:MULTISPEED") {
                             PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = UnitarySystem_MSHeatPump;
+
+                        } else if ( componentType == "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW" ) {
+                            PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).CompType_Num = ZoneVRFasAirLoopEquip;
 
                         } else if (componentType == "FAN:ONOFF" || componentType == "COIL:COOLING:DX:SINGLESPEED" ||
                                    componentType == "COIL:HEATING:DX:SINGLESPEED" ||
@@ -3495,7 +3501,7 @@ namespace SimAirServingZones {
                              bool const FirstHVACIteration,          // TRUE if first full HVAC iteration in an HVAC timestep
                              int const AirLoopNum,                   // Primary air loop number
                              int &CompIndex,                         // numeric pointer for CompType/CompName -- passed back from other routines
-                             UnitarySystems::UnitarySys *CompPointer // equipment actual pointer
+                             HVACSystemData *CompPointer // equipment actual pointer
     )
     {
 
@@ -3543,16 +3549,14 @@ namespace SimAirServingZones {
 
         // SUBROUTINE LOCAL VARIABLE DEFINITIONS:
         Real64 QActual;
-        bool CoolingActive;
-        bool HeatingActive;
         int OAUnitNum = 0;           // used only for UnitarySystem call
         Real64 OAUCoilOutTemp = 0.0; // used only for UnitarySystem call
         bool ZoneEquipFlag = false;  // used only for UnitarySystem call
 
         // FLOW:
 
-        CoolingActive = false;
-        HeatingActive = false;
+        bool CoolingActive = false;
+        bool HeatingActive = false;
 
         {
             auto const SELECT_CASE_var(CompType_Num);
@@ -3630,8 +3634,19 @@ namespace SimAirServingZones {
                 SimCoilUserDefined(CompName, CompIndex, AirLoopNum, HeatingActive, CoolingActive);
 
             } else if (SELECT_CASE_var == UnitarySystemModel) { // 'AirLoopHVAC:UnitarySystem'
-                CompPointer->simulate(
-                    CompName, FirstHVACIteration, AirLoopNum, CompIndex, HeatingActive, CoolingActive, OAUnitNum, OAUCoilOutTemp, ZoneEquipFlag);
+                Real64 sensOut = 0.0;
+                Real64 latOut = 0.0;
+                CompPointer->simulate(CompName,
+                                      FirstHVACIteration,
+                                      AirLoopNum,
+                                      CompIndex,
+                                      HeatingActive,
+                                      CoolingActive,
+                                      OAUnitNum,
+                                      OAUCoilOutTemp,
+                                      ZoneEquipFlag,
+                                      sensOut,
+                                      latOut);
 
             } else if (SELECT_CASE_var == Furnace_UnitarySys_HeatOnly || SELECT_CASE_var == Furnace_UnitarySys_HeatCool) {
                 // 'AirLoopHVAC:Unitary:Furnace:HeatOnly', 'AirLoopHVAC:Unitary:Furnace:HeatCool',
@@ -3673,6 +3688,25 @@ namespace SimAirServingZones {
                                 AirLoopControlInfo(AirLoopNum).HighHumCtrlActive);
 
                 // Ducts
+            } else if (SELECT_CASE_var == ZoneVRFasAirLoopEquip) { // 'ZoneHVAC:TerminalUnit:VariableRefrigerantFlow'
+                int ControlledZoneNum = 0;
+                int const OAUnitNum = 0;
+                Real64 const OAUCoilOutTemp = 0.0;
+                bool const ZoneEquipment = false;
+                Real64 sysOut = 0.0;
+                Real64 latOut = 0.0;
+                HVACVariableRefrigerantFlow::SimulateVRF(CompName,
+                                                         FirstHVACIteration,
+                                                         ControlledZoneNum,
+                                                         CompIndex,
+                                                         HeatingActive,
+                                                         CoolingActive,
+                                                         OAUnitNum,
+                                                         OAUCoilOutTemp,
+                                                         ZoneEquipment,
+                                                         sysOut,
+                                                         latOut);
+
             } else if (SELECT_CASE_var == Duct) { // 'Duct'
                 SimDuct(CompName, FirstHVACIteration, CompIndex);
 

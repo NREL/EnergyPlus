@@ -22272,43 +22272,115 @@
     0.001,                   !- Heating Convergence Tolerance
     ;                        !- Availability Manager List Name
 
-!-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:UNCONTROLLED ===========
+!-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:NOREHEAT ===========
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     FrontLoungeFlr1 Direct Air,  !- Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
-    FrontLoungeFlr1 Zone Equip Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    FrontLoungeFlr1 Zone Equip Inlet ATInlet,  !- Air Inlet Node Name
+    FrontLoungeFlr1 Zone Equip Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    FrontLoungeFlr1 Direct Air ADU,  !- Name
+    FrontLoungeFlr1 Zone Equip Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    FrontLoungeFlr1 Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     RestRoomFlr1 Direct Air, !- Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
-    RestRoomFlr1 Zone Equip Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    RestRoomFlr1 Zone Equip Inlet ATInlet,  !- Air Inlet Node Name
+    RestRoomFlr1 Zone Equip Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    RestRoomFlr1 Direct Air ADU,  !- Name
+    RestRoomFlr1 Zone Equip Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    RestRoomFlr1 Direct Air, !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     MeetingRoomFlr1 Direct Air,  !- Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
-    MeetingRoomFlr1 Zone Equip Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    MeetingRoomFlr1 Zone Equip Inlet ATInlet,  !- Air Inlet Node Name
+    MeetingRoomFlr1 Zone Equip Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    MeetingRoomFlr1 Direct Air ADU,  !- Name
+    MeetingRoomFlr1 Zone Equip Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    MeetingRoomFlr1 Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     EmployeeLoungeFlr1 Direct Air,  !- Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
-    EmployeeLoungeFlr1 Zone Equip Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    EmployeeLoungeFlr1 Zone Equip Inlet ATInlet,  !- Air Inlet Node Name
+    EmployeeLoungeFlr1 Zone Equip Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    EmployeeLoungeFlr1 Direct Air ADU,  !- Name
+    EmployeeLoungeFlr1 Zone Equip Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    EmployeeLoungeFlr1 Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     ExerciseCenterFlr1 Direct Air,  !- Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
-    ExerciseCenterFlr1 Zone Equip Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    ExerciseCenterFlr1 Zone Equip Inlet ATInlet,  !- Air Inlet Node Name
+    ExerciseCenterFlr1 Zone Equip Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    ExerciseCenterFlr1 Direct Air ADU,  !- Name
+    ExerciseCenterFlr1 Zone Equip Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    ExerciseCenterFlr1 Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     FrontOfficeFlr1 Direct Air,  !- Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
-    FrontOfficeFlr1 Zone Equip Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    FrontOfficeFlr1 Zone Equip Inlet ATInlet,  !- Air Inlet Node Name
+    FrontOfficeFlr1 Zone Equip Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    FrontOfficeFlr1 Direct Air ADU,  !- Name
+    FrontOfficeFlr1 Zone Equip Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    FrontOfficeFlr1 Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:EQUIPMENTLIST ===========
 
@@ -22725,8 +22797,8 @@
   ZoneHVAC:EquipmentList,
     FrontLoungeFlr1 Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    FrontLoungeFlr1 Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    FrontLoungeFlr1 Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -22735,8 +22807,8 @@
   ZoneHVAC:EquipmentList,
     RestRoomFlr1 Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    RestRoomFlr1 Direct Air, !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    RestRoomFlr1 Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -22745,8 +22817,8 @@
   ZoneHVAC:EquipmentList,
     MeetingRoomFlr1 Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    MeetingRoomFlr1 Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    MeetingRoomFlr1 Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -22755,8 +22827,8 @@
   ZoneHVAC:EquipmentList,
     EmployeeLoungeFlr1 Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    EmployeeLoungeFlr1 Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    EmployeeLoungeFlr1 Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -22765,8 +22837,8 @@
   ZoneHVAC:EquipmentList,
     ExerciseCenterFlr1 Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    ExerciseCenterFlr1 Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    ExerciseCenterFlr1 Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -22775,8 +22847,8 @@
   ZoneHVAC:EquipmentList,
     FrontOfficeFlr1 Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    FrontOfficeFlr1 Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    FrontOfficeFlr1 Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -26107,24 +26179,24 @@
   AirLoopHVAC:ZoneSplitter,
     SAC_FrontOffice Zone Splitter,  !- Name
     SAC_FrontOffice Supply Path Inlet,  !- Inlet Node Name
-    FrontOfficeFlr1 Zone Equip Inlet;  !- Outlet 1 Node Name
+    FrontOfficeFlr1 Zone Equip Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     SAC_FrontLounge Zone Splitter,  !- Name
     SAC_FrontLounge Supply Path Inlet,  !- Inlet Node Name
-    FrontLoungeFlr1 Zone Equip Inlet;  !- Outlet 1 Node Name
+    FrontLoungeFlr1 Zone Equip Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     SAC_MeetingRoom Zone Splitter,  !- Name
     SAC_MeetingRoom Supply Path Inlet,  !- Inlet Node Name
-    MeetingRoomFlr1 Zone Equip Inlet;  !- Outlet 1 Node Name
+    MeetingRoomFlr1 Zone Equip Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     SAC_Exc_EmpLge_RestRm Zone Splitter,  !- Name
     SAC_Exc_EmpLge_RestRm Supply Path Inlet,  !- Inlet Node Name
-    RestRoomFlr1 Zone Equip Inlet,  !- Outlet 1 Node Name
-    EmployeeLoungeFlr1 Zone Equip Inlet,  !- Outlet 2 Node Name
-    ExerciseCenterFlr1 Zone Equip Inlet;  !- Outlet 3 Node Name
+    RestRoomFlr1 Zone Equip Inlet ATInlet,  !- Outlet 1 Node Name
+    EmployeeLoungeFlr1 Zone Equip Inlet ATInlet,  !- Outlet 2 Node Name
+    ExerciseCenterFlr1 Zone Equip Inlet ATInlet;  !- Outlet 3 Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:SUPPLYPATH ===========
 
