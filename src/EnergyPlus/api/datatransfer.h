@@ -91,6 +91,7 @@ ENERGYPLUSLIB_API Real64 getPluginTrendVariableAverage(int handle, int count);
 ENERGYPLUSLIB_API Real64 getPluginTrendVariableMin(int handle, int count);
 ENERGYPLUSLIB_API Real64 getPluginTrendVariableMax(int handle, int count);
 ENERGYPLUSLIB_API Real64 getPluginTrendVariableSum(int handle, int count);
+ENERGYPLUSLIB_API Real64 getPluginTrendVariableDirection(int handle, int count);
 
 // Then there are a plethora of specialty one-off EMSVariable values that need to be accessible
 // We could certainly add to this list

@@ -49,6 +49,8 @@ class AverageZoneTempAndTests(EnergyPlusPlugin):
             print("Trend max: " + str(trend_max))
             trend_sum = self.api.exchange.get_trend_sum(self.data["h_trend"], 5)
             print("Trend sum: " + str(trend_sum))
+            trend_direction = self.api.exchange.get_trend_direction(self.data['h_trend'], 5)
+            print("Trend direction: " + str(trend_direction))
         except:
             self.api.runtime.issue_severe("Problem getting trend min/max values, aborting")
             return False

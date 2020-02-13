@@ -169,7 +169,7 @@ namespace PluginManagement {
         Real64 getTrendVariableMin(int handle, int count);
         Real64 getTrendVariableMax(int handle, int count);
         Real64 getTrendVariableSum(int handle, int count);
-        Real64 getTrendDirection(int handle, int count);
+        Real64 getTrendVariableDirection(int handle, int count);
         void updatePluginValues();
 
         static int getLocationOfUserDefinedPlugin(std::string const &programName);
@@ -180,13 +180,17 @@ namespace PluginManagement {
         std::string name;
         int numVals;
         std::deque<Real64> values;
+        std::deque<Real64> times;
         int indexOfPluginVariable;
         PluginTrendVariable(std::string _name, int _numVals, int _indexOfPluginVariable) :
             name(std::move(_name)), numVals(_numVals), indexOfPluginVariable(_indexOfPluginVariable)
         {
             // initialize the deque so it can be queried immediately, even with just zeroes
             for (int i = 1; i <= this->numVals; i++) {
-                values.push_back(0);
+                this->values.push_back(0);
+            }
+            for (int loop = 1; loop <= _numVals; ++loop) {
+                this->times.push_back(-loop * DataGlobals::TimeStepZone);
             }
         }
     };

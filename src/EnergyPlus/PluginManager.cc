@@ -994,14 +994,22 @@ namespace PluginManagement {
 #endif
     }
 
-    Real64 PluginManager::getTrendDirection(int handle, int count) {
+    Real64 PluginManager::getTrendVariableDirection(int handle, int count) {
 #if LINK_WITH_PYTHON == 1
-//        auto &trend = trends[handle];
-//        Real64 numerator = sum(trend.TimeARR({1, thisIndex})) * sum(trend.TrendValARR({1, thisIndex})) -
-//                           thisIndex * sum((trend.TimeARR({1, thisIndex}) * trend.TrendValARR({1, thisIndex})));
-//        Real64 denominator = pow_2(sum(trend.TimeARR({1, thisIndex}))) - thisIndex * sum(pow(trend.TimeARR({1, thisIndex}), 2));
-//        return numerator / denominator;
-        return 0;
+        auto &trend = trends[handle];
+        Real64 timeSum = 0.0;
+        Real64 valueSum = 0.0;
+        Real64 crossSum = 0.0;
+        Real64 powSum = 0.0;
+        for (int i = 0; i < count; i++) {
+            timeSum += trend.times[i];
+            valueSum += trend.values[i];
+            crossSum += trend.times[i] * trend.values[i];
+            powSum += pow2(trend.times[i]);
+        }
+        Real64 numerator = timeSum * valueSum - count * crossSum;
+        Real64 denominator = pow_2(timeSum) - count * powSum;
+        return numerator / denominator;
 #endif
     }
 

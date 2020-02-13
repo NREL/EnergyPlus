@@ -105,6 +105,8 @@ class DataExchange:
         self.api.getPluginTrendVariableMax.restype = RealEP
         self.api.getPluginTrendVariableSum.argtypes = [c_int, c_int]
         self.api.getPluginTrendVariableSum.restype = RealEP
+        self.api.getPluginTrendVariableDirection.argtypes = [c_int, c_int]
+        self.api.getPluginTrendVariableDirection.restype = RealEP
 
     def list_available_api_data_csv(self) -> str:
         """
@@ -403,6 +405,11 @@ class DataExchange:
         if not self.running_as_python_plugin:
             raise EnergyPlusException("get_trend_sum is only available as part of a Python Plugin workflow")
         return self.api.getPluginTrendVariableSum(trend_handle, count)
+
+    def get_trend_direction(self, trend_handle: int, count: int) -> RealEP:
+        if not self.running_as_python_plugin:
+            raise EnergyPlusException("get_trend_direction is only available as part of a Python Plugin workflow")
+        return self.api.getPluginTrendVariableDirection(trend_handle, count)
 
     def year(self) -> int:
         """
