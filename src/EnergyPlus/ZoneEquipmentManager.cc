@@ -78,7 +78,6 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/DirectAirManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/EarthTube.hh>
@@ -3398,7 +3397,6 @@ namespace ZoneEquipmentManager {
         using DataHeatBalance::ZoneAirMassFlow;
         using DataHeatBalFanSys::NonAirSystemResponse;
         using DataHeatBalFanSys::SysDepZoneLoads;
-        using DirectAirManager::SimDirectAir;
         using ElectricBaseboardRadiator::SimElecBaseboard;
         using EvaporativeCoolers::SimZoneEvaporativeCoolerUnit;
         using FanCoilUnits::SimFanCoilUnit;
@@ -3459,7 +3457,6 @@ namespace ZoneEquipmentManager {
         Real64 LatOutputProvided; // latent output delivered by zone equipment (kg/s)
         Real64 AirSysOutput;
         Real64 NonAirSysOutput;
-        static Array1D_bool DirectAirAndAirTerminalWarningIssued; // only warn once for each zone with problems
 
         // Determine flow rate and temperature of supply air based on type of damper
 
@@ -3500,10 +3497,6 @@ namespace ZoneEquipmentManager {
                     }
                 }
             }
-        }
-
-        if (FirstCall && !allocated(DirectAirAndAirTerminalWarningIssued)) {
-            DirectAirAndAirTerminalWarningIssued.dimension(NumOfZones, false);
         }
 
         FirstCall = false;
@@ -3633,13 +3626,6 @@ namespace ZoneEquipmentManager {
 
                         NonAirSystemResponse(ActualZoneNum) += NonAirSysOutput;
                         SysOutputProvided = NonAirSysOutput + AirSysOutput;
-                    } else if (SELECT_CASE_var == DirectAir_Num) { // 'AirTerminal:SingleDuct:Uncontrolled'
-                        SimDirectAir(PrioritySimOrder(EquipTypeNum).EquipName,
-                                     ControlledZoneNum,
-                                     FirstHVACIteration,
-                                     SysOutputProvided,
-                                     LatOutputProvided,
-                                     ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
                     } else if (SELECT_CASE_var == VRFTerminalUnit_Num) { // 'ZoneHVAC:TerminalUnit:VariableRefrigerantFlow'
                         SimulateVRF(PrioritySimOrder(EquipTypeNum).EquipName,
                                     ControlledZoneNum,
@@ -4759,13 +4745,6 @@ namespace ZoneEquipmentManager {
                 AirLoopFlow(airLoop).RecircFlow += DataDefineEquip::AirDistUnit(airDistUnit).MassFlowRatePlenInd;
                 AirLoopFlow(airLoop).LeakFlow +=
                     DataDefineEquip::AirDistUnit(airDistUnit).MassFlowRateDnStrLk + DataDefineEquip::AirDistUnit(airDistUnit).MassFlowRateUpStrLk;
-            }
-        }
-        // Accumulate air loop supply flow here for use in CalcZoneMassBalance
-        for (int directAirUnit = 1; directAirUnit <= DirectAirManager::NumDirectAir; ++directAirUnit) {
-            int airLoop = DirectAirManager::DirectAir(directAirUnit).AirLoopNum;
-            if (airLoop > 0) {
-                AirLoopFlow(airLoop).SupFlow += Node(DirectAirManager::DirectAir(directAirUnit).ZoneSupplyAirNode).MassFlowRate;
             }
         }
 

@@ -14,13 +14,13 @@ Types of Zone equipment are listed below and shown below in figure ``Zone Equipm
 \begin{longtable}[c]{p{1.5in}p{4.5in}}
 \caption{Available Zone Equipment Types \label{table:available-zone-equipment-types}} \tabularnewline
 \toprule
-Air Distribution Equipment & AirTerminal:SingleDuct:Uncontrolled    AirTerminal:SingleDuct:ConstantVolume:Reheat    AirTerminal:SingleDuct:VAV:Reheat    AirTerminal:SingleDuct:VAV:NoReheat    AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan    AirTerminal:DualDuct:ConstantVolume    AirTerminal:DualDuct:VAV    Powered Induction Units (Series and Parallel) \tabularnewline
+Air Distribution Equipment & AirTerminal:SingleDuct:ConstantVolume:Reheat     AirTerminal:SingleDuct:ConstantVolume:NoReheat    AirTerminal:SingleDuct:VAV:Reheat    AirTerminal:SingleDuct:VAV:NoReheat    AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan    AirTerminal:DualDuct:ConstantVolume    AirTerminal:DualDuct:VAV    Powered Induction Units (Series and Parallel) \tabularnewline
 \midrule
 \endfirsthead
 
 \caption[]{Available Zone Equipment Types} \tabularnewline
 \toprule
-Air Distribution Equipment & AirTerminal:SingleDuct:Uncontrolled    AirTerminal:SingleDuct:ConstantVolume:Reheat    AirTerminal:SingleDuct:VAV:Reheat    AirTerminal:SingleDuct:VAV:NoReheat    AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan    AirTerminal:DualDuct:ConstantVolume    AirTerminal:DualDuct:VAV    Powered Induction Units (Series and Parallel) \tabularnewline
+Air Distribution Equipment & AirTerminal:SingleDuct:ConstantVolume:Reheat    AirTerminal:SingleDuct:ConstantVolume:NoReheat    AirTerminal:SingleDuct:VAV:Reheat    AirTerminal:SingleDuct:VAV:NoReheat    AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan    AirTerminal:DualDuct:ConstantVolume    AirTerminal:DualDuct:VAV    Powered Induction Units (Series and Parallel) \tabularnewline
 \midrule
 \endhead
 
@@ -201,7 +201,7 @@ The following HVAC equipment types are allowed as zone equipment. The component 
 
 The first list encountered in the \hyperref[zonehvacequipmentconnections]{ZoneHVAC:EquipmentConnections} statement is the ZoneHVAC:EquipmentList. This object lists all HVAC equipment serving the zone. Each item in the list has four fields associated with it: Object Type, Name, Cooling Sequence and Heating or No-Load Sequence The Object Type and Name identify the specific equipment object. Cooling Sequence and Heating or No-Load Sequence specify the order of simulation for zones with more than one type of HVAC equipment.
 
-Note that a \hyperref[zonehvacairdistributionunit]{ZoneHVAC:AirDistributionUnit} or \hyperref[airterminalsingleductuncontrolled]{AirTerminal:SingleDuct:Uncontrolled} must be listed in this statement if there is a forced air system serving the zone from an air loop.
+Note that a \hyperref[zonehvacairdistributionunit]{ZoneHVAC:AirDistributionUnit} must be listed in this statement if there is a forced air system serving the zone from an air loop.
 
 \subsubsection{Inputs}\label{inputs-2-048}
 
@@ -247,7 +247,6 @@ Legal Zone Equipment Types \tabularnewline
 \midrule
 \endhead
 
-AirTerminal:SingleDuct:Uncontrolled \tabularnewline
 Fan:ZoneExhaust \tabularnewline
 WaterHeater:HeatPump:PumpedCondenser \tabularnewline
 WaterHeater:HeatPump:WrappedCondenser \tabularnewline
@@ -313,18 +312,18 @@ Examples of this statement in an IDF are:
 
 
     ZoneHVAC:EquipmentList,
-      Zone1Equipment,                       !- Name
-      SequentialLoad,                       !- Load Distribution Scheme
-      AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-      Zone1DirectAir,                       !- Zone Equipment 1 Name
-      1,                                    !- Zone Equipment 1 Cooling Sequence
-      1,                                    !- Zone Equipment 1 Heating or No-Load Sequence
-      0.5,                                  !- Zone Equipment 1 Sequential Cooling Fraction
-      0.5,                                  !- Zone Equipment 1 Sequential Heating Fraction
-      ZoneHVAC:WaterToAirHeatPump,  !- Zone Equipment 2 Object Type
-      Zone1WTAHP,                           !- Zone Equipment 2 Name
-      2,                                    !- Zone Equipment 2 Cooling Sequence
-      2,                                    !- Zone Equipment 2 Heating or No-Load Sequence
-      0.5,                                  !- Zone Equipment 2 Sequential Cooling Fraction
-      0.5;                                  !- Zone Equipment 2 Sequential Heating Fraction
+      Zone1Equipment,                !- Name
+      SequentialLoad,                !- Load Distribution Scheme
+      ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+      Zone1TermReheat,               !- Zone Equipment 1 Name
+      1,                             !- Zone Equipment 1 Cooling Sequence
+      1,                             !- Zone Equipment 1 Heating or No-Load Sequence
+      0.5,                           !- Zone Equipment 1 Sequential Cooling Fraction
+      0.5,                           !- Zone Equipment 1 Sequential Heating Fraction
+      ZoneHVAC:WaterToAirHeatPump,   !- Zone Equipment 2 Object Type
+      Zone1WTAHP,                    !- Zone Equipment 2 Name
+      2,                             !- Zone Equipment 2 Cooling Sequence
+      2,                             !- Zone Equipment 2 Heating or No-Load Sequence
+      0.5,                           !- Zone Equipment 2 Sequential Cooling Fraction
+      0.5;                           !- Zone Equipment 2 Sequential Heating Fraction
 \end{lstlisting}
