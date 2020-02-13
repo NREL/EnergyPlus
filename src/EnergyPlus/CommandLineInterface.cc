@@ -59,6 +59,7 @@
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/OutputReports.hh>
@@ -385,7 +386,7 @@ namespace CommandLineInterface {
         outputAuditFileName = outputFilePrefix + normalSuffix + ".audit";
         outputBndFileName = outputFilePrefix + normalSuffix + ".bnd";
         outputDxfFileName = outputFilePrefix + normalSuffix + ".dxf";
-        outputEioFileName = outputFilePrefix + normalSuffix + ".eio";
+        OutputFiles::getSingleton().eio.fileName = outputFilePrefix + normalSuffix + ".eio";
         outputEndFileName = outputFilePrefix + normalSuffix + ".end";
         outputErrFileName = outputFilePrefix + normalSuffix + ".err";
         outputEsoFileName = outputFilePrefix + normalSuffix + ".eso";

@@ -72,6 +72,7 @@
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -180,7 +181,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVReheat_GetInputTest)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput();  // read schedules
+    ProcessScheduleInput(OutputFiles::getSingleton());  // read schedules
 
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -310,7 +311,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuct4PipeInduction_GetInputTest)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput();  // read schedules
+    ProcessScheduleInput(OutputFiles::getSingleton());  // read schedules
 
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -399,7 +400,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVHeatCool_GetInputTest)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput();  // read schedules
+    ProcessScheduleInput(OutputFiles::getSingleton());  // read schedules
 
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -522,7 +523,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheatVarSpeedFan_GetInputTest
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput();  // read schedules
+    ProcessScheduleInput(OutputFiles::getSingleton());  // read schedules
 
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -619,7 +620,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheat_NormalActionTest)
 
     NumOfTimeStepInHour = 1;
     MinutesPerTimeStep = 60;
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     bool ErrorsFound(false);
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -784,7 +785,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFan_DamperPositionTest)
 
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ScheduleManager::ProcessScheduleInput();
+    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
