@@ -90,7 +90,6 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/DirectAirManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EconomicLifeCycleCost.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
@@ -106,6 +105,7 @@
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
 #include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
@@ -181,7 +181,6 @@ namespace OutputReportTabular {
     using DataGlobals::ksRunPeriodWeather;
     using DataGlobals::NumOfZones;
     using DataGlobals::OutputFileDebug;
-    using DataGlobals::OutputFileInits;
     using DataGlobals::SecInHour;
     using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZone;
@@ -768,7 +767,7 @@ namespace OutputReportTabular {
             OutputReportTabularAnnual::GetInputTabularAnnual();
             OutputReportTabularAnnual::checkAggregationOrderForAnnual();
             GetInputTabularTimeBins();
-            GetInputTabularStyle();
+            GetInputTabularStyle(OutputFiles::getSingleton());
             GetInputOutputTableSummaryReports();
             // noel -- noticed this was called once and very slow -- sped up a little by caching keys
             InitializeTabularMonthly();
@@ -1741,7 +1740,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void GetInputTabularStyle()
+    void GetInputTabularStyle(OutputFiles &outputFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -1896,13 +1895,13 @@ namespace OutputReportTabular {
         }
 
         if (WriteTabularFiles) {
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Tabular Report>,Style,Unit Conversion";
+            print(outputFiles.eio, "! <Tabular Report>,Style,Unit Conversion\n");
             if (AlphArray(1) != "HTML") {
                 ConvertCaseToLower(AlphArray(1), AlphArray(2));
                 AlphArray(1).erase(1);
                 AlphArray(1) += AlphArray(2).substr(1);
             }
-            ObjexxFCL::gio::write(OutputFileInits, "('Tabular Report,',A,',',A)") << AlphArray(1) << AlphArray(2);
+            print(outputFiles.eio, "Tabular Report,{},{}\n", AlphArray(1), AlphArray(2));
         }
     }
 
@@ -5105,8 +5104,6 @@ namespace OutputReportTabular {
         using DataHeatBalance::ZoneWinHeatLossRep;
         using DataHeatBalance::ZoneWinHeatLossRepEnergy;
         using DataHVACGlobals::TimeStepSys;
-        using DirectAirManager::DirectAir;
-        using DirectAirManager::NumDirectAir;
         using General::DetermineMinuteForReporting;
         using General::EncodeMonDayHrMin;
         using LowTempRadiantSystem::CFloRadSys;
@@ -5231,17 +5228,6 @@ namespace OutputReportTabular {
                 ZonePreDefRep(curZone).SHGSAnHvacATUCl -= AirDistUnit(iunit).CoolGain;
                 ATUHeat(curZone) = AirDistUnit(iunit).HeatRate;
                 ATUCool(curZone) = -AirDistUnit(iunit).CoolRate;
-            }
-        }
-        iunit = 0;
-        for (iunit = 1; iunit <= NumDirectAir; ++iunit) {
-            // HVAC equipment should already have the multipliers included, no "* mult" needed (assumes autosized or multiplied hard-sized air flow).
-            curZone = DirectAir(iunit).ZoneNum;
-            if ((curZone > 0) && (curZone <= NumOfZones)) {
-                ZonePreDefRep(curZone).SHGSAnHvacATUHt += DirectAir(iunit).HeatEnergy;
-                ZonePreDefRep(curZone).SHGSAnHvacATUCl -= DirectAir(iunit).CoolEnergy;
-                ATUHeat(curZone) += DirectAir(iunit).HeatRate;
-                ATUCool(curZone) -= DirectAir(iunit).CoolRate;
             }
         }
         curZone = 0;
@@ -5695,7 +5681,7 @@ namespace OutputReportTabular {
             WriteSurfaceShadowing();
             WriteCompCostTable();
             WriteAdaptiveComfortTable();
-            WriteEioTables();
+            WriteEioTables(OutputFiles::getSingleton());
             WriteLoadComponentSummaryTables();
             WriteHeatEmissionTable();
 
@@ -11821,7 +11807,7 @@ namespace OutputReportTabular {
 
     // Parses the contents of the EIO (initializations) file and creates subtables for each type of record in the tabular output files
     // Glazer - November 2016
-    void WriteEioTables()
+    void WriteEioTables(OutputFiles &outputFiles)
     {
 
         if (displayEioSummary) {
@@ -11834,26 +11820,19 @@ namespace OutputReportTabular {
             // setting up  report header
             WriteReportHeaders("Initialization Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
 
-            // since the EIO initilization file is open at this point must close it to read it and then reopen afterward.
-            ObjexxFCL::gio::close(OutputFileInits);
-
-            std::ifstream eioFile;
-            eioFile.open(DataStringGlobals::outputEioFileName);
             std::vector<std::string> headerLines; // holds the lines that describe each type of records - each starts with ! symbol
             std::vector<std::string> bodyLines;   // holds the data records only
-            std::string line;
-            while (std::getline(eioFile, line)) {
+            for (auto const &line : outputFiles.eio.getLines()) {
                 if (line.at(0) == '!') {
                     headerLines.push_back(line);
                 } else {
                     if (line.at(0) == ' ') {
-                        bodyLines.push_back(line.erase(0, 1)); // remove leading space
+                        bodyLines.push_back(line.substr(1)); // remove leading space
                     } else {
                         bodyLines.push_back(line);
                     }
                 }
             }
-            eioFile.close();
 
             // now go through each header and create a report for each one
             for (auto headerLine : headerLines) {
@@ -11932,16 +11911,6 @@ namespace OutputReportTabular {
                 }
             }
 
-            // reopen the EIO initilization file and position it at the end of the file so that additional writes continue to be added at the end.
-            int write_stat;
-            {
-                IOFlags flags;
-                flags.ACTION("write");
-                flags.STATUS("UNKNOWN");
-                flags.POSITION("APPEND");
-                ObjexxFCL::gio::open(OutputFileInits, DataStringGlobals::outputEioFileName, flags);
-                write_stat = flags.ios();
-            }
             // as of Oct 2016 only the <Program Control Information:Threads/Parallel Sims> section is written after this point
         }
     }
@@ -12204,7 +12173,7 @@ namespace OutputReportTabular {
         // need for reporting  DEALLOCATE(decayCurveHeat)
     }
 
-    void ComputeLoadComponentDecayCurve()
+    void ComputeLoadComponentDecayCurve(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -12305,53 +12274,27 @@ namespace OutputReportTabular {
 
         if (ShowDecayCurvesInEIO) {
             // show the line definition for the decay curves
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Radiant to Convective Decay Curves for Cooling>,Zone Name, Surface Name, Time "
-                                                 "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36";
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Radiant to Convective Decay Curves for Heating>,Zone Name, Surface Name, Time "
-                                                 "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36";
+            print(outputFiles.eio,  "! <Radiant to Convective Decay Curves for Cooling>,Zone Name, Surface Name, Time "
+                                    "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36");
             // Put the decay curve into the EIO file
             for (int iZone = 1; iZone <= NumOfZones; ++iZone) {
                 ZoneData &zd(Zone(iZone));
                 for (int kSurf = zd.SurfaceFirst; kSurf <= zd.SurfaceLast; ++kSurf) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, "(4A)", flags)
-                            << "Radiant to Convective Decay Curves for Cooling," << Zone(iZone).Name << ',' << Surface(kSurf).Name;
-                    }
+                    print(outputFiles.eio, "{},{},{}", "Radiant to Convective Decay Curves for Cooling", Zone(iZone).Name, Surface(kSurf).Name);
                     for (int jTime = 1; jTime <= min(NumOfTimeStepInHour * 24, 36); ++jTime) {
-                        {
-                            IOFlags flags;
-                            flags.ADVANCE("NO");
-                            ObjexxFCL::gio::write(OutputFileInits, "(A,F6.3)", flags) << ',' << decayCurveCool(jTime, kSurf);
-                        }
+                        print(outputFiles.eio, ",{:6.3F}", decayCurveCool(jTime, kSurf));
                     }
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("YES");
-                        ObjexxFCL::gio::write(OutputFileInits, "()", flags);
-                    } // put a line feed at the end of the line
+                    // put a line feed at the end of the line
+                    print(outputFiles.eio, "\n");
                 }
 
                 for (int kSurf = zd.SurfaceFirst; kSurf <= zd.SurfaceLast; ++kSurf) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, "(4A)", flags)
-                            << "Radiant to Convective Decay Curves for Heating," << Zone(iZone).Name << ',' << Surface(kSurf).Name;
-                    }
+                    print(outputFiles.eio, "{},{},{}", "Radiant to Convective Decay Curves for Heating", Zone(iZone).Name, Surface(kSurf).Name);
                     for (int jTime = 1; jTime <= min(NumOfTimeStepInHour * 24, 36); ++jTime) {
-                        {
-                            IOFlags flags;
-                            flags.ADVANCE("NO");
-                            ObjexxFCL::gio::write(OutputFileInits, "(A,F6.3)", flags) << ',' << decayCurveHeat(jTime, kSurf);
-                        }
+                        print(outputFiles.eio, ",{:6.3F}", decayCurveHeat(jTime, kSurf));
                     }
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("YES");
-                        ObjexxFCL::gio::write(OutputFileInits, "()", flags);
-                    } // put a line feed at the end of the line
+                    // put a line feed at the end of the line
+                    print(outputFiles.eio, "\n");
                 }
             }
         }

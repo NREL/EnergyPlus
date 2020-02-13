@@ -414,7 +414,6 @@ namespace DataHVACGlobals {
     extern int const ZoneEquipTypeOf_RefrigerationChillerSet;
     extern int const ZoneEquipTypeOf_FanZoneExhaust;
     extern int const ZoneEquipTypeOf_WaterHeaterHeatPump;
-    extern int const ZoneEquipTypeOf_AirTerminalSingleDuctUncontrolled;
     extern int const ZoneEquipTypeOf_AirTerminalDualDuctConstantVolume;
     extern int const ZoneEquipTypeOf_AirTerminalDualDuctVAV;
     extern int const ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeReheat;

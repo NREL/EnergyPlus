@@ -66,6 +66,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -125,7 +126,7 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
 
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(); // read schedules
+    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton()); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
@@ -296,7 +297,7 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
 
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(); // read schedules
+    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton()); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
@@ -2476,8 +2477,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
     Real64 ZoneDesTemp = FinalZoneSizing(1).ZoneTempAtHeatPeak;
     Real64 ZoneDesHumRat = FinalZoneSizing(1).ZoneHumRatAtHeatPeak;
 
-    Real64 DesCoilLoad =
-        DesZoneHeatLoad + Psychrometrics::PsyCpAirFnWTdb(ZoneDesHumRat, 0.5 * (CoilInTemp + ZoneDesTemp)) * DesMassFlow * (ZoneDesTemp - CoilInTemp);
+    Real64 DesCoilLoad = DesZoneHeatLoad + Psychrometrics::PsyCpAirFnW(ZoneDesHumRat) * DesMassFlow * (ZoneDesTemp - CoilInTemp);
 
     EXPECT_EQ(CoilInTemp, 16.0);
     EXPECT_EQ(DesZoneHeatLoad, 0.0);
