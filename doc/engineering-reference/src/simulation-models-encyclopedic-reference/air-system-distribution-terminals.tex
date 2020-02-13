@@ -92,11 +92,11 @@ The reheat version of this terminal unit requires additional information. The na
 The simulation begins by determining the air mass flow rate required to satisfy the heating/cooling demand.
 
 \begin{equation}
-C{p_{zone}} = PsyCpAirFnWTdb\left( {{\omega_{zone}},{T_{zone}}} \right)
+C{p_{zone}} = PsyCpAirFnW\left( {{\omega_{zone}}} \right)
 \end{equation}
 
 \begin{equation}
-C{p_{inlet}} = PsyCpAirFnWTdb\left( {{\omega_{inlet}},{T_{inlet}}} \right)
+C{p_{inlet}} = PsyCpAirFnW\left( {{\omega_{inlet}}} \right)
 \end{equation}
 
 \begin{equation}
@@ -125,7 +125,7 @@ where:
 
 \(\dot m\) = Terminal unit air mass flow rate, kg/s
 
-\(PsyCpAirFnWTdb\) = Psychrometric function calculating air specific heat given air humidity ratio and dry-bulb temperature
+\(PsyCpAirFnW\) = Psychrometric function calculating air specific heat given air humidity ratio
 
 \(MinAirFlowFrac\) = User-specified zone minimum air flow fraction
 
@@ -784,11 +784,11 @@ When sizing for the cooling design load, the following design values are set for
 \end{equation}
 
 \begin{equation}
-  {c_{p,Z}} = {PsyCpAirFnWTdb ({w_{Z,cool,design } },  {T_{Z,cool,design } }  ) }
+  {c_{p,Z}} = {PsyCpAirFnW ({w_{Z,cool,design}})}
 \end{equation}
 
 \begin{equation}
-  {c_{p,SA}} = {PsyCpAirFnWTdb ( {w_{SA,cool,design } },  {T_{SA,cool,design } }   ) }
+  {c_{p,SA}} = {PsyCpAirFnW ( {w_{SA,cool,design } }) }
 \end{equation}
 
 \begin{equation}
@@ -828,11 +828,11 @@ When sizing for the heating design load, the following design values are set for
 \end{equation}
 
 \begin{equation}
-  {c_{p,Z}} = {PsyCpAirFnWTdb ({w_{Z,heat,design } },  {T_{Z,heat,design } }  ) }
+  {c_{p,Z}} = {PsyCpAirFnW({w_{Z,heat,design } }) }
 \end{equation}
 
 \begin{equation}
-  {c_{p,SA}} = {PsyCpAirFnWTdb ( {w_{SA,heat,design } },  {T_{SA,heat,design } }   ) }
+  {c_{p,SA}} = {PsyCpAirFnW ( {w_{SA,heat,design } }) }
 \end{equation}
 
 \begin{equation}
@@ -1079,11 +1079,11 @@ This dual duct air terminal may also be used to provide a minimum outdoor air qu
 The simulation begins by determining the air mass flow rate required to satisfy the heating/cooling demand using either the heating duct or cooling duct.
 
 \begin{equation}
-C_{p,zone} = PsyCpAirFnWTdb\left( {\omega_{zone}},{T_{zone}} \right)
+C_{p,zone} = PsyCpAirFnW\left( {\omega_{zone}} \right)
 \end{equation}
 
 \begin{equation}
-C_{p,inlet} = PsyCpAirFnWTdb\left( {\omega_{inlet}},{T_{inlet}} \right)
+C_{p,inlet} = PsyCpAirFnW\left( {\omega_{inlet}} \right)
 \end{equation}
 
 \begin{equation}
@@ -1112,7 +1112,7 @@ where
 
 \(\dot m\) is the terminal unit air mass flow rate through either heating or cooling duct, kg/s
 
-\(PsyCpAirFnWTdb\) is the psychrometric function calculating air specific heat given air humidity ratio and dry-bulb temperature
+\(PsyCpAirFnW\) is the psychrometric function calculating air specific heat given air humidity ratio
 
 \(MinAirFlowFrac\) is the user-specified zone minimum air flow fraction
 
@@ -1161,15 +1161,15 @@ The outdoor air rate is controlled by the schedule and specifications contained 
 The recirculated cool air flow rate is controlled to meet the zone cooling loads.~ The first step is to calculate the impact that the outdoor air flow has on the loads starting with the specific heats.
 
 \begin{equation}
-{c_{p,zone}} = PsyCpAirFnWTdb\left( {{\omega_{zone}},{T_{zone}}} \right)
+{c_{p,zone}} = PsyCpAirFnW\left( {{\omega_{zone}}} \right)
 \end{equation}
 
 \begin{equation}
-{c_{p,OA}} = PsyCpAirFnWTdb\left( {{\omega_{OA}},{T_{OA}}} \right)
+{c_{p,OA}} = PsyCpAirFnW\left( {{\omega_{OA}}} \right)
 \end{equation}
 
 \begin{equation}
-{c_{p,RC}} = PsyCpAirFnWTdb\left( {{\omega_{RC}},{T_{RC}}} \right)
+{c_{p,RC}} = PsyCpAirFnW\left( {{\omega_{RC}}} \right)
 \end{equation}
 
 where:
@@ -1192,7 +1192,7 @@ where:
 
 \(T_{RC}\) is the air drybulb temperature of the recirculated cool air entering the terminal unit, \(^{\circ}\)C
 
-\(PsyCpAirFnWTdb\) is a psychrometric function for calculating the specific heat of moist air as a function of humidity ratio and drybulb temperature.
+\(PsyCpAirFnW\) is a psychrometric function for calculating the specific heat of moist air as a function of humidity ratio.
 
 The contribution to zone load provided by the outdoor air toward meeting the cooling setpoint, \({\dot Q_{OA}}\) (W), is then calculated using:
 

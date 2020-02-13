@@ -6470,7 +6470,7 @@
     Set Temp = 20.0,         !- Program Line 2
     Set Humrat = 0.009,      !- <none>
     Set rhoAir = @RhoAirFnPbTdbW Pressure Temp humrat,  !- <none>
-    Set cpAir = @CpAirFnWtdb Humrat Temp,  !- <none>
+    Set cpAir = @CpAirFnW Humrat,  !- <none>
     Set hfgAir = @HfgAirFnWTdb Humrat Temp,  !- <none>
     set hgAir = @HgAirFnWTdb humrat Temp,  !- <none>
     set wetbulb = @TwbFnTdbWPb temp humrat pressure,  !- <none>
