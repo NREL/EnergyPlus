@@ -676,7 +676,6 @@ add_subdirectory(AirflowNetwork)
 if(LINK_WITH_PYTHON)
   # check the python bit version here...if we are building against Python it has to match up bitwise
   # if we aren't, then the identified interpreter can be whatever bit it wants
-  execute_process(COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/cmake/PythonGetBitSize.py" OUTPUT_VARIABLE PYTHON_BIT_SIZE)
   if(MSVC)
     execute_process(COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/cmake/PythonGetBitSize.py" OUTPUT_VARIABLE PYTHON_BIT_SIZE)
     if(("${PYTHON_BIT_SIZE}" STREQUAL "64") AND NOT ("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "Win64"))
