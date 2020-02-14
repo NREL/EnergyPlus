@@ -145,12 +145,6 @@
 
   Timestep,6;
 
-  ConvergenceLimits,
-    1,                       !- Minimum System Timestep {minutes}
-    20,                      !- Maximum HVAC Iterations
-    10,                       !- Minimum Plant Iterations
-    10;                      !- Maximum Plant Iterations
-
 !-   ===========  ALL OBJECTS IN CLASS: SITE:LOCATION ===========
 
   Site:Location,
@@ -3806,3 +3800,4 @@
   Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
 
   Output:Meter:MeterFileOnly,Gas:Plant,runperiod;
+

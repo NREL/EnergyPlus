@@ -187,12 +187,6 @@
 
 ! CHICAGO_IL_USA Annual Cooling 1% Design Conditions, MaxDB=  31.5°C MCWB=  23.0°C
 
-ConvergenceLimits,
-  1,                       !- Minimum System Timestep {minutes}
-  20,                      !- Maximum HVAC Iterations
-  10,                       !- Minimum Plant Iterations
-  10;                      !- Maximum Plant Iterations
-
   SizingPeriod:DesignDay,
     CHICAGO_IL_USA Annual Cooling 1% Design Conditions DB/MCWB,  !- Name
     7,                       !- Month
@@ -3806,3 +3800,4 @@ ConvergenceLimits,
   Output:Meter:MeterFileOnly,Gas:Facility,runperiod;
 
   Output:Meter:MeterFileOnly,Gas:Plant,runperiod;
+
