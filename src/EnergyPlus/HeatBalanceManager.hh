@@ -53,10 +53,10 @@
 #include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
-#include "OutputFiles.hh"
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class OutputFiles;
 
 namespace HeatBalanceManager {
 
