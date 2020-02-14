@@ -94,6 +94,10 @@
     25,                      !- Maximum Number of Warmup Days
     6;                       !- Minimum Number of Warmup Days
 
+  PerformancePrecisionTradeoffs,
+    Yes,                      !- Use Coil Direct Solutions
+    CarrollMRT;               !- Zone Radiant Exchange Algorithm
+
   RunPeriod,
     Run Period 1,            !- Name
     1,                       !- Begin Month

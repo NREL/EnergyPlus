@@ -1216,4 +1216,3 @@
     ENDIF;                   !- <none>
 
   Output:Variable,*,PUE,Hourly;
-

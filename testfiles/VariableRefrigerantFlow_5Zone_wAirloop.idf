@@ -616,6 +616,39 @@
     ,                        !- Supplemental Heating Coil Name
     ;                        !- Maximum Supply Air Temperature from Supplemental Heater {C}
 
+  ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
+    TU5inAirloop,            !- Zone Terminal Unit Name
+    VRFAvailSched,           !- Terminal Unit Availability Schedule
+    Airloop Mixed Air Outlet,   !- Terminal Unit Air Inlet Node Name
+    Airloop Fan Outlet Node,!- Terminal Unit Air Outlet Node Name
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- No Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
+    autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
+    VRFFanSchedule,          !- Supply Air Fan Operating Mode Schedule Name
+    drawthrough,             !- Supply Air Fan Placement
+    Fan:SystemModel,         !- Supply Air Fan Object Type
+    TU5 VRF Supply Fan,      !- Supply Air Fan Object Name
+    OutdoorAir:Mixer,        !- Outside Air Mixer Object Type
+    TU5 OA Mixer,            !- Outside Air Mixer Object Name
+    COIL:Cooling:DX:VariableRefrigerantFlow,  !- Cooling Coil Object Type
+    TU5 VRF DX Cooling Coil, !- Cooling Coil Object Name
+    COIL:Heating:DX:VariableRefrigerantFlow,  !- Heating Coil Object Type
+    TU5 VRF DX Heating Coil, !- Heating Coil Object Name
+    30,                      !- Zone Terminal Unit On Parasitic Electric Energy Use {W}
+    20,                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}
+    ,                        !- Rated Heating Capacity Sizing Ratio {W/W}
+    ,                        !- Availability Manager List Name
+    ,                        !- Design Specification ZoneHVAC Sizing Object Name
+    ,                        !- Supplemental Heating Coil Object Type
+    ,                        !- Supplemental Heating Coil Name
+    ,                        !- Maximum Supply Air Temperature from Supplemental Heater {C}
+    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation
+    SPACE5-1;                !- Controlling Zone or Thermostat Location
+
   Sizing:System,
     Main Airloop,            !- AirLoop Name
     Total,                   !- Type of Load to Size On
@@ -990,6 +1023,39 @@
     ,                        !- Minimum Fraction of Outdoor Air Schedule Name
     ,                        !- Maximum Fraction of Outdoor Air Schedule Name
     ;                        !- Mechanical Ventilation Controller Name
+
+  ZoneHVAC:TerminalUnit:VariableRefrigerantFlow,
+    TU6inOASystem,           !- Zone Terminal Unit Name
+    VRFAvailSched,           !- Terminal Unit Availability Schedule
+    Airloop Outdoor Air Inlet,  !- Terminal Unit Air Inlet Node Name
+    TU6 Outlet Node to Mixer,     !- Terminal Unit Air Outlet Node Name
+    autosize,                !- Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- No Cooling Supply Air Flow Rate {m3/s}
+    autosize,                !- Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- No Heating Supply Air Flow Rate {m3/s}
+    autosize,                !- Cooling Outdoor Air Flow Rate {m3/s}
+    autosize,                !- Heating Outdoor Air Flow Rate {m3/s}
+    autosize,                !- No Load Outdoor Air Flow Rate {m3/s}
+    ,                        !- Supply Air Fan Operating Mode Schedule Name
+    ,                        !- Supply Air Fan Placement
+    ,                        !- Supply Air Fan Object Type
+    ,                        !- Supply Air Fan Object Name
+    ,                        !- Outside Air Mixer Object Type
+    ,                        !- Outside Air Mixer Object Name
+    COIL:Cooling:DX:VariableRefrigerantFlow,  !- Cooling Coil Object Type
+    TU6 OA VRF DX Cooling Coil, !- Cooling Coil Object Name
+    COIL:Heating:DX:VariableRefrigerantFlow,  !- Heating Coil Object Type
+    TU6 OA VRF DX Heating Coil, !- Heating Coil Object Name
+    30,                      !- Zone Terminal Unit On Parasitic Electric Energy Use {W}
+    20,                      !- Zone Terminal Unit Off Parasitic Electric Energy Use {W}
+    ,                        !- Rated Heating Capacity Sizing Ratio
+    ,                        !- Availability Manager List Name
+    ,                        !- Design Specification ZoneHVAC Sizing Object Name
+    ,                        !- Supplemental Heating Coil Object Type
+    ,                        !- Supplemental Heating Coil Name
+    ,                        !- Maximum Supply Air Temperature from Supplemental Heater
+    ,                        !- Maximum Outdoor Dry-Bulb Temperature for Supplemental Heater Operation
+    ;                        !- Controlling Zone or Thermostat Location
 
   COIL:Cooling:DX:VariableRefrigerantFlow,
     TU6 OA VRF DX Cooling Coil,  !- Name

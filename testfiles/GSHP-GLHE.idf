@@ -3652,22 +3652,6 @@
 
   Output:Variable,*,Heat Pump Source Side Mass Flow Rate,timestep;
 
-  Output:Variable,*,Heat Pump Load Side Heat Transfer Rate,timestep;
-
-  Output:Variable,*,Heat Pump Source Side Heat Transfer Rate,timestep;
-
-  Output:Variable,*,Heat Pump Load Side Inlet Temperature,timestep;
-
-  Output:Variable,*,Heat Pump Load Side Outlet Temperature,timestep;
-
-  Output:Variable,*,Heat Pump Source Side Inlet Temperature,timestep;
-
-  Output:Variable,*,Heat Pump Source Side Outlet Temperature,timestep;
-
-  Output:Variable,*,Heat Pump Load Side Mass Flow Rate,timestep;
-
-  Output:Variable,*,Heat Pump Source Side Mass Flow Rate,timestep;
-
   Output:Variable,*,Ground Heat Exchanger Average Borehole Temperature,timestep;
 
   Output:Variable,*,Ground Heat Exchanger Inlet Temperature,timestep;
