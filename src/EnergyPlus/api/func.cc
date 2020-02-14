@@ -141,10 +141,10 @@ Real64 psyHFnTdbW(Real64 const TDB, Real64 const dW) {
     // humidity ratio
     return EnergyPlus::Psychrometrics::PsyHFnTdbW_fast(TDB, dW);
 }
-Real64 psyCpAirFnWTdb(Real64 const dw, Real64 const T) {
+Real64 psyCpAirFnW(Real64 const dw) {
     // humidity ratio {kgWater/kgDryAir}
     // input temperature {Celsius}
-    return EnergyPlus::Psychrometrics::PsyCpAirFnWTdb_fast(dw, T);
+    return EnergyPlus::Psychrometrics::PsyCpAirFnW(dw);
 }
 Real64 psyTdbFnHW(Real64 const H, Real64 const dW) {
     // enthalpy {J/kg}

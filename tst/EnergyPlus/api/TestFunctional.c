@@ -138,7 +138,7 @@ int main() {
     Real64 vaporDensity = psyRhovFnTdbWPb(24, 0.009, 101325);
     Real64 vaporDensity_2 = psyRhovFnTdbRh(24, 0.5);
     printf("C API Test: Expected VapDensity ~ 0.0107 kg/m3; Calculated: %8.4f, %8.4f\n", vaporDensity, vaporDensity_2);
-    Real64 cp = psyCpAirFnWTdb(0.009, 24);
+    Real64 cp = psyCpAirFnW(0.009);
     printf("C API Test: Expected Cp ~ 1007 J/kgK; Calculated: %8.4f\n", cp);
     Real64 energy = psyHfgAirFnWTdb(24);
     printf("C API Test: Calculated energy?: %8.4f\n", energy);

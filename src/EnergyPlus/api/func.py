@@ -115,8 +115,8 @@ class Psychrometrics:
         self.api.psyHgAirFnWTdb.restype = RealEP
         self.api.psyHFnTdbW.argtypes = [RealEP, RealEP]
         self.api.psyHFnTdbW.restype = RealEP
-        self.api.psyCpAirFnWTdb.argtypes = [RealEP, RealEP]
-        self.api.psyCpAirFnWTdb.restype = RealEP
+        self.api.psyCpAirFnW.argtypes = [RealEP]
+        self.api.psyCpAirFnW.restype = RealEP
         self.api.psyTdbFnHW.argtypes = [RealEP, RealEP]
         self.api.psyTdbFnHW.restype = RealEP
         self.api.psyRhovFnTdbWPb.argtypes = [RealEP, RealEP, RealEP]
@@ -165,8 +165,8 @@ class Psychrometrics:
     def enthalpy_b(self, dry_bulb_temp: float, relative_humidity_fraction: float, barometric_pressure: float) -> float:
         return self.api.psyHFnTdbRhPb(dry_bulb_temp, relative_humidity_fraction, barometric_pressure)
 
-    def specific_heat(self, humidity_ratio: float, dry_bulb_temp: float) -> float:
-        return self.api.psyCpAirFnWTdb(humidity_ratio, dry_bulb_temp)
+    def specific_heat(self, humidity_ratio: float) -> float:
+        return self.api.psyCpAirFnW(humidity_ratio)
 
     def dry_bulb(self, enthalpy: float, humidity_ratio: float) -> float:
         return self.api.psyTdbFnHW(enthalpy, humidity_ratio)
