@@ -70,7 +70,7 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -3195,7 +3195,6 @@ namespace SystemReports {
                             // Get complete list of components for complex branches
                             if (IsParentObject(TypeOfComp, NameOfComp)) {
 
-                                thisComp.Parent = true;
                                 NumChildren = GetNumChildren(TypeOfComp, NameOfComp);
 
                                 SubCompTypes.allocate(NumChildren);
@@ -3235,7 +3234,6 @@ namespace SystemReports {
 
                             } else {
                                 NumChildren = 0;
-                                thisComp.Parent = false;
                             }
                             thisComp.NumSubComps = NumChildren;
 

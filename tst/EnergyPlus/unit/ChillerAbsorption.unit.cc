@@ -56,7 +56,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/ChillerAbsorption.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/SimulationManager.hh>
 
