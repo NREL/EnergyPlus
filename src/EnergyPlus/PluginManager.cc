@@ -377,6 +377,9 @@ namespace PluginManagement {
         for (auto & plugin: plugins) {
             plugin.shutdown(); // clear unmanaged memory first
         }
+        trends.clear();
+        globalVariableNames.clear();
+        globalVariableValues.clear();
         plugins.clear();
         pluginManager.reset(); // delete the current plugin manager instance, which was created in simulation manager, this clean up Python
         PluginManagement::fullyReady = false;
