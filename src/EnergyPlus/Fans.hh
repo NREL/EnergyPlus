@@ -364,6 +364,10 @@ namespace Fans {
                         bool &ErrorsFound           // set to true if problem
     );
 
+    int getFanInNodeIndex(int const &FanIndex, // fan index
+                          bool &ErrorsFound    // set to true if problem
+    );
+        
     int GetFanOutletNode(std::string const &FanType, // must match fan types in this module
                          std::string const &FanName, // must match fan names for the fan type
                          bool &ErrorsFound           // set to true if problem

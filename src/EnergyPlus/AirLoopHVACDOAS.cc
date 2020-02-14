@@ -65,6 +65,7 @@
 #include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/Humidifiers.hh>
@@ -658,13 +659,17 @@ namespace AirLoopHVACDOAS {
 
                     } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM") {
                         OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) =
-                            OutsideAirSys(thisDOAS.m_OASystemNum).compPointer[CompNum]->AirInNode;
+                            OutsideAirSys(thisDOAS.m_OASystemNum)
+                                .compPointer[CompNum]
+                                ->getAirInNode(OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), 0);
                         if (OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) == 0) {
                             InletNodeErrFlag = true;
                             errorsFound = true;
                         }
                         OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) =
-                            OutsideAirSys(thisDOAS.m_OASystemNum).compPointer[CompNum]->AirOutNode;
+                            OutsideAirSys(thisDOAS.m_OASystemNum)
+                                .compPointer[CompNum]
+                                ->getAirOutNode(OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), 0);
                         if (OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) == 0) {
                             OutletNodeErrFlag = true;
                             errorsFound = true;
@@ -783,6 +788,16 @@ namespace AirLoopHVACDOAS {
                         if (errorsFound) InletNodeErrFlag = true;
                         OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) =
                             EvaporativeCoolers::GetOutletNodeNum(OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), errorsFound);
+                        if (errorsFound) OutletNodeErrFlag = true;
+                    } else if (SELECT_CASE_var == "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW") {
+                        OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) = HVACVariableRefrigerantFlow::GetVRFTUInAirNodeFromName(
+                            OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), errorsFound);
+                        if (errorsFound) {
+                            InletNodeErrFlag = true;
+                            errorsFound = false;
+                        }
+                        OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) = HVACVariableRefrigerantFlow::GetVRFTUOutAirNodeFromName(
+                            OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), errorsFound);
                         if (errorsFound) OutletNodeErrFlag = true;
                     } else {
                         ShowSevereError(CurrentModuleObject + " = \"" + CompName + "\" invalid Outside Air Component=\"" +

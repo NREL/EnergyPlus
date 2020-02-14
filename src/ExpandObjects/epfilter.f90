@@ -13331,11 +13331,7 @@ DO iZone = 1, numCompactZoneUnit
   CALL CreateNewObj('ZoneHVAC:EquipmentConnections')
   CALL AddToObjFld('Zone Name', base +  uzNameOff,'')
   CALL AddToObjFld('Zone Conditioning Equipment List Name', base +  uzNameOff,' Equipment')
-  IF (isZnSupPlenumBlank) THEN
-    CALL AddToObjFld('Zone Air Inlet Node or NodeList Name', base + uzNameOff,' Zone Equip Inlet')
-  ELSE
-    CALL AddToObjFld('Zone Air Inlet Node or NodeList Name', base +  uzNameOff,' Supply Inlet')
-  END IF
+  CALL AddToObjFld('Zone Air Inlet Node or NodeList Name', base +  uzNameOff,' Supply Inlet')
   CALL AddToObjStr('Zone Air Exhaust Node or NodeList Name','')
   CALL AddToObjFld('Zone Air Node Name', base +  uzNameOff,' Zone Air Node')
   IF (isZnRetPlenumBlank) THEN
@@ -13350,7 +13346,7 @@ DO iZone = 1, numCompactZoneUnit
     CALL AddToObjFld('Zone Name', base + uzZoneSupplyPlenumNameOff,'')
     CALL AddToObjFld('Zone Node Name', base + uzZoneSupplyPlenumNameOff,' Zone Air Node')
     CALL AddToObjFld('Inlet Node Name', base + uzNameOff,' Zone Equip Inlet')
-    CALL AddToObjFld('Outlet Node Name', base + uzNameOff,' Supply Inlet',.TRUE.)
+    CALL AddToObjFld('Outlet Node Name', base + uzNameOff,' Terminal Unit Inlet',.TRUE.)
   END IF
   IF (.NOT. isZnRetPlenumBlank) THEN
     CALL CreateNewObj('AirLoopHVAC:ReturnPlenum')
@@ -13365,8 +13361,8 @@ DO iZone = 1, numCompactZoneUnit
   CALL CreateNewObj('ZoneHVAC:EquipmentList')
   CALL AddToObjFld('Name', base +  uzNameOff,' Equipment')
   CALL AddToObjStr('Load Distribution Scheme','SequentialLoad')
-  CALL AddToObjStr('Zone Equipment Object Type','AirTerminal:SingleDuct:Uncontrolled')
-  CALL AddToObjFld('Zone Equipment Name', base +  uzNameOff,' Air Terminal')
+  CALL AddToObjStr('Zone Equipment Object Type','ZoneHVAC:AirDistributionUnit')
+  CALL AddToObjFld('Zone Equipment Name', base +  uzNameOff,' ATU')
   CALL AddToObjStr('Zone Equipment Cooling Sequence','1')
   SELECT CASE (baseboardKind)
     CASE (baseboardNone)
@@ -13390,18 +13386,27 @@ DO iZone = 1, numCompactZoneUnit
   END SELECT
   CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
   CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',.TRUE.)
-  !DIRECT AIR
-  CALL CreateNewObj('AirTerminal:SingleDuct:Uncontrolled')
-  CALL AddToObjFld('Name', base +  uzNameOff,' Air Terminal')
-  CALL AddToObjStr('Availability Schedule Name',' ')
+  !AIR DISTRIBUTION UNIT
+  CALL CreateNewObj('ZoneHVAC:AirDistributionUnit')
+  CALL AddToObjFld('Name', base +  uzNameOff,' ATU')
+  CALL AddToObjFld('Air Distribution Unit Outlet Node Name', base +  uzNameOff,' Supply Inlet')
+  CALL AddToObjStr('Air Terminal Object Type','AirTerminal:SingleDuct:ConstantVolume:NoReheat')
+  CALL AddToObjFld('Air Terminal Name', base +  uzNameOff,' CV',.TRUE.)
+
+  !AirTerminal:SingleDuct:ConstantVolume:NoReheat
+  CALL CreateNewObj('AirTerminal:SingleDuct:ConstantVolume:NoReheat')
+  CALL AddToObjFld('Name', base +  uzNameOff,' CV')
+  CALL AddToObjStr('Availability Schedule Name','')
   IF (isZnSupPlenumBlank) THEN
-    CALL AddToObjFld('Zone Supply Air Node Name', base + uzNameOff,' Zone Equip Inlet')
+    CALL AddToObjFld('Air Inlet Node Name', base + uzNameOff,' Zone Equip Inlet')
   ELSE
-    CALL AddToObjFld('Zone Supply Air Node Name', base + uzNameOff,' Supply Inlet')
+    CALL AddToObjFld('Air Inlet Node Name', base + uzNameOff,' Terminal Unit Inlet')
   END IF
-  !CR8001
-  !CALL AddToObjFld('Maximum air flow rate {m3/s}', base + uzSupplyMaxRateOff,' ',.TRUE.)
-  CALL AddToObjStr('Maximum air flow rate {m3/s}', 'autosize',.TRUE.)
+  CALL AddToObjFld('Air Outlet Node Name', base + uzNameOff,' Supply Inlet')
+  CALL AddToObjStr('Maximum air flow rate {m3/s}', 'autosize')
+  CALL AddToObjStr('Design Specification Outdoor Air Object Name', '')
+  CALL AddToObjStr('Per Person Ventilation Rate Mode', '',.TRUE.)
+
   !Baseboards
   SELECT CASE (baseboardKind)
     CASE (baseboardHotWater)
@@ -14373,11 +14378,7 @@ DO iSys = 1, numCompactSysUnit
   CALL AddToObjStr('maximum supply air temperature {C}','45')
   CALL AddToObjFld('Control Zone Name', base + usControlZoneOff,'')
   CALL AddToObjFld('Zone Node Name', base + usControlZoneOff,' Zone Air Node')
-  IF (isControlZonePlenumBlank) THEN
-    CALL AddToObjFld('Zone Inlet Node Name', base + usControlZoneOff,' Zone Equip Inlet')
-  ELSE
-    CALL AddToObjFld('Zone Inlet Node Name', base + usControlZoneOff,' Supply Inlet')
-  END IF
+  CALL AddToObjFld('Zone Inlet Node Name', base + usControlZoneOff,' Supply Inlet')
   CALL AddToObjFld('Setpoint Node or NodeList Name', base + usAirHandlerNameOff,' Air Loop Outlet',.TRUE.)
   !SET POINT MANAGER:MIXED AIR
   CALL CreateNewObj('SetpointManager:MixedAir')
@@ -15307,11 +15308,7 @@ DO iSys = 1, numCompactSysUnitHP
   CALL AddToObjStr('maximum supply air temperature {C}','45')
   CALL AddToObjFld('Control Zone Name', base + uhpsControlZoneOff,'')
   CALL AddToObjFld('Zone Node Name', base + uhpsControlZoneOff,' Zone Air Node')
-  IF (isControlZonePlenumBlank) THEN
-    CALL AddToObjFld('Zone Inlet Node Name', base + uhpsControlZoneOff,' Zone Equip Inlet')
-  ELSE
-    CALL AddToObjFld('Zone Inlet Node Name', base + uhpsControlZoneOff,' Supply Inlet')
-  END IF
+  CALL AddToObjFld('Zone Inlet Node Name', base + uhpsControlZoneOff,' Supply Inlet')
   CALL AddToObjFld('Setpoint Node or NodeList Name', base + uhpsAirHandlerNameOff,' Air Loop Outlet',.TRUE.)
   !Object ==> SetpointManager:MixedAir
   CALL CreateNewObj('SetpointManager:MixedAir')
@@ -17779,11 +17776,7 @@ DO iSys = 1, numCompactSysUnitarySystem
   CALL AddToObjStr('maximum supply air temperature {C}','45')
   CALL AddToObjFld('Control Zone Name', base + ussControlZoneOff,'')
   CALL AddToObjFld('Zone Node Name', base + ussControlZoneOff,' Zone Air Node')
-  IF (isControlZonePlenumBlank) THEN
-    CALL AddToObjFld('Zone Inlet Node Name', base + ussControlZoneOff,' Zone Equip Inlet')
-  ELSE
-    CALL AddToObjFld('Zone Inlet Node Name', base + ussControlZoneOff,' Supply Inlet')
-  END IF
+  CALL AddToObjFld('Zone Inlet Node Name', base + ussControlZoneOff,' Supply Inlet')
   CALL AddToObjFld('Setpoint Node or NodeList Name', base + ussAirHandlerNameOff,TRIM(unitOutlet),.TRUE.)
   !Object ==> SetpointManager:MixedAir
   CALL CreateNewObj('SetpointManager:MixedAir')
@@ -18568,11 +18561,7 @@ DO iZone = 1, numCompactZoneConstVol
   CALL CreateNewObj('ZoneHVAC:EquipmentConnections')
   CALL AddToObjFld('Zone Name', base +  cvzNameOff,'')
   CALL AddToObjFld('Zone Conditioning Equipment List Name', base +  cvzNameOff,' Equipment')
-  IF ((reheatCoilType .EQ. ctNone) .AND. (isZoneSupPlenBlank)) THEN
-    CALL AddToObjFld('Zone Air Inlet Node or NodeList Name', base +  cvzNameOff,' Zone Equip Inlet')
-  ELSE
-    CALL AddToObjFld('Zone Air Inlet Node or NodeList Name', base +  cvzNameOff,' Supply Inlet')
-  END IF
+  CALL AddToObjFld('Zone Air Inlet Node or NodeList Name', base +  cvzNameOff,' Supply Inlet')
   CALL AddToObjStr('Zone Air Exhaust Node or NodeList Name','')
   CALL AddToObjFld('Zone Air Node Name', base +  cvzNameOff,' Zone Air Node')
   IF (isZoneRetPlenBlank) THEN
@@ -18607,13 +18596,8 @@ DO iZone = 1, numCompactZoneConstVol
   CALL CreateNewObj('ZoneHVAC:EquipmentList')
   CALL AddToObjFld('Name', base +  cvzNameOff,' Equipment')
   CALL AddToObjStr('Load Distribution Scheme','SequentialLoad')
-  IF (reheatCoilType .EQ. ctNone) THEN
-    CALL AddToObjStr('Zone Equipment Object Type','AirTerminal:SingleDuct:Uncontrolled')
-    CALL AddToObjFld('Zone Equipment Name', base +  cvzNameOff,' Air Terminal')
-  ELSE
-    CALL AddToObjStr('Zone Equipment Object Type','ZoneHVAC:AirDistributionUnit')
-    CALL AddToObjFld('Zone Equipment Name', base +  cvzNameOff,' ATU')
-  END IF
+  CALL AddToObjStr('Zone Equipment Object Type','ZoneHVAC:AirDistributionUnit')
+  CALL AddToObjFld('Zone Equipment Name', base +  cvzNameOff,' ATU')
   CALL AddToObjStr('Zone Equipment Cooling Sequence','1')
   SELECT CASE (baseboardKind)
     CASE (baseboardNone)
@@ -18637,26 +18621,33 @@ DO iZone = 1, numCompactZoneConstVol
   END SELECT
   CALL AddToObjStr('Zone Equipment Sequential Cooling Fraction Schedule Name','',.FALSE.)
   CALL AddToObjStr('Zone Equipment Sequential Heating Fraction Schedule Name','',.TRUE.)
-  !AIR DISTRIBUTION UNIT ~ line 72
+  !AIR DISTRIBUTION UNIT
+  CALL CreateNewObj('ZoneHVAC:AirDistributionUnit')
+  CALL AddToObjFld('Name', base +  cvzNameOff,' ATU')
+  CALL AddToObjFld('Air Distribution Unit Outlet Node Name', base +  cvzNameOff,' Supply Inlet')
   IF (reheatCoilType .EQ. ctNone) THEN
-    CALL CreateNewObj('AirTerminal:SingleDuct:Uncontrolled')
-    CALL AddToObjFld('Name', base +  cvzNameOff,' Air Terminal')
-    CALL AddToObjStr('Availability Schedule Name','')
-    IF (isZoneSupPlenBlank) THEN
-      CALL AddToObjFld('Zone Supply Air Node Name', base + cvzNameOff,' Zone Equip Inlet')
-    ELSE
-      CALL AddToObjFld('Zone Supply Air Node Name', base + cvzNameOff,' Supply Inlet')
-    END IF
-    CALL AddToObjStr('Maximum air flow rate {m3/s}', 'autosize',.TRUE.)
+    CALL AddToObjStr('Air Terminal Object Type','AirTerminal:SingleDuct:ConstantVolume:NoReheat')
+    CALL AddToObjFld('Air Terminal Name', base +  cvzNameOff,' CV',.TRUE.)
   ELSE
-    CALL CreateNewObj('ZoneHVAC:AirDistributionUnit')
-    CALL AddToObjFld('Name', base +  cvzNameOff,' ATU')
-    CALL AddToObjFld('Air Distribution Unit Outlet Node Name', base +  cvzNameOff,' Supply Inlet')
     CALL AddToObjStr('Air Terminal Object Type','AirTerminal:SingleDuct:ConstantVolume:Reheat')
     CALL AddToObjFld('Air Terminal Name', base +  cvzNameOff,' CV Reheat',.TRUE.)
   END IF
-  !This object if cvzReheatTypeOff=Hot Water
-  IF (.NOT. reheatCoilType .EQ. ctNone) THEN
+
+  IF (reheatCoilType .EQ. ctNone) THEN
+    !AirTerminal:SingleDuct:ConstantVolume:NoReheat
+    CALL CreateNewObj('AirTerminal:SingleDuct:ConstantVolume:NoReheat')
+    CALL AddToObjFld('Name', base +  cvzNameOff,' CV')
+    CALL AddToObjStr('Availability Schedule Name','')
+    IF (isZoneSupPlenBlank) THEN
+      CALL AddToObjFld('Air Inlet Node Name', base + cvzNameOff,' Zone Equip Inlet')
+    ELSE
+      CALL AddToObjFld('Air Inlet Node Name', base + cvzNameOff,' Terminal Unit Inlet')
+    END IF
+    CALL AddToObjFld('Air Outlet Node Name', base + cvzNameOff,' Supply Inlet')
+    CALL AddToObjStr('Maximum air flow rate {m3/s} ', 'autosize')
+    CALL AddToObjStr('Design Specification Outdoor Air Object Name', '')
+    CALL AddToObjStr('Per Person Ventilation Rate Mode', '',.TRUE.)
+  ELSE
     !AirTerminal:SingleDuct:ConstantVolume:Reheat
     CALL CreateNewObj('AirTerminal:SingleDuct:ConstantVolume:Reheat')
     CALL AddToObjFld('Name', base +  cvzNameOff,' CV Reheat')
@@ -19431,12 +19422,7 @@ DO iSys = 1, numCompactSysConstVol
       END IF
       CALL AddToObjFld('Control Zone Name', base + cvsCoolControlZoneOff,'')
       CALL AddToObjFld('Zone Node Name', base + cvsCoolControlZoneOff,' Zone Air Node')
-      IF ((FldVal(coolCtrlZoneBase + cvzZoneSupplyPlenumNameOff) .EQ. '') .AND. &
-          (FldVal(coolCtrlZoneBase + cvzReheatTypeOff) .EQ. 'None')) THEN
-        CALL AddToObjFld('Zone Inlet Node Name', base + cvsCoolControlZoneOff,' Zone Equip Inlet')
-      ELSE
-        CALL AddToObjFld('Zone Inlet Node Name', base + cvsCoolControlZoneOff,' Supply Inlet')
-      END IF
+      CALL AddToObjFld('Zone Inlet Node Name', base + cvsCoolControlZoneOff,' Supply Inlet')
     END IF
     IF (supFanPlacement .EQ. sfpDrawThru) THEN
       CALL AddToObjStr('Setpoint Node or NodeList Name', TRIM(airloopOutlet),.TRUE.)
@@ -19774,12 +19760,7 @@ DO iSys = 1, numCompactSysConstVol
       CALL AddToObjFld('Maximum Supply Air Temperature {C}', base + cvsHeatSetPtDesignOff,'')
       CALL AddToObjFld('Control Zone Name', base + cvsheatControlZoneOff,'')
       CALL AddToObjFld('Zone Node Name', base + cvsheatControlZoneOff,' Zone Air Node')
-      IF ((FldVal(heatCtrlZoneBase + cvzZoneSupplyPlenumNameOff) .EQ. '') .AND. &
-          (FldVal(heatCtrlZoneBase + cvzReheatTypeOff) .EQ. 'None')) THEN
-        CALL AddToObjFld('Zone Inlet Node Name', base + cvsheatControlZoneOff,' Zone Equip Inlet')
-      ELSE
-        CALL AddToObjFld('Zone Inlet Node Name', base + cvsheatControlZoneOff,' Supply Inlet')
-      END IF
+      CALL AddToObjFld('Zone Inlet Node Name', base + cvsheatControlZoneOff,' Supply Inlet')
     END IF
     IF (supFanPlacement .EQ. sfpDrawThru) THEN
       CALL AddToObjFld('Setpoint Node or NodeList Name', base + cvsAirHandlerNameOff,' Supply Path Inlet',.TRUE.)
