@@ -55,6 +55,9 @@ namespace EnergyPlus {
 
 TEST_F(EnergyPlusFixture, TestTrendVariable)
 {
+
+#ifdef LINK_WITH_PYTHON
+#if LINK_WITH_PYTHON == 1
     // create a plugin manager instance
     EnergyPlus::PluginManagement::PluginManager pluginManager;
 
@@ -87,6 +90,8 @@ TEST_F(EnergyPlusFixture, TestTrendVariable)
     EXPECT_NEAR(fakeValues[1], pluginManager.getTrendVariableValue(trendVarIndex, 1), 0.001);
     EXPECT_NEAR(fakeValues[0], pluginManager.getTrendVariableValue(trendVarIndex, 2), 0.001);
     EXPECT_DOUBLE_EQ(0.0, pluginManager.getTrendVariableValue(trendVarIndex, 3));
-
+#endif
+#endif
+    
 }
 } // namespace EnergyPlus
