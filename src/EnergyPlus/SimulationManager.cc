@@ -1212,18 +1212,25 @@ namespace SimulationManager {
                         overrideBeginEnvResetSuppress = true;
                     }
                     else if (overrideModeValue == "MODE05") {
-                    }
-                    else if (overrideModeValue == "MODE06") {
-                    }
-                    else if (overrideModeValue == "MODE07") {
-                    }
-                    else if (overrideModeValue == "MODE08") {
-                    }
-                    else if (overrideModeValue == "MODE09") {
-                    }
-                    else if (overrideModeValue == "MODE10") {
+                        // Mode04 plus internal variable MaxZoneTempDiff will be set to 1.00
+                        overrideTimestep = true;
+                        overrideZoneAirHeatBalAlg = true;
+                        overrideMinNumWarmupDays = true;
+                        overrideBeginEnvResetSuppress = true;
+                        DataConvergParams::MaxZoneTempDiff = 1.0;
                     }
                     else if (overrideModeValue == "ADVANCED") {
+                        bool advancedModeUsed = false;
+                        if (fields.find("maxzonetempdiff") != fields.end()) { // not required field, has default value
+                            DataConvergParams::MaxZoneTempDiff = fields.at("maxzonetempdiff");
+                            ShowWarningError("PerformancePrecisionTradeoffs using the Advanced Override Mode, MaxZoneTempDiff set to: " + RoundSigDigits(DataConvergParams::MaxZoneTempDiff, 4));
+                            advancedModeUsed = true;
+                        }
+                        if (advancedModeUsed) {
+                            ShowContinueError("...Care should be used when using the Advanced Overrude Mode. Results may be signficantly different than a simulation not using this mode.");
+                        } else {
+                            ShowWarningError("PerformancePrecisionTradeoffs using the Advanced Override Mode but no specific parameters have been set.");
+                        }
                     }
                     else {
                         ShowSevereError("Invalid over ride mode specified in PerformancePrecisionTradeoffs object: " + overrideModeValue);
