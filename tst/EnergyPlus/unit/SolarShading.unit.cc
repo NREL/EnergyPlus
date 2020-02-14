@@ -1778,14 +1778,14 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
     bool FoundError = false;
 
     HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), FoundError); // read project control data
-    EXPECT_FALSE(FoundError);                              // expect no errors
+    EXPECT_FALSE(FoundError);                                                           // expect no errors
 
     HeatBalanceManager::SetPreConstructionInputParameters();
-    ScheduleManager::ProcessScheduleInput(); // read schedules
+    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton()); // read schedules
 
     HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), FoundError);
     EXPECT_FALSE(FoundError);
@@ -1799,7 +1799,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     HeatBalanceManager::GetZoneData(FoundError); // Read Zone data from input file
     EXPECT_FALSE(FoundError);
 
-    SurfaceGeometry::GetGeometryParameters(FoundError);
+    SurfaceGeometry::GetGeometryParameters(OutputFiles::getSingleton(), FoundError);
     EXPECT_FALSE(FoundError);
 
     SurfaceGeometry::CosZoneRelNorth.allocate(1);
@@ -1810,12 +1810,12 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(FoundError); // setup zone geometry and get zone data
-    EXPECT_FALSE(FoundError);                    // expect no errors
+    SurfaceGeometry::GetSurfaceData(OutputFiles::getSingleton(), FoundError); // setup zone geometry and get zone data
+    EXPECT_FALSE(FoundError);                                                 // expect no errors
 
     //	compare_err_stream( "" ); // just for debugging
 
-    SurfaceGeometry::SetupZoneGeometry(FoundError); // this calls GetSurfaceData()
+    SurfaceGeometry::SetupZoneGeometry(OutputFiles::getSingleton(), FoundError); // this calls GetSurfaceData()
     EXPECT_FALSE(FoundError);
 
     SolarShading::AllocateModuleArrays();
@@ -1837,12 +1837,11 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     SolarShading::InitSolarCalculations();
     SolarShading::SkyDifSolarShading();
     CalcSkyDifShading = false;
-    
+
     FigureSolarBeamAtTimestep(DataGlobals::HourOfDay, DataGlobals::TimeStep);
 
     EXPECT_NEAR(0.6504, DifShdgRatioIsoSkyHRTS(4, 9, 6), 0.0001);
     EXPECT_NEAR(0.9152, DifShdgRatioHorizHRTS(4, 9, 6), 0.0001);
 
     DataSystemVariables::SlaterandBarsky = false;
-
 }
