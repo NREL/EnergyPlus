@@ -243,6 +243,7 @@ namespace DataGlobals {
     extern int OutputFileInits;                      // Unit number for the standard Initialization output file
     extern std::ostream *eio_stream;                 // Internal stream used for eio output (used for unit tests)
     extern int OutputFileDebug;                      // Unit number for debug outputs
+    extern int OutputFilePerfLog;                    // Unit number for performance log outputs
     extern int OutputFileZoneSizing;                 // Unit number of zone sizing calc output file
     extern int OutputFileSysSizing;                  // Unit number of system sizing calc output file
     extern int OutputFileMeters;                     // Unit number for meters output

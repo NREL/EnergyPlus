@@ -204,6 +204,7 @@ namespace DataGlobals {
     std::ostream *err_stream(nullptr);               // Internal stream used for err output (used for performance)
     int StdOutputRecordCount(0);                     // Count of Standard output records
     int OutputFileDebug(0);                          // Unit number for debug outputs
+    int OutputFilePerfLog(0);                        // Unit number for performance log outputs
     int OutputFileZoneSizing(0);                     // Unit number of zone sizing calc output file
     int OutputFileSysSizing(0);                      // Unit number of system sizing calc output file
     int OutputFileMeters(0);                         // Unit number for meters output
@@ -306,6 +307,7 @@ namespace DataGlobals {
         OutputStandardError = 0;
         StdOutputRecordCount = 0;
         OutputFileDebug = 0;
+        OutputFilePerfLog = 0;
         OutputFileZoneSizing = 0;
         OutputFileSysSizing = 0;
         OutputFileMeters = 0;

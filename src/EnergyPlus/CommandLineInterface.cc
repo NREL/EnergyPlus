@@ -433,6 +433,7 @@ namespace CommandLineInterface {
         outputWrlFileName = outputFilePrefix + normalSuffix + ".wrl";
         outputSqlFileName = outputFilePrefix + normalSuffix + ".sql";
         outputDbgFileName = outputFilePrefix + normalSuffix + ".dbg";
+        outputPerfLogFileName = outputFilePrefix + normalSuffix + ".perflog";
         outputTblCsvFileName = outputFilePrefix + tableSuffix + ".csv";
         outputTblHtmFileName = outputFilePrefix + tableSuffix + ".htm";
         outputTblTabFileName = outputFilePrefix + tableSuffix + ".tab";
