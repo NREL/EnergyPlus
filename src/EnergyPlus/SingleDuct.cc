@@ -1316,14 +1316,6 @@ namespace SingleDuct {
                                 "System",
                                 "Average",
                                 sd_airterminal(SysNum).SysName);
-            SetupOutputVariable(
-                "Zone Air Terminal Sensible Heating Energy", OutputProcessor::Unit::J, sd_airterminal(SysNum).HeatEnergy, "System", "Sum", sd_airterminal(SysNum).SysName);
-            SetupOutputVariable(
-                "Zone Air Terminal Sensible Cooling Energy", OutputProcessor::Unit::J, sd_airterminal(SysNum).CoolEnergy, "System", "Sum", sd_airterminal(SysNum).SysName);
-            SetupOutputVariable(
-                "Zone Air Terminal Sensible Heating Rate", OutputProcessor::Unit::W, sd_airterminal(SysNum).HeatRate, "System", "Average", sd_airterminal(SysNum).SysName);
-            SetupOutputVariable(
-                "Zone Air Terminal Sensible Cooling Rate", OutputProcessor::Unit::W, sd_airterminal(SysNum).CoolRate, "System", "Average", sd_airterminal(SysNum).SysName);
 
             if (DataGlobals::AnyEnergyManagementSystemInModel) {
                 // model results related actuators
