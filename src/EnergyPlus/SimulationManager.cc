@@ -1184,6 +1184,7 @@ namespace SimulationManager {
                 bool overrideZoneAirHeatBalAlg(false);
                 bool overrideMinNumWarmupDays(false);
                 bool overrideBeginEnvResetSuppress(false);
+                bool overrideMaxZoneTempDiff(false);
                 if (fields.find("override_mode") != fields.end()) {
                     auto overrideModeValue = UtilityRoutines::MakeUPPERCase(fields.at("override_mode"));
                     if (overrideModeValue == "NORMAL") {
@@ -1217,7 +1218,7 @@ namespace SimulationManager {
                         overrideZoneAirHeatBalAlg = true;
                         overrideMinNumWarmupDays = true;
                         overrideBeginEnvResetSuppress = true;
-                        DataConvergParams::MaxZoneTempDiff = 1.0;
+                        overrideMaxZoneTempDiff = true;
                     }
                     else if (overrideModeValue == "ADVANCED") {
                         bool advancedModeUsed = false;
@@ -1238,7 +1239,7 @@ namespace SimulationManager {
 
                     if (overrideTimestep) {
                         ShowWarningError("Due to PerformancePrecisionTradeoffs Override Mode, the Number of TimeSteps has been changed to 1.");
-                        NumOfTimeStepInHour = 1;
+                        DataGlobals::NumOfTimeStepInHour = 1;
                     }
                     if (overrideZoneAirHeatBalAlg) {
                         ShowWarningError("Due to PerformancePrecisionTradeoffs Override Mode, the ZoneAirHeatBalanceAlgorithm has been changed to EulerMethod.");
@@ -1251,6 +1252,10 @@ namespace SimulationManager {
                     if (overrideBeginEnvResetSuppress) {
                         ShowWarningError("Due to PerformancePrecisionTradeoffs Override Mode, the Begin Environment Reset Mode has been changed to SuppressAllBeginEnvironmentResets.");
                         DataEnvironment::forceBeginEnvResetSuppress = true;
+                    }
+                    if (overrideMaxZoneTempDiff) {
+                        ShowWarningError("Due to PerformancePrecisionTradeoffs Override Mode, internal variable MaxZoneTempDiff will be set to 1.0 .");
+                        DataConvergParams::MaxZoneTempDiff = 1.0;
                     }
                 }
             }
