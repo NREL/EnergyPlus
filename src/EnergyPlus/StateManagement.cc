@@ -106,7 +106,6 @@
 #include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DemandManager.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
-#include <EnergyPlus/DirectAirManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/DualDuct.hh>
 #include <EnergyPlus/EMSManager.hh>

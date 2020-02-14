@@ -52,6 +52,7 @@
 #include <queue>
 #include <utility>
 #include <vector>
+#include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 #if LINK_WITH_PYTHON
