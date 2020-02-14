@@ -53,8 +53,8 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
-#include <EnergyPlus/DataPlant.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {

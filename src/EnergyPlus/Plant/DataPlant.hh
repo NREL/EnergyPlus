@@ -62,9 +62,7 @@
 #include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/Plant/Loop.hh>
 #include <EnergyPlus/Plant/PlantAvailManager.hh>
-#include <EnergyPlus/Plant/PlantLoopSolver.hh>
 #include <EnergyPlus/Plant/ReportLoopData.hh>
-#include <EnergyPlus/Plant/ReportVars.hh>
 
 namespace EnergyPlus {
 
@@ -113,11 +111,6 @@ namespace DataPlant {
     extern int const DemandSupply_No;
     extern int const DemandSide;
     extern int const SupplySide;
-
-    // Parameters for economizer
-    extern int const Integrated;
-    extern int const NonIntegrated;
-    extern int const None;
 
     // Parameters for tolerance
     extern Real64 const LoopDemandTol; // minimum significant loop cooling or heating demand
@@ -250,42 +243,11 @@ namespace DataPlant {
     extern int const TypeOf_HeatPumpEIRCooling;
     extern int const TypeOf_HeatPumpEIRHeating;
 
-    // Parameters for General Equipment Types
-    extern int const NumGeneralEquipTypes;
-    extern Array1D_string const GeneralEquipTypes;
-
-    extern int const GenEquipTypes_Boiler;
-    extern int const GenEquipTypes_Chiller;
-    extern int const GenEquipTypes_CoolingTower;
-    extern int const GenEquipTypes_Generator;
-    extern int const GenEquipTypes_HeatExchanger;
-    extern int const GenEquipTypes_HeatPump;
-    extern int const GenEquipTypes_Pipe;
-    extern int const GenEquipTypes_Pump;
-    extern int const GenEquipTypes_Purchased;
-    extern int const GenEquipTypes_ThermalStorage;
-    extern int const GenEquipTypes_Valve;
-    extern int const GenEquipTypes_WaterThermalTank;
-    extern int const GenEquipTypes_WaterUse;
-    extern int const GenEquipTypes_DemandCoil;
-    extern int const GenEquipTypes_SolarCollector;
-    extern int const GenEquipTypes_LoadProfile;
-    extern int const GenEquipTypes_FluidCooler;
-    extern int const GenEquipTypes_EvapFluidCooler;
-    extern int const GenEquipTypes_GroundHeatExchanger;
-    extern int const GenEquipTypes_ZoneHVACDemand;
-    extern int const GenEquipTypes_Refrigeration;
-    extern int const GenEquipTypes_PlantComponent;
-    extern int const GenEquipTypes_CentralHeatPumpSystem;
-
     extern Array1D<Real64> const ConvergenceHistoryARR;
     extern Real64 const sum_ConvergenceHistoryARR;
     extern Real64 const square_sum_ConvergenceHistoryARR;
     extern Real64 const sum_square_ConvergenceHistoryARR;
 
-    extern int NumPipes;                       // Total number of pipes
-    extern int NumPlantPipes;                  // Total number of plant pipes
-    extern int NumCondPipes;                   // Total number of condenser pipes
     extern int TotNumLoops;                    // number of plant and condenser loops
     extern int TotNumHalfLoops;                // number of half loops (2 * TotNumLoops)
     extern bool PlantFirstSizeCompleted;       // true if first-pass sizing is still going on and not finished
@@ -296,18 +258,12 @@ namespace DataPlant {
 
     extern bool AnyEMSPlantOpSchemesInModel;
 
-    extern Array1D_int EconBranchNum; // Branch num on which economizer is placed
-    extern Array1D_int EconCompNum;   // Component num of economizer in the economizer branch
-
-    extern Array1D_bool LoadChangeDownStream; // sim control flag.
-
     extern int PlantManageSubIterations; // tracks plant iterations to characterize solver
     extern int PlantManageHalfLoopCalls; // tracks number of half loop calls
 
     // Object Data
     extern Array1D<PlantLoopData> PlantLoop;
     extern Array1D<PlantAvailMgrData> PlantAvailMgr;
-    extern Array1D<ReportVars> PlantReport;
     extern Array1D<ReportLoopData> VentRepPlantSupplySide;
     extern Array1D<ReportLoopData> VentRepPlantDemandSide;
     extern Array1D<ReportLoopData> VentRepCondSupplySide;
