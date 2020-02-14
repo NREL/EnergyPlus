@@ -109,6 +109,7 @@ SET( SRC
   DataHVACControllers.hh
   DataHVACGlobals.cc
   DataHVACGlobals.hh
+  DataHVACSystems.hh
   DataHeatBalFanSys.cc
   DataHeatBalFanSys.hh
   DataHeatBalSurface.cc
@@ -176,8 +177,6 @@ SET( SRC
   DemandManager.hh
   DesiccantDehumidifiers.cc
   DesiccantDehumidifiers.hh
-  DirectAirManager.cc
-  DirectAirManager.hh
   DisplacementVentMgr.cc
   DisplacementVentMgr.hh
   DisplayRoutines.cc
