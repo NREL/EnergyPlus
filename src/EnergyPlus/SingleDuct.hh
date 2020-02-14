@@ -256,7 +256,7 @@ namespace SingleDuct {
 
         static Real64 VAVVSHCFanOnResidual(Real64 const HeatingFrac, Array1<Real64> const &Par);
 
-        void SimConstVolNoReheat(int const SysNum, bool const EP_UNUSED(FirstHVACIteration), int const EP_UNUSED(ZoneNum), int const ZoneNodeNum);
+        void SimConstVolNoReheat(int const SysNum, int const ZoneNodeNum);
 
         void UpdateSys(int const SysNum);
 

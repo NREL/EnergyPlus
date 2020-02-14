@@ -58,6 +58,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
@@ -246,7 +247,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing1)
     GetZoneAirDistribution(); // get zone air distribution objects
     GetZoneSizingInput();
     GetZoneEquipmentData1();
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment();
     GetSysInput();
@@ -426,7 +427,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing2)
     GetZoneAirDistribution(); // get zone air distribution objects
     GetZoneSizingInput();
     GetZoneEquipmentData1();
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment();
     GetSysInput();
@@ -605,7 +606,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing3)
     GetZoneAirDistribution(); // get zone air distribution objects
     GetZoneSizingInput();
     GetZoneEquipmentData1();
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment();
     GetSysInput();
@@ -786,7 +787,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing4)
     // GetZoneAirDistribution(); // get zone air distribution objects
     // GetZoneSizingInput();
     GetZoneEquipmentData1();
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment();
     GetSysInput();
@@ -936,7 +937,7 @@ TEST_F(EnergyPlusFixture, VAVDefMinMaxFlowTestSizing5)
     GetZoneAirDistribution(); // get zone air distribution objects
     GetZoneSizingInput();
     GetZoneEquipmentData1();
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
     GetZoneAirLoopEquipment();
     GetSysInput();

@@ -571,15 +571,11 @@ namespace BranchNodeConnections {
             // Only non-parent node connections
             if (NodeConnections(Loop1).ObjectIsParent) continue;
             if (NodeConnections(Loop1).ConnectionType != ValidConnectionTypes(NodeConnectionType_Outlet)) continue;
-            // Skip if DIRECT AIR, because it only has one node which is an outlet, so it dupes the outlet which feeds it
-            if (NodeConnections(Loop1).ObjectType == "AIRTERMINAL:SINGLEDUCT:UNCONTROLLED") continue;
             IsValid = true;
             for (Loop2 = Loop1; Loop2 <= NumOfNodeConnections; ++Loop2) {
                 if (Loop1 == Loop2) continue;
                 if (NodeConnections(Loop2).ObjectIsParent) continue;
                 if (NodeConnections(Loop2).ConnectionType != ValidConnectionTypes(NodeConnectionType_Outlet)) continue;
-                // Skip if DIRECT AIR, because it only has one node which is an outlet, so it dupes the outlet which feeds it
-                if (NodeConnections(Loop2).ObjectType == "AIRTERMINAL:SINGLEDUCT:UNCONTROLLED") continue;
                 if (NodeConnections(Loop2).NodeNumber == NodeConnections(Loop1).NodeNumber) {
                     // Skip if one of the
                     ShowSevereError("Node Connection Error, Node=\"" + NodeConnections(Loop1).NodeName +

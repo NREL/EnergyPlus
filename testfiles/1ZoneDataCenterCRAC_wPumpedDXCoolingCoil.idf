@@ -1118,11 +1118,6 @@
     System Node Mass Flow Rate;  !- Output:Variable or Output:Meter Name
 
   EnergyManagementSystem:Sensor,
-    Tout_SupplyFan,          !- Name
-    Supply Outlet Node,      !- Output:Variable or Output:Meter Index Key Name
-    System Node Temperature; !- Output:Variable or Output:Meter Name
-
-  EnergyManagementSystem:Sensor,
     Wout_SupplyFan,          !- Name
     Supply Outlet Node,      !- Output:Variable or Output:Meter Index Key Name
     System Node Humidity Ratio;  !- Output:Variable or Output:Meter Name
@@ -1164,7 +1159,7 @@
 
   EnergyManagementSystem:Program,
     CalcSCOP,                !- Name
-    set cpair = @CpAirFnWTdb Wout_SupplyFan  Tout_SupplyFan,  !- Program Line 1
+    set cpair = @CpAirFnW Wout_SupplyFan,  !- Program Line 1
     set FanSensHeat = (Mdot_SupplyFan * cpair ) * DeltaT_SupplyFan,  !- Program Line 2
     set numerator = Qdot_DXCoil_Sens - FanSensHeat,  !- <none>
     set denominator = Power_DX_Coil_Elec + Power_SupplyFan_Elec,  !- <none>
@@ -1216,4 +1211,3 @@
     ENDIF;                   !- <none>
 
   Output:Variable,*,PUE,Hourly;
-

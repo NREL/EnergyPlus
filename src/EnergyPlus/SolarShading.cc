@@ -83,6 +83,7 @@
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -399,7 +400,7 @@ namespace SolarShading {
             }
 
             if (GetInputFlag) {
-                GetShadowingInput();
+                GetShadowingInput(OutputFiles::getSingleton());
                 GetInputFlag = false;
                 MaxHCV = (((max(15, MaxVerticesPerSurface) + 16) / 16) * 16) - 1; // Assure MaxHCV+1 is multiple of 16 for 128 B alignment
                 assert((MaxHCV + 1) % 16 == 0);
@@ -557,7 +558,7 @@ namespace SolarShading {
         firstTime = false;
     }
 
-    void GetShadowingInput()
+    void GetShadowingInput(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -582,8 +583,6 @@ namespace SolarShading {
         using DataSystemVariables::UseScheduledSunlitFrac;
         using ScheduleManager::ScheduleFileShadingProcessed;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumItems;
@@ -866,14 +865,23 @@ namespace SolarShading {
             }
         }
 
-        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Shadowing/Sun Position Calculations Annual Simulations>, Calculation Method, Value {days}, "
-                                             "Allowable Number Figures in Shadow Overlap {}, Polygon Clipping Algorithm, Sky Diffuse Modeling "
-                                             "Algorithm, External Shading Calculation Method, Output External Shading Calculation Results, Disable "
-                                             "Self-Shading Within Shading Zone Groups, Disable Self-Shading From Shading Zone Groups to Other Zones";
-        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Shadowing/Sun Position Calculations Annual Simulations," + cAlphaArgs(1) + ',' +
-                                                 RoundSigDigits(ShadowingCalcFrequency) + ',' + RoundSigDigits(MaxHCS) + ',' + cAlphaArgs(2) + ',' +
-                                                 cAlphaArgs(3) + ',' + cAlphaArgs(4) + ',' + cAlphaArgs(5) + ',' + cAlphaArgs(6) + ',' +
-                                                 cAlphaArgs(7);
+        print(outputFiles.eio,
+              "{}",
+              "! <Shadowing/Sun Position Calculations Annual Simulations>, Calculation Method, Value {days}, "
+              "Allowable Number Figures in Shadow Overlap {}, Polygon Clipping Algorithm, Sky Diffuse Modeling "
+              "Algorithm, External Shading Calculation Method, Output External Shading Calculation Results, Disable "
+              "Self-Shading Within Shading Zone Groups, Disable Self-Shading From Shading Zone Groups to Other Zones\n");
+        print(outputFiles.eio,
+              "Shadowing/Sun Position Calculations Annual Simulations,{},{},{},{},{},{},{},{},{}\n",
+              cAlphaArgs(1),
+              ShadowingCalcFrequency,
+              MaxHCS,
+              cAlphaArgs(2),
+              cAlphaArgs(3),
+              cAlphaArgs(4),
+              cAlphaArgs(5),
+              cAlphaArgs(6),
+              cAlphaArgs(7));
     }
 
     void AllocateModuleArrays()
@@ -4790,9 +4798,6 @@ namespace SolarShading {
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
