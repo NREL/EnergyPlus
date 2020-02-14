@@ -92,6 +92,6 @@ TEST_F(EnergyPlusFixture, TestTrendVariable)
     EXPECT_DOUBLE_EQ(0.0, pluginManager.getTrendVariableValue(trendVarIndex, 3));
 #endif
 #endif
-    
+
 }
 } // namespace EnergyPlus
