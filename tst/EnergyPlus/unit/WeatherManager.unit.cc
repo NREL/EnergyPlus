@@ -177,9 +177,6 @@ TEST_F(EnergyPlusFixture, SkyEmissivityTest)
     EXPECT_NEAR(0.746, CalcSkyEmissivity(Environment(2).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
     EXPECT_NEAR(0.760, CalcSkyEmissivity(Environment(3).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
     EXPECT_NEAR(0.747, CalcSkyEmissivity(Environment(4).SkyTempModel, OpagueSkyCover, DryBulb, DewPoint, RelHum), 0.001);
-
-    Environment.deallocate();
-
 }
 
 TEST_F(EnergyPlusFixture, WaterMainsCorrelationTest)

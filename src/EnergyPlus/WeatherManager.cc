@@ -3753,18 +3753,18 @@ namespace WeatherManager {
     Real64 CalcSkyEmissivity(int ESkyCalcType, Real64 OSky, Real64 DryBulb, Real64 DewPoint, Real64 RelHum){
         //Calculate Sky Emissivity
         Real64 ESky;
-        double TDewC = min(DryBulb, DewPoint);
-        double SatPress = PsyPsatFnTemp(DryBulb) * 0.01;
-        double PartialPress = RelHum * SatPress;
-        double TDewK = TDewC + TKelvin;
+
         if (ESkyCalcType == WP_BruntModel) {
+            double const PartialPress = RelHum * PsyPsatFnTemp(DryBulb) * 0.01;
             ESky = 0.618 + 0.056 * pow(PartialPress, 0.5);
         } else if (ESkyCalcType == WP_IdsoModel) {
+            double const PartialPress = RelHum * PsyPsatFnTemp(DryBulb) * 0.01;
             ESky = 0.685 + 0.000032 * PartialPress * exp(1699 / (DryBulb + TKelvin));
         } else if (ESkyCalcType == WP_BerdahlMartinModel) {
+            double const TDewC = min(DryBulb, DewPoint);
             ESky = 0.758 + 0.521 * (TDewC / 100) + 0.625 * pow_2(TDewC / 100);
         } else {
-            ESky = 0.787 + 0.764 * std::log(TDewK / TKelvin);
+            ESky = 0.787 + 0.764 * std::log((min(DryBulb, DewPoint) + TKelvin) / TKelvin);
         }
         ESky = ESky * (1.0 + 0.0224 * OSky - 0.0035 * pow_2(OSky) + 0.00028 * pow_3(OSky));
         return ESky;
@@ -4544,6 +4544,8 @@ namespace WeatherManager {
                 } else {
                     HumidityRatio = PsyWFnTdbRhPb(
                         TomorrowOutDryBulbTemp(TS, Hour), DDHumIndModifier(TS, Hour, EnvrnNum) / 100.0, DesDayInput(EnvrnNum).PressBarom);
+                    TomorrowOutRelHum(TS, Hour) =
+                            PsyRhFnTdbWPb(TomorrowOutDryBulbTemp(TS, Hour), HumidityRatio, DesDayInput(EnvrnNum).PressBarom, WeatherManager) * 100.0;
                     // TomorrowOutRelHum values set earlier
                     TomorrowOutDewPointTemp(TS, Hour) = PsyTdpFnWPb(HumidityRatio, DesDayInput(EnvrnNum).PressBarom);
                 }
@@ -4573,7 +4575,8 @@ namespace WeatherManager {
                 // Cloudy Skies," Proc. 2nd National Passive Solar Conference (AS/ISES), 1978, pp. 675-678.
 
                 double DryBulb = TomorrowOutDryBulbTemp(TS, Hour);
-                ESky = CalcSkyEmissivity(Environment(EnvrnNum).SkyTempModel, OSky, DryBulb, TomorrowOutDewPointTemp(TS, Hour), OutHumRat);
+                double RelHum = TomorrowOutRelHum(TS, Hour) * 0.01;
+                ESky = CalcSkyEmissivity(Environment(EnvrnNum).SkyTempModel, OSky, DryBulb, TomorrowOutDewPointTemp(TS, Hour), RelHum);
                 TomorrowHorizIRSky(TS, Hour) = ESky * Sigma * pow_4(DryBulb + TKelvin);
 
                 if (Environment(EnvrnNum).SkyTempModel > 3 || Environment(EnvrnNum).SkyTempModel == 0) {
