@@ -131,8 +131,18 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   INTEGER PNumArgs   ! Number of Arguments in a definition
   CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: POutArgs
 
-
-
+  ! For AirTerminal:SingleDuct:Uncontrolled transition
+  CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: ATSDUNodeNames
+  CHARACTER(len=MaxNameLength), ALLOCATABLE, DIMENSION(:) :: MatchingATSDUAirFlowNodeNames
+  INTEGER TotATSDUObjs
+  INTEGER TotAFNDistNodeObjs
+  INTEGER atCount
+  INTEGER nodeCount
+  INTEGER TotNodeListOjbs
+  INTEGER nodeListCount
+  INTEGER nodeCountA
+  LOGICAL :: nodeFound = .false.
+  INTEGER DuctObjNum
 
 
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
@@ -280,6 +290,30 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 !                                                    P R E P R O C E S S I N G                                                     !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+     ! Begin Pre-process AirTerminal:SingleDuct:Uncontrolled
+          ! Clean up from any previous passes, then re-allocate
+          IF(ALLOCATED(ATSDUNodeNames)) DEALLOCATE(ATSDUNodeNames)
+          IF(ALLOCATED(MatchingATSDUAirFlowNodeNames)) DEALLOCATE(MatchingATSDUAirFlowNodeNames)
+          TotATSDUObjs = GetNumObjectsFound('AIRTERMINAL:SINGLEDUCT:UNCONTROLLED')
+          IF (TotATSDUObjs > 0) ALLOCATE(ATSDUNodeNames(TotATSDUObjs))
+          TotAFNDistNodeObjs = GetNumObjectsFound('AIRFLOWNETWORK:DISTRIBUTION:NODE')
+          IF (TotAFNDistNodeObjs > 0) ALLOCATE(MatchingATSDUAirFlowNodeNames(TotATSDUObjs))
+
+          DO atCount=1, TotATSDUObjs
+            CALL GetObjectItem('AIRTERMINAL:SINGLEDUCT:UNCONTROLLED',atCount,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+            ! Store Zone Supply Air Node Name to search and replace later in AirLoopHVAC:ZoneSplitter and AirLoopHVAC:SupplyPlenum objects
+            ATSDUNodeNames(atCount) = Alphas(3)
+            IF (TotATSDUObjs > 0) THEN
+              ! Find and Store name of corresponding AIRFLOWNETWORK:DISTRIBUTION:NODE object to search for later in AIRFLOWNETWORK:DISTRIBUTION:LINKAGE objects
+              DO nodeCount=1, TotAFNDistNodeObjs
+                CALL GetObjectItem('AIRFLOWNETWORK:DISTRIBUTION:NODE',nodeCount,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+                IF (SameString(TRIM(Alphas(2)), TRIM(ATSDUNodeNames(atCount)))) THEN
+                  MatchingATSDUAirFlowNodeNames(atCount) = Alphas(1)
+                  EXIT
+                END IF
+              ENDDO
+            END IF
+          ENDDO
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                                                       P R O C E S S I N G                                                        !
@@ -407,6 +441,352 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                  IF (CurArgs .GE. 67) THEN
                    CALL FixFuelTypes(OutArgs(67), NoDiff)
                  END IF
+
+              CASE('AIRTERMINAL:SINGLEDUCT:UNCONTROLLED')
+                 ! ZoneHVAC:EquipmentList already has a transition rule of its own, so add this object type change there
+                 CALL GetNewObjectDefInIDD('AirTerminal:SingleDuct:ConstantVolume:NoReheat',NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodiff=.false.
+                 OutArgs(1:2)=InArgs(1:2)
+                 OutArgs(3) = TRIM(InArgs(3)) // ' ATInlet'
+                 OutArgs(4) =  InArgs(3)
+                 OutArgs(5:7)=InArgs(4:6)
+
+                CALL WriteOutIDFLines(DifLfn,'AirTerminal:SingleDuct:ConstantVolume:NoReheat',7,OutArgs,NwFldNames,NwFldUnits)
+                NoDiff=.false.
+                Written=.true.
+
+                CALL GetNewObjectDefInIDD('ZoneHVAC:AirDistributionUnit',PNumArgs,PAOrN,PReqFld,PObjMinFlds,PFldNames,PFldDefaults,PFldUnits)
+                POutArgs(1) = TRIM(InArgs(1)) // ' ADU'
+                POutArgs(2) = InArgs(3)
+                POutArgs(3) = 'AirTerminal:SingleDuct:ConstantVolume:NoReheat'
+                POutArgs(4) = InArgs(1)
+                POutArgs(5) = Blank
+                POutArgs(6) = Blank
+                POutArgs(7) = InArgs(7)
+                CALL WriteOutIDFLines(DifLfn,'ZoneHVAC:AirDistributionUnit',PNumArgs,POutArgs,PFldNames,PFldUnits)
+
+              ! This is part of the transition for AirTerminal:SingleDuct:Uncontrolled
+              CASE('ZONEHVAC:EQUIPMENTLIST')
+                nodiff = .false.
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                DO CurField = 1, CurArgs
+                    ! Add air terminal unit object type and name change here (see AirTerminal:SingleDuct:Uncontrolled above)
+                    IF (CurField > 2) THEN
+                      IF (SameString(TRIM(InArgs(CurField)),'AirTerminal:SingleDuct:Uncontrolled')) THEN
+                        OutArgs(CurField) = 'ZoneHVAC:AirDistributionUnit'
+                      ELSE IF (SameString(TRIM(InArgs(CurField-1)),'AirTerminal:SingleDuct:Uncontrolled')) THEN
+                        OutArgs(CurField) = TRIM(InArgs(CurField)) // ' ADU'
+                      ELSE
+                        OutArgs(CurField) = InArgs(CurField)
+                      END IF
+                    ELSE
+                      OutArgs(CurField) = InArgs(CurField)
+                    END IF
+                END DO
+
+              ! This is part of the transition for AirTerminal:SingleDuct:Uncontrolled
+              CASE('AIRLOOPHVAC:ZONESPLITTER')
+              IF(TotATSDUObjs > 0) THEN
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 OutArgs(1:2) = InArgs(1:2)
+                 ! Loop through outlet node names looking for a match to an AirTerminal:SingleDuct:Uncontrolled node name
+                 DO nodeCountA=3, CurArgs
+                   nodeFound = .false.
+                   ! Is the node referenced directly here?
+                   DO atCount=1, TotATSDUObjs
+                     IF (SameString(TRIM(InArgs(nodeCountA)), TRIM(ATSDUNodeNames(atCount)))) THEN
+                       nodeFound = .true.
+                       EXIT
+                     END IF
+                   ENDDO
+                   IF (.not. nodeFound) THEN
+                     ! Is the node referenced via a NodeList here?
+                     TotNodeListOjbs = GetNumObjectsFound('NODELIST')
+                     DO nodeListCount=1, TotNodeListOjbs
+                       CALL GetObjectItem('NODELIST',nodeListCount,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+                       ! Does this NodeList name match the AirloopHVAC field?
+                       IF (SameString(TRIM(InArgs(nodeCountA)), TRIM(Alphas(1)))) THEN
+                         DO nodeCount=2, CurArgs
+                           DO atCount=1, TotATSDUObjs
+                             IF (SameString(TRIM(Alphas(nodeCount)), TRIM(ATSDUNodeNames(atCount)))) THEN
+                               nodeFound = .true.
+                               EXIT
+                             END IF
+                           ENDDO
+                           IF (nodeFound) EXIT
+                         ENDDO
+                       ELSE
+                         CYCLE
+                       END IF
+                       IF (nodeFound) THEN
+                         ! Make a new nodelist object
+                         POutArgs(1) = TRIM(Alphas(1)) // ' ATInlet'
+                         IF (nodeCount > 2) THEN
+                           POutArgs(2:nodeCount-1) = Alphas(2:nodeCount-1)
+                         END IF
+                         POutArgs(nodeCount) = TRIM(Alphas(nodeCount)) // ' ATInlet'
+                         IF (NumAlphas > nodeCount) THEN
+                           POutArgs(nodeCount+1:NumAlphas) = Alphas(nodeCount+1:NumAlphas)
+                         END IF
+                         CALL GetNewObjectDefInIDD('NodeList',PNumArgs,PAOrN,PReqFld,PObjMinFlds,PFldNames,PFldDefaults,PFldUnits)
+                         CALL WriteOutIDFLines(DifLfn,'NodeList',NumAlphas,POutArgs,PFldNames,PFldUnits)
+                         EXIT
+                       END IF
+                     ENDDO
+                   END IF
+                   IF (nodeFound) THEN
+                     OutArgs(nodeCountA) = TRIM(InArgs(nodeCountA)) // ' ATInlet'
+                   ELSE
+                     OutArgs(nodeCountA) = InArgs(nodeCountA)
+                   END IF
+                 ENDDO
+                NoDiff = .false.
+              ELSE
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                NoDiff=.true.
+              ENDIF
+                
+              ! This is still part of the transition for AirTerminal:SingleDuct:Uncontrolled
+              CASE('AIRLOOPHVAC:SUPPLYPLENUM')
+              IF(TotATSDUObjs > 0) THEN
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 OutArgs(1:4) = InArgs(1:4)
+                 ! Loop through outlet node names looking for a match to an AirTerminal:SingleDuct:Uncontrolled node name
+                 DO nodeCountA=5, CurArgs
+                   nodeFound = .false.
+                   ! Is the node referenced directly here?
+                   DO atCount=1, TotATSDUObjs
+                     IF (SameString(TRIM(InArgs(nodeCountA)), TRIM(ATSDUNodeNames(atCount)))) THEN
+                       nodeFound = .true.
+                       EXIT
+                     END IF
+                   ENDDO
+                   IF (.not. nodeFound) THEN
+                     ! Is the node referenced via a NodeList here?
+                     TotNodeListOjbs = GetNumObjectsFound('NODELIST')
+                     DO nodeListCount=1, TotNodeListOjbs
+                       CALL GetObjectItem('NODELIST',nodeListCount,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+                       ! Does this NodeList name match the AirloopHVAC field?
+                       IF (SameString(TRIM(InArgs(nodeCountA)), TRIM(Alphas(1)))) THEN
+                         DO nodeCount=2, CurArgs
+                           DO atCount=1, TotATSDUObjs
+                             IF (SameString(TRIM(Alphas(nodeCount)), TRIM(ATSDUNodeNames(atCount)))) THEN
+                               nodeFound = .true.
+                               EXIT
+                             END IF
+                           ENDDO
+                           IF (nodeFound) EXIT
+                         ENDDO
+                       ELSE
+                         CYCLE
+                       END IF
+                       IF (nodeFound) THEN
+                         ! Make a new nodelist object
+                         POutArgs(1) = TRIM(Alphas(1)) // ' ATInlet'
+                         IF (nodeCount > 2) THEN
+                           POutArgs(2:nodeCount-1) = Alphas(2:nodeCount-1)
+                         END IF
+                         POutArgs(nodeCount) = TRIM(Alphas(nodeCount)) // ' ATInlet'
+                         IF (NumAlphas > nodeCount) THEN
+                           POutArgs(nodeCount+1:NumAlphas) = Alphas(nodeCount+1:NumAlphas)
+                         END IF
+                         CALL GetNewObjectDefInIDD('NodeList',PNumArgs,PAOrN,PReqFld,PObjMinFlds,PFldNames,PFldDefaults,PFldUnits)
+                         CALL WriteOutIDFLines(DifLfn,'NodeList',NumAlphas,POutArgs,PFldNames,PFldUnits)
+                         EXIT
+                       END IF
+                     ENDDO
+                   END IF
+                   IF (nodeFound) THEN
+                     OutArgs(nodeCountA) = TRIM(InArgs(nodeCountA)) // ' ATInlet'
+                   ELSE
+                     OutArgs(nodeCountA) = InArgs(nodeCountA)
+                   END IF
+                 ENDDO
+                NoDiff = .false.
+              ELSE
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                NoDiff=.true.
+              ENDIF
+                
+              ! This is yet another part of the transition for AirTerminal:SingleDuct:Uncontrolled
+              ! The node name could be referenced in an AirLoopHVAC F9 "Demand Side Inlet Node Names" either directly or in a NodeList
+              CASE('AIRLOOPHVAC')
+              IF(TotATSDUObjs > 0) THEN
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 nodeFound = .false.
+                 ! Is the node referenced directly here?
+                 DO atCount=1, TotATSDUObjs
+                   IF (SameString(TRIM(InArgs(9)), TRIM(ATSDUNodeNames(atCount)))) THEN
+                     nodeFound = .true.
+                     EXIT
+                   END IF
+                 ENDDO
+                 IF (.not. nodeFound) THEN
+                   ! Is the node referenced via a NodeList here?
+                   TotNodeListOjbs = GetNumObjectsFound('NODELIST')
+                   DO nodeListCount=1, TotNodeListOjbs
+                     CALL GetObjectItem('NODELIST',nodeListCount,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+                     ! Does this NodeList name match the AirloopHVAC field?
+                     IF (SameString(TRIM(InArgs(9)), TRIM(Alphas(1)))) THEN
+                       DO nodeCount=2, CurArgs
+                         DO atCount=1, TotATSDUObjs
+                           IF (SameString(TRIM(Alphas(nodeCount)), TRIM(ATSDUNodeNames(atCount)))) THEN
+                             nodeFound = .true.
+                             EXIT
+                           END IF
+                         ENDDO
+                         IF (nodeFound) EXIT
+                       ENDDO
+                     ELSE
+                       CYCLE
+                     END IF
+                     IF (nodeFound) THEN
+                       ! Make a new nodelist object
+                       POutArgs(1) = TRIM(Alphas(1)) // ' ATInlet'
+                       IF (nodeCount > 2) THEN
+                         POutArgs(2:nodeCount-1) = Alphas(2:nodeCount-1)
+                       END IF
+                       POutArgs(nodeCount) = TRIM(Alphas(nodeCount)) // ' ATInlet'
+                       IF (NumAlphas > nodeCount) THEN
+                         POutArgs(nodeCount+1:NumAlphas) = Alphas(nodeCount+1:NumAlphas)
+                       END IF
+                       CALL GetNewObjectDefInIDD('NodeList',PNumArgs,PAOrN,PReqFld,PObjMinFlds,PFldNames,PFldDefaults,PFldUnits)
+                       CALL WriteOutIDFLines(DifLfn,'NodeList',NumAlphas,POutArgs,PFldNames,PFldUnits)
+                       EXIT
+                     END IF
+                   ENDDO
+                 END IF
+
+                 ! Now, finally, modify the AirLoopHVAC object, or pass it through
+                 IF (nodeFound) THEN
+                   ! Found the node name directly referenced or via a NodeList
+                   NoDiff = .false.
+                   OutArgs(1:8) = InArgs(1:8)
+                   OutArgs(9) = TRIM(InArgs(9)) // ' ATInlet'
+                   OutArgs(10:CurArgs) = InArgs(10:CurArgs)
+                 ELSE
+                   ! Node name not found - past this object through untouched
+                   OutArgs(1:CurArgs) = InArgs(1:CurArgs)
+                   NoDiff = .true.
+                 END IF
+              ELSE
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                NoDiff=.true.
+              ENDIF
+                
+              ! Wait - there's more for the transition for AirTerminal:SingleDuct:Uncontrolled
+              CASE('ROOMAIR:NODE:AIRFLOWNETWORK:HVACEQUIPMENT')
+              IF(TotATSDUObjs > 0) THEN
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 OutArgs(1) = InArgs(1)
+                 ! Loop through fields looking for  AirTerminal:SingleDuct:Uncontrolled node name
+                 DO nodeCount=2, CurArgs
+                   IF (SameString(TRIM(InArgs(nodeCount)), TRIM(ATSDUNodeNames(atCount)))) THEN
+                     OutArgs(nodeCount) = TRIM(InArgs(nodeCount)) // ' ATInlet'
+                   ELSE
+                     OutArgs(nodeCount) = InArgs(nodeCount)
+                   END IF
+                 ENDDO
+                NoDiff = .false.
+              ELSE
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                NoDiff=.true.
+              ENDIF
+                
+              ! And even more for the transition for AirTerminal:SingleDuct:Uncontrolled
+              CASE('AIRFLOWNETWORK:DISTRIBUTION:NODE')
+              IF(TotATSDUObjs > 0) THEN
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 ! Does this node match an AirTerminal:SingleDuct:Uncontrolled node name
+                 nodeFound = .false.
+                 DO atCount=1, TotATSDUObjs
+                   IF (SameString(TRIM(InArgs(2)), TRIM(ATSDUNodeNames(atCount)))) THEN
+                     nodeFound = .true.
+                     EXIT
+                   END IF
+                 ENDDO
+                 IF (nodeFound) THEN
+                   ! Create companion object for the new node name
+                   POutArgs(1) = TRIM(InArgs(1)) // ' ATInlet'
+                   POutArgs(2) = TRIM(InArgs(2)) // ' ATInlet'
+                   IF (CurArgs > 2) POutArgs(3:CurArgs) = InArgs(3:CurArgs)
+                   CALL WriteOutIDFLines(DifLfn,'AirflowNetwork:Distribution:Node',CurArgs,POutArgs,NwFldNames,NwFldUnits)
+                 END IF
+
+                 ! Either way, do nothing with this object, let it pass through unchanged
+                 OutArgs(1:CurArgs) = InArgs(1:CurArgs)
+                 NoDiff = .true.
+              ELSE
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                NoDiff=.true.
+              ENDIF
+
+              ! And still more for the transition for AirTerminal:SingleDuct:Uncontrolled
+              CASE('AIRFLOWNETWORK:DISTRIBUTION:LINKAGE')
+              IF(TotATSDUObjs > 0) THEN
+                 CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                 ! Does this linkage contain an match an AIRFLOWNETWORK:DISTRIBUTION:NODE that matches an AirTerminal:SingleDuct:Uncontrolled node name
+                 nodeFound = .false.
+                 DO atCount=1, TotATSDUObjs
+                   IF (SameString(TRIM(InArgs(3)), TRIM(MatchingATSDUAirFlowNodeNames(atCount)))) THEN
+                     nodeFound = .true.
+                     EXIT
+                   END IF
+                 ENDDO
+                 IF (nodeFound) THEN
+                   ! Modify this object
+                   OutArgs(1:2) = InArgs(1:2)
+                   OutArgs(3) = TRIM(InArgs(3)) // ' ATInlet'
+                   OutArgs(4) = InArgs(4) ! this is required, so it should be present
+                   NoDiff = .false.
+                   IF (CurArgs > 4) OutArgs(5) = InArgs(5)
+                   ! Create companion object for the new linkage from InArgs3...ATInlet to original outlet INArgs3
+                   POutArgs(1) = TRIM(InArgs(1)) // ' ATInlet'
+                   POutArgs(2) = TRIM(InArgs(3)) // ' ATInlet'
+                   POutArgs(3) = InArgs(3)
+                   ! Assume that the existing referenced component is a duct - look for it
+                   DuctObjNum = GetObjectItemNum('AIRFLOWNETWORK:DISTRIBUTION:COMPONENT:DUCT',TRIM(InArgs(4)))
+                   IF (DuctObjNum > 0) THEN
+                     POutArgs(4) = TRIM(InArgs(1)) // ' ATInlet Duct' ! reference a new tiny duct object created next
+                   ELSE
+                     CALL ShowWarningError('Linkage component name for AirflowNetwork:Distribution:Linkage= ' // TRIM(InArgs(1)),Auditf)
+                     CALL ShowContinueError('Is not an AirflowNetwork:Distribution:Component:Duct. Diffs may result from duplicate linkage component.',Auditf)
+                     POutArgs(4) = TRIM(InArgs(4))
+                   END IF
+                   IF (CurArgs > 4) POutArgs(5) = InArgs(5)
+                   CALL WriteOutIDFLines(DifLfn,'AirflowNetwork:Distribution:Linkage',CurArgs,POutArgs,NwFldNames,NwFldUnits)
+                   IF (DuctObjNum > 0) THEN
+                     ! If duct was found above create a very short matching new duct object for the new linkage
+                     CALL GetObjectItem('AIRFLOWNETWORK:DISTRIBUTION:COMPONENT:DUCT',DuctObjNum,Alphas,NumAlphas,Numbers,NumNumbers,Status)
+                     CALL GetNewObjectDefInIDD('AirflowNetwork:Distribution:Component:Duct',PNumArgs,PAOrN,PReqFld,PObjMinFlds,PFldNames,PFldDefaults,PFldUnits)
+                     POutArgs = Blank
+                     POutArgs(1) = TRIM(InArgs(1)) // ' ATInlet Duct'
+                     POutArgs(2) = '0.0001'
+                     PNumArgs = NumNumbers + 1
+                     ! First, copy all the same values for remaining fields
+                     POutArgs(3:PNumArgs) = Numbers(2:NumNumbers)
+                     ! Now set loss coefficients as small as possible to minimize diffs
+                     POutArgs(6) = '0.0'
+                     POutArgs(7) = '0.0000001'
+                     POutArgs(8) = '0.0000001'
+                     CALL WriteOutIDFLines(DifLfn,'AirflowNetwork:Distribution:Component:Duct',PNumArgs,POutArgs,PFldNames,PFldUnits)
+                   END IF
+                 ELSE
+                   ! Do nothing with this object, let it pass through unchanged
+                   OutArgs(1:CurArgs) = InArgs(1:CurArgs)
+                   NoDiff = .true.
+                 END IF
+              ELSE
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                NoDiff=.true.
+              ENDIF
+              ! Whew - Done with the transition for AirTerminal:SingleDuct:Uncontrolled
 
               ! If your original object starts with B, insert the rules here
 
@@ -610,6 +990,34 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
               ! If your original object starts with H, insert the rules here
 
+              CASE("HEATPUMP:WATERTOWATER:EIR:HEATING")
+                  ! object rename
+                  ObjectName = "HeatPump:PlantLoop:EIR:Heating"
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  ! fields 1-3 same
+                  OutArgs(1:3)=InArgs(1:3)
+                  ! insert condenser type field
+                  OutArgs(4)=Blank
+                  ! all others equal
+                  OutArgs(5:CurArgs+1)=InArgs(4:CurArgs)
+                  CurArgs = CurArgs + 1
+                  NoDiff = .false.
+
+              CASE("HEATPUMP:WATERTOWATER:EIR:COOLING")
+                  ! object rename
+                  ObjectName = "HeatPump:PlantLoop:EIR:Cooling"
+                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                  nodiff=.false.
+                  ! fields 1-3 same
+                  OutArgs(1:3)=InArgs(1:3)
+                  ! insert condenser type field
+                  OutArgs(4)=Blank
+                  ! all others equal
+                  OutArgs(5:CurArgs+1)=InArgs(4:CurArgs)
+                  CurArgs = CurArgs + 1
+                  NoDiff = .false.
+
              CASE('HVACTEMPLATE:SYSTEM:VRF')
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
                  ! FixFuelTypes will set NoDiff = .false. if it makes a change
@@ -703,6 +1111,13 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
               ! If your original object starts with R, insert the rules here
 
+              ! See above - this object is part of the transition for AirTerminal:SingleDuct:Uncontrolled
+              ! CASE('ROOMAIR:NODE:AIRFLOWNETWORK:HVACEQUIPMENT')
+
+              ! If your original object starts with S, insert the rules here
+
+              ! If your original object starts with T, insert the rules here
+
               ! If your original object starts with U, insert the rules here
 
               ! If your original object starts with V, insert the rules here
@@ -752,33 +1167,8 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                    CALL FixFuelTypes(OutArgs(20), NoDiff)
                  END IF
 
-              CASE("HEATPUMP:WATERTOWATER:EIR:HEATING")
-                  ! object rename
-                  ObjectName = "HeatPump:PlantLoop:EIR:Heating"
-                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                  nodiff=.false.
-                  ! fields 1-3 same
-                  OutArgs(1:3)=InArgs(1:3)
-                  ! insert condenser type field
-                  OutArgs(4)=Blank
-                  ! all others equal
-                  OutArgs(5:CurArgs+1)=InArgs(4:CurArgs)
-                  CurArgs = CurArgs + 1
-                  NoDiff = .false.
-
-              CASE("HEATPUMP:WATERTOWATER:EIR:COOLING")
-                  ! object rename
-                  ObjectName = "HeatPump:PlantLoop:EIR:Cooling"
-                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
-                  nodiff=.false.
-                  ! fields 1-3 same
-                  OutArgs(1:3)=InArgs(1:3)
-                  ! insert condenser type field
-                  OutArgs(4)=Blank
-                  ! all others equal
-                  OutArgs(5:CurArgs+1)=InArgs(4:CurArgs)
-                  CurArgs = CurArgs + 1
-                  NoDiff = .false.
+              ! See above - this object is part of the transition for AirTerminal:SingleDuct:Uncontrolled
+              ! CASE('ZONEHVAC:EQUIPMENTLIST')
 
     !!!   Changes for report variables, meters, tables -- update names
               CASE('OUTPUT:VARIABLE')
@@ -1410,3 +1800,49 @@ SUBROUTINE FixFuelTypes(InOutArg, NoDiffArg)
     NoDiffArg=.false.
   END IF
 END SUBROUTINE
+
+SUBROUTINE SortUnique(StrArray, Size, Order)
+  IMPLICIT NONE    ! Enforce explicit typing of all variables in this routine
+  CHARACTER(len=*), DIMENSION(Size) :: StrArray
+  Integer, DIMENSION(Size) :: Order
+  INTEGER :: Size, InitSize
+
+  REAL, ALLOCATABLE, DIMENSION(:)  :: InNumbers
+  REAL, ALLOCATABLE, DIMENSION(:)  :: OutNumbers
+  INTEGER :: I, I2
+  REAL :: min_val, max_val
+
+  ALLOCATE(InNumbers(Size))
+  ALLOCATE(OutNumbers(Size))
+
+  InitSize = Size
+
+  DO I=1,Size
+    READ(StrArray(I),*) InNumbers(I)
+  END DO
+
+  min_val = minval(InNumbers)-1
+  max_val = maxval(InNumbers)
+
+  Size = 0
+  DO WHILE (min_val<max_val)
+    Size = Size+1
+    min_val = minval(InNumbers, MASK=InNumbers>min_val)
+    OutNumbers(Size) = min_val
+  END DO
+
+  DO I=1,Size
+    WRITE(StrArray(I),'(F0.5)') OutNumbers(I)
+    StrArray(I) =  TRIM(StrArray(I))
+  END DO
+
+  DO I=1,InitSize
+    DO I2=1,Size
+      IF (OutNumbers(I2) == InNumbers(I)) THEN
+        Order(I) = I2
+        EXIT
+      END IF
+    END DO
+  END DO
+
+END SUBROUTINE SortUnique

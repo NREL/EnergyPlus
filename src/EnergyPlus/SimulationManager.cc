@@ -118,6 +118,7 @@ extern "C" {
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
@@ -316,8 +317,6 @@ namespace SimulationManager {
         bool AnyUnderwaterBoundaries = false;
         int EnvCount;
 
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_700("('Environment:WarmupDays,',I3)");
 
         // CreateSQLiteDatabase();
         sqlite = EnergyPlus::CreateSQLiteDatabase();
@@ -343,7 +342,8 @@ namespace SimulationManager {
         AskForConnectionsReport = false; // set to false until sizing is finished
 
         OpenOutputFiles();
-        GetProjectData();
+        auto &outputFiles = OutputFiles::getSingleton();
+        GetProjectData(outputFiles);
         CheckForMisMatchedEnvironmentSpecifications();
         CheckForRequestedReporting();
         SetPredefinedTables();
@@ -372,7 +372,7 @@ namespace SimulationManager {
         }
 
         DoingSizing = true;
-        ManageSizing();
+        ManageSizing(OutputFiles::getSingleton());
 
         BeginFullSimFlag = true;
         SimsDone = false;
@@ -401,7 +401,7 @@ namespace SimulationManager {
         KickOffSimulation = true;
 
         ResetEnvironmentCounter();
-        SetupSimulation(ErrorsFound);
+        SetupSimulation(outputFiles, ErrorsFound);
 
         CheckAndReadFaults();
 
@@ -422,12 +422,12 @@ namespace SimulationManager {
             SetupNodeVarsForReporting();
             MetersHaveBeenInitialized = true;
             SetupPollutionMeterReporting();
+            SystemReports::AllocateAndSetUpVentReports();
             UpdateMeterReporting();
             CheckPollutionMeterReporting();
             facilityElectricServiceObj->verifyCustomMetersElecPowerMgr();
             SetupPollutionCalculations();
             InitDemandManagers();
-
             TestBranchIntegrity(ErrFound);
             if (ErrFound) TerminalError = true;
             TestAirPathIntegrity(ErrFound);
@@ -449,7 +449,6 @@ namespace SimulationManager {
                 //      CALL ReportCompSetMeterVariables
                 //      CALL ReportParentChildren
             }
-
             CreateEnergyReportStructure();
             bool anyEMSRan;
             ManageEMS(emsCallFromSetupSimulation, anyEMSRan); // point to finish setup processing EMS, sensor ready now
@@ -481,7 +480,7 @@ namespace SimulationManager {
 
         // if user requested HVAC Sizing Simulation, call HVAC sizing simulation manager
         if (DoHVACSizingSimulation) {
-            ManageHVACSizingSimulation(ErrorsFound);
+            ManageHVACSizingSimulation(OutputFiles::getSingleton(), ErrorsFound);
         }
 
         ShowMessage("Beginning Simulation");
@@ -494,7 +493,7 @@ namespace SimulationManager {
 
         while (Available) {
 
-            GetNextEnvironment(Available, ErrorsFound);
+            GetNextEnvironment(outputFiles, Available, ErrorsFound);
 
             if (!Available) break;
             if (ErrorsFound) break;
@@ -572,7 +571,8 @@ namespace SimulationManager {
                     } else {
                         DisplayString("Starting Simulation at " + DataEnvironment::CurMnDy + " for " + EnvironmentName);
                     }
-                    ObjexxFCL::gio::write(OutputFileInits, Format_700) << NumOfWarmupDays;
+                    static constexpr auto Format_700("Environment:WarmupDays,{:3}\n");
+                    print(outputFiles.eio, Format_700, NumOfWarmupDays);
                     ResetAccumulationWhenWarmupComplete();
                 } else if (DisplayPerfSimulationFlag) {
                     if (KindOfSim == ksRunPeriodWeather) {
@@ -595,7 +595,7 @@ namespace SimulationManager {
 
                     for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
                         if (AnySlabsInModel || AnyBasementsInModel) {
-                            SimulateGroundDomains(false);
+                            SimulateGroundDomains(OutputFiles::getSingleton(), false);
                         }
 
                         if (AnyUnderwaterBoundaries) {
@@ -701,7 +701,7 @@ namespace SimulationManager {
 #ifdef EP_Detailed_Timings
         epStopTime("Closeout Reporting=");
 #endif
-        CloseOutputFiles();
+        CloseOutputFiles(outputFiles);
 
         // sqlite->createZoneExtendedOutput();
         CreateSQLiteZoneExtendedOutput();
@@ -717,7 +717,7 @@ namespace SimulationManager {
         }
     }
 
-    void GetProjectData()
+    void GetProjectData(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -768,13 +768,6 @@ namespace SimulationManager {
         bool CondFDAlgo;
         int Item;
 
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_721("(' Version, ',A)");
-        static ObjexxFCL::gio::Fmt Format_731("(' Timesteps per Hour, ',I2,', ',I2)");
-        static ObjexxFCL::gio::Fmt Format_733("(' System Convergence Limits',4(', ',A))");
-        static ObjexxFCL::gio::Fmt Format_741("(' Simulation Control',$)");
-        static ObjexxFCL::gio::Fmt Format_741_1("(', ',A,$)");
-        static ObjexxFCL::gio::Fmt Format_751("(' Output Reporting Tolerances',5(', ',A))");
 
         ErrorsFound = false;
 
@@ -1212,17 +1205,26 @@ namespace SimulationManager {
             ShowFatalError("Errors found getting Project Input");
         }
 
-        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Version>, Version ID";
-        ObjexxFCL::gio::write(OutputFileInits, Format_721) << VersionID;
+        print(outputFiles.eio, "{}\n", "! <Version>, Version ID");
+        static constexpr auto Format_721(" Version, {}\n");
+        print(outputFiles.eio, Format_721, VersionID);
 
-        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Timesteps per Hour>, #TimeSteps, Minutes per TimeStep {minutes}";
-        ObjexxFCL::gio::write(OutputFileInits, Format_731) << NumOfTimeStepInHour << int(MinutesPerTimeStep);
+        print(outputFiles.eio, "{}\n", "! <Timesteps per Hour>, #TimeSteps, Minutes per TimeStep {minutes}");
+        static constexpr auto Format_731(" Timesteps per Hour, {:2}, {:2}\n");
+        print(outputFiles.eio, Format_731, NumOfTimeStepInHour, MinutesPerTimeStep);
 
-        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <System Convergence Limits>, Minimum System TimeStep {minutes}, Max HVAC Iterations, Minimum Plant "
-                                             "Iterations, Maximum Plant Iterations";
+        print(outputFiles.eio,
+              "{}\n",
+              "! <System Convergence Limits>, Minimum System TimeStep {minutes}, Max HVAC Iterations, Minimum Plant "
+              "Iterations, Maximum Plant Iterations");
         MinInt = MinTimeStepSys * 60.0;
-        ObjexxFCL::gio::write(OutputFileInits, Format_733) << RoundSigDigits(MinInt) << RoundSigDigits(MaxIter) << RoundSigDigits(MinPlantSubIterations)
-                                                << RoundSigDigits(MaxPlantSubIterations);
+        static constexpr auto Format_733(" System Convergence Limits, {}, {}, {}, {}\n");
+        print(outputFiles.eio,
+              Format_733,
+              RoundSigDigits(MinInt),
+              RoundSigDigits(MaxIter),
+              RoundSigDigits(MinPlantSubIterations),
+              RoundSigDigits(MaxPlantSubIterations));
 
         if (DoZoneSizing) {
             Alphas(1) = "Yes";
@@ -1258,18 +1260,23 @@ namespace SimulationManager {
             Alphas(6) = "No";
         }
 
-        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Simulation Control>, Do Zone Sizing, Do System Sizing, Do Plant Sizing, Do Design Days, Do Weather "
-                                             "Simulation, Do HVAC Sizing Simulation";
-        ObjexxFCL::gio::write(OutputFileInits, Format_741);
+        print(outputFiles.eio,
+              "{}\n",
+              "! <Simulation Control>, Do Zone Sizing, Do System Sizing, Do Plant Sizing, Do Design Days, Do Weather "
+              "Simulation, Do HVAC Sizing Simulation");
+        print(outputFiles.eio, " Simulation Control");
         for (Num = 1; Num <= 6; ++Num) {
-            ObjexxFCL::gio::write(OutputFileInits, Format_741_1) << Alphas(Num);
+            print(outputFiles.eio, ", {}", Alphas(Num));
         }
-        ObjexxFCL::gio::write(OutputFileInits);
+        print(outputFiles.eio, "\n");
 
-        ObjexxFCL::gio::write(OutputFileInits, fmtA)
-            << "! <Output Reporting Tolerances>, Tolerance for Time Heating Setpoint Not Met, Tolerance for Zone Cooling Setpoint Not Met Time";
-        ObjexxFCL::gio::write(OutputFileInits, Format_751) << RoundSigDigits(std::abs(deviationFromSetPtThresholdHtg), 3)
-                                                << RoundSigDigits(deviationFromSetPtThresholdClg, 3);
+        print(outputFiles.eio,
+              "{}\n",
+              "! <Output Reporting Tolerances>, Tolerance for Time Heating Setpoint Not Met, Tolerance for Zone Cooling Setpoint Not Met Time");
+        // Formats
+        static constexpr auto Format_751(" Output Reporting Tolerances, {:.3R}, {:.3R}, \n");
+
+        print(outputFiles.eio, Format_751, std::abs(deviationFromSetPtThresholdHtg), deviationFromSetPtThresholdClg);
 
         //  IF (DisplayExtraWarnings) THEN
         //    Write(OutputFileInits,740)
@@ -1640,25 +1647,18 @@ namespace SimulationManager {
             write_stat = flags.ios();
         }
         if (write_stat != 0) {
-            ShowFatalError("OpenOutputFiles: Could not open file " + DataStringGlobals::outputEsoFileName + " for output (write).");
+           ShowFatalError("OpenOutputFiles: Could not open file " + DataStringGlobals::outputEsoFileName + " for output (write).");
         }
         eso_stream = ObjexxFCL::gio::out_stream(OutputFileStandard);
         ObjexxFCL::gio::write(OutputFileStandard, fmtA) << "Program Version," + VerString;
 
         // Open the Initialization Output File
-        OutputFileInits = GetNewUnitNumber();
-        {
-            IOFlags flags;
-            flags.ACTION("write");
-            flags.STATUS("UNKNOWN");
-            ObjexxFCL::gio::open(OutputFileInits, DataStringGlobals::outputEioFileName, flags);
-            write_stat = flags.ios();
+        OutputFiles::getSingleton().eio.open();
+        if (!OutputFiles::getSingleton().eio.good()) {
+            ShowFatalError("OpenOutputFiles: Could not open file " + OutputFiles::getSingleton().eio.fileName + " for output (write).");
         }
-        if (write_stat != 0) {
-            ShowFatalError("OpenOutputFiles: Could not open file " + DataStringGlobals::outputEioFileName + " for output (write).");
-        }
-        eio_stream = ObjexxFCL::gio::out_stream(OutputFileInits);
-        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Program Version," + VerString;
+
+        print(OutputFiles::getSingleton().eio, "Program Version,{}\n", VerString);
 
         // Open the Meters Output File
         OutputFileMeters = GetNewUnitNumber();
@@ -1691,7 +1691,7 @@ namespace SimulationManager {
         ObjexxFCL::gio::write(OutputFileBNDetails, fmtA) << "Program Version," + VerString;
     }
 
-    void CloseOutputFiles()
+    void CloseOutputFiles(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1747,11 +1747,7 @@ namespace SimulationManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt EndOfDataFormat("(\"End of Data\")"); // Signifies the end of the data block in the output file
-        static std::string const ThreadingHeader("! <Program Control Information:Threads/Parallel Sims>, Threading Supported,Maximum Number of "
-                                                 "Threads, Env Set Threads (OMP_NUM_THREADS), EP Env Set Threads (EP_OMP_NUM_THREADS), IDF Set "
-                                                 "Threads, Number of Threads Used (Interior Radiant Exchange), Number Nominal Surfaces, Number "
-                                                 "Parallel Sims");
+        static constexpr auto EndOfDataFormat("End of Data"); // Signifies the end of the data block in the output file
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -1837,12 +1833,17 @@ namespace SimulationManager {
         eso_stream = nullptr;
 
         if (DataHeatBalance::AnyCondFD) { // echo out relaxation factor, it may have been changed by the program
-            ObjexxFCL::gio::write(OutputFileInits, fmtA)
-                << "! <ConductionFiniteDifference Numerical Parameters>, Starting Relaxation Factor, Final Relaxation Factor";
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "ConductionFiniteDifference Numerical Parameters, " + RoundSigDigits(CondFDRelaxFactorInput, 3) +
-                                                     ", " + RoundSigDigits(CondFDRelaxFactor, 3);
+            print(
+                outputFiles.eio, "{}\n", "! <ConductionFiniteDifference Numerical Parameters>, Starting Relaxation Factor, Final Relaxation Factor");
+            print(outputFiles.eio, "ConductionFiniteDifference Numerical Parameters, {:.3R}, {:.3R}\n", CondFDRelaxFactorInput, CondFDRelaxFactor);
         }
         // Report number of threads to eio file
+        static constexpr auto ThreadingHeader("! <Program Control Information:Threads/Parallel Sims>, Threading Supported,Maximum Number of "
+                                              "Threads, Env Set Threads (OMP_NUM_THREADS), EP Env Set Threads (EP_OMP_NUM_THREADS), IDF Set "
+                                              "Threads, Number of Threads Used (Interior Radiant Exchange), Number Nominal Surfaces, Number "
+                                              "Parallel Sims");
+        print(outputFiles.eio, "{}\n", ThreadingHeader);
+        static constexpr auto ThreadReport("Program Control:Threads/Parallel Sims, {},{}, {}, {}, {}, {}, {}, {}\n");
         if (Threading) {
             if (iEnvSetThreads == 0) {
                 cEnvSetThreads = "Not Set";
@@ -1860,33 +1861,39 @@ namespace SimulationManager {
                 cIDFSetThreads = RoundSigDigits(iIDFSetThreads);
             }
             if (lnumActiveSims) {
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << ThreadingHeader;
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Program Control:Threads/Parallel Sims, Yes," + RoundSigDigits(MaxNumberOfThreads) + ", " +
-                                                         cEnvSetThreads + ", " + cepEnvSetThreads + ", " + cIDFSetThreads + ", " +
-                                                         RoundSigDigits(NumberIntRadThreads) + ", " + RoundSigDigits(iNominalTotSurfaces) + ", " +
-                                                         RoundSigDigits(inumActiveSims);
+                print(outputFiles.eio,
+                      ThreadReport,
+                      "Yes",
+                      MaxNumberOfThreads,
+                      cEnvSetThreads,
+                      cepEnvSetThreads,
+                      cIDFSetThreads,
+                      NumberIntRadThreads,
+                      iNominalTotSurfaces,
+                      inumActiveSims);
             } else {
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << ThreadingHeader;
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Program Control:Threads/Parallel Sims, Yes," + RoundSigDigits(MaxNumberOfThreads) + ", " +
-                                                         cEnvSetThreads + ", " + cepEnvSetThreads + ", " + cIDFSetThreads + ", " +
-                                                         RoundSigDigits(NumberIntRadThreads) + ", " + RoundSigDigits(iNominalTotSurfaces) + ", N/A";
+                print(outputFiles.eio,
+                      ThreadReport,
+                      "Yes",
+                      MaxNumberOfThreads,
+                      cEnvSetThreads,
+                      cepEnvSetThreads,
+                      cIDFSetThreads,
+                      NumberIntRadThreads,
+                      iNominalTotSurfaces,
+                      "N/A");
             }
         } else { // no threading
             if (lnumActiveSims) {
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << ThreadingHeader;
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Program Control:Threads/Parallel Sims, No," + RoundSigDigits(MaxNumberOfThreads) +
-                                                         ", N/A, N/A, N/A, N/A, N/A, " + RoundSigDigits(inumActiveSims);
+                print(outputFiles.eio, ThreadReport, "No", MaxNumberOfThreads, "N/A", "N/A", "N/A", "N/A", "N/A", inumActiveSims);
             } else {
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << ThreadingHeader;
-                ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Program Control:Threads/Parallel Sims, No," + RoundSigDigits(MaxNumberOfThreads) +
-                                                         ", N/A, N/A, N/A, N/A, N/A, N/A";
+                print(outputFiles.eio, ThreadReport, "No", MaxNumberOfThreads, "N/A", "N/A", "N/A", "N/A", "N/A", "N/A");
             }
         }
 
         // Close the Initialization Output File
-        ObjexxFCL::gio::write(OutputFileInits, EndOfDataFormat);
-        ObjexxFCL::gio::close(OutputFileInits);
-        eio_stream = nullptr;
+        print(outputFiles.eio, "{}\n", EndOfDataFormat);
+        outputFiles.eio.close();
 
         // Close the Meters Output File
         ObjexxFCL::gio::write(OutputFileMeters, EndOfDataFormat);
@@ -1909,7 +1916,7 @@ namespace SimulationManager {
         }
     }
 
-    void SetupSimulation(bool &ErrorsFound)
+    void SetupSimulation(OutputFiles &outputFiles, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1949,7 +1956,7 @@ namespace SimulationManager {
 
         while (Available) { // do for each environment
 
-            GetNextEnvironment(Available, ErrorsFound);
+            GetNextEnvironment(outputFiles, Available, ErrorsFound);
 
             if (!Available) break;
             if (ErrorsFound) break;
@@ -2012,7 +2019,7 @@ namespace SimulationManager {
         } // ... End environment loop.
 
         if (AnySlabsInModel || AnyBasementsInModel) {
-            SimulateGroundDomains(true);
+            SimulateGroundDomains(outputFiles, true);
         }
 
         if (!ErrorsFound) SimCostEstimate(); // basically will get and check input

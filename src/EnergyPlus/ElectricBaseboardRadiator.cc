@@ -441,10 +441,10 @@ namespace ElectricBaseboardRadiator {
                 ElecBaseboard(BaseboardNum).SurfaceName(SurfNum) = cAlphaArgs(SurfNum + 3);
                 ElecBaseboard(BaseboardNum).SurfacePtr(SurfNum) =
                     HeatBalanceIntRadExchange::GetRadiantSystemSurface(cCurrentModuleObject,
-                        ElecBaseboard(BaseboardNum).EquipName,
-                        ElecBaseboard(BaseboardNum).ZonePtr,
-                        ElecBaseboard(BaseboardNum).SurfaceName(SurfNum),
-                        ErrorsFound);
+                                                                       ElecBaseboard(BaseboardNum).EquipName,
+                                                                       ElecBaseboard(BaseboardNum).ZonePtr,
+                                                                       ElecBaseboard(BaseboardNum).SurfaceName(SurfNum),
+                                                                       ErrorsFound);
                 ElecBaseboard(BaseboardNum).FracDistribToSurf(SurfNum) = rNumericArgs(SurfNum + 6);
                 if (ElecBaseboard(BaseboardNum).FracDistribToSurf(SurfNum) > MaxFraction) {
                     ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(SurfNum + 6) +
@@ -770,7 +770,7 @@ namespace ElectricBaseboardRadiator {
         using DataZoneEnergyDemands::CurDeadBandOrSetback;
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
         using DataZoneEquipment::ZoneEquipConfig;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using ScheduleManager::GetCurrentScheduleValue;
         using ScheduleManager::GetScheduleIndex;
 
@@ -794,7 +794,7 @@ namespace ElectricBaseboardRadiator {
         QZnReq = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
         AirInletTemp = ElecBaseboard(BaseboardNum).AirInletTemp;
         AirOutletTemp = AirInletTemp;
-        CpAir = PsyCpAirFnWTdb(ElecBaseboard(BaseboardNum).AirInletHumRat, AirInletTemp);
+        CpAir = PsyCpAirFnW(ElecBaseboard(BaseboardNum).AirInletHumRat);
         AirMassFlowRate = SimpConvAirFlowSpeed;
         CapacitanceAir = CpAir * AirMassFlowRate;
 

@@ -269,7 +269,6 @@ private:
 
     std::unique_ptr<std::ostringstream> json_stream;
     std::unique_ptr<std::ostringstream> eso_stream;
-    std::unique_ptr<std::ostringstream> eio_stream;
     std::unique_ptr<std::ostringstream> mtr_stream;
     std::unique_ptr<std::ostringstream> err_stream;
     std::unique_ptr<std::ostringstream> m_cout_buffer;

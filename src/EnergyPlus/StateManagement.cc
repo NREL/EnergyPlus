@@ -296,7 +296,6 @@ void EnergyPlus::clearAllStates()
     DaylightingManager::clear_state();
     DemandManager::clear_state();
     DesiccantDehumidifiers::clear_state();
-    DirectAirManager::clear_state();
     DualDuct::clear_state();
     DXCoils::clear_state();
     clearFacilityElectricPowerServiceObject();

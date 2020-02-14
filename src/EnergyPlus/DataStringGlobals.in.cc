@@ -122,7 +122,6 @@ namespace DataStringGlobals {
     std::string outputAuditFileName("eplusout.audit");
     std::string outputBndFileName("eplusout.bnd");
     std::string outputDxfFileName("eplusout.dxf");
-    std::string outputEioFileName("eplusout.eio");
     std::string outputEndFileName("eplusout.end");
     std::string outputErrFileName("eplusout.err");
     std::string outputEsoFileName("eplusout.eso");

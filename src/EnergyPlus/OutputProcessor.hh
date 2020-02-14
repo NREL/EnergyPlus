@@ -65,6 +65,7 @@
 #include <EnergyPlus/DisplayRoutines.hh>
 
 namespace EnergyPlus {
+    class OutputFiles;
 
 namespace OutputProcessor {
 
@@ -605,7 +606,7 @@ namespace OutputProcessor {
                       int const MaxIndx                // Max number (from previous routine) for this variable
     );
 
-    void GetReportVariableInput();
+    void GetReportVariableInput(OutputFiles &outputFiles);
 
     ReportingFrequency determineFrequency(std::string const &FreqString);
 
