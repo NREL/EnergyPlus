@@ -11694,16 +11694,6 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputwithTradeOff)
 TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput_Autosizing)
 {
 
-    bool ErrorsFound(false);
-    bool FirstHVACIteration(false);
-    Real64 CpAir(0.0);       // specific heat of air
-    Real64 Qsens_sys(0.0);   // UnitarySystem delivered sensible capacity wrt zone
-    Real64 MinHumRatio(0.0); // track minimum of outlet node or zone humidity ratio
-    Real64 ZoneTemp(0.0);    // control zone temperature
-    int InletNode(0);        // UnitarySystem inlet node number
-    int OutletNode(0);       // UnitarySystem outlet node number
-    int ControlZoneNum(0);   // index to control zone
-
     std::string const idf_objects = delimited_string({
         "Zone,",
         "  EAST ZONE,                !- Name",
@@ -11906,9 +11896,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput_Autosizing)
     });
 
 
-
     ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
 
+    bool ErrorsFound(false);
     HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                    // expect no errors
 
@@ -11921,15 +11911,26 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput_Autosizing)
     std::string compName = "UNITARY SYSTEM MODEL";
     bool zoneEquipment = true;
     int compTypeOfNum = DataHVACGlobals::UnitarySys_AnyCoilType;
-    FirstHVACIteration = true;
+
     UnitarySystems::UnitarySys::factory(compTypeOfNum, compName, zoneEquipment, 0);
+    // only 1 unitary system above so expect 1 as number of unitary system objects
+    ASSERT_EQ(1, UnitarySystems::numUnitarySystems);
+    // Now retrieve it
     UnitarySystems::UnitarySys *thisSys = &UnitarySystems::unitarySys[0];
 
-    DataZoneEquipment::ZoneEquipInputsFilled = true;                             // indicate zone data is available
-    thisSys->getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
-    EXPECT_FALSE(ErrorsFound);                                                   // expect no errors
+    // indicate zone data is available
+    DataZoneEquipment::ZoneEquipInputsFilled = true;
 
-    ASSERT_EQ(1, UnitarySystems::numUnitarySystems); // only 1 unitary system above so expect 1 as number of unitary system objects
-    EXPECT_EQ(thisSys->UnitType, DataHVACGlobals::cFurnaceTypes(compTypeOfNum)); // compare UnitarySystem type string to valid type
+    // get UnitarySystem input from object above
+    // Before fix for #7771, it throws
+    // C++ exception with description "[json.exception.type_error.302] type must be number, but is string" thrown in the test body.
+    ASSERT_NO_THROW(thisSys->getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound));
+    EXPECT_FALSE(ErrorsFound);
 
+    EXPECT_EQ(thisSys->DesignMinOutletTemp, DataSizing::AutoSize);
+    EXPECT_EQ(thisSys->m_MaxCoolAirVolFlow, DataSizing::AutoSize);
+    EXPECT_EQ(thisSys->m_MaxHeatAirVolFlow, DataSizing::AutoSize);
+    EXPECT_EQ(thisSys->m_MaxNoCoolHeatAirVolFlow, DataSizing::AutoSize);
+    EXPECT_EQ(thisSys->DesignMaxOutletTemp, DataSizing::AutoSize);
+    EXPECT_TRUE(thisSys->m_RequestAutoSize);
 }
