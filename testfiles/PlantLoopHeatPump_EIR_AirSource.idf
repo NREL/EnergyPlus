@@ -256,6 +256,23 @@
     0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
 
+  HeatPump:PlantLoop:EIR:Heating,
+    Heating Coil,            !- Name
+    Heating Coil Load Loop Intermediate Node, !- Load Side Inlet Node Name
+    Heating Coil Load Loop Supply Outlet Node,  !- Load Side Outlet Node Name
+    AirSource,               !- Condenser Type
+    Outdoor Air Inlet Node,  !- Source Side Inlet Node Name
+    Outdoor Air Outlet Node, !- Source Side Outlet Node Name
+    Cooling Coil,            !- Companion Coil Name
+    0.005,                   !- Load Side Design Volume Flow Rate {m3/s}
+    2,                       !- Source Side Design Volume Flow Rate {m3/s}
+    80000,                   !- Reference Capacity
+    3.5,                     !- Reference COP
+    ,                        !- Sizing Factor
+    CapCurveFuncTemp,        !- Heating Capacity Function of Temperature Curve Name
+    EIRCurveFuncTemp,        !- Electric Input to Heating Output Ratio Function of Temperature Curve Name
+    EIRCurveFuncPLR;         !- Electric Input to Heating Output Ratio Function of Part Load Ratio Curve Name
+
   Curve:Biquadratic,
     CapCurveFuncTemp,        !- Name
     1.0,                     !- Coefficient1 Constant
@@ -397,6 +414,23 @@
     0,                       !- Coefficient 4 of the Part Load Performance Curve
     0,                       !- Design Minimum Flow Rate {m3/s}
     INTERMITTENT;            !- Pump Control Type
+
+  HeatPump:PlantLoop:EIR:Cooling,
+    Cooling Coil,            !- Name
+    Cooling Coil Load Loop Intermediate Node, !- Load Side Inlet Node Name
+    Cooling Coil Load Loop Supply Outlet Node,  !- Load Side Outlet Node Name
+    AirSource,               !- Condenser Type
+    Outdoor Air Inlet Node,  !- Source Side Inlet Node Name
+    Outdoor Air Outlet Node, !- Source Side Outlet Node Name
+    Heating Coil,            !- Companion Heating Heat Pump Name
+    0.005,                   !- Load Side Design Volume Flow Rate {m3/s}
+    20,                      !- Source Side Design Volume Flow Rate {m3/s}
+    400000,                  !- Reference Capacity
+    3.5,                     !- Reference COP
+    ,                        !- Sizing Factor
+    CapCurveFuncTemp2,       !- Heating Capacity Modifier Function of Temperature Curve Name
+    EIRCurveFuncTemp2,       !- Electric Input to Heating Output Ratio Modifier Function of Temperature Curve Name
+    EIRCurveFuncPLR2;        !- Electric Input to Heating Output Ratio Modifier Function of Part Load Ratio Curve Name
 
   Curve:Biquadratic,
     CapCurveFuncTemp2,       !- Name
