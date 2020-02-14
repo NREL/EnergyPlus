@@ -54,15 +54,20 @@
 // ObjexxFCL Headers
 
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataDefineEquip.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SingleDuct.hh>
+#include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
 
 #include <EnergyPlus/DataRuntimeLanguage.hh>
@@ -148,7 +153,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_GetInput)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput();  // read schedules
+    ProcessScheduleInput(OutputFiles::getSingleton());  // read schedules
 
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -169,7 +174,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimConstVolNoReheat)
 {
 
     bool ErrorsFound(false);
-    bool FirstHVACIteration(false);
 
     std::string const idf_objects = delimited_string({
         "  AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
@@ -229,7 +233,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimConstVolNoReheat)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput();  // read schedules
+    ProcessScheduleInput(OutputFiles::getSingleton());  // read schedules
 
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -238,7 +242,6 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimConstVolNoReheat)
     GetZoneAirLoopEquipment();
     GetSysInput();
     DataEnvironment::StdRhoAir = 1.0;
-    // FirstHVACIteration = false;
     int const SysNum(1);
     Real64 MassFlowRateMaxAvail = Sys(SysNum).MaxAirVolFlowRate * DataEnvironment::StdRhoAir;
     SysInlet(SysNum).AirMassFlowRate = MassFlowRateMaxAvail;
@@ -246,7 +249,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimConstVolNoReheat)
     int const ZonePtr = Sys(SysNum).ActualZoneNum;
     int const ZoneAirNodeNum = ZoneEquipConfig(ZonePtr).ZoneNode;
     // run SimConstVolNoReheat() function
-    Sys(SysNum).SimConstVolNoReheat(SysNum, FirstHVACIteration, ZonePtr, ZoneAirNodeNum);
+    Sys(SysNum).SimConstVolNoReheat(SysNum, ZoneAirNodeNum);
     // check the TA outlet air mass flow rate
     EXPECT_EQ(MassFlowRateMaxAvail, SysOutlet(SysNum).AirMassFlowRate);
 }
@@ -315,7 +318,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_Sim)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput();  // read schedules
+    ProcessScheduleInput(OutputFiles::getSingleton());  // read schedules
 
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
@@ -384,6 +387,218 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_Sim)
     EXPECT_EQ(SysOutlet(SysNum).AirMassFlowRate, SysInlet(SysNum).AirMassFlowRate);
 }
 
+TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
+{
+
+    bool ErrorsFound(false);
+    bool FirstHVACIteration(false);
+
+    std::string const idf_objects = delimited_string({
+        "  AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+        "    SDCVNoReheatAT1,         !- Name",
+        "    ,                        !- Availability Schedule Name",
+        "    Zone1NoReheatAirInletNode,   !- Air Inlet Node Name",
+        "    Zone1NoReheatAirOutletNode,  !- Air Outlet Node Name",
+        "    3.0,                     !- Maximum Air Flow Rate {m3/s}",
+        "    Zone 1 Ventilation,      !- Design Specification Outdoor Air Object Name",
+        "    CurrentOccupancy;        !- Per Person Ventilation Rate Mode",
+
+        "DesignSpecification:OutdoorAir,",
+        "    Zone 1 Ventilation,      !- Name",
+        "    Sum,                     !- Outdoor Air Method",
+        "    0.1000,                  !- Outdoor Air Flow per Person {m3/s-person}",
+        "    0.0000,                  !- Outdoor Air Flow per Zone Floor Area {m3/s-m2}",
+        "    0.5,                     !- Outdoor Air Flow per Zone {m3/s}",
+        "    0,                       !- Outdoor Air Flow Air Changes per Hour {1/hr}",
+        "    VentSchedule;            !- Outdoor Air Schedule Name",
+
+        "  Schedule:Compact,",
+        "    VentSchedule,            !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 18:00,1.0,        !- Field 3",
+        "    Until: 24:00,0.0;        !- Field 4",
+
+        "  People,",
+        "    West Zone People,        !- Name",
+        "    West Zone,               !- Zone or ZoneList Name",
+        "    OFFICE OCCUPANCY,        !- Number of People Schedule Name",
+        "    people,                  !- Number of People Calculation Method",
+        "    3.000000,                !- Number of People",
+        "    ,                        !- People per Zone Floor Area {person/m2}",
+        "    ,                        !- Zone Floor Area per Person {m2/person}",
+        "    0.3000000,               !- Fraction Radiant",
+        "    ,                        !- Sensible Heat Fraction",
+        "    Activity Sch;            !- Activity Level Schedule Name",
+
+        "  Schedule:Compact,",
+        "    OFFICE OCCUPANCY,        !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: WeekDays,           !- Field 2",
+        "    Until: 6:00,0.0,         !- Field 3",
+        "    Until: 7:00,0.10,        !- Field 5",
+        "    Until: 8:00,0.50,        !- Field 7",
+        "    Until: 12:00,1.00,       !- Field 9",
+        "    Until: 13:00,0.50,       !- Field 11",
+        "    Until: 16:00,1.00,       !- Field 13",
+        "    Until: 17:00,0.50,       !- Field 15",
+        "    Until: 18:00,0.10,       !- Field 17",
+        "    Until: 24:00,0.0,        !- Field 19",
+        "    For: AllOtherDays,       !- Field 21",
+        "    Until: 24:00,0.0;        !- Field 22",
+
+        "  Schedule:Compact,",
+        "    Activity Sch,            !- Name",
+        "    Any Number,              !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,131.8;      !- Field 3",
+
+        "  ZoneHVAC:EquipmentList,",
+        "    Zone1Equipment,          !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+        "    SDCVNoReheatADU1,        !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
+
+        "  ZoneHVAC:AirDistributionUnit,",
+        "    SDCVNoReheatADU1,        !- Name",
+        "    Zone1NoReheatAirOutletNode,  !- Air Distribution Unit Outlet Node Name",
+        "    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+        "    SDCVNoReheatAT1;         !- Air Terminal Name",
+
+        "  Zone,",
+        "    West Zone,               !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    2.40,                    !- Ceiling Height {m}",
+        "    240.0;                   !- Volume {m3}",
+
+        "  ZoneHVAC:EquipmentConnections,",
+        "    West Zone,               !- Zone Name",
+        "    Zone1Equipment,          !- Zone Conditioning Equipment List Name",
+        "    Zone1Inlets,             !- Zone Air Inlet Node or NodeList Name",
+        "    ,                        !- Zone Air Exhaust Node or NodeList Name",
+        "    Zone 1 Node,             !- Zone Air Node Name",
+        "    Zone 1 Outlet Node;      !- Zone Return Air Node Name",
+
+        "  NodeList,",
+        "    Zone1Inlets,             !- Name",
+        "    Zone1NoReheatAirOutletNode;   !- Node 1 Name",
+
+        });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    ProcessScheduleInput(OutputFiles::getSingleton());  // read schedules
+
+    GetZoneData(ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+
+    SizingManager::GetOARequirements();
+    InternalHeatGains::GetInternalHeatGainsInput(OutputFiles::getSingleton());
+    GetZoneEquipmentData1();
+    GetZoneAirLoopEquipment();
+    GetSysInput();
+
+    DataGlobals::SysSizingCalc = true;
+    DataGlobals::BeginEnvrnFlag = true;
+    DataEnvironment::StdRhoAir = 1.0;
+    DataEnvironment::OutBaroPress = 101325.0;
+
+    int const SysNum(1);
+    int const InletNode = Sys(SysNum).InletNodeNum;
+    int const ZonePtr = Sys(SysNum).ActualZoneNum;
+    int const ZoneAirNodeNum = ZoneEquipConfig(ZonePtr).ZoneNode;
+
+    // design maximum air mass flow rate
+    Real64 MassFlowRateMaxAvail = Sys(SysNum).MaxAirVolFlowRate * DataEnvironment::StdRhoAir;
+    EXPECT_EQ(3.0, Sys(SysNum).MaxAirVolFlowRate);
+    EXPECT_EQ(3.0, MassFlowRateMaxAvail);
+
+    // set air inlet node properties
+    Node(InletNode).Temp = 50.0;
+    Node(InletNode).HumRat = 0.0075;
+    Node(InletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(InletNode).Temp, Node(InletNode).HumRat);
+    Node(InletNode).MassFlowRate = 0.0;
+    // set zone air node properties
+    Node(ZoneAirNodeNum).Temp = 20.0;
+    Node(ZoneAirNodeNum).HumRat = 0.0075;
+    Node(ZoneAirNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(ZoneAirNodeNum).Temp, Node(ZoneAirNodeNum).HumRat);
+
+    // set inlet mass flow rate to zero
+    Node(InletNode).MassFlowRateMaxAvail = 0.0;
+    FirstHVACIteration = true;
+    SingleDuct::GetInputFlag = false;
+    // run SimulateSingleDuct() function
+    SimulateSingleDuct(AirDistUnit(1).EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, AirDistUnit(1).EquipIndex(1));
+    // check AT air mass flow rates
+    EXPECT_EQ(MassFlowRateMaxAvail, Sys(SysNum).AirMassFlowRateMax); // design maximum mass flow rate
+    EXPECT_EQ(0.0, SysInlet(SysNum).AirMassFlowRateMaxAvail);        // maximum available mass flow rate
+    EXPECT_EQ(0.0, SysInlet(SysNum).AirMassFlowRate);                // outlet mass flow rate is zero
+    EXPECT_EQ(0.0, SysOutlet(SysNum).AirMassFlowRate);               // outlet mass flow rate is zero
+    EXPECT_EQ(0.0, Sys(SysNum).HeatRate);                            // delivered heat rate is zero
+
+    DataGlobals::BeginEnvrnFlag = false;
+    FirstHVACIteration = false;
+    // Needs an airloop, assume 100% OA
+    Sys(SysNum).AirLoopNum = 1;
+    DataAirLoop::AirLoopFlow.allocate(1);
+    DataAirLoop::AirLoopFlow(Sys(SysNum).AirLoopNum).OAFrac = 1.0;
+    Node(InletNode).MassFlowRateMaxAvail = MassFlowRateMaxAvail;
+    EXPECT_EQ(3.0, MassFlowRateMaxAvail);
+
+    DataEnvironment::DSTIndicator = 0;
+    DataEnvironment::DayOfYear_Schedule = 1;
+    DataEnvironment::DayOfWeek = 1;
+    DataEnvironment::HolidayIndex = 0;
+    DataGlobals::TimeStep = 1;
+
+    // Full occupancy 3 people, OA/person = 0.1, OA/zone = 0.5, OA Sched = 1.0
+    DataGlobals::HourOfDay = 12;
+    ScheduleManager::UpdateScheduleValues();
+    // Just set number of people directly, too many other things that have to be in place to call ManagerInternalHeatGains()
+    DataHeatBalance::ZoneIntGain(1).NOFOCC = 3.0;
+    Real64 expectedMassFlow = 1.0 * ((3.0 * 0.1) + 0.5);
+
+    // run SimulateSingleDuct() function
+    SimulateSingleDuct(AirDistUnit(1).EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, AirDistUnit(1).EquipIndex(1));
+    // check AT air mass flow rates
+    EXPECT_EQ(expectedMassFlow, SysInlet(SysNum).AirMassFlowRate);
+    EXPECT_EQ(expectedMassFlow, SysOutlet(SysNum).AirMassFlowRate);
+
+    // 50% occupancy 1.5 people, OA/person = 0.1, OA/zone = 0.5, OA Sched = 1.0
+    DataGlobals::HourOfDay = 12;
+    ScheduleManager::UpdateScheduleValues();
+    // Just set number of people directly, too many other things that have to be in place to call ManagerInternalHeatGains()
+    DataHeatBalance::ZoneIntGain(1).NOFOCC = 1.5;
+    expectedMassFlow = 1.0 * ((1.5 * 0.1) + 0.5);
+    SimulateSingleDuct(AirDistUnit(1).EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, AirDistUnit(1).EquipIndex(1));
+    // check AT air mass flow rates
+    EXPECT_EQ(expectedMassFlow, SysInlet(SysNum).AirMassFlowRate);
+    EXPECT_EQ(expectedMassFlow, SysOutlet(SysNum).AirMassFlowRate);
+
+    // Nighttime OA Sched = 0.0
+    DataGlobals::HourOfDay = 24;
+    ScheduleManager::UpdateScheduleValues();
+    // Just set number of people directly, too many other things that have to be in place to call ManagerInternalHeatGains()
+    DataHeatBalance::ZoneIntGain(1).NOFOCC = 1.5;
+    expectedMassFlow = 0.0 * ((1.5 * 0.1) + 0.5);
+    SimulateSingleDuct(AirDistUnit(1).EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, AirDistUnit(1).EquipIndex(1));
+    // check AT air mass flow rates
+    EXPECT_EQ(expectedMassFlow, SysInlet(SysNum).AirMassFlowRate);
+    EXPECT_EQ(expectedMassFlow, SysOutlet(SysNum).AirMassFlowRate);
+}
+
 TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_EMSOverrideAirFlow)
 {
 
@@ -448,7 +663,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_EMSOverrideAirFlow)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput();  // read schedules
+    ProcessScheduleInput(OutputFiles::getSingleton());  // read schedules
 
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);

@@ -110,7 +110,6 @@
 #include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DemandManager.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
-#include <EnergyPlus/DirectAirManager.hh>
 #include <EnergyPlus/DualDuct.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/EarthTube.hh>
@@ -257,14 +256,14 @@ void EnergyPlusFixture::SetUp()
 
     show_message();
 
+    OutputFiles::getSingleton().eio.open_as_stringstream();
+    
     this->eso_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
-    this->eio_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
     this->mtr_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
     this->err_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
     this->json_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
 
     DataGlobals::eso_stream = this->eso_stream.get();
-    DataGlobals::eio_stream = this->eio_stream.get();
     DataGlobals::mtr_stream = this->mtr_stream.get();
     DataGlobals::err_stream = this->err_stream.get();
     DataGlobals::jsonOutputStreams.json_stream = this->json_stream.get();
@@ -294,7 +293,6 @@ void EnergyPlusFixture::TearDown()
         ObjexxFCL::gio::close(DataGlobals::OutputFileStandard, flags);
         ObjexxFCL::gio::close(DataGlobals::jsonOutputStreams.OutputFileJson, flags);
         ObjexxFCL::gio::close(DataGlobals::OutputStandardError, flags);
-        ObjexxFCL::gio::close(DataGlobals::OutputFileInits, flags);
         ObjexxFCL::gio::close(DataGlobals::OutputFileDebug, flags);
         ObjexxFCL::gio::close(DataGlobals::OutputFileZoneSizing, flags);
         ObjexxFCL::gio::close(DataGlobals::OutputFileSysSizing, flags);
@@ -367,7 +365,6 @@ void EnergyPlusFixture::clear_all_states()
     DaylightingManager::clear_state();
     DemandManager::clear_state();
     DesiccantDehumidifiers::clear_state();
-    DirectAirManager::clear_state();
     DualDuct::clear_state();
     DXCoils::clear_state();
     EarthTube::clear_state();
@@ -532,10 +529,10 @@ bool EnergyPlusFixture::compare_eso_stream(std::string const &expected_string, b
 
 bool EnergyPlusFixture::compare_eio_stream(std::string const &expected_string, bool reset_stream)
 {
-    auto const stream_str = this->eio_stream->str();
+    auto const stream_str = OutputFiles::getSingleton().eio.get_output();
     EXPECT_EQ(expected_string, stream_str);
     bool are_equal = (expected_string == stream_str);
-    if (reset_stream) this->eio_stream->str(std::string());
+    if (reset_stream) OutputFiles::getSingleton().eio.open_as_stringstream();
     return are_equal;
 }
 
@@ -591,8 +588,8 @@ bool EnergyPlusFixture::has_eso_output(bool reset_stream)
 
 bool EnergyPlusFixture::has_eio_output(bool reset_stream)
 {
-    auto const has_output = this->eio_stream->str().size() > 0;
-    if (reset_stream) this->eio_stream->str(std::string());
+    auto const has_output = !OutputFiles::getSingleton().eio.get_output().empty();
+    if (reset_stream) OutputFiles::getSingleton().eio.open_as_stringstream();
     return has_output;
 }
 

@@ -78,7 +78,6 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/DirectAirManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/EarthTube.hh>
@@ -97,6 +96,7 @@
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
 #include <EnergyPlus/OutdoorAirUnit.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/PackagedTerminalHeatPump.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
@@ -626,7 +626,7 @@ namespace ZoneEquipmentManager {
         Real64 HR90L;                         // humidity ratio at DOAS low setpoint temperature and 90% relative humidity [kg Water / kg Dry Air]
 
         if (SizeZoneEquipmentOneTimeFlag) {
-            SetUpZoneSizingArrays();
+            SetUpZoneSizingArrays(OutputFiles::getSingleton());
             SizeZoneEquipmentOneTimeFlag = false;
         }
 
@@ -907,7 +907,7 @@ namespace ZoneEquipmentManager {
         }
     }
 
-    void SetUpZoneSizingArrays()
+    void SetUpZoneSizingArrays(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -928,7 +928,6 @@ namespace ZoneEquipmentManager {
         // Using/Aliasing
         using DataGlobals::AnyEnergyManagementSystemInModel;
         using DataGlobals::isPulseZoneSizing;
-        using DataGlobals::OutputFileInits;
         using DataHeatBalance::People;
         using DataHeatBalance::TotPeople;
         using DataHeatBalance::Zone;
@@ -971,15 +970,6 @@ namespace ZoneEquipmentManager {
         bool UseMinOASchFlag;            // flag to use min OA schedule when calculating OA
         int DSOAPtr;                     // index to DesignSpecification:OutdoorAir object
 
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_890("('! <Load Timesteps in Zone Design Calculation Averaging Window>, Value')");
-        static ObjexxFCL::gio::Fmt Format_891("(' Load Timesteps in Zone Design Calculation Averaging Window, ',I4)");
-        static ObjexxFCL::gio::Fmt Format_990("('! <Heating Sizing Factor Information>, Sizing Factor ID, Value')");
-        static ObjexxFCL::gio::Fmt Format_991("(' Heating Sizing Factor Information, Global, ',G12.5)");
-        static ObjexxFCL::gio::Fmt Format_992("(' Heating Sizing Factor Information, Zone ',A,', ',G12.5)");
-        static ObjexxFCL::gio::Fmt Format_993("('! <Cooling Sizing Factor Information>, Sizing Factor ID, Value')");
-        static ObjexxFCL::gio::Fmt Format_994("(' Cooling Sizing Factor Information, Global, ',G12.5)");
-        static ObjexxFCL::gio::Fmt Format_995("(' Cooling Sizing Factor Information, Zone ',A,', ',G12.5)");
 
         for (ZoneSizIndex = 1; ZoneSizIndex <= NumZoneSizingInput; ++ZoneSizIndex) {
             ZoneIndex = UtilityRoutines::FindItemInList(ZoneSizingInput(ZoneSizIndex).ZoneName, Zone);
@@ -1015,7 +1005,7 @@ namespace ZoneEquipmentManager {
         }
 
         // Put Auto Sizing of Sizing:Zone inputs here!
-        AutoCalcDOASControlStrategy();
+        AutoCalcDOASControlStrategy(outputFiles);
 
         ZoneSizing.allocate(TotDesDays + TotRunDesPersDays, NumOfZones);
         FinalZoneSizing.allocate(NumOfZones);
@@ -1742,25 +1732,28 @@ namespace ZoneEquipmentManager {
                 CalcZoneSizing(DesDayNum, CtrlZoneNum).DesHeatMaxAirFlow = CalcFinalZoneSizing(CtrlZoneNum).DesHeatMaxAirFlow;
             }
         }
-
-        ObjexxFCL::gio::write(OutputFileInits, Format_890);
-        ObjexxFCL::gio::write(OutputFileInits, Format_891) << NumTimeStepsInAvg;
-        ObjexxFCL::gio::write(OutputFileInits, Format_990);
-        ObjexxFCL::gio::write(OutputFileInits, Format_991) << GlobalHeatSizingFactor;
+        // Formats
+        print(outputFiles.eio, "! <Load Timesteps in Zone Design Calculation Averaging Window>, Value\n");
+        static constexpr auto Format_891(" Load Timesteps in Zone Design Calculation Averaging Window, {:4}\n");
+        print(outputFiles.eio, Format_891, NumTimeStepsInAvg);
+        print(outputFiles.eio, "! <Heating Sizing Factor Information>, Sizing Factor ID, Value\n");
+        static constexpr auto Format_991(" Heating Sizing Factor Information, Global, {:12.5N}\n");
+        print(outputFiles.eio, Format_991, GlobalHeatSizingFactor);
         for (CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
             if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
             if (FinalZoneSizing(CtrlZoneNum).HeatSizingFactor != 1.0) {
-                ObjexxFCL::gio::write(OutputFileInits, Format_992)
-                    << FinalZoneSizing(CtrlZoneNum).ZoneName << FinalZoneSizing(CtrlZoneNum).HeatSizingFactor;
+                static constexpr auto Format_992(" Heating Sizing Factor Information, Zone {}, {:12.5N}\n");
+                print(outputFiles.eio, Format_992, FinalZoneSizing(CtrlZoneNum).ZoneName, FinalZoneSizing(CtrlZoneNum).HeatSizingFactor);
             }
         }
-        ObjexxFCL::gio::write(OutputFileInits, Format_993);
-        ObjexxFCL::gio::write(OutputFileInits, Format_994) << GlobalCoolSizingFactor;
+        print(outputFiles.eio, "! <Cooling Sizing Factor Information>, Sizing Factor ID, Value\n");
+        static constexpr auto Format_994(" Cooling Sizing Factor Information, Global, {:12.5N}\n");
+        print(outputFiles.eio, Format_994, GlobalCoolSizingFactor);
         for (CtrlZoneNum = 1; CtrlZoneNum <= NumOfZones; ++CtrlZoneNum) {
             if (!ZoneEquipConfig(CtrlZoneNum).IsControlled) continue;
             if (FinalZoneSizing(CtrlZoneNum).CoolSizingFactor != 1.0) {
-                ObjexxFCL::gio::write(OutputFileInits, Format_995)
-                    << FinalZoneSizing(CtrlZoneNum).ZoneName << FinalZoneSizing(CtrlZoneNum).CoolSizingFactor;
+                static constexpr auto Format_995(" Cooling Sizing Factor Information, Zone {}, {:12.5N}\n");
+                print(outputFiles.eio, Format_995, FinalZoneSizing(CtrlZoneNum).ZoneName, FinalZoneSizing(CtrlZoneNum).CoolSizingFactor);
             }
         }
     }
@@ -3404,7 +3397,6 @@ namespace ZoneEquipmentManager {
         using DataHeatBalance::ZoneAirMassFlow;
         using DataHeatBalFanSys::NonAirSystemResponse;
         using DataHeatBalFanSys::SysDepZoneLoads;
-        using DirectAirManager::SimDirectAir;
         using ElectricBaseboardRadiator::SimElecBaseboard;
         using EvaporativeCoolers::SimZoneEvaporativeCoolerUnit;
         using FanCoilUnits::SimFanCoilUnit;
@@ -3465,7 +3457,6 @@ namespace ZoneEquipmentManager {
         Real64 LatOutputProvided; // latent output delivered by zone equipment (kg/s)
         Real64 AirSysOutput;
         Real64 NonAirSysOutput;
-        static Array1D_bool DirectAirAndAirTerminalWarningIssued; // only warn once for each zone with problems
 
         // Determine flow rate and temperature of supply air based on type of damper
 
@@ -3506,10 +3497,6 @@ namespace ZoneEquipmentManager {
                     }
                 }
             }
-        }
-
-        if (FirstCall && !allocated(DirectAirAndAirTerminalWarningIssued)) {
-            DirectAirAndAirTerminalWarningIssued.dimension(NumOfZones, false);
         }
 
         FirstCall = false;
@@ -3639,20 +3626,23 @@ namespace ZoneEquipmentManager {
 
                         NonAirSystemResponse(ActualZoneNum) += NonAirSysOutput;
                         SysOutputProvided = NonAirSysOutput + AirSysOutput;
-                    } else if (SELECT_CASE_var == DirectAir_Num) { // 'AirTerminal:SingleDuct:Uncontrolled'
-                        SimDirectAir(PrioritySimOrder(EquipTypeNum).EquipName,
-                                     ControlledZoneNum,
-                                     FirstHVACIteration,
-                                     SysOutputProvided,
-                                     LatOutputProvided,
-                                     ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
                     } else if (SELECT_CASE_var == VRFTerminalUnit_Num) { // 'ZoneHVAC:TerminalUnit:VariableRefrigerantFlow'
+                        bool HeatingActive = false;
+                        bool CoolingActive = false;
+                        int const OAUnitNum = 0;
+                        Real64 const OAUCoilOutTemp = 0.0;
+                        bool const ZoneEquipment = true;
                         SimulateVRF(PrioritySimOrder(EquipTypeNum).EquipName,
-                                    ControlledZoneNum,
                                     FirstHVACIteration,
+                                    ControlledZoneNum,
+                                    ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
+                                    HeatingActive,
+                                    CoolingActive,
+                                    OAUnitNum,
+                                    OAUCoilOutTemp,
+                                    ZoneEquipment,
                                     SysOutputProvided,
-                                    LatOutputProvided,
-                                    ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
+                                    LatOutputProvided);
 
                     } else if (SELECT_CASE_var == WindowAC_Num) { // 'ZoneHVAC:WindowAirConditioner'
                         SimWindowAC(PrioritySimOrder(EquipTypeNum).EquipName,
@@ -4765,13 +4755,6 @@ namespace ZoneEquipmentManager {
                 AirLoopFlow(airLoop).RecircFlow += DataDefineEquip::AirDistUnit(airDistUnit).MassFlowRatePlenInd;
                 AirLoopFlow(airLoop).LeakFlow +=
                     DataDefineEquip::AirDistUnit(airDistUnit).MassFlowRateDnStrLk + DataDefineEquip::AirDistUnit(airDistUnit).MassFlowRateUpStrLk;
-            }
-        }
-        // Accumulate air loop supply flow here for use in CalcZoneMassBalance
-        for (int directAirUnit = 1; directAirUnit <= DirectAirManager::NumDirectAir; ++directAirUnit) {
-            int airLoop = DirectAirManager::DirectAir(directAirUnit).AirLoopNum;
-            if (airLoop > 0) {
-                AirLoopFlow(airLoop).SupFlow += Node(DirectAirManager::DirectAir(directAirUnit).ZoneSupplyAirNode).MassFlowRate;
             }
         }
 
@@ -6673,7 +6656,7 @@ namespace ZoneEquipmentManager {
         MassConservation(ZoneNum).MixingSourceMassFlowRate = ZoneSourceMassFlowRate;
     }
 
-    void AutoCalcDOASControlStrategy()
+    void AutoCalcDOASControlStrategy(OutputFiles &outputFiles)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Fred Buhl
@@ -6704,7 +6687,8 @@ namespace ZoneEquipmentManager {
                     } else if (ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint > 0.0 && ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint == AutoSize) {
                         ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint = ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint + 2.8;
                     }
-                    ReportZoneSizingDOASInputs(ZoneSizingInput(ZoneSizIndex).ZoneName,
+                    ReportZoneSizingDOASInputs(outputFiles,
+                                               ZoneSizingInput(ZoneSizIndex).ZoneName,
                                                "NeutralSupplyAir",
                                                ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint,
                                                ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint);
@@ -6717,7 +6701,8 @@ namespace ZoneEquipmentManager {
                     } else if (ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint > 0.0 && ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint == AutoSize) {
                         ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint = 22.2;
                     }
-                    ReportZoneSizingDOASInputs(ZoneSizingInput(ZoneSizIndex).ZoneName,
+                    ReportZoneSizingDOASInputs(outputFiles,
+                                               ZoneSizingInput(ZoneSizIndex).ZoneName,
                                                "NeutralDehumidifiedSupplyAir",
                                                ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint,
                                                ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint);
@@ -6730,7 +6715,8 @@ namespace ZoneEquipmentManager {
                     } else if (ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint > 0.0 && ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint == AutoSize) {
                         ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint = ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint + 2.2;
                     }
-                    ReportZoneSizingDOASInputs(ZoneSizingInput(ZoneSizIndex).ZoneName,
+                    ReportZoneSizingDOASInputs(outputFiles,
+                                               ZoneSizingInput(ZoneSizIndex).ZoneName,
                                                "ColdSupplyAir",
                                                ZoneSizingInput(ZoneSizIndex).DOASLowSetpoint,
                                                ZoneSizingInput(ZoneSizIndex).DOASHighSetpoint);
@@ -6747,7 +6733,8 @@ namespace ZoneEquipmentManager {
         }
     }
 
-    void ReportZoneSizingDOASInputs(std::string const &ZoneName,         // the name of the zone
+    void ReportZoneSizingDOASInputs(OutputFiles &outputFiles,
+                                    std::string const &ZoneName,         // the name of the zone
                                     std::string const &DOASCtrlStrategy, // DOAS control strategy
                                     Real64 const DOASLowTemp,            // DOAS design low setpoint temperature [C]
                                     Real64 const DOASHighTemp            // DOAS design high setpoint temperature [C]
@@ -6771,23 +6758,22 @@ namespace ZoneEquipmentManager {
 
         // Using/Aliasing
         using namespace DataPrecisionGlobals;
-        using DataGlobals::OutputFileInits;
         using DataStringGlobals::VerString;
         using General::RoundSigDigits;
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_990(
-            "('! <Zone Sizing DOAS Inputs>, Zone Name, DOAS Design Control Strategy, DOAS Design Low Setpoint Temperature "
-            "{C}, DOAS Design High Setpoint Temperature {C} ')");
-        static ObjexxFCL::gio::Fmt Format_991("(' Zone Sizing DOAS Inputs',4(', ',A))");
+        static constexpr auto Format_990(
+            "! <Zone Sizing DOAS Inputs>, Zone Name, DOAS Design Control Strategy, DOAS Design Low Setpoint Temperature "
+            "{C}, DOAS Design High Setpoint Temperature {C} ");
+
 
         if (reportDOASZoneSizingHeader) {
-            ObjexxFCL::gio::write(OutputFileInits, Format_990);
+            print(outputFiles.eio, "{}\n", Format_990);
             reportDOASZoneSizingHeader = false;
         }
 
-        ObjexxFCL::gio::write(OutputFileInits, Format_991)
-            << ZoneName << DOASCtrlStrategy << RoundSigDigits(DOASLowTemp, 3) << RoundSigDigits(DOASHighTemp, 3);
+        static constexpr auto Format_991(" Zone Sizing DOAS Inputs, {}, {}, {:.3R}, {:.3R}\n");
+        print(outputFiles.eio, Format_991, ZoneName, DOASCtrlStrategy, DOASLowTemp, DOASHighTemp);
 
         // BSLLC Start
         // if ( sqlite ) {
