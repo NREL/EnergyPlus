@@ -568,7 +568,7 @@ namespace PluginManagement {
 
         // setting up output variables deferred until later in the simulation setup process
 #else
-        EnergyPlus::ShowWarningMessage("EnergyPlus was not built with Python Plugins Enabled, PythonPlugin:* objects are ignored");
+        // EnergyPlus::ShowWarningMessage("EnergyPlus was not built with Python Plugins Enabled, PythonPlugin:* objects are ignored");
 #endif
     }
 
