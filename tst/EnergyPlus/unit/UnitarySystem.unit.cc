@@ -11724,9 +11724,10 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput_Autosizing)
         "  ,                         !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name",
         "  ;                         !- Zone Equipment 1 Sequential Heating Fraction Schedule Name",
 
+        // Note: Control type MUST be SingleZoneVAV if you are autosizing 'Minimum Supply Air Temperature'
         "AirLoopHVAC:UnitarySystem,",
         "  Unitary System Model,     !- Name",
-        "  Load,                     !- Control Type",
+        "  SingleZoneVAV,            !- Control Type",
         "  East Zone,                !- Controlling Zone or Thermostat Location",
         "  None,                     !- Dehumidification Control Type",
         "  FanAndCoilAvailSched,     !- Availability Schedule Name",
@@ -11927,6 +11928,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput_Autosizing)
     ASSERT_NO_THROW(thisSys->getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound));
     EXPECT_FALSE(ErrorsFound);
 
+    // Like I said above in the IDF snippet section, control type has to be SingleZoneVAV or autosizing of
+    // 'Minimum Supply Air Temperature' (DesignMinOutletTemp) isn't allowed
+    EXPECT_EQ(thisSys->m_ControlType, EnergyPlus::UnitarySystems::UnitarySys::ControlType::CCMASHRAE);
     EXPECT_EQ(thisSys->DesignMinOutletTemp, DataSizing::AutoSize);
     EXPECT_EQ(thisSys->m_MaxCoolAirVolFlow, DataSizing::AutoSize);
     EXPECT_EQ(thisSys->m_MaxHeatAirVolFlow, DataSizing::AutoSize);
