@@ -717,7 +717,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_CheckTempAndHumRatCtrl)
     EXPECT_FALSE(thisController.HumRatCtrlOverride);
     EXPECT_NEAR(thisController.SetPointValue, 21.1, 0.0001);
     EXPECT_TRUE(thisController.IsSetPointDefinedFlag);
-    EXPECT_EQ(thisController.NumCalcCalls,5);
+    EXPECT_EQ(thisController.NumCalcCalls, 5);
 
     // Case 2 - converged, override true, return untouched
     isConverged = true;
@@ -779,7 +779,6 @@ TEST_F(EnergyPlusFixture, HVACControllers_CheckTempAndHumRatCtrl)
     EXPECT_NEAR(thisController.SetPointValue, 21.1, 0.0001);
     EXPECT_TRUE(thisController.IsSetPointDefinedFlag);
     EXPECT_EQ(thisController.NumCalcCalls, 5);
-
 }
 
 TEST_F(EnergyPlusFixture, HVACControllers_BlankAutosized)
@@ -1017,7 +1016,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_MaxFlowZero)
     EXPECT_EQ(ControllerProps(1).Offset, expectedOffset);
 
     std::string const error_string = delimited_string({
-      "   ** Warning ** Controller:WaterCoil, Maximum Actuated Flow is zero; CW COIL CONTROLLER",
+        "   ** Warning ** Controller:WaterCoil, Maximum Actuated Flow is zero; CW COIL CONTROLLER",
     });
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
