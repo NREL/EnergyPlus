@@ -2616,7 +2616,7 @@ namespace WeatherManager {
                 SPSiteBeamSolarScheduleValue(envrnDayNum) = DDBeamSolarValues(TimeStep, HourOfDay, envrnDayNum);
                 SPSiteDiffuseSolarScheduleValue(envrnDayNum) = DDDiffuseSolarValues(TimeStep, HourOfDay, envrnDayNum);
             }
-            if (Environment(Envrn).SkyTempModel > 3 || Environment(Envrn).SkyTempModel == 0) {
+            if (Environment(Envrn).SkyTempModel <= 3 || Environment(Envrn).SkyTempModel >= 1) {
                 SPSiteSkyTemperatureScheduleValue(envrnDayNum) = DDSkyTempScheduleValues(TimeStep, HourOfDay, envrnDayNum);
             }
         } else if (TotDesDays > 0) {
@@ -3500,7 +3500,7 @@ namespace WeatherManager {
                     TomorrowLiquidPrecip(CurTimeStep, Hour) = LiquidPrecip;
 
                     ESky = CalcSkyEmissivity(Environment(Envrn).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum);
-                    if (IRHoriz >= 9999.0) {
+                    if (!Environment(Envrn).UseWeatherFileHorizontalIR || IRHoriz >= 9999.0) {
                         TomorrowHorizIRSky(CurTimeStep, Hour) = ESky * Sigma * pow_4(DryBulb + TKelvin);
                     } else {
                         TomorrowHorizIRSky(CurTimeStep, Hour) = IRHoriz;
@@ -3508,11 +3508,11 @@ namespace WeatherManager {
 
                     if (Environment(Envrn).SkyTempModel > 3 || Environment(Envrn).SkyTempModel == 0) {
                         // Calculate sky temperature, use IRHoriz if not missing
-                        if (IRHoriz >= 9999.0) {
-                            // Missing, using sky cover and clear sky emissivity
+                        if (!Environment(Envrn).UseWeatherFileHorizontalIR || IRHoriz >= 9999.0) {
+                            // Missing or user defined to not use IRHoriz from weather, using sky cover and clear sky emissivity
                             SkyTemp = (DryBulb + TKelvin) * root_4(ESky) - TKelvin;
                         } else {
-                            // Valid IR from Sky
+                            // Valid IR from weather files
                             SkyTemp = root_4(IRHoriz / Sigma) - TKelvin;
                         }
                     } else {
@@ -8041,10 +8041,26 @@ namespace WeatherManager {
                     }
                 }
             }
+
+            if (!WPSkyTemperature(Item).IsSchedule && !lAlphaFieldBlanks(4)) {
+                if (UtilityRoutines::SameString(cAlphaArgs(4), "Yes")) {
+                    WPSkyTemperature(Item).UseWeatherFileHorizontalIR = true;
+                } else if (UtilityRoutines::SameString(cAlphaArgs(4), "No")) {
+                    WPSkyTemperature(Item).UseWeatherFileHorizontalIR = false;
+                } else {
+                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(4) + '.');
+                    ShowContinueError("...entered value=\"" + cAlphaArgs(4) + "\", should be Yes or No.");
+                    ErrorsFound = true;
+                }
+            } else {
+                WPSkyTemperature(Item).UseWeatherFileHorizontalIR = true;
+            }
         }
         for (int envrn = 1; envrn <= NumOfEnvrn; ++envrn) {
-            if (Environment(envrn).WP_Type1 != 0 && NumWPSkyTemperatures >= Environment(envrn).WP_Type1)
+            if (Environment(envrn).WP_Type1 != 0 && NumWPSkyTemperatures >= Environment(envrn).WP_Type1){
                 Environment(envrn).SkyTempModel = WPSkyTemperature(Environment(envrn).WP_Type1).CalculationType;
+                Environment(envrn).UseWeatherFileHorizontalIR = WPSkyTemperature(Environment(envrn).WP_Type1).UseWeatherFileHorizontalIR;
+            }
         }
     }
 

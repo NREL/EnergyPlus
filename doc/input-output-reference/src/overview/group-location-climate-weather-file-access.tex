@@ -839,7 +839,9 @@ Of course, these could not all appear in the same IDF as only one DaylightSaving
 
 \subsection{WeatherProperty:SkyTemperature}\label{weatherpropertyskytemperature}
 
-Sky Temperature, or radiative sky temperature, is internally calculated by EnergyPlus with an empirical model using sky cloudiness factors and current clear sky emissivity. In Weather File Run Periods, the sky temperature is derived by the horizontal infrared radiation if presented in the weather file input. For flexibility, the following object can be entered to override the entire internal sky temperature calculation from schedule import.
+Sky Temperature, or radiative sky temperature, is internally calculated by EnergyPlus with an empirical model using sky cloudiness factors and current clear sky emissivity. For flexibility, the following object can be entered to override the entire internal sky temperature calculation from schedule import.
+
+In particular, during Weather File Run Periods, the sky temperature is derived by the horizontal infrared radiation if presented in the weather file input by default. For flexibility, the field \textbf{Use Weather File Horizontal IR} can be set to "No" to ignore horizontal IR values from the weather file and always use the specified sky model for horizontal infrared radiation and sky temperature calculations.
 
 By default, EnergyPlus calculates clear sky emissivity using Clark-Allen model. The following object can also be entered to adopt alternative sky emissivity calculation methods. Alternative methods of sky emissivity calculation include the calibrated forms of Berdahl \& Martin, Brunt, and Idso model. Their algorithms are all described in the Engineering Reference document. Much of the literature describes the sky temperature as relative to water vapor pressure, drybulb or dewpoint temperature.
 
@@ -872,6 +874,10 @@ In the case of \textbf{ScheduleValue}, \textbf{DifferenceScheduleDryBulbValue} a
 \paragraph{Field: ScheduleName}\label{field-schedulename}
 
 This field specifies a schedule name to accomplish the sky temperature calculation from the previous field. A Schedule:Day:* (i.e., \hyperref[scheduledayhourly]{Schedule:Day:Hourly}, \hyperref[scheduledayinterval]{Schedule:Day:Interval}, \hyperref[scheduledaylist]{Schedule:Day:List}) should be specified if the name in the name field matches a \hyperref[sizingperioddesignday]{SizingPeriod:DesignDay} object. If the name is one of the weather file period specifications (i.e. matches a \hyperref[sizingperiodweatherfiledays]{SizingPeriod:WeatherFileDays}, \hyperref[sizingperiodweatherfileconditiontype]{SizingPeriod:WeatherFileConditionType} or \hyperref[runperiod]{RunPeriod}), then the schedule name must match a full year schedule (i.e. \hyperref[scheduleyear]{Schedule:Year}, \hyperref[schedulecompact]{Schedule:Compact}, \hyperref[schedulefile]{Schedule:File}, or \hyperref[scheduleconstant]{Schedule:Constant}).
+
+\paragraph{Field: Use Weather File Horizontal IR}\label{field-use-weather-file-hori-ir}
+
+This field specifies whether or not to use the horizontal infrared radiation values from weather files if presented. The field is default to be true. If yes or blank, and the values are presented in weather file, EnergyPlus uses the values from weather file for weather calculations, otherwise it uses the specified sky model to calculate the values. If no, it always uses the specified sky model and ignores the horizontal IR values from the weather file. For \textbf{Calculation Type} = \textbf{ScheduleValue}, \textbf{ScheduleValue} or \textbf{DifferenceScheduleDewPointValue,} this field is ignored and the scheduled values are used. If this field is set to \textbf{No} but no specific sky model is declared in the field \textbf{Calculation Type}, the default sky model \textbf{ClarkAllen} is used.
 
 An example of IDF usage (with DesignDay):
 
@@ -914,7 +920,9 @@ Another example of IDF usage:
 \begin{lstlisting}
 WeatherProperty:SkyTemperature,
   ,
-  UseBerdahlMartinModel;     !- Calculation Type
+  UseBerdahlMartinModel,     !- Calculation Type
+  ,
+  No;                        !- Use Weather File Horizontal IR
 \end{lstlisting}
 
 

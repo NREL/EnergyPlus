@@ -318,6 +318,7 @@ namespace WeatherManager {
         int CurrentCycle;             // Current cycle through weather file in NumSimYears repeats
         int WP_Type1;                 // WeatherProperties SkyTemperature Pointer
         int SkyTempModel;       // WeatherProperties SkyTemperature CalculationType
+        bool UseWeatherFileHorizontalIR; // If false, horizontal IR and sky temperature are calculated with WP models
         int CurrentYear;              // Current year
         bool IsLeapYear;              // True if current year is leap year.
         bool RollDayTypeOnRepeat;     // If repeating run period, increment day type on repeat.
@@ -331,8 +332,8 @@ namespace WeatherManager {
             : KindOfEnvrn(0), DesignDayNum(0), RunPeriodDesignNum(0), SeedEnvrnNum(0), HVACSizingIterationNum(0), TotalDays(0), StartJDay(0),
               StartMonth(0), StartDay(0), StartYear(0), StartDate(0), EndMonth(0), EndDay(0), EndJDay(0), EndYear(0), EndDate(0), DayOfWeek(0),
               UseDST(false), UseHolidays(false), ApplyWeekendRule(false), UseRain(true), UseSnow(true), MonWeekDay(12, 0), SetWeekDays(false),
-              NumSimYears(1), CurrentCycle(0), WP_Type1(0), SkyTempModel(0), CurrentYear(0), IsLeapYear(false), RollDayTypeOnRepeat(true),
-              TreatYearsAsConsecutive(true), MatchYear(false), ActualWeather(false), RawSimDays(0)
+              NumSimYears(1), CurrentCycle(0), WP_Type1(0), SkyTempModel(0), UseWeatherFileHorizontalIR(true), CurrentYear(0), IsLeapYear(false),
+              RollDayTypeOnRepeat(true), TreatYearsAsConsecutive(true), MatchYear(false), ActualWeather(false), RawSimDays(0)
         {
         }
     };
@@ -629,9 +630,10 @@ namespace WeatherManager {
         int CalculationType;
         int SchedulePtr; // pointer to schedule when used
         bool UsedForEnvrn;
+        bool UseWeatherFileHorizontalIR; // If false, horizontal IR and sky temperature are calculated with WP models
 
         // Default Constructor
-        WeatherProperties() : IsSchedule(true), CalculationType(0), SchedulePtr(0), UsedForEnvrn(false)
+        WeatherProperties() : IsSchedule(true), CalculationType(0), SchedulePtr(0), UsedForEnvrn(false), UseWeatherFileHorizontalIR(true)
         {
         }
     };
