@@ -104,7 +104,7 @@ DeltaCpT = \left( {C{p_{inlet}}} \right)\left( {{T_{inlet}}} \right) - \left( {C
 \end{equation}
 
 \begin{equation}
-  \dot{m} = \min \PB{ \dot{m}_{max}, \max \PB{ \dot{m}_{max}\times MinAirFlowFrac,\frac{\dot{Q}_{zone}}{DeltaCpT} } }
+  \dot{m} = \min \PB{ \dot{m}_{max}, \max \PB{ \dot{m}_{max}\times MinAirFlowFrac\times MinAirFlowTurnDownFrac,\frac{\dot{Q}_{zone}}{DeltaCpT} } }
 \end{equation}
 
 where:
@@ -128,6 +128,8 @@ where:
 \(PsyCpAirFnW\) = Psychrometric function calculating air specific heat given air humidity ratio
 
 \(MinAirFlowFrac\) = User-specified zone minimum air flow fraction
+
+\(MinAirFlowTurnDownFrac\) = User-specified zone minimum air flow turndown fraction
 
 \({\dot m_{max}}\) = Terminal unit maximum air mass flow rate, kg/s.
 
@@ -426,7 +428,7 @@ The VS fan VAV terminal unit is modeled as a compound component consisting of tw
 
 The user describes the terminal unit by inputting the name and type of the heating coil and the name and type of the fan. The user must also specify the connectivity of the component by naming the inlet air node; the air node connecting the fan and heating coil (fan outlet, coil inlet); the unit air outlet node (same as the zone inlet node); and hot water inlet node (if any). Maximum flow rates need to be specified (although these can be autosized): maximum cooling and heating air flow rates and the maximum hot water flow rate (if there is a hot water coil). Minimum flow rates are specified by giving by giving a minimum flow fraction for the air flow and a volumetric flow rate minimum for the hot water. For the units with hot water coils the relative convergence tolerance for the hot water flow rate also needs to be input (or allowed to default).
 
-All input data for the VS fan VAV terminal units is stored in the array \emph{Sys}.
+All input data for the VS fan VAV terminal units is stored in the array \textit{sd\_airterminal}.
 
 \subsubsection{Calculation}\label{calculation-2}
 
@@ -1091,7 +1093,7 @@ C_{p,inlet} = PsyCpAirFnW\left( {\omega_{inlet}} \right)
 \end{equation}
 
 \begin{equation}
-\dot m = \min \left( \dot m_{max}, \max \left( \dot m_{max}\cdot MinAirFlowFrac,\frac{\dot Q_{zone}}{\Delta C_p T} \right) \right)
+\dot m = \min \left( \dot m_{max}, \max \left( \dot m_{max}\cdot MinAirFlowFrac\times MinAirFlowTurnDownFrac,\frac{\dot Q_{zone}}{\Delta C_p T} \right) \right)
 \end{equation}
 
 where
@@ -1115,6 +1117,8 @@ where
 \(PsyCpAirFnW\) is the psychrometric function calculating air specific heat given air humidity ratio
 
 \(MinAirFlowFrac\) is the user-specified zone minimum air flow fraction
+
+\(MinAirFlowTurnDownFrac\) is the user-specified zone minimum air flow turndown fraction
 
 \({\dot m_{max}}\) is the terminal unit maximum air mass flow rate, kg/s.
 
