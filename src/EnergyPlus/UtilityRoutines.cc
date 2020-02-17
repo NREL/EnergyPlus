@@ -1628,7 +1628,6 @@ void ShowWarningMessage(std::string const &ErrorMessage, Optional_int OutUnit1, 
         if (has(ErrorMessage, MessageSearch(Loop))) ++MatchCounts(Loop);
     }
 
-    ++TotalWarningErrors;
     ShowErrorMessage(" ** Warning ** " + ErrorMessage, OutUnit1, OutUnit2);
     if (sqlite) {
         sqlite->createSQLiteErrorRecord(1, 0, ErrorMessage, 0);
