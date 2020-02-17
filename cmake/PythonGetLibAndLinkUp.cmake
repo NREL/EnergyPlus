@@ -23,7 +23,7 @@
 
 # set RESOLVED_PYTHON_LIB, and EXECUTABLE_PATH when calling
 
-message("Setting up Python Linking:\n RESOLVED_PYTHON_LIB: "${RESOLVED_PYTHON_LIB}"\n EXECUTABLE_PATH: "${EXECUTABLE_PATH}"")
+message("Collecting Python dynamic library")
 
 # get some path info things
 get_filename_component(BASE_PATH ${EXECUTABLE_PATH} DIRECTORY)
@@ -41,17 +41,3 @@ endif()
 
 # then copy the DLL in
 execute_process(COMMAND "${CMAKE_COMMAND}" -E copy "${RESOLVED_PYTHON_LIB}" "${BASE_PATH}")
-
-# on Mac, we then need to fixup the binary
-if(APPLE)
-  include(GetPrerequisites)
-  get_prerequisites("${EXECUTABLE_PATH}" PREREQUISITES 1 1 "" "")
-  foreach(PREREQ IN LISTS PREREQUISITES)
-    string(TOLOWER "${PREREQ}" PREREQ_LOWERCASE )
-    string(FIND "${PREREQ_LOWERCASE}" "python" PYTHON_IN_PREREQ)
-    if (NOT PYTHON_IN_PREREQ EQUAL -1)
-      gp_resolve_item("" "${PREREQ}" "" "${LIBRARY_SEARCH_DIRECTORY}" resolved_item_var)
-      execute_process(COMMAND "install_name_tool" -change "${PREREQ}" "@executable_path/${PYTHON_LIB_FILENAME}" "${EXECUTABLE_PATH}")
-    endif()
-  endforeach()
-endif()

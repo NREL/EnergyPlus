@@ -776,17 +776,31 @@ add_custom_command(
         -P "${CMAKE_SOURCE_DIR}/cmake/PythonSetupAPIinBuild.cmake"
 )
 
+install( TARGETS energyplus energyplusapi DESTINATION ./ )
+
 if(LINK_WITH_PYTHON)
   # link the executable to the dll and bring it in
   get_filename_component(RESOLVED_PYTHON_LIBRARY "${PYTHON_LIBRARIES}" REALPATH)
-  install(CODE
-      "execute_process(
-          COMMAND ${CMAKE_COMMAND}
-           -DRESOLVED_PYTHON_LIB=${RESOLVED_PYTHON_LIBRARY}
-           -DEXECUTABLE_PATH=\"\${CMAKE_INSTALL_PREFIX}/energyplus${CMAKE_EXECUTABLE_SUFFIX}\"
-            -P ${CMAKE_SOURCE_DIR}/cmake/PythonGetLibAndLinkUp.cmake
-      )"
+  install(
+    CODE
+    "execute_process(
+      COMMAND ${CMAKE_COMMAND}
+      -DRESOLVED_PYTHON_LIB=${RESOLVED_PYTHON_LIBRARY}
+      -DEXECUTABLE_PATH=\${CMAKE_INSTALL_PREFIX}/energyplus${CMAKE_EXECUTABLE_SUFFIX}
+      -P ${CMAKE_SOURCE_DIR}/cmake/PythonGetLibAndLinkUp.cmake
+    )"
   )
+  if (APPLE)
+    install(
+      CODE
+      "execute_process(
+        COMMAND ${CMAKE_COMMAND}
+        -DRESOLVED_PYTHON_LIB=${RESOLVED_PYTHON_LIBRARY}
+        -DEXECUTABLE_PATH=\${CMAKE_INSTALL_PREFIX}/energyplus${CMAKE_EXECUTABLE_SUFFIX}
+        -P ${CMAKE_SOURCE_DIR}/cmake/PythonFixUpOnMac.cmake
+      )"
+    )
+  endif()
   # along with the python standard lib
   add_custom_command(
           TARGET energyplus
@@ -797,15 +811,12 @@ endif()
 
 if(BUILD_PACKAGE)
   if(LINK_WITH_PYTHON)
-    install(FILES "${RESOLVED_PYTHON_LIBRARY}" DESTINATION "./")
     install(DIRECTORY "${CMAKE_BINARY_DIR}/Products/python_standard_lib/"
             DESTINATION "./python_standard_lib")
   endif()
   install(DIRECTORY "${CMAKE_BINARY_DIR}/Products/pyenergyplus/"
           DESTINATION "./pyenergyplus")
 endif()
-
-install( TARGETS energyplus energyplusapi DESTINATION ./ )
 
 if( BUILD_TESTING )
   # Build the test executable
