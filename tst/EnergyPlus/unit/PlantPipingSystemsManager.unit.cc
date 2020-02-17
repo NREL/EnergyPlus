@@ -50,11 +50,11 @@
 // Google Test Headers
 #include <gtest/gtest.h>
 
-#include "EnergyPlus/DataPlant.hh"
-#include "EnergyPlus/DataSurfaces.hh"
-#include "EnergyPlus/HeatBalanceManager.hh"
-#include "EnergyPlus/PlantPipingSystemsManager.hh"
-#include "EnergyPlus/SurfaceGeometry.hh"
+#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/PlantPipingSystemsManager.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
