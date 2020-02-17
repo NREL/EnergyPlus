@@ -114,7 +114,7 @@ TEST_F(EnergyPlusFixture, Test_PerformancePrecisionTradeoffs_DirectSolution_Mess
     SimulationManager::GetProjectData(OutputFiles::getSingleton());
 
     std::string const error_string = delimited_string({
-        "   ** Warning ** PerformancePrecisionTradeoffs: Direct Solution Simulation is selected.",
+        "   ** Warning ** PerformancePrecisionTradeoffs: Coil Direct Solution simulation is selected.",
     });
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
