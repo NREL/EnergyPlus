@@ -704,12 +704,7 @@ namespace HybridUnitaryAirConditioners {
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).SystemSensibleCoolingEnergy,
                                 "System",
                                 "Sum",
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
-                                _,
-                                "ENERGYTRANSFER",
-                                "COOLINGCOILS",
-                                _,
-                                "System");
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
             SetupOutputVariable("Zone Hybrid Unitary HVAC System Latent Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).SystemLatentCoolingRate,
@@ -721,12 +716,7 @@ namespace HybridUnitaryAirConditioners {
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).SystemLatentCoolingEnergy,
                                 "System",
                                 "Sum",
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
-                                _,
-                                "ENERGYTRANSFER",
-                                "COOLINGCOILS",
-                                _,
-                                "System");
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 
             SetupOutputVariable("Zone Hybrid Unitary HVAC Zone Total Cooling Rate",
                                 OutputProcessor::Unit::W,
@@ -739,12 +729,7 @@ namespace HybridUnitaryAirConditioners {
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).UnitTotalCoolingEnergy,
                                 "System",
                                 "Sum",
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
-                                _,
-                                "ENERGYTRANSFER",
-                                "COOLINGCOILS",
-                                _,
-                                "System");
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
             SetupOutputVariable("Zone Hybrid Unitary HVAC Zone Sensible Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).UnitSensibleCoolingRate,
@@ -756,12 +741,7 @@ namespace HybridUnitaryAirConditioners {
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).UnitSensibleCoolingEnergy,
                                 "System",
                                 "Sum",
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
-                                _,
-                                "ENERGYTRANSFER",
-                                "COOLINGCOILS",
-                                _,
-                                "System");
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
             SetupOutputVariable("Zone Hybrid Unitary HVAC Zone Latent Cooling Rate",
                                 OutputProcessor::Unit::W,
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).UnitLatentCoolingRate,
@@ -773,12 +753,7 @@ namespace HybridUnitaryAirConditioners {
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).UnitLatentCoolingEnergy,
                                 "System",
                                 "Sum",
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
-                                _,
-                                "ENERGYTRANSFER",
-                                "COOLINGCOILS",
-                                _,
-                                "System");
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 
             SetupOutputVariable("Zone Hybrid Unitary HVAC System Total Heating Rate",
                                 OutputProcessor::Unit::W,
@@ -808,12 +783,7 @@ namespace HybridUnitaryAirConditioners {
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).SystemSensibleHeatingEnergy,
                                 "System",
                                 "Sum",
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
-                                _,
-                                "ENERGYTRANSFER",
-                                "HeatingCOILS",
-                                _,
-                                "System");
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
             SetupOutputVariable("Zone Hybrid Unitary HVAC System Latent Heating Rate",
                                 OutputProcessor::Unit::W,
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).SystemLatentHeatingRate,
@@ -825,12 +795,7 @@ namespace HybridUnitaryAirConditioners {
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).SystemLatentHeatingEnergy,
                                 "System",
                                 "Sum",
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
-                                _,
-                                "ENERGYTRANSFER",
-                                "HeatingCOILS",
-                                _,
-                                "System");
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 
             SetupOutputVariable("Zone Hybrid Unitary HVAC Zone Total Heating Rate",
                                 OutputProcessor::Unit::W,
@@ -843,12 +808,7 @@ namespace HybridUnitaryAirConditioners {
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).UnitTotalHeatingEnergy,
                                 "System",
                                 "Sum",
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
-                                _,
-                                "ENERGYTRANSFER",
-                                "HeatingCOILS",
-                                _,
-                                "System");
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
             SetupOutputVariable("Zone Hybrid Unitary HVAC Zone Sensible Heating Rate",
                                 OutputProcessor::Unit::W,
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).UnitSensibleHeatingRate,
@@ -860,12 +820,7 @@ namespace HybridUnitaryAirConditioners {
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).UnitSensibleHeatingEnergy,
                                 "System",
                                 "Sum",
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
-                                _,
-                                "ENERGYTRANSFER",
-                                "HeatingCOILS",
-                                _,
-                                "System");
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
             SetupOutputVariable("Zone Hybrid Unitary HVAC Zone Latent Heating Rate",
                                 OutputProcessor::Unit::W,
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).UnitLatentHeatingRate,
@@ -877,12 +832,7 @@ namespace HybridUnitaryAirConditioners {
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).UnitLatentHeatingEnergy,
                                 "System",
                                 "Sum",
-                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name,
-                                _,
-                                "ENERGYTRANSFER",
-                                "COOLINGCOILS",
-                                _,
-                                "System");
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
 
             SetupOutputVariable("Zone Hybrid Unitary HVAC Predicted Sensible Load to Setpoint Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
