@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
@@ -59,7 +60,6 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -75,7 +75,9 @@ using EnergyPlus::DataGlobalConstants::iEvapCoolerInDirectRDDSpecial;
 
 namespace EnergyPlus {
 
-TEST_F(EnergyPlusFixture, EvapCoolers_SecondaryAirOutletCondition)
+class EvapCoolersFixture : public EnergyPlusFixture {};
+
+TEST_F(EvapCoolersFixture, EvapCoolers_SecondaryAirOutletCondition)
 {
 
     EvapCond.allocate(1);
@@ -109,7 +111,7 @@ TEST_F(EnergyPlusFixture, EvapCoolers_SecondaryAirOutletCondition)
     CalcSecondaryAirOutletCondition(EvapCoolNum, OperatingMode, AirMassFlowSec, EDBTSec, EWBTSec, EHumRatSec, QHXTotal, QHXLatent);
 
     // check outputs for dry operating condition
-    EXPECT_DOUBLE_EQ(25.0, EvapCond(EvapCoolNum).SecOutletTemp);
+    EXPECT_NEAR(25.0, EvapCond(EvapCoolNum).SecOutletTemp, 0.000001);
     EXPECT_DOUBLE_EQ(0.0, QHXLatent);
 
     // wet operating mode and non zero secondary air flow rate
@@ -128,7 +130,7 @@ TEST_F(EnergyPlusFixture, EvapCoolers_SecondaryAirOutletCondition)
     EvapCond.deallocate();
 }
 
-TEST_F(EnergyPlusFixture, EvapCoolers_IndEvapCoolerOutletTemp)
+TEST_F(EvapCoolersFixture, EvapCoolers_IndEvapCoolerOutletTemp)
 {
 
     int const EvapCoolNum(1);
@@ -163,7 +165,7 @@ TEST_F(EnergyPlusFixture, EvapCoolers_IndEvapCoolerOutletTemp)
     EvapCond.deallocate();
 }
 
-TEST_F(EnergyPlusFixture, EvapCoolers_SizeIndEvapCoolerTest)
+TEST_F(EvapCoolersFixture, EvapCoolers_SizeIndEvapCoolerTest)
 {
 
     int const EvapCoolNum(1);
@@ -255,7 +257,7 @@ TEST_F(EnergyPlusFixture, EvapCoolers_SizeIndEvapCoolerTest)
     FinalSysSizing.deallocate();
 }
 
-TEST_F(EnergyPlusFixture, EvapCoolers_SizeDirEvapCoolerTest)
+TEST_F(EvapCoolersFixture, EvapCoolers_SizeDirEvapCoolerTest)
 {
 
     int const EvapCoolNum(1);
@@ -321,7 +323,7 @@ TEST_F(EnergyPlusFixture, EvapCoolers_SizeDirEvapCoolerTest)
     FinalSysSizing.deallocate();
 }
 
-TEST_F(EnergyPlusFixture, EvaporativeCoolers_CalcSecondaryAirOutletCondition)
+TEST_F(EvapCoolersFixture, EvaporativeCoolers_CalcSecondaryAirOutletCondition)
 {
 
     EvaporativeCoolers::EvapCond.allocate(1);
@@ -357,7 +359,7 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_CalcSecondaryAirOutletCondition)
         EvapCoolNum, OperatingMode, AirMassFlowSec, EDBTSec, EWBTSec, EHumRatSec, QHXTotal, QHXLatent);
 
     // check outputs for dry operating condition
-    EXPECT_DOUBLE_EQ(25.0, EvaporativeCoolers::EvapCond(EvapCoolNum).SecOutletTemp);
+    EXPECT_NEAR(25.0, EvaporativeCoolers::EvapCond(EvapCoolNum).SecOutletTemp, 0.000001);
     EXPECT_DOUBLE_EQ(0.0, QHXLatent);
 
     // wet operating mode and non zero secondary air flow rate
@@ -377,7 +379,7 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_CalcSecondaryAirOutletCondition)
     EvaporativeCoolers::EvapCond.deallocate();
 }
 
-TEST_F(EnergyPlusFixture, EvaporativeCoolers_CalcIndirectRDDEvapCoolerOutletTemp)
+TEST_F(EvapCoolersFixture, EvaporativeCoolers_CalcIndirectRDDEvapCoolerOutletTemp)
 {
 
     OutBaroPress = 101325.0;
@@ -411,7 +413,7 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_CalcIndirectRDDEvapCoolerOutletTemp
     EvaporativeCoolers::EvapCond.deallocate();
 }
 
-TEST_F(EnergyPlusFixture, EvaporativeCoolers_IndEvapCoolerPower)
+TEST_F(EvapCoolersFixture, EvaporativeCoolers_IndEvapCoolerPower)
 {
 
     ShowMessage("Begin Test: EvaporativeCoolers, IndEvapCoolerPower");
@@ -470,7 +472,7 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_IndEvapCoolerPower)
     PerfCurve.deallocate();
 }
 
-TEST_F(EnergyPlusFixture, EvaporativeCoolers_SizeEvapCooler)
+TEST_F(EvapCoolersFixture, EvaporativeCoolers_SizeEvapCooler)
 {
 
     // one-time setup of evap cooler instance
@@ -550,7 +552,7 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_SizeEvapCooler)
     DataSizing::SysSizInput.deallocate();
 }
 
-TEST_F(EnergyPlusFixture, DefaultAutosizeIndEvapCoolerTest)
+TEST_F(EvapCoolersFixture, DefaultAutosizeIndEvapCoolerTest)
 {
 
     int const EvapCoolNum(1);
@@ -646,7 +648,7 @@ TEST_F(EnergyPlusFixture, DefaultAutosizeIndEvapCoolerTest)
     FinalSysSizing.deallocate();
 }
 
-TEST_F(EnergyPlusFixture, DefaultAutosizeDirEvapCoolerTest)
+TEST_F(EvapCoolersFixture, DefaultAutosizeDirEvapCoolerTest)
 {
 
     int const EvapCoolNum(1);
@@ -712,7 +714,7 @@ TEST_F(EnergyPlusFixture, DefaultAutosizeDirEvapCoolerTest)
     FinalSysSizing.deallocate();
 }
 
-TEST_F(EnergyPlusFixture, DirectEvapCoolerResearchSpecialCalcTest)
+TEST_F(EvapCoolersFixture, DirectEvapCoolerResearchSpecialCalcTest)
 {
 
     // one-time setup of evap cooler instance
@@ -764,7 +766,7 @@ TEST_F(EnergyPlusFixture, DirectEvapCoolerResearchSpecialCalcTest)
     EXPECT_DOUBLE_EQ(100.0, thisEvapCooler.EvapCoolerPower);
 }
 
-TEST_F(EnergyPlusFixture, EvaporativeCoolers_IndirectRDDEvapCoolerOperatingMode)
+TEST_F(EvapCoolersFixture, EvaporativeCoolers_IndirectRDDEvapCoolerOperatingMode)
 {
 
     OutBaroPress = 101325.0;
@@ -807,7 +809,7 @@ TEST_F(EnergyPlusFixture, EvaporativeCoolers_IndirectRDDEvapCoolerOperatingMode)
     EXPECT_NEAR(22.03, thisEvapCooler.OutletTemp, 0.001);
 }
 
-TEST_F(EnergyPlusFixture, DirectEvapCoolerAutosizeWithoutSysSizingRunDone)
+TEST_F(EvapCoolersFixture, DirectEvapCoolerAutosizeWithoutSysSizingRunDone)
 {
 
     int const EvapCoolNum(1);
@@ -868,9 +870,9 @@ TEST_F(EnergyPlusFixture, DirectEvapCoolerAutosizeWithoutSysSizingRunDone)
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
 
-TEST_F(EnergyPlusFixture, EvapCoolerAirLoopPumpCycling)
+TEST_F(EvapCoolersFixture, EvapCoolerAirLoopPumpCycling)
 {
-    
+
     bool ErrorsFound = false;
 
     std::string const idf_objects = delimited_string({
@@ -891,7 +893,7 @@ TEST_F(EnergyPlusFixture, EvapCoolerAirLoopPumpCycling)
 
     EvaporativeCoolers::GetEvapInput();
     ASSERT_FALSE(ErrorsFound);
-    
+
     int AirLoopNum = 1;
     int EvapCoolNum = 1;
     int Evap_Cooler_CompType = 18;
@@ -902,21 +904,20 @@ TEST_F(EnergyPlusFixture, EvapCoolerAirLoopPumpCycling)
     DataAirLoop::AirLoopControlInfo.allocate(AirLoopNum);
     DataAirLoop::AirLoopFlow(1).FanPLR = 0.8;
 
-    //Evap cooler conditions
+    // Evap cooler conditions
     DataLoopNode::Node(EvapCond(EvapCoolNum).InletNode).MassFlowRate = 0.5;
     DataLoopNode::Node(EvapCond(EvapCoolNum).InletNode).Temp = 28.0;
     DataLoopNode::Node(EvapCond(EvapCoolNum).InletNode).HumRat = 0.001;
     DataLoopNode::Node(EvapCond(EvapCoolNum).InletNode).Press = DataEnvironment::OutBaroPress;
 
     DataGlobals::BeginEnvrnFlag = true;
-    
-    //Simulate air loop component calls SimEvapCooler
-    //SimEvapCooler calls InitEvapCooler(EvapCoolNum) and CalcDirectEvapCooler
-    SimAirServingZones::SimAirLoopComponent(EvapCond(EvapCoolNum).EvapCoolerName, Evap_Cooler_CompType, false, AirLoopNum, EvapCoolNum, 0);
-    
-    //air loop FanPLR successfully passed for pump power calculation
-    EXPECT_EQ(EvapCond(EvapCoolNum).EvapCoolerPower, 60 * 0.8);
 
+    // Simulate air loop component calls SimEvapCooler
+    // SimEvapCooler calls InitEvapCooler(EvapCoolNum) and CalcDirectEvapCooler
+    SimAirServingZones::SimAirLoopComponent(EvapCond(EvapCoolNum).EvapCoolerName, Evap_Cooler_CompType, false, AirLoopNum, EvapCoolNum, 0);
+
+    // air loop FanPLR successfully passed for pump power calculation
+    EXPECT_EQ(EvapCond(EvapCoolNum).EvapCoolerPower, 60 * 0.8);
 }
 
 } // namespace EnergyPlus

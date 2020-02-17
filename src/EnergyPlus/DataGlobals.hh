@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -67,9 +67,12 @@ namespace DataGlobals {
     extern bool DDOnlySimulation;
     extern bool AnnualSimulation;
     extern bool outputEpJSONConversion;
+    extern bool outputEpJSONConversionOnly;
     extern bool isEpJSON;
     extern bool isCBOR;
     extern bool isMsgPack;
+    extern bool isUBJSON;
+    extern bool isBSON;
     extern bool preserveIDFOrder;
 
     // MODULE PARAMETER DEFINITIONS:
@@ -207,6 +210,7 @@ namespace DataGlobals {
 
     extern bool BeginDayFlag;           // True at the start of each day, False after first time step in day
     extern bool BeginEnvrnFlag;         // True at the start of each environment, False after first time step in environ
+    extern bool beginEnvrnWarmStartFlag;  // Sizing Speed Up true if at the start of each environment, would rather retain thermal history and the like.
     extern bool BeginHourFlag;          // True at the start of each hour, False after first time step in hour
     extern bool BeginSimFlag;           // True until any actual simulation (full or sizing) has begun, False after first time step
     extern bool BeginFullSimFlag;       // True until full simulation has begun, False after first time step
@@ -295,9 +299,7 @@ namespace DataGlobals {
     extern bool AnySlabsInModel;         // true if there are any zone-coupled ground domains in the input file
     extern bool AnyBasementsInModel;     // true if there are any basements in the input file
     extern bool DoCoilDirectSolutions;        //true if use coil direction solutions
-
     extern int Progress;
-    // these are the old ones
     extern void (*fProgressPtr)(int const);
     extern void (*fMessagePtr)(std::string const &);
     // these are the new ones

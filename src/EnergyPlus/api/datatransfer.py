@@ -32,6 +32,10 @@ class DataExchange:
     def __init__(self, api: cdll, running_as_python_plugin: bool = False):
         self.api = api
         self.running_as_python_plugin = running_as_python_plugin
+        self.api.listAllAPIDataCSV.argtypes = []
+        self.api.listAllAPIDataCSV.restype = c_char_p
+        self.api.apiDataFullyReady.argtypes = []
+        self.api.apiDataFullyReady.restype = c_int
         self.api.requestVariable.argtypes = [c_char_p, c_char_p]
         self.api.requestVariable.restype = c_void_p
         self.api.getVariableHandle.argtypes = [c_char_p, c_char_p]
@@ -46,6 +50,8 @@ class DataExchange:
         self.api.getMeterValue.restype = RealEP
         self.api.setActuatorValue.argtypes = [c_int, RealEP]
         self.api.setActuatorValue.restype = c_void_p
+        self.api.resetActuator.argtypes = [c_int]
+        self.api.resetActuator.restype = c_void_p
         self.api.getInternalVariableHandle.argtypes = [c_char_p, c_char_p]
         self.api.getInternalVariableHandle.restype = c_int
         self.api.getInternalVariableValue.argtypes = [c_int]
@@ -87,6 +93,33 @@ class DataExchange:
         self.api.getPluginGlobalVariableValue.restype = RealEP
         self.api.setPluginGlobalVariableValue.argtypes = [c_int, RealEP]
         self.api.setPluginGlobalVariableValue.restype = c_void_p
+        self.api.getPluginTrendVariableHandle.argtypes = [c_char_p]
+        self.api.getPluginTrendVariableHandle.restype = c_int
+        self.api.getPluginTrendVariableValue.argtypes = [c_int, c_int]
+        self.api.getPluginTrendVariableValue.restype = RealEP
+        self.api.getPluginTrendVariableAverage.argtypes = [c_int, c_int]
+        self.api.getPluginTrendVariableAverage.restype = RealEP
+        self.api.getPluginTrendVariableMin.argtypes = [c_int, c_int]
+        self.api.getPluginTrendVariableMin.restype = RealEP
+        self.api.getPluginTrendVariableMax.argtypes = [c_int, c_int]
+        self.api.getPluginTrendVariableMax.restype = RealEP
+        self.api.getPluginTrendVariableSum.argtypes = [c_int, c_int]
+        self.api.getPluginTrendVariableSum.restype = RealEP
+        self.api.getPluginTrendVariableDirection.argtypes = [c_int, c_int]
+        self.api.getPluginTrendVariableDirection.restype = RealEP
+
+    def list_available_api_data_csv(self) -> str:
+        """
+        Lists out all API data stuff in an easily parseable CSV form
+        :return:
+        """
+        return self.api.listAllAPIDataCSV()
+
+    def api_data_fully_ready(self) -> bool:
+        success = self.api.apiDataFullyReady()
+        if success == 0:
+            return True
+        return False
 
     def request_variable(self, variable_name: Union[str, bytes], variable_key: Union[str, bytes]) -> None:
         """
@@ -214,6 +247,17 @@ class DataExchange:
         """
         self.api.setActuatorValue(actuator_handle, actuator_value)
 
+    def reset_actuator(self, actuator_handle: int) -> None:
+        """
+        Resets the actuator internally to EnergyPlus.  This allows subsequent calculations to be used for the actuator
+        instead of the externally set actuator value.
+        // TODO: Add a call to this in the test
+
+        :param actuator_handle: An integer returned from the `get_actuator_handle` function.
+        :return: Nothing
+        """
+        self.api.resetActuator(actuator_handle)
+
     def get_internal_variable_handle(self, variable_type: Union[str, bytes], variable_key: Union[str, bytes]) -> int:
         """
         Get a handle to an internal variable in a running simulation.
@@ -234,7 +278,7 @@ class DataExchange:
             variable_key = variable_key.encode('utf-8')
         return self.api.getInternalVariableHandle(variable_type, variable_key)
 
-    def get_internal_variable_value(self, variable_handle: int):
+    def get_internal_variable_value(self, variable_handle: int) -> float:
         """
         Get the value of an internal variable in a running simulation.  The `get_internal_variable_handle` function is
         first used to get a handle to the variable by name.  Then once the handle is retrieved, it is passed into this
@@ -292,7 +336,7 @@ class DataExchange:
         :return: Floating point representation of the global variable value
         """
         if not self.running_as_python_plugin:
-            raise EnergyPlusException("get_global_handle is only available as part of a Python Plugin workflow")
+            raise EnergyPlusException("get_global_value is only available as part of a Python Plugin workflow")
         return self.api.getPluginGlobalVariableValue(handle)
 
     def set_global_value(self, handle: int, value: float) -> None:
@@ -316,8 +360,56 @@ class DataExchange:
         :param value: Floating point value to assign to the global variable
         """
         if not self.running_as_python_plugin:
-            raise EnergyPlusException("get_global_handle is only available as part of a Python Plugin workflow")
+            raise EnergyPlusException("set_global_handle is only available as part of a Python Plugin workflow")
         self.api.setPluginGlobalVariableValue(handle, value)
+
+    def get_trend_handle(self, trend_var_name: Union[str, bytes]) -> int:
+        """
+
+        :param trend_var_name:
+        :return:
+        """
+        if not self.running_as_python_plugin:
+            raise EnergyPlusException("get_trend_handle is only available as part of a Python Plugin workflow")
+        if isinstance(trend_var_name, str):
+            trend_var_name = trend_var_name.encode('utf-8')
+        return self.api.getPluginTrendVariableHandle(trend_var_name)
+
+    def get_trend_value(self, trend_handle: int, time_index: int) -> RealEP:
+        """
+
+        :param trend_handle:
+        :param time_index:
+        :return:
+        """
+        if not self.running_as_python_plugin:
+            raise EnergyPlusException("get_trend_value is only available as part of a Python Plugin workflow")
+        return self.api.getPluginTrendVariableValue(trend_handle, time_index)
+
+    def get_trend_average(self, trend_handle: int, count: int) -> RealEP:
+        if not self.running_as_python_plugin:
+            raise EnergyPlusException("get_trend_average is only available as part of a Python Plugin workflow")
+        return self.api.getPluginTrendVariableAverage(trend_handle, count)
+
+    def get_trend_min(self, trend_handle: int, count: int) -> RealEP:
+        if not self.running_as_python_plugin:
+            raise EnergyPlusException("get_trend_min is only available as part of a Python Plugin workflow")
+        return self.api.getPluginTrendVariableMin(trend_handle, count)
+
+    def get_trend_max(self, trend_handle: int, count: int) -> RealEP:
+        if not self.running_as_python_plugin:
+            raise EnergyPlusException("get_trend_max is only available as part of a Python Plugin workflow")
+        return self.api.getPluginTrendVariableMax(trend_handle, count)
+
+    def get_trend_sum(self, trend_handle: int, count: int) -> RealEP:
+        if not self.running_as_python_plugin:
+            raise EnergyPlusException("get_trend_sum is only available as part of a Python Plugin workflow")
+        return self.api.getPluginTrendVariableSum(trend_handle, count)
+
+    def get_trend_direction(self, trend_handle: int, count: int) -> RealEP:
+        if not self.running_as_python_plugin:
+            raise EnergyPlusException("get_trend_direction is only available as part of a Python Plugin workflow")
+        return self.api.getPluginTrendVariableDirection(trend_handle, count)
 
     def year(self) -> int:
         """

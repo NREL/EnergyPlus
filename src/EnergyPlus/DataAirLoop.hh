@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,8 +53,8 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/UnitarySystem.hh>
 
 namespace EnergyPlus {
 
@@ -261,7 +261,7 @@ namespace DataAirLoop {
         Array1D_int ComponentType_Num; // Parameterized (see above) Component Types this
         // module can address
         Array1D_int ComponentIndex; // Which one in list -- updated by routines called from here
-        std::vector<UnitarySystems::UnitarySys *> compPointer;
+        std::vector<HVACSystemData *> compPointer;
         Array1D_string ControllerName;
         Array1D_string ControllerType;
         Array1D_int ControllerIndex; // Which one in list -- updated by routines called from here

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,188 +53,20 @@
 
 // EnergyPlus Headers
 #include "EnergyPlusFixture.hh"
-// A to Z order
-#include <AirflowNetwork/Elements.hpp>
-#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
-#include <EnergyPlus/BaseboardElectric.hh>
-#include <EnergyPlus/BaseboardRadiator.hh>
-#include <EnergyPlus/BoilerSteam.hh>
-#include <EnergyPlus/Boilers.hh>
-#include <EnergyPlus/BranchInputManager.hh>
-#include <EnergyPlus/BranchNodeConnections.hh>
-#include <EnergyPlus/ChilledCeilingPanelSimple.hh>
-#include <EnergyPlus/ChillerElectricEIR.hh>
-#include <EnergyPlus/ChillerExhaustAbsorption.hh>
-#include <EnergyPlus/ChillerGasAbsorption.hh>
-#include <EnergyPlus/ChillerIndirectAbsorption.hh>
-#include <EnergyPlus/CondenserLoopTowers.hh>
-#include <EnergyPlus/CoolTower.hh>
-#include <EnergyPlus/CrossVentMgr.hh>
-#include <EnergyPlus/CurveManager.hh>
-#include <EnergyPlus/DElightManagerF.hh>
-#include <EnergyPlus/DXCoils.hh>
-#include <EnergyPlus/DataAirLoop.hh>
-#include <EnergyPlus/DataAirSystems.hh>
-#include <EnergyPlus/DataBranchAirLoopPlant.hh>
-#include <EnergyPlus/DataBranchNodeConnections.hh>
-#include <EnergyPlus/DataContaminantBalance.hh>
-#include <EnergyPlus/DataConvergParams.hh>
-#include <EnergyPlus/DataDefineEquip.hh>
-#include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataErrorTracking.hh>
-#include <EnergyPlus/DataGenerators.hh>
-#include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataHeatBalFanSys.hh>
-#include <EnergyPlus/DataHeatBalSurface.hh>
-#include <EnergyPlus/DataHeatBalance.hh>
+
 #include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataMoistureBalance.hh>
-#include <EnergyPlus/DataMoistureBalanceEMPD.hh>
-#include <EnergyPlus/DataOutputs.hh>
-#include <EnergyPlus/DataPhotovoltaics.hh>
-#include <EnergyPlus/DataPlant.hh>
-#include <EnergyPlus/DataRoomAirModel.hh>
-#include <EnergyPlus/DataRuntimeLanguage.hh>
-#include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/DataStringGlobals.hh>
-#include <EnergyPlus/DataSurfaceLists.hh>
-#include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/DataSystemVariables.hh>
-#include <EnergyPlus/DataUCSDSharedData.hh>
-#include <EnergyPlus/DataViewFactorInformation.hh>
-#include <EnergyPlus/DataZoneControls.hh>
-#include <EnergyPlus/DataZoneEnergyDemands.hh>
-#include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/DaylightingManager.hh>
-#include <EnergyPlus/DemandManager.hh>
-#include <EnergyPlus/DesiccantDehumidifiers.hh>
-#include <EnergyPlus/DirectAirManager.hh>
-#include <EnergyPlus/DisplayRoutines.hh>
-#include <EnergyPlus/DualDuct.hh>
-#include <EnergyPlus/EMSManager.hh>
-#include <EnergyPlus/EarthTube.hh>
-#include <EnergyPlus/EconomicLifeCycleCost.hh>
-#include <EnergyPlus/EconomicTariff.hh>
-#include <EnergyPlus/ElectricPowerServiceManager.hh>
-#include <EnergyPlus/EvaporativeCoolers.hh>
-#include <EnergyPlus/EvaporativeFluidCoolers.hh>
-#include <EnergyPlus/ExteriorEnergyUse.hh>
-#include <EnergyPlus/FanCoilUnits.hh>
-#include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/FileSystem.hh>
-#include <EnergyPlus/FluidCoolers.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/Furnaces.hh>
-#include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/GroundHeatExchangers.hh>
-#include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
-#include <EnergyPlus/HeatPumpWaterToWaterCOOLING.hh>
-#include <EnergyPlus/HeatPumpWaterToWaterHEATING.hh>
-#include <EnergyPlus/HVACControllers.hh>
-#include <EnergyPlus/HVACDXHeatPumpSystem.hh>
-#include <EnergyPlus/HVACDXSystem.hh>
-#include <EnergyPlus/HVACFan.hh>
-#include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
-#include <EnergyPlus/HVACManager.hh>
-#include <EnergyPlus/HVACSingleDuctInduc.hh>
-#include <EnergyPlus/HVACStandAloneERV.hh>
-#include <EnergyPlus/HVACUnitaryBypassVAV.hh>
-#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
-#include <EnergyPlus/HeatBalFiniteDiffManager.hh>
-#include <EnergyPlus/HeatBalanceAirManager.hh>
-#include <EnergyPlus/HeatBalanceIntRadExchange.hh>
-#include <EnergyPlus/HeatBalanceManager.hh>
-#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
-#include <EnergyPlus/HeatPumpWaterToWaterSimple.hh>
-#include <EnergyPlus/HeatRecovery.hh>
-#include <EnergyPlus/HeatingCoils.hh>
-#include <EnergyPlus/HighTempRadiantSystem.hh>
-#include <EnergyPlus/Humidifiers.hh>
-#include <EnergyPlus/HybridModel.hh>
-#include <EnergyPlus/IceThermalStorage.hh>
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
-#include <EnergyPlus/IntegratedHeatPump.hh>
-#include <EnergyPlus/InternalHeatGains.hh>
-#include <EnergyPlus/LowTempRadiantSystem.hh>
-#include <EnergyPlus/MixedAir.hh>
-#include <EnergyPlus/MixerComponent.hh>
-#include <EnergyPlus/MoistureBalanceEMPDManager.hh>
-#include <EnergyPlus/NodeInputManager.hh>
-#include <EnergyPlus/OutAirNodeManager.hh>
-#include <EnergyPlus/OutdoorAirUnit.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
-#include <EnergyPlus/OutputReportPredefined.hh>
-#include <EnergyPlus/OutputReportTabular.hh>
-#include <EnergyPlus/OutputReportTabularAnnual.hh>
-#include <EnergyPlus/OutsideEnergySources.hh>
-#include <EnergyPlus/PVWatts.hh>
-#include <EnergyPlus/PackagedTerminalHeatPump.hh>
-#include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
-#include <EnergyPlus/PipeHeatTransfer.hh>
-#include <EnergyPlus/Pipes.hh>
-#include <EnergyPlus/Plant/PlantLoopSolver.hh>
-#include <EnergyPlus/Plant/PlantManager.hh>
-#include <EnergyPlus/PlantCentralGSHP.hh>
-#include <EnergyPlus/PlantChillers.hh>
-#include <EnergyPlus/PlantCondLoopOperation.hh>
-#include <EnergyPlus/PlantLoadProfile.hh>
-#include <EnergyPlus/PlantPipingSystemsManager.hh>
-#include <EnergyPlus/PlantPressureSystem.hh>
-#include <EnergyPlus/PlantUtilities.hh>
-#include <EnergyPlus/PlantValves.hh>
-#include <EnergyPlus/PollutionModule.hh>
-#include <EnergyPlus/PoweredInductionUnits.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/Pumps.hh>
-#include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
-#include <EnergyPlus/ResultsSchema.hh>
-#include <EnergyPlus/ReturnAirPathManager.hh>
-#include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
-#include <EnergyPlus/RoomAirModelManager.hh>
-#include <EnergyPlus/RuntimeLanguageProcessor.hh>
-#include <EnergyPlus/ScheduleManager.hh>
-#include <EnergyPlus/SetPointManager.hh>
-#include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SimulationManager.hh>
-#include <EnergyPlus/SingleDuct.hh>
-#include <EnergyPlus/SizingManager.hh>
-#include <EnergyPlus/SolarCollectors.hh>
-#include <EnergyPlus/SolarShading.hh>
-#include <EnergyPlus/SortAndStringUtilities.hh>
-#include <EnergyPlus/SplitterComponent.hh>
-#include <EnergyPlus/SteamCoils.hh>
-#include <EnergyPlus/SurfaceGeometry.hh>
-#include <EnergyPlus/SwimmingPool.hh>
-#include <EnergyPlus/SystemAvailabilityManager.hh>
-#include <EnergyPlus/ThermalComfort.hh>
-#include <EnergyPlus/UnitHeater.hh>
-#include <EnergyPlus/UnitVentilator.hh>
 #include <EnergyPlus/UnitarySystem.hh>
-#include <EnergyPlus/VariableSpeedCoils.hh>
-#include <EnergyPlus/VentilatedSlab.hh>
-#include <EnergyPlus/WaterCoils.hh>
-#include <EnergyPlus/WaterThermalTanks.hh>
-#include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
-#include <EnergyPlus/WaterToWaterHeatPumpEIR.hh>
-#include <EnergyPlus/WaterUse.hh>
-#include <EnergyPlus/WeatherManager.hh>
-#include <EnergyPlus/WindowAC.hh>
-#include <EnergyPlus/WindowComplexManager.hh>
-#include <EnergyPlus/WindowEquivalentLayer.hh>
-#include <EnergyPlus/WindowManager.hh>
-#include <EnergyPlus/ZoneAirLoopEquipmentManager.hh>
-#include <EnergyPlus/ZoneContaminantPredictorCorrector.hh>
-#include <EnergyPlus/ZoneDehumidifier.hh>
-#include <EnergyPlus/ZoneEquipmentManager.hh>
-#include <EnergyPlus/ZonePlenum.hh>
-#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
-
+#include <nlohmann/json.hpp>
 #include <EnergyPlus/StateManagement.hh>
 #include <algorithm>
 #include <fstream>
@@ -254,14 +86,14 @@ void EnergyPlusFixture::SetUp()
 
     show_message();
 
+    OutputFiles::getSingleton().eio.open_as_stringstream();
+    
     this->eso_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
-    this->eio_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
     this->mtr_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
     this->err_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
     this->json_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
 
     DataGlobals::eso_stream = this->eso_stream.get();
-    DataGlobals::eio_stream = this->eio_stream.get();
     DataGlobals::mtr_stream = this->mtr_stream.get();
     DataGlobals::err_stream = this->err_stream.get();
     DataGlobals::jsonOutputStreams.json_stream = this->json_stream.get();
@@ -291,7 +123,6 @@ void EnergyPlusFixture::TearDown()
         ObjexxFCL::gio::close(DataGlobals::OutputFileStandard, flags);
         ObjexxFCL::gio::close(DataGlobals::jsonOutputStreams.OutputFileJson, flags);
         ObjexxFCL::gio::close(DataGlobals::OutputStandardError, flags);
-        ObjexxFCL::gio::close(DataGlobals::OutputFileInits, flags);
         ObjexxFCL::gio::close(DataGlobals::OutputFileDebug, flags);
         ObjexxFCL::gio::close(DataGlobals::OutputFileZoneSizing, flags);
         ObjexxFCL::gio::close(DataGlobals::OutputFileSysSizing, flags);
@@ -343,10 +174,10 @@ bool EnergyPlusFixture::compare_eso_stream(std::string const &expected_string, b
 
 bool EnergyPlusFixture::compare_eio_stream(std::string const &expected_string, bool reset_stream)
 {
-    auto const stream_str = this->eio_stream->str();
+    auto const stream_str = OutputFiles::getSingleton().eio.get_output();
     EXPECT_EQ(expected_string, stream_str);
     bool are_equal = (expected_string == stream_str);
-    if (reset_stream) this->eio_stream->str(std::string());
+    if (reset_stream) OutputFiles::getSingleton().eio.open_as_stringstream();
     return are_equal;
 }
 
@@ -402,8 +233,8 @@ bool EnergyPlusFixture::has_eso_output(bool reset_stream)
 
 bool EnergyPlusFixture::has_eio_output(bool reset_stream)
 {
-    auto const has_output = this->eio_stream->str().size() > 0;
-    if (reset_stream) this->eio_stream->str(std::string());
+    auto const has_output = !OutputFiles::getSingleton().eio.get_output().empty();
+    if (reset_stream) OutputFiles::getSingleton().eio.open_as_stringstream();
     return has_output;
 }
 

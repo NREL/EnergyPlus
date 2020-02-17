@@ -111,7 +111,7 @@
 ! ExtWallConstruction=Mass
 ! End SimMetaData
 
-  Version,9.2;
+  Version,9.3;
 
 !-   ===========  ALL OBJECTS IN CLASS: SIMULATIONCONTROL ===========
 
@@ -4781,31 +4781,31 @@
   InternalMass,
     Back_Space_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Back_Space,              !- Zone Name
+    Back_Space,              !- Zone or ZoneList Name
     759.7800;                !- Surface Area {m2}
 
   InternalMass,
     Core_Retail_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Core_Retail,             !- Zone Name
+    Core_Retail,             !- Zone or ZoneList Name
     3200.9658;               !- Surface Area {m2}
 
   InternalMass,
     Point_Of_Sale_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Point_Of_Sale,           !- Zone Name
+    Point_Of_Sale,           !- Zone or ZoneList Name
     301.6200;                !- Surface Area {m2}
 
   InternalMass,
     Front_Retail_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Front_Retail,            !- Zone Name
+    Front_Retail,            !- Zone or ZoneList Name
     301.6200;                !- Surface Area {m2}
 
   InternalMass,
     Front_Entry_InternalMass_1,  !- Name
     InteriorFurnishings,     !- Construction Name
-    Front_Entry,             !- Zone Name
+    Front_Entry,             !- Zone or ZoneList Name
     24.0000;                 !- Surface Area {m2}
 
 !-   ===========  ALL OBJECTS IN CLASS: PEOPLE ===========
@@ -5606,65 +5606,121 @@
     0.001,                   !- Heating Convergence Tolerance
     ;                        !- Availability Manager List Name
 
-!-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:UNCONTROLLED ===========
+!-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:NOREHEAT ===========
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Back_Space Direct Air,   !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Back_Space Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
-    AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
+    Back_Space Direct Air Inlet Node Name ATInlet,  !- Air Inlet Node Name
+    Back_Space Direct Air Inlet Node Name,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    Back_Space Direct Air ADU,  !- Name
+    Back_Space Direct Air Inlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Back_Space Direct Air,   !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Core_Retail Direct Air,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Core_Retail Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
-    AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
+    Core_Retail Direct Air Inlet Node Name ATInlet,  !- Air Inlet Node Name
+    Core_Retail Direct Air Inlet Node Name,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    Core_Retail Direct Air ADU,  !- Name
+    Core_Retail Direct Air Inlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Core_Retail Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Point_Of_Sale Direct Air,!- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Point_Of_Sale Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
-    AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
+    Point_Of_Sale Direct Air Inlet Node Name ATInlet,  !- Air Inlet Node Name
+    Point_Of_Sale Direct Air Inlet Node Name,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    Point_Of_Sale Direct Air ADU,  !- Name
+    Point_Of_Sale Direct Air Inlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Point_Of_Sale Direct Air,!- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Front_Retail Direct Air, !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Front_Retail Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
-    AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
+    Front_Retail Direct Air Inlet Node Name ATInlet,  !- Air Inlet Node Name
+    Front_Retail Direct Air Inlet Node Name,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    Front_Retail Direct Air ADU,  !- Name
+    Front_Retail Direct Air Inlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Front_Retail Direct Air, !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:EQUIPMENTLIST ===========
 
   ZoneHVAC:EquipmentList,
     Back_Space Equipment,    !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Back_Space Direct Air,   !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Back_Space Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Core_Retail Equipment,   !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Core_Retail Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Core_Retail Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Point_Of_Sale Equipment, !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Point_Of_Sale Direct Air,!- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Point_Of_Sale Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Front_Retail Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Front_Retail Direct Air, !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Front_Retail Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     Front_Entry Equipment,   !- Name
@@ -5672,7 +5728,9 @@
     ZoneHVAC:UnitHeater,     !- Zone Equipment 1 Object Type
     Front_Entry Unit Heater, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
-    1;                       !- Zone Equipment 1 Heating or No-Load Sequence
+    1,                       !- Zone Equipment 1 Heating or No-Load Sequence
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:EQUIPMENTCONNECTIONS ===========
 
@@ -6213,22 +6271,22 @@
   AirLoopHVAC:ZoneSplitter,
     PSZ-AC:1 Supply Air Splitter,  !- Name
     PSZ-AC:1 Zone Equipment Inlet Node,  !- Inlet Node Name
-    Back_Space Direct Air Inlet Node Name;  !- Outlet 1 Node Name
+    Back_Space Direct Air Inlet Node Name ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     PSZ-AC:2 Supply Air Splitter,  !- Name
     PSZ-AC:2 Zone Equipment Inlet Node,  !- Inlet Node Name
-    Core_Retail Direct Air Inlet Node Name;  !- Outlet 1 Node Name
+    Core_Retail Direct Air Inlet Node Name ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     PSZ-AC:3 Supply Air Splitter,  !- Name
     PSZ-AC:3 Zone Equipment Inlet Node,  !- Inlet Node Name
-    Point_Of_Sale Direct Air Inlet Node Name;  !- Outlet 1 Node Name
+    Point_Of_Sale Direct Air Inlet Node Name ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     PSZ-AC:4 Supply Air Splitter,  !- Name
     PSZ-AC:4 Zone Equipment Inlet Node,  !- Inlet Node Name
-    Front_Retail Direct Air Inlet Node Name;  !- Outlet 1 Node Name
+    Front_Retail Direct Air Inlet Node Name ATInlet;  !- Outlet 1 Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:SUPPLYPATH ===========
 

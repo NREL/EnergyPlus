@@ -139,8 +139,6 @@ AirTerminal:SingleDuct:SeriesPIU:Reheat \tabularnewline
  & Maximum Primary Air Flow Rate \tabularnewline
  & Minimum Primary Air Flow Fraction \tabularnewline
  & Maximum Hot Water or Steam Flow Rate \tabularnewline
-AirTerminal:SingleDuct:Uncontrolled \tabularnewline
- & Maximum Air Flow Rate \tabularnewline
 AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat \tabularnewline
  & Maximum Air Flow Rate \tabularnewline
 AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat \tabularnewline
@@ -775,7 +773,7 @@ AirLoopHVAC:UnitarySystem & AirTerminal:DualDuct:ConstantVolume \tabularnewline
 AirTerminal:DualDuct:VAV & AirTerminal:DualDuct:VAV:OutdoorAir \tabularnewline
 AirTerminal:SingleDuct:ConstantVolume:CooledBeam & AirTerminal:SingleDuct:ConstantVolume:FourPipeInduction \tabularnewline
 AirTerminal:SingleDuct:ConstantVolume:Reheat & AirTerminal:SingleDuct:ParallelPIU:Reheat \tabularnewline
-AirTerminal:SingleDuct:SeriesPIU:Reheat & AirTerminal:SingleDuct:Uncontrolled \tabularnewline
+AirTerminal:SingleDuct:SeriesPIU:Reheat & AirTerminal:SingleDuct:ConstantVolume:NoReheat \tabularnewline
 AirTerminal:SingleDuct:VAV:HeatAndCool:NoReheat & AirTerminal:SingleDuct:VAV:HeatAndCool:Reheat \tabularnewline
 AirTerminal:SingleDuct:VAV:NoReheat & AirTerminal:SingleDuct:VAV:Reheat \tabularnewline
 AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan & Boiler:HotWater \tabularnewline
@@ -859,7 +857,7 @@ For each system (\hyperref[airloophvac]{AirLoopHVAC}), in the corresponding \hyp
 
 \subsection{DesignSpecification:OutdoorAir}\label{designspecificationoutdoorair}
 
-This object allows for the outdoor air requirements to be defined in a common location for use by other objects. This object may be referenced by name from other objects (e.g., VAV terminal units, \hyperref[airterminalsingleductuncontrolled]{AirTerminal:SingleDuct:Uncontrolled}, and \hyperref[airterminalsingleductmixer]{AirTerminal:SingleDuct:Mixer}) as required to identify an outdoor air quantity for use by that object. Note that a zone name Is not included as an input to this zone outdoor air definition and the number of people in a zone, zone floor area, and zone volume can only be determined after this object has been referenced by another. A single zone outdoor air definition may be referenced by multiple objects to specify that the same outdoor air requirements are used by those objects \emph{or} multiple zone outdoor air objects may be defined and referenced by other objects as needed. If multiple zone outdoor air definitions are used, each outdoor air definition must have a unique name.
+This object allows for the outdoor air requirements to be defined in a common location for use by other objects. This object may be referenced by name from other objects (e.g., VAV terminal units, \hyperref[airterminalsingleductconstantvolumenoreheat]{AirTerminal:SingleDuct:ConstantVolume:NoReheat}, and \hyperref[airterminalsingleductmixer]{AirTerminal:SingleDuct:Mixer}) as required to identify an outdoor air quantity for use by that object. Note that a zone name Is not included as an input to this zone outdoor air definition and the number of people in a zone, zone floor area, and zone volume can only be determined after this object has been referenced by another. A single zone outdoor air definition may be referenced by multiple objects to specify that the same outdoor air requirements are used by those objects \emph{or} multiple zone outdoor air objects may be defined and referenced by other objects as needed. If multiple zone outdoor air definitions are used, each outdoor air definition must have a unique name.
 
 \subsubsection{Inputs}\label{inputs-012}
 
@@ -1520,13 +1518,13 @@ Enter the heating capacity as a fraction of the autosized heating capacity. This
 
 \subsection{DesignSpecification:AirTerminal:Sizing}\label{designspecificationairterminalsizing}
 
-This object modifies the sizing of an air loop terminal unit. It may be referenced by a \hyperref[zonehvacairdistributionunit]{ZoneHVAC:AirDistributionUnit} or \hyperref[airterminalsingleductuncontrolled]{AirTerminal:SingleDuct:Uncontrolled} object. The values specified here are applied to the base sizing results from the corresponding \hyperref[sizingzone]{Sizing:Zone} inputs. Any given DesignSpecification:AirTerminal:Sizing object may be used by multiple terminal units with similar characteristics.
+This object modifies the sizing of an air loop terminal unit. It may be referenced by a \hyperref[zonehvacairdistributionunit]{ZoneHVAC:AirDistributionUnit} object. The values specified here are applied to the base sizing results from the corresponding \hyperref[sizingzone]{Sizing:Zone} inputs. Any given DesignSpecification:AirTerminal:Sizing object may be used by multiple terminal units with similar characteristics.
 
 \subsubsection{Inputs}\label{inputs-52-007}
 
 \paragraph{Field: Name}\label{designspecificationairterminalsizing-field-name}
 
-Name of the design specification air terminal sizing object. This name may be referenced by a \hyperref[zonehvacairdistributionunit]{ZoneHVAC:AirDistributionUnit} or \hyperref[airterminalsingleductuncontrolled]{AirTerminal:SingleDuct:Uncontrolled} object.
+Name of the design specification air terminal sizing object. This name may be referenced by a \hyperref[zonehvacairdistributionunit]{ZoneHVAC:AirDistributionUnit} object.
 
 \paragraph{Field: Fraction of Design Sensible Cooling Load}\label{fraction-of-design-sensible-cooling-load}
 

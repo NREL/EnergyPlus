@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,14 +55,17 @@
 #include <EnergyPlus/Boilers.hh>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/ChillerAbsorption.hh>
 #include <EnergyPlus/ChilledCeilingPanelSimple.hh>
 #include <EnergyPlus/ChillerElectricEIR.hh>
 #include <EnergyPlus/ChillerExhaustAbsorption.hh>
 #include <EnergyPlus/ChillerGasAbsorption.hh>
 #include <EnergyPlus/ChillerIndirectAbsorption.hh>
+#include <EnergyPlus/ChillerReformulatedEIR.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
 #include <EnergyPlus/CoolTower.hh>
 #include <EnergyPlus/CrossVentMgr.hh>
+#include <EnergyPlus/CTElectricGenerator.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DElightManagerF.hh>
 #include <EnergyPlus/DXCoils.hh>
@@ -87,7 +90,7 @@
 #include <EnergyPlus/DataMoistureBalanceEMPD.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataPhotovoltaics.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -103,7 +106,6 @@
 #include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DemandManager.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
-#include <EnergyPlus/DirectAirManager.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/DualDuct.hh>
 #include <EnergyPlus/EMSManager.hh>
@@ -168,13 +170,14 @@
 #include <EnergyPlus/PVWatts.hh>
 #include <EnergyPlus/PackagedTerminalHeatPump.hh>
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
+#include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
 #include <EnergyPlus/PipeHeatTransfer.hh>
 #include <EnergyPlus/Pipes.hh>
-#include <EnergyPlus/Plant/PlantLoopSolver.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/PlantCentralGSHP.hh>
 #include <EnergyPlus/PlantChillers.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
+#include <EnergyPlus/PlantHeatExchangerFluidToFluid.hh>
 #include <EnergyPlus/PlantLoadProfile.hh>
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
 #include <EnergyPlus/PlantPressureSystem.hh>
@@ -186,6 +189,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/Pumps.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
+#include <EnergyPlus/RefrigeratedCase.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/ResultsSchema.hh>
 #include <EnergyPlus/ReturnAirPathManager.hh>
@@ -210,12 +214,13 @@
 #include <EnergyPlus/UnitHeater.hh>
 #include <EnergyPlus/UnitVentilator.hh>
 #include <EnergyPlus/UnitarySystem.hh>
+#include <EnergyPlus/UserDefinedComponents.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 #include <EnergyPlus/VentilatedSlab.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/WaterThermalTanks.hh>
 #include <EnergyPlus/WaterToAirHeatPumpSimple.hh>
-#include <EnergyPlus/WaterToWaterHeatPumpEIR.hh>
+#include <EnergyPlus/PlantLoopHeatPumpEIR.hh>
 #include <EnergyPlus/WaterUse.hh>
 #include <EnergyPlus/WeatherManager.hh>
 #include <EnergyPlus/WindowAC.hh>
@@ -240,13 +245,16 @@ void EnergyPlus::clearAllStates()
     BoilerSteam::clear_state();
     BranchInputManager::clear_state();
     CoolingPanelSimple::clear_state();
+    ChillerAbsorption::clear_state();
     ChillerElectricEIR::clear_state();
     ChillerExhaustAbsorption::clear_state();
     ChillerGasAbsorption::clear_state();
     ChillerIndirectAbsorption::clear_state();
+    ChillerReformulatedEIR::clear_state();
     CondenserLoopTowers::clear_state();
     CoolTower::clear_state();
     CrossVentMgr::clear_state();
+    CTElectricGenerator::clear_state();
     CurveManager::clear_state();
     AirflowNetwork::clear_state();
     DataAirLoop::clear_state();
@@ -286,7 +294,6 @@ void EnergyPlus::clearAllStates()
     DaylightingManager::clear_state();
     DemandManager::clear_state();
     DesiccantDehumidifiers::clear_state();
-    DirectAirManager::clear_state();
     DualDuct::clear_state();
     DXCoils::clear_state();
     clearFacilityElectricPowerServiceObject();
@@ -347,13 +354,14 @@ void EnergyPlus::clearAllStates()
     OutputReportTabularAnnual::clear_state();
     OutsideEnergySources::clear_state();
     PackagedTerminalHeatPump::clear_state();
+    PhotovoltaicThermalCollectors::clear_state();
     Pipes::clear_state();
     PipeHeatTransfer::clear_state();
     PlantCentralGSHP::clear_state();
     PlantChillers::clear_state();
     PlantCondLoopOperation::clear_state();
+    PlantHeatExchangerFluidToFluid::clear_state();
     PlantLoadProfile::clear_state();
-    PlantLoopSolver::clear_state();
     PlantManager::clear_state();
     PlantPipingSystemsManager::clear_state();
     PlantPressureSystem::clear_state();
@@ -368,6 +376,7 @@ void EnergyPlus::clearAllStates()
     PurchasedAirManager::clear_state();
     PVWatts::clear_state();
     clearCoilSelectionReportObj(); // ReportCoilSelection
+    RefrigeratedCase::clear_state();
     ReturnAirPathManager::clear_state();
     RoomAirModelAirflowNetwork::clear_state();
     RoomAirModelManager::clear_state();
@@ -389,12 +398,13 @@ void EnergyPlus::clearAllStates()
     UnitarySystems::clear_state();
     UnitHeater::clear_state();
     UnitVentilator::clear_state();
+    UserDefinedComponents::clear_state();
     VariableSpeedCoils::clear_state();
     VentilatedSlab::clear_state();
     WaterCoils::clear_state();
     WaterThermalTanks::clear_state();
     WaterToAirHeatPumpSimple::clear_state();
-    EIRWaterToWaterHeatPumps::EIRWaterToWaterHeatPump::clear_state();
+    EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::clear_state();
     WaterUse::clear_state();
     WeatherManager::clear_state();
     WindowAC::clear_state();

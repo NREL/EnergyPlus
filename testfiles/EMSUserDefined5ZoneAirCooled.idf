@@ -98,7 +98,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.2;
+  Version,9.3;
 
   Building,
     Building,                !- Name
@@ -2219,8 +2219,8 @@
     SPACE1-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SPACE2-1 Eq,             !- Name
@@ -2229,8 +2229,8 @@
     SPACE2-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SPACE3-1 Eq,             !- Name
@@ -2239,8 +2239,8 @@
     SPACE3-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SPACE4-1 Eq,             !- Name
@@ -2249,8 +2249,8 @@
     SPACE4-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SPACE5-1 Eq,             !- Name
@@ -2259,8 +2259,8 @@
     SPACE5-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     SPACE1-1 ATU,            !- Name
@@ -4336,9 +4336,8 @@
     Set HW_rho = @RhoH2O HWLoopExitTemp,  !- <none>
     Set HeatCentralSAT = 16.7,  !- <none>
     Set HeatZoneSAT    = 50.0,  !- <none>
-    Set AvgSAT = (HeatCentralSAT + HeatZoneSAT) / 2,  !- <none>
     Set HeatingZoneW      = 0.004,  !- <none>
-    Set HeatingAir_CP     = @CpAirFnWTdb HeatingZoneW AvgSAT,  !- <none>
+    Set HeatingAir_CP     = @CpAirFnW HeatingZoneW,  !- <none>
     Set HWCoil_DesLoad = (HeatingAir_CP * Space1ATU_DesignAirMdot) * (HeatZoneSAT - HeatCentralSAT),  !- <none>
     Set Space1ATU_HW_DesignVdot = HWCoil_DesLoad / (( HW_rho * HW_CP) * HWLoopDeltaTemp),  !- <none>
     Set Space1ATU_HW_MdotMin = 0.0,  !- <none>
@@ -4535,9 +4534,8 @@
     Set HW_rho = @RhoH2O HWLoopExitTemp,  !- <none>
     Set HeatCentralSAT = 16.7,  !- <none>
     Set HeatZoneSAT    = 50.0,  !- <none>
-    Set AvgSAT = (HeatCentralSAT + HeatZoneSAT) / 2,  !- <none>
     Set HeatingZoneW      = 0.004,  !- <none>
-    Set HeatingAir_CP     = @CpAirFnWTdb HeatingZoneW AvgSAT,  !- <none>
+    Set HeatingAir_CP     = @CpAirFnW HeatingZoneW,  !- <none>
     Set HWCoil_DesLoad = (HeatingAir_CP * Space2ATU_DesignAirMdot) * (HeatZoneSAT - HeatCentralSAT),  !- <none>
     Set Space2ATU_HW_DesignVdot = HWCoil_DesLoad / (( HW_rho * HW_CP) * HWLoopDeltaTemp),  !- <none>
     Set Space2ATU_HW_MdotMin = 0.0,  !- <none>
@@ -4734,9 +4732,8 @@
     Set HW_rho = @RhoH2O HWLoopExitTemp,  !- <none>
     Set HeatCentralSAT = 16.7,  !- <none>
     Set HeatZoneSAT    = 50.0,  !- <none>
-    Set AvgSAT = (HeatCentralSAT + HeatZoneSAT) / 2,  !- <none>
     Set HeatingZoneW      = 0.004,  !- <none>
-    Set HeatingAir_CP     = @CpAirFnWTdb HeatingZoneW AvgSAT,  !- <none>
+    Set HeatingAir_CP     = @CpAirFnW HeatingZoneW,  !- <none>
     Set HWCoil_DesLoad = (HeatingAir_CP * Space3ATU_DesignAirMdot) * (HeatZoneSAT - HeatCentralSAT),  !- <none>
     Set Space3ATU_HW_DesignVdot = HWCoil_DesLoad / (( HW_rho * HW_CP) * HWLoopDeltaTemp),  !- <none>
     Set Space3ATU_HW_MdotMin = 0.0,  !- <none>
@@ -4933,9 +4930,8 @@
     Set HW_rho = @RhoH2O HWLoopExitTemp,  !- <none>
     Set HeatCentralSAT = 16.7,  !- <none>
     Set HeatZoneSAT    = 50.0,  !- <none>
-    Set AvgSAT = (HeatCentralSAT + HeatZoneSAT) / 2,  !- <none>
     Set HeatingZoneW      = 0.004,  !- <none>
-    Set HeatingAir_CP     = @CpAirFnWTdb HeatingZoneW AvgSAT,  !- <none>
+    Set HeatingAir_CP     = @CpAirFnW HeatingZoneW,  !- <none>
     Set HWCoil_DesLoad = (HeatingAir_CP * Space4ATU_DesignAirMdot) * (HeatZoneSAT - HeatCentralSAT),  !- <none>
     Set Space4ATU_HW_DesignVdot = HWCoil_DesLoad / (( HW_rho * HW_CP) * HWLoopDeltaTemp),  !- <none>
     Set Space4ATU_HW_MdotMin = 0.0,  !- <none>
@@ -5132,9 +5128,8 @@
     Set HW_rho = @RhoH2O HWLoopExitTemp,  !- <none>
     Set HeatCentralSAT = 16.7,  !- <none>
     Set HeatZoneSAT    = 50.0,  !- <none>
-    Set AvgSAT = (HeatCentralSAT + HeatZoneSAT) / 2,  !- <none>
     Set HeatingZoneW      = 0.004,  !- <none>
-    Set HeatingAir_CP     = @CpAirFnWTdb HeatingZoneW AvgSAT,  !- <none>
+    Set HeatingAir_CP     = @CpAirFnW HeatingZoneW,  !- <none>
     Set HWCoil_DesLoad = (HeatingAir_CP * Space4ATU_DesignAirMdot) * (HeatZoneSAT - HeatCentralSAT),  !- <none>
     Set Space5ATU_HW_DesignVdot = HWCoil_DesLoad / (( HW_rho * HW_CP) * HWLoopDeltaTemp),  !- <none>
     Set Space5ATU_HW_MdotMin = 0.0,  !- <none>
@@ -5316,4 +5311,3 @@
     Set HW_tempFall = ActualQdot/(Water_MdotRequest * Water_cp),  !- <none>
     Set Water_Tout = Water_Tinlet - HW_tempFall,  !- <none>
     Set tot_heat_Power = ActualQdot;  !- <none>
-

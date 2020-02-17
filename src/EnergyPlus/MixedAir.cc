@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -84,6 +84,7 @@
 #include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/Humidifiers.hh>
@@ -91,8 +92,10 @@
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
@@ -101,6 +104,7 @@
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/SteamCoils.hh>
 #include <EnergyPlus/TranspiredCollector.hh>
+#include <EnergyPlus/UnitarySystem.hh>
 #include <EnergyPlus/UserDefinedComponents.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
@@ -149,7 +153,6 @@ namespace MixedAir {
     using DataGlobals::BeginEnvrnFlag;
     using DataGlobals::DoZoneSizing;
     using DataGlobals::NumOfZones;
-    using DataGlobals::OutputFileInits;
     using DataGlobals::ScheduleAlwaysOn;
     using DataGlobals::SysSizingCalc;
     using namespace DataEnvironment;
@@ -205,6 +208,7 @@ namespace MixedAir {
     int const Humidifier(21);
     int const Fan_System_Object(22);
     int const UnitarySystemModel(23);
+    int const VRFTerminalUnit(24); // new Jan 2020
 
     int const ControllerOutsideAir(2);
     int const ControllerStandAloneERV(3);
@@ -458,7 +462,7 @@ namespace MixedAir {
                                OACoolCoil,
                                OAHX);
             }
-            // now simulate again propogate current temps back through OA system
+            // now simulate again propigate current temps back through OA system
             for (CompNum = 1; CompNum <= OutsideAirSys(OASysNum).NumComponents; ++CompNum) {
                 CompType = OutsideAirSys(OASysNum).ComponentType(CompNum);
                 CompName = OutsideAirSys(OASysNum).ComponentName(CompNum);
@@ -599,8 +603,6 @@ namespace MixedAir {
         using HVACDXSystem::SimDXCoolingSystem;
         using HVACHXAssistedCoolingCoil::HXAssistedCoil;
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
-        using PhotovoltaicThermalCollectors::CalledFromOutsideAirSystem;
-        using PhotovoltaicThermalCollectors::SimPVTcollectors;
         using SimAirServingZones::SolveWaterCoilController;
         using SteamCoils::SimulateSteamCoilComponents;
         using TranspiredCollector::SimTranspiredCollector;
@@ -748,8 +750,19 @@ namespace MixedAir {
                     bool CoolingActive = false;
                     Real64 OAUCoilOutTemp = 0.0;
                     bool ZoneEquipFlag = false;
-                    OutsideAirSys(OASysNum).compPointer[CompIndex]->simulate(
-                        CompName, FirstHVACIteration, AirLoopNum, CompIndex, HeatingActive, CoolingActive, CompIndex, OAUCoilOutTemp, ZoneEquipFlag);
+                    Real64 sensOut = 0.0;
+                    Real64 latOut = 0.0;
+                    OutsideAirSys(OASysNum).compPointer[CompIndex]->simulate(CompName,
+                                                                             FirstHVACIteration,
+                                                                             AirLoopNum,
+                                                                             CompIndex,
+                                                                             HeatingActive,
+                                                                             CoolingActive,
+                                                                             CompIndex,
+                                                                             OAUCoilOutTemp,
+                                                                             ZoneEquipFlag,
+                                                                             sensOut,
+                                                                             latOut);
                 }
                 if (AirLoopInputsFilled) UnitarySystems::UnitarySys::getUnitarySysHeatCoolCoil(CompName, OACoolingCoil, OAHeatingCoil, 0);
                 if (MyOneTimeCheckUnitarySysFlag(OASysNum)) {
@@ -831,7 +844,10 @@ namespace MixedAir {
                 // Air-based Photovoltaic-thermal flat plate collector
             } else if (SELECT_CASE_var == PVT_AirBased) { // 'SolarCollector:FlatPlate:PhotovoltaicThermal'
                 if (Sim) {
-                    SimPVTcollectors(CompIndex, FirstHVACIteration, CalledFromOutsideAirSystem, CompName);
+                    if (CompIndex == 0) {
+                        CompIndex = PhotovoltaicThermalCollectors::getPVTindexFromName(CompName);
+                    }
+                    PhotovoltaicThermalCollectors::simPVTfromOASys(CompIndex, FirstHVACIteration);
                 }
 
                 // Evaporative Cooler Types
@@ -839,6 +855,31 @@ namespace MixedAir {
                 // 'EvaporativeCooler:Indirect:WetCoil','EvaporativeCooler:Indirect:ResearchSpecial'
                 if (Sim) {
                     SimEvapCooler(CompName, CompIndex);
+                }
+
+            } else if (SELECT_CASE_var == VRFTerminalUnit) { // 'ZoneHVAC:TerminalUnit:VariableRefrigerantFlow'
+                if (Sim) {
+                    int ControlledZoneNum = 0;
+                    bool HeatingActive = false;
+                    bool CoolingActive = false;
+                    int const OAUnitNum = 0;
+                    Real64 const OAUCoilOutTemp = 0.0;
+                    bool const ZoneEquipment = false;
+                    Real64 sysOut = 0.0;
+                    Real64 latOut = 0.0;
+                    HVACVariableRefrigerantFlow::SimulateVRF(CompName,
+                        FirstHVACIteration,
+                        ControlledZoneNum,
+                        CompIndex,
+                        HeatingActive,
+                        CoolingActive,
+                        OAUnitNum,
+                        OAUCoilOutTemp,
+                        ZoneEquipment,
+                        sysOut,
+                        latOut);
+                } else {
+                    HVACVariableRefrigerantFlow::isVRFCoilPresent(CompName, OACoolingCoil, OAHeatingCoil);
                 }
 
             } else {
@@ -902,7 +943,7 @@ namespace MixedAir {
         int OAControllerNum;
 
         if ((GetOAControllerInputFlag) && (AirLoopNum > 0)) { // Gets input for object  first time Sim routine is called from an airloop
-            GetOAControllerInputs();
+            GetOAControllerInputs(OutputFiles::getSingleton());
             GetOAControllerInputFlag = false;
         }
 
@@ -1264,6 +1305,8 @@ namespace MixedAir {
                         OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = EvapCooler;
                     } else if (SELECT_CASE_var == "EVAPORATIVECOOLER:DIRECT:RESEARCHSPECIAL") {
                         OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = EvapCooler;
+                    } else if ( SELECT_CASE_var == "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW" ) {
+                        OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = VRFTerminalUnit;
                     } else {
                         ShowSevereError(CurrentModuleObject + " = \"" + AlphArray(1) + "\" invalid Outside Air Component=\"" +
                                         OutsideAirSys(OASysNum).ComponentType(CompNum) + "\".");
@@ -1295,7 +1338,7 @@ namespace MixedAir {
         GetOASysInputFlag = false;
     }
 
-    void GetOAControllerInputs()
+    void GetOAControllerInputs(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1367,10 +1410,7 @@ namespace MixedAir {
         int i;
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_700(
-            "('!<Controller:MechanicalVentilation>,Name,Availability Schedule Name,Demand Controlled Ventilation "
-            "{Yes/No},','System Outdoor Air Method,Zone Maximum Outdoor Air Fraction,Number of Zones,Zone Name,DSOA "
-            "Name,DSZAD Name')");
+
         static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // First, call other get input routines in this module to make sure data is filled during this routine.
@@ -1892,6 +1932,7 @@ namespace MixedAir {
                                                     if (UtilityRoutines::SameString(ZoneEquipList(EquipListNum).EquipName(EquipNum),
                                                                                     AirDistUnit(ADUNum).Name)) {
                                                         if ((AirDistUnit(ADUNum).EquipType_Num(EquipNum) == SingleDuctVAVReheat) ||
+                                                            (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == SingleDuctConstVolNoReheat) ||
                                                             (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == SingleDuctConstVolReheat) ||
                                                             (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == SingleDuctVAVNoReheat) ||
                                                             (AirDistUnit(ADUNum).EquipType_Num(EquipNum) == SingleDuctVAVReheatVSFan) ||
@@ -1968,109 +2009,59 @@ namespace MixedAir {
             }
 
             // write to .eio file
-            ObjexxFCL::gio::write(OutputFileInits, Format_700);
+            static constexpr auto Format_700(
+                "!<Controller:MechanicalVentilation>,Name,Availability Schedule Name,Demand Controlled Ventilation "
+                "{Yes/No},System Outdoor Air Method,Zone Maximum Outdoor Air Fraction,Number of Zones,Zone Name,DSOA "
+                "Name,DSZAD Name");
+            print(outputFiles.eio, "{}\n", Format_700);
             for (VentMechNum = 1; VentMechNum <= NumVentMechControllers; ++VentMechNum) {
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("NO");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << " Controller:MechanicalVentilation," +
-                                                                               VentilationMechanical(VentMechNum).Name + ',' +
-                                                                               VentilationMechanical(VentMechNum).SchName + ',';
-                }
+                print(outputFiles.eio,
+                      " Controller:MechanicalVentilation,{},{},",
+                      VentilationMechanical(VentMechNum).Name,
+                      VentilationMechanical(VentMechNum).SchName);
+
                 if (VentilationMechanical(VentMechNum).DCVFlag) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "Yes,";
-                    }
+                    print(outputFiles.eio, "Yes,");
                 } else {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "No,";
-                    }
+                    print(outputFiles.eio, "No,");
                 }
+
                 if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ZoneSum) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "ZoneSum,";
-                    }
+                    print(outputFiles.eio, "ZoneSum,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_VRP) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "VentilationRateProcedure,";
-                    }
+                    print(outputFiles.eio, "VentilationRateProcedure,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_IAQP) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "IndoorAirQualityProcedure,";
-                    }
+                    print(outputFiles.eio, "IndoorAirQualityProcedure,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ProportionalControlSchOcc) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "ProportionalControlBasedonOccupancySchedule,";
-                    }
+                    print(outputFiles.eio, "ProportionalControlBasedonOccupancySchedule,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ProportionalControlDesOcc) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "ProportionalControlBasedOnDesignOccupancy,";
-                    }
+                    print(outputFiles.eio, "ProportionalControlBasedOnDesignOccupancy,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_ProportionalControlDesOARate) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "ProportionalControlBasedOnDesignOARate,";
-                    }
+                    print(outputFiles.eio, "ProportionalControlBasedOnDesignOARate,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_IAQPGC) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "IndoorAirQualityGenericContaminant,";
-                    }
+                    print(outputFiles.eio, "IndoorAirQualityGenericContaminant,");
                 } else if (VentilationMechanical(VentMechNum).SystemOAMethod == SOAM_IAQPCOM) {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "IndoorAirQualityProcedureCombined,";
-                    }
+                    print(outputFiles.eio, "IndoorAirQualityProcedureCombined,");
                 } else {
-                    {
-                        IOFlags flags;
-                        flags.ADVANCE("NO");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA, flags) << "Invalid/Unknown,";
-                    }
+                    print(outputFiles.eio, "Invalid/Unknown,");
                 }
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("NO");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags)
-                        << RoundSigDigits(VentilationMechanical(VentMechNum).ZoneMaxOAFraction, 2) + ',';
-                }
-                {
-                    IOFlags flags;
-                    flags.ADVANCE("NO");
-                    ObjexxFCL::gio::write(OutputFileInits, fmtA, flags)
-                        << RoundSigDigits(VentilationMechanical(VentMechNum).NumofVentMechZones) + ',';
-                }
+
+                print(outputFiles.eio, "{:.2R},", VentilationMechanical(VentMechNum).ZoneMaxOAFraction);
+                print(outputFiles.eio, "{},", VentilationMechanical(VentMechNum).NumofVentMechZones);
+
                 for (jZone = 1; jZone <= VentilationMechanical(VentMechNum).NumofVentMechZones; ++jZone) {
                     if (jZone < VentilationMechanical(VentMechNum).NumofVentMechZones) {
-                        {
-                            IOFlags flags;
-                            flags.ADVANCE("NO");
-                            ObjexxFCL::gio::write(OutputFileInits, fmtA, flags)
-                                << Zone(VentilationMechanical(VentMechNum).VentMechZone(jZone)).Name + ',' +
-                                       VentilationMechanical(VentMechNum).ZoneDesignSpecOAObjName(jZone) + ',' +
-                                       VentilationMechanical(VentMechNum).ZoneDesignSpecADObjName(jZone) + ',';
-                        }
+                        print(outputFiles.eio,
+                              "{},{},{},",
+                              Zone(VentilationMechanical(VentMechNum).VentMechZone(jZone)).Name,
+                              VentilationMechanical(VentMechNum).ZoneDesignSpecOAObjName(jZone),
+                              VentilationMechanical(VentMechNum).ZoneDesignSpecADObjName(jZone));
                     } else {
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA) << VentilationMechanical(VentMechNum).VentMechZoneName(jZone) + ',' +
-                                                                            VentilationMechanical(VentMechNum).ZoneDesignSpecOAObjName(jZone) + ',' +
-                                                                            VentilationMechanical(VentMechNum).ZoneDesignSpecADObjName(jZone);
+                        print(outputFiles.eio,
+                              "{},{},{}\n",
+                              Zone(VentilationMechanical(VentMechNum).VentMechZone(jZone)).Name,
+                              VentilationMechanical(VentMechNum).ZoneDesignSpecOAObjName(jZone),
+                              VentilationMechanical(VentMechNum).ZoneDesignSpecADObjName(jZone));
                     }
                 }
             }
@@ -3837,7 +3828,7 @@ namespace MixedAir {
         }
         this->RelTemp = this->RetTemp;
         this->RelEnth = this->RetEnth;
-        this->RelSensiLossRate = this->RelMassFlow * Psychrometrics::PsyCpAirFnWTdb(OutHumRat, OutDryBulbTemp) * (this->RelTemp - OutDryBulbTemp);
+        this->RelSensiLossRate = this->RelMassFlow * Psychrometrics::PsyCpAirFnW(OutHumRat) * (this->RelTemp - OutDryBulbTemp);
         this->RelTotalLossRate = this->RelMassFlow * (this->RelEnth - OutEnthalpy);
         this->RelLatentLossRate = this->RelTotalLossRate - this->RelSensiLossRate;
     }
@@ -4593,7 +4584,8 @@ namespace MixedAir {
                 if (ZoneSysMoistureDemand(this->HumidistatZoneNum).TotalOutputRequired < 0.0) {
                     //     IF OAController is not allowed to modify air flow during high outdoor humrat condition, then disable modified air flow
                     //     if indoor humrat is less than or equal to outdoor humrat
-                    if (!this->ModifyDuringHighOAMoisture && Node(this->NodeNumofHumidistatZone).HumRat <= this->OAHumRat) {
+                    if (!this->ModifyDuringHighOAMoisture &&
+                        (Node(this->NodeNumofHumidistatZone).HumRat - this->OAHumRat) <= DataHVACGlobals::SmallHumRatDiff) {
                         HighHumidityOperationFlag = false;
                     } else {
                         HighHumidityOperationFlag = true;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
@@ -399,7 +400,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_DOASDXCoilTest)
 
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ScheduleManager::ProcessScheduleInput();
+    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
 
     HVACDXSystem::GetDXCoolingSystemInput();
     EXPECT_EQ(HVACDXSystem::DXCoolingSystem(1).Name, "DX COOLING COIL SYSTEM");
@@ -515,7 +516,7 @@ TEST_F(EnergyPlusFixture, VariableSpeedCoils_RHControl)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60;
     OutputReportPredefined::SetPredefinedTables();
-    ScheduleManager::ProcessScheduleInput();
+    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleManager::Schedule(1).CurrentValue = 1.0; // Enable schedule without calling schedule manager
 
     int DXSystemNum = 1;

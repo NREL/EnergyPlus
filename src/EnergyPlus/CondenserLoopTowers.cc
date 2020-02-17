@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -64,7 +64,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataWater.hh>
@@ -5182,7 +5182,7 @@ namespace CondenserLoopTowers {
         // set water and air properties
         Real64 AirDensity = Psychrometrics::PsyRhoAirFnPbTdbW(this->AirPress, InletAirTemp, this->AirHumRat); // Density of air [kg/m3]
         Real64 AirMassFlowRate = AirFlowRate * AirDensity;                                                    // Mass flow rate of air [kg/s]
-        Real64 CpAir = Psychrometrics::PsyCpAirFnWTdb(this->AirHumRat, InletAirTemp);                         // Heat capacity of air [J/kg/K]
+        Real64 CpAir = Psychrometrics::PsyCpAirFnW(this->AirHumRat);                                          // Heat capacity of air [J/kg/K]
         Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(this->LoopNum).FluidName,
                                                                 this->WaterTemp,
                                                                 DataPlant::PlantLoop(this->LoopNum).FluidIndex,

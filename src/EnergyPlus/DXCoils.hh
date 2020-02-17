@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -59,6 +59,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class OutputFiles;
 
 namespace DXCoils {
 
@@ -88,7 +89,7 @@ namespace DXCoils {
     extern Real64 const RatedOutdoorWetBulbTempHeat; // 6.11 C or 43F
     extern Real64 const RatedInletWetBulbTempHeat;   // 15.55 or 60F
 
-    extern Real64 const DryCoilOutletHumRatioMin; // dry coil outlet minimum hum ratio kgH2O/kgdry air
+    extern Real64 const DryCoilOutletHumRatioMin; // dry coil outlet minimum hum ratio kgWater/kgDryAir
 
     // Curve Types
     extern int const Linear;
@@ -419,6 +420,7 @@ namespace DXCoils {
         bool LatentImpact;                          // Latent degradation applied to Speed Number > 1
         Array1D_int MSErrIndex;                     // index flag for num speeds/recurring messages
         Array1D<Real64> MSRatedTotCap;              // Rated cooling capacity for MS heat pump [W]
+        Array1D<Real64> MSRatedTotCapDes;           // Autosized Gross total cooling capacity at rated conditions [watts]
         Array1D<Real64> MSRatedSHR;                 // Rated SHR for MS heat pump [dimensionless]
         Array1D<Real64> MSRatedCOP;                 // Rated COP for MS heat pump [dimensionless]
         Array1D<Real64> MSRatedAirVolFlowRate;      // Air volume flow rate through unit at rated conditions [m3/s]
@@ -752,7 +754,7 @@ namespace DXCoils {
 
     void ReportDXCoil(int const DXCoilNum); // number of the current fan coil unit being simulated
 
-    void CalcTwoSpeedDXCoilStandardRating(int const DXCoilNum);
+    void CalcTwoSpeedDXCoilStandardRating(OutputFiles &outputFiles, int const DXCoilNum);
 
     void GetFanIndexForTwoSpeedCoil(int const CoolingCoilIndex, int &SupplyFanIndex, std::string &SupplyFanName, int &SupplyFan_TypeNum);
 
@@ -803,6 +805,14 @@ namespace DXCoils {
     int GetCoilOutletNode(std::string const &CoilType, // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
+    );
+
+    int getCoilInNodeIndex(int const &CoilIndex,       // coil index
+                           bool &ErrorsFound           // set to true if problem
+    );
+
+    int getCoilOutNodeIndex(int const &CoilIndex,      // coil index
+                            bool &ErrorsFound          // set to true if problem
     );
 
     int GetCoilCondenserInletNode(std::string const &CoilType, // must match coil types in this module

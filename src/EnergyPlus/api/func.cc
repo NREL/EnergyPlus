@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -141,10 +141,10 @@ Real64 psyHFnTdbW(Real64 const TDB, Real64 const dW) {
     // humidity ratio
     return EnergyPlus::Psychrometrics::PsyHFnTdbW_fast(TDB, dW);
 }
-Real64 psyCpAirFnWTdb(Real64 const dw, Real64 const T) {
+Real64 psyCpAirFnW(Real64 const dw) {
     // humidity ratio {kgWater/kgDryAir}
     // input temperature {Celsius}
-    return EnergyPlus::Psychrometrics::PsyCpAirFnWTdb_fast(dw, T);
+    return EnergyPlus::Psychrometrics::PsyCpAirFnW(dw);
 }
 Real64 psyTdbFnHW(Real64 const H, Real64 const dW) {
     // enthalpy {J/kg}

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -65,6 +65,11 @@ void afterZoneTimeStepHandler()
         if (outdoorDewPointActuator == -1 || outdoorTempSensor == -1 || outdoorDewPointSensor == -1) {
             exit(1);
         }
+        FILE *apiAvailFile;
+        apiAvailFile = fopen("/tmp/api_stuff_available.csv", "w");
+        const char * apiStuff = listAllAPIDataCSV();
+        fputs(apiStuff, apiAvailFile);
+        fclose(apiAvailFile);
     }
     setActuatorValue(outdoorDewPointActuator, -25);
     Real64 oa_temp = getVariableValue(outdoorTempSensor);

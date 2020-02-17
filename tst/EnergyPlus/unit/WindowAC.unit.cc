@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,6 +54,7 @@
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -68,7 +69,7 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
     // this unit test runs the window air conditioner with a Coil:Cooling:DX:VariableSpeed coil
     // set up minimal zone, zone equipment, and ZoneHVAC:WindowAirConditioner, check input processing, check sizing, check simulation results
     std::string const idf_objects = delimited_string({
-        " Version,9.2;",
+        " Version,9.3;",
 
         "  Timestep,6;",
 
@@ -432,15 +433,15 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
 
     DataGlobals::NumOfTimeStepInHour = 6;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 10;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(); // read schedule data
+    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton()); // read schedule data
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
 
@@ -449,9 +450,9 @@ TEST_F(EnergyPlusFixture, WindowAC_VStest1)
     DataGlobals::ZoneSizingCalc = true;
     EnergyPlus::createFacilityElectricPowerServiceObject();
 
-    SizingManager::ManageSizing();
+    SizingManager::ManageSizing(OutputFiles::getSingleton());
 
-    SimulationManager::SetupSimulation(errorsFound);
+    SimulationManager::SetupSimulation(OutputFiles::getSingleton(), errorsFound);
     //
 
     Real64 qDotMet(0.0);    // Watts total cap

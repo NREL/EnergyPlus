@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -59,6 +59,7 @@
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/OutputReports.hh>
@@ -150,6 +151,8 @@ namespace CommandLineInterface {
 
         opt.add("", 0, 0, 0, "Output IDF->epJSON or epJSON->IDF, dependent on input file type", "-c", "--convert");
 
+        opt.add("", 0, 0, 0, "Only convert IDF->epJSON or epJSON->IDF, dependent on input file type. No simulation", "--convert-only");
+
         opt.add("L",
                 0,
                 1,
@@ -198,6 +201,8 @@ namespace CommandLineInterface {
         AnnualSimulation = opt.isSet("-a");
 
         outputEpJSONConversion = opt.isSet("-c");
+
+        outputEpJSONConversionOnly = opt.isSet("--convert-only");
 
         // Process standard arguments
         if (opt.isSet("-h")) {
@@ -262,9 +267,19 @@ namespace CommandLineInterface {
         } else if (inputFileExt == "CBOR") {
             isEpJSON = true;
             isCBOR = true;
+            DisplayString("CBOR input format is experimental and unsupported.");
         } else if (inputFileExt == "MSGPACK") {
             isEpJSON = true;
             isMsgPack = true;
+            DisplayString("MsgPack input format is experimental and unsupported.");
+        } else if (inputFileExt == "UBJSON") {
+            isEpJSON = true;
+            isUBJSON = true;
+            DisplayString("UBJSON input format is experimental and unsupported.");
+        } else if (inputFileExt == "BSON") {
+            isEpJSON = true;
+            isBSON = true;
+            DisplayString("BSON input format is experimental and unsupported.");
         } else {
             DisplayString("ERROR: Input file must have IDF, IMF, or epJSON extension.");
             exit(EXIT_FAILURE);
@@ -371,7 +386,7 @@ namespace CommandLineInterface {
         outputAuditFileName = outputFilePrefix + normalSuffix + ".audit";
         outputBndFileName = outputFilePrefix + normalSuffix + ".bnd";
         outputDxfFileName = outputFilePrefix + normalSuffix + ".dxf";
-        outputEioFileName = outputFilePrefix + normalSuffix + ".eio";
+        OutputFiles::getSingleton().eio.fileName = outputFilePrefix + normalSuffix + ".eio";
         outputEndFileName = outputFilePrefix + normalSuffix + ".end";
         outputErrFileName = outputFilePrefix + normalSuffix + ".err";
         outputEsoFileName = outputFilePrefix + normalSuffix + ".eso";

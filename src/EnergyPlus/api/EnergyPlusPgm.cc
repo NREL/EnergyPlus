@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -207,6 +207,7 @@
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ResultsSchema.hh>
@@ -218,6 +219,7 @@
 #include <direct.h>
 #include <stdlib.h>
 #else // Mac or Linux
+#include <fmt-6.1.2/include/fmt/format.h>
 #include <unistd.h>
 #endif
 
@@ -298,6 +300,10 @@ int initializeEnergyPlus(std::string const & filepath) {
     try {
         EnergyPlus::inputProcessor = InputProcessor::factory();
         EnergyPlus::inputProcessor->processInput();
+        if (DataGlobals::outputEpJSONConversionOnly) {
+            DisplayString("Converted input file format. Exiting.");
+            return EndEnergyPlus();
+        }
         ResultsFramework::OutputSchema->setupOutputOptions();
     } catch (const FatalError &e) {
         return AbortEnergyPlus();

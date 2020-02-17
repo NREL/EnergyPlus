@@ -9,7 +9,6 @@ outdoor_dew_point_actuator = 0
 
 def time_step_handler():
     global one_time, outdoor_temp_sensor, outdoor_dew_point_sensor, outdoor_dew_point_actuator
-    print("OH HAI NEW TIMESTEP")
     sys.stdout.flush()
     if one_time:
         outdoor_temp_sensor = api.exchange.get_variable_handle(

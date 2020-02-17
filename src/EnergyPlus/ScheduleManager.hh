@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -62,7 +62,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-
+    class OutputFiles;
+    
 namespace ScheduleManager {
 
     // Using/Aliasing
@@ -191,9 +192,9 @@ namespace ScheduleManager {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void ProcessScheduleInput();
+    void ProcessScheduleInput(OutputFiles &outputFiles);
 
-    void ReportScheduleDetails(int const LevelOfDetail); // =1: hourly; =2: timestep; = 3: make IDF excerpt
+    void ReportScheduleDetails(OutputFiles &outputFiles, int const LevelOfDetail); // =1: hourly; =2: timestep; = 3: make IDF excerpt
 
     Real64 GetCurrentScheduleValue(int const ScheduleIndex);
 

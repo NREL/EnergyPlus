@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -58,7 +58,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
@@ -416,13 +416,13 @@ namespace HeatPumpWaterToWaterCOOLING {
 
         // CurrentModuleObject='HeatPump:WaterToWater:ParameterEstimation:Cooling'
         for (GSHPNum = 1; GSHPNum <= NumGSHPs; ++GSHPNum) {
-            SetupOutputVariable("Water to Water Heat Pump Electric Power",
+            SetupOutputVariable("Heat Pump Electric Power",
                                 OutputProcessor::Unit::W,
                                 GSHP(GSHPNum).Power,
                                 "System",
                                 "Average",
                                 GSHP(GSHPNum).Name);
-            SetupOutputVariable("Water to Water Heat Pump Electric Energy",
+            SetupOutputVariable("Heat Pump Electric Energy",
                                 OutputProcessor::Unit::J,
                                 GSHP(GSHPNum).Energy,
                                 "System",
@@ -434,63 +434,63 @@ namespace HeatPumpWaterToWaterCOOLING {
                                 _,
                                 "Plant");
 
-            SetupOutputVariable("Water to Water Heat Pump Load Side Heat Transfer Rate",
+            SetupOutputVariable("Heat Pump Load Side Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
                                 GSHP(GSHPNum).QLoad,
                                 "System",
                                 "Average",
                                 GSHP(GSHPNum).Name);
-            SetupOutputVariable("Water to Water Heat Pump Load Side Heat Transfer Energy",
+            SetupOutputVariable("Heat Pump Load Side Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
                                 GSHP(GSHPNum).QLoadEnergy,
                                 "System",
                                 "Sum",
                                 GSHP(GSHPNum).Name);
 
-            SetupOutputVariable("Water to Water Heat Pump Source Side Heat Transfer Rate",
+            SetupOutputVariable("Heat Pump Source Side Heat Transfer Rate",
                                 OutputProcessor::Unit::W,
                                 GSHP(GSHPNum).QSource,
                                 "System",
                                 "Average",
                                 GSHP(GSHPNum).Name);
-            SetupOutputVariable("Water to Water Heat Pump Source Side Heat Transfer Energy",
+            SetupOutputVariable("Heat Pump Source Side Heat Transfer Energy",
                                 OutputProcessor::Unit::J,
                                 GSHP(GSHPNum).QSourceEnergy,
                                 "System",
                                 "Sum",
                                 GSHP(GSHPNum).Name);
 
-            SetupOutputVariable("Water to Water Heat Pump Load Side Outlet Temperature",
+            SetupOutputVariable("Heat Pump Load Side Outlet Temperature",
                                 OutputProcessor::Unit::C,
                                 GSHP(GSHPNum).LoadSideWaterOutletTemp,
                                 "System",
                                 "Average",
                                 GSHP(GSHPNum).Name);
-            SetupOutputVariable("Water to Water Heat Pump Load Side Inlet Temperature",
+            SetupOutputVariable("Heat Pump Load Side Inlet Temperature",
                                 OutputProcessor::Unit::C,
                                 GSHP(GSHPNum).LoadSideWaterInletTemp,
                                 "System",
                                 "Average",
                                 GSHP(GSHPNum).Name);
-            SetupOutputVariable("Water to Water Heat Pump Source Side Outlet Temperature",
+            SetupOutputVariable("Heat Pump Source Side Outlet Temperature",
                                 OutputProcessor::Unit::C,
                                 GSHP(GSHPNum).SourceSideWaterOutletTemp,
                                 "System",
                                 "Average",
                                 GSHP(GSHPNum).Name);
-            SetupOutputVariable("Water to Water Heat Pump Source Side Inlet Temperature",
+            SetupOutputVariable("Heat Pump Source Side Inlet Temperature",
                                 OutputProcessor::Unit::C,
                                 GSHP(GSHPNum).SourceSideWaterInletTemp,
                                 "System",
                                 "Average",
                                 GSHP(GSHPNum).Name);
-            SetupOutputVariable("Water to Water Heat Pump Load Side Mass Flow Rate",
+            SetupOutputVariable("Heat Pump Load Side Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 GSHP(GSHPNum).LoadSideWaterMassFlowRate,
                                 "System",
                                 "Average",
                                 GSHP(GSHPNum).Name);
-            SetupOutputVariable("Water to Water Heat Pump Source Side Mass Flow Rate",
+            SetupOutputVariable("Heat Pump Source Side Mass Flow Rate",
                                 OutputProcessor::Unit::kg_s,
                                 GSHP(GSHPNum).SourceSideWaterMassFlowRate,
                                 "System",

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -67,10 +67,10 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
 #include <EnergyPlus/RoomAirModelManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/Psychrometrics.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
@@ -294,9 +294,9 @@ TEST_F(RoomAirflowNetworkTest, RAFNTest)
     RhoVaporAirIn(1) = PsyRhovFnTdbWPb(MAT(ZoneNum), ZoneAirHumRat(ZoneNum), OutBaroPress);
     RhoVaporAirIn(2) = PsyRhovFnTdbWPb(MAT(ZoneNum), ZoneAirHumRat(ZoneNum), OutBaroPress);
     HMassConvInFD(1) = HConvIn(1) / ((PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum)) + RhoVaporAirIn(1)) *
-                                     PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), MAT(ZoneNum)));
+                                     PsyCpAirFnW(ZoneAirHumRat(ZoneNum)));
     HMassConvInFD(2) = HConvIn(2) / ((PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum)) + RhoVaporAirIn(2)) *
-                                     PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), MAT(ZoneNum)));
+                                     PsyCpAirFnW(ZoneAirHumRat(ZoneNum)));
 
     RoomAirNode = 1;
     auto &thisRAFN(RAFN(ZoneNum));

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -60,7 +60,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -123,7 +123,7 @@ namespace HVACCooledBeam {
     using DataHVACGlobals::SmallMassFlow;
     using DataHVACGlobals::SmallWaterVolFlow;
     using DataHVACGlobals::TimeStepSys;
-    using Psychrometrics::PsyCpAirFnWTdb;
+    using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyHFnTdbW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
 
@@ -775,8 +775,7 @@ namespace HVACCooledBeam {
 
                     if (TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolMassFlow >= SmallAirVolFlow) {
                         DesAirVolFlow = CoolBeam(CBNum).MaxAirVolFlow;
-                        CpAir = PsyCpAirFnWTdb(TermUnitFinalZoneSizing(CurTermUnitSizingNum).CoolDesHumRat,
-                                               TermUnitFinalZoneSizing(CurTermUnitSizingNum).CoolDesTemp);
+                        CpAir = PsyCpAirFnW(TermUnitFinalZoneSizing(CurTermUnitSizingNum).CoolDesHumRat);
                         // the design cooling coil load is the zone load minus whatever the central system does. Note that
                         // DesCoolCoilInTempTU is really the primary air inlet temperature for the unit.
                         if (TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtCoolPeak > 0.0) {
@@ -981,8 +980,8 @@ namespace HVACCooledBeam {
         QZnReq = ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
         QToHeatSetPt = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
         QToCoolSetPt = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
-        CpAirZn = PsyCpAirFnWTdb(Node(ZoneNodeNum).HumRat, Node(ZoneNodeNum).Temp);
-        CpAirSys = PsyCpAirFnWTdb(Node(InAirNode).HumRat, Node(InAirNode).Temp);
+        CpAirZn = PsyCpAirFnW(Node(ZoneNodeNum).HumRat);
+        CpAirSys = PsyCpAirFnW(Node(InAirNode).HumRat);
         MaxColdWaterFlow = CoolBeam(CBNum).MaxCoolWaterMassFlow;
         SetComponentFlowRate(MaxColdWaterFlow,
                              CoolBeam(CBNum).CWInNode,

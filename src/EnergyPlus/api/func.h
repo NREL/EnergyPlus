@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -90,7 +90,7 @@ ENERGYPLUSLIB_API Real64 psyRhoFnPbTdbW(Real64 pb, Real64 tdb, Real64 dw);
 ENERGYPLUSLIB_API Real64 psyHfgAirFnWTdb(Real64 T);
 ENERGYPLUSLIB_API Real64 psyHgAirFnWTdb(Real64 T);
 ENERGYPLUSLIB_API Real64 psyHFnTdbW(Real64 TDB, Real64 dW);
-ENERGYPLUSLIB_API Real64 psyCpAirFnWTdb(Real64 dw, Real64 T);
+ENERGYPLUSLIB_API Real64 psyCpAirFnW(Real64 dw);
 ENERGYPLUSLIB_API Real64 psyTdbFnHW(Real64 H, Real64 dW);
 ENERGYPLUSLIB_API Real64 psyRhovFnTdbWPb(Real64 Tdb, Real64 dW, Real64 PB);
 ENERGYPLUSLIB_API Real64 psyTwbFnTdbWPb(Real64 Tdb, Real64 W, Real64 Pb);

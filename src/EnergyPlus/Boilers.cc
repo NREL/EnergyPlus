@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -62,7 +62,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EMSManager.hh>
@@ -238,11 +238,11 @@ namespace Boilers {
             {
                 auto const SELECT_CASE_var(DataIPShortCuts::cAlphaArgs(2));
 
-                if ((SELECT_CASE_var == "ELECTRICITY") || (SELECT_CASE_var == "ELECTRIC") || (SELECT_CASE_var == "ELEC")) {
+                if (SELECT_CASE_var == "ELECTRICITY") {
                     Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Electric";
                     Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("ELECTRICITY");
 
-                } else if ((SELECT_CASE_var == "GAS") || (SELECT_CASE_var == "NATURALGAS") || (SELECT_CASE_var == "NATURAL GAS")) {
+                } else if (SELECT_CASE_var == "NATURALGAS") {
                     Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Gas";
                     Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("NATURALGAS");
 
@@ -258,17 +258,15 @@ namespace Boilers {
                     Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Coal";
                     Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("COAL");
 
-                } else if ((SELECT_CASE_var == "FUEL OIL #1") || (SELECT_CASE_var == "FUELOIL#1") || (SELECT_CASE_var == "FUEL OIL") ||
-                           (SELECT_CASE_var == "DISTILLATE OIL")) {
+                } else if (SELECT_CASE_var == "FUELOILNO1") {
                     Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "FuelOil#1";
-                    Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("DISTILLATE OIL");
+                    Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#1");
 
-                } else if ((SELECT_CASE_var == "FUEL OIL #2") || (SELECT_CASE_var == "FUELOIL#2") || (SELECT_CASE_var == "RESIDUAL OIL")) {
+                } else if (SELECT_CASE_var == "FUELOILNO2") {
                     Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "FuelOil#2";
-                    Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("RESIDUAL OIL");
+                    Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("FUELOIL#2");
 
-                } else if ((SELECT_CASE_var == "PROPANE") || (SELECT_CASE_var == "LPG") || (SELECT_CASE_var == "PROPANEGAS") ||
-                           (SELECT_CASE_var == "PROPANE GAS")) {
+                } else if (SELECT_CASE_var == "PROPANE") {
                     Boiler(BoilerNum).BoilerFuelTypeForOutputVariable = "Propane";
                     Boiler(BoilerNum).FuelType = DataGlobalConstants::AssignResourceTypeNum("PROPANE");
 
@@ -397,11 +395,6 @@ namespace Boilers {
 
             if (DataIPShortCuts::cAlphaArgs(7) == "CONSTANTFLOW") {
                 Boiler(BoilerNum).FlowMode = ConstantFlow;
-            } else if (DataIPShortCuts::cAlphaArgs(7) == "VARIABLEFLOW") { // backward compatible, clean out eventually
-                Boiler(BoilerNum).FlowMode = LeavingSetPointModulated;
-                ShowWarningError(RoutineName + DataIPShortCuts::cCurrentModuleObject + "=\"" + DataIPShortCuts::cAlphaArgs(1) + "\",");
-                ShowContinueError("Invalid " + DataIPShortCuts::cAlphaFieldNames(7) + '=' + DataIPShortCuts::cAlphaArgs(7));
-                ShowContinueError("Key choice is now called \"LeavingSetpointModulated\" and the simulation continues");
             } else if (DataIPShortCuts::cAlphaArgs(7) == "LEAVINGSETPOINTMODULATED") {
                 Boiler(BoilerNum).FlowMode = LeavingSetPointModulated;
             } else if (DataIPShortCuts::cAlphaArgs(7) == "NOTMODULATED") {

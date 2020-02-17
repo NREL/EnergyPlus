@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -73,11 +73,13 @@
 #include <EnergyPlus/Humidifiers.hh>
 #include <EnergyPlus/HybridUnitaryAirConditioners.hh>
 #include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <fstream>
+
 using namespace EnergyPlus::MixedAir;
 using namespace EnergyPlus::DataContaminantBalance;
 using namespace EnergyPlus::DataAirLoop;
@@ -163,13 +165,13 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     DataHeatBalance::ZoneIntGain.allocate(1);
 
     SizingManager::GetOARequirements();
-    GetOAControllerInputs();
+    GetOAControllerInputs(OutputFiles::getSingleton());
     using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
 
     // Setup performnace tables
     using namespace EnergyPlus::DataEnvironment;
     // process schedules
-    ProcessScheduleInput(); // read schedules
+    ProcessScheduleInput(OutputFiles::getSingleton()); // read schedules
     UpdateScheduleValues();
     // Get Unitary system
     GetInputZoneHybridUnitaryAirConditioners(ErrorsFound);

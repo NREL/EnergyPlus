@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -63,7 +63,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidCoolers.hh>
@@ -1650,7 +1650,7 @@ namespace FluidCoolers {
         Real64 AirDensity =
             Psychrometrics::PsyRhoAirFnPbTdbW(SimpleFluidCooler(FluidCoolerNum).AirPress, InletAirTemp, SimpleFluidCooler(FluidCoolerNum).AirHumRat);
         Real64 AirMassFlowRate = AirFlowRate * AirDensity;
-        Real64 CpAir = Psychrometrics::PsyCpAirFnWTdb(SimpleFluidCooler(FluidCoolerNum).AirHumRat, InletAirTemp);
+        Real64 CpAir = Psychrometrics::PsyCpAirFnW(SimpleFluidCooler(FluidCoolerNum).AirHumRat);
         Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(SimpleFluidCooler(FluidCoolerNum).LoopNum).FluidName,
                                                                 _InletWaterTemp,
                                                                 DataPlant::PlantLoop(SimpleFluidCooler(FluidCoolerNum).LoopNum).FluidIndex,

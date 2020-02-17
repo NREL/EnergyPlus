@@ -89,13 +89,13 @@ class Refrigerant:
     def saturation_temperature(self, pressure: float) -> float:
         return self.api.refrigerantSaturationTemperature(self.instance, pressure)
 
-    def saturated_enthalpy(self, temperature: float, quality: float):
+    def saturated_enthalpy(self, temperature: float, quality: float) -> float:
         return self.api.refrigerantSaturatedEnthalpy(self.instance, temperature, quality)
 
-    def saturated_density(self, temperature: float, quality: float):
+    def saturated_density(self, temperature: float, quality: float) -> float:
         return self.api.refrigerantSaturatedDensity(self.instance, temperature, quality)
 
-    def saturated_specific_heat(self, temperature: float, quality: float):
+    def saturated_specific_heat(self, temperature: float, quality: float) -> float:
         return self.api.refrigerantSaturatedSpecificHeat(self.instance, temperature, quality)
 
 
@@ -115,8 +115,8 @@ class Psychrometrics:
         self.api.psyHgAirFnWTdb.restype = RealEP
         self.api.psyHFnTdbW.argtypes = [RealEP, RealEP]
         self.api.psyHFnTdbW.restype = RealEP
-        self.api.psyCpAirFnWTdb.argtypes = [RealEP, RealEP]
-        self.api.psyCpAirFnWTdb.restype = RealEP
+        self.api.psyCpAirFnW.argtypes = [RealEP]
+        self.api.psyCpAirFnW.restype = RealEP
         self.api.psyTdbFnHW.argtypes = [RealEP, RealEP]
         self.api.psyTdbFnHW.restype = RealEP
         self.api.psyRhovFnTdbWPb.argtypes = [RealEP, RealEP, RealEP]
@@ -165,8 +165,8 @@ class Psychrometrics:
     def enthalpy_b(self, dry_bulb_temp: float, relative_humidity_fraction: float, barometric_pressure: float) -> float:
         return self.api.psyHFnTdbRhPb(dry_bulb_temp, relative_humidity_fraction, barometric_pressure)
 
-    def specific_heat(self, humidity_ratio: float, dry_bulb_temp: float) -> float:
-        return self.api.psyCpAirFnWTdb(humidity_ratio, dry_bulb_temp)
+    def specific_heat(self, humidity_ratio: float) -> float:
+        return self.api.psyCpAirFnW(humidity_ratio)
 
     def dry_bulb(self, enthalpy: float, humidity_ratio: float) -> float:
         return self.api.psyTdbFnHW(enthalpy, humidity_ratio)
@@ -302,7 +302,7 @@ class Functional:
         self.api.registerErrorCallback(cb_ptr)
 
     @staticmethod
-    def clear_callbacks():
+    def clear_callbacks() -> None:
         """
         This function is only used if you are running this script continually making many calls into the E+ library in
         one thread, each with many new and different error handler callbacks, and you need to clean up.

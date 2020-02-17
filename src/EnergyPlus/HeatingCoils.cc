@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -125,7 +125,7 @@ namespace HeatingCoils {
     using DataHeatBalance::RefrigCondenserTypeWater;
     using DataHeatBalance::RefrigSystemTypeDetailed;
     using DataHeatBalance::RefrigSystemTypeRack;
-    using Psychrometrics::PsyCpAirFnWTdb;
+    using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyHFnTdbW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
     using namespace ScheduleManager;
@@ -1121,8 +1121,8 @@ namespace HeatingCoils {
                         SourceTypeString = HeatReclaimRefrigCondenser(SourceIndexNum).SourceType;
                         SourceNameString = HeatReclaimRefrigCondenser(SourceIndexNum).Name;
                     }
-                    if (HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_COOLING || 
-                        HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_MULTISPEED || 
+                    if (HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_COOLING ||
+                        HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_MULTISPEED ||
                         HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_MULTIMODE ||
                         HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_VARIABLE_COOLING) {
                         SourceTypeString = HeatReclaimDXCoil(SourceIndexNum).SourceType;
@@ -1632,7 +1632,7 @@ namespace HeatingCoils {
             AirMassFlow = HeatingCoil(CoilNum).InletAirMassFlowRate;
         }
 
-        CapacitanceAir = PsyCpAirFnWTdb(Win, TempAirIn) * AirMassFlow;
+        CapacitanceAir = PsyCpAirFnW(Win) * AirMassFlow;
 
         // If the coil is operating there should be some heating capacitance
         //  across the coil, so do the simulation. If not set outlet to inlet and no load.
@@ -1707,12 +1707,13 @@ namespace HeatingCoils {
         QCoilActual = HeatingCoilLoad;
         if (std::abs(HeatingCoil(CoilNum).NominalCapacity) < 1.e-8) {
             if (HeatingCoil(CoilNum).AirLoopNum > 0) {
-                AirLoopAFNInfo(HeatingCoil(CoilNum).AirLoopNum).AFNLoopHeatingCoilMaxRTF = max(AirLoopAFNInfo(HeatingCoil(CoilNum).AirLoopNum).AFNLoopHeatingCoilMaxRTF, 0.0);
+                AirLoopAFNInfo(HeatingCoil(CoilNum).AirLoopNum).AFNLoopHeatingCoilMaxRTF =
+                    max(AirLoopAFNInfo(HeatingCoil(CoilNum).AirLoopNum).AFNLoopHeatingCoilMaxRTF, 0.0);
             }
         } else {
             if (HeatingCoil(CoilNum).AirLoopNum > 0) {
-                AirLoopAFNInfo(HeatingCoil(CoilNum).AirLoopNum).AFNLoopHeatingCoilMaxRTF =
-                    max(AirLoopAFNInfo(HeatingCoil(CoilNum).AirLoopNum).AFNLoopHeatingCoilMaxRTF, HeatingCoilLoad / HeatingCoil(CoilNum).NominalCapacity);
+                AirLoopAFNInfo(HeatingCoil(CoilNum).AirLoopNum).AFNLoopHeatingCoilMaxRTF = max(
+                    AirLoopAFNInfo(HeatingCoil(CoilNum).AirLoopNum).AFNLoopHeatingCoilMaxRTF, HeatingCoilLoad / HeatingCoil(CoilNum).NominalCapacity);
             }
         }
 
@@ -2000,7 +2001,7 @@ namespace HeatingCoils {
         TempSetPoint = HeatingCoil(CoilNum).DesiredOutletTemp;
         AirMassFlow = HeatingCoil(CoilNum).InletAirMassFlowRate;
 
-        CapacitanceAir = PsyCpAirFnWTdb(Win, TempAirIn) * AirMassFlow;
+        CapacitanceAir = PsyCpAirFnW(Win) * AirMassFlow;
 
         // If there is a fault of coil SAT Sensor (zrp_Jul2016)
         if (HeatingCoil(CoilNum).FaultyCoilSATFlag && (!WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
@@ -2493,7 +2494,7 @@ namespace HeatingCoils {
         AirMassFlow = HeatingCoil(CoilNum).InletAirMassFlowRate;
         TempAirIn = HeatingCoil(CoilNum).InletAirTemp;
         Win = HeatingCoil(CoilNum).InletAirHumRat;
-        CapacitanceAir = PsyCpAirFnWTdb(Win, TempAirIn) * AirMassFlow;
+        CapacitanceAir = PsyCpAirFnW(Win) * AirMassFlow;
         TempSetPoint = HeatingCoil(CoilNum).DesiredOutletTemp;
 
         // If there is a fault of coil SAT Sensor (zrp_Jul2016)
@@ -3114,24 +3115,6 @@ namespace HeatingCoils {
         SuppressWarning = true;
         CoilFound = 0;
 
-        // This function only used for dessicant regeneration and refrigeration desuperheat not a valid source
-        // IF (UtilityRoutines::SameString(CoilType,'REFRIGERATION:COMPRESSORRACK')) THEN
-        //    CALL GetRefrigeratedRackIndex(CoilName, CoilNum,RefrigSystemTypeRack, GetCoilErrFlag, CoilType, SuppressWarning)
-        //    DO NumCoil = 1, NumHeatingCoils
-        //      IF(HeatingCoil(NumCoil)%ReclaimHeatingSource .NE. COMPRESSORRACK_REFRIGERATEDCASE .AND. &
-        //         HeatingCoil(NumCoil)%ReclaimHeatingCoilName .NE. CoilName)CYCLE
-        //      CoilFound = CoilNum
-        //      EXIT
-        //    END DO
-        // ELSEIF (UtilityRoutines::SameString(CoilType,'REFRIGERATION:CONDENSER')) THEN   bbb
-        //    CALL GetRefrigeratedRackIndex(CoilName, CoilNum,RefrigSystemTypeDetailed, GetCoilErrFlag, CoilType, SuppressWarning)
-        //    DO NumCoil = 1, NumHeatingCoils
-        //      IF(HeatingCoil(NumCoil)%ReclaimHeatingSource .NE. CONDENSER_REFRIGERATION .AND. &
-        //         HeatingCoil(NumCoil)%ReclaimHeatingCoilName .NE. CoilName)CYCLE
-        //      CoilFound = CoilNum
-        //      EXIT
-        //    END DO
-        // ELSEIF
         // note should eventually get rid of this string comparison
         if (UtilityRoutines::SameString(CoilType, "COIL:COOLING:DX:SINGLESPEED") ||
             UtilityRoutines::SameString(CoilType, "COIL:COOLING:DX:TWOSPEED") ||

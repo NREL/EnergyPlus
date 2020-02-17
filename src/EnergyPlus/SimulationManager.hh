@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class OutputFiles;
+
 namespace SimulationManager {
 
     // Data
@@ -75,7 +77,7 @@ namespace SimulationManager {
 
     void ManageSimulation();
 
-    void GetProjectData();
+    void GetProjectData(OutputFiles &outputFiles);
 
     void CheckForMisMatchedEnvironmentSpecifications();
 
@@ -87,9 +89,9 @@ namespace SimulationManager {
 
     void OpenOutputJsonFiles();
 
-    void CloseOutputFiles();
+    void CloseOutputFiles(OutputFiles &outputFiles);
 
-    void SetupSimulation(bool &ErrorsFound);
+    void SetupSimulation(OutputFiles &outputFiles, bool &ErrorsFound);
 
     void ReportNodeConnections();
 

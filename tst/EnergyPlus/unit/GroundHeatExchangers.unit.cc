@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,7 +52,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/GroundHeatExchangers.hh>
@@ -1180,7 +1180,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcGFunction_Check)
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
     GetPlantLoopData();
     GetPlantInput();
@@ -1662,7 +1662,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_convection_re
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
     GetPlantLoopData();
     GetPlantInput();
@@ -1966,7 +1966,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_resistance)
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
     GetPlantLoopData();
     GetPlantInput();
@@ -2262,7 +2262,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_1
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
     GetPlantLoopData();
     GetPlantInput();
@@ -2560,7 +2560,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_2
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
     GetPlantLoopData();
     GetPlantInput();
@@ -2858,7 +2858,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_3
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
     GetPlantLoopData();
     GetPlantInput();
@@ -3156,7 +3156,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
     GetPlantLoopData();
     GetPlantInput();
@@ -3454,7 +3454,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
     GetPlantLoopData();
     GetPlantInput();
@@ -3752,7 +3752,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
 
     // Setup
     ASSERT_TRUE(process_idf(idf_objects));
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
     GetPlantLoopData();
     GetPlantInput();

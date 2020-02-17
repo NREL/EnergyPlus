@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -84,7 +84,7 @@ namespace DualDuct {
     // MODULE VARIABLE DECLARATIONS:
     extern Array1D_bool CheckEquipName;
 
-    extern int NumDampers; // The Number of Dampers found in the Input
+    extern int NumDDAirTerminal; // The Number of dual duct air terminals found in the Input
     extern int NumDualDuctConstVolDampers;
     extern int NumDualDuctVarVolDampers;
     extern int NumDualDuctVarVolOA;
@@ -106,10 +106,10 @@ namespace DualDuct {
 
     // Types
 
-    struct DamperDesignParams
+    struct DualDuctAirTerminal
     {
         // Members
-        std::string DamperName; // Name of the Damper
+        std::string Name; // Name of the Damper
         //  CHARACTER(len=MaxNameLength) :: DamperType  = ' ' ! Type of Damper ie. VAV, Mixing, Inducing, etc.
         int DamperType;            // Type of Damper ie. VAV, Mixing, Inducing, etc.
         std::string Schedule;      // Damper Operation Schedule
@@ -119,7 +119,8 @@ namespace DualDuct {
         int HotAirInletNodeNum;
         int ColdAirInletNodeNum;
         int OutletNodeNum;
-        Real64 ZoneMinAirFrac;
+        Real64 ZoneMinAirFracDes;        // Fraction of supply air used as design minimum flow
+        Real64 ZoneMinAirFrac;           // Fraction of supply air used as current minimum flow
         Real64 ColdAirDamperPosition;
         Real64 HotAirDamperPosition;
         int OAInletNodeNum;              // Alternate Node for VAV:OutdoorAir for Outdoor Air
@@ -141,20 +142,66 @@ namespace DualDuct {
         int OAPerPersonMode;             // mode for how per person rates are determined, DCV or design.
         Real64 OAPerPersonByDesignLevel; // store sum of people and per person rate, constant, m3/s
         int AirLoopNum;                  // index to airloop that this terminal unit is connected to
+        int ZoneTurndownMinAirFracSchPtr;    // pointer to the schedule for turndown minimum airflow fraction
+        Real64 ZoneTurndownMinAirFrac;       // turndown minimum airflow fraction value, multiplier of zone design minimum air flow 
+        bool ZoneTurndownMinAirFracSchExist; // if true, if zone turndown min air frac schedule exist
 
         // Default Constructor
-        DamperDesignParams()
+        DualDuctAirTerminal()
             : DamperType(0), SchedPtr(0), MaxAirVolFlowRate(0.0), MaxAirMassFlowRate(0.0), HotAirInletNodeNum(0), ColdAirInletNodeNum(0),
-              OutletNodeNum(0), ZoneMinAirFrac(0.0), ColdAirDamperPosition(0.0), HotAirDamperPosition(0.0), OAInletNodeNum(0),
+              OutletNodeNum(0), ZoneMinAirFracDes(0.0), ZoneMinAirFrac(0.0), ColdAirDamperPosition(0.0), HotAirDamperPosition(0.0), OAInletNodeNum(0),
               RecircAirInletNodeNum(0), RecircIsUsed(true), DesignOAFlowRate(0.0), DesignRecircFlowRate(0.0), OAControlMode(0),
               RecircAirDamperPosition(0.0), OADamperPosition(0.0), OAFraction(0.0), ADUNum(0), CtrlZoneNum(0), CtrlZoneInNodeIndex(0),
               ActualZoneNum(0), OutdoorAirFlowRate(0.0), NoOAFlowInputFromUser(true), OARequirementsPtr(0), OAPerPersonMode(PerPersonModeNotSet),
-              OAPerPersonByDesignLevel(0.0), AirLoopNum(0)
+              OAPerPersonByDesignLevel(0.0), AirLoopNum(0), ZoneTurndownMinAirFracSchPtr(0), ZoneTurndownMinAirFrac(1.0), ZoneTurndownMinAirFracSchExist(false)
         {
         }
+
+        void InitDualDuct(int const DamperNum, bool const FirstHVACIteration);
+
+        void SizeDualDuct(int const DamperNum);
+
+        // End Initialization Section of the Module
+        //******************************************************************************
+
+        // Begin Algorithm Section of the Module
+        //******************************************************************************
+
+        void SimDualDuctConstVol(int const DamperNum, int const ZoneNum, int const ZoneNodeNum);
+
+        void SimDualDuctVarVol(int const DamperNum, int const ZoneNum, int const ZoneNodeNum);
+
+        void SimDualDuctVAVOutdoorAir(int const DamperNum, int const ZoneNum, int const ZoneNodeNum);
+
+        void CalcOAMassFlow(int const DamperNum,  // index to terminal unit
+            Real64 &SAMassFlow,   // outside air based on optional user input
+            Real64 &AirLoopOAFrac // outside air based on optional user input
+        );
+
+        void CalcOAOnlyMassFlow(int const DamperNum,              // index to terminal unit
+            Real64 &OAMassFlow,               // outside air flow from user input kg/s
+            Optional<Real64> MaxOAVolFlow = _ // design level for outside air m3/s
+        );
+
+        // End Algorithm Section of the Module
+        // *****************************************************************************
+
+        // Beginning of Update subroutines for the Damper Module
+        // *****************************************************************************
+
+        void UpdateDualDuct(int const DamperNum);
+
+        //        End of Update subroutines for the Damper Module
+        // *****************************************************************************
+
+        // Beginning of Reporting subroutines for the Damper Module
+        // *****************************************************************************
+
+        void ReportDualDuct(int const DamperNum); // unused1208
+
     };
 
-    struct DamperFlowConditions
+    struct DualDuctAirTerminalFlowConditions
     {
         // Members
         Real64 AirMassFlowRate;         // MassFlow through the Damper being Simulated [kg/Sec]
@@ -170,7 +217,7 @@ namespace DualDuct {
         Real64 AirMassFlowDiffMag;   // flow difference scale, kg/s
 
         // Default Constructor
-        DamperFlowConditions()
+        DualDuctAirTerminalFlowConditions()
             : AirMassFlowRate(0.0), AirMassFlowRateMaxAvail(0.0), AirMassFlowRateMinAvail(0.0), AirMassFlowRateMax(0.0), AirTemp(0.0), AirHumRat(0.0),
               AirEnthalpy(0.0), AirMassFlowRateHist1(0.0), AirMassFlowRateHist2(0.0), AirMassFlowRateHist3(0.0), AirMassFlowDiffMag(0.0)
         {
@@ -178,13 +225,13 @@ namespace DualDuct {
     };
 
     // Object Data
-    extern Array1D<DamperDesignParams> Damper;
-    extern Array1D<DamperFlowConditions> DamperInlet;
-    extern Array1D<DamperFlowConditions> DamperHotAirInlet;
-    extern Array1D<DamperFlowConditions> DamperColdAirInlet;
-    extern Array1D<DamperFlowConditions> DamperOutlet;
-    extern Array1D<DamperFlowConditions> DamperOAInlet;        // VAV:OutdoorAir Outdoor Air Inlet
-    extern Array1D<DamperFlowConditions> DamperRecircAirInlet; // VAV:OutdoorAir Recirculated Air Inlet
+    extern Array1D<DualDuctAirTerminal> dd_airterminal;
+    extern Array1D<DualDuctAirTerminalFlowConditions> dd_airterminalInlet;
+    extern Array1D<DualDuctAirTerminalFlowConditions> dd_airterminalHotAirInlet;
+    extern Array1D<DualDuctAirTerminalFlowConditions> dd_airterminalColdAirInlet;
+    extern Array1D<DualDuctAirTerminalFlowConditions> dd_airterminalOutlet;
+    extern Array1D<DualDuctAirTerminalFlowConditions> dd_airterminalOAInlet;        // VAV:OutdoorAir Outdoor Air Inlet
+    extern Array1D<DualDuctAirTerminalFlowConditions> dd_airterminalRecircAirInlet; // VAV:OutdoorAir Recirculated Air Inlet
 
     // Functions
 
@@ -197,51 +244,6 @@ namespace DualDuct {
 
     // End of Get Input subroutines for the Module
     //******************************************************************************
-
-    // Beginning Initialization Section of the Module
-    //******************************************************************************
-
-    void InitDualDuct(int const DamperNum, bool const FirstHVACIteration);
-
-    void SizeDualDuct(int const DamperNum);
-
-    // End Initialization Section of the Module
-    //******************************************************************************
-
-    // Begin Algorithm Section of the Module
-    //******************************************************************************
-
-    void SimDualDuctConstVol(int const DamperNum, int const ZoneNum, int const ZoneNodeNum);
-
-    void SimDualDuctVarVol(int const DamperNum, int const ZoneNum, int const ZoneNodeNum);
-
-    void SimDualDuctVAVOutdoorAir(int const DamperNum, int const ZoneNum, int const ZoneNodeNum);
-
-    void CalcOAMassFlow(int const DamperNum,  // index to terminal unit
-                        Real64 &SAMassFlow,   // outside air based on optional user input
-                        Real64 &AirLoopOAFrac // outside air based on optional user input
-    );
-
-    void CalcOAOnlyMassFlow(int const DamperNum,              // index to terminal unit
-                            Real64 &OAMassFlow,               // outside air flow from user input kg/s
-                            Optional<Real64> MaxOAVolFlow = _ // design level for outside air m3/s
-    );
-
-    // End Algorithm Section of the Module
-    // *****************************************************************************
-
-    // Beginning of Update subroutines for the Damper Module
-    // *****************************************************************************
-
-    void UpdateDualDuct(int const DamperNum);
-
-    //        End of Update subroutines for the Damper Module
-    // *****************************************************************************
-
-    // Beginning of Reporting subroutines for the Damper Module
-    // *****************************************************************************
-
-    void ReportDualDuct(int const DamperNum); // unused1208
 
     void ReportDualDuctConnections();
 

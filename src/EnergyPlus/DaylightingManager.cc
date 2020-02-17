@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -84,6 +84,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/PierceSurface.hh>
@@ -453,7 +454,7 @@ namespace DaylightingManager {
         }
     }
 
-    void CalcDayltgCoefficients()
+    void CalcDayltgCoefficients(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -568,8 +569,7 @@ namespace DaylightingManager {
         static bool doSkyReporting(true);
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_700(
-            "('! <Sky Daylight Factors>, MonthAndDay, Zone Name, Window Name, Daylight Fac: Ref Pt #1, Daylight Fac: Ref Pt #2')");
+
 
         // FLOW:
         if (CalcDayltghCoefficients_firstTime) {
@@ -726,7 +726,9 @@ namespace DaylightingManager {
                     // Write the bare-window four sky daylight factors at noon time to the eio file; this is done only
                     // for first time that daylight factors are calculated and so is insensitive to possible variation
                     // due to change in ground reflectance from month to month, or change in storm window status.
-                    ObjexxFCL::gio::write(OutputFileInits, Format_700);
+                    static constexpr auto Format_700(
+                        "! <Sky Daylight Factors>, MonthAndDay, Zone Name, Window Name, Daylight Fac: Ref Pt #1, Daylight Fac: Ref Pt #2\n");
+                    print(outputFiles.eio, Format_700);
                     for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
                         if (ZoneDaylight(ZoneNum).NumOfDayltgExtWins == 0 || ZoneDaylight(ZoneNum).DaylightMethod != SplitFluxDaylighting) continue;
                         for (loop = 1; loop <= ZoneDaylight(ZoneNum).NumOfDayltgExtWins; ++loop) {
@@ -738,33 +740,49 @@ namespace DaylightingManager {
                                 DaylFac1 = ZoneDaylight(ZoneNum).DaylIllFacSky(12, 1, 1, 1, loop);
                                 DaylFac2 = 0.0;
                                 if (ZoneDaylight(ZoneNum).TotalDaylRefPoints > 1) DaylFac2 = ZoneDaylight(ZoneNum).DaylIllFacSky(12, 1, 1, 2, loop);
-                                ObjexxFCL::gio::write(OutputFileInits, fmtA) << " Clear Sky Daylight Factors," + CurMnDy + ',' + Zone(ZoneNum).Name + ',' +
-                                                                         Surface(IWin).Name + ',' + RoundSigDigits(DaylFac1, 4) + ',' +
-                                                                         RoundSigDigits(DaylFac2, 4);
+                                print(outputFiles.eio,
+                                      " Clear Sky Daylight Factors,{},{},{},{:.4R},{:.4R}\n",
+                                      CurMnDy,
+                                      Zone(ZoneNum).Name,
+                                      Surface(IWin).Name,
+                                      DaylFac1,
+                                      DaylFac2);
 
                                 // clear Turbid sky
                                 DaylFac1 = ZoneDaylight(ZoneNum).DaylIllFacSky(12, 1, 2, 1, loop);
                                 DaylFac2 = 0.0;
                                 if (ZoneDaylight(ZoneNum).TotalDaylRefPoints > 1) DaylFac2 = ZoneDaylight(ZoneNum).DaylIllFacSky(12, 1, 2, 2, loop);
-                                ObjexxFCL::gio::write(OutputFileInits, fmtA) << " Clear Turbid Sky Daylight Factors," + CurMnDy + ',' + Zone(ZoneNum).Name +
-                                                                         ',' + Surface(IWin).Name + ',' + RoundSigDigits(DaylFac1, 4) + ',' +
-                                                                         RoundSigDigits(DaylFac2, 4);
+                                print(outputFiles.eio,
+                                      " Clear Turbid Sky Daylight Factors,{},{},{},{:.4R},{:.4R}\n",
+                                      CurMnDy,
+                                      Zone(ZoneNum).Name,
+                                      Surface(IWin).Name,
+                                      DaylFac1,
+                                      DaylFac2);
 
                                 // Intermediate sky
                                 DaylFac1 = ZoneDaylight(ZoneNum).DaylIllFacSky(12, 1, 3, 1, loop);
                                 DaylFac2 = 0.0;
                                 if (ZoneDaylight(ZoneNum).TotalDaylRefPoints > 1) DaylFac2 = ZoneDaylight(ZoneNum).DaylIllFacSky(12, 1, 3, 2, loop);
-                                ObjexxFCL::gio::write(OutputFileInits, fmtA) << " Intermediate Sky Daylight Factors," + CurMnDy + ',' + Zone(ZoneNum).Name +
-                                                                         ',' + Surface(IWin).Name + ',' + RoundSigDigits(DaylFac1, 4) + ',' +
-                                                                         RoundSigDigits(DaylFac2, 4);
+                                print(outputFiles.eio,
+                                      " Intermediate Sky Daylight Factors,{},{},{},{:.4R},{:.4R}\n",
+                                      CurMnDy,
+                                      Zone(ZoneNum).Name,
+                                      Surface(IWin).Name,
+                                      DaylFac1,
+                                      DaylFac2);
 
                                 // Overcast sky
                                 DaylFac1 = ZoneDaylight(ZoneNum).DaylIllFacSky(12, 1, 4, 1, loop);
                                 DaylFac2 = 0.0;
                                 if (ZoneDaylight(ZoneNum).TotalDaylRefPoints > 1) DaylFac2 = ZoneDaylight(ZoneNum).DaylIllFacSky(12, 1, 4, 2, loop);
-                                ObjexxFCL::gio::write(OutputFileInits, fmtA) << " Overcast Sky Daylight Factors," + CurMnDy + ',' + Zone(ZoneNum).Name + ',' +
-                                                                         Surface(IWin).Name + ',' + RoundSigDigits(DaylFac1, 4) + ',' +
-                                                                         RoundSigDigits(DaylFac2, 4);
+                                print(outputFiles.eio,
+                                      " Overcast Sky Daylight Factors,{},{},{},{:.4R},{:.4R}\n",
+                                      CurMnDy,
+                                      Zone(ZoneNum).Name,
+                                      Surface(IWin).Name,
+                                      DaylFac1,
+                                      DaylFac2);
                             }
                         }
                     }
@@ -4443,13 +4461,14 @@ namespace DaylightingManager {
         cCurrentModuleObject = "Daylighting:Controls";
         TotDaylightingControls = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
         if (TotDaylightingControls > 0) {
+            auto &outputFiles = OutputFiles::getSingleton();
             GetInputDayliteRefPt(ErrorsFound);
             GetDaylightingControls(TotDaylightingControls, ErrorsFound);
             GeometryTransformForDaylighting();
-            GetInputIlluminanceMap(ErrorsFound);
+            GetInputIlluminanceMap(outputFiles, ErrorsFound);
             GetLightWellData(ErrorsFound);
             if (ErrorsFound) ShowFatalError("Program terminated for above reasons, related to DAYLIGHTING");
-            DayltgSetupAdjZoneListsAndPointers();
+            DayltgSetupAdjZoneListsAndPointers(outputFiles);
         }
 
         maxNumRefPtInAnyZone = 0;
@@ -4746,7 +4765,7 @@ namespace DaylightingManager {
         if (ErrorsFound) ShowFatalError("Program terminated for above reasons");
     }
 
-    void GetInputIlluminanceMap(bool &ErrorsFound)
+    void GetInputIlluminanceMap(OutputFiles &outputFiles, bool &ErrorsFound)
     {
         // Perform the GetInput function for the Output:IlluminanceMap
         // Glazer - June 2016 (moved from GetDaylightingControls)
@@ -4905,11 +4924,11 @@ namespace DaylightingManager {
                     cAlphaArgs(1) = "COMMA";
                 }
             }
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Daylighting:Illuminance Maps>,#Maps,Style";
+            print(outputFiles.eio, "! <Daylighting:Illuminance Maps>,#Maps,Style\n");
             ConvertCaseToLower(cAlphaArgs(1), cAlphaArgs(2));
             cAlphaArgs(1).erase(1);
             cAlphaArgs(1) += cAlphaArgs(2).substr(1);
-            ObjexxFCL::gio::write(OutputFileInits, "( 'Daylighting:Illuminance Maps,',A,',',A )") << TrimSigDigits(TotIllumMaps) << cAlphaArgs(1);
+            print(outputFiles.eio, "Daylighting:Illuminance Maps,{},{}\n", TotIllumMaps, cAlphaArgs(1));
         }
         for (Loop1 = 1; Loop1 <= NumOfZones; ++Loop1) {
             ZoneDaylight(Loop1).ZoneToMap.allocate(ZoneMapCount(Loop1));
@@ -5105,15 +5124,23 @@ namespace DaylightingManager {
         ZoneMsgDone.deallocate();
 
         if (TotIllumMaps > 0) {
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Daylighting:Illuminance Maps:Detail>,Name,Zone,XMin {m},XMax {m},Xinc {m},#X Points,YMin "
-                                                 "{m},YMax {m},Yinc {m},#Y Points,Z {m}";
+            print(outputFiles.eio, "! <Daylighting:Illuminance Maps:Detail>,Name,Zone,XMin {{m}},XMax {{m}},Xinc {{m}},#X Points,YMin "
+                                                 "{{m}},YMax {{m}},Yinc {{m}},#Y Points,Z {{m}}\n");
         }
         for (MapNum = 1; MapNum <= TotIllumMaps; ++MapNum) {
-            ObjexxFCL::gio::write(OutputFileInits, "( 'Daylighting:Illuminance Maps:Detail',11( ',',A ) )")
-                << IllumMap(MapNum).Name << Zone(IllumMap(MapNum).Zone).Name << RoundSigDigits(IllumMap(MapNum).Xmin, 2)
-                << RoundSigDigits(IllumMap(MapNum).Xmax, 2) << RoundSigDigits(IllumMap(MapNum).Xinc, 2) << RoundSigDigits(IllumMap(MapNum).Xnum)
-                << RoundSigDigits(IllumMap(MapNum).Ymin, 2) << RoundSigDigits(IllumMap(MapNum).Ymax, 2) << RoundSigDigits(IllumMap(MapNum).Yinc, 2)
-                << RoundSigDigits(IllumMap(MapNum).Ynum) << RoundSigDigits(IllumMap(MapNum).Z, 2);
+            print(outputFiles.eio,
+                  "Daylighting:Illuminance Maps:Detail,{},{},{:.2R},{:.2R},{:.2R},{},{:.2R},{:.2R},{:.2R},{},{:.2R}\n",
+                  IllumMap(MapNum).Name,
+                  Zone(IllumMap(MapNum).Zone).Name,
+                  IllumMap(MapNum).Xmin,
+                  IllumMap(MapNum).Xmax,
+                  IllumMap(MapNum).Xinc,
+                  IllumMap(MapNum).Xnum,
+                  IllumMap(MapNum).Ymin,
+                  IllumMap(MapNum).Ymax,
+                  IllumMap(MapNum).Yinc,
+                  IllumMap(MapNum).Ynum,
+                  IllumMap(MapNum).Z);
         }
 
         if (ErrorsFound) return;
@@ -10390,7 +10417,7 @@ namespace DaylightingManager {
         if (OutputFileDFS > 0) ObjexxFCL::gio::close(OutputFileDFS);
     }
 
-    void DayltgSetupAdjZoneListsAndPointers()
+    void DayltgSetupAdjZoneListsAndPointers(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -10414,14 +10441,6 @@ namespace DaylightingManager {
         int RefSize;
         int MapNum;
 
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_700("('! <Zone/Window Adjacency Daylighting Counts>, Zone Name, ','Number of Exterior Windows, Number of Exterior "
-                                   "Windows in Adjacent Zones')");
-        static ObjexxFCL::gio::Fmt Format_701("('Zone/Window Adjacency Daylighting Counts, ',A,',',A,',',A)");
-        static ObjexxFCL::gio::Fmt Format_702("('! <Zone/Window Adjacency Daylighting Matrix>, Zone Name, Number of Adjacent Zones with Windows,','Adjacent "
-                                   "Zone Names - 1st 100 (max)')");
-        static ObjexxFCL::gio::Fmt Format_703("('Zone/Window Adjacency Daylighting Matrix, ',A,',',A,$)");
-        static ObjexxFCL::gio::Fmt fmtCommaA("(',',A,$)");
 
         // Count number of exterior Windows (use to allocate arrays)
         for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
@@ -10715,23 +10734,25 @@ namespace DaylightingManager {
             }
 
         } // End of primary zone loop
-
-        ObjexxFCL::gio::write(OutputFileInits, Format_700);
+        static constexpr auto Format_700("! <Zone/Window Adjacency Daylighting Counts>, Zone Name, Number of Exterior Windows, Number of Exterior Windows in Adjacent Zones\n");
+        print(outputFiles.eio, Format_700);
         for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
             if (ZoneDaylight(ZoneNum).TotalDaylRefPoints == 0 || ZoneDaylight(ZoneNum).DaylightMethod != SplitFluxDaylighting) continue;
-            ObjexxFCL::gio::write(OutputFileInits, Format_701)
-                << Zone(ZoneNum).Name << RoundSigDigits(ZoneDaylight(ZoneNum).TotalExtWindows)
-                << RoundSigDigits(ZoneDaylight(ZoneNum).NumOfDayltgExtWins - ZoneDaylight(ZoneNum).TotalExtWindows);
+            static constexpr auto Format_701("Zone/Window Adjacency Daylighting Counts, {},{},{}\n");
+            print(outputFiles.eio, Format_701, Zone(ZoneNum).Name, ZoneDaylight(ZoneNum).TotalExtWindows,
+                  (ZoneDaylight(ZoneNum).NumOfDayltgExtWins - ZoneDaylight(ZoneNum).TotalExtWindows));
         }
-
-        ObjexxFCL::gio::write(OutputFileInits, Format_702);
+        static constexpr auto Format_702("! <Zone/Window Adjacency Daylighting Matrix>, Zone Name, Number of Adjacent Zones with Windows,Adjacent "
+                                              "Zone Names - 1st 100 (max)\n");
+        print(outputFiles.eio, Format_702);
         for (int ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
             if (ZoneDaylight(ZoneNum).TotalDaylRefPoints == 0 || ZoneDaylight(ZoneNum).DaylightMethod != SplitFluxDaylighting) continue;
-            ObjexxFCL::gio::write(OutputFileInits, Format_703) << Zone(ZoneNum).Name << RoundSigDigits(ZoneDaylight(ZoneNum).NumOfIntWinAdjZones);
+            static constexpr auto Format_703("Zone/Window Adjacency Daylighting Matrix, {},{}");
+            print(outputFiles.eio, Format_703, Zone(ZoneNum).Name, ZoneDaylight(ZoneNum).NumOfIntWinAdjZones);
             for (int loop = 1, loop_end = min(ZoneDaylight(ZoneNum).NumOfIntWinAdjZones, 100); loop <= loop_end; ++loop) {
-                ObjexxFCL::gio::write(OutputFileInits, fmtCommaA) << Zone(ZoneDaylight(ZoneNum).AdjIntWinZoneNums(loop)).Name;
+                print(outputFiles.eio, ",{}", Zone(ZoneDaylight(ZoneNum).AdjIntWinZoneNums(loop)).Name);
             }
-            ObjexxFCL::gio::write(OutputFileInits);
+            print(outputFiles.eio, "\n");
         }
 
         ZoneExtWin.deallocate();

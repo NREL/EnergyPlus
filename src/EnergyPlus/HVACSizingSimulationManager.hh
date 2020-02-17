@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -58,7 +58,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
@@ -102,7 +102,7 @@ private:
 
 extern std::unique_ptr<HVACSizingSimulationManager> hvacSizingSimulationManager;
 
-void ManageHVACSizingSimulation(bool &ErrorsFound);
+void ManageHVACSizingSimulation(OutputFiles &outputFiles, bool &ErrorsFound);
 
 } // namespace EnergyPlus
 

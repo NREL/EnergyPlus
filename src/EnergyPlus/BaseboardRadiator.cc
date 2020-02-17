@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -60,7 +60,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -118,7 +118,7 @@ namespace BaseboardRadiator {
     using namespace ScheduleManager;
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSpecificHeatGlycol;
-    using Psychrometrics::PsyCpAirFnWTdb;
+    using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
 
     // Data
@@ -1156,7 +1156,7 @@ namespace BaseboardRadiator {
 
         CpWater = GetSpecificHeatGlycol(
             PlantLoop(Baseboard(BaseboardNum).LoopNum).FluidName, WaterInletTemp, PlantLoop(Baseboard(BaseboardNum).LoopNum).FluidIndex, RoutineName);
-        CpAir = PsyCpAirFnWTdb(Baseboard(BaseboardNum).AirInletHumRat, AirInletTemp);
+        CpAir = PsyCpAirFnW(Baseboard(BaseboardNum).AirInletHumRat);
 
         if (Baseboard(BaseboardNum).DesAirMassFlowRate > 0.0) { // If UA is autosized, assign design condition
             AirMassFlowRate = Baseboard(BaseboardNum).DesAirMassFlowRate;

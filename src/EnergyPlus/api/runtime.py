@@ -363,7 +363,7 @@ class Runtime:
         self.api.callbackUnitarySystemSizing(cb_ptr)
 
     @staticmethod
-    def clear_callbacks():
+    def clear_callbacks() -> None:
         """
         This function is only used if you are running this script continually making many calls into the E+ library in
         one thread, each with new and different callbacks, and you need to clean up.

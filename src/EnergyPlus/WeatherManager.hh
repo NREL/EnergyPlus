@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -63,7 +63,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-
+    class OutputFiles;
 namespace WeatherManager {
 
     // Using/Aliasing
@@ -362,13 +362,16 @@ namespace WeatherManager {
         Real64 DailyWBRange;    // daily range of wetbulb (deltaC)
         bool PressureEntered;   // true if a pressure was entered in design day data
         bool DewPointNeedsSet;  // true if the Dewpoint humidicating value needs to be set (after location determined)
+        int maxWarmupDays;        // Maximum warmup days between sizing periods
+        bool suppressBegEnvReset; // true if this design day should be run without thermal history being reset at begin environment
 
         // Default Constructor
         DesignDayData()
             : MaxDryBulb(0.0), DailyDBRange(0.0), HumIndValue(0.0), HumIndType(0), PressBarom(0.0), WindSpeed(0.0), WindDir(0.0), SkyClear(0.0),
               RainInd(0), SnowInd(0), DayOfMonth(0), Month(0), DayType(0), DSTIndicator(0), SolarModel(0), DBTempRangeType(0), TempRangeSchPtr(0),
               HumIndSchPtr(0), BeamSolarSchPtr(0), DiffuseSolarSchPtr(0), TauB(0.0), TauD(0.0), DailyWBRange(0.0), PressureEntered(false),
-              DewPointNeedsSet(false)
+              DewPointNeedsSet(false),                       //**Trane:BEG: Sizing Speed Up
+              maxWarmupDays(-1), suppressBegEnvReset(false) //**Trane:END: Sizing Speed Up
         {
         }
     };
@@ -678,7 +681,8 @@ namespace WeatherManager {
 
     void ResetEnvironmentCounter();
 
-    bool GetNextEnvironment(bool &Available,  // true if there is another environment, false if the end
+    bool GetNextEnvironment(OutputFiles &outputFiles,
+                            bool &Available,  // true if there is another environment, false if the end
                             bool &ErrorsFound // will be set to true if severe errors are found in inputs
     );
 
@@ -777,7 +781,7 @@ namespace WeatherManager {
                                   Real64 &RField27       // LiquidPrecip
     );
 
-    void SetUpDesignDay(int const EnvrnNum); // Environment number passed into the routine
+    void SetUpDesignDay(OutputFiles &outputFiles, int const EnvrnNum); // Environment number passed into the routine
 
     //------------------------------------------------------------------------------
 
@@ -823,7 +827,7 @@ namespace WeatherManager {
 
     void CloseWeatherFile();
 
-    void ResolveLocationInformation(bool &ErrorsFound); // Set to true if no location evident
+    void ResolveLocationInformation(OutputFiles &outputFiles, bool &ErrorsFound); // Set to true if no location evident
 
     void CheckLocationValidity();
 
@@ -833,7 +837,7 @@ namespace WeatherManager {
 
     void ReportWeatherAndTimeInformation(bool &PrintEnvrnStamp); // Set to true when the environment header should be printed
 
-    void ReadUserWeatherInput();
+    void ReadUserWeatherInput(OutputFiles &outputFiles);
 
     void GetRunPeriodData(int &TotRunPers, // Total number of Run Periods requested
                           bool &ErrorsFound);
@@ -855,9 +859,9 @@ namespace WeatherManager {
 
     void GetGroundTemps(bool &ErrorsFound);
 
-    void GetGroundReflectances(bool &ErrorsFound);
+    void GetGroundReflectances(OutputFiles &outputFiles, bool &ErrorsFound);
 
-    void GetSnowGroundRefModifiers(bool &ErrorsFound);
+    void GetSnowGroundRefModifiers(OutputFiles &outputFiles, bool &ErrorsFound);
 
     void GetWaterMainsTemperatures(bool &ErrorsFound);
 
@@ -868,7 +872,7 @@ namespace WeatherManager {
                                   Real64 const MonthlyOAAvgDryBulbTempMaxDiff // monthly daily average OA drybulb temperature maximum difference
     );
 
-    void GetWeatherStation(bool &ErrorsFound);
+    void GetWeatherStation(OutputFiles &outputFiles, bool &ErrorsFound);
 
     void DayltgCurrentExtHorizIllum();
 

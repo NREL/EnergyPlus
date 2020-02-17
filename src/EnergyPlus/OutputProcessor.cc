@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -63,6 +63,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include "OutputFiles.hh"
 #include "re2/re2.h"
 #include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -564,7 +565,7 @@ namespace OutputProcessor {
         int MaxLook;
 
         // Make sure that input has been read
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
 
         if (NumOfReqVariables > 0) {
             // Do a quick check
@@ -821,7 +822,7 @@ namespace OutputProcessor {
         return ReportFreq;
     }
 
-    void GetReportVariableInput()
+    void GetReportVariableInput(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -852,7 +853,6 @@ namespace OutputProcessor {
         //        \object-list ScheduleNames
 
         // Using/Aliasing
-        using DataGlobals::OutputFileInits;
         using DataSystemVariables::MinReportFrequency;
         using ScheduleManager::GetScheduleIndex;
 
@@ -870,9 +870,6 @@ namespace OutputProcessor {
         Array1D_string cNumericFieldNames(1);
         Array1D_bool lNumericFieldBlanks(1);
 
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_800("('! <Minimum Reporting Frequency (overriding input value)>, Value, Input Value')");
-        static ObjexxFCL::gio::Fmt Format_801("(' Minimum Reporting Frequency, ',A,',',A)");
 
         // Bail out if the input has already been read in
         if (!GetOutputInputFlag) {
@@ -882,9 +879,12 @@ namespace OutputProcessor {
 
         // First check environment variable to see of possible override for minimum reporting frequency
         if (MinReportFrequency != "") {
+            // Formats
+            static constexpr auto Format_800("! <Minimum Reporting Frequency (overriding input value)>, Value, Input Value\n");
+            static constexpr auto Format_801(" Minimum Reporting Frequency, {},{}\n");
             minimumReportFrequency = determineFrequency(MinReportFrequency);
-            ObjexxFCL::gio::write(OutputFileInits, Format_800);
-            ObjexxFCL::gio::write(OutputFileInits, Format_801) << frequencyNotice(StoreType::Averaged, minimumReportFrequency) << MinReportFrequency;
+            print(outputFiles.eio, Format_800);
+            print(outputFiles.eio, Format_801, frequencyNotice(StoreType::Averaged, minimumReportFrequency), MinReportFrequency);
         }
 
         cCurrentModuleObject = "Output:Variable";
@@ -1918,7 +1918,7 @@ namespace OutputProcessor {
             if (meterType == "ELECTRICITY" || meterType == "ELECTRIC" || meterType == "ELEC") {
                 OutResourceType = "Electricity";
 
-            } else if (meterType == "GAS" || meterType == "NATURALGAS" || meterType == "NATURAL GAS") {
+            } else if (meterType == "GAS" || meterType == "NATURALGAS") {
                 OutResourceType = "Gas";
 
             } else if (meterType == "GASOLINE") {
@@ -1930,13 +1930,13 @@ namespace OutputProcessor {
             } else if (meterType == "COAL") {
                 OutResourceType = "Coal";
 
-            } else if (meterType == "FUEL OIL #1" || meterType == "FUELOIL#1" || meterType == "FUEL OIL" || meterType == "DISTILLATE OIL") {
+            } else if (meterType ==  "FUELOIL#1") {
                 OutResourceType = "FuelOil#1";
 
-            } else if (meterType == "FUEL OIL #2" || meterType == "FUELOIL#2" || meterType == "RESIDUAL OIL") {
+            } else if (meterType == "FUELOIL#2") {
                 OutResourceType = "FuelOil#2";
 
-            } else if (meterType == "PROPANE" || meterType == "LPG" || meterType == "PROPANEGAS" || meterType == "PROPANE GAS") {
+            } else if (meterType == "PROPANE" || meterType == "PROPANEGAS") {
                 OutResourceType = "Propane";
 
             } else if (meterType == "WATER" || meterType == "H2O") {

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -760,7 +760,7 @@ namespace DataSurfaces {
                 for (int NodeNum = 1; NodeNum <= ZoneEquipConfig(Zone).NumInletNodes; ++NodeNum) {
                     Real64 NodeTemp = Node(ZoneEquipConfig(Zone).InletNode(NodeNum)).Temp;
                     Real64 MassFlowRate = Node(ZoneEquipConfig(Zone).InletNode(NodeNum)).MassFlowRate;
-                    Real64 CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(Zone), NodeTemp);
+                    Real64 CpAir = PsyCpAirFnW(ZoneAirHumRat(Zone));
                     SumSysMCp += MassFlowRate * CpAir;
                     SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                 }

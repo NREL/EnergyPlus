@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,6 +55,7 @@
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
+#if LINK_WITH_PYTHON == 1
 #ifdef _DEBUG
 // We don't want to try to import a debug build of Python here
 // so if we are building a Debug build of the C++ code, we need
@@ -66,169 +67,45 @@
 #else
 #include <Python.h>
 #endif
+#endif
 
 namespace EnergyPlus {
 namespace PluginManagement {
     std::unique_ptr<PluginManager> pluginManager;
 
     std::map<int, std::vector<std::function<void ()> > > callbacks;
-    std::map<int, std::vector<PluginInstance>> plugins;
+    std::vector<PluginInstance> plugins;
+    std::vector<PluginTrendVariable> trends;
+    std::vector<std::string> globalVariableNames;
+    std::vector<Real64> globalVariableValues;
+
+    // some flags
+    bool fullyReady = false;
 
     void registerNewCallback(int iCalledFrom, std::function<void ()> f)
     {
         callbacks[iCalledFrom].push_back(f);
     }
 
-    void runAnyRegisteredCallbacks(int iCalledFrom)
+    void runAnyRegisteredCallbacks(int iCalledFrom, bool &anyRan)
     {
+        if (DataGlobals::KickOffSimulation) return;
         for (auto const &cb : callbacks[iCalledFrom]) {
             cb();
+            anyRan = true;
         }
-        for (auto &plugin : plugins[iCalledFrom]) {
-            if (plugin.runDuringWarmup || !DataGlobals::WarmupFlag) plugin.run();
+#if LINK_WITH_PYTHON == 1
+        for (auto &plugin : plugins) {
+            if (plugin.runDuringWarmup || !DataGlobals::WarmupFlag) {
+                plugin.run(iCalledFrom);
+                anyRan = true;
+            }
         }
+#endif
     }
 
-    void PluginManager::initAllRegisteredPlugins() {
-        for (auto &pair : plugins) {
-            for (auto &plugin: pair.second) {
-                plugin.init();
-            }
-        }
-    }
-
-    void clear_state()
-    {
-        callbacks.clear();
-        plugins.clear();
-        pluginManager.reset(); // delete the current plugin manager instance, which was created in simulation manager, this clean up Python
-    }
-
-    // Python Plugin stuff here
-
-    PluginManager::PluginManager()
-    {
-        // from https://docs.python.org/3/c-api/init.html
-        // If arg 0, it skips init registration of signal handlers, which might be useful when Python is embedded.
-        Py_InitializeEx(0);
-
-        PyRun_SimpleString("import sys"); // allows us to report sys.path later
-
-        // we'll always want to add the program executable directory to PATH so that Python can find the installed pyenergyplus package
-        // we will then optionally add the current working directory to allow Python to find scripts in the current directory
-        // we will then optionally add the directory of the running IDF to allow Python to find scripts kept next to the IDF
-        // we will then optionally add any additional paths the user specifies on the search paths object
-        std::string programPath = FileSystem::getProgramPath();
-        std::string programDir = FileSystem::getParentDirectoryPath(programPath);
-        std::string sanitizedDir = PluginManager::sanitizedPath(programDir);
-        PluginManager::addToPythonPath(sanitizedDir, false);
-
-        // Read all the additional search paths next
-        std::string const sPaths = "PythonPlugin:SearchPaths";
-        int searchPaths = inputProcessor->getNumObjectsFound(sPaths);
-        if (searchPaths == 0) {
-            // no search path objects in the IDF, just do the default behavior: add the current working dir and the input file dir
-            PluginManager::addToPythonPath(".", false);
-            std::string sanitizedInputFileDir = PluginManager::sanitizedPath(DataStringGlobals::inputDirPathName);
-            PluginManager::addToPythonPath(sanitizedInputFileDir, false);
-        }
-        if (searchPaths > 0) {
-            auto const instances = inputProcessor->epJSON.find(sPaths);
-            if (instances == inputProcessor->epJSON.end()) {
-                ShowSevereError(                                                                             // LCOV_EXCL_LINE
-                    "PythonPlugin:SearchPaths: Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
-            }
-            auto &instancesValue = instances.value();
-            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
-                // This is a unique object, so we should have one, but this is fine
-                auto const &fields = instance.value();
-                auto const &thisObjectName = instance.key();
-                inputProcessor->markObjectAsUsed(sPaths, thisObjectName);
-                std::string workingDirFlagUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("add_current_working_directory_to_search_path"));
-                if (workingDirFlagUC == "YES") {
-                    PluginManager::addToPythonPath(".", false);
-                }
-                std::string inputFileDirFlagUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("add_input_file_directory_to_search_path"));
-                if (inputFileDirFlagUC == "YES") {
-                    std::string sanitizedInputFileDir = PluginManager::sanitizedPath(DataStringGlobals::inputDirPathName);
-                    PluginManager::addToPythonPath(sanitizedInputFileDir, false);
-                }
-                if (fields.find("search_path_1") != fields.end()) {
-                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_1")), true);
-                }
-                if (fields.find("search_path_2") != fields.end()) {
-                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_2")), true);
-                }
-                if (fields.find("search_path_3") != fields.end()) {
-                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_3")), true);
-                }
-                if (fields.find("search_path_4") != fields.end()) {
-                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_4")), true);
-                }
-                if (fields.find("search_path_5") != fields.end()) {
-                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_5")), true);
-                }
-            }
-        }
-
-        // Now read all the actual plugins and interpret them
-        std::string const sPlugins = "PythonPlugin:Instance";
-        int pluginInstances = inputProcessor->getNumObjectsFound(sPlugins);
-        if (pluginInstances > 0) {
-            auto const instances = inputProcessor->epJSON.find(sPlugins);
-            if (instances == inputProcessor->epJSON.end()) {
-                ShowSevereError(                                                                          // LCOV_EXCL_LINE
-                    "PythonPlugin:Instance: Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
-            }
-            auto &instancesValue = instances.value();
-            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
-                auto const &fields = instance.value();
-                auto const &thisObjectName = instance.key();
-                inputProcessor->markObjectAsUsed(sPlugins, thisObjectName);
-                std::string fileName = fields.at("python_module_name");
-                std::string className = fields.at("plugin_class_name");
-                std::string sCallingPoint = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("calling_point"));
-                std::string sWarmup = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("run_during_warmup_days"));
-                bool warmup = false;
-                if (sWarmup == "YES") {
-                    warmup = true;
-                }
-                int iCalledFrom = PluginManager::calledFromFromString(sCallingPoint);
-                plugins[iCalledFrom].emplace_back(fileName, className, thisObjectName, warmup);
-            }
-        }
-
-        std::string const sGlobals = "PythonPlugin:Variables";
-        int globalVarInstances = inputProcessor->getNumObjectsFound(sGlobals);
-        if (globalVarInstances > 0) {
-            auto const instances = inputProcessor->epJSON.find(sGlobals);
-            if (instances == inputProcessor->epJSON.end()) {
-                ShowSevereError(sGlobals + ": Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
-            }
-            auto &instancesValue = instances.value();
-            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
-                auto const &fields = instance.value();
-                auto const &thisObjectName = instance.key();
-                inputProcessor->markObjectAsUsed(sGlobals, thisObjectName);
-                if (fields.find("variable_name_1") != fields.end()) {
-                    PluginManager::addGlobalVariable(fields.at("variable_name_1"));
-                }
-                if (fields.find("variable_name_2") != fields.end()) {
-                    PluginManager::addGlobalVariable(fields.at("variable_name_2"));
-                }
-                if (fields.find("variable_name_3") != fields.end()) {
-                    PluginManager::addGlobalVariable(fields.at("variable_name_3"));
-                }
-                if (fields.find("variable_name_4") != fields.end()) {
-                    PluginManager::addGlobalVariable(fields.at("variable_name_4"));
-                }
-                if (fields.find("variable_name_5") != fields.end()) {
-                    PluginManager::addGlobalVariable(fields.at("variable_name_5"));
-                }
-            }
-
-        }
-
+    void PluginManager::setupOutputVariables() {
+#if LINK_WITH_PYTHON == 1
         // with the PythonPlugin:Variables all set in memory, we can now set them up as outputs as needed
         std::string const sOutputVariable = "PythonPlugin:OutputVariable";
         int outputVarInstances = inputProcessor->getNumObjectsFound(sOutputVariable);
@@ -254,7 +131,7 @@ namespace PluginManagement {
                 // get the index of the global variable, fatal if it doesn't mach one
                 // validate type of data, update frequency, and look up units enum value
                 // call setup output variable - variable TYPE is "PythonPlugin:OutputVariable"
-                int variableHandle = this->getGlobalVariableHandle(varName);
+                int variableHandle = EnergyPlus::PluginManagement::PluginManager::getGlobalVariableHandle(varName);
                 if (variableHandle == -1) {
                     EnergyPlus::ShowSevereError("Failed to match Python Plugin Output Variable");
                     EnergyPlus::ShowContinueError("Trying to create output instance for variable name \"" + varName + "\"");
@@ -283,11 +160,11 @@ namespace PluginManagement {
                 if (!isMetered) {
                     // regular output variable, ignore the meter/resource stuff and register the variable
                     if (thisUnit != OutputProcessor::Unit::customEMS) {
-                        SetupOutputVariable(sOutputVariable, thisUnit, this->globalVariableValues[variableHandle], sUpdateFreq, sAvgOrSum, thisObjectName);
+                        SetupOutputVariable(sOutputVariable, thisUnit, PluginManagement::globalVariableValues[variableHandle], sUpdateFreq, sAvgOrSum, thisObjectName);
                     } else {
                         SetupOutputVariable(sOutputVariable,
                                             thisUnit,
-                                            this->globalVariableValues[variableHandle],
+                                            PluginManagement::globalVariableValues[variableHandle],
                                             sUpdateFreq,
                                             sAvgOrSum,
                                             thisObjectName,
@@ -439,18 +316,18 @@ namespace PluginManagement {
                         sEndUse = "HeatRecoveryForHeating";
                     } else {
                         ShowSevereError(
-                                "Invalid input for PythonPlugin:OutputVariable, unexpected End-use Subcategory = " +
-                                groupType);
+                            "Invalid input for PythonPlugin:OutputVariable, unexpected End-use Subcategory = " +
+                            groupType);
                         ShowFatalError("Python plugin output variable input problem causes program termination");
                     }
 
                     // Additional End Use Types Only Used for EnergyTransfer
                     if ((sResourceType != "EnergyTransfer") &&
                         (sEndUse == "HeatingCoils" || sEndUse == "CoolingCoils" ||
-                                sEndUse == "Chillers" ||
-                                sEndUse == "Boilers" || sEndUse == "Baseboard" ||
-                                sEndUse == "HeatRecoveryForCooling" ||
-                                sEndUse == "HeatRecoveryForHeating")) {
+                         sEndUse == "Chillers" ||
+                         sEndUse == "Boilers" || sEndUse == "Baseboard" ||
+                         sEndUse == "HeatRecoveryForCooling" ||
+                         sEndUse == "HeatRecoveryForHeating")) {
                         ShowWarningError("Inconsistent resource type input for PythonPlugin:OutputVariable = " + thisObjectName);
                         ShowContinueError("For end use subcategory = " + sEndUse + ", resource type must be EnergyTransfer");
                         ShowContinueError("Resource type is being reset to EnergyTransfer and the simulation continues...");
@@ -465,7 +342,7 @@ namespace PluginManagement {
                     if (sEndUseSubcategory.empty()) { // no subcategory
                         SetupOutputVariable(sOutputVariable,
                                             thisUnit,
-                                            this->globalVariableValues[variableHandle],
+                                            PluginManagement::globalVariableValues[variableHandle],
                                             sUpdateFreq,
                                             sAvgOrSum,
                                             thisObjectName,
@@ -477,7 +354,7 @@ namespace PluginManagement {
                     } else { // has subcategory
                         SetupOutputVariable(sOutputVariable,
                                             thisUnit,
-                                            this->globalVariableValues[variableHandle],
+                                            PluginManagement::globalVariableValues[variableHandle],
                                             sUpdateFreq,
                                             sAvgOrSum,
                                             thisObjectName,
@@ -490,15 +367,222 @@ namespace PluginManagement {
                 }
             }
         }
+#endif
+    }
 
+    void clear_state()
+    {
+        callbacks.clear();
+#if LINK_WITH_PYTHON == 1
+        for (auto & plugin: plugins) {
+            plugin.shutdown(); // clear unmanaged memory first
+        }
+        trends.clear();
+        globalVariableNames.clear();
+        globalVariableValues.clear();
+        plugins.clear();
+        pluginManager.reset(); // delete the current plugin manager instance, which was created in simulation manager, this clean up Python
+        PluginManagement::fullyReady = false;
+#endif
+    }
+
+    PluginManager::PluginManager()
+    {
+#if LINK_WITH_PYTHON == 1
+        // we'll need the program directory for a few things so get it once here at the top and sanitize it
+        std::string programPath = FileSystem::getProgramPath();
+        std::string programDir = FileSystem::getParentDirectoryPath(programPath);
+        std::string sanitizedProgramDir = PluginManager::sanitizedPath(programDir);
+
+        // I think we need to set the python path before initializing the library
+        // make this relative to the binary
+        std::string pathToPythonPackages = sanitizedProgramDir + "/python_standard_lib";
+        FileSystem::makeNativePath(pathToPythonPackages);
+        auto a = Py_DecodeLocale(pathToPythonPackages.c_str(), nullptr);
+        Py_SetPath(a);
+
+        // now that we have set the path, we can initialize python
+        // from https://docs.python.org/3/c-api/init.html
+        // If arg 0, it skips init registration of signal handlers, which might be useful when Python is embedded.
+        Py_InitializeEx(0);
+
+        PyRun_SimpleString("import sys"); // allows us to report sys.path later
+
+        // we also need to set an extra import path to find some dynamic library loading stuff, again make it relative to the binary
+        std::string pathToDynLoad = sanitizedProgramDir + "/python_standard_lib/lib-dynload";
+        FileSystem::makeNativePath(pathToDynLoad);
+        std::string libDirDynLoad = PluginManager::sanitizedPath(pathToDynLoad);
+        PluginManager::addToPythonPath(libDirDynLoad, false);
+
+        // now for additional paths:
+        // we'll always want to add the program executable directory to PATH so that Python can find the installed pyenergyplus package
+        // we will then optionally add the current working directory to allow Python to find scripts in the current directory
+        // we will then optionally add the directory of the running IDF to allow Python to find scripts kept next to the IDF
+        // we will then optionally add any additional paths the user specifies on the search paths object
+
+        // so add the executable directory here
+        PluginManager::addToPythonPath(sanitizedProgramDir, false);
+
+        // Read all the additional search paths next
+        std::string const sPaths = "PythonPlugin:SearchPaths";
+        int searchPaths = inputProcessor->getNumObjectsFound(sPaths);
+        if (searchPaths == 0) {
+            // no search path objects in the IDF, just do the default behavior: add the current working dir and the input file dir
+            PluginManager::addToPythonPath(".", false);
+            std::string sanitizedInputFileDir = PluginManager::sanitizedPath(DataStringGlobals::inputDirPathName);
+            PluginManager::addToPythonPath(sanitizedInputFileDir, false);
+        }
+        if (searchPaths > 0) {
+            auto const instances = inputProcessor->epJSON.find(sPaths);
+            if (instances == inputProcessor->epJSON.end()) {
+                ShowSevereError(                                                                             // LCOV_EXCL_LINE
+                    "PythonPlugin:SearchPaths: Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
+            }
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                // This is a unique object, so we should have one, but this is fine
+                auto const &fields = instance.value();
+                auto const &thisObjectName = instance.key();
+                inputProcessor->markObjectAsUsed(sPaths, thisObjectName);
+                std::string workingDirFlagUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("add_current_working_directory_to_search_path"));
+                if (workingDirFlagUC == "YES") {
+                    PluginManager::addToPythonPath(".", false);
+                }
+                std::string inputFileDirFlagUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("add_input_file_directory_to_search_path"));
+                if (inputFileDirFlagUC == "YES") {
+                    std::string sanitizedInputFileDir = PluginManager::sanitizedPath(DataStringGlobals::inputDirPathName);
+                    PluginManager::addToPythonPath(sanitizedInputFileDir, false);
+                }
+                if (fields.find("search_path_1") != fields.end()) {
+                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_1")), true);
+                }
+                if (fields.find("search_path_2") != fields.end()) {
+                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_2")), true);
+                }
+                if (fields.find("search_path_3") != fields.end()) {
+                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_3")), true);
+                }
+                if (fields.find("search_path_4") != fields.end()) {
+                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_4")), true);
+                }
+                if (fields.find("search_path_5") != fields.end()) {
+                    PluginManager::addToPythonPath(PluginManager::sanitizedPath(fields.at("search_path_5")), true);
+                }
+            }
+        }
+
+        // Now read all the actual plugins and interpret them
+        // IMPORTANT -- DO NOT CALL setup() UNTIL ALL INSTANCES ARE DONE
+        std::string const sPlugins = "PythonPlugin:Instance";
+        int pluginInstances = inputProcessor->getNumObjectsFound(sPlugins);
+        if (pluginInstances > 0) {
+            auto const instances = inputProcessor->epJSON.find(sPlugins);
+            if (instances == inputProcessor->epJSON.end()) {
+                ShowSevereError(                                                                          // LCOV_EXCL_LINE
+                    "PythonPlugin:Instance: Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
+            }
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = instance.key();
+                inputProcessor->markObjectAsUsed(sPlugins, thisObjectName);
+                std::string fileName = fields.at("python_module_name");
+                std::string className = fields.at("plugin_class_name");
+                std::string sWarmup = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("run_during_warmup_days"));
+                bool warmup = false;
+                if (sWarmup == "YES") {
+                    warmup = true;
+                }
+                plugins.emplace_back(fileName, className, thisObjectName, warmup);
+            }
+        }
+
+        // IMPORTANT - CALL setup() HERE ONCE ALL INSTANCES ARE CONSTRUCTED TO AVOID DESTRUCTOR/MEMORY ISSUES DURING VECTOR RESIZING
+        for (auto & plugin : plugins) {
+            plugin.setup();
+        }
+
+        std::string const sGlobals = "PythonPlugin:Variables";
+        int globalVarInstances = inputProcessor->getNumObjectsFound(sGlobals);
+        if (globalVarInstances > 0) {
+            auto const instances = inputProcessor->epJSON.find(sGlobals);
+            if (instances == inputProcessor->epJSON.end()) {
+                ShowSevereError(sGlobals + ": Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
+            }
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = instance.key();
+                inputProcessor->markObjectAsUsed(sGlobals, thisObjectName);
+                // TODO: Make this an extensible object
+                if (fields.find("variable_name_1") != fields.end()) {
+                    PluginManager::addGlobalVariable(fields.at("variable_name_1"));
+                }
+                if (fields.find("variable_name_2") != fields.end()) {
+                    PluginManager::addGlobalVariable(fields.at("variable_name_2"));
+                }
+                if (fields.find("variable_name_3") != fields.end()) {
+                    PluginManager::addGlobalVariable(fields.at("variable_name_3"));
+                }
+                if (fields.find("variable_name_4") != fields.end()) {
+                    PluginManager::addGlobalVariable(fields.at("variable_name_4"));
+                }
+                if (fields.find("variable_name_5") != fields.end()) {
+                    PluginManager::addGlobalVariable(fields.at("variable_name_5"));
+                }
+            }
+        }
+
+        // PythonPlugin:TrendVariable,
+        //       \memo This object sets up a Python plugin trend variable from an Python plugin variable
+        //       \memo A trend variable logs values across timesteps
+        //       \min-fields 3
+        //  A1 , \field Name
+        //       \required-field
+        //       \type alpha
+        //  A2 , \field Name of a Python Plugin Variable
+        //       \required-field
+        //       \type alpha
+        //  N1 ; \field Number of Timesteps to be Logged
+        //       \required-field
+        //       \type integer
+        //       \minimum 1
+        std::string const sTrends = "PythonPlugin:TrendVariable";
+        int trendInstances = inputProcessor->getNumObjectsFound(sTrends);
+        if (trendInstances > 0) {
+            auto const instances = inputProcessor->epJSON.find(sTrends);
+            if (instances == inputProcessor->epJSON.end()) {
+                ShowSevereError(sTrends + ": Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
+            }
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto const &thisObjectName = EnergyPlus::UtilityRoutines::MakeUPPERCase(instance.key());
+                inputProcessor->markObjectAsUsed(sGlobals, thisObjectName);
+                std::string variableName = fields.at("name_of_a_python_plugin_variable");
+                int variableIndex = this->getGlobalVariableHandle(variableName);
+                int numValues = fields.at("number_of_timesteps_to_be_logged");
+                trends.emplace_back(thisObjectName, numValues, variableIndex);
+            }
+        }
+
+        // setting up output variables deferred until later in the simulation setup process
+#else
+        // EnergyPlus::ShowWarningMessage("EnergyPlus was not built with Python Plugins Enabled, PythonPlugin:* objects are ignored");
+#endif
     }
 
     std::string PluginManager::sanitizedPath(std::string path)
     {
+#if LINK_WITH_PYTHON == 1
         // there are parts of this program that need to write out a string to execute in Python
         // because of that, escaped backslashes actually need double escaping
         // plus, the string cannot end with a backslash
         // sanitize the path to remove any trailing backslash
+        if (path.empty()) {
+            // this is really only likely to occur during unit testing, just return the original blank path
+            return path;
+        }
         if (path.substr(path.length() - 1, path.length()) == "\\") {
             path = path.substr(0, path.length() - 1);
         }
@@ -512,9 +596,11 @@ namespace PluginManagement {
             }
         }
         return sanitizedDir;
+#endif
     }
 
     void PluginInstance::reportPythonError() {
+#if LINK_WITH_PYTHON == 1
         PyObject *exc_type = nullptr, *exc_value = nullptr, *exc_tb = nullptr;
         PyErr_Fetch(&exc_type, &exc_value, &exc_tb);
         PyObject* str_exc_value = PyObject_Repr(exc_value); //Now a unicode object
@@ -522,21 +608,23 @@ namespace PluginManagement {
         char *strExcValue =  PyBytes_AS_STRING(pyStr2); // NOLINT(hicpp-signed-bitwise)
         EnergyPlus::ShowContinueError("Python error description follows: ");
         EnergyPlus::ShowContinueError(strExcValue);
+#endif
     }
 
-    PluginInstance::PluginInstance(const std::string &moduleName, const std::string &className, const std::string &emsName, const bool runPluginDuringWarmup)
+    void PluginInstance::setup()
     {
+#if LINK_WITH_PYTHON == 1
         // this first section is really all about just ultimately getting a full Python class instance
         // this answer helped with a few things: https://ru.stackoverflow.com/a/785927
 
-        PyObject *pModuleName = PyUnicode_DecodeFSDefault(moduleName.c_str());
-        PyObject *pModule = PyImport_Import(pModuleName);
+        PyObject *pModuleName = PyUnicode_DecodeFSDefault(this->moduleName.c_str());
+        this->pModule = PyImport_Import(pModuleName);
         // PyUnicode_DecodeFSDefault documentation does not explicitly say whether it returns a new or borrowed reference,
         // but other functions in that section say they return a new reference, and that makes sense to me, so I think we
         // should decrement it.
         Py_DECREF(pModuleName);
-        if (!pModule) {
-            EnergyPlus::ShowSevereError("Failed to import module \"" + moduleName + "\"");
+        if (!this->pModule) {
+            EnergyPlus::ShowSevereError("Failed to import module \"" + this->moduleName + "\"");
             // ONLY call PyErr_Print if PyErr has occurred, otherwise it will cause other problems
             if (PyErr_Occurred()) {
                 PluginInstance::reportPythonError();
@@ -546,10 +634,9 @@ namespace PluginManagement {
             }
             EnergyPlus::ShowFatalError("Python import error causes program termination");
         }
-        PyObject *pModuleDict = PyModule_GetDict(pModule);
-        Py_DECREF(pModule); // PyImport_Import returns a new reference, decrement it
+        PyObject *pModuleDict = PyModule_GetDict(this->pModule);
         if (!pModuleDict) {
-            EnergyPlus::ShowSevereError("Failed to read module dictionary from module \"" + moduleName + "\"");
+            EnergyPlus::ShowSevereError("Failed to read module dictionary from module \"" + this->moduleName + "\"");
             if (PyErr_Occurred()) {
                 PluginInstance::reportPythonError();
             } else {
@@ -590,9 +677,9 @@ namespace PluginManagement {
             }
             EnergyPlus::ShowFatalError("Python class check error causes program termination");
         }
-        PyObject *pClassInstance = PyObject_CallObject(pClass, nullptr);
+        this->pClassInstance = PyObject_CallObject(pClass, nullptr);
         // Py_DECREF(pClass);  // PyDict_GetItemString returns a borrowed reference, DO NOT decrement
-        if (!pClassInstance) {
+        if (!this->pClassInstance) {
             EnergyPlus::ShowSevereError("Something went awry calling class constructor for class \"" + className + "\"");
             if (PyErr_Occurred()) {
                 PluginInstance::reportPythonError();
@@ -606,82 +693,205 @@ namespace PluginManagement {
         // so I don't intend on decrementing it, at least not until the manager destructor
         // In any case, it will be an **extremely** tiny memory use if we hold onto it a bit too long
 
-        // now grab the function pointer to the main call function
-        std::string const mainFunctionName = "main";
-        this->pPluginMainFunction = PyObject_GetAttrString(pClassInstance, mainFunctionName.c_str());
-        if (!this->pPluginMainFunction || !PyCallable_Check(this->pPluginMainFunction)) {
-            EnergyPlus::ShowSevereError("Could not find or call function \"" + mainFunctionName + "\" on class \"" + moduleName + "." + className + "\"");
+        // check which methods are overridden in the derived class
+        std::string const detectOverriddenFunctionName = "_detect_overridden";
+        PyObject *detectFunction = PyObject_GetAttrString(this->pClassInstance, detectOverriddenFunctionName.c_str());
+        if (!detectFunction || !PyCallable_Check(detectFunction)) {
+            EnergyPlus::ShowSevereError("Could not find or call function \"" + detectOverriddenFunctionName + "\" on class \"" + this->moduleName + "." + this->className + "\"");
             if (PyErr_Occurred()) {
                 PluginInstance::reportPythonError();
             } else {
-                EnergyPlus::ShowContinueError("Make sure the plugin class overrides the main() function, and does not require arguments.");
+                EnergyPlus::ShowContinueError("This function should be available on the base class, so this is strange.");
             }
-            EnergyPlus::ShowFatalError("Python main() function error causes program termination");
+            EnergyPlus::ShowFatalError("Python _detect_overridden() function error causes program termination");
         }
-
-        // and grab the initialize function pointer
-        std::string const initFunctionName = "initialize";
-        this->pPluginInitFunction = PyObject_GetAttrString(pClassInstance, initFunctionName.c_str());
-        if (!this->pPluginInitFunction || !PyCallable_Check(this->pPluginInitFunction)) {
-            EnergyPlus::ShowSevereError("Could not find or call function \"" + initFunctionName + "\" on class \"" + moduleName + "." + className + "\"");
+        PyObject *pFunctionResponse = PyObject_CallFunction(detectFunction, nullptr);
+        Py_DECREF(detectFunction);  // PyObject_GetAttrString returns a new reference, decrement it
+        if (!pFunctionResponse) {
+            EnergyPlus::ShowSevereError("Call to _detect_overridden() on " + this->stringIdentifier + " failed!");
             if (PyErr_Occurred()) {
                 PluginInstance::reportPythonError();
             } else {
-                EnergyPlus::ShowContinueError("The base class defines an empty initialize() function, so this should not occur.  Make sure the class inherits the EnergyPlusPlugin base class.");
+                EnergyPlus::ShowContinueError("This is available on the base class and should not be overridden...strange.");
             }
-            EnergyPlus::ShowFatalError("Python initialize() function error causes program termination");
+            EnergyPlus::ShowFatalError("Program terminates after call to _detect_overridden() on " + this->stringIdentifier + " failed!");
         }
-
-        // update the rest of the plugin call instance and store it
-        this->stringIdentifier = moduleName + "." + className;
-        this->emsAlias = emsName;
-        this->runDuringWarmup = runPluginDuringWarmup;
+        if (!PyList_Check(pFunctionResponse)) { // NOLINT(hicpp-signed-bitwise)
+            EnergyPlus::ShowFatalError("Invalid return from _detect_overridden() on class \"" + this->stringIdentifier + ", this is weird");
+        }
+        int numVals = PyList_Size(pFunctionResponse);
+        // at this point we know which base class methods are being overridden by the derived class
+        // we can loop over them and based on the name check the appropriate flag and assign the function pointer
+        if (numVals == 0) {
+            EnergyPlus::ShowFatalError("Python plugin \"" + this->stringIdentifier + "\" did not override any base class methods; must override at least one");
+        }
+        for (int itemNum = 0; itemNum < numVals; itemNum++) {
+            PyObject *item = PyList_GetItem(pFunctionResponse, itemNum);
+            if (PyUnicode_Check(item)) { // NOLINT(hicpp-signed-bitwise) -- something inside Python code causes warning
+                std::string functionName = PyUnicode_AsUTF8(item);
+                if (functionName == this->sHookBeginNewEnvironment) {
+                    this->bHasBeginNewEnvironment = true;
+                } else if (functionName == this->sHookAfterNewEnvironmentWarmUpIsComplete) {
+                    this->bHasAfterNewEnvironmentWarmUpIsComplete = true;
+                } else if (functionName == this->sHookBeginZoneTimestepBeforeInitHeatBalance) {
+                    this->bHasBeginZoneTimestepBeforeInitHeatBalance = true;
+                } else if (functionName == this->sHookBeginZoneTimestepAfterInitHeatBalance) {
+                    this->bHasBeginZoneTimestepAfterInitHeatBalance = true;
+                } else if (functionName == this->sHookBeginTimestepBeforePredictor) {
+                    this->bHasBeginTimestepBeforePredictor = true;
+                } else if (functionName == this->sHookAfterPredictorBeforeHVACManagers) {
+                    this->bHasAfterPredictorBeforeHVACManagers = true;
+                } else if (functionName == this->sHookAfterPredictorAfterHVACManagers) {
+                    this->bHasAfterPredictorAfterHVACManagers = true;
+                } else if (functionName == this->sHookInsideHVACSystemIterationLoop) {
+                    this->bHasInsideHVACSystemIterationLoop = true;
+                } else if (functionName == this->sHookEndOfZoneTimestepBeforeZoneReporting) {
+                    this->bHasEndOfZoneTimestepBeforeZoneReporting = true;
+                } else if (functionName == this->sHookEndOfZoneTimestepAfterZoneReporting) {
+                    this->bHasEndOfZoneTimestepAfterZoneReporting = true;
+                } else if (functionName == this->sHookEndOfSystemTimestepBeforeHVACReporting) {
+                    this->bHasEndOfSystemTimestepBeforeHVACReporting = true;
+                } else if (functionName == this->sHookEndOfSystemTimestepAfterHVACReporting) {
+                    this->bHasEndOfSystemTimestepAfterHVACReporting = true;
+                } else if (functionName == this->sHookEndOfZoneSizing) {
+                    this->bHasEndOfZoneSizing = true;
+                } else if (functionName == this->sHookEndOfSystemSizing) {
+                    this->bHasEndOfSystemSizing = true;
+                } else if (functionName == this->sHookAfterComponentInputReadIn) {
+                    this->bHasAfterComponentInputReadIn = true;
+                } else if (functionName == this->sHookUserDefinedComponentModel) {
+                    this->bHasUserDefinedComponentModel = true;
+                } else if (functionName == this->sHookUnitarySystemSizing) {
+                    this->bHasUnitarySystemSizing = true;
+                } else {
+                    // the Python _detect_function worker is supposed to ignore any other functions so they don't show up at this point
+                    // I don't think it's appropriate to warn here, so just ignore and move on
+                }
+            }
+            // PyList_GetItem returns a borrowed reference, do not decrement
+        }
+        // PyList_Size returns a borrowed reference, do not decrement
+        Py_DECREF(pFunctionResponse); // PyObject_CallFunction returns new reference, decrement
+#endif
     }
 
-    void PluginInstance::run()
+    void PluginInstance::shutdown() {
+#if LINK_WITH_PYTHON == 1
+        Py_DECREF(this->pClassInstance);
+        Py_DECREF(this->pModule); // PyImport_Import returns a new reference, decrement it
+#endif
+    }
+
+    void PluginInstance::run(int iCalledFrom)
     {
+#if LINK_WITH_PYTHON == 1
+        const char *functionName = nullptr;
+        if (iCalledFrom == DataGlobals::emsCallFromBeginNewEvironment) {
+            if (this->bHasBeginNewEnvironment) {
+                functionName = this->sHookBeginNewEnvironment;
+            }
+        } else if (iCalledFrom == DataGlobals::emsCallFromZoneSizing) {
+            if (this->bHasEndOfZoneSizing) {
+                functionName = this->sHookEndOfZoneSizing;
+            }
+        } else if (iCalledFrom == DataGlobals::emsCallFromSystemSizing) {
+            if (this->bHasEndOfSystemSizing) {
+                functionName = this->sHookEndOfSystemSizing;
+            }
+        } else if (iCalledFrom == DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp) {
+            if (this->bHasAfterNewEnvironmentWarmUpIsComplete) {
+                functionName = this->sHookAfterNewEnvironmentWarmUpIsComplete;
+            }
+        } else if (iCalledFrom == DataGlobals::emsCallFromBeginTimestepBeforePredictor) {
+            if (this->bHasBeginTimestepBeforePredictor) {
+                functionName = this->sHookBeginTimestepBeforePredictor;
+            }
+        } else if (iCalledFrom == DataGlobals::emsCallFromBeforeHVACManagers) {
+            if (this->bHasAfterPredictorBeforeHVACManagers) {
+                functionName = this->sHookAfterPredictorBeforeHVACManagers;
+            }
+        } else if (iCalledFrom == DataGlobals::emsCallFromAfterHVACManagers) {
+            if (this->bHasAfterPredictorAfterHVACManagers) {
+                functionName = this->sHookAfterPredictorAfterHVACManagers;
+            }
+        } else if (iCalledFrom == DataGlobals::emsCallFromHVACIterationLoop) {
+            if (this->bHasInsideHVACSystemIterationLoop) {
+                functionName = this->sHookInsideHVACSystemIterationLoop;
+            }
+        } else if (iCalledFrom == DataGlobals::emsCallFromEndSystemTimestepBeforeHVACReporting) {
+            if (this->bHasEndOfSystemTimestepBeforeHVACReporting) {
+                functionName = this->sHookEndOfSystemTimestepBeforeHVACReporting;
+            }
+        } else if (iCalledFrom == DataGlobals::emsCallFromEndSystemTimestepAfterHVACReporting) {
+            if (this->bHasEndOfSystemTimestepAfterHVACReporting) {
+                functionName = this->sHookEndOfSystemTimestepAfterHVACReporting;
+            }
+        } else if (iCalledFrom == DataGlobals::emsCallFromEndZoneTimestepBeforeZoneReporting) {
+            if (this->bHasEndOfZoneTimestepBeforeZoneReporting) {
+                functionName = this->sHookEndOfZoneTimestepBeforeZoneReporting;
+            }
+        } else if (iCalledFrom == DataGlobals::emsCallFromEndZoneTimestepAfterZoneReporting) {
+            if (this->bHasEndOfZoneTimestepAfterZoneReporting) {
+                functionName = this->sHookEndOfZoneTimestepAfterZoneReporting;
+            }
+        } else if (iCalledFrom == DataGlobals::emsCallFromComponentGetInput) {
+            if (this->bHasAfterComponentInputReadIn) {
+                functionName = this->sHookAfterComponentInputReadIn;
+            }
+        } else if (iCalledFrom == DataGlobals::emsCallFromUserDefinedComponentModel) {
+            if (this->bHasUserDefinedComponentModel) {
+                functionName = this->sHookUserDefinedComponentModel;
+            }
+        } else if (iCalledFrom == DataGlobals::emsCallFromUnitarySystemSizing) {
+            if (this->bHasUnitarySystemSizing) {
+                functionName = this->sHookUnitarySystemSizing;
+            }
+        } else if (iCalledFrom == DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance) {
+            if (this->bHasBeginZoneTimestepBeforeInitHeatBalance) {
+                functionName = this->sHookBeginZoneTimestepBeforeInitHeatBalance;
+            }
+        } else if (iCalledFrom == DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance) {
+            if (this->bHasBeginZoneTimestepAfterInitHeatBalance) {
+                functionName = this->sHookBeginZoneTimestepAfterInitHeatBalance;
+            }
+        }
+
+        // leave if we didn't find a match
+        if (!functionName) {
+            return;
+        }
+
         // then call the main function
-        PyObject *pFunctionResponse = PyObject_CallFunction(this->pPluginMainFunction, nullptr);
+        PyObject *pFunctionResponse = PyObject_CallMethod(this->pClassInstance, functionName, nullptr);
         if (!pFunctionResponse) {
-            EnergyPlus::ShowSevereError("Call to main() on " + this->stringIdentifier + " failed!");
+            std::string const functionNameAsString(functionName);  // only convert to string if an error occurs
+            EnergyPlus::ShowSevereError("Call to " + functionNameAsString + "() on " + this->stringIdentifier + " failed!");
             if (PyErr_Occurred()) {
                 PluginInstance::reportPythonError();
             } else {
                 EnergyPlus::ShowContinueError("This could happen for any number of reasons, check the plugin code.");
             }
-            EnergyPlus::ShowFatalError("Program terminates after call to main() on " + this->stringIdentifier + " failed!");
+            EnergyPlus::ShowFatalError("Program terminates after call to " + functionNameAsString + "() on " + this->stringIdentifier + " failed!");
         }
         if (PyLong_Check(pFunctionResponse)) { // NOLINT(hicpp-signed-bitwise)
-            int exitCode = (int)PyLong_AsLong(pFunctionResponse);
+            auto exitCode = PyLong_AsLong(pFunctionResponse);
             if (exitCode == 0) {
                 // success
             } else if (exitCode == 1) {
                 EnergyPlus::ShowFatalError("Python Plugin \"" + this->stringIdentifier + "\" returned 1 to indicate EnergyPlus should abort");
             }
         } else {
-            EnergyPlus::ShowFatalError("Invalid return from main() on class \"" + this->stringIdentifier +
-                                       ", make sure it returns an integer exit code");
+            std::string const functionNameAsString(functionName);  // only convert to string if an error occurs
+            EnergyPlus::ShowFatalError("Invalid return from " + functionNameAsString + "() on class \"" + this->stringIdentifier +
+                                       ", make sure it returns an integer exit code, either zero (success) or one (failure)");
         }
         Py_DECREF(pFunctionResponse); // PyObject_CallFunction returns new reference, decrement
-    }
-
-    void PluginInstance::init() {
-        // then call the main function
-        PyObject *pFunctionResponse = PyObject_CallFunction(this->pPluginInitFunction, nullptr);
-        if (!pFunctionResponse) {
-            EnergyPlus::ShowSevereError("Call to initialize() on " + this->stringIdentifier + " failed!");
-            if (PyErr_Occurred()) {
-                PluginInstance::reportPythonError();
-            } else {
-                EnergyPlus::ShowContinueError("This could happen for any number of reasons, check the plugin code.");
-            }
-            EnergyPlus::ShowFatalError("Program terminates after call to initialize() on " + this->stringIdentifier + " failed!");
-        }
-        Py_DECREF(pFunctionResponse); // PyObject_CallFunction returns new reference, decrement
+#endif
     }
 
     void PluginManager::addToPythonPath(const std::string &path, bool userDefinedPath)
     {
+#if LINK_WITH_PYTHON == 1
         std::string command = "sys.path.insert(0, \"" + path + "\")";
         if (PyRun_SimpleString(command.c_str()) == 0) {
             if (userDefinedPath) {
@@ -691,115 +901,184 @@ namespace PluginManagement {
         } else {
             EnergyPlus::ShowFatalError("ERROR adding \"" + path + "\" to the sys.path in Python");
         }
+#endif
     }
 
     void PluginManager::addGlobalVariable(const std::string &name) {
+#if LINK_WITH_PYTHON == 1
         std::string const varNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(name);
-        this->globalVariableNames.push_back(varNameUC);
-        this->globalVariableValues.push_back(Real64());
+        PluginManagement::globalVariableNames.push_back(varNameUC);
+        PluginManagement::globalVariableValues.push_back(Real64());
+#endif
     }
 
     int PluginManager::getGlobalVariableHandle(const std::string& name, bool const suppress_warning) { // note zero is a valid handle
+#if LINK_WITH_PYTHON == 1
         std::string const varNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(name);
-        auto const it = std::find(this->globalVariableNames.begin(), this->globalVariableNames.end(), varNameUC);
-        if (it != this->globalVariableNames.end()) {
-            return std::distance(this->globalVariableNames.begin(), it);
+        auto const it = std::find(PluginManagement::globalVariableNames.begin(), PluginManagement::globalVariableNames.end(), varNameUC);
+        if (it != PluginManagement::globalVariableNames.end()) {
+            return std::distance(PluginManagement::globalVariableNames.begin(), it);
         } else {
             if (suppress_warning) {
                 return -1;
             } else {
                 EnergyPlus::ShowSevereError("Tried to retrieve handle for a nonexistent plugin global variable");
                 EnergyPlus::ShowContinueError("Name looked up: \"" + varNameUC + "\", available names: ");
-                for (auto const &gvName : this->globalVariableNames) {
+                for (auto const &gvName : PluginManagement::globalVariableNames) {
                     EnergyPlus::ShowContinueError("    \"" + gvName + "\"");
                 }
                 EnergyPlus::ShowFatalError("Plugin global variable problem causes program termination");
                 return -1; // hush the compiler warning
             }
         }
+#endif
+    }
+
+    int PluginManager::getTrendVariableHandle(const std::string& name) {
+#if LINK_WITH_PYTHON == 1
+        std::string const varNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(name);
+        for (size_t i = 0; i < trends.size(); i++) {
+            auto & thisTrend = trends[i];
+            if (thisTrend.name == varNameUC) {
+                return i;
+            }
+        }
+        return -1;
+#endif
+    }
+
+    Real64 PluginManager::getTrendVariableValue(int handle, int timeIndex) {
+#if LINK_WITH_PYTHON == 1
+        return trends[handle].values[timeIndex];
+#endif
+    }
+
+    Real64 PluginManager::getTrendVariableAverage(int handle, int count) {
+    #if LINK_WITH_PYTHON == 1
+        Real64 sum = 0;
+        for (int i = 0; i < count; i++) {
+            sum += trends[handle].values[i];
+        }
+        return sum / count;
+    #endif
+    }
+
+    Real64 PluginManager::getTrendVariableMin(int handle, int count) {
+    #if LINK_WITH_PYTHON == 1
+        Real64 minimumValue = 9999999999999;
+        for (int i = 0; i < count; i++) {
+            if (trends[handle].values[i] < minimumValue) {
+                minimumValue = trends[handle].values[i];
+            }
+        }
+        return minimumValue;
+    #endif
+    }
+
+    Real64 PluginManager::getTrendVariableMax(int handle, int count) {
+    #if LINK_WITH_PYTHON == 1
+        Real64 maximumValue = -9999999999999;
+        for (int i = 0; i < count; i++) {
+            if (trends[handle].values[i] > maximumValue) {
+                maximumValue = trends[handle].values[i];
+            }
+        }
+        return maximumValue;
+    #endif
+    }
+
+    Real64 PluginManager::getTrendVariableSum(int handle, int count) {
+#if LINK_WITH_PYTHON == 1
+        Real64 sum = 0.0;
+        for (int i = 0; i < count; i++) {
+            sum += trends[handle].values[i];
+        }
+        return sum;
+#endif
+    }
+
+    Real64 PluginManager::getTrendVariableDirection(int handle, int count) {
+#if LINK_WITH_PYTHON == 1
+        auto &trend = trends[handle];
+        Real64 timeSum = 0.0;
+        Real64 valueSum = 0.0;
+        Real64 crossSum = 0.0;
+        Real64 powSum = 0.0;
+        for (int i = 0; i < count; i++) {
+            timeSum += trend.times[i];
+            valueSum += trend.values[i];
+            crossSum += trend.times[i] * trend.values[i];
+            powSum += pow2(trend.times[i]);
+        }
+        Real64 numerator = timeSum * valueSum - count * crossSum;
+        Real64 denominator = pow_2(timeSum) - count * powSum;
+        return numerator / denominator;
+#endif
+    }
+
+    size_t PluginManager::getTrendVariableHistorySize(int handle) {
+#if LINK_WITH_PYTHON == 1
+        return trends[handle].values.size();
+#endif
+    }
+
+    void PluginManager::updatePluginValues() {
+#if LINK_WITH_PYTHON == 1
+        for (auto & trend : trends) {
+            Real64 newVarValue = this->getGlobalVariableValue(trend.indexOfPluginVariable);
+            trend.values.push_front(newVarValue);
+            trend.values.pop_back();
+        }
+#endif
     }
 
     Real64 PluginManager::getGlobalVariableValue(int handle) {
-        if (this->globalVariableValues.empty()) {
+#if LINK_WITH_PYTHON == 1
+        if (PluginManagement::globalVariableValues.empty()) {
             EnergyPlus::ShowFatalError("Tried to access plugin global variable but it looks like there aren't any; use the PythonPlugin:GlobalVariables object to declare them.");
         }
         try {
-            return this->globalVariableValues[handle];
+            return PluginManagement::globalVariableValues[handle];
         } catch (...) {
             EnergyPlus::ShowSevereError("Tried to access plugin global variable value at index " + std::to_string(handle));
-            EnergyPlus::ShowContinueError("Available handles range from 0 to " + std::to_string(this->globalVariableValues.size()-1));
+            EnergyPlus::ShowContinueError("Available handles range from 0 to " + std::to_string(PluginManagement::globalVariableValues.size()-1));
             EnergyPlus::ShowFatalError("Plugin global variable problem causes program termination");
         }
-        return 0;
+        return 0.0;
+#endif
     }
 
     void PluginManager::setGlobalVariableValue(int handle, Real64 value) {
-        if (this->globalVariableValues.empty()) {
+#if LINK_WITH_PYTHON == 1
+        if (PluginManagement::globalVariableValues.empty()) {
             EnergyPlus::ShowFatalError("Tried to set plugin global variable but it looks like there aren't any; use the PythonPlugin:GlobalVariables object to declare them.");
         }
         try {
-            this->globalVariableValues[handle] = value;
+            PluginManagement::globalVariableValues[handle] = value;
         } catch (...) {
             EnergyPlus::ShowSevereError("Tried to set plugin global variable value at index " + std::to_string(handle));
-            EnergyPlus::ShowContinueError("Available handles range from 0 to " + std::to_string(this->globalVariableValues.size()-1));
+            EnergyPlus::ShowContinueError("Available handles range from 0 to " + std::to_string(PluginManagement::globalVariableValues.size()-1));
             EnergyPlus::ShowFatalError("Plugin global variable problem causes program termination");
         }
+#endif
     }
 
-    int PluginManager::calledFromFromString(std::string const &calledFrom) {
-        if (calledFrom == "BEGINNEWENVIRONMENT") {
-            return DataGlobals::emsCallFromBeginNewEvironment;
-        } else if (calledFrom == "AFTERNEWENVIRONMENTWARMUPISCOMPLETE") {
-            return DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp;
-        } else if (calledFrom == "BEGINZONETIMESTEPBEFOREINITHEATBALANCE") {
-            return DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance;
-        } else if (calledFrom == "BEGINZONETIMESTEPAFTERINITHEATBALANCE") {
-            return DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance;
-        } else if (calledFrom == "BEGINTIMESTEPBEFOREPREDICTOR") {
-            return DataGlobals::emsCallFromBeginTimestepBeforePredictor;
-        } else if (calledFrom == "AFTERPREDICTORBEFOREHVACMANAGERS") {
-            return DataGlobals::emsCallFromBeforeHVACManagers;
-        } else if (calledFrom == "AFTERPREDICTORAFTERHVACMANAGERS") {
-            return DataGlobals::emsCallFromAfterHVACManagers;
-        } else if (calledFrom == "INSIDEHVACSYSTEMITERATIONLOOP") {
-            return DataGlobals::emsCallFromHVACIterationLoop;
-        } else if (calledFrom == "ENDOFZONETIMESTEPBEFOREZONEREPORTING") {
-            return DataGlobals::emsCallFromEndZoneTimestepBeforeZoneReporting;
-        } else if (calledFrom == "ENDOFZONETIMESTEPAFTERZONEREPORTING") {
-            return DataGlobals::emsCallFromEndZoneTimestepAfterZoneReporting;
-        } else if (calledFrom == "ENDOFSYSTEMTIMESTEPBEFOREHVACREPORTING") {
-            return DataGlobals::emsCallFromEndSystemTimestepBeforeHVACReporting;
-        } else if (calledFrom == "ENDOFSYSTEMTIMESTEPAFTERHVACREPORTING") {
-            return DataGlobals::emsCallFromEndSystemTimestepAfterHVACReporting;
-        } else if (calledFrom == "ENDOFZONESIZING") {
-            return DataGlobals::emsCallFromZoneSizing;
-        } else if (calledFrom == "ENDOFSYSTEMSIZING") {
-            return DataGlobals::emsCallFromSystemSizing;
-        } else if (calledFrom == "AFTERCOMPONENTINPUTREADIN") {
-            return DataGlobals::emsCallFromComponentGetInput;
-        } else if (calledFrom == "USERDEFINEDCOMPONENTMODEL") {
-            return DataGlobals::emsCallFromUserDefinedComponentModel;
-        } else if (calledFrom == "UNITARYSYSTEMSIZING") {
-            return DataGlobals::emsCallFromUnitarySystemSizing;
-        } else {
-            EnergyPlus::ShowFatalError("Invalid calledFrom string passed to calledFromFromString");
-            return -1;
-        }
-    }
-
-    std::pair<int, int> PluginManager::getLocationOfUserDefinedPlugin(std::string const &programName) {
-        for (auto &pair : plugins) {
-            for (size_t handle = 0; handle < pair.second.size(); handle++) {
-                auto const thisPlugin = pair.second[handle];
-                if (EnergyPlus::UtilityRoutines::MakeUPPERCase(thisPlugin.emsAlias) == EnergyPlus::UtilityRoutines::MakeUPPERCase(programName)) {
-                    return {pair.first, handle};
-                }
+    int PluginManager::getLocationOfUserDefinedPlugin(std::string const &programName) {
+#if LINK_WITH_PYTHON == 1
+        for (size_t handle = 0; handle < plugins.size(); handle++) {
+            auto const thisPlugin = plugins[handle];
+            if (EnergyPlus::UtilityRoutines::MakeUPPERCase(thisPlugin.emsAlias) == EnergyPlus::UtilityRoutines::MakeUPPERCase(programName)) {
+                return handle;
             }
         }
-        return {-1, -1};
+        return -1;
+#endif
     }
-    void PluginManager::runSingleUserDefinedPlugin(int callingPoint, int index) {
-        plugins[callingPoint][index].run();
+
+    void PluginManager::runSingleUserDefinedPlugin(int index) {
+#if LINK_WITH_PYTHON == 1
+        plugins[index].run(DataGlobals::emsCallFromUserDefinedComponentModel);
+#endif
     }
 
 } // namespace PluginManagement

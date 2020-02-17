@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,22 +55,43 @@
 extern "C" {
 #endif
 
+// this is a silly little no-op to make sure this file and its symbols are included by the linker
 ENERGYPLUSLIB_API void dataTransferNoOp();
+
+// there are a few query functions for seeing what is available
+ENERGYPLUSLIB_API const char * listAllAPIDataCSV();
+ENERGYPLUSLIB_API int apiDataFullyReady();
+
+// functions to gain access to an Output:Variable value
 ENERGYPLUSLIB_API void requestVariable(const char* type, const char* key);
 ENERGYPLUSLIB_API int getVariableHandle(const char* type, const char* key);
-ENERGYPLUSLIB_API int getMeterHandle(const char* meterName);
-ENERGYPLUSLIB_API int getActuatorHandle(const char* uniqueKey, const char* componentType, const char* controlType);
 ENERGYPLUSLIB_API Real64 getVariableValue(int handle);
+
+// functions to gain access to output meters
+ENERGYPLUSLIB_API int getMeterHandle(const char* meterName);
 ENERGYPLUSLIB_API Real64 getMeterValue(int handle);
+
+// functions to gain access to actuators
+ENERGYPLUSLIB_API int getActuatorHandle(const char* uniqueKey, const char* componentType, const char* controlType);
+ENERGYPLUSLIB_API void resetActuator(int handle);
 ENERGYPLUSLIB_API void setActuatorValue(int handle, Real64 value);
+
+// functions to gain access to internal variables (static simulation data)
 ENERGYPLUSLIB_API int getInternalVariableHandle(const char* type, const char* key);
 ENERGYPLUSLIB_API Real64 getInternalVariableValue(int handle);
 
-// There are also a couple API points for Python Plugins specifically.  It is expected these will only
+// There are also a few API points for Python Plugins specifically.  It is expected these will only
 // be exposed through the plugin base class, not through the regular Python bindings.
 ENERGYPLUSLIB_API int getPluginGlobalVariableHandle(const char* name);
 ENERGYPLUSLIB_API Real64 getPluginGlobalVariableValue(int handle);
 ENERGYPLUSLIB_API void setPluginGlobalVariableValue(int handle, Real64 value);
+ENERGYPLUSLIB_API int getPluginTrendVariableHandle(const char* name);
+ENERGYPLUSLIB_API Real64 getPluginTrendVariableValue(int handle, int timeIndex);
+ENERGYPLUSLIB_API Real64 getPluginTrendVariableAverage(int handle, int count);
+ENERGYPLUSLIB_API Real64 getPluginTrendVariableMin(int handle, int count);
+ENERGYPLUSLIB_API Real64 getPluginTrendVariableMax(int handle, int count);
+ENERGYPLUSLIB_API Real64 getPluginTrendVariableSum(int handle, int count);
+ENERGYPLUSLIB_API Real64 getPluginTrendVariableDirection(int handle, int count);
 
 // Then there are a plethora of specialty one-off EMSVariable values that need to be accessible
 // We could certainly add to this list

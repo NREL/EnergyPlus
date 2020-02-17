@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -227,7 +227,7 @@ namespace EMSManager {
         } else {
             AnyEnergyManagementSystemInModel = false;
         }
-        AnyEnergyManagementSystemInModel = true;
+
         if (AnyEnergyManagementSystemInModel) {
 
             ScanForReports("EnergyManagementSystem", OutputEDDFile);
@@ -308,7 +308,11 @@ namespace EMSManager {
         InitEMS(iCalledFrom);
 
         // also call plugins and callbacks here for convenience
-        PluginManagement::runAnyRegisteredCallbacks(iCalledFrom);
+        bool anyPluginsOrCallbacksRan = false;
+        PluginManagement::runAnyRegisteredCallbacks(iCalledFrom, anyPluginsOrCallbacksRan);
+        if (anyPluginsOrCallbacksRan) {
+            anyProgramRan = true;
+        }
 
         if (iCalledFrom == emsCallFromSetupSimulation) {
             ProcessEMSInput(true);

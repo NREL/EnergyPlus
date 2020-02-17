@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/ElectricBaseboardRadiator.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 
@@ -263,14 +264,14 @@ TEST_F(EnergyPlusFixture, RadConvElecBaseboard_Test1)
 
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(); // read schedules
+    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton()); // read schedules
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
@@ -289,7 +290,7 @@ TEST_F(EnergyPlusFixture, RadConvElecBaseboard_Test1)
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(errorsFound);
+    SurfaceGeometry::GetSurfaceData(OutputFiles::getSingleton(), errorsFound);
     ASSERT_FALSE(errorsFound);
 
     DataZoneEquipment::GetZoneEquipmentData1();
@@ -307,7 +308,7 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
     bool FirstHVACIteration(false);
 
     std::string const idf_objects = delimited_string({
-        " Version,9.2;",
+        " Version,9.3;",
 
         "  Zone,",
         "    SPACE2-1,                !- Name",
@@ -556,14 +557,14 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
 
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(); // read schedules
+    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton()); // read schedules
 
     bool errorsFound(false);
-    HeatBalanceManager::GetProjectControlData(errorsFound); // read project control data
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), errorsFound); // read project control data
     EXPECT_FALSE(errorsFound);                              // expect no errors
 
     errorsFound = false;
-    HeatBalanceManager::GetMaterialData(errorsFound); // read material data
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errorsFound); // read material data
     EXPECT_FALSE(errorsFound);                        // expect no errors
 
     errorsFound = false;
@@ -585,7 +586,7 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(errorsFound);
+    SurfaceGeometry::GetSurfaceData(OutputFiles::getSingleton(), errorsFound);
     ASSERT_FALSE(errorsFound);
 
     DataZoneEquipment::GetZoneEquipmentData1();

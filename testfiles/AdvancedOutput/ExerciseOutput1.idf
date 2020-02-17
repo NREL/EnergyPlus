@@ -4,7 +4,7 @@
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
 !-   ===========  ALL OBJECTS IN CLASS: VERSION ===========
 
-  Version,9.2;
+  Version,9.3;
 
 !-   ===========  ALL OBJECTS IN CLASS: BUILDING ===========
 
@@ -298,7 +298,7 @@
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     Counterclockwise,        !- Vertex Entry Direction
-    WorldCoordinateSystem;   !- Coordinate System
+    World;                   !- Coordinate System
 
 !-   ===========  ALL OBJECTS IN CLASS: SURFACE:HEATTRANSFER ===========
 
@@ -1204,12 +1204,12 @@
   ZoneHVAC:EquipmentList,
     ZONE ONE Equipment,      !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    ZONE ONE Direct Air,     !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    ZONE ONE Direct Air ADU, !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
 !-   ===========  ALL OBJECTS IN CLASS: FURNACE:HEATCOOL ===========
 
@@ -1235,11 +1235,23 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: DIRECT AIR ===========
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     ZONE ONE Direct Air,     !- Name
     FanAndCoilAvailSched,    !- Availability Schedule Name
-    ZONE ONE Supply Inlet,   !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    ZONE ONE Supply Inlet ATInlet,  !- Air Inlet Node Name
+    ZONE ONE Supply Inlet,   !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    ZONE ONE Direct Air ADU, !- Name
+    ZONE ONE Supply Inlet,   !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    ZONE ONE Direct Air,     !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONE CONTROL:THERMOSTATIC ===========
 ! Student Exercise 2
@@ -1297,7 +1309,7 @@
   AirLoopHVAC:ZoneSplitter,
     AHU 1 Zone Splitter,     !- Name
     AHU 1 Zone Equip Inlet,  !- Inlet Node Name
-    ZONE ONE Supply Inlet;   !- Outlet 1 Node Name
+    ZONE ONE Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONE MIXER ===========
 
