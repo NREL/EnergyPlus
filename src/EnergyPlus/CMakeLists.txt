@@ -781,6 +781,18 @@ install( TARGETS energyplus energyplusapi DESTINATION ./ )
 if(LINK_WITH_PYTHON)
   # link the executable to the dll and bring it in
   get_filename_component(RESOLVED_PYTHON_LIBRARY "${PYTHON_LIBRARIES}" REALPATH)
+  if (WIN32)
+    # Windows is being ugly and linking against the Python DLL but not running unless it's close by
+    # Force it here.
+    add_custom_command(
+        TARGET energyplus
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND}
+          -DRESOLVED_PYTHON_LIB=${RESOLVED_PYTHON_LIBRARY}
+          -DEXECUTABLE_PATH=$<TARGET_FILE:energyplus>
+          -P ${CMAKE_SOURCE_DIR}/cmake/PythonGetLibAndLinkUp.cmake
+    )
+  endif()
   install(
     CODE
     "execute_process(
