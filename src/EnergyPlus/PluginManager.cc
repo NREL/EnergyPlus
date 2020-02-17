@@ -131,7 +131,7 @@ namespace PluginManagement {
                 // get the index of the global variable, fatal if it doesn't mach one
                 // validate type of data, update frequency, and look up units enum value
                 // call setup output variable - variable TYPE is "PythonPlugin:OutputVariable"
-                int variableHandle = this->getGlobalVariableHandle(varName);
+                int variableHandle = EnergyPlus::PluginManagement::PluginManager::getGlobalVariableHandle(varName);
                 if (variableHandle == -1) {
                     EnergyPlus::ShowSevereError("Failed to match Python Plugin Output Variable");
                     EnergyPlus::ShowContinueError("Trying to create output instance for variable name \"" + varName + "\"");

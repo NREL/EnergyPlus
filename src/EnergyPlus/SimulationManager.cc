@@ -423,6 +423,9 @@ namespace SimulationManager {
             MetersHaveBeenInitialized = true;
             SetupPollutionMeterReporting();
             SystemReports::AllocateAndSetUpVentReports();
+            if (EnergyPlus::PluginManagement::pluginManager) {
+                EnergyPlus::PluginManagement::pluginManager->setupOutputVariables();
+            }
             UpdateMeterReporting();
             CheckPollutionMeterReporting();
             facilityElectricServiceObj->verifyCustomMetersElecPowerMgr();
@@ -467,10 +470,6 @@ namespace SimulationManager {
             sqlite->sqliteBegin();
             sqlite->updateSQLiteSimulationRecord(1, DataGlobals::NumOfTimeStepInHour);
             sqlite->sqliteCommit();
-        }
-
-        if (EnergyPlus::PluginManagement::pluginManager) {
-            EnergyPlus::PluginManagement::pluginManager->setupOutputVariables();
         }
 
         GetInputForLifeCycleCost(); // must be prior to WriteTabularReports -- do here before big simulation stuff.
