@@ -437,6 +437,44 @@ namespace UtilityRoutines {
     bool case_insensitive_comparator::operator()(const std::string& a, const std::string& b) const noexcept {
         return SameString(a, b);
     }
+
+    void appendPerfLog(std::string const &colHeader, std::string const &colValue, bool finalColumn) 
+    // Add column to the performance log file (comma separated) which is appended to existing log.
+    // The finalColumn (an optional argument) being true triggers the actual file to be written or appended.
+    // J.Glazer February 2020
+    {
+        static std::string headerRow = "";
+        static std::string valuesRow = "";
+
+        //accumuate the row until ready to be written to the file.
+        headerRow = headerRow + colHeader + ",";
+        valuesRow = valuesRow + colValue + ",";
+
+        if (finalColumn) {
+            bool FileExists;
+            {
+                IOFlags flags;
+                ObjexxFCL::gio::inquire(DataStringGlobals::outputPerfLogFileName, flags);
+                FileExists = flags.exists();
+            }
+            // only write the header row if the file does not already exist
+            std::fstream fsPerfLog;
+            if (!FileExists) {
+                fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::out); //open file normally
+                if (!fsPerfLog.fail()) {
+                    fsPerfLog << headerRow << std::endl;
+                    fsPerfLog << valuesRow << std::endl;
+                }
+            } else {
+                fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::app); //append to already existing file
+                if (!fsPerfLog.fail()) {
+                    fsPerfLog << valuesRow << std::endl;
+                }
+            }
+            fsPerfLog.close();
+        }
+    }
+
 } // namespace UtilityRoutines
 
 int AbortEnergyPlus()
@@ -844,6 +882,7 @@ int EndEnergyPlus()
     Time_Finish = epElapsedTime();
     if (Time_Finish < Time_Start) Time_Finish += 24.0 * 3600.0;
     Elapsed_Time = Time_Finish - Time_Start;
+    UtilityRoutines::appendPerfLog("Run Time [seconds]", RoundSigDigits(Elapsed_Time, 2)); 
 #ifdef EP_Detailed_Timings
     epStopTime("EntireRun=");
 #endif
@@ -859,6 +898,10 @@ int EndEnergyPlus()
     ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsWarmup(NumWarningsDuringWarmup, NumSevereDuringWarmup);
     ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
     ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
+
+    UtilityRoutines::appendPerfLog("Run Time [string]", Elapsed); 
+    UtilityRoutines::appendPerfLog("Number of Warnings", NumWarnings);
+    UtilityRoutines::appendPerfLog("Number of Severe", NumSevere, true); //last item so write the perfLog file
 
     ShowMessage("EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
                 " Severe Errors.");

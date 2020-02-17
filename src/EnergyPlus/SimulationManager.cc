@@ -1354,6 +1354,33 @@ namespace SimulationManager {
         //    ENDIF
         // unused0909743 Format(' Display Extra Warnings',2(', ',A))
         //  ENDIF
+        writeIntialPerfLogValues();
+    }
+
+    void writeIntialPerfLogValues()
+    // write the input related portions of the .perflog
+    // J.Glazer February 2020
+    {
+        UtilityRoutines::appendPerfLog("Program, Version, TimeStamp", DataStringGlobals::VerString); // this string already includes three portions and has commas
+        UtilityRoutines::appendPerfLog("Use Coil Direct Solution", bool_to_string(DoCoilDirectSolutions));
+        if (HeatBalanceIntRadExchange::CarrollMethod) {
+            UtilityRoutines::appendPerfLog("Zone Radiant Exchange Algorithm", "CarrollMRT");
+        } else {
+            UtilityRoutines::appendPerfLog("Zone Radiant Exchange Algorithm", "ScriptF");
+        }
+        UtilityRoutines::appendPerfLog("Number of Timesteps per Hour", General::RoundSigDigits(DataGlobals::NumOfTimeStepInHour));
+        UtilityRoutines::appendPerfLog("Minimum Number of Warmup Days", General::RoundSigDigits(DataHeatBalance::MinNumberOfWarmupDays));
+        UtilityRoutines::appendPerfLog("SuppressAllBeginEnvironmentResets", bool_to_string(DataEnvironment::forceBeginEnvResetSuppress));
+        UtilityRoutines::appendPerfLog("MaxZoneTempDiff", General::RoundSigDigits(DataConvergParams::MaxZoneTempDiff));
+     }
+
+    std::string bool_to_string(bool logical)
+    {
+        if (logical) {
+            return("True");
+        } else {
+            return("False");
+        }
     }
 
     void CheckForMisMatchedEnvironmentSpecifications()
