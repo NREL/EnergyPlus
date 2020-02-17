@@ -779,16 +779,14 @@ add_custom_command(
 if(LINK_WITH_PYTHON)
   # link the executable to the dll and bring it in
   get_filename_component(RESOLVED_PYTHON_LIBRARY "${PYTHON_LIBRARIES}" REALPATH)
-#  message("execute_process(COMMAND \"${CMAKE_COMMAND}\" -DRESOLVED_PYTHON_LIB=\"${RESOLVED_PYTHON_LIBRARY}\" -DEXECUTABLE_PATH=\"\${CMAKE_INSTALL_PREFIX}/energyplus${CMAKE_EXECUTABLE_SUFFIX}\" -P \"${CMAKE_SOURCE_DIR}/cmake/PythonGetLibAndLinkUp.cmake\"")
-#  install(CODE "execute_process(COMMAND \"${CMAKE_COMMAND}\" -DRESOLVED_PYTHON_LIB=\"${RESOLVED_PYTHON_LIBRARY}\" -DEXECUTABLE_PATH=\"\${CMAKE_INSTALL_PREFIX}/energyplus${CMAKE_EXECUTABLE_SUFFIX}\" -P \"${CMAKE_SOURCE_DIR}/cmake/PythonGetLibAndLinkUp.cmake\")")
-#  add_custom_command(
-#    TARGET energyplus
-#    POST_BUILD
-#    COMMAND ${CMAKE_COMMAND}
-#          -DRESOLVED_PYTHON_LIB=${RESOLVED_PYTHON_LIBRARY}
-#          -DEXECUTABLE_PATH=$<TARGET_FILE:energyplus>
-#          -P ${CMAKE_SOURCE_DIR}/cmake/PythonGetLibAndLinkUp.cmake
-#  )
+  install(CODE
+      "execute_process(
+          COMMAND ${CMAKE_COMMAND}
+           -DRESOLVED_PYTHON_LIB=${RESOLVED_PYTHON_LIBRARY}
+           -DEXECUTABLE_PATH=\"\${CMAKE_INSTALL_PREFIX}/energyplus${CMAKE_EXECUTABLE_SUFFIX}\"
+            -P ${CMAKE_SOURCE_DIR}/cmake/PythonGetLibAndLinkUp.cmake
+      )"
+  )
   # along with the python standard lib
   add_custom_command(
           TARGET energyplus

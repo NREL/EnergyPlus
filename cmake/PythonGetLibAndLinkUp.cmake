@@ -23,11 +23,11 @@
 
 # set RESOLVED_PYTHON_LIB, and EXECUTABLE_PATH when calling
 
-message("Setting up Python Linking:\n RESOLVED_PYTHON_LIB: ${RESOLVED_PYTHON_LIB}\n EXECUTABLE_PATH: ${EXECUTABLE_PATH}")
+message("Setting up Python Linking:\n RESOLVED_PYTHON_LIB: "${RESOLVED_PYTHON_LIB}"\n EXECUTABLE_PATH: "${EXECUTABLE_PATH}"")
 
 # get some path info things
-get_filename_component(BASE_PATH "${EXECUTABLE_PATH}" DIRECTORY)
-get_filename_component(PYTHON_LIB_FILENAME "${RESOLVED_PYTHON_LIB}" NAME)
+get_filename_component(BASE_PATH ${EXECUTABLE_PATH} DIRECTORY)
+get_filename_component(PYTHON_LIB_FILENAME ${RESOLVED_PYTHON_LIB} NAME)
 
 # on Windows, RESOLVED_PYTHON_LIB is pointing to the likes of `C:\Python38\libs\python38.lib`,
 # when we actually want the DLL at `C:\Python38\python38.dll`
