@@ -54,12 +54,12 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataAirLoop.hh>
-#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/DataHVACControllers.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -263,31 +263,6 @@ namespace UnitarySystems {
                               Real64 &sysOutputProvided,
                               Real64 &latOutputProvided)
     {
-        simulateSys(Name,
-                    FirstHVACIteration,
-                    AirLoopNum,
-                    CompIndex,
-                    HeatActive,
-                    CoolActive,
-                    ZoneOAUnitNum,
-                    OAUCoilOutTemp,
-                    ZoneEquipment,
-                    sysOutputProvided,
-                    latOutputProvided);
-    }
-
-    void UnitarySys::simulate(std::string const &Name,
-                              bool const FirstHVACIteration,
-                              int const &AirLoopNum,
-                              int &CompIndex,
-                              bool &HeatActive,
-                              bool &CoolActive,
-                              int const ZoneOAUnitNum,
-                              Real64 const OAUCoilOutTemp,
-                              bool const ZoneEquipment)
-    {
-        Real64 sysOutputProvided = 0.0;
-        Real64 latOutputProvided = 0.0;
         simulateSys(Name,
                     FirstHVACIteration,
                     AirLoopNum,
@@ -529,7 +504,7 @@ namespace UnitarySystems {
         }
     } // namespace UnitarySystems
 
-    UnitarySys *UnitarySys::factory(int const object_type_of_num, std::string const objectName, bool const ZoneEquipment, int const ZoneOAUnitNum)
+    HVACSystemData *UnitarySys::factory(int const object_type_of_num, std::string const objectName, bool const ZoneEquipment, int const ZoneOAUnitNum)
     {
         if (UnitarySystems::getInputOnceFlag) {
             UnitarySys::getUnitarySystemInput(objectName, ZoneEquipment, ZoneOAUnitNum);
@@ -597,7 +572,7 @@ namespace UnitarySystems {
                     DataAirLoop::AirLoopControlInfo(AirLoopNum).UnitarySys = true;
                 DataAirLoop::AirLoopControlInfo(AirLoopNum).UnitarySysSimulating = true;
             }
-            this->sizeUnitarySystem(FirstHVACIteration, AirLoopNum);
+            this->sizeSystem(FirstHVACIteration, AirLoopNum);
             this->m_MySizingCheckFlag = false;
             if (AirLoopNum > 0) {
                 DataAirLoop::AirLoopControlInfo(AirLoopNum).FanOpMode = this->m_FanOpMode;
@@ -1445,7 +1420,7 @@ namespace UnitarySystems {
         }
     }
 
-    void UnitarySys::sizeUnitarySystem(bool const FirstHVACIteration, int const AirLoopNum)
+    void UnitarySys::sizeSystem(bool const FirstHVACIteration, int const AirLoopNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8941,8 +8916,7 @@ namespace UnitarySystems {
 
         FullSensibleOutput = TempSensOutput;
 
-        CpAir = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(this->CoolCoilInletNodeNum).HumRat,
-                                               DataLoopNode::Node(this->CoolCoilInletNodeNum).Temp);
+        CpAir = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(this->CoolCoilInletNodeNum).HumRat);
         CoolingOnlySensibleOutput = DataLoopNode::Node(this->CoolCoilInletNodeNum).MassFlowRate * CpAir *
                                     ((DataLoopNode::Node(this->NodeNumOfControlledZone).Temp - DataLoopNode::Node(this->CoolCoilOutletNodeNum).Temp) -
                                      (DataLoopNode::Node(this->HeatCoilOutletNodeNum).Temp - DataLoopNode::Node(this->HeatCoilInletNodeNum).Temp));
@@ -10031,10 +10005,8 @@ namespace UnitarySystems {
                 this->calcUnitaryHeatingSystem(AirLoopNum, FirstHVACIteration, HeatPLR, HeatingCompOn, OnOffAirFlowRatio, HeatCoilLoad);
                 if (DataLoopNode::Node(this->HeatCoilOutletNodeNum).Temp > this->DesignMaxOutletTemp && !this->m_SimASHRAEModel) {
                     Real64 MDotAir = DataLoopNode::Node(this->HeatCoilInletNodeNum).MassFlowRate;
-                    Real64 CpAirIn = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(this->HeatCoilInletNodeNum).HumRat,
-                                                                    DataLoopNode::Node(this->HeatCoilInletNodeNum).Temp);
-                    Real64 CpAirOut = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(this->HeatCoilOutletNodeNum).HumRat,
-                                                                     DataLoopNode::Node(this->HeatCoilOutletNodeNum).Temp);
+                    Real64 CpAirIn = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(this->HeatCoilInletNodeNum).HumRat);
+                    Real64 CpAirOut = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(this->HeatCoilOutletNodeNum).HumRat);
                     Real64 CpAir = (CpAirIn + CpAirOut) / 2;
                     Real64 HCDeltaT = this->DesignMaxOutletTemp - DataLoopNode::Node(this->HeatCoilInletNodeNum).Temp;
                     Real64 MaxHeatCoilLoad = MDotAir * CpAir * HCDeltaT;
@@ -10058,10 +10030,8 @@ namespace UnitarySystems {
                     this->calcUnitaryHeatingSystem(AirLoopNum, FirstHVACIteration, HeatPLR, HeatingCompOn, OnOffAirFlowRatio, HeatCoilLoad);
                     if (DataLoopNode::Node(this->HeatCoilOutletNodeNum).Temp > this->DesignMaxOutletTemp && !this->m_SimASHRAEModel) {
                         Real64 MDotAir = DataLoopNode::Node(this->HeatCoilInletNodeNum).MassFlowRate;
-                        Real64 CpAirIn = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(this->HeatCoilInletNodeNum).HumRat,
-                                                                        DataLoopNode::Node(this->HeatCoilInletNodeNum).Temp);
-                        Real64 CpAirOut = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(this->HeatCoilOutletNodeNum).HumRat,
-                                                                         DataLoopNode::Node(this->HeatCoilOutletNodeNum).Temp);
+                        Real64 CpAirIn = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(this->HeatCoilInletNodeNum).HumRat);
+                        Real64 CpAirOut = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(this->HeatCoilOutletNodeNum).HumRat);
                         Real64 CpAir = (CpAirIn + CpAirOut) / 2;
                         Real64 HCDeltaT = this->DesignMaxOutletTemp - DataLoopNode::Node(this->HeatCoilInletNodeNum).Temp;
                         Real64 MaxHeatCoilLoad = MDotAir * CpAir * HCDeltaT;
@@ -10076,10 +10046,8 @@ namespace UnitarySystems {
                 this->calcUnitaryHeatingSystem(AirLoopNum, FirstHVACIteration, HeatPLR, HeatingCompOn, OnOffAirFlowRatio, HeatCoilLoad);
                 if (DataLoopNode::Node(this->HeatCoilOutletNodeNum).Temp > this->DesignMaxOutletTemp && !this->m_SimASHRAEModel) {
                     Real64 MDotAir = DataLoopNode::Node(this->HeatCoilInletNodeNum).MassFlowRate;
-                    Real64 CpAirIn = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(this->HeatCoilInletNodeNum).HumRat,
-                                                                    DataLoopNode::Node(this->HeatCoilInletNodeNum).Temp);
-                    Real64 CpAirOut = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(this->HeatCoilOutletNodeNum).HumRat,
-                                                                     DataLoopNode::Node(this->HeatCoilOutletNodeNum).Temp);
+                    Real64 CpAirIn = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(this->HeatCoilInletNodeNum).HumRat);
+                    Real64 CpAirOut = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(this->HeatCoilOutletNodeNum).HumRat);
                     Real64 CpAir = (CpAirIn + CpAirOut) / 2;
                     Real64 HCDeltaT = this->DesignMaxOutletTemp - DataLoopNode::Node(this->HeatCoilInletNodeNum).Temp;
                     Real64 MaxHeatCoilLoad = MDotAir * CpAir * HCDeltaT;
@@ -10101,10 +10069,8 @@ namespace UnitarySystems {
                     this->calcUnitaryHeatingSystem(AirLoopNum, FirstHVACIteration, HeatPLR, HeatingCompOn, OnOffAirFlowRatio, HeatCoilLoad);
                     if (DataLoopNode::Node(this->HeatCoilOutletNodeNum).Temp > this->DesignMaxOutletTemp && !this->m_SimASHRAEModel) {
                         Real64 MDotAir = DataLoopNode::Node(this->HeatCoilInletNodeNum).MassFlowRate;
-                        Real64 CpAirIn = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(this->HeatCoilInletNodeNum).HumRat,
-                                                                        DataLoopNode::Node(this->HeatCoilInletNodeNum).Temp);
-                        Real64 CpAirOut = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(this->HeatCoilOutletNodeNum).HumRat,
-                                                                         DataLoopNode::Node(this->HeatCoilOutletNodeNum).Temp);
+                        Real64 CpAirIn = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(this->HeatCoilInletNodeNum).HumRat);
+                        Real64 CpAirOut = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(this->HeatCoilOutletNodeNum).HumRat);
                         Real64 CpAir = (CpAirIn + CpAirOut) / 2;
                         Real64 HCDeltaT = this->DesignMaxOutletTemp - DataLoopNode::Node(this->HeatCoilInletNodeNum).Temp;
                         Real64 MaxHeatCoilLoad = MDotAir * CpAir * HCDeltaT;
@@ -10131,10 +10097,8 @@ namespace UnitarySystems {
             this->calcUnitarySuppHeatingSystem(FirstHVACIteration, SuppPLR, SuppCoilLoad);
             if ((DataLoopNode::Node(this->m_SuppCoilAirOutletNode).Temp > this->DesignMaxOutletTemp) && SuppPLR > 0.0 && !this->m_SimASHRAEModel) {
                 Real64 MDotAir = DataLoopNode::Node(this->m_SuppCoilAirInletNode).MassFlowRate;
-                Real64 CpAirIn = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(this->m_SuppCoilAirInletNode).HumRat,
-                                                                DataLoopNode::Node(this->m_SuppCoilAirInletNode).Temp);
-                Real64 CpAirOut = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(this->m_SuppCoilAirOutletNode).HumRat,
-                                                                 DataLoopNode::Node(this->m_SuppCoilAirOutletNode).Temp);
+                Real64 CpAirIn = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(this->m_SuppCoilAirInletNode).HumRat);
+                Real64 CpAirOut = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(this->m_SuppCoilAirOutletNode).HumRat);
                 Real64 CpAir = (CpAirIn + CpAirOut) / 2;
                 Real64 HCDeltaT = max(0.0, this->DesignMaxOutletTemp - DataLoopNode::Node(this->m_SuppCoilAirInletNode).Temp);
                 Real64 MaxHeatCoilLoad = MDotAir * CpAir * HCDeltaT;
@@ -15507,6 +15471,36 @@ namespace UnitarySystems {
                 break;
             }
         }
+    }
+
+    int UnitarySys::getAirInNode(std::string const &UnitarySysName, int const ZoneOAUnitNum) {
+        if (UnitarySystems::getInputOnceFlag) {
+            getUnitarySystemInput(UnitarySysName, false, ZoneOAUnitNum);
+            UnitarySystems::getInputOnceFlag = false;
+        }
+        int airNode = 0;
+        for (int UnitarySysNum = 0; UnitarySysNum < numUnitarySystems; ++UnitarySysNum) {
+            if (UtilityRoutines::SameString(UnitarySysName, unitarySys[ UnitarySysNum ].Name)) {
+                airNode = this->AirInNode;
+                break;
+            }
+        }
+        return airNode;
+    }
+
+    int UnitarySys::getAirOutNode(std::string const &UnitarySysName, int const ZoneOAUnitNum) {
+        if (UnitarySystems::getInputOnceFlag) {
+            getUnitarySystemInput(UnitarySysName, false, ZoneOAUnitNum);
+            UnitarySystems::getInputOnceFlag = false;
+        }
+        int airNode = 0;
+        for (int UnitarySysNum = 0; UnitarySysNum < numUnitarySystems; ++UnitarySysNum) {
+            if (UtilityRoutines::SameString(UnitarySysName, unitarySys[ UnitarySysNum ].Name)) {
+                airNode = this->AirOutNode;
+                break;
+            }
+        }
+        return airNode;
     }
 
 } // namespace UnitarySystems

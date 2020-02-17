@@ -742,7 +742,7 @@ namespace DataSizing {
         }
     };
 
-    // Data Structure for air terminal sizing, referenced by ZoneHVAC:AirDistributionUnit and AirTerminal:SingleDuct:Uncontrolled
+    // Data Structure for air terminal sizing, referenced by ZoneHVAC:AirDistributionUnit
     struct AirTerminalSizingSpecData
     {
         // Members

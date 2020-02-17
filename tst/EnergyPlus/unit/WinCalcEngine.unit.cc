@@ -59,6 +59,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/WindowManager.hh>
 #include <EnergyPlus/WindowManagerExteriorData.hh>
 #include <WCEMultiLayerOptics.hpp>

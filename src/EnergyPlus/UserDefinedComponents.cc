@@ -2079,7 +2079,7 @@ namespace UserDefinedComponents {
                                                                              DataLoopNode::Node(this->Loop(LoopNum).InletNodeNum).Temp,
                                                                              DataPlant::PlantLoop(this->Loop(LoopNum).LoopNum).FluidIndex,
                                                                              RoutineName);
-        this->Loop(LoopNum).InletMassFlowRate = DataLoopNode::Node(this->Loop(LoopNum).InletNodeNum).MassFlowRate;
+         this->Loop(LoopNum).InletMassFlowRate = DataLoopNode::Node(this->Loop(LoopNum).InletNodeNum).MassFlowRate;
         this->Loop(LoopNum).InletTemp = DataLoopNode::Node(this->Loop(LoopNum).InletNodeNum).Temp;
         if (this->Air.InletNodeNum > 0) {
             this->Air.InletRho = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::OutBaroPress,
@@ -2087,7 +2087,7 @@ namespace UserDefinedComponents {
                                                                    DataLoopNode::Node(this->Air.InletNodeNum).HumRat,
                                                                    RoutineName);
             this->Air.InletCp =
-                Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(this->Air.InletNodeNum).HumRat, DataLoopNode::Node(this->Air.InletNodeNum).Temp);
+                Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(this->Air.InletNodeNum).HumRat);
             this->Air.InletTemp = DataLoopNode::Node(this->Air.InletNodeNum).Temp;
             this->Air.InletMassFlowRate = DataLoopNode::Node(this->Air.InletNodeNum).MassFlowRate;
             this->Air.InletHumRat = DataLoopNode::Node(this->Air.InletNodeNum).HumRat;
@@ -2142,8 +2142,7 @@ namespace UserDefinedComponents {
                                                                          DataLoopNode::Node(this->Air(loop).InletNodeNum).HumRat,
                                                                          RoutineName);
 
-            this->Air(loop).InletCp = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(this->Air(loop).InletNodeNum).HumRat,
-                                                                     DataLoopNode::Node(this->Air(loop).InletNodeNum).Temp);
+            this->Air(loop).InletCp = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(this->Air(loop).InletNodeNum).HumRat);
             this->Air(loop).InletTemp = DataLoopNode::Node(this->Air(loop).InletNodeNum).Temp;
             this->Air(loop).InletMassFlowRate = DataLoopNode::Node(this->Air(loop).InletNodeNum).MassFlowRate;
             this->Air(loop).InletHumRat = DataLoopNode::Node(this->Air(loop).InletNodeNum).HumRat;
@@ -2222,8 +2221,7 @@ namespace UserDefinedComponents {
                                                                    DataLoopNode::Node(this->ZoneAir.InletNodeNum).Temp,
                                                                    DataLoopNode::Node(this->ZoneAir.InletNodeNum).HumRat,
                                                                    RoutineName);
-        this->ZoneAir.InletCp = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(this->ZoneAir.InletNodeNum).HumRat,
-                                                               DataLoopNode::Node(this->ZoneAir.InletNodeNum).Temp);
+        this->ZoneAir.InletCp = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(this->ZoneAir.InletNodeNum).HumRat);
         this->ZoneAir.InletTemp = DataLoopNode::Node(this->ZoneAir.InletNodeNum).Temp;
         this->ZoneAir.InletHumRat = DataLoopNode::Node(this->ZoneAir.InletNodeNum).HumRat;
 
@@ -2232,8 +2230,7 @@ namespace UserDefinedComponents {
                                                                          DataLoopNode::Node(this->SourceAir.InletNodeNum).Temp,
                                                                          DataLoopNode::Node(this->SourceAir.InletNodeNum).HumRat,
                                                                          RoutineName);
-            this->SourceAir.InletCp = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(this->SourceAir.InletNodeNum).HumRat,
-                                                                     DataLoopNode::Node(this->SourceAir.InletNodeNum).Temp);
+            this->SourceAir.InletCp = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(this->SourceAir.InletNodeNum).HumRat);
             this->SourceAir.InletTemp = DataLoopNode::Node(this->SourceAir.InletNodeNum).Temp;
             this->SourceAir.InletHumRat = DataLoopNode::Node(this->SourceAir.InletNodeNum).HumRat;
         }
@@ -2310,8 +2307,7 @@ namespace UserDefinedComponents {
                                                                    DataLoopNode::Node(this->AirLoop.InletNodeNum).Temp,
                                                                    DataLoopNode::Node(this->AirLoop.InletNodeNum).HumRat,
                                                                    RoutineName);
-        this->AirLoop.InletCp = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(this->AirLoop.InletNodeNum).HumRat,
-                                                               DataLoopNode::Node(this->AirLoop.InletNodeNum).Temp);
+        this->AirLoop.InletCp = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(this->AirLoop.InletNodeNum).HumRat);
         this->AirLoop.InletTemp = DataLoopNode::Node(this->AirLoop.InletNodeNum).Temp;
         this->AirLoop.InletHumRat = DataLoopNode::Node(this->AirLoop.InletNodeNum).HumRat;
 
@@ -2320,8 +2316,7 @@ namespace UserDefinedComponents {
                                                                          DataLoopNode::Node(this->SourceAir.InletNodeNum).Temp,
                                                                          DataLoopNode::Node(this->SourceAir.InletNodeNum).HumRat,
                                                                          RoutineName);
-            this->SourceAir.InletCp = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(this->SourceAir.InletNodeNum).HumRat,
-                                                                     DataLoopNode::Node(this->SourceAir.InletNodeNum).Temp);
+            this->SourceAir.InletCp = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(this->SourceAir.InletNodeNum).HumRat);
             this->SourceAir.InletTemp = DataLoopNode::Node(this->SourceAir.InletNodeNum).Temp;
             this->SourceAir.InletHumRat = DataLoopNode::Node(this->SourceAir.InletNodeNum).HumRat;
         }

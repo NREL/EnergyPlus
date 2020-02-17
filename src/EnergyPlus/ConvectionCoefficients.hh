@@ -59,6 +59,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class OutputFiles;
 
 namespace ConvectionCoefficients {
 
@@ -553,7 +554,7 @@ namespace ConvectionCoefficients {
                                         Real64 const AirTemperature      // Mean Air Temperature of Zone (or adjacent air temperature)
     );
 
-    void SetupAdaptiveConvectionStaticMetaData();
+    void SetupAdaptiveConvectionStaticMetaData(EnergyPlus::OutputFiles &outputFiles);
 
     void SetupAdaptiveConvectionRadiantSurfaceData();
 
