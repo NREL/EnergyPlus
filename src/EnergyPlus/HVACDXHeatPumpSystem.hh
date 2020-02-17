@@ -190,9 +190,9 @@ namespace HVACDXHeatPumpSystem {
                                Array1<Real64> const &Par // par(1) = DX coil number
     );
 
-    int GetHeatingCoilInletNodeNum(std::string const &DXCoilSysName);
+    int GetHeatingCoilInletNodeNum(std::string const &DXCoilSysName, bool &InletNodeErrFlag);
 
-    int GetHeatingCoilOutletNodeNum(std::string const &DXCoilSysName);
+    int GetHeatingCoilOutletNodeNum(std::string const &DXCoilSysName, bool &OutletNodeErrFlag);
 
 
 } // namespace HVACDXHeatPumpSystem
