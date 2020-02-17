@@ -111,7 +111,7 @@ TEST_F(EnergyPlusFixture, Test_PerformancePrecisionTradeoffs_DirectSolution_Mess
 
     EXPECT_TRUE(process_idf(idf_objects, false));
 
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
 
     std::string const error_string = delimited_string({
         "   ** Warning ** PerformancePrecisionTradeoffs: Direct Solution Simulation is selected.",

@@ -1183,14 +1183,6 @@ namespace SimulationManager {
             }
         }
 
-        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <PerformancePrecisionTradeoffs:DirectSolution>, Simulation {{Yes/No}}, Direct Solution";
-        if (DoCoilDirectSolutions) {
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << " Direct Solution Simulation, Yes";
-            ShowWarningError("PerformancePrecisionTradeoffs: Direct Solution Simulation is selected.");
-        } else {
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << " Direct Solution Simulation, No";
-        }
-
         if (ErrorsFound) {
             ShowFatalError("Errors found getting Project Input");
         }
@@ -1257,6 +1249,17 @@ namespace SimulationManager {
         print(outputFiles.eio, " Simulation Control");
         for (Num = 1; Num <= 6; ++Num) {
             print(outputFiles.eio, ", {}", Alphas(Num));
+        }
+        print(outputFiles.eio, "\n");
+
+        print(outputFiles.eio,
+              "{}\n",
+              "! <Performance Precision Tradeoffs>, Use Coil Direct Simulation, Zone Radiant Exchange Algorithm");
+        if (DoCoilDirectSolutions) {
+            print(outputFiles.eio," Performance Precision Tradeoffs, Yes");
+            ShowWarningError("PerformancePrecisionTradeoffs: Direct Solution Simulation is selected.");
+        } else {
+            print(outputFiles.eio, " Performance Precision Tradeoffs, No");
         }
         print(outputFiles.eio, "\n");
 
