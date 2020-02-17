@@ -50,6 +50,7 @@
 
 #include <string>
 #include <vector>
+#include <EnergyPlus/DataHVACSystems.hh>
 
 namespace EnergyPlus {
 
@@ -115,7 +116,7 @@ namespace UnitarySystems {
         static void getDesignSpecMSHPdata(bool errorsFound);
     };
 
-    struct UnitarySys
+    struct UnitarySys : HVACSystemData
     {
 
         enum class ControlType : int
@@ -625,8 +626,6 @@ namespace UnitarySystems {
                                   Real64 &OnOffAirFlowRatio,
                                   Real64 &ZoneLoad);
 
-        void sizeUnitarySystem(bool const FirstHVACIteration, int const AirLoopNum);
-
         void setOnOffMassFlowRate(Real64 &OnOffAirFlowRatio, // ratio of coil on to coil off air flow rate
                                   Real64 const PartLoadRatio // coil part-load ratio
         );
@@ -711,31 +710,7 @@ namespace UnitarySystems {
 
         static void getUnitarySystemInputData(std::string const &Name, bool const ZoneEquipment, int const ZoneOAUnitNum, bool &errorsFound);
 
-        static UnitarySys *factory(int const object_type_of_num, std::string const objectName, bool const ZoneEquipment, int const ZoneOAUnitNum);
-
-        void simulate(std::string const &Name,
-                      bool const firstHVACIteration,
-                      int const &AirLoopNum,
-                      int &CompIndex,
-                      bool &HeatActive,
-                      bool &CoolActive,
-                      int const OAUnitNum,         // If the system is an equipment of OutdoorAirUnit
-                      Real64 const OAUCoilOutTemp, // the coil inlet temperature of OutdoorAirUnit
-                      bool const ZoneEquipment,    // TRUE if called as zone equipment
-                      Real64 &sysOutputProvided,   // sensible output at supply air node
-                      Real64 &latOutputProvided    // latent output at supply air node
-        );
-
-        void simulate(std::string const &Name,
-                      bool const firstHVACIteration,
-                      int const &AirLoopNum,
-                      int &CompIndex,
-                      bool &HeatActive,
-                      bool &CoolActive,
-                      int const OAUnitNum,         // If the system is an equipment of OutdoorAirUnit
-                      Real64 const OAUCoilOutTemp, // the coil inlet temperature of OutdoorAirUnit
-                      bool const ZoneEquipment     // TRUE if called as zone equipment
-        );
+        static HVACSystemData *factory(int const object_type_of_num, std::string const objectName, bool const ZoneEquipment, int const ZoneOAUnitNum);
 
         void simulateSys(std::string const &Name,
                          bool const firstHVACIteration,
@@ -774,6 +749,23 @@ namespace UnitarySystems {
         static Real64 calcUnitarySystemWaterFlowResidual(Real64 const PartLoadRatio,    // water mass flow rate [kg/s]
                                                          std::vector<Real64> const &Par // Function parameters
         );
+
+        void simulate(std::string const &Name,
+            bool const firstHVACIteration,
+            int const &AirLoopNum,
+            int &CompIndex,
+            bool &HeatActive,
+            bool &CoolActive,
+            int const OAUnitNum,         // If the system is an equipment of OutdoorAirUnit
+            Real64 const OAUCoilOutTemp, // the coil inlet temperature of OutdoorAirUnit
+            bool const ZoneEquipment,    // TRUE if called as zone equipment
+            Real64 &sysOutputProvided,   // sensible output at supply air node
+            Real64 &latOutputProvided    // latent output at supply air node
+        ) override;
+
+        void sizeSystem(bool const FirstHVACIteration, int const AirLoopNum) override;
+        int getAirInNode(std::string const &UnitarySysName, int const ZoneOAUnitNum)override;
+        int getAirOutNode(std::string const &UnitarySysName, int const ZoneOAUnitNum)override;
     };
 
     extern std::vector<UnitarySys> unitarySys;

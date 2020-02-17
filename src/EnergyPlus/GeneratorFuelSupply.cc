@@ -700,7 +700,7 @@ namespace GeneratorFuelSupply {
         // report Heating Values in EIO.
         print(outputFiles.eio, "! <Fuel Supply>, Fuel Supply Name, Lower Heating Value [J/kmol], Lower Heating Value [kJ/kg], Higher "
                                              "Heating Value [KJ/kg],  Molecular Weight [g/mol] \n");
-        static constexpr auto Format_501(" Fuel Supply, {},{:13.6T},{:13.6T},{:13.6T},{:13.6T}\n");
+        static constexpr auto Format_501(" Fuel Supply, {},{:13.6N},{:13.6N},{:13.6N},{:13.6N}\n");
         print(outputFiles.eio,
               Format_501,
               FuelSupply(FuelSupplyNum).Name,

@@ -45,25 +45,45 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef PlantReportingLoopSideReportVars_hh_INCLUDED
-#define PlantReportingLoopSideReportVars_hh_INCLUDED
+#ifndef DataHVACSystems_hh_INCLUDED
+#define DataHVACSystems_hh_INCLUDED
+
+// C++ Headers
+#include <string>
+
+// EnergyPlus Headers
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-namespace DataPlant {
 
-    struct LoopSideReportVars
-    {
-        // Members
-        Real64 LoopSetPtDemandAtInlet;
-        Real64 ThisSideLoadAlterations;
+    // base class for all HVAC systems
+    class HVACSystemData {
+
+    public:
 
         // Default Constructor
-        LoopSideReportVars() : LoopSetPtDemandAtInlet(0.0), ThisSideLoadAlterations(0.0)
-        {
+        HVACSystemData() {
         }
+
+        virtual void simulate(std::string const &Name,
+            bool const firstHVACIteration,
+            int const &AirLoopNum,
+            int &CompIndex,
+            bool &HeatActive,
+            bool &CoolActive,
+            int const OAUnitNum,         // If the system is an equipment of OutdoorAirUnit
+            Real64 const OAUCoilOutTemp, // the coil inlet temperature of OutdoorAirUnit
+            bool const ZoneEquipment,    // TRUE if called as zone equipment
+            Real64 &sysOutputProvided,   // sensible output at supply air node
+            Real64 &latOutputProvided    // latent output at supply air node
+        ) = 0;
+
+        virtual void sizeSystem(bool const FirstHVACIteration, int const AirLoopNum) = 0;
+        virtual int getAirInNode(std::string const &UnitarySysName, int const ZoneOAUnitNum) = 0;
+        virtual int getAirOutNode(std::string const &UnitarySysName, int const ZoneOAUnitNum) = 0;
+
     };
 
-} // namespace DataPlant
 } // namespace EnergyPlus
 
-#endif
+#endif // DataHVACSystems_hh_INCLUDED
