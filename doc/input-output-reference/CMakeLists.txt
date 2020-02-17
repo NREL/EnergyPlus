@@ -1,6 +1,7 @@
 
 # to get the list of input files, go to the root of the document folder, and:
 # grep -r '\\input{' * | cut -d ':' -f 2 | cut -c 8- | rev | cut -c 2- | rev | sed 's|^|  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/|g' | sed 's/$/.tex/g'
+SET( INCLUDED_TEX
   ${PROJECT_SOURCE_DIR}/doc/input-output-reference/media/ACBussDiagram.png
   ${PROJECT_SOURCE_DIR}/doc/input-output-reference/media/ACStorageBussDiagram.png
   ${PROJECT_SOURCE_DIR}/doc/input-output-reference/media/AirLoopComponentMatrix.png
@@ -198,15 +199,17 @@
 SET( SOURCE_FILENAME "input-output-reference" )
 SET( OUTPUT_FILENAME "InputOutputReference" )
 
+message("output: ${PROJECT_BINARY_DIR}/doc/${OUTPUT_FILENAME}.pdf")
+
 add_custom_command(
   OUTPUT ${PROJECT_BINARY_DIR}/doc/${OUTPUT_FILENAME}.pdf
-  COMMAND ${CMAKE_COMMAND} -DXELATEX=${XELATEX} -DINNAME=${SOURCE_FILENAME} -DOUTNAME=${OUTPUT_FILENAME} -DORIGINAL_PROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR} -DORIGINAL_PROJECT_BINARY_DIR=${PROJECT_BINARY_DIR} -DTEX_INTERACTION=${TEX_INTERACTION} -P ${PROJECT_SOURCE_DIR}/cmake/BuildDocumentation.cmake
+  COMMAND ${CMAKE_COMMAND} -DXELATEX=${XELATEX} -DINNAME=${SOURCE_FILENAME} -DOUTNAME=${OUTPUT_FILENAME} -DORIGINAL_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -DORIGINAL_CMAKE_BINARY_DIR=${PROJECT_BINARY_DIR} -DTEX_INTERACTION=${TEX_INTERACTION} -P ${CMAKE_SOURCE_DIR}/cmake/BuildDocumentation.cmake
   WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/doc/${SOURCE_FILENAME}
   DEPENDS ${INCLUDED_TEX} ${INCLUDED_IMAGES}
 )
 
 add_custom_target( zPDF_${OUTPUT_FILENAME}
-                   DEPENDS ${PROJECT_BINARY_DIR}/doc/${OUTPUT_FILENAME}.pdf
+                    DEPENDS ${PROJECT_BINARY_DIR}/doc/${OUTPUT_FILENAME}.pdf
                  )
 
 # Make top-level 'documentation' target depend on this one
