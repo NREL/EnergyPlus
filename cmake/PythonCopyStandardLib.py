@@ -5,7 +5,9 @@
 
 # this script must be called with a target directory to copy this into
 import ctypes
+from distutils.dir_util import copy_tree
 import os
+import platform
 import shutil
 import sys
 
@@ -25,6 +27,12 @@ ctypes_import_file = os.path.abspath(ctypes.__file__)
 ctypes_package_dir = os.path.dirname(ctypes_import_file)
 standard_lib_dir = os.path.dirname(ctypes_package_dir)
 shutil.copytree(standard_lib_dir, target_dir)
+
+# On Windows, we also need to grab the DLLs folder, which is one folder up
+if platform.system() == 'Windows':
+    python_root_dir = os.path.dirname(standard_lib_dir)
+    dll_dir = os.path.join(python_root_dir, 'DLLs')
+    copy_tree(dll_dir, target_dir)
 
 # then I'm going to try to clean up any __pycache__ folders in the target dir to reduce installer size
 for root, dirs, _ in os.walk(target_dir):
