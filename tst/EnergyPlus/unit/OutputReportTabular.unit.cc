@@ -77,6 +77,7 @@
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
@@ -7253,7 +7254,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputV
     // We do need to trick it into thinking it's a weather simulation, otherwise the monthly reports aren't reported
     DataGlobals::DoWeathSim = true; // flag to trick tabular reports to scan meters
 
-    OutputProcessor::GetReportVariableInput();
+    OutputProcessor::GetReportVariableInput(OutputFiles::getSingleton());
     OutputReportTabular::GetInputOutputTableSummaryReports();
     OutputReportTabular::InitializeTabularMonthly();
 
