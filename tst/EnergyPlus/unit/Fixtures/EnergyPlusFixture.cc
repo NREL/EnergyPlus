@@ -94,7 +94,7 @@
 #include <EnergyPlus/DataMoistureBalanceEMPD.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/DataPhotovoltaics.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -110,7 +110,6 @@
 #include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/DemandManager.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
-#include <EnergyPlus/DirectAirManager.hh>
 #include <EnergyPlus/DualDuct.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/EarthTube.hh>
@@ -177,7 +176,6 @@
 #include <EnergyPlus/PhotovoltaicThermalCollectors.hh>
 #include <EnergyPlus/PipeHeatTransfer.hh>
 #include <EnergyPlus/Pipes.hh>
-#include <EnergyPlus/Plant/PlantLoopSolver.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/PlantCentralGSHP.hh>
 #include <EnergyPlus/PlantChillers.hh>
@@ -366,7 +364,6 @@ void EnergyPlusFixture::clear_all_states()
     DaylightingManager::clear_state();
     DemandManager::clear_state();
     DesiccantDehumidifiers::clear_state();
-    DirectAirManager::clear_state();
     DualDuct::clear_state();
     DXCoils::clear_state();
     EarthTube::clear_state();
@@ -434,7 +431,6 @@ void EnergyPlusFixture::clear_all_states()
     PlantCondLoopOperation::clear_state();
     PlantHeatExchangerFluidToFluid::clear_state();
     PlantLoadProfile::clear_state();
-    PlantLoopSolver::clear_state();
     PlantManager::clear_state();
     PlantPipingSystemsManager::clear_state();
     PlantPipingSystemsManager::clear_state();

@@ -58,8 +58,8 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataPlant.hh>
+// #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>

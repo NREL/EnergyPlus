@@ -87,7 +87,6 @@ namespace MixedAir {
     extern int const OAMixer_Num;
     extern int const Fan_Simple_CV;
     extern int const Fan_Simple_VAV;
-    extern int const Fan_System_Object;
     extern int const WaterCoil_SimpleCool;
     extern int const WaterCoil_Cooling;
     extern int const WaterCoil_SimpleHeat;
@@ -105,8 +104,10 @@ namespace MixedAir {
     extern int const Fan_ComponentModel; // cpw22Aug2010 (new)
     extern int const DXHeatPumpSystem;
     extern int const Coil_UserDefined;
-    extern int const UnitarySystem;
     extern int const Humidifier;
+    extern int const Fan_System_Object;
+    extern int const UnitarySystem;
+    extern int const VRFTerminalUnit;
 
     extern int const ControllerOutsideAir;
     extern int const ControllerStandAloneERV;

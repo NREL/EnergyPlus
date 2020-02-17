@@ -82,7 +82,7 @@ extern "C" {
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataOutputs.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
@@ -410,12 +410,12 @@ namespace SimulationManager {
             SetupNodeVarsForReporting();
             MetersHaveBeenInitialized = true;
             SetupPollutionMeterReporting();
+            SystemReports::AllocateAndSetUpVentReports();
             UpdateMeterReporting();
             CheckPollutionMeterReporting();
             facilityElectricServiceObj->verifyCustomMetersElecPowerMgr();
             SetupPollutionCalculations();
             InitDemandManagers();
-
             TestBranchIntegrity(ErrFound);
             if (ErrFound) TerminalError = true;
             TestAirPathIntegrity(ErrFound);
@@ -437,7 +437,6 @@ namespace SimulationManager {
                 //      CALL ReportCompSetMeterVariables
                 //      CALL ReportParentChildren
             }
-
             CreateEnergyReportStructure();
             bool anyEMSRan;
             ManageEMS(emsCallFromSetupSimulation, anyEMSRan); // point to finish setup processing EMS, sensor ready now
@@ -1730,7 +1729,7 @@ namespace SimulationManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static constexpr auto EndOfDataFormat("End of Data\n"); // Signifies the end of the data block in the output file
+        static constexpr auto EndOfDataFormat("End of Data"); // Signifies the end of the data block in the output file
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -1875,7 +1874,7 @@ namespace SimulationManager {
         }
 
         // Close the Initialization Output File
-        print(outputFiles.eio, EndOfDataFormat);
+        print(outputFiles.eio, "{}\n", EndOfDataFormat);
         outputFiles.eio.close();
 
         // Close the Meters Output File
@@ -2315,7 +2314,7 @@ namespace SimulationManager {
                            PlantLoop(Count).LoopSide(LoopSideNum).NodeNameOut + ',' + PlantLoop(Count).LoopSide(LoopSideNum).BranchList + ',' +
                            PlantLoop(Count).LoopSide(LoopSideNum).ConnectList;
                 //  Plant Supply Side Splitter
-                if (PlantLoop(Count).LoopSide(LoopSideNum).SplitterExists) {
+                if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Exists) {
                     ObjexxFCL::gio::write(ChrOut, fmtLD) << PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes;
                     ObjexxFCL::gio::write(OutputFileBNDetails, Format_713) << "   Plant Loop Connector,Splitter," +
                                                                        PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name + ',' +
@@ -2375,7 +2374,7 @@ namespace SimulationManager {
                 }
 
                 //  Plant Supply Side Mixer
-                if (PlantLoop(Count).LoopSide(LoopSideNum).MixerExists) {
+                if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Exists) {
                     ObjexxFCL::gio::write(ChrOut, fmtLD) << PlantLoop(Count).LoopSide(LoopSideNum).Mixer.TotalInletNodes;
                     ObjexxFCL::gio::write(OutputFileBNDetails, Format_713)
                         << "   Plant Loop Connector,Mixer," + PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name + ',' +
@@ -2476,7 +2475,7 @@ namespace SimulationManager {
                            PlantLoop(Count).LoopSide(LoopSideNum).NodeNameOut + ',' + PlantLoop(Count).LoopSide(LoopSideNum).BranchList + ',' +
                            PlantLoop(Count).LoopSide(LoopSideNum).ConnectList;
                 //  Plant Supply Side Splitter
-                if (PlantLoop(Count).LoopSide(LoopSideNum).SplitterExists) {
+                if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Exists) {
                     ObjexxFCL::gio::write(ChrOut, fmtLD) << PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes;
                     ObjexxFCL::gio::write(OutputFileBNDetails, Format_713) << "   Plant Loop Connector,Splitter," +
                                                                        PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name + ',' +
