@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,13 +57,18 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputReports.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
+#include "Fixtures/SQLiteFixture.hh"
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::WeatherManager;
@@ -297,7 +302,7 @@ TEST_F(EnergyPlusFixture, UnderwaterBoundaryConditionFullyPopulated)
 
     // need to populate the OSCM array by calling the get input for it
     bool errorsFound = false;
-    SurfaceGeometry::GetOSCMData(errorsFound);
+    SurfaceGeometry::GetOSCMData(OutputFiles::getSingleton(), errorsFound);
     EXPECT_FALSE(errorsFound);
     EXPECT_EQ(DataSurfaces::TotOSCM, 1);
 
@@ -321,7 +326,7 @@ TEST_F(EnergyPlusFixture, UnderwaterBoundaryConditionMissingVelocityOK)
 
     // need to populate the OSCM array by calling the get input for it
     bool errorsFound = false;
-    SurfaceGeometry::GetOSCMData(errorsFound);
+    SurfaceGeometry::GetOSCMData(OutputFiles::getSingleton(), errorsFound);
     EXPECT_FALSE(errorsFound);
     EXPECT_EQ(DataSurfaces::TotOSCM, 1);
 
@@ -471,7 +476,6 @@ TEST_F(EnergyPlusFixture, WaterMainsOutputReports_CorrelationFromWeatherFileTest
     EXPECT_EQ(WeatherManager::WaterMainsTempsAnnualAvgAirTemp, 0.0);
     EXPECT_EQ(WeatherManager::WaterMainsTempsMaxDiffAirTemp, 0.0);
 
-    DataGlobals::OutputFileInits = GetNewUnitNumber();
     // set water mains temp parameters for CorrelationFromWeatherFile method
     OADryBulbAverage.AnnualAvgOADryBulbTemp = 9.99;
     OADryBulbAverage.MonthlyAvgOADryBulbTempMaxDiff = 28.78;
@@ -486,14 +490,14 @@ TEST_F(EnergyPlusFixture, WaterMainsOutputReports_CorrelationFromWeatherFileTest
                                                     "Annual Average Outdoor Air Temperature{C},"
                                                     "Maximum Difference In Monthly Average Outdoor Air Temperatures{deltaC},"
                                                     "Fixed Default Water Mains Temperature{C}",
-                                                    "Site Water Mains Temperature Information,CorrelationFromWeatherFile,NA,9.99,28.78,NA"});
+                                                    "Site Water Mains Temperature Information,CorrelationFromWeatherFile,NA,9.99,28.78,NA"}, "\n");
 
     EXPECT_TRUE(compare_eio_stream(eiooutput, true));
 }
 TEST_F(EnergyPlusFixture, ASHRAE_Tau2017ModelTest)
 {
     std::string const idf_objects = delimited_string({
-        "  Version,9.2;",
+        "  Version,9.3;",
 
         "  SizingPeriod:DesignDay,",
         "    Atlanta Jan 21 cooling,  !- Name",
@@ -622,7 +626,7 @@ TEST_F(EnergyPlusFixture, WeatherManager_NoLocation) {
 
     // GetNextEnvironment Will call ReadUserWeatherInput which calls inputProcessor, so let's use process_idf to create one Environment (Design Day)
     std::string const idf_objects = delimited_string({
-        "  Version,9.2;",
+        "  Version,9.3;",
 
         "  SizingPeriod:DesignDay,",
         "    Atlanta Jan 21 cooling,  !- Name",
@@ -661,7 +665,7 @@ TEST_F(EnergyPlusFixture, WeatherManager_NoLocation) {
 
     bool Available{false};
     bool ErrorsFound{false};
-    ASSERT_THROW(WeatherManager::GetNextEnvironment(Available, ErrorsFound), std::runtime_error);
+    ASSERT_THROW(WeatherManager::GetNextEnvironment(OutputFiles::getSingleton(), Available, ErrorsFound), std::runtime_error);
     ASSERT_TRUE(ErrorsFound);
 
     std::string const error_string = delimited_string({
@@ -677,4 +681,137 @@ TEST_F(EnergyPlusFixture, WeatherManager_NoLocation) {
     EXPECT_TRUE(compare_err_stream(error_string, true));
     EXPECT_EQ(1, WeatherManager::NumOfEnvrn);
     EXPECT_EQ(WeatherManager::Environment(1).KindOfEnvrn, DataGlobals::ksDesignDay);
+}
+
+// Test for https://github.com/NREL/EnergyPlus/issues/7550
+TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
+{
+    EnergyPlus::sqlite->sqliteBegin();
+    EnergyPlus::sqlite->createSQLiteSimulationsRecord(1, "EnergyPlus Version", "Current Time");
+
+    OutputReportTabular::WriteTabularFiles = true;
+    OutputReportTabular::displayEioSummary = true;
+
+    std::string const idf_objects = delimited_string({
+        "Version,9.2;",
+
+        "Site:Location,",
+        "  Changsha_Hunan_CHN Design_Conditions,   !- Location Name",
+        "  28.22,                                  !- Latitude {N+ S-}",
+        "  112.92,                                 !- Longitude {W- E+}",
+        "  8.00,                                   !- Time Zone Relative to GMT {GMT+/-}",
+        "  68.00;                                  !- Elevation {m}",
+
+        "SizingPeriod:DesignDay,",
+        "  Changsha Ann Clg .4% Condns Enth=>MDB,  !- Name",
+        "  7,                                      !- Month",
+        "  21,                                     !- Day of Month",
+        "  SummerDesignDay,                        !- Day Type",
+        "  33,                                     !- Maximum Dry-Bulb Temperature {C}",
+        "  6.6,                                    !- Daily Dry-Bulb Temperature Range {deltaC}",
+        "  DefaultMultipliers,                     !- Dry-Bulb Temperature Range Modifier Type",
+        "  ,                                       !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+        "  Enthalpy,                               !- Humidity Condition Type",
+        "  ,                                       !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+        "  ,                                       !- Humidity Condition Day Schedule Name",
+        "  ,                                       !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+        "  90500.0,                                !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+        "  ,                                       !- Daily Wet-Bulb Temperature Range {deltaC}",
+        "  100511.,                                !- Barometric Pressure {Pa}",
+        "  3.2,                                    !- Wind Speed {m/s}",
+        "  220,                                    !- Wind Direction {deg}",
+        "  No,                                     !- Rain Indicator",
+        "  No,                                     !- Snow Indicator",
+        "  No,                                     !- Daylight Saving Time Indicator",
+        "  ASHRAETau,                              !- Solar Model Indicator",
+        "  ,                                       !- Beam Solar Day Schedule Name",
+        "  ,                                       !- Diffuse Solar Day Schedule Name",
+        "  0.773,                                  !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+        "  1.428;                                  !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+    });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    SimulationManager::OpenOutputFiles();
+    // reset eio stream
+    compare_eio_stream("", true);
+
+    bool ErrorsFound(false);
+    DataEnvironment::TotDesDays = 1;
+    // setup environment state
+    Environment.allocate(DataEnvironment::TotDesDays);
+    DesignDay.allocate(DataEnvironment::TotDesDays);
+
+    Environment(1).DesignDayNum = 1;
+    DataGlobals::MinutesPerTimeStep = 60;
+    DataGlobals::NumOfTimeStepInHour = 1;
+    DataGlobals::BeginSimFlag = true;
+    DataReportingFlags::DoWeatherInitReporting = true;
+
+    WeatherManager::SetupInterpolationValues();
+    WeatherManager::AllocateWeatherData();
+
+    WeatherManager::GetDesignDayData(DataEnvironment::TotDesDays, ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+
+    WeatherManager::SetUpDesignDay(OutputFiles::getSingleton(), 1);
+    EXPECT_EQ(WeatherManager::DesDayInput(1).HumIndType, DDHumIndType_Enthalpy);
+    EXPECT_EQ(WeatherManager::DesDayInput(1).HumIndValue, 90500.0);
+
+    unsigned n_RH_not100 = 0;
+    for (int Hour = 1; Hour <= 24; ++Hour) {
+        for (int TS = 1; TS <= DataGlobals::NumOfTimeStepInHour; ++TS) {
+            EXPECT_GE(WeatherManager::TomorrowOutRelHum(TS, Hour), 0.);
+            EXPECT_LE(WeatherManager::TomorrowOutRelHum(TS, Hour), 100.);
+            if (WeatherManager::TomorrowOutRelHum(TS, Hour) < 100.) {
+                ++n_RH_not100;
+            }
+        }
+    }
+    EXPECT_TRUE(n_RH_not100 > 0) << "Expected at least one hour with RH below 100%";
+
+    // This actually doesn't end up in the EIO stream yet, it's written to a gio::out_stream
+    // That's why I used SQLiteFixture instead
+    std::string const eiooutput = delimited_string({
+        "! <Environment:Design Day Data>, Max Dry-Bulb Temp {C}, Temp Range {dC}, Temp Range Ind Type, Hum Ind Type, Hum Ind Value at Max Temp, Hum Ind Units, Pressure {Pa}, Wind Direction {deg CW from N}, Wind Speed {m/s}, Clearness, Rain, Snow",
+        "! <Environment:Design Day Misc>,DayOfYear,ASHRAE A Coeff,ASHRAE B Coeff,ASHRAE C Coeff,Solar Constant-Annual Variation,Eq of Time {minutes}, Solar Declination Angle {deg}, Solar Model",
+        "Environment:Design Day Data,33.00,6.60,DefaultMultipliers,Enthalpy,90500.00,{J/kgDryAir},100511,220,3.2,0.00,No,No",
+        "Environment:Design Day Misc,202,1084.4,0.2082,0.1365,1.0,-6.23,20.6,ASHRAETau",
+    }, "\n");
+
+    EXPECT_TRUE(compare_eio_stream(eiooutput, false));
+
+    OutputReportTabular::WriteEioTables(OutputFiles::getSingleton());
+
+
+    // Close output files *after* the EIO has been written to
+    SimulationManager::CloseOutputFiles(OutputFiles::getSingleton());
+
+    EnergyPlus::sqlite->sqliteCommit();
+
+    std::vector<std::tuple<std::string, std::string>> results_strings({
+        {"Hum Ind Value at Max Temp", "90500.00"},
+        {"Hum Ind Type", "Enthalpy"},
+        {"Hum Ind Units", "{J/kgDryAir}"}
+    });
+
+    std::string columnName;
+    std::string expectedValue;
+    for (auto v : results_strings) {
+
+        columnName = std::get<0>(v);
+        expectedValue = std::get<1>(v);
+
+        std::string query("SELECT Value From TabularDataWithStrings"
+                          "  WHERE ReportName = 'Initialization Summary'"
+                          "  AND TableName = 'Environment:Design Day Data'"
+                          "  AND ColumnName = '" + columnName + "'");
+
+        std::string value = queryResult(query, "TabularDataWithStrings")[0][0];
+
+        // Add informative message if failed
+        EXPECT_EQ(value, expectedValue) << "Failed for ColumnName=" << columnName;
+    }
+
+
 }

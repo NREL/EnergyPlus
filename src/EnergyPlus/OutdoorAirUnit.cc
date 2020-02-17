@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -61,7 +61,7 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaceLists.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -2196,7 +2196,7 @@ namespace OutdoorAirUnit {
                     WHCoilInletNode = OutAirUnit(OAUnitNum).OAEquip(EquipNum).CoilAirInletNode;
                     WHCoilOutletNode = OutAirUnit(OAUnitNum).OAEquip(EquipNum).CoilAirOutletNode;
 
-                    CpAirZn = PsyCpAirFnWTdb(Node(WHCoilInletNode).HumRat, Node(WHCoilInletNode).Temp);
+                    CpAirZn = PsyCpAirFnW(Node(WHCoilInletNode).HumRat);
 
                     if ((OpMode == NeutralMode) || (OpMode == CoolingMode) || (Node(WHCoilInletNode).Temp > CompAirOutTemp)) {
                         QCompReq = 0.0;
@@ -2260,7 +2260,7 @@ namespace OutdoorAirUnit {
                     WCCoilInletNode = OutAirUnit(OAUnitNum).OAEquip(EquipNum).CoilAirInletNode;
                     WCCoilOutletNode = OutAirUnit(OAUnitNum).OAEquip(EquipNum).CoilAirOutletNode;
 
-                    CpAirZn = PsyCpAirFnWTdb(Node(WCCoilInletNode).HumRat, Node(WCCoilInletNode).Temp);
+                    CpAirZn = PsyCpAirFnW(Node(WCCoilInletNode).HumRat);
                     OAMassFlow = OutAirUnit(OAUnitNum).OutAirMassFlow;
                     if ((OpMode == NeutralMode) || (OpMode == HeatingMode) || (Node(WCCoilInletNode).Temp < CompAirOutTemp)) {
                         QCompReq = 0.0;
@@ -2310,7 +2310,7 @@ namespace OutdoorAirUnit {
                     WCCoilInletNode = OutAirUnit(OAUnitNum).OAEquip(EquipNum).CoilAirInletNode;
                     WCCoilOutletNode = OutAirUnit(OAUnitNum).OAEquip(EquipNum).CoilAirOutletNode;
 
-                    CpAirZn = PsyCpAirFnWTdb(Node(WCCoilInletNode).HumRat, Node(WCCoilInletNode).Temp);
+                    CpAirZn = PsyCpAirFnW(Node(WCCoilInletNode).HumRat);
                     OAMassFlow = OutAirUnit(OAUnitNum).OutAirMassFlow;
 
                     if ((OpMode == NeutralMode) || (OpMode == HeatingMode) || (Node(WCCoilInletNode).Temp < CompAirOutTemp)) {
@@ -2356,7 +2356,7 @@ namespace OutdoorAirUnit {
                     }
                     WCCoilInletNode = OutAirUnit(OAUnitNum).OAEquip(EquipNum).CoilAirInletNode;
                     WCCoilOutletNode = OutAirUnit(OAUnitNum).OAEquip(EquipNum).CoilAirOutletNode;
-                    CpAirZn = PsyCpAirFnWTdb(Node(WCCoilInletNode).HumRat, Node(WCCoilInletNode).Temp);
+                    CpAirZn = PsyCpAirFnW(Node(WCCoilInletNode).HumRat);
                     OAMassFlow = OutAirUnit(OAUnitNum).OutAirMassFlow;
                     if ((OpMode == NeutralMode) || (OpMode == HeatingMode) || (Node(WCCoilInletNode).Temp < CompAirOutTemp)) {
                         QCompReq = 0.0;
@@ -2417,10 +2417,21 @@ namespace OutdoorAirUnit {
                     } else {
                         Dxsystemouttemp = CompAirOutTemp - FanEffect;
                     }
+                    Real64 sensOut = 0.0;
+                    Real64 latOut = 0.0;
                     OutAirUnit(OAUnitNum)
                         .OAEquip(SimCompNum)
-                        .compPointer->simulate(
-                            EquipName, FirstHVACIteration, -1, DXSystemIndex, HeatActive, CoolActive, UnitNum, Dxsystemouttemp, false);
+                        .compPointer->simulate(EquipName,
+                                               FirstHVACIteration,
+                                               -1,
+                                               DXSystemIndex,
+                                               HeatActive,
+                                               CoolActive,
+                                               UnitNum,
+                                               Dxsystemouttemp,
+                                               false,
+                                               sensOut,
+                                               latOut);
                 }
 
             } else {
@@ -2497,7 +2508,7 @@ namespace OutdoorAirUnit {
                 if ((OpMode == NeutralMode) || (OpMode == CoolingMode) || (Node(InletNode).Temp > CoilAirOutTemp)) {
                     QCompReq = 0.0;
                 } else {
-                    CpAirZn = PsyCpAirFnWTdb(Node(InletNode).HumRat, Node(InletNode).Temp);
+                    CpAirZn = PsyCpAirFnW(Node(InletNode).HumRat);
                     QCompReq = Node(InletNode).MassFlowRate * CpAirZn * ((CoilAirOutTemp - Node(InletNode).Temp) - FanEffect);
                     if (std::abs(QCompReq) < SmallLoad) QCompReq = 0.0;
                 }
@@ -2521,7 +2532,7 @@ namespace OutdoorAirUnit {
                     QCompReq = 0.0;
                 } else {
                     Node(OutletNode).MassFlowRate = Node(InletNode).MassFlowRate;
-                    CpAirZn = PsyCpAirFnWTdb(Node(InletNode).HumRat, Node(InletNode).Temp);
+                    CpAirZn = PsyCpAirFnW(Node(InletNode).HumRat);
                     QCompReq = Node(InletNode).MassFlowRate * CpAirZn * ((CoilAirOutTemp - Node(InletNode).Temp) - FanEffect);
                     if (std::abs(QCompReq) < SmallLoad) QCompReq = 0.0;
                 }
@@ -2543,7 +2554,7 @@ namespace OutdoorAirUnit {
                 if ((OpMode == NeutralMode) || (OpMode == CoolingMode) || (Node(InletNode).Temp > CoilAirOutTemp)) {
                     QCompReq = 0.0;
                 } else {
-                    CpAirZn = PsyCpAirFnWTdb(Node(InletNode).HumRat, Node(InletNode).Temp);
+                    CpAirZn = PsyCpAirFnW(Node(InletNode).HumRat);
                     QCompReq = Node(InletNode).MassFlowRate * CpAirZn * ((CoilAirOutTemp - Node(InletNode).Temp) - FanEffect);
                     if (std::abs(QCompReq) < SmallLoad) QCompReq = 0.0;
                 }

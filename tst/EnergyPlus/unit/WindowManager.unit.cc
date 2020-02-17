@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -74,6 +74,7 @@
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SolarShading.hh>
@@ -431,9 +432,9 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
 
     createFacilityElectricPowerServiceObject();
     HeatBalanceManager::SetPreConstructionInputParameters();
-    HeatBalanceManager::GetProjectControlData(ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound);
     HeatBalanceManager::GetFrameAndDividerData(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     HeatBalanceManager::GetBuildingData(ErrorsFound);
 
@@ -588,7 +589,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
 
     std::string const idf_objects = delimited_string({
 
-        "  Version,9.2;",
+        "  Version,9.3;",
 
         "  Building,",
         "    Small Office with AirflowNetwork model,  !- Name",
@@ -2448,10 +2449,10 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
     bool FoundError = false;
 
-    HeatBalanceManager::GetProjectControlData(FoundError); // read project control data
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), FoundError); // read project control data
     EXPECT_FALSE(FoundError);                              // expect no errors
 
     HeatBalanceManager::SetPreConstructionInputParameters();
@@ -2460,7 +2461,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
 
     HeatBalanceManager::GetWindowGlassSpectralData(FoundError);
     EXPECT_FALSE(FoundError);
-    HeatBalanceManager::GetMaterialData(FoundError);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), FoundError);
     EXPECT_FALSE(FoundError);
 
     HeatBalanceManager::GetFrameAndDividerData(FoundError);
@@ -2472,7 +2473,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
     HeatBalanceManager::GetZoneData(FoundError); // Read Zone data from input file
     EXPECT_FALSE(FoundError);
 
-    SurfaceGeometry::GetGeometryParameters(FoundError);
+    SurfaceGeometry::GetGeometryParameters(OutputFiles::getSingleton(), FoundError);
     EXPECT_FALSE(FoundError);
 
     SurfaceGeometry::CosZoneRelNorth.allocate(4);
@@ -2493,7 +2494,7 @@ TEST_F(EnergyPlusFixture, SpectralAngularPropertyTest)
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(FoundError); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(OutputFiles::getSingleton(), FoundError); // setup zone geometry and get zone data
     EXPECT_FALSE(FoundError);                    // expect no errors
 
     WindowManager::InitGlassOpticalCalculations();
@@ -2648,14 +2649,14 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
                           "  autocalculate;           !- Volume {m3}"});
 
     ASSERT_TRUE(process_idf(idf_objects));
-    ScheduleManager::ProcessScheduleInput();
+    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
     DataHeatBalance::ZoneIntGain.allocate(1);
 
     createFacilityElectricPowerServiceObject();
     HeatBalanceManager::SetPreConstructionInputParameters();
-    HeatBalanceManager::GetProjectControlData(ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound);
     HeatBalanceManager::GetFrameAndDividerData(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     HeatBalanceManager::GetBuildingData(ErrorsFound);
 
@@ -2790,3 +2791,51 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     // Test if LWR from surrounding surfaces correctly calculated
     EXPECT_DOUBLE_EQ(StefanBoltzmann * 0.84 * 0.6 * (pow_4(25.0 + KelvinConv) - pow_4(thetas(1))), DataHeatBalSurface::QRadLWOutSrdSurfs(2));
 }
+TEST_F(EnergyPlusFixture, WindowMaterialComplexShadeTest)
+{
+
+   std::string const idf_objects =
+        delimited_string({ 
+   "WindowMaterial:ComplexShade,",
+    "Shade_14_Layer,          !- Name",
+    "VenetianHorizontal,      !- Layer Type",
+    "1.016000e-003,           !- Thickness {m}",
+    "1.592276e+002,           !- Conductivity {W / m - K}",
+    "0.000000e+000,           !- IR Transmittance",
+    "0.9,                     !- Front Emissivity",
+    "0.9,                       !- Back Emissivity",
+    "0.000000e+000,           !- Top Opening Multiplier",
+    "0.000000e+000,           !- Bottom Opening Multiplier",
+    "0.000000e+000,           !- Left Side Opening Multiplier",
+    "0.000000e+000,           !- Right Side Opening Multiplier",
+    "5.000000e-002,           !- Front Opening Multiplier",
+    "0.0254,                  !- Slat Width {m}",
+    "0.0201,                  !- Slat Spacing {m}",
+    "0.0010,                  !- Slat Thickness {m}",
+    "45.0000,                 !- Slat Angle {deg}",
+    "159.2276,                !- Slat Conductivity {W / m - K}",
+    "0.0000;                  !- Slat Curve {m}" });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool errors_found = false; 
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errors_found);
+    EXPECT_FALSE(errors_found);
+    EXPECT_EQ(DataHeatBalance::ComplexShade(1).Name, "SHADE_14_LAYER");
+    EXPECT_EQ(DataHeatBalance::ComplexShade(1).LayerType, 1);
+    EXPECT_NEAR(DataHeatBalance::ComplexShade(1).Thickness, 1.016000e-003, 1e-5);
+    EXPECT_NEAR(DataHeatBalance::ComplexShade(1).Conductivity, 1.592276e+002, 1e-5);
+    EXPECT_NEAR(DataHeatBalance::ComplexShade(1).IRTransmittance, 0, 1e-5);
+    EXPECT_NEAR(DataHeatBalance::ComplexShade(1).FrontEmissivity, 0.9,1e-5);
+    EXPECT_NEAR(DataHeatBalance::ComplexShade(1).BackEmissivity, 0.9,1e-5);
+    EXPECT_NEAR(DataHeatBalance::ComplexShade(1).TopOpeningMultiplier, 0, 1e-5);
+    EXPECT_NEAR(DataHeatBalance::ComplexShade(1).BottomOpeningMultiplier, 0, 1e-5);
+    EXPECT_NEAR(DataHeatBalance::ComplexShade(1).LeftOpeningMultiplier, 0, 1e-5);
+    EXPECT_NEAR(DataHeatBalance::ComplexShade(1).RightOpeningMultiplier, 0, 1e-5);
+    EXPECT_NEAR(DataHeatBalance::ComplexShade(1).FrontOpeningMultiplier, 5.000000e-002, 1e-5);
+    EXPECT_NEAR(DataHeatBalance::ComplexShade(1).SlatWidth, 0.0254, 1e-5);
+    EXPECT_NEAR(DataHeatBalance::ComplexShade(1).SlatSpacing, 0.0201, 1e-5);
+    EXPECT_NEAR(DataHeatBalance::ComplexShade(1).SlatThickness, 0.0010, 1e-5);
+    EXPECT_NEAR(DataHeatBalance::ComplexShade(1).SlatAngle, 45.0, 1e-5);
+    EXPECT_NEAR(DataHeatBalance::ComplexShade(1).SlatConductivity, 159.2276, 1e-5);
+    EXPECT_NEAR(DataHeatBalance::ComplexShade(1).SlatCurve, 0, 1e-5);
+    }

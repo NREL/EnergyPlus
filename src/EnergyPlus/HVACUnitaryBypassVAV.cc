@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -61,7 +61,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneControls.hh>
@@ -315,7 +315,7 @@ namespace HVACUnitaryBypassVAV {
         if (CBVAV(CBVAVNum).modeChanged) {
             // set outlet node SP for mixed air SP manager
             DataLoopNode::Node(CBVAV(CBVAVNum).AirOutNode).TempSetPoint = CalcSetPointTempTarget(CBVAVNum);
-            if (CBVAV(CBVAVNum).OutNodeSPMIndex > 0) { // update mixed air SPM if exists
+            if (CBVAV(CBVAVNum).OutNodeSPMIndex > 0) {                                          // update mixed air SPM if exists
                 SetPointManager::MixedAirSetPtMgr(CBVAV(CBVAVNum).OutNodeSPMIndex).calculate(); // update mixed air SP based on new mode
                 SetPointManager::UpdateMixedAirSetPoints(); // need to know control node to fire off just one of these, do this later
             }
@@ -1521,8 +1521,8 @@ namespace HVACUnitaryBypassVAV {
             DataAirLoop::AirLoopControlInfo(AirLoopNum).UnitarySys = false;
             DataAirLoop::AirLoopControlInfo(AirLoopNum).FanOpMode = CBVAV(CBVAVNum).OpMode;
             // check for set point manager on outlet node of CBVAV
-            CBVAV(CBVAVNum).OutNodeSPMIndex =
-                SetPointManager::getSPMBasedOnNode(OutNode, SetPointManager::iCtrlVarType_Temp, SetPointManager::iSPMType_MixedAir, SetPointManager::CtrlNodeType::reference);
+            CBVAV(CBVAVNum).OutNodeSPMIndex = SetPointManager::getSPMBasedOnNode(
+                OutNode, SetPointManager::iCtrlVarType_Temp, SetPointManager::iSPMType_MixedAir, SetPointManager::CtrlNodeType::reference);
             MySizeFlag(CBVAVNum) = false;
         }
 
@@ -3339,8 +3339,7 @@ namespace HVACUnitaryBypassVAV {
                        (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingElectric) || (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingWater) ||
                        (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingSteam)) { // not a DX heating coil
                 if (CBVAV(CBVAVNum).HeatCoolMode == HeatingMode) {
-                    CpAir = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilInletNode).HumRat,
-                                                           DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilInletNode).Temp);
+                    CpAir = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilInletNode).HumRat);
                     QHeater = DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilInletNode).MassFlowRate * CpAir *
                               (CBVAV(CBVAVNum).CoilTempSetPoint - DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilInletNode).Temp);
                 } else {
@@ -3581,7 +3580,7 @@ namespace HVACUnitaryBypassVAV {
                 QToHeatSetPt = DataZoneEnergyDemands::ZoneSysEnergyDemand(CBVAV(CBVAVNumber).ControlledZoneNum(ZoneNum)).OutputRequiredToHeatingSP;
             }
 
-            Real64 CpSupplyAir = Psychrometrics::PsyCpAirFnWTdb(OutAirHumRat, OutAirTemp);
+            Real64 CpSupplyAir = Psychrometrics::PsyCpAirFnW(OutAirHumRat);
 
             // Find the supply air temperature that will force the box to full flow
             if (BoxOutletNodeNum > 0) {
@@ -3773,8 +3772,8 @@ namespace HVACUnitaryBypassVAV {
         return Residuum;
     }
 
-    void SetAverageAirFlow(int const CBVAVNum,           // Index to CBVAV system
-                           Real64 &OnOffAirFlowRatio    // Ratio of compressor ON airflow to average airflow over timestep
+    void SetAverageAirFlow(int const CBVAVNum,       // Index to CBVAV system
+                           Real64 &OnOffAirFlowRatio // Ratio of compressor ON airflow to average airflow over timestep
     )
     {
 
@@ -3798,8 +3797,7 @@ namespace HVACUnitaryBypassVAV {
         int MixerInletAirNode = CBVAV(CBVAVNum).MixerInletAirNode;     // Inlet air node number in OA mixer
 
         Real64 SystemMassFlow = 0.0; // System mass flow rate required for all zones [kg/s]
-        Real64 CpSupplyAir = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(OutletNode).HumRat,
-                                                            DataLoopNode::Node(OutletNode).Temp); // Specific heat of outlet air [J/kg-K]
+        Real64 CpSupplyAir = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(OutletNode).HumRat); // Specific heat of outlet air [J/kg-K]
         // Determine zone air flow
         for (int ZoneNum = 1; ZoneNum <= CBVAV(CBVAVNum).NumControlledZones; ++ZoneNum) {
             int ZoneNodeNum = CBVAV(CBVAVNum).ActualZoneNodeNum(ZoneNum);
@@ -3819,7 +3817,7 @@ namespace HVACUnitaryBypassVAV {
             } else {
                 ZoneLoad = DataZoneEnergyDemands::ZoneSysEnergyDemand(CBVAV(CBVAVNum).ControlledZoneNum(ZoneNum)).RemainingOutputRequired;
             }
-            Real64 CpZoneAir = Psychrometrics::PsyCpAirFnWTdb(DataLoopNode::Node(ZoneNodeNum).HumRat, DataLoopNode::Node(ZoneNodeNum).Temp);
+            Real64 CpZoneAir = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(ZoneNodeNum).HumRat);
             Real64 DeltaCpTemp = CpSupplyAir * DataLoopNode::Node(OutletNode).Temp - CpZoneAir * DataLoopNode::Node(ZoneNodeNum).Temp;
 
             // Need to check DeltaCpTemp and ensure that it is not zero

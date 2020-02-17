@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,7 +52,8 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-
+    class OutputFiles;
+    
 namespace HeatBalanceAirManager {
 
     // Data
@@ -79,16 +80,16 @@ namespace HeatBalanceAirManager {
 
     void GetAirHeatBalanceInput();
 
-    void GetAirFlowFlag(bool &ErrorsFound); // Set to true if errors found
+    void GetAirFlowFlag(OutputFiles &outputFiles, bool &ErrorsFound); // Set to true if errors found
 
     void SetZoneMassConservationFlag(); // sets the zone air mass flow variables
 
-    void GetSimpleAirModelInputs(bool &ErrorsFound); // IF errors found in input
+    void GetSimpleAirModelInputs(OutputFiles &outputFiles, bool &ErrorsFound); // IF errors found in input
 
     //*****************************************************************************************
     // This subroutine was moved from 'RoomAirManager' Module
 
-    void GetRoomAirModelParameters(bool &errFlag); // True if errors found during this input routine
+    void GetRoomAirModelParameters(OutputFiles &outputFiles, bool &errFlag); // True if errors found during this input routine
 
     // END of Get Input subroutines for the HBAir Module
     //******************************************************************************

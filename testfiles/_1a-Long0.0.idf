@@ -10,7 +10,7 @@
 ! Plant:    None.
 ! Modified:
 
-  Version,9.2;
+  Version,9.3;
 
   Site:Location,
     UNKNOWN,                 !- Name
@@ -1377,8 +1377,6 @@
   Output:Variable,*,Surface Outside Face Sunlit Area,timestep;
 
   Output:Variable,*,Surface Outside Face Sunlit Fraction,timestep;
-
-  report variable dictionary;
 
   Output:Variable,*,Site Solar Azimuth Angle,timestep;
 

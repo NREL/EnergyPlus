@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,8 +53,8 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/UnitarySystem.hh>
 
 namespace EnergyPlus {
 
@@ -111,12 +111,6 @@ namespace OutdoorAirUnit {
     extern Array1D_bool MySizeFlag;
     extern Array1D_bool CheckEquipName;
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE OUTDOOR AIR UNIT
-    // PRIVATE UpdateOutdoorAirUnit
-    // PUBLIC GetOutAirCoilOutletTemp
-
-    // Types
-
     struct OAEquipList
     {
         // Members
@@ -125,7 +119,7 @@ namespace OutdoorAirUnit {
         std::string ComponentType;
         int ComponentType_Num; // Parameterized Component Types this module can address
         int ComponentIndex;    // Which one in list -- updated by routines called from here
-        UnitarySystems::UnitarySys *compPointer;
+        HVACSystemData *compPointer;
         int CoilAirInletNode;
         int CoilAirOutletNode;
         int CoilWaterInletNode;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -65,6 +65,7 @@
 #include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
+#include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/Humidifiers.hh>
@@ -658,13 +659,17 @@ namespace AirLoopHVACDOAS {
 
                     } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM") {
                         OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) =
-                            OutsideAirSys(thisDOAS.m_OASystemNum).compPointer[CompNum]->AirInNode;
+                            OutsideAirSys(thisDOAS.m_OASystemNum)
+                                .compPointer[CompNum]
+                                ->getAirInNode(OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), 0);
                         if (OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) == 0) {
                             InletNodeErrFlag = true;
                             errorsFound = true;
                         }
                         OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) =
-                            OutsideAirSys(thisDOAS.m_OASystemNum).compPointer[CompNum]->AirOutNode;
+                            OutsideAirSys(thisDOAS.m_OASystemNum)
+                                .compPointer[CompNum]
+                                ->getAirOutNode(OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), 0);
                         if (OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) == 0) {
                             OutletNodeErrFlag = true;
                             errorsFound = true;
@@ -784,6 +789,16 @@ namespace AirLoopHVACDOAS {
                         OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) =
                             EvaporativeCoolers::GetOutletNodeNum(OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), errorsFound);
                         if (errorsFound) OutletNodeErrFlag = true;
+                    } else if (SELECT_CASE_var == "ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW") {
+                        OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) = HVACVariableRefrigerantFlow::GetVRFTUInAirNodeFromName(
+                            OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), errorsFound);
+                        if (errorsFound) {
+                            InletNodeErrFlag = true;
+                            errorsFound = false;
+                        }
+                        OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) = HVACVariableRefrigerantFlow::GetVRFTUOutAirNodeFromName(
+                            OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), errorsFound);
+                        if (errorsFound) OutletNodeErrFlag = true;
                     } else {
                         ShowSevereError(CurrentModuleObject + " = \"" + CompName + "\" invalid Outside Air Component=\"" +
                                         OutsideAirSys(thisDOAS.m_OASystemNum).ComponentType(CompNum) + "\".");
@@ -861,7 +876,7 @@ namespace AirLoopHVACDOAS {
                 auto AirLoopNames = fields.find("airloophvacs");
                 if (AirLoopNames != fields.end()) {
                     auto AirLoopArray = AirLoopNames.value();
-                    int num = 0;                   
+                    int num = 0;
                     for (auto AirLoopHAVCName : AirLoopArray) {
                         std::string name = AirLoopHAVCName.at("airloophvac_name");
                         int LoopNum = UtilityRoutines::FindItemInList(name, PrimaryAirSystem);
@@ -1088,27 +1103,27 @@ namespace AirLoopHVACDOAS {
             // Summer design day
             if (DesDayInput(i).DayType == summerDesignDayTypeIndex && SummerDesignDayFlag) {
                 this->SizingCoolOATemp = DesDayInput(i).MaxDryBulb;
-                if (DesDayInput(i).HumIndType == 0) { // wet bulb temperature
+                if (DesDayInput(i).HumIndType == WeatherManager::DDHumIndType_WetBulb) { // wet bulb temperature
                     this->SizingCoolOAHumRat =
                         Psychrometrics::PsyWFnTdbTwbPb(this->SizingCoolOATemp, DesDayInput(i).HumIndValue, DataEnvironment::StdPressureSeaLevel);
-                } else if (DesDayInput(i).HumIndType == 1) { // dewpoint
+                } else if (DesDayInput(i).HumIndType == WeatherManager::DDHumIndType_DewPoint) { // dewpoint
                     this->SizingCoolOAHumRat = Psychrometrics::PsyWFnTdpPb(DesDayInput(i).HumIndValue, DataEnvironment::StdPressureSeaLevel);
-                } else if (DesDayInput(i).HumIndType == 3) {
+                } else if (DesDayInput(i).HumIndType == WeatherManager::DDHumIndType_HumRatio) {
                     this->SizingCoolOAHumRat = DesDayInput(i).HumIndValue;
-                }
+                } // else { // What about other cases?
                 SummerDesignDayFlag = false;
             }
             // Winter design day
             if (DesDayInput(i).DayType == winterDesignDayTypeIndex && WinterDesignDayFlag) {
                 this->HeatOutTemp = DesDayInput(i).MaxDryBulb;
-                if (DesDayInput(i).HumIndType == 0) { // wet bulb temperature
+                if (DesDayInput(i).HumIndType == WeatherManager::DDHumIndType_WetBulb) { // wet bulb temperature
                     this->HeatOutHumRat =
                         Psychrometrics::PsyWFnTdbTwbPb(this->HeatOutTemp, DesDayInput(i).HumIndValue, DataEnvironment::StdPressureSeaLevel);
-                } else if (DesDayInput(i).HumIndType == 1) { // dewpoint
+                } else if (DesDayInput(i).HumIndType == WeatherManager::DDHumIndType_DewPoint) { // dewpoint
                     this->HeatOutHumRat = Psychrometrics::PsyWFnTdpPb(DesDayInput(i).HumIndValue, DataEnvironment::StdPressureSeaLevel);
-                } else if (DesDayInput(i).HumIndType == 3) {
+                } else if (DesDayInput(i).HumIndType == WeatherManager::DDHumIndType_HumRatio) {
                     this->HeatOutHumRat = DesDayInput(i).HumIndValue;
-                }
+                } // else { // What about other cases?
                 WinterDesignDayFlag = false;
             }
         }

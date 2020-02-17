@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -140,7 +140,8 @@ namespace StandardRatings {
 
     // Functions
 
-    void CalcChillerIPLV(std::string const &ChillerName,             // Name of Chiller for which IPLV is calculated
+    void CalcChillerIPLV(OutputFiles &outputFiles,
+                         std::string const &ChillerName,             // Name of Chiller for which IPLV is calculated
                          int const ChillerType,                      // Type of Chiller - EIR or Reformulated EIR
                          Real64 const RefCap,                        // Reference capacity of chiller [W]
                          Real64 const RefCOP,                        // Reference coefficient of performance [W/W]
@@ -150,17 +151,17 @@ namespace StandardRatings {
                          int const EIRFPLRCurveIndex,                // Index for the EIR vs part-load ratio curve
                          Real64 const MinUnloadRat,                  // Minimum unloading ratio
                          Real64 &IPLV,
-                         Optional<Real64 const> EvapVolFlowRate = _, // Reference water volumetric flow rate through the evaporator [m3/s]
-                         Optional_int_const CondLoopNum = _,         // condenser water plant loop index number
-                         Optional<Real64 const> OpenMotorEff = _     // Open chiller motor efficiency [fraction, 0 to 1]
-    );
+                         Optional<Real64 const> EvapVolFlowRate,
+                         Optional_int_const CondLoopNum,
+                         Optional<Real64 const> OpenMotorEff);
 
     Real64
     ReformEIRChillerCondInletTempResidual(Real64 const CondenserOutletTemp, // Condenser outlet temperature (boundary condition or guess value) [C]
                                           Array1<Real64> const &Par         // par(1)  = Condenser inlet temperature at AHRI Standard
     );
 
-    void ReportChillerIPLV(std::string const &ChillerName, // Name of Chiller for which IPLV is calculated
+    void ReportChillerIPLV(OutputFiles &outputFiles,
+                           std::string const &ChillerName, // Name of Chiller for which IPLV is calculated
                            int const ChillerType,          // Type of Chiller - EIR or Reformulated EIR
                            Real64 const IPLVValueSI,       // IPLV value in SI units {W/W}
                            Real64 const IPLVValueIP        // IPLV value in IP units {Btu/W-h}
@@ -174,6 +175,7 @@ namespace StandardRatings {
     );
 
     void CalcDXCoilStandardRating(
+        OutputFiles &outputFiles,
         std::string const &DXCoilName,                             // Name of DX coil for which HSPF is calculated
         std::string const &DXCoilType,                             // Type of DX coil for which HSPF is calculated
         int const DXCoilType_Num,                                  // Integer Type of DX coil - heating or cooling
@@ -292,7 +294,8 @@ namespace StandardRatings {
         Optional_int_const DefrostControl = _                      // defrost control; 1=timed, 2=on-demand
     );
 
-    void ReportDXCoilRating(std::string const &CompType,    // Type of component
+    void ReportDXCoilRating(OutputFiles &outputFiles,
+                            std::string const &CompType,    // Type of component
                             std::string const &CompName,    // Name of component
                             int const CompTypeNum,          // TypeNum of component
                             Real64 const CoolCapVal,        // Standard total (net) cooling capacity for AHRI Std. 210/240 {W}
@@ -306,7 +309,8 @@ namespace StandardRatings {
                             int const RegionNum             // Region Number for which HSPF is calculated
     );
 
-    void ReportDXCoolCoilDataCenterApplication(std::string const &CompType,           // Type of component
+    void ReportDXCoolCoilDataCenterApplication(OutputFiles &outputFiles,
+                                               std::string const &CompType,           // Type of component
                                                std::string const &CompName,           // Name of component
                                                int const CompTypeNum,                 // TypeNum of component
                                                Array1D<Real64> &NetCoolingCapRated,   // net cooling capacity of single speed DX cooling coil

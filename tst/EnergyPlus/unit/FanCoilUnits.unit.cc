@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -59,7 +59,7 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -69,6 +69,7 @@
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -260,7 +261,7 @@ TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilHeatingTest)
     EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
     GetZoneEquipmentData1();
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
     GetFanInput();
     EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
@@ -573,7 +574,7 @@ TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilCoolingTest)
     EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
     GetZoneEquipmentData1();
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
     GetFanInput();
     EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
@@ -884,7 +885,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
     EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
     GetZoneEquipmentData1();
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
     GetFanInput();
     EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
@@ -1262,7 +1263,7 @@ TEST_F(EnergyPlusFixture, ElectricCoilFanCoilHeatingTest)
     EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
     GetZoneEquipmentData1();
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
     GetFanInput();
     EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
@@ -1581,7 +1582,7 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilCoolingTest)
     EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
     GetZoneEquipmentData1();
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
     GetFanInput();
     EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
@@ -1937,7 +1938,7 @@ TEST_F(EnergyPlusFixture, FanCoil_ASHRAE90VariableFan)
     EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
     GetZoneEquipmentData1();
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
     GetFanInput();
     EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
@@ -2270,7 +2271,7 @@ TEST_F(EnergyPlusFixture, Test_TightenWaterFlowLimits)
 
     GetZoneData(ErrorsFound);
     GetZoneEquipmentData1();
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
     SetPredefinedTables();
     GetFanInput();
@@ -2333,7 +2334,7 @@ TEST_F(EnergyPlusFixture, Test_TightenWaterFlowLimits)
     DataEnvironment::DayOfYear_Schedule = 1;
     DataEnvironment::DayOfWeek = 2;
     DataGlobals::HourOfDay = 1;
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     UpdateScheduleValues();
 
     // fan coil can hit maximum iterations while trying to find the water mass flow rate to meet the load. In this case RegulaFalsi will return -1.
@@ -2644,7 +2645,7 @@ TEST_F(EnergyPlusFixture, FanCoil_CyclingFanMode)
     EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
     GetZoneEquipmentData1();
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
     GetFanInput();
     EXPECT_EQ(DataHVACGlobals::FanType_SimpleOnOff, Fan(1).FanType_Num);
@@ -3060,7 +3061,7 @@ TEST_F(EnergyPlusFixture, FanCoil_FanSystemModelCyclingFanMode)
     EXPECT_EQ("EAST ZONE", Zone(1).Name);
 
     GetZoneEquipmentData1();
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
 
     GetFanCoilUnits();

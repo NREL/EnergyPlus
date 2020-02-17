@@ -109,6 +109,7 @@ SET( SRC
   DataHVACControllers.hh
   DataHVACGlobals.cc
   DataHVACGlobals.hh
+  DataHVACSystems.hh
   DataHeatBalFanSys.cc
   DataHeatBalFanSys.hh
   DataHeatBalSurface.cc
@@ -127,8 +128,6 @@ SET( SRC
   DataOutputs.hh
   DataPhotovoltaics.cc
   DataPhotovoltaics.hh
-  DataPlant.cc
-  DataPlant.hh
   DataPrecisionGlobals.cc
   DataPrecisionGlobals.hh
   DataReportingFlags.cc
@@ -178,8 +177,6 @@ SET( SRC
   DemandManager.hh
   DesiccantDehumidifiers.cc
   DesiccantDehumidifiers.hh
-  DirectAirManager.cc
-  DirectAirManager.hh
   DisplacementVentMgr.cc
   DisplacementVentMgr.hh
   DisplayRoutines.cc
@@ -367,6 +364,8 @@ SET( SRC
   OutAirNodeManager.hh
   OutdoorAirUnit.cc
   OutdoorAirUnit.hh
+  OutputFiles.cc
+  OutputFiles.hh
   OutputProcessor.cc
   OutputProcessor.hh
   OutputReportPredefined.cc
@@ -397,22 +396,26 @@ SET( SRC
   Pipes.cc
   Pipes.hh
   Plant/CallingOrder.hh
+  Plant/DataPlant.cc
+  Plant/DataPlant.hh
   Plant/Enums.hh
   Plant/EquipAndOperations.hh
   Plant/LoopSidePumpInformation.hh
   Plant/PlantAvailManager.hh
   Plant/PlantConvergencePoint.hh
-  Plant/LoopSideReportVars.hh
   Plant/MeterData.hh
   Plant/ReportBranchData.hh
   Plant/ReportCompData.hh
   Plant/ReportLoopData.hh
-  Plant/ReportVars.hh
+  Plant/Branch.cc
   Plant/Branch.hh
+  Plant/Component.cc
   Plant/Component.hh
   Plant/ConnectedLoopData.hh
   Plant/Connection.hh
+  Plant/Loop.cc
   Plant/Loop.hh
+  Plant/LoopSide.cc
   Plant/LoopSide.hh
   Plant/MixerData.hh
   Plant/SplitterData.hh
@@ -431,10 +434,6 @@ SET( SRC
   PlantLoadProfile.cc
   PlantLoadProfile.hh
   Plant/PlantLocation.hh
-  PlantLoopEquip.cc
-  PlantLoopEquip.hh
-  Plant/PlantLoopSolver.cc
-  Plant/PlantLoopSolver.hh
   Plant/PlantManager.cc
   Plant/PlantManager.hh
   PlantPipingSystemsManager.cc
@@ -586,8 +585,8 @@ SET( SRC
   WaterToAirHeatPump.hh
   WaterToAirHeatPumpSimple.cc
   WaterToAirHeatPumpSimple.hh
-  WaterToWaterHeatPumpEIR.cc
-  WaterToWaterHeatPumpEIR.hh
+  PlantLoopHeatPumpEIR.cc
+  PlantLoopHeatPumpEIR.hh
   WaterToWaterHeatPumps.hh
   WaterUse.cc
   WaterUse.hh
@@ -627,6 +626,25 @@ SET( SRC
 
 CREATE_SRC_GROUPS( "${SRC}" )
 
+SET( INPUTPARSING_SRC
+  "${CMAKE_SOURCE_DIR}/third_party/milo/dtoa.h"
+  "${CMAKE_SOURCE_DIR}/third_party/milo/itoa.h"
+  "${CMAKE_SOURCE_DIR}/third_party/milo/diyfp.h"
+  "${CMAKE_SOURCE_DIR}/third_party/milo/ieee754.h"
+  "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc"
+  DataStringGlobals.hh
+  FileSystem.cc
+  FileSystem.hh
+  InputProcessing/EmbeddedEpJSONSchema.hh
+  "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc"
+  InputProcessing/IdfParser.cc
+  InputProcessing/IdfParser.hh
+  InputProcessing/InputValidation.cc
+  InputProcessing/InputValidation.hh
+)
+
+CREATE_SRC_GROUPS( "${INPUTPARSING_SRC}" )
+
 if (UNIX)
   ADD_DEFINITIONS("-fPIC")
 endif()
@@ -645,10 +663,20 @@ add_subdirectory(AirflowNetwork)
 #message( $<TARGET_PROPERTY:airflownetworklib,INTERFACE_INCLUDE_DIRECTORIES> )
 #include_directories($<TARGET_PROPERTY:airflownetworklib,INTERFACE_INCLUDE_DIRECTORIES>)
 
+add_library( energyplusparser STATIC ${INPUTPARSING_SRC} )
+add_dependencies( energyplusparser GenerateEmbeddedEpJSONSchema )
+target_link_libraries( energyplusparser re2 )
+if(UNIX AND NOT APPLE)
+  target_link_libraries( energyplusparser dl )
+endif()
+if (WIN32)
+  target_link_libraries( energyplusparser Shlwapi )
+endif()
+
 # first we will create a static library of EnergyPlus
 # this will be linked statically to create the DLL and also the unit tests
 add_library( energypluslib STATIC ${SRC} )
-target_link_libraries( energypluslib objexx sqlite bcvtb epexpat epfmiimport re2 DElight libkiva btwxt Windows-CalcEngine airflownetworklib )
+target_link_libraries( energypluslib fmt::fmt objexx sqlite bcvtb epexpat epfmiimport re2 DElight libkiva btwxt Windows-CalcEngine airflownetworklib )
 add_dependencies( energypluslib GenerateEmbeddedEpJSONSchema )
 if(BUILD_GROUND_PLOT)
   set_source_files_properties(HeatBalanceKivaManager.cc PROPERTIES COMPILE_DEFINITIONS GROUND_PLOT)

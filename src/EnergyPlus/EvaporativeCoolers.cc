@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1739,8 +1739,8 @@ namespace EvaporativeCoolers {
             EvapCond(EvapCoolNum).EvapCoolerPower += PartLoadRatio * EvapCond(EvapCoolNum).RecircPumpPower;
             //******************
             //             WATER CONSUMPTION IN m3 OF WATER FOR DIRECT
-            //             H2O [m3/sec] = Delta W[KgH2O/Kg air]*Mass Flow Air[Kg air]
-            //                                /RhoWater [kg H2O/m3 H2O]
+            //             H2O [m3/s] = Delta W[kgWater/kDryAir]*Mass Flow Air[kgDryAir/s]
+            //                                /RhoWater [kgWater/m3]
             //******************
             RhoWater = RhoH2O(EvapCond(EvapCoolNum).OutletTemp);
             EvapCond(EvapCoolNum).EvapWaterConsumpRate =
@@ -1859,7 +1859,7 @@ namespace EvaporativeCoolers {
             //                  CALCULATE THE TLDB FROM HX EQUATIONS GIVEN AN EFFICIENCY
             //***************************************************************************
             EffHX = EvapCond(EvapCoolNum).IndirectHXEffectiveness;
-            CpAir = PsyCpAirFnWTdb(EvapCond(EvapCoolNum).InletHumRat, EvapCond(EvapCoolNum).InletTemp);
+            CpAir = PsyCpAirFnW(EvapCond(EvapCoolNum).InletHumRat);
             RhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, EvapCond(EvapCoolNum).InletTemp, EvapCond(EvapCoolNum).InletHumRat);
             CFMAir = EvapCond(EvapCoolNum).VolFlowRate;         // Volume Flow Rate Primary Side
             CFMSec = EvapCond(EvapCoolNum).IndirectVolFlowRate; // Volume Flolw Rate Secondary Side
@@ -1897,9 +1897,9 @@ namespace EvaporativeCoolers {
             EvapCond(EvapCoolNum).EvapCoolerPower += PartLoadRatio * EvapCond(EvapCoolNum).IndirectRecircPumpPower;
 
             //******************
-            //             WATER CONSUMPTION IN LITERS OF WATER FOR DIRECT
-            //             H2O [m3/sec] = Delta W[KgH2O/Kg air]*Mass Flow Air[Kg air]
-            //                                /RhoWater [kg H2O/m3 H2O]
+            //             WATER CONSUMPTION IN m3 OF WATER FOR DIRECT
+            //             H2O [m3/s] = Delta W[kgWater/kgDryAir]*Mass Flow Air[kgDryAir/s]
+            //                                /RhoWater [kgWater/m3]
             //******************
             RhoWater = RhoH2O(TDBSec);
             RhoAir =
@@ -2054,8 +2054,8 @@ namespace EvaporativeCoolers {
             EvapCond(EvapCoolNum).EvapCoolerPower += PartLoadRatio * EvapCond(EvapCoolNum).IndirectRecircPumpPower;
 
             //******************
-            //             WATER CONSUMPTION IN LITERS OF WATER FOR Wet InDIRECT
-            //             H2O [m3/sec] = (QHX [J/s])/(2,500,000 [J/kg H2O] * RhoWater [kg H2O/m3 H2O])
+            //             WATER CONSUMPTION IN m3 OF WATER FOR Wet InDIRECT
+            //             H2O [m3/s] = (QHX [J/s])/(2,500,000 [J/kgWater] * RhoWater [kgWater/m3])
             //******************
             //***** FIRST calculate the heat exchange on the primary air side**********
             RhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, EvapCond(EvapCoolNum).InletTemp, EvapCond(EvapCoolNum).InletHumRat);
@@ -2397,8 +2397,8 @@ namespace EvaporativeCoolers {
 
                 EvapCond(EvapCoolNum).OutletEnthalpy = PsyHFnTdbW(EvapCond(EvapCoolNum).OutletTemp, EvapCond(EvapCoolNum).OutletHumRat);
                 //******************
-                //             WATER CONSUMPTION IN LITERS OF WATER FOR Wet InDIRECT
-                //             H2O [m3/sec] = (QHX [J/s])/(2,500,000 [J/kg H2O] * RhoWater [kg H2O/m3 H2O])
+                //             WATER CONSUMPTION IN m3 OF WATER FOR Wet InDIRECT
+                //             H2O [m3/s] = (QHX [J/s])/(2,500,000 [J/kgWater] * RhoWater [kgWater/m3])
                 //******************
                 //***** FIRST calculate the heat exchange on the primary air side**********
                 RhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, EvapCond(EvapCoolNum).InletTemp, EvapCond(EvapCoolNum).InletHumRat);
@@ -3047,10 +3047,10 @@ namespace EvaporativeCoolers {
                 if (OutletTemp > EvapCond(EvapCoolNum).InletTemp) {
                     OutletTemp = EvapCond(EvapCoolNum).InletTemp;
                 }
-                CpAirSys = PsyCpAirFnWTdb(EvapCond(EvapCoolNum).InletHumRat, EvapCond(EvapCoolNum).InletTemp);
+                CpAirSys = PsyCpAirFnW(EvapCond(EvapCoolNum).InletHumRat);
                 CapFlowSys = EvapCond(EvapCoolNum).InletMassFlowRate * CpAirSys;
                 QHXRate = CapFlowSys * (EvapCond(EvapCoolNum).InletTemp - OutletTemp);
-                CpAirSec = PsyCpAirFnWTdb(EHumRatSec, EDBTSec);
+                CpAirSec = PsyCpAirFnW(EHumRatSec);
                 CapFlowSec = AirMassFlowSec * CpAirSec;
                 OutletTempSec = EDBTSec + QHXRate / CapFlowSec;
                 if (OutletTempSec >= EvapCond(EvapCoolNum).InletTemp) {
@@ -3071,7 +3071,7 @@ namespace EvaporativeCoolers {
                 if (OutletTemp > EvapCond(EvapCoolNum).InletTemp) {
                     OutletTemp = EvapCond(EvapCoolNum).InletTemp;
                 }
-                CpAirSys = PsyCpAirFnWTdb(EvapCond(EvapCoolNum).InletHumRat, EvapCond(EvapCoolNum).InletTemp);
+                CpAirSys = PsyCpAirFnW(EvapCond(EvapCoolNum).InletHumRat);
                 CapFlowSys = EvapCond(EvapCoolNum).InletMassFlowRate * CpAirSys;
                 QHXRate = CapFlowSys * (EvapCond(EvapCoolNum).InletTemp - OutletTemp);
                 SecOutletEnthalpy = EvapCond(EvapCoolNum).SecInletEnthalpy + QHXRate / AirMassFlowSec;
@@ -3116,11 +3116,11 @@ namespace EvaporativeCoolers {
         // latent heat transfer only.  For dry operation the humdity ratio remains constant.
 
         // REFERENCES:
-        // CalculateWaterUseage routine of cooling towers for wet operation mode
+        // CalculateWaterUsage routine of cooling towers for wet operation mode
 
         // Using/Aliasing
         using DataEnvironment::OutBaroPress;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHfgAirFnWTdb;
         using Psychrometrics::PsyWFnTdbH;
         using Psychrometrics::PsyWFnTdbTwbPb;
@@ -3147,7 +3147,7 @@ namespace EvaporativeCoolers {
         if (AirMassFlowSec > 0.0) {
             if ((OperatingMode == DryModulated || OperatingMode == DryFull)) {
                 EvapCond(EvapCoolNum).SecOutletHumRat = EHumRatSec;
-                CpAirSec = PsyCpAirFnWTdb(EHumRatSec, EDBTSec);
+                CpAirSec = PsyCpAirFnW(EHumRatSec);
                 EvapCond(EvapCoolNum).SecOutletTemp = EDBTSec + QHXTotal / AirMassFlowSec / CpAirSec;
                 EvapCond(EvapCoolNum).SecOutletEnthalpy = PsyHFnTdbW(EvapCond(EvapCoolNum).SecOutletTemp, EHumRatSec);
                 EvapCond(EvapCoolNum).SecOuletWetBulbTemp = PsyTwbFnTdbWPb(EvapCond(EvapCoolNum).SecOutletTemp, EHumRatSec, OutBaroPress);
@@ -3373,8 +3373,8 @@ namespace EvaporativeCoolers {
             EvapCond(EvapCoolNum).EvapCoolerPower = EvapCond(EvapCoolNum).RecircPumpPower * PumpPowerModCurveValue;
             //******************
             //             WATER CONSUMPTION IN m3 OF WATER FOR DIRECT
-            //             H2O [m3/sec] = Delta W[KgH2O/Kg air]*Mass Flow Air[Kg air]
-            //                                /RhoWater [kg H2O/m3 H2O]
+            //             H2O [m3/s] = Delta W[kgWater/kgDryAir]*Mass Flow Air[kgDryAir]
+            //                                /RhoWater [kgWater/m3]
             //******************
             RhoWater = RhoH2O(EvapCond(EvapCoolNum).OutletTemp);
             EvapVdot = (EvapCond(EvapCoolNum).OutletHumRat - EvapCond(EvapCoolNum).InletHumRat) * EvapCond(EvapCoolNum).InletMassFlowRate / RhoWater;
@@ -5012,9 +5012,7 @@ namespace EvaporativeCoolers {
         ZoneEquipmentListChecked = false;
     }
 
-    int GetInletNodeNum(std::string const &EvapCondName,
-        bool &ErrorsFound
-    )
+    int GetInletNodeNum(std::string const &EvapCondName, bool &ErrorsFound)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
@@ -5049,9 +5047,7 @@ namespace EvaporativeCoolers {
         return NodeNum;
     }
 
-    int GetOutletNodeNum(std::string const &EvapCondName,
-        bool &ErrorsFound
-    )
+    int GetOutletNodeNum(std::string const &EvapCondName, bool &ErrorsFound)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu

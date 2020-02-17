@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -997,7 +997,7 @@ namespace RoomAirModelUserTempPattern {
         using DataSurfaces::ZoneMeanAirTemp;
         using InternalHeatGains::SumAllReturnAirConvectionGains;
         using InternalHeatGains::SumAllReturnAirLatentGains;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyHgAirFnWTdb;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -1047,7 +1047,7 @@ namespace RoomAirModelUserTempPattern {
             // Add sensible heat gain from refrigerated cases with under case returns
             SumAllReturnAirConvectionGains(ZoneNum, QRetAir, ReturnNode);
 
-            CpAir = PsyCpAirFnWTdb(Node(ZoneNode).HumRat, Node(ZoneNode).Temp);
+            CpAir = PsyCpAirFnW(Node(ZoneNode).HumRat);
 
             // Need to add the energy to the return air from lights and from airflow windows. Where the heat
             // is added depends on if there is system flow or not.  If there is system flow the heat is added

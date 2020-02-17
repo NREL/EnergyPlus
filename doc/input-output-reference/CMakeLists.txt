@@ -1,120 +1,6 @@
 
 # to get the list of input files, go to the root of the document folder, and:
 # grep -r '\\input{' * | cut -d ':' -f 2 | cut -c 8- | rev | cut -c 2- | rev | sed 's|^|  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/|g' | sed 's/$/.tex/g'
-SET( INCLUDED_TEX
-  ${PROJECT_SOURCE_DIR}/doc/header.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/input-output-reference.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/title.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/hvac-template-objects.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/energyplus-economics.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/parametric-objects.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/input-for-output.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/output.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/standard-output-reports.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/weather-data.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/running-energyplus.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/appendix-a-units-and-abbreviations.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/appendix-a-units-and-abbreviations/standard-energyplus-conditions.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/appendix-a-units-and-abbreviations/standard-energyplus-units.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/energyplus-economics/group-economics.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/energyplus-economics/introduction-to-economics.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/energyplus-economics/conceptual-framework-variables-and-hierarchy.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/energyplus-economics/utilitycost-tariff.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/energyplus-economics/utilitycost-qualify.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/energyplus-economics/utilitycost-charge-simple.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/energyplus-economics/utilitycost-charge-block.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/energyplus-economics/utilitycost-ratchet.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/energyplus-economics/utilitycost-variable.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/energyplus-economics/utilitycost-computation.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/energyplus-economics/utilitycost-tariff-examples.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/energyplus-economics/utilitycost-tariff-reporting.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/energyplus-economics/economic-results-summary-report.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/energyplus-economics/complex-tariff-modeling.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/energyplus-economics/cost-estimating.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/energyplus-economics/life-cycle-costing.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/energyplus-economics/lifecyclecost-parameters.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/energyplus-economics/lifecyclecost-recurringcosts.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/energyplus-economics/lifecyclecost-nonrecurringcost.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/energyplus-economics/lifecyclecost-usepriceescalation.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/energyplus-economics/lifecyclecost-useadjustment.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/hvac-template-objects/hvactemplate-processing.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/hvac-template-objects/group-hvac-templates.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/output/using-readvarseso.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/what-s-different-about-energyplus-input.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/idd-conventions.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/input-output-descriptions.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-simulation-parameters.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-compliance-objects.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-location-climate-weather-file-access.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-schedules.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-surface-construction-elements.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-thermal-zone-description-geometry.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-advanced-surface-concepts.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-detailed-ground-heat-transfer.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-room-air-models.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-internal-gains-people-lights-other.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-daylighting.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-exterior-energy-use-equipment.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-airflow.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-design-objects.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/hvac-primary-and-secondary-systems.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-node-branch-management.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-plant-condenser-loops.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-plant-condenser-control.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-plant-equipment.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-water-heaters.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-condenser-equipment.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-plant-condenser-flow-control.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-air-distribution.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-airflow-network.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-zone-equipment.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-air-distribution-equipment.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-zone-forced-air-units.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-unitary-equipment.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-variable-refrigerant-flow-equipment.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-radiative-convective-units.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-refrigeration.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-zone-controls-thermostats.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-air-path.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-non-zone-equipment.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-solar-collectors.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-pumps.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-heating-and-cooling-coils.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-fans.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-humidifiers.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-desiccant-dehumidifiers.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-energy-management-system-ems.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-externalinterface.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-user-defined-hvac-and-plant-component.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-system-availability-managers.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-setpoint-managers.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-controllers.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-evaporative-coolers.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-heat-recovery.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-demand-limiting-controls.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-electric-load-center-generator.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-water-systems.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-operational-faults.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-performance-curves.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-performance-tables.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/overview/group-fluid-properties.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/running-energyplus/energy-ini.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/running-energyplus/errors.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/running-energyplus/energyplus-execution-time.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/standard-output-reports/output-table-timebins.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/standard-output-reports/output-table-monthly.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/standard-output-reports/output-table-annual.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/standard-output-reports/output-table-summaryreports.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/standard-output-reports/outputcontrol-table-style.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/weather-data/missing-weather-file-data.tex
-  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/src/weather-data/weather-data-hourly-interpolation.tex
-  ${PROJECT_SOURCE_DIR}/doc/title.tex
-)
-
-# to get the list of inluded images, go to the root of the document folder and:
-# grep -r '\\includegraphics' * | cut -d ':' -f 2 | rev | cut -d '{' -f 1 | rev | cut -d '}' -f 1 | sed 's/^/  /g' | sort -n -t'.' -k 1.14
-SET( INCLUDED_IMAGES
   ${PROJECT_SOURCE_DIR}/doc/input-output-reference/media/ACBussDiagram.png
   ${PROJECT_SOURCE_DIR}/doc/input-output-reference/media/ACStorageBussDiagram.png
   ${PROJECT_SOURCE_DIR}/doc/input-output-reference/media/AirLoopComponentMatrix.png
@@ -223,6 +109,7 @@ SET( INCLUDED_IMAGES
   ${PROJECT_SOURCE_DIR}/doc/input-output-reference/media/image222.png
   ${PROJECT_SOURCE_DIR}/doc/input-output-reference/media/image223.png
   ${PROJECT_SOURCE_DIR}/doc/input-output-reference/media/image236.png
+  ${PROJECT_SOURCE_DIR}/doc/input-output-reference/media/image261.png
   ${PROJECT_SOURCE_DIR}/doc/input-output-reference/media/image262.png
   ${PROJECT_SOURCE_DIR}/doc/input-output-reference/media/image263.png
   ${PROJECT_SOURCE_DIR}/doc/input-output-reference/media/image264.png
@@ -311,11 +198,13 @@ SET( INCLUDED_IMAGES
 SET( SOURCE_FILENAME "input-output-reference" )
 SET( OUTPUT_FILENAME "InputOutputReference" )
 
-add_custom_command( OUTPUT ${PROJECT_BINARY_DIR}/doc/${OUTPUT_FILENAME}.pdf
-	COMMAND ${CMAKE_COMMAND} -DXELATEX=${XELATEX} -DINNAME=${SOURCE_FILENAME} -DOUTNAME=${OUTPUT_FILENAME} -DORIGINAL_CMAKE_SOURCE_DIR=${PROJECT_SOURCE_DIR} -DORIGINAL_CMAKE_BINARY_DIR=${PROJECT_BINARY_DIR} -DTEX_INTERACTION=${TEX_INTERACTION} -P ${PROJECT_SOURCE_DIR}/cmake/BuildDocumentation.cmake
-		    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/doc/${SOURCE_FILENAME}
-		    DEPENDS ${INCLUDED_TEX} ${INCLUDED_IMAGES}
-                 )
+add_custom_command(
+  OUTPUT ${PROJECT_BINARY_DIR}/doc/${OUTPUT_FILENAME}.pdf
+  COMMAND ${CMAKE_COMMAND} -DXELATEX=${XELATEX} -DINNAME=${SOURCE_FILENAME} -DOUTNAME=${OUTPUT_FILENAME} -DORIGINAL_PROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR} -DORIGINAL_PROJECT_BINARY_DIR=${PROJECT_BINARY_DIR} -DTEX_INTERACTION=${TEX_INTERACTION} -P ${PROJECT_SOURCE_DIR}/cmake/BuildDocumentation.cmake
+  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/doc/${SOURCE_FILENAME}
+  DEPENDS ${INCLUDED_TEX} ${INCLUDED_IMAGES}
+)
+
 add_custom_target( zPDF_${OUTPUT_FILENAME}
                    DEPENDS ${PROJECT_BINARY_DIR}/doc/${OUTPUT_FILENAME}.pdf
                  )

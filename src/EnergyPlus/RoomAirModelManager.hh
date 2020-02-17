@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -102,12 +102,12 @@ namespace RoomAirModelManager {
                         int &RAFNNodeNum,
                         bool &Errorfound); // find zone number and node number based on the node name
 
-    bool CheckEquipName(std::string const &EquipType,
-                        std::string const &EquipName,
-                        std::string &SupplyNodeName,
-                        std::string &ReturnNodeName,
-                        int TotNumEquip,
-                        int TypeNum); // Ensure valid equipment name
+    bool CheckEquipName(std::string const &EquipType, // Equipment type
+                        std::string const &EquipName, // Equipment Name
+                        std::string &SupplyNodeName,  // Supply node name
+                        std::string &ReturnNodeName,  // Return node name
+                        int TotNumEquip,              // how many of this equipment type
+                        int TypeNum);                 // equipment type number
 
     //*****************************************************************************************
 
