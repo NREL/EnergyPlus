@@ -62,7 +62,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/PlantComponent.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 
