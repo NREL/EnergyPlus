@@ -779,14 +779,12 @@ add_custom_command(
 if(LINK_WITH_PYTHON)
   # link the executable to the dll and bring it in
   get_filename_component(RESOLVED_PYTHON_LIBRARY "${PYTHON_LIBRARIES}" REALPATH)
-  get_filename_component(PYTHON_LIB_FILENAME "${RESOLVED_PYTHON_LIBRARY}" NAME)
   add_custom_command(
     TARGET energyplus
     POST_BUILD
     COMMAND ${CMAKE_COMMAND}
           -DRESOLVED_PYTHON_LIB=${RESOLVED_PYTHON_LIBRARY}
           -DEXECUTABLE_PATH=$<TARGET_FILE:energyplus>
-          -DPYTHON_LIB_FILENAME=${PYTHON_LIB_FILENAME}
           -P ${CMAKE_SOURCE_DIR}/cmake/PythonGetLibAndLinkUp.cmake
   )
   # along with the python standard lib
