@@ -31,3 +31,7 @@ for root, dirs, _ in os.walk(target_dir):
     for this_dir in dirs:
         if this_dir == "__pycache__":
             shutil.rmtree(os.path.join(root, this_dir))
+
+# on Windows the site_packages folder is inside the standard lib folder, so we need to delete that too
+if os.path.exists(os.path.join(target_dir, 'site_packages')):
+    shutil.rmtree(os.path.join(target_dir, 'site_packages'))
