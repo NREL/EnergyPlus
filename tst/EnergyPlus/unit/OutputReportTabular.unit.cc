@@ -7131,12 +7131,13 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
         EXPECT_EQ(std::get<2>(v), oa_db) << "Failed for TableName=" << tableName << "; ReportName=" << reportName;
     }
 
-	std::string query_2("SELECT Value From TabularDataWithStrings"
-	                    "  WHERE ReportName = 'Heating Peak Conditions'"
-	                    "  AND TableName = 'Engineering Checks for Heating'"
-	                    "  AND RowName = 'Airflow per Floor Area';");
+    // https://github.com/NREL/EnergyPlus/pull/7741
+    std::string query_2("SELECT Value From TabularDataWithStrings"
+                        "  WHERE TableName = 'Engineering Checks for Cooling'"
+                        "  AND RowName = 'Outside Air Fraction';");
 
-	auto result = queryResult(query_2, "TabularDataWithStrings");
+    auto result = queryResult(query_2, "TabularDataWithStrings")[0][0];
+    EXPECT_EQ(result, "0.0000");
 }
 
 

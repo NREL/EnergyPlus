@@ -14122,14 +14122,14 @@ namespace OutputReportTabular {
 
                 columnHead(1) = "Value";
                 if (unitsStyle != unitsStyleInchPound) {
-                    rowHead(1) = "Outside Air Fraction (-)";
+                    rowHead(1) = "Outside Air Fraction [fraction]";
                     rowHead(2) = "Airflow per Floor Area [m3/s-m2]";
                     rowHead(3) = "Airflow per Total Capacity [m3/s-W]";
                     rowHead(4) = "Floor Area per Total Capacity [m2/W]";
                     rowHead(5) = "Total Capacity per Floor Area [W/m2]";
                     rowHead(6) = "Number of People";
                 } else {
-                    rowHead(1) = "Outside Air Fraction (-)";
+                    rowHead(1) = "Outside Air Fraction [fraction]";
                     rowHead(2) = "Airflow per Floor Area [ft3/min-ft2]";
                     rowHead(3) = "Airflow per Total Capacity [ft3-h/min-Btu]";
                     rowHead(4) = "Floor Area per Total Capacity [ft2-h/Btu]";
