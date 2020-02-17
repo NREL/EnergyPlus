@@ -45,40 +45,57 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef PlantReportingReportVars_hh_INCLUDED
-#define PlantReportingReportVars_hh_INCLUDED
-
-#include <EnergyPlus/Plant/LoopSideReportVars.hh>
+#include <EnergyPlus/DataBranchAirLoopPlant.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/Plant/Branch.hh>
+#include <EnergyPlus/PlantUtilities.hh>
 
 namespace EnergyPlus {
 namespace DataPlant {
 
-    struct ReportVars
-    {
-        // Members
-        // Whole loop descriptions
-        Real64 CoolingDemand;       // Plant Loop Cooling Demand, W
-        Real64 HeatingDemand;       // Plant Loop Heating Demand[W]
-        Real64 DemandNotDispatched; // Plant Loop Demand that was not distributed [W]
-        Real64 UnmetDemand;         // Plant Loop Unmet Demand [W]
-        // Loop side data
-        Array1D<LoopSideReportVars> LoopSide;
-        Real64 BypassFrac;            // Debug Variable
-        Real64 InletNodeFlowrate;     // Debug Variable
-        Real64 InletNodeTemperature;  // Debug Variable
-        Real64 OutletNodeFlowrate;    // Debug Variable
-        Real64 OutletNodeTemperature; // Debug Variable
-        int LastLoopSideSimulated;
+    Real64 BranchData::DetermineBranchFlowRequest() {
 
-        // Default Constructor
-        ReportVars()
-            : CoolingDemand(0.0), HeatingDemand(0.0), DemandNotDispatched(0.0), UnmetDemand(0.0), LoopSide(2), BypassFrac(0.0),
-              InletNodeFlowrate(0.0), InletNodeTemperature(0.0), OutletNodeFlowrate(0.0), OutletNodeTemperature(0.0), LastLoopSideSimulated(0)
-        {
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Edwin Lee
+        //       DATE WRITTEN   September 2010
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This routine will analyze the given branch and determine the representative
+        //  flow request.
+
+        // METHODOLOGY EMPLOYED:
+        // Several possibilities are available.  In any case, the request is constrained to within
+        //  branch outlet min/max avail.  This assumes that the component flow routines will properly
+        //  propagate the min/max avail down the branch.
+        // Some possibilities for flow request are:
+        //  1) take the outlet flow rate -- assumes that the last component wins
+        //  2) take the inlet flow rate request -- assumes that the request is propogated up and is good
+        //  3) take the maximum request
+        //  4) move down the loop and take the maximum "non-load-range-based" request within min/max avail bounds
+        //     This assumes that load range based should not request flow for load-rejection purposes, and we
+        //     should only "respond" to other component types.
+
+        int const BranchInletNodeNum = this->NodeNumIn;
+        int const BranchOutletNodeNum = this->NodeNumOut;
+        Real64 OverallFlowRequest = 0.0;
+
+        if (this->ControlType != DataBranchAirLoopPlant::ControlType_SeriesActive) {
+            OverallFlowRequest = DataLoopNode::Node(BranchInletNodeNum).MassFlowRateRequest;
+        } else { // is series active, so take largest request of all the component inlet nodes
+            for (int CompCounter = 1; CompCounter <= this->TotalComponents; ++CompCounter) {
+                int const CompInletNode = this->Comp(CompCounter).NodeNumIn;
+                OverallFlowRequest = max(OverallFlowRequest, DataLoopNode::Node(CompInletNode).MassFlowRateRequest);
+            }
         }
-    };
 
-} // namespace DataPlant
-} // namespace EnergyPlus
+        //~ Now use a worker to bound the value to outlet min/max avail
+        OverallFlowRequest = PlantUtilities::BoundValueToNodeMinMaxAvail(OverallFlowRequest, BranchOutletNodeNum);
 
-#endif
+        return OverallFlowRequest;
+
+    }
+
+}
+}

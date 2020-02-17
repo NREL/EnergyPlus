@@ -49,11 +49,10 @@
 #define GeneratorFuelSupply_hh_INCLUDED
 
 // EnergyPlus Headers
-#include "OutputFiles.hh"
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-
+    class OutputFiles;
 namespace GeneratorFuelSupply {
 
     // Data

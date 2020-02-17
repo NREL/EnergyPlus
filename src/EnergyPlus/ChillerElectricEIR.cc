@@ -64,7 +64,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FaultsManager.hh>
@@ -75,6 +75,7 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
@@ -1536,7 +1537,8 @@ namespace ChillerElectricEIR {
         if (DataPlant::PlantFinalSizesOkayToReport) {
             if (this->IPLVFlag) {
                 Real64 IPLV;
-                StandardRatings::CalcChillerIPLV(this->Name,
+                StandardRatings::CalcChillerIPLV(OutputFiles::getSingleton(),
+                                                 this->Name,
                                                  DataPlant::TypeOf_Chiller_ElectricEIR,
                                                  this->RefCap,
                                                  this->RefCOP,
@@ -1545,7 +1547,10 @@ namespace ChillerElectricEIR {
                                                  this->ChillerEIRFTIndex,
                                                  this->ChillerEIRFPLRIndex,
                                                  this->MinUnloadRat,
-                                                 IPLV);
+                                                 IPLV,
+                                                 Optional<const Real64>(),
+                                                 ObjexxFCL::Optional_int_const(),
+                                                 Optional<const Real64>());
                 this->IPLVFlag = false;
             }
             // create predefined report

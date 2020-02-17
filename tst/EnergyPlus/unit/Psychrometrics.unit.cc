@@ -227,6 +227,49 @@ TEST_F(EnergyPlusFixture, Psychrometrics_PsyWFnTdpPb_Test)
     EXPECT_TRUE(compare_err_stream(error_string1, true));
 }
 
+inline Real64 PsyCpAirFnWTdb(Real64 const dw, // humidity ratio {kgWater/kgDryAir}
+                             Real64 const T   // input temperature {Celsius}
+)
+{
+
+    //// NOTE: THIS FUNCTION IS DEPRECATED AND USED FOR TESTING PURPOSES ONLY
+
+    // FUNCTION INFORMATION:
+    //       AUTHOR         J. C. VanderZee
+    //       DATE WRITTEN   Feb. 1994
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS FUNCTION:
+    // This function provides the heat capacity of air {J/kg-C} as function of humidity ratio.
+
+    // METHODOLOGY EMPLOYED:
+    // take numerical derivative of PsyHFnTdbW function
+
+    // REFERENCES:
+    // see PsyHFnTdbW ref. to ASHRAE Fundamentals
+    // USAGE:  cpa = PsyCpAirFnWTdb(w,T)
+
+    // Static locals
+    static Real64 dwSave(-100.0);
+    static Real64 Tsave(-100.0);
+    static Real64 cpaSave(-100.0);
+
+    // check if last call had the same input and if it did just use the saved output
+    if ((Tsave == T) && (dwSave == dw)) return cpaSave;
+
+    // compute heat capacity of air
+    Real64 const w(max(dw, 1.0e-5));
+    Real64 const cpa((PsyHFnTdbW(T + 0.1, w) - PsyHFnTdbW(T, w)) * 10.0); // result => heat capacity of air {J/kg-C}
+
+    // save values for next call
+    dwSave = dw;
+    Tsave = T;
+    cpaSave = cpa;
+
+    return cpa;
+}
+
 TEST_F(EnergyPlusFixture, Psychrometrics_PsyCpAirFn_Test)
 {
 
@@ -310,7 +353,7 @@ TEST_F(EnergyPlusFixture, Psychrometrics_CpAirValue_Test)
     Real64 T2 = 20.0;
 
     // Dry Cooling Test
-    Real64 MassFlowRate = 5.0;  // kgDryAir/s
+    Real64 MassFlowRate = 5.0;                 // kgDryAir/s
     Real64 CpAir = 1.00484e3 + W1 * 1.85895e3; // PsyCpAirFnW per cp = dh/dT
     Real64 CpAir1 = PsyCpAirFnW(W1);           // PsyCpAirFnW per cp = dh/dT
     Real64 CpAir2 = PsyCpAirFnW(W2);           // PsyCpAirFnW per cp = dh/dT
@@ -322,8 +365,8 @@ TEST_F(EnergyPlusFixture, Psychrometrics_CpAirValue_Test)
     Real64 Qfrom_mdot_CpAir_DeltaT = MassFlowRate * CpAir * (T1 - T2);
 
     // get enthalpy at state 1 and 2
-    Real64 H1 = PsyHFnTdbW(T1, W1);         // enthaly ait state 1
-    Real64 H2 = PsyHFnTdbW(T2, W2);         // enthaly ait state 2
+    Real64 H1 = PsyHFnTdbW(T1, W1); // enthaly ait state 1
+    Real64 H2 = PsyHFnTdbW(T2, W2); // enthaly ait state 2
     Real64 Qfrom_mdot_DeltaH = MassFlowRate * (H1 - H2);
 
     // check heat rate
@@ -335,8 +378,8 @@ TEST_F(EnergyPlusFixture, Psychrometrics_CpAirValue_Test)
     CpAir = 1.00484e3 + W1 * 1.85895e3;
     Qfrom_mdot_CpAir_DeltaT = MassFlowRate * CpAir * (T2 - T1);
 
-    H1 = PsyHFnTdbW(T1, W1);         // enthaly ait state 1
-    H2 = PsyHFnTdbW(T2, W2);         // enthaly ait state 2
+    H1 = PsyHFnTdbW(T1, W1); // enthaly ait state 1
+    H2 = PsyHFnTdbW(T2, W2); // enthaly ait state 2
     Qfrom_mdot_DeltaH = MassFlowRate * (H2 - H1);
 
     // check heat transfer rate calc method for heating

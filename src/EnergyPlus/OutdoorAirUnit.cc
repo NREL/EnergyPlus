@@ -61,7 +61,7 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaceLists.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -2417,10 +2417,21 @@ namespace OutdoorAirUnit {
                     } else {
                         Dxsystemouttemp = CompAirOutTemp - FanEffect;
                     }
+                    Real64 sensOut = 0.0;
+                    Real64 latOut = 0.0;
                     OutAirUnit(OAUnitNum)
                         .OAEquip(SimCompNum)
-                        .compPointer->simulate(
-                            EquipName, FirstHVACIteration, -1, DXSystemIndex, HeatActive, CoolActive, UnitNum, Dxsystemouttemp, false);
+                        .compPointer->simulate(EquipName,
+                                               FirstHVACIteration,
+                                               -1,
+                                               DXSystemIndex,
+                                               HeatActive,
+                                               CoolActive,
+                                               UnitNum,
+                                               Dxsystemouttemp,
+                                               false,
+                                               sensOut,
+                                               latOut);
                 }
 
             } else {
