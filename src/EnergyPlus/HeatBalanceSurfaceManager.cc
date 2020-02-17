@@ -106,6 +106,7 @@
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
 #include <EnergyPlus/MoistureBalanceEMPDManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
@@ -508,7 +509,7 @@ namespace HeatBalanceSurfaceManager {
         // Calculate factors that are used to determine how much long-wave radiation from internal
         // gains is absorbed by interior surfaces
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Computing Interior Absorption Factors");
-        if (InitSurfaceHeatBalancefirstTime) HeatBalanceIntRadExchange::InitInteriorRadExchange();
+        if (InitSurfaceHeatBalancefirstTime) HeatBalanceIntRadExchange::InitInteriorRadExchange(OutputFiles::getSingleton());
         ComputeIntThermalAbsorpFactors();
 
         // Calculate factors for diffuse solar absorbed by room surfaces and interior shades
@@ -5956,7 +5957,7 @@ namespace HeatBalanceSurfaceManager {
                         NodeTemp = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
                         MassFlowRate = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
                         CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
-                        // Real64 CpAir2 = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), NodeTemp);
+                        // Real64 CpAir2 = PsyCpAirFnW(ZoneAirHumRat(ZoneNum), NodeTemp);
                         SumSysMCp += MassFlowRate * CpAir;
                         SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                     }

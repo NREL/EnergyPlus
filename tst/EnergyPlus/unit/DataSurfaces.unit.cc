@@ -59,6 +59,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/Vectors.hh>
 
@@ -182,7 +183,7 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest)
     SinBldgRelNorth = 0.0;
 
     ErrorsFound = false;
-    GetSurfaceData(ErrorsFound); // setup zone geometry and get zone data
+    GetSurfaceData(OutputFiles::getSingleton(), ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
     SetSurfaceOutBulbTempAt();

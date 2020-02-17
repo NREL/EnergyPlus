@@ -61,7 +61,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
@@ -70,6 +70,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/HVACFan.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
@@ -146,7 +147,6 @@ namespace ReportSizingManager {
 
         // Using/Aliasing
         using namespace DataPrecisionGlobals;
-        using DataGlobals::OutputFileInits;
         using namespace OutputReportPredefined;
         using General::RoundSigDigits;
 
@@ -166,21 +166,23 @@ namespace ReportSizingManager {
         static bool MyOneTimeFlag(true);
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_990(
-            "('! <Component Sizing Information>, Component Type, Component Name, ','Input Field Description, Value')");
-        static ObjexxFCL::gio::Fmt Format_991("(' Component Sizing Information, ',A,', ',A,', ',A,', ',A)");
+        static constexpr auto Format_991(" Component Sizing Information, {}, {}, {}, {:.5R}\n");
 
+        // to do, make this a parameter. Unfortunately this function is used in MANY
+        // places so it involves touching most of E+
+        auto &outputFiles = OutputFiles::getSingleton();
         if (MyOneTimeFlag) {
-            ObjexxFCL::gio::write(OutputFileInits, Format_990);
+            static constexpr auto Format_990("! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value\n");
+            print(outputFiles.eio, Format_990);
             MyOneTimeFlag = false;
         }
 
-        ObjexxFCL::gio::write(OutputFileInits, Format_991) << CompType << CompName << VarDesc << RoundSigDigits(VarValue, 5);
+        print(outputFiles.eio, Format_991, CompType, CompName, VarDesc, VarValue);
         // add to tabular output reports
         AddCompSizeTableEntry(CompType, CompName, VarDesc, VarValue);
 
         if (present(UsrDesc) && present(UsrValue)) {
-            ObjexxFCL::gio::write(OutputFileInits, Format_991) << CompType << CompName << UsrDesc << RoundSigDigits(UsrValue, 5);
+            print(outputFiles.eio, Format_991, CompType, CompName, UsrDesc(), UsrValue());
             AddCompSizeTableEntry(CompType, CompName, UsrDesc, UsrValue);
         } else if (present(UsrDesc) || present(UsrValue)) {
             ShowFatalError("ReportSizingOutput: (Developer Error) - called with user-specified description or value but not both.");

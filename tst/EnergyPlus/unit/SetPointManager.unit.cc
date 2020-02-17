@@ -66,13 +66,13 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/DirectAirManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReturnAirPathManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -336,7 +336,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineCondEntSetPointManager)
     ASSERT_TRUE(process_idf(idf_objects));
     DataGlobals::NumOfTimeStepInHour = 4;
     DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
-    ScheduleManager::ProcessScheduleInput();
+    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
     DataGlobals::TimeStep = 1;
     DataGlobals::HourOfDay = 1;
     DataEnvironment::DayOfWeek = 1;
@@ -357,7 +357,6 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineCondEntSetPointManager)
     // Set up ChW loop manually, way too much input to do that here in idf, all I care about is the
     DataPlant::TotNumLoops = 2;
     DataPlant::PlantLoop.allocate(2);
-    DataPlant::PlantReport.allocate(1);
 
     DataPlant::PlantLoop(chwLoopIndex).LoopSide.allocate(2);
     DataPlant::PlantLoop(chwLoopIndex).LoopSide(supplySide).Branch.allocate(1);
@@ -393,14 +392,14 @@ TEST_F(EnergyPlusFixture, SetPointManager_DefineCondEntSetPointManager)
     thisSPM.TypeNum = DataPlant::TypeOf_Chiller_Electric;
 
     // switch: Weighted ratio > 9 && etc...
-    DataPlant::PlantReport(1).CoolingDemand = 4700;
+    DataPlant::PlantLoop(1).CoolingDemand = 4700;
 
     // Now call and check
     thisSPM.calculate();
     EXPECT_NEAR(designCondenserEnteringTemp + 1.0, thisSPM.SetPt, 0.001);
 
     // switch: Weighted ratio < 9 || etc...
-    DataPlant::PlantReport(1).CoolingDemand = 4000;
+    DataPlant::PlantLoop(1).CoolingDemand = 4000;
 
     // switch: OAWB>MinWb && DesignWB>MinDesignWB && CurLift>MinLift
     DataEnvironment::OutWetBulbTemp = 40;
@@ -546,7 +545,7 @@ TEST_F(EnergyPlusFixture, CalcScheduledTESSetPoint)
     ASSERT_TRUE(process_idf(idf_contents));
     DataGlobals::NumOfTimeStepInHour = 4;
     DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
-    ScheduleManager::ProcessScheduleInput();
+    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
     DataGlobals::TimeStep = 1;
     DataGlobals::HourOfDay = 1;
     DataEnvironment::DayOfWeek = 1;
@@ -1195,7 +1194,7 @@ TEST_F(EnergyPlusFixture, ColdestSetPointMgrInSingleDuct)
 
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ScheduleManager::ProcessScheduleInput();
+    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
 
     HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                    // zones are specified in the idf snippet

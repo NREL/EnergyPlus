@@ -60,7 +60,7 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -68,6 +68,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutdoorAirUnit.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -302,7 +303,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_AutoSize)
 
     ZoneSysEnergyDemand.allocate(1);
 
-    ProcessScheduleInput();   // read schedules
+    ProcessScheduleInput(OutputFiles::getSingleton());   // read schedules
     GetCurveInput();          // read curves
     GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
@@ -561,7 +562,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_WaterCoolingCoilAutoSizeTest)
     EXPECT_EQ("THERMAL ZONE 1", Zone(1).Name);
 
     GetZoneEquipmentData1();
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
     Fans::GetFanInput();
 
@@ -867,7 +868,7 @@ TEST_F(EnergyPlusFixture, OutdoorAirUnit_SteamHeatingCoilAutoSizeTest)
     EXPECT_EQ("THERMAL ZONE 1", Zone(1).Name);
 
     GetZoneEquipmentData1();
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
     Fans::GetFanInput();
 
