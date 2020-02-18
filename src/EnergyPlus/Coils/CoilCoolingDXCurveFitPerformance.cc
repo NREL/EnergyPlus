@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -60,7 +60,11 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <ObjexxFCL/gio.hh>
+#include <EnergyPlus/HVACFan.hh>
+#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/OutputFiles.hh>
 
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
@@ -357,11 +361,8 @@ void CoilCoolingDXCurveFitPerformance::calculate(CoilCoolingDXCurveFitOperatingM
 
 }
 
-void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex,
-                                                           int const supplyFanType,
-                                                           std::string const &supplyFanName,
-                                                           int condInletNodeIndex)
-{
+void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, int const supplyFanType, std::string const &supplyFanName, int condInletNodeIndex, OutputFiles &outputFiles) {
+
 
     // If fan index hasn't been set, we can't do anything
     if (supplyFanIndex == -1) { // didn't find VAV fan, do not rate this coil
@@ -370,16 +371,14 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex,
         return;
     }
 
-    static ObjexxFCL::gio::Fmt Format_890(
-        "('! <VAV DX Cooling Coil Standard Rating Information>, DX Coil Type, DX Coil Name, Fan Type, Fan Name, "
-        "','Standard Net Cooling Capacity {W}, Standard Net Cooling Capacity {Btu/h}, IEER {Btu/W-h}, ','COP 100% "
-        "Capacity {W/W}, COP 75% Capacity {W/W}, COP 50% Capacity {W/W}, COP 25% Capacity {W/W}, ','EER 100% Capacity "
-        "{Btu/W-h}, EER 75% Capacity {Btu/W-h}, EER 50% Capacity {Btu/W-h}, EER 25% Capacity {Btu/W-h}, ','Supply Air "
-        "Flow 100% {kg/s}, Supply Air Flow 75% {kg/s},Supply Air Flow 50% {kg/s},Supply Air Flow 25% {kg/s}')");
-    static ObjexxFCL::gio::Fmt Format_891(
-        "(' VAV DX Cooling Coil Standard Rating Information, "
-        "',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,',',A,'"
-        ",',A)");
+    static constexpr auto Format_890(
+            "('! <VAV DX Cooling Coil Standard Rating Information>, DX Coil Type, DX Coil Name, Fan Type, Fan Name, "
+            "','Standard Net Cooling Capacity {W}, Standard Net Cooling Capacity {Btu/h}, IEER {Btu/W-h}, ','COP 100% "
+            "Capacity {W/W}, COP 75% Capacity {W/W}, COP 50% Capacity {W/W}, COP 25% Capacity {W/W}, ','EER 100% Capacity "
+            "{Btu/W-h}, EER 75% Capacity {Btu/W-h}, EER 50% Capacity {Btu/W-h}, EER 25% Capacity {Btu/W-h}, ','Supply Air "
+            "Flow 100% {kg/s}, Supply Air Flow 75% {kg/s},Supply Air Flow 50% {kg/s},Supply Air Flow 25% {kg/s}')\n");
+    print(outputFiles.eio, Format_890);
+
     std::string const RoutineName = "CoilCoolingDXCurveFitPerformance::calcStandardRatings";
 
     // 365 W/1000 scfm or 773.3 W/(m3/s). The AHRI standard
@@ -685,7 +684,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex,
 
     // begin output
     if (this->oneTimeEIOHeaderWrite) {
-        ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_890);
+        print(outputFiles.eio, Format_890); // TODO: Verify this works
         this->oneTimeEIOHeaderWrite = false;
         OutputReportPredefined::pdstVAVDXCoolCoil =
             OutputReportPredefined::newPreDefSubTable(OutputReportPredefined::pdrEquip, "VAV DX Cooling Standard Rating Details");
@@ -747,26 +746,17 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex,
         //        }
     }
 
+    static constexpr auto fmt = " VAV DX Cooling Coil Standard Rating Information, {},{},{},{},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.4R},{:.4R},{:.4R},{:.4R}\n";
     if (this->unitStatic > 0) {
-        ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_891)
-            << "Coil:Cooling:DX" << this->name << "Fan:VariableVolume" << supplyFanName << General::RoundSigDigits(NetCoolingCapRated, 2)
-            << General::RoundSigDigits((NetCoolingCapRated * ConvFromSIToIP), 2) << General::RoundSigDigits(IEER, 2)
-            << General::RoundSigDigits(EER_TestPoint_SI[0], 2) << General::RoundSigDigits(EER_TestPoint_SI[1], 2)
-            << General::RoundSigDigits(EER_TestPoint_SI[2], 2) << General::RoundSigDigits(EER_TestPoint_SI[3], 2)
-            << General::RoundSigDigits(EER_TestPoint_IP[0], 2) << General::RoundSigDigits(EER_TestPoint_IP[1], 2)
-            << General::RoundSigDigits(EER_TestPoint_IP[2], 2) << General::RoundSigDigits(EER_TestPoint_IP[3], 2)
-            << General::RoundSigDigits(SupAirMdot_TestPoint[0], 4) << General::RoundSigDigits(SupAirMdot_TestPoint[1], 4)
-            << General::RoundSigDigits(SupAirMdot_TestPoint[2], 4) << General::RoundSigDigits(SupAirMdot_TestPoint[3], 4);
+        print(outputFiles.eio, fmt,"Coil:Cooling:DX", this->name,"Fan:VariableVolume",
+              supplyFanName, NetCoolingCapRated,(NetCoolingCapRated * ConvFromSIToIP), IEER,EER_TestPoint_SI[0],EER_TestPoint_SI[1],
+              EER_TestPoint_SI[2],EER_TestPoint_SI[3],EER_TestPoint_IP[0],EER_TestPoint_IP[1],EER_TestPoint_IP[2],
+              EER_TestPoint_IP[3],SupAirMdot_TestPoint[0],SupAirMdot_TestPoint[1],SupAirMdot_TestPoint[2],SupAirMdot_TestPoint[3]);
     } else {
-        ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_891)
-            << "Coil:Cooling:DX" << this->name << "N/A"
-            << "N/A" << General::RoundSigDigits(NetCoolingCapRated, 2) << General::RoundSigDigits((NetCoolingCapRated * ConvFromSIToIP), 2)
-            << General::RoundSigDigits(IEER, 2) << General::RoundSigDigits(EER_TestPoint_SI[0], 2) << General::RoundSigDigits(EER_TestPoint_SI[1], 2)
-            << General::RoundSigDigits(EER_TestPoint_SI[2], 2) << General::RoundSigDigits(EER_TestPoint_SI[3], 2)
-            << General::RoundSigDigits(EER_TestPoint_IP[0], 2) << General::RoundSigDigits(EER_TestPoint_IP[1], 2)
-            << General::RoundSigDigits(EER_TestPoint_IP[2], 2) << General::RoundSigDigits(EER_TestPoint_IP[3], 2)
-            << General::RoundSigDigits(SupAirMdot_TestPoint[0], 4) << General::RoundSigDigits(SupAirMdot_TestPoint[1], 4)
-            << General::RoundSigDigits(SupAirMdot_TestPoint[2], 4) << General::RoundSigDigits(SupAirMdot_TestPoint[3], 4);
+        print(outputFiles.eio, fmt,"Coil:Cooling:DX", "N/A","Fan:VariableVolume",
+              "N/A", NetCoolingCapRated,(NetCoolingCapRated * ConvFromSIToIP), IEER,EER_TestPoint_SI[0],EER_TestPoint_SI[1],
+              EER_TestPoint_SI[2],EER_TestPoint_SI[3],EER_TestPoint_IP[0],EER_TestPoint_IP[1],EER_TestPoint_IP[2],
+              EER_TestPoint_IP[3],SupAirMdot_TestPoint[0],SupAirMdot_TestPoint[1],SupAirMdot_TestPoint[2],SupAirMdot_TestPoint[3]);
     }
 
     OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilType, this->name, "Coil:Cooling:DX");
