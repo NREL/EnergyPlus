@@ -1357,7 +1357,7 @@ namespace SimulationManager {
         } else {
             Alphas(7) = "No";
         }
-        Alphas(8) = General::RoundSigDigits(DataConvergParams::MaxZoneTempDiff);
+        Alphas(8) = General::RoundSigDigits(DataConvergParams::MaxZoneTempDiff,3);
         std::string pptHeader = "! <Performance Precision Tradeoffs>, Use Coil Direct Simulation, "
             "Zone Radiant Exchange Algorithm, Override Mode, Number of Timestep In Hour, "
             "Force Euler Method, Minimum Number of Warmup Days, Force Suppress All Begin Environment Resets, "
