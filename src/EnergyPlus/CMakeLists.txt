@@ -727,7 +727,7 @@ if( BUILD_TESTING )
   add_test(NAME "integration.TestEnergyPlusCallbacks"
            COMMAND ${CMAKE_COMMAND}
            -DSOURCE_DIR=${PROJECT_SOURCE_DIR}
-           -DBINARY_DIR=${CMAKE_CURRENT_BINARY_DIR}
+           -DBINARY_DIR=${PROJECT_BINARY_DIR}
            -DIDF_FILE=1ZoneUncontrolled.idf
            -DEPW_FILE=USA_CO_Golden-NREL.724666_TMY3.epw
            -P ${PROJECT_SOURCE_DIR}/cmake/RunCallbackTest.cmake)
