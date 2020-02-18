@@ -65,6 +65,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -217,10 +218,10 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     SizeDXCoil(2);
     EXPECT_DOUBLE_EQ(5000.0, DXCoil(2).DefrostCapacity);
 
-    EXPECT_TRUE(has_cerr_output());
+    EXPECT_TRUE(has_eio_output());
 
     // fails on windows due to endline issue... this outputs /r/n on Windows but it is outputting /n on Windows for some reason...
-    // EXPECT_TRUE( compare_cerr_stream( delimited_string( {
+    // EXPECT_TRUE( compare_eio_stream( delimited_string( {
     // 	"! <DX Heating Coil Standard Rating Information>, Component Type, Component Name, High Temperature Heating (net) Rating Capacity {W}, Low
     // Temperature Heating (net) Rating Capacity {W}, HSPF {Btu/W-h}, Region Number", 	" DX Heating Coil Standard Rating Information, , DX Heating
     // coil, 6414.3, 6414.3, 6.58, 4" } ) ) );
@@ -372,9 +373,9 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
     SizeDXCoil(2);
     EXPECT_DOUBLE_EQ(0.0, DXCoil(2).RatedTotCap(1));
 
-    EXPECT_TRUE(has_cerr_output());
+    EXPECT_TRUE(has_eio_output());
 
-    // EXPECT_TRUE( compare_cerr_stream( delimited_string( {
+    // EXPECT_TRUE( compare_eio_stream( delimited_string( {
     // 	"! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value",
     // 	" Component Sizing Information, Coil:Heating:DX:SingleSpeed, DX Heating coil, Design Size  [W], 0.00000",
     // 	" Component Sizing Information, Coil:Heating:DX:SingleSpeed, DX Heating coil, User-Specified  [W], 5000.00000",
@@ -1076,7 +1077,7 @@ TEST_F(EnergyPlusFixture, DXCoilEvapCondPumpSizingTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     GetCurveInput();
     GetDXCoils();
 
@@ -1458,7 +1459,7 @@ TEST_F(EnergyPlusFixture, DXCoil_ValidateADPFunction)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     GetCurveInput();
     GetDXCoils();
     SetPredefinedTables();
@@ -1788,7 +1789,7 @@ TEST_F(EnergyPlusFixture, BlankDefrostEIRCurveInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     GetCurveInput();
     GetDXCoils();
 
@@ -1855,7 +1856,7 @@ TEST_F(EnergyPlusFixture, CurveOutputLimitWarning)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     GetCurveInput();
     GetDXCoils();
 
@@ -1962,7 +1963,7 @@ TEST_F(EnergyPlusFixture, CoilHeatingDXSingleSpeed_MinOADBTempCompOperLimit)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     GetDXCoils();
 
     ASSERT_EQ("HEATING COIL SINGLESPEED", DXCoil(1).Name); // Heating Coil Single Speed
@@ -2073,7 +2074,7 @@ TEST_F(EnergyPlusFixture, CoilCoolingDXTwoSpeed_MinOADBTempCompOperLimit)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     GetDXCoils();
 
     ASSERT_EQ("MAIN COOLING COIL 1", DXCoil(1).Name); // Cooling Coil Two Speed
@@ -2196,7 +2197,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ScheduleManager::ProcessScheduleInput();
+    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
     DXCoils::GetDXCoils();
     EXPECT_EQ(1, DXCoils::NumDXCoils);
 
@@ -2418,7 +2419,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ScheduleManager::ProcessScheduleInput();
+    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
     DXCoils::GetDXCoils();
     EXPECT_EQ(1, DXCoils::NumDXCoils);
 

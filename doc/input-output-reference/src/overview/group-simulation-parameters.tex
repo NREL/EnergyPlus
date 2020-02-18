@@ -178,11 +178,11 @@ Setting this value determines how EnergyPlus treats beam solar radiation and ref
 
 \textbf{MinimalShadowing}
 
-In this case, there is no exterior shadowing except from window and door reveals. All beam solar radiation entering the zone is assumed to fall on the floor, where it is absorbed according to the floor's solar absorptance. Any reflected by the floor is added to the transmitted diffuse radiation, which is assumed to be uniformly distributed on all interior surfaces. If no floor is present in the zone, the incident beam solar radiation is absorbed on all interior surfaces according to their absorptances. The zone heat balance is then applied at each surface and on the zone's air with the absorbed radiation being treated as a flux on the surface.
+In this case, there is no exterior shadowing except from window and door reveals. All beam solar radiation entering the zone is assumed to fall on the floor, where it is absorbed according to the floor's solar absorptance. Any reflected by the floor is added to the reflected diffuse radiation, which is assumed to be uniformly distributed on all interior surfaces. If no floor is present in the zone, the incident beam solar radiation is absorbed on all interior surfaces according to their absorptances. The zone heat balance is then applied at each surface and on the zone's air with the absorbed radiation being treated as a flux on the surface.
 
 \textbf{FullExterior, FullExteriorWithReflections}
 
-In this case, shadow patterns on exterior surfaces caused by detached shading, wings, overhangs, and exterior surfaces of all zones are computed. As for MinimalShadowing, shadowing by window and door reveals is also calculated. Beam solar radiation entering the zone is treated as for MinimalShadowing -- All beam solar radiation entering the zone is assumed to fall on the floor, where it is absorbed according to the floor's solar absorptance. Any reflected by the floor is added to the transmitted diffuse radiation, which is assumed to be uniformly distributed on all interior surfaces. If no floor is present in the zone, the incident beam solar radiation is absorbed on all interior surfaces according to their absorptances. The zone heat balance is then applied at each surface and on the zone's air with the absorbed radiation being treated as a flux on the surface.
+In this case, shadow patterns on exterior surfaces caused by detached shading, wings, overhangs, and exterior surfaces of all zones are computed. As for MinimalShadowing, shadowing by window and door reveals is also calculated. Beam solar radiation entering the zone is treated as for MinimalShadowing -- All beam solar radiation entering the zone is assumed to fall on the floor, where it is absorbed according to the floor's solar absorptance. Any reflected by the floor is added to the reflected diffuse radiation, which is assumed to be uniformly distributed on all interior surfaces. If no floor is present in the zone, the incident beam solar radiation is absorbed on all interior surfaces according to their absorptances. The zone heat balance is then applied at each surface and on the zone's air with the absorbed radiation being treated as a flux on the surface.
 
 \textbf{FullInteriorAndExterior, FullInteriorAndExteriorWithReflections}
 
@@ -198,9 +198,14 @@ If you use \textbf{FullInteriorAndExterior} the program will also calculate how 
 \caption{Illustration of Convex and Non-convex Zones \protect \label{fig:illustration-of-convex-and-non-convex-zones}}
 \end{figure}
 
+\textbf{Diffuse Radiation}
+
+Diffuse solar transmitted through exterior and interior windows is distributed according to the approximate view factors between the transmitting window and all other heat transfer surfaces in the zone.
+The portion of this diffuse solar that is reflected by all surfaces in the zone is subsequently redistributed uniformly (based on area and solar absorptance) to all heat transfer surfaces in the zone, along with interior reflected beam solar and shortwave radiation from lights. Refer to the section ``Solar Distribution'' in the Engineering Reference Guide for more information including equations.
+
 \textbf{Reflection calculations}
 
-Note: Using the reflection calculations can be very time-consuming. Even error-prone. As a possible alleviation, you can use the \hyperref[outputdiagnostics]{Output:Diagnostics},DoNotMirrorDetachedShading; in many cases to get past a fatal error.
+Note: Using the reflection calculations can be very time-consuming. Even error-prone. As a possible alleviation, you can use the \hyperref[outputdiagnostics]{Output:Diagnostics} ``DoNotMirrorDetachedShading'' in many cases to get past a fatal error.
 
 If using reflections, the program calculates beam and sky solar radiation that is reflected from exterior surfaces and then strikes the building. These reflecting surfaces fall into three categories:
 
