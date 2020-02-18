@@ -505,7 +505,7 @@ namespace DataHVACGlobals {
     bool ZoneMassBalanceHVACReSim; // True when zone air mass flow balance and air loop needs (re)simulated
     int MinAirLoopIterationsAfterFirst(1); // minimum number of HVAC iterations after FirstHVACIteration
 
-    int const NumZoneHVACTerminalTypes(39);
+    int const NumZoneHVACTerminalTypes(38);
 
     Array1D_string const ZoneHVACTerminalTypes(NumZoneHVACTerminalTypes,
                                                {"ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW",
@@ -531,7 +531,6 @@ namespace DataHVACGlobals {
                                                 "ZONEHVAC:HYBRIDUNITARYHVAC",
                                                 "FAN:ZONEEXHAUST",
                                                 "WATERHEATER:HEATPUMP",
-                                                "AIRTERMINAL:SINGLEDUCT:UNCONTROLLED",
                                                 "AIRTERMINAL:DUALDUCT:CONSTANTVOLUME",
                                                 "AIRTERMINAL:DUALDUCT:VAV",
                                                 "AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:REHEAT",
@@ -572,7 +571,6 @@ namespace DataHVACGlobals {
                                                   "ZoneHVAC:HybridUnitaryHVAC",
                                                   "Fan:ZoneExhaust",
                                                   "WaterHeater:HeatPump",
-                                                  "AirTerminal:SingleDuct:Uncontrolled",
                                                   "AirTerminal:DualDuct:ConstantVolume",
                                                   "AirTerminal:DualDuct:VAV",
                                                   "AirTerminal:SingleDuct:ConstantVolume:Reheat",
@@ -612,22 +610,21 @@ namespace DataHVACGlobals {
     int const ZoneEquipTypeOf_HybridUnitaryAirConditioners(21);
     int const ZoneEquipTypeOf_FanZoneExhaust(22);
     int const ZoneEquipTypeOf_WaterHeaterHeatPump(23);
-    int const ZoneEquipTypeOf_AirTerminalSingleDuctUncontrolled(24);
-    int const ZoneEquipTypeOf_AirTerminalDualDuctConstantVolume(25);
-    int const ZoneEquipTypeOf_AirTerminalDualDuctVAV(26);
-    int const ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeReheat(27);
-    int const ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeNoReheat(28);
-    int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVReheat(29);
-    int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVNoReheat(30);
-    int const ZoneEquipTypeOf_AirTerminalSingleDuctSeriesPIUReheat(31);
-    int const ZoneEquipTypeOf_AirTerminalSingleDuctParallelPIUReheat(32);
-    int const ZoneEquipTypeOf_AirTerminalSingleDuctCAVFourPipeInduction(33);
-    int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVReheatVariableSpeedFan(45);
-    int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVHeatAndCoolReheat(35);
-    int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVHeatAndCoolNoReheat(36);
-    int const ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeCooledBeam(37);
-    int const ZoneEquipTypeOf_AirTerminalDualDuctVAVOutdoorAir(38);
-    int const ZoneEquipTypeOf_AirLoopHVACReturnAir(39);
+    int const ZoneEquipTypeOf_AirTerminalDualDuctConstantVolume(24);
+    int const ZoneEquipTypeOf_AirTerminalDualDuctVAV(25);
+    int const ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeReheat(26);
+    int const ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeNoReheat(27);
+    int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVReheat(28);
+    int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVNoReheat(29);
+    int const ZoneEquipTypeOf_AirTerminalSingleDuctSeriesPIUReheat(30);
+    int const ZoneEquipTypeOf_AirTerminalSingleDuctParallelPIUReheat(31);
+    int const ZoneEquipTypeOf_AirTerminalSingleDuctCAVFourPipeInduction(32);
+    int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVReheatVariableSpeedFan(33);
+    int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVHeatAndCoolReheat(34);
+    int const ZoneEquipTypeOf_AirTerminalSingleDuctVAVHeatAndCoolNoReheat(35);
+    int const ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeCooledBeam(36);
+    int const ZoneEquipTypeOf_AirTerminalDualDuctVAVOutdoorAir(37);
+    int const ZoneEquipTypeOf_AirLoopHVACReturnAir(38);
 
     // Object Data
     Array1D<ZoneCompTypeData> ZoneComp;
