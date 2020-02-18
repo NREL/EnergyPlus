@@ -2399,18 +2399,12 @@
   ZoneHVAC:EquipmentList,
     SPACE1-1 Equipment,      !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    SPACE1-1 Air Terminal,   !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    SPACE1-1 DirectAir ADU,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
     ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
-
-  AirTerminal:SingleDuct:Uncontrolled,
-    SPACE1-1 Air Terminal,   !- Name
-    ,                        !- Availability Schedule Name
-    SPACE1-1 Zone Equip Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
 
   ZoneControl:Thermostat,
     SPACE2-1 Thermostat,     !- Name
@@ -2418,6 +2412,96 @@
     HVACTemplate-Always 4,   !- Control Type Schedule Name
     ThermostatSetpoint:DualSetpoint,  !- Control 1 Object Type
     All Zones Dual SP Control;  !- Control 1 Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
+    SPACE1-1 Air Terminal,          !- Name
+    ,    !- Availability Schedule Name
+    SPACE1-1 Inlet Node ATInlet,  !- Air Inlet Node Name
+    SPACE1-1 Zone Equip Inlet,       !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    SPACE1-1 DirectAir ADU,      !- Name
+    SPACE1-1 Zone Equip Inlet,       !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    SPACE1-1 Air Terminal,          !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
+    SPACE2-1 Air Terminal,          !- Name
+    ,    !- Availability Schedule Name
+    SPACE2-1 Inlet Node ATInlet,  !- Air Inlet Node Name
+    SPACE2-1 Zone Equip Inlet,       !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    SPACE2-1 DirectAir ADU,      !- Name
+    SPACE2-1 Zone Equip Inlet,       !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    SPACE2-1 Air Terminal,          !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
+    SPACE3-1 Air Terminal,          !- Name
+    ,    !- Availability Schedule Name
+    SPACE3-1 Inlet Node ATInlet,  !- Air Inlet Node Name
+    SPACE3-1 Zone Equip Inlet,       !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    SPACE3-1 DirectAir ADU,      !- Name
+    SPACE3-1 Zone Equip Inlet,       !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    SPACE3-1 Air Terminal,          !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
+    SPACE4-1 Air Terminal,          !- Name
+    ,    !- Availability Schedule Name
+    SPACE4-1 Inlet Node ATInlet,  !- Air Inlet Node Name
+    SPACE4-1 Zone Equip Inlet,       !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    SPACE4-1 DirectAir ADU,      !- Name
+    SPACE4-1 Zone Equip Inlet,       !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    SPACE4-1 Air Terminal,          !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
+    SPACE5-1 Air Terminal,          !- Name
+    ,    !- Availability Schedule Name
+    SPACE5-1 Inlet Node ATInlet,  !- Air Inlet Node Name
+    SPACE5-1 Zone Equip Inlet,       !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    SPACE5-1 DirectAir ADU,      !- Name
+    SPACE5-1 Zone Equip Inlet,       !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    SPACE5-1 Air Terminal,          !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   DesignSpecification:OutdoorAir,
     SZ DSOA SPACE2-1,        !- Name
@@ -2467,18 +2551,12 @@
   ZoneHVAC:EquipmentList,
     SPACE2-1 Equipment,      !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    SPACE2-1 Air Terminal,   !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    SPACE2-1 DirectAir ADU,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
     ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
-
-  AirTerminal:SingleDuct:Uncontrolled,
-    SPACE2-1 Air Terminal,   !- Name
-    ,                        !- Availability Schedule Name
-    SPACE2-1 Zone Equip Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
 
   ZoneControl:Thermostat,
     SPACE3-1 Thermostat,     !- Name
@@ -2535,18 +2613,12 @@
   ZoneHVAC:EquipmentList,
     SPACE3-1 Equipment,      !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    SPACE3-1 Air Terminal,   !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    SPACE3-1 DirectAir ADU,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
     ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
-
-  AirTerminal:SingleDuct:Uncontrolled,
-    SPACE3-1 Air Terminal,   !- Name
-    ,                        !- Availability Schedule Name
-    SPACE3-1 Zone Equip Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
 
   ZoneControl:Thermostat,
     SPACE4-1 Thermostat,     !- Name
@@ -2603,18 +2675,12 @@
   ZoneHVAC:EquipmentList,
     SPACE4-1 Equipment,      !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    SPACE4-1 Air Terminal,   !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    SPACE4-1 DirectAir ADU,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
     ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
-
-  AirTerminal:SingleDuct:Uncontrolled,
-    SPACE4-1 Air Terminal,   !- Name
-    ,                        !- Availability Schedule Name
-    SPACE4-1 Zone Equip Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
 
   ZoneControl:Thermostat,
     SPACE5-1 Thermostat,     !- Name
@@ -2671,18 +2737,12 @@
   ZoneHVAC:EquipmentList,
     SPACE5-1 Equipment,      !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    SPACE5-1 Air Terminal,   !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    SPACE5-1 DirectAir ADU,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
     ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
-
-  AirTerminal:SingleDuct:Uncontrolled,
-    SPACE5-1 Air Terminal,   !- Name
-    ,                        !- Availability Schedule Name
-    SPACE5-1 Zone Equip Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
 
   Sizing:System,
     Sys 1 Furnace DX Cool,   !- AirLoop Name
@@ -2760,7 +2820,7 @@
   AirLoopHVAC:ZoneSplitter,
     Sys 1 Furnace DX Cool Zone Splitter,  !- Name
     Sys 1 Furnace DX Cool Supply Path Inlet,  !- Inlet Node Name
-    SPACE1-1 Zone Equip Inlet;  !- Outlet 1 Node Name
+    SPACE1-1 Inlet Node ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ReturnPath,
     Sys 1 Furnace DX Cool Return Path,  !- Name
@@ -3513,7 +3573,7 @@ Dimensionless;	!- Output Unit Type
   AirLoopHVAC:ZoneSplitter,
     Sys 2 Furnace DX Cool Zone Splitter,  !- Name
     Sys 2 Furnace DX Cool Supply Path Inlet,  !- Inlet Node Name
-    SPACE2-1 Zone Equip Inlet;  !- Outlet 1 Node Name
+    SPACE2-1 Inlet Node ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ReturnPath,
     Sys 2 Furnace DX Cool Return Path,  !- Name
@@ -3877,7 +3937,7 @@ Dimensionless;	!- Output Unit Type
   AirLoopHVAC:ZoneSplitter,
     Sys 3 Heat Pump Air Source Zone Splitter,  !- Name
     Sys 3 Heat Pump Air Source Supply Path Inlet,  !- Inlet Node Name
-    SPACE3-1 Zone Equip Inlet;  !- Outlet 1 Node Name
+    SPACE3-1 Inlet Node ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ReturnPath,
     Sys 3 Heat Pump Air Source Return Path,  !- Name
@@ -4322,7 +4382,7 @@ Dimensionless;	!- Output Unit Type
   AirLoopHVAC:ZoneSplitter,
     Sys 4 Heat Pump Air Source Zone Splitter,  !- Name
     Sys 4 Heat Pump Air Source Supply Path Inlet,  !- Inlet Node Name
-    SPACE4-1 Zone Equip Inlet;  !- Outlet 1 Node Name
+    SPACE4-1 Inlet Node ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ReturnPath,
     Sys 4 Heat Pump Air Source Return Path,  !- Name
@@ -4767,7 +4827,7 @@ Dimensionless;	!- Output Unit Type
   AirLoopHVAC:ZoneSplitter,
     Sys 5 Furnace DX Cool Zone Splitter,  !- Name
     Sys 5 Furnace DX Cool Supply Path Inlet,  !- Inlet Node Name
-    SPACE5-1 Zone Equip Inlet;  !- Outlet 1 Node Name
+    SPACE5-1 Inlet Node ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ReturnPath,
     Sys 5 Furnace DX Cool Return Path,  !- Name
