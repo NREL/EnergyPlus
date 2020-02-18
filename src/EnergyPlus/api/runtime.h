@@ -78,7 +78,6 @@ extern "C" {
 #endif
 
 ENERGYPLUSLIB_API void cClearAllStates();
-ENERGYPLUSLIB_API void cRuntimeNoOp();
 
 // Program level functions
 ENERGYPLUSLIB_API int energyplus(int argc, const char *argv[]);
