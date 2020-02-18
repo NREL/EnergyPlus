@@ -91,9 +91,7 @@ If this coil is used with a Fan:VariableVolume to model a packaged variable-air-
 
 \paragraph{Field: Capacity Control Method}\label{field-capacity-control-method}
 
-This choice field defined the capacity control method. Valid choices for this input field are \textbf{Staged}, \textbf{VariableSpeed}, or \textbf{Multispeed}. The default for this field is \textbf{Multispeed}. \textbf{Staged} control mode.... <<<check this>>>. \textbf{VariableSpeed} control mode allows the coil performance to be operated at continuously variable speeds. \textbf{Multispeed} control mode allow the coil to operate at discrete speed levels.
-
-If the DX unit can switch operating modes to increase dehumidification based on a humidistat signal, then set this to \textbf{HumidityControl}. This field just specifies the availability of enhanced dehumidification. Actual control of the operating mode is handled by the coil's parent component.
+This choice field defined the capacity control method. Valid choices for this input field are \textbf{Staged}, \textbf{VariableSpeed} or \textbf{Multispeed}. The default for this field is \textbf{Multispeed}. \textbf{VariableSpeed} control mode allows the coil performance to be operated at continuously variable speeds. \textbf{Multispeed} control mode allow the coil to operate at discrete speed levels.
 
 \paragraph{Field: Evaporative Condenser Basin Heater Capacity}\label{field-evaporative-condenser-basin-heater-capacity-000}
 
@@ -101,7 +99,7 @@ This numeric field contains the capacity of the coil's electric evaporative cool
 
 \paragraph{Field: Evaporative Condenser Basin Heater Setpoint Temperature}\label{field-evaporative-condenser-basin-heater-setpoint-temperature-000}
 
-This numeric field contains the set point temperature (˚C) for the basin heater described in the previous field. This field only applies for Condenser Type = \textbf{EvaporativelyCooled}. The basin heater is active when the outdoor air dry-bulb temperature falls below this setpoint temperature, as long as the DX coil is off. This set point temperature must be greater than or equal to 2 ˚C (35.6 °F), and the default value is 2 ˚C (35.6 °F) if this field is left blank.
+This numeric field contains the set point temperature (\SI{\celsius}) for the basin heater described in the previous field. This field only applies for Condenser Type = \textbf{EvaporativelyCooled}. The basin heater is active when the outdoor air dry-bulb temperature falls below this setpoint temperature, as long as the DX coil is off. This set point temperature must be greater than or equal to \SI{2}{\celsius} (\SI{35.6}{\fahrenheit}), and the default value is \SI{2}{\celsius} (\SI{35.6}{\fahrenheit}) if this field is left blank.
 
 \paragraph{Field: Evaporative Condenser Basin Heater Operating Schedule Name}\label{field-evaporative-condenser-basin-heater-operating-schedule-name-000}
 

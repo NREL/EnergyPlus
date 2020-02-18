@@ -116,7 +116,6 @@ struct CoilCoolingDXCurveFitPerformance
 
 	enum CapControlMethod
 	{
-		STAGED,
 		VARIABLE,
 		MULTISPEED
 	};

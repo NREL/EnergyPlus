@@ -2087,8 +2087,6 @@ namespace UnitarySystems {
                 this->m_MultiSpeedCoolingCoil = true;
             } else if (newCoil.performance.capControlMethod == CoilCoolingDXCurveFitPerformance::CapControlMethod::VARIABLE) {
                 this->m_VarSpeedCoolingCoil = true;
-            } else if (newCoil.performance.capControlMethod == CoilCoolingDXCurveFitPerformance::CapControlMethod::STAGED) {
-                // not sure what to do here
             }
 
             newCoil.size();
@@ -2136,7 +2134,7 @@ namespace UnitarySystems {
             DXCoils::SimDXCoilMultiSpeed(blankString, 1.0, 1.0, this->m_CoolingCoilIndex, 0, 0, 0);
             if ( !HardSizeNoDesRun && EqSizing.Capacity ) {
                 // do nothing, the vars EqSizing.DesCoolingLoad and DataSizing::DXCoolCap are already set earlier and the values could be max of the
-                // cooling and heating austosized values. Thus reseting them here to user specified value may not be the design size used else where 
+                // cooling and heating austosized values. Thus reseting them here to user specified value may not be the design size used else where
             } else {
                 DataSizing::DXCoolCap = DXCoils::GetCoilCapacityByIndexType( this->m_CoolingCoilIndex, this->m_CoolingCoilType_Num, ErrFound );
                 EqSizing.DesCoolingLoad = DataSizing::DXCoolCap;

@@ -77,8 +77,6 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(const CoilCoolin
     this->normalMode = CoilCoolingDXCurveFitOperatingMode(input_data.base_operating_mode_name);
     if (UtilityRoutines::SameString(input_data.capacity_control, "VARIABLESPEED")) {
         this->capControlMethod = CapControlMethod::VARIABLE;
-    } else if (UtilityRoutines::SameString(input_data.capacity_control, "STAGED")) {
-        this->capControlMethod = CapControlMethod::STAGED;
     } else if (UtilityRoutines::SameString(input_data.capacity_control, "MULTISPEED")) {
         this->capControlMethod = CapControlMethod::MULTISPEED;
     } else {
