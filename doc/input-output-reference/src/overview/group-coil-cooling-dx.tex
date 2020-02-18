@@ -92,9 +92,7 @@ If this coil is used with a Fan:VariableVolume to model a packaged variable-air-
 
 \paragraph{Field: Capacity Control Method}\label{field-capacity-control-method}
 
-This choice field defined the capacity control method. Valid choices for this input field are \textbf{Staged}, \textbf{VariableSpeed}, or \textbf{Multispeed}. The default for this field is \textbf{Multispeed}. \textbf{Staged} control mode.... <<<check this>>>. \textbf{VariableSpeed} control mode allows the coil performance to be operated at continuously variable speeds. \textbf{Multispeed} control mode allow the coil to operate at discrete speed levels.
-
-If the DX unit can switch operating modes to increase dehumidification based on a humidistat signal, then set this to \textbf{HumidityControl}. This field just specifies the availability of enhanced dehumidification. Actual control of the operating mode is handled by the coil's parent component.
+This choice field defined the capacity control method. Valid choices for this input field are \textbf{Discrete} \textbf{Continuous}. The default for this field is \textbf{Discrete}. \textbf{Discrete} control mode allow the coil to operate at discrete speed levels. \textbf{Continuous} control mode allows the coil performance to be operated at continuously variable speeds.
 
 \paragraph{Field: Evaporative Condenser Basin Heater Capacity}\label{field-evaporative-condenser-basin-heater-capacity-000}
 
@@ -102,7 +100,7 @@ This numeric field contains the capacity of the coil's electric evaporative cool
 
 \paragraph{Field: Evaporative Condenser Basin Heater Setpoint Temperature}\label{field-evaporative-condenser-basin-heater-setpoint-temperature-000}
 
-This numeric field contains the set point temperature (˚C) for the basin heater described in the previous field. This field only applies for Condenser Type = \textbf{EvaporativelyCooled}. The basin heater is active when the outdoor air dry-bulb temperature falls below this setpoint temperature, as long as the DX coil is off. This set point temperature must be greater than or equal to 2 ˚C (35.6 °F), and the default value is 2 ˚C (35.6 °F) if this field is left blank.
+This numeric field contains the set point temperature (\SI{\celsius}) for the basin heater described in the previous field. This field only applies for Condenser Type = \textbf{EvaporativelyCooled}. The basin heater is active when the outdoor air dry-bulb temperature falls below this setpoint temperature, as long as the DX coil is off. This set point temperature must be greater than or equal to \SI{2}{\celsius} (\SI{35.6}{\fahrenheit}), and the default value is \SI{2}{\celsius} (\SI{35.6}{\fahrenheit}) if this field is left blank.
 
 \paragraph{Field: Evaporative Condenser Basin Heater Operating Schedule Name}\label{field-evaporative-condenser-basin-heater-operating-schedule-name-000}
 
@@ -309,64 +307,64 @@ Following is an example input for a single-speed air-cooled cooling DX coil.
 \begin{lstlisting}
 
 Coil:Cooling:DX,
-  Single Speed Cooling Coil,     !- Name
-  Cooling Coil Air Inlet Node, !- Evaporator Inlet Node Name
-  Cooling Coil Air Outlet Node, !- Evaporator Outlet Node Name
-  FanAndCoilAvailSched,   !- Availability Schedule Name
-  , !- Condenser Zone Name
-  Outdoor Condenser Air Inlet Node, !- Condenser Inlet Node Name
-  Outdoor Condenser Air Outlet Node, !- Condenser Outlet Node Name
+  Single Speed Cooling Coil,          !- Name
+  Cooling Coil Air Inlet Node,        !- Evaporator Inlet Node Name
+  Cooling Coil Air Outlet Node,       !- Evaporator Outlet Node Name
+  FanAndCoilAvailSched,               !- Availability Schedule Name
+  ,                                   !- Condenser Zone Name
+  Outdoor Condenser Air Inlet Node,   !- Condenser Inlet Node Name
+  Outdoor Condenser Air Outlet Node,  !- Condenser Outlet Node Name
   Single Speed Cooling Coil Performance, !- Performance Object Name
   , !- Condensate Collection Water Storage Tank Name
   ; !- Evaporative Condenser Supply Water Storage Tank Name
 
 Coil:Cooling:DX:CurveFit:Performance,
-  Single Speed Cooling Coil Performance, !- Name
-  0.0, !- Crankcase Heater Capacity {W}
-  -25.0, !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-  10.0, !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-  500.0, !- Unit Internal Static Air Pressure {Pa}
-  HumidityControl, !- Capacity Control Method
-  , !- Evaporative Condenser Basin Heater Capacity {W}
-  , !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
-  , !- Evaporative Condenser Basin Heater Operating Schedule Name
-  Electricity, !- Compressor Fuel Type
+  Single Speed Cooling Coil Performance,  !- Name
+  0.0,       !- Crankcase Heater Capacity {W}
+  -25.0,     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+  10.0,      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+  500.0,     !- Unit Internal Static Air Pressure {Pa}
+  Discrete,  !- Capacity Control Method
+  ,          !- Evaporative Condenser Basin Heater Capacity {W}
+  ,          !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
+  ,          !- Evaporative Condenser Basin Heater Operating Schedule Name
+  Electricity,   !- Compressor Fuel Type
   Single Speed Cooling Coil Operating Mode; !- Operating Mode 1 Name
 
 Coil:Cooling:DX:CurveFit:OperatingMode,
   Single Speed Cooling Coil Operating Mode, !-  Name
-  Autosize, !- Rated Gross Total Cooling Capacity {W}
-  Autosize, !- Rated Evaporator Air Flow Rate {m3/s}
-  , !- Rated Condenser Air Flow Rate {m3/s}
-  0.0, !- Maximum Cycling Rate {cycles/hr}
-  0.0, !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity
-  0.0, !- Latent Capacity Time Constant {s}
-  0.0, !- Nominal Time for Condensate Removal to Begin {s}
-  No, !- Apply Latent Degradation to Speeds Greater than 1
+  Autosize,  !- Rated Gross Total Cooling Capacity {W}
+  Autosize,  !- Rated Evaporator Air Flow Rate {m3/s}
+  ,          !- Rated Condenser Air Flow Rate {m3/s}
+  0.0,       !- Maximum Cycling Rate {cycles/hr}
+  0.0,       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity
+  0.0,       !- Latent Capacity Time Constant {s}
+  0.0,       !- Nominal Time for Condensate Removal to Begin {s}
+  No,        !- Apply Latent Degradation to Speeds Greater than 1
   AirCooled, !- Condenser Type
-  , !- Nominal Evaporative Condenser Pump Power {W}
-  Multispeed, !- Capacity Control Method
-  1, !- Nominal Speed Number
-  Single Speed Cooling Coil Speed 1; !- Speed 1 Name
+  1,         !- Nominal Speed Number
+  Single Speed Cooling Coil Speed 1;  !- Speed 1 Name
 
 Coil:Cooling:DX:CurveFit:Speed,
-  Single Speed Cooling Coil Speed 1, !- Name
-  1.0, !- Gross Total Cooling Capacity Fraction
-  1.0, !- Evaporator Air Flow Rate Fraction
-  1.0, !- Condenser Air Flow Rate Fraction
-  Autosize, !- Gross Sensible Heat Ratio
-  3.0, !- Gross Cooling COP
-  1.0, !- Active Fraction of Coil Face Area
-  773.3, !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-  1.0, !- Evaporative Condenser Pump Power Fraction
-  0.9, !- Evaporative Condenser Effectiveness
-  Single Speed Cool Cap fTemp, !- Total Cooling Capacity Modifier Function of Temperature Curve Name
-  Single Speed Cool Cap fFlow, !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
-  Single Speed Cool EIR fTemp, !- Energy Input Ratio Modifier Function of Temperature Curve Name
-  Single Speed Cool EIR fFlow, !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-  Single Speed Cool fPLR, !- Part Load Fraction Correlation Curve Name
-  0.2, !- Rated Waste Heat Fraction of Power Input
-  Single Speed Waste Heat fTemp; !- Waste Heat Function of Temperature Curve Name
+  Single Speed Cooling Coil Speed 1,  !- Name
+  1.0,       !- Gross Total Cooling Capacity Fraction
+  1.0,       !- Evaporator Air Flow Rate Fraction
+  1.0,       !- Condenser Air Flow Rate Fraction
+  Autosize,  !- Gross Sensible Heat Ratio
+  3.0,       !- Gross Cooling COP
+  1.0,       !- Active Fraction of Coil Face Area
+  773.3,     !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  1.0,       !- Evaporative Condenser Pump Power Fraction
+  0.9,       !- Evaporative Condenser Effectiveness
+  Single Speed Cool Cap fTemp,  !- Total Cooling Capacity Modifier Function of Temperature Curve Name
+  Single Speed Cool Cap fFlow,  !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
+  Single Speed Cool EIR fTemp,  !- Energy Input Ratio Modifier Function of Temperature Curve Name
+  Single Speed Cool EIR fFlow,  !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
+  Single Speed Cool fPLR,       !- Part Load Fraction Correlation Curve Name
+  0.2,                            !- Rated Waste Heat Fraction of Power Input
+  Single Speed Waste Heat fTemp;  !- Waste Heat Function of Temperature Curve Name
+  , !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
+  ; !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
 \end{lstlisting}
 
@@ -376,82 +374,82 @@ Following is an example input for a three-speed evaporatively-cooled cooling DX 
 
 Coil:Cooling:DX,
   Three Speed Cooling Coil,     !- Name
-  Cooling Coil Air Inlet Node, !- Evaporator Inlet Node Name
+  Cooling Coil Air Inlet Node,  !- Evaporator Inlet Node Name
   Cooling Coil Air Outlet Node, !- Evaporator Outlet Node Name
-  FanAndCoilAvailSched,   !- Availability Schedule Name
-  , !- Condenser Zone Name
-  Outdoor Condenser Air Inlet Node, !- Condenser Inlet Node Name
-  Outdoor Condenser Air Outlet Node, !- Condenser Outlet Node Name
-  Three Speed Cooling Coil Performance, !- Performance Object Name
+  FanAndCoilAvailSched,         !- Availability Schedule Name
+  ,                             !- Condenser Zone Name
+  Outdoor Condenser Air Inlet Node,   !- Condenser Inlet Node Name
+  Outdoor Condenser Air Outlet Node,  !- Condenser Outlet Node Name
+  Three Speed Cooling Coil Performance,   !- Performance Object Name
   , !- Condensate Collection Water Storage Tank Name
   ; !- Evaporative Condenser Supply Water Storage Tank Name
 
 Coil:Cooling:DX:CurveFit:Performance,
-  Three Speed Cooling Coil Performance, !- Name
-  0.0, !- Crankcase Heater Capacity {W}
-  -25.0, !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
-  10.0, !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
-  500.0, !- Unit Internal Static Air Pressure {Pa}
-  Staged, !- Capacity Control Method
-  0.0, !- Evaporative Condenser Basin Heater Capacity {W}
-  2.0, !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
+  Three Speed Cooling Coil Performance,   !- Name
+  0.0,       !- Crankcase Heater Capacity {W}
+  -25.0,     !- Minimum Outdoor Dry-Bulb Temperature for Compressor Operation {C}
+  10.0,      !- Maximum Outdoor Dry-Bulb Temperature for Crankcase Heater Operation {C}
+  500.0,     !- Unit Internal Static Air Pressure {Pa}
+  Discrete,  !- Capacity Control Method
+  0.0,       !- Evaporative Condenser Basin Heater Capacity {W}
+  2.0,       !- Evaporative Condenser Basin Heater Setpoint Temperature {C}
   FanAndCoilAvailSched, !- Evaporative Condenser Basin Heater Operating Schedule Name
-  Electricity, !- Compressor Fuel Type
-  Three Speed Cooling Coil Operating Mode; !- Operating Mode 1 Name
+  Electricity,          !- Compressor Fuel Type
+  Three Speed Cooling Coil Operating Mode;  !- Operating Mode 1 Name
 
 Coil:Cooling:DX:CurveFit:OperatingMode,
-  Three Speed Cooling Coil Operating Mode, !-  Name
-  Autosize, !- Rated Gross Total Cooling Capacity {W}
-  Autosize, !- Rated Evaporator Air Flow Rate {m3/s}
-  Autosize, !- Rated Condenser Air Flow Rate {m3/s}
-  0.0, !- Maximum Cycling Rate {cycles/hr}
-  0.0, !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity
-  0.0, !- Latent Capacity Time Constant {s}
-  0.0, !- Nominal Time for Condensate Removal to Begin {s}
-  No,  !- Apply Latent Degradation to Speeds Greater than 1
+  Three Speed Cooling Coil Operating Mode,  !-  Name
+  Autosize,  !- Rated Gross Total Cooling Capacity {W}
+  Autosize,  !- Rated Evaporator Air Flow Rate {m3/s}
+  Autosize,  !- Rated Condenser Air Flow Rate {m3/s}
+  0.0,       !- Maximum Cycling Rate {cycles/hr}
+  0.0,       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity
+  0.0,       !- Latent Capacity Time Constant {s}
+  0.0,       !- Nominal Time for Condensate Removal to Begin {s}
+  No,        !- Apply Latent Degradation to Speeds Greater than 1
   Aircooled, !- Condenser Type
-  , !- Nominal Evaporative Condenser Pump Power
-  Three Speed Cooling Coil Speed 1, !- Speed 1 Name
-  Three Speed Cooling Coil Speed 2, !- Speed 2 Name
-  Three Speed Cooling Coil Speed 3; !- Speed 3 Name
+  ,          !- Nominal Evaporative Condenser Pump Power
+  Three Speed Cooling Coil Speed 1,  !- Speed 1 Name
+  Three Speed Cooling Coil Speed 2,  !- Speed 2 Name
+  Three Speed Cooling Coil Speed 3;  !- Speed 3 Name
 
 Coil:Cooling:DX:CurveFit:Speed,
   Three Speed Cooling Coil Speed 1, !- Name
-  0.4, !- Gross Total Cooling Capacity Fraction
-  0.4, !- Evaporator Air Flow Rate Fraction
-  0.4, !- Condenser Air Flow Rate Fraction
-  Autosize, !- Gross Sensible Heat Ratio
-  4.5, !- Gross Cooling COP
-  1.0, !- Active Fraction of Coil Face Area
-  453.3, !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-  0.4, !- Evaporative Condenser Pump Power Fraction
-  0.9, !- Evaporative Condenser Effectiveness
+  0.4,       !- Gross Total Cooling Capacity Fraction
+  0.4,       !- Evaporator Air Flow Rate Fraction
+  0.4,       !- Condenser Air Flow Rate Fraction
+  Autosize,  !- Gross Sensible Heat Ratio
+  4.5,       !- Gross Cooling COP
+  1.0,       !- Active Fraction of Coil Face Area
+  453.3,     !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  0.4,       !- Evaporative Condenser Pump Power Fraction
+  0.9,       !- Evaporative Condenser Effectiveness
   Three Speed Cool Cap fTemp Spd 1, !- Total Cooling Capacity Modifier Function of Temperature Curve Name
   Three Speed Cool Cap fFlow Spd 1, !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
   Three Speed Cool EIR fTemp Spd 1, !- Energy Input Ratio Modifier Function of Temperature Curve Name
   Three Speed Cool EIR fFlow Spd 1, !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-  Three Speed Cool fPLR Spd 1, !- Part Load Fraction Correlation Curve Name
-  0.2, !- Rated Waste Heat Fraction of Power Input
+  Three Speed Cool fPLR Spd 1,      !- Part Load Fraction Correlation Curve Name
+  0.2,                              !- Rated Waste Heat Fraction of Power Input
   Three Speed Waste Heat fTemp Spd 1, !- Waste Heat Function of Temperature Curve Name
   Three Speed SHR fTemp Spd 1, !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
   Three Speed SHR fFlow Spd 1; !- Sensible Heat Ratio Modifier Function of Flow Fraction Curve Name
 
 Coil:Cooling:DX:CurveFit:Speed,
   Three Speed Cooling Coil Speed 2, !- Name
-  0.7, !- Gross Total Cooling Capacity Fraction
-  0.7, !- Evaporator Air Flow Rate Fraction
-  0.7, !- Condenser Air Flow Rate Fraction
-  Autosize, !- Gross Sensible Heat Ratio
-  3.5, !- Gross Cooling COP
-  1.0, !- Active Fraction of Coil Face Area
-  613.3, !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-  0.7, !- Evaporative Condenser Pump Power Fraction
-  0.9, !- Evaporative Condenser Effectiveness
+  0.7,       !- Gross Total Cooling Capacity Fraction
+  0.7,       !- Evaporator Air Flow Rate Fraction
+  0.7,       !- Condenser Air Flow Rate Fraction
+  Autosize,  !- Gross Sensible Heat Ratio
+  3.5,       !- Gross Cooling COP
+  1.0,       !- Active Fraction of Coil Face Area
+  613.3,     !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  0.7,       !- Evaporative Condenser Pump Power Fraction
+  0.9,       !- Evaporative Condenser Effectiveness
   Three Speed Cool Cap fTemp Spd 2, !- Total Cooling Capacity Modifier Function of Temperature Curve Name
   Three Speed Cool Cap fFlow Spd 2, !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
   Three Speed Cool EIR fTemp Spd 2, !- Energy Input Ratio Modifier Function of Temperature Curve Name
   Three Speed Cool EIR fFlow Spd 2, !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-  Three Speed Cool fPLR Spd 2, !- Part Load Fraction Correlation Curve Name
+  Three Speed Cool fPLR Spd 2,      !- Part Load Fraction Correlation Curve Name
   0.2, !- Rated Waste Heat Fraction of Power Input
   Three Speed Waste Heat fTemp Spd 2, !- Waste Heat Function of Temperature Curve Name
   Three Speed SHR fTemp Spd 2, !- Sensible Heat Ratio Modifier Function of Temperature Curve Name
@@ -459,20 +457,20 @@ Coil:Cooling:DX:CurveFit:Speed,
 
 Coil:Cooling:DX:CurveFit:Speed,
   Three Speed Cooling Coil Speed 3, !- Name
-  1.0, !- Gross Total Cooling Capacity Fraction
-  1.0, !- Evaporator Air Flow Rate Fraction
-  1.0, !- Condenser Air Flow Rate Fraction
+  1.0,      !- Gross Total Cooling Capacity Fraction
+  1.0,      !- Evaporator Air Flow Rate Fraction
+  1.0,      !- Condenser Air Flow Rate Fraction
   Autosize, !- Gross Sensible Heat Ratio
-  3.0, !- Gross Cooling COP
-  1.0, !- Active Fraction of Coil Face Area
-  773.3, !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
-  1.0, !- Evaporative Condenser Pump Power Fraction
-  0.9, !- Evaporative Condenser Effectiveness
+  3.0,      !- Gross Cooling COP
+  1.0,      !- Active Fraction of Coil Face Area
+  773.3,    !- Rated Evaporator Fan Power Per Volume Flow Rate {W/(m3/s)}
+  1.0,      !- Evaporative Condenser Pump Power Fraction
+  0.9,      !- Evaporative Condenser Effectiveness
   Three Speed Cool Cap fTemp Spd 3, !- Total Cooling Capacity Modifier Function of Temperature Curve Name
   Three Speed Cool Cap fFlow Spd 3, !- Total Cooling Capacity Modifier Function of Air Flow Fraction Curve Name
   Three Speed Cool EIR fTemp Spd 3, !- Energy Input Ratio Modifier Function of Temperature Curve Name
   Three Speed Cool EIR fFlow Spd 3, !- Energy Input Ratio Modifier Function of Air Flow Fraction Curve Name
-  Three Speed Cool fPLR Spd 3, !- Part Load Fraction Correlation Curve Name
+  Three Speed Cool fPLR Spd 3,      !- Part Load Fraction Correlation Curve Name
   0.2, !- Rated Waste Heat Fraction of Power Input
   Three Speed Waste Heat fTemp Spd 3, !- Waste Heat Function of Temperature Curve Name
   Three Speed SHR fTemp Spd 3, !- Sensible Heat Ratio Modifier Function of Temperature Curve Name

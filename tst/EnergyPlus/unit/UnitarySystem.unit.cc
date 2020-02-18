@@ -3460,7 +3460,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SetOnOffMassFlowRateTest)
     // same test for cooling mode (flow @ 0.3 * PLR @ 0.7 = 0.21)
     thisSys.m_HeatingSpeedNum = 0;
     thisSys.m_CoolingSpeedNum = 1;
-    thisSys.m_MultiSpeedCoolingCoil = true;
+    thisSys.m_DiscreteSpeedCoolingCoil = true;
     UnitarySystems::HeatingLoad = false;
     UnitarySystems::CoolingLoad = true;
     thisSys.setOnOffMassFlowRate(OnOffAirFlowRatio, PartLoadRatio);
@@ -3772,7 +3772,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryHeatingSystem)
     AirMassFlowRate = 1.0;
     HotWaterMassFlowRate = 1.0;
     thisSys.MaxHeatCoilFluidFlow = HotWaterMassFlowRate;
-    thisSys.m_MultiSpeedCoolingCoil = true;
+    thisSys.m_DiscreteSpeedCoolingCoil = true;
     thisSys.m_HeatingCoilType_Num = DataHVACGlobals::Coil_HeatingWater;
     thisSys.m_HeatingSpeedRatio = 1.0;
     thisSys.m_HeatingCycRatio = 1.0;
@@ -3912,7 +3912,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryCoolingSystem)
     ColdWaterMassFlowRate = 1.0;
 
     thisSys.MaxCoolCoilFluidFlow = ColdWaterMassFlowRate;
-    thisSys.m_MultiSpeedCoolingCoil = true;
+    thisSys.m_DiscreteSpeedCoolingCoil = true;
     thisSys.m_CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingWater;
     thisSys.m_CoolingSpeedRatio = 1.0;
     thisSys.m_CoolingCycRatio = 1.0;
