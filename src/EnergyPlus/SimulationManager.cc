@@ -732,7 +732,7 @@ namespace SimulationManager {
         static Array1D_int const Div60(12, {1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60});
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D_string Alphas(6);
+        Array1D_string Alphas(8);
         Array1D<Real64> Number(4);
         int NumAlpha;
         int NumNumber;
@@ -1166,6 +1166,7 @@ namespace SimulationManager {
             ErrorsFound = true;
             ShowFatalError("GetProjectData: Only one (\"1\") " + CurrentModuleObject + " object per simulation is allowed.");
         }
+        std::string overrideModeValue = "Normal";
         if (instances != inputProcessor->epJSON.end()) {
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
@@ -1173,7 +1174,7 @@ namespace SimulationManager {
                 auto const &thisObjectName = instance.key();
                 inputProcessor->markObjectAsUsed(CurrentModuleObject, thisObjectName);
                 if (fields.find("use_coil_direct_solutions") != fields.end()) {
-                    DoCoilDirectSolutions =
+                    DataGlobals::DoCoilDirectSolutions =
                         UtilityRoutines::MakeUPPERCase(fields.at("use_coil_direct_solutions")) == "YES";
                 }
                 if (fields.find("zone_radiant_exchange_algorithm") != fields.end()) {
@@ -1186,7 +1187,7 @@ namespace SimulationManager {
                 bool overrideBeginEnvResetSuppress(false);
                 bool overrideMaxZoneTempDiff(false);
                 if (fields.find("override_mode") != fields.end()) {
-                    auto overrideModeValue = UtilityRoutines::MakeUPPERCase(fields.at("override_mode"));
+                    overrideModeValue = UtilityRoutines::MakeUPPERCase(fields.at("override_mode"));
                     if (overrideModeValue == "NORMAL") {
                         // no overrides
                     }
@@ -1343,9 +1344,27 @@ namespace SimulationManager {
         } else {
             Alphas(2) = "ScriptF";
         }
-        print(outputFiles.eio, "{}\n", "! <Performance Precision Tradeoffs>, Use Coil Direct Simulation, Zone Radiant Exchange Algorithm");
+        Alphas(3) = overrideModeValue;
+        Alphas(4) = General::RoundSigDigits(DataGlobals::NumOfTimeStepInHour);
+        if (DataHeatBalance::OverrideZoneAirSolutionAlgo) {
+            Alphas(5) = "Yes";
+        } else {
+            Alphas(5) = "No";
+        }
+        Alphas(6) = General::RoundSigDigits(DataHeatBalance::MinNumberOfWarmupDays);
+        if (DataEnvironment::forceBeginEnvResetSuppress) {
+            Alphas(7) = "Yes";
+        } else {
+            Alphas(7) = "No";
+        }
+        Alphas(8) = General::RoundSigDigits(DataConvergParams::MaxZoneTempDiff);
+        std::string pptHeader = "! <Performance Precision Tradeoffs>, Use Coil Direct Simulation, "
+            "Zone Radiant Exchange Algorithm, Override Mode, Number of Timestep In Hour, "
+            "Force Euler Method, Minimum Number of Warmup Days, Force Suppress All Begin Environment Resets, "
+            "MaxZoneTempDiff";
+        print(outputFiles.eio, "{}\n", pptHeader);
         print(outputFiles.eio, " Performance Precision Tradeoffs");
-        for (Num = 1; Num <= 2; ++Num) {
+        for (Num = 1; Num <= 8; ++Num) {
             print(outputFiles.eio, ", {}", Alphas(Num));
         }
         print(outputFiles.eio, "\n");
