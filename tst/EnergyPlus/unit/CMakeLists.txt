@@ -112,6 +112,7 @@ set( test_src
   OASystemHWPreheatCoil.unit.cc
   OutAirNodeManager.unit.cc
   OutdoorAirUnit.unit.cc
+  OutputFiles.unit.cc
   OutputProcessor.unit.cc
   OutputReportData.unit.cc
   OutputReports.unit.cc
@@ -191,7 +192,7 @@ set( test_src
   XingGroundTemperatureModel.unit.cc
   ZoneContaminantPredictorCorrector.unit.cc
   ZoneEquipmentManager.unit.cc
-  ZoneHVACEvaporativeCooler.unit
+  ZoneHVACEvaporativeCooler.unit.cc
   ZonePlenum.unit.cc
   ZoneTempPredictorCorrector.unit.cc
   main.cc

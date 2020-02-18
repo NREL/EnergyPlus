@@ -6981,7 +6981,15 @@ namespace DXCoils {
                     FieldNum = 1;
                     TempSize = DXCoil(DXCoilNum).RatedTotCap(Mode);
                     SizingString = DXCoilNumericFields(DXCoilNum).PerfMode(Mode).FieldNames(FieldNum) + " [W]";
-                    CoilInTemp = ZoneSizingRunDone ? FinalZoneSizing(CurZoneEqNum).DesCoolCoilInTemp : 26;
+                    if (CurZoneEqNum > 0) {
+                        CoilInTemp = ZoneSizingRunDone ? FinalZoneSizing(CurZoneEqNum).DesCoolCoilInTemp : 26;
+                    } else {
+                        if (CurOASysNum > 0) {
+                            CoilInTemp = SysSizingRunDone ? FinalSysSizing(CurSysNum).OutTempAtCoolPeak : 32;
+                        } else {
+                            CoilInTemp = SysSizingRunDone ? FinalSysSizing(CurSysNum).MixTempAtCoolPeak : 26;
+                        }
+                    }
                     CalcVRFCoilCapModFac(0, _, CompName, CoilInTemp, _, _, _, DataTotCapCurveValue);
                 } else if (DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_MultiSpeedCooling) {
                     SizingMethod = CoolingCapacitySizing;
@@ -7901,7 +7909,8 @@ namespace DXCoils {
         // Call routine that computes AHRI certified rating for single-speed DX Coils
         if ((DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_CoolingSingleSpeed && DXCoil(DXCoilNum).CondenserType(1) == AirCooled) ||
             DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatingEmpirical) {
-            CalcDXCoilStandardRating(DXCoil(DXCoilNum).Name,
+            CalcDXCoilStandardRating(OutputFiles::getSingleton(),
+                                     DXCoil(DXCoilNum).Name,
                                      DXCoil(DXCoilNum).DXCoilType,
                                      DXCoil(DXCoilNum).DXCoilType_Num,
                                      1,
@@ -7923,7 +7932,8 @@ namespace DXCoils {
         }
         // Call routine that computes AHRI certified rating for multi-speed DX cooling Coils
         if (DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_MultiSpeedCooling || DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_MultiSpeedHeating) {
-            CalcDXCoilStandardRating(DXCoil(DXCoilNum).Name,
+            CalcDXCoilStandardRating(OutputFiles::getSingleton(),
+                                     DXCoil(DXCoilNum).Name,
                                      DXCoil(DXCoilNum).DXCoilType,
                                      DXCoil(DXCoilNum).DXCoilType_Num,
                                      DXCoil(DXCoilNum).NumOfSpeeds,
@@ -7940,7 +7950,8 @@ namespace DXCoils {
                                      DXCoil(DXCoilNum).MinOATCompressor,
                                      DXCoil(DXCoilNum).OATempCompressorOn,
                                      DXCoil(DXCoilNum).OATempCompressorOnOffBlank,
-                                     DXCoil(DXCoilNum).DefrostControl);
+                                     DXCoil(DXCoilNum).DefrostControl,
+                                     ObjexxFCL::Optional_bool_const());
         }
 
         // create predefined report entries
@@ -14477,6 +14488,29 @@ namespace DXCoils {
         return NodeNumber;
     }
 
+    int getCoilInNodeIndex(int const &CoilIndex, // coil index
+                           bool &ErrorsFound     // set to true if problem
+    ) {
+
+        int NodeNumber; // returned node number of matched coil
+
+        // Obtains and Allocates DXCoils
+        if ( GetCoilsInputFlag ) {
+            GetDXCoils();
+            GetCoilsInputFlag = false;
+        }
+
+        if (CoilIndex != 0) {
+            NodeNumber = DXCoil(CoilIndex).AirInNode;
+        } else {
+            ShowSevereError("GetCoilInletNode: Could not find Coil Type");
+            ErrorsFound = true;
+            NodeNumber = 0;
+        }
+
+        return NodeNumber;
+    }
+
     int GetCoilOutletNode(std::string const &CoilType, // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
@@ -14510,6 +14544,29 @@ namespace DXCoils {
         } else {
             ShowSevereError("GetCoilOutletNode: Could not find Coil, Type=\"" + CoilType + "\" Name=\"" + CoilName +
                             "\" when accessing coil outlet node number.");
+            ErrorsFound = true;
+            NodeNumber = 0;
+        }
+
+        return NodeNumber;
+    }
+
+    int getCoilOutNodeIndex(int const &CoilIndex, // must match coil types in this module
+                            bool &ErrorsFound     // set to true if problem
+    ) {
+
+        int NodeNumber; // returned node number of matched coil
+
+        // Obtains and Allocates DXCoils
+        if ( GetCoilsInputFlag ) {
+            GetDXCoils();
+            GetCoilsInputFlag = false;
+        }
+
+        if (CoilIndex != 0) {
+            NodeNumber = DXCoil(CoilIndex).AirOutNode;
+        } else {
+            ShowSevereError("GetCoilOutletNode: Could not find Coil Type");
             ErrorsFound = true;
             NodeNumber = 0;
         }

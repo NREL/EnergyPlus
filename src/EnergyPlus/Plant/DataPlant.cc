@@ -49,23 +49,13 @@
 #include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus/BranchInputManager.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
-#include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/General.hh>
 #include <EnergyPlus/Plant/PlantConvergencePoint.hh>
-#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
 namespace DataPlant {
-
-    // MODULE INFORMATION:
-    //       AUTHOR         Plant code authors?
-    //       DATE WRITTEN
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS MODULE:
     // This data-only module contains the structures for various parts of the Plant and
@@ -112,11 +102,6 @@ namespace DataPlant {
     int const DemandSupply_No(0);
     int const DemandSide(1);
     int const SupplySide(2);
-
-    // Parameters for economizer
-    int const Integrated(1);
-    int const NonIntegrated(2);
-    int const None(3);
 
     // Parameters for tolerance
     Real64 const LoopDemandTol(0.1);   // minimum significant loop cooling or heating demand
@@ -456,65 +441,11 @@ namespace DataPlant {
     int const TypeOf_HeatPumpEIRCooling(95);
     int const TypeOf_HeatPumpEIRHeating(96);
 
-    // Parameters for General Equipment Types
-    int const NumGeneralEquipTypes(23);
-    Array1D_string const GeneralEquipTypes(NumGeneralEquipTypes,
-                                           {"BOILER",
-                                            "CHILLER",
-                                            "COOLINGTOWER",
-                                            "GENERATOR",
-                                            "HEATEXCHANGER",
-                                            "HEATPUMP",
-                                            "PIPE",
-                                            "PUMP",
-                                            "DISTRICT",
-                                            "THERMALSTORAGE",
-                                            "TEMPERINGVALVE",
-                                            "WATERHEATER",
-                                            "WATERUSE",
-                                            "DEMANDCOIL",
-                                            "SOLARCOLLECTOR",
-                                            "LOADPROFILE",
-                                            "FLUIDCOOLER",
-                                            "EVAPORATIVEFLUIDCOOLER",
-                                            "GROUNDHEATEXCHANGER",
-                                            "ZONEHVACDEMAND",
-                                            "REFRIGERATION",
-                                            "PLANTCOMPONENT",
-                                            "CENTRALHEATPUMPSYSTEM"});
-
-    int const GenEquipTypes_Boiler(1);
-    int const GenEquipTypes_Chiller(2);
-    int const GenEquipTypes_CoolingTower(3);
-    int const GenEquipTypes_Generator(4);
-    int const GenEquipTypes_HeatExchanger(5);
-    int const GenEquipTypes_HeatPump(6);
-    int const GenEquipTypes_Pipe(7);
-    int const GenEquipTypes_Pump(8);
-    int const GenEquipTypes_Purchased(9);
-    int const GenEquipTypes_ThermalStorage(10);
-    int const GenEquipTypes_Valve(11);
-    int const GenEquipTypes_WaterThermalTank(12);
-    int const GenEquipTypes_WaterUse(13);
-    int const GenEquipTypes_DemandCoil(14);
-    int const GenEquipTypes_SolarCollector(15);
-    int const GenEquipTypes_LoadProfile(16);
-    int const GenEquipTypes_FluidCooler(17);
-    int const GenEquipTypes_EvapFluidCooler(18);
-    int const GenEquipTypes_GroundHeatExchanger(19);
-    int const GenEquipTypes_ZoneHVACDemand(20);
-    int const GenEquipTypes_Refrigeration(21);
-    int const GenEquipTypes_PlantComponent(22);
-    int const GenEquipTypes_CentralHeatPumpSystem(23);
-
     Array1D<Real64> const ConvergenceHistoryARR(DataPlant::NumConvergenceHistoryTerms, {0.0, -1.0, -2.0, -3.0, -4.0});
     Real64 const sum_ConvergenceHistoryARR(sum(ConvergenceHistoryARR));
     Real64 const square_sum_ConvergenceHistoryARR(pow_2(sum_ConvergenceHistoryARR));
     Real64 const sum_square_ConvergenceHistoryARR(sum(pow(ConvergenceHistoryARR, 2)));
 
-    int NumPipes(0);        // Total number of pipes
-    int NumPlantPipes(0);   // Total number of plant pipes
-    int NumCondPipes(0);    // Total number of condenser pipes
     int TotNumLoops(0);     // number of plant and condenser loops
     int TotNumHalfLoops(0); // number of half loops (2 * TotNumLoops)
     bool PlantFirstSizeCompleted(false);
@@ -524,18 +455,12 @@ namespace DataPlant {
     bool PlantFinalSizesOkayToReport(false);
     bool AnyEMSPlantOpSchemesInModel(false);
 
-    Array1D_int EconBranchNum; // Branch num on which economizer is placed
-    Array1D_int EconCompNum;   // Component num of economizer in the economizer branch
-
-    Array1D_bool LoadChangeDownStream; // sim control flag.
-
     int PlantManageSubIterations(0); // tracks plant iterations to characterize solver
     int PlantManageHalfLoopCalls(0); // tracks number of half loop calls
 
     // Object Data
     Array1D<PlantLoopData> PlantLoop;
     Array1D<PlantAvailMgrData> PlantAvailMgr;
-    Array1D<ReportVars> PlantReport;
     Array1D<ReportLoopData> VentRepPlantSupplySide;
     Array1D<ReportLoopData> VentRepPlantDemandSide;
     Array1D<ReportLoopData> VentRepCondSupplySide;
@@ -546,9 +471,6 @@ namespace DataPlant {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        NumPipes = 0;
-        NumPlantPipes = 0;
-        NumCondPipes = 0;
         TotNumLoops = 0;
         TotNumHalfLoops = 0;
         PlantFirstSizeCompleted = false;
@@ -557,14 +479,10 @@ namespace DataPlant {
         PlantFirstSizesOkayToReport = false;
         PlantFinalSizesOkayToReport = false;
         AnyEMSPlantOpSchemesInModel = false;
-        EconBranchNum.deallocate();
-        EconCompNum.deallocate();
-        LoadChangeDownStream.deallocate();
         PlantManageSubIterations = 0;
         PlantManageHalfLoopCalls = 0;
         PlantLoop.deallocate();
         PlantAvailMgr.deallocate();
-        PlantReport.deallocate();
         VentRepPlantSupplySide.deallocate();
         VentRepPlantDemandSide.deallocate();
         VentRepCondSupplySide.deallocate();

@@ -49,6 +49,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/SimulationManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -68,6 +69,52 @@ TEST_F(EnergyPlusFixture, CheckThreading)
 
     std::string const error_string = delimited_string({
         "   ** Severe  ** Line: 1 Index: 14 - \"ProgramControl\" is not a valid Object Type.",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(EnergyPlusFixture, Test_PerformancePrecisionTradeoffs)
+{
+    std::string const idf_objects = delimited_string({
+        "  Version,9.3;",
+
+        "  SimulationControl,",
+        "    No,                      !- Do Zone Sizing Calculation",
+        "    No,                      !- Do System Sizing Calculation",
+        "    No,                      !- Do Plant Sizing Calculation",
+        "    No,                      !- Run Simulation for Sizing Periods",
+        "    Yes;                     !- Run Simulation for Weather File Run Periods",
+
+        "  PerformancePrecisionTradeoffs,",
+        "    No;       ! - Use Coil Direct Solutions",
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects));
+
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
+
+    // no error message from PerformancePrecisionTradeoffs objects
+    EXPECT_TRUE(compare_err_stream("", true));
+  
+}
+
+TEST_F(EnergyPlusFixture, Test_PerformancePrecisionTradeoffs_DirectSolution_Message)
+{
+    // issue 7646
+    std::string const idf_objects = delimited_string({
+        "  Version,9.3;",
+        "  PerformancePrecisionTradeoffs,",
+        "     Yes; ! - Use Coil Direct Solutions",
+
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects, false));
+
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
+
+    std::string const error_string = delimited_string({
+        "   ** Warning ** PerformancePrecisionTradeoffs: Coil Direct Solution simulation is selected.",
     });
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
