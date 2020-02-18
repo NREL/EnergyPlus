@@ -75,14 +75,14 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(const CoilCoolin
     this->maxOutdoorDrybulbForBasin = input_data.maximum_outdoor_dry_bulb_temperature_for_crankcase_heater_operation;
     this->crankcaseHeaterCap = input_data.crankcase_heater_capacity;
     this->normalMode = CoilCoolingDXCurveFitOperatingMode(input_data.base_operating_mode_name);
-    if (UtilityRoutines::SameString(input_data.capacity_control, "VARIABLESPEED")) {
-        this->capControlMethod = CapControlMethod::VARIABLE;
-    } else if (UtilityRoutines::SameString(input_data.capacity_control, "MULTISPEED")) {
-        this->capControlMethod = CapControlMethod::MULTISPEED;
+    if (UtilityRoutines::SameString(input_data.capacity_control, "CONTINUOUS")) {
+        this->capControlMethod = CapControlMethod::CONTINUOUS;
+    } else if (UtilityRoutines::SameString(input_data.capacity_control, "DISCRETE")) {
+        this->capControlMethod = CapControlMethod::DISCRETE;
     } else {
         ShowSevereError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
         ShowContinueError("...Capacity Control Method=\"" + input_data.capacity_control + "\":");
-        ShowContinueError("...must be Staged, VariableSpeed or MultiSpeed.");
+        ShowContinueError("...must be Discrete or Continuous.");
         errorsFound = true;
     }
     this->evapCondBasinHeatCap = input_data.basin_heater_capacity;

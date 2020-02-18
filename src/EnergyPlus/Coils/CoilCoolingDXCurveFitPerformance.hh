@@ -116,10 +116,10 @@ struct CoilCoolingDXCurveFitPerformance
 
 	enum CapControlMethod
 	{
-		VARIABLE,
-		MULTISPEED
-	};
-	CapControlMethod capControlMethod = CapControlMethod::MULTISPEED;
+            CONTINUOUS,
+            DISCRETE
+        };
+	CapControlMethod capControlMethod = CapControlMethod::DISCRETE;
 
     Real64 evapCondBasinHeatCap = 0.0;
     Real64 evapCondBasinHeatSetpoint = 0.0;
