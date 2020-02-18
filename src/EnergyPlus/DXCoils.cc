@@ -6677,7 +6677,6 @@ namespace DXCoils {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Real64 CoilInTemp;                      // DX coil inlet temperature
-        Real64 RatedVolFlowPerRatedTotCap;      // Rated Air Volume Flow Rate divided by Rated Total Capacity[m3/s-W)
         int CapacityStageNum;                   // Loop index for 1,Number of capacity stages
         int DehumidModeNum;                     // Loop index for 1,Number of enhanced dehumidification modes
         int Mode;                               // Operating mode for MultiMode DX coil; Always 1 for other coil types
