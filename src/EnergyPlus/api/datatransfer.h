@@ -55,9 +55,6 @@
 extern "C" {
 #endif
 
-// this is a silly little no-op to make sure this file and its symbols are included by the linker
-ENERGYPLUSLIB_API void dataTransferNoOp();
-
 // there are a few query functions for seeing what is available
 ENERGYPLUSLIB_API const char * listAllAPIDataCSV();
 ENERGYPLUSLIB_API int apiDataFullyReady();

@@ -811,10 +811,10 @@ endif()
 
 if(BUILD_PACKAGE)
   if(LINK_WITH_PYTHON)
-    install(DIRECTORY "${CMAKE_BINARY_DIR}/Products/python_standard_lib/"
+    install(DIRECTORY "$<TARGET_FILE_DIR:energyplus>/python_standard_lib/"
             DESTINATION "./python_standard_lib")
   endif()
-  install(DIRECTORY "${CMAKE_BINARY_DIR}/Products/pyenergyplus/"
+  install(DIRECTORY "$<TARGET_FILE_DIR:energyplus>/pyenergyplus/"
           DESTINATION "./pyenergyplus")
 endif()
 

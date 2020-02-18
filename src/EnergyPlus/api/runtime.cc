@@ -52,8 +52,6 @@
 #include <EnergyPlus/StateManagement.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-void cRuntimeNoOp() {}
-
 void cClearAllStates() {
     EnergyPlus::clearAllStates();
 }

@@ -54,8 +54,6 @@
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 
-void functionalNoOp() {}
-
 void initializeFunctionalAPI() {
     EnergyPlus::inputProcessor = EnergyPlus::InputProcessor::factory();
     EnergyPlus::Psychrometrics::InitializePsychRoutines();

@@ -55,8 +55,6 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PluginManager.hh>
 
-void dataTransferNoOp() {}
-
 const char * listAllAPIDataCSV() {
     std::string output;
     output.append("**ACTUATORS**\n");
