@@ -193,6 +193,9 @@ Environment,DENVER CENTENNIAL GOLDEN ANN HTG 99% CONDNS DB DEFAULT,SizingPeriod:
 Environment,DENVER CENTENNIAL GOLDEN ANN HTG 99% CONDNS DB DEFAULT,SizingPeriod:DesignDay,12/21,12/21,WinterDesignDay,1,N/A,N/A,N/A,N/A,N/A,N/A,Clark and Allen
 ```
 
-
 See [#PR7562](https://github.com/NREL/EnergyPlus/pull/7562)
 
+### EIO output for PerformancePrecisionTradeoffs
+In the eio and table output, new lines report the status of options for the PerformancePrecisionTradeoffs object.
+
+See [7743](https://github.com/NREL/EnergyPlus/pull/7743/)
