@@ -58,18 +58,17 @@
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/GroundTemperatureModeling/SiteFCFactorMethodGroundTemperatures.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
 
-static ObjexxFCL::gio::Fmt fmtA("(A)");
-static ObjexxFCL::gio::Fmt fmtAN("(A,$)");
-
 //******************************************************************************
 
 // Site:GroundTemperature:FCFactorMethod factory
-std::shared_ptr<SiteFCFactorMethodGroundTemps> SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(int objectType, std::string objectName)
+std::shared_ptr<SiteFCFactorMethodGroundTemps>
+SiteFCFactorMethodGroundTemps::FCFactorGTMFactory(OutputFiles &outputFiles, int objectType, std::string objectName)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -82,7 +81,6 @@ std::shared_ptr<SiteFCFactorMethodGroundTemps> SiteFCFactorMethodGroundTemps::FC
 
     // USE STATEMENTS:
     using DataEnvironment::FCGroundTemps;
-    using DataGlobals::OutputFileInits;
     using WeatherManager::GroundTempsFCFromEPWHeader;
     using WeatherManager::wthFCGroundTemps;
     using namespace DataIPShortCuts;
@@ -143,13 +141,7 @@ std::shared_ptr<SiteFCFactorMethodGroundTemps> SiteFCFactorMethodGroundTemps::FC
 
     // Write Final Ground Temp Information to the initialization output file
     if (FCGroundTemps) {
-        ObjexxFCL::gio::write(OutputFileInits, fmtA)
-            << "! <Site:GroundTemperature:FCfactorMethod>,Jan{C},Feb{C},Mar{C},Apr{C},May{C},Jun{C},Jul{C},Aug{C},Sep{C},Oct{C},Nov{C},Dec{C}";
-        ObjexxFCL::gio::write(OutputFileInits, fmtAN) << " Site:GroundTemperature:FCfactorMethod";
-        for (int i = 1; i <= 12; ++i) {
-            ObjexxFCL::gio::write(OutputFileInits, "(', ',F6.2,$)") << thisModel->fcFactorGroundTemps(i);
-        }
-        ObjexxFCL::gio::write(OutputFileInits);
+        write_ground_temps(outputFiles.eio, "FCfactorMethod", thisModel->fcFactorGroundTemps);
     }
 
     if (found && !thisModel->errorsFound) {

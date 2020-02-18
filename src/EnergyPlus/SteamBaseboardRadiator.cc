@@ -61,7 +61,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
@@ -129,7 +129,7 @@ namespace SteamBaseboardRadiator {
     using DataZoneEquipment::ZoneEquipInputsFilled;
 
     // Use statements for access to subroutines in other modules
-    using Psychrometrics::PsyCpAirFnWTdb;
+    using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
 
     // Data
@@ -567,7 +567,7 @@ namespace SteamBaseboardRadiator {
             }
             if (SteamBaseboard(BaseboardNum).ZonePtr <= 0) {
                 ShowSevereError(RoutineName + cCMO_BBRadiator_Steam + "=\"" + SteamBaseboard(BaseboardNum).EquipID +
-                    "\" is not on any ZoneHVAC:EquipmentList.");
+                                "\" is not on any ZoneHVAC:EquipmentList.");
                 ErrorsFound = true;
                 continue;
             }
@@ -625,7 +625,6 @@ namespace SteamBaseboardRadiator {
             }
 
             SteamBaseboard(BaseboardNum).FluidIndex = SteamIndex;
-
         }
 
         if (ErrorsFound) {
