@@ -56,7 +56,7 @@
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>

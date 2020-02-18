@@ -82,7 +82,7 @@ extern "C" {
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataOutputs.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
@@ -1173,7 +1173,7 @@ namespace SimulationManager {
                 auto const &thisObjectName = instance.key();
                 inputProcessor->markObjectAsUsed(CurrentModuleObject, thisObjectName);
                 if (fields.find("use_coil_direct_solutions") != fields.end()) {
-                    DoCoilDirectSolutions =
+                    DataGlobals::DoCoilDirectSolutions =
                         UtilityRoutines::MakeUPPERCase(fields.at("use_coil_direct_solutions"))=="YES";
                 }
                 if (fields.find("zone_radiant_exchange_algorithm") != fields.end()) {
@@ -1248,6 +1248,26 @@ namespace SimulationManager {
               "Simulation, Do HVAC Sizing Simulation");
         print(outputFiles.eio, " Simulation Control");
         for (Num = 1; Num <= 6; ++Num) {
+            print(outputFiles.eio, ", {}", Alphas(Num));
+        }
+        print(outputFiles.eio, "\n");
+
+        // Performance Precision Tradeoffs
+        if (DataGlobals::DoCoilDirectSolutions) {
+            Alphas(1) = "Yes";
+            ShowWarningError("PerformancePrecisionTradeoffs: Coil Direct Solution simulation is selected.");
+        } else {
+            Alphas(1) = "No";
+        }
+        if (HeatBalanceIntRadExchange::CarrollMethod) {
+            Alphas(2) = "CarrollMRT";
+            ShowWarningError("PerformancePrecisionTradeoffs: Carroll MRT radiant exchange method is selected.");
+        } else {
+            Alphas(2) = "ScriptF";
+        }
+        print(outputFiles.eio, "{}\n", "! <Performance Precision Tradeoffs>, Use Coil Direct Simulation, Zone Radiant Exchange Algorithm");
+        print(outputFiles.eio, " Performance Precision Tradeoffs");
+        for (Num = 1; Num <= 2; ++Num) {
             print(outputFiles.eio, ", {}", Alphas(Num));
         }
         print(outputFiles.eio, "\n");
@@ -2318,7 +2338,7 @@ namespace SimulationManager {
                            PlantLoop(Count).LoopSide(LoopSideNum).NodeNameOut + ',' + PlantLoop(Count).LoopSide(LoopSideNum).BranchList + ',' +
                            PlantLoop(Count).LoopSide(LoopSideNum).ConnectList;
                 //  Plant Supply Side Splitter
-                if (PlantLoop(Count).LoopSide(LoopSideNum).SplitterExists) {
+                if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Exists) {
                     ObjexxFCL::gio::write(ChrOut, fmtLD) << PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes;
                     ObjexxFCL::gio::write(OutputFileBNDetails, Format_713) << "   Plant Loop Connector,Splitter," +
                                                                        PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name + ',' +
@@ -2378,7 +2398,7 @@ namespace SimulationManager {
                 }
 
                 //  Plant Supply Side Mixer
-                if (PlantLoop(Count).LoopSide(LoopSideNum).MixerExists) {
+                if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Exists) {
                     ObjexxFCL::gio::write(ChrOut, fmtLD) << PlantLoop(Count).LoopSide(LoopSideNum).Mixer.TotalInletNodes;
                     ObjexxFCL::gio::write(OutputFileBNDetails, Format_713)
                         << "   Plant Loop Connector,Mixer," + PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name + ',' +
@@ -2479,7 +2499,7 @@ namespace SimulationManager {
                            PlantLoop(Count).LoopSide(LoopSideNum).NodeNameOut + ',' + PlantLoop(Count).LoopSide(LoopSideNum).BranchList + ',' +
                            PlantLoop(Count).LoopSide(LoopSideNum).ConnectList;
                 //  Plant Supply Side Splitter
-                if (PlantLoop(Count).LoopSide(LoopSideNum).SplitterExists) {
+                if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Exists) {
                     ObjexxFCL::gio::write(ChrOut, fmtLD) << PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes;
                     ObjexxFCL::gio::write(OutputFileBNDetails, Format_713) << "   Plant Loop Connector,Splitter," +
                                                                        PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name + ',' +
