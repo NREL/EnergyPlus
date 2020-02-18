@@ -749,7 +749,7 @@ TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_Meter_test) {
     UpdateScheduleValues();
     // Get Unitary system
     GetInputZoneHybridUnitaryAirConditioners(ErrorsFound);
-    // All to get OA requiremetns
+    // All to get OA requirements
     GetOARequirements();
 
     EXPECT_FALSE(ErrorsFound);
@@ -764,8 +764,6 @@ TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_Meter_test) {
     MsaRatio = OSAF = 1;
 
     Requestedheating = RequestedCooling = Requested_Humidification = Requested_Dehumidification = 0;
-    pZoneHybridUnitaryAirConditioner->SecondFuelType = "NaturalGas";
-    pZoneHybridUnitaryAirConditioner->ThirdFuelType = "NaturalGas";
 
     int NumFound;
 
@@ -785,7 +783,7 @@ TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_Meter_test) {
     GetMeteredVariables(TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes,
                         EndUses, Groups, Names, NumFound);
 
-    EXPECT_EQ(4, NumFound);
+    EXPECT_EQ(7, NumFound);
     EXPECT_EQ(ResourceTypes(1), 1010); // ENERGYTRANSFER
     EXPECT_EQ(EndUses(1), "COOLINGCOILS");
     EXPECT_EQ(Groups(1), "HVAC");
@@ -798,6 +796,15 @@ TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_Meter_test) {
     EXPECT_EQ(ResourceTypes(4), 1001); // ELECTRIC
     EXPECT_EQ(EndUses(4), "FANS");
     EXPECT_EQ(Groups(4), "HVAC");
+    EXPECT_EQ(ResourceTypes(5), 1002); // NATURALGAS specified in UnitaryHybridUnitTest_DOSA.idf
+    EXPECT_EQ(EndUses(5), "COOLING");
+    EXPECT_EQ(Groups(5), "HVAC");
+    EXPECT_EQ(ResourceTypes(6), 1012); // DISTRICTCOOLING specified in UnitaryHybridUnitTest_DOSA.idf
+    EXPECT_EQ(EndUses(6), "COOLING");
+    EXPECT_EQ(Groups(6), "HVAC");
+    EXPECT_EQ(ResourceTypes(7), 1009); // WATER
+    EXPECT_EQ(EndUses(7), "COOLING");
+    EXPECT_EQ(Groups(7), "HVAC");
 }
 
 } // namespace EnergyPlus
