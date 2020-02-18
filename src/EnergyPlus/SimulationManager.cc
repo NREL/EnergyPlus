@@ -1173,7 +1173,7 @@ namespace SimulationManager {
                 auto const &thisObjectName = instance.key();
                 inputProcessor->markObjectAsUsed(CurrentModuleObject, thisObjectName);
                 if (fields.find("use_coil_direct_solutions") != fields.end()) {
-                    DoCoilDirectSolutions =
+                    DataGlobals::DoCoilDirectSolutions =
                         UtilityRoutines::MakeUPPERCase(fields.at("use_coil_direct_solutions"))=="YES";
                 }
                 if (fields.find("zone_radiant_exchange_algorithm") != fields.end()) {
@@ -1248,6 +1248,26 @@ namespace SimulationManager {
               "Simulation, Do HVAC Sizing Simulation");
         print(outputFiles.eio, " Simulation Control");
         for (Num = 1; Num <= 6; ++Num) {
+            print(outputFiles.eio, ", {}", Alphas(Num));
+        }
+        print(outputFiles.eio, "\n");
+
+        // Performance Precision Tradeoffs
+        if (DataGlobals::DoCoilDirectSolutions) {
+            Alphas(1) = "Yes";
+            ShowWarningError("PerformancePrecisionTradeoffs: Coil Direct Solution simulation is selected.");
+        } else {
+            Alphas(1) = "No";
+        }
+        if (HeatBalanceIntRadExchange::CarrollMethod) {
+            Alphas(2) = "CarrollMRT";
+            ShowWarningError("PerformancePrecisionTradeoffs: Carroll MRT radiant exchange method is selected.");
+        } else {
+            Alphas(2) = "ScriptF";
+        }
+        print(outputFiles.eio, "{}\n", "! <Performance Precision Tradeoffs>, Use Coil Direct Simulation, Zone Radiant Exchange Algorithm");
+        print(outputFiles.eio, " Performance Precision Tradeoffs");
+        for (Num = 1; Num <= 2; ++Num) {
             print(outputFiles.eio, ", {}", Alphas(Num));
         }
         print(outputFiles.eio, "\n");

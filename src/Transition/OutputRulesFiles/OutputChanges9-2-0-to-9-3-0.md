@@ -176,3 +176,8 @@ Heat Pump Source Side Mass Flow Rate
 ```
 
 See [7489](https://github.com/NREL/EnergyPlus/pull/7489/)
+
+### EIO output for PerformancePrecisionTradeoffs
+In the eio and table output, new lines report the status of options for the PerformancePrecisionTradeoffs object.
+
+See [7743](https://github.com/NREL/EnergyPlus/pull/7743/)
