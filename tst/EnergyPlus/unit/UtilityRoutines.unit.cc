@@ -127,7 +127,6 @@ TEST_F(EnergyPlusFixture, DisplayMessageTest)
     EXPECT_TRUE(has_cout_output(true));
     // Open six files to get unit number beyond 6 - these all get closed later by EnergyPlusFixture
     DataGlobals::OutputFileStandard = FindUnitNumber(DataStringGlobals::outputEsoFileName);
-    DataGlobals::OutputFileInits = FindUnitNumber(DataStringGlobals::outputEioFileName);
     DataGlobals::OutputFileMeters = FindUnitNumber(DataStringGlobals::outputMtrFileName);
     DataGlobals::OutputFileBNDetails = FindUnitNumber(DataStringGlobals::outputBndFileName);
     DataGlobals::OutputFileZoneSizing = FindUnitNumber(DataStringGlobals::outputZszCsvFileName);

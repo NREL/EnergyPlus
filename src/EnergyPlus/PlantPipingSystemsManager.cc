@@ -70,7 +70,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/FluidProperties.hh>
@@ -195,7 +195,8 @@ namespace EnergyPlus {
             thisDomain.UpdatePipingSystems(this);
         }
 
-        void SimulateGroundDomains(bool initOnly) {
+        void SimulateGroundDomains(OutputFiles &outputFiles, bool initOnly)
+        {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Matt Mitchell
@@ -205,9 +206,6 @@ namespace EnergyPlus {
 
             static std::string const RoutineName("InitAndSimGroundDomain");
 
-            static ObjexxFCL::gio::Fmt DomainCellsToEIOHeader(
-                    "('! <Domain Name>, Total Number of Domain Cells, Total Number of Ground Surface Cells, Total Number of Insulation Cells')");
-            static ObjexxFCL::gio::Fmt DomainCellsToEIO("(A,',',I5',',I5',',I5)");
 
             // Read input if necessary
             if (GetInputFlag) {
@@ -394,13 +392,19 @@ namespace EnergyPlus {
 
             if (WriteEIOFlag) {
                 // Write eio header
-                ObjexxFCL::gio::write(DataGlobals::OutputFileInits, DomainCellsToEIOHeader);
+                static constexpr auto DomainCellsToEIOHeader(
+                    "! <Domain Name>, Total Number of Domain Cells, Total Number of Ground Surface Cells, Total Number of Insulation Cells\n");
+                print(outputFiles.eio, DomainCellsToEIOHeader);
 
                 // Write eio data
                 for (auto &thisDomain : domains) {
-                    ObjexxFCL::gio::write(DataGlobals::OutputFileInits, DomainCellsToEIO)
-                            << thisDomain.Name << thisDomain.NumDomainCells << thisDomain.NumGroundSurfCells
-                            << thisDomain.NumInsulationCells;
+                    static constexpr auto DomainCellsToEIO("{},{:5},{:5},{:5}\n");
+                    print(outputFiles.eio,
+                          DomainCellsToEIO,
+                          thisDomain.Name,
+                          thisDomain.NumDomainCells,
+                          thisDomain.NumGroundSurfCells,
+                          thisDomain.NumInsulationCells);
                 }
                 WriteEIOFlag = false;
             }

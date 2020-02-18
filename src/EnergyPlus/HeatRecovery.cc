@@ -1333,7 +1333,7 @@ namespace HeatRecovery {
             // I believe that all of these initializations should be taking place at the SCFM conditions
             RhoAir = StdRhoAir;
             //    RhoAir = PsyRhoAirFnPbTdbW(101325.0,20.0,0.0)  do we want standard air density at sea level for generic ERVs per ARI 1060?
-            CpAir = PsyCpAirFnWTdb(0.0, 20.0);
+            CpAir = PsyCpAirFnW(0.0);
 
             ExIndex = ExchNum; // this replaces the loop that went over multiple at once
 
@@ -1857,8 +1857,8 @@ namespace HeatRecovery {
             Deno = std::pow(QuotSup, 0.78) + ExchCond(ExNum).hARatio * std::pow(QuotExh, 0.78);
             UA = ExchCond(ExNum).UA0 * (ExchCond(ExNum).hARatio + 1.0) / Deno;
             // calculate the NTU
-            CSup = UnitSupMassFlow * PsyCpAirFnWTdb(ExchCond(ExNum).SupInHumRat, ExchCond(ExNum).SupInTemp);
-            CSec = UnitSecMassFlow * PsyCpAirFnWTdb(ExchCond(ExNum).SecInHumRat, ExchCond(ExNum).SecInTemp);
+            CSup = UnitSupMassFlow * PsyCpAirFnW(ExchCond(ExNum).SupInHumRat);
+            CSec = UnitSecMassFlow * PsyCpAirFnW(ExchCond(ExNum).SecInHumRat);
             // note: no C can be zero since otherwise we wouldn't be here
             if (CSup < CSec) {
                 CMin = CSup;
@@ -1917,7 +1917,7 @@ namespace HeatRecovery {
             ExchCond(ExNum).SecOutTemp = ExchCond(ExNum).SecInTemp;
             ExchCond(ExNum).SecOutMassFlow = ExchCond(ExNum).SecInMassFlow;
         }
-        CSup = ExchCond(ExNum).SupInMassFlow * PsyCpAirFnWTdb(ExchCond(ExNum).SupInHumRat, ExchCond(ExNum).SupInTemp);
+        CSup = ExchCond(ExNum).SupInMassFlow * PsyCpAirFnW(ExchCond(ExNum).SupInHumRat);
         SensHeatRecRate = CSup * (ExchCond(ExNum).SupOutTemp - ExchCond(ExNum).SupInTemp);
         TotHeatRecRate = ExchCond(ExNum).SupOutMassFlow * (ExchCond(ExNum).SupOutEnth - ExchCond(ExNum).SupInEnth);
         LatHeatRecRate = TotHeatRecRate - SensHeatRecRate;
@@ -2197,8 +2197,8 @@ namespace HeatRecovery {
             // Use the effectiveness to calculate the air conditions exiting the heat exchanger (all air flow through the HX)
             // Include EATR and OACF in the following calculations at some point
 
-            CSup = ExchCond(ExNum).SupOutMassFlow * PsyCpAirFnWTdb(ExchCond(ExNum).SupInHumRat, ExchCond(ExNum).SupInTemp);
-            CSec = ExchCond(ExNum).SecOutMassFlow * PsyCpAirFnWTdb(ExchCond(ExNum).SecInHumRat, ExchCond(ExNum).SecInTemp);
+            CSup = ExchCond(ExNum).SupOutMassFlow * PsyCpAirFnW(ExchCond(ExNum).SupInHumRat);
+            CSec = ExchCond(ExNum).SecOutMassFlow * PsyCpAirFnW(ExchCond(ExNum).SecInHumRat);
             CMin = min(CSup, CSec);
 
             ExchCond(ExNum).SupOutTemp =
@@ -2259,7 +2259,7 @@ namespace HeatRecovery {
                         HXSupAirVolFlowRate = MassFlowSupOut / RhoSup;
                         HXAvgAirVolFlowRate = (HXSecAirVolFlowRate + HXSupAirVolFlowRate) / 2.0;
                         HXAirVolFlowRatio = HXAvgAirVolFlowRate / ExchCond(ExNum).NomSupAirVolFlow;
-                        CSup = MassFlowSupOut * PsyCpAirFnWTdb(HumRatSupIn, TempSupIn);
+                        CSup = MassFlowSupOut * PsyCpAirFnW(HumRatSupIn);
                         CMin = min(CSup, CSec);
                         if (TempSupIn < TempSecIn) {
                             //          Use heating effectiveness values
@@ -2397,7 +2397,7 @@ namespace HeatRecovery {
         } // ENDIF for "IF (UnitOn) THEN"
 
         // Calculate heat transfer from the unit using the final supply inlet and supply outlet air conditions
-        CSup = ExchCond(ExNum).SupOutMassFlow * PsyCpAirFnWTdb(ExchCond(ExNum).SupInHumRat, ExchCond(ExNum).SupInTemp);
+        CSup = ExchCond(ExNum).SupOutMassFlow * PsyCpAirFnW(ExchCond(ExNum).SupInHumRat);
         SensHeatRecRate = CSup * (ExchCond(ExNum).SupOutTemp - ExchCond(ExNum).SupInTemp);
         TotHeatRecRate = ExchCond(ExNum).SupOutMassFlow * (ExchCond(ExNum).SupOutEnth - ExchCond(ExNum).SupInEnth);
         LatHeatRecRate = TotHeatRecRate - SensHeatRecRate;
@@ -2724,8 +2724,8 @@ namespace HeatRecovery {
                     //     the mass flow rate on the process and secondary side of HX may be imbalanced when the HX is used in the OA branch
                     //     use the average mass flow rate to avoid psych warnings, mass flow rates will converge at the end of the iteration
                     //     if the air mass flow rates do not converge, this model should not be used
-                    CSup = AverageMassFlowRate * PsyCpAirFnWTdb(ExchCond(ExNum).SupInHumRat, ExchCond(ExNum).SupInTemp);
-                    CSec = AverageMassFlowRate * PsyCpAirFnWTdb(ExchCond(ExNum).SecInHumRat, ExchCond(ExNum).SecInTemp);
+                    CSup = AverageMassFlowRate * PsyCpAirFnW(ExchCond(ExNum).SupInHumRat);
+                    CSec = AverageMassFlowRate * PsyCpAirFnW(ExchCond(ExNum).SecInHumRat);
 
                     ExchCond(ExNum).SupOutEnth = PsyHFnTdbW(ExchCond(ExNum).SupOutTemp, ExchCond(ExNum).SupOutHumRat);
 
@@ -2759,7 +2759,7 @@ namespace HeatRecovery {
         } // ENDIF for "IF (UnitOn) THEN"
 
         // Report the process side heat transfer
-        CSec = AverageMassFlowRate * PsyCpAirFnWTdb(ExchCond(ExNum).SecInHumRat, ExchCond(ExNum).SecInTemp);
+        CSec = AverageMassFlowRate * PsyCpAirFnW(ExchCond(ExNum).SecInHumRat);
         ProcessSensHeatRecRate = CSec * (ExchCond(ExNum).SecOutTemp - ExchCond(ExNum).SecInTemp);
 
         ProcessTotHeatRecRate = ExchCond(ExNum).SecOutMassFlow * (ExchCond(ExNum).SecOutEnth - ExchCond(ExNum).SecInEnth);
@@ -2858,8 +2858,8 @@ namespace HeatRecovery {
         ExchCond(ExNum).SecBypassMassFlow = 0.0;
         RhoSup = PsyRhoAirFnPbTdbW(OutBaroPress, ExchCond(ExNum).SupInTemp, ExchCond(ExNum).SupInHumRat);
         RhoSec = PsyRhoAirFnPbTdbW(OutBaroPress, ExchCond(ExNum).SecInTemp, ExchCond(ExNum).SecInHumRat);
-        CSup = ExchCond(ExNum).SupOutMassFlow * PsyCpAirFnWTdb(ExchCond(ExNum).SupInHumRat, ExchCond(ExNum).SupInTemp);
-        CSec = ExchCond(ExNum).SecOutMassFlow * PsyCpAirFnWTdb(ExchCond(ExNum).SecInHumRat, ExchCond(ExNum).SecInTemp);
+        CSup = ExchCond(ExNum).SupOutMassFlow * PsyCpAirFnW(ExchCond(ExNum).SupInHumRat);
+        CSec = ExchCond(ExNum).SecOutMassFlow * PsyCpAirFnW(ExchCond(ExNum).SecInHumRat);
         CMin = min(CSup, CSec);
         TempThreshold = ExchCond(ExNum).ThresholdTemperature;
 
@@ -2927,7 +2927,7 @@ namespace HeatRecovery {
                     HXSecAirVolFlowRate = ExchCond(ExNum).SecOutMassFlow / RhoSec;
                     HXAvgAirVolFlowRate = (HXSecAirVolFlowRate + HXSupAirVolFlowRate) / 2.0;
                     HXAirVolFlowRatio = HXAvgAirVolFlowRate / ExchCond(ExNum).NomSupAirVolFlow;
-                    CSup = MassFlowSupOut * PsyCpAirFnWTdb(HumRatSupIn, TempSupIn);
+                    CSup = MassFlowSupOut * PsyCpAirFnW(HumRatSupIn);
                     CMin = min(CSup, CSec);
                     if (TempSupIn < TempSecIn) {
                         //         Use heating effectiveness values

@@ -132,7 +132,7 @@ namespace DataRuntimeLanguage {
 
     // begin psychrometric routines
     extern int const FuncRhoAirFnPbTdbW;    // accessor for E+ psych routine
-    extern int const FuncCpAirFnWTdb;       // accessor for E+ psych routine
+    extern int const FuncCpAirFnW;       // accessor for E+ psych routine
     extern int const FuncHfgAirFnWTdb;      // accessor for E+ psych routine
     extern int const FuncHgAirFnWTdb;       // accessor for E+ psych routine
     extern int const FuncTdpFnTdbTwbPb;     // accessor for E+ psych routine

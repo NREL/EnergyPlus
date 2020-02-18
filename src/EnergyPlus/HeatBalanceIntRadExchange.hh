@@ -59,6 +59,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class OutputFiles;
 
 #define EP_HBIRE_SEQ
 
@@ -90,9 +91,9 @@ namespace HeatBalanceIntRadExchange {
                                      int const SurfNum              // surface number of surface being investigated
     );
 
-    void InitInteriorRadExchange();
+    void InitInteriorRadExchange(OutputFiles &outputFiles);
 
-    void InitSolarViewFactors();
+    void InitSolarViewFactors(OutputFiles &outputFiles);
 
     void AlignInputViewFactors(std::string const &cCurrentModuleObject, // Object type
                                bool &ErrorsFound                        // True when errors are found

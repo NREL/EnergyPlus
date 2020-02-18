@@ -303,7 +303,7 @@ TEST_F(ExhAbsorptionFixture, ExhAbsorption_GetInput_Test)
 
     compare_err_stream("");
 
-    EXPECT_EQ(1, NumExhaustAbsorbers);
+    EXPECT_EQ(1u, ExhaustAbsorber.size());
     EXPECT_EQ("EXH CHILLER", ExhaustAbsorber(1).Name);
 
     EXPECT_EQ(100000., ExhaustAbsorber(1).NomCoolingCap);
