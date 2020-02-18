@@ -1785,8 +1785,8 @@ namespace SimulationManager {
         ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumReportList=" << NumReportList;
         ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "InstMeterCacheSize=" << InstMeterCacheSize;
         if (SutherlandHodgman) {
-            if (SlaterandBarsky) {
-                ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "ClippingAlgorithm=SlaterBarskyandSutherlHodgman";
+            if (SlaterBarsky) {
+                ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "ClippingAlgorithm=SlaterBarskyandSutherlandHodgman";
             } else {
                 ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "ClippingAlgorithm=SutherlandHodgman";
             }

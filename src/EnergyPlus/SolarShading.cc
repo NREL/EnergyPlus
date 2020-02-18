@@ -579,7 +579,7 @@ namespace SolarShading {
         using DataSystemVariables::DisableGroupSelfShading;
         using DataSystemVariables::ReportExtShadingSunlitFrac;
         using DataSystemVariables::SutherlandHodgman;
-        using DataSystemVariables::SlaterandBarsky;
+        using DataSystemVariables::SlaterBarsky;
         using DataSystemVariables::UseImportedSunlitFrac;
         using DataSystemVariables::UseScheduledSunlitFrac;
         using ScheduleManager::ScheduleFileShadingProcessed;
@@ -658,18 +658,18 @@ namespace SolarShading {
             } else if (UtilityRoutines::SameString(cAlphaArgs(2), "ConvexWeilerAtherton")) {
                 SutherlandHodgman = false;
                 cAlphaArgs(2) = "ConvexWeilerAtherton";
-            } else if (UtilityRoutines::SameString(cAlphaArgs(2), "SlaterBarskyandSutherlHodgman")) {
+            } else if (UtilityRoutines::SameString(cAlphaArgs(2), "SlaterBarskyandSutherlandHodgman")) {
                 SutherlandHodgman = true;
-                SlaterandBarsky = true;
-                cAlphaArgs(2) = "SlaterBarskyandSutherlHodgman";
+                SlaterBarsky = true;
+                cAlphaArgs(2) = "SlaterBarskyandSutherlandHodgman";
             } else if (lAlphaFieldBlanks(2)) {
                 if (!SutherlandHodgman) { // if already set.
                     cAlphaArgs(2) = "ConvexWeilerAtherton";
                 } else {
-                    if (!SlaterandBarsky) {
+                    if (!SlaterBarsky) {
                         cAlphaArgs(2) = "SutherlandHodgman";
                     } else {
-                        cAlphaArgs(2) = "SlaterBarskyandSutherlHodgman";
+                        cAlphaArgs(2) = "SlaterBarskyandSutherlandHodgman";
                     }
                 }
             } else {
@@ -677,10 +677,10 @@ namespace SolarShading {
                 if (!SutherlandHodgman) {
                     ShowContinueError("Value entered=\"" + cAlphaArgs(2) + "\", ConvexWeilerAtherton will be used.");
                 } else {
-                    if (!SlaterandBarsky) {
+                    if (!SlaterBarsky) {
                         ShowContinueError("Value entered=\"" + cAlphaArgs(2) + "\", SutherlandHodgman will be used.");
                     } else {
-                        ShowContinueError("Value entered=\"" + cAlphaArgs(2) + "\", SlaterBarskyandSutherlHodgman will be used.");
+                        ShowContinueError("Value entered=\"" + cAlphaArgs(2) + "\", SlaterBarskyandSutherlandHodgman will be used.");
                     }
 
                 }
@@ -689,10 +689,10 @@ namespace SolarShading {
             if (!SutherlandHodgman) {
                 cAlphaArgs(2) = "ConvexWeilerAtherton";
             } else {
-                if (!SlaterandBarsky) {
+                if (!SlaterBarsky) {
                     cAlphaArgs(2) = "SutherlandHodgman";
                 } else {
-                    cAlphaArgs(2) = "SlaterBarskyandSutherlHodgman";
+                    cAlphaArgs(2) = "SlaterBarskyandSutherlandHodgman";
                 }
             }
         }
@@ -3816,9 +3816,13 @@ namespace SolarShading {
         return std::abs(a-b) < 2.0;
     }
 
-    inline void CLIPLINE(Real64 &x1, Real64 &x2, Real64 &y1, Real64 &y2,
-                         Real64 maxX, Real64 minX, Real64 maxY, Real64 minY, bool &visible, bool &rev)  {
-        // SLATER & BARSKY 1994
+    void CLIPLINE(Real64 &x1, Real64 &x2, Real64 &y1, Real64 &y2,
+                  Real64 maxX, Real64 minX, Real64 maxY, Real64 minY, bool &visible, bool &rev)  {
+        // Line segment clipping
+        // Reference:
+        // Slater, M., Barsky, B.A.
+        // 2D line and polygon clipping based on space subdivision.
+        // The Visual Computer 10, 407–422 (1994).
         Real64 dx, dy, e, xinc, yinc, tempVar;
         bool needX = true, needY = true;
         int c1, c2;
@@ -3967,6 +3971,11 @@ namespace SolarShading {
     }
 
     void CLIPRECT(int const NS2, int const NV1, int &NV3) {
+        // Polygon clipping by line segment clipping for rectangles
+        // Reference:
+        // Slater, M., Barsky, B.A.
+        // 2D line and polygon clipping based on space subdivision.
+        // The Visual Computer 10, 407–422 (1994).
         bool INTFLAG = false;
         auto l(HCA.index(NS2, 1));
         Real64 maxX, minX, maxY, minY;
@@ -4218,7 +4227,6 @@ namespace SolarShading {
         // Using/Aliasing
         using General::ReallocateRealArray;
         using General::SafeDivide;
-        using DataSystemVariables::SlaterandBarsky;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4268,7 +4276,7 @@ namespace SolarShading {
         KK = 0;
 
         //Check if clipping polygon is rectangle
-        if (SlaterandBarsky) {
+        if (DataSystemVariables::SlaterBarsky) {
             auto l1(HCA.index(NS2, 1));
             bool rectFlag = ((NV2 == 4) && (((((HCX[l1] == HCX[l1 + 1] && HCY[l1] != HCY[l1 + 1]) &&
                                                ((HCY[l1 + 2] == HCY[l1 + 1] && HCY[l1 + 3] == HCY[l1]))) &&

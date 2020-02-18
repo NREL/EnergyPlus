@@ -1467,8 +1467,7 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_DisableGroupSelfShading)
 
 TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
 {
-    std::string const idf_objects = delimited_string({"  Version,9.1;                                                                       ",
-                                                      "  Building,                                                                          ",
+    std::string const idf_objects = delimited_string({"  Building,                                                                          ",
                                                       "    DemoFDT,                 !- Name                                                 ",
                                                       "    0,                       !- North Axis {deg}                                     ",
                                                       "    Suburbs,                 !- Terrain                                              ",
@@ -1826,12 +1825,12 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     DataGlobals::HourOfDay = 9;
 
     //	compare_err_stream( "" ); // just for debugging
-    EXPECT_FALSE(DataSystemVariables::SlaterandBarsky);
+    EXPECT_FALSE(DataSystemVariables::SlaterBarsky);
 
     DataSurfaces::ShadingTransmittanceVaries = true;
     DataSystemVariables::DetailedSkyDiffuseAlgorithm = true;
     SolarDistribution = FullExterior;
-    DataSystemVariables::SlaterandBarsky = true;
+    DataSystemVariables::SlaterBarsky = true;
 
     CalcSkyDifShading = true;
     SolarShading::InitSolarCalculations();
@@ -1843,5 +1842,5 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     EXPECT_NEAR(0.6504, DifShdgRatioIsoSkyHRTS(4, 9, 6), 0.0001);
     EXPECT_NEAR(0.9152, DifShdgRatioHorizHRTS(4, 9, 6), 0.0001);
 
-    DataSystemVariables::SlaterandBarsky = false;
+    DataSystemVariables::SlaterBarsky = false;
 }
