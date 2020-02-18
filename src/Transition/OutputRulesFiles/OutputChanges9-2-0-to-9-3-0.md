@@ -181,3 +181,42 @@ See [7489](https://github.com/NREL/EnergyPlus/pull/7489/)
 In the eio and table output, new lines report the status of options for the PerformancePrecisionTradeoffs object.
 
 See [7743](https://github.com/NREL/EnergyPlus/pull/7743/)
+
+See [7761](https://github.com/NREL/EnergyPlus/pull/7761) 
+and the [NFP](https://github.com/energy-plus/EnergyPlus/blob/PerfOverrideAndReporting/design/FY2020/NFP-PerformanceOverRidesAndReporting.md)
+
+### New _perflog.csv file as Log File for PerformancePrecisionTradeoffs
+
+A new file has been added with the suffix _perflog.csv specifically to help with 
+performance tuning for a specific input file. Instead of disappearing, it gets
+appended to each simulation so experimentation can be done. It appears when
+ever the PerformancePrecisionTradeoffs object is used. For each simulation a line is added
+that contains the following:
+
+- Program
+- Version
+- TimeStamp
+- Use Coil Direct Solution
+- Zone Radiant Exchange Algorithm
+- Number of Timesteps per Hour
+- Minimum Number of Warmup Days
+- SuppressAllBeginEnvironmentResets
+- MaxZoneTempDiff
+- Electricity ABUPS Total [J]
+- Natural Gas ABUPS Total [J]
+- Additional Fuel ABUPS Total [J]
+- District Cooling ABUPS Total [J]
+- District Heating ABUPS Total [J]
+- Water ABUPS Total [m3]
+- Values Gathered Over [hours]
+- Run Time [seconds]
+- Run Time [string]
+- Number of Warnings
+- Number of Severe
+
+See [7761](https://github.com/NREL/EnergyPlus/pull/7761) 
+and the [NFP](https://github.com/energy-plus/EnergyPlus/blob/PerfOverrideAndReporting/design/FY2020/NFP-PerformanceOverRidesAndReporting.md)
+
+
+
+
