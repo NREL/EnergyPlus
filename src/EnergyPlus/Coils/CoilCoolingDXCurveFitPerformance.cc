@@ -557,7 +557,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
 
     // begin output
     if (this->oneTimeEIOHeaderWrite) {
-        ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_890);
+        print(outputFiles.eio, Format_890); // TODO: Verify this works
         this->oneTimeEIOHeaderWrite = false;
         OutputReportPredefined::pdstVAVDXCoolCoil = OutputReportPredefined::newPreDefSubTable(OutputReportPredefined::pdrEquip, "VAV DX Cooling Standard Rating Details");
         OutputReportPredefined::pdchVAVDXCoolCoilType = OutputReportPredefined::newPreDefColumn(OutputReportPredefined::pdstVAVDXCoolCoil, "DX Cooling Coil Type");
@@ -607,29 +607,11 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
               supplyFanName, NetCoolingCapRated,(NetCoolingCapRated * ConvFromSIToIP), IEER,EER_TestPoint_SI[0],EER_TestPoint_SI[1],
               EER_TestPoint_SI[2],EER_TestPoint_SI[3],EER_TestPoint_IP[0],EER_TestPoint_IP[1],EER_TestPoint_IP[2],
               EER_TestPoint_IP[3],SupAirMdot_TestPoint[0],SupAirMdot_TestPoint[1],SupAirMdot_TestPoint[2],SupAirMdot_TestPoint[3]);
-
-//        ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_891)
-//                << "Coil:Cooling:DX" << this->name << "Fan:VariableVolume" << supplyFanName
-//                << General::RoundSigDigits(NetCoolingCapRated, 2) << General::RoundSigDigits((NetCoolingCapRated * ConvFromSIToIP), 2) << General::RoundSigDigits(IEER, 2)
-//                << General::RoundSigDigits(EER_TestPoint_SI[0], 2) << General::RoundSigDigits(EER_TestPoint_SI[1], 2) << General::RoundSigDigits(EER_TestPoint_SI[2], 2)
-//                << General::RoundSigDigits(EER_TestPoint_SI[3], 2) << General::RoundSigDigits(EER_TestPoint_IP[0], 2) << General::RoundSigDigits(EER_TestPoint_IP[1], 2)
-//                << General::RoundSigDigits(EER_TestPoint_IP[2], 2) << General::RoundSigDigits(EER_TestPoint_IP[3], 2) << General::RoundSigDigits(SupAirMdot_TestPoint[0], 4)
-//                << General::RoundSigDigits(SupAirMdot_TestPoint[1], 4) << General::RoundSigDigits(SupAirMdot_TestPoint[2], 4)
-//                << General::RoundSigDigits(SupAirMdot_TestPoint[3], 4);
     } else {
         print(outputFiles.eio, fmt,"Coil:Cooling:DX", "N/A","Fan:VariableVolume",
               "N/A", NetCoolingCapRated,(NetCoolingCapRated * ConvFromSIToIP), IEER,EER_TestPoint_SI[0],EER_TestPoint_SI[1],
               EER_TestPoint_SI[2],EER_TestPoint_SI[3],EER_TestPoint_IP[0],EER_TestPoint_IP[1],EER_TestPoint_IP[2],
               EER_TestPoint_IP[3],SupAirMdot_TestPoint[0],SupAirMdot_TestPoint[1],SupAirMdot_TestPoint[2],SupAirMdot_TestPoint[3]);
-
-//        ObjexxFCL::gio::write(DataGlobals::OutputFileInits, Format_891)
-//                << "Coil:Cooling:DX" << this->name << "N/A"
-//                << "N/A" << General::RoundSigDigits(NetCoolingCapRated, 2) << General::RoundSigDigits((NetCoolingCapRated * ConvFromSIToIP), 2)
-//                << General::RoundSigDigits(IEER, 2) << General::RoundSigDigits(EER_TestPoint_SI[0], 2) << General::RoundSigDigits(EER_TestPoint_SI[1], 2)
-//                << General::RoundSigDigits(EER_TestPoint_SI[2], 2) << General::RoundSigDigits(EER_TestPoint_SI[3], 2) << General::RoundSigDigits(EER_TestPoint_IP[0], 2)
-//                << General::RoundSigDigits(EER_TestPoint_IP[1], 2) << General::RoundSigDigits(EER_TestPoint_IP[2], 2) << General::RoundSigDigits(EER_TestPoint_IP[3], 2)
-//                << General::RoundSigDigits(SupAirMdot_TestPoint[0], 4) << General::RoundSigDigits(SupAirMdot_TestPoint[1], 4)
-//                << General::RoundSigDigits(SupAirMdot_TestPoint[2], 4) << General::RoundSigDigits(SupAirMdot_TestPoint[3], 4);
     }
 
     OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilType, this->name, "Coil:Cooling:DX");
