@@ -1330,6 +1330,26 @@ namespace SimulationManager {
         }
         print(outputFiles.eio, "\n");
 
+        // Performance Precision Tradeoffs
+        if (DataGlobals::DoCoilDirectSolutions) {
+            Alphas(1) = "Yes";
+            ShowWarningError("PerformancePrecisionTradeoffs: Coil Direct Solution simulation is selected.");
+        } else {
+            Alphas(1) = "No";
+        }
+        if (HeatBalanceIntRadExchange::CarrollMethod) {
+            Alphas(2) = "CarrollMRT";
+            ShowWarningError("PerformancePrecisionTradeoffs: Carroll MRT radiant exchange method is selected.");
+        } else {
+            Alphas(2) = "ScriptF";
+        }
+        print(outputFiles.eio, "{}\n", "! <Performance Precision Tradeoffs>, Use Coil Direct Simulation, Zone Radiant Exchange Algorithm");
+        print(outputFiles.eio, " Performance Precision Tradeoffs");
+        for (Num = 1; Num <= 2; ++Num) {
+            print(outputFiles.eio, ", {}", Alphas(Num));
+        }
+        print(outputFiles.eio, "\n");
+
         print(outputFiles.eio,
               "{}\n",
               "! <Output Reporting Tolerances>, Tolerance for Time Heating Setpoint Not Met, Tolerance for Zone Cooling Setpoint Not Met Time");
