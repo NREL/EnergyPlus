@@ -2954,6 +2954,12 @@ namespace UnitarySystems {
                 if (fields.find("availability_schedule_name") != fields.end()) { // not required field
                     loc_sysAvailSched = UtilityRoutines::MakeUPPERCase(fields.at("availability_schedule_name"));
                     thisSys.m_SysAvailSchedPtr = ScheduleManager::GetScheduleIndex(loc_sysAvailSched);
+                    if (thisSys.m_SysAvailSchedPtr == 0) {
+                        ShowWarningError(getUnitarySystemInput + cCurrentModuleObject + "=\"" + thisSys.Name + "\", invalid Availability Schedule Name" +
+                                         " = " + loc_sysAvailSched);
+                        ShowContinueError("Set the default as Always On. Simulation continues.");
+                        thisSys.m_SysAvailSchedPtr = DataGlobals::ScheduleAlwaysOn;
+                    }
                 } else {
                     thisSys.m_SysAvailSchedPtr = DataGlobals::ScheduleAlwaysOn;
                 }
