@@ -3751,7 +3751,14 @@ namespace WeatherManager {
     }
 
     Real64 CalcSkyEmissivity(int ESkyCalcType, Real64 OSky, Real64 DryBulb, Real64 DewPoint, Real64 RelHum){
-        //Calculate Sky Emissivity
+        // Calculate Sky Emissivity
+        // References:
+        // M. Li, Y. Jiang and C. F. M. Coimbra,
+        // "On the determination of atmospheric longwave irradiance under all-sky conditions,"
+        // Solar Energy 144, 2017, pp. 40–48,
+        // G. Clark and C. Allen, "The Estimation of Atmospheric Radiation for Clear and
+        // Cloudy Skies," Proc. 2nd National Passive Solar Conference (AS/ISES), 1978, pp. 675-678.
+
         Real64 ESky;
 
         if (ESkyCalcType == WP_BruntModel) {

@@ -176,3 +176,23 @@ Heat Pump Source Side Mass Flow Rate
 ```
 
 See [7489](https://github.com/NREL/EnergyPlus/pull/7489/)
+
+### EIO output for Environment
+
+In the eio and table output related to `Environment`, the Sky Temperature Model are now correctly reported at the end. Example:
+
+*Before:*
+```
+! <Environment>,Environment Name,Environment Type, Start Date, End Date, Start DayOfWeek, Duration {#days}, Source:Start DayOfWeek,  Use Daylight Saving, Use Holidays, Apply Weekend Holiday Rule,  Use Rain Values, Use Snow Values
+Environment,DENVER CENTENNIAL GOLDEN ANN HTG 99% CONDNS DB DEFAULT,SizingPeriod:DesignDay,12/21,12/21,WinterDesignDay,1,N/A,N/A,N/A,N/A,N/A,N/A
+```
+
+*After:*
+```
+! <Environment>,Environment Name,Environment Type, Start Date, End Date, Start DayOfWeek, Duration {#days}, Source:Start DayOfWeek,  Use Daylight Saving, Use Holidays, Apply Weekend Holiday Rule,  Use Rain Values, Use Snow Values, Sky Temperature Model
+Environment,DENVER CENTENNIAL GOLDEN ANN HTG 99% CONDNS DB DEFAULT,SizingPeriod:DesignDay,12/21,12/21,WinterDesignDay,1,N/A,N/A,N/A,N/A,N/A,N/A,Clark and Allen
+```
+
+
+See [#PR7562](https://github.com/NREL/EnergyPlus/pull/7562)
+
