@@ -1116,7 +1116,6 @@ namespace HeatBalanceManager {
         if (DataHeatBalance::OverrideZoneAirSolutionAlgo) {
             ZoneAirSolutionAlgo = UseEulerMethod;
             AlphaName(1) = "EulerMethod";
-            ShowWarningError("Due to PerformancePrecisionTradeoffs the ZoneAirHeatBalanceAlgorithm has been changed to EulerMethod.");
         }
 
 

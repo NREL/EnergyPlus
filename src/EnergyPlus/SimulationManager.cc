@@ -1395,11 +1395,11 @@ namespace SimulationManager {
         // unused0909743 Format(' Display Extra Warnings',2(', ',A))
         //  ENDIF
         if (DataGlobals::createProfLog) {
-            writeIntialPerfLogValues();
+            writeIntialPerfLogValues(overrideModeValue);
         }
     }
 
-    void writeIntialPerfLogValues()
+    void writeIntialPerfLogValues(std::string const &currentOverrideModeValue)
     // write the input related portions of the .perflog
     // J.Glazer February 2020
     {
@@ -1410,6 +1410,7 @@ namespace SimulationManager {
         } else {
             UtilityRoutines::appendPerfLog("Zone Radiant Exchange Algorithm", "ScriptF");
         }
+        UtilityRoutines::appendPerfLog("Override Mode", currentOverrideModeValue);
         UtilityRoutines::appendPerfLog("Number of Timesteps per Hour", General::RoundSigDigits(DataGlobals::NumOfTimeStepInHour));
         UtilityRoutines::appendPerfLog("Minimum Number of Warmup Days", General::RoundSigDigits(DataHeatBalance::MinNumberOfWarmupDays));
         UtilityRoutines::appendPerfLog("SuppressAllBeginEnvironmentResets", bool_to_string(DataEnvironment::forceBeginEnvResetSuppress));
