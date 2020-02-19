@@ -318,6 +318,7 @@ namespace HybridEvapCoolingModel {
         Real64 ZoneEnthalpy;     // Zone Temp
         Real64 ZonePressure;   // Zone Humidity Ratio
         Real64 InletMassFlowRate; // Inlet is primary process air node at inlet to cooler
+        Real64 InletVolumetricFlowRate; // Inlet is primary process air node at inlet to cooler
         Real64 InletTemp;
         Real64 InletWetBulbTemp;
         Real64 InletHumRat;

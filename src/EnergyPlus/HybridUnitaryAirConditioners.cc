@@ -287,6 +287,11 @@ namespace HybridUnitaryAirConditioners {
         // Transfer the node data to EvapCond data structure
         InletNode = ZoneHybridUnitaryAirConditioner(UnitNum).InletNode;
         ZoneHybridUnitaryAirConditioner(UnitNum).InletMassFlowRate = Node(InletNode).MassFlowRate;
+        if (DataEnvironment::StdRhoAir > 1) {
+            ZoneHybridUnitaryAirConditioner(UnitNum).InletVolumetricFlowRate = ZoneHybridUnitaryAirConditioner(UnitNum).InletMassFlowRate / DataEnvironment::StdRhoAir;
+        } else {
+            ZoneHybridUnitaryAirConditioner(UnitNum).InletVolumetricFlowRate = ZoneHybridUnitaryAirConditioner(UnitNum).InletMassFlowRate / 1.225;
+        }
 
         // Set all of the inlet state variables from the inlet nodes
         ZoneHybridUnitaryAirConditioner(UnitNum).InletTemp = Node(InletNode).Temp;  //Return Air Node
@@ -931,6 +936,18 @@ namespace HybridUnitaryAirConditioners {
             SetupOutputVariable("Zone Hybrid Unitary HVAC Supply Air Standard Density Volume Flow Rate",
                                 OutputProcessor::Unit::m3_s,
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).OutletVolumetricFlowRate,
+                                "System",
+                                "Average",
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Return Air Mass Flow Rate",
+                                OutputProcessor::Unit::kg_s,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).InletMassFlowRate,
+                                "System",
+                                "Average",
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
+            SetupOutputVariable("Zone Hybrid Unitary HVAC Return Air Standard Density Volume Flow Rate",
+                                OutputProcessor::Unit::m3_s,
+                                ZoneHybridUnitaryAirConditioner(UnitLoop).InletVolumetricFlowRate,
                                 "System",
                                 "Average",
                                 ZoneHybridUnitaryAirConditioner(UnitLoop).Name);
