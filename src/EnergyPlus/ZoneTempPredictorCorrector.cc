@@ -4746,14 +4746,11 @@ namespace ZoneTempPredictorCorrector {
         }
 
         // Save the unmultiplied zone moisture load to a report variable
-        MoisturePredictedRate(ZoneNum) = ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired;
-        MoisturePredictedHumSPRate(ZoneNum) = ZoneSysMoistureDemand(ZoneNum).OutputRequiredToHumidifyingSP;
-        MoisturePredictedDehumSPRate(ZoneNum) = ZoneSysMoistureDemand(ZoneNum).OutputRequiredToDehumidifyingSP;
-
-        // Apply the Zone Multiplier to the total zone moisture load
-        ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired *= Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
-        ZoneSysMoistureDemand(ZoneNum).OutputRequiredToHumidifyingSP *= Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
-        ZoneSysMoistureDemand(ZoneNum).OutputRequiredToDehumidifyingSP *= Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
+        ReportMoistLoadsZoneMultiplier(ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired,
+                                       ZoneSysMoistureDemand(ZoneNum).OutputRequiredToHumidifyingSP,
+                                       ZoneSysMoistureDemand(ZoneNum).OutputRequiredToDehumidifyingSP,
+                                       MoisturePredictedRate(ZoneNum),MoisturePredictedHumSPRate(ZoneNum),MoisturePredictedDehumSPRate(ZoneNum),
+                                       Zone(ZoneNum).Multiplier,Zone(ZoneNum).ListMultiplier);
 
         // init each sequenced demand to the full output
         if (allocated(ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequired))
@@ -4765,6 +4762,28 @@ namespace ZoneTempPredictorCorrector {
             ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToDehumidSP =
                 ZoneSysMoistureDemand(ZoneNum).OutputRequiredToDehumidifyingSP; // array assignment
     }
+
+    void ReportMoistLoadsZoneMultiplier(Real64 &TotalLoad,
+                                        Real64 &TotalHumidLoad,
+                                        Real64 &TotalDehumidLoad,
+                                        Real64 &MoistLoadSingleZone,
+                                        Real64 &MoistLoadHumidSingleZone,
+                                        Real64 &MoistLoadDehumidSingleZone,
+                                        Real64 const ZoneMultiplier,
+                                        Real64 const ZoneMultiplierList
+    )
+    {
+        MoistLoadSingleZone = TotalLoad;
+        MoistLoadHumidSingleZone = TotalHumidLoad;
+        MoistLoadDehumidSingleZone = TotalDehumidLoad;
+        
+        Real64 ZoneMultFac = ZoneMultiplier * ZoneMultiplierList;
+        
+        TotalLoad *= ZoneMultFac;
+        TotalHumidLoad *= ZoneMultFac;
+        TotalDehumidLoad *= ZoneMultFac;
+    }
+
 
     void CorrectZoneAirTemp(Real64 &ZoneTempChange, // Temperature change in zone air between previous and current timestep
                             bool const ShortenTimeStepSys,

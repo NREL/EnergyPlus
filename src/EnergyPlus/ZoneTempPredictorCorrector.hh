@@ -243,6 +243,16 @@ namespace ZoneTempPredictorCorrector {
 
     void CalcPredictedHumidityRatio(int const ZoneNum, Real64 RAFNFrac);
 
+    void ReportMoistLoadsZoneMultiplier(Real64 &TotalLoad,
+                                        Real64 &TotalHumidLoad,
+                                        Real64 &TotalDehumidLoad,
+                                        Real64 &MoistLoadSingleZone,
+                                        Real64 &MoistLoadHumidSingleZone,
+                                        Real64 &MoistLoadDehumidSingleZone,
+                                        Real64 const ZoneMultiplier,
+                                        Real64 const ZoneMultiplierList
+    );
+
     void CorrectZoneAirTemp(Real64 &ZoneTempChange, // Temperature change in zone air between previous and current timestep
                             bool const ShortenTimeStepSys,
                             bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step history
