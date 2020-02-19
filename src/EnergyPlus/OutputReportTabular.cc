@@ -598,9 +598,9 @@ namespace OutputReportTabular {
         ffSchedIndex = Array1D_int(numResourceTypes, 0);
         meterNumEndUseBEPS = Array2D_int(numResourceTypes, NumEndUses, 0);
         meterNumEndUseSubBEPS.deallocate();
-        //		resourceTypeNames.deallocate();
-        //		sourceTypeNames.deallocate();
-        //		endUseNames.deallocate();
+        // resourceTypeNames.deallocate();
+        // sourceTypeNames.deallocate();
+        // endUseNames.deallocate();
         gatherTotalsBEPS = Array1D<Real64>(numResourceTypes, 0.0);
         gatherTotalsBySourceBEPS = Array1D<Real64>(numResourceTypes, 0.0);
         gatherTotalsSource = Array1D<Real64>(numSourceTypes, 0.0);
@@ -14131,8 +14131,8 @@ namespace OutputReportTabular {
                     rowHead(3) = "Airflow per Total Capacity [m3/s-W]";
                     rowHead(4) = "Floor Area per Total Capacity [m2/W]";
                     rowHead(5) = "Total Capacity per Floor Area [W/m2]";
-                    //					rowHead( 6 ) = "Chiller Pump Power per Flow [W-s/m3]"; // facility only
-                    //					rowHead( 7 ) = "Condenser Pump Power per Flor [W-s/m3]"; // facility only
+                    // rowHead( 6 ) = "Chiller Pump Power per Flow [W-s/m3]"; // facility only
+                    // rowHead( 7 ) = "Condenser Pump Power per Flor [W-s/m3]"; // facility only
                     rowHead(6) = "Number of People";
                 } else {
                     rowHead(1) = "Outside Air (%)";
@@ -14140,8 +14140,8 @@ namespace OutputReportTabular {
                     rowHead(3) = "Airflow per Total Capacity [ft3-h/min-Btu]";
                     rowHead(4) = "Floor Area per Total Capacity [ft2-h/Btu]";
                     rowHead(5) = "Total Capacity per Floor Area [Btu/h-ft2]";
-                    //					rowHead( 6 ) = "Chiller Pump Power per Flow [W-min/gal]";
-                    //					rowHead( 7 ) = "Condenser Pump Power per Flow [W-min/gal]";
+                    // rowHead( 6 ) = "Chiller Pump Power per Flow [W-min/gal]";
+                    // rowHead( 7 ) = "Condenser Pump Power per Flow [W-min/gal]";
                     rowHead(6) = "Number of People";
                 }
 
@@ -14150,11 +14150,11 @@ namespace OutputReportTabular {
                 tableBody(1, 3) = RealToStr(curCompLoad.airflowPerTotCap, 4);  // airflow per total capacity
                 tableBody(1, 4) = RealToStr(curCompLoad.areaPerTotCap, 4);     // area per total capacity
                 tableBody(1, 5) = RealToStr(curCompLoad.totCapPerArea, 4);     // total capacity per area
-                                                                               //				if ( kind == facilityOutput ) {
-                //					tableBody( 1, 6 ) = RealToStr( curCompLoad.chlPumpPerFlow, 4 );  // chiller pump power per
-                // flow 					tableBody( 1, 7 ) = RealToStr( curCompLoad.cndPumpPerFlow, 4 );  // condenser pump
+                                                                               // if ( kind == facilityOutput ) {
+                // tableBody( 1, 6 ) = RealToStr( curCompLoad.chlPumpPerFlow, 4 );  // chiller pump power per
+                // flow tableBody( 1, 7 ) = RealToStr( curCompLoad.cndPumpPerFlow, 4 );  // condenser pump
                 // power per  flow
-                //				}
+                // }
                 tableBody(1, 6) = RealToStr(curCompLoad.numPeople, 1); // number of people
 
                 WriteSubtitle(engineeringCheckName);
