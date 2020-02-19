@@ -1629,7 +1629,7 @@ namespace HybridEvapCoolingModel {
 
             Real64 Y_val =
                 thisSetting.oMode.CalculateCurveVal(StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, POWER_CURVE); // fix modenumber not set
-            ElectricalPower = Y_val; // [Kw] calculations for fuel in Kw
+            ElectricalPower = Y_val; // [W] calculations for fuel in W
             thisSetting.ElectricalPower = ElectricalPower;
 
             thisSetting.SupplyFanElectricPower =

@@ -175,7 +175,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     UpdateScheduleValues();
     // Get Unitary system
     GetInputZoneHybridUnitaryAirConditioners(ErrorsFound);
-    // All to get OA requiremetns
+    // All to get OA requirements
     GetOARequirements();
 
     EXPECT_FALSE(ErrorsFound);
@@ -226,7 +226,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     Real64 Tsa = pZoneHybridUnitaryAirConditioner->OutletTemp;
     Real64 Wsa = pZoneHybridUnitaryAirConditioner->OutletHumRat;
     Real64 Msa = pZoneHybridUnitaryAirConditioner->OutletMassFlowRate;
-    Real64 Y_val = pZoneHybridUnitaryAirConditioner->FinalElectricalPower / 1000;
+    Real64 Y_val = pZoneHybridUnitaryAirConditioner->FinalElectricalPower;
     Real64 ErrorCode = pZoneHybridUnitaryAirConditioner->ErrorCode;
     Real64 deliveredSC = pZoneHybridUnitaryAirConditioner->UnitSensibleCoolingRate;
     Real64 deliveredSH = pZoneHybridUnitaryAirConditioner->UnitSensibleHeatingRate;
@@ -235,7 +235,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     Real64 ElectricPower = pZoneHybridUnitaryAirConditioner->FinalElectricalPower;
     Real64 SupplyFanElectricPower = pZoneHybridUnitaryAirConditioner->SupplyFanElectricPower;             //
     Real64 SupplyFanElectricEnergy = pZoneHybridUnitaryAirConditioner->SupplyFanElectricEnergy;           //
-    Real64 SecondaryFuelConsumptionRate = pZoneHybridUnitaryAirConditioner->SecondaryFuelConsumptionRate; ///
+    Real64 SecondaryFuelConsumptionRate = pZoneHybridUnitaryAirConditioner->SecondaryFuelConsumptionRate; //
     Real64 SecondaryFuelConsumption = pZoneHybridUnitaryAirConditioner->SecondaryFuelConsumption;         //
     Real64 ThirdFuelConsumptionRate = pZoneHybridUnitaryAirConditioner->ThirdFuelConsumptionRate;         //
     Real64 ThirdFuelConsumption = pZoneHybridUnitaryAirConditioner->ThirdFuelConsumption;                 //
@@ -248,6 +248,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     EXPECT_GT(deliveredSC, 0);
     EXPECT_NEAR(0.0, deliveredSH, 0.001);
     EXPECT_LT(Tsa, Tra);
+    EXPECT_NEAR(Y_val, 10988.26, 0.1);
 
     // Scenario 2: high cooling larger system
 
@@ -265,7 +266,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     Wsa = pZoneHybridUnitaryAirConditioner->OutletHumRat;
     Msa = pZoneHybridUnitaryAirConditioner->OutletMassFlowRate;
     // double Msa_setting0= (pZoneHybridUnitaryAirConditioner->CurrentOperatingSettings[0].Supply_Air_Mass_Flow_Rate);
-    Y_val = pZoneHybridUnitaryAirConditioner->FinalElectricalPower / 1000;
+    Y_val = pZoneHybridUnitaryAirConditioner->FinalElectricalPower;
     ErrorCode = pZoneHybridUnitaryAirConditioner->ErrorCode;
     deliveredSC = pZoneHybridUnitaryAirConditioner->UnitSensibleCoolingRate;
     deliveredSH = pZoneHybridUnitaryAirConditioner->UnitSensibleHeatingRate;
@@ -273,7 +274,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     returnOSAF = pZoneHybridUnitaryAirConditioner->averageOSAF;
     SupplyFanElectricPower = pZoneHybridUnitaryAirConditioner->SupplyFanElectricPower;             //
     SupplyFanElectricEnergy = pZoneHybridUnitaryAirConditioner->SupplyFanElectricEnergy;           //
-    SecondaryFuelConsumptionRate = pZoneHybridUnitaryAirConditioner->SecondaryFuelConsumptionRate; ///
+    SecondaryFuelConsumptionRate = pZoneHybridUnitaryAirConditioner->SecondaryFuelConsumptionRate; //
     SecondaryFuelConsumption = pZoneHybridUnitaryAirConditioner->SecondaryFuelConsumption;         //
     ThirdFuelConsumptionRate = pZoneHybridUnitaryAirConditioner->ThirdFuelConsumptionRate;         //
     ThirdFuelConsumption = pZoneHybridUnitaryAirConditioner->ThirdFuelConsumption;                 //
@@ -285,6 +286,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     EXPECT_GT(deliveredSC, 0);
     EXPECT_NEAR(0.0, deliveredSH, 0.001);
     EXPECT_LT(Tsa, Tra);
+    EXPECT_NEAR(Y_val, 4749.14, 0.1);
 
     // Scenario 3: Outside of env conditions. should go to standby and have standby energy
     pZoneHybridUnitaryAirConditioner->Initialize(1);
@@ -297,6 +299,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     ElectricPower = pZoneHybridUnitaryAirConditioner->FinalElectricalPower;
     // checks
     EXPECT_EQ(0, modenumber);
+    EXPECT_NEAR(ElectricPower, 244, 10);
 
     // Scenario 4: Low Cooling
     pZoneHybridUnitaryAirConditioner->Initialize(1);
@@ -320,7 +323,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     Tsa = pZoneHybridUnitaryAirConditioner->OutletTemp;
     Wsa = pZoneHybridUnitaryAirConditioner->OutletHumRat;
     Msa = pZoneHybridUnitaryAirConditioner->OutletMassFlowRate;
-    Y_val = pZoneHybridUnitaryAirConditioner->FinalElectricalPower / 1000;
+    Y_val = pZoneHybridUnitaryAirConditioner->FinalElectricalPower;
     ErrorCode = pZoneHybridUnitaryAirConditioner->ErrorCode;
     deliveredSC = pZoneHybridUnitaryAirConditioner->UnitSensibleCoolingRate;
     deliveredSH = pZoneHybridUnitaryAirConditioner->UnitSensibleHeatingRate;
@@ -331,6 +334,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     EXPECT_GT(deliveredSC, 0);
     EXPECT_NEAR(0.0, deliveredSH, 0.001);
     EXPECT_LT(Tsa, Tra);
+    EXPECT_NEAR(Y_val, 1480.56, 0.1);
 
     // Scenario 5: No Conditioning
     DesignMinVR = 1.622720855;
@@ -349,7 +353,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     Tsa = pZoneHybridUnitaryAirConditioner->OutletTemp;
     Wsa = pZoneHybridUnitaryAirConditioner->OutletHumRat;
     Msa = pZoneHybridUnitaryAirConditioner->OutletMassFlowRate;
-    Y_val = pZoneHybridUnitaryAirConditioner->FinalElectricalPower / 1000;
+    Y_val = pZoneHybridUnitaryAirConditioner->FinalElectricalPower;
     ErrorCode = pZoneHybridUnitaryAirConditioner->ErrorCode;
     deliveredSC = pZoneHybridUnitaryAirConditioner->UnitSensibleCoolingRate;
     deliveredSH = pZoneHybridUnitaryAirConditioner->UnitSensibleHeatingRate;
@@ -358,6 +362,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     // checks
     EXPECT_NEAR(1.0, returnOSAF, 0.001);
     EXPECT_GT(Tsa, Tra);
+    EXPECT_NEAR(Y_val, 1482.97, 0.1);
 }
 
 } // namespace EnergyPlus
