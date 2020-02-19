@@ -87,6 +87,7 @@ namespace DataSystemVariables {
     extern std::string const cIgnoreBeamRadiation;
     extern std::string const cIgnoreDiffuseRadiation;
     extern std::string const cSutherlandHodgman;
+    extern std::string const cSlaterBarsky;
     extern std::string const cMinimalSurfaceVariables;
     extern std::string const cMinimalShadowing;
     extern std::string const cNumActiveSims;
@@ -118,6 +119,7 @@ namespace DataSystemVariables {
     extern bool DeveloperFlag;                    // TRUE if developer flag is turned on. (turns on more displays to console)
     extern bool TimingFlag;                       // TRUE if timing flag is turned on. (turns on more timing displays to console)
     extern bool SutherlandHodgman;                // TRUE if SutherlandHodgman algorithm for polygon clipping is to be used.
+    extern bool SlaterBarsky;                  // TRUE if SlaterBarsky algorithm for polygon clipping is to be used for vertical polygons.
     extern bool DetailedSkyDiffuseAlgorithm;      // use detailed diffuse shading algorithm for sky (shading transmittance varies)
     extern bool DetailedSolarTimestepIntegration; // when true, use detailed timestep integration for all solar,shading, etc.
     extern bool TrackAirLoopEnvFlag;              // If TRUE generates a file with runtime statistics for each HVAC
