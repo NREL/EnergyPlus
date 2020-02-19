@@ -608,13 +608,17 @@ TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_Scenario5_NoHeatingCooling
     modenumber = pZoneHybridUnitaryAirConditioner->PrimaryMode;
     Real64 Tsa = pZoneHybridUnitaryAirConditioner->OutletTemp;
     Real64 Msa = pZoneHybridUnitaryAirConditioner->OutletMassFlowRate;
+    Real64 Mreturn = pZoneHybridUnitaryAirConditioner->InletMassFlowRate;
+    Real64 Mrelief = pZoneHybridUnitaryAirConditioner->SecOutletMassFlowRate;
     // checks
     EXPECT_NEAR(Tsa, Tosa, 1.0);
     EXPECT_NEAR(Msa, DesignMinVR, 0.001);
+    EXPECT_NEAR(Mreturn, 0, 0.001);
+    EXPECT_NEAR(Mrelief, 0, 0.001);
 
 }
 
-TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_Scenario6_AvailabilityManagerOff)
+TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_AvailabilityManagerOff)
 {
     std::vector<std::string> snippet = getAllLinesInFile2(configured_source_directory() + "/tst/EnergyPlus/unit/UnitaryHybridUnitTest_DOSA.idf");
     std::string string = delimited_string(snippet);
