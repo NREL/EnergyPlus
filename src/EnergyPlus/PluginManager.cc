@@ -560,7 +560,7 @@ namespace PluginManagement {
                 auto const &thisObjectName = EnergyPlus::UtilityRoutines::MakeUPPERCase(instance.key());
                 inputProcessor->markObjectAsUsed(sGlobals, thisObjectName);
                 std::string variableName = fields.at("name_of_a_python_plugin_variable");
-                int variableIndex = this->getGlobalVariableHandle(variableName);
+                int variableIndex = EnergyPlus::PluginManagement::PluginManager::getGlobalVariableHandle(variableName);
                 int numValues = fields.at("number_of_timesteps_to_be_logged");
                 trends.emplace_back(thisObjectName, numValues, variableIndex);
             }
@@ -568,13 +568,18 @@ namespace PluginManagement {
 
         // setting up output variables deferred until later in the simulation setup process
 #else
-        // EnergyPlus::ShowWarningMessage("EnergyPlus was not built with Python Plugins Enabled, PythonPlugin:* objects are ignored");
+        // need to alert only if a plugin instance is found
+        std::string const sPlugins = "PythonPlugin:Instance";
+        int pluginInstances = inputProcessor->getNumObjectsFound(sPlugins);
+        if (pluginInstances > 0) {
+            EnergyPlus::ShowFatalError("Python Plugin instance found, but this build of EnergyPlus is not compiled with Python.");
+        }
 #endif
     }
 
+#if LINK_WITH_PYTHON == 1
     std::string PluginManager::sanitizedPath(std::string path)
     {
-#if LINK_WITH_PYTHON == 1
         // there are parts of this program that need to write out a string to execute in Python
         // because of that, escaped backslashes actually need double escaping
         // plus, the string cannot end with a backslash
@@ -596,8 +601,10 @@ namespace PluginManagement {
             }
         }
         return sanitizedDir;
-#endif
     }
+#else
+    std::string PluginManager::sanitizedPath(std::string EP_UNUSED(path)) {return "";}
+#endif
 
     void PluginInstance::reportPythonError() {
 #if LINK_WITH_PYTHON == 1
@@ -782,9 +789,9 @@ namespace PluginManagement {
 #endif
     }
 
+#if LINK_WITH_PYTHON == 1
     void PluginInstance::run(int iCalledFrom)
     {
-#if LINK_WITH_PYTHON == 1
         const char *functionName = nullptr;
         if (iCalledFrom == DataGlobals::emsCallFromBeginNewEvironment) {
             if (this->bHasBeginNewEnvironment) {
@@ -886,12 +893,14 @@ namespace PluginManagement {
                                        ", make sure it returns an integer exit code, either zero (success) or one (failure)");
         }
         Py_DECREF(pFunctionResponse); // PyObject_CallFunction returns new reference, decrement
-#endif
     }
+#else
+    void PluginInstance::run(int EP_UNUSED(iCalledFrom)) {}
+#endif
 
+#if LINK_WITH_PYTHON == 1
     void PluginManager::addToPythonPath(const std::string &path, bool userDefinedPath)
     {
-#if LINK_WITH_PYTHON == 1
         std::string command = "sys.path.insert(0, \"" + path + "\")";
         if (PyRun_SimpleString(command.c_str()) == 0) {
             if (userDefinedPath) {
@@ -901,19 +910,23 @@ namespace PluginManagement {
         } else {
             EnergyPlus::ShowFatalError("ERROR adding \"" + path + "\" to the sys.path in Python");
         }
-#endif
     }
+#else
+    void PluginManager::addToPythonPath(const std::string &EP_UNUSED(path), bool EP_UNUSED(userDefinedPath)) {}
+#endif
 
-    void PluginManager::addGlobalVariable(const std::string &name) {
 #if LINK_WITH_PYTHON == 1
+    void PluginManager::addGlobalVariable(const std::string &name) {
         std::string const varNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(name);
         PluginManagement::globalVariableNames.push_back(varNameUC);
         PluginManagement::globalVariableValues.push_back(Real64());
-#endif
     }
+#else
+    void PluginManager::addGlobalVariable(const std::string &EP_UNUSED(name)) {}
+#endif
 
-    int PluginManager::getGlobalVariableHandle(const std::string& name, bool const suppress_warning) { // note zero is a valid handle
 #if LINK_WITH_PYTHON == 1
+    int PluginManager::getGlobalVariableHandle(const std::string& name, bool const suppress_warning) { // note zero is a valid handle
         std::string const varNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(name);
         auto const it = std::find(PluginManagement::globalVariableNames.begin(), PluginManagement::globalVariableNames.end(), varNameUC);
         if (it != PluginManagement::globalVariableNames.end()) {
@@ -931,11 +944,13 @@ namespace PluginManagement {
                 return -1; // hush the compiler warning
             }
         }
-#endif
     }
+#else
+    int PluginManager::getGlobalVariableHandle(const std::string& EP_UNUSED(name), bool const EP_UNUSED(suppress_warning)) {return -1;}
+#endif
 
-    int PluginManager::getTrendVariableHandle(const std::string& name) {
 #if LINK_WITH_PYTHON == 1
+    int PluginManager::getTrendVariableHandle(const std::string& name) {
         std::string const varNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(name);
         for (size_t i = 0; i < trends.size(); i++) {
             auto & thisTrend = trends[i];
@@ -944,27 +959,33 @@ namespace PluginManagement {
             }
         }
         return -1;
-#endif
     }
+#else
+    int PluginManager::getTrendVariableHandle(const std::string& EP_UNUSED(name)) {return -1;}
+#endif
 
-    Real64 PluginManager::getTrendVariableValue(int handle, int timeIndex) {
 #if LINK_WITH_PYTHON == 1
+    Real64 PluginManager::getTrendVariableValue(int handle, int timeIndex) {
         return trends[handle].values[timeIndex];
-#endif
     }
+#else
+    Real64 PluginManager::getTrendVariableValue(int EP_UNUSED(handle), int EP_UNUSED(timeIndex)) {return 0.0;}
+#endif
 
+#if LINK_WITH_PYTHON == 1
     Real64 PluginManager::getTrendVariableAverage(int handle, int count) {
-    #if LINK_WITH_PYTHON == 1
         Real64 sum = 0;
         for (int i = 0; i < count; i++) {
             sum += trends[handle].values[i];
         }
         return sum / count;
-    #endif
     }
+#else
+    Real64 PluginManager::getTrendVariableAverage(int EP_UNUSED(handle), int EP_UNUSED(count)) {return 0.0;}
+#endif
 
+#if LINK_WITH_PYTHON == 1
     Real64 PluginManager::getTrendVariableMin(int handle, int count) {
-    #if LINK_WITH_PYTHON == 1
         Real64 minimumValue = 9999999999999;
         for (int i = 0; i < count; i++) {
             if (trends[handle].values[i] < minimumValue) {
@@ -972,11 +993,13 @@ namespace PluginManagement {
             }
         }
         return minimumValue;
-    #endif
     }
+#else
+    Real64 PluginManager::getTrendVariableMin(int EP_UNUSED(handle), int EP_UNUSED(count)) {return 0.0;}
+#endif
 
+#if LINK_WITH_PYTHON == 1
     Real64 PluginManager::getTrendVariableMax(int handle, int count) {
-    #if LINK_WITH_PYTHON == 1
         Real64 maximumValue = -9999999999999;
         for (int i = 0; i < count; i++) {
             if (trends[handle].values[i] > maximumValue) {
@@ -984,21 +1007,25 @@ namespace PluginManagement {
             }
         }
         return maximumValue;
-    #endif
     }
+#else
+    Real64 PluginManager::getTrendVariableMax(int EP_UNUSED(handle), int EP_UNUSED(count)) {return 0.0;}
+#endif
 
-    Real64 PluginManager::getTrendVariableSum(int handle, int count) {
 #if LINK_WITH_PYTHON == 1
+    Real64 PluginManager::getTrendVariableSum(int handle, int count) {
         Real64 sum = 0.0;
         for (int i = 0; i < count; i++) {
             sum += trends[handle].values[i];
         }
         return sum;
-#endif
     }
+#else
+    Real64 PluginManager::getTrendVariableSum(int EP_UNUSED(handle), int EP_UNUSED(count)) {return 0.0;}
+#endif
 
-    Real64 PluginManager::getTrendVariableDirection(int handle, int count) {
 #if LINK_WITH_PYTHON == 1
+    Real64 PluginManager::getTrendVariableDirection(int handle, int count) {
         auto &trend = trends[handle];
         Real64 timeSum = 0.0;
         Real64 valueSum = 0.0;
@@ -1013,14 +1040,18 @@ namespace PluginManagement {
         Real64 numerator = timeSum * valueSum - count * crossSum;
         Real64 denominator = pow_2(timeSum) - count * powSum;
         return numerator / denominator;
-#endif
     }
+#else
+    Real64 PluginManager::getTrendVariableDirection(int EP_UNUSED(handle), int EP_UNUSED(count)) {return 0.0;}
+#endif
 
-    size_t PluginManager::getTrendVariableHistorySize(int handle) {
 #if LINK_WITH_PYTHON == 1
+    size_t PluginManager::getTrendVariableHistorySize(int handle) {
         return trends[handle].values.size();
-#endif
     }
+#else
+    size_t PluginManager::getTrendVariableHistorySize(int EP_UNUSED(handle)) {return 0;}
+#endif
 
     void PluginManager::updatePluginValues() {
 #if LINK_WITH_PYTHON == 1
@@ -1032,8 +1063,8 @@ namespace PluginManagement {
 #endif
     }
 
-    Real64 PluginManager::getGlobalVariableValue(int handle) {
 #if LINK_WITH_PYTHON == 1
+    Real64 PluginManager::getGlobalVariableValue(int handle) {
         if (PluginManagement::globalVariableValues.empty()) {
             EnergyPlus::ShowFatalError("Tried to access plugin global variable but it looks like there aren't any; use the PythonPlugin:GlobalVariables object to declare them.");
         }
@@ -1045,11 +1076,13 @@ namespace PluginManagement {
             EnergyPlus::ShowFatalError("Plugin global variable problem causes program termination");
         }
         return 0.0;
-#endif
     }
+#else
+    Real64 PluginManager::getGlobalVariableValue(int EP_UNUSED(handle)) {return 0.0;}
+#endif
 
-    void PluginManager::setGlobalVariableValue(int handle, Real64 value) {
 #if LINK_WITH_PYTHON == 1
+    void PluginManager::setGlobalVariableValue(int handle, Real64 value) {
         if (PluginManagement::globalVariableValues.empty()) {
             EnergyPlus::ShowFatalError("Tried to set plugin global variable but it looks like there aren't any; use the PythonPlugin:GlobalVariables object to declare them.");
         }
@@ -1060,11 +1093,13 @@ namespace PluginManagement {
             EnergyPlus::ShowContinueError("Available handles range from 0 to " + std::to_string(PluginManagement::globalVariableValues.size()-1));
             EnergyPlus::ShowFatalError("Plugin global variable problem causes program termination");
         }
-#endif
     }
+#else
+    void PluginManager::setGlobalVariableValue(int EP_UNUSED(handle), Real64 EP_UNUSED(value)) {}
+#endif
 
-    int PluginManager::getLocationOfUserDefinedPlugin(std::string const &programName) {
 #if LINK_WITH_PYTHON == 1
+    int PluginManager::getLocationOfUserDefinedPlugin(std::string const &programName) {
         for (size_t handle = 0; handle < plugins.size(); handle++) {
             auto const thisPlugin = plugins[handle];
             if (EnergyPlus::UtilityRoutines::MakeUPPERCase(thisPlugin.emsAlias) == EnergyPlus::UtilityRoutines::MakeUPPERCase(programName)) {
@@ -1072,14 +1107,18 @@ namespace PluginManagement {
             }
         }
         return -1;
-#endif
     }
+#else
+    int PluginManager::getLocationOfUserDefinedPlugin(std::string const &EP_UNUSED(programName)) {return -1;}
+#endif
 
-    void PluginManager::runSingleUserDefinedPlugin(int index) {
 #if LINK_WITH_PYTHON == 1
+    void PluginManager::runSingleUserDefinedPlugin(int index) {
         plugins[index].run(DataGlobals::emsCallFromUserDefinedComponentModel);
-#endif
     }
+#else
+    void PluginManager::runSingleUserDefinedPlugin(int EP_UNUSED(index)) {}
+#endif
 
 } // namespace PluginManagement
 } // namespace EnergyPlus
