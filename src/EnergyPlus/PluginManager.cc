@@ -87,6 +87,10 @@ namespace PluginManagement {
         callbacks[iCalledFrom].push_back(f);
     }
 
+    int PluginManager::numActiveCallbacks() {
+        return (int) callbacks.size();
+    }
+
     void runAnyRegisteredCallbacks(int iCalledFrom, bool &anyRan)
     {
         if (DataGlobals::KickOffSimulation) return;

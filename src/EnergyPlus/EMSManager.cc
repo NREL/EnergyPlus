@@ -216,13 +216,14 @@ namespace EMSManager {
 
         // Python plugin instances also count since actuators need to be set up for them
         int numPythonPlugins = inputProcessor->getNumObjectsFound("PythonPlugin:Instance");
+        int numActiveCallbacks = PluginManagement::PluginManager::numActiveCallbacks();
 
         // added for FMU
         if ((NumSensors + numActuatorsUsed + NumProgramCallManagers + NumErlPrograms + NumErlSubroutines + NumUserGlobalVariables +
              NumEMSOutputVariables + NumEMSCurveIndices + NumExternalInterfaceGlobalVariables + NumExternalInterfaceActuatorsUsed +
              NumEMSConstructionIndices + NumEMSMeteredOutputVariables + NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed +
              NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables + NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed +
-             NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables + NumOutputEMSs + numPythonPlugins) > 0) {
+             NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables + NumOutputEMSs + numPythonPlugins + numActiveCallbacks) > 0) {
             AnyEnergyManagementSystemInModel = true;
         } else {
             AnyEnergyManagementSystemInModel = false;
