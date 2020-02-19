@@ -164,10 +164,10 @@ protected:
 						" 0,                                   ",  // min OAT for compressor
 						" 1,                                   ",  // max OAT for basin heater
 						" 100,                                 ",  // static pressure
-						" VariableSpeed,                       ",  // capacity control method
+						" Continuous,                          ",  // capacity control method
 						" 100,                                 ",  // basin heater capacity
 						" 400,                                 ",  // basin heater setpoint temp
-						" , !BasinHeaterOpSchedule,               ",  // basin heater operating schedule name
+						" ,                                    ",  // basin heater operating schedule name
 						" Electricity,                         ",  // compressor fuel type
 						" BaseOperatingMode,                   "   // base operating mode name
 				};
