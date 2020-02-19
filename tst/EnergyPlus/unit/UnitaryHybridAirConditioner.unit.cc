@@ -74,7 +74,9 @@
 #include <EnergyPlus/HybridUnitaryAirConditioners.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <fstream>
@@ -93,6 +95,8 @@ using namespace EnergyPlus::DataZoneEnergyDemands;
 using namespace EnergyPlus::DataZoneControls;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::Humidifiers;
+using namespace EnergyPlus::OutputReportPredefined;
+using namespace EnergyPlus::ReportSizingManager;
 using namespace EnergyPlus::SizingManager;
 
 using namespace EnergyPlus::DataContaminantBalance;
@@ -714,7 +718,7 @@ TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_AvailabilityManagerOff)
 
 }
 
-TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_Meter_test) {
+TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_MeterAndReport_test) {
     std::vector<std::string> snippet = getAllLinesInFile2(
             configured_source_directory() + "/tst/EnergyPlus/unit/UnitaryHybridUnitTest_DOSA.idf");
     std::string string = delimited_string(snippet);
@@ -764,7 +768,7 @@ TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_Meter_test) {
     Real64 RHosa, Requestedheating, RequestedCooling, Requested_Humidification, Requested_Dehumidification;
     RHosa = 0;
     std::string TimeDate;
-    Real64 MsaRatio, OSAF;
+    Real64 MsaRatio, OSAF, MaxFlow;
     MsaRatio = OSAF = 1;
 
     Requestedheating = RequestedCooling = Requested_Humidification = Requested_Dehumidification = 0;
@@ -787,28 +791,39 @@ TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_Meter_test) {
     GetMeteredVariables(TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes,
                         EndUses, Groups, Names, NumFound);
 
+    // output results
+    MaxFlow = pZoneHybridUnitaryAirConditioner->ScaledSystemMaximumSupplyAirVolumeFlowRate;
+
+    // Check the meters associated with the ZoneHVAC:HybridUnitaryHVAC ouputs
     EXPECT_EQ(7, NumFound);
-    EXPECT_EQ(ResourceTypes(1), 1010); // ENERGYTRANSFER
+    EXPECT_EQ(ResourceTypes(1), 1010); // ENERGYTRANSFER - Cooling
     EXPECT_EQ(EndUses(1), "COOLINGCOILS");
     EXPECT_EQ(Groups(1), "HVAC");
-    EXPECT_EQ(ResourceTypes(2), 1010); // ENERGYTRANSFER
+    EXPECT_EQ(ResourceTypes(2), 1010); // ENERGYTRANSFER - Heating
     EXPECT_EQ(EndUses(2), "HEATINGCOILS");
     EXPECT_EQ(Groups(2), "HVAC");
-    EXPECT_EQ(ResourceTypes(3), 1001); // ELECTRIC
+    EXPECT_EQ(ResourceTypes(3), 1001); // ELECTRIC - Cooling Energy
     EXPECT_EQ(EndUses(3), "COOLING");
     EXPECT_EQ(Groups(3), "HVAC");
-    EXPECT_EQ(ResourceTypes(4), 1001); // ELECTRIC
+    EXPECT_EQ(ResourceTypes(4), 1001); // ELECTRIC - Fan Energy
     EXPECT_EQ(EndUses(4), "FANS");
     EXPECT_EQ(Groups(4), "HVAC");
-    EXPECT_EQ(ResourceTypes(5), 1002); // NATURALGAS specified in UnitaryHybridUnitTest_DOSA.idf
+    EXPECT_EQ(ResourceTypes(5), 1002); // NATURALGAS - Secondary Fuel Type - specified in UnitaryHybridUnitTest_DOSA.idf
     EXPECT_EQ(EndUses(5), "COOLING");
     EXPECT_EQ(Groups(5), "HVAC");
-    EXPECT_EQ(ResourceTypes(6), 1012); // DISTRICTCOOLING specified in UnitaryHybridUnitTest_DOSA.idf
+    EXPECT_EQ(ResourceTypes(6), 1012); // DISTRICTCOOLING - Third Fuel Type - specified in UnitaryHybridUnitTest_DOSA.idf
     EXPECT_EQ(EndUses(6), "COOLING");
     EXPECT_EQ(Groups(6), "HVAC");
-    EXPECT_EQ(ResourceTypes(7), 1009); // WATER
+    EXPECT_EQ(ResourceTypes(7), 1009); // WATER - Cooling Water Use
     EXPECT_EQ(EndUses(7), "COOLING");
     EXPECT_EQ(Groups(7), "HVAC");
+
+    // Check that unit is included in Component Sizing Summary Report
+    EXPECT_EQ("ZoneHVAC:HybridUnitaryHVAC", OutputReportPredefined::CompSizeTableEntry(1).typeField);
+    EXPECT_EQ("MUNTERSEPX5000", OutputReportPredefined::CompSizeTableEntry(1).nameField);
+    EXPECT_EQ("Scaled Maximum Supply Air Volume Flow Rate [m3/s]", OutputReportPredefined::CompSizeTableEntry(1).description);
+    EXPECT_EQ(MaxFlow, OutputReportPredefined::CompSizeTableEntry(1).valField);
+
 }
 
 } // namespace EnergyPlus
