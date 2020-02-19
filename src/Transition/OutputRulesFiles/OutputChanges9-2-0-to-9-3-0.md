@@ -181,3 +181,8 @@ See [7489](https://github.com/NREL/EnergyPlus/pull/7489/)
 In the eio and table output, new lines report the status of options for the PerformancePrecisionTradeoffs object.
 
 See [7743](https://github.com/NREL/EnergyPlus/pull/7743/)
+
+### Fix when "other" shows up in ABUPS end-use subcategory table
+In the AUBPS end-use subcategory table, the "other" row would show up when ever an end-use subcategory
+was not specified. Now unless specified, end-uses are assumed to be "general" and show up in that row.
+It is now unlikely that the "other" row will be shown.
