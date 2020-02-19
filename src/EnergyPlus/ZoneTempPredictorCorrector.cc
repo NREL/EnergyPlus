@@ -6981,9 +6981,11 @@ namespace ZoneTempPredictorCorrector {
             if (isOscillate) {
                 ZoneTempOscillate(iZone) = TimeStepSys;
                 isAnyZoneOscillating = true;
-                if (ThermalComfortInASH55(iZone).ZoneIsOccupied) {
-                    ZoneTempOscillateDuringOccupancy(iZone) = TimeStepSys;
-                    isAnyZoneOscillatingDuringOccupancy = true;
+                if (allocated(ThermalComfortInASH55)) {
+                    if (ThermalComfortInASH55(iZone).ZoneIsOccupied) {
+                        ZoneTempOscillateDuringOccupancy(iZone) = TimeStepSys;
+                        isAnyZoneOscillatingDuringOccupancy = true;
+                    }
                 }
                 if (CurDeadBandOrSetback(iZone)) {
                     ZoneTempOscillateInDeadband(iZone) = TimeStepSys;
