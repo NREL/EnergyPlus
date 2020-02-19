@@ -3203,7 +3203,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
 
         Real64 cooling_consumption = 0.;
         SetupOutputVariable("Chiller Electric Energy",
