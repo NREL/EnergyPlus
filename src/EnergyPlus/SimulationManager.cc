@@ -1173,7 +1173,7 @@ namespace SimulationManager {
                 auto const &thisObjectName = instance.key();
                 inputProcessor->markObjectAsUsed(CurrentModuleObject, thisObjectName);
                 if (fields.find("use_coil_direct_solutions") != fields.end()) {
-                    DoCoilDirectSolutions =
+                    DataGlobals::DoCoilDirectSolutions =
                         UtilityRoutines::MakeUPPERCase(fields.at("use_coil_direct_solutions"))=="YES";
                 }
                 if (fields.find("zone_radiant_exchange_algorithm") != fields.end()) {
@@ -1248,6 +1248,26 @@ namespace SimulationManager {
               "Simulation, Do HVAC Sizing Simulation");
         print(outputFiles.eio, " Simulation Control");
         for (Num = 1; Num <= 6; ++Num) {
+            print(outputFiles.eio, ", {}", Alphas(Num));
+        }
+        print(outputFiles.eio, "\n");
+
+        // Performance Precision Tradeoffs
+        if (DataGlobals::DoCoilDirectSolutions) {
+            Alphas(1) = "Yes";
+            ShowWarningError("PerformancePrecisionTradeoffs: Coil Direct Solution simulation is selected.");
+        } else {
+            Alphas(1) = "No";
+        }
+        if (HeatBalanceIntRadExchange::CarrollMethod) {
+            Alphas(2) = "CarrollMRT";
+            ShowWarningError("PerformancePrecisionTradeoffs: Carroll MRT radiant exchange method is selected.");
+        } else {
+            Alphas(2) = "ScriptF";
+        }
+        print(outputFiles.eio, "{}\n", "! <Performance Precision Tradeoffs>, Use Coil Direct Simulation, Zone Radiant Exchange Algorithm");
+        print(outputFiles.eio, " Performance Precision Tradeoffs");
+        for (Num = 1; Num <= 2; ++Num) {
             print(outputFiles.eio, ", {}", Alphas(Num));
         }
         print(outputFiles.eio, "\n");
@@ -1729,7 +1749,8 @@ namespace SimulationManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static constexpr auto EndOfDataFormat("End of Data"); // Signifies the end of the data block in the output file
+        static constexpr auto EndOfDataString("End of Data"); // Signifies the end of the data block in the output file
+        static ObjexxFCL::gio::Fmt EndOfDataFormat("(\"End of Data\")");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -1874,7 +1895,7 @@ namespace SimulationManager {
         }
 
         // Close the Initialization Output File
-        print(outputFiles.eio, "{}\n", EndOfDataFormat);
+        print(outputFiles.eio, "{}\n", EndOfDataString);
         outputFiles.eio.close();
 
         // Close the Meters Output File
