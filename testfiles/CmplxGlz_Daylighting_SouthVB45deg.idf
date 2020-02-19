@@ -86155,8 +86155,8 @@
   ZoneHVAC:EquipmentList,
     COMFENZone Equipment,    !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    COMFENZone Direct Air,   !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    COMFENZone Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -86166,11 +86166,23 @@
     COMFENZone Inlets,       !- Name
     COMFENZone Supply Inlet; !- Node 1 Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     COMFENZone Direct Air,   !- Name
     ALWAYSON,                !- Availability Schedule Name
-    COMFENZone Supply Inlet, !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    COMFENZone Supply Inlet ATInlet,  !- Air Inlet Node Name
+    COMFENZone Supply Inlet, !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    COMFENZone Direct Air ADU,  !- Name
+    COMFENZone Supply Inlet, !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    COMFENZone Direct Air,   !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
 !-- DirectAirZone-Autosize[] --End--: COMFENZone
 !-- PSZAirLoop-Autosize[] --Begin--: SYS-1
@@ -86260,7 +86272,7 @@
   AirLoopHVAC:ZoneSplitter,
     SYS-1 Zone Splitter,     !- Name
     SYS-1 Zone Equip Inlet,  !- Inlet Node Name
-    COMFENZone Supply Inlet; !- Outlet 1 Node Name
+    COMFENZone Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ReturnPath,
     SYS-1 Return Path,       !- Name

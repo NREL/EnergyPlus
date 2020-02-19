@@ -27173,495 +27173,1455 @@
     HTGSETP_OFF_SCH_Yes_Optimum,  !- Heating Setpoint Temperature Schedule Name
     CLGSETP_OFF_SCH_Yes_Optimum;  !- Cooling Setpoint Temperature Schedule Name
 
-!-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:UNCONTROLLED ===========
+!-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:NOREHEAT ===========
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     G SW Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    G SW Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    G SW Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    G SW Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    G SW Apartment Direct Air ADU,  !- Name
+    G SW Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    G SW Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     G NW Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    G NW Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    G NW Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    G NW Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    G NW Apartment Direct Air ADU,  !- Name
+    G NW Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    G NW Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Office Direct Air,       !- Name
     All On,                  !- Availability Schedule Name
-    Office Supply Inlet,     !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    Office Supply Inlet ATInlet,  !- Air Inlet Node Name
+    Office Supply Inlet,     !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    Office Direct Air ADU,   !- Name
+    Office Supply Inlet,     !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Office Direct Air,       !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     G NE Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    G NE Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    G NE Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    G NE Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    G NE Apartment Direct Air ADU,  !- Name
+    G NE Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    G NE Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     G N1 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    G N1 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    G N1 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    G N1 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    G N1 Apartment Direct Air ADU,  !- Name
+    G N1 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    G N1 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     G N2 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    G N2 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    G N2 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    G N2 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    G N2 Apartment Direct Air ADU,  !- Name
+    G N2 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    G N2 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     G S1 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    G S1 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    G S1 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    G S1 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    G S1 Apartment Direct Air ADU,  !- Name
+    G S1 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    G S1 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     G S2 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    G S2 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    G S2 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    G S2 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    G S2 Apartment Direct Air ADU,  !- Name
+    G S2 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    G S2 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F2 SW Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F2 SW Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F2 SW Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F2 SW Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F2 SW Apartment Direct Air ADU,  !- Name
+    F2 SW Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F2 SW Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F2 NW Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F2 NW Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F2 NW Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F2 NW Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F2 NW Apartment Direct Air ADU,  !- Name
+    F2 NW Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F2 NW Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F2 SE Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F2 SE Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F2 SE Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F2 SE Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F2 SE Apartment Direct Air ADU,  !- Name
+    F2 SE Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F2 SE Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F2 NE Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F2 NE Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F2 NE Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F2 NE Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F2 NE Apartment Direct Air ADU,  !- Name
+    F2 NE Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F2 NE Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F2 N1 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F2 N1 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F2 N1 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F2 N1 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F2 N1 Apartment Direct Air ADU,  !- Name
+    F2 N1 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F2 N1 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F2 N2 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F2 N2 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F2 N2 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F2 N2 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F2 N2 Apartment Direct Air ADU,  !- Name
+    F2 N2 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F2 N2 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F2 S1 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F2 S1 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F2 S1 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F2 S1 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F2 S1 Apartment Direct Air ADU,  !- Name
+    F2 S1 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F2 S1 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F2 S2 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F2 S2 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F2 S2 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F2 S2 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F2 S2 Apartment Direct Air ADU,  !- Name
+    F2 S2 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F2 S2 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F3 SW Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F3 SW Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F3 SW Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F3 SW Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F3 SW Apartment Direct Air ADU,  !- Name
+    F3 SW Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F3 SW Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F3 NW Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F3 NW Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F3 NW Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F3 NW Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F3 NW Apartment Direct Air ADU,  !- Name
+    F3 NW Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F3 NW Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F3 SE Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F3 SE Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F3 SE Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F3 SE Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F3 SE Apartment Direct Air ADU,  !- Name
+    F3 SE Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F3 SE Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F3 NE Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F3 NE Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F3 NE Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F3 NE Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F3 NE Apartment Direct Air ADU,  !- Name
+    F3 NE Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F3 NE Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F3 N1 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F3 N1 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F3 N1 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F3 N1 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F3 N1 Apartment Direct Air ADU,  !- Name
+    F3 N1 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F3 N1 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F3 N2 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F3 N2 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F3 N2 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F3 N2 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F3 N2 Apartment Direct Air ADU,  !- Name
+    F3 N2 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F3 N2 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F3 S1 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F3 S1 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F3 S1 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F3 S1 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F3 S1 Apartment Direct Air ADU,  !- Name
+    F3 S1 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F3 S1 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F3 S2 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F3 S2 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F3 S2 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F3 S2 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F3 S2 Apartment Direct Air ADU,  !- Name
+    F3 S2 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F3 S2 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F4 SW Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F4 SW Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F4 SW Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F4 SW Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F4 SW Apartment Direct Air ADU,  !- Name
+    F4 SW Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F4 SW Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F4 NW Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F4 NW Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F4 NW Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F4 NW Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F4 NW Apartment Direct Air ADU,  !- Name
+    F4 NW Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F4 NW Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F4 SE Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F4 SE Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F4 SE Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F4 SE Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F4 SE Apartment Direct Air ADU,  !- Name
+    F4 SE Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F4 SE Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F4 NE Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F4 NE Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F4 NE Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F4 NE Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F4 NE Apartment Direct Air ADU,  !- Name
+    F4 NE Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F4 NE Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F4 N1 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F4 N1 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F4 N1 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F4 N1 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F4 N1 Apartment Direct Air ADU,  !- Name
+    F4 N1 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F4 N1 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F4 N2 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F4 N2 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F4 N2 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F4 N2 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F4 N2 Apartment Direct Air ADU,  !- Name
+    F4 N2 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F4 N2 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F4 S1 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F4 S1 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F4 S1 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F4 S1 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F4 S1 Apartment Direct Air ADU,  !- Name
+    F4 S1 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F4 S1 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F4 S2 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F4 S2 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F4 S2 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F4 S2 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F4 S2 Apartment Direct Air ADU,  !- Name
+    F4 S2 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F4 S2 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     M SW Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    M SW Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    M SW Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    M SW Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    M SW Apartment Direct Air ADU,  !- Name
+    M SW Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    M SW Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     M NW Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    M NW Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    M NW Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    M NW Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    M NW Apartment Direct Air ADU,  !- Name
+    M NW Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    M NW Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     M SE Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    M SE Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    M SE Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    M SE Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    M SE Apartment Direct Air ADU,  !- Name
+    M SE Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    M SE Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     M NE Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    M NE Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    M NE Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    M NE Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    M NE Apartment Direct Air ADU,  !- Name
+    M NE Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    M NE Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     M N1 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    M N1 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    M N1 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    M N1 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    M N1 Apartment Direct Air ADU,  !- Name
+    M N1 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    M N1 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     M N2 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    M N2 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    M N2 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    M N2 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    M N2 Apartment Direct Air ADU,  !- Name
+    M N2 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    M N2 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     M S1 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    M S1 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    M S1 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    M S1 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    M S1 Apartment Direct Air ADU,  !- Name
+    M S1 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    M S1 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     M S2 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    M S2 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    M S2 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    M S2 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    M S2 Apartment Direct Air ADU,  !- Name
+    M S2 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    M S2 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F6 SW Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F6 SW Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F6 SW Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F6 SW Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F6 SW Apartment Direct Air ADU,  !- Name
+    F6 SW Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F6 SW Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F6 NW Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F6 NW Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F6 NW Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F6 NW Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F6 NW Apartment Direct Air ADU,  !- Name
+    F6 NW Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F6 NW Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F6 SE Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F6 SE Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F6 SE Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F6 SE Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F6 SE Apartment Direct Air ADU,  !- Name
+    F6 SE Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F6 SE Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F6 NE Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F6 NE Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F6 NE Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F6 NE Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F6 NE Apartment Direct Air ADU,  !- Name
+    F6 NE Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F6 NE Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F6 N1 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F6 N1 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F6 N1 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F6 N1 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F6 N1 Apartment Direct Air ADU,  !- Name
+    F6 N1 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F6 N1 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F6 N2 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F6 N2 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F6 N2 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F6 N2 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F6 N2 Apartment Direct Air ADU,  !- Name
+    F6 N2 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F6 N2 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F6 S1 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F6 S1 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F6 S1 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F6 S1 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F6 S1 Apartment Direct Air ADU,  !- Name
+    F6 S1 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F6 S1 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F6 S2 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F6 S2 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F6 S2 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F6 S2 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F6 S2 Apartment Direct Air ADU,  !- Name
+    F6 S2 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F6 S2 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F7 SW Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F7 SW Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F7 SW Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F7 SW Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F7 SW Apartment Direct Air ADU,  !- Name
+    F7 SW Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F7 SW Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F7 NW Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F7 NW Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F7 NW Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F7 NW Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F7 NW Apartment Direct Air ADU,  !- Name
+    F7 NW Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F7 NW Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F7 SE Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F7 SE Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F7 SE Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F7 SE Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F7 SE Apartment Direct Air ADU,  !- Name
+    F7 SE Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F7 SE Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F7 NE Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F7 NE Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F7 NE Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F7 NE Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F7 NE Apartment Direct Air ADU,  !- Name
+    F7 NE Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F7 NE Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F7 N1 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F7 N1 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F7 N1 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F7 N1 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F7 N1 Apartment Direct Air ADU,  !- Name
+    F7 N1 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F7 N1 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F7 N2 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F7 N2 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F7 N2 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F7 N2 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F7 N2 Apartment Direct Air ADU,  !- Name
+    F7 N2 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F7 N2 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F7 S1 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F7 S1 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F7 S1 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F7 S1 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F7 S1 Apartment Direct Air ADU,  !- Name
+    F7 S1 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F7 S1 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F7 S2 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F7 S2 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F7 S2 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F7 S2 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F7 S2 Apartment Direct Air ADU,  !- Name
+    F7 S2 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F7 S2 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F8 SW Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F8 SW Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F8 SW Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F8 SW Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F8 SW Apartment Direct Air ADU,  !- Name
+    F8 SW Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F8 SW Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F8 NW Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F8 NW Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F8 NW Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F8 NW Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F8 NW Apartment Direct Air ADU,  !- Name
+    F8 NW Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F8 NW Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F8 SE Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F8 SE Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F8 SE Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F8 SE Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F8 SE Apartment Direct Air ADU,  !- Name
+    F8 SE Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F8 SE Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F8 NE Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F8 NE Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F8 NE Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F8 NE Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F8 NE Apartment Direct Air ADU,  !- Name
+    F8 NE Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F8 NE Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F8 N1 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F8 N1 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F8 N1 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F8 N1 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F8 N1 Apartment Direct Air ADU,  !- Name
+    F8 N1 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F8 N1 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F8 N2 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F8 N2 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F8 N2 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F8 N2 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F8 N2 Apartment Direct Air ADU,  !- Name
+    F8 N2 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F8 N2 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F8 S1 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F8 S1 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F8 S1 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F8 S1 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F8 S1 Apartment Direct Air ADU,  !- Name
+    F8 S1 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F8 S1 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F8 S2 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F8 S2 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F8 S2 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F8 S2 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F8 S2 Apartment Direct Air ADU,  !- Name
+    F8 S2 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F8 S2 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F9 SW Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F9 SW Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F9 SW Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F9 SW Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F9 SW Apartment Direct Air ADU,  !- Name
+    F9 SW Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F9 SW Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F9 NW Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F9 NW Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F9 NW Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F9 NW Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F9 NW Apartment Direct Air ADU,  !- Name
+    F9 NW Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F9 NW Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F9 SE Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F9 SE Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F9 SE Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F9 SE Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F9 SE Apartment Direct Air ADU,  !- Name
+    F9 SE Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F9 SE Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F9 NE Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F9 NE Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F9 NE Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F9 NE Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F9 NE Apartment Direct Air ADU,  !- Name
+    F9 NE Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F9 NE Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F9 N1 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F9 N1 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F9 N1 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F9 N1 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F9 N1 Apartment Direct Air ADU,  !- Name
+    F9 N1 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F9 N1 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F9 N2 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F9 N2 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F9 N2 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F9 N2 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F9 N2 Apartment Direct Air ADU,  !- Name
+    F9 N2 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F9 N2 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F9 S1 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F9 S1 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F9 S1 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F9 S1 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F9 S1 Apartment Direct Air ADU,  !- Name
+    F9 S1 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F9 S1 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     F9 S2 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    F9 S2 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    F9 S2 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    F9 S2 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    F9 S2 Apartment Direct Air ADU,  !- Name
+    F9 S2 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    F9 S2 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     T SW Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    T SW Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    T SW Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    T SW Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    T SW Apartment Direct Air ADU,  !- Name
+    T SW Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    T SW Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     T NW Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    T NW Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    T NW Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    T NW Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    T NW Apartment Direct Air ADU,  !- Name
+    T NW Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    T NW Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     T SE Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    T SE Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    T SE Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    T SE Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    T SE Apartment Direct Air ADU,  !- Name
+    T SE Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    T SE Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     T NE Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    T NE Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    T NE Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    T NE Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    T NE Apartment Direct Air ADU,  !- Name
+    T NE Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    T NE Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     T N1 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    T N1 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    T N1 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    T N1 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    T N1 Apartment Direct Air ADU,  !- Name
+    T N1 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    T N1 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     T N2 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    T N2 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    T N2 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    T N2 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    T N2 Apartment Direct Air ADU,  !- Name
+    T N2 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    T N2 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     T S1 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    T S1 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    T S1 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    T S1 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    T S1 Apartment Direct Air ADU,  !- Name
+    T S1 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    T S1 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     T S2 Apartment Direct Air,  !- Name
     All On,                  !- Availability Schedule Name
-    T S2 Apartment Supply Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    T S2 Apartment Supply Inlet ATInlet,  !- Air Inlet Node Name
+    T S2 Apartment Supply Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    T S2 Apartment Direct Air ADU,  !- Name
+    T S2 Apartment Supply Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    T S2 Apartment Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
 !-   ===========  ALL OBJECTS IN CLASS: ZONEHVAC:EQUIPMENTLIST ===========
 
   ZoneHVAC:EquipmentList,
     G SW Apartment Equipment,!- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    G SW Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    G SW Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -27670,8 +28630,8 @@
   ZoneHVAC:EquipmentList,
     G NW Apartment Equipment,!- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    G NW Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    G NW Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -27680,8 +28640,8 @@
   ZoneHVAC:EquipmentList,
     Office Equipment,        !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Office Direct Air,       !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Office Direct Air ADU,   !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -27690,8 +28650,8 @@
   ZoneHVAC:EquipmentList,
     G NE Apartment Equipment,!- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    G NE Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    G NE Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -27700,8 +28660,8 @@
   ZoneHVAC:EquipmentList,
     G N1 Apartment Equipment,!- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    G N1 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    G N1 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -27710,8 +28670,8 @@
   ZoneHVAC:EquipmentList,
     G N2 Apartment Equipment,!- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    G N2 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    G N2 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -27720,8 +28680,8 @@
   ZoneHVAC:EquipmentList,
     G S1 Apartment Equipment,!- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    G S1 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    G S1 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -27730,8 +28690,8 @@
   ZoneHVAC:EquipmentList,
     G S2 Apartment Equipment,!- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    G S2 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    G S2 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -27740,8 +28700,8 @@
   ZoneHVAC:EquipmentList,
     F2 SW Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F2 SW Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F2 SW Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -27750,8 +28710,8 @@
   ZoneHVAC:EquipmentList,
     F2 NW Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F2 NW Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F2 NW Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -27760,8 +28720,8 @@
   ZoneHVAC:EquipmentList,
     F2 SE Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F2 SE Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F2 SE Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -27770,8 +28730,8 @@
   ZoneHVAC:EquipmentList,
     F2 NE Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F2 NE Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F2 NE Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -27780,8 +28740,8 @@
   ZoneHVAC:EquipmentList,
     F2 N1 Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F2 N1 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F2 N1 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -27790,8 +28750,8 @@
   ZoneHVAC:EquipmentList,
     F2 N2 Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F2 N2 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F2 N2 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -27800,8 +28760,8 @@
   ZoneHVAC:EquipmentList,
     F2 S1 Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F2 S1 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F2 S1 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -27810,8 +28770,8 @@
   ZoneHVAC:EquipmentList,
     F2 S2 Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F2 S2 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F2 S2 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -27820,8 +28780,8 @@
   ZoneHVAC:EquipmentList,
     F3 SW Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F3 SW Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F3 SW Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -27830,8 +28790,8 @@
   ZoneHVAC:EquipmentList,
     F3 NW Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F3 NW Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F3 NW Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -27840,8 +28800,8 @@
   ZoneHVAC:EquipmentList,
     F3 SE Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F3 SE Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F3 SE Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -27850,8 +28810,8 @@
   ZoneHVAC:EquipmentList,
     F3 NE Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F3 NE Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F3 NE Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -27860,8 +28820,8 @@
   ZoneHVAC:EquipmentList,
     F3 N1 Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F3 N1 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F3 N1 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -27870,8 +28830,8 @@
   ZoneHVAC:EquipmentList,
     F3 N2 Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F3 N2 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F3 N2 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -27880,8 +28840,8 @@
   ZoneHVAC:EquipmentList,
     F3 S1 Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F3 S1 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F3 S1 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -27890,8 +28850,8 @@
   ZoneHVAC:EquipmentList,
     F3 S2 Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F3 S2 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F3 S2 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -27900,8 +28860,8 @@
   ZoneHVAC:EquipmentList,
     F4 SW Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F4 SW Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F4 SW Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -27910,8 +28870,8 @@
   ZoneHVAC:EquipmentList,
     F4 NW Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F4 NW Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F4 NW Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -27920,8 +28880,8 @@
   ZoneHVAC:EquipmentList,
     F4 SE Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F4 SE Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F4 SE Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -27930,8 +28890,8 @@
   ZoneHVAC:EquipmentList,
     F4 NE Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F4 NE Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F4 NE Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -27940,8 +28900,8 @@
   ZoneHVAC:EquipmentList,
     F4 N1 Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F4 N1 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F4 N1 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -27950,8 +28910,8 @@
   ZoneHVAC:EquipmentList,
     F4 N2 Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F4 N2 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F4 N2 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -27960,8 +28920,8 @@
   ZoneHVAC:EquipmentList,
     F4 S1 Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F4 S1 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F4 S1 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -27970,8 +28930,8 @@
   ZoneHVAC:EquipmentList,
     F4 S2 Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F4 S2 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F4 S2 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -27980,8 +28940,8 @@
   ZoneHVAC:EquipmentList,
     M SW Apartment Equipment,!- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    M SW Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    M SW Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -27990,8 +28950,8 @@
   ZoneHVAC:EquipmentList,
     M NW Apartment Equipment,!- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    M NW Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    M NW Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28000,8 +28960,8 @@
   ZoneHVAC:EquipmentList,
     M SE Apartment Equipment,!- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    M SE Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    M SE Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28010,8 +28970,8 @@
   ZoneHVAC:EquipmentList,
     M NE Apartment Equipment,!- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    M NE Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    M NE Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28020,8 +28980,8 @@
   ZoneHVAC:EquipmentList,
     M N1 Apartment Equipment,!- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    M N1 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    M N1 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28030,8 +28990,8 @@
   ZoneHVAC:EquipmentList,
     M N2 Apartment Equipment,!- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    M N2 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    M N2 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28040,8 +29000,8 @@
   ZoneHVAC:EquipmentList,
     M S1 Apartment Equipment,!- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    M S1 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    M S1 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28050,8 +29010,8 @@
   ZoneHVAC:EquipmentList,
     M S2 Apartment Equipment,!- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    M S2 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    M S2 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28060,8 +29020,8 @@
   ZoneHVAC:EquipmentList,
     F6 SW Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F6 SW Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F6 SW Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28070,8 +29030,8 @@
   ZoneHVAC:EquipmentList,
     F6 NW Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F6 NW Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F6 NW Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28080,8 +29040,8 @@
   ZoneHVAC:EquipmentList,
     F6 SE Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F6 SE Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F6 SE Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28090,8 +29050,8 @@
   ZoneHVAC:EquipmentList,
     F6 NE Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F6 NE Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F6 NE Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28100,8 +29060,8 @@
   ZoneHVAC:EquipmentList,
     F6 N1 Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F6 N1 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F6 N1 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28110,8 +29070,8 @@
   ZoneHVAC:EquipmentList,
     F6 N2 Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F6 N2 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F6 N2 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28120,8 +29080,8 @@
   ZoneHVAC:EquipmentList,
     F6 S1 Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F6 S1 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F6 S1 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28130,8 +29090,8 @@
   ZoneHVAC:EquipmentList,
     F6 S2 Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F6 S2 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F6 S2 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28140,8 +29100,8 @@
   ZoneHVAC:EquipmentList,
     F7 SW Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F7 SW Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F7 SW Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28150,8 +29110,8 @@
   ZoneHVAC:EquipmentList,
     F7 NW Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F7 NW Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F7 NW Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28160,8 +29120,8 @@
   ZoneHVAC:EquipmentList,
     F7 SE Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F7 SE Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F7 SE Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28170,8 +29130,8 @@
   ZoneHVAC:EquipmentList,
     F7 NE Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F7 NE Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F7 NE Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28180,8 +29140,8 @@
   ZoneHVAC:EquipmentList,
     F7 N1 Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F7 N1 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F7 N1 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28190,8 +29150,8 @@
   ZoneHVAC:EquipmentList,
     F7 N2 Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F7 N2 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F7 N2 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28200,8 +29160,8 @@
   ZoneHVAC:EquipmentList,
     F7 S1 Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F7 S1 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F7 S1 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28210,8 +29170,8 @@
   ZoneHVAC:EquipmentList,
     F7 S2 Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F7 S2 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F7 S2 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28220,8 +29180,8 @@
   ZoneHVAC:EquipmentList,
     F8 SW Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F8 SW Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F8 SW Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28230,8 +29190,8 @@
   ZoneHVAC:EquipmentList,
     F8 NW Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F8 NW Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F8 NW Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28240,8 +29200,8 @@
   ZoneHVAC:EquipmentList,
     F8 SE Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F8 SE Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F8 SE Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28250,8 +29210,8 @@
   ZoneHVAC:EquipmentList,
     F8 NE Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F8 NE Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F8 NE Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28260,8 +29220,8 @@
   ZoneHVAC:EquipmentList,
     F8 N1 Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F8 N1 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F8 N1 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28270,8 +29230,8 @@
   ZoneHVAC:EquipmentList,
     F8 N2 Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F8 N2 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F8 N2 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28280,8 +29240,8 @@
   ZoneHVAC:EquipmentList,
     F8 S1 Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F8 S1 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F8 S1 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28290,8 +29250,8 @@
   ZoneHVAC:EquipmentList,
     F8 S2 Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F8 S2 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F8 S2 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28300,8 +29260,8 @@
   ZoneHVAC:EquipmentList,
     F9 SW Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F9 SW Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F9 SW Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28310,8 +29270,8 @@
   ZoneHVAC:EquipmentList,
     F9 NW Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F9 NW Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F9 NW Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28320,8 +29280,8 @@
   ZoneHVAC:EquipmentList,
     F9 SE Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F9 SE Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F9 SE Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28330,8 +29290,8 @@
   ZoneHVAC:EquipmentList,
     F9 NE Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F9 NE Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F9 NE Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28340,8 +29300,8 @@
   ZoneHVAC:EquipmentList,
     F9 N1 Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F9 N1 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F9 N1 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28350,8 +29310,8 @@
   ZoneHVAC:EquipmentList,
     F9 N2 Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F9 N2 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F9 N2 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28360,8 +29320,8 @@
   ZoneHVAC:EquipmentList,
     F9 S1 Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F9 S1 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F9 S1 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28370,8 +29330,8 @@
   ZoneHVAC:EquipmentList,
     F9 S2 Apartment Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    F9 S2 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    F9 S2 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28380,8 +29340,8 @@
   ZoneHVAC:EquipmentList,
     T SW Apartment Equipment,!- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    T SW Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    T SW Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28390,8 +29350,8 @@
   ZoneHVAC:EquipmentList,
     T NW Apartment Equipment,!- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    T NW Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    T NW Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28400,8 +29360,8 @@
   ZoneHVAC:EquipmentList,
     T SE Apartment Equipment,!- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    T SE Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    T SE Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28410,8 +29370,8 @@
   ZoneHVAC:EquipmentList,
     T NE Apartment Equipment,!- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    T NE Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    T NE Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28420,8 +29380,8 @@
   ZoneHVAC:EquipmentList,
     T N1 Apartment Equipment,!- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    T N1 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    T N1 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28430,8 +29390,8 @@
   ZoneHVAC:EquipmentList,
     T N2 Apartment Equipment,!- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    T N2 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    T N2 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28440,8 +29400,8 @@
   ZoneHVAC:EquipmentList,
     T S1 Apartment Equipment,!- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    T S1 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    T S1 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -28450,8 +29410,8 @@
   ZoneHVAC:EquipmentList,
     T S2 Apartment Equipment,!- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    T S2 Apartment Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    T S2 Apartment Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -41928,402 +42888,402 @@
   AirLoopHVAC:ZoneSplitter,
     AirLoop G SW Zone Splitter,  !- Name
     ZoneSplitter G SW Supply Air Inlet,  !- Inlet Node Name
-    G SW Apartment Supply Inlet;  !- Outlet 1 Node Name
+    G SW Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop G NW Zone Splitter,  !- Name
     ZoneSplitter G NW Supply Air Inlet,  !- Inlet Node Name
-    G NW Apartment Supply Inlet;  !- Outlet 1 Node Name
+    G NW Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop Office Zone Splitter,  !- Name
     ZoneSplitter Office Supply Air Inlet,  !- Inlet Node Name
-    Office Supply Inlet;     !- Outlet 1 Node Name
+    Office Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop G NE Zone Splitter,  !- Name
     ZoneSplitter G NE Supply Air Inlet,  !- Inlet Node Name
-    G NE Apartment Supply Inlet;  !- Outlet 1 Node Name
+    G NE Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop G N1 Zone Splitter,  !- Name
     ZoneSplitter G N1 Supply Air Inlet,  !- Inlet Node Name
-    G N1 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    G N1 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop G N2 Zone Splitter,  !- Name
     ZoneSplitter G N2 Supply Air Inlet,  !- Inlet Node Name
-    G N2 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    G N2 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop G S1 Zone Splitter,  !- Name
     ZoneSplitter G S1 Supply Air Inlet,  !- Inlet Node Name
-    G S1 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    G S1 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop G S2 Zone Splitter,  !- Name
     ZoneSplitter G S2 Supply Air Inlet,  !- Inlet Node Name
-    G S2 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    G S2 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F2 SW Zone Splitter,  !- Name
     ZoneSplitter F2 SW Supply Air Inlet,  !- Inlet Node Name
-    F2 SW Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F2 SW Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F2 NW Zone Splitter,  !- Name
     ZoneSplitter F2 NW Supply Air Inlet,  !- Inlet Node Name
-    F2 NW Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F2 NW Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F2 SE Zone Splitter,  !- Name
     ZoneSplitter F2 SE Supply Air Inlet,  !- Inlet Node Name
-    F2 SE Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F2 SE Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F2 NE Zone Splitter,  !- Name
     ZoneSplitter F2 NE Supply Air Inlet,  !- Inlet Node Name
-    F2 NE Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F2 NE Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F2 N1 Zone Splitter,  !- Name
     ZoneSplitter F2 N1 Supply Air Inlet,  !- Inlet Node Name
-    F2 N1 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F2 N1 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F2 N2 Zone Splitter,  !- Name
     ZoneSplitter F2 N2 Supply Air Inlet,  !- Inlet Node Name
-    F2 N2 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F2 N2 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F2 S1 Zone Splitter,  !- Name
     ZoneSplitter F2 S1 Supply Air Inlet,  !- Inlet Node Name
-    F2 S1 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F2 S1 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F2 S2 Zone Splitter,  !- Name
     ZoneSplitter F2 S2 Supply Air Inlet,  !- Inlet Node Name
-    F2 S2 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F2 S2 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F3 SW Zone Splitter,  !- Name
     ZoneSplitter F3 SW Supply Air Inlet,  !- Inlet Node Name
-    F3 SW Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F3 SW Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F3 NW Zone Splitter,  !- Name
     ZoneSplitter F3 NW Supply Air Inlet,  !- Inlet Node Name
-    F3 NW Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F3 NW Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F3 SE Zone Splitter,  !- Name
     ZoneSplitter F3 SE Supply Air Inlet,  !- Inlet Node Name
-    F3 SE Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F3 SE Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F3 NE Zone Splitter,  !- Name
     ZoneSplitter F3 NE Supply Air Inlet,  !- Inlet Node Name
-    F3 NE Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F3 NE Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F3 N1 Zone Splitter,  !- Name
     ZoneSplitter F3 N1 Supply Air Inlet,  !- Inlet Node Name
-    F3 N1 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F3 N1 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F3 N2 Zone Splitter,  !- Name
     ZoneSplitter F3 N2 Supply Air Inlet,  !- Inlet Node Name
-    F3 N2 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F3 N2 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F3 S1 Zone Splitter,  !- Name
     ZoneSplitter F3 S1 Supply Air Inlet,  !- Inlet Node Name
-    F3 S1 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F3 S1 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F3 S2 Zone Splitter,  !- Name
     ZoneSplitter F3 S2 Supply Air Inlet,  !- Inlet Node Name
-    F3 S2 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F3 S2 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F4 SW Zone Splitter,  !- Name
     ZoneSplitter F4 SW Supply Air Inlet,  !- Inlet Node Name
-    F4 SW Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F4 SW Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F4 NW Zone Splitter,  !- Name
     ZoneSplitter F4 NW Supply Air Inlet,  !- Inlet Node Name
-    F4 NW Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F4 NW Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F4 SE Zone Splitter,  !- Name
     ZoneSplitter F4 SE Supply Air Inlet,  !- Inlet Node Name
-    F4 SE Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F4 SE Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F4 NE Zone Splitter,  !- Name
     ZoneSplitter F4 NE Supply Air Inlet,  !- Inlet Node Name
-    F4 NE Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F4 NE Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F4 N1 Zone Splitter,  !- Name
     ZoneSplitter F4 N1 Supply Air Inlet,  !- Inlet Node Name
-    F4 N1 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F4 N1 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F4 N2 Zone Splitter,  !- Name
     ZoneSplitter F4 N2 Supply Air Inlet,  !- Inlet Node Name
-    F4 N2 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F4 N2 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F4 S1 Zone Splitter,  !- Name
     ZoneSplitter F4 S1 Supply Air Inlet,  !- Inlet Node Name
-    F4 S1 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F4 S1 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F4 S2 Zone Splitter,  !- Name
     ZoneSplitter F4 S2 Supply Air Inlet,  !- Inlet Node Name
-    F4 S2 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F4 S2 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop M SW Zone Splitter,  !- Name
     ZoneSplitter M SW Supply Air Inlet,  !- Inlet Node Name
-    M SW Apartment Supply Inlet;  !- Outlet 1 Node Name
+    M SW Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop M NW Zone Splitter,  !- Name
     ZoneSplitter M NW Supply Air Inlet,  !- Inlet Node Name
-    M NW Apartment Supply Inlet;  !- Outlet 1 Node Name
+    M NW Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop M SE Zone Splitter,  !- Name
     ZoneSplitter M SE Supply Air Inlet,  !- Inlet Node Name
-    M SE Apartment Supply Inlet;  !- Outlet 1 Node Name
+    M SE Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop M NE Zone Splitter,  !- Name
     ZoneSplitter M NE Supply Air Inlet,  !- Inlet Node Name
-    M NE Apartment Supply Inlet;  !- Outlet 1 Node Name
+    M NE Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop M N1 Zone Splitter,  !- Name
     ZoneSplitter M N1 Supply Air Inlet,  !- Inlet Node Name
-    M N1 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    M N1 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop M N2 Zone Splitter,  !- Name
     ZoneSplitter M N2 Supply Air Inlet,  !- Inlet Node Name
-    M N2 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    M N2 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop M S1 Zone Splitter,  !- Name
     ZoneSplitter M S1 Supply Air Inlet,  !- Inlet Node Name
-    M S1 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    M S1 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop M S2 Zone Splitter,  !- Name
     ZoneSplitter M S2 Supply Air Inlet,  !- Inlet Node Name
-    M S2 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    M S2 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F6 SW Zone Splitter,  !- Name
     ZoneSplitter F6 SW Supply Air Inlet,  !- Inlet Node Name
-    F6 SW Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F6 SW Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F6 NW Zone Splitter,  !- Name
     ZoneSplitter F6 NW Supply Air Inlet,  !- Inlet Node Name
-    F6 NW Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F6 NW Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F6 SE Zone Splitter,  !- Name
     ZoneSplitter F6 SE Supply Air Inlet,  !- Inlet Node Name
-    F6 SE Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F6 SE Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F6 NE Zone Splitter,  !- Name
     ZoneSplitter F6 NE Supply Air Inlet,  !- Inlet Node Name
-    F6 NE Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F6 NE Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F6 N1 Zone Splitter,  !- Name
     ZoneSplitter F6 N1 Supply Air Inlet,  !- Inlet Node Name
-    F6 N1 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F6 N1 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F6 N2 Zone Splitter,  !- Name
     ZoneSplitter F6 N2 Supply Air Inlet,  !- Inlet Node Name
-    F6 N2 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F6 N2 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F6 S1 Zone Splitter,  !- Name
     ZoneSplitter F6 S1 Supply Air Inlet,  !- Inlet Node Name
-    F6 S1 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F6 S1 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F6 S2 Zone Splitter,  !- Name
     ZoneSplitter F6 S2 Supply Air Inlet,  !- Inlet Node Name
-    F6 S2 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F6 S2 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F7 SW Zone Splitter,  !- Name
     ZoneSplitter F7 SW Supply Air Inlet,  !- Inlet Node Name
-    F7 SW Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F7 SW Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F7 NW Zone Splitter,  !- Name
     ZoneSplitter F7 NW Supply Air Inlet,  !- Inlet Node Name
-    F7 NW Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F7 NW Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F7 SE Zone Splitter,  !- Name
     ZoneSplitter F7 SE Supply Air Inlet,  !- Inlet Node Name
-    F7 SE Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F7 SE Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F7 NE Zone Splitter,  !- Name
     ZoneSplitter F7 NE Supply Air Inlet,  !- Inlet Node Name
-    F7 NE Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F7 NE Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F7 N1 Zone Splitter,  !- Name
     ZoneSplitter F7 N1 Supply Air Inlet,  !- Inlet Node Name
-    F7 N1 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F7 N1 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F7 N2 Zone Splitter,  !- Name
     ZoneSplitter F7 N2 Supply Air Inlet,  !- Inlet Node Name
-    F7 N2 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F7 N2 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F7 S1 Zone Splitter,  !- Name
     ZoneSplitter F7 S1 Supply Air Inlet,  !- Inlet Node Name
-    F7 S1 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F7 S1 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F7 S2 Zone Splitter,  !- Name
     ZoneSplitter F7 S2 Supply Air Inlet,  !- Inlet Node Name
-    F7 S2 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F7 S2 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F8 SW Zone Splitter,  !- Name
     ZoneSplitter F8 SW Supply Air Inlet,  !- Inlet Node Name
-    F8 SW Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F8 SW Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F8 NW Zone Splitter,  !- Name
     ZoneSplitter F8 NW Supply Air Inlet,  !- Inlet Node Name
-    F8 NW Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F8 NW Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F8 SE Zone Splitter,  !- Name
     ZoneSplitter F8 SE Supply Air Inlet,  !- Inlet Node Name
-    F8 SE Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F8 SE Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F8 NE Zone Splitter,  !- Name
     ZoneSplitter F8 NE Supply Air Inlet,  !- Inlet Node Name
-    F8 NE Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F8 NE Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F8 N1 Zone Splitter,  !- Name
     ZoneSplitter F8 N1 Supply Air Inlet,  !- Inlet Node Name
-    F8 N1 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F8 N1 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F8 N2 Zone Splitter,  !- Name
     ZoneSplitter F8 N2 Supply Air Inlet,  !- Inlet Node Name
-    F8 N2 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F8 N2 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F8 S1 Zone Splitter,  !- Name
     ZoneSplitter F8 S1 Supply Air Inlet,  !- Inlet Node Name
-    F8 S1 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F8 S1 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F8 S2 Zone Splitter,  !- Name
     ZoneSplitter F8 S2 Supply Air Inlet,  !- Inlet Node Name
-    F8 S2 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F8 S2 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F9 SW Zone Splitter,  !- Name
     ZoneSplitter F9 SW Supply Air Inlet,  !- Inlet Node Name
-    F9 SW Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F9 SW Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F9 NW Zone Splitter,  !- Name
     ZoneSplitter F9 NW Supply Air Inlet,  !- Inlet Node Name
-    F9 NW Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F9 NW Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F9 SE Zone Splitter,  !- Name
     ZoneSplitter F9 SE Supply Air Inlet,  !- Inlet Node Name
-    F9 SE Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F9 SE Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F9 NE Zone Splitter,  !- Name
     ZoneSplitter F9 NE Supply Air Inlet,  !- Inlet Node Name
-    F9 NE Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F9 NE Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F9 N1 Zone Splitter,  !- Name
     ZoneSplitter F9 N1 Supply Air Inlet,  !- Inlet Node Name
-    F9 N1 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F9 N1 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F9 N2 Zone Splitter,  !- Name
     ZoneSplitter F9 N2 Supply Air Inlet,  !- Inlet Node Name
-    F9 N2 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F9 N2 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F9 S1 Zone Splitter,  !- Name
     ZoneSplitter F9 S1 Supply Air Inlet,  !- Inlet Node Name
-    F9 S1 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F9 S1 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop F9 S2 Zone Splitter,  !- Name
     ZoneSplitter F9 S2 Supply Air Inlet,  !- Inlet Node Name
-    F9 S2 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    F9 S2 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop T SW Zone Splitter,  !- Name
     ZoneSplitter T SW Supply Air Inlet,  !- Inlet Node Name
-    T SW Apartment Supply Inlet;  !- Outlet 1 Node Name
+    T SW Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop T NW Zone Splitter,  !- Name
     ZoneSplitter T NW Supply Air Inlet,  !- Inlet Node Name
-    T NW Apartment Supply Inlet;  !- Outlet 1 Node Name
+    T NW Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop T SE Zone Splitter,  !- Name
     ZoneSplitter T SE Supply Air Inlet,  !- Inlet Node Name
-    T SE Apartment Supply Inlet;  !- Outlet 1 Node Name
+    T SE Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop T NE Zone Splitter,  !- Name
     ZoneSplitter T NE Supply Air Inlet,  !- Inlet Node Name
-    T NE Apartment Supply Inlet;  !- Outlet 1 Node Name
+    T NE Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop T N1 Zone Splitter,  !- Name
     ZoneSplitter T N1 Supply Air Inlet,  !- Inlet Node Name
-    T N1 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    T N1 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop T N2 Zone Splitter,  !- Name
     ZoneSplitter T N2 Supply Air Inlet,  !- Inlet Node Name
-    T N2 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    T N2 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop T S1 Zone Splitter,  !- Name
     ZoneSplitter T S1 Supply Air Inlet,  !- Inlet Node Name
-    T S1 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    T S1 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     AirLoop T S2 Zone Splitter,  !- Name
     ZoneSplitter T S2 Supply Air Inlet,  !- Inlet Node Name
-    T S2 Apartment Supply Inlet;  !- Outlet 1 Node Name
+    T S2 Apartment Supply Inlet ATInlet;  !- Outlet 1 Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:SUPPLYPATH ===========
 

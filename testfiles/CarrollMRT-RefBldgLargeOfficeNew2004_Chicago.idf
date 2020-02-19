@@ -2,7 +2,7 @@
 !-Option OriginalOrderTop UseSpecialFormat
 !-NOTE: All comments with '!-' are ignored by the IDFEditor and are generated automatically.
 !-      Use '!' comments if they need to be retained when using the IDFEditor.
-! RefBldgLargeOfficeNew2004_Chicago.idf
+! CarrollMRT-RefBldgLargeOfficeNew2004_Chicago.idf
 !
 ! This example file is based on Version 1.3_5.0 and was transitioned to Version 6.0 using the transition utility
 !
@@ -12,7 +12,8 @@
 ! EnergyPlus Version 6.0
 ! ASHRAE Standards 90.1-2004 and 62-1999
 !
-! Description:  12 story plus basement, office building.
+! Description:  12 story plus basement, office building. Demonstrates use of Carroll MRT radiant exchange method. 
+!               Compare to RefBldgLargeOfficeNew2004_Chicago.idf
 ! Form:         Area = 46,320 m2 (498,588 ft2); Number of Stories = 12; Shape = rectangle, Aspect ratio = 1.5
 ! Envelope:     Envelope thermal properties vary with climate according to ASHRAE Standard 90.1-2004.
 !               Opaque constructions: mass walls; built-up flat roof (insulation above deck); slab-on-grade floor
@@ -73,7 +74,7 @@
 ! ***GENERAL SIMULATION PARAMETERS***
 ! Number of Zones: 19
 
-  Version,9.2;
+  Version,9.3;
 
   SimulationControl,
     YES,                     !- Do Zone Sizing Calculation
@@ -95,7 +96,7 @@
     6;                       !- Minimum Number of Warmup Days
 
   PerformancePrecisionTradeoffs,
-    Yes,                      !- Use Coil Direct Solutions
+    No,                       !- Use Coil Direct Solutions
     CarrollMRT;               !- Zone Radiant Exchange Algorithm
 
   RunPeriod,

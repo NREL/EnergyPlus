@@ -109,6 +109,7 @@ SET( SRC
   DataHVACControllers.hh
   DataHVACGlobals.cc
   DataHVACGlobals.hh
+  DataHVACSystems.hh
   DataHeatBalFanSys.cc
   DataHeatBalFanSys.hh
   DataHeatBalSurface.cc
@@ -127,8 +128,6 @@ SET( SRC
   DataOutputs.hh
   DataPhotovoltaics.cc
   DataPhotovoltaics.hh
-  DataPlant.cc
-  DataPlant.hh
   DataPrecisionGlobals.cc
   DataPrecisionGlobals.hh
   DataReportingFlags.cc
@@ -178,8 +177,6 @@ SET( SRC
   DemandManager.hh
   DesiccantDehumidifiers.cc
   DesiccantDehumidifiers.hh
-  DirectAirManager.cc
-  DirectAirManager.hh
   DisplacementVentMgr.cc
   DisplacementVentMgr.hh
   DisplayRoutines.cc
@@ -399,22 +396,26 @@ SET( SRC
   Pipes.cc
   Pipes.hh
   Plant/CallingOrder.hh
+  Plant/DataPlant.cc
+  Plant/DataPlant.hh
   Plant/Enums.hh
   Plant/EquipAndOperations.hh
   Plant/LoopSidePumpInformation.hh
   Plant/PlantAvailManager.hh
   Plant/PlantConvergencePoint.hh
-  Plant/LoopSideReportVars.hh
   Plant/MeterData.hh
   Plant/ReportBranchData.hh
   Plant/ReportCompData.hh
   Plant/ReportLoopData.hh
-  Plant/ReportVars.hh
+  Plant/Branch.cc
   Plant/Branch.hh
+  Plant/Component.cc
   Plant/Component.hh
   Plant/ConnectedLoopData.hh
   Plant/Connection.hh
+  Plant/Loop.cc
   Plant/Loop.hh
+  Plant/LoopSide.cc
   Plant/LoopSide.hh
   Plant/MixerData.hh
   Plant/SplitterData.hh
@@ -433,10 +434,6 @@ SET( SRC
   PlantLoadProfile.cc
   PlantLoadProfile.hh
   Plant/PlantLocation.hh
-  PlantLoopEquip.cc
-  PlantLoopEquip.hh
-  Plant/PlantLoopSolver.cc
-  Plant/PlantLoopSolver.hh
   Plant/PlantManager.cc
   Plant/PlantManager.hh
   PlantPipingSystemsManager.cc

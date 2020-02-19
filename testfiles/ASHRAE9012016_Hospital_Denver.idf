@@ -24839,8 +24839,8 @@
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
     ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 2 Object Type
-    Kitchen_Flr_5 CAV Box,   !- Zone Equipment 2 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type
+    Kitchen_Flr_5 CAV Box ADU,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
     ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
@@ -25389,11 +25389,23 @@
 
 !-   ===========  ALL OBJECTS IN CLASS: SINGLE DUCT:UNCONTROLLED ===========
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Kitchen_Flr_5 CAV Box,   !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Kitchen_Flr_5 Inlet Node,!- Zone Supply Air Node Name
-    AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
+    Kitchen_Flr_5 Inlet Node ATInlet,  !- Air Inlet Node Name
+    Kitchen_Flr_5 Inlet Node,!- Air Outlet Node Name
+    AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    Kitchen_Flr_5 CAV Box ADU,  !- Name
+    Kitchen_Flr_5 Inlet Node,!- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Kitchen_Flr_5 CAV Box,   !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
 !-   ===========  ALL OBJECTS IN CLASS: SINGLE DUCT:VAV:REHEAT ===========
 
@@ -27379,10 +27391,14 @@
     Lab_Flr_3 VAV Box Inlet Node,  !- Outlet 1 Node Name
     Lab_Flr_4 VAV Box Inlet Node;  !- Outlet 2 Node Name
 
+  NodeList,
+    Kitchen_Flr_5 Inlet Nodes ATInlet,  !- Name
+    Kitchen_Flr_5 Inlet Node ATInlet;  !- Node 1 Name
+
   AirLoopHVAC:ZoneSplitter,
     CAV_KITCHEN Supply Air Splitter,  !- Name
     CAV_KITCHEN Zone Equipment Inlet Node,  !- Inlet Node Name
-    Kitchen_Flr_5 Inlet Nodes;  !- Outlet 1 Node Name
+    Kitchen_Flr_5 Inlet Nodes ATInlet;  !- Outlet 1 Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:ZONEMIXER ===========
 

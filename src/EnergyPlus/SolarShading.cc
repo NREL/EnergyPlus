@@ -83,6 +83,7 @@
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -406,7 +407,7 @@ namespace SolarShading {
             }
 
             if (GetInputFlag) {
-                GetShadowingInput();
+                GetShadowingInput(OutputFiles::getSingleton());
                 GetInputFlag = false;
                 MaxHCV = (((max(15, MaxVerticesPerSurface) + 16) / 16) * 16) - 1; // Assure MaxHCV+1 is multiple of 16 for 128 B alignment
                 assert((MaxHCV + 1) % 16 == 0);
@@ -564,7 +565,7 @@ namespace SolarShading {
         firstTime = false;
     }
 
-    void GetShadowingInput()
+    void GetShadowingInput(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -589,8 +590,6 @@ namespace SolarShading {
         using DataSystemVariables::shadingMethod;
         using ScheduleManager::ScheduleFileShadingProcessed;
 
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumItems;
@@ -912,15 +911,25 @@ namespace SolarShading {
             }
         }
 
-        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Shadowing/Sun Position Calculations Annual Simulations>, Shading Calculation Method, "
-                                             "Shading Calculation Update Frequency Method, Shading Calculation Update Frequency {days}, "
-                                             "Maximum Figures in Shadow Overlap Calculations {}, Polygon Clipping Algorithm, Pixel Counting Resolution, Sky Diffuse Modeling "
-                                             "Algorithm, Output External Shading Calculation Results, Disable "
-                                             "Self-Shading Within Shading Zone Groups, Disable Self-Shading From Shading Zone Groups to Other Zones";
-        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Shadowing/Sun Position Calculations Annual Simulations," + cAlphaArgs(1) + ',' + cAlphaArgs(2) + ',' +
-                                                 RoundSigDigits(ShadowingCalcFrequency) + ',' + RoundSigDigits(MaxHCS) + ',' +
-                                                 cAlphaArgs(3) + ',' + RoundSigDigits(pixelRes) + ',' + cAlphaArgs(4) + ',' + cAlphaArgs(5) + ',' + cAlphaArgs(6) + ',' +
-                                                 cAlphaArgs(7);
+        print(outputFiles.eio,
+              "{}",
+              "! <Shadowing/Sun Position Calculations Annual Simulations>, Shading Calculation Method, "
+              "Shading Calculation Update Frequency Method, Shading Calculation Update Frequency {days}, "
+              "Maximum Figures in Shadow Overlap Calculations {}, Polygon Clipping Algorithm, Pixel Counting Resolution, Sky Diffuse Modeling "
+              "Algorithm, Output External Shading Calculation Results, Disable "
+              "Self-Shading Within Shading Zone Groups, Disable Self-Shading From Shading Zone Groups to Other Zones\n");
+        print(outputFiles.eio,
+              "Shadowing/Sun Position Calculations Annual Simulations,{},{},{},{},{},{},{},{},{},{}\n",
+              cAlphaArgs(1),
+              cAlphaArgs(2),
+              ShadowingCalcFrequency,
+              MaxHCS,
+              cAlphaArgs(3),
+              pixelRes,
+              cAlphaArgs(4),
+              cAlphaArgs(5),
+              cAlphaArgs(6),
+              cAlphaArgs(7));
     }
 
     void AllocateModuleArrays()
@@ -4837,9 +4846,6 @@ namespace SolarShading {
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // na
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na
@@ -8879,7 +8885,7 @@ namespace SolarShading {
             }
 
             //  Calculate daylighting coefficients
-            CalcDayltgCoefficients();
+            CalcDayltgCoefficients(OutputFiles::getSingleton());
         }
 
         if (!WarmupFlag) {
@@ -8889,7 +8895,7 @@ namespace SolarShading {
         // Recalculate daylighting coefficients if storm window has been added
         // or removed from one or more windows at beginning of day
         if (TotWindowsWithDayl > 0 && !BeginSimFlag && !BeginEnvrnFlag && !WarmupFlag && TotStormWin > 0 && StormWinChangeThisDay) {
-            CalcDayltgCoefficients();
+            CalcDayltgCoefficients(OutputFiles::getSingleton());
         }
     }
 

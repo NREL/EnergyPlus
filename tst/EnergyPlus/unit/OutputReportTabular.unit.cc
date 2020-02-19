@@ -77,6 +77,7 @@
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
@@ -6950,7 +6951,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     EnergyPlus::sqlite->sqliteCommit();
 
     EXPECT_EQ(460ul, tabularData.size());
-    EXPECT_EQ(76ul, strings.size());
+    EXPECT_EQ(77ul, strings.size());
     EXPECT_EQ("AirLoop Component Load Summary", strings[0][2]); // just make sure that the output table was generated and did not crash
 }
 
@@ -7132,7 +7133,13 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
         EXPECT_EQ(std::get<2>(v), oa_db) << "Failed for TableName=" << tableName << "; ReportName=" << reportName;
     }
 
+    // https://github.com/NREL/EnergyPlus/pull/7741
+    std::string query_2("SELECT Value From TabularDataWithStrings"
+                        "  WHERE TableName = 'Engineering Checks for Cooling'"
+                        "  AND RowName = 'Outside Air Fraction';");
 
+    auto result = queryResult(query_2, "TabularDataWithStrings")[0][0];
+    EXPECT_EQ(result, "0.0000");
 }
 
 
@@ -7250,7 +7257,7 @@ TEST_F(EnergyPlusFixture, OutputReportTabularMonthlyPredefined_FindNeededOutputV
     // We do need to trick it into thinking it's a weather simulation, otherwise the monthly reports aren't reported
     DataGlobals::DoWeathSim = true; // flag to trick tabular reports to scan meters
 
-    OutputProcessor::GetReportVariableInput();
+    OutputProcessor::GetReportVariableInput(OutputFiles::getSingleton());
     OutputReportTabular::GetInputOutputTableSummaryReports();
     OutputReportTabular::InitializeTabularMonthly();
 
