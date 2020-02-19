@@ -62,6 +62,9 @@
 #include <ObjexxFCL/string.functions.hh>
 #include <ObjexxFCL/time.hh>
 
+// Third-party Headers
+#include <fmt/format.h>
+
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
@@ -14126,7 +14129,7 @@ namespace OutputReportTabular {
 
                 columnHead(1) = "Value";
                 if (unitsStyle != unitsStyleInchPound) {
-                    rowHead(1) = "Outside Air (%)";
+                    rowHead(1) = "Outside Air Fraction [fraction]";
                     rowHead(2) = "Airflow per Floor Area [m3/s-m2]";
                     rowHead(3) = "Airflow per Total Capacity [m3/s-W]";
                     rowHead(4) = "Floor Area per Total Capacity [m2/W]";
@@ -14135,7 +14138,7 @@ namespace OutputReportTabular {
                     // rowHead( 7 ) = "Condenser Pump Power per Flor [W-s/m3]"; // facility only
                     rowHead(6) = "Number of People";
                 } else {
-                    rowHead(1) = "Outside Air (%)";
+                    rowHead(1) = "Outside Air Fraction [fraction]";
                     rowHead(2) = "Airflow per Floor Area [ft3/min-ft2]";
                     rowHead(3) = "Airflow per Total Capacity [ft3-h/min-Btu]";
                     rowHead(4) = "Floor Area per Total Capacity [ft2-h/Btu]";
