@@ -69,7 +69,7 @@ int energyplus(int argc, const char *argv[]) {
 }
 
 void stopSimulation() {
-  energyplus::DataGlobals::stopSimulation = true;
+  EnergyPlus::DataGlobals::stopSimulation = true;
 }
 
 void issueWarning(const char * message) {
