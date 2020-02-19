@@ -391,6 +391,9 @@ int RunEnergyPlus(std::string const & filepath)
     get_environment_variable(cSutherlandHodgman, cEnvValue);
     if (!cEnvValue.empty()) SutherlandHodgman = env_var_on(cEnvValue); // Yes or True
 
+    get_environment_variable(cSlaterBarsky, cEnvValue);
+    if (!cEnvValue.empty()) SlaterBarsky = env_var_on(cEnvValue); // Yes or True
+
     get_environment_variable(cMinimalShadowing, cEnvValue);
     if (!cEnvValue.empty()) lMinimalShadowing = env_var_on(cEnvValue); // Yes or True
 
