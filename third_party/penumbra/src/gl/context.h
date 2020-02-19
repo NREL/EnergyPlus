@@ -32,8 +32,7 @@ public:
   ~Context();
   void showRendering(const unsigned surfaceIndex, mat4x4 sunView);
   void setModel(const std::vector<float> &vertices, const std::vector<SurfaceBuffer> &surfaceBuffers);
-  float setScene(const SurfaceBuffer &surfaceBuffer, mat4x4 sunView, bool clipFar = true);
-  float setScene(mat4x4 sunView, bool clipFar = true);
+  float setScene(mat4x4 sunView, const SurfaceBuffer &surfaceBuffer=NULL, bool clipFar = true);
   void bufferedQuery(const unsigned surfaceIndex);
   void bufferedQuery(const SurfaceBuffer &surfaceBuffer);
   void submitPSSA(const unsigned surfaceIndex, mat4x4 sunView);

@@ -31,9 +31,6 @@ Penumbra::Penumbra(PenumbraCallbackFunction callbackFunction, void *contextPtr, 
 Penumbra::~Penumbra() {}
 
 bool Penumbra::isValidContext() {
-
-	glfwSetErrorCallback([](int, const char* description) {showMessage(MSG_INFO, description); });
-
 	bool invalid(false);
 	if (!glfwInit()) {
 		invalid = true;
@@ -56,7 +53,7 @@ VendorName Penumbra::getVendorName() {
       vendorType = VendorName::NVIDIA;
   } else if (vendorName == "AMD" || vendorName == "ATI" || vendorName == "Advanced Micro Devices" || vendorName == "ATI Technologies Inc.") {
       vendorType = VendorName::AMD;
-  } else if (vendorName == "Intel" || vendorName == "INTEL") {
+  } else if (vendorName == "Intel" || vendorName == "INTEL" || "Intel Inc.") {
       vendorType = VendorName::Intel;
   } else if (vendorName == "VMware, Inc.") {
       vendorType = VendorName::VMware;

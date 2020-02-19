@@ -269,7 +269,7 @@ void Context::setModel(const std::vector<float> &vertices, const std::vector<Sur
   modelSet = true;
 }
 
-float Context::setScene(const SurfaceBuffer &surfaceBuffer, mat4x4 sunView, bool clipFar) {
+float Context::setScene(mat4x4 sunView, const SurfaceBuffer &surfaceBuffer, bool clipFar) {
 
   if (!modelSet) {
     showMessage(MSG_ERR, "Model has not been set. Cannot set OpenGL scene.");
@@ -285,18 +285,33 @@ float Context::setScene(const SurfaceBuffer &surfaceBuffer, mat4x4 sunView, bool
   near_ = -MAX_FLOAT;
   far_ = MAX_FLOAT;
 
-  for (GLuint i = surfaceBuffer.begin * model.vertexSize;
-       i < surfaceBuffer.begin * model.vertexSize + surfaceBuffer.count * model.vertexSize;
-       i += model.vertexSize) {
-    vec4 point = {model.vertexArray[i], model.vertexArray[i + 1], model.vertexArray[i + 2], 0};
-    vec4 trans;
-    mat4x4_mul_vec4(trans, view, point);
-    left = std::min(trans[0], left);
-    right = std::max(trans[0], right);
-    bottom = std::min(trans[1], bottom);
-    top = std::max(trans[1], top);
-    // near_ = min(trans[2], near_);
-    far_ = std::min(trans[2], far_);
+  if (&surfaceBuffer){
+      for (GLuint i = surfaceBuffer.begin * model.vertexSize;
+           i < surfaceBuffer.begin * model.vertexSize + surfaceBuffer.count * model.vertexSize;
+           i += model.vertexSize) {
+          vec4 point = {model.vertexArray[i], model.vertexArray[i + 1], model.vertexArray[i + 2], 0};
+          vec4 trans;
+          mat4x4_mul_vec4(trans, view, point);
+          left = std::min(trans[0], left);
+          right = std::max(trans[0], right);
+          bottom = std::min(trans[1], bottom);
+          top = std::max(trans[1], top);
+          // near_ = min(trans[2], near_);
+          far_ = std::min(trans[2], far_);
+      }
+  }
+  else {
+      for (GLuint i = 0; i < model.vertexArray.size(); i += model.vertexSize) {
+          vec4 point = {model.vertexArray[i], model.vertexArray[i + 1], model.vertexArray[i + 2], 0};
+          vec4 trans;
+          mat4x4_mul_vec4(trans, view, point);
+          left = std::min(trans[0], left);
+          right = std::max(trans[0], right);
+          bottom = std::min(trans[1], bottom);
+          top = std::max(trans[1], top);
+          // near_ = min(trans[2], near_);
+          far_ = std::min(trans[2], far_);
+      }
   }
 
   // Use model box to determine near clipping plane (and far if looking interior)
@@ -310,72 +325,7 @@ float Context::setScene(const SurfaceBuffer &surfaceBuffer, mat4x4 sunView, bool
   }
 
   // account for camera position
-  near_ -= 1.f;
-  far_ -= 1.001f; // For some reason, -1. is too tight when sun is perpendicular to the surface.
-
-  // Grow horizontal extents of view by one pixel on each side
-  float deltaX = (right - left) / size;
-  left -= deltaX;
-  right += deltaX;
-
-  // Grow vertical extents of view by one pixel on each side
-  float deltaY = (top - bottom) / size;
-  bottom -= deltaY;
-  top += deltaY;
-
-  // calculate pixel area (A[i]*cos(theta) for each pixel of the surface)
-  // multiplies by the number of pixels to get projected sunlit surface area
-
-  auto const pixelArea = (right - left) * (top - bottom) / (size * size);
-
-  mat4x4_ortho(projection, left, right, bottom, top, -near_, -far_);
-  mat4x4_mul(mvp, projection, view);
-
-  setMVP();
-
-  return pixelArea;
-}
-
-float Context::setScene(mat4x4 sunView, bool clipFar) {
-
-  if (!modelSet) {
-    showMessage(MSG_ERR, "Model has not been set. Cannot set OpenGL scene.");
-  }
-
-  mat4x4_dup(view, sunView);
-
-  // calculate clipping planes in rendered coorinates
-  left = MAX_FLOAT;
-  right = -MAX_FLOAT;
-  bottom = MAX_FLOAT;
-  top = -MAX_FLOAT;
-  near_ = -MAX_FLOAT;
-  far_ = MAX_FLOAT;
-
-  for (GLuint i = 0; i < model.vertexArray.size(); i += model.vertexSize) {
-    vec4 point = {model.vertexArray[i], model.vertexArray[i + 1], model.vertexArray[i + 2], 0};
-    vec4 trans;
-    mat4x4_mul_vec4(trans, view, point);
-    left = std::min(trans[0], left);
-    right = std::max(trans[0], right);
-    bottom = std::min(trans[1], bottom);
-    top = std::max(trans[1], top);
-    // near_ = min(trans[2], near_);
-    far_ = std::min(trans[2], far_);
-  }
-
-  // Use model box to determine near clipping plane (and far if looking interior)
-  for (std::size_t i = 0; i < 8; i++) {
-    vec4 trans;
-    mat4x4_mul_vec4(trans, view, modelBox[i]);
-    near_ = std::max(trans[2], near_);
-    if (!clipFar) {
-      far_ = std::min(trans[2], far_);
-    }
-  }
-
-  // account for camera position
-  near_ -= 1.f;
+  near_ -= 0.999f; // For some reason, -1. is too tight when sun is perpendicular to the surface.
   far_ -= 1.001f; // For some reason, -1. is too tight when sun is perpendicular to the surface.
 
   // Grow horizontal extents of view by one pixel on each side
@@ -473,7 +423,7 @@ void Context::showRendering(const unsigned surfaceIndex, mat4x4 sunView) {
   }
 
   auto const & surfaceBuffer = model.surfaceBuffers[surfaceIndex];
-  setScene(surfaceBuffer, sunView);
+  setScene(sunView, surfaceBuffer);
 
   while (!glfwWindowShouldClose(window)) {
     glUniform3f(vColLocation, 0.5f, 0.5f, 0.5f);
@@ -505,7 +455,7 @@ void Context::showInteriorRendering(const std::vector<unsigned> &hiddenSurfaceIn
     hiddenSurfaces.push_back(model.surfaceBuffers[hiddenSurf]);
   }
 
-  setScene(model.surfaceBuffers[hiddenSurfaceIndices.at(0)], sunView, false);
+  setScene(sunView, model.surfaceBuffers[hiddenSurfaceIndices.at(0)], false);
 
   while (!glfwWindowShouldClose(window)) {
     glUniform3f(vColLocation, 0.5f, 0.5f, 0.5f);
@@ -522,7 +472,7 @@ void Context::showInteriorRendering(const std::vector<unsigned> &hiddenSurfaceIn
 
 void Context::submitPSSA(const unsigned surfaceIndex, mat4x4 sunView) {
   auto const & surfaceBuffer = model.surfaceBuffers[surfaceIndex];
-  auto const pixelArea = setScene(surfaceBuffer, sunView);
+  auto const pixelArea = setScene(sunView, surfaceBuffer);
   drawModel();
   glBeginQuery(GL_SAMPLES_PASSED, queries.at(surfaceBuffer.index));
   model.drawSurface(surfaceBuffer);
@@ -560,7 +510,7 @@ void Context::bufferedQuery(const SurfaceBuffer &surfaceBuffer) {
 void Context::submitPSSA(const std::vector<unsigned> &surfaceIndices, mat4x4 sunView) {
   for (auto const surfaceIndex : surfaceIndices) {
     auto const & surfaceBuffer = model.surfaceBuffers[surfaceIndex];
-    auto const pixelArea = setScene(surfaceBuffer, sunView);
+    auto const pixelArea = setScene(sunView, surfaceBuffer);
     drawModel();
     glBeginQuery(GL_SAMPLES_PASSED, queries.at(surfaceBuffer.index));
     model.drawSurface(surfaceBuffer);
@@ -571,7 +521,7 @@ void Context::submitPSSA(const std::vector<unsigned> &surfaceIndices, mat4x4 sun
 
 void Context::submitPSSA(mat4x4 sunView) {
   for (auto const & surfaceBuffer : model.surfaceBuffers) {
-    auto const pixelArea = setScene(surfaceBuffer, sunView);
+    auto const pixelArea = setScene(sunView, surfaceBuffer);
     drawModel();
     glBeginQuery(GL_SAMPLES_PASSED, queries.at(surfaceBuffer.index));
     model.drawSurface(surfaceBuffer);
@@ -650,7 +600,7 @@ Context::calculateInteriorPSSAs(const std::vector<unsigned> &hiddenSurfaceIndice
 
   glGenQueries(pssasQueries.size(), pssasQueries.data());
 
-  auto const pixelArea = setScene(model.surfaceBuffers[hiddenSurfaceIndices.at(0)], sunView, false);
+  auto const pixelArea = setScene( sunView, model.surfaceBuffers[hiddenSurfaceIndices.at(0)], false);
 
   std::vector<SurfaceBuffer> hiddenSurfaces;
   for (auto const hiddenSurf : hiddenSurfaceIndices) {
