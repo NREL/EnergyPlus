@@ -52,9 +52,6 @@
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/gio.hh>
-
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
@@ -484,7 +481,7 @@ TEST_F(EnergyPlusFixture, ZoneTempPredictorCorrector_ReportingTest)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput();  // read schedules
+    ProcessScheduleInput(OutputFiles::getSingleton());  // read schedules
 
     GetZoneAirSetPoints(OutputFiles::getSingleton());
 
