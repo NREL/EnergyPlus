@@ -2126,18 +2126,17 @@ namespace HybridEvapCoolingModel {
         }
 
         // set timestep outputs calculated considering different runtime fractions.
-        SupplyFanElectricPower = 1000 * CalculateTimeStepAverage(SYSTEMOUTPUTS::OSUPPLY_FAN_POWER); // Watts
+        SupplyFanElectricPower = CalculateTimeStepAverage(SYSTEMOUTPUTS::OSUPPLY_FAN_POWER); // Watts
         SupplyFanElectricEnergy = SupplyFanElectricPower * TimeStepSys * SecInHour;
-        SecondaryFuelConsumptionRate = 1000 * CalculateTimeStepAverage(SYSTEMOUTPUTS::OSECOND_FUEL_USE);
+        SecondaryFuelConsumptionRate = CalculateTimeStepAverage(SYSTEMOUTPUTS::OSECOND_FUEL_USE);
         SecondaryFuelConsumption = SecondaryFuelConsumptionRate * TimeStepSys * SecInHour;
-        ThirdFuelConsumptionRate = 1000 * CalculateTimeStepAverage(SYSTEMOUTPUTS::OTHIRD_FUEL_USE);
+        ThirdFuelConsumptionRate = CalculateTimeStepAverage(SYSTEMOUTPUTS::OTHIRD_FUEL_USE);
         ThirdFuelConsumption = ThirdFuelConsumptionRate * TimeStepSys * SecInHour;
         WaterConsumptionRate = CalculateTimeStepAverage(SYSTEMOUTPUTS::OWATER_USE);
         WaterConsumption = WaterConsumptionRate * TimeStepSys * SecInHour;
         ExternalStaticPressure = CalculateTimeStepAverage(SYSTEMOUTPUTS::OEXTERNAL_STATIC_PRESSURE);
 
-        // fuel use in calculation is in Kw, powers are typically output in EP in Watts, so do conversion here.
-        FinalElectricalPower = 1000 * CalculateTimeStepAverage(SYSTEMOUTPUTS::SYSTEM_FUEL_USE);
+        FinalElectricalPower = CalculateTimeStepAverage(SYSTEMOUTPUTS::SYSTEM_FUEL_USE);
         FinalElectricalEnergy = FinalElectricalPower * TimeStepSys * SecInHour;
     }
 
