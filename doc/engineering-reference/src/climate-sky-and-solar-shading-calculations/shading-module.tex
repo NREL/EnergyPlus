@@ -270,13 +270,15 @@ Note that the use of homogeneous coordinates as outlined above provides a consis
 
 \subsection{Polygon Clipping Algorithms}\label{polygon-clipping-algorithms}
 
-Two methods for polygon clipping (treating of overlapping shadows) are currently in use in EnergyPlus.
+Three methods for polygon clipping (treating of overlapping shadows) are currently in use in EnergyPlus.
 
 \begin{itemize}
 \item
-  Convex Weiler - Atherton
+  Convex Weiler-Atherton
 \item
-  Sutherland -- Hodgman
+  Sutherland-Hodgman
+\item
+  Slater-Barsky (for rectangular surfaces only)
 \end{itemize}
 
 The original EnergyPlus method for polygon clipping is a special version of the Weiler-Atherton model (Weiler, Atherton, 1977). It was developed to be sufficiently general to clip concave polygons with holes. The implementation in the current version of EnergyPlus, however, does not support concave shadowing surfaces or holes. The relative computational complexity is preserved -- the algorithm is carried out in four steps. For example, if A and B are polygons (see Figure~\ref{fig:point-a-vertex-of-a-enclosed-by-b}).
@@ -290,6 +292,53 @@ The original EnergyPlus method for polygon clipping is a special version of the 
 4)~~~Since the points are usually gathered out of order, they must then be oriented.
 
 The Sutherland-Hodgman algorithm (Sutherland, Hodgman, 1974) is less complex compared to the Weiler-Atherton method and is well-suited to clipping convex polygons. In actuality, only convex shading surfaces are currently supported by EnergyPlus. Let X be a polygon called the ``subject polygon'' (SP) and Y be a polygon called the ``clipping polygon'' (CP). The method performs the computation by iterating over the edges of the CP and removing points from the SP that fall in the clipping plane, i.e.~points that fall to the left of the edge of the CP. Intersections between the clip edge and the edges of the SP are added appropriately, and points falling outside of the clipping plane, i.e.~to the right of the edge of the CP, are added the output polygon as well. This resultant polygon is stored and the process is repeated for the rest of the clip edges in CP. The process is analogous to cutting off pieces of the SP one-by-one with respect to each edge of the CP. The result is ordered and identical to the polygon produced by the Weiler-Atherton method.
+
+The Slater-Barsky algorithm (Slater, M., Barsky, B.A., 1994) can also be chosen for clipping surfaces which are rectangular. The algorithm further saves computational cost. It relies on converting the line segment to be clipped into a parametric equation. Below is the general form for the x- and y- components of a parametric line:
+
+\begin{equation}
+x = x_0 + t \Delta x
+\end{equation}
+
+\begin{equation}
+y = y_0 + t \Delta y
+\end{equation}
+
+Letting our subject line be starting at ($x_0$, $y_0$) and ending at ($x_1$, $x_1$):
+
+\begin{equation}
+\Delta x = x_1 - x_0
+\end{equation}
+
+\begin{equation}
+\Delta y = y_1 - y_0
+\end{equation}
+
+Distances from the endpoints to the edges of the clipping rectangle that collide with the line are used to obtain two values of $t$ that parameterize the equation, representing the pair of new endpoints.
+
+Once we have the two values of $t, t_1$ and $t_2$, we can calculate the clipped line endpoints (Note that $t_2$ > $t_1$).
+
+\begin{equation}
+x'_1 = x_0 + t_1 \Delta x
+\end{equation}
+\begin{equation}
+y'_1 = y_0 + t_1 \Delta y
+\end{equation}
+\begin{equation}
+x'_2 = x_0 + t_2 \Delta x
+\end{equation}
+\begin{equation}
+y'_2 = y_0 + t_2 \Delta y
+\end{equation}
+
+The Slater-Barsky algorithm uses space subdivision to reduce the number of pre-emptive calculations. We break the plane into 9 parts, where region (4) is the clipping region.
+
+
+| 6 | 7 | 8 | \\
+| 3 | 4 | 5 | \\
+| 0 | 1 | 2 | \\
+
+
+With this method, calculating deltas and plugging in the final parametric equations can be skipped if the subject line obeys certain conditions. For example, if the line begins in region (0) and ends in region (6), then no new endpoints need to be calculated.
 
 \subsection{Overlapping Shadows}\label{overlapping-shadows}
 
@@ -757,6 +806,8 @@ Polygon area derived from Green's Theorem.~ Graphic Gems repository.
 Weiler, Kevin, Atherton, Peter. ``Hidden Surface Removal Using Polygon Area Sorting.'' Program of Computer Graphics, Cornell University. Ithaca, NY: 1977.
 
 Sutherland, I.E., and Hodgman, G.W. 1974. ``Reentrant Polygon Clipping'', Communication of Association for Computing Machinery (CACM), vol.~17, pp.~32-42.
+
+Slater, M. and Barsky, B.A. 1994, "2D line and polygon clipping based on space subdivision". The Visual Computer, vol.10, pp.407–422.
 
 Maillot,Patrick-Gilles.** ``**A New, Fast Method For 2D Polygon Clipping: Analysis and Software Implementation.'' Sun Microsystems, inc. Mountain View, CA: 1992.
 
