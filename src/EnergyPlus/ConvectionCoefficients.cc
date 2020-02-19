@@ -8824,7 +8824,7 @@ namespace ConvectionCoefficients {
         static int diaErrIdx(0);
         static int deltaTempErrIdx(0);
 
-        if ((HydraulicDiameter == 0.0) || (DeltaTemp == 0.0)) {
+        if ((HydraulicDiameter != 0.0) && (DeltaTemp != 0.0)) {
             Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(ZoneNum);
             Real64 AirChangeRate = CalcZoneSystemACH(ZoneNum);
             return CalcBeausoleilMorrisonMixedStableFloor(DeltaTemp, HydraulicDiameter, SurfTemp, SupplyAirTemp, AirChangeRate);
