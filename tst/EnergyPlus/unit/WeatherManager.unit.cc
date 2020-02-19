@@ -813,117 +813,168 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
 
 }
 
+TEST_F(EnergyPlusFixture, tonytest) {
 
+    std::vector<std::string> Lines{
+            "1980,1,1,1,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9,-0.6,-8.7,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,2,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9,-0.6,-8.7,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,3,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9,-1.1,-9.2,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,4,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9,-1.1,-9.2,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,5,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9,-1.1,-9.2,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,6,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9,-0.6,-8.7,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,7,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9,-0.6,-8.7,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,8,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9*9*9*9,-0.6,-8.7,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,9,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9*9*9*9,-1.1,-9.2,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,10,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9*9*9*9,-0.6,-8.7,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,11,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9*9*9*9,0,-8.2,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,12,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9*9*9*9,0,-8.2,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,13,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9*9*9*9,0,-8.2,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,14,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9*9*9*9,0.6,-7.7,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,15,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9*9*9*9,0.6,-7.7,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,16,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9*9*9*9,0.6,-7.7,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,17,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9?9*9*9*9*9*9,0.6,-7.7,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,18,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9,0,-8.2,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,19,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9,-0.6,-8.7,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,20,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9,-0.6,-8.7,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,21,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9,-1.1,-9.2,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,22,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9,-1.1,-9.2,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,23,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9,-1.1,-9.2,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+            "1980,1,1,24,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9,-1.1,-9.2,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
+    };
 
+    // DERIVED TYPE DEFINITIONS:
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    int Hour;
+    int TS;
+    int WYear;
+    int WMonth;
+    int WDay;
+    int WHour;
+    int WMinute;
+    Real64 DryBulb;
+    Real64 DewPoint;
+    Real64 RelHum;
+    Real64 AtmPress;
+    Real64 ETHoriz;
+    Real64 ETDirect;
+    Real64 IRHoriz;
+    Real64 GLBHoriz;
+    Real64 DirectRad;
+    Real64 DiffuseRad;
+    Real64 GLBHorizIllum;
+    Real64 DirectNrmIllum;
+    Real64 DiffuseHorizIllum;
+    Real64 ZenLum;
+    Real64 WindDir;
+    Real64 WindSpeed;
+    Real64 TotalSkyCover;
+    Real64 OpaqueSkyCover;
+    Real64 Visibility;
+    Real64 CeilHeight;
+    Real64 PrecipWater;
+    Real64 AerosolOptDepth;
+    Real64 SnowDepth;
+    Real64 DaysSinceLastSnow;
+    Real64 Albedo;
+    Real64 LiquidPrecip;
+    int PresWeathObs;
+    Array1D_int PresWeathConds(9);
+    std::string WeatherDataLine;
+    bool Ready;
+    int CurTimeStep;
+    int Item;
 
-std::vector<std::string> getAllLinesInFile2(std::string filePath)
-{
-    std::ifstream infile(filePath);
-    std::vector<std::string> lines;
-    std::string line;
-    while (std::getline(infile, line)) {
-        lines.push_back(line);
+    Real64 A;
+    Real64 B;
+    Real64 C;
+    Real64 AVSC;
+    Real64 SkyTemp;
+    static int CurDayOfWeek;
+    static bool UseDayOfWeek;
+    bool SkipThisDay; // Used when LeapYear is/is not in effect
+    bool TryAgain;
+    int ReadStatus;
+    int NumRewinds;
+    std::string BadRecord;
+    bool ErrorsFound;
+    static Real64 CurTime;
+    Real64 HourRep;
+    int OSky;
+    Real64 TDewK;
+    Real64 ESky;
+    bool ErrorFound;
+    std::string ErrOut;
+    static bool LastHourSet; // for Interpolation
+    int NxtHour;
+    Real64 WtNow;
+    Real64 WtPrevHour;
+    Real64 WgtHourNow;
+    Real64 WgtPrevHour;
+    Real64 WgtNextHour;
+    static Real64 LastHrOutDryBulbTemp;
+    static Real64 LastHrOutDewPointTemp;
+    static Real64 LastHrOutBaroPress;
+    static Real64 LastHrOutRelHum;
+    static Real64 LastHrWindSpeed;
+    static Real64 LastHrWindDir;
+    static Real64 LastHrSkyTemp;
+    static Real64 LastHrHorizIRSky;
+    static Real64 LastHrBeamSolarRad;
+    static Real64 LastHrDifSolarRad;
+    static Real64 LastHrAlbedo;
+    static Real64 LastHrLiquidPrecip;
+    static Real64 NextHrBeamSolarRad;
+    static Real64 NextHrDifSolarRad;
+    static Real64 NextHrLiquidPrecip;
+    bool RecordDateMatch;
+
+    for (auto WeatherDataLine : Lines){
+        WeatherManager::InterpretWeatherDataLine(WeatherDataLine,
+                                                 ErrorFound,
+                                                 WYear,
+                                                 WMonth,
+                                                 WDay,
+                                                 WHour,
+                                                 WMinute,
+                                                 DryBulb,
+                                                 DewPoint,
+                                                 RelHum,
+                                                 AtmPress,
+                                                 ETHoriz,
+                                                 ETDirect,
+                                                 IRHoriz,
+                                                 GLBHoriz,
+                                                 DirectRad,
+                                                 DiffuseRad,
+                                                 GLBHorizIllum,
+                                                 DirectNrmIllum,
+                                                 DiffuseHorizIllum,
+                                                 ZenLum,
+                                                 WindDir,
+                                                 WindSpeed,
+                                                 TotalSkyCover,
+                                                 OpaqueSkyCover,
+                                                 Visibility,
+                                                 CeilHeight,
+                                                 PresWeathObs,
+                                                 PresWeathConds,
+                                                 PrecipWater,
+                                                 AerosolOptDepth,
+                                                 SnowDepth,
+                                                 DaysSinceLastSnow,
+                                                 Albedo,
+                                                 LiquidPrecip);
+
+        EXPECT_EQ(IRHoriz, 0.0);
     }
-    return lines;
-}
 
-TEST_F(EnergyPlusFixture, WeatherManager_NoIRHoriz) {
-
-    //std::vector<std::string> snippet = getAllLinesInFile2(EnergyPlus::configured_source_directory() + "/tst/EnergyPlus/unit/UnitaryHybridUnitTest_DOSA.idf");
-
-//    std::vector<std::string> snippet = getAllLinesInFile2("/Users/tony-scimone/Projects/EnergyPlus/tst/EnergyPlus/unit/WeatherManagerIROutputTest.idf");
-//
-//    std::string idf_objects = delimited_string(snippet);
-//    ASSERT_TRUE(process_idf(idf_objects));
-
-    std::string const idf_objects = delimited_string({
-                                                             "SimulationControl, NO, NO, NO, YES, YES;",
-                                                             "Timestep,4;",
-                                                             "RunPeriod,",
-                                                             "RP1,                     !- Name",
-                                                             "2,                       !- Begin Month",
-                                                             "27,                      !- Begin Day of Month",
-                                                             ",                        !- Begin Year",
-                                                             "3,                       !- End Month",
-                                                             "3,                       !- End Day of Month",
-                                                             ",                        !- End Year",
-                                                             "Tuesday,                 !- Day of Week for Start Day",
-                                                             "Yes,                     !- Use Weather File Holidays and Special Days",
-                                                             "Yes,                     !- Use Weather File Daylight Saving Period",
-                                                             "No,                      !- Apply Weekend Holiday Rule",
-                                                             "Yes,                     !- Use Weather File Rain Indicators",
-                                                             "Yes;                     !- Use Weather File Snow Indicators",
-                                                             "BUILDING, Simple One Zone (Wireframe DXF), 0.0, Suburbs, .04, .004, MinimalShadowing, 30, 6;",
-                                                             "Schedule:Compact,",
-                                                             "TskySchedule,                !- Name",
-                                                             ",              !- Schedule Type Limits Name",
-                                                             "Through: 2/26, For: AllOtherDays,  Until: 24:00, 2.26,",
-                                                             "Through: 2/27, For: AllOtherDays,  Until: 24:00, 2.27,",
-                                                             "Through: 2/28, For: AllOtherDays,  Until: 24:00, 2.28,",
-                                                             "Through: 3/1, For: AllOtherDays,  Until: 24:00, 3.01,",
-                                                             "Through: 3/2, For: AllOtherDays,  Until: 24:00, 3.02,",
-                                                             "Through: 12/31, For: AllOtherDays,  Until: 24:00, 12.31;",
-                                                             "WeatherProperty:SkyTemperature,",
-                                                             ",                        !- Name",
-                                                             "ScheduleValue,           !- Calculation Type",
-                                                             "TskySchedule;                  !- Schedule Name",
-                                                             "Site:WaterMainsTemperature,",
-                                                             "Schedule,             !- Calculation Method",
-                                                             "TskySchedule,                        !- Temperature Schedule Name",
-                                                             ",                   !- Annual Average Outdoor Air Temperature{ C }",
-                                                             ";                   !- Maximum Difference In Monthly Average Outdoor Air Temperatures{ deltaC }",
-                                                             "Output:Variable,*,Schedule Value,hourly;",
-                                                             "Output:Variable,*,Site Sky Temperature,hourly;",
-                                                             "Output:Variable,*,Site Mains Water Temperature,hourly; !- Zone Average[C]",
-                                                             "  Site:Location,",
-                                                             "    USA IL-CHICAGO-OHARE,    !- Name",
-                                                             "    41.77,                   !- Latitude {deg}",
-                                                             "    -87.75,                  !- Longitude {deg}",
-                                                             "    -6.00,                   !- Time Zone {hr}",
-                                                             "    190;                     !- Elevation {m}",
-                                                     });
-
-
-    ASSERT_TRUE(process_idf(idf_objects));
-
-    // Set an actual weather file to Chicago EPW
-    WeatherManager::WeatherFileExists = true;
-    //DataStringGlobals::inputWeatherFileName = configured_source_directory() + "/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw";
-
-    DataStringGlobals::inputWeatherFileName = "/Users/tony-scimone/Projects/EnergyPlus/tst/EnergyPlus/unit/WeatherManagerIROutputTest.epw";
-
-    // Read the project data, such as Timestep
-    DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData();
-    EXPECT_EQ(DataGlobals::NumOfTimeStepInHour, 4);
-
-    Array2D<Real64> TomorrowSkyTemp; // Sky temperature
-    DataGlobals::NumOfTimeStepInHour = 4;
-    DataGlobals::MinutesPerTimeStep = 60 / DataGlobals::NumOfTimeStepInHour;
-    TomorrowSkyTemp.allocate(DataGlobals::NumOfTimeStepInHour, 24);
-    TomorrowSkyTemp = 0.0;
-
-
-    ScheduleManager::GetSingleDayScheduleValues(1, TomorrowSkyTemp);
-    EXPECT_NEAR(2.26, TomorrowSkyTemp(1, 1), .001);
+    TomorrowHorizIRSky(CurTimeStep, Hour) = IRHoriz;
+    TomorrowSkyTemp(CurTimeStep, Hour) = SkyTemp;
 
 
 
-    //EXPECT_NEAR(2.26, TodayHorizIRSky(1, 1), .001);
-
-    DataEnvironment::DayOfYear = 202; // July 21st
-    WeatherManager::CalcWaterMainsTemp();
-
-//    // March 1
-//    ScheduleManager::GetScheduleValuesForDay(1, TomorrowSkyTemp, 60, 5);
-//    EXPECT_NEAR(3.01, TomorrowSkyTemp(1, 1), .001);
-//
-//    // Not March 2, this "Day" is ignored unless its a leap year, otherwise same data as March 1
-//    ScheduleManager::GetScheduleValuesForDay(1, TomorrowSkyTemp, 61, 6);
-//    EXPECT_NEAR(3.01, TomorrowSkyTemp(1, 1), .001);
-//
-//    // March 2
-//    ScheduleManager::GetScheduleValuesForDay(1, TomorrowSkyTemp, 62, 6);
-//    EXPECT_NEAR(3.02, TomorrowSkyTemp(1, 1), .001);
+//    void ReadEPlusWeatherForDay(int const DayToRead,          // =1 when starting out, otherwise signifies next day
+//                                int const Environ,            // Environment being simulated
+//                                bool const BackSpaceAfterRead // True if weather file is to be backspaced after read
 
 }
