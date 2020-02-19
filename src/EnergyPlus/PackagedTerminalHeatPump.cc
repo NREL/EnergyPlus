@@ -65,7 +65,7 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -5447,7 +5447,7 @@ namespace PackagedTerminalHeatPump {
         using General::TrimSigDigits;
         using HeatingCoils::SimulateHeatingCoilComponents;
         using PlantUtilities::SetComponentFlowRate;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using SteamCoils::SimulateSteamCoilComponents;
         using WaterCoils::SimulateWaterCoilComponents;
 
@@ -5709,7 +5709,7 @@ namespace PackagedTerminalHeatPump {
                 //     use the outlet conditions when the supplemental heater was off (CALL above) as the inlet conditions for the calculation
                 //     of supplemental heater load to just meet the maximum supply air temperature from the supplemental heater.
                 if (Node(PTUnit(PTUnitNum).AirOutNode).Temp < PTUnit(PTUnitNum).MaxSATSupHeat) {
-                    CpAir = PsyCpAirFnWTdb(Node(PTUnit(PTUnitNum).AirOutNode).HumRat, Node(PTUnit(PTUnitNum).AirOutNode).Temp);
+                    CpAir = PsyCpAirFnW(Node(PTUnit(PTUnitNum).AirOutNode).HumRat);
                     SupHeaterLoad = Node(PTUnit(PTUnitNum).AirInNode).MassFlowRate * CpAir *
                                     (PTUnit(PTUnitNum).MaxSATSupHeat - Node(PTUnit(PTUnitNum).AirOutNode).Temp);
 
@@ -5754,7 +5754,7 @@ namespace PackagedTerminalHeatPump {
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using MixedAir::SimOAMixer;
         using PlantUtilities::SetComponentFlowRate;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
         using SingleDuct::SimATMixer;
         using SteamCoils::SimulateSteamCoilComponents;
@@ -7278,7 +7278,7 @@ namespace PackagedTerminalHeatPump {
         using General::TrimSigDigits;
         using HeatingCoils::SimulateHeatingCoilComponents;
         using PlantUtilities::SetComponentFlowRate;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using SteamCoils::SimulateSteamCoilComponents;
         using WaterCoils::SimulateWaterCoilComponents;
 
@@ -7650,7 +7650,7 @@ namespace PackagedTerminalHeatPump {
                 //     use the outlet conditions when the supplemental heater was off (CALL above) as the inlet conditions for the calculation
                 //     of supplemental heater load to just meet the maximum supply air temperature from the supplemental heater.
                 if (Node(PTUnit(PTUnitNum).AirOutNode).Temp < PTUnit(PTUnitNum).MaxSATSupHeat) {
-                    CpAir = PsyCpAirFnWTdb(Node(PTUnit(PTUnitNum).AirOutNode).HumRat, Node(PTUnit(PTUnitNum).AirOutNode).Temp);
+                    CpAir = PsyCpAirFnW(Node(PTUnit(PTUnitNum).AirOutNode).HumRat);
                     SupHeaterLoad = Node(PTUnit(PTUnitNum).AirInNode).MassFlowRate * CpAir *
                                     (PTUnit(PTUnitNum).MaxSATSupHeat - Node(PTUnit(PTUnitNum).AirOutNode).Temp);
 
@@ -7946,7 +7946,7 @@ namespace PackagedTerminalHeatPump {
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using MixedAir::SimOAMixer;
         using PlantUtilities::SetComponentFlowRate;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
         using SingleDuct::SimATMixer;
         using SteamCoils::SimulateSteamCoilComponents;

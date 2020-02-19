@@ -70,7 +70,7 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -2496,9 +2496,6 @@ namespace SystemReports {
         int LoopSideNum;
 
         VentReportStructureCreated = true;
-
-        AllocateAndSetUpVentReports();
-
         for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
             for (BranchNum = 1; BranchNum <= PrimaryAirSystem(AirLoopNum).NumBranches; ++BranchNum) {
                 for (CompNum = 1; CompNum <= PrimaryAirSystem(AirLoopNum).Branch(BranchNum).TotalComponents; ++CompNum) {
@@ -3198,7 +3195,6 @@ namespace SystemReports {
                             // Get complete list of components for complex branches
                             if (IsParentObject(TypeOfComp, NameOfComp)) {
 
-                                thisComp.Parent = true;
                                 NumChildren = GetNumChildren(TypeOfComp, NameOfComp);
 
                                 SubCompTypes.allocate(NumChildren);
@@ -3238,7 +3234,6 @@ namespace SystemReports {
 
                             } else {
                                 NumChildren = 0;
-                                thisComp.Parent = false;
                             }
                             thisComp.NumSubComps = NumChildren;
 
@@ -3860,7 +3855,6 @@ namespace SystemReports {
             AIRTERMINAL_SINGLEDUCT_MIXER,
             AIRTERMINAL_SINGLEDUCT_PARALLELPIU_REHEAT,
             AIRTERMINAL_SINGLEDUCT_SERIESPIU_REHEAT,
-            AIRTERMINAL_SINGLEDUCT_UNCONTROLLED,
             AIRTERMINAL_SINGLEDUCT_USERDEFINED,
             AIRTERMINAL_SINGLEDUCT_VAV_HEATANDCOOL_NOREHEAT,
             AIRTERMINAL_SINGLEDUCT_VAV_HEATANDCOOL_REHEAT,
@@ -3920,6 +3914,11 @@ namespace SystemReports {
             SOLARCOLLECTOR_FLATPLATE_PHOTOVOLTAICTHERMAL,
             SOLARCOLLECTOR_UNGLAZEDTRANSPIRED,
             ZONEHVAC_AIRDISTRIBUTIONUNIT,
+            ZONEHVAC_TERMINALUNIT_VRF,
+            COIL_COOLING_VRF,
+            COIL_HEATING_VRF,
+            COIL_COOLING_VRF_FTC,
+            COIL_HEATING_VRF_FTC,
             n_ComponentTypes,
             Unknown_ComponentType
         };
@@ -3949,7 +3948,6 @@ namespace SystemReports {
             {"AIRTERMINAL:SINGLEDUCT:MIXER", AIRTERMINAL_SINGLEDUCT_MIXER},
             {"AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT", AIRTERMINAL_SINGLEDUCT_PARALLELPIU_REHEAT},
             {"AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT", AIRTERMINAL_SINGLEDUCT_SERIESPIU_REHEAT},
-            {"AIRTERMINAL:SINGLEDUCT:UNCONTROLLED", AIRTERMINAL_SINGLEDUCT_UNCONTROLLED},
             {"AIRTERMINAL:SINGLEDUCT:USERDEFINED", AIRTERMINAL_SINGLEDUCT_USERDEFINED},
             {"AIRTERMINAL:SINGLEDUCT:VAV:HEATANDCOOL:NOREHEAT", AIRTERMINAL_SINGLEDUCT_VAV_HEATANDCOOL_NOREHEAT},
             {"AIRTERMINAL:SINGLEDUCT:VAV:HEATANDCOOL:REHEAT", AIRTERMINAL_SINGLEDUCT_VAV_HEATANDCOOL_REHEAT},
@@ -4008,7 +4006,12 @@ namespace SystemReports {
             {"OUTDOORAIR:MIXER", OUTDOORAIR_MIXER},
             {"SOLARCOLLECTOR:FLATPLATE:PHOTOVOLTAICTHERMAL", SOLARCOLLECTOR_FLATPLATE_PHOTOVOLTAICTHERMAL},
             {"SOLARCOLLECTOR:UNGLAZEDTRANSPIRED", SOLARCOLLECTOR_UNGLAZEDTRANSPIRED},
-            {"ZONEHVAC:AIRDISTRIBUTIONUNIT", ZONEHVAC_AIRDISTRIBUTIONUNIT}};
+            {"ZONEHVAC:AIRDISTRIBUTIONUNIT", ZONEHVAC_AIRDISTRIBUTIONUNIT},
+            {"ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW",ZONEHVAC_TERMINALUNIT_VRF},
+            {"COIL:COOLING:DX:VARIABLEREFRIGERANTFLOW",COIL_COOLING_VRF},
+            {"COIL:HEATING:DX:VARIABLEREFRIGERANTFLOW",COIL_HEATING_VRF},
+            {"COIL:COOLING:DX:VARIABLEREFRIGERANTFLOW:FLUIDTEMPERATURECONTROL", COIL_COOLING_VRF_FTC},
+            {"COIL:HEATING:DX:VARIABLEREFRIGERANTFLOW:FLUIDTEMPERATURECONTROL", COIL_HEATING_VRF_FTC}};
         assert(component_map.size() == n_ComponentTypes);
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -4092,6 +4095,8 @@ namespace SystemReports {
         case COIL_COOLING_WATER_DETAILEDGEOMETRY:
         case COIL_COOLING_WATER:
         case COIL_COOLING_DX_SINGLESPEED_THERMALSTORAGE:
+        case COIL_COOLING_VRF:
+        case COIL_COOLING_VRF_FTC:
         case COIL_WATERHEATING_AIRTOWATERHEATPUMP_VARIABLESPEED:
 
             if (CompLoadFlag) SysCCCompCLNG(AirLoopNum) += std::abs(CompLoad);
@@ -4163,6 +4168,8 @@ namespace SystemReports {
 
             // DX Systems
             break;
+        case COIL_HEATING_VRF:
+        case COIL_HEATING_VRF_FTC:
         case AIRLOOPHVAC_UNITARYSYSTEM:
             // All energy transfers accounted for in subcomponent models
             break;
@@ -4195,9 +4202,11 @@ namespace SystemReports {
             break;
         case AIRLOOPHVAC_UNITARYHEATPUMP_AIRTOAIR_MULTISPEED:
             // All energy transfers accounted for in subcomponent models
-
-            // Humidifier Types for the air system simulation
             break;
+        case ZONEHVAC_TERMINALUNIT_VRF:
+            // All energy transfers accounted for in subcomponent models
+            break;
+            // Humidifier Types for the air system simulation
         case HUMIDIFIER_STEAM_GAS:
         case HUMIDIFIER_STEAM_ELECTRIC:
             if (CompLoadFlag) SysHumidHTNG(AirLoopNum) += std::abs(CompLoad);
@@ -4258,7 +4267,6 @@ namespace SystemReports {
         case AIRTERMINAL_SINGLEDUCT_CONSTANTVOLUME_NOREHEAT:
         case AIRTERMINAL_SINGLEDUCT_PARALLELPIU_REHEAT:
         case AIRTERMINAL_SINGLEDUCT_SERIESPIU_REHEAT:
-        case AIRTERMINAL_SINGLEDUCT_UNCONTROLLED:
         case AIRTERMINAL_SINGLEDUCT_VAV_HEATANDCOOL_NOREHEAT:
         case AIRTERMINAL_SINGLEDUCT_VAV_HEATANDCOOL_REHEAT:
         case AIRTERMINAL_SINGLEDUCT_VAV_NOREHEAT:
@@ -4507,7 +4515,6 @@ namespace SystemReports {
                     } else if (SELECT_CASE_var == VRFTerminalUnit_Num) {
                         OutAirNode = GetVRFTUOutAirNode(ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
-
                         ZoneInletAirNode =
                             GetVRFTUZoneInletAirNode(ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
@@ -4658,7 +4665,7 @@ namespace SystemReports {
                     } else if (SELECT_CASE_var == UnitHeater_Num || SELECT_CASE_var == VentilatedSlab_Num ||
                                //	ZoneHVAC:EvaporativeCoolerUnit ?????
                                SELECT_CASE_var == ZoneHybridEvaporativeCooler_Num || ZoneEvaporativeCoolerUnit_Num ||
-                               SELECT_CASE_var == AirDistUnit_Num || SELECT_CASE_var == DirectAir_Num || SELECT_CASE_var == BBWaterConvective_Num ||
+                               SELECT_CASE_var == AirDistUnit_Num || SELECT_CASE_var == BBWaterConvective_Num ||
                                SELECT_CASE_var == BBElectricConvective_Num || SELECT_CASE_var == HiTempRadiant_Num ||
                                //	not sure how HeatExchanger:* could be used as zone equipment ?????
                                SELECT_CASE_var == LoTempRadiant_Num || SELECT_CASE_var == ZoneExhaustFan_Num || SELECT_CASE_var == HeatXchngr_Num ||

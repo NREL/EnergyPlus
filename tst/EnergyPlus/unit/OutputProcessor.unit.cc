@@ -52,12 +52,16 @@
 
 // EnergyPlus Headers
 #include "Fixtures/SQLiteFixture.hh"
+#include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
+#include <EnergyPlus/SystemReports.hh>
 #include <EnergyPlus/WeatherManager.hh>
 
 #include <map>
@@ -2795,7 +2799,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
 
         NumOfReqVariables = inputProcessor->getNumObjectsFound("Output:Variable");
 
@@ -2850,7 +2854,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
 
         auto const keyed_value = "ENVIRONMENT";
         auto const var_name = "SITE OUTDOOR AIR DRYBULB TEMPERATURE";
@@ -2939,7 +2943,7 @@ namespace OutputProcessor {
         EXPECT_EQ(OutputReportTabular::MonthlyInputCount, 1);
         OutputReportTabular::InitializeTabularMonthly();
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
 
         NumExtraVars = 0;
         BuildKeyVarList("LIVING", "ZONE TOTAL INTERNAL LATENT GAIN RATE", 1, 3);
@@ -2996,7 +3000,7 @@ namespace OutputProcessor {
         EXPECT_EQ(OutputReportTabular::MonthlyInputCount, 1);
         OutputReportTabular::InitializeTabularMonthly();
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
 
         NumExtraVars = 0;
         BuildKeyVarList("LIVING1", "ZONE TOTAL INTERNAL LATENT GAIN RATE", 1, 2);
@@ -3021,7 +3025,7 @@ namespace OutputProcessor {
 
         InitializeOutput();
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
 
         auto const var_name = "Site Outdoor Air Drybulb Temperature";
 
@@ -3160,7 +3164,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
         SetupOutputVariable(
             "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment");
 
@@ -3300,7 +3304,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
         Real64 fuel_used = 999;
         SetupOutputVariable("Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1");
         SetupOutputVariable("Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler2");
@@ -3331,7 +3335,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
         Real64 fuel_used = 999;
         SetupOutputVariable("Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1");
         SetupOutputVariable("Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler2");
@@ -3360,7 +3364,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
         Real64 fuel_used = 999;
         SetupOutputVariable("Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler1");
         SetupOutputVariable("Boiler Gas Rate", OutputProcessor::Unit::W, fuel_used, "System", "Average", "Boiler2");
@@ -3391,7 +3395,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
         Real64 vol_flow = 999;
         SetupOutputVariable(
             "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "Zn003:Wall001");
@@ -3441,7 +3445,7 @@ namespace OutputProcessor {
 
         ASSERT_TRUE(process_idf(idf_objects));
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
         Real64 vol_flow = 999;
         SetupOutputVariable(
             "AFN Linkage Node 1 to Node 2 Volume Flow Rate", OutputProcessor::Unit::m3_s, vol_flow, "System", "Average", "ZN003:WALL001");
@@ -3500,7 +3504,7 @@ namespace OutputProcessor {
 
         InitializeOutput();
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
         CheckReportVariable(keyed_value, var_name);
 
         EXPECT_EQ(5, NumOfReqVariables);
@@ -3577,7 +3581,6 @@ namespace OutputProcessor {
         });
 
         ASSERT_TRUE(process_idf(idf_objects));
-
         Real64 light_consumption = 0;
         SetupOutputVariable("Lights Electric Energy",
                             OutputProcessor::Unit::J,
@@ -3797,7 +3800,7 @@ namespace OutputProcessor {
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
         SetupOutputVariable(
             "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment");
         Real64 light_consumption = 999;
@@ -4041,7 +4044,7 @@ namespace OutputProcessor {
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
         SetupOutputVariable(
             "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment");
         Real64 light_consumption = 999;
@@ -4298,7 +4301,7 @@ namespace OutputProcessor {
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
         SetupOutputVariable(
             "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment");
         Real64 light_consumption = 999;
@@ -4504,7 +4507,7 @@ namespace OutputProcessor {
 
         ReportOutputFileHeaders();
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
         Array1D<ZonePurchasedAir> PurchAir; // Used to specify purchased air parameters
         PurchAir.allocate(1);
         SetupOutputVariable("Zone Ideal Loads Supply Air Total Heating Energy",
@@ -4637,7 +4640,7 @@ namespace OutputProcessor {
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).CurMinute = 50;
         TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).CurMinute = 50;
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
         SetupOutputVariable(
             "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment");
         Real64 light_consumption = 999;
@@ -4718,7 +4721,7 @@ namespace OutputProcessor {
         OutputReportTabular::GetInputTabularMonthly();
         OutputReportTabular::InitializeTabularMonthly();
 
-        GetReportVariableInput();
+        GetReportVariableInput(OutputFiles::getSingleton());
         SetupOutputVariable(
             "Site Outdoor Air Drybulb Temperature", OutputProcessor::Unit::C, DataEnvironment::OutDryBulbTemp, "Zone", "Average", "Environment");
         Real64 light_consumption = 999;
@@ -4752,6 +4755,163 @@ namespace OutputProcessor {
         compare_err_stream("");
     }
 
+    TEST_F(EnergyPlusFixture, OutputProcessor_MeterCustomSystemEnergy)
+    {
+        std::string const idf_objects =
+            delimited_string({"Meter:Custom,",
+                              "Meter Surface Average Face Conduction Heat Transfer Energy,  !- Name",
+                              "Generic,                 !- Fuel Type",
+                              "*,                       !- Key Name 1",
+                              "Surface Average Face Conduction Heat Transfer Energy;  !- Output Variable or Meter Name 1",
+
+                              "Meter:Custom,",
+                              "Meter Surface Window Heat Loss Energy,  !- Name",
+                              "Generic,                 !- Fuel Type",
+                              "*,                       !- Key Name 1",
+                              "Surface Window Heat Loss Energy;  !- Output Variable or Meter Name 1",
+
+                              "Meter:Custom,",
+                              "Meter Zone Windows Total Heat Gain Energy,  !- Name",
+                              "Generic,                 !- Fuel Type",
+                              "*,                       !- Key Name 1",
+                              "Zone Windows Total Heat Gain Energy;  !- Output Variable or Meter Name 1",
+
+                              "Meter:Custom,",
+                              "Meter Surface Window Heat Gain Energy,  !- Name",
+                              "Generic,                 !- Fuel Type",
+                              "*,                       !- Key Name 1",
+                              "Surface Window Heat Gain Energy;  !- Output Variable or Meter Name 1",
+
+                              "Meter:Custom,",
+                              "Meter Zone Ventilation Heat Gain,  !- Name",
+                              "Generic,                 !- Fuel Type",
+                              "*,                       !- Key Name 1",
+                              "Zone Ventilation Total Heat Gain Energy;  !- Output Variable or Meter Name 1",
+
+                              "Meter:Custom,",
+                              "Meter Zone Ventilation Heat Loss,  !- Name",
+                              "Generic,                 !- Fuel Type",
+                              "*,                       !- Key Name 1",
+                              "Zone Ventilation Total Heat Loss Energy;  !- Output Variable or Meter Name 1",
+
+                              "Meter:Custom,",
+                              "Meter Zone Infiltration Heat Gain,  !- Name",
+                              "Generic,                 !- Fuel Type",
+                              "*,                       !- Key Name 1",
+                              "Zone Infiltration Total Heat Gain Energy;  !- Output Variable or Meter Name 1",
+
+                              "Meter:Custom,",
+                              "Meter Zone Infiltration Heat Loss,  !- Name",
+                              "Generic,                 !- Fuel Type",
+                              "*,                       !- Key Name 1",
+                              "Zone Infiltration Total Heat Loss Energy;  !- Output Variable or Meter Name 1",
+
+                              "Meter:Custom,",
+                              "Meter Internal Loads Heating Energy,  !- Name",
+                              "Generic,                 !- Fuel Type",
+                              "*,                       !- Key Name 1",
+                              "Zone Electric Equipment Total Heating Energy,  !- Output Variable or Meter Name 1",
+                              "* ,                       !- Key Name 2",
+                              "Zone Lights Total Heating Energy,  !- Output Variable or Meter Name 2",
+                              "* ,                       !- Key Name 3",
+                              "People Total Heating Energy;  !- Output Variable or Meter Name 3",
+
+                              "Meter:Custom,",
+                              "Meter Zone Electric Equipment Total Heating Energy,  !- Name",
+                              "Generic,                 !- Fuel Type",
+                              "*,                       !- Key Name 1",
+                              "Zone Electric Equipment Total Heating Energy;  !- Output Variable or Meter Name 1",
+
+                              "Meter:Custom,",
+                              "Meter Zone Mechanical Ventilation XYZ,  !- Name",
+                              "Generic,                 !- Fuel Type",
+                              "*,                       !- Key Name 1",
+                              "Zone Mechanical Ventilation Cooling Load Decrease Energy;  !- Output Variable or Meter Name 1",
+
+                              "Meter:Custom,",
+                              "Meter Zone Mechanical Ventilation 123,  !- Name",
+                              "Generic,                 !- Fuel Type",
+                              "*,                       !- Key Name 1",
+                              "Zone Mechanical Ventilation No Load Heat Removal Energy;  !- Output Variable or Meter Name 1",
+
+                              "Meter:Custom,",
+                              "Meter Air System Total Heating Energy,  !- Name",
+                              "Generic,                 !- Fuel Type",
+                              "*,                       !- Key Name 1",
+                              "Air System Total Heating Energy;  !- Output Variable or Meter Name 1",
+
+                              "Meter:Custom,",
+                              "Meter Air System Total Cooling Energy,  !- Name",
+                              "Generic,                 !- Fuel Type",
+                              "*,                       !- Key Name 1",
+                              "Air System Total Cooling Energy;  !- Output Variable or Meter Name 1",
+
+                              "Meter:Custom,",
+                              "Meter Air System Hot Water Energy,  !- Name",
+                              "Generic,                 !- Fuel Type",
+                              "*,                       !- Key Name 1",
+                              "Air System Hot Water Energy;  !- Output Variable or Meter Name 1",
+
+                              "Output:Meter, Meter Surface Average Face Conduction Heat Transfer Energy, Timestep;",
+
+                              "Output:Meter, Meter Surface Window Heat Loss Energy, Timestep;",
+
+                              "Output:Meter, Meter Zone Windows Total Heat Gain Energy, Timestep;",
+
+                              "Output:Meter, Meter Surface Window Heat Gain Energy, Timestep;",
+
+                              "Output:Meter, Meter Zone Ventilation Heat Gain, Timestep;",
+
+                              "Output:Meter, Meter Zone Ventilation Heat Loss, Timestep;",
+
+                              "Output:Meter, Meter Zone Infiltration Heat Gain, Timestep;",
+
+                              "Output:Meter, Meter Zone Infiltration Heat Loss, Timestep;",
+
+                              "Output:Meter, Meter Internal Loads Heating Energy, Timestep;",
+
+                              "Output:Meter, Meter Zone Electric Equipment Total Heating Energy, Timestep;",
+
+                              "Output:Meter, Meter Zone Mechanical Ventilation XYZ, Timestep;",
+
+                              "Output:Meter, Meter Zone Mechanical Ventilation 123, Timestep;",
+
+                              "Output:Meter, Meter Air System Total Heating Energy, Timestep;",
+
+                              "Output:Meter, Meter Air System Total Cooling Energy, Timestep;",
+
+                              "Output:Meter, Meter Air System Hot Water Energy, Timestep;"});
+
+        ASSERT_TRUE(process_idf(idf_objects));
+        bool errors_found = false;
+        Real64 transferredenergy = 0;
+        DataGlobals::NumOfZones = 1;
+        DataHVACGlobals::NumPrimaryAirSys = 1;
+        DataAirSystems::PrimaryAirSystem.allocate(DataHVACGlobals::NumPrimaryAirSys);
+        DataAirSystems::PrimaryAirSystem(1).Name = "Air Loop 1";
+        DataZoneEquipment::ZoneEquipConfig.allocate(DataGlobals::NumOfZones);
+        DataZoneEquipment::ZoneEquipConfig(DataGlobals::NumOfZones).IsControlled = true;
+        SetupOutputVariable("Surface Average Face Conduction Heat Transfer Energy", OutputProcessor::Unit::J, transferredenergy, "Zone", "Sum", "*");
+        SetupOutputVariable("Surface Window Heat Loss Energy", OutputProcessor::Unit::J, transferredenergy, "Zone", "Sum", "*");
+        SetupOutputVariable("Zone Windows Total Heat Gain Energy", OutputProcessor::Unit::J, transferredenergy, "Zone", "Sum", "*");
+        SetupOutputVariable("Surface Window Heat Gain Energy", OutputProcessor::Unit::J, transferredenergy, "Zone", "Sum", "*");
+        SetupOutputVariable("Zone Ventilation Total Heat Gain Energy", OutputProcessor::Unit::J, transferredenergy, "Zone", "Sum", "*");
+        SetupOutputVariable("Zone Ventilation Total Heat Loss Energy", OutputProcessor::Unit::J, transferredenergy, "Zone", "Sum", "*");
+        SetupOutputVariable("Zone Infiltration Total Heat Gain Energy", OutputProcessor::Unit::J, transferredenergy, "Zone", "Sum", "*");
+        SetupOutputVariable("Zone Infiltration Total Heat Loss Energy", OutputProcessor::Unit::J, transferredenergy, "Zone", "Sum", "*");
+        SetupOutputVariable("Zone Electric Equipment Total Heating Energy", OutputProcessor::Unit::J, transferredenergy, "Zone", "Sum", "*");
+        SetupOutputVariable("Zone Lights Total Heating Energy", OutputProcessor::Unit::J, transferredenergy, "Zone", "Sum", "*");
+        SetupOutputVariable("People Total Heating Energy", OutputProcessor::Unit::J, transferredenergy, "Zone", "Sum", "*");
+        SystemReports::AllocateAndSetUpVentReports();
+        SystemReports::AllocateAndSetUpVentReports();
+        GetCustomMeterInput(errors_found);
+        EXPECT_FALSE(errors_found);
+        EXPECT_EQ(15, NumEnergyMeters);
+        EXPECT_EQ(EnergyMeters(1).Name, "METER SURFACE AVERAGE FACE CONDUCTION HEAT TRANSFER ENERGY");
+        EXPECT_EQ(EnergyMeters(12).Name, "METER ZONE MECHANICAL VENTILATION 123");
+        EXPECT_EQ(EnergyMeters(15).Name, "METER AIR SYSTEM HOT WATER ENERGY");
+    }
+
     TEST_F(EnergyPlusFixture, OutputProcessor_DuplicateMeterCustom)
     {
         std::string const idf_objects = delimited_string({"Meter:Custom,",
@@ -4783,7 +4943,6 @@ namespace OutputProcessor {
              "Meter:Custom.",
              "   ** Warning ** Meter:Custom=\"CUSTOMMETER2\", contains a reference to another Meter:Custom in field: Output Variable or Meter "
              "Name=\"CUSTOMMETER1\"."});
-
         compare_err_stream(errMsg);
     }
 
