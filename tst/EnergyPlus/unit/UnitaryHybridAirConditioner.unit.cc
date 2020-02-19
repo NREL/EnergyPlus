@@ -139,7 +139,7 @@ std::vector<std::string> parseLine(std::string line)
     return vect;
 }
 
-TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_Scenario1_HighCooling)
+TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_HighCooling)
 {
     std::vector<std::string> snippet = getAllLinesInFile2(configured_source_directory() + "/tst/EnergyPlus/unit/UnitaryHybridUnitTest_DOSA.idf");
     std::string string = delimited_string(snippet);
@@ -239,7 +239,7 @@ TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_Scenario1_HighCooling)
     EXPECT_GT(Msa, DesignMinVR);
 }
 
-TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_Scenario2_HighCoolingLargeSys)
+TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_HighCoolingLargeSys)
 {
     std::vector<std::string> snippet = getAllLinesInFile2(configured_source_directory() + "/tst/EnergyPlus/unit/UnitaryHybridUnitTest_DOSA.idf");
     std::string string = delimited_string(snippet);
@@ -341,7 +341,7 @@ TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_Scenario2_HighCoolingLarge
     EXPECT_LT(Tsa, Tra);
     EXPECT_GT(Msa, DesignMinVR);
 }
-TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_Scenario3_OutsideEnvConditions)
+TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_OutsideEnvConditions)
 {
     std::vector<std::string> snippet = getAllLinesInFile2(configured_source_directory() + "/tst/EnergyPlus/unit/UnitaryHybridUnitTest_DOSA.idf");
     std::string string = delimited_string(snippet);
@@ -429,7 +429,7 @@ TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_Scenario3_OutsideEnvCondit
     EXPECT_EQ(0, modenumber);
 }
 
-TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_Scenario4_LowCooling)
+TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_LowCooling)
 {
     std::vector<std::string> snippet = getAllLinesInFile2(configured_source_directory() + "/tst/EnergyPlus/unit/UnitaryHybridUnitTest_DOSA.idf");
     std::string string = delimited_string(snippet);
@@ -529,7 +529,7 @@ TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_Scenario4_LowCooling)
     EXPECT_LT(Tsa, Tra);
 }
 
-TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_Scenario5_NoHeatingCooling_MinVentilation)
+TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_NoHeatingCooling_MinVentilation)
 {
     std::vector<std::string> snippet = getAllLinesInFile2(configured_source_directory() + "/tst/EnergyPlus/unit/UnitaryHybridUnitTest_DOSA.idf");
     std::string string = delimited_string(snippet);
