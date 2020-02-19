@@ -8196,7 +8196,7 @@ namespace WaterThermalTanks {
                         while (std::abs(PreTankTemp - NewTankTemp) > DataHVACGlobals::SmallTempDiff || firstThrough) {
                             firstThrough = false;
                             PreTankTemp = this->TankTemp;
-                            PartLoadRatio = DesupHtr.DXSysPLR;
+                            partLoadRatio = DesupHtr.DXSysPLR;
                             if (MdotWater > 0.0) {
                                 DataLoopNode::Node(WaterOutletNode).Temp =
                                     DataLoopNode::Node(WaterInletNode).Temp + QHeatRate / (MdotWater * CpWater);
@@ -8277,7 +8277,7 @@ namespace WaterThermalTanks {
                                 }
                             }
                         } else {
-                            PartLoadRatio = DesupHtr.DXSysPLR;
+                            partLoadRatio = DesupHtr.DXSysPLR;
                         }
 
                     } else if (SELECT_CASE_var1 == floatMode) {
@@ -8310,7 +8310,7 @@ namespace WaterThermalTanks {
                                 DesupHtr.Mode = heatMode;
                                 this->Mode = DesupHtr.SaveWHMode;
                                 if ((this->SavedTankTemp - NewTankTemp) != 0.0) {
-                                    PartLoadRatio = min(
+                                    partLoadRatio = min(
                                         DesupHtr.DXSysPLR,
                                         max(0.0, ((desupHtrSetPointTemp - DeadBandTempDiff) - NewTankTemp) / (this->SavedTankTemp - NewTankTemp)));
                                 } else {
@@ -8385,8 +8385,8 @@ namespace WaterThermalTanks {
                                                                                "\": Part-load ratio calculation failed in float mode warning "
                                                                                "continues. Part-load ratio statistics follow.",
                                                                            WaterHeaterDesuperheater(DesuperheaterNum).RegulaFalsiFailedIndex2,
-                                                                           PartLoadRatio,
-                                                                           PartLoadRatio);
+                                                                           partLoadRatio,
+                                                                           partLoadRatio);
                                         }
                                     }
                                 }
