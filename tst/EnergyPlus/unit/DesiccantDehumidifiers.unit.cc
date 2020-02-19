@@ -2701,7 +2701,7 @@ TEST_F(EnergyPlusFixture, DesiccantDehum_OnOASystemTest)
         "  Coil:Heating:Fuel,",
         "    OA Desiccant Regen Coil, !- Name",
         "    FanAvailSched,           !- Availability Schedule Name",
-        "    Gas,                     !- Fuel Type",
+        "    NaturalGas,              !- Fuel Type",
         "    0.80,                    !- Gas Burner Efficiency",
         "    autosize,                !- Nominal Capacity {W}",
         "    OA Heat Recovery Secondary Outlet Node,  !- Air Inlet Node Name",
