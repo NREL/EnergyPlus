@@ -6949,7 +6949,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     EnergyPlus::sqlite->sqliteCommit();
 
     EXPECT_EQ(460ul, tabularData.size());
-    EXPECT_EQ(76ul, strings.size());
+    EXPECT_EQ(77ul, strings.size());
     EXPECT_EQ("AirLoop Component Load Summary", strings[0][2]); // just make sure that the output table was generated and did not crash
 }
 
