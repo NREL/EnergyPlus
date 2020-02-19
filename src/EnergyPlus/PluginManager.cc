@@ -73,7 +73,7 @@ namespace EnergyPlus {
 namespace PluginManagement {
     std::unique_ptr<PluginManager> pluginManager;
 
-    std::map<int, std::vector<void (*)()>> callbacks;
+    std::map<int, std::vector<std::function<void ()> > > callbacks;
     std::vector<PluginInstance> plugins;
     std::vector<PluginTrendVariable> trends;
     std::vector<std::string> globalVariableNames;
@@ -82,7 +82,7 @@ namespace PluginManagement {
     // some flags
     bool fullyReady = false;
 
-    void registerNewCallback(int iCalledFrom, void (*f)())
+    void registerNewCallback(int iCalledFrom, std::function<void ()> f)
     {
         callbacks[iCalledFrom].push_back(f);
     }
