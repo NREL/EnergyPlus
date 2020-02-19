@@ -491,6 +491,7 @@ namespace SimulationManager {
         WarmupFlag = true;
 
         while (Available) {
+            if (stopSimulation) break;
 
             GetNextEnvironment(outputFiles, Available, ErrorsFound);
 
@@ -545,6 +546,7 @@ namespace SimulationManager {
             ManageEMS(emsCallFromBeginNewEvironment, anyEMSRan); // calling point
 
             while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
+                if (stopSimulation) break;
 
                 if (sqlite) sqlite->sqliteBegin(); // setup for one transaction per day
 
@@ -588,11 +590,14 @@ namespace SimulationManager {
                 }
 
                 for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
+                    if (stopSimulation) break;
 
                     BeginHourFlag = true;
                     EndHourFlag = false;
 
                     for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
+                        if (stopSimulation) break;
+
                         if (AnySlabsInModel || AnyBasementsInModel) {
                             SimulateGroundDomains(OutputFiles::getSingleton(), false);
                         }

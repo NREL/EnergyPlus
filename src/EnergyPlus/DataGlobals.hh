@@ -74,6 +74,7 @@ namespace DataGlobals {
     extern bool isUBJSON;
     extern bool isBSON;
     extern bool preserveIDFOrder;
+    extern bool stopSimulation;
 
     // MODULE PARAMETER DEFINITIONS:
     extern int const BeginDay;
