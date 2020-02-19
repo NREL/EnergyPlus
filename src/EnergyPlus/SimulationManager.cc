@@ -1166,6 +1166,7 @@ namespace SimulationManager {
             ErrorsFound = true;
             ShowFatalError("GetProjectData: Only one (\"1\") " + CurrentModuleObject + " object per simulation is allowed.");
         }
+        DataGlobals::createProfLog = Num > 0;
         std::string overrideModeValue = "Normal";
         if (instances != inputProcessor->epJSON.end()) {
             auto &instancesValue = instances.value();
@@ -1393,7 +1394,9 @@ namespace SimulationManager {
         //    ENDIF
         // unused0909743 Format(' Display Extra Warnings',2(', ',A))
         //  ENDIF
-        writeIntialPerfLogValues();
+        if (DataGlobals::createProfLog) {
+            writeIntialPerfLogValues();
+        }
     }
 
     void writeIntialPerfLogValues()

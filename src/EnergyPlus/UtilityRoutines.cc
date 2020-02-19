@@ -882,7 +882,9 @@ int EndEnergyPlus()
     Time_Finish = epElapsedTime();
     if (Time_Finish < Time_Start) Time_Finish += 24.0 * 3600.0;
     Elapsed_Time = Time_Finish - Time_Start;
-    UtilityRoutines::appendPerfLog("Run Time [seconds]", RoundSigDigits(Elapsed_Time, 2)); 
+    if (DataGlobals::createProfLog) {
+        UtilityRoutines::appendPerfLog("Run Time [seconds]", RoundSigDigits(Elapsed_Time, 2));
+    }
 #ifdef EP_Detailed_Timings
     epStopTime("EntireRun=");
 #endif
@@ -899,10 +901,11 @@ int EndEnergyPlus()
     ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
     ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
 
-    UtilityRoutines::appendPerfLog("Run Time [string]", Elapsed); 
-    UtilityRoutines::appendPerfLog("Number of Warnings", NumWarnings);
-    UtilityRoutines::appendPerfLog("Number of Severe", NumSevere, true); //last item so write the perfLog file
-
+    if (DataGlobals::createProfLog) {
+        UtilityRoutines::appendPerfLog("Run Time [string]", Elapsed);
+        UtilityRoutines::appendPerfLog("Number of Warnings", NumWarnings);
+        UtilityRoutines::appendPerfLog("Number of Severe", NumSevere, true); //last item so write the perfLog file
+    }
     ShowMessage("EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
                 " Severe Errors.");
     ShowMessage("EnergyPlus Sizing Error Summary. During Sizing: " + NumWarningsDuringSizing + " Warning; " + NumSevereDuringSizing +
