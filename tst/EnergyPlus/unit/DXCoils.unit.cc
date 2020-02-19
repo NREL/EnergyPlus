@@ -3815,17 +3815,17 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
     EXPECT_EQ(31899.037804634620, DXCoil(1).MSRatedTotCap(2));
     EXPECT_EQ(31899.037804634620 * 0.5, DXCoil(1).MSRatedTotCap(1));
     // Design SHR at speed 2 and speed 1
-    EXPECT_EQ(0.76488154417788068, DXCoil(1).MSRatedSHR(2));
-    EXPECT_EQ(0.76488154417788068, DXCoil(1).MSRatedSHR(1));
+    EXPECT_NEAR(0.80088, DXCoil(1).MSRatedSHR(2), 0.00001);
+    EXPECT_NEAR(0.80088, DXCoil(1).MSRatedSHR(1), 0.00001);
 
     // test SHR design size when partial autosizing (capacity is hardsized)
-    DXCoil( 1 ).MSRatedTotCap( 1 ) = 17500.0; // DataSizing::AutoSize;
-    DXCoil( 1 ).MSRatedTotCap( 2 ) = 35000.0; // DataSizing::AutoSize;
+    DXCoil(1).MSRatedTotCap(1) = 17500.0; // DataSizing::AutoSize;
+    DXCoil(1).MSRatedTotCap(2) = 35000.0; // DataSizing::AutoSize;
 
     SizeDXCoil(1);
     // Design size SHR at speed 2 and speed 1
-    EXPECT_EQ(0.76488154417788068, DXCoil(1).MSRatedSHR(2));
-    EXPECT_EQ(0.76488154417788068, DXCoil(1).MSRatedSHR(1));
+    EXPECT_NEAR(0.80088, DXCoil(1).MSRatedSHR(2), 0.00001);
+    EXPECT_NEAR(0.80088, DXCoil(1).MSRatedSHR(1), 0.00001);
     // Design Capacity at speed 2 and speed 1
     EXPECT_EQ(31899.037804634620, DXCoil(1).MSRatedTotCapDes(2));
     EXPECT_EQ(35000.0, DXCoil(1).MSRatedTotCap(2));
