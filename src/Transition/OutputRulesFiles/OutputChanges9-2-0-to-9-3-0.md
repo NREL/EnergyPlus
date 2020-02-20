@@ -193,9 +193,19 @@ Environment,DENVER CENTENNIAL GOLDEN ANN HTG 99% CONDNS DB DEFAULT,SizingPeriod:
 Environment,DENVER CENTENNIAL GOLDEN ANN HTG 99% CONDNS DB DEFAULT,SizingPeriod:DesignDay,12/21,12/21,WinterDesignDay,1,N/A,N/A,N/A,N/A,N/A,N/A,Clark and Allen
 ```
 
-See [#PR7562](https://github.com/NREL/EnergyPlus/pull/7562)
+See [PR #7562](https://github.com/NREL/EnergyPlus/pull/7562)
 
 ### EIO output for PerformancePrecisionTradeoffs
 In the eio and table output, new lines report the status of options for the PerformancePrecisionTradeoffs object.
 
-See [7743](https://github.com/NREL/EnergyPlus/pull/7743/)
+See [PR #7743](https://github.com/NREL/EnergyPlus/pull/7743/)
+
+### Default end use subcategory to General
+In the AUBPS end-use subcategory table, the "other" row would show up whenever an end-use subcategory
+was not specified. Now unless specified, end-uses are assumed to be "general" and show up in that row.
+It is now unlikely that the "other" row will be shown. 
+
+This results in additional end-use meters, e.g. General:Cooling:Electricity which may have not been present before.
+And it results in more outputs attached to the General:* meters.
+
+See [PR #7794](https://github.com/NREL/EnergyPlus/pull/7794)
