@@ -63,7 +63,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-
+    class OutputFiles;
 namespace WeatherManager {
 
     // Using/Aliasing
@@ -104,9 +104,13 @@ namespace WeatherManager {
     extern int const DDDBRangeType_Difference; // Design Day DryBulb Range Type = Difference Schedule
     extern int const DDDBRangeType_Profile;    // Design Day DryBulb Range Type = Temperature Profile
 
+    extern int const WP_ClarkAllenModel;  // Use Clark and Allen model for sky emissivity calculation
     extern int const WP_ScheduleValue;  // User entered Schedule value for Weather Property
     extern int const WP_DryBulbDelta;   // User entered DryBulb difference Schedule value for Weather Property
     extern int const WP_DewPointDelta;  // User entered Dewpoint difference Schedule value for Weather Property
+    extern int const WP_BruntModel;  // Use Brunt model for sky emissivity calculation
+    extern int const WP_IdsoModel;   // Use Isdo model for sky emissivity calculation
+    extern int const WP_BerdahlMartinModel;  // Use Berdahl & Martin model for sky emissivity calculation
     extern int const WP_SkyTAlgorithmA; // place holder
 
     extern int const GregorianToJulian; // JGDate argument for Gregorian to Julian Date conversion
@@ -313,6 +317,8 @@ namespace WeatherManager {
         int NumSimYears;              // Total Number of times this period to be performed
         int CurrentCycle;             // Current cycle through weather file in NumSimYears repeats
         int WP_Type1;                 // WeatherProperties SkyTemperature Pointer
+        int SkyTempModel;       // WeatherProperties SkyTemperature CalculationType
+        bool UseWeatherFileHorizontalIR; // If false, horizontal IR and sky temperature are calculated with WP models
         int CurrentYear;              // Current year
         bool IsLeapYear;              // True if current year is leap year.
         bool RollDayTypeOnRepeat;     // If repeating run period, increment day type on repeat.
@@ -326,8 +332,8 @@ namespace WeatherManager {
             : KindOfEnvrn(0), DesignDayNum(0), RunPeriodDesignNum(0), SeedEnvrnNum(0), HVACSizingIterationNum(0), TotalDays(0), StartJDay(0),
               StartMonth(0), StartDay(0), StartYear(0), StartDate(0), EndMonth(0), EndDay(0), EndJDay(0), EndYear(0), EndDate(0), DayOfWeek(0),
               UseDST(false), UseHolidays(false), ApplyWeekendRule(false), UseRain(true), UseSnow(true), MonWeekDay(12, 0), SetWeekDays(false),
-              NumSimYears(1), CurrentCycle(0), WP_Type1(0), CurrentYear(0), IsLeapYear(false), RollDayTypeOnRepeat(true),
-              TreatYearsAsConsecutive(true), MatchYear(false), ActualWeather(false), RawSimDays(0)
+              NumSimYears(1), CurrentCycle(0), WP_Type1(0), SkyTempModel(0), UseWeatherFileHorizontalIR(true), CurrentYear(0), IsLeapYear(false),
+              RollDayTypeOnRepeat(true), TreatYearsAsConsecutive(true), MatchYear(false), ActualWeather(false), RawSimDays(0)
         {
         }
     };
@@ -624,9 +630,10 @@ namespace WeatherManager {
         int CalculationType;
         int SchedulePtr; // pointer to schedule when used
         bool UsedForEnvrn;
+        bool UseWeatherFileHorizontalIR; // If false, horizontal IR and sky temperature are calculated with WP models
 
         // Default Constructor
-        WeatherProperties() : IsSchedule(true), CalculationType(0), SchedulePtr(0), UsedForEnvrn(false)
+        WeatherProperties() : IsSchedule(true), CalculationType(0), SchedulePtr(0), UsedForEnvrn(false), UseWeatherFileHorizontalIR(true)
         {
         }
     };
@@ -681,7 +688,8 @@ namespace WeatherManager {
 
     void ResetEnvironmentCounter();
 
-    void GetNextEnvironment(bool &Available,  // true if there is another environment, false if the end
+    void GetNextEnvironment(OutputFiles &outputFiles,
+                            bool &Available,  // true if there is another environment, false if the end
                             bool &ErrorsFound // will be set to true if severe errors are found in inputs
     );
 
@@ -780,13 +788,15 @@ namespace WeatherManager {
                                   Real64 &RField27       // LiquidPrecip
     );
 
-    void SetUpDesignDay(int const EnvrnNum); // Environment number passed into the routine
+    void SetUpDesignDay(OutputFiles &outputFiles, int const EnvrnNum); // Environment number passed into the routine
 
     //------------------------------------------------------------------------------
 
     Real64 AirMass(Real64 const CosZen); // COS( solar zenith), 0 - 1
 
     //------------------------------------------------------------------------------
+
+    Real64 CalcSkyEmissivity(int Envrn, Real64 OSky, Real64 DryBulb, Real64 DewPoint, Real64 RelHum); // Calculate sky temperature from weather data
 
     void ASHRAETauModel(int const TauModelType, // ASHRAETau solar model type ASHRAE_Tau or ASHRAE_Tau2017
                         Real64 const ETR,       // extraterrestrial normal irradiance, W/m2
@@ -826,7 +836,7 @@ namespace WeatherManager {
 
     void CloseWeatherFile();
 
-    void ResolveLocationInformation(bool &ErrorsFound); // Set to true if no location evident
+    void ResolveLocationInformation(OutputFiles &outputFiles, bool &ErrorsFound); // Set to true if no location evident
 
     void CheckLocationValidity();
 
@@ -836,7 +846,7 @@ namespace WeatherManager {
 
     void ReportWeatherAndTimeInformation(bool &PrintEnvrnStamp); // Set to true when the environment header should be printed
 
-    void ReadUserWeatherInput();
+    void ReadUserWeatherInput(OutputFiles &outputFiles);
 
     void GetRunPeriodData(int &TotRunPers, // Total number of Run Periods requested
                           bool &ErrorsFound);
@@ -858,9 +868,9 @@ namespace WeatherManager {
 
     void GetGroundTemps(bool &ErrorsFound);
 
-    void GetGroundReflectances(bool &ErrorsFound);
+    void GetGroundReflectances(OutputFiles &outputFiles, bool &ErrorsFound);
 
-    void GetSnowGroundRefModifiers(bool &ErrorsFound);
+    void GetSnowGroundRefModifiers(OutputFiles &outputFiles, bool &ErrorsFound);
 
     void GetWaterMainsTemperatures(bool &ErrorsFound);
 
@@ -871,7 +881,7 @@ namespace WeatherManager {
                                   Real64 const MonthlyOAAvgDryBulbTempMaxDiff // monthly daily average OA drybulb temperature maximum difference
     );
 
-    void GetWeatherStation(bool &ErrorsFound);
+    void GetWeatherStation(OutputFiles &outputFiles, bool &ErrorsFound);
 
     void DayltgCurrentExtHorizIllum();
 

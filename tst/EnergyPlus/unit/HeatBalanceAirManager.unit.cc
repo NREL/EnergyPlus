@@ -54,6 +54,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
