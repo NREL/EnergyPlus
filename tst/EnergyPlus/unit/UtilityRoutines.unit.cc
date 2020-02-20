@@ -45,6 +45,11 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <cstdio>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+
 // Google Test Headers
 #include <gtest/gtest.h>
 
@@ -140,3 +145,49 @@ TEST_F(EnergyPlusFixture, DisplayMessageTest)
     DisplayString("Testing");
     EXPECT_TRUE(has_cout_output(true));
 }
+
+TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog)
+{
+    DataStringGlobals::outputPerfLogFileName = "eplusout_perflog.csv";
+
+    // start with no file 
+    std::remove(DataStringGlobals::outputPerfLogFileName.c_str());
+
+    // add headers and values
+    UtilityRoutines::appendPerfLog("header1", "value1-1");
+    UtilityRoutines::appendPerfLog("header2", "value1-2");
+    UtilityRoutines::appendPerfLog("header3", "value1-3", true);
+
+    std::ifstream perfLogFile;
+    std::stringstream perfLogStrSteam;
+
+    perfLogFile.open(DataStringGlobals::outputPerfLogFileName);
+    perfLogStrSteam << perfLogFile.rdbuf();
+    perfLogFile.close();
+    std::string perfLogContents1 = perfLogStrSteam.str();
+
+    std::string expectedContents1 = "header1,header2,header3,\n"
+                                   "value1-1,value1-2,value1-3,\n";
+
+    EXPECT_EQ(perfLogContents1, expectedContents1);
+
+    std::remove(DataStringGlobals::outputPerfLogFileName.c_str());
+
+    // without deleting file add headers and values again
+    UtilityRoutines::appendPerfLog("header1", "value2-1");
+    UtilityRoutines::appendPerfLog("header2", "value2-2");
+    UtilityRoutines::appendPerfLog("header3", "value2-3", true);
+
+    perfLogFile.open(DataStringGlobals::outputPerfLogFileName);
+    perfLogStrSteam << perfLogFile.rdbuf();
+    perfLogFile.close();
+    std::string perfLogContents2 = perfLogStrSteam.str();
+
+    std::string expectedContents2 = "header1,header2,header3,\n"
+                       "value1-1,value1-2,value1-3,\n"
+                       "value2-1,value2-2,value2-3,\n";
+
+    EXPECT_EQ(perfLogContents2, expectedContents2);
+
+}
+
