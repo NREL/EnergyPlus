@@ -78,7 +78,7 @@ TEST(PenumbraTest, azimuth) {
   for (float azm = 0.0f; azm <= 2 * M_PI; azm += M_PI_4) {
     pumbra.setSunPosition(azm, 0.0f);
     float wallPSSA = pumbra.calculatePSSA(wallId);
-    EXPECT_NEAR(wallPSSA, std::abs(cos(azm)), 0.0001) << "azm evaluates to " << azm;
+    EXPECT_NEAR(wallPSSA, std::abs(cos(azm)), 0.01) << "azm evaluates to " << azm;
     // pumbra.renderScene(wallId);
   }
 }
@@ -158,16 +158,16 @@ TEST(PenumbraTest, interior) {
   pumbra2.setModel();
   pumbra2.setSunPosition(0.0f, 0.f);
   float wallPSSA2 = pumbra2.calculatePSSA(wallFrontId);
-  EXPECT_NEAR(wallPSSA2, r_W * r_H - w_W * w_H, 0.0001);
+  EXPECT_NEAR(wallPSSA2, r_W * r_H - w_W * w_H, 0.01);
   // pumbra2.renderScene(wallFrontId);
 
   float backWallInteriorPSSA = pumbra2.calculateInteriorPSSAs({windowId}, {wallBackId})[wallBackId];
-  EXPECT_NEAR(backWallInteriorPSSA, w_W * w_H, 0.0001);
+  EXPECT_NEAR(backWallInteriorPSSA, w_W * w_H, 0.01);
   // pumbra2.renderInteriorScene({windowId},{wallBackId});
 
   pumbra2.setSunPosition(3.1415f, 0.f);
   float wallPSSA3 = pumbra2.calculatePSSA(wallFrontId);
-  EXPECT_NEAR(wallPSSA3, 0, 0.0001); // WallFront should be blocked by back wall.
+  EXPECT_NEAR(wallPSSA3, 0, 0.01); // WallFront should be blocked by back wall.
   // pumbra2.renderScene(wallFrontId);
 
   pumbra2.setSunPosition(0.5f, 0.5f);
@@ -310,7 +310,7 @@ TEST(PenumbraTest, calculatePSSA_multiple_surfaces) {
 
       //pumbra.renderScene(side);
 
-      EXPECT_NEAR(results[side], expectedResults, 0.0001);
+      EXPECT_NEAR(results[side], expectedResults, 0.01);
     }
   }
 }
@@ -357,14 +357,12 @@ TEST(PenumbraTest, side_count_check) {
   Pumbra::Surface wall(wallVerts);
   Pumbra::Penumbra pumbra;
 
-  unsigned wallId = pumbra.addSurface(wall);
+  pumbra.addSurface(wall);
   pumbra.setModel();
 
   EXPECT_EQ(pumbra.getNumSurfaces(), 1);
 
   pumbra.clearModel();
-
-  float const r_W = 1.f, r_D = 1.f, r_H = 1.f; // Overall dimensions
 
   Pumbra::Polygon wallFrontVerts = { -.5f, .5f, -.5f, .5f, .5f, -.5f, .5f, .5f, .5f, -.5f, .5f, .5f };
 
@@ -376,9 +374,9 @@ TEST(PenumbraTest, side_count_check) {
   Pumbra::Surface wallBack(wallBackVerts);
   Pumbra::Surface roof(roofVerts);
 
-  const unsigned wallFrontId        = pumbra.addSurface(wallFront);
-  const unsigned wallBackId         = pumbra.addSurface(wallBack);
-  const unsigned roofId             = pumbra.addSurface(roof);
+  pumbra.addSurface(wallFront);
+  pumbra.addSurface(wallBack);
+  pumbra.addSurface(roof);
 
   pumbra.setModel();
 
@@ -406,9 +404,9 @@ TEST(PenumbraTest, bad_surface_input_errors) {
 
   Pumbra::Penumbra pumbra(penumbraCallbackFunction, messageCallbackContextPtr);
 
-  const unsigned wallFrontId        = pumbra.addSurface(wallFront);
-  const unsigned wallBackId         = pumbra.addSurface(wallBack);
-  const unsigned roofId             = pumbra.addSurface(roof);
+  pumbra.addSurface(wallFront);
+  pumbra.addSurface(wallBack);
+  pumbra.addSurface(roof);
 
   pumbra.setModel();
 
