@@ -13215,7 +13215,7 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
         "  Coil:Heating:Fuel,",
         "    Sys 1 Furnace DX Cool Heating Coil,  !- Name",
         "    ,                        !- Availability Schedule Name",
-        "    Gas,                     !- Fuel Type",
+        "    NaturalGas,              !- Fuel Type",
         "    0.8,                     !- Burner Efficiency",
         "    19814.84997,                !- Nominal Capacity {W}",
         "    Sys 1 Furnace DX Cool Cooling Coil Outlet,  !- Air Inlet Node Name",
