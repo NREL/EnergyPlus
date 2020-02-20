@@ -197,7 +197,7 @@ namespace DataHVACGlobals {
                                         "AirLoopHVAC:UnitarySystem"});
 
     // parameters describing coil types
-    int const NumAllCoilTypes(34);
+    int const NumAllCoilTypes(35);
 
     int const CoilDX_CoolingSingleSpeed(1);
     int const CoilDX_HeatingEmpirical(2);
@@ -240,6 +240,8 @@ namespace DataHVACGlobals {
     int const CoilVRF_FluidTCtrl_Cooling(33);
     int const CoilVRF_FluidTCtrl_Heating(34);
 
+    int const CoilDX_Cooling(35);
+
     Array1D_string const cAllCoilTypes(NumAllCoilTypes,
                                        {"Coil:Cooling:DX:SingleSpeed",
                                         "Coil:Heating:DX:SingleSpeed",
@@ -274,7 +276,8 @@ namespace DataHVACGlobals {
                                         "Coil:Heating:DX:VariableSpeed",
                                         "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed",
                                         "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl",
-                                        "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl"});
+                                        "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl",
+                                        "Coil:Cooling:DX"});
 
     Array1D_string const cCoolingCoilTypes(NumAllCoilTypes,
                                            {"Coil:Cooling:DX:SingleSpeed",
@@ -310,7 +313,8 @@ namespace DataHVACGlobals {
                                             "",
                                             "",
                                             "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl",
-                                            ""});
+                                            "",
+					    "Coil:Cooling:DX"});
 
     Array1D_string const cHeatingCoilTypes(NumAllCoilTypes,
                                            {"",
@@ -346,7 +350,8 @@ namespace DataHVACGlobals {
                                             "Coil:Heating:DX:VariableSpeed",
                                             "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed",
                                             "",
-                                            "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl"});
+                                            "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl",
+					    ""});
 
     // Water to air HP coil types
     int const WatertoAir_Simple(1);
