@@ -81,7 +81,7 @@ ENERGYPLUSLIB_API void cClearAllStates();
 
 // Program level functions
 ENERGYPLUSLIB_API int energyplus(int argc, const char *argv[]);
-void stopSimulation();
+ENERGYPLUSLIB_API void stopSimulation();
 
 // There are a few things here to provide a way for plugins to issue messages
 // I don't see how these are really useful in API applications, but I'm not going to

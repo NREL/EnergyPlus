@@ -452,6 +452,7 @@ namespace HVACManager {
 
         if (UseZoneTimeStepHistory) PreviousTimeStep = TimeStepZone;
         for (SysTimestepLoop = 1; SysTimestepLoop <= NumOfSysTimeSteps; ++SysTimestepLoop) {
+            if (DataGlobals::stopSimulation) break;
 
             if (TimeStepSys < TimeStepZone) {
 
