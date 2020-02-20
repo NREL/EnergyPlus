@@ -68,7 +68,6 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -102,12 +101,6 @@ namespace ConvectionCoefficients {
     // Subroutines are called to fill the variable HConvIn with the convection coefficient at
     // the inside face.  or outside face for the current surface.
 
-    // REFERENCES:
-
-    // OTHER NOTES: none
-
-    // Using/Aliasing
-    using namespace DataPrecisionGlobals;
     using namespace DataGlobals;
     using namespace DataLoopNode;
     using namespace DataHeatBalance;
@@ -115,7 +108,6 @@ namespace ConvectionCoefficients {
     using namespace DataVectorTypes;
     using General::RoundSigDigits;
 
-    // Data
     // MODULE PARAMETER DEFINITIONS:
     Real64 const AdaptiveHcInsideLowLimit(0.5);  // W/m2-K
     Real64 const AdaptiveHcOutsideLowLimit(1.0); // W/m2-K
@@ -205,10 +197,6 @@ namespace ConvectionCoefficients {
     int const RefTempMeanAirTemp(1);
     int const RefTempAdjacentAirTemp(2);
     int const RefTempSupplyAirTemp(3);
-    int const RefTempOutDryBulbAtZ(4);
-    int const RefTempOutDryBulbEPW(5);
-    int const RefTempOutWetBulbAtZ(6);
-    int const RefTempOutWetBulbEPW(7);
 
     // params for wind speed type
     int const RefWindWeatherFile(1);
@@ -216,23 +204,25 @@ namespace ConvectionCoefficients {
     int const RefWindParallComp(3);
     int const RefWindParallCompAtZ(4);
 
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    int TotOutsideHcUserCurves(0);
-    int TotInsideHcUserCurves(0);
     bool GetUserSuppliedConvectionCoeffs(true); // Get user input first call for Init
 
-    bool ConvectionGeometryMetaDataSetup(false); // set to true once geometry meta data are setup
     Real64 CubeRootOfOverallBuildingVolume(0.0); // building meta data. cube root of the volume of all the zones
     Real64 RoofLongAxisOutwardAzimuth(0.0);      // roof surfaces meta data. outward normal azimuth for longest roof edge
 
-    // SUBROUTINE SPECIFICATIONS:
-    // PRIVATE ApplyConvectionValue ! internal to GetUserConvectionCoefficients
+    // error indices
+    int BMMixedAssistedWallErrorIDX1(0);
+    int BMMixedAssistedWallErrorIDX2(0);
+    int BMMixedOpposingWallErrorIDX1(0);
+    int BMMixedOpposingWallErrorIDX2(0);
+    int BMMixedStableFloorErrorIDX1(0);
+    int BMMixedStableFloorErrorIDX2(0);
+    int BMMixedUnstableFloorErrorIDX1(0);
+    int BMMixedUnstableFloorErrorIDX2(0);
+    int BMMixedStableCeilingErrorIDX1(0);
+    int BMMixedStableCeilingErrorIDX2(0);
+    int BMMixedUnstableCeilingErrorIDX1(0);
+    int BMMixedUnstableCeilingErrorIDX2(0);
 
-    // more specific Hc model equations
 
     // Object Data
     InsideFaceAdaptiveConvAlgoStruct InsideFaceAdaptiveConvectionAlgo; // stores rules for Hc model equations
@@ -241,7 +231,26 @@ namespace ConvectionCoefficients {
     Array1D<HcOutsideFaceUserCurveStruct> HcOutsideUserCurve;
     RoofGeoCharactisticsStruct RoofGeo;
 
-    // Functions
+    void clear_state()
+    {
+        GetUserSuppliedConvectionCoeffs = true;
+        CubeRootOfOverallBuildingVolume = 0.0;
+        RoofLongAxisOutwardAzimuth = 0.0;
+        HcInsideUserCurve.deallocate();
+        HcOutsideUserCurve.deallocate();
+        BMMixedAssistedWallErrorIDX1 = 0;
+        BMMixedAssistedWallErrorIDX2 = 0;
+        BMMixedOpposingWallErrorIDX1 = 0;
+        BMMixedOpposingWallErrorIDX2 = 0;
+        BMMixedStableFloorErrorIDX1 = 0;
+        BMMixedStableFloorErrorIDX2 = 0;
+        BMMixedUnstableFloorErrorIDX1 = 0;
+        BMMixedUnstableFloorErrorIDX2 = 0;
+        BMMixedStableCeilingErrorIDX1 = 0;
+        BMMixedStableCeilingErrorIDX2 = 0;
+        BMMixedUnstableCeilingErrorIDX1 = 0;
+        BMMixedUnstableCeilingErrorIDX2 = 0;
+    }
 
     void InitInteriorConvectionCoeffs(Array1S<Real64> const SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
                                       Optional_int_const ZoneToResimulate        // if passed in, then only calculate surfaces that have this zone
@@ -1161,7 +1170,7 @@ namespace ConvectionCoefficients {
 
         // first get user-defined H models so they can be processed for later objects
         CurrentModuleObject = "SurfaceConvectionAlgorithm:Inside:UserCurve";
-        TotInsideHcUserCurves = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        int TotInsideHcUserCurves = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         HcInsideUserCurve.allocate(TotInsideHcUserCurves);
         for (Loop = 1; Loop <= TotInsideHcUserCurves; ++Loop) {
             inputProcessor->getObjectItem(CurrentModuleObject,
@@ -1266,7 +1275,7 @@ namespace ConvectionCoefficients {
         } // end of 'SurfaceConvectionAlgorithm:Inside:UserCurve'
 
         CurrentModuleObject = "SurfaceConvectionAlgorithm:Outside:UserCurve";
-        TotOutsideHcUserCurves = inputProcessor->getNumObjectsFound(CurrentModuleObject);
+        int TotOutsideHcUserCurves = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         HcOutsideUserCurve.allocate(TotOutsideHcUserCurves);
         for (Loop = 1; Loop <= TotOutsideHcUserCurves; ++Loop) {
             inputProcessor->getObjectItem(CurrentModuleObject,
@@ -5620,8 +5629,6 @@ namespace ConvectionCoefficients {
                       RoofGeo.XuYuZu.Vertex.z);
             }
         }
-
-        ConvectionGeometryMetaDataSetup = true;
     }
 
     void SetupAdaptiveConvectionRadiantSurfaceData()
@@ -8648,16 +8655,13 @@ namespace ConvectionCoefficients {
                                                    int const ZoneNum       // index of zone for messaging
     )
     {
-        static int deltaTempErrIdx(0);
-        static int heightErrIdx(0);
-
         if ((DeltaTemp != 0.0) && (Height != 0.0)) {
             Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(ZoneNum);
             Real64 AirChangeRate = CalcZoneSystemACH(ZoneNum);
             return CalcBeausoleilMorrisonMixedAssistedWall(DeltaTemp, Height, SurfTemp, SupplyAirTemp, AirChangeRate);
         } else {
             if (Height == 0.0) {
-                if (heightErrIdx == 0) {
+                if (BMMixedAssistedWallErrorIDX2 == 0) {
                     ShowWarningMessage("CalcBeausoleilMorrisonMixedAssistedWall: Convection model not evaluated (would divide by zero)");
                     ShowContinueError("Effective height is zero, convection model not applicable for zone named =" + Zone(ZoneNum).Name);
                     ShowContinueError("Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
@@ -8665,10 +8669,10 @@ namespace ConvectionCoefficients {
 
                 ShowRecurringWarningErrorAtEnd("CalcBeausoleilMorrisonMixedAssistedWall: Convection model not evaluated because of zero height "
                                                "and set to 9.999 [W/m2-K]",
-                                               heightErrIdx);
+                                               BMMixedAssistedWallErrorIDX2);
             }
             if (DeltaTemp == 0.0 && !WarmupFlag) {
-                if (deltaTempErrIdx == 0) {
+                if (BMMixedAssistedWallErrorIDX1 == 0) {
                     ShowWarningMessage("CalcBeausoleilMorrisonMixedAssistedWall: Convection model not evaluated (would divide by zero)");
                     ShowContinueError("The temperature difference between surface and air is zero");
                     ShowContinueError("Occurs for zone named = " + Zone(ZoneNum).Name);
@@ -8677,7 +8681,7 @@ namespace ConvectionCoefficients {
 
                 ShowRecurringWarningErrorAtEnd("CalcBeausoleilMorrisonMixedAssistedWall: Convection model not evaluated because of zero temperature "
                                                "difference and set to 9.999 [W/m2-K]",
-                                               deltaTempErrIdx);
+                                               BMMixedAssistedWallErrorIDX1);
             }
             return 9.999;
         }
@@ -8742,13 +8746,10 @@ namespace ConvectionCoefficients {
                                                    int const ZoneNum       // index of zone for messaging
     )
     {
-        static int ErrorIndex(0);
-        static int ErrorIndex2(0);
-
         if ((DeltaTemp != 0.0)) { // protect divide by zero
 
             if (Height == 0.0) {
-                if (ErrorIndex2 == 0) {
+                if (BMMixedOpposingWallErrorIDX2 == 0) {
                     ShowSevereMessage("CalcBeausoleilMorrisonMixedOpposingWall: Convection model not evaluated (would divide by zero)");
                     ShowContinueError("Effective height is zero, convection model not applicable for zone named =" + Zone(ZoneNum).Name);
                     ShowContinueError("Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
@@ -8756,7 +8757,7 @@ namespace ConvectionCoefficients {
 
                 ShowRecurringSevereErrorAtEnd(
                     "CalcBeausoleilMorrisonMixedOpposingWall: Convection model not evaluated because of zero height and set to 9.999 [W/m2-K]",
-                    ErrorIndex2);
+                    BMMixedOpposingWallErrorIDX2);
             }
             Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(ZoneNum);
             Real64 AirChangeRate = CalcZoneSystemACH(ZoneNum);
@@ -8764,7 +8765,7 @@ namespace ConvectionCoefficients {
 
         } else {
             if (!WarmupFlag) {
-                if (ErrorIndex == 0) {
+                if (BMMixedOpposingWallErrorIDX1 == 0) {
                     ShowSevereMessage("CalcBeausoleilMorrisonMixedOpposingWall: Convection model not evaluated (would divide by zero)");
                     ShowContinueError("The temperature difference between surface and air is zero");
                     ShowContinueError("Occurs for zone named = " + Zone(ZoneNum).Name);
@@ -8773,7 +8774,7 @@ namespace ConvectionCoefficients {
 
                 ShowRecurringSevereErrorAtEnd("CalcBeausoleilMorrisonMixedOpposingWall: Convection model not evaluated because of zero temperature "
                                               "difference and set to 9.999 [W/m2-K]",
-                                              ErrorIndex);
+                                              BMMixedOpposingWallErrorIDX1);
             }
             return 9.999;
         }
@@ -8821,16 +8822,13 @@ namespace ConvectionCoefficients {
     )
     {
 
-        static int diaErrIdx(0);
-        static int deltaTempErrIdx(0);
-
         if ((HydraulicDiameter != 0.0) && (DeltaTemp != 0.0)) {
             Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(ZoneNum);
             Real64 AirChangeRate = CalcZoneSystemACH(ZoneNum);
             return CalcBeausoleilMorrisonMixedStableFloor(DeltaTemp, HydraulicDiameter, SurfTemp, SupplyAirTemp, AirChangeRate);
         } else {
             if (HydraulicDiameter == 0.0) {
-                if (diaErrIdx == 0) {
+                if (BMMixedStableFloorErrorIDX1 == 0) {
                     ShowWarningMessage("CalcBeausoleilMorrisonMixedStableFloor: Convection model not evaluated (would divide by zero)");
                     ShowContinueError("Effective hydraulic diameter is zero, convection model not applicable for zone named =" + Zone(ZoneNum).Name);
                     ShowContinueError("Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
@@ -8838,10 +8836,10 @@ namespace ConvectionCoefficients {
 
                 ShowRecurringWarningErrorAtEnd("CalcBeausoleilMorrisonMixedStableFloor: Convection model not evaluated because effective hydraulic diameter is zero "
                                                "and set to 9.999 [W/m2-K]",
-                                               diaErrIdx);
+                                               BMMixedStableFloorErrorIDX1);
             }
             if (DeltaTemp == 0.0 && !WarmupFlag) {
-                if (deltaTempErrIdx == 0) {
+                if (BMMixedStableFloorErrorIDX2 == 0) {
                     ShowWarningMessage("CalcBeausoleilMorrisonMixedStableFloor: Convection model not evaluated (would divide by zero)");
                     ShowContinueError("The temperature difference between surface and air is zero");
                     ShowContinueError("Occurs for zone named = " + Zone(ZoneNum).Name);
@@ -8850,7 +8848,7 @@ namespace ConvectionCoefficients {
 
                 ShowRecurringWarningErrorAtEnd("CalcBeausoleilMorrisonMixedStableFloor: Convection model not evaluated because of zero temperature "
                                                "difference and set to 9.999 [W/m2-K]",
-                                               deltaTempErrIdx);
+                                               BMMixedStableFloorErrorIDX2);
             }
             return 9.999;
         }
@@ -8899,8 +8897,6 @@ namespace ConvectionCoefficients {
                                                     int const ZoneNum               // index of zone for messaging
     )
     {
-        static int diaErrIdx(0);
-        static int deltaTempErrIdx(0);
 
         if ((HydraulicDiameter != 0.0) && (DeltaTemp != 0.0)) {
             Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(ZoneNum);
@@ -8908,7 +8904,7 @@ namespace ConvectionCoefficients {
             return CalcBeausoleilMorrisonMixedUnstableFloor(DeltaTemp, HydraulicDiameter, SurfTemp, SupplyAirTemp, AirChangeRate);
         } else {
             if (HydraulicDiameter == 0.0) {
-                if (diaErrIdx == 0) {
+                if (BMMixedUnstableFloorErrorIDX1 == 0) {
                     ShowWarningMessage("CalcBeausoleilMorrisonMixedUnstableFloor: Convection model not evaluated (would divide by zero)");
                     ShowContinueError("Effective hydraulic diameter is zero, convection model not applicable for zone named =" + Zone(ZoneNum).Name);
                     ShowContinueError("Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
@@ -8916,11 +8912,11 @@ namespace ConvectionCoefficients {
 
                 ShowRecurringWarningErrorAtEnd("CalcBeausoleilMorrisonMixedUnstableFloor: Convection model not evaluated because effective hydraulic diameter is zero "
                                                "and set to 9.999 [W/m2-K]",
-                                               diaErrIdx);
+                                               BMMixedUnstableFloorErrorIDX1);
             }
 
             if (DeltaTemp == 0.0 && !WarmupFlag) {
-                if (deltaTempErrIdx == 0) {
+                if (BMMixedUnstableFloorErrorIDX2 == 0) {
                     ShowWarningMessage("CalcBeausoleilMorrisonMixedUnstableFloor: Convection model not evaluated (would divide by zero)");
                     ShowContinueError("The temperature difference between surface and air is zero");
                     ShowContinueError("Occurs for zone named = " + Zone(ZoneNum).Name);
@@ -8929,7 +8925,7 @@ namespace ConvectionCoefficients {
 
                 ShowRecurringWarningErrorAtEnd("CalcBeausoleilMorrisonMixedUnstableFloor: Convection model not evaluated because of zero temperature "
                                                "difference and set to 9.999 [W/m2-K]",
-                                               deltaTempErrIdx);
+                                               BMMixedUnstableFloorErrorIDX2);
             }
             return 9.999;
         }
@@ -8977,16 +8973,13 @@ namespace ConvectionCoefficients {
     )
     {
 
-        static int diaErrIdx(0);
-        static int deltaTempErrIdx(0);
-
         if ((HydraulicDiameter != 0.0) && (DeltaTemp != 0.0)) {
             Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(ZoneNum);
             Real64 AirChangeRate = CalcZoneSystemACH(ZoneNum);
             return CalcBeausoleilMorrisonMixedStableCeiling(DeltaTemp, HydraulicDiameter, SurfTemp, SupplyAirTemp, AirChangeRate);
         } else {
             if (HydraulicDiameter == 0.0) {
-                if (diaErrIdx == 0) {
+                if (BMMixedStableCeilingErrorIDX1 == 0) {
                     ShowWarningMessage("CalcBeausoleilMorrisonMixedStableCeiling: Convection model not evaluated (would divide by zero)");
                     ShowContinueError("Effective hydraulic diameter is zero, convection model not applicable for zone named =" + Zone(ZoneNum).Name);
                     ShowContinueError("Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
@@ -8994,11 +8987,11 @@ namespace ConvectionCoefficients {
 
                 ShowRecurringWarningErrorAtEnd("CalcBeausoleilMorrisonMixedStableCeiling: Convection model not evaluated because effective hydraulic diameter is zero "
                                                "and set to 9.999 [W/m2-K]",
-                                               diaErrIdx);
+                                               BMMixedStableCeilingErrorIDX1);
 
             }
             if (DeltaTemp == 0.0 && !WarmupFlag) {
-                if (deltaTempErrIdx == 0) {
+                if (BMMixedStableCeilingErrorIDX2 == 0) {
                     ShowWarningMessage("CalcBeausoleilMorrisonMixedStableCeiling: Convection model not evaluated (would divide by zero)");
                     ShowContinueError("The temperature difference between surface and air is zero");
                     ShowContinueError("Occurs for zone named = " + Zone(ZoneNum).Name);
@@ -9007,7 +9000,7 @@ namespace ConvectionCoefficients {
 
                 ShowRecurringWarningErrorAtEnd("CalcBeausoleilMorrisonMixedStableCeiling: Convection model not evaluated because of zero temperature "
                                                "difference and set to 9.999 [W/m2-K]",
-                                               deltaTempErrIdx);
+                                               BMMixedStableCeilingErrorIDX2);
             }
             return 9.999;
         }
@@ -9057,16 +9050,13 @@ namespace ConvectionCoefficients {
     {
         using DataGlobals::WarmupFlag;
 
-        static int diaErrIdx(0);
-        static int deltaTempErrIdx(0);
-
-        if ((HydraulicDiameter != 0.0) && (DeltaTemp != 0.0)) {
+         if ((HydraulicDiameter != 0.0) && (DeltaTemp != 0.0)) {
             Real64 SupplyAirTemp = CalcZoneSupplyAirTemp(ZoneNum);
             Real64 AirChangeRate = CalcZoneSystemACH(ZoneNum);
             return CalcBeausoleilMorrisonMixedUnstableCeiling(DeltaTemp, HydraulicDiameter, SurfTemp, SupplyAirTemp, AirChangeRate);
         } else {
             if (HydraulicDiameter == 0.0) {
-                if (diaErrIdx == 0) {
+                if (BMMixedUnstableCeilingErrorIDX1 == 0) {
                     ShowWarningMessage("CalcBeausoleilMorrisonMixedUnstableCeiling: Convection model not evaluated (would divide by zero)");
                     ShowContinueError("Effective hydraulic diameter is zero, convection model not applicable for zone named =" + Zone(ZoneNum).Name);
                     ShowContinueError("Convection surface heat transfer coefficient set to 9.999 [W/m2-K] and the simulation continues");
@@ -9074,10 +9064,10 @@ namespace ConvectionCoefficients {
 
                 ShowRecurringWarningErrorAtEnd("CalcBeausoleilMorrisonMixedUnstableCeiling: Convection model not evaluated because effective hydraulic diameter is zero "
                                                "and set to 9.999 [W/m2-K]",
-                                               diaErrIdx);
+                                               BMMixedUnstableCeilingErrorIDX1);
             }
             if (DeltaTemp == 0.0 && !WarmupFlag) {
-                if (deltaTempErrIdx == 0) {
+                if (BMMixedUnstableCeilingErrorIDX2 == 0) {
                     ShowWarningMessage("CalcBeausoleilMorrisonMixedUnstableCeiling: Convection model not evaluated (would divide by zero)");
                     ShowContinueError("The temperature difference between surface and air is zero");
                     ShowContinueError("Occurs for zone named = " + Zone(ZoneNum).Name);
@@ -9086,7 +9076,7 @@ namespace ConvectionCoefficients {
 
                 ShowRecurringWarningErrorAtEnd("CalcBeausoleilMorrisonMixedUnstableCeiling: Convection model not evaluated because of zero "
                                                "temperature difference and set to 9.999 [W/m2-K]",
-                                               deltaTempErrIdx);
+                                               BMMixedUnstableCeilingErrorIDX2);
             }
             return 9.999;
         }

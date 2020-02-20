@@ -165,25 +165,10 @@ namespace ConvectionCoefficients {
     extern int const RefWindParallComp;
     extern int const RefWindParallCompAtZ;
 
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-
-    extern int TotOutsideHcUserCurves;
-    extern int TotInsideHcUserCurves;
     extern bool GetUserSuppliedConvectionCoeffs; // Get user input first call for Init
 
-    extern bool ConvectionGeometryMetaDataSetup;   // set to true once geometry meta data are setup
     extern Real64 CubeRootOfOverallBuildingVolume; // building meta data. cube root of the volume of all the zones
     extern Real64 RoofLongAxisOutwardAzimuth;      // roof surfaces meta data. outward normal azimuth for longest roof edge
-
-    // SUBROUTINE SPECIFICATIONS:
-    // PRIVATE ApplyConvectionValue ! internal to GetUserConvectionCoefficients
-
-    // more specific Hc model equations
-
-    // Types
 
     struct HcInsideFaceUserCurveStruct
     {
@@ -627,7 +612,7 @@ namespace ConvectionCoefficients {
                                                  Real64 const humRat,
                                                  Real64 const height,
                                                  bool const isWindow);
-    
+
     Real64 CalcAlamdariHammondUnstableHorizontal(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
                                                    Real64 const HydraulicDiameter  // [m] characteristic size, = (4 * area) / perimeter
     );
@@ -857,6 +842,8 @@ namespace ConvectionCoefficients {
                          Real64 const WindDirect, // Wind direction measured clockwise from geographhic North
                          Real64 const RoofArea,
                          Real64 const RoofPerimeter);
+
+    void clear_state();
 
 } // namespace ConvectionCoefficients
 

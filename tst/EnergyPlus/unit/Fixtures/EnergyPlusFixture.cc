@@ -70,6 +70,7 @@
 #include <EnergyPlus/ChillerIndirectAbsorption.hh>
 #include <EnergyPlus/ChillerReformulatedEIR.hh>
 #include <EnergyPlus/CondenserLoopTowers.hh>
+#include <EnergyPlus/ConvectionCoefficients.hh>
 #include <EnergyPlus/CoolTower.hh>
 #include <EnergyPlus/CrossVentMgr.hh>
 #include <EnergyPlus/CTElectricGenerator.hh>
@@ -256,7 +257,7 @@ void EnergyPlusFixture::SetUp()
     show_message();
 
     OutputFiles::getSingleton().eio.open_as_stringstream();
-    
+
     this->eso_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
     this->mtr_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
     this->err_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
@@ -322,6 +323,7 @@ void EnergyPlusFixture::clear_all_states()
     clearCoilSelectionReportObj(); // ReportCoilSelection
     clearFacilityElectricPowerServiceObject();
     CondenserLoopTowers::clear_state();
+    ConvectionCoefficients::clear_state();
     CoolingPanelSimple::clear_state();
     CoolTower::clear_state();
     CrossVentMgr::clear_state();
