@@ -211,7 +211,6 @@ namespace SizingManager {
         //  EXTERNAL            ReportSysSizing
         std::string curName;
         int NumSizingPeriodsPerformed;
-        int write_stat;
         int numZoneSizeIter; // number of times to repeat zone sizing calcs. 1 normal, 2 load component reporting
         int iZoneCalcIter;   // index for repeating the zone sizing calcs
         static bool runZeroingOnce(true);
@@ -222,7 +221,6 @@ namespace SizingManager {
 
         // FLOW:
 
-        OutputFileSysSizing = 0;
         TimeStepInDay = 0;
         SysSizingRunDone = false;
         ZoneSizingRunDone = false;
@@ -501,38 +499,18 @@ namespace SizingManager {
 
             SysSizingCalc = true;
             Available = true;
-            OutputFileSysSizing = GetNewUnitNumber();
             if (SizingFileColSep == CharComma) {
-                {
-                    IOFlags flags;
-                    flags.ACTION("write");
-                    ObjexxFCL::gio::open(OutputFileSysSizing, DataStringGlobals::outputSszCsvFileName, flags);
-                    write_stat = flags.ios();
-                }
-                if (write_stat != 0) {
-                    ShowFatalError(RoutineName + "Could not open file " + DataStringGlobals::outputSszCsvFileName + " for output (write).");
-                }
+                outputFiles.ssz.fileName = outputFiles.outputSszCsvFileName;
             } else if (SizingFileColSep == CharTab) {
-                {
-                    IOFlags flags;
-                    flags.ACTION("write");
-                    ObjexxFCL::gio::open(OutputFileSysSizing, DataStringGlobals::outputSszTabFileName, flags);
-                    write_stat = flags.ios();
-                }
-                if (write_stat != 0) {
-                    ShowFatalError(RoutineName + "Could not open file " + DataStringGlobals::outputSszTabFileName + " for output (write).");
-                }
+                outputFiles.ssz.fileName = outputFiles.outputSszTabFileName;
             } else {
-                {
-                    IOFlags flags;
-                    flags.ACTION("write");
-                    ObjexxFCL::gio::open(OutputFileSysSizing, DataStringGlobals::outputSszTxtFileName, flags);
-                    write_stat = flags.ios();
-                }
-                if (write_stat != 0) {
-                    ShowFatalError(RoutineName + "Could not open file " + DataStringGlobals::outputSszTxtFileName + " for output (write).");
-                }
+                outputFiles.ssz.fileName = outputFiles.outputSszTxtFileName;
             }
+            outputFiles.ssz.open();
+            if (!outputFiles.ssz.good()) {
+                ShowFatalError(RoutineName + "Could not open file " + outputFiles.ssz.fileName + " for output (write).");
+            }
+
             SimAir = true;
             SimZoneEquip = true;
 
@@ -592,7 +570,7 @@ namespace SizingManager {
                             DisplayString("Calculating System sizing");
                             DisplayString("...for Sizing Period: #" + RoundSigDigits(NumSizingPeriodsPerformed) + ' ' + EnvironmentName);
                         }
-                        UpdateSysSizing(BeginDay);
+                        UpdateSysSizing(outputFiles, BeginDay);
                     }
 
                     for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
@@ -621,7 +599,7 @@ namespace SizingManager {
 
                             ManageWeather();
 
-                            UpdateSysSizing(DuringDay);
+                            UpdateSysSizing(outputFiles, DuringDay);
 
                             BeginHourFlag = false;
                             BeginDayFlag = false;
@@ -633,7 +611,7 @@ namespace SizingManager {
 
                     } // ... End hour loop.
 
-                    if (EndDayFlag) UpdateSysSizing(EndDay);
+                    if (EndDayFlag) UpdateSysSizing(outputFiles, EndDay);
 
                     if (!WarmupFlag && (DayOfSim > 0) && (DayOfSim < NumOfDayInEnvrn)) {
                         ++CurOverallSimDay;
@@ -644,7 +622,7 @@ namespace SizingManager {
             } // ... End environment loop
 
             if (NumSizingPeriodsPerformed > 0) {
-                UpdateSysSizing(EndSysSizingCalc);
+                UpdateSysSizing(outputFiles, EndSysSizingCalc);
                 SysSizingRunDone = true;
             } else {
                 ShowSevereError(RoutineName + "No Sizing periods were performed for System Sizing. No System Sizing calculations saved.");

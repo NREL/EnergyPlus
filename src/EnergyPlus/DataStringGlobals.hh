@@ -129,9 +129,6 @@ namespace DataStringGlobals {
     extern std::string outputSlnFileName;
     extern std::string outputSciFileName;
     extern std::string outputWrlFileName;
-    extern std::string outputSszCsvFileName;
-    extern std::string outputSszTabFileName;
-    extern std::string outputSszTxtFileName;
     extern std::string outputScreenCsvFileName;
     extern std::string outputSqlFileName;
     extern std::string outputSqliteErrFileName;

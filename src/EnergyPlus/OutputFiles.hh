@@ -94,10 +94,17 @@ public:
     };
 
     OutputFile eio{"eplusout.eio"};
+
     OutputFile zsz{""};
     std::string outputZszCsvFileName{"epluszsz.csv"};
     std::string outputZszTabFileName{"epluszsz.tab"};
     std::string outputZszTxtFileName{"epluszsz.txt"};
+
+    OutputFile ssz{""};
+    std::string outputSszCsvFileName{"eplusssz.csv"};
+    std::string outputSszTabFileName{"eplusssz.tab"};
+    std::string outputSszTxtFileName{"eplusssz.txt"};
+
     static OutputFiles makeOutputFiles();
     static OutputFiles &getSingleton();
 

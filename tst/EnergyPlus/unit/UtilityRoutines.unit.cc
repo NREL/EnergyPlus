@@ -129,12 +129,9 @@ TEST_F(EnergyPlusFixture, DisplayMessageTest)
     DataGlobals::OutputFileStandard = FindUnitNumber(DataStringGlobals::outputEsoFileName);
     DataGlobals::OutputFileMeters = FindUnitNumber(DataStringGlobals::outputMtrFileName);
     DataGlobals::OutputFileBNDetails = FindUnitNumber(DataStringGlobals::outputBndFileName);
-    DataGlobals::OutputFileSysSizing = FindUnitNumber(DataStringGlobals::outputSszCsvFileName);
     DisplayString("Testing");
     EXPECT_TRUE(has_cout_output(true));
     // repeat this one - before fix, this broke cout_stream
-    int unitNum; // found unit number
-    unitNum = FindUnitNumber(DataStringGlobals::outputSszCsvFileName);
     EXPECT_FALSE(has_cout_output(true));
     DisplayString("Testing");
     EXPECT_TRUE(has_cout_output(true));

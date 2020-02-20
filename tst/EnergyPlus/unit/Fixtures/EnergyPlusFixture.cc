@@ -296,7 +296,7 @@ void EnergyPlusFixture::TearDown()
         OutputFiles::getSingleton().eio.del();
         ObjexxFCL::gio::close(DataGlobals::OutputFileDebug, flags);
         OutputFiles::getSingleton().zsz.del();
-        ObjexxFCL::gio::close(DataGlobals::OutputFileSysSizing, flags);
+        OutputFiles::getSingleton().ssz.del();
         ObjexxFCL::gio::close(DataGlobals::OutputFileMeters, flags);
         ObjexxFCL::gio::close(DataGlobals::OutputFileBNDetails, flags);
         ObjexxFCL::gio::close(DataGlobals::OutputFileZonePulse, flags);

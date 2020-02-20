@@ -241,7 +241,6 @@ namespace DataGlobals {
     extern std::ostream *err_stream;                 // Internal stream used for err output (used for performance)
     extern int StdOutputRecordCount;                 // Count of Standard output records
     extern int OutputFileDebug;                      // Unit number for debug outputs
-    extern int OutputFileSysSizing;                  // Unit number of system sizing calc output file
     extern int OutputFileMeters;                     // Unit number for meters output
     extern std::ostream *mtr_stream;                 // Internal stream used for mtr output (used for performance)
     extern int OutputFileShadingFrac;                // Unit number for shading output
