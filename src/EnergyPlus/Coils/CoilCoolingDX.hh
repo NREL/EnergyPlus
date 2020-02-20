@@ -45,7 +45,6 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-
 #ifndef ENERGYPLUS_COILS_COILCOOLINGDX
 #define ENERGYPLUS_COILS_COILCOOLINGDX
 
@@ -74,23 +73,23 @@ struct CoilCoolingDXInputSpecification
 struct CoilCoolingDX
 {
     CoilCoolingDX() = default;
-    static int factory(std::string const & coilName);
+    static int factory(std::string const &coilName);
     static void getInput();
     static void clear_state();
-    void instantiateFromInputSpec(const CoilCoolingDXInputSpecification& input_data);
+    void instantiateFromInputSpec(const CoilCoolingDXInputSpecification &input_data);
     void oneTimeInit();
     void simulate(bool useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode);
     void setData(int fanIndex, int fanType, std::string const &fanName, int airLoopNum);
     void getFixedData(int &evapInletNodeIndex,
-                 int &evapOutletNodeIndex,
-                 int &condInletNodeIndex,
-                 int &normalModeNumSpeeds,
-                 CoilCoolingDXCurveFitPerformance::CapControlMethod &capacityControlMethod,
-                 Real64 &minOutdoorDryBulb);
+                      int &evapOutletNodeIndex,
+                      int &condInletNodeIndex,
+                      int &normalModeNumSpeeds,
+                      CoilCoolingDXCurveFitPerformance::CapControlMethod &capacityControlMethod,
+                      Real64 &minOutdoorDryBulb);
     void getDataAfterSizing(Real64 &normalModeRatedEvapAirFlowRate,
-                      Real64 &normalModeRatedCapacity,
-                      std::vector<Real64> &normalModeFlowRates, 
-                      std::vector<Real64> &normalModeRatedCapacities);
+                            Real64 &normalModeRatedCapacity,
+                            std::vector<Real64> &normalModeFlowRates,
+                            std::vector<Real64> &normalModeRatedCapacities);
     static void inline passThroughNodeData(DataLoopNode::NodeData &in, DataLoopNode::NodeData &out);
     void size();
 
@@ -100,7 +99,7 @@ struct CoilCoolingDX
     int evapInletNodeIndex = 0;
     int evapOutletNodeIndex = 0;
     int availScheduleIndex = 0;
-    //int condZoneIndex = 0;
+    // int condZoneIndex = 0;
     int condInletNodeIndex = 0;
     int condOutletNodeIndex = 0;
     CoilCoolingDXCurveFitPerformance performance;
@@ -111,9 +110,9 @@ struct CoilCoolingDX
     int evaporativeCondSupplyTankIndex = 0;
     int evaporativeCondSupplyTankARRID = 0;
     Real64 evaporativeCondSupplyTankVolumeFlow = 0.0;
-    //Real64 evaporativeCondSupplyTankVolumeConsumption = 0.0;
-	Real64 evapCondPumpElecPower = 0.0;
-	Real64 evapCondPumpElecConsumption = 0.0;
+    // Real64 evaporativeCondSupplyTankVolumeConsumption = 0.0;
+    Real64 evapCondPumpElecPower = 0.0;
+    Real64 evapCondPumpElecConsumption = 0.0;
     int airLoopNum = 0; // Add for AFN compatibility, revisit at a later date
     int supplyFanIndex = 0;
     int supplyFanType = 0;
@@ -143,7 +142,6 @@ struct CoilCoolingDX
     Real64 speedRatioReport = 0.0;
     Real64 wasteHeatEnergyRate = 0.0;
     Real64 wasteHeatEnergy = 0.0;
-
 };
 
 extern std::vector<CoilCoolingDX> coilCoolingDXs;
