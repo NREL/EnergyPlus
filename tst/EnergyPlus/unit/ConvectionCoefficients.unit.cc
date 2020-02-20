@@ -942,17 +942,12 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedAssistedWall)
 
     // DeltaT = 0 Error Path
     deltaTemp = 0.0;
-    height = 1.0;
-    surfTemp = 20.0;
-    zoneNum = 1;
     convCoeff = CalcBeausoleilMorrisonMixedAssistedWall(deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 
     // Height = 0 Error Path
     deltaTemp = 10.0;
     height = 0.0;
-    surfTemp = 20.0;
-    zoneNum = 1;
     convCoeff = CalcBeausoleilMorrisonMixedAssistedWall(deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 }
@@ -1004,17 +999,12 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedOpposingWall)
 
     // DeltaT = 0 Error Path
     deltaTemp = 0.0;
-    height = 1.0;
-    surfTemp = 20.0;
-    zoneNum = 1;
     convCoeff = CalcBeausoleilMorrisonMixedOpposingWall(deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 
     // Height = 0 Error Path
     deltaTemp = 10.0;
     height = 0.0;
-    surfTemp = 20.0;
-    zoneNum = 1;
     convCoeff = CalcBeausoleilMorrisonMixedOpposingWall(deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 }
@@ -1066,17 +1056,12 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableFloor)
 
     // DeltaT = 0 Error Path
     deltaTemp = 0.0;
-    height = 1.0;
-    surfTemp = 20.0;
-    zoneNum = 1;
     convCoeff = CalcBeausoleilMorrisonMixedStableFloor(deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 
     // Height = 0 Error Path
     deltaTemp = 10.0;
     height = 0.0;
-    surfTemp = 20.0;
-    zoneNum = 1;
     convCoeff = CalcBeausoleilMorrisonMixedStableFloor(deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 }
@@ -1128,17 +1113,12 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableFloor)
 
     // DeltaT = 0 Error Path
     deltaTemp = 0.0;
-    height = 1.0;
-    surfTemp = 20.0;
-    zoneNum = 1;
     convCoeff = CalcBeausoleilMorrisonMixedUnstableFloor(deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 
     // Height = 0 Error Path
     deltaTemp = 10.0;
     height = 0.0;
-    surfTemp = 20.0;
-    zoneNum = 1;
     convCoeff = CalcBeausoleilMorrisonMixedUnstableFloor(deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 }
@@ -1190,17 +1170,12 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedStableCeiling)
 
     // DeltaT = 0 Error Path
     deltaTemp = 0.0;
-    height = 1.0;
-    surfTemp = 20.0;
-    zoneNum = 1;
     convCoeff = CalcBeausoleilMorrisonMixedStableCeiling(deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 
     // Height = 0 Error Path
     deltaTemp = 10.0;
     height = 0.0;
-    surfTemp = 20.0;
-    zoneNum = 1;
     convCoeff = CalcBeausoleilMorrisonMixedStableCeiling(deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 }
@@ -1252,17 +1227,12 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableCeiling
 
     // DeltaT = 0 Error Path
     deltaTemp = 0.0;
-    height = 1.0;
-    surfTemp = 20.0;
-    zoneNum = 1;
     convCoeff = CalcBeausoleilMorrisonMixedUnstableCeiling(deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 
     // Height = 0 Error Path
     deltaTemp = 10.0;
     height = 0.0;
-    surfTemp = 20.0;
-    zoneNum = 1;
     convCoeff = CalcBeausoleilMorrisonMixedUnstableCeiling(deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
 }
