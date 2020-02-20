@@ -62,6 +62,9 @@
 #include <ObjexxFCL/string.functions.hh>
 #include <ObjexxFCL/time.hh>
 
+// Third-party Headers
+#include <fmt/format.h>
+
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
@@ -14119,36 +14122,27 @@ namespace OutputReportTabular {
 
                 columnHead(1) = "Value";
                 if (unitsStyle != unitsStyleInchPound) {
-                    rowHead(1) = "Outside Air (%)";
+                    rowHead(1) = "Outside Air Fraction [fraction]";
                     rowHead(2) = "Airflow per Floor Area [m3/s-m2]";
                     rowHead(3) = "Airflow per Total Capacity [m3/s-W]";
                     rowHead(4) = "Floor Area per Total Capacity [m2/W]";
                     rowHead(5) = "Total Capacity per Floor Area [W/m2]";
-                    //					rowHead( 6 ) = "Chiller Pump Power per Flow [W-s/m3]"; // facility only
-                    //					rowHead( 7 ) = "Condenser Pump Power per Flor [W-s/m3]"; // facility only
                     rowHead(6) = "Number of People";
                 } else {
-                    rowHead(1) = "Outside Air (%)";
+                    rowHead(1) = "Outside Air Fraction [fraction]";
                     rowHead(2) = "Airflow per Floor Area [ft3/min-ft2]";
                     rowHead(3) = "Airflow per Total Capacity [ft3-h/min-Btu]";
                     rowHead(4) = "Floor Area per Total Capacity [ft2-h/Btu]";
                     rowHead(5) = "Total Capacity per Floor Area [Btu/h-ft2]";
-                    //					rowHead( 6 ) = "Chiller Pump Power per Flow [W-min/gal]";
-                    //					rowHead( 7 ) = "Condenser Pump Power per Flow [W-min/gal]";
                     rowHead(6) = "Number of People";
                 }
 
-                tableBody(1, 1) = RealToStr(curCompLoad.outsideAirRatio, 4);   // outside Air
-                tableBody(1, 2) = RealToStr(curCompLoad.airflowPerFlrArea, 4); // airflow per floor area
-                tableBody(1, 3) = RealToStr(curCompLoad.airflowPerTotCap, 4);  // airflow per total capacity
-                tableBody(1, 4) = RealToStr(curCompLoad.areaPerTotCap, 4);     // area per total capacity
-                tableBody(1, 5) = RealToStr(curCompLoad.totCapPerArea, 4);     // total capacity per area
-                                                                               //				if ( kind == facilityOutput ) {
-                //					tableBody( 1, 6 ) = RealToStr( curCompLoad.chlPumpPerFlow, 4 );  // chiller pump power per
-                // flow 					tableBody( 1, 7 ) = RealToStr( curCompLoad.cndPumpPerFlow, 4 );  // condenser pump
-                // power per  flow
-                //				}
-                tableBody(1, 6) = RealToStr(curCompLoad.numPeople, 1); // number of people
+	            tableBody(1, 1) = fmt::format("{:.{}f}", curCompLoad.outsideAirRatio, 4);   // outside Air
+	            tableBody(1, 2) = fmt::format("{:0.3E}", curCompLoad.airflowPerFlrArea); // airflow per floor area
+	            tableBody(1, 3) = fmt::format("{:0.3E}", curCompLoad.airflowPerTotCap);  // airflow per total capacity
+	            tableBody(1, 4) = fmt::format("{:0.3E}", curCompLoad.areaPerTotCap);     // area per total capacity
+	            tableBody(1, 5) = fmt::format("{:0.3E}", curCompLoad.totCapPerArea);     // total capacity per area
+	            tableBody(1, 6) = fmt::format("{:.{}f}", curCompLoad.numPeople, 1); // number of people
 
                 WriteSubtitle(engineeringCheckName);
                 WriteTable(tableBody, rowHead, columnHead, columnWidth);

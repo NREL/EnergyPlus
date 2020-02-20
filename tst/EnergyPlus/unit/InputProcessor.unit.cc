@@ -3007,7 +3007,7 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_heating_fuel)
         "Coil:Heating:Fuel,",
         "  name number one, ! A1 , \field Name",
         "  schedule_name1, ! A2 , \field Availability Schedule Name",
-        "  Gas, ! A3 , \field Fuel Type",
+        "  NaturalGas, ! A3 , \field Fuel Type",
         "  0.45, ! N1 , \field Burner Efficiency",
         "  0.1, ! N2 , \field Nominal Capacity",
         "  this_is_an_air_inlet_name, ! A4 , \field Air Inlet Node Name",
@@ -3020,7 +3020,7 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_heating_fuel)
         "Coil:Heating:Fuel,",
         "  the second name, ! A1 , \field Name",
         "  schedule_name2, ! A2 , \field Availability Schedule Name",
-        "  Gas, ! A3 , \field Fuel Type",
+        "  NaturalGas, ! A3 , \field Fuel Type",
         "  0.55, ! N1 , \field Burner Efficiency",
         "  0.2, ! N2 , \field Nominal Capacity",
         "  this_is_an_air_inlet_name2, ! A4 , \field Air Inlet Node Name",
@@ -3058,7 +3058,7 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_heating_fuel)
     EXPECT_EQ(7, NumAlphas);
     EXPECT_TRUE(compare_containers(
         std::vector<std::string>(
-            {"NAME NUMBER ONE", "SCHEDULE_NAME1", "GAS", "THIS_IS_AN_AIR_INLET_NAME", "THIS_IS_OUTLET", "OTHER_NAME", "CURVE_BLAH_NAME"}),
+            {"NAME NUMBER ONE", "SCHEDULE_NAME1", "NATURALGAS", "THIS_IS_AN_AIR_INLET_NAME", "THIS_IS_OUTLET", "OTHER_NAME", "CURVE_BLAH_NAME"}),
         Alphas));
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, false, false, false}), lAlphaBlanks));
 
@@ -3085,7 +3085,7 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_heating_fuel)
     EXPECT_EQ(7, NumAlphas);
     EXPECT_TRUE(compare_containers(
         std::vector<std::string>(
-            {"THE SECOND NAME", "SCHEDULE_NAME2", "GAS", "THIS_IS_AN_AIR_INLET_NAME2", "THIS_IS_OUTLET2", "OTHER_NAME2", "CURVE_BLAH_NAME2"}),
+            {"THE SECOND NAME", "SCHEDULE_NAME2", "NATURALGAS", "THIS_IS_AN_AIR_INLET_NAME2", "THIS_IS_OUTLET2", "OTHER_NAME2", "CURVE_BLAH_NAME2"}),
         Alphas2));
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, false, false, false}), lAlphaBlanks2));
 

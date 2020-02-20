@@ -115,13 +115,17 @@ void OutputFiles::OutputFile::open()
 std::vector<std::string> OutputFiles::OutputFile::getLines()
 {
     if (os) {
+        // avoid saving and reloading the file by simply reading the current input stream
         os->flush();
         const auto last_pos = os->tellg();
         std::string line;
         std::vector<std::string> lines;
+        os->seekg(0);
+
         while (std::getline(*os, line)) {
             lines.push_back(line);
         }
+
         // after getline is done, we're at eof/fail bit
         os->clear();
         os->seekg(last_pos);

@@ -562,7 +562,15 @@ This numeric field will allow you to increase the number of figures in shadow ov
 
 \paragraph{Field: Polygon Clipping Algorithm}\label{field-polygon-clipping-algorithm}
 
-This is an advanced feature. Prior to V7, the internal polygon clipping method was a special case of the Weiler-Atherton method. Now, two options are available: \textbf{SutherlandHodgman} (default) and \textbf{ConvexWeilerAtherton}. Theoretically, Sutherland-Hodgman is a simpler algorithm but it works well in cases where receiving surfaces (of shadows) are non-convex. The Weiler-Atherton implementation is only accurate where both casting and receiving surfaces are convex. Warnings/severe errors are displayed when necessary. More details on polygon clipping are contained in the Engineering Reference.
+This is an advanced feature. Prior to V7, the internal polygon clipping method was a special case of the Weiler-Atherton method. Now, three options are available: 
+
+\begin{description}
+  \item[SutherlandHodgman] A simpler algorithm but it works well in cases where receiving surfaces (of shadows) are non-convex.
+  \item[ConvexWeilerAtherton] Only accurate where both casting and receiving surfaces are convex. Warnings/severe errors are displayed when necessary.
+  \item[SlaterBarskyandSutherlandHodgman] Slater-Barsky only applies to rectangular surfaces. Polygon clipping for rectangular surfaces will be calculated using the Slater-Barsky algorithm, while the rest adopts the default Sutherl-Hodgman algorithm. 
+\end{description}
+
+Default is SutherlandHodgman. More details on polygon clipping are contained in the Engineering Reference.
 
 \paragraph{Field: Sky Diffuse Modeling Algorithm}\label{field-sky-diffuse-modeling-algorithm}
 

@@ -1749,7 +1749,8 @@ namespace SimulationManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static constexpr auto EndOfDataFormat("End of Data"); // Signifies the end of the data block in the output file
+        static constexpr auto EndOfDataString("End of Data"); // Signifies the end of the data block in the output file
+        static ObjexxFCL::gio::Fmt EndOfDataFormat("(\"End of Data\")");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -1785,7 +1786,11 @@ namespace SimulationManager {
         ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumReportList=" << NumReportList;
         ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "InstMeterCacheSize=" << InstMeterCacheSize;
         if (SutherlandHodgman) {
-            ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "ClippingAlgorithm=SutherlandHodgman";
+            if (SlaterBarsky) {
+                ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "ClippingAlgorithm=SlaterBarskyandSutherlandHodgman";
+            } else {
+                ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "ClippingAlgorithm=SutherlandHodgman";
+            }
         } else {
             ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "ClippingAlgorithm=ConvexWeilerAtherton";
         }
@@ -1894,7 +1899,7 @@ namespace SimulationManager {
         }
 
         // Close the Initialization Output File
-        print(outputFiles.eio, "{}\n", EndOfDataFormat);
+        print(outputFiles.eio, "{}\n", EndOfDataString);
         outputFiles.eio.close();
 
         // Close the Meters Output File
