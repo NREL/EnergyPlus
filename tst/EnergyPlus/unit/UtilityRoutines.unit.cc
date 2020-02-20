@@ -146,12 +146,15 @@ TEST_F(EnergyPlusFixture, DisplayMessageTest)
     EXPECT_TRUE(has_cout_output(true));
 }
 
-TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog)
+TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog1)
 {
     DataStringGlobals::outputPerfLogFileName = "eplusout_perflog.csv";
 
     // start with no file 
     std::remove(DataStringGlobals::outputPerfLogFileName.c_str());
+
+    // make sure the static variables are cleared
+    UtilityRoutines::appendPerfLog("RESET", "RESET");
 
     // add headers and values
     UtilityRoutines::appendPerfLog("header1", "value1-1");
@@ -164,30 +167,53 @@ TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog)
     perfLogFile.open(DataStringGlobals::outputPerfLogFileName);
     perfLogStrSteam << perfLogFile.rdbuf();
     perfLogFile.close();
-    std::string perfLogContents1 = perfLogStrSteam.str();
+    std::string perfLogContents = perfLogStrSteam.str();
 
-    std::string expectedContents1 = "header1,header2,header3,\n"
+    std::string expectedContents = "header1,header2,header3,\n"
                                    "value1-1,value1-2,value1-3,\n";
 
-    EXPECT_EQ(perfLogContents1, expectedContents1);
+    EXPECT_EQ(perfLogContents, expectedContents);
 
+    // clean up the file
     std::remove(DataStringGlobals::outputPerfLogFileName.c_str());
 
+}
+
+TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog2)
+{
+    // make sure the static variables are cleared
+    UtilityRoutines::appendPerfLog("RESET", "RESET");
+
+    DataStringGlobals::outputPerfLogFileName = "eplusout_perflog.csv";
+
+    //create a file for the equivalent of the previous run
+    std::ofstream initPerfLogFile;
+    initPerfLogFile.open(DataStringGlobals::outputPerfLogFileName);
+    initPerfLogFile << "header1,header2,header3,\n";
+    initPerfLogFile << "value1-1,value1-2,value1-3,\n";
+    initPerfLogFile.close();
+
     // without deleting file add headers and values again
-    UtilityRoutines::appendPerfLog("header1", "value2-1");
-    UtilityRoutines::appendPerfLog("header2", "value2-2");
-    UtilityRoutines::appendPerfLog("header3", "value2-3", true);
+    UtilityRoutines::appendPerfLog("ignored1", "value2-1");
+    UtilityRoutines::appendPerfLog("ignored2", "value2-2");
+    UtilityRoutines::appendPerfLog("ignored3", "value2-3", true);
+
+    std::ifstream perfLogFile;
+    std::stringstream perfLogStrSteam;
 
     perfLogFile.open(DataStringGlobals::outputPerfLogFileName);
     perfLogStrSteam << perfLogFile.rdbuf();
     perfLogFile.close();
-    std::string perfLogContents2 = perfLogStrSteam.str();
+    std::string perfLogContents = perfLogStrSteam.str();
 
-    std::string expectedContents2 = "header1,header2,header3,\n"
+    std::string expectedContents = "header1,header2,header3,\n"
                        "value1-1,value1-2,value1-3,\n"
                        "value2-1,value2-2,value2-3,\n";
 
-    EXPECT_EQ(perfLogContents2, expectedContents2);
+    EXPECT_EQ(perfLogContents, expectedContents);
+
+    // clean up the file
+    std::remove(DataStringGlobals::outputPerfLogFileName.c_str());
 
 }
 

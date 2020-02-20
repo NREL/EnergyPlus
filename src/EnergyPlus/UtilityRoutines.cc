@@ -446,6 +446,13 @@ namespace UtilityRoutines {
         static std::string headerRow = "";
         static std::string valuesRow = "";
 
+        // the following was added for unit testing to clear the static strings
+        if (colHeader == "RESET" && colValue == "RESET") {
+            headerRow = "";
+            valuesRow = "";
+            return;
+        }
+
         //accumuate the row until ready to be written to the file.
         headerRow = headerRow + colHeader + ",";
         valuesRow = valuesRow + colValue + ",";
