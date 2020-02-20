@@ -686,12 +686,12 @@ if(LINK_WITH_PYTHON)
   # if we aren't, then the identified interpreter can be whatever bit it wants
   if(MSVC)
     execute_process(COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/cmake/PythonGetBitSize.py" OUTPUT_VARIABLE PYTHON_BIT_SIZE)
-    if(("${PYTHON_BIT_SIZE}" STREQUAL "64") AND NOT ("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "x64"))
-      message(SEND_ERROR "Found 64-bit Python but attempting to generate non-64-bit EnergyPlus; this is invalid")
-    endif()
-    if(("${PYTHON_BIT_SIZE}" STREQUAL "32") AND NOT ("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "Win32"))
-      message(SEND_ERROR "Found 32-bit Python but attempting to generate non-32-bit EnergyPlus; this is invalid")
-    endif()
+#    if(("${PYTHON_BIT_SIZE}" STREQUAL "64") AND NOT ("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "x64"))
+#      message(SEND_ERROR "Found 64-bit Python but attempting to generate non-64-bit EnergyPlus; this is invalid")
+#    endif()
+#    if(("${PYTHON_BIT_SIZE}" STREQUAL "32") AND NOT ("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "Win32"))
+#      message(SEND_ERROR "Found 32-bit Python but attempting to generate non-32-bit EnergyPlus; this is invalid")
+#    endif()
   endif()
 
   # now we need to get the Python libs and add the include path for further compiling
