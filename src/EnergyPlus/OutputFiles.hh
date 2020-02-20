@@ -62,6 +62,7 @@ public:
     {
     public:
         void close();
+        void del();
         bool good() const;
         void open_at_end();
         std::string fileName;
@@ -93,6 +94,10 @@ public:
     };
 
     OutputFile eio{"eplusout.eio"};
+    OutputFile zsz{""};
+    std::string outputZszCsvFileName{"epluszsz.csv"};
+    std::string outputZszTabFileName{"epluszsz.tab"};
+    std::string outputZszTxtFileName{"epluszsz.txt"};
     static OutputFiles makeOutputFiles();
     static OutputFiles &getSingleton();
 

@@ -222,7 +222,6 @@ namespace SizingManager {
 
         // FLOW:
 
-        OutputFileZoneSizing = 0;
         OutputFileSysSizing = 0;
         TimeStepInDay = 0;
         SysSizingRunDone = false;
@@ -286,37 +285,18 @@ namespace SizingManager {
             DoOutputReporting = false;
             ZoneSizingCalc = true;
             Available = true;
-            OutputFileZoneSizing = GetNewUnitNumber();
+
             if (SizingFileColSep == CharComma) {
-                {
-                    IOFlags flags;
-                    flags.ACTION("write");
-                    ObjexxFCL::gio::open(OutputFileZoneSizing, DataStringGlobals::outputZszCsvFileName, flags);
-                    write_stat = flags.ios();
-                }
-                if (write_stat != 0) {
-                    ShowFatalError(RoutineName + "Could not open file " + DataStringGlobals::outputZszCsvFileName + " for output (write).");
-                }
+                outputFiles.zsz.fileName = outputFiles.outputZszCsvFileName;
             } else if (SizingFileColSep == CharTab) {
-                {
-                    IOFlags flags;
-                    flags.ACTION("write");
-                    ObjexxFCL::gio::open(OutputFileZoneSizing, DataStringGlobals::outputZszTabFileName, flags);
-                    write_stat = flags.ios();
-                }
-                if (write_stat != 0) {
-                    ShowFatalError(RoutineName + "Could not open file " + DataStringGlobals::outputZszTabFileName + " for output (write).");
-                }
+                outputFiles.zsz.fileName = outputFiles.outputZszTabFileName;
             } else {
-                {
-                    IOFlags flags;
-                    flags.ACTION("write");
-                    ObjexxFCL::gio::open(OutputFileZoneSizing, DataStringGlobals::outputZszTxtFileName, flags);
-                    write_stat = flags.ios();
-                }
-                if (write_stat != 0) {
-                    ShowFatalError(RoutineName + "Could not open file " + DataStringGlobals::outputZszTxtFileName + " for output (write).");
-                }
+                outputFiles.zsz.fileName = outputFiles.outputZszTxtFileName;
+            }
+
+            outputFiles.zsz.open();
+            if (!outputFiles.zsz.good() != 0) {
+                ShowFatalError(RoutineName + "Could not open file " + outputFiles.zsz.fileName + " for output (write).");
             }
 
             ShowMessage("Beginning Zone Sizing Calculations");
@@ -395,7 +375,7 @@ namespace SizingManager {
                                     DisplayString("...for Sizing Period: #" + RoundSigDigits(NumSizingPeriodsPerformed) + ' ' + EnvironmentName);
                                 }
                             }
-                            UpdateZoneSizing(BeginDay);
+                            UpdateZoneSizing(outputFiles, BeginDay);
                             UpdateFacilitySizing(BeginDay);
                         }
 
@@ -465,7 +445,7 @@ namespace SizingManager {
                         } // ... End hour loop.
 
                         if (EndDayFlag) {
-                            UpdateZoneSizing(EndDay);
+                            UpdateZoneSizing(outputFiles, EndDay);
                             UpdateFacilitySizing(EndDay);
                         }
 
@@ -481,7 +461,7 @@ namespace SizingManager {
                 } // ... End environment loop
 
                 if (NumSizingPeriodsPerformed > 0) {
-                    UpdateZoneSizing(EndZoneSizingCalc);
+                    UpdateZoneSizing(outputFiles, EndZoneSizingCalc);
                     UpdateFacilitySizing(EndZoneSizingCalc);
                     ZoneSizingRunDone = true;
                 } else {

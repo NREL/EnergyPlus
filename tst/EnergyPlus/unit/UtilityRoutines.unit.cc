@@ -129,7 +129,6 @@ TEST_F(EnergyPlusFixture, DisplayMessageTest)
     DataGlobals::OutputFileStandard = FindUnitNumber(DataStringGlobals::outputEsoFileName);
     DataGlobals::OutputFileMeters = FindUnitNumber(DataStringGlobals::outputMtrFileName);
     DataGlobals::OutputFileBNDetails = FindUnitNumber(DataStringGlobals::outputBndFileName);
-    DataGlobals::OutputFileZoneSizing = FindUnitNumber(DataStringGlobals::outputZszCsvFileName);
     DataGlobals::OutputFileSysSizing = FindUnitNumber(DataStringGlobals::outputSszCsvFileName);
     DisplayString("Testing");
     EXPECT_TRUE(has_cout_output(true));

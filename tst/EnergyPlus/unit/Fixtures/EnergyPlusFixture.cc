@@ -293,8 +293,9 @@ void EnergyPlusFixture::TearDown()
         ObjexxFCL::gio::close(DataGlobals::OutputFileStandard, flags);
         ObjexxFCL::gio::close(DataGlobals::jsonOutputStreams.OutputFileJson, flags);
         ObjexxFCL::gio::close(DataGlobals::OutputStandardError, flags);
+        OutputFiles::getSingleton().eio.del();
         ObjexxFCL::gio::close(DataGlobals::OutputFileDebug, flags);
-        ObjexxFCL::gio::close(DataGlobals::OutputFileZoneSizing, flags);
+        OutputFiles::getSingleton().zsz.del();
         ObjexxFCL::gio::close(DataGlobals::OutputFileSysSizing, flags);
         ObjexxFCL::gio::close(DataGlobals::OutputFileMeters, flags);
         ObjexxFCL::gio::close(DataGlobals::OutputFileBNDetails, flags);

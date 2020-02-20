@@ -88,6 +88,14 @@ void OutputFiles::OutputFile::close()
     os.reset();
 }
 
+void OutputFiles::OutputFile::del()
+{
+    if (os) {
+        os.reset();
+        std::remove(fileName.c_str());
+    }
+}
+
 void OutputFiles::OutputFile::open_as_stringstream()
 {
     os = std::unique_ptr<std::iostream>(new std::stringstream());

@@ -539,7 +539,7 @@ namespace HVACManager {
                     UpdateTabularReports(OutputProcessor::TimeStepType::TimeStepSystem);
                 }
                 if (ZoneSizingCalc) {
-                    UpdateZoneSizing(DuringDay);
+                    UpdateZoneSizing(OutputFiles::getSingleton(), DuringDay);
                     UpdateFacilitySizing(DuringDay);
                 }
                 EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::checkConcurrentOperation();
