@@ -120,6 +120,7 @@ namespace DataSystemVariables {
     std::string const cIgnoreBeamRadiation("IgnoreBeamRadiation");
     std::string const cIgnoreDiffuseRadiation("IgnoreDiffuseRadiation");
     std::string const cSutherlandHodgman("SutherlandHodgman");
+    std::string const cSlaterBarsky("SlaterBarsky");
     std::string const cMinimalSurfaceVariables("CreateMinimalSurfaceVariables");
     std::string const cMinimalShadowing("MinimalShadowing");
     std::string const cNumActiveSims("cntActv");
@@ -152,6 +153,7 @@ namespace DataSystemVariables {
     bool DeveloperFlag(false);                    // TRUE if developer flag is turned on. (turns on more displays to console)
     bool TimingFlag(false);                       // TRUE if timing flag is turned on. (turns on more timing displays to console)
     bool SutherlandHodgman(true);                 // TRUE if SutherlandHodgman algorithm for polygon clipping is to be used.
+    bool SlaterBarsky(false);                  // TRUE if SlaterBarsky algorithm for polygon clipping is to be used for vertical polygons.
     bool DetailedSkyDiffuseAlgorithm(false);      // use detailed diffuse shading algorithm for sky (shading transmittance varies)
     bool DetailedSolarTimestepIntegration(false); // when true, use detailed timestep integration for all solar,shading, etc.
     bool TrackAirLoopEnvFlag(false);              // If TRUE generates a file with runtime statistics for each HVAC
@@ -377,6 +379,7 @@ namespace DataSystemVariables {
         DeveloperFlag = false;
         TimingFlag = false;
         SutherlandHodgman = true;
+        SlaterBarsky = false;
         DetailedSkyDiffuseAlgorithm = false;
         DetailedSolarTimestepIntegration = false;
         TrackAirLoopEnvFlag = false;
@@ -487,6 +490,9 @@ namespace DataSystemVariables {
 
         get_environment_variable(cSutherlandHodgman, cEnvValue);
         if (!cEnvValue.empty()) SutherlandHodgman = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cSlaterBarsky, cEnvValue);
+        if (!cEnvValue.empty()) SlaterBarsky = env_var_on(cEnvValue); // Yes or True
 
         get_environment_variable(cMinimalShadowing, cEnvValue);
         if (!cEnvValue.empty()) lMinimalShadowing = env_var_on(cEnvValue); // Yes or True

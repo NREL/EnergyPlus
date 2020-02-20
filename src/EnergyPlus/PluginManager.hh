@@ -154,6 +154,7 @@ namespace PluginManagement {
             Py_FinalizeEx();
 #endif
         }
+        static int numActiveCallbacks();
         static void addToPythonPath(const std::string& path, bool userDefinedPath);
         static std::string sanitizedPath(std::string path); // intentionally not a const& string
         void setupOutputVariables();

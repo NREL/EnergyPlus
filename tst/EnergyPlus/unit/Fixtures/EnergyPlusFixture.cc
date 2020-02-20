@@ -53,7 +53,6 @@
 
 // EnergyPlus Headers
 #include "EnergyPlusFixture.hh"
-
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/FluidProperties.hh>
@@ -65,7 +64,6 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/SimulationManager.hh>
-#include <EnergyPlus/UnitarySystem.hh>
 #include <nlohmann/json.hpp>
 #include <EnergyPlus/StateManagement.hh>
 #include <algorithm>
@@ -87,7 +85,7 @@ void EnergyPlusFixture::SetUp()
     show_message();
 
     OutputFiles::getSingleton().eio.open_as_stringstream();
-    
+
     this->eso_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
     this->mtr_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
     this->err_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
