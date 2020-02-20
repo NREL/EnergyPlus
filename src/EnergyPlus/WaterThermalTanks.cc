@@ -6874,7 +6874,7 @@ namespace WaterThermalTanks {
 
         Qfuel = Efuel / SecInTimeStep;
 
-        this->Mode = Mode_loc; // Operating mode for carry-over to next DataGlobals::TimeStep
+        this->Mode = Mode_loc;               // Operating mode for carry-over to next DataGlobals::TimeStep
         this->TankTemp = TankTemp_loc;       // Final tank temperature for carry-over to next DataGlobals::TimeStep
         this->TankTempAvg = TankTempAvg_loc; // Average tank temperature over the DataGlobals::TimeStep for reporting
 
@@ -7711,7 +7711,7 @@ namespace WaterThermalTanks {
                 } else {
                     if (this->SourceOutletStratNode > 0) {
                         return this->SourceEffectiveness * this->SourceMassFlowRate * Cp *
-                        (this->SourceInletTemp - Tavg[this->SourceOutletStratNode - 1]);
+                               (this->SourceInletTemp - Tavg[this->SourceOutletStratNode - 1]);
                     } else {
                         return 0.0;
                     }
@@ -8182,8 +8182,10 @@ namespace WaterThermalTanks {
             if (TankType == DataPlant::TypeOf_WtrHeaterMixed || TankType == DataPlant::TypeOf_WtrHeaterStratified) {
 
                 DesupHtr.SaveWHMode = this->Mode;
-                Real64 PreTankTemp = this->TankTemp;
-                Real64 NewTankTemp = 0.0; // Initialization
+                Real64 PreTankAvgTemp = this->TankTempAvg;
+                Real64 NewTankAvgTemp = 0.0; // Initialization
+                int max_count = 200;
+                int count = 0;
                 bool firstThrough = true;
                 auto boundPLRFunc = std::bind(
                     &WaterThermalTanks::WaterThermalTankData::PLRResidualWaterThermalTank, this, std::placeholders::_1, std::placeholders::_2);
@@ -8191,17 +8193,16 @@ namespace WaterThermalTanks {
                 {
                     auto const SELECT_CASE_var1(DesupHtr.Mode);
                     if (SELECT_CASE_var1 == heatMode) {
-
                         // Calculate until consistency of desuperheater and tank source side energy transfer achieved
-                        while (std::abs(PreTankTemp - NewTankTemp) > DataHVACGlobals::SmallTempDiff || firstThrough) {
+                        while ((std::abs(PreTankAvgTemp - NewTankAvgTemp) > DataHVACGlobals::SmallTempDiff || firstThrough) && count < max_count) {
+                            count++;
                             firstThrough = false;
-                            PreTankTemp = this->TankTemp;
+                            PreTankAvgTemp = this->TankTempAvg;
                             partLoadRatio = DesupHtr.DXSysPLR;
                             if (MdotWater > 0.0) {
-                                DataLoopNode::Node(WaterOutletNode).Temp =
-                                    DataLoopNode::Node(WaterInletNode).Temp + QHeatRate / (MdotWater * CpWater);
+                                DataLoopNode::Node(WaterOutletNode).Temp = this->SourceOutletTemp + QHeatRate / (MdotWater * CpWater);
                             } else {
-                                DataLoopNode::Node(WaterOutletNode).Temp = DataLoopNode::Node(WaterInletNode).Temp;
+                                DataLoopNode::Node(WaterOutletNode).Temp = this->SourceOutletTemp;
                             }
 
                             //         set the full load outlet temperature on the water heater source inlet node (init has already been called)
@@ -8215,71 +8216,74 @@ namespace WaterThermalTanks {
                             DesupHtr.DesuperheaterPLR = partLoadRatio;
                             DesupHtr.HeaterRate = QHeatRate * partLoadRatio;
                             this->CalcWaterThermalTank();
-                            NewTankTemp = this->TankTemp;
-                        }
+                            Real64 NewTankTemp = this->TankTemp;
 
-                        if (NewTankTemp > desupHtrSetPointTemp) {
-                            //           Only revert to floating mode if the tank temperature is higher than the cut out temperature
-                            if (NewTankTemp > DesupHtr.SetPointTemp) {
-                                DesupHtr.Mode = floatMode;
-                            }
-                            Par(1) = desupHtrSetPointTemp;
-                            Par(2) = DesupHtr.SaveWHMode;
-                            if (FirstHVACIteration) {
-                                Par(4) = 1.0;
+                            if (NewTankTemp > desupHtrSetPointTemp) {
+                                //           Only revert to floating mode if the tank temperature is higher than the cut out temperature
+                                if (NewTankTemp > DesupHtr.SetPointTemp) {
+                                    DesupHtr.Mode = floatMode;
+                                }
+                                Par(1) = desupHtrSetPointTemp;
+                                Par(2) = DesupHtr.SaveWHMode;
+                                if (FirstHVACIteration) {
+                                    Par(4) = 1.0;
+                                } else {
+                                    Par(4) = 0.0;
+                                }
+                                Par(5) = MdotWater;
+                                int SolFla;
+                                std::string IterNum;
+                                General::SolveRoot(Acc, MaxIte, SolFla, partLoadRatio, boundPLRFunc, 0.0, DesupHtr.DXSysPLR, Par);
+                                if (SolFla == -1) {
+                                    ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
+                                    strip(IterNum);
+                                    if (!DataGlobals::WarmupFlag) {
+                                        ++DesupHtr.IterLimitExceededNum1;
+                                        if (DesupHtr.IterLimitExceededNum1 == 1) {
+                                            ShowWarningError(DesupHtr.Type + " \"" + DesupHtr.Name + "\"");
+                                            ShowContinueError(
+                                                "Iteration limit exceeded calculating desuperheater unit part-load ratio, maximum iterations = " +
+                                                IterNum + ". Part-load ratio returned = " + General::RoundSigDigits(partLoadRatio, 3));
+                                            ShowContinueErrorTimeStamp("This error occurred in heating mode.");
+                                        } else {
+                                            ShowRecurringWarningErrorAtEnd(DesupHtr.Type + " \"" + DesupHtr.Name +
+                                                                               "\":  Iteration limit exceeded in heating mode warning continues. "
+                                                                               "Part-load ratio statistics follow.",
+                                                                           DesupHtr.IterLimitErrIndex1,
+                                                                           partLoadRatio,
+                                                                           partLoadRatio);
+                                        }
+                                    }
+                                } else if (SolFla == -2) {
+                                    partLoadRatio = max(
+                                        0.0,
+                                        min(DesupHtr.DXSysPLR, (desupHtrSetPointTemp - this->SavedTankTemp) / (NewTankTemp - this->SavedTankTemp)));
+                                    this->SourceMassFlowRate = MdotWater * partLoadRatio;
+                                    this->CalcWaterThermalTank();
+                                    if (!DataGlobals::WarmupFlag) {
+                                        ++DesupHtr.RegulaFalsiFailedNum1;
+                                        if (DesupHtr.RegulaFalsiFailedNum1 == 1) {
+                                            ShowWarningError(DesupHtr.Type + " \"" + DesupHtr.Name + "\"");
+                                            ShowContinueError("Desuperheater unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded. "
+                                                              "Part-load ratio used = " +
+                                                              General::RoundSigDigits(partLoadRatio, 3));
+                                            ShowContinueError("Please send this information to the EnergyPlus support group.");
+                                            ShowContinueErrorTimeStamp("This error occurred in heating mode.");
+                                        } else {
+                                            ShowRecurringWarningErrorAtEnd(DesupHtr.Type + " \"" + DesupHtr.Name +
+                                                                               "\":  Part-load ratio calculation failed in heating mode warning "
+                                                                               "continues. Part-load ratio statistics follow.",
+                                                                           DesupHtr.RegulaFalsiFailedIndex1,
+                                                                           partLoadRatio,
+                                                                           partLoadRatio);
+                                        }
+                                    }
+                                }
                             } else {
-                                Par(4) = 0.0;
+                                partLoadRatio = DesupHtr.DXSysPLR;
                             }
-                            Par(5) = MdotWater;
-                            int SolFla;
-                            std::string IterNum;
-                            General::SolveRoot(Acc, MaxIte, SolFla, partLoadRatio, boundPLRFunc, 0.0, DesupHtr.DXSysPLR, Par);
-                            if (SolFla == -1) {
-                                ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
-                                strip(IterNum);
-                                if (!DataGlobals::WarmupFlag) {
-                                    ++DesupHtr.IterLimitExceededNum1;
-                                    if (DesupHtr.IterLimitExceededNum1 == 1) {
-                                        ShowWarningError(DesupHtr.Type + " \"" + DesupHtr.Name + "\"");
-                                        ShowContinueError(
-                                            "Iteration limit exceeded calculating desuperheater unit part-load ratio, maximum iterations = " +
-                                            IterNum + ". Part-load ratio returned = " + General::RoundSigDigits(partLoadRatio, 3));
-                                        ShowContinueErrorTimeStamp("This error occurred in heating mode.");
-                                    } else {
-                                        ShowRecurringWarningErrorAtEnd(
-                                            DesupHtr.Type + " \"" + DesupHtr.Name +
-                                                "\":  Iteration limit exceeded in heating mode warning continues. Part-load ratio statistics follow.",
-                                            DesupHtr.IterLimitErrIndex1,
-                                            partLoadRatio,
-                                            partLoadRatio);
-                                    }
-                                }
-                            } else if (SolFla == -2) {
-                                partLoadRatio = max(
-                                    0.0, min(DesupHtr.DXSysPLR, (desupHtrSetPointTemp - this->SavedTankTemp) / (NewTankTemp - this->SavedTankTemp)));
-                                if (!DataGlobals::WarmupFlag) {
-                                    ++DesupHtr.RegulaFalsiFailedNum1;
-                                    if (DesupHtr.RegulaFalsiFailedNum1 == 1) {
-                                        ShowWarningError(DesupHtr.Type + " \"" + DesupHtr.Name + "\"");
-                                        ShowContinueError("Desuperheater unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded. "
-                                                          "Part-load ratio used = " +
-                                                          General::RoundSigDigits(partLoadRatio, 3));
-                                        ShowContinueError("Please send this information to the EnergyPlus support group.");
-                                        ShowContinueErrorTimeStamp("This error occurred in heating mode.");
-                                    } else {
-                                        ShowRecurringWarningErrorAtEnd(DesupHtr.Type + " \"" + DesupHtr.Name +
-                                                                           "\":  Part-load ratio calculation failed in heating mode warning "
-                                                                           "continues. Part-load ratio statistics follow.",
-                                                                       DesupHtr.RegulaFalsiFailedIndex1,
-                                                                       partLoadRatio,
-                                                                       partLoadRatio);
-                                    }
-                                }
-                            }
-                        } else {
-                            partLoadRatio = DesupHtr.DXSysPLR;
+                            NewTankAvgTemp = this->TankTempAvg;
                         }
-
                     } else if (SELECT_CASE_var1 == floatMode) {
                         if (MdotWater > 0.0) {
                             DataLoopNode::Node(WaterOutletNode).Temp = DataLoopNode::Node(WaterInletNode).Temp + QHeatRate / (MdotWater * CpWater);
@@ -8304,23 +8308,24 @@ namespace WaterThermalTanks {
                         Real64 NewTankTemp = this->TankTemp;
 
                         if (NewTankTemp <= (desupHtrSetPointTemp - DeadBandTempDiff)) {
-                            while (std::abs(PreTankTemp - NewTankTemp) > DataHVACGlobals::SmallTempDiff || firstThrough) {
-                                firstThrough = false;
-                                PreTankTemp = this->TankTemp;
-                                DesupHtr.Mode = heatMode;
-                                this->Mode = DesupHtr.SaveWHMode;
-                                if ((this->SavedTankTemp - NewTankTemp) != 0.0) {
-                                    partLoadRatio = min(
-                                        DesupHtr.DXSysPLR,
+                            this->Mode = DesupHtr.SaveWHMode;
+                            if ((this->SavedTankTemp - NewTankTemp) != 0.0) {
+                                partLoadRatio =
+                                    min(DesupHtr.DXSysPLR,
                                         max(0.0, ((desupHtrSetPointTemp - DeadBandTempDiff) - NewTankTemp) / (this->SavedTankTemp - NewTankTemp)));
-                                } else {
-                                    partLoadRatio = DesupHtr.DXSysPLR;
-                                }
+                            } else {
+                                partLoadRatio = DesupHtr.DXSysPLR;
+                            }
+                            while ((std::abs(PreTankAvgTemp - NewTankAvgTemp) > DataHVACGlobals::SmallTempDiff || firstThrough) &&
+                                   count < max_count) {
+                                count++;
+                                firstThrough = false;
+                                PreTankAvgTemp = this->TankTempAvg;
+                                DesupHtr.Mode = heatMode;
                                 if (MdotWater > 0.0) {
-                                    DataLoopNode::Node(WaterOutletNode).Temp =
-                                        DataLoopNode::Node(WaterInletNode).Temp + QHeatRate / (MdotWater * CpWater);
+                                    DataLoopNode::Node(WaterOutletNode).Temp = this->SourceOutletTemp + QHeatRate / (MdotWater * CpWater);
                                 } else {
-                                    DataLoopNode::Node(WaterOutletNode).Temp = DataLoopNode::Node(WaterInletNode).Temp;
+                                    DataLoopNode::Node(WaterOutletNode).Temp = this->SourceOutletTemp;
                                 }
 
                                 //           set the full load outlet temperature on the water heater source inlet node
@@ -8334,62 +8339,65 @@ namespace WaterThermalTanks {
                                 DesupHtr.HeaterRate = QHeatRate * partLoadRatio;
                                 this->CalcWaterThermalTank();
                                 NewTankTemp = this->TankTemp;
-                            }
-                            if (NewTankTemp > desupHtrSetPointTemp) {
-                                Par(1) = desupHtrSetPointTemp;
-                                Par(2) = DesupHtr.SaveWHMode;
-                                if (FirstHVACIteration) {
-                                    Par(4) = 1.0;
-                                } else {
-                                    Par(4) = 0.0;
-                                }
-                                Par(5) = MdotWater;
-                                int SolFla;
-                                std::string IterNum;
-                                General::SolveRoot(Acc, MaxIte, SolFla, partLoadRatio, boundPLRFunc, 0.0, DesupHtr.DXSysPLR, Par);
-                                if (SolFla == -1) {
-                                    ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
-                                    strip(IterNum);
-                                    if (!DataGlobals::WarmupFlag) {
-                                        ++DesupHtr.IterLimitExceededNum2;
-                                        if (DesupHtr.IterLimitExceededNum2 == 1) {
-                                            ShowWarningError(DesupHtr.Type + " \"" + DesupHtr.Name + "\"");
-                                            ShowContinueError(
-                                                "Iteration limit exceeded calculating desuperheater unit part-load ratio, maximum iterations = " +
-                                                IterNum + ". Part-load ratio returned = " + General::RoundSigDigits(partLoadRatio, 3));
-                                            ShowContinueErrorTimeStamp("This error occurred in float mode.");
-                                        } else {
-                                            ShowRecurringWarningErrorAtEnd(DesupHtr.Type + " \"" + DesupHtr.Name +
-                                                                               "\":  Iteration limit exceeded in float mode warning continues. "
-                                                                               "Part-load ratio statistics follow.",
-                                                                           DesupHtr.IterLimitErrIndex2,
-                                                                           partLoadRatio,
-                                                                           partLoadRatio);
+
+                                if (NewTankTemp > desupHtrSetPointTemp) {
+                                    Par(1) = desupHtrSetPointTemp;
+                                    Par(2) = DesupHtr.SaveWHMode;
+                                    if (FirstHVACIteration) {
+                                        Par(4) = 1.0;
+                                    } else {
+                                        Par(4) = 0.0;
+                                    }
+                                    Par(5) = MdotWater;
+                                    int SolFla;
+                                    std::string IterNum;
+                                    General::SolveRoot(Acc, MaxIte, SolFla, partLoadRatio, boundPLRFunc, 0.0, DesupHtr.DXSysPLR, Par);
+                                    if (SolFla == -1) {
+                                        ObjexxFCL::gio::write(IterNum, fmtLD) << MaxIte;
+                                        strip(IterNum);
+                                        if (!DataGlobals::WarmupFlag) {
+                                            ++DesupHtr.IterLimitExceededNum2;
+                                            if (DesupHtr.IterLimitExceededNum2 == 1) {
+                                                ShowWarningError(DesupHtr.Type + " \"" + DesupHtr.Name + "\"");
+                                                ShowContinueError(
+                                                    "Iteration limit exceeded calculating desuperheater unit part-load ratio, maximum iterations = " +
+                                                    IterNum + ". Part-load ratio returned = " + General::RoundSigDigits(partLoadRatio, 3));
+                                                ShowContinueErrorTimeStamp("This error occurred in float mode.");
+                                            } else {
+                                                ShowRecurringWarningErrorAtEnd(DesupHtr.Type + " \"" + DesupHtr.Name +
+                                                                                   "\":  Iteration limit exceeded in float mode warning continues. "
+                                                                                   "Part-load ratio statistics follow.",
+                                                                               DesupHtr.IterLimitErrIndex2,
+                                                                               partLoadRatio,
+                                                                               partLoadRatio);
+                                            }
+                                        }
+                                    } else if (SolFla == -2) {
+                                        partLoadRatio = max(0.0,
+                                                            min(DesupHtr.DXSysPLR,
+                                                                (desupHtrSetPointTemp - this->SavedTankTemp) / (NewTankTemp - this->SavedTankTemp)));
+                                        if (!DataGlobals::WarmupFlag) {
+                                            ++DesupHtr.RegulaFalsiFailedNum2;
+                                            if (DesupHtr.RegulaFalsiFailedNum2 == 1) {
+                                                ShowWarningError(DesupHtr.Type + " \"" + DesupHtr.Name + "\"");
+                                                ShowContinueError(
+                                                    "Desuperheater unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded. "
+                                                    "Part-load ratio used = " +
+                                                    General::RoundSigDigits(partLoadRatio, 3));
+                                                ShowContinueError("Please send this information to the EnergyPlus support group.");
+                                                ShowContinueErrorTimeStamp("This error occurred in float mode.");
+                                            } else {
+                                                ShowRecurringWarningErrorAtEnd(DesupHtr.Type + " \"" + DesupHtr.Name +
+                                                                                   "\": Part-load ratio calculation failed in float mode warning "
+                                                                                   "continues. Part-load ratio statistics follow.",
+                                                                               WaterHeaterDesuperheater(DesuperheaterNum).RegulaFalsiFailedIndex2,
+                                                                               partLoadRatio,
+                                                                               partLoadRatio);
+                                            }
                                         }
                                     }
-                                } else if (SolFla == -2) {
-                                    partLoadRatio = max(
-                                        0.0,
-                                        min(DesupHtr.DXSysPLR, (desupHtrSetPointTemp - this->SavedTankTemp) / (NewTankTemp - this->SavedTankTemp)));
-                                    if (!DataGlobals::WarmupFlag) {
-                                        ++DesupHtr.RegulaFalsiFailedNum2;
-                                        if (DesupHtr.RegulaFalsiFailedNum2 == 1) {
-                                            ShowWarningError(DesupHtr.Type + " \"" + DesupHtr.Name + "\"");
-                                            ShowContinueError("Desuperheater unit part-load ratio calculation failed: PLR limits of 0 to 1 exceeded. "
-                                                              "Part-load ratio used = " +
-                                                              General::RoundSigDigits(partLoadRatio, 3));
-                                            ShowContinueError("Please send this information to the EnergyPlus support group.");
-                                            ShowContinueErrorTimeStamp("This error occurred in float mode.");
-                                        } else {
-                                            ShowRecurringWarningErrorAtEnd(DesupHtr.Type + " \"" + DesupHtr.Name +
-                                                                               "\": Part-load ratio calculation failed in float mode warning "
-                                                                               "continues. Part-load ratio statistics follow.",
-                                                                           WaterHeaterDesuperheater(DesuperheaterNum).RegulaFalsiFailedIndex2,
-                                                                           partLoadRatio,
-                                                                           partLoadRatio);
-                                        }
-                                    }
                                 }
+                                NewTankAvgTemp = this->TankTempAvg;
                             }
                         } else {
                             this->MaxCapacity = DesupHtr.BackupElementCapacity;
