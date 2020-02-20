@@ -3688,7 +3688,7 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
 
     DataGlobals::NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput();
+    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleManager::ScheduleInputProcessed = true;
 
     DataGlobals::TimeStep = 1;
