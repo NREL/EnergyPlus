@@ -589,8 +589,6 @@ namespace SolarShading {
         using DataSystemVariables::ShadingMethod;
         using DataSystemVariables::shadingMethod;
         using DataSystemVariables::SlaterBarsky;
-        using DataSystemVariables::UseImportedSunlitFrac;
-        using DataSystemVariables::UseScheduledSunlitFrac;
         using ScheduleManager::ScheduleFileShadingProcessed;
 
 
