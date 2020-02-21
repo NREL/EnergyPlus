@@ -3511,8 +3511,6 @@ namespace WeatherManager {
                         if (!Environment(Envrn).UseWeatherFileHorizontalIR || IRHoriz >= 9999.0) {
                             // Missing or user defined to not use IRHoriz from weather, using sky cover and clear sky emissivity
                             SkyTemp = (DryBulb + TKelvin) * root_4(ESky) - TKelvin;
-                            // Backwards calculate IRHoriz for output reporting purposes. Not used for calculations.
-                            IRHoriz = pow((DryBulb + TKelvin), 4.0) * ESky * Sigma;
                         } else {
                             // Valid IR from Sky
                             SkyTemp = root_4(IRHoriz / Sigma) - TKelvin;
@@ -3521,7 +3519,6 @@ namespace WeatherManager {
                         SkyTemp = 0.0; // dealt with later
                     }
 
-                    TomorrowHorizIRSky(CurTimeStep, Hour) = IRHoriz;
                     TomorrowSkyTemp(CurTimeStep, Hour) = SkyTemp;
 
                     if (ETHoriz >= 9999.0) ETHoriz = 0.0;

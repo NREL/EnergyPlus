@@ -845,7 +845,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
 
 }
 
-TEST_F(EnergyPlusFixture, tonytest) {
+TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherZeroIRHoriz) {
 
     std::vector<std::string> Lines{
             "1980,1,1,1,0,?9?9?9?9E0?9?9?9?9?9?9?9?9?9?9?9?9?9?9*_*9*9*9*9*9,-0.6,-8.7,50,100000,0,0,0,0,0,0,0,0,0,0,0,2,0,0,10,77777,9,999999999,0,0.04,0,99,0,0,0",
@@ -876,8 +876,6 @@ TEST_F(EnergyPlusFixture, tonytest) {
 
     // DERIVED TYPE DEFINITIONS:
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    int Hour;
-    int TS;
     int WYear;
     int WMonth;
     int WDay;
@@ -912,53 +910,9 @@ TEST_F(EnergyPlusFixture, tonytest) {
     int PresWeathObs;
     Array1D_int PresWeathConds(9);
     std::string WeatherDataLine;
-    bool Ready;
-    int CurTimeStep;
-    int Item;
-
-    Real64 A;
-    Real64 B;
-    Real64 C;
-    Real64 AVSC;
-    Real64 SkyTemp;
-    static int CurDayOfWeek;
-    static bool UseDayOfWeek;
-    bool SkipThisDay; // Used when LeapYear is/is not in effect
-    bool TryAgain;
-    int ReadStatus;
-    int NumRewinds;
-    std::string BadRecord;
-    bool ErrorsFound;
-    static Real64 CurTime;
-    Real64 HourRep;
-    int OSky;
-    Real64 TDewK;
-    Real64 ESky;
     bool ErrorFound;
     std::string ErrOut;
-    static bool LastHourSet; // for Interpolation
-    int NxtHour;
-    Real64 WtNow;
-    Real64 WtPrevHour;
-    Real64 WgtHourNow;
-    Real64 WgtPrevHour;
-    Real64 WgtNextHour;
-    static Real64 LastHrOutDryBulbTemp;
-    static Real64 LastHrOutDewPointTemp;
-    static Real64 LastHrOutBaroPress;
-    static Real64 LastHrOutRelHum;
-    static Real64 LastHrWindSpeed;
-    static Real64 LastHrWindDir;
-    static Real64 LastHrSkyTemp;
-    static Real64 LastHrHorizIRSky;
-    static Real64 LastHrBeamSolarRad;
-    static Real64 LastHrDifSolarRad;
-    static Real64 LastHrAlbedo;
-    static Real64 LastHrLiquidPrecip;
-    static Real64 NextHrBeamSolarRad;
-    static Real64 NextHrDifSolarRad;
-    static Real64 NextHrLiquidPrecip;
-    bool RecordDateMatch;
+
 
     for (auto WeatherDataLine : Lines){
         WeatherManager::InterpretWeatherDataLine(WeatherDataLine,
@@ -999,14 +953,95 @@ TEST_F(EnergyPlusFixture, tonytest) {
 
         EXPECT_EQ(IRHoriz, 0.0);
     }
-
-    TomorrowHorizIRSky(CurTimeStep, Hour) = IRHoriz;
-    TomorrowSkyTemp(CurTimeStep, Hour) = SkyTemp;
+}
 
 
+TEST_F(EnergyPlusFixture, IRHoriz_InterpretWeatherCalculateMissingIRHoriz) {
 
-//    void ReadEPlusWeatherForDay(int const DayToRead,          // =1 when starting out, otherwise signifies next day
-//                                int const Environ,            // Environment being simulated
-//                                bool const BackSpaceAfterRead // True if weather file is to be backspaced after read
+
+    DataStringGlobals::inputWeatherFileName = "/Users/tony-scimone/Projects/EnergyPlus/tst/EnergyPlus/unit/WeatherManagerIROutputTest.epw";
+
+    std::string const idf_objects = delimited_string({
+                                                         "  Version,9.3;",
+
+                                                         "  SizingPeriod:DesignDay,",
+                                                         "    Atlanta Jan 21 cooling,  !- Name",
+                                                         "    1,                       !- Month",
+                                                         "    21,                      !- Day of Month",
+                                                         "    SummerDesignDay,         !- Day Type",
+                                                         "    16.9,                    !- Maximum Dry-Bulb Temperature {C}",
+                                                         "    11.6,                    !- Daily Dry-Bulb Temperature Range {deltaC}",
+                                                         "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
+                                                         "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+                                                         "    WetBulbProfileDefaultMultipliers,  !- Humidity Condition Type",
+                                                         "    13.2,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+                                                         "    ,                        !- Humidity Condition Day Schedule Name",
+                                                         "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+                                                         "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+                                                         "    8,                       !- Daily Wet-Bulb Temperature Range {deltaC}",
+                                                         "    97620,                   !- Barometric Pressure {Pa}",
+                                                         "    0.0,                     !- Wind Speed {m/s}",
+                                                         "    0.0,                     !- Wind Direction {deg}",
+                                                         "    No,                      !- Rain Indicator",
+                                                         "    No,                      !- Snow Indicator",
+                                                         "    No,                      !- Daylight Saving Time Indicator",
+                                                         "    ASHRAETau2017,           !- Solar Model Indicator",
+                                                         "    ,                        !- Beam Solar Day Schedule Name",
+                                                         "    ,                        !- Diffuse Solar Day Schedule Name",
+                                                         "    0.325,                   !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+                                                         "    2.461;                   !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+
+                                                         "  SizingPeriod:DesignDay,",
+                                                         "    Atlanta Jul 21 cooling,  !- Name",
+                                                         "    7,                       !- Month",
+                                                         "    21,                      !- Day of Month",
+                                                         "    SummerDesignDay,         !- Day Type",
+                                                         "    33.3,                    !- Maximum Dry-Bulb Temperature {C}",
+                                                         "    11.5,                    !- Daily Dry-Bulb Temperature Range {deltaC}",
+                                                         "    ,                        !- Dry-Bulb Temperature Range Modifier Type",
+                                                         "    ,                        !- Dry-Bulb Temperature Range Modifier Day Schedule Name",
+                                                         "    WetBulbProfileDefaultMultipliers,  !- Humidity Condition Type",
+                                                         "    23.5,                    !- Wetbulb or DewPoint at Maximum Dry-Bulb {C}",
+                                                         "    ,                        !- Humidity Condition Day Schedule Name",
+                                                         "    ,                        !- Humidity Ratio at Maximum Dry-Bulb {kgWater/kgDryAir}",
+                                                         "    ,                        !- Enthalpy at Maximum Dry-Bulb {J/kg}",
+                                                         "    3.5,                     !- Daily Wet-Bulb Temperature Range {deltaC}",
+                                                         "    97620,                   !- Barometric Pressure {Pa}",
+                                                         "    0.0,                     !- Wind Speed {m/s}",
+                                                         "    0.0,                     !- Wind Direction {deg}",
+                                                         "    No,                      !- Rain Indicator",
+                                                         "    No,                      !- Snow Indicator",
+                                                         "    No,                      !- Daylight Saving Time Indicator",
+                                                         "    ASHRAETau2017,           !- Solar Model Indicator",
+                                                         "    ,                        !- Beam Solar Day Schedule Name",
+                                                         "    ,                        !- Diffuse Solar Day Schedule Name",
+                                                         "    .556,                    !- ASHRAE Clear Sky Optical Depth for Beam Irradiance (taub) {dimensionless}",
+                                                         "    1.779;                   !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}",
+                                                     });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    bool ErrorsFound(false);
+    DataEnvironment::TotDesDays = 2;
+    // setup environment state
+    Environment.allocate(DataEnvironment::TotDesDays);
+    DesignDay.allocate(DataEnvironment::TotDesDays);
+    Environment(1).DesignDayNum = 1;
+    Environment(2).DesignDayNum = 2;
+    GetDesignDayData(DataEnvironment::TotDesDays, ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+
+    WeatherManager::Envrn =1;
+
+    DataGlobals::NumOfTimeStepInHour = 1;
+    Environment.allocate(1);
+    Environment(1).SkyTempModel = WP_ClarkAllenModel;
+
+    AllocateWeatherData();
+    OpenEPlusWeatherFile(ErrorsFound, true);
+
+    ReadEPlusWeatherForDay(0, 1, false);
+
+    EXPECT_EQ(TomorrowHorizIRSky(1, 1), 345.73838855245953);
 
 }
