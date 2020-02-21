@@ -126,6 +126,7 @@ namespace DataStringGlobals {
     extern std::string outputEddFileName;
     extern std::string outputIperrFileName;
     extern std::string outputDbgFileName;
+    extern std::string outputPerfLogFileName;
     extern std::string outputSlnFileName;
     extern std::string outputSciFileName;
     extern std::string outputWrlFileName;

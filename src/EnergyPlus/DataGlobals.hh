@@ -242,6 +242,7 @@ namespace DataGlobals {
     extern int StdOutputRecordCount;                 // Count of Standard output records
     extern std::ostream *eio_stream;                 // Internal stream used for eio output (used for unit tests)
     extern int OutputFileDebug;                      // Unit number for debug outputs
+    extern int OutputFilePerfLog;                    // Unit number for performance log outputs
     extern int OutputFileZoneSizing;                 // Unit number of zone sizing calc output file
     extern int OutputFileSysSizing;                  // Unit number of system sizing calc output file
     extern int OutputFileMeters;                     // Unit number for meters output
@@ -298,6 +299,7 @@ namespace DataGlobals {
     extern bool AnySlabsInModel;         // true if there are any zone-coupled ground domains in the input file
     extern bool AnyBasementsInModel;     // true if there are any basements in the input file
     extern bool DoCoilDirectSolutions;        //true if use coil direction solutions
+    extern bool createProfLog; //true if the _proflog.csv file should be created and a PerformancePrecisionTradeoffs object is used
     extern int Progress;
     extern void (*fProgressPtr)(int const);
     extern void (*fMessagePtr)(std::string const &);
