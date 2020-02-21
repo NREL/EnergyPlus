@@ -30,6 +30,11 @@ set( test_src
   ChillerExhaustAbsorption.unit.cc
   ChillerGasAbsorption.unit.cc
   ChillerIndirectAbsorption.unit.cc
+  Coils/CoilCoolingDXFixture.hh
+  Coils/CoilCoolingDX.unit.cc
+  Coils/CoilCoolingDXCurveFitPerformance.unit.cc
+  Coils/CoilCoolingDXCurveFitOperatingMode.unit.cc
+  Coils/CoilCoolingDXCurveFitSpeed.unit.cc
   CondenserLoopTowers.unit.cc
   ConstructionInternalSource.unit.cc
   ConvectionCoefficients.unit.cc
@@ -192,7 +197,7 @@ set( test_src
   XingGroundTemperatureModel.unit.cc
   ZoneContaminantPredictorCorrector.unit.cc
   ZoneEquipmentManager.unit.cc
-  ZoneHVACEvaporativeCooler.unit
+  ZoneHVACEvaporativeCooler.unit.cc
   ZonePlenum.unit.cc
   ZoneTempPredictorCorrector.unit.cc
   main.cc

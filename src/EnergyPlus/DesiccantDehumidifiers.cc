@@ -62,7 +62,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DesiccantDehumidifiers.hh>
@@ -1515,13 +1515,12 @@ namespace DesiccantDehumidifiers {
             DesicDehum(DesicDehumNum).ExhaustFanCurveIndex = GetCurveIndex(Alphas(15));
 
             if (DesicDehum(DesicDehumNum).ExhaustFanCurveIndex > 0) {
-                ErrorsFoundGeneric |= CurveManager::CheckCurveDims(
-                    DesicDehum(DesicDehumNum).ExhaustFanCurveIndex,   // Curve index
-                    {1},                            // Valid dimensions
-                    RoutineName,                    // Routine name
-                    CurrentModuleObject,            // Object Type
-                    DesicDehum(DesicDehumNum).Name, // Object Name
-                    cAlphaFields(15));              // Field Name
+                ErrorsFoundGeneric |= CurveManager::CheckCurveDims(DesicDehum(DesicDehumNum).ExhaustFanCurveIndex, // Curve index
+                                                                   {1},                                            // Valid dimensions
+                                                                   RoutineName,                                    // Routine name
+                                                                   CurrentModuleObject,                            // Object Type
+                                                                   DesicDehum(DesicDehumNum).Name,                 // Object Name
+                                                                   cAlphaFields(15));                              // Field Name
             }
 
             if (DesicDehum(DesicDehumNum).Preheat == Yes) {
@@ -2680,8 +2679,7 @@ namespace DesiccantDehumidifiers {
                     DataHeatBalance::HeatReclaimVS_DXCoil(DesicDehum(DesicDehumNum).DXCoilIndex).AvailCapacity = 0.0;
                 }
 
-                CpAir = PsyCpAirFnWTdb(Node(DesicDehum(DesicDehumNum).CondenserInletNode).HumRat,
-                                       Node(DesicDehum(DesicDehumNum).CondenserInletNode).Temp);
+                CpAir = PsyCpAirFnW(Node(DesicDehum(DesicDehumNum).CondenserInletNode).HumRat);
 
                 if (DesicDehum(DesicDehumNum).RegenFanPlacement == BlowThru) {
                     if (DesicDehum(DesicDehumNum).regenFanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
@@ -2763,8 +2761,7 @@ namespace DesiccantDehumidifiers {
 
                 if (RegenCoilIndex > 0) {
                     if (NewRegenInTemp < RegenSetPointTemp) {
-                        CpAir = PsyCpAirFnWTdb(Node(DesicDehum(DesicDehumNum).RegenAirInNode).HumRat,
-                                               Node(DesicDehum(DesicDehumNum).RegenAirInNode).Temp);
+                        CpAir = PsyCpAirFnW(Node(DesicDehum(DesicDehumNum).RegenAirInNode).HumRat);
                     }
                     QRegen = max(0.0,
                                  (CpAir * Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate *
@@ -2850,8 +2847,7 @@ namespace DesiccantDehumidifiers {
                     }
 
                     if (RegenCoilIndex > 0) {
-                        CpAir = PsyCpAirFnWTdb(Node(DesicDehum(DesicDehumNum).RegenAirInNode).HumRat,
-                                               Node(DesicDehum(DesicDehumNum).RegenAirInNode).Temp);
+                        CpAir = PsyCpAirFnW(Node(DesicDehum(DesicDehumNum).RegenAirInNode).HumRat);
                         QRegen = max(0.0,
                                      (CpAir * Node(DesicDehum(DesicDehumNum).RegenAirInNode).MassFlowRate *
                                       (RegenSetPointTemp - Node(DesicDehum(DesicDehumNum).RegenAirInNode).Temp)));
@@ -3496,7 +3492,7 @@ namespace DesiccantDehumidifiers {
         // Return value
         int NodeNum; // node number returned
 
-                                // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int WhichDesicDehum;
 
         // Obtains and Allocates heat exchanger related parameters from input file
@@ -3512,7 +3508,7 @@ namespace DesiccantDehumidifiers {
             ShowSevereError("GetProcAirInletNodeNum: Could not find Desciccant Dehumidifier = \"" + DesicDehumName + "\"");
             ErrorsFound = true;
             NodeNum = 0;
-        }        
+        }
 
         return NodeNum;
     }
@@ -3532,7 +3528,7 @@ namespace DesiccantDehumidifiers {
         // Return value
         int NodeNum; // node number returned
 
-                     // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int WhichDesicDehum;
 
         // Obtains and Allocates heat exchanger related parameters from input file
@@ -3568,7 +3564,7 @@ namespace DesiccantDehumidifiers {
         // Return value
         int NodeNum; // node number returned
 
-                     // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int WhichDesicDehum;
 
         // Obtains and Allocates heat exchanger related parameters from input file
@@ -3604,7 +3600,7 @@ namespace DesiccantDehumidifiers {
         // Return value
         int NodeNum; // node number returned
 
-                     // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int WhichDesicDehum;
 
         // Obtains and Allocates heat exchanger related parameters from input file

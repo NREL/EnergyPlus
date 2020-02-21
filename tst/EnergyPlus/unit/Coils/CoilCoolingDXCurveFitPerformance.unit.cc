@@ -45,32 +45,31 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef PlantLoopEquip_hh_INCLUDED
-#define PlantLoopEquip_hh_INCLUDED
+// Google Test Headers
+#include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Coils/CoilCoolingDX.hh>
+#include "CoilCoolingDXFixture.hh"
 
-namespace EnergyPlus {
+using namespace EnergyPlus;
 
-namespace PlantLoopEquip {
+TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitPerformanceInput )
+{
+    std::string idf_objects = this->getPerformanceObjectString("coilPerformance", false, 2);
+    EXPECT_TRUE(process_idf( idf_objects, false ));
+    CoilCoolingDXCurveFitPerformance thisPerf("coilPerformance");
+    EXPECT_EQ("COILPERFORMANCE", thisPerf.name);
+    EXPECT_EQ("BASEOPERATINGMODE", thisPerf.normalMode.name);
+    EXPECT_FALSE(thisPerf.hasAlternateMode);
+}
 
-    // Data
-    // SUBROUTINE SPECIFICATION
-
-    // Functions
-
-    void SimPlantEquip(int const LoopNum,     // loop counter
-                       int const LoopSideNum, // loop counter
-                       int const BranchNum,
-                       int const Num,
-                       bool const FirstHVACIteration, // TRUE if First iteration of simulation
-                       bool &InitLoopEquip,
-                       bool const GetCompSizFac // Tells component routine to return the component sizing fraction
-    );
-
-} // namespace PlantLoopEquip
-
-} // namespace EnergyPlus
-
-#endif
+TEST_F( CoilCoolingDXTest, CoilCoolingDXCurveFitPerformanceInputAlternateMode )
+{
+    std::string idf_objects = this->getPerformanceObjectString("coilPerformance", true, 2);
+    EXPECT_TRUE(process_idf( idf_objects, false ));
+    CoilCoolingDXCurveFitPerformance thisPerf("coilPerformance");
+    EXPECT_EQ("COILPERFORMANCE", thisPerf.name);
+    EXPECT_EQ("BASEOPERATINGMODE", thisPerf.normalMode.name);
+    EXPECT_TRUE(thisPerf.hasAlternateMode);
+}
