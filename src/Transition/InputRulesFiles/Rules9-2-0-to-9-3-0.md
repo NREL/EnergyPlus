@@ -217,4 +217,12 @@ object and create a new one as shown in this exmple.
       Zone3Supply,             !- Component Name
       Attic Zone;              !- Thermal Zone Name
 
+# EMS Function Change: Change EMS Function `@CpAirFnWTdb` to `@CpAirFnW`
+For all `EnergyManagementSystem:Program` and `EnergyManagementSystem:Subroutine`, the function signature for the specific heat of air has changed from requiring both humidity ratio and drybulb temperature, to *only* requiring humidity ratio.
 
+### Before
+    SET cp_air = @CpAirFnWTdb HumRatAir TdbAir, !- Program Line
+    
+### After
+    SET cp_air = @CpAirFnTW HumRatAir, !- Program Line
+    
