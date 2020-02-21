@@ -43,7 +43,7 @@ TEST(PenumbraTest, check_azimuth) {
   for (float azm = 0.0f; azm <= 2 * M_PI; azm += M_PI_4) {
     pumbra.setSunPosition(azm, 0.0f);
     float check_azimuth = pumbra.getSunAzimuth();
-    EXPECT_EQ(azm, check_azimuth);
+    EXPECT_FLOAT_EQ(azm, check_azimuth);
   }
 }
 
@@ -59,7 +59,7 @@ TEST(PenumbraTest, check_altitude) {
   for (float alt = 0.0f; alt <= 2 * M_PI; alt += M_PI_4) {
     pumbra.setSunPosition(0.0f, alt);
     float check_altitude = pumbra.getSunAltitude();
-    EXPECT_EQ(alt, check_altitude);
+    EXPECT_FLOAT_EQ(alt, check_altitude);
   }
 }
 
@@ -167,7 +167,7 @@ TEST(PenumbraTest, interior) {
 
   pumbra2.setSunPosition(3.1415f, 0.f);
   float wallPSSA3 = pumbra2.calculatePSSA(wallFrontId);
-  EXPECT_NEAR(wallPSSA3, 0, 0.01); // WallFront should be blocked by back wall.
+  EXPECT_NEAR(wallPSSA3, 0.f, 0.01); // WallFront should be blocked by back wall.
   // pumbra2.renderScene(wallFrontId);
 
   pumbra2.setSunPosition(0.5f, 0.5f);
@@ -177,10 +177,10 @@ TEST(PenumbraTest, interior) {
   float floorInteriorPSSA = intPSSAs[floorId];
   float leftWallInteriorPSSA = intPSSAs[sideWallLeftId];
   float rightWallInteriorPSSA = intPSSAs[sideWallRightId];
-  EXPECT_GT(backWallInteriorPSSA, 0);
-  EXPECT_GT(floorInteriorPSSA, 0);
-  EXPECT_GT(leftWallInteriorPSSA, 0);
-  EXPECT_EQ(rightWallInteriorPSSA, 0);
+  EXPECT_GT(backWallInteriorPSSA, 0.f);
+  EXPECT_GT(floorInteriorPSSA, 0.f);
+  EXPECT_GT(leftWallInteriorPSSA, 0.f);
+  EXPECT_EQ(rightWallInteriorPSSA, 0.f);
   // pumbra2.renderInteriorScene({windowId},{wallBackId, floorId, sideWallLeftId, sideWallRightId});
 }
 
@@ -360,7 +360,7 @@ TEST(PenumbraTest, side_count_check) {
   pumbra.addSurface(wall);
   pumbra.setModel();
 
-  EXPECT_EQ(pumbra.getNumSurfaces(), 1);
+  EXPECT_EQ(pumbra.getNumSurfaces(), 1u);
 
   pumbra.clearModel();
 
@@ -380,7 +380,7 @@ TEST(PenumbraTest, side_count_check) {
 
   pumbra.setModel();
 
-  EXPECT_EQ(pumbra.getNumSurfaces(), 3);
+  EXPECT_EQ(pumbra.getNumSurfaces(), 3u);
 }
 
 TEST(PenumbraTest, bad_surface_input_errors) {
