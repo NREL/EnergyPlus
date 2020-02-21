@@ -87,6 +87,7 @@ namespace DataSystemVariables {
     extern std::string const cIgnoreBeamRadiation;
     extern std::string const cIgnoreDiffuseRadiation;
     extern std::string const cSutherlandHodgman;
+    extern std::string const cSlaterBarsky;
     extern std::string const cMinimalSurfaceVariables;
     extern std::string const cMinimalShadowing;
     extern std::string const cNumActiveSims;
@@ -122,6 +123,7 @@ namespace DataSystemVariables {
     enum class ShadingMethod {PolygonClipping, PixelCounting, Scheduled, Imported};
     extern ShadingMethod shadingMethod;           // defines the shading method used
     extern bool SutherlandHodgman;                // TRUE if SutherlandHodgman algorithm for polygon clipping is to be used.
+    extern bool SlaterBarsky;                  // TRUE if SlaterBarsky algorithm for polygon clipping is to be used for vertical polygons.
     extern bool DetailedSkyDiffuseAlgorithm;      // use detailed diffuse shading algorithm for sky (shading transmittance varies)
     extern bool DetailedSolarTimestepIntegration; // when true, use detailed timestep integration for all solar,shading, etc.
     extern bool ReportExtShadingSunlitFrac;              // when true, the sunlit fraction for all surfaces are exported as a csv format output

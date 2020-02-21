@@ -118,6 +118,7 @@ namespace DataSystemVariables {
     std::string const cIgnoreBeamRadiation("IgnoreBeamRadiation");
     std::string const cIgnoreDiffuseRadiation("IgnoreDiffuseRadiation");
     std::string const cSutherlandHodgman("SutherlandHodgman");
+    std::string const cSlaterBarsky("SlaterBarsky");
     std::string const cMinimalSurfaceVariables("CreateMinimalSurfaceVariables");
     std::string const cMinimalShadowing("MinimalShadowing");
     std::string const cNumActiveSims("cntActv");
@@ -153,6 +154,7 @@ namespace DataSystemVariables {
     // Shading methods
     ShadingMethod shadingMethod(ShadingMethod::PolygonClipping);
     bool SutherlandHodgman(true);                 // TRUE if SutherlandHodgman algorithm for polygon clipping is to be used.
+    bool SlaterBarsky(false);                  // TRUE if SlaterBarsky algorithm for polygon clipping is to be used for vertical polygons.
     bool DetailedSkyDiffuseAlgorithm(false);      // use detailed diffuse shading algorithm for sky (shading transmittance varies)
     bool DetailedSolarTimestepIntegration(false); // when true, use detailed timestep integration for all solar,shading, etc.
     bool DisableGroupSelfShading(false); // when true, defined shadowing surfaces group is ignored when calculating sunlit fraction
@@ -378,6 +380,7 @@ namespace DataSystemVariables {
         TimingFlag = false;
         shadingMethod = ShadingMethod::PolygonClipping;
         SutherlandHodgman = true;
+        SlaterBarsky = false;
         DetailedSkyDiffuseAlgorithm = false;
         DetailedSolarTimestepIntegration = false;
         TrackAirLoopEnvFlag = false;
