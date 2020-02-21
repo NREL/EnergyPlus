@@ -676,7 +676,7 @@ namespace SolarShading {
 #else
                 auto error_callback = [](const int messageType, const std::string & message, void * /*contextPtr*/){
                     if (messageType == Pumbra::MSG_ERR) {
-                        ShowFatalError(message);
+                        ShowSevereError(message);
                     } else if (messageType == Pumbra::MSG_WARN) {
                         ShowWarningError(message);
                     } else /*if (messageType == MSG_INFO)*/ {
