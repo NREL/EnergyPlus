@@ -78,6 +78,11 @@ Environment:Design Day Data,33.00,6.60,DefaultMultipliers,Enthalpy,90500.00,{J/k
 
 See [#PR7577](https://github.com/NREL/EnergyPlus/pull/7577)
 
+### EIO output for ShadowCalculations
+
+The eio output related to `ShadowCalculations` has been changed to reflect the new input fields. See Rules9-2-0-to-9-3-0.md.
+
+
 ### End Use By Subcategory in SQL
 
 In the SQL Output file, for `ReportName = "AnnualBuildingUtilityPerformanceSummary"` and `ReportName = "DemandEndUseComponentsSummary"`,
