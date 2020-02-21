@@ -65,19 +65,18 @@ void afterZoneTimeStepHandler()
         if (outdoorDewPointActuator == -1 || outdoorTempSensor == -1 || outdoorDewPointSensor == -1) {
             exit(1);
         }
-        FILE *apiAvailFile;
-        apiAvailFile = fopen("/tmp/api_stuff_available.csv", "w");
-        const char * apiStuff = listAllAPIDataCSV();
-        fputs(apiStuff, apiAvailFile);
-        fclose(apiAvailFile);
+//        FILE *apiAvailFile;
+//        apiAvailFile = fopen("/tmp/api_stuff_available.csv", "w");
+//        const char * apiStuff = listAllAPIDataCSV();
+//        fputs(apiStuff, apiAvailFile);
+//        fclose(apiAvailFile);
     }
-    setActuatorValue(outdoorDewPointActuator, -25);
+    setActuatorValue(outdoorDewPointActuator, -25.0);
     Real64 oa_temp = getVariableValue(outdoorTempSensor);
     printf("Reading outdoor temp via getVariable, value is: %8.4f \n", oa_temp);
     Real64 dp_temp = getVariableValue(outdoorDewPointSensor);
     printf("Actuated Dew Point temp value is: %8.4f \n", dp_temp);
 }
-
 
 int main(int argc, const char * argv[]) {
     callbackEndOfZoneTimeStepAfterZoneReporting(afterZoneTimeStepHandler);

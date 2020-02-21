@@ -141,7 +141,7 @@ int getVariableHandle(const char* type, const char* key) {
     return -1;
 }
 
-double getVariableValue(const int handle) {
+Real64 getVariableValue(const int handle) {
     // I'm not sure whether to validate the handle range here, even if I check for positive, they could still go
     // out of range too high.  I'm inclined to just let it fail?  Maybe?
     // If it is to be checked, just do
@@ -163,7 +163,7 @@ int getMeterHandle(const char* meterName) {
     }
 }
 
-double getMeterValue(int handle) {
+Real64 getMeterValue(int handle) {
     // I'm not sure whether to validate the handle range here, even if I check for positive, they could still go
     // out of range too high.  I'm inclined to just let it fail?  Maybe?
     // If it is to be checked, just do
@@ -198,7 +198,7 @@ void resetActuator(int handle) {
     theActuator.Actuated = false;
 }
 
-void setActuatorValue(const int handle, const double value) {
+void setActuatorValue(const int handle, const Real64 value) {
     // I could imagine returning a 0 or 1, but it would really only be validating the handle was in range
     // the handle is based on the available actuator list
     auto & theActuator(EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable(handle));
