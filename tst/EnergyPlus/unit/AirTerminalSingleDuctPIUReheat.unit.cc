@@ -335,10 +335,12 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SimTest)
         "    ;                        !- Minimum Number of Warmup Days",
 
         "ShadowCalculation,",
-        "    AverageOverDaysInFrequency,  !- Calculation Method",
-        "    20,                      !- Calculation Frequency",
+        "    PolygonClipping,         !- Shading Calculation Method",
+        "    Periodic,                !- Shading Calculation Update Frequency Method",
+        "    ,                        !- Shading Calculation Update Frequency",
         "    15000,                   !- Maximum Figures in Shadow Overlap Calculations",
         "    ,                        !- Polygon Clipping Algorithm",
+        "    ,                        !- Pixel Counting Resolution",
         "    SimpleSkyDiffuseModeling;!- Sky Diffuse Modeling Algorithm",
 
         "SurfaceConvectionAlgorithm:Inside,",
