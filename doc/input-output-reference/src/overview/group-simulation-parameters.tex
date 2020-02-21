@@ -548,29 +548,53 @@ The object also allows input to disable self-shading effect from exterior surfac
 
 \subsubsection{Inputs}\label{inputs-10-019}
 
-\paragraph{Field: Calculation Method}\label{field-calculation-method-000}
+\paragraph{Field: Shading Calculation Method}
 
-This field is used to control how the solar, shading, and daylighting models are calculated with respect to the time of calculations during the simulation. The default and fastest method is selected using the keyword AverageOverDaysInFrequency. A more detailed and slower method can be selected using the keyword TimestepFrequency. The TimestepFrequency method must be used for modeling dynamic fenestration and shading surfaces.
+Select between CPU-based polygon clipping method, the GPU-based pixel counting method,
+or importing from external shading data.
+If PixelCounting is selected and GPU hardware (or GPU emulation) is not available, a warning will be
+displayed and EnergyPlus will revert to PolygonClipping.
+If Scheduled is chosen, the External Shading Fraction Schedule Name is required
+in SurfaceProperty:LocalEnvironment.
+If Imported is chosen, the Schedule:File:Shading object is required.
 
-\paragraph{Field: Calculation Frequency}\label{field-calculation-frequency}
+Choices are:
+\begin{enumeration}
+    \item PolygonClipping
+    \item PixelCounting
+    \item Scheduled
+    \item Imported
+\end{enumeration}
+
+Default: PolygonClipping
+
+\paragraph{Field: Shading Calculation Update Frequency Method}\label{field-calculation-method-000}
+
+This field is used to control how the solar, shading, and daylighting models are calculated with respect to the time of calculations during the simulation. The default and fastest method is selected using the keyword Periodic. A more detailed and slower method can be selected using the keyword Timestep. The Timestep method must be used for modeling dynamic fenestration and shading surfaces.
+
+\paragraph{Field: Shading Calculation Update Frequency}\label{field-calculation-frequency}
 
 This numeric field will cause the shadowing calculations to be done periodically using the number in the field as the number of days in each period. This field is only used if the default method AverageOverDaysInFrequency is used in the previous field. Using this field will allow you to synchronize the shadowing calculations with changes in shading devices. Using the default of 20 days in each period is the average number of days between significant changes in solar position angles. For these shadowing calculations, an ``average'' (over the time period) of solar angles, position, equation of time are also used.
 
 \paragraph{Field: Maximum Figures in Shadow Overlap Calculations}\label{field-maximum-figures-in-shadow-overlap-calculations}
 
-This numeric field will allow you to increase the number of figures in shadow overlaps. Due to the shadowing algorithm, the number of shadows in a figure may grow quite large even with fairly reasonable looking structures. Of course, the inclusion of more allowed figures will increase calculation time. Likewise, too few figures may not result in as accurate calculations as you desire.
+This numeric field will allow you to increase the number of figures in shadow overlaps in the PolygonClipping method. Due to the shadowing algorithm, the number of shadows in a figure may grow quite large even with fairly reasonable looking structures. Of course, the inclusion of more allowed figures will increase calculation time. Likewise, too few figures may not result in as accurate calculations as you desire.
 
 \paragraph{Field: Polygon Clipping Algorithm}\label{field-polygon-clipping-algorithm}
 
-This is an advanced feature. Prior to V7, the internal polygon clipping method was a special case of the Weiler-Atherton method. Now, three options are available: 
+This is an advanced feature. Prior to V7, the internal polygon clipping method was a special case of the Weiler-Atherton method. Now, three options are available:
 
 \begin{description}
   \item[SutherlandHodgman] A simpler algorithm but it works well in cases where receiving surfaces (of shadows) are non-convex.
   \item[ConvexWeilerAtherton] Only accurate where both casting and receiving surfaces are convex. Warnings/severe errors are displayed when necessary.
-  \item[SlaterBarskyandSutherlandHodgman] Slater-Barsky only applies to rectangular surfaces. Polygon clipping for rectangular surfaces will be calculated using the Slater-Barsky algorithm, while the rest adopts the default Sutherl-Hodgman algorithm. 
+  \item[SlaterBarskyandSutherlandHodgman] Slater-Barsky only applies to rectangular surfaces. Polygon clipping for rectangular surfaces will be calculated using the Slater-Barsky algorithm, while the rest adopts the default Sutherl-Hodgman algorithm.
 \end{description}
 
 Default is SutherlandHodgman. More details on polygon clipping are contained in the Engineering Reference.
+
+\paragraph{Field: Pixel Counting Resolution}
+
+Number of pixels in both dimensions of the surface rendering. Default: 512.
 
 \paragraph{Field: Sky Diffuse Modeling Algorithm}\label{field-sky-diffuse-modeling-algorithm}
 
