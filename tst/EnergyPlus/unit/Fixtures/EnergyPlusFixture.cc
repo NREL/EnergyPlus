@@ -257,14 +257,13 @@ void EnergyPlusFixture::SetUp()
     show_message();
 
     OutputFiles::getSingleton().eio.open_as_stringstream();
+    OutputFiles::getSingleton().mtr.open_as_stringstream();
 
     this->eso_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
-    this->mtr_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
     this->err_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
     this->json_stream = std::unique_ptr<std::ostringstream>(new std::ostringstream);
 
     DataGlobals::eso_stream = this->eso_stream.get();
-    DataGlobals::mtr_stream = this->mtr_stream.get();
     DataGlobals::err_stream = this->err_stream.get();
     DataGlobals::jsonOutputStreams.json_stream = this->json_stream.get();
 
@@ -297,7 +296,7 @@ void EnergyPlusFixture::TearDown()
         ObjexxFCL::gio::close(DataGlobals::OutputFileDebug, flags);
         OutputFiles::getSingleton().zsz.del();
         OutputFiles::getSingleton().ssz.del();
-        ObjexxFCL::gio::close(DataGlobals::OutputFileMeters, flags);
+        OutputFiles::getSingleton().mtr.del();
         ObjexxFCL::gio::close(DataGlobals::OutputFileBNDetails, flags);
         ObjexxFCL::gio::close(DataGlobals::OutputFileZonePulse, flags);
         ObjexxFCL::gio::close(DataGlobals::OutputDElightIn, flags);
@@ -539,10 +538,10 @@ bool EnergyPlusFixture::compare_eio_stream(std::string const &expected_string, b
 
 bool EnergyPlusFixture::compare_mtr_stream(std::string const &expected_string, bool reset_stream)
 {
-    auto const stream_str = this->mtr_stream->str();
+    auto const stream_str = OutputFiles::getSingleton().mtr.get_output();
     EXPECT_EQ(expected_string, stream_str);
     bool are_equal = (expected_string == stream_str);
-    if (reset_stream) this->mtr_stream->str(std::string());
+    if (reset_stream) OutputFiles::getSingleton().mtr.open_as_stringstream();
     return are_equal;
 }
 
@@ -596,8 +595,8 @@ bool EnergyPlusFixture::has_eio_output(bool reset_stream)
 
 bool EnergyPlusFixture::has_mtr_output(bool reset_stream)
 {
-    auto const has_output = this->mtr_stream->str().size() > 0;
-    if (reset_stream) this->mtr_stream->str(std::string());
+    auto const has_output = !OutputFiles::getSingleton().mtr.get_output().empty();
+    if (reset_stream) OutputFiles::getSingleton().mtr.open_as_stringstream();
     return has_output;
 }
 

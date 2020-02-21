@@ -64,6 +64,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class OutputFile;
     class OutputFiles;
 
 namespace OutputProcessor {
@@ -748,6 +749,22 @@ namespace OutputProcessor {
 
     void AddEndUseSubcategory(std::string const &ResourceName, std::string const &EndUseName, std::string const &EndUseSubName);
 
+    void WriteTimeStampFormatData(OutputFile &outputFile,
+                                  ReportingFrequency const reportingInterval, // Reporting frequency.
+                                  int const reportID,                         // The ID of the time stamp
+                                  std::string const &reportIDString,          // The ID of the time stamp
+                                  int const DayOfSim,                         // the number of days simulated so far
+                                  std::string const &DayOfSimChr,             // the number of days simulated so far
+                                  bool writeToSQL,                            // write to SQLite
+                                  Optional_int_const Month = _,               // the month of the reporting interval
+                                  Optional_int_const DayOfMonth = _,          // The day of the reporting interval
+                                  Optional_int_const Hour = _,                // The hour of the reporting interval
+                                  Optional<Real64 const> EndMinute = _,       // The last minute in the reporting interval
+                                  Optional<Real64 const> StartMinute = _,     // The starting minute of the reporting interval
+                                  Optional_int_const DST = _,                 // A flag indicating whether daylight savings time is observed
+                                  Optional_string_const DayType = _           // The day tied for the data (e.g., Monday)
+    );
+
     void WriteTimeStampFormatData(std::ostream *out_stream_p,                 // Output stream pointer
                                   ReportingFrequency const reportingInterval, // Reporting frequency.
                                   int const reportID,                         // The ID of the time stamp
@@ -763,6 +780,11 @@ namespace OutputProcessor {
                                   Optional_int_const DST = _,                 // A flag indicating whether daylight savings time is observed
                                   Optional_string_const DayType = _           // The day tied for the data (e.g., Monday)
     );
+
+    void WriteYearlyTimeStamp(OutputFile &outputFile,
+                              std::string const &reportIDString,    // The ID of the time stamp
+                              std::string const &yearOfSimChr,      // the year of the simulation
+                              bool writeToSQL);
 
     void WriteYearlyTimeStamp(std::ostream *out_stream_p,        // Output stream pointer
                               std::string const &reportIDString, // The ID of the time stamp
@@ -782,7 +804,8 @@ namespace OutputProcessor {
                                            Optional_string_const customUnitName = _,
                                            Optional_string_const ScheduleName = _);
 
-    void WriteMeterDictionaryItem(ReportingFrequency const reportingInterval, // The reporting interval (e.g., hourly, daily)
+    void WriteMeterDictionaryItem(OutputFiles &outputFiles,
+                                  ReportingFrequency const reportingInterval, // The reporting interval (e.g., hourly, daily)
                                   StoreType const storeType,
                                   int const reportID,                // The reporting ID in for the variable
                                   int const indexGroupKey,           // The reporting group for the variable
@@ -816,7 +839,8 @@ namespace OutputProcessor {
                                         bool const meterOnlyFlag      // A flag that indicates if the data should be written to standard output
     );
 
-    void WriteReportMeterData(int const reportID,                         // The variable's report ID
+    void WriteReportMeterData(OutputFiles &outputFiles,
+                              int const reportID,                         // The variable's report ID
                               std::string const &creportID,               // variable ID in characters
                               Real64 const repValue,                      // The variable's value
                               ReportingFrequency const reportingInterval, // The variable's reporting interval (e.g., hourly)
@@ -940,9 +964,10 @@ void AssignReportNumber(int &ReportNumber);
 
 void GenOutputVariablesAuditReport();
 
-void UpdateMeterReporting();
+void UpdateMeterReporting(OutputFiles &outputFiles);
 
-void SetInitialMeterReportingAndOutputNames(int const WhichMeter,              // Which meter number
+void SetInitialMeterReportingAndOutputNames(OutputFiles &outputFiles,
+                                            int const WhichMeter,              // Which meter number
                                             bool const MeterFileOnlyIndicator, // true if this is a meter file only reporting
                                             OutputProcessor::ReportingFrequency const FrequencyIndicator, // at what frequency is the meter reported
                                             bool const CumulativeIndicator // true if this is a Cumulative meter reporting
@@ -1002,7 +1027,7 @@ void GetVariableKeys(std::string const &varName, // Standard variable name
 
 bool ReportingThisVariable(std::string const &RepVarName);
 
-void InitPollutionMeterReporting(std::string const &ReportFreqName);
+void InitPollutionMeterReporting(OutputFiles &outputFiles, std::string const &ReportFreqName);
 
 void ProduceRDDMDD();
 

@@ -421,7 +421,7 @@ namespace CommandLineInterface {
 
         outputMtdFileName = outputFilePrefix + normalSuffix + ".mtd";
         outputMddFileName = outputFilePrefix + normalSuffix + ".mdd";
-        outputMtrFileName = outputFilePrefix + normalSuffix + ".mtr";
+        OutputFiles::getSingleton().mtr.fileName = outputFilePrefix + normalSuffix + ".mtr";
         outputRddFileName = outputFilePrefix + normalSuffix + ".rdd";
         outputShdFileName = outputFilePrefix + normalSuffix + ".shd";
         outputDfsFileName = outputFilePrefix + normalSuffix + ".dfs";

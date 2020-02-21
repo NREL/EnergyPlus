@@ -301,7 +301,7 @@ namespace SizingManager {
 
             ResetEnvironmentCounter();
             KickOffSizing = true;
-            SetupZoneSizing(ErrorsFound); // Should only be done ONCE
+            SetupZoneSizing(outputFiles, ErrorsFound); // Should only be done ONCE
             KickOffSizing = false;
 
             for (iZoneCalcIter = 1; iZoneCalcIter <= numZoneSizeIter; ++iZoneCalcIter) { // normally this is performed once but if load component
@@ -429,7 +429,7 @@ namespace SizingManager {
                                     DesDayWeath(CurOverallSimDay).Press(TimeStepInDay) = OutBaroPress;
                                 }
 
-                                ManageHeatBalance();
+                                ManageHeatBalance(outputFiles);
 
                                 BeginHourFlag = false;
                                 BeginDayFlag = false;
@@ -3863,7 +3863,7 @@ namespace SizingManager {
         }
     }
 
-    void SetupZoneSizing(bool &ErrorsFound)
+    void SetupZoneSizing(OutputFiles &outputFiles, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3895,7 +3895,7 @@ namespace SizingManager {
         CurOverallSimDay = 0;
         while (Available) { // do for each environment
 
-            GetNextEnvironment(OutputFiles::getSingleton(), Available, ErrorsFound);
+            GetNextEnvironment(outputFiles, Available, ErrorsFound);
 
             if (!Available) break;
             if (ErrorsFound) break;
@@ -3929,7 +3929,7 @@ namespace SizingManager {
 
             ManageWeather();
 
-            ManageHeatBalance();
+            ManageHeatBalance(outputFiles);
 
             BeginHourFlag = false;
             BeginDayFlag = false;
@@ -3940,7 +3940,7 @@ namespace SizingManager {
             //          ! do another timestep=1
             ManageWeather();
 
-            ManageHeatBalance();
+            ManageHeatBalance(outputFiles);
 
             //         do an end of day, end of environment time step
 
@@ -3950,7 +3950,7 @@ namespace SizingManager {
 
             ManageWeather();
 
-            ManageHeatBalance();
+            ManageHeatBalance(outputFiles);
 
         } // ... End environment loop.
     }

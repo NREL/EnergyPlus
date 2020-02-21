@@ -214,7 +214,7 @@ namespace SimulationManager {
         PreP_Fatal = false;
     }
 
-    void ManageSimulation()
+    void ManageSimulation(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -339,7 +339,6 @@ namespace SimulationManager {
         AskForConnectionsReport = false; // set to false until sizing is finished
 
         OpenOutputFiles();
-        auto &outputFiles = OutputFiles::getSingleton();
         GetProjectData(outputFiles);
         CheckForMisMatchedEnvironmentSpecifications();
         CheckForRequestedReporting();
@@ -411,7 +410,7 @@ namespace SimulationManager {
             MetersHaveBeenInitialized = true;
             SetupPollutionMeterReporting();
             SystemReports::AllocateAndSetUpVentReports();
-            UpdateMeterReporting();
+            UpdateMeterReporting(outputFiles);
             CheckPollutionMeterReporting();
             facilityElectricServiceObj->verifyCustomMetersElecPowerMgr();
             SetupPollutionCalculations();
@@ -612,7 +611,7 @@ namespace SimulationManager {
 
                         ManageExteriorEnergyUse();
 
-                        ManageHeatBalance();
+                        ManageHeatBalance(outputFiles);
 
                         if (oneTimeUnderwaterBoundaryCheck) {
                             AnyUnderwaterBoundaries = WeatherManager::CheckIfAnyUnderwaterBoundaries();
@@ -1663,20 +1662,12 @@ namespace SimulationManager {
         print(OutputFiles::getSingleton().eio, "Program Version,{}\n", VerString);
 
         // Open the Meters Output File
-        OutputFileMeters = GetNewUnitNumber();
+        OutputFiles::getSingleton().mtr.open();
         StdMeterRecordCount = 0;
-        {
-            IOFlags flags;
-            flags.ACTION("write");
-            flags.STATUS("UNKNOWN");
-            ObjexxFCL::gio::open(OutputFileMeters, DataStringGlobals::outputMtrFileName, flags);
-            write_stat = flags.ios();
+        if (!OutputFiles::getSingleton().mtr.good()) {
+            ShowFatalError("OpenOutputFiles: Could not open file " + OutputFiles::getSingleton().mtr.fileName + " for output (write).");
         }
-        if (write_stat != 0) {
-            ShowFatalError("OpenOutputFiles: Could not open file " + DataStringGlobals::outputMtrFileName + " for output (write).");
-        }
-        mtr_stream = ObjexxFCL::gio::out_stream(OutputFileMeters);
-        ObjexxFCL::gio::write(OutputFileMeters, fmtA) << "Program Version," + VerString;
+        print(OutputFiles::getSingleton().mtr, "Program Version,{}\n", VerString);
 
         // Open the Branch-Node Details Output File
         OutputFileBNDetails = GetNewUnitNumber();
@@ -1903,18 +1894,13 @@ namespace SimulationManager {
         outputFiles.eio.close();
 
         // Close the Meters Output File
-        ObjexxFCL::gio::write(OutputFileMeters, EndOfDataFormat);
-        ObjexxFCL::gio::write(OutputFileMeters, fmtLD) << "Number of Records Written=" << StdMeterRecordCount;
+        print(outputFiles.mtr, "{}\n", EndOfDataString);
+        print(outputFiles.mtr, " Number of Records Written={:12}\n", StdMeterRecordCount);
         if (StdMeterRecordCount > 0) {
-            ObjexxFCL::gio::close(OutputFileMeters);
+            outputFiles.mtr.close();
         } else {
-            {
-                IOFlags flags;
-                flags.DISPOSE("DELETE");
-                ObjexxFCL::gio::close(OutputFileMeters, flags);
-            }
+            outputFiles.mtr.del();
         }
-        mtr_stream = nullptr;
 
         // Close the External Shading Output File
 
@@ -1993,7 +1979,7 @@ namespace SimulationManager {
 
             ManageExteriorEnergyUse();
 
-            ManageHeatBalance();
+            ManageHeatBalance(outputFiles);
 
             BeginHourFlag = false;
             BeginDayFlag = false;
@@ -2008,7 +1994,7 @@ namespace SimulationManager {
 
             ManageExteriorEnergyUse();
 
-            ManageHeatBalance();
+            ManageHeatBalance(outputFiles);
 
             //         do an end of day, end of environment time step
 
@@ -2021,7 +2007,7 @@ namespace SimulationManager {
 
             ManageExteriorEnergyUse();
 
-            ManageHeatBalance();
+            ManageHeatBalance(outputFiles);
 
         } // ... End environment loop.
 

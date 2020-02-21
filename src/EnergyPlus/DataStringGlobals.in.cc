@@ -154,7 +154,6 @@ namespace DataStringGlobals {
     std::string outputSMMsgPackFileName("eplusout_runperiod.msgpack");
     std::string outputMtdFileName("eplusout.mtd");
     std::string outputMddFileName("eplusout.mdd");
-    std::string outputMtrFileName("eplusout.mtr");
     std::string outputRddFileName("eplusout.rdd");
     std::string outputShdFileName("eplusout.shd");
     std::string outputTblCsvFileName("eplustbl.csv");

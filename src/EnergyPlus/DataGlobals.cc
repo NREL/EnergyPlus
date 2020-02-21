@@ -204,7 +204,6 @@ namespace DataGlobals {
     std::ostream *err_stream(nullptr);               // Internal stream used for err output (used for performance)
     int StdOutputRecordCount(0);                     // Count of Standard output records
     int OutputFileDebug(0);                          // Unit number for debug outputs
-    int OutputFileMeters(0);                         // Unit number for meters output
     std::ostream *mtr_stream(nullptr);               // Internal stream used for mtr output (used for performance)
     int OutputFileShadingFrac(0);                    // Unit number for shading output
     int StdMeterRecordCount(0);                      // Count of Meter output records
@@ -304,7 +303,6 @@ namespace DataGlobals {
         OutputStandardError = 0;
         StdOutputRecordCount = 0;
         OutputFileDebug = 0;
-        OutputFileMeters = 0;
         OutputFileShadingFrac = 0;
         StdMeterRecordCount = 0;
         OutputFileBNDetails = 0;

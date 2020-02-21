@@ -468,7 +468,7 @@ int RunEnergyPlus(std::string const & filepath)
 
         ResultsFramework::OutputSchema->setupOutputOptions();
 
-        ManageSimulation();
+        ManageSimulation(OutputFiles::getSingleton());
 
         ShowMessage("Simulation Error Summary *************");
 
@@ -548,7 +548,7 @@ int RunEnergyPlus(std::string const & filepath)
                 if (iostatus != 0) {
                     ShowFatalError("EnergyPlus: Could not open file \"" + MVIfile + "\" for output (write).");
                 }
-                ObjexxFCL::gio::write(fileUnitNumber, readvarsFmt) << outputMtrFileName;
+                ObjexxFCL::gio::write(fileUnitNumber, readvarsFmt) << OutputFiles::getSingleton().mtr.fileName;
                 ObjexxFCL::gio::write(fileUnitNumber, readvarsFmt) << outputMtrCsvFileName;
                 ObjexxFCL::gio::close(fileUnitNumber);
             }
