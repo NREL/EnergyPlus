@@ -1891,6 +1891,8 @@ SUBROUTINE UpdateEMSFunctionName(InOutArg, OldName, NewName, NoDiffArg)
 
   Call DELIM(InOutArg, ARRAY, N, ICOUNT, IBEGIN, ITERM, ILEN, ' ')
 
+  NewInOutArg = ''
+
   IF (SameString( ARRAY(4), OldName )) THEN
     IDXStart = 1
     IDXEnd = 0
