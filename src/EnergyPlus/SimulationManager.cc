@@ -52,6 +52,7 @@ extern "C" {
 
 // C++ Headers
 #include <cmath>
+#include <memory>
 #include <string>
 
 // ObjexxFCL Headers
@@ -63,6 +64,7 @@ extern "C" {
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/api/datatransfer.h>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CommandLineInterface.hh>
@@ -123,6 +125,7 @@ extern "C" {
 #include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
+#include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/PollutionModule.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RefrigeratedCase.hh>
@@ -359,6 +362,15 @@ namespace SimulationManager {
 
         ManageBranchInput(); // just gets input and returns.
 
+        // Create a new plugin manager which starts up the Python interpreter
+        // Note this cannot be done if we are running within the library environment, nor would you really to do so
+        // If we are already within a Python interpreter context, and we try to start up a new Python interpreter environment, it segfaults
+        // Note that some setup is deferred until later such as setting up output variables
+        if (!eplusRunningViaAPI) {
+            EnergyPlus::PluginManagement::pluginManager =
+                std::unique_ptr<EnergyPlus::PluginManagement::PluginManager>(new EnergyPlus::PluginManagement::PluginManager);
+        }
+
         DoingSizing = true;
         ManageSizing(OutputFiles::getSingleton());
 
@@ -411,6 +423,9 @@ namespace SimulationManager {
             MetersHaveBeenInitialized = true;
             SetupPollutionMeterReporting();
             SystemReports::AllocateAndSetUpVentReports();
+            if (EnergyPlus::PluginManagement::pluginManager) {
+                EnergyPlus::PluginManagement::pluginManager->setupOutputVariables();
+            }
             UpdateMeterReporting();
             CheckPollutionMeterReporting();
             facilityElectricServiceObj->verifyCustomMetersElecPowerMgr();
@@ -447,6 +462,9 @@ namespace SimulationManager {
                 ShowFatalError("Previous Conditions cause program termination.");
             }
         }
+
+        // up until this point, output vars, meters, actuators, etc., may not have been registered; they are now
+        PluginManagement::fullyReady = true;
 
         if (sqlite) {
             sqlite->sqliteBegin();
@@ -624,7 +642,6 @@ namespace SimulationManager {
                         BeginEnvrnFlag = false;
                         BeginSimFlag = false;
                         BeginFullSimFlag = false;
-
                     } // TimeStep loop
 
                     PreviousHour = HourOfDay;

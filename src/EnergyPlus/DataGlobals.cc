@@ -266,11 +266,17 @@ namespace DataGlobals {
     int Progress(0); // current progress (0-100)
     void (*fProgressPtr)(int const);
     void (*fMessagePtr)(std::string const &);
+    void (*progressCallback)(int const);
+    void (*messageCallback)(const char * message);
+    void (*errorCallback)(const char * errorMessage);
+
+    bool eplusRunningViaAPI;
 
     // Clears the global data in DataGlobals.
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
+
         runReadVars = false;
         DDOnlySimulation = false;
         AnnualSimulation = false;
@@ -362,10 +368,16 @@ namespace DataGlobals {
         AnyBasementsInModel = false;
         DoCoilDirectSolutions = false;
         Progress = 0;
+        fProgressPtr = nullptr;
+        fMessagePtr = nullptr;
+        progressCallback = nullptr;
+        messageCallback = nullptr;
+        errorCallback = nullptr;
         eso_stream = nullptr;
         mtr_stream = nullptr;
         err_stream = nullptr;
         delightin_stream = nullptr;
+        eplusRunningViaAPI = false;
     }
 
 } // namespace DataGlobals

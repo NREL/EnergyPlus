@@ -100,6 +100,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
+#include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
@@ -378,6 +379,7 @@ namespace HeatBalanceManager {
         ManageEMS(emsCallFromEndZoneTimestepAfterZoneReporting, anyRan); // EMS calling point
 
         UpdateEMSTrendVariables();
+        EnergyPlus::PluginManagement::pluginManager->updatePluginValues();
 
         if (WarmupFlag && EndDayFlag) {
 

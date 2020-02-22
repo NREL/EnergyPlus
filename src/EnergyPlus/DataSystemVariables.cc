@@ -57,6 +57,8 @@
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 
 namespace EnergyPlus {
 
@@ -411,6 +413,107 @@ namespace DataSystemVariables {
         NumberIntRadThreads = 1;
         iNominalTotSurfaces = 0;
         Threading = false;
+    }
+
+    void processEnvironmentVariables() {
+
+        static std::string cEnvValue;
+
+        get_environment_variable(DDOnlyEnvVar, cEnvValue);
+        DDOnly = env_var_on(cEnvValue); // Yes or True
+        if (DataGlobals::DDOnlySimulation) DDOnly = true;
+
+        get_environment_variable(ReverseDDEnvVar, cEnvValue);
+        ReverseDD = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(DisableGLHECachingEnvVar, cEnvValue);
+        DisableGLHECaching = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(FullAnnualSimulation, cEnvValue);
+        FullAnnualRun = env_var_on(cEnvValue); // Yes or True
+        if (DataGlobals::AnnualSimulation) FullAnnualRun = true;
+
+        get_environment_variable(cDisplayAllWarnings, cEnvValue);
+        DataGlobals::DisplayAllWarnings = env_var_on(cEnvValue); // Yes or True
+        if (DataGlobals::DisplayAllWarnings) {
+            DataGlobals::DisplayAllWarnings = true;
+            DataGlobals::DisplayExtraWarnings = true;
+            DataGlobals::DisplayUnusedSchedules = true;
+            DataGlobals::DisplayUnusedObjects = true;
+        }
+
+        get_environment_variable(cDisplayExtraWarnings, cEnvValue);
+        if (!cEnvValue.empty()) DataGlobals::DisplayExtraWarnings = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cDisplayUnusedObjects, cEnvValue);
+        if (!cEnvValue.empty()) DataGlobals::DisplayUnusedObjects = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cDisplayUnusedSchedules, cEnvValue);
+        if (!cEnvValue.empty()) DataGlobals::DisplayUnusedSchedules = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cDisplayZoneAirHeatBalanceOffBalance, cEnvValue);
+        if (!cEnvValue.empty()) DataGlobals::DisplayZoneAirHeatBalanceOffBalance = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cDisplayAdvancedReportVariables, cEnvValue);
+        if (!cEnvValue.empty()) DataGlobals::DisplayAdvancedReportVariables = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cReportDuringWarmup, cEnvValue);
+        if (!cEnvValue.empty()) ReportDuringWarmup = env_var_on(cEnvValue); // Yes or True
+        if (ReverseDD) ReportDuringWarmup = false;                          // force to false for ReverseDD runs
+
+        get_environment_variable(cReportDuringWarmup, cEnvValue);
+        if (!cEnvValue.empty()) ReportDuringWarmup = env_var_on(cEnvValue); // Yes or True
+        if (DisableGLHECaching) ReportDuringWarmup = true;                  // force to true for standard runs runs
+
+        get_environment_variable(cReportDuringHVACSizingSimulation, cEnvValue);
+        if (!cEnvValue.empty()) ReportDuringHVACSizingSimulation = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cIgnoreSolarRadiation, cEnvValue);
+        if (!cEnvValue.empty()) DataEnvironment::IgnoreSolarRadiation = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cMinimalSurfaceVariables, cEnvValue);
+        if (!cEnvValue.empty()) DataGlobals::CreateMinimalSurfaceVariables = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cSortIDD, cEnvValue);
+        if (!cEnvValue.empty()) SortedIDD = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(MinReportFrequencyEnvVar, cEnvValue);
+        if (!cEnvValue.empty()) MinReportFrequency = cEnvValue; // turned into value later
+
+        get_environment_variable(cDeveloperFlag, cEnvValue);
+        if (!cEnvValue.empty()) DeveloperFlag = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cIgnoreBeamRadiation, cEnvValue);
+        if (!cEnvValue.empty()) DataEnvironment::IgnoreBeamRadiation = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cIgnoreDiffuseRadiation, cEnvValue);
+        if (!cEnvValue.empty()) DataEnvironment::IgnoreDiffuseRadiation = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cSutherlandHodgman, cEnvValue);
+        if (!cEnvValue.empty()) SutherlandHodgman = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cSlaterBarsky, cEnvValue);
+        if (!cEnvValue.empty()) SlaterBarsky = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cMinimalShadowing, cEnvValue);
+        if (!cEnvValue.empty()) lMinimalShadowing = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cTimingFlag, cEnvValue);
+        if (!cEnvValue.empty()) TimingFlag = env_var_on(cEnvValue); // Yes or True
+
+        // Initialize env flags for air loop simulation debugging
+        get_environment_variable(TrackAirLoopEnvVar, cEnvValue);
+        if (!cEnvValue.empty()) TrackAirLoopEnvFlag = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(TraceAirLoopEnvVar, cEnvValue);
+        if (!cEnvValue.empty()) TraceAirLoopEnvFlag = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(TraceHVACControllerEnvVar, cEnvValue);
+        if (!cEnvValue.empty()) TraceHVACControllerEnvFlag = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cDisplayInputInAuditEnvVar, cEnvValue);
+        if (!cEnvValue.empty()) DataGlobals::DisplayInputInAudit = env_var_on(cEnvValue); // Yes or True
+
     }
 
 } // namespace DataSystemVariables
