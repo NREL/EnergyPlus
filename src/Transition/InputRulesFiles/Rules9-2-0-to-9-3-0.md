@@ -48,6 +48,30 @@ a) change "WCS" or "WorldCoordinateSystem" or "Absolute" to "World"
 
 b) change "Rel\*" or "Relative\*" or "Local" to "Relative"
 
+# Object Change: ShadowCalculations
+Insert field 1, Shading Calculation Method, if "External Shading Calculation Method" was specified use:
+ 
+ - "Scheduled" for "ScheduledShading"
+ - "Imported" for "ImportedShading"
+ - "PolygonClipping" for "InternalCalculation" or if not specified
+
+Field 2, Shading Calculation Update Frequency Method, renamed from previous field 1 "Calculation Method" and uses:
+
+- "Periodic" for "AverageOverDaysInFrequency"
+- "Timestep" for "TimestepFrequency"
+
+Field 3, Shading Calculation Update Frequency, renamed from previous field 2 "Calculation Frequency".
+
+Fields 4 and 5, previous fields 3 and 4. No other changes.
+
+Insert field 6, Pixel Counting Resolution.
+
+Field 7, previous field 5. No other changes.
+
+Remove previous field 6 "External Shading Calculation Method".
+
+Remaining fields 8 onward are the same as previous fields 7 onwards. No other changes.
+
 # Object change: Output:Table:SummaryReports
 Any field F1:FN
 

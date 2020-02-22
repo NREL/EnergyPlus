@@ -1146,6 +1146,28 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
 
               ! If your original object starts with S, insert the rules here
 
+              CASE('SHADOWCALCULATION')
+                ObjectName = "ShadowCalculation"
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                IF (SameString(InArgs(6),"ScheduledShading")) THEN
+                  OutArgs(1)="Scheduled"
+                ELSE IF (SameString(InArgs(6),"ImportedShading")) THEN
+                  OutArgs(1)="Imported"
+                ELSE
+                  OutArgs(1)="PolygonClipping"
+                END IF
+                IF (SameString(InArgs(1),"AverageOverDaysInFrequency")) THEN
+                  OutArgs(2)="Periodic"
+                ELSE IF (SameString(InArgs(1),"TimestepFrequency")) THEN
+                  OutArgs(2)="Timestep"
+                END IF
+                OutArgs(3:5) = InArgs(2:4)
+                OutArgs(6) = Blank
+                OutArgs(7) = InArgs(5)
+                OutArgs(8:NwNumArgs) = InArgs(7:NumArgs)
+                CurArgs = CurArgs + 1
+                NoDiff = .false.
+
               ! If your original object starts with T, insert the rules here
 
               ! If your original object starts with U, insert the rules here
