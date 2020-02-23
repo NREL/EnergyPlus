@@ -425,7 +425,7 @@ namespace SimulationManager {
             if (EnergyPlus::PluginManagement::pluginManager) {
                 EnergyPlus::PluginManagement::pluginManager->setupOutputVariables();
             }
-            UpdateMeterReporting();
+            UpdateMeterReporting(outputFiles);
             CheckPollutionMeterReporting();
             facilityElectricServiceObj->verifyCustomMetersElecPowerMgr();
             SetupPollutionCalculations();

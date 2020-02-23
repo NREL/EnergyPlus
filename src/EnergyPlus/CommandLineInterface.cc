@@ -896,7 +896,7 @@ namespace CommandLineInterface {
             if (iostatus != 0) {
                 ShowFatalError("EnergyPlus: Could not open file \"" + MVIfile + "\" for output (write).");
             }
-            ObjexxFCL::gio::write(fileUnitNumber, readvarsFmt) << outputMtrFileName;
+            ObjexxFCL::gio::write(fileUnitNumber, readvarsFmt) << OutputFiles::getSingleton().mtr.fileName;
             ObjexxFCL::gio::write(fileUnitNumber, readvarsFmt) << outputMtrCsvFileName;
             ObjexxFCL::gio::close(fileUnitNumber);
         }
