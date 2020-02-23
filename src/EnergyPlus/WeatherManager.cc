@@ -786,7 +786,7 @@ namespace WeatherManager {
         }
     }
 
-    void GetNextEnvironment(OutputFiles &outputFiles,
+    bool GetNextEnvironment(OutputFiles &outputFiles,
                             bool &Available,  // true if there is another environment, false if the end
                             bool &ErrorsFound // will be set to true if severe errors are found in inputs
     )
@@ -1434,6 +1434,7 @@ namespace WeatherManager {
         } else if (ErrorsFound) {
             Available = false;
         }
+        return Available && !ErrorsFound;
     }
 
     void AddDesignSetToEnvironmentStruct(int const HVACSizingIterCount)
@@ -7130,6 +7131,10 @@ namespace WeatherManager {
                 } else if (UtilityRoutines::SameString(cAlphaArgs(13), "SuppressThermalResetAtBeginEnvironment")) {
                     DesDayInput(EnvrnNum).suppressBegEnvReset = true;
                 }
+            }
+            // for PerformancePrecisionTradeoffs
+            if (DataEnvironment::forceBeginEnvResetSuppress) {
+                DesDayInput(EnvrnNum).suppressBegEnvReset = true;
             }
             //   A7,  \field Rain Indicator
             if (UtilityRoutines::SameString(cAlphaArgs(7), "Yes")) {

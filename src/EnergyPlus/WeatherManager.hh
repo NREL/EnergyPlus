@@ -688,7 +688,7 @@ namespace WeatherManager {
 
     void ResetEnvironmentCounter();
 
-    void GetNextEnvironment(OutputFiles &outputFiles,
+    bool GetNextEnvironment(OutputFiles &outputFiles,
                             bool &Available,  // true if there is another environment, false if the end
                             bool &ErrorsFound // will be set to true if severe errors are found in inputs
     );

@@ -204,6 +204,7 @@ namespace DataGlobals {
     std::ostream *err_stream(nullptr);               // Internal stream used for err output (used for performance)
     int StdOutputRecordCount(0);                     // Count of Standard output records
     int OutputFileDebug(0);                          // Unit number for debug outputs
+    int OutputFilePerfLog(0);                        // Unit number for performance log outputs
     std::ostream *mtr_stream(nullptr);               // Internal stream used for mtr output (used for performance)
     int OutputFileShadingFrac(0);                    // Unit number for shading output
     int StdMeterRecordCount(0);                      // Count of Meter output records
@@ -257,15 +258,22 @@ namespace DataGlobals {
     bool AnyBasementsInModel(false);     // true if there are any basements in the input file
     // Performance tradeoff globals
     bool DoCoilDirectSolutions(false);       //true if use coil direction solutions
+    bool createProfLog(false); //true if the _proflog.csv file should be created and a PerformancePrecisionTradeoffs object is used
 
     int Progress(0); // current progress (0-100)
     void (*fProgressPtr)(int const);
     void (*fMessagePtr)(std::string const &);
+    void (*progressCallback)(int const);
+    void (*messageCallback)(const char * message);
+    void (*errorCallback)(const char * errorMessage);
+
+    bool eplusRunningViaAPI;
 
     // Clears the global data in DataGlobals.
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
+
         runReadVars = false;
         DDOnlySimulation = false;
         AnnualSimulation = false;
@@ -303,6 +311,7 @@ namespace DataGlobals {
         OutputStandardError = 0;
         StdOutputRecordCount = 0;
         OutputFileDebug = 0;
+        OutputFilePerfLog = 0;
         OutputFileShadingFrac = 0;
         StdMeterRecordCount = 0;
         OutputFileBNDetails = 0;
@@ -353,10 +362,16 @@ namespace DataGlobals {
         AnyBasementsInModel = false;
         DoCoilDirectSolutions = false;
         Progress = 0;
+        fProgressPtr = nullptr;
+        fMessagePtr = nullptr;
+        progressCallback = nullptr;
+        messageCallback = nullptr;
+        errorCallback = nullptr;
         eso_stream = nullptr;
         mtr_stream = nullptr;
         err_stream = nullptr;
         delightin_stream = nullptr;
+        eplusRunningViaAPI = false;
     }
 
 } // namespace DataGlobals

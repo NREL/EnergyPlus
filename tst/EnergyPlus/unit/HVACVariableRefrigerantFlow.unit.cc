@@ -8288,9 +8288,10 @@ TEST_F(HVACVRFFixture, VRFFluidControl_FanSysModel_OnOffModeTest)
         " !-   ===========  ALL OBJECTS IN CLASS: SHADOWCALCULATION ===========",
 
         " ShadowCalculation,",
-        "     AverageOverDaysInFrequency,  !- Calculation Method",
-        "     20,                      !- Calculation Frequency",
-        "     15000;                   !- Maximum Figures in Shadow Overlap Calculations",
+        "    PolygonClipping,         !- Shading Calculation Method",
+        "    Periodic,                !- Shading Calculation Update Frequency Method",
+        "    20,                      !- Shading Calculation Update Frequency",
+        "    15000;                   !- Maximum Figures in Shadow Overlap Calculations",
 
         " !-   ===========  ALL OBJECTS IN CLASS: ZONEAIRHEATBALANCEALGORITHM ===========",
 

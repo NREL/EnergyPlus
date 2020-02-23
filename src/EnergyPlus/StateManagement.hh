@@ -45,24 +45,8 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef EnergyPlusPgm_hh_INCLUDED
-#define EnergyPlusPgm_hh_INCLUDED
+#include <EnergyPlus/EnergyPlus.hh>
 
-#include <EnergyPlus/public/EnergyPlusAPI.hh>
-
-// C++ Headers
-#include <string>
-
-// Functions
-
-void CreateCurrentDateTimeString(std::string &CurrentDateTimeString);
-
-void ENERGYPLUSLIB_API EnergyPlusPgm(std::string const &filepath = std::string());
-
-int ENERGYPLUSLIB_API RunEnergyPlus(std::string const & filepath = std::string());
-
-void ENERGYPLUSLIB_API StoreProgressCallback(void (*f)(int const));
-
-void ENERGYPLUSLIB_API StoreMessageCallback(void (*f)(std::string const &));
-
-#endif
+namespace EnergyPlus {
+    void clearAllStates();
+}

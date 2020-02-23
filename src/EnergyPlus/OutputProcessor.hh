@@ -62,6 +62,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
 
 namespace EnergyPlus {
     class OutputFile;
@@ -620,6 +621,7 @@ namespace OutputProcessor {
                                          ReportingFrequency const ReportFreq // Reporting Frequency
     );
 
+    // TODO: GET RID OF THESE REDIMENSIONS
     inline void ReallocateIntegerArray(Array1D_int &Array,
                                        int &ArrayMax,     // Current and resultant dimension for Array
                                        int const ArrayInc // increment for redimension
@@ -903,6 +905,12 @@ namespace OutputProcessor {
 
     std::string timeStepTypeEnumToString(OutputProcessor::TimeStepType const &t_timeStepType);
 
+    struct APIOutputVariableRequest {
+        std::string varName = "";
+        std::string varKey = "";
+    };
+    extern std::vector<APIOutputVariableRequest> apiVarRequests;
+
 } // namespace OutputProcessor
 
 //==============================================================================================
@@ -1038,6 +1046,8 @@ void AddToOutputVariableList(std::string const &VarName, // Variable Name
                              OutputProcessor::Unit const unitsForVar,
                              Optional_string_const customUnitName = _ // the custom name for the units from EMS definition of units
 );
+
+int initErrorFile();
 
 } // namespace EnergyPlus
 
