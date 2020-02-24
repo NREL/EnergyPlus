@@ -525,12 +525,18 @@ json IdfParser::parse_value(std::string const &idf, size_t &index, bool &success
             }
         } else if (icompare(parsed_string, "Autosize") || icompare(parsed_string, "Autocalculate")) {
             auto const &default_it = field_loc.find("default");
+            auto const &anyOf_it = field_loc.find("anyOf");
+
+            if (anyOf_it == field_loc.end()) {
+                errors_.emplace_back("Line: " + std::to_string(cur_line_num) + " Index: " + std::to_string(index_into_cur_line) + " - Field cannot be Autosize or Autocalculate");
+                return parsed_string;
+            }
             // The following is hacky because it abuses knowing the consistent generated structure
             // in the future this might not hold true for the array indexes.
             if (default_it != field_loc.end()) {
-                return field_loc["anyOf"][1]["enum"][1];
+                return field_loc.at("anyOf")[1]["enum"][1];
             } else {
-                return field_loc["anyOf"][1]["enum"][0];
+                return field_loc.at("anyOf")[1]["enum"][0];
             }
         }
         return parsed_string;
