@@ -551,7 +551,6 @@ ADD_SIMULATION_TEST(IDF_FILE UnitarySystem_MultiSpeedCoils_SingleMode.idf EPW_FI
 ADD_SIMULATION_TEST(IDF_FILE UnitarySystem_MultiSpeedDX.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE UnitarySystem_SingleSpeedDX.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE UnitarySystem_SubcoolReheatDX.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
-ADD_SIMULATION_TEST(IDF_FILE UnitarySystem_SingleSpeedDX_SharedData.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE UnitarySystem_TwoSpeedDX.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE UnitarySystem_TwoStageDX.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)
 ADD_SIMULATION_TEST(IDF_FILE UnitarySystem_TwoStageDXWithHumidityControl.idf EPW_FILE USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw)

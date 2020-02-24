@@ -2987,8 +2987,7 @@
   Temperature,  !- Input Unit Type for Y
   Dimensionless;  !- Output Unit Type
 
-  ! 0.9989,  R Squared
-  Curve:Biquadratic,  
+  Curve:Biquadratic,
   NormalTempCoolingEIRFTemp,  !- Name
   -0.0439174307,  !- Coefficient1 Constant
   0.0620812106,  !- Coefficient2 x
@@ -3006,8 +3005,7 @@
   Temperature,  !- Input Unit Type for Y
   Dimensionless;  !- Output Unit Type
 
-  ! 1,  R Squared
-  Curve:Quadratic,  
+  Curve:Quadratic,
   NormalFlowCoolingCAPFFF,  !- Name
   0.7333333334,  !- Coefficient1 Constant
   0.3733333333,  !- Coefficient2 x
@@ -3019,8 +3017,7 @@
   Dimensionless,  !- Input Unit Type for X
   Dimensionless;  !- Output Unit Type
 
-  ! 1,  R Squared
-  Curve:Quadratic,  
+  Curve:Quadratic,
   NormalFlowCoolingEIRFFF,  !- Name
   1.1970044563,  !- Coefficient1 Constant
   -0.2513822149,  !- Coefficient2 x
@@ -3032,38 +3029,35 @@
   Dimensionless,  !- Input Unit Type for X
   Dimensionless;  !- Output Unit Type
 
-! 0.9998	R Squared
-Curve:Biquadratic,	
-NormalSHRTempCoolingFFF,	!- Name
-3.9903739056,	!- Coefficient1 Constant
--0.2158168778,	!- Coefficient2 x
-0.0034746418,	!- Coefficient3 x**2
-0.0310505116,	!- Coefficient4 y
--0.0000360698,	!- Coefficient5 y**2
--0.0016903602,	!- Coefficient6 x*y
-16.67,	!- Minimum Value of x
-22.22,	!- Maximum Value of x
-23.89, !- Minimum Value of y
-51.67,	!- Maximum Value of y
-0.4786,	!- Minimum Curve Output
-1.4194,	!- Maximum Curve Output
-Temperature,	!- Input Unit Type for X
-Temperature,	!- Input Unit Type for Y
-Dimensionless;	!- Output Unit Type
+  Curve:Biquadratic,
+  NormalSHRTempCoolingFFF,    !- Name
+  3.9903739056,   !- Coefficient1 Constant
+  -0.2158168778,  !- Coefficient2 x
+  0.0034746418,   !- Coefficient3 x**2
+  0.0310505116,   !- Coefficient4 y
+  -0.0000360698,  !- Coefficient5 y**2
+  -0.0016903602,  !- Coefficient6 x*y
+  16.67,  !- Minimum Value of x
+  22.22,  !- Maximum Value of x
+  23.89,  !- Minimum Value of y
+  51.67,  !- Maximum Value of y
+  0.4786, !- Minimum Curve Output
+  1.4194, !- Maximum Curve Output
+  Temperature,    !- Input Unit Type for X
+  Temperature,    !- Input Unit Type for Y
+  Dimensionless;  !- Output Unit Type
 
-! 1	R Squared
-Curve:Quadratic,	
-NormalSHRFlowCoolingFFF,	!- Name
-0.5620186265,	!- Coefficient1 Constant
-0.4708409870,	!- Coefficient2 x
--0.0285306092,	!- Coefficient3 x**2
-0.7500000000,	!- Minimum Value of x
-1.2500000000,	!- Maximum Value of x
-0.8991000000,	!- Minimum Curve Output
-1.11,	!- Maximum Curve Output
-Dimensionless,	!- Input Unit Type for X
-Dimensionless;	!- Output Unit Type
-
+  Curve:Quadratic,
+  NormalSHRFlowCoolingFFF,    !- Name
+  0.5620186265,   !- Coefficient1 Constant
+  0.4708409870,   !- Coefficient2 x
+  -0.0285306092,  !- Coefficient3 x**2
+  0.7500000000,   !- Minimum Value of x
+  1.2500000000,   !- Maximum Value of x
+  0.8991000000,   !- Minimum Curve Output
+  1.11,   !- Maximum Curve Output
+  Dimensionless,  !- Input Unit Type for X
+  Dimensionless;  !- Output Unit Type
 
   Coil:Cooling:DX:CurveFit:OperatingMode,
     Sys 1 Furnace DX Cool Cooling Coil Alternative Mode 1,  !- Name
