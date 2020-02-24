@@ -45,19 +45,18 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-
 #ifndef ENERGYPLUS_COILS_COILCOOLINGDXCURVEFITPERFORMANCE
 #define ENERGYPLUS_COILS_COILCOOLINGDXCURVEFITPERFORMANCE
 
 #include <string>
 #include <vector>
 
-#include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitOperatingMode.hh>
 #include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-    class OutputFiles;
+class OutputFiles;
 
 struct CoilCoolingDXCurveFitPerformanceInputSpecification
 {
@@ -79,7 +78,7 @@ struct CoilCoolingDXCurveFitPerformanceInputSpecification
 struct CoilCoolingDXCurveFitPerformance
 {
     std::string object_name = "Coil:Cooling:DX:CurveFit:Performance";
-    void instantiateFromInputSpec(const CoilCoolingDXCurveFitPerformanceInputSpecification& input_data);
+    void instantiateFromInputSpec(const CoilCoolingDXCurveFitPerformanceInputSpecification &input_data);
     void simulate(const DataLoopNode::NodeData &inletNode,
                   DataLoopNode::NodeData &outletNode,
                   int useAlternateMode,
@@ -100,11 +99,12 @@ struct CoilCoolingDXCurveFitPerformance
                    int &fanOpMode,
                    DataLoopNode::NodeData &condInletNode,
                    DataLoopNode::NodeData &condOutletNode);
-    void calcStandardRatings(int supplyFanIndex, int supplyFanType, std::string const &supplyFanName, int condInletNodeIndex, EnergyPlus::OutputFiles &outputFiles);
+    void calcStandardRatings(
+        int supplyFanIndex, int supplyFanType, std::string const &supplyFanName, int condInletNodeIndex, EnergyPlus::OutputFiles &outputFiles);
     Real64 calcIEERResidual(Real64 const SupplyAirMassFlowRate, std::vector<Real64> const &Par);
     CoilCoolingDXCurveFitPerformanceInputSpecification original_input_specs;
     CoilCoolingDXCurveFitPerformance() = default;
-	explicit CoilCoolingDXCurveFitPerformance(const std::string& name);
+    explicit CoilCoolingDXCurveFitPerformance(const std::string &name);
     void size();
     void setOperMode(CoilCoolingDXCurveFitOperatingMode &currentMode, int const mode);
 
@@ -117,18 +117,18 @@ struct CoilCoolingDXCurveFitPerformance
     Real64 unitStatic = 0.0;
     bool mySizeFlag = true;
 
-	enum CapControlMethod
-	{
-            CONTINUOUS,
-            DISCRETE
-        };
-	CapControlMethod capControlMethod = CapControlMethod::DISCRETE;
+    enum CapControlMethod
+    {
+        CONTINUOUS,
+        DISCRETE
+    };
+    CapControlMethod capControlMethod = CapControlMethod::DISCRETE;
 
     Real64 evapCondBasinHeatCap = 0.0;
     Real64 evapCondBasinHeatSetpoint = 0.0;
     int evapCondBasinHeatSchedulIndex = 0;
-	Real64 basinHeaterElectricityConsumption = 0.0;
-	Real64 basinHeaterPower = 0.0;
+    Real64 basinHeaterElectricityConsumption = 0.0;
+    Real64 basinHeaterPower = 0.0;
     Real64 powerUse = 0.0;
     Real64 electricityConsumption = 0.0;
     Real64 RTF = 0.0;
