@@ -616,9 +616,9 @@ namespace AirflowNetwork {
         }
     }
 
-    void SOLVZP(Array1A_int IK,     // pointer to the top of column/row "K"
-                Array1A<Real64> AD, // the main diagonal of [A] before and after factoring
-                Array1A<Real64> AU, // the upper triangle of [A] before and after factoring
+    void SOLVZP(Array1D_int &IK,     // pointer to the top of column/row "K"
+                Array1D<Real64> &AD, // the main diagonal of [A] before and after factoring
+                Array1D<Real64> &AU, // the upper triangle of [A] before and after factoring
                 int &ITER           // number of iterations
     )
     {
@@ -641,9 +641,9 @@ namespace AirflowNetwork {
         // na
 
         // Argument array dimensioning
-        IK.dim(NetworkNumOfNodes + 1);
-        AD.dim(NetworkNumOfNodes);
-        AU.dim(IK(NetworkNumOfNodes + 1));
+        IK.dimension(NetworkNumOfNodes + 1);
+        AD.dimension(NetworkNumOfNodes);
+        AU.dimension(IK(NetworkNumOfNodes + 1));
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1700,10 +1700,10 @@ namespace AirflowNetwork {
         return 1;
     }
 
-    void FACSKY(Array1A<Real64> AU,   // the upper triangle of [A] before and after factoring
-                Array1A<Real64> AD,   // the main diagonal of [A] before and after factoring
-                Array1A<Real64> AL,   // the lower triangle of [A] before and after factoring
-                Array1A_int const IK, // pointer to the top of column/row "K"
+    void FACSKY(Array1D<Real64> &AU,   // the upper triangle of [A] before and after factoring
+                Array1D<Real64> &AD,   // the main diagonal of [A] before and after factoring
+                Array1D<Real64> &AL,   // the lower triangle of [A] before and after factoring
+                const Array1D_int &IK, // pointer to the top of column/row "K"
                 int const NEQ,        // number of equations
                 int const NSYM        // symmetry:  0 = symmetric matrix, 1 = non-symmetric
     )
@@ -1736,10 +1736,10 @@ namespace AirflowNetwork {
         // na
 
         // Argument array dimensioning
-        AU.dim(IK(NetworkNumOfNodes + 1));
-        AD.dim(NetworkNumOfNodes);
-        AL.dim(IK(NetworkNumOfNodes + 1) - 1);
-        IK.dim(NetworkNumOfNodes + 1);
+        AU.dimension(IK(NetworkNumOfNodes + 1));
+        AD.dimension(NetworkNumOfNodes);
+        AL.dimension(IK(NetworkNumOfNodes + 1) - 1);
+        //IK.dimension(NetworkNumOfNodes + 1);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1849,11 +1849,11 @@ namespace AirflowNetwork {
         }
     }
 
-    void SLVSKY(Array1A<Real64> const AU, // the upper triangle of [A] before and after factoring
-                Array1A<Real64> const AD, // the main diagonal of [A] before and after factoring
-                Array1A<Real64> const AL, // the lower triangle of [A] before and after factoring
-                Array1A<Real64> B,        // "B" vector (input); "X" vector (output).
-                Array1A_int const IK,     // pointer to the top of column/row "K"
+    void SLVSKY(const Array1D<Real64> &AU, // the upper triangle of [A] before and after factoring
+                const Array1D<Real64> &AD, // the main diagonal of [A] before and after factoring
+                const Array1D<Real64> &AL, // the lower triangle of [A] before and after factoring
+                Array1D<Real64> &B,        // "B" vector (input); "X" vector (output).
+                const Array1D_int &IK,     // pointer to the top of column/row "K"
                 int const NEQ,            // number of equations
                 int const NSYM            // symmetry:  0 = symmetric matrix, 1 = non-symmetric
     )
@@ -1881,11 +1881,11 @@ namespace AirflowNetwork {
         // na
 
         // Argument array dimensioning
-        AU.dim(IK(NetworkNumOfNodes + 1));
-        AD.dim(NetworkNumOfNodes);
-        AL.dim(IK(NetworkNumOfNodes + 1) - 1);
-        B.dim(NetworkNumOfNodes);
-        IK.dim(NetworkNumOfNodes + 1);
+        //AU.dimension(IK(NetworkNumOfNodes + 1));
+        //AD.dimension(NetworkNumOfNodes);
+        //AL.dimension(IK(NetworkNumOfNodes + 1) - 1);
+        B.dimension(NetworkNumOfNodes);
+        //IK.dimension(NetworkNumOfNodes + 1);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1951,12 +1951,12 @@ namespace AirflowNetwork {
         }
     }
 
-    void FILSKY(Array1A<Real64> const X,     // element array (row-wise sequence)
-                std::array<int, 2> const LM, // location matrix
-                Array1A_int const IK,        // pointer to the top of column/row "K"
-                Array1A<Real64> AU,          // the upper triangle of [A] before and after factoring
-                Array1A<Real64> AD,          // the main diagonal of [A] before and after factoring
-                int const FLAG               // mode of operation
+    void FILSKY(const Array1D<Real64> &X,     // element array (row-wise sequence)
+                std::array<int, 2> const LM,  // location matrix
+                const Array1D_int &IK,        // pointer to the top of column/row "K"
+                Array1D<Real64> &AU,          // the upper triangle of [A] before and after factoring
+                Array1D<Real64> &AD,          // the main diagonal of [A] before and after factoring
+                int const FLAG                // mode of operation
     )
     {
 
@@ -1981,10 +1981,10 @@ namespace AirflowNetwork {
         // na
 
         // Argument array dimensioning
-        X.dim(4);
-        IK.dim(NetworkNumOfNodes + 1);
-        AU.dim(IK(NetworkNumOfNodes + 1));
-        AD.dim(NetworkNumOfNodes);
+        //X.dimension(4);
+        //IK.dimension(NetworkNumOfNodes + 1);
+        AU.dimension(IK(NetworkNumOfNodes + 1));
+        AD.dimension(NetworkNumOfNodes);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2029,7 +2029,7 @@ namespace AirflowNetwork {
     }
 
     void DUMPVD(std::string const &S,    // Description
-                Array1A<Real64> const V, // Output values
+                const Array1D<Real64> &V, // Output values
                 int const n,             // Array size
                 int const UOUT           // Output file unit
     )
@@ -2056,7 +2056,7 @@ namespace AirflowNetwork {
         // na
 
         // Argument array dimensioning
-        V.dim(_);
+        //V.dim(_);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2087,7 +2087,7 @@ namespace AirflowNetwork {
     }
 
     void DUMPVR(std::string const &S,    // Description
-                Array1A<Real64> const V, // Output values
+                const Array1D<Real64> &V, // Output values
                 int const n,             // Array size
                 int const UOUT           // Output file unit
     )
@@ -2114,7 +2114,7 @@ namespace AirflowNetwork {
         // na
 
         // Argument array dimensioning
-        V.dim(_);
+        //V.dim(_);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

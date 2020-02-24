@@ -175,10 +175,10 @@ namespace AirflowNetwork {
 
     void AIRMOV();
 
-    void SOLVZP(Array1A_int IK,     // pointer to the top of column/row "K"
-                Array1A<Real64> AD, // the main diagonal of [A] before and after factoring
-                Array1A<Real64> AU, // the upper triangle of [A] before and after factoring
-                int &ITER           // number of iterations
+    void SOLVZP(Array1D_int &IK,     // pointer to the top of column/row "K"
+                Array1D<Real64> &AD, // the main diagonal of [A] before and after factoring
+                Array1D<Real64> &AU, // the upper triangle of [A] before and after factoring
+                int &ITER            // number of iterations
     );
 
     void FILJAC(int const NNZE,  // number of nonzero entries in the "AU" array.
@@ -239,41 +239,41 @@ namespace AirflowNetwork {
                     std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
     );
 
-    void FACSKY(Array1A<Real64> AU,   // the upper triangle of [A] before and after factoring
-                Array1A<Real64> AD,   // the main diagonal of [A] before and after factoring
-                Array1A<Real64> AL,   // the lower triangle of [A] before and after factoring
-                Array1A_int const IK, // pointer to the top of column/row "K"
-                int const NEQ,        // number of equations
-                int const NSYM        // symmetry:  0 = symmetric matrix, 1 = non-symmetric
+    void FACSKY(Array1D<Real64> &AU,   // the upper triangle of [A] before and after factoring
+                Array1D<Real64> &AD,   // the main diagonal of [A] before and after factoring
+                Array1D<Real64> &AL,   // the lower triangle of [A] before and after factoring
+                const Array1D_int &IK, // pointer to the top of column/row "K"
+                int const NEQ,         // number of equations
+                int const NSYM         // symmetry:  0 = symmetric matrix, 1 = non-symmetric
     );
 
-    void SLVSKY(Array1A<Real64> const AU, // the upper triangle of [A] before and after factoring
-                Array1A<Real64> const AD, // the main diagonal of [A] before and after factoring
-                Array1A<Real64> const AL, // the lower triangle of [A] before and after factoring
-                Array1A<Real64> B,        // "B" vector (input); "X" vector (output).
-                Array1A_int const IK,     // pointer to the top of column/row "K"
-                int const NEQ,            // number of equations
-                int const NSYM            // symmetry:  0 = symmetric matrix, 1 = non-symmetric
+    void SLVSKY(const Array1D<Real64> &AU, // the upper triangle of [A] before and after factoring
+                const Array1D<Real64> &AD, // the main diagonal of [A] before and after factoring
+                const Array1D<Real64> &AL, // the lower triangle of [A] before and after factoring
+                Array1D<Real64> &B,        // "B" vector (input); "X" vector (output).
+                const Array1D_int &IK,     // pointer to the top of column/row "K"
+                int const NEQ,             // number of equations
+                int const NSYM             // symmetry:  0 = symmetric matrix, 1 = non-symmetric
     );
 
-    void FILSKY(Array1A<Real64> const X,     // element array (row-wise sequence)
+    void FILSKY(const Array1D<Real64> &X,    // element array (row-wise sequence)
                 std::array<int, 2> const LM, // location matrix
-                Array1A_int const IK,        // pointer to the top of column/row "K"
-                Array1A<Real64> AU,          // the upper triangle of [A] before and after factoring
-                Array1A<Real64> AD,          // the main diagonal of [A] before and after factoring
+                const Array1D_int &IK,       // pointer to the top of column/row "K"
+                Array1D<Real64> &AU,         // the upper triangle of [A] before and after factoring
+                Array1D<Real64> &AD,         // the main diagonal of [A] before and after factoring
                 int const FLAG               // mode of operation
     );
 
-    void DUMPVD(std::string const &S,    // Description
-                Array1A<Real64> const V, // Output values
-                int const n,             // Array size
-                int const UOUT           // Output file unit
+    void DUMPVD(std::string const &S,     // Description
+                const Array1D<Real64> &V, // Output values
+                int const n,              // Array size
+                int const UOUT            // Output file unit
     );
 
-    void DUMPVR(std::string const &S,    // Description
-                Array1A<Real64> const V, // Output values
-                int const n,             // Array size
-                int const UOUT           // Output file unit
+    void DUMPVR(std::string const &S,     // Description
+                const Array1D<Real64> &V, // Output values
+                int const n,              // Array size
+                int const UOUT            // Output file unit
     );
 
     int AFEDOP(int const j,                // Component number
