@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -67,6 +67,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/OutputFiles.hh>
 // TODO: move DetermineMinuteForReporting to avoid bringing this one in
 #include <EnergyPlus/OutputProcessor.hh>
 
@@ -1574,302 +1575,26 @@ namespace General {
 
     std::string TrimSigDigits(Real64 const RealValue, int const SigDigits)
     {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   March 2002
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function accepts a number as parameter as well as the number of
-        // significant digits after the decimal point to report and returns a string
-        // that is appropriate.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // USE, INTRINSIC :: IEEE_ARITHMETIC, ONLY : IEEE_IS_NAN ! Use IEEE_IS_NAN when GFortran supports it
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        static std::string const NAN_string("NAN");
-        static std::string const ZEROOOO("0.000000000000000000000000000");
-        static ObjexxFCL::gio::Fmt fmtLD("*");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-
-        if (std::isnan(RealValue)) return NAN_string;
-
-        std::string String; // Working string
-        if (RealValue != 0.0) {
-            ObjexxFCL::gio::write(String, fmtLD) << RealValue;
-        } else {
-            String = ZEROOOO;
-        }
-        std::string::size_type const EPos = index(String, 'E'); // Position of E in original string format xxEyy
-        std::string EString;                                    // E string retained from original string
-        if (EPos != std::string::npos) {
-            EString = String.substr(EPos);
-            String.erase(EPos);
-        }
-        std::string::size_type const DotPos = index(String, '.'); // Position of decimal point in original string
-        std::string::size_type const SLen = len(String);          // Length of String (w/o E part)
-        bool IncludeDot;                                          // True when decimal point output
-        if (SigDigits > 0 || EString != "") {
-            IncludeDot = true;
-        } else {
-            IncludeDot = false;
-        }
-        if (IncludeDot) {
-            String.erase(min(DotPos + SigDigits + 1, SLen));
-            String += EString;
-        } else {
-            String.erase(DotPos);
-        }
-        return stripped(String);
+        return format("{:.{}T}", RealValue, SigDigits);
     }
 
     std::string TrimSigDigits(int const IntegerValue,
                               Optional_int_const EP_UNUSED(SigDigits) // ignored
     )
     {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   March 2002
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function accepts a number as parameter as well as the number of
-        // significant digits after the decimal point to report and returns a string
-        // that is appropriate.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtLD("*");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        std::string String; // Working string
-
-        ObjexxFCL::gio::write(String, fmtLD) << IntegerValue;
-        return stripped(String);
+        return format("{}", IntegerValue);
     }
 
     std::string RoundSigDigits(Real64 const RealValue, int const SigDigits)
     {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   March 2002
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function accepts a number as parameter as well as the number of
-        // significant digits after the decimal point to report and returns a string
-        // that is appropriate.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // USE, INTRINSIC :: IEEE_ARITHMETIC, ONLY : IEEE_IS_NAN ! Use IEEE_IS_NAN when GFortran supports it
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        static std::string const DigitChar("01234567890");
-        static std::string const NAN_string("NAN");
-        static std::string const ZEROOOO("0.000000000000000000000000000");
-        static ObjexxFCL::gio::Fmt fmtLD("*");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-
-        if (std::isnan(RealValue)) return NAN_string;
-
-        std::string String; // Working string
-        if (RealValue != 0.0) {
-            ObjexxFCL::gio::write(String, fmtLD) << RealValue;
-        } else {
-            String = ZEROOOO;
-        }
-
-        std::string::size_type const EPos = index(String, 'E'); // Position of E in original string format xxEyy
-        std::string EString;                                    // E string retained from original string
-        if (EPos != std::string::npos) {
-            EString = String.substr(EPos);
-            String.erase(EPos);
-        }
-
-        std::string::size_type const DotPos = index(String, '.'); // Position of decimal point in original string
-        assert(DotPos != std::string::npos);
-        assert(DotPos > 0); // Or SPos will not be valid
-        char TestChar(DotPos + SigDigits + 1 < String.length()
-                          ? String[DotPos + SigDigits + 1]
-                          : ' '); // Test character (digit) for rounding, if position in digit string >= 5 (digit is 5 or greater) then will round
-        std::string::size_type const TPos = index(DigitChar, TestChar); // Position of Testchar in Digit string
-
-        std::string::size_type SPos; // Actual string position being replaced
-        if (SigDigits == 0) {
-            SPos = DotPos - 1;
-        } else {
-            SPos = DotPos + SigDigits;
-        }
-
-        if ((TPos != std::string::npos) && (TPos >= 5)) {             // Must round to next Digit
-            char const Char2Rep = String[SPos];                       // Character (digit) to be replaced
-            std::string::size_type NPos = index(DigitChar, Char2Rep); // Position of "next" char in Digit String
-            std::string::size_type TPos1;
-            assert(NPos != std::string::npos);
-            String[SPos] = DigitChar[NPos + 1];
-            while (NPos == 9) { // Must change other char too
-                if (SigDigits == 1) {
-                    assert(SPos >= 2u);
-                    TestChar = String[SPos - 2];
-                    if (TestChar == '.') {
-                        assert(SPos >= 3u);
-                        TestChar = String[SPos - 3];
-                        SPos -= 2;
-                    }
-                    if (TestChar == ' ') {
-                        TestChar = '0';           // all 999s
-                    } else if (TestChar == '-') { // Autodesk Added to fix bug for values like -9.9999
-                        assert(SPos >= 3u);
-                        String[SPos - 3] = TestChar; // Shift sign left to avoid overwriting it
-                        TestChar = '0';              // all 999s
-                    }
-                    TPos1 = index(DigitChar, TestChar);
-                    assert(TPos1 != std::string::npos);
-                    assert(SPos >= 2u);
-                    String[SPos - 2] = DigitChar[TPos1 + 1];
-                } else {
-                    assert(SPos >= 1u);
-                    TestChar = String[SPos - 1];
-                    if (TestChar == '.') {
-                        assert(SPos >= 2u);
-                        TestChar = String[SPos - 2];
-                        --SPos;
-                    }
-                    if (TestChar == ' ') {
-                        TestChar = '0';           // all 999s
-                    } else if (TestChar == '-') { // Autodesk Added to fix bug for values like -9.9999
-                        assert(SPos >= 2u);
-                        String[SPos - 2] = TestChar; // Shift sign left to avoid overwriting it
-                        TestChar = '0';              // all 999s
-                    }
-                    TPos1 = index(DigitChar, TestChar);
-                    assert(TPos1 != std::string::npos);
-                    assert(SPos >= 1u);
-                    String[SPos - 1] = DigitChar[TPos1 + 1];
-                }
-                --SPos;
-                NPos = TPos1;
-            }
-        }
-
-        bool IncludeDot; // True when decimal point output
-        if (SigDigits > 0 || EString != "") {
-            IncludeDot = true;
-        } else {
-            IncludeDot = false;
-        }
-        if (IncludeDot) {
-            String.erase(min(DotPos + SigDigits + 1, len(String)));
-            String += EString;
-        } else {
-            String.erase(DotPos);
-        }
-
-        return stripped(String);
+        return format("{:.{}R}", RealValue, SigDigits);
     }
 
     std::string RoundSigDigits(int const IntegerValue,
                                Optional_int_const EP_UNUSED(SigDigits) // ignored
     )
     {
-
-        // FUNCTION INFORMATION:
-        //       AUTHOR         Linda K. Lawrie
-        //       DATE WRITTEN   March 2002
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
-
-        // PURPOSE OF THIS FUNCTION:
-        // This function accepts a number as parameter as well as the number of
-        // significant digits after the decimal point to report and returns a string
-        // that is appropriate.
-
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // USE STATEMENTS:
-        // na
-
-        // Locals
-        // FUNCTION ARGUMENT DEFINITIONS:
-
-        // FUNCTION PARAMETER DEFINITIONS:
-        static ObjexxFCL::gio::Fmt fmtLD("*");
-
-        // INTERFACE BLOCK SPECIFICATIONS
-        // na
-
-        // DERIVED TYPE DEFINITIONS
-        // na
-
-        // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        std::string String; // Working string
-
-        ObjexxFCL::gio::write(String, fmtLD) << IntegerValue;
-        return stripped(String);
+        return format("{}", IntegerValue);
     }
 
     std::string RemoveTrailingZeros(std::string const &InputString)

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -69,6 +69,7 @@
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SolarShading.hh>
@@ -344,14 +345,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
         "    FullInteriorAndExterior, !- Solar Distribution",
         "    25,                      !- Maximum Number of Warmup Days",
         "    6;                       !- Minimum Number of Warmup Days",
-
-        "  Timestep,6;",
-
-        "  SurfaceConvectionAlgorithm:Inside,TARP;",
-
-        "  SurfaceConvectionAlgorithm:Outside,DOE-2;",
-
-        "  HeatBalanceAlgorithm,ConductionTransferFunction;",
 
         "  Output:DebuggingData,0,0;",
 
@@ -691,20 +684,20 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    HeatBalanceManager::GetProjectControlData(ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(ErrorsFound);
+    SurfaceGeometry::GetSurfaceData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     DataZoneEquipment::ZoneEquipConfig.allocate(1);
@@ -1222,25 +1215,25 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertyLocalEnv)
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    ScheduleManager::ProcessScheduleInput();
+    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
 
-    HeatBalanceManager::GetProjectControlData(ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::SetupZoneGeometry(ErrorsFound);
+    SurfaceGeometry::SetupZoneGeometry(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    HeatBalanceIntRadExchange::InitSolarViewFactors();
+    HeatBalanceIntRadExchange::InitSolarViewFactors(OutputFiles::getSingleton());
     EXPECT_FALSE(has_err_output(true));
 
     EXPECT_TRUE(DataGlobals::AnyLocalEnvironmentsInModel);
@@ -1801,25 +1794,25 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfPropertySrdSurfLWR)
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    ScheduleManager::ProcessScheduleInput();
+    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
 
-    HeatBalanceManager::GetProjectControlData(ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::SetupZoneGeometry(ErrorsFound);
+    SurfaceGeometry::SetupZoneGeometry(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    HeatBalanceIntRadExchange::InitSolarViewFactors();
+    HeatBalanceIntRadExchange::InitSolarViewFactors(OutputFiles::getSingleton());
     EXPECT_FALSE(has_err_output(true));
 
     EXPECT_TRUE(DataGlobals::AnyLocalEnvironmentsInModel);
@@ -1976,7 +1969,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_SurfaceCOnstructionIndexTest
     DataHeatBalance::Construct(1).CTFTUserSource(0) = 0.25;
 
     AllocateSurfaceHeatBalArrays(); // allocates a host of variables related to CTF calculations
-    OutputProcessor::GetReportVariableInput();
+    OutputProcessor::GetReportVariableInput(OutputFiles::getSingleton());
 
     EXPECT_EQ(OutputProcessor::ReqRepVars(2).VarName, "SURFACE CONSTRUCTION INDEX");
 }
@@ -2366,26 +2359,26 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceA
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    HeatBalanceManager::GetProjectControlData(ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::SetupZoneGeometry(ErrorsFound);
+    SurfaceGeometry::SetupZoneGeometry(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // Clear schedule type warnings
     EXPECT_TRUE(has_err_output(true));
 
-    HeatBalanceIntRadExchange::InitSolarViewFactors();
+    HeatBalanceIntRadExchange::InitSolarViewFactors(OutputFiles::getSingleton());
     EXPECT_TRUE(compare_err_stream(""));
     EXPECT_FALSE(has_err_output(true));
 

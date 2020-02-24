@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -58,6 +58,7 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include "OutputFiles.hh"
 #include <EnergyPlus/ConductionTransferFunctionCalc.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataBSDFWindow.hh>
@@ -99,6 +100,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
+#include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
@@ -333,7 +335,7 @@ namespace HeatBalanceManager {
         // Get the heat balance input at the beginning of the simulation only
         if (ManageHeatBalanceGetInputFlag) {
             GetHeatBalanceInput(); // Obtains heat balance related parameters from input file
-            HeatBalanceIntRadExchange::InitSolarViewFactors();
+            HeatBalanceIntRadExchange::InitSolarViewFactors(OutputFiles::getSingleton());
 
             // Surface octree setup
             //  The surface octree holds live references to surfaces so it must be updated
@@ -366,7 +368,7 @@ namespace HeatBalanceManager {
         // in the Surface Heat Balance Manager).  In the future, this may be improved.
         ManageSurfaceHeatBalance();
         ManageEMS(emsCallFromEndZoneTimestepBeforeZoneReporting, anyRan); // EMS calling point
-        RecKeepHeatBalance();                                             // Do any heat balance related record keeping
+        RecKeepHeatBalance(OutputFiles::getSingleton());                                             // Do any heat balance related record keeping
 
         // This call has been moved to the FanSystemModule and does effect the output file
         //   You do get a shift in the Air Handling System Summary for the building electric loads
@@ -377,6 +379,7 @@ namespace HeatBalanceManager {
         ManageEMS(emsCallFromEndZoneTimestepAfterZoneReporting, anyRan); // EMS calling point
 
         UpdateEMSTrendVariables();
+        EnergyPlus::PluginManagement::pluginManager->updatePluginValues();
 
         if (WarmupFlag && EndDayFlag) {
 
@@ -390,7 +393,7 @@ namespace HeatBalanceManager {
         }
 
         if (!WarmupFlag && EndDayFlag && DayOfSim == 1 && !DoingSizing) {
-            ReportWarmupConvergence();
+            ReportWarmupConvergence(OutputFiles::getSingleton());
         }
     }
 
@@ -439,13 +442,14 @@ namespace HeatBalanceManager {
 
         // FLOW:
 
-        GetProjectControlData(ErrorsFound);
+        auto &outputFiles = OutputFiles::getSingleton();
+        GetProjectControlData(outputFiles, ErrorsFound);
 
-        GetSiteAtmosphereData(ErrorsFound);
+        GetSiteAtmosphereData(outputFiles, ErrorsFound);
 
         GetWindowGlassSpectralData(ErrorsFound);
 
-        GetMaterialData(ErrorsFound); // Read materials from input file/transfer from legacy data structure
+        GetMaterialData(outputFiles, ErrorsFound); // Read materials from input file/transfer from legacy data structure
 
         GetFrameAndDividerData(ErrorsFound);
 
@@ -648,7 +652,7 @@ namespace HeatBalanceManager {
         // Construction:InternalSource
     }
 
-    void GetProjectControlData(bool &ErrorsFound) // Set to true if errors detected during getting data
+    void GetProjectControlData(OutputFiles &outputFiles, bool &ErrorsFound) // Set to true if errors detected during getting data
     {
 
         // SUBROUTINE INFORMATION:
@@ -700,34 +704,6 @@ namespace HeatBalanceManager {
         int IOStat;
         int NumObjects;
         std::string::size_type TMP;
-
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_721(
-            "('! <Building Information>, Building Name,North Axis {deg},Terrain, ',' Loads Convergence Tolerance "
-            "Value,Temperature Convergence Tolerance Value, ',' Solar Distribution,Maximum Number of Warmup Days,Minimum "
-            "Number of Warmup Days')");
-        static ObjexxFCL::gio::Fmt Format_720("(' Building Information',8(',',A))");
-        static ObjexxFCL::gio::Fmt Format_722("('! <Inside Convection Algorithm>, Algorithm {Simple | TARP | CeilingDiffuser | "
-                                              "AdaptiveConvectionAlgorithm}',/,'Inside Convection Algorithm,',A)");
-        static ObjexxFCL::gio::Fmt Format_723("('! <Outside Convection Algorithm>, ','Algorithm {SimpleCombined | TARP | MoWitt | DOE-2 | "
-                                              "AdaptiveConvectionAlgorithm}',/,'Outside Convection Algorithm,',A)");
-        static ObjexxFCL::gio::Fmt Format_724("('! <Sky Radiance Distribution>, Value {Anisotropic}',/,'Sky Radiance Distribution,Anisotropic')");
-        static ObjexxFCL::gio::Fmt Format_726(
-            "('! <Zone Air Solution Algorithm>, Value {ThirdOrderBackwardDifference | AnalyticalSolution | EulerMethod}')");
-        static ObjexxFCL::gio::Fmt Format_727("(' Zone Air Solution Algorithm, ',A)");
-        static ObjexxFCL::gio::Fmt Format_728(
-            "('! <Zone Air Carbon Dioxide Balance Simulation>, Simulation {Yes/No}, Carbon Dioxide Concentration')");
-        static ObjexxFCL::gio::Fmt Format_730("(' Zone Air Carbon Dioxide Balance Simulation, ',A,',',A)");
-        static ObjexxFCL::gio::Fmt Format_729(
-            "('! <Zone Air Generic Contaminant Balance Simulation>, Simulation {Yes/No}, Generic Contaminant Concentration')");
-        static ObjexxFCL::gio::Fmt Format_731("(' Zone Air Generic Contaminant Balance Simulation, ',A,',',A)");
-        static ObjexxFCL::gio::Fmt Format_732(
-            "('! <Zone Air Mass Flow Balance Simulation>, Enforce Mass Balance, Adjust Zone Mixing, Adjust Zone Infiltration "
-            "{AddInfiltration | AdjustInfiltration | None}, Infiltration Zones {MixingSourceZonesOnly | AllZones}')");
-        static ObjexxFCL::gio::Fmt Format_733("(' Zone Air Mass Flow Balance Simulation, ',A,',',A,',',A,',',A)");
-        static ObjexxFCL::gio::Fmt Format_734(
-            "('! <HVACSystemRootFindingAlgorithm>, Value {RegulaFalsi | Bisection | BisectionThenRegulaFalsi | RegulaFalsiThenBisection}')");
-        static ObjexxFCL::gio::Fmt Format_735("(' HVACSystemRootFindingAlgorithm, ',A)");
 
         // Assign the values to the building data
 
@@ -861,17 +837,7 @@ namespace HeatBalanceManager {
                                  RoundSigDigits(MinNumberOfWarmupDays) + " will be used.");
                 MaxNumberOfWarmupDays = MinNumberOfWarmupDays;
             }
-            if (MinNumberOfWarmupDays < 6) {
-                ShowWarningError(RoutineName + CurrentModuleObject + ": " + cNumericFieldNames(5) +
-                                 " potentially invalid. Experience has shown that most files will converge within " +
-                                 RoundSigDigits(DefaultMaxNumberOfWarmupDays) + " warmup days. ");
-                ShowContinueError("...Choosing less than " + RoundSigDigits(DefaultMinNumberOfWarmupDays) +
-                                  " warmup days may have adverse effects on the simulation results, particularly design day simulations. ");
-                ShowContinueError("...Users should only alter this default if they are certain that less than " +
-                                  RoundSigDigits(DefaultMinNumberOfWarmupDays) + " warmup days is appropriate for a particular file. ");
-                ShowContinueError(
-                    "...Verify that convergence to desired results are achieved. You can report values during warmup days to ascertain convergence.");
-            }
+
         } else {
             ShowSevereError(RoutineName + " A " + CurrentModuleObject + " Object must be entered.");
             ErrorsFound = true;
@@ -882,12 +848,16 @@ namespace HeatBalanceManager {
             MinNumberOfWarmupDays = DefaultMinNumberOfWarmupDays;
         }
 
+        static constexpr auto Format_720(" Building Information,{},{:.3R},{},{:.5R},{:.5R},{},{},{}\n");
+        static constexpr auto Format_721(
+            "! <Building Information>, Building Name,North Axis {{deg}},Terrain,  Loads Convergence Tolerance "
+            "Value,Temperature Convergence Tolerance Value,  Solar Distribution,Maximum Number of Warmup Days,Minimum "
+            "Number of Warmup Days\n");
         // Write Building Information to the initialization output file
-        ObjexxFCL::gio::write(OutputFileInits, Format_721);
-
-        ObjexxFCL::gio::write(OutputFileInits, Format_720)
-            << BuildingName << RoundSigDigits(BuildingAzimuth, 3) << AlphaName(2) << RoundSigDigits(LoadsConvergTol, 5)
-            << RoundSigDigits(TempConvergTol, 5) << AlphaName(3) << RoundSigDigits(MaxNumberOfWarmupDays) << RoundSigDigits(MinNumberOfWarmupDays);
+        print(outputFiles.eio, Format_721);
+        print(outputFiles.eio, Format_720,
+            BuildingName , BuildingAzimuth , AlphaName(2) , LoadsConvergTol
+            , TempConvergTol , AlphaName(3) , MaxNumberOfWarmupDays , MinNumberOfWarmupDays);
         // Above should be validated...
 
         CurrentModuleObject = "SurfaceConvectionAlgorithm:Inside";
@@ -942,7 +912,9 @@ namespace HeatBalanceManager {
             DefaultInsideConvectionAlgo = ASHRAETARP;
             AlphaName(1) = "TARP";
         }
-        ObjexxFCL::gio::write(OutputFileInits, Format_722) << AlphaName(1);
+        static constexpr auto Format_722("! <Inside Convection Algorithm>, Algorithm {{Simple | TARP | CeilingDiffuser | "
+                                              "AdaptiveConvectionAlgorithm}}\nInside Convection Algorithm,{}\n");
+        print(outputFiles.eio, Format_722, AlphaName(1));
 
         // Get only the first (if more were input)
         CurrentModuleObject = "SurfaceConvectionAlgorithm:Outside";
@@ -995,7 +967,9 @@ namespace HeatBalanceManager {
             AlphaName(1) = "DOE-2";
         }
 
-        ObjexxFCL::gio::write(OutputFileInits, Format_723) << AlphaName(1);
+        static constexpr auto Format_723("! <Outside Convection Algorithm>, Algorithm {{SimpleCombined | TARP | MoWitt | DOE-2 | "
+                                              "AdaptiveConvectionAlgorithm}}\nOutside Convection Algorithm,{}\n");
+        print(outputFiles.eio, Format_723, AlphaName(1));
 
         CurrentModuleObject = "HeatBalanceAlgorithm";
         NumObjects = inputProcessor->getNumObjectsFound(CurrentModuleObject);
@@ -1079,7 +1053,8 @@ namespace HeatBalanceManager {
         // algorithm input checks now deferred until surface properties are read in,
         //  moved to SurfaceGeometry.cc routine GetSurfaceHeatTransferAlgorithmOverrides
 
-        ObjexxFCL::gio::write(OutputFileInits, Format_724);
+        static constexpr auto Format_724("! <Sky Radiance Distribution>, Value {{Anisotropic}}\nSky Radiance Distribution,Anisotropic\n");
+        print(outputFiles.eio, Format_724);
 
         CurrentModuleObject = "Compliance:Building";
         NumObjects = inputProcessor->getNumObjectsFound(CurrentModuleObject);
@@ -1140,10 +1115,18 @@ namespace HeatBalanceManager {
             ZoneAirSolutionAlgo = Use3rdOrder;
             AlphaName(1) = "ThirdOrderBackwardDifference";
         }
+        if (DataHeatBalance::OverrideZoneAirSolutionAlgo) {
+            ZoneAirSolutionAlgo = UseEulerMethod;
+            AlphaName(1) = "EulerMethod";
+        }
+
 
         // Write Solution Algorithm to the initialization output file for User Verification
-        ObjexxFCL::gio::write(OutputFileInits, Format_726);
-        ObjexxFCL::gio::write(OutputFileInits, Format_727) << AlphaName(1);
+        static constexpr auto Format_726(
+            "! <Zone Air Solution Algorithm>, Value {{ThirdOrderBackwardDifference | AnalyticalSolution | EulerMethod}}\n");
+        print(outputFiles.eio, Format_726);
+        static constexpr auto Format_727(" Zone Air Solution Algorithm, {}\n");
+        print(outputFiles.eio, Format_727, AlphaName(1));
 
         // A new object is added by L. Gu, 06/10
         CurrentModuleObject = "ZoneAirContaminantBalance";
@@ -1224,20 +1207,24 @@ namespace HeatBalanceManager {
 
         WindowManager::initWindowModel();
 
-        ObjexxFCL::gio::write(OutputFileInits, Format_728);
+        static constexpr auto Format_728(
+            "! <Zone Air Carbon Dioxide Balance Simulation>, Simulation {{Yes/No}}, Carbon Dioxide Concentration\n");
+        print(outputFiles.eio, Format_728);
+        static constexpr auto Format_730(" Zone Air Carbon Dioxide Balance Simulation, {},{}\n");
         if (Contaminant.SimulateContaminants && Contaminant.CO2Simulation) {
-            ObjexxFCL::gio::write(OutputFileInits, Format_730) << "Yes" << AlphaName(1);
+            print(outputFiles.eio, Format_730, "Yes", AlphaName(1));
         } else {
-            ObjexxFCL::gio::write(OutputFileInits, Format_730) << "No"
-                                                               << "N/A";
+            print(outputFiles.eio, Format_730, "No", "N/A");
         }
 
-        ObjexxFCL::gio::write(OutputFileInits, Format_729);
+        static constexpr auto Format_729(
+            "! <Zone Air Generic Contaminant Balance Simulation>, Simulation {{Yes/No}}, Generic Contaminant Concentration\n");
+        static constexpr auto Format_731(" Zone Air Generic Contaminant Balance Simulation, {},{}\n");
+        print(outputFiles.eio, Format_729);
         if (Contaminant.SimulateContaminants && Contaminant.GenericContamSimulation) {
-            ObjexxFCL::gio::write(OutputFileInits, Format_731) << "Yes" << AlphaName(3);
+            print(outputFiles.eio, Format_731, "Yes", AlphaName(3));
         } else {
-            ObjexxFCL::gio::write(OutputFileInits, Format_731) << "No"
-                                                               << "N/A";
+            print(outputFiles.eio, Format_731, "No", "N/A");
         }
 
         // A new object is added by B. Nigusse, 02/14
@@ -1331,14 +1318,16 @@ namespace HeatBalanceManager {
             ZoneAirMassFlow.EnforceZoneMassBalance = false;
         }
 
-        ObjexxFCL::gio::write(OutputFileInits, Format_732);
+        static constexpr auto Format_732(
+            "! <Zone Air Mass Flow Balance Simulation>, Enforce Mass Balance, Adjust Zone Mixing, Adjust Zone Infiltration "
+            "{{AddInfiltration | AdjustInfiltration | None}}, Infiltration Zones {{MixingSourceZonesOnly | AllZones}}\n");
+        static constexpr auto Format_733(" Zone Air Mass Flow Balance Simulation, {},{},{},{}\n");
+
+        print(outputFiles.eio, Format_732);
         if (ZoneAirMassFlow.EnforceZoneMassBalance) {
-            ObjexxFCL::gio::write(OutputFileInits, Format_733) << "Yes" << AlphaName(1) << AlphaName(2) << AlphaName(3);
+            print(outputFiles.eio, Format_733, "Yes", AlphaName(1), AlphaName(2), AlphaName(3));
         } else {
-            ObjexxFCL::gio::write(OutputFileInits, Format_733) << "No"
-                                                               << "N/A"
-                                                               << "N/A"
-                                                               << "N/A";
+            print(outputFiles.eio, Format_733, "No", "N/A", "N/A", "N/A");
         }
 
         // A new object is added by L. Gu, 4/17
@@ -1388,11 +1377,14 @@ namespace HeatBalanceManager {
         }
 
         // Write Solution Algorithm to the initialization output file for User Verification
-        ObjexxFCL::gio::write(OutputFileInits, Format_734);
-        ObjexxFCL::gio::write(OutputFileInits, Format_735) << HVACSystemRootFinding.Algorithm;
+        static constexpr auto Format_734(
+            "! <HVACSystemRootFindingAlgorithm>, Value {{RegulaFalsi | Bisection | BisectionThenRegulaFalsi | RegulaFalsiThenBisection}}\n");
+        static constexpr auto Format_735(" HVACSystemRootFindingAlgorithm, {}\n");
+        print(outputFiles.eio, Format_734);
+        print(outputFiles.eio, Format_735, HVACSystemRootFinding.Algorithm);
     }
 
-    void GetSiteAtmosphereData(bool &ErrorsFound)
+    void GetSiteAtmosphereData(OutputFiles &outputFiles, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1416,7 +1408,7 @@ namespace HeatBalanceManager {
         Array1D<Real64> NumArray(3); // Numeric data
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_720("('Environment:Site Atmospheric Variation',3(',',A))");
+        static constexpr auto Format_720("Environment:Site Atmospheric Variation,{:.3R},{:.3R},{:.6R}\n");
 
         // FLOW:
         CurrentModuleObject = "Site:HeightVariation";
@@ -1452,15 +1444,14 @@ namespace HeatBalanceManager {
         }
 
         // Write to the initialization output file
-        ObjexxFCL::gio::write(OutputFileInits, fmtA)
-            << "! <Environment:Site Atmospheric Variation>,Wind Speed Profile Exponent {},Wind Speed Profile Boundary "
-               "Layer Thickness {m},Air Temperature Gradient Coefficient {K/m}";
+        print(outputFiles.eio,
+            "! <Environment:Site Atmospheric Variation>,Wind Speed Profile Exponent {{}},Wind Speed Profile Boundary "
+            "Layer Thickness {{m}},Air Temperature Gradient Coefficient {{K/m}}\n");
 
-        ObjexxFCL::gio::write(OutputFileInits, Format_720)
-            << RoundSigDigits(SiteWindExp, 3) << RoundSigDigits(SiteWindBLHeight, 3) << RoundSigDigits(SiteTempGradient, 6);
+        print(outputFiles.eio, Format_720, SiteWindExp, SiteWindBLHeight, SiteTempGradient);
     }
 
-    void GetMaterialData(bool &ErrorsFound) // set to true if errors found in input
+    void GetMaterialData(OutputFiles &outputFiles, bool &ErrorsFound) // set to true if errors found in input
     {
 
         // SUBROUTINE INFORMATION:
@@ -1552,9 +1543,6 @@ namespace HeatBalanceManager {
         int TotFfactorConstructs; // Number of slabs-on-grade or underground floor constructions defined with F factors
         int TotCfactorConstructs; // Number of underground wall constructions defined with C factors
 
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_701("(' Material Details',10(',',A))");
-        static ObjexxFCL::gio::Fmt Format_702("(' Material:Air',2(',',A))");
 
         // FLOW:
         std::string RoutineName("GetMaterialData: ");
@@ -1828,7 +1816,7 @@ namespace HeatBalanceManager {
 
             // Load the material derived type from the input data.
             Material(MaterNum).Name = MaterialNames(1);
-            
+
             // Load data for other properties that need defaults
             Material(MaterNum).ROnly = true;
             Material(MaterNum).Resistance = 0.01;
@@ -2099,11 +2087,11 @@ namespace HeatBalanceManager {
                         ShowContinueError(cAlphaFieldNames(5) + " requires a valid table object name, entered input=" + MaterialNames(5));
                     } else {
                         ErrorsFound |= CurveManager::CheckCurveDims(Material(MaterNum).GlassSpecAngTransDataPtr, // Curve index
-                                                                    {2},                            // Valid dimensions
-                                                                    RoutineName,                    // Routine name
-                                                                    CurrentModuleObject,            // Object Type
-                                                                    Material(MaterNum).Name,        // Object Name
-                                                                    cAlphaFieldNames(5));           // Field Name
+                                                                    {2},                                         // Valid dimensions
+                                                                    RoutineName,                                 // Routine name
+                                                                    CurrentModuleObject,                         // Object Type
+                                                                    Material(MaterNum).Name,                     // Object Name
+                                                                    cAlphaFieldNames(5));                        // Field Name
 
                         GetCurveMinMaxValues(Material(MaterNum).GlassSpecAngTransDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
                         if (minAngValue > 1.0e-6) {
@@ -2148,11 +2136,11 @@ namespace HeatBalanceManager {
                         ShowContinueError(cAlphaFieldNames(6) + " requires a valid table object name, entered input=" + MaterialNames(6));
                     } else {
                         ErrorsFound |= CurveManager::CheckCurveDims(Material(MaterNum).GlassSpecAngFRefleDataPtr, // Curve index
-                                                                    {2},                            // Valid dimensions
-                                                                    RoutineName,                    // Routine name
-                                                                    CurrentModuleObject,            // Object Type
-                                                                    Material(MaterNum).Name,        // Object Name
-                                                                    cAlphaFieldNames(6));           // Field Name
+                                                                    {2},                                          // Valid dimensions
+                                                                    RoutineName,                                  // Routine name
+                                                                    CurrentModuleObject,                          // Object Type
+                                                                    Material(MaterNum).Name,                      // Object Name
+                                                                    cAlphaFieldNames(6));                         // Field Name
 
                         GetCurveMinMaxValues(Material(MaterNum).GlassSpecAngFRefleDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
                         if (minAngValue > 1.0e-6) {
@@ -2197,11 +2185,11 @@ namespace HeatBalanceManager {
                         ShowContinueError(cAlphaFieldNames(7) + " requires a valid table object name, entered input=" + MaterialNames(7));
                     } else {
                         ErrorsFound |= CurveManager::CheckCurveDims(Material(MaterNum).GlassSpecAngBRefleDataPtr, // Curve index
-                                                                    {2},                            // Valid dimensions
-                                                                    RoutineName,                    // Routine name
-                                                                    CurrentModuleObject,            // Object Type
-                                                                    Material(MaterNum).Name,        // Object Name
-                                                                    cAlphaFieldNames(7));           // Field Name
+                                                                    {2},                                          // Valid dimensions
+                                                                    RoutineName,                                  // Routine name
+                                                                    CurrentModuleObject,                          // Object Type
+                                                                    Material(MaterNum).Name,                      // Object Name
+                                                                    cAlphaFieldNames(7));                         // Field Name
 
                         GetCurveMinMaxValues(Material(MaterNum).GlassSpecAngBRefleDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
                         if (minAngValue > 1.0e-6) {
@@ -3850,27 +3838,36 @@ namespace HeatBalanceManager {
 
         if (DoReport) {
 
-            ObjexxFCL::gio::write(OutputFileInits, fmtA)
-                << "! <Material Details>,Material Name,ThermalResistance {m2-K/w},Roughness,Thickness {m},Conductivity "
-                   "{w/m-K},Density {kg/m3},Specific Heat "
-                   "{J/kg-K},Absorptance:Thermal,Absorptance:Solar,Absorptance:Visible";
+            print(outputFiles.eio,
+                  "! <Material Details>,Material Name,ThermalResistance {{m2-K/w}},Roughness,Thickness {{m}},Conductivity "
+                  "{{w/m-K}},Density {{kg/m3}},Specific Heat "
+                  "{{J/kg-K}},Absorptance:Thermal,Absorptance:Solar,Absorptance:Visible\n");
 
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Material:Air>,Material Name,ThermalResistance {m2-K/w}";
+            print(outputFiles.eio, "! <Material:Air>,Material Name,ThermalResistance {{m2-K/w}}\n");
+
+            // Formats
+            static constexpr auto Format_701(" Material Details,{},{:.4R},{},{:.4R},{:.3R},{:.3R},{:.3R},{:.4R},{:.4R},{:.4R}\n");
+            static constexpr auto Format_702(" Material:Air,{},{:.4R}\n");
 
             for (MaterNum = 1; MaterNum <= TotMaterials; ++MaterNum) {
 
                 {
                     auto const SELECT_CASE_var(Material(MaterNum).Group);
                     if (SELECT_CASE_var == Air) {
-                        ObjexxFCL::gio::write(OutputFileInits, Format_702)
-                            << Material(MaterNum).Name << RoundSigDigits(Material(MaterNum).Resistance, 4);
+                        print(outputFiles.eio, Format_702, Material(MaterNum).Name, Material(MaterNum).Resistance);
                     } else {
-                        ObjexxFCL::gio::write(OutputFileInits, Format_701)
-                            << Material(MaterNum).Name << RoundSigDigits(Material(MaterNum).Resistance, 4)
-                            << DisplayMaterialRoughness(Material(MaterNum).Roughness) << RoundSigDigits(Material(MaterNum).Thickness, 4)
-                            << RoundSigDigits(Material(MaterNum).Conductivity, 3) << RoundSigDigits(Material(MaterNum).Density, 3)
-                            << RoundSigDigits(Material(MaterNum).SpecHeat, 3) << RoundSigDigits(Material(MaterNum).AbsorpThermal, 4)
-                            << RoundSigDigits(Material(MaterNum).AbsorpSolar, 4) << RoundSigDigits(Material(MaterNum).AbsorpVisible, 4);
+                        print(outputFiles.eio,
+                              Format_701,
+                              Material(MaterNum).Name,
+                              Material(MaterNum).Resistance,
+                              DisplayMaterialRoughness(Material(MaterNum).Roughness),
+                              Material(MaterNum).Thickness,
+                              Material(MaterNum).Conductivity,
+                              Material(MaterNum).Density,
+                              Material(MaterNum).SpecHeat,
+                              Material(MaterNum).AbsorpThermal,
+                              Material(MaterNum).AbsorpSolar,
+                              Material(MaterNum).AbsorpVisible);
                     }
                 }
             }
@@ -4175,7 +4172,7 @@ namespace HeatBalanceManager {
         int TotWindow5Constructs; // Number of constructions from Window5 data file
         bool ConstructionFound;   // True if input window construction name is found in the
         //  Window5 data file
-        bool EOFonW5File; // True if EOF encountered reading Window5 data file
+        bool EOFonW5File;       // True if EOF encountered reading Window5 data file
         int MaterialLayerGroup; // window construction layer material group index
 
         int iMatGlass; // number of glass layers
@@ -4637,7 +4634,7 @@ namespace HeatBalanceManager {
 
         GetZoneData(ErrorsFound); // Read Zone data from input file
 
-        SetupZoneGeometry(ErrorsFound);
+        SetupZoneGeometry(OutputFiles::getSingleton(), ErrorsFound);
     }
 
     void GetZoneData(bool &ErrorsFound) // If errors found in input
@@ -5223,7 +5220,7 @@ namespace HeatBalanceManager {
             InitEquivalentLayerWindowCalculations(); // Initialize the EQL window optical properties
             // InitGlassOpticalCalculations(); // Initialize the window optical properties
             InitWindowOpticalCalculations();
-            InitDaylightingDevices(); // Initialize any daylighting devices
+            InitDaylightingDevices(OutputFiles::getSingleton()); // Initialize any daylighting devices
             DisplayString("Initializing Solar Calculations");
             InitSolarCalculations(); // Initialize the shadowing calculations
         }
@@ -5527,7 +5524,7 @@ namespace HeatBalanceManager {
     // Beginning of Record Keeping subroutines for the HB Module
     // *****************************************************************************
 
-    void RecKeepHeatBalance()
+    void RecKeepHeatBalance(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5549,10 +5546,6 @@ namespace HeatBalanceManager {
         int SurfNum;
         static bool FirstWarmupWrite(true);
 
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_731("(' Warmup Convergence Information, ',A,',',A,',',A,',',A,',',A)");
-        static ObjexxFCL::gio::Fmt Format_732("('! <Warmup Convergence Information>,Zone Name,Time Step,Hour of Day,Warmup Temperature Difference "
-                                              "{deltaC},','Warmup Load Difference {W}')");
 
         // FLOW:
 
@@ -5591,13 +5584,12 @@ namespace HeatBalanceManager {
                 if (ReportDetailedWarmupConvergence) { // only do this detailed thing when requested by user is on
                     // Write Warmup Convergence Information to the initialization output file
                     if (FirstWarmupWrite) {
-                        ObjexxFCL::gio::write(OutputFileInits, Format_732);
+                        static constexpr auto Format_732{"! <Warmup Convergence Information>,Zone Name,Time Step,Hour of Day,Warmup Temperature Difference {{deltaC}},Warmup Load Difference {{W}}\n"};
+                        print(outputFiles.eio, Format_732);
                         FirstWarmupWrite = false;
                     }
-
-                    ObjexxFCL::gio::write(OutputFileInits, Format_731)
-                        << Zone(ZoneNum).Name << RoundSigDigits(TimeStep) << RoundSigDigits(HourOfDay) << RoundSigDigits(WarmupTempDiff(ZoneNum), 10)
-                        << RoundSigDigits(WarmupLoadDiff(ZoneNum), 10);
+                    static constexpr auto Format_731{" Warmup Convergence Information, {},{},{},{:.10R},{:.10R}\n"};
+                    print(outputFiles.eio, Format_731, Zone(ZoneNum).Name, TimeStep, HourOfDay, WarmupTempDiff(ZoneNum), WarmupLoadDiff(ZoneNum));
                 }
             }
         }
@@ -5607,10 +5599,9 @@ namespace HeatBalanceManager {
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             DataSurfaces::Surface(SurfNum).MovInsulIntPresentPrevTS = DataSurfaces::Surface(SurfNum).MovInsulIntPresent;
         }
-        
+
         // For non-complex windows, update a report variable so this shows up in the output as something other than zero
         UpdateWindowFaceTempsNonBSDFWin();
-        
     }
 
     void CheckWarmupConvergence()
@@ -5787,7 +5778,7 @@ namespace HeatBalanceManager {
         }
     }
 
-    void ReportWarmupConvergence()
+    void ReportWarmupConvergence(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5832,17 +5823,16 @@ namespace HeatBalanceManager {
         int Num; // loop control
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_730(
-            "('! <Warmup Convergence Information>,Zone Name,Environment Type/Name,','Average Warmup Temperature Difference "
-            "{deltaC},','Std Dev Warmup Temperature Difference {deltaC},Max Temperature Pass/Fail Convergence,','Min "
-            "Temperature Pass/Fail Convergence,Average Warmup Load Difference {W},Std Dev Warmup Load Difference "
-            "{W},','Heating Load Pass/Fail Convergence,Cooling Load Pass/Fail Convergence')");
-        static ObjexxFCL::gio::Fmt Format_731("(' Warmup Convergence Information',10(',',A))");
+        static constexpr auto Format_730(
+            "! <Warmup Convergence Information>,Zone Name,Environment Type/Name,Average Warmup Temperature Difference "
+            "{{deltaC}},Std Dev Warmup Temperature Difference {{deltaC}},Max Temperature Pass/Fail Convergence,Min "
+            "Temperature Pass/Fail Convergence,Average Warmup Load Difference {{W}},Std Dev Warmup Load Difference "
+            "{{W}},Heating Load Pass/Fail Convergence,Cooling Load Pass/Fail Convergence\n");
 
         if (!WarmupFlag) { // Report out average/std dev
             // Write Warmup Convervence Information to the initialization output file
             if (FirstWarmupWrite && NumOfZones > 0) {
-                ObjexxFCL::gio::write(OutputFileInits, Format_730);
+                print(outputFiles.eio, Format_730);
                 FirstWarmupWrite = false;
             }
 
@@ -5874,33 +5864,40 @@ namespace HeatBalanceManager {
                 StdDevZoneTemp = std::sqrt(sum(TempZoneRptStdDev({1, CountWarmupDayPoints})) / double(CountWarmupDayPoints));
                 StdDevZoneLoad = std::sqrt(sum(LoadZoneRptStdDev({1, CountWarmupDayPoints})) / double(CountWarmupDayPoints));
 
-                ObjexxFCL::gio::write(OutputFileInits, Format_731)
-                    << Zone(ZoneNum).Name << EnvHeader + ' ' + EnvironmentName << RoundSigDigits(AverageZoneTemp, 10)
-                    << RoundSigDigits(StdDevZoneTemp, 10) << PassFail(WarmupConvergenceValues(ZoneNum).PassFlag(1))
-                    << PassFail(WarmupConvergenceValues(ZoneNum).PassFlag(2)) << RoundSigDigits(AverageZoneLoad, 10)
-                    << RoundSigDigits(StdDevZoneLoad, 10) << PassFail(WarmupConvergenceValues(ZoneNum).PassFlag(3))
-                    << PassFail(WarmupConvergenceValues(ZoneNum).PassFlag(4));
+                static constexpr auto Format_731(" Warmup Convergence Information,{},{},{:.10R},{:.10R},{},{},{:.10R},{:.10R},{},{}\n");
+                print(outputFiles.eio,
+                      Format_731,
+                      Zone(ZoneNum).Name,
+                      EnvHeader + ' ' + EnvironmentName,
+                      AverageZoneTemp,
+                      StdDevZoneTemp,
+                      PassFail(WarmupConvergenceValues(ZoneNum).PassFlag(1)),
+                      PassFail(WarmupConvergenceValues(ZoneNum).PassFlag(2)),
+                      AverageZoneLoad,
+                      StdDevZoneLoad,
+                      PassFail(WarmupConvergenceValues(ZoneNum).PassFlag(3)),
+                      PassFail(WarmupConvergenceValues(ZoneNum).PassFlag(4)));
             }
         }
     }
 
     void UpdateWindowFaceTempsNonBSDFWin()
     {
-        
+
         int SurfNum;
-        
+
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             auto &thisSurface(DataSurfaces::Surface(SurfNum));
             if (thisSurface.Class == DataSurfaces::SurfaceClass_Window) {
                 auto &thisConstruct(thisSurface.Construction);
                 if (!Construct(thisConstruct).WindowTypeBSDF) {
                     FenLaySurfTempFront(1, SurfNum) = TH(1, 1, SurfNum);
-                    FenLaySurfTempBack(Construct(thisConstruct).TotLayers,SurfNum) = TH(2, 1, SurfNum);
+                    FenLaySurfTempBack(Construct(thisConstruct).TotLayers, SurfNum) = TH(2, 1, SurfNum);
                 }
             }
         }
     }
-    
+
     //        End of Record Keeping subroutines for the HB Module
     // *****************************************************************************
 
@@ -7559,12 +7556,12 @@ namespace HeatBalanceManager {
                     ShowWarningError(RoutineName + ": Construction:AirBoundary Solar and Daylighting Method=InteriorWindow is not functional.");
                     ShowContinueError("Using GroupedZones method instead for Construction:AirBoundary = " + thisConstruct.Name + ".");
                     thisConstruct.TypeIsAirBoundarySolar = true;
-                    //thisConstruct.TypeIsAirBoundaryInteriorWindow = true;
-                    //thisConstruct.TransDiff = 1.0;
-                    //thisConstruct.TransDiffVis = 1.0;
-                    //thisConstruct.TotGlassLayers = 0; // Yes, zero, so it doesn't calculate any glass absorbed solar
-                    //thisConstruct.TransSolBeamCoef = 1.0;
-                    //thisConstruct.ReflectSolDiffBack = 0.0;
+                    // thisConstruct.TypeIsAirBoundaryInteriorWindow = true;
+                    // thisConstruct.TransDiff = 1.0;
+                    // thisConstruct.TransDiffVis = 1.0;
+                    // thisConstruct.TotGlassLayers = 0; // Yes, zero, so it doesn't calculate any glass absorbed solar
+                    // thisConstruct.TransSolBeamCoef = 1.0;
+                    // thisConstruct.ReflectSolDiffBack = 0.0;
                 }
 
                 // Radiant Exchange Method
@@ -8493,14 +8490,14 @@ namespace HeatBalanceManager {
                 ShowContinueError(cNumericFieldNames(3) + " value must be >= 0 and <= 1, entered value = " + RoundSigDigits(rNumericArgs(3), 2));
             }
 
-            if ((rNumericArgs(4) < 0.0) || (rNumericArgs(4) > 1.0)) {
+            if ((rNumericArgs(4) <= 0.0) || (rNumericArgs(4) > 1.0)) {
                 ErrorsFound = true;
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(4) +
                                 " has been found.");
                 ShowContinueError(cNumericFieldNames(4) + " value must be >= 0 and <= 1, entered value = " + RoundSigDigits(rNumericArgs(4), 2));
             }
 
-            if ((rNumericArgs(5) < 0.0) || (rNumericArgs(5) > 1.0)) {
+            if ((rNumericArgs(5) <= 0.0) || (rNumericArgs(5) > 1.0)) {
                 ErrorsFound = true;
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(5) +
                                 " has been found.");

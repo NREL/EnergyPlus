@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -181,6 +181,8 @@ public:
 
     const json &getObjectInstances(std::string const &ObjType);
 
+    void clear_state();
+
 private:
     struct ObjectInfo
     {
@@ -277,8 +279,6 @@ private:
         }
         return s;
     }
-
-    void clear_state();
 
     using UnorderedObjectTypeMap = std::unordered_map<std::string, std::string>;
     using UnorderedObjectCacheMap = std::unordered_map<std::string, ObjectCache>;

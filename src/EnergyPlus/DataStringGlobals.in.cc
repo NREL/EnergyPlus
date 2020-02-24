@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -122,7 +122,6 @@ namespace DataStringGlobals {
     std::string outputAuditFileName("eplusout.audit");
     std::string outputBndFileName("eplusout.bnd");
     std::string outputDxfFileName("eplusout.dxf");
-    std::string outputEioFileName("eplusout.eio");
     std::string outputEndFileName("eplusout.end");
     std::string outputErrFileName("eplusout.err");
     std::string outputEsoFileName("eplusout.eso");
@@ -176,6 +175,7 @@ namespace DataStringGlobals {
     std::string outputEddFileName("eplusout.edd");
     std::string outputIperrFileName("eplusout.iperr");
     std::string outputDbgFileName("eplusout.dbg");
+    std::string outputPerfLogFileName("eplusout_perflog.csv");
     std::string outputSlnFileName("eplusout.sln");
     std::string outputSciFileName("eplusout.sci");
     std::string outputWrlFileName("eplusout.wrl");
@@ -221,6 +221,7 @@ namespace DataStringGlobals {
                                                                                                                                       // version
                                                                                                                                       // information
     std::string MatchVersion("${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}"); // String to be matched by Version object
+    std::string PythonAPIVersion("${PYTHON_API_VERSION_MAJOR}.${PYTHON_API_VERSION_MINOR}"); // API version string to be matched when using the Python API
 
 
     void clear_state()

@@ -192,8 +192,9 @@
 !-   ===========  ALL OBJECTS IN CLASS: SHADOWCALCULATION ===========
 
   ShadowCalculation,
-    AverageOverDaysInFrequency,  !- Calculation Method
-    7,                       !- Calculation Frequency
+    PolygonClipping,         !- Shading Calculation Method
+    Periodic,                !- Shading Calculation Update Frequency Method
+    7,                       !- Shading Calculation Update Frequency
     15000;                   !- Maximum Figures in Shadow Overlap Calculations
 
 !-   ===========  ALL OBJECTS IN CLASS: SURFACECONVECTIONALGORITHM:INSIDE ===========
@@ -11487,61 +11488,169 @@
     0.0,                     !- Minimum Hot Water Flow Rate {m3/s}
     0.001;                   !- Heating Convergence Tolerance
 
-!-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:UNCONTROLLED ===========
+!-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:CONSTANTVOLUME:NOREHEAT ===========
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Room_1_Flr_3 Direct Air, !- Name
     OCCUPANCY_BASED_VENTILATION_SCHEDULE,  !- Availability Schedule Name
-    Room_1_Flr_3 Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
-    0.061733136;             !- Maximum Air Flow Rate {m3/s}
+    Room_1_Flr_3 Direct Air Inlet Node Name ATInlet,  !- Air Inlet Node Name
+    Room_1_Flr_3 Direct Air Inlet Node Name,  !- Air Outlet Node Name
+    0.061733136,             !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    Room_1_Flr_3 Direct Air ADU,  !- Name
+    Room_1_Flr_3 Direct Air Inlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Room_1_Flr_3 Direct Air, !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Room_2_Flr_3 Direct Air, !- Name
     OCCUPANCY_BASED_VENTILATION_SCHEDULE,  !- Availability Schedule Name
-    Room_2_Flr_3 Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
-    0.061733136;             !- Maximum Air Flow Rate {m3/s}
+    Room_2_Flr_3 Direct Air Inlet Node Name ATInlet,  !- Air Inlet Node Name
+    Room_2_Flr_3 Direct Air Inlet Node Name,  !- Air Outlet Node Name
+    0.061733136,             !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    Room_2_Flr_3 Direct Air ADU,  !- Name
+    Room_2_Flr_3 Direct Air Inlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Room_2_Flr_3 Direct Air, !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Room_3_Mult19_Flr_3 Direct Air,  !- Name
     VAC_GUESTROOM_VENTILATION_SCHEDULE,  !- Availability Schedule Name
-    Room_3_Mult19_Flr_3 Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
-    0.83695266;              !- Maximum Air Flow Rate {m3/s}
+    Room_3_Mult19_Flr_3 Direct Air Inlet Node Name ATInlet,  !- Air Inlet Node Name
+    Room_3_Mult19_Flr_3 Direct Air Inlet Node Name,  !- Air Outlet Node Name
+    0.83695266,              !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    Room_3_Mult19_Flr_3 Direct Air ADU,  !- Name
+    Room_3_Mult19_Flr_3 Direct Air Inlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Room_3_Mult19_Flr_3 Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Room_4_Mult19_Flr_3 Direct Air,  !- Name
     OCCUPANCY_BASED_VENTILATION_SCHEDULE,  !- Availability Schedule Name
-    Room_4_Mult19_Flr_3 Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
-    0.83695266;              !- Maximum Air Flow Rate {m3/s}
+    Room_4_Mult19_Flr_3 Direct Air Inlet Node Name ATInlet,  !- Air Inlet Node Name
+    Room_4_Mult19_Flr_3 Direct Air Inlet Node Name,  !- Air Outlet Node Name
+    0.83695266,              !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    Room_4_Mult19_Flr_3 Direct Air ADU,  !- Name
+    Room_4_Mult19_Flr_3 Direct Air Inlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Room_4_Mult19_Flr_3 Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Room_5_Flr_3 Direct Air, !- Name
     OCCUPANCY_BASED_VENTILATION_SCHEDULE,  !- Availability Schedule Name
-    Room_5_Flr_3 Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
-    0.061733136;             !- Maximum Air Flow Rate {m3/s}
+    Room_5_Flr_3 Direct Air Inlet Node Name ATInlet,  !- Air Inlet Node Name
+    Room_5_Flr_3 Direct Air Inlet Node Name,  !- Air Outlet Node Name
+    0.061733136,             !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    Room_5_Flr_3 Direct Air ADU,  !- Name
+    Room_5_Flr_3 Direct Air Inlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Room_5_Flr_3 Direct Air, !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Room_6_Flr_3 Direct Air, !- Name
     OCCUPANCY_BASED_VENTILATION_SCHEDULE,  !- Availability Schedule Name
-    Room_6_Flr_3 Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
-    0.061733136;             !- Maximum Air Flow Rate {m3/s}
+    Room_6_Flr_3 Direct Air Inlet Node Name ATInlet,  !- Air Inlet Node Name
+    Room_6_Flr_3 Direct Air Inlet Node Name,  !- Air Outlet Node Name
+    0.061733136,             !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    Room_6_Flr_3 Direct Air ADU,  !- Name
+    Room_6_Flr_3 Direct Air Inlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Room_6_Flr_3 Direct Air, !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Room_1_Flr_6 Direct Air, !- Name
     OCCUPANCY_BASED_VENTILATION_SCHEDULE,  !- Availability Schedule Name
-    Room_1_Flr_6 Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
-    0.015433284;             !- Maximum Air Flow Rate {m3/s}
+    Room_1_Flr_6 Direct Air Inlet Node Name ATInlet,  !- Air Inlet Node Name
+    Room_1_Flr_6 Direct Air Inlet Node Name,  !- Air Outlet Node Name
+    0.015433284,             !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    Room_1_Flr_6 Direct Air ADU,  !- Name
+    Room_1_Flr_6 Direct Air Inlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Room_1_Flr_6 Direct Air, !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Room_2_Flr_6 Direct Air, !- Name
     OCCUPANCY_BASED_VENTILATION_SCHEDULE,  !- Availability Schedule Name
-    Room_2_Flr_6 Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
-    0.015433284;             !- Maximum Air Flow Rate {m3/s}
+    Room_2_Flr_6 Direct Air Inlet Node Name ATInlet,  !- Air Inlet Node Name
+    Room_2_Flr_6 Direct Air Inlet Node Name,  !- Air Outlet Node Name
+    0.015433284,             !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    Room_2_Flr_6 Direct Air ADU,  !- Name
+    Room_2_Flr_6 Direct Air Inlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Room_2_Flr_6 Direct Air, !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Room_3_Mult9_Flr_6 Direct Air,  !- Name
     OCCUPANCY_BASED_VENTILATION_SCHEDULE,  !- Availability Schedule Name
-    Room_3_Mult9_Flr_6 Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
-    0.099112815;             !- Maximum Air Flow Rate {m3/s}
+    Room_3_Mult9_Flr_6 Direct Air Inlet Node Name ATInlet,  !- Air Inlet Node Name
+    Room_3_Mult9_Flr_6 Direct Air Inlet Node Name,  !- Air Outlet Node Name
+    0.099112815,             !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    Room_3_Mult9_Flr_6 Direct Air ADU,  !- Name
+    Room_3_Mult9_Flr_6 Direct Air Inlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Room_3_Mult9_Flr_6 Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRTERMINAL:SINGLEDUCT:VAV:REHEAT ===========
 
@@ -11997,8 +12106,8 @@
   ZoneHVAC:EquipmentList,
     Room_1_Flr_3 Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Room_1_Flr_3 Direct Air, !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Room_1_Flr_3 Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -12013,8 +12122,8 @@
   ZoneHVAC:EquipmentList,
     Room_2_Flr_3 Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Room_2_Flr_3 Direct Air, !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Room_2_Flr_3 Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -12029,8 +12138,8 @@
   ZoneHVAC:EquipmentList,
     Room_3_Mult19_Flr_3 Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Room_3_Mult19_Flr_3 Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Room_3_Mult19_Flr_3 Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -12045,8 +12154,8 @@
   ZoneHVAC:EquipmentList,
     Room_4_Mult19_Flr_3 Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Room_4_Mult19_Flr_3 Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Room_4_Mult19_Flr_3 Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -12061,8 +12170,8 @@
   ZoneHVAC:EquipmentList,
     Room_5_Flr_3 Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Room_5_Flr_3 Direct Air, !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Room_5_Flr_3 Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -12077,8 +12186,8 @@
   ZoneHVAC:EquipmentList,
     Room_6_Flr_3 Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Room_6_Flr_3 Direct Air, !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Room_6_Flr_3 Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -12103,8 +12212,8 @@
   ZoneHVAC:EquipmentList,
     Room_1_Flr_6 Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Room_1_Flr_6 Direct Air, !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Room_1_Flr_6 Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -12119,8 +12228,8 @@
   ZoneHVAC:EquipmentList,
     Room_2_Flr_6 Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Room_2_Flr_6 Direct Air, !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Room_2_Flr_6 Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -12135,8 +12244,8 @@
   ZoneHVAC:EquipmentList,
     Room_3_Mult9_Flr_6 Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Room_3_Mult9_Flr_6 Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Room_3_Mult9_Flr_6 Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -13693,15 +13802,15 @@
   AirLoopHVAC:ZoneSplitter,
     FLR_3_DOAS Supply Air Splitter,  !- Name
     FLR_3_DOAS Zone Equipment Inlet Node,  !- Inlet Node Name
-    Room_1_Flr_3 Direct Air Inlet Node Name,  !- Outlet 1 Node Name
-    Room_2_Flr_3 Direct Air Inlet Node Name,  !- Outlet 2 Node Name
-    Room_3_Mult19_Flr_3 Direct Air Inlet Node Name,  !- Outlet 3 Node Name
-    Room_4_Mult19_Flr_3 Direct Air Inlet Node Name,  !- Outlet 4 Node Name
-    Room_5_Flr_3 Direct Air Inlet Node Name,  !- Outlet 5 Node Name
-    Room_6_Flr_3 Direct Air Inlet Node Name,  !- Outlet 6 Node Name
-    Room_2_Flr_6 Direct Air Inlet Node Name,  !- Outlet 7 Node Name
-    Room_3_Mult9_Flr_6 Direct Air Inlet Node Name,  !- Outlet 8 Node Name
-    Room_1_Flr_6 Direct Air Inlet Node Name;  !- Outlet 9 Node Name
+    Room_1_Flr_3 Direct Air Inlet Node Name ATInlet,  !- Outlet 1 Node Name
+    Room_2_Flr_3 Direct Air Inlet Node Name ATInlet,  !- Outlet 2 Node Name
+    Room_3_Mult19_Flr_3 Direct Air Inlet Node Name ATInlet,  !- Outlet 3 Node Name
+    Room_4_Mult19_Flr_3 Direct Air Inlet Node Name ATInlet,  !- Outlet 4 Node Name
+    Room_5_Flr_3 Direct Air Inlet Node Name ATInlet,  !- Outlet 5 Node Name
+    Room_6_Flr_3 Direct Air Inlet Node Name ATInlet,  !- Outlet 6 Node Name
+    Room_2_Flr_6 Direct Air Inlet Node Name ATInlet,  !- Outlet 7 Node Name
+    Room_3_Mult9_Flr_6 Direct Air Inlet Node Name ATInlet,  !- Outlet 8 Node Name
+    Room_1_Flr_6 Direct Air Inlet Node Name ATInlet;  !- Outlet 9 Node Name
 
 !-   ===========  ALL OBJECTS IN CLASS: AIRLOOPHVAC:SUPPLYPATH ===========
 

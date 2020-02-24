@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -110,8 +110,6 @@ protected:
 
     // This is run every unit test and makes sure to clear all state in global variables this fixture touches.
     virtual void TearDown();
-
-    void clear_all_states();
 
     // This will output the "Begin Test" ShowMessage for every unit test that uses or inherits from this fixture.
     // Now this does not need to be manually entered for every unit test as well as it will automatically be updated as the
@@ -271,7 +269,6 @@ private:
 
     std::unique_ptr<std::ostringstream> json_stream;
     std::unique_ptr<std::ostringstream> eso_stream;
-    std::unique_ptr<std::ostringstream> eio_stream;
     std::unique_ptr<std::ostringstream> mtr_stream;
     std::unique_ptr<std::ostringstream> err_stream;
     std::unique_ptr<std::ostringstream> m_cout_buffer;

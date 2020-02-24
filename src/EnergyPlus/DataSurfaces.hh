@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -738,6 +738,8 @@ namespace DataSurfaces {
         bool HasLinkedOutAirNode;          // true if an OutdoorAir::Node is linked to the surface
         int LinkedOutAirNode;              // Index of the an OutdoorAir:Node
 
+        int PenumbraID;    // Surface ID in penumbra
+
         std::string UNomWOFilm; // Nominal U Value without films stored as string
         std::string UNomFilm;   // Nominal U Value with films stored as string
         bool ExtEcoRoof;        // True if the top outside construction material is of type Eco Roof
@@ -801,7 +803,7 @@ namespace DataSurfaces {
               WindDir(0.0), WindDirEMSOverrideOn(false), WindDirEMSOverrideValue(0.0),
 
               SchedExternalShadingFrac(false), ExternalShadingSchInd(0), HasSurroundingSurfProperties(false), SurroundingSurfacesNum(0),
-              HasLinkedOutAirNode(false), LinkedOutAirNode(0),
+              HasLinkedOutAirNode(false), LinkedOutAirNode(0), PenumbraID(-1),
 
               UNomWOFilm("-              "), UNomFilm("-              "), ExtEcoRoof(false), ExtCavityPresent(false), ExtCavNum(0), IsPV(false),
               IsICS(false), IsPool(false), ICSPtr(0), MirroredSurf(false), IntConvClassification(0), IntConvHcModelEq(0), IntConvHcUserCurveIndex(0),

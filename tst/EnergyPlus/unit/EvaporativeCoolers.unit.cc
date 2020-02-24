@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,6 +52,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
@@ -59,7 +60,6 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -111,7 +111,7 @@ TEST_F(EvapCoolersFixture, EvapCoolers_SecondaryAirOutletCondition)
     CalcSecondaryAirOutletCondition(EvapCoolNum, OperatingMode, AirMassFlowSec, EDBTSec, EWBTSec, EHumRatSec, QHXTotal, QHXLatent);
 
     // check outputs for dry operating condition
-    EXPECT_DOUBLE_EQ(25.0, EvapCond(EvapCoolNum).SecOutletTemp);
+    EXPECT_NEAR(25.0, EvapCond(EvapCoolNum).SecOutletTemp, 0.000001);
     EXPECT_DOUBLE_EQ(0.0, QHXLatent);
 
     // wet operating mode and non zero secondary air flow rate
@@ -359,7 +359,7 @@ TEST_F(EvapCoolersFixture, EvaporativeCoolers_CalcSecondaryAirOutletCondition)
         EvapCoolNum, OperatingMode, AirMassFlowSec, EDBTSec, EWBTSec, EHumRatSec, QHXTotal, QHXLatent);
 
     // check outputs for dry operating condition
-    EXPECT_DOUBLE_EQ(25.0, EvaporativeCoolers::EvapCond(EvapCoolNum).SecOutletTemp);
+    EXPECT_NEAR(25.0, EvaporativeCoolers::EvapCond(EvapCoolNum).SecOutletTemp, 0.000001);
     EXPECT_DOUBLE_EQ(0.0, QHXLatent);
 
     // wet operating mode and non zero secondary air flow rate
@@ -872,7 +872,7 @@ TEST_F(EvapCoolersFixture, DirectEvapCoolerAutosizeWithoutSysSizingRunDone)
 
 TEST_F(EvapCoolersFixture, EvapCoolerAirLoopPumpCycling)
 {
-    
+
     bool ErrorsFound = false;
 
     std::string const idf_objects = delimited_string({
@@ -893,7 +893,7 @@ TEST_F(EvapCoolersFixture, EvapCoolerAirLoopPumpCycling)
 
     EvaporativeCoolers::GetEvapInput();
     ASSERT_FALSE(ErrorsFound);
-    
+
     int AirLoopNum = 1;
     int EvapCoolNum = 1;
     int Evap_Cooler_CompType = 18;
@@ -904,21 +904,20 @@ TEST_F(EvapCoolersFixture, EvapCoolerAirLoopPumpCycling)
     DataAirLoop::AirLoopControlInfo.allocate(AirLoopNum);
     DataAirLoop::AirLoopFlow(1).FanPLR = 0.8;
 
-    //Evap cooler conditions
+    // Evap cooler conditions
     DataLoopNode::Node(EvapCond(EvapCoolNum).InletNode).MassFlowRate = 0.5;
     DataLoopNode::Node(EvapCond(EvapCoolNum).InletNode).Temp = 28.0;
     DataLoopNode::Node(EvapCond(EvapCoolNum).InletNode).HumRat = 0.001;
     DataLoopNode::Node(EvapCond(EvapCoolNum).InletNode).Press = DataEnvironment::OutBaroPress;
 
     DataGlobals::BeginEnvrnFlag = true;
-    
-    //Simulate air loop component calls SimEvapCooler
-    //SimEvapCooler calls InitEvapCooler(EvapCoolNum) and CalcDirectEvapCooler
-    SimAirServingZones::SimAirLoopComponent(EvapCond(EvapCoolNum).EvapCoolerName, Evap_Cooler_CompType, false, AirLoopNum, EvapCoolNum, 0);
-    
-    //air loop FanPLR successfully passed for pump power calculation
-    EXPECT_EQ(EvapCond(EvapCoolNum).EvapCoolerPower, 60 * 0.8);
 
+    // Simulate air loop component calls SimEvapCooler
+    // SimEvapCooler calls InitEvapCooler(EvapCoolNum) and CalcDirectEvapCooler
+    SimAirServingZones::SimAirLoopComponent(EvapCond(EvapCoolNum).EvapCoolerName, Evap_Cooler_CompType, false, AirLoopNum, EvapCoolNum, 0);
+
+    // air loop FanPLR successfully passed for pump power calculation
+    EXPECT_EQ(EvapCond(EvapCoolNum).EvapCoolerPower, 60 * 0.8);
 }
 
 } // namespace EnergyPlus

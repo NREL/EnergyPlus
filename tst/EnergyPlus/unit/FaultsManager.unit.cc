@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -67,6 +67,7 @@
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SetPointManager.hh>
 
@@ -429,9 +430,9 @@ TEST_F(EnergyPlusFixture, FaultsManager_EconomizerFaultGetInput)
     // Process inputs
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ScheduleManager::ProcessScheduleInput(); // read schedules
+    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton()); // read schedules
 
-    MixedAir::GetOAControllerInputs();
+    MixedAir::GetOAControllerInputs(OutputFiles::getSingleton());
 
     // there are two OA controller objects
     EXPECT_EQ(MixedAir::NumOAControllers, 2);

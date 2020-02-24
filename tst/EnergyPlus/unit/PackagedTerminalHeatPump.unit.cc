@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,13 +57,14 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/PackagedTerminalHeatPump.hh>
@@ -652,7 +653,7 @@ TEST_F(PTHPFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
         "Coil:Heating:Fuel,",
         "    SPACE1-1 Heating Coil,   !- Name",
         "    FanAvailSched,           !- Availability Schedule Name",
-        "    Gas,                     !- Fuel Type",
+        "    NaturalGas,              !- Fuel Type",
         "    0.8,                     !- Gas Burner Efficiency",
         "    10000.0,                 !- Nominal Capacity {W}",
         "    SPACE1-1 CCoil Outlet Node,  !- Air Inlet Node Name",
@@ -795,7 +796,7 @@ TEST_F(PTHPFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(); // read schedules
+    ProcessScheduleInput(OutputFiles::getSingleton()); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
@@ -1004,7 +1005,7 @@ TEST_F(PTHPFixture, SimPTAC_SZVAVTest)
         "Coil:Heating:Fuel,",
         "    SPACE1-1 Heating Coil,   !- Name",
         "    FanAvailSched,           !- Availability Schedule Name",
-        "    Gas,                     !- Fuel Type",
+        "    NaturalGas,              !- Fuel Type",
         "    0.8,                     !- Gas Burner Efficiency",
         "    10000.0,                 !- Nominal Capacity {W}",
         "    SPACE1-1 CCoil Outlet Node,  !- Air Inlet Node Name",
@@ -1147,7 +1148,7 @@ TEST_F(PTHPFixture, SimPTAC_SZVAVTest)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(); // read schedules
+    ProcessScheduleInput(OutputFiles::getSingleton()); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,6 +55,11 @@
 #include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Array3D.hh>
+
+// Penumbra Headers
+#ifndef EP_NO_OPENGL
+#include <penumbra/penumbra.h>
+#endif
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataBSDFWindow.hh>
@@ -167,6 +172,11 @@ namespace SolarShading {
     extern int maxNumberOfFigures;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE SolarShading
+#ifdef EP_NO_OPENGL
+    extern bool penumbra;
+#else
+    extern std::unique_ptr<Pumbra::Penumbra> penumbra;
+#endif
 
     // Types
 
@@ -193,7 +203,7 @@ namespace SolarShading {
 
     void InitSolarCalculations();
 
-    void GetShadowingInput();
+    void GetShadowingInput(OutputFiles &outputFiles);
 
     void AllocateModuleArrays();
 

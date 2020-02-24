@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,6 +49,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/SimulationManager.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -71,4 +72,93 @@ TEST_F(EnergyPlusFixture, CheckThreading)
     });
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(EnergyPlusFixture, Test_PerformancePrecisionTradeoffs)
+{
+    std::string const idf_objects = delimited_string({
+        "  Version,9.3;",
+
+        "  SimulationControl,",
+        "    No,                      !- Do Zone Sizing Calculation",
+        "    No,                      !- Do System Sizing Calculation",
+        "    No,                      !- Do Plant Sizing Calculation",
+        "    No,                      !- Run Simulation for Sizing Periods",
+        "    Yes;                     !- Run Simulation for Weather File Run Periods",
+
+        "  PerformancePrecisionTradeoffs,",
+        "    No;       ! - Use Coil Direct Solutions",
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects));
+
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
+
+    // no error message from PerformancePrecisionTradeoffs objects
+    EXPECT_TRUE(compare_err_stream("", true));
+  
+}
+
+TEST_F(EnergyPlusFixture, Test_PerformancePrecisionTradeoffs_DirectSolution_Message)
+{
+    // issue 7646
+    std::string const idf_objects = delimited_string({
+        "  Version,9.3;",
+        "  PerformancePrecisionTradeoffs,",
+        "     Yes; ! - Use Coil Direct Solutions",
+
+    });
+
+    EXPECT_TRUE(process_idf(idf_objects, false));
+
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
+
+    std::string const error_string = delimited_string({
+        "   ** Warning ** PerformancePrecisionTradeoffs: Coil Direct Solution simulation is selected.",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
+}
+
+TEST_F(EnergyPlusFixture, Simulationmanager_bool_to_string)
+{
+    EXPECT_EQ(SimulationManager::bool_to_string(true), "True");
+    EXPECT_EQ(SimulationManager::bool_to_string(false), "False");
+}
+
+TEST_F(EnergyPlusFixture, Simulationmanager_writeIntialPerfLogValues)
+{
+    DataStringGlobals::outputPerfLogFileName = "eplusout_perflog.csv";
+
+    // start with no file 
+    std::remove(DataStringGlobals::outputPerfLogFileName.c_str());
+
+    // make sure the static variables are cleared
+    UtilityRoutines::appendPerfLog("RESET", "RESET");
+
+    DataStringGlobals::VerString = "EnergyPlus, Version 0.0.0-xxxx, August 14 1945";
+
+    // call the function to test
+    SimulationManager::writeIntialPerfLogValues("MODE193");
+
+    // force the file to be written
+    UtilityRoutines::appendPerfLog("lastHeader", "lastValue", true);
+
+    std::ifstream perfLogFile;
+    std::stringstream perfLogStrSteam;
+
+    perfLogFile.open(DataStringGlobals::outputPerfLogFileName);
+    perfLogStrSteam << perfLogFile.rdbuf();
+    perfLogFile.close();
+    std::string perfLogContents = perfLogStrSteam.str();
+
+    std::string expectedContents = "Program, Version, TimeStamp,Use Coil Direct Solution,Zone Radiant Exchange Algorithm,"
+        "Override Mode,Number of Timesteps per Hour,Minimum Number of Warmup Days,SuppressAllBeginEnvironmentResets,MaxZoneTempDiff,lastHeader,\n"
+        "EnergyPlus, Version 0.0.0-xxxx, August 14 1945,False,ScriptF,MODE193,0,1,False,0,lastValue,\n";
+
+    EXPECT_EQ(perfLogContents, expectedContents);
+
+    // clean up the file
+    std::remove(DataStringGlobals::outputPerfLogFileName.c_str());
+
 }

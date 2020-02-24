@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -126,6 +126,7 @@ namespace DataStringGlobals {
     extern std::string outputEddFileName;
     extern std::string outputIperrFileName;
     extern std::string outputDbgFileName;
+    extern std::string outputPerfLogFileName;
     extern std::string outputSlnFileName;
     extern std::string outputSciFileName;
     extern std::string outputWrlFileName;
@@ -184,6 +185,8 @@ namespace DataStringGlobals {
     extern std::string VerString;            // String that represents version information
     extern std::string MatchVersion;         // String to be matched by Version object
     extern std::string CurrentDateTime;      // For printing current date and time at start of run
+
+    extern std::string PythonAPIVersion;
 
     // Functions
     void clear_state();

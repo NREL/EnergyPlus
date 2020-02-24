@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -64,6 +64,7 @@
 #include <EnergyPlus/HVACFourPipeBeam.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
@@ -447,8 +448,9 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
         "    25;                      !- Maximum HVAC Iterations",
 
         "  ShadowCalculation,",
-        "    AverageOverDaysInFrequency,  !- Calculation Method",
-        "    7,                       !- Calculation Frequency",
+        "    PolygonClipping,         !- Shading Calculation Method",
+        "    Periodic,                !- Shading Calculation Update Frequency Method",
+        "    7,                       !- Shading Calculation Update Frequency",
         "    15000;                   !- Maximum Figures in Shadow Overlap Calculations",
 
         "  Timestep,6;",
@@ -1718,7 +1720,7 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
 
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
@@ -1729,13 +1731,13 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     createFacilityElectricPowerServiceObject();
     BranchInputManager::ManageBranchInput(); // just gets input and returns.
     DataGlobals::DoingSizing = true;
-    SizingManager::ManageSizing();
+    SizingManager::ManageSizing(OutputFiles::getSingleton());
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
     TestAirPathIntegrity(ErrorsFound); // Needed to initialize return node connections to airloops and inlet nodes
-    SimulationManager::SetupSimulation(ErrorsFound);
+    SimulationManager::SetupSimulation(OutputFiles::getSingleton(), ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
     DataHVACGlobals::SimZoneEquipmentFlag = true;
@@ -2020,8 +2022,9 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
         "    25;                      !- Maximum HVAC Iterations",
 
         "  ShadowCalculation,",
-        "    AverageOverDaysInFrequency,  !- Calculation Method",
-        "    7,                       !- Calculation Frequency",
+        "    PolygonClipping,         !- Shading Calculation Method",
+        "    Periodic,                !- Shading Calculation Update Frequency Method",
+        "    7,                       !- Shading Calculation Update Frequency",
         "    15000;                   !- Maximum Figures in Shadow Overlap Calculations",
 
         "  Timestep,6;",
@@ -3291,7 +3294,7 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
 
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
@@ -3302,13 +3305,13 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
     createFacilityElectricPowerServiceObject();
     BranchInputManager::ManageBranchInput(); // just gets input and returns.
     DataGlobals::DoingSizing = true;
-    SizingManager::ManageSizing();
+    SizingManager::ManageSizing(OutputFiles::getSingleton());
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
 
-    ASSERT_ANY_THROW(SimulationManager::SetupSimulation(ErrorsFound));
+    ASSERT_ANY_THROW(SimulationManager::SetupSimulation(OutputFiles::getSingleton(), ErrorsFound));
 }
 
 } // namespace EnergyPlus

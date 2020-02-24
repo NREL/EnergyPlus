@@ -19,9 +19,13 @@ set( CMAKE_VERSION_MAJOR 9 )
 set( CMAKE_VERSION_MINOR 3 )
 set( CMAKE_VERSION_PATCH 0 )
 
+set( CMAKE_POSITION_INDEPENDENT_CODE ON )
+
 set( PREV_RELEASE_SHA "921312f" )
 
 set( ENERGYPLUS_VERSION "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}" )
+
+string( TIMESTAMP CMAKE_YEAR "%Y")
 
 set( CMAKE_VERSION_BUILD "Unknown" CACHE STRING "Build number" )
 find_package(Git)
@@ -50,6 +54,17 @@ else()
   set(GIT_DIR "")
 endif()
 
+set( OPENGL_REQUIRED OFF CACHE BOOL "Require OpenGL in order to build" )
+if(OPENGL_REQUIRED)
+  find_package(OpenGL)
+  if(NOT OPENGL_FOUND)
+    set(CMAKE_VERSION_BUILD "${CMAKE_VERSION_BUILD} (No OpenGL)" CACHE STRING "Build number" FORCE) # git sha
+    message(WARNING "OpenGL libraries were not found. EnergyPlus will be compiled without GPU acceleration capabilities.")
+  endif()
+else()
+  set( OPENGL_FOUND FALSE )
+endif()
+
 # Set a default build type if none was specified
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   message(STATUS "Setting build type to 'Release' as none was specified.")
@@ -72,8 +87,8 @@ option( ENABLE_INSTALL_REMOTE "Enable install_remote and install_remote_plist co
 
 mark_as_advanced( ENABLE_INSTALL_REMOTE )
 
-# we are making python a required dependency, so find it here...starting off by requiring at least 2.7
-find_package(PythonInterp 2.7 REQUIRED)
+# we are making *a Python 3 Interpreter* a required dependency, so find it here
+find_package(PythonInterp 3 REQUIRED)
 
 if( BUILD_TESTING )
   option( ENABLE_REGRESSION_TESTING "Enable Regression Tests" OFF )
@@ -143,6 +158,9 @@ INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/SQLite/ SYSTEM )
 INCLUDE_DIRECTORIES( "${CMAKE_SOURCE_DIR}/third_party/Expat" "${CMAKE_SOURCE_DIR}/third_party/Expat/lib" SYSTEM )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/CLI/ )
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/eigen/ )
+if( OPENGL_FOUND )
+  INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/penumbra/include )
+endif()
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Chromogenics/include)
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Common/include)
 INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Gases/include)
@@ -157,6 +175,11 @@ INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/View
 # target_include_directories( ModernJSON INTERFACE "${CMAKE_SOURCE_DIR}/third_party/nlohmann" "${CMAKE_SOURCE_DIR}/third_party/doj" )
 
 set(RE2_BUILD_TESTING OFF CACHE BOOL "" FORCE)
+
+
+if( OPENGL_FOUND )
+  set(BUILD_PENUMBRA_TESTING ${BUILD_TESTING} CACHE BOOL "" FORCE)
+endif()
 
 if( BUILD_TESTING )
   set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
@@ -179,6 +202,7 @@ ADD_SUBDIRECTORY(third_party/FMI)
 ADD_SUBDIRECTORY(third_party/zlib)
 ADD_SUBDIRECTORY(third_party/DElight)
 ADD_SUBDIRECTORY(third_party/re2)
+ADD_SUBDIRECTORY(third_party/fmt-6.1.2 )
 
 ADD_SUBDIRECTORY(scripts/dev/generate_embeddable_epJSON_schema)
 IF( NOT APPLE )
@@ -193,6 +217,10 @@ ADD_SUBDIRECTORY(third_party/btwxt)
 
 # Kiva
 INCLUDE(third_party/cmake/kiva.cmake)
+
+if( OPENGL_FOUND )
+  ADD_SUBDIRECTORY(third_party/penumbra)
+endif()
 
 execute_process( COMMAND ${PYTHON_EXECUTABLE} "${CMAKE_SOURCE_DIR}/scripts/dev/generate_epJSON_schema/generate_epJSON_schema.py" "${CMAKE_SOURCE_DIR}" TIMEOUT 30 RESULT_VARIABLE generate_epJSON_schema_result)
 if( ${generate_epJSON_schema_result} MATCHES ".*timeout.*" )
@@ -237,9 +265,9 @@ if( BUILD_FORTRAN )
   cmake_add_fortran_subdirectory(src/ReadVars PROJECT ReadVars NO_EXTERNAL_INSTALL )
   set(TRANSITION_EXTRA_FLAGS "-DCMAKE_VERSION_MAJOR:STRING=${CMAKE_VERSION_MAJOR}" "-DCMAKE_VERSION_MINOR:STRING=${CMAKE_VERSION_MINOR}" "-DCMAKE_VERSION_PATCH:STRING=${CMAKE_VERSION_PATCH}")
   cmake_add_fortran_subdirectory(src/Transition PROJECT Transition CMAKE_COMMAND_LINE ${TRANSITION_EXTRA_FLAGS} NO_EXTERNAL_INSTALL )
-  file( COPY "idd/V9-1-0-Energy+.idd" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
-  configure_file( idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V9-2-0-Energy+.idd" )
-  file( COPY "src/Transition/SupportFiles/Report Variables 9-1-0 to 9-2-0.csv" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
+  file( COPY "idd/V9-2-0-Energy+.idd" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
+  configure_file( idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V9-3-0-Energy+.idd" )
+  file( COPY "src/Transition/SupportFiles/Report Variables 9-2-0 to 9-3-0.csv" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
   cmake_add_fortran_subdirectory(src/Basement PROJECT Basement NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/HVAC-Diagram PROJECT HVAC-Diagram NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/ParametricPreprocessor PROJECT ParametricPreprocessor NO_EXTERNAL_INSTALL )
@@ -297,3 +325,10 @@ mark_as_advanced(gtest_build_tests)
 mark_as_advanced(gtest_disable_pthreads)
 mark_as_advanced(gtest_force_shared_crt)
 mark_as_advanced(gtest_hide_internal_symbols)
+mark_as_advanced(FMT_CUDA_TEST)
+mark_as_advanced(FMT_DOC)
+mark_as_advanced(FMT_FUZZ)
+mark_as_advanced(FMT_INSTALL)
+mark_as_advanced(FMT_PEDANTIC)
+mark_as_advanced(FMT_TEST)
+mark_as_advanced(FMT_WERROR)

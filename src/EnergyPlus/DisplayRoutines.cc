@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -135,6 +135,7 @@ void DisplayString(char const *String) // String to be displayed
     // na
 
     if (fMessagePtr) fMessagePtr(String);
+    if (DataGlobals::messageCallback) DataGlobals::messageCallback(String);
 
     if (KickOffSimulation && !DeveloperFlag) return;
     std::cout << String << std::endl;
@@ -181,6 +182,7 @@ void DisplayNumberAndString(int const Number,         // number to be displayed
     std::stringstream sstm;
     sstm << String << ' ' << Number;
     if (fMessagePtr) fMessagePtr(sstm.str());
+    if (DataGlobals::messageCallback) DataGlobals::messageCallback(sstm.str().c_str());
 
     if (KickOffSimulation && !DeveloperFlag) return;
     std::cout << String << ' ' << Number << std::endl;
@@ -237,6 +239,7 @@ void DisplaySimDaysProgress( // This doesn't do anything!
     }
 
     if (fProgressPtr) fProgressPtr(percent);
+    if (DataGlobals::progressCallback) DataGlobals::progressCallback(percent);
 }
 
 } // namespace EnergyPlus

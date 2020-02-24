@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,9 +55,14 @@
 // C++ Headers
 #include <cstdint> // C++11
 
+#include <EnergyPlus/TypeDefs.h>
+
 // macro to supress unused parameter
 // UNUSED( foo );
 #define EP_UNUSED(expr)
+
+typedef std::int32_t Int32;
+typedef std::int64_t Int64;
 
 // ObjexxFCL
 #include <ObjexxFCL/Array1.fwd.hh>
@@ -207,11 +212,5 @@ using ObjexxFCL::bit::bit_and;
 using ObjexxFCL::bit::bit_shift;
 using ObjexxFCL::bit::bit_transfer;
 using ObjexxFCL::bit::bit_xor;
-
-// Types
-typedef std::int32_t Int32;
-typedef std::int64_t Int64;
-typedef float Real32;  // Platform-specific: C++ has no defined precision floating point types
-typedef double Real64; // Platform-specific: C++ has no defined precision floating point types
 
 #endif

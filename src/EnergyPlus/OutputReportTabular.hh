@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -693,7 +693,7 @@ namespace OutputReportTabular {
 
     bool warningAboutKeyNotFound(int foundIndex, int inObjIndex, std::string const &moduleName);
 
-    void GetInputTabularStyle();
+    void GetInputTabularStyle(OutputFiles &outputFiles);
 
     int SetUnitsStyleFromString(std::string const &unitStringIn);
 
@@ -791,7 +791,7 @@ namespace OutputReportTabular {
 
     void WriteSurfaceShadowing();
 
-    void WriteEioTables();
+    void WriteEioTables(OutputFiles &outputFiles);
 
     int unitsFromHeading(std::string &heading);
 
@@ -803,7 +803,7 @@ namespace OutputReportTabular {
 
     void DeallocateLoadComponentArrays();
 
-    void ComputeLoadComponentDecayCurve();
+    void ComputeLoadComponentDecayCurve(OutputFiles &outputFiles);
 
     void GatherComponentLoadsSurface();
 
@@ -889,6 +889,10 @@ namespace OutputReportTabular {
     std::string ConvertToEscaped(std::string const &inString); // Input String
 
     void DetermineBuildingFloorArea();
+
+    /* Tables with Subcategories in particular have a blank for rowHead for display in the HTML output.
+     * This routine will fill up the blanks for output to Sql in particular */
+    void FillRowHead(Array1D_string & rowHead);
 
     //======================================================================================================================
     //======================================================================================================================

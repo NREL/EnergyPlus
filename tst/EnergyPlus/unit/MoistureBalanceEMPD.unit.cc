@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -62,6 +62,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/MoistureBalanceEMPDManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 
@@ -95,7 +96,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool errors_found(false);
-    HeatBalanceManager::GetMaterialData(errors_found);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errors_found);
     ASSERT_FALSE(errors_found) << "Errors in GetMaterialData";
 
     // Surface
@@ -184,7 +185,7 @@ TEST_F(EnergyPlusFixture, EMPDAutocalcDepth)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool errors_found(false);
-    HeatBalanceManager::GetMaterialData(errors_found);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errors_found);
     ASSERT_FALSE(errors_found) << "Errors in GetMaterialData";
     MoistureBalanceEMPDManager::GetMoistureBalanceEMPDInput();
 
@@ -221,7 +222,7 @@ TEST_F(EnergyPlusFixture, EMPDRcoating)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool errors_found(false);
-    HeatBalanceManager::GetMaterialData(errors_found);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errors_found);
     ASSERT_FALSE(errors_found) << "Errors in GetMaterialData";
 
     // Surface
@@ -310,7 +311,7 @@ TEST_F(EnergyPlusFixture, CheckEMPDCalc_Slope)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool errors_found(false);
-    HeatBalanceManager::GetMaterialData(errors_found);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errors_found);
     ASSERT_FALSE(errors_found) << "Errors in GetMaterialData";
 
     // Surface

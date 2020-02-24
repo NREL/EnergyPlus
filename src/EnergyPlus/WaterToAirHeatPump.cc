@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -58,7 +58,7 @@
 #include <EnergyPlus/DataContaminantBalance.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
@@ -1114,7 +1114,7 @@ namespace WaterToAirHeatPump {
         using DataPlant::PlantLoop;
         using General::RoundSigDigits;
         using General::SolveRoot;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW; // ,PsyHFnTdbRhPb,PsyWFnTdpPb
         using Psychrometrics::PsyTdbFnHW;
         using Psychrometrics::PsyTsatFnHPb;
@@ -1287,7 +1287,7 @@ namespace WaterToAirHeatPump {
         // Set indoor air conditions to the actual condition
         LoadSideInletDBTemp_Unit = WatertoAirHP(HPNum).InletAirDBTemp;
         LoadSideInletHumRat_Unit = WatertoAirHP(HPNum).InletAirHumRat;
-        CpAir = PsyCpAirFnWTdb(LoadSideInletHumRat_Unit, LoadSideInletDBTemp_Unit);
+        CpAir = PsyCpAirFnW(LoadSideInletHumRat_Unit);
         LoadSideAirInletEnth_Unit = PsyHFnTdbW(LoadSideInletDBTemp_Unit, LoadSideInletHumRat_Unit);
 
         SourceSideInletTemp = WatertoAirHP(HPNum).InletWaterTemp;
@@ -1783,7 +1783,7 @@ namespace WaterToAirHeatPump {
 
         // Using/Aliasing
         using namespace FluidProperties;
-        using Psychrometrics::PsyCpAirFnWTdb; // ,PsyHFnTdbRhPb,PsyWFnTdpPb
+        using Psychrometrics::PsyCpAirFnW; // ,PsyHFnTdbRhPb,PsyWFnTdpPb
         using Psychrometrics::PsyTdbFnHW;
         using Psychrometrics::PsyWFnTdbH;
         //  USE DataZoneEnergyDemands
@@ -1920,7 +1920,7 @@ namespace WaterToAirHeatPump {
         LoadSideMassFlowRate = WatertoAirHP(HPNum).InletAirMassFlowRate;
         LoadSideInletDBTemp = WatertoAirHP(HPNum).InletAirDBTemp;
         LoadSideInletHumRat = WatertoAirHP(HPNum).InletAirHumRat;
-        CpAir = PsyCpAirFnWTdb(LoadSideInletHumRat, LoadSideInletDBTemp);
+        CpAir = PsyCpAirFnW(LoadSideInletHumRat);
 
         SourceSideInletTemp = WatertoAirHP(HPNum).InletWaterTemp;
         SourceSideWaterInletEnth = WatertoAirHP(HPNum).InletWaterEnthalpy;

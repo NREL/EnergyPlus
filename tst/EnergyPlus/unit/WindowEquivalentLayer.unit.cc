@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -75,6 +75,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -178,7 +179,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_GetInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
 
     int VBMatNum(0);
@@ -937,7 +938,7 @@ TEST_F(EnergyPlusFixture, WindowEquivalentLayer_InvalidLayerTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(1, DataHeatBalance::TotMaterials);
     EXPECT_EQ(DataHeatBalance::Material(1).Group, DataHeatBalance::WindowSimpleGlazing);

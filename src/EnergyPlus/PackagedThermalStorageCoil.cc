@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -61,7 +61,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataWater.hh>
@@ -4420,7 +4420,7 @@ namespace PackagedThermalStorageCoil {
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
-        // par(2) = desired air outlet hum rat [kg_h20/kg_dryair]
+        // par(2) = desired air outlet hum rat [kgWater/kgDryAir]
         // par(3) = TES coil operating mode
         // par(4) = outlet node number
         // par(5) = supply air fan operating mode (ContFanCycCoil)
@@ -4436,7 +4436,7 @@ namespace PackagedThermalStorageCoil {
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int CoilIndex;          // index of this coil
-        Real64 OutletAirHumRat; // outlet air humidity ratio [kg_H20/Kg_dryair]
+        Real64 OutletAirHumRat; // outlet air humidity ratio [kgWater/kgDryAir]
         int FanOpMode;          // Supply air fan operating mode
         int TESOpMode;
         int OutletNodeNum;
@@ -4535,8 +4535,7 @@ namespace PackagedThermalStorageCoil {
         using DataPlant::PlantLoop;
         using FluidProperties::GetDensityGlycol;
         using FluidProperties::GetSpecificHeatGlycol;
-        using WaterThermalTanks::CalcTankTemp;
-        using WaterThermalTanks::CalcTempIntegral;
+        using WaterThermalTanks::WaterThermalTankData;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -4599,7 +4598,7 @@ namespace PackagedThermalStorageCoil {
         LossCoeff = TESCoil(TESCoilNum).StorageUA;
         QdotTES = TESCoil(TESCoilNum).QdotTES;
 
-        NewTankTemp = CalcTankTemp(TankTemp,
+        NewTankTemp = WaterThermalTanks::WaterThermalTankData::CalcTankTemp(TankTemp,
                                    AmbientTemp,
                                    UseInletTemp,
                                    SourceInletTemp,
@@ -4632,7 +4631,7 @@ namespace PackagedThermalStorageCoil {
             Node(TESCoil(TESCoilNum).TESPlantOutletNodeNum).Temp = NewOutletTemp;
         }
 
-        deltaTsum = CalcTempIntegral(TankTemp,
+        deltaTsum = WaterThermalTankData::CalcTempIntegral(TankTemp,
                                      NewTankTemp,
                                      AmbientTemp,
                                      UseInletTemp,

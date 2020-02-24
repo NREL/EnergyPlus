@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -9532,6 +9532,60 @@ namespace FluidProperties {
             MinTempLimit = GlycolData(FluidIndex).CpLowTempValue;
             MaxTempLimit = GlycolData(FluidIndex).CpHighTempValue;
         }
+    }
+
+    GlycolAPI::GlycolAPI(std::string const &glycolName) {
+        this->glycolName = EnergyPlus::UtilityRoutines::MakeUPPERCase(glycolName);
+        this->glycolIndex = 0;
+        this->cf = "GlycolAPI:Instance";
+        if (this->glycolName != "WATER") {
+            EnergyPlus::ShowFatalError("Can only do water right now");
+        }
+    }
+    Real64 GlycolAPI::specificHeat(Real64 temperature) {
+        return FluidProperties::GetSpecificHeatGlycol(this->glycolName, temperature, this->glycolIndex, this->cf);
+    }
+    Real64 GlycolAPI::density(Real64 temperature) {
+        return FluidProperties::GetDensityGlycol(this->glycolName, temperature, this->glycolIndex, this->cf);
+    }
+    Real64 GlycolAPI::conductivity(Real64 temperature) {
+        return FluidProperties::GetConductivityGlycol(this->glycolName, temperature, this->glycolIndex, this->cf);
+    }
+    Real64 GlycolAPI::viscosity(Real64 temperature) {
+        return FluidProperties::GetViscosityGlycol(this->glycolName, temperature, this->glycolIndex, this->cf);
+    }
+
+    RefrigerantAPI::RefrigerantAPI(std::string const &refrigName) {
+        this->rName = EnergyPlus::UtilityRoutines::MakeUPPERCase(refrigName);
+        this->rIndex = 0;
+        this->cf = "RefrigerantAPI:Instance";
+        if (this->rName != "STEAM") {
+            EnergyPlus::ShowFatalError("Can only do steam right now");
+        }
+    }
+    Real64 RefrigerantAPI::saturationPressure(Real64 temperature) {
+        return FluidProperties::GetSatPressureRefrig(this->rName, temperature, this->rIndex, this->cf);
+    }
+    Real64 RefrigerantAPI::saturationTemperature(Real64 pressure) {
+        return FluidProperties::GetSatTemperatureRefrig(this->rName, pressure, this->rIndex, this->cf);
+    }
+    Real64 RefrigerantAPI::saturatedEnthalpy(Real64 temperature, Real64 quality) {
+        return FluidProperties::GetSatEnthalpyRefrig(this->rName, temperature, quality, this->rIndex, this->cf);
+    }
+    Real64 RefrigerantAPI::saturatedDensity(Real64 temperature, Real64 quality) {
+        return FluidProperties::GetSatDensityRefrig(this->rName, temperature, quality, this->rIndex, this->cf);
+    }
+    Real64 RefrigerantAPI::saturatedSpecificHeat(Real64 temperature, Real64 quality) {
+        return FluidProperties::GetSatSpecificHeatRefrig(this->rName, temperature, quality, this->rIndex, this->cf);
+    }
+    Real64 RefrigerantAPI::superHeatedEnthalpy(Real64 temperature, Real64 pressure) {
+        return FluidProperties::GetSupHeatEnthalpyRefrig(this->rName, temperature, pressure, this->rIndex, this->cf);
+    }
+    Real64 RefrigerantAPI::superHeatedPressure(Real64 temperature, Real64 enthalpy) {
+        return FluidProperties::GetSupHeatPressureRefrig(this->rName, temperature, enthalpy, this->rIndex, this->cf);
+    }
+    Real64 RefrigerantAPI::superHeatedDensity(Real64 temperature, Real64 pressure) {
+        return FluidProperties::GetSupHeatDensityRefrig(this->rName, temperature, pressure, this->rIndex, this->cf);
     }
 
 } // namespace FluidProperties

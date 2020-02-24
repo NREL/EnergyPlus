@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -69,6 +69,7 @@
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
+#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <milo/dtoa.h>
@@ -1453,6 +1454,9 @@ void InputProcessor::preScanReportingVariables()
     // consider those variables for output.  (At this time, all metered variables are
     // allowed to pass through).
 
+    // This routine also scans any variables requested by API call for library usage.
+    // These variables are stored in a vector in output processor, and the values are added before E+ begins.
+
     // METHODOLOGY EMPLOYED:
     // Uses internal records and structures.
     // Looks at:
@@ -1560,6 +1564,10 @@ void InputProcessor::preScanReportingVariables()
         for (auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj) {
             addRecordToOutputVariableStructure("*", obj.key());
         }
+    }
+
+    for (auto const & requestedVar : OutputProcessor::apiVarRequests) {
+        addRecordToOutputVariableStructure(requestedVar.varKey, requestedVar.varName);
     }
 
     epJSON_objects = epJSON.find(OutputTableTimeBins);

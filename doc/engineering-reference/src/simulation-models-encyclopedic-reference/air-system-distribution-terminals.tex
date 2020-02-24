@@ -1,13 +1,5 @@
 \section{Air System Distribution Terminals }\label{air-system-distribution-terminals}
 
-\subsection{Constant Volume Single Duct Uncontrolled Air Terminal}\label{constant-volume-single-duct-uncontrolled-air-terminal}
-
-The input object AirTerminal:SingleDuct:Uncontrolled provides a method for directly connecting a central air system to a thermal zone.~ Central system air is usually supplied to a zone through a terminal unit such as a single duct VAV reheat box.~ Sometimes, however, it is desirable to supply central system air directly to a zone without any zone level control or tempering.~ An example would be Furnace or Central DX equipment.~ AirTerminal:SingleDuct:Uncontrolled is the input object for a component used to pass supply air directly into a zone without any thermostatic control.~ This unit allows the program to know what zone this branch of the air system is attached to and a place to input the maximum air flow rate.~ It is typically used with an AirLoopHVAC running as a constant-volume, variable-temperature system.
-
-The AirTerminal:SingleDuct:Uncontrolled object creates the capability of supplying central system air directly to a zone and only contains the zone inlet node.~ This node is both the zone inlet node and the outlet node of the AirLoopHVAC:ZoneSplitter.~ It can be thought of as a balancing damper in the duct branch going to the zone.~ This inlet flow can be controlled by an availability schedule.~ This can be thought of as a seasonal shut off of the balancing damper.
-
-For the AirTerminal:SingleDuct:Uncontrolled objects to work correctly, it is important in any systems including them for the sum of the maximum zone air flow rates to be equal to the maximum central system flow rate.~ The zone maximum flow rates are specified in the direct air inputs.~ The central air system flow rate is specified in the AirLoopHVAC input and also in the air loop branch and central fan inputs.
-
 \subsection{Constant Volume Single Duct Reheat Air Terminal}\label{constant-volume-single-duct-reheat-air-terminal}
 
 The input object AirTerminal:SingleDuct:ConstantVolume:Reheat provides a model for single duct constant volume systems with reheat that satisfy the cooling load in a zone by changing the inlet air temperature with a reheat coil. The supply air temperature must be low enough to meet the cooling load in the zone having the greatest load. For zones with a smaller cooling load, a reheat coil is used to raise the temperature of the zone inlet air.
@@ -100,11 +92,11 @@ The reheat version of this terminal unit requires additional information. The na
 The simulation begins by determining the air mass flow rate required to satisfy the heating/cooling demand.
 
 \begin{equation}
-C{p_{zone}} = PsyCpAirFnWTdb\left( {{\omega_{zone}},{T_{zone}}} \right)
+C{p_{zone}} = PsyCpAirFnW\left( {{\omega_{zone}}} \right)
 \end{equation}
 
 \begin{equation}
-C{p_{inlet}} = PsyCpAirFnWTdb\left( {{\omega_{inlet}},{T_{inlet}}} \right)
+C{p_{inlet}} = PsyCpAirFnW\left( {{\omega_{inlet}}} \right)
 \end{equation}
 
 \begin{equation}
@@ -112,7 +104,7 @@ DeltaCpT = \left( {C{p_{inlet}}} \right)\left( {{T_{inlet}}} \right) - \left( {C
 \end{equation}
 
 \begin{equation}
-  \dot{m} = \min \PB{ \dot{m}_{max}, \max \PB{ \dot{m}_{max}\times MinAirFlowFrac,\frac{\dot{Q}_{zone}}{DeltaCpT} } }
+  \dot{m} = \min \PB{ \dot{m}_{max}, \max \PB{ \dot{m}_{max}\times MinAirFlowFrac\times MinAirFlowTurnDownFrac,\frac{\dot{Q}_{zone}}{DeltaCpT} } }
 \end{equation}
 
 where:
@@ -133,9 +125,11 @@ where:
 
 \(\dot m\) = Terminal unit air mass flow rate, kg/s
 
-\(PsyCpAirFnWTdb\) = Psychrometric function calculating air specific heat given air humidity ratio and dry-bulb temperature
+\(PsyCpAirFnW\) = Psychrometric function calculating air specific heat given air humidity ratio
 
 \(MinAirFlowFrac\) = User-specified zone minimum air flow fraction
+
+\(MinAirFlowTurnDownFrac\) = User-specified zone minimum air flow turndown fraction
 
 \({\dot m_{max}}\) = Terminal unit maximum air mass flow rate, kg/s.
 
@@ -434,7 +428,7 @@ The VS fan VAV terminal unit is modeled as a compound component consisting of tw
 
 The user describes the terminal unit by inputting the name and type of the heating coil and the name and type of the fan. The user must also specify the connectivity of the component by naming the inlet air node; the air node connecting the fan and heating coil (fan outlet, coil inlet); the unit air outlet node (same as the zone inlet node); and hot water inlet node (if any). Maximum flow rates need to be specified (although these can be autosized): maximum cooling and heating air flow rates and the maximum hot water flow rate (if there is a hot water coil). Minimum flow rates are specified by giving by giving a minimum flow fraction for the air flow and a volumetric flow rate minimum for the hot water. For the units with hot water coils the relative convergence tolerance for the hot water flow rate also needs to be input (or allowed to default).
 
-All input data for the VS fan VAV terminal units is stored in the array \emph{Sys}.
+All input data for the VS fan VAV terminal units is stored in the array \textit{sd\_airterminal}.
 
 \subsubsection{Calculation}\label{calculation-2}
 
@@ -792,11 +786,11 @@ When sizing for the cooling design load, the following design values are set for
 \end{equation}
 
 \begin{equation}
-  {c_{p,Z}} = {PsyCpAirFnWTdb ({w_{Z,cool,design } },  {T_{Z,cool,design } }  ) }
+  {c_{p,Z}} = {PsyCpAirFnW ({w_{Z,cool,design}})}
 \end{equation}
 
 \begin{equation}
-  {c_{p,SA}} = {PsyCpAirFnWTdb ( {w_{SA,cool,design } },  {T_{SA,cool,design } }   ) }
+  {c_{p,SA}} = {PsyCpAirFnW ( {w_{SA,cool,design } }) }
 \end{equation}
 
 \begin{equation}
@@ -836,11 +830,11 @@ When sizing for the heating design load, the following design values are set for
 \end{equation}
 
 \begin{equation}
-  {c_{p,Z}} = {PsyCpAirFnWTdb ({w_{Z,heat,design } },  {T_{Z,heat,design } }  ) }
+  {c_{p,Z}} = {PsyCpAirFnW({w_{Z,heat,design } }) }
 \end{equation}
 
 \begin{equation}
-  {c_{p,SA}} = {PsyCpAirFnWTdb ( {w_{SA,heat,design } },  {T_{SA,heat,design } }   ) }
+  {c_{p,SA}} = {PsyCpAirFnW ( {w_{SA,heat,design } }) }
 \end{equation}
 
 \begin{equation}
@@ -1087,11 +1081,11 @@ This dual duct air terminal may also be used to provide a minimum outdoor air qu
 The simulation begins by determining the air mass flow rate required to satisfy the heating/cooling demand using either the heating duct or cooling duct.
 
 \begin{equation}
-C_{p,zone} = PsyCpAirFnWTdb\left( {\omega_{zone}},{T_{zone}} \right)
+C_{p,zone} = PsyCpAirFnW\left( {\omega_{zone}} \right)
 \end{equation}
 
 \begin{equation}
-C_{p,inlet} = PsyCpAirFnWTdb\left( {\omega_{inlet}},{T_{inlet}} \right)
+C_{p,inlet} = PsyCpAirFnW\left( {\omega_{inlet}} \right)
 \end{equation}
 
 \begin{equation}
@@ -1099,7 +1093,7 @@ C_{p,inlet} = PsyCpAirFnWTdb\left( {\omega_{inlet}},{T_{inlet}} \right)
 \end{equation}
 
 \begin{equation}
-\dot m = \min \left( \dot m_{max}, \max \left( \dot m_{max}\cdot MinAirFlowFrac,\frac{\dot Q_{zone}}{\Delta C_p T} \right) \right)
+\dot m = \min \left( \dot m_{max}, \max \left( \dot m_{max}\cdot MinAirFlowFrac\times MinAirFlowTurnDownFrac,\frac{\dot Q_{zone}}{\Delta C_p T} \right) \right)
 \end{equation}
 
 where
@@ -1120,9 +1114,11 @@ where
 
 \(\dot m\) is the terminal unit air mass flow rate through either heating or cooling duct, kg/s
 
-\(PsyCpAirFnWTdb\) is the psychrometric function calculating air specific heat given air humidity ratio and dry-bulb temperature
+\(PsyCpAirFnW\) is the psychrometric function calculating air specific heat given air humidity ratio
 
 \(MinAirFlowFrac\) is the user-specified zone minimum air flow fraction
+
+\(MinAirFlowTurnDownFrac\) is the user-specified zone minimum air flow turndown fraction
 
 \({\dot m_{max}}\) is the terminal unit maximum air mass flow rate, kg/s.
 
@@ -1169,15 +1165,15 @@ The outdoor air rate is controlled by the schedule and specifications contained 
 The recirculated cool air flow rate is controlled to meet the zone cooling loads.~ The first step is to calculate the impact that the outdoor air flow has on the loads starting with the specific heats.
 
 \begin{equation}
-{c_{p,zone}} = PsyCpAirFnWTdb\left( {{\omega_{zone}},{T_{zone}}} \right)
+{c_{p,zone}} = PsyCpAirFnW\left( {{\omega_{zone}}} \right)
 \end{equation}
 
 \begin{equation}
-{c_{p,OA}} = PsyCpAirFnWTdb\left( {{\omega_{OA}},{T_{OA}}} \right)
+{c_{p,OA}} = PsyCpAirFnW\left( {{\omega_{OA}}} \right)
 \end{equation}
 
 \begin{equation}
-{c_{p,RC}} = PsyCpAirFnWTdb\left( {{\omega_{RC}},{T_{RC}}} \right)
+{c_{p,RC}} = PsyCpAirFnW\left( {{\omega_{RC}}} \right)
 \end{equation}
 
 where:
@@ -1200,7 +1196,7 @@ where:
 
 \(T_{RC}\) is the air drybulb temperature of the recirculated cool air entering the terminal unit, \(^{\circ}\)C
 
-\(PsyCpAirFnWTdb\) is a psychrometric function for calculating the specific heat of moist air as a function of humidity ratio and drybulb temperature.
+\(PsyCpAirFnW\) is a psychrometric function for calculating the specific heat of moist air as a function of humidity ratio.
 
 The contribution to zone load provided by the outdoor air toward meeting the cooling setpoint, \({\dot Q_{OA}}\) (W), is then calculated using:
 

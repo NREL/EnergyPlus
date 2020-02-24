@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -111,7 +111,7 @@ namespace ZoneEquipmentManager {
 
     void SizeZoneEquipment();
 
-    void SetUpZoneSizingArrays();
+    void SetUpZoneSizingArrays(OutputFiles &outputFiles);
 
     void RezeroZoneSizingArrays();
 
@@ -165,9 +165,10 @@ namespace ZoneEquipmentManager {
                                    Real64 &DOASSupHR    // DOAS Supply Humidity ratio [kg Water / kg Dry Air]
     );
 
-    void AutoCalcDOASControlStrategy();
+    void AutoCalcDOASControlStrategy(OutputFiles &outputFiles);
 
-    void ReportZoneSizingDOASInputs(std::string const &ZoneName,         // the name of the zone
+    void ReportZoneSizingDOASInputs(OutputFiles &outputFiles,
+                                    std::string const &ZoneName,         // the name of the zone
                                     std::string const &DOASCtrlStrategy, // DOAS control strategy
                                     Real64 const DOASLowTemp,            // DOAS design low setpoint temperature [C]
                                     Real64 const DOASHighTemp            // DOAS design high setpoint temperature [C]

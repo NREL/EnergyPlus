@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -1816,6 +1816,8 @@ namespace WaterManager {
             }
             WaterStorage(TankNum).VdotOverflow = 0.0;
             if (WaterStorage(TankNum).NumWaterSupplies > 0) {
+                // TODO: Figure out what to do with this...the available supply should be updated by the components
+                //       This was an issue because the coil supply was being stomped by this assignment to zero, so no tank action was happening
                 WaterStorage(TankNum).VdotAvailSupply = 0.0;
             }
             if ((WaterStorage(TankNum).ControlSupplyType == WellFloatValve) || (WaterStorage(TankNum).ControlSupplyType == WellFloatMainsBackup)) {

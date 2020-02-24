@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -217,7 +217,7 @@ namespace DataHVACGlobals {
     extern int const Coil_HeatingWaterToAirHPSimple;
     extern int const CoilVRF_Cooling;
     extern int const CoilVRF_Heating;
-
+    extern int const CoilDX_Cooling;
     extern int const Coil_UserDefined;
     extern int const CoilDX_PackagedThermalStorageCooling;
 
@@ -414,7 +414,6 @@ namespace DataHVACGlobals {
     extern int const ZoneEquipTypeOf_RefrigerationChillerSet;
     extern int const ZoneEquipTypeOf_FanZoneExhaust;
     extern int const ZoneEquipTypeOf_WaterHeaterHeatPump;
-    extern int const ZoneEquipTypeOf_AirTerminalSingleDuctUncontrolled;
     extern int const ZoneEquipTypeOf_AirTerminalDualDuctConstantVolume;
     extern int const ZoneEquipTypeOf_AirTerminalDualDuctVAV;
     extern int const ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeReheat;

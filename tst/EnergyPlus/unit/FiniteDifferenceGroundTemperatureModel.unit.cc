@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -281,14 +281,14 @@ TEST_F(EnergyPlusFixture, FiniteDiffGroundTempModel_GetWeather_Weather) {
 
     // Read the project data, such as Timestep
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
     EXPECT_EQ(DataGlobals::NumOfTimeStepInHour, 4);
 
     // Needed to avoid crash in SetupSimulation (from ElectricPowerServiceManager.hh)
     createFacilityElectricPowerServiceObject();
 
     bool ErrorsFound(false);
-    SimulationManager::SetupSimulation(ErrorsFound);
+    SimulationManager::SetupSimulation(OutputFiles::getSingleton(), ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
     EXPECT_EQ(WeatherManager::NumOfEnvrn, 3);

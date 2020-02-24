@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -66,6 +66,7 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -171,8 +172,9 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
         "    25;                      !- Maximum HVAC Iterations",
 
         "  ShadowCalculation,",
-        "    AverageOverDaysInFrequency,  !- Calculation Method",
-        "    7,                       !- Calculation Frequency",
+        "    PolygonClipping,         !- Shading Calculation Method",
+        "    Periodic,                !- Shading Calculation Update Frequency Method",
+        "    7,                       !- Shading Calculation Update Frequency",
         "    15000;                   !- Maximum Figures in Shadow Overlap Calculations",
 
         "  Timestep,6;",
@@ -2258,8 +2260,8 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
         "  ZoneHVAC:EquipmentList,",
         "    Core_ZN Equipment,       !- Name",
         "    SequentialLoad,          !- Load Distribution Scheme",
-        "    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type",
-        "    Core_ZN Direct Air,      !- Zone Equipment 1 Name",
+        "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+        "    Core_ZN ADU,             !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
         "    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction",
@@ -2268,8 +2270,8 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
         "  ZoneHVAC:EquipmentList,",
         "    Perimeter_ZN_1 Equipment,!- Name",
         "    SequentialLoad,          !- Load Distribution Scheme",
-        "    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type",
-        "    Perimeter_ZN_1 Direct Air,  !- Zone Equipment 1 Name",
+        "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+        "    Perimeter_ZN_1 ADU,      !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
         "    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction",
@@ -2278,8 +2280,8 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
         "  ZoneHVAC:EquipmentList,",
         "    Perimeter_ZN_2 Equipment,!- Name",
         "    SequentialLoad,          !- Load Distribution Scheme",
-        "    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type",
-        "    Perimeter_ZN_2 Direct Air,  !- Zone Equipment 1 Name",
+        "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+        "    Perimeter_ZN_2 ADU,      !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
         "    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction",
@@ -2288,8 +2290,8 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
         "  ZoneHVAC:EquipmentList,",
         "    Perimeter_ZN_3 Equipment,!- Name",
         "    SequentialLoad,          !- Load Distribution Scheme",
-        "    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type",
-        "    Perimeter_ZN_3 Direct Air,  !- Zone Equipment 1 Name",
+        "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+        "    Perimeter_ZN_3 ADU,      !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
         "    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction",
@@ -2298,12 +2300,42 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
         "  ZoneHVAC:EquipmentList,",
         "    Perimeter_ZN_4 Equipment,!- Name",
         "    SequentialLoad,          !- Load Distribution Scheme",
-        "    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type",
-        "    Perimeter_ZN_4 Direct Air,  !- Zone Equipment 1 Name",
+        "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+        "    Perimeter_ZN_4 ADU,      !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
         "    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction",
         "    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction",
+
+        "  ZoneHVAC:AirDistributionUnit,",
+        "    Core_ZN ADU,             !- Name",
+        "    Zone1NoReheatAirOutletNode,  !- Air Distribution Unit Outlet Node Name",
+        "    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+        "    Core_ZN Direct Air;      !- Air Terminal Name",
+
+        "  ZoneHVAC:AirDistributionUnit,",
+        "    Perimeter_ZN_1 ADU,             !- Name",
+        "    Zone1NoReheatAirOutletNode,  !- Air Distribution Unit Outlet Node Name",
+        "    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+        "    Perimeter_ZN_1 Direct Air;      !- Air Terminal Name",
+
+        "  ZoneHVAC:AirDistributionUnit,",
+        "    Perimeter_ZN_2 ADU,             !- Name",
+        "    Zone1NoReheatAirOutletNode,  !- Air Distribution Unit Outlet Node Name",
+        "    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+        "    Perimeter_ZN_2 Direct Air;      !- Air Terminal Name",
+
+        "  ZoneHVAC:AirDistributionUnit,",
+        "    Perimeter_ZN_3 ADU,             !- Name",
+        "    Zone1NoReheatAirOutletNode,  !- Air Distribution Unit Outlet Node Name",
+        "    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+        "    Perimeter_ZN_3 Direct Air;      !- Air Terminal Name",
+
+        "  ZoneHVAC:AirDistributionUnit,",
+        "    Perimeter_ZN_4 ADU,             !- Name",
+        "    Zone1NoReheatAirOutletNode,  !- Air Distribution Unit Outlet Node Name",
+        "    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+        "    Perimeter_ZN_4 Direct Air;      !- Air Terminal Name",
 
         "  Sizing:Zone,",
         "    Core_ZN,                 !- Zone or ZoneList Name",
@@ -3067,7 +3099,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
 
         "  NodeList,",
         "    Core_ZN Inlet Nodes,     !- Name",
-        "    Core_ZN Direct Air Inlet Node Name;  !- Node 1 Name",
+        "    Core_ZN Zone Inlet Node;  !- Node 1 Name",
 
         "  NodeList,",
         "    PSZ-AC:1_OANode List,    !- Name",
@@ -3091,49 +3123,54 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
 
         "  NodeList,",
         "    Perimeter_ZN_1 Inlet Nodes,  !- Name",
-        "    Perimeter_ZN_1 Direct Air Inlet Node Name;  !- Node 1 Name",
+        "    Perimeter_ZN_1 Zone Inlet Node;  !- Node 1 Name",
 
         "  NodeList,",
         "    Perimeter_ZN_2 Inlet Nodes,  !- Name",
-        "    Perimeter_ZN_2 Direct Air Inlet Node Name;  !- Node 1 Name",
+        "    Perimeter_ZN_2 Zone Inlet Node;  !- Node 1 Name",
 
         "  NodeList,",
         "    Perimeter_ZN_3 Inlet Nodes,  !- Name",
-        "    Perimeter_ZN_3 Direct Air Inlet Node Name;  !- Node 1 Name",
+        "    Perimeter_ZN_3 Zone Inlet Node;  !- Node 1 Name",
 
         "  NodeList,",
         "    Perimeter_ZN_4 Inlet Nodes,  !- Name",
-        "    Perimeter_ZN_4 Direct Air Inlet Node Name;  !- Node 1 Name",
+        "    Perimeter_ZN_4 Zone Inlet Node;  !- Node 1 Name",
 
-        "  AirTerminal:SingleDuct:Uncontrolled,",
+        "  AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
         "    Core_ZN Direct Air,      !- Name",
         "    ALWAYS_ON,               !- Availability Schedule Name",
-        "    Core_ZN Direct Air Inlet Node Name,  !- Zone Supply Air Node Name",
-        "    AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}",
+        "    Core_ZN Direct Air Inlet Node Name, !- Air Inlet Node Name",
+        "    Core_ZN Zone Inlet Node, !- Zone Supply Air Node Name",
+        "    Autosize;                !- Maximum Air Flow Rate {m3/s}",
 
-        "  AirTerminal:SingleDuct:Uncontrolled,",
-        "    Perimeter_ZN_1 Direct Air,  !- Name",
+        "  AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+        "    Perimeter_ZN_1 Direct Air, !- Name",
         "    ALWAYS_ON,               !- Availability Schedule Name",
-        "    Perimeter_ZN_1 Direct Air Inlet Node Name,  !- Zone Supply Air Node Name",
-        "    AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}",
+        "    Perimeter_ZN_1 Direct Air Inlet Node Name, !- Air Inlet Node Name",
+        "    Perimeter_ZN_1 Zone Inlet Node, !- Zone Supply Air Node Name",
+        "    Autosize;                !- Maximum Air Flow Rate {m3/s}",
 
-        "  AirTerminal:SingleDuct:Uncontrolled,",
-        "    Perimeter_ZN_2 Direct Air,  !- Name",
+        "  AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+        "    Perimeter_ZN_2 Direct Air, !- Name",
         "    ALWAYS_ON,               !- Availability Schedule Name",
-        "    Perimeter_ZN_2 Direct Air Inlet Node Name,  !- Zone Supply Air Node Name",
-        "    AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}",
+        "    Perimeter_ZN_2 Direct Air Inlet Node Name, !- Air Inlet Node Name",
+        "    Perimeter_ZN_2 Zone Inlet Node, !- Zone Supply Air Node Name",
+        "    Autosize;                !- Maximum Air Flow Rate {m3/s}",
 
-        "  AirTerminal:SingleDuct:Uncontrolled,",
-        "    Perimeter_ZN_3 Direct Air,  !- Name",
+        "  AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+        "    Perimeter_ZN_3 Direct Air, !- Name",
         "    ALWAYS_ON,               !- Availability Schedule Name",
-        "    Perimeter_ZN_3 Direct Air Inlet Node Name,  !- Zone Supply Air Node Name",
-        "    AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}",
+        "    Perimeter_ZN_3 Direct Air Inlet Node Name, !- Air Inlet Node Name",
+        "    Perimeter_ZN_3 Zone Inlet Node, !- Zone Supply Air Node Name",
+        "    Autosize;                !- Maximum Air Flow Rate {m3/s}",
 
-        "  AirTerminal:SingleDuct:Uncontrolled,",
-        "    Perimeter_ZN_4 Direct Air,  !- Name",
+        "  AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+        "    Perimeter_ZN_4 Direct Air, !- Name",
         "    ALWAYS_ON,               !- Availability Schedule Name",
-        "    Perimeter_ZN_4 Direct Air Inlet Node Name,  !- Zone Supply Air Node Name",
-        "    AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}",
+        "    Perimeter_ZN_4 Direct Air Inlet Node Name, !- Air Inlet Node Name",
+        "    Perimeter_ZN_4 Zone Inlet Node, !- Zone Supply Air Node Name",
+        "    Autosize;                !- Maximum Air Flow Rate {m3/s}",
 
         "  AvailabilityManagerAssignmentList,",
         "    PSZ-AC:1 Availability Manager List,  !- Name",
@@ -3915,17 +3952,17 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
 
     bool ErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
@@ -3936,7 +3973,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
     SurfaceGeometry::SinZoneRelNorth = 0.0;
     SurfaceGeometry::CosBldgRelNorth = 1.0;
     SurfaceGeometry::SinBldgRelNorth = 0.0;
-    SurfaceGeometry::GetSurfaceData(ErrorsFound);
+    SurfaceGeometry::GetSurfaceData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     ZoneEquipmentManager::GetZoneEquipment();
@@ -3977,7 +4014,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
     // Mixer outlet
     EXPECT_NEAR(23.0, DataLoopNode::Node(68).Temp, 0.0001);
     EXPECT_NEAR(0.5, DataLoopNode::Node(68).MassFlowRate, 0.0001);
-    // Outlet of HX 
+    // Outlet of HX
     EXPECT_NEAR(-8.0710884, DataLoopNode::Node(67).Temp, 0.0001);
     // Outlet of Central DOAS
     EXPECT_NEAR(4.5, DataLoopNode::Node(70).Temp, 0.0001);

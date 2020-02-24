@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -604,7 +604,7 @@ namespace CoolTower {
         using DataHeatBalFanSys::MCPTC;
         using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHeatBalFanSys::ZT;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::PsyWFnTdbH;
         using Psychrometrics::PsyWFnTdbTwbPb;
@@ -716,7 +716,7 @@ namespace CoolTower {
                 // From the mass balance W_in*(m_air + m_water) = W_out*m_air
                 RhoWater = RhoH2O(OutletTemp); // Assume T_water = T_outlet
                 OutletHumRat = (InletHumRat * (AirMassFlowRate + (CoolTowerSys(CoolTowerNum).ActualWaterFlowRate * RhoWater))) / AirMassFlowRate;
-                AirSpecHeat = PsyCpAirFnWTdb(OutletHumRat, OutletTemp);
+                AirSpecHeat = PsyCpAirFnW(OutletHumRat);
                 AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, OutletTemp, OutletHumRat); // Outlet air density
                 CVF_ZoneNum = CoolTowerSys(CoolTowerNum).ActualAirVolFlowRate * GetCurrentScheduleValue(CoolTowerSys(CoolTowerNum).SchedPtr);
                 MCPC(ZoneNum) = CVF_ZoneNum * AirDensity * AirSpecHeat;

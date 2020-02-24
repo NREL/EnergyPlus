@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,7 +57,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -303,7 +303,7 @@ namespace PlantValves {
                                     if (thisBranch.ControlType == DataBranchAirLoopPlant::ControlType_Active) IsBranchActive = true;
 
                                     // is Valve inlet node an outlet node of a splitter
-                                    if (thisLoopSide.SplitterExists) {
+                                    if (thisLoopSide.Splitter.Exists) {
                                         if (allocated(thisLoopSide.Splitter.NodeNumOut)) {
                                             if (any_eq(thisLoopSide.Splitter.NodeNumOut, this->PltInletNodeNum)) {
                                                 InNodeOnSplitter = true;
@@ -317,7 +317,7 @@ namespace PlantValves {
                                     }  // has splitter
 
                                     // is stream 2 node an inlet to the mixer ?
-                                    if (thisLoopSide.MixerExists) {
+                                    if (thisLoopSide.Mixer.Exists) {
                                         if (any_eq(thisLoopSide.Mixer.NodeNumIn, this->PltStream2NodeNum)) {
                                             int thisInnerBranchCtr = 0;
                                             for (auto & thisInnerBranch : thisLoopSide.Branch) {
@@ -336,7 +336,7 @@ namespace PlantValves {
                                     for (auto & thisInnerBranch : thisLoopSide.Branch) {
                                         if (thisInnerBranch.NodeNumOut == this->PltPumpOutletNodeNum) {
                                             for (auto & thisInnerComp : thisInnerBranch.Comp) {
-                                                if (thisInnerComp.GeneralEquipType == DataPlant::GenEquipTypes_Pump) {
+                                                if (thisInnerComp.isPump()) {
                                                     PumpOutNodeOkay = true;
                                                 }
                                             }
