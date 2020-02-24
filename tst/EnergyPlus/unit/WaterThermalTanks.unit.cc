@@ -3712,7 +3712,6 @@ TEST_F(EnergyPlusFixture, MultipleDesuperheaterSingleSource)
     int DXNum = 1;
     bool FirstHVAC = true;
 
-    bool ErrorsFound = false;
     EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(OutputFiles::getSingleton()));
 
     // first tank
