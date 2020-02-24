@@ -224,6 +224,9 @@ namespace DataEnvironment {
     int varyingLocationSchedIndexLong(0);
     int varyingOrientationSchedIndex(0);
 
+    // for PerformancePrecisionTradeoffs
+    bool forceBeginEnvResetSuppress(false);
+
     // SUBROUTINE SPECIFICATIONS FOR MODULE DataEnvironment:
     // PUBLIC OutBaroPressAt
     // PUBLIC OutAirDensityAt

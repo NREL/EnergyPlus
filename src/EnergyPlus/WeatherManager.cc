@@ -163,10 +163,14 @@ namespace WeatherManager {
     int const DDDBRangeType_Difference(2); // Design Day DryBulb Range Type = Difference Schedule
     int const DDDBRangeType_Profile(3);    // Design Day DryBulb Range Type = Temperature Profile
 
+    int const WP_ClarkAllenModel(0);     // Use Clark & Allen model for sky emissivity calculation
     int const WP_ScheduleValue(1);  // User entered Schedule value for Weather Property
     int const WP_DryBulbDelta(2);   // User entered DryBulb difference Schedule value for Weather Property
     int const WP_DewPointDelta(3);  // User entered Dewpoint difference Schedule value for Weather Property
-    int const WP_SkyTAlgorithmA(4); // place holder
+    int const WP_BruntModel(4);          // Use Brunt model for sky emissivity calculation
+    int const WP_IdsoModel(5);           // Use Isdo model for sky emissivity calculation
+    int const WP_BerdahlMartinModel(6);  // Use Martin & Berdahl model for sky emissivity calculation
+    int const WP_SkyTAlgorithmA(7);      // place holder
 
     int const GregorianToJulian(1); // JGDate argument for Gregorian to Julian Date conversion
     int const JulianToGregorian(2); // JGDate argument for Julian to Gregorian Date conversion
@@ -782,7 +786,7 @@ namespace WeatherManager {
         }
     }
 
-    void GetNextEnvironment(OutputFiles &outputFiles,
+    bool GetNextEnvironment(OutputFiles &outputFiles,
                             bool &Available,  // true if there is another environment, false if the end
                             bool &ErrorsFound // will be set to true if severe errors are found in inputs
     )
@@ -809,10 +813,10 @@ namespace WeatherManager {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetNextEnvironment: ");
-        static constexpr auto EnvNameFormat("Environment,{},{},{},{},{},{},{},{},{},{},{},{}\n");
+        static constexpr auto EnvNameFormat("Environment,{},{},{},{},{},{},{},{},{},{},{},{},{}\n");
         static constexpr auto EnvDSTNFormat("Environment:Daylight Saving,No,{}\n");
         static constexpr auto EnvDSTYFormat("Environment:Daylight Saving,Yes,{},{},{}\n");
-       static ObjexxFCL::gio::Fmt DateFormat("(I2.2,'/',I2.2)");
+        static ObjexxFCL::gio::Fmt DateFormat("(I2.2,'/',I2.2)");
         static ObjexxFCL::gio::Fmt DateFormatwithYear("(I2.2,'/',I2.2,'/',I4.4)");
         static Array1D_string const SpecialDayNames(5, {"Holiday", "SummerDesignDay", "WinterDesignDay", "CustomDay1", "CustomDay2"});
         static Array1D_string const ValidDayNames(12,
@@ -828,7 +832,14 @@ namespace WeatherManager {
                                                    "WinterDesignDay",
                                                    "CustomDay1",
                                                    "CustomDay2"});
-
+        static Array1D_string const SkyTempModelNames(7,
+                                                      {"Clark and Allen",
+                                                       "Schedule Value",
+                                                       "DryBulb Difference Schedule Value",
+                                                       "Dewpoint Difference Schedule Value",
+                                                       "Brunt",
+                                                       "Idso",
+                                                       "Berdahl and Martin"});
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         //////////// hoisted into namespace changed to GetBranchInputOneTimeFlag////////////
         //	static bool GetInputFlag( true ); // Set to true before execution starts changed to GetEnvironmentInputOneTimeFlag
@@ -840,6 +851,7 @@ namespace WeatherManager {
         std::string EnDate;
         std::string string;
         std::string cTotalEnvDays;
+        std::string skyTempModel;
         int DSTActStMon;
         int DSTActStDay;
         int DSTActEnMon;
@@ -1049,7 +1061,7 @@ namespace WeatherManager {
                         static constexpr auto EnvironFormat(
                             "! <Environment>,Environment Name,Environment Type, Start Date, End Date, Start DayOfWeek, Duration {#days}, "
                             "Source:Start DayOfWeek,  Use Daylight Saving, Use Holidays, Apply Weekend Holiday Rule,  Use Rain Values, Use Snow "
-                            "Values\n! <Environment:Special Days>, Special Day Name, Special Day Type, Source, Start Date, Duration {#days}\n! "
+                            "Values, Sky Temperature Model\n! <Environment:Special Days>, Special Day Name, Special Day Type, Source, Start Date, Duration {#days}\n! "
                             "<Environment:Daylight Saving>, Daylight Saving Indicator, Source, Start Date, End Date\n! <Environment:WarmupDays>, "
                             "NumberofWarmupDays");
                         print(outputFiles.eio, "{}\n", EnvironFormat);
@@ -1216,6 +1228,7 @@ namespace WeatherManager {
                                     AlpUseSnow = "No";
                                 }
                                 cTotalEnvDays = RoundSigDigits(Environment(Envrn).TotalDays);
+                                skyTempModel = SkyTempModelNames(Environment(Envrn).SkyTempModel + 1);
 
                                 print(outputFiles.eio,
                                       EnvNameFormat,
@@ -1230,7 +1243,8 @@ namespace WeatherManager {
                                       AlpUseSpec,
                                       ApWkRule,
                                       AlpUseRain,
-                                      AlpUseSnow);
+                                      AlpUseSnow,
+                                      skyTempModel);
                             }
 
                             if (!DoingSizing && !KickOffSimulation) {
@@ -1370,6 +1384,7 @@ namespace WeatherManager {
                                 << DesDayInput(Environment(Envrn).DesignDayNum).Month << DesDayInput(Environment(Envrn).DesignDayNum).DayOfMonth;
                             EnDate = StDate;
                             if (DesDayInput(Environment(Envrn).DesignDayNum).DayType <= 7 && DoWeatherInitReporting) {
+
                                 print(outputFiles.eio,
                                       EnvNameFormat,
                                       Environment(Envrn).Title,
@@ -1383,7 +1398,8 @@ namespace WeatherManager {
                                       "N/A",
                                       "N/A",
                                       "N/A",
-                                      "N/A");
+                                      "N/A",
+                                      SkyTempModelNames(Environment(Envrn).SkyTempModel + 1));
                             } else if (DoWeatherInitReporting) {
                                 print(outputFiles.eio,
                                       EnvNameFormat,
@@ -1398,7 +1414,8 @@ namespace WeatherManager {
                                       "N/A",
                                       "N/A",
                                       "N/A",
-                                      "N/A");
+                                      "N/A",
+                                      SkyTempModelNames(Environment(Envrn).SkyTempModel + 1));
                             }
                             if (DesDayInput(Environment(Envrn).DesignDayNum).DSTIndicator == 0 && DoWeatherInitReporting) {
                                 print(outputFiles.eio, EnvDSTNFormat, "SizingPeriod:DesignDay");
@@ -1417,6 +1434,7 @@ namespace WeatherManager {
         } else if (ErrorsFound) {
             Available = false;
         }
+        return Available && !ErrorsFound;
     }
 
     void AddDesignSetToEnvironmentStruct(int const HVACSizingIterCount)
@@ -2599,7 +2617,7 @@ namespace WeatherManager {
                 SPSiteBeamSolarScheduleValue(envrnDayNum) = DDBeamSolarValues(TimeStep, HourOfDay, envrnDayNum);
                 SPSiteDiffuseSolarScheduleValue(envrnDayNum) = DDDiffuseSolarValues(TimeStep, HourOfDay, envrnDayNum);
             }
-            if (Environment(Envrn).WP_Type1 != 0) {
+            if (Environment(Envrn).SkyTempModel <= 3 || Environment(Envrn).SkyTempModel >= 1) {
                 SPSiteSkyTemperatureScheduleValue(envrnDayNum) = DDSkyTempScheduleValues(TimeStep, HourOfDay, envrnDayNum);
             }
         } else if (TotDesDays > 0) {
@@ -2801,8 +2819,6 @@ namespace WeatherManager {
         bool ErrorsFound;
         static Real64 CurTime;
         Real64 HourRep;
-        int OSky;
-        Real64 TDewK;
         Real64 ESky;
         bool ErrorFound;
         std::string ErrOut;
@@ -3483,17 +3499,21 @@ namespace WeatherManager {
                     TomorrowWindSpeed(CurTimeStep, Hour) = WindSpeed;
                     TomorrowWindDir(CurTimeStep, Hour) = WindDir;
                     TomorrowLiquidPrecip(CurTimeStep, Hour) = LiquidPrecip;
-                    TomorrowHorizIRSky(CurTimeStep, Hour) = IRHoriz;
 
-                    if (Environment(Envrn).WP_Type1 == 0) {
+                    ESky = CalcSkyEmissivity(Environment(Envrn).SkyTempModel, OpaqueSkyCover, DryBulb, DewPoint, RelHum);
+                    if (!Environment(Envrn).UseWeatherFileHorizontalIR || IRHoriz >= 9999.0) {
+                        TomorrowHorizIRSky(CurTimeStep, Hour) = ESky * Sigma * pow_4(DryBulb + TKelvin);
+                    } else {
+                        TomorrowHorizIRSky(CurTimeStep, Hour) = IRHoriz;
+                    }
+
+                    if (Environment(Envrn).SkyTempModel > 3 || Environment(Envrn).SkyTempModel == 0) {
                         // Calculate sky temperature, use IRHoriz if not missing
-                        if (IRHoriz >= 9999.0) {
-                            // Missing, use sky cover
-                            OSky = OpaqueSkyCover;
-                            TDewK = min(DryBulb, DewPoint) + TKelvin;
-                            ESky = (0.787 + 0.764 * std::log(TDewK / TKelvin)) * (1.0 + 0.0224 * OSky - 0.0035 * pow_2(OSky) + 0.00028 * pow_3(OSky));
+                        if (!Environment(Envrn).UseWeatherFileHorizontalIR || IRHoriz >= 9999.0) {
+                            // Missing or user defined to not use IRHoriz from weather, using sky cover and clear sky emissivity
                             SkyTemp = (DryBulb + TKelvin) * root_4(ESky) - TKelvin;
-                        } else { // Valid IR from Sky
+                        } else {
+                            // Valid IR from weather files
                             SkyTemp = root_4(IRHoriz / Sigma) - TKelvin;
                         }
                     } else {
@@ -3646,7 +3666,7 @@ namespace WeatherManager {
                     TomorrowWindSpeed(TS, Hour) = LastHrWindSpeed * WtPrevHour + Wthr.WindSpeed(Hour) * WtNow;
                     TomorrowWindDir(TS, Hour) = interpolateWindDirection(LastHrWindDir, Wthr.WindDir(Hour), WtNow);
                     TomorrowHorizIRSky(TS, Hour) = LastHrHorizIRSky * WtPrevHour + Wthr.HorizIRSky(Hour) * WtNow;
-                    if (Environment(Environ).WP_Type1 == 0) {
+                    if (Environment(Envrn).SkyTempModel > 3 || Environment(Envrn).SkyTempModel == 0) {
                         TomorrowSkyTemp(TS, Hour) = LastHrSkyTemp * WtPrevHour + Wthr.SkyTemp(Hour) * WtNow;
                     }
                     TomorrowDifSolarRad(TS, Hour) =
@@ -3730,6 +3750,34 @@ namespace WeatherManager {
         Real64 interpAng = prevAng + (curAng - prevAng) * curHrWeight;
         return (fmod(interpAng, 360.)); // fmod is float modulus function
     }
+
+    Real64 CalcSkyEmissivity(int ESkyCalcType, Real64 OSky, Real64 DryBulb, Real64 DewPoint, Real64 RelHum){
+        // Calculate Sky Emissivity
+        // References:
+        // M. Li, Y. Jiang and C. F. M. Coimbra,
+        // "On the determination of atmospheric longwave irradiance under all-sky conditions,"
+        // Solar Energy 144, 2017, pp. 40–48,
+        // G. Clark and C. Allen, "The Estimation of Atmospheric Radiation for Clear and
+        // Cloudy Skies," Proc. 2nd National Passive Solar Conference (AS/ISES), 1978, pp. 675-678.
+
+        Real64 ESky;
+
+        if (ESkyCalcType == WP_BruntModel) {
+            double const PartialPress = RelHum * PsyPsatFnTemp(DryBulb) * 0.01;
+            ESky = 0.618 + 0.056 * pow(PartialPress, 0.5);
+        } else if (ESkyCalcType == WP_IdsoModel) {
+            double const PartialPress = RelHum * PsyPsatFnTemp(DryBulb) * 0.01;
+            ESky = 0.685 + 0.000032 * PartialPress * exp(1699 / (DryBulb + TKelvin));
+        } else if (ESkyCalcType == WP_BerdahlMartinModel) {
+            double const TDewC = min(DryBulb, DewPoint);
+            ESky = 0.758 + 0.521 * (TDewC / 100) + 0.625 * pow_2(TDewC / 100);
+        } else {
+            ESky = 0.787 + 0.764 * std::log((min(DryBulb, DewPoint) + TKelvin) / TKelvin);
+        }
+        ESky = ESky * (1.0 + 0.0224 * OSky - 0.0035 * pow_2(OSky) + 0.00028 * pow_3(OSky));
+        return ESky;
+    }
+
 
     void SetDayOfWeekInitialValues(int const EnvironDayOfWeek, // Starting Day of Week for the (Weather) RunPeriod (User Input)
                                    int &CurDayOfWeek,          // Current Day of Week
@@ -4191,7 +4239,6 @@ namespace WeatherManager {
         int CurrentYear;
         int OSky;             // Opaque Sky Cover (tenths)
         Real64 HumidityRatio; // Humidity Ratio -- when constant for day
-        Real64 TDewK;         // Dewpoint in Kelvin
         Real64 ESky;          // Emissivitity of Sky
         Real64 CosZenith;     // Cosine of Zenith Angle of Sun
         Real64 TotHoriz;      // Total Radiation on Horizontal Surface
@@ -4505,6 +4552,8 @@ namespace WeatherManager {
                 } else {
                     HumidityRatio = PsyWFnTdbRhPb(
                         TomorrowOutDryBulbTemp(TS, Hour), DDHumIndModifier(TS, Hour, EnvrnNum) / 100.0, DesDayInput(EnvrnNum).PressBarom);
+                    TomorrowOutRelHum(TS, Hour) =
+                            PsyRhFnTdbWPb(TomorrowOutDryBulbTemp(TS, Hour), HumidityRatio, DesDayInput(EnvrnNum).PressBarom, WeatherManager) * 100.0;
                     // TomorrowOutRelHum values set earlier
                     TomorrowOutDewPointTemp(TS, Hour) = PsyTdpFnWPb(HumidityRatio, DesDayInput(EnvrnNum).PressBarom);
                 }
@@ -4533,17 +4582,15 @@ namespace WeatherManager {
                 // G. Clark and C. Allen, "The Estimation of Atmospheric Radiation for Clear and
                 // Cloudy Skies," Proc. 2nd National Passive Solar Conference (AS/ISES), 1978, pp. 675-678.
 
-                if (Environment(EnvrnNum).WP_Type1 == 0) {
-                    TDewK = min(TomorrowOutDryBulbTemp(TS, Hour), TomorrowOutDewPointTemp(TS, Hour)) + TKelvin;
-                    ESky = (0.787 + 0.764 * std::log((TDewK) / TKelvin)) * (1.0 + 0.0224 * OSky - 0.0035 * pow_2(OSky) + 0.00028 * pow_3(OSky));
-                    TomorrowHorizIRSky(TS, Hour) = ESky * Sigma * pow_4(TomorrowOutDryBulbTemp(TS, Hour) + TKelvin);
-                    TomorrowSkyTemp(TS, Hour) = (TomorrowOutDryBulbTemp(TS, Hour) + TKelvin) * root_4(ESky) - TKelvin;
-                } else {
-                    TDewK = min(TomorrowOutDryBulbTemp(TS, Hour), TomorrowOutDewPointTemp(TS, Hour)) + TKelvin;
-                    ESky = (0.787 + 0.764 * std::log((TDewK) / TKelvin)) * (1.0 + 0.0224 * OSky - 0.0035 * pow_2(OSky) + 0.00028 * pow_3(OSky));
-                    TomorrowHorizIRSky(TS, Hour) = ESky * Sigma * pow_4(TomorrowOutDryBulbTemp(TS, Hour) + TKelvin);
-                }
+                double DryBulb = TomorrowOutDryBulbTemp(TS, Hour);
+                double RelHum = TomorrowOutRelHum(TS, Hour) * 0.01;
+                ESky = CalcSkyEmissivity(Environment(EnvrnNum).SkyTempModel, OSky, DryBulb, TomorrowOutDewPointTemp(TS, Hour), RelHum);
+                TomorrowHorizIRSky(TS, Hour) = ESky * Sigma * pow_4(DryBulb + TKelvin);
 
+                if (Environment(EnvrnNum).SkyTempModel > 3 || Environment(EnvrnNum).SkyTempModel == 0) {
+                    // Design day not scheduled
+                    TomorrowSkyTemp(TS, Hour) = (DryBulb + TKelvin) * root_4(ESky) - TKelvin;
+                }
                 // Generate solar values for timestep
                 //    working results = BeamRad and DiffRad
                 //    stored to program globals at end of loop
@@ -7084,6 +7131,10 @@ namespace WeatherManager {
                     DesDayInput(EnvrnNum).suppressBegEnvReset = true;
                 }
             }
+            // for PerformancePrecisionTradeoffs
+            if (DataEnvironment::forceBeginEnvResetSuppress) {
+                DesDayInput(EnvrnNum).suppressBegEnvReset = true;
+            }
             //   A7,  \field Rain Indicator
             if (UtilityRoutines::SameString(cAlphaArgs(7), "Yes")) {
                 DesDayInput(EnvrnNum).RainInd = 1;
@@ -7931,6 +7982,18 @@ namespace WeatherManager {
                 WPSkyTemperature(Item).IsSchedule = true;
                 units = "[deltaC]";
                 unitType = OutputProcessor::Unit::deltaC;
+            } else if (UtilityRoutines::SameString(cAlphaArgs(2), "Brunt")) {
+                WPSkyTemperature(Item).CalculationType = WP_BruntModel;
+                WPSkyTemperature(Item).IsSchedule = false;
+            } else if (UtilityRoutines::SameString(cAlphaArgs(2), "Idso")) {
+                WPSkyTemperature(Item).CalculationType = WP_IdsoModel;
+                WPSkyTemperature(Item).IsSchedule = false;
+            } else if (UtilityRoutines::SameString(cAlphaArgs(2), "BerdahlMartin")) {
+                WPSkyTemperature(Item).CalculationType = WP_BerdahlMartinModel;
+                WPSkyTemperature(Item).IsSchedule = false;
+            } else if (UtilityRoutines::SameString(cAlphaArgs(2), "ClarkAllen")) {
+                WPSkyTemperature(Item).CalculationType = WP_ClarkAllenModel;
+                WPSkyTemperature(Item).IsSchedule = false;
             } else {
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(2) + '.');
                 ShowContinueError("...entered value=\"" + cAlphaArgs(2) +
@@ -7938,57 +8001,77 @@ namespace WeatherManager {
                 ErrorsFound = true;
             }
 
-            WPSkyTemperature(Item).ScheduleName = cAlphaArgs(3);
-            if (Environment(Found).KindOfEnvrn == ksRunPeriodWeather || Environment(Found).KindOfEnvrn == ksRunPeriodDesign) {
+            if (WPSkyTemperature(Item).IsSchedule) {
                 WPSkyTemperature(Item).ScheduleName = cAlphaArgs(3);
-                // See if it's a schedule.
-                Found = GetScheduleIndex(cAlphaArgs(3));
-                if (Found == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(3) + '.');
-                    ShowContinueError("...Entered name=\"" + cAlphaArgs(3) + "\".");
-                    ShowContinueError("...Should be a full year schedule (\"Schedule:Year\", \"Schedule:Compact\", \"Schedule:File\", or "
-                                      "\"Schedule:Constant\" objects.");
-                    ErrorsFound = true;
-                } else {
-                    WPSkyTemperature(Item).IsSchedule = true;
-                    WPSkyTemperature(Item).SchedulePtr = Found;
-                }
-            } else { // See if it's a valid schedule.
-                Found = GetDayScheduleIndex(cAlphaArgs(3));
-                if (Found == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(3) + '.');
-                    ShowContinueError("...Entered name=\"" + cAlphaArgs(3) + "\".");
-                    ShowContinueError(
-                        "...Should be a single day schedule (\"Schedule:Day:Hourly\", \"Schedule:Day:Interval\", or \"Schedule:Day:List\" objects.");
-                    ErrorsFound = true;
-                } else {
-                    if (envFound != 0) {
-                        schPtr = FindNumberInList(Found, SPSiteScheduleNamePtr, NumSPSiteScheduleNamePtrs);
-                        if (schPtr == 0) {
-                            ++NumSPSiteScheduleNamePtrs;
-                            SPSiteScheduleNamePtr(NumSPSiteScheduleNamePtrs) = Found;
-                            SPSiteScheduleUnits(NumSPSiteScheduleNamePtrs) = units;
-                            SetupOutputVariable("Sizing Period Site Sky Temperature Schedule Value",
-                                                unitType,
-                                                SPSiteSkyTemperatureScheduleValue(envFound),
-                                                "Zone",
-                                                "Average",
-                                                cAlphaArgs(3));
-                        } else if (SPSiteScheduleUnits(schPtr) != units) {
-                            ++NumSPSiteScheduleNamePtrs;
-                            SPSiteScheduleNamePtr(NumSPSiteScheduleNamePtrs) = Found;
-                            SPSiteScheduleUnits(NumSPSiteScheduleNamePtrs) = units;
-                            SetupOutputVariable("Sizing Period Site Sky Temperature Schedule Value",
-                                                unitType,
-                                                SPSiteSkyTemperatureScheduleValue(envFound),
-                                                "Zone",
-                                                "Average",
-                                                cAlphaArgs(3));
-                        }
+                if (Environment(Found).KindOfEnvrn == ksRunPeriodWeather ||
+                    Environment(Found).KindOfEnvrn == ksRunPeriodDesign) {
+                    WPSkyTemperature(Item).ScheduleName = cAlphaArgs(3);
+                    // See if it's a schedule.
+                    Found = GetScheduleIndex(cAlphaArgs(3));
+                    if (Found == 0) {
+                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " +
+                                        cAlphaFieldNames(3) + '.');
+                        ShowContinueError("...Entered name=\"" + cAlphaArgs(3) + "\".");
+                        ShowContinueError(
+                                "...Should be a full year schedule (\"Schedule:Year\", \"Schedule:Compact\", \"Schedule:File\", or "
+                                "\"Schedule:Constant\" objects.");
+                        ErrorsFound = true;
+                    } else {
                         WPSkyTemperature(Item).IsSchedule = true;
                         WPSkyTemperature(Item).SchedulePtr = Found;
                     }
+                } else { // See if it's a valid schedule.
+                    Found = GetDayScheduleIndex(cAlphaArgs(3));
+                    if (Found == 0) {
+                        ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " +
+                                        cAlphaFieldNames(3) + '.');
+                        ShowContinueError("...Entered name=\"" + cAlphaArgs(3) + "\".");
+                        ShowContinueError(
+                                "...Should be a single day schedule (\"Schedule:Day:Hourly\", \"Schedule:Day:Interval\", or \"Schedule:Day:List\" objects.");
+                        ErrorsFound = true;
+                    } else {
+                        if (envFound != 0) {
+                            schPtr = FindNumberInList(Found, SPSiteScheduleNamePtr, NumSPSiteScheduleNamePtrs);
+                            if (schPtr == 0) {
+                                ++NumSPSiteScheduleNamePtrs;
+                                SPSiteScheduleNamePtr(NumSPSiteScheduleNamePtrs) = Found;
+                                SPSiteScheduleUnits(NumSPSiteScheduleNamePtrs) = units;
+                                SetupOutputVariable("Sizing Period Site Sky Temperature Schedule Value", unitType,
+                                                    SPSiteSkyTemperatureScheduleValue(envFound), "Zone", "Average",
+                                                    cAlphaArgs(3));
+                            } else if (SPSiteScheduleUnits(schPtr) != units) {
+                                ++NumSPSiteScheduleNamePtrs;
+                                SPSiteScheduleNamePtr(NumSPSiteScheduleNamePtrs) = Found;
+                                SPSiteScheduleUnits(NumSPSiteScheduleNamePtrs) = units;
+                                SetupOutputVariable("Sizing Period Site Sky Temperature Schedule Value", unitType,
+                                                    SPSiteSkyTemperatureScheduleValue(envFound), "Zone", "Average",
+                                                    cAlphaArgs(3));
+                            }
+                            WPSkyTemperature(Item).IsSchedule = true;
+                            WPSkyTemperature(Item).SchedulePtr = Found;
+                        }
+                    }
                 }
+            }
+
+            if (!WPSkyTemperature(Item).IsSchedule && !lAlphaFieldBlanks(4)) {
+                if (UtilityRoutines::SameString(cAlphaArgs(4), "Yes")) {
+                    WPSkyTemperature(Item).UseWeatherFileHorizontalIR = true;
+                } else if (UtilityRoutines::SameString(cAlphaArgs(4), "No")) {
+                    WPSkyTemperature(Item).UseWeatherFileHorizontalIR = false;
+                } else {
+                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", invalid " + cAlphaFieldNames(4) + '.');
+                    ShowContinueError("...entered value=\"" + cAlphaArgs(4) + "\", should be Yes or No.");
+                    ErrorsFound = true;
+                }
+            } else {
+                WPSkyTemperature(Item).UseWeatherFileHorizontalIR = true;
+            }
+        }
+        for (int envrn = 1; envrn <= NumOfEnvrn; ++envrn) {
+            if (Environment(envrn).WP_Type1 != 0 && NumWPSkyTemperatures >= Environment(envrn).WP_Type1){
+                Environment(envrn).SkyTempModel = WPSkyTemperature(Environment(envrn).WP_Type1).CalculationType;
+                Environment(envrn).UseWeatherFileHorizontalIR = WPSkyTemperature(Environment(envrn).WP_Type1).UseWeatherFileHorizontalIR;
             }
         }
     }

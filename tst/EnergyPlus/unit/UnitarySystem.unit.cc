@@ -63,7 +63,7 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -3204,7 +3204,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SetOnOffMassFlowRateTest)
     // same test for cooling mode (flow @ 0.3 * PLR @ 0.7 = 0.21)
     thisSys.m_HeatingSpeedNum = 0;
     thisSys.m_CoolingSpeedNum = 1;
-    thisSys.m_MultiSpeedCoolingCoil = true;
+    thisSys.m_DiscreteSpeedCoolingCoil = true;
     UnitarySystems::HeatingLoad = false;
     UnitarySystems::CoolingLoad = true;
     thisSys.setOnOffMassFlowRate(OnOffAirFlowRatio, PartLoadRatio);
@@ -3516,7 +3516,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryHeatingSystem)
     AirMassFlowRate = 1.0;
     HotWaterMassFlowRate = 1.0;
     thisSys.MaxHeatCoilFluidFlow = HotWaterMassFlowRate;
-    thisSys.m_MultiSpeedCoolingCoil = true;
+    thisSys.m_DiscreteSpeedCoolingCoil = true;
     thisSys.m_HeatingCoilType_Num = DataHVACGlobals::Coil_HeatingWater;
     thisSys.m_HeatingSpeedRatio = 1.0;
     thisSys.m_HeatingCycRatio = 1.0;
@@ -3656,7 +3656,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryCoolingSystem)
     ColdWaterMassFlowRate = 1.0;
 
     thisSys.MaxCoolCoilFluidFlow = ColdWaterMassFlowRate;
-    thisSys.m_MultiSpeedCoolingCoil = true;
+    thisSys.m_DiscreteSpeedCoolingCoil = true;
     thisSys.m_CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingWater;
     thisSys.m_CoolingSpeedRatio = 1.0;
     thisSys.m_CoolingCycRatio = 1.0;
@@ -3867,7 +3867,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput)
         "Coil:Heating:Fuel,",
         "  Furnace Heating Coil 1, !- Name",
         "  FanAndCoilAvailSched,   !- Availability Schedule Name",
-        "  Gas,                    !- Fuel Type",
+        "  NaturalGas,             !- Fuel Type",
         "  0.8,                    !- Gas Burner Efficiency",
         "  32000,                  !- Nominal Capacity{ W }",
         "  Heating Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -3876,7 +3876,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput)
         "Coil:Heating:Fuel,",
         "  Humidistat Reheat Coil 1, !- Name",
         "  FanAndCoilAvailSched, !- Availability Schedule Name",
-        "  Gas,                    !- Fuel Type",
+        "  NaturalGas,             !- Fuel Type",
         "  0.8, !- Gas Burner Efficiency",
         "  32000, !- Nominal Capacity{ W }",
         "  Reheat Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -4389,7 +4389,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VSDXCoilSizing)
         "Coil:Heating:Fuel,",
         "  Humidistat Reheat Coil 1,    !- Name",
         "  FanAndCoilAvailSched,        !- Availability Schedule Name",
-        "  Gas,                         !- Fuel Type",
+        "  NaturalGas,             !- Fuel Type",
         "  0.8,                         !- Gas Burner Efficiency",
         "  32000,                       !- Nominal Capacity{ W }",
         "  Reheat Coil Air Inlet Node,  !- Air Inlet Node Name",
@@ -4717,7 +4717,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils)
         "Coil:Heating:Fuel,",
         "  Furnace Heating Coil 1, !- Name",
         "  FanAndCoilAvailSched,   !- Availability Schedule Name",
-        "  Gas,                    !- Fuel Type",
+        "  NaturalGas,             !- Fuel Type",
         "  0.8,                    !- Gas Burner Efficiency",
         "  32000,                  !- Nominal Capacity{ W }",
         "  Heating Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -4726,7 +4726,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils)
         "Coil:Heating:Fuel,",
         "  Humidistat Reheat Coil 1, !- Name",
         "  FanAndCoilAvailSched, !- Availability Schedule Name",
-        "  Gas,                    !- Fuel Type",
+        "  NaturalGas,             !- Fuel Type",
         "  0.8, !- Gas Burner Efficiency",
         "  32000, !- Nominal Capacity{ W }",
         "  Reheat Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -5179,7 +5179,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils_CyclingFan)
         "Coil:Heating:Fuel,",
         "  Furnace Heating Coil 1, !- Name",
         "  FanAndCoilAvailSched,   !- Availability Schedule Name",
-        "  Gas,                    !- Fuel Type",
+        "  NaturalGas,             !- Fuel Type",
         "  0.8,                    !- Gas Burner Efficiency",
         "  32000,                  !- Nominal Capacity{ W }",
         "  Heating Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -5188,7 +5188,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils_CyclingFan)
         "Coil:Heating:Fuel,",
         "  Humidistat Reheat Coil 1, !- Name",
         "  FanAndCoilAvailSched,   !- Availability Schedule Name",
-        "  Gas,                    !- Fuel Type",
+        "  NaturalGas,             !- Fuel Type",
         "  0.8,                    !- Gas Burner Efficiency",
         "  32000,                  !- Nominal Capacity{ W }",
         "  Reheat Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -5552,7 +5552,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetBadSupplyAirMethodInput)
         "Coil:Heating:Fuel,",
         "  Furnace Heating Coil 1, !- Name",
         "  FanAndCoilAvailSched,   !- Availability Schedule Name",
-        "  Gas,                    !- Fuel Type",
+        "  NaturalGas,             !- Fuel Type",
         "  0.8,                    !- Gas Burner Efficiency",
         "  32000,                  !- Nominal Capacity{ W }",
         "  Heating Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -6481,7 +6481,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXCoilSizing)
         "Coil:Heating:Fuel,",
         "  Humidistat Reheat Coil 1, !- Name",
         "  FanAndCoilAvailSched, !- Availability Schedule Name",
-        "  Gas,                    !- Fuel Type",
+        "  NaturalGas,             !- Fuel Type",
         "  0.8, !- Gas Burner Efficiency",
         "  32000, !- Nominal Capacity{ W }",
         "  Reheat Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -7003,7 +7003,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump)
         "Coil:Heating:Fuel,",
         "  Humidistat Reheat Coil 1, !- Name",
         "  FanAndCoilAvailSched, !- Availability Schedule Name",
-        "  Gas,                    !- Fuel Type",
+        "  NaturalGas,             !- Fuel Type",
         "  0.8, !- Gas Burner Efficiency",
         "  32000, !- Nominal Capacity{ W }",
         "  Reheat Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -8575,7 +8575,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
         "Coil:Heating:Fuel,",
         "  Heat Pump DX Supp Heating Coil 1, !- Name",
         "  FanAndCoilAvailSched, !- Availability Schedule Name",
-        "  Gas,                    !- Fuel Type",
+        "  NaturalGas,             !- Fuel Type",
         "  0.8, !- Gas Burner Efficiency",
         "  45000, !- Nominal Capacity{ W }",
         "  SuppHeating Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -9940,7 +9940,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXCoilHeatRecoveryHandlin
         "Coil:Heating:Fuel,",
         "  Humidistat Reheat Coil 1, !- Name",
         "  FanAndCoilAvailSched, !- Availability Schedule Name",
-        "  Gas,                    !- Fuel Type",
+        "  NaturalGas,             !- Fuel Type",
         "  0.8, !- Gas Burner Efficiency",
         "  32000, !- Nominal Capacity{ W }",
         "  Reheat Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -11092,7 +11092,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FractionOfAutoSizedCoolingValueTes
                                            // call the UnitarySystem factory
     bool ErrorsFound = false;
     bool zoneEquipment = true;
-    std::string compName = "UNITARY SYSTEM MODEL";   
+    std::string compName = "UNITARY SYSTEM MODEL";
     UnitarySystems::UnitarySys::factory(DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &UnitarySystems::unitarySys[0];
 
@@ -11235,7 +11235,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FlowPerCoolingCapacityTest)
                                            // call the UnitarySystem factory
     bool ErrorsFound = false;
     bool zoneEquipment = true;
-    std::string compName = "UNITARY SYSTEM MODEL";   
+    std::string compName = "UNITARY SYSTEM MODEL";
     UnitarySystems::UnitarySys::factory(DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &UnitarySystems::unitarySys[0];
 
@@ -11394,7 +11394,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_getUnitarySystemInputDataTest)
         "  Coil:Heating:Fuel,",
         "    Supplemental Heating Coil,              !- Name",
         "    ,                                       !- Availability Schedule Name",
-        "    Gas,                                    !- Fuel Type",
+        "    NaturalGas,                             !- Fuel Type",
         "    0.8,                                    !- Gas Burner Efficiency",
         "    32000,                                  !- Nominal Capacity{ W }",
         "    Supplemental Heating Coil Inlet Node,   !- Air Inlet Node Name",
@@ -11572,7 +11572,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputwithTradeOff)
         "Coil:Heating:Fuel,",
         "  Furnace Heating Coil 1, !- Name",
         "  FanAndCoilAvailSched,   !- Availability Schedule Name",
-        "  Gas,                    !- Fuel Type",
+        "  NaturalGas,             !- Fuel Type",
         "  0.8,                    !- Gas Burner Efficiency",
         "  32000,                  !- Nominal Capacity{ W }",
         "  Heating Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -11581,7 +11581,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputwithTradeOff)
         "Coil:Heating:Fuel,",
         "  Humidistat Reheat Coil 1, !- Name",
         "  FanAndCoilAvailSched, !- Availability Schedule Name",
-        "  Gas,                    !- Fuel Type",
+        "  NaturalGas,             !- Fuel Type",
         "  0.8, !- Gas Burner Efficiency",
         "  32000, !- Nominal Capacity{ W }",
         "  Reheat Coil Air Inlet Node, !- Air Inlet Node Name",
