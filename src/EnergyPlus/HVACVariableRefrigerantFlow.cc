@@ -2206,6 +2206,13 @@ namespace HVACVariableRefrigerantFlow {
                 if (UtilityRoutines::SameString(cAlphaArgs(34), "WaterCooled")) {
                     VRF(VRFNum).CondenserType = DataHVACGlobals::WaterCooled;
                     VRF(VRFNum).VRFPlantTypeOfNum = TypeOf_HeatPumpVRF;
+                    if (VRF(VRFNum).HeatingPerformanceOATType == DataHVACGlobals::WetBulbIndicator) {
+                        ShowSevereError(cCurrentModuleObject + " = " + VRF(VRFNum).Name);
+                        ShowContinueError(cAlphaFieldNames(34) + " = " + cAlphaArgs(34));
+                        ShowContinueError("Illegal " +  cAlphaFieldNames(19) + " input for this object = " + cAlphaArgs(19));
+                        ShowContinueError("... input must be DRYBULBTEMPERATURE when Condenser Type is WaterCooled.");
+                        ShowContinueError("... " + cAlphaFieldNames(19) + " will be reset to DRYBULBTEMPERATURE and simulation continues.");
+                    }
                 }
                 if (VRF(VRFNum).CondenserType == 0) {
                     ShowSevereError(cCurrentModuleObject + " = " + VRF(VRFNum).Name);
