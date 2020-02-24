@@ -577,10 +577,17 @@ namespace HVACVariableRefrigerantFlow {
                 OutdoorWetBulb = OutWetBulbTemp;
             }
         } else {
-            OutdoorDryBulb = OutDryBulbTemp;
-            OutdoorHumRat = OutHumRat;
-            OutdoorPressure = OutBaroPress;
-            OutdoorWetBulb = OutWetBulbTemp;
+            if (VRF(VRFCond).CondenserType == DataHVACGlobals::WaterCooled) {
+                OutdoorDryBulb = DataLoopNode::Node(VRF(VRFCond).CondenserNodeNum).Temp;
+                OutdoorHumRat = DataLoopNode::Node(VRF(VRFCond).CondenserNodeNum).HumRat;
+                OutdoorPressure = OutBaroPress;
+                OutdoorWetBulb = OutdoorDryBulb;
+            } else {
+                OutdoorDryBulb = OutDryBulbTemp;
+                OutdoorHumRat = OutHumRat;
+                OutdoorPressure = OutBaroPress;
+                OutdoorWetBulb = OutWetBulbTemp;
+            }
         }
 
         if (VRF(VRFCond).CondenserType == DataHVACGlobals::AirCooled) {
@@ -593,6 +600,7 @@ namespace HVACVariableRefrigerantFlow {
             CondInletHumRat = PsyWFnTdbTwbPb(CondInletTemp, OutdoorWetBulb, OutdoorPressure);
         } else if (VRF(VRFCond).CondenserType == DataHVACGlobals::WaterCooled) {
             CondInletTemp = OutdoorDryBulb; // node inlet temp from above
+            OutdoorWetBulb = CondInletTemp; // for watercooled
             CondWaterMassFlow = VRF(VRFCond).WaterCondenserDesignMassFlow;
         } else {
             assert(false);
