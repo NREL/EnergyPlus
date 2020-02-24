@@ -242,6 +242,7 @@ namespace DataGlobals {
     extern int StdOutputRecordCount;                 // Count of Standard output records
     extern std::ostream *eio_stream;                 // Internal stream used for eio output (used for unit tests)
     extern int OutputFileDebug;                      // Unit number for debug outputs
+    extern int OutputFilePerfLog;                    // Unit number for performance log outputs
     extern int OutputFileZoneSizing;                 // Unit number of zone sizing calc output file
     extern int OutputFileSysSizing;                  // Unit number of system sizing calc output file
     extern int OutputFileMeters;                     // Unit number for meters output
@@ -298,9 +299,15 @@ namespace DataGlobals {
     extern bool AnySlabsInModel;         // true if there are any zone-coupled ground domains in the input file
     extern bool AnyBasementsInModel;     // true if there are any basements in the input file
     extern bool DoCoilDirectSolutions;        //true if use coil direction solutions
+    extern bool createProfLog; //true if the _proflog.csv file should be created and a PerformancePrecisionTradeoffs object is used
     extern int Progress;
     extern void (*fProgressPtr)(int const);
     extern void (*fMessagePtr)(std::string const &);
+    // these are the new ones
+    extern void (*progressCallback)(int const);
+    extern void (*messageCallback)(const char * message);
+    extern void (*errorCallback)(const char * errorMessage);
+    extern bool eplusRunningViaAPI; // a flag for capturing whether we are running via API - if so we can't do python plugins
 
     // Clears the global data in DataGlobals.
     // Needed for unit tests, should not be normally called.

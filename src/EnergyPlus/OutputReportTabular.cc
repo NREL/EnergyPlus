@@ -7651,6 +7651,15 @@ namespace OutputReportTabular {
             collapsedTotal(5) = gatherTotalsBEPS(4) + gatherTotalsBEPS(5); // district heating <- purchased heating | <- steam
             collapsedTotal(6) = gatherTotalsBEPS(7);                       // water
 
+            if (DataGlobals::createProfLog) {
+                UtilityRoutines::appendPerfLog("Electricity ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(1), 3));
+                UtilityRoutines::appendPerfLog("Natural Gas ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(2), 3));
+                UtilityRoutines::appendPerfLog("Additional Fuel ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(3), 3));
+                UtilityRoutines::appendPerfLog("District Cooling ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(4), 3));
+                UtilityRoutines::appendPerfLog("District Heating ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(5), 3));
+                UtilityRoutines::appendPerfLog("Water ABUPS Total [m3]", General::RoundSigDigits(collapsedTotal(6), 3));
+                UtilityRoutines::appendPerfLog("Values Gathered Over [hours]", General::RoundSigDigits(gatherElapsedTimeBEPS, 2));
+            }
             for (jEndUse = 1; jEndUse <= NumEndUses; ++jEndUse) {
                 for (kEndUseSub = 1; kEndUseSub <= EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
                     collapsedEndUseSub(kEndUseSub, jEndUse, 1) = gatherEndUseSubBEPS(kEndUseSub, jEndUse, 1); // electricity
@@ -12292,9 +12301,10 @@ namespace OutputReportTabular {
 
         if (ShowDecayCurvesInEIO) {
             // show the line definition for the decay curves
-            print(outputFiles.eio,
-                  "! <Radiant to Convective Decay Curves for Cooling>,Zone Name, Surface Name, Time "
-                  "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36");
+            print(outputFiles.eio,  "! <Radiant to Convective Decay Curves for Cooling>,Zone Name, Surface Name, Time "
+                                    "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36");
+            print(outputFiles.eio,  "! <Radiant to Convective Decay Curves for Heating>,Zone Name, Surface Name, Time "
+                                                 "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36");
             // Put the decay curve into the EIO file
             for (int iZone = 1; iZone <= NumOfZones; ++iZone) {
                 ZoneData &zd(Zone(iZone));
@@ -14141,6 +14151,8 @@ namespace OutputReportTabular {
                     rowHead(3) = "Airflow per Total Capacity [m3/s-W]";
                     rowHead(4) = "Floor Area per Total Capacity [m2/W]";
                     rowHead(5) = "Total Capacity per Floor Area [W/m2]";
+                    // rowHead( 6 ) = "Chiller Pump Power per Flow [W-s/m3]"; // facility only
+                    // rowHead( 7 ) = "Condenser Pump Power per Flor [W-s/m3]"; // facility only
                     rowHead(6) = "Number of People";
                 } else {
                     rowHead(1) = "Outside Air Fraction [fraction]";
@@ -14148,6 +14160,8 @@ namespace OutputReportTabular {
                     rowHead(3) = "Airflow per Total Capacity [ft3-h/min-Btu]";
                     rowHead(4) = "Floor Area per Total Capacity [ft2-h/Btu]";
                     rowHead(5) = "Total Capacity per Floor Area [Btu/h-ft2]";
+                    // rowHead( 6 ) = "Chiller Pump Power per Flow [W-min/gal]";
+                    // rowHead( 7 ) = "Condenser Pump Power per Flow [W-min/gal]";
                     rowHead(6) = "Number of People";
                 }
 

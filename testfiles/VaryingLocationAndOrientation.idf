@@ -45,8 +45,9 @@
     No;                      !- Run Simulation for Weather File Run Periods
 
   ShadowCalculation,
-    AverageOverDaysInFrequency,  !- Calculation Method
-    1;                       !- Calculation Frequency
+    PolygonClipping,         !- Shading Calculation Method
+    Periodic,                !- Shading Calculation Update Frequency Method
+    1;                       !- Shading Calculation Update Frequency
 
 !***********************************************************
 !****** LOCATION SPECIFIC OBJECTS **************************
