@@ -556,7 +556,7 @@ namespace AirflowNetwork {
         for (n = 1; n <= NetworkNumOfNodes; ++n) {
             SUMAF(n) = 0.0;
         }
-        if (LIST >= 1) ObjexxFCL::gio::write(Unit21, Format_900);
+        //if (LIST >= 1) ObjexxFCL::gio::write(Unit21, Format_900);
         for (i = 1; i <= NetworkNumOfLinks; ++i) {
             n = AirflowNetworkLinkageData(i).NodeNums[0];
             m = AirflowNetworkLinkageData(i).NodeNums[1];
@@ -641,9 +641,9 @@ namespace AirflowNetwork {
         // na
 
         // Argument array dimensioning
-        IK.dimension(NetworkNumOfNodes + 1);
-        AD.dimension(NetworkNumOfNodes);
-        AU.dimension(IK(NetworkNumOfNodes + 1));
+        //IK.dimension(NetworkNumOfNodes + 1);
+        //AD.dimension(NetworkNumOfNodes);
+        //AU.dimension(IK(NetworkNumOfNodes + 1));
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1736,9 +1736,9 @@ namespace AirflowNetwork {
         // na
 
         // Argument array dimensioning
-        AU.dimension(IK(NetworkNumOfNodes + 1));
-        AD.dimension(NetworkNumOfNodes);
-        AL.dimension(IK(NetworkNumOfNodes + 1) - 1);
+        //AU.dimension(IK(NetworkNumOfNodes + 1));
+        //AD.dimension(NetworkNumOfNodes);
+        //AL.dimension(IK(NetworkNumOfNodes + 1) - 1);
         //IK.dimension(NetworkNumOfNodes + 1);
 
         // Locals
@@ -1884,7 +1884,7 @@ namespace AirflowNetwork {
         //AU.dimension(IK(NetworkNumOfNodes + 1));
         //AD.dimension(NetworkNumOfNodes);
         //AL.dimension(IK(NetworkNumOfNodes + 1) - 1);
-        B.dimension(NetworkNumOfNodes);
+        //B.dimension(NetworkNumOfNodes);
         //IK.dimension(NetworkNumOfNodes + 1);
 
         // Locals
@@ -1983,8 +1983,8 @@ namespace AirflowNetwork {
         // Argument array dimensioning
         //X.dimension(4);
         //IK.dimension(NetworkNumOfNodes + 1);
-        AU.dimension(IK(NetworkNumOfNodes + 1));
-        AD.dimension(NetworkNumOfNodes);
+        //AU.dimension(IK(NetworkNumOfNodes + 1));
+        //AD.dimension(NetworkNumOfNodes);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2665,19 +2665,19 @@ namespace AirflowNetwork {
         return NF;
     }
 
-    void PresProfile(int const il,                 // Linkage number
-                     int const Pprof,              // Opening number
-                     Real64 const G,               // gravitation field strength [N/kg]
-                     Array1A<Real64> const DpF,    // Stack pressures at start heights of Layers
-                     Array1A<Real64> const DpT,    // Stack pressures at start heights of Layers
-                     Array1A<Real64> const BetaF,  // Density gradients in the FROM zone (starting at linkheight) [Kg/m3/m]
-                     Array1A<Real64> const BetaT,  // Density gradients in the TO zone (starting at linkheight) [Kg/m3/m]
-                     Array1A<Real64> const RhoStF, // Density at the start heights of Layers in the FROM zone
-                     Array1A<Real64> const RhoStT, // Density at the start heights of Layers in the TO zone
-                     int const From,               // Number of FROM zone
-                     int const To,                 // Number of To zone
-                     Real64 const ActLh,           // Actual height of opening [m]
-                     Real64 const OwnHeightFactor  // Cosine of deviation angle of the opening plane from the vertical direction
+    void PresProfile(int const il,                  // Linkage number
+                     int const Pprof,               // Opening number
+                     Real64 const G,                // gravitation field strength [N/kg]
+                     const Array1D<Real64> &DpF,    // Stack pressures at start heights of Layers
+                     const Array1D<Real64> &DpT,    // Stack pressures at start heights of Layers
+                     const Array1D<Real64> &BetaF,  // Density gradients in the FROM zone (starting at linkheight) [Kg/m3/m]
+                     const Array1D<Real64> &BetaT,  // Density gradients in the TO zone (starting at linkheight) [Kg/m3/m]
+                     const Array1D<Real64> &RhoStF, // Density at the start heights of Layers in the FROM zone
+                     const Array1D<Real64> &RhoStT, // Density at the start heights of Layers in the TO zone
+                     int const From,                // Number of FROM zone
+                     int const To,                  // Number of To zone
+                     Real64 const ActLh,            // Actual height of opening [m]
+                     Real64 const OwnHeightFactor   // Cosine of deviation angle of the opening plane from the vertical direction
     )
     {
 
@@ -2719,12 +2719,12 @@ namespace AirflowNetwork {
         // na
 
         // Argument array dimensioning
-        DpF.dim(2);
-        DpT.dim(2);
-        BetaF.dim(2);
-        BetaT.dim(2);
-        RhoStF.dim(2);
-        RhoStT.dim(2);
+        //DpF.dim(2);
+        //DpT.dim(2);
+        //BetaF.dim(2);
+        //BetaT.dim(2);
+        //RhoStF.dim(2);
+        //RhoStT.dim(2);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

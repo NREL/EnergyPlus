@@ -653,7 +653,7 @@ namespace DataPlant {
     Real64 HalfLoopData::EvaluateLoopSetPointLoad(int const FirstBranchNum,
                                                           int const LastBranchNum,
                                                           Real64 ThisLoopSideFlow,
-                                                          Array1S_int LastComponentSimulated) {
+                                                          Array1D_int &LastComponentSimulated) {
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Edwin Lee
@@ -847,7 +847,7 @@ namespace DataPlant {
         //  the very beginning of this loop side, so that it is basically for the entire loop side
     
         // FUNCTION PARAMETER DEFINITIONS:
-        static Array1D_int const InitCompArray(1, 0);
+        static Array1D_int InitCompArray(1, 0);
         return this->EvaluateLoopSetPointLoad(1, 1, ThisLoopSideFlow, InitCompArray);
     }
 

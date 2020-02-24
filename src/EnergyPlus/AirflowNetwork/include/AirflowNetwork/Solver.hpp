@@ -286,19 +286,19 @@ namespace AirflowNetwork {
                std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
     );
 
-    void PresProfile(int const il,                 // Linkage number
-                     int const Pprof,              // Opening number
-                     Real64 const G,               // gravitation field strength [N/kg]
-                     Array1A<Real64> const DpF,    // Stack pressures at start heights of Layers
-                     Array1A<Real64> const DpT,    // Stack pressures at start heights of Layers
-                     Array1A<Real64> const BetaF,  // Density gradients in the FROM zone (starting at linkheight) [Kg/m3/m]
-                     Array1A<Real64> const BetaT,  // Density gradients in the TO zone (starting at linkheight) [Kg/m3/m]
-                     Array1A<Real64> const RhoStF, // Density at the start heights of Layers in the FROM zone
-                     Array1A<Real64> const RhoStT, // Density at the start heights of Layers in the TO zone
-                     int const From,               // Number of FROM zone
-                     int const To,                 // Number of To zone
-                     Real64 const ActLh,           // Actual height of opening [m]
-                     Real64 const OwnHeightFactor  // Cosine of deviation angle of the opening plane from the vertical direction
+    void PresProfile(int const il,                  // Linkage number
+                     int const Pprof,               // Opening number
+                     Real64 const G,                // gravitation field strength [N/kg]
+                     const Array1D<Real64> &DpF,    // Stack pressures at start heights of Layers
+                     const Array1D<Real64> &DpT,    // Stack pressures at start heights of Layers
+                     const Array1D<Real64> &BetaF,  // Density gradients in the FROM zone (starting at linkheight) [Kg/m3/m]
+                     const Array1D<Real64> &BetaT,  // Density gradients in the TO zone (starting at linkheight) [Kg/m3/m]
+                     const Array1D<Real64> &RhoStF, // Density at the start heights of Layers in the FROM zone
+                     const Array1D<Real64> &RhoStT, // Density at the start heights of Layers in the TO zone
+                     int const From,                // Number of FROM zone
+                     int const To,                  // Number of To zone
+                     Real64 const ActLh,            // Actual height of opening [m]
+                     Real64 const OwnHeightFactor   // Cosine of deviation angle of the opening plane from the vertical direction
     );
 
     void PStack();
