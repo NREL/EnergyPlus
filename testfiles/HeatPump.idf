@@ -1552,7 +1552,11 @@
 
   Output:Variable,*,Cooling Coil Electric Power,timestep;
 
-  Output:Variable,*,Cooling Coil Condenser Inlet Temperature,hourly;
+  Output:Variable,*,Cooling Coil Condenser Inlet Temperature,timestep;
+
+  Output:Variable,*,Cooling Coil Evaporative Condenser Mains Supply Water Volume,timestep;
+
+  Output:Variable,*,Cooling Coil Evaporative Condenser Water Volume,timestep;
 
   Output:Variable,*,Heating Coil Heating Rate,timestep;
 
