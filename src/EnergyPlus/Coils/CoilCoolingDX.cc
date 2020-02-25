@@ -66,6 +66,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/WaterManager.hh>
@@ -570,6 +571,109 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
         // The original calculation is below, but no heating yet
         //        max(DXCoil(DXCoilNum).CoolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
     }
+
+    // report out to the coil sizing report if needed
+    if (this->reportCoilFinalSizes) {
+        if (!DataGlobals::WarmupFlag && !DataGlobals::DoingHVACSizingSimulations && !DataGlobals::DoingSizing) {
+
+            // report out final coil sizing info
+            Real64 ratedSensCap(0.0);
+            ratedSensCap = this->performance.normalMode.ratedGrossTotalCap * this->performance.normalMode.speeds.back().grossRatedSHR;
+            coilSelectionReportObj->setCoilFinalSizes(this->name,
+                                                      coilCoolingDXObjectName,
+                                                      this->performance.normalMode.ratedGrossTotalCap,
+                                                      ratedSensCap,
+                                                      this->performance.normalMode.ratedEvapAirFlowRate,
+                                                      -999.0);
+
+            // report out fan information
+            if (this->supplyFanType > 0 && this->supplyFanIndex > -1) { // TODO: Seems wrong, should check type first because 0 is only valid for system model right?
+                if (this->supplyFanType == DataHVACGlobals::FanType_SystemModelObject) {
+                    coilSelectionReportObj->setCoilSupplyFanInfo(this->name,
+                                                                 coilCoolingDXObjectName,
+                                                                 HVACFan::fanObjs[this->supplyFanIndex]->name,
+                                                                 DataAirSystems::objectVectorOOFanSystemModel,
+                                                                 this->supplyFanIndex);
+                } else {
+                    coilSelectionReportObj->setCoilSupplyFanInfo(this->name,
+                                                                 coilCoolingDXObjectName,
+                                                                 Fans::Fan(this->supplyFanIndex).FanName,
+                                                                 DataAirSystems::structArrayLegacyFanModels,
+                                                                 this->supplyFanIndex);
+                }
+            }
+
+            // report out coil rating conditions, just create a set of dummy nodes and run calculate on them
+            DataLoopNode::NodeData dummyEvapInlet;
+            DataLoopNode::NodeData dummyEvapOutlet;
+            DataLoopNode::NodeData dummyCondInlet;
+            DataLoopNode::NodeData dummyCondOutlet;
+            Real64 dummyPLR = 1.0;
+            int dummySpeedNum = 1;
+            Real64 dummySpeedRatio = 1.0;
+            int dummyFanOpMode = 1.0;
+
+            Real64 const RatedInletAirTemp(26.6667);        // 26.6667C or 80F
+            Real64 const RatedInletWetBulbTemp(19.44);      // 19.44 or 67F
+            Real64 const RatedOutdoorAirTemp(35.0);         // 35 C or 95F
+            Real64 ratedOutdoorAirWetBulb = 23.9; // from I/O ref. more precise value?
+
+            Real64 ratedInletEvapMassFlowRate = this->performance.normalMode.ratedEvapAirMassFlowRate;
+            dummyEvapInlet.MassFlowRate = ratedInletEvapMassFlowRate;
+            dummyEvapInlet.Temp = RatedInletAirTemp;
+            Real64 dummyInletAirHumRat = Psychrometrics::PsyWFnTdbTwbPb(RatedInletAirTemp, RatedInletWetBulbTemp, DataEnvironment::StdPressureSeaLevel, "Coil:Cooling:DX::simulate");
+            dummyEvapInlet.HumRat = dummyInletAirHumRat;
+            dummyEvapInlet.Enthalpy = Psychrometrics::PsyHFnTdbW(RatedInletAirTemp, dummyInletAirHumRat);
+
+            // maybe we don't actually need to override weather below, we'll see
+            dummyCondInlet.Temp = RatedOutdoorAirTemp;
+            dummyCondInlet.HumRat = Psychrometrics::PsyWFnTdbTwbPb(RatedOutdoorAirTemp, ratedOutdoorAirWetBulb, DataEnvironment::StdPressureSeaLevel, "Coil:Cooling:DX::simulate");
+            dummyCondInlet.OutAirWetBulb = ratedOutdoorAirWetBulb;
+            dummyCondInlet.Press = condInletNode.Press; // for now; TODO: Investigate
+
+            Real64 holdOutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
+            Real64 holdOutHumRat = DataEnvironment::OutHumRat;
+            Real64 holdOutWetBulb = DataEnvironment::OutWetBulbTemp;
+            Real64 holdOutBaroPress = DataEnvironment::OutBaroPress;
+            DataEnvironment::OutDryBulbTemp = RatedOutdoorAirTemp;
+            DataEnvironment::OutWetBulbTemp = ratedOutdoorAirWetBulb;
+            DataEnvironment::OutBaroPress = DataEnvironment::StdPressureSeaLevel; // assume rating is for sea level.
+            DataEnvironment::OutHumRat =
+                    Psychrometrics::PsyWFnTdbTwbPb(RatedOutdoorAirTemp, ratedOutdoorAirWetBulb, DataEnvironment::StdPressureSeaLevel, "Coil:Cooling:DX::simulate");
+
+            // do I need to override outdoor conditions as well?  If so then that's gross.
+            this->performance.simulate(dummyEvapInlet, dummyEvapOutlet, false, dummyPLR, dummySpeedNum, dummySpeedRatio, dummyFanOpMode, dummyCondInlet, dummyCondOutlet);
+
+            DataEnvironment::OutDryBulbTemp = holdOutDryBulbTemp;
+            DataEnvironment::OutWetBulbTemp = holdOutWetBulb;
+            DataEnvironment::OutBaroPress = holdOutBaroPress;
+            DataEnvironment::OutHumRat = holdOutHumRat;
+
+
+            Real64 const coolingRate = dummyEvapInlet.MassFlowRate * (dummyEvapInlet.Enthalpy - dummyEvapOutlet.Enthalpy);
+            Real64 const thisMinAirHumRat = min(dummyEvapInlet.HumRat, dummyEvapOutlet.HumRat);
+            Real64 const sensCoolingRate = dummyEvapInlet.MassFlowRate * (Psychrometrics::PsyHFnTdbW(dummyEvapInlet.Temp, thisMinAirHumRat) - Psychrometrics::PsyHFnTdbW(dummyEvapOutlet.Temp, thisMinAirHumRat));
+            Real64 const ratedOutletWetBulb = Psychrometrics::PsyTwbFnTdbWPb(dummyEvapOutlet.Temp, dummyEvapOutlet.HumRat, DataEnvironment::StdPressureSeaLevel, "Coil:Cooling:DX::simulate");
+            coilSelectionReportObj->setRatedCoilConditions(this->name,
+                                                           coilCoolingDXObjectName,
+                                                           coolingRate, // this is the report variable
+                                                           sensCoolingRate,  // this is the report variable
+                                                           ratedInletEvapMassFlowRate,
+                                                           RatedInletAirTemp,
+                                                           dummyInletAirHumRat,
+                                                           RatedInletWetBulbTemp,
+                                                           dummyEvapOutlet.Temp,
+                                                           dummyEvapOutlet.HumRat,
+                                                           ratedOutletWetBulb,
+                                                           RatedOutdoorAirTemp,
+                                                           ratedOutdoorAirWetBulb,
+                                                           this->performance.normalMode.speeds.back().RatedCBF, // TODO: DXCoil(DXCoilNum).RatedCBF(Mode),
+                                                           -999.0); // coil effectiveness not define for DX
+
+            this->reportCoilFinalSizes = false;
+        }
+    }
+
 }
 
 void CoilCoolingDX::passThroughNodeData(EnergyPlus::DataLoopNode::NodeData &in, EnergyPlus::DataLoopNode::NodeData &out)
