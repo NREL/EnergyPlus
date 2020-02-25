@@ -62,6 +62,7 @@
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -1688,9 +1689,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_CalcInteriorRadExchange)
 
     createFacilityElectricPowerServiceObject();
     HeatBalanceManager::SetPreConstructionInputParameters();
-    HeatBalanceManager::GetProjectControlData(ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound);
     HeatBalanceManager::GetFrameAndDividerData(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     HeatBalanceManager::GetBuildingData(ErrorsFound);
 
