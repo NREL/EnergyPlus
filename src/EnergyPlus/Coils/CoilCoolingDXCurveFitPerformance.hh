@@ -113,6 +113,9 @@ struct CoilCoolingDXCurveFitPerformance
     Real64 maxOutdoorDrybulbForBasin = 0.0;
     Real64 unitStatic = 0.0;
     bool mySizeFlag = true;
+    int compressorFuelType = 0;
+    Real64 compressorFuelRate;
+    Real64 compressorFuelConsumption;
 
     enum CapControlMethod
     {

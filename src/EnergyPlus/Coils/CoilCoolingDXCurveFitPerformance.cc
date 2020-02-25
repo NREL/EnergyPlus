@@ -231,6 +231,11 @@ void CoilCoolingDXCurveFitPerformance::calculate(CoilCoolingDXCurveFitOperatingM
     this->electricityConsumption = this->powerUse * reportingConstant;
     this->wasteHeatRate = currentMode.OpModeWasteHeat;
 
+    if (this->compressorFuelType != DataGlobalConstants::iRT_Electricity) {
+        this->compressorFuelRate = this->powerUse;
+        this->compressorFuelConsumption = this->electricityConsumption;
+    }
+
 }
 
 void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240() {

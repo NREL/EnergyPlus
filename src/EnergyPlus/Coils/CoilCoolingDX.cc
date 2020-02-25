@@ -444,6 +444,21 @@ void CoilCoolingDX::oneTimeInit() {
                             this->name);
     }
 
+    if (this->performance.compressorFuelType != DataGlobalConstants::iRT_Electricity) {
+        SetupOutputVariable("Cooling Coil " + DataGlobalConstants::GetResourceTypeChar(this->performance.compressorFuelType) + " Rate",
+                            OutputProcessor::Unit::W,
+                            this->performance.compressorFuelRate,
+                            "System",
+                            "Average",
+                            this->name);
+        SetupOutputVariable("Cooling Coil " + DataGlobalConstants::GetResourceTypeChar(this->performance.compressorFuelType) + " Energy",
+                            OutputProcessor::Unit::J,
+                            this->performance.compressorFuelConsumption,
+                            "System",
+                            "Sun",
+                            this->name);
+    }
+
     // HPWH and/or VRF output variables
 
     //    SetupOutputVariable("Cooling Coil VRF Super Heating Degrees",
