@@ -1824,7 +1824,7 @@ namespace OutputProcessor {
                                  false,
                                  false);
         EXPECT_TRUE(compare_mtr_stream(
-            delimited_string({"26,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"})));
+            delimited_string({"26,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(
             delimited_string({"26,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"})));
 
@@ -1840,7 +1840,7 @@ namespace OutputProcessor {
                                  false,
                                  false);
         EXPECT_TRUE(compare_mtr_stream(
-            delimited_string({"27,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"})));
+            delimited_string({"27,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n")));
         EXPECT_TRUE(compare_eso_stream(
             delimited_string({"27,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"})));
 
@@ -1870,7 +1870,7 @@ namespace OutputProcessor {
                                  false,
                                  true);
         EXPECT_TRUE(compare_mtr_stream(
-            delimited_string({"29,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"})));
+            delimited_string({"29,11,meterName [deltaC] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]"}, "\n")));
 
         WriteMeterDictionaryItem(OutputFiles::getSingleton(),
                                  ReportingFrequency::Simulation,
