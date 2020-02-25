@@ -62,7 +62,9 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
@@ -78,6 +80,7 @@ namespace EnergyPlus {
     std::vector<CoilCoolingDX> coilCoolingDXs;
     bool coilCoolingDXGetInputFlag = true;
     std::string const coilCoolingDXObjectName = "Coil:Cooling:DX";
+    bool stillNeedToReportStandardRatings = true;
 }
 
 int CoilCoolingDX::factory(std::string const & coilName) {
@@ -99,6 +102,7 @@ int CoilCoolingDX::factory(std::string const & coilName) {
 void CoilCoolingDX::clear_state() {
     coilCoolingDXs.clear();
     coilCoolingDXGetInputFlag = true;
+    stillNeedToReportStandardRatings = true;
 }
 
 void CoilCoolingDX::getInput() {
@@ -485,14 +489,6 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
     this->performance.simulate(evapInletNode, evapOutletNode, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
     EnergyPlus::CoilCoolingDX::passThroughNodeData(evapInletNode, evapOutletNode);
 
-    // after we have made a call to simulate, the component should be fully sized, so we can report standard ratings
-    // call that here, and THEN set the one time init flag to false
-    if (!DataGlobals::SysSizingCalc && !DataGlobals::WarmupFlag && this->doStandardRatingFlag) {
-        //TODO: Re-add this carefully
-        // this->performance.calcStandardRatings(this->supplyFanIndex, this->supplyFanType, this->supplyFanName, this->condInletNodeIndex);
-        this->doStandardRatingFlag = false;
-    }
-
     // calculate energy conversion factor
     Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
@@ -586,4 +582,36 @@ void CoilCoolingDX::passThroughNodeData(EnergyPlus::DataLoopNode::NodeData &in, 
     out.MassFlowRateMin = in.MassFlowRateMin;
     out.MassFlowRateMaxAvail = in.MassFlowRateMaxAvail;
     out.MassFlowRateMinAvail = in.MassFlowRateMinAvail;
+}
+
+void CoilCoolingDX::reportAllStandardRatings(OutputFiles &outputFiles) {
+
+    Real64 const ConvFromSIToIP(3.412141633);              // Conversion from SI to IP [3.412 Btu/hr-W]
+    static constexpr auto Format_990("! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
+                                     "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER {Btu/W-h}, IEER {Btu/W-h}\n");
+    print(outputFiles.eio, "{}", Format_990);
+    for (auto & coil : coilCoolingDXs) {
+        coil.performance.calcStandardRatings210240();
+
+        static constexpr auto Format_991(" DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}\n");
+        print(outputFiles.eio, Format_991,
+                "Coil:Cooling:DX", coil.name,
+                coil.performance.standardRatingCoolingCapacity,
+                coil.performance.standardRatingEER,
+                coil.performance.standardRatingEER * ConvFromSIToIP,
+                coil.performance.standardRatingSEER * ConvFromSIToIP,
+                coil.performance.standardRatingIEER * ConvFromSIToIP);
+
+        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilType, coil.name, "Coil:Cooling:DX");
+        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilNetCapSI, coil.name, coil.performance.standardRatingCoolingCapacity, 1);
+        // W/W is the same as Btuh/Btuh so that's fine too
+        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilCOP, coil.name, coil.performance.standardRatingEER, 2);
+        // Btu/W-h will convert to itself
+        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilEERIP, coil.name, coil.performance.standardRatingEER * ConvFromSIToIP, 2);
+        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilSEERIP, coil.name, coil.performance.standardRatingSEER * ConvFromSIToIP, 2);
+        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilIEERIP, coil.name, coil.performance.standardRatingIEER * ConvFromSIToIP, 2);
+        OutputReportPredefined::addFootNoteSubTable(OutputReportPredefined::pdstDXCoolCoil, "ANSI/AHRI ratings account for supply air fan heat and electric power.");
+
+    }
+    stillNeedToReportStandardRatings = false;
 }
