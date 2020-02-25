@@ -124,7 +124,6 @@ struct CoilCoolingDXCurveFitSpeed
     // speed class objects
     Real64 ambPressure = 0.0; // outdoor pressure {Pa]
     Real64 PLR = 0.0;
-    Real64 CondInletTemp = 0.0;     // condenser inlet node temp or outdoor temp if no condenser node {C}
     Real64 AirFF = 0.0;             // ratio of air mass flow rate to rated air mass flow rate
     Real64 fullLoadPower = 0.0;     // full load power at speed {W}
     Real64 fullLoadWasteHeat = 0.0; // full load waste heat at speed {W}

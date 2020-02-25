@@ -316,8 +316,12 @@ void CoilCoolingDX::oneTimeInit() {
         "System",
         "Average",
         this->name);
-
-
+    SetupOutputVariable("Cooling Coil Condenser Inlet Temperature",
+        OutputProcessor::Unit::C,
+        this->condenserInletTemperature,
+        "System",
+        "Average",
+        this->name);
 
     if (this->performance.evapCondBasinHeatCap > 0) {
         SetupOutputVariable("Cooling Coil Basin Heater Electric Power",
@@ -428,6 +432,9 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
     auto &evapOutletNode = DataLoopNode::Node(this->evapOutletNodeIndex);
     auto &condInletNode = DataLoopNode::Node(this->condInletNodeIndex);
     auto &condOutletNode = DataLoopNode::Node(this->condOutletNodeIndex);
+
+    // set inlet conditions
+    this->condenserInletTemperature = condInletNode.Temp;
 
     // call the simulation, which returns useful data
     // TODO: check the avail schedule and reset data/pass through data as needed

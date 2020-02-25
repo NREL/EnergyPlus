@@ -239,7 +239,7 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(const std::string& name_t
       rated_total_capacity(0.0),
       rated_evap_fan_power_per_volume_flow_rate(0.0),
       ratedWasteHeatFractionOfPowerInput(0.0),  // rated waste heat fraction of power input
-      evap_condenser_pump_power_fraction(0.0), 
+      evap_condenser_pump_power_fraction(0.0),
       evap_condenser_effectiveness(0.0),
 
       FanOpMode(0),              // fan operating mode, constant or cycling fan
@@ -249,7 +249,6 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(const std::string& name_t
 
       ambPressure(0.0),          // outdoor pressure {Pa}
       PLR(0.0),                  // coil operating part load ratio
-      CondInletTemp(0.0),        // condenser inlet temperature {C}
       AirFF(0.0),                // ratio of air mass flow rate to rated air mass flow rate
                                  //	RatedTotCap( 0.0 ), // rated total capacity at speed {W}
 
