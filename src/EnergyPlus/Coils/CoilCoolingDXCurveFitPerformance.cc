@@ -183,6 +183,7 @@ void CoilCoolingDXCurveFitPerformance::size()
         this->normalMode.parentName = this->parentName;
         this->normalMode.size();
         if (this->hasAlternateMode) {
+            this->alternateMode.parentName = this->parentName;
             this->alternateMode.size();
         }
         this->mySizeFlag = false;

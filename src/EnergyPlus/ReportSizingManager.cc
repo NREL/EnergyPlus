@@ -2575,6 +2575,7 @@ namespace ReportSizingManager {
                             }
                         }
                     }
+                    if (DataConstantUsedForSizing > 0.0) AutosizeDes *= DataConstantUsedForSizing;
 
                 } else if (SizingType == HeatingAirflowSizing) {
                     if (CurOASysNum > 0) {
@@ -3310,7 +3311,9 @@ namespace ReportSizingManager {
                         }
                         AutosizeDes =
                             NominalCapacityDes * DataFracOfAutosizedCoolingCapacity; // Fixed Moved up 1 line inside block per Richard Raustad
+
                     }                                                                // IF(OASysFlag) THEN or ELSE IF(AirLoopSysFlag) THEN
+                    if (DataConstantUsedForSizing > 0.0) AutosizeDes *= DataConstantUsedForSizing;
                     DataDesAccountForFanHeat = true;                                 // reset for next water coil
                     if (DisplayExtraWarnings && AutosizeDes <= 0.0) {
                         ShowWarningMessage(CallingRoutine + ": Potential issue with equipment sizing for " + CompType + ' ' + CompName);

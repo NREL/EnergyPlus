@@ -100,6 +100,8 @@ struct CoilCoolingDXCurveFitOperatingMode
     Real64 ratedEvapAirFlowRate = 0.0;
     Real64 ratedCondAirFlowRate = 0.0;
     Real64 ratedEvapAirMassFlowRate = 0.0;
+    bool ratedGrossTotalCapIsAutosized = false;
+    bool ratedEvapAirFlowRateIsAutosized = false;
 
     // Latent degradation model
     Real64 maxCyclingRate = 0.0;

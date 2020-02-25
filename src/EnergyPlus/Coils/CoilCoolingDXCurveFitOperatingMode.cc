@@ -66,7 +66,9 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(CoilCoolingDXC
     this->original_input_specs = input_data;
     this->name = input_data.name;
     this->ratedGrossTotalCap = input_data.gross_rated_total_cooling_capacity;
+    if (this->ratedGrossTotalCap == DataSizing::AutoSize) this->ratedGrossTotalCapIsAutosized = true;
     this->ratedEvapAirFlowRate = input_data.rated_evaporator_air_flow_rate;
+    if (this->ratedEvapAirFlowRate == DataSizing::AutoSize) this->ratedEvapAirFlowRateIsAutosized = true;
     this->maxCyclingRate = input_data.maximum_cycling_rate;
     this->evapRateRatio = input_data.ratio_of_initial_moisture_evaporation_rate_and_steady_state_latent_capacity;
     this->latentTimeConst = input_data.latent_capacity_time_constant;
@@ -181,13 +183,18 @@ void CoilCoolingDXCurveFitOperatingMode::size()
     TempSize = this->original_input_specs.rated_condenser_air_flow_rate;
     ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
     this->ratedCondAirFlowRate = TempSize;
+    int numSpeeds = this->speeds.size();
+    int thisSpeedNum = 0;
 
     for (auto &curSpeed : this->speeds) {
         curSpeed.parentName = this->parentName;
         curSpeed.parentModeRatedGrossTotalCap = this->ratedGrossTotalCap;
+        curSpeed.ratedGrossTotalCapIsAutosized = this->ratedGrossTotalCapIsAutosized;
         curSpeed.parentModeRatedEvapAirFlowRate = this->ratedEvapAirFlowRate;
+        curSpeed.ratedEvapAirFlowRateIsAutosized = this->ratedEvapAirFlowRateIsAutosized;
         curSpeed.parentModeRatedCondAirFlowRate = this->ratedCondAirFlowRate;
-        curSpeed.size();
+        curSpeed.size(thisSpeedNum, numSpeeds);
+        thisSpeedNum++;
     }
 }
 
