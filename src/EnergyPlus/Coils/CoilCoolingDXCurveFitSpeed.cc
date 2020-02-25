@@ -333,7 +333,8 @@ void CoilCoolingDXCurveFitSpeed::size()
 
     bool PrintFlag = true;
     std::string CompType = this->object_name;
-    std::string CompName = this->name;
+    std::string CompName = this->parentName;
+    std::string parentType = DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_Cooling);
 
     int SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
     std::string SizingString = "Rated Air Flow Rate [m3/s]";

@@ -413,6 +413,7 @@ void CoilCoolingDX::getDataAfterSizing(Real64 &_normalModeRatedEvapAirFlowRate,
 }
 
 void CoilCoolingDX::size() {
+    this->performance.parentName = this->name;
     this->performance.size();
 }
 

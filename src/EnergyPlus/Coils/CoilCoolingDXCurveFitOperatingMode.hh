@@ -78,6 +78,7 @@ struct CoilCoolingDXCurveFitOperatingModeInputSpecification
 struct CoilCoolingDXCurveFitOperatingMode
 {
     std::string object_name = "Coil:Cooling:DX:CurveFit:OperatingMode";
+    std::string parentName;
 
     void instantiateFromInputSpec(CoilCoolingDXCurveFitOperatingModeInputSpecification input_data);
     void size();
