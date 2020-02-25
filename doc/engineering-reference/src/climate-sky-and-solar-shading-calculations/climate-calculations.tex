@@ -60,17 +60,44 @@ Sigma = Stefan-Boltzmann constant = 5.6697e-8 \{W/m\(^{2}\)-K\(^{4}\)\}
 
 Temperature\(_{drybulb}\) = drybulb temperature \{K\}
 
-The sky emissivity is given by
+By default, the clear sky emissivity is calculated by the Clark \& Allen (1978) model as
 
 \begin{equation}
-Sk{y_{emissivity}} = \left( {.787 + .764\cdot \ln \left( {\frac{{Temperatur{e_{dewpoint}}}}{{273.}}} \right)} \right)\cdot \left( {1. + .0224N - .0035{N^2} + .00028{N^3}} \right)
+Sky_{clear-sky-emissivity} = 0.787 + 0.764\cdot \ln \frac {T_{dewpoint}}{T_{Kelvin}}
 \end{equation}
 
-where
+where, T\(_{dewpoint}\) = dewpoint temperature \{K\}.
 
-Temperature\(_{dewpoint}\) = dewpoint temperature \{K\}
+Alternatively, the clear sky emissivity can also be calculated using different models set by the user from options using the \textbf{WeatherProperty:SkyTemperature} object, including the calibrated version of the Berdahl and Martin, Brunt and Idso models (2017), listed as follows.
 
-N = opaque sky cover \{tenths\}
+Calibrated Berdahl and Martin model:
+
+\begin{equation}
+Sky_{clear-sky-emissivity} = 0.711 + 0.56\cdot(T_{dewpoint} / 100) + 0.73\cdot{T_{dewpoint} / 100}^2.
+\end{equation}
+
+Calibrated Brunt model:
+
+\begin{equation}
+Sky_{clear-sky-emissivity} = 0.52 + 0.065\cdot(P_{water-vapor})^{0.5},
+\end{equation}
+
+where, P\(_{water-vapor}\) = partial water vapor pressure \{hPa\}.
+
+Calibrated Idso model:
+
+\begin{equation}
+Sky_{clear-sky-emissivity} = 0.70 + 5.95\cdot10E-5\cdot(P_{water-vapor} \cdot exp(1500/T_{drybulb})).
+\end{equation}
+
+
+Then the sky emissivity is given by:
+
+\begin{equation}
+Sky_{emissivity} = Sky_{clear-sky-emissivity} \cdot \left( {1. + .0224N - .0035{N^2} + .00028{N^3}} \right)
+\end{equation}
+
+where, N = opaque sky cover \{tenths\}
 
 Example: Clear sky (N = 0), Temperature\(_{drybulb}\) = 273+20 = 293 K, Temperature\(_{dewpoint}\) = 273+10 = 283 K:
 
@@ -78,7 +105,9 @@ Sky\(_{emissivity}\) = 0.787 + 0.764*0.036 = 0.815
 
 Horizontal\_IR = 0.815*5.6697e-8*(293**4) = 340.6 W/m\(^{2}\)
 
-References for these calculations are contained in the references subsection at the end of this  section and include Walton (1983) and Clark and Allen (1978).
+If specified in \textbf{WeatherProperty:SkyTemperature} object, Horizontal Infrared Radiation Intensity from the weather files can also be ignored and the values can be calculated directly from the specified sky emissivity model.
+
+References for these calculations are contained in the references subsection at the end of this section and include Walton (1983), Clark and Allen (1978), and Li et al (2017).
 
 \subsection{EnergyPlus Sky Temperature Calculation}\label{energyplus-sky-temperature-calculation}
 
@@ -268,6 +297,8 @@ Varying the location adjusts the solar calculation terms to account for the chan
 Walton, G. N. 1983. Thermal Analysis Research Program Reference Manual. NBSSIR 83-2655. National Bureau of Standards, p.~21.
 
 Clark, G. and C. Allen, ``The Estimation of Atmospheric Radiation for Clear and Cloudy Skies,'' Proceedings 2nd National Passive Solar Conference (AS/ISES), 1978, pp.~675-678.
+
+Li, M., Jiang, Y. and Coimbra, C. F. M. 2017. On the determination of atmospheric longwave irradiance under all-sky conditions. Solar Energy 144,  40–48, 
 
 Watanabe, T., Urano, Y., and Hayashi, T. 1983. ``Procedures for Separating Direct and Diffuse Insolation on a Horizontal Surface and Prediction of Insolation on Tilted Surfaces'' (in Japanese), Transactions, No. 330, Architectural Institute of Japan, Tokyo, Japan.
 

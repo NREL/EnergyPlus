@@ -57,7 +57,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
@@ -653,7 +653,7 @@ TEST_F(PTHPFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
         "Coil:Heating:Fuel,",
         "    SPACE1-1 Heating Coil,   !- Name",
         "    FanAvailSched,           !- Availability Schedule Name",
-        "    Gas,                     !- Fuel Type",
+        "    NaturalGas,              !- Fuel Type",
         "    0.8,                     !- Gas Burner Efficiency",
         "    10000.0,                 !- Nominal Capacity {W}",
         "    SPACE1-1 CCoil Outlet Node,  !- Air Inlet Node Name",
@@ -1005,7 +1005,7 @@ TEST_F(PTHPFixture, SimPTAC_SZVAVTest)
         "Coil:Heating:Fuel,",
         "    SPACE1-1 Heating Coil,   !- Name",
         "    FanAvailSched,           !- Availability Schedule Name",
-        "    Gas,                     !- Fuel Type",
+        "    NaturalGas,              !- Fuel Type",
         "    0.8,                     !- Gas Burner Efficiency",
         "    10000.0,                 !- Nominal Capacity {W}",
         "    SPACE1-1 CCoil Outlet Node,  !- Air Inlet Node Name",

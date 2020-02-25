@@ -2362,9 +2362,9 @@ IF (Found /= 0) THEN
   ItemNum=0
 
   DO ObjNum=1,NumIDFRecords
-    IF (IDFRecords(ObjNum)%Name /= UCObjType) CYCLE
+    IF (.not. SameString(IDFRecords(ObjNum)%Name, UCObjType)) CYCLE
     ItemNum=ItemNum+1
-    IF (IDFRecords(ObjNum)%Alphas(1) == ObjName) EXIT
+    IF (SameString(IDFRecords(ObjNum)%Alphas(1), ObjName)) EXIT
   END DO
 ENDIF
 
