@@ -1556,6 +1556,8 @@
 
   Output:Variable,*,Cooling Coil Evaporative Condenser Mains Supply Water Volume,timestep;
 
+  Output:Variable,*,Cooling Coil Evaporative Condenser Water Volume,timestep;
+
   Output:Variable,*,Heating Coil Heating Rate,timestep;
 
   Output:Variable,*,Heating Coil Heating Energy,timestep;
