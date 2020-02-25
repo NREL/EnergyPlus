@@ -61,6 +61,7 @@ class OutputFiles;
 struct CoilCoolingDXCurveFitPerformanceInputSpecification
 {
     std::string name;
+    std::string parentName;
     Real64 crankcase_heater_capacity;
     Real64 minimum_outdoor_dry_bulb_temperature_for_compressor_operation;
     Real64 maximum_outdoor_dry_bulb_temperature_for_crankcase_heater_operation;
@@ -77,6 +78,7 @@ struct CoilCoolingDXCurveFitPerformanceInputSpecification
 struct CoilCoolingDXCurveFitPerformance
 {
     std::string object_name = "Coil:Cooling:DX:CurveFit:Performance";
+    std::string parentName;
     void instantiateFromInputSpec(const CoilCoolingDXCurveFitPerformanceInputSpecification &input_data);
     void simulate(const DataLoopNode::NodeData &inletNode,
                   DataLoopNode::NodeData &outletNode,
