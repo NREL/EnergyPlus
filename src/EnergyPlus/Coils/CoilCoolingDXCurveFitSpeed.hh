@@ -83,6 +83,7 @@ struct CoilCoolingDXCurveFitSpeedInputSpecification
 struct CoilCoolingDXCurveFitSpeed
 {
     std::string const object_name = "Coil:Cooling:DX:CurveFit:Speed";
+    std::string parentName;
 
     CoilCoolingDXCurveFitSpeed() = default;
     explicit CoilCoolingDXCurveFitSpeed(const std::string& name);

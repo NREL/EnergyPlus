@@ -180,6 +180,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &in
 void CoilCoolingDXCurveFitPerformance::size()
 {
     if (!DataGlobals::SysSizingCalc && this->mySizeFlag) {
+        this->normalMode.parentName = this->parentName;
         this->normalMode.size();
         if (this->hasAlternateMode) {
             this->alternateMode.size();

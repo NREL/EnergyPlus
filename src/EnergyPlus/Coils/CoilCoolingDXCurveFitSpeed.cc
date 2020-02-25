@@ -331,8 +331,8 @@ void CoilCoolingDXCurveFitSpeed::size()
         Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::StdBaroPress, RatedInletAirTemp, RatedInletAirHumRat, RoutineName);
 
     bool PrintFlag = true;
-    std::string CompType = this->object_name;
-    std::string CompName = this->name;
+    std::string CompType = DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilDX_Cooling);
+    std::string CompName = this->parentName;
 
     int SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
     std::string SizingString = "Rated Air Flow Rate [m3/s]";
