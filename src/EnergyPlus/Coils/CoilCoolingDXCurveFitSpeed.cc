@@ -485,15 +485,15 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(
         EIRFlowModFac = CurveManager::CurveValue(indexEIRFFF, AirFF);
     }
 
-    Real64 wastHeatempModFac = 1.0; // waste heat fraction as a function of temperature curve result
+    Real64 wasteHeatTempModFac = 1.0; // waste heat fraction as a function of temperature curve result
     if (indexWHFT > 0) {
-        wastHeatempModFac = CurveManager::CurveValue(indexWHFT, condInletTemp, inletNode.Temp);
+        wasteHeatTempModFac = CurveManager::CurveValue(indexWHFT, condInletTemp, inletNode.Temp);
     }
 
     Real64 EIR = RatedEIR * EIRFlowModFac * EIRTempModFac;
     RTF = _PLR / PLF;
     fullLoadPower = TotCap * EIR;
-    fullLoadWasteHeat = ratedWasteHeatFractionOfPowerInput * wastHeatempModFac * fullLoadPower;
+    fullLoadWasteHeat = ratedWasteHeatFractionOfPowerInput * wasteHeatTempModFac * fullLoadPower;
 
     outletNode.Enthalpy = inletNode.Enthalpy - hDelta;
     Real64 hTinwout = inletNode.Enthalpy - ((1.0 - SHR) * hDelta);
