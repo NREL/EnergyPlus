@@ -106,6 +106,8 @@ struct CoilCoolingDXCurveFitSpeed
     Real64 RatedAirMassFlowRate = 0.0;     // rated air mass flow rate at speed {kg/s}
     Real64 RatedCondAirMassFlowRate = 0.0; // rated condenser air mass flow rate at speed {kg/s}
     Real64 grossRatedSHR = 0.0;            // rated sensible heat ratio at speed
+    bool ratedGrossTotalCapIsAutosized = false;
+    bool ratedEvapAirFlowRateIsAutosized = false;
     Real64 RatedCBF = 0.0;                 // rated coil bypass factor at speed
     Real64 RatedEIR = 0.0;                 // rated energy input ratio at speed {W/W}
     Real64 ratedCOP = 0.0;
@@ -143,7 +145,7 @@ struct CoilCoolingDXCurveFitSpeed
 
     void CalcSpeedOutput(
         const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &fanOpMode, Real64 condInletTemp);
-    void size();
+    void size(int const speedNum, int const maxSpeeds);
     Real64 CalcBypassFactor(Real64 tdb, Real64 w, Real64 h, Real64 p);
 
 private:
