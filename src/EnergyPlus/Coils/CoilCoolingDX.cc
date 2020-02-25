@@ -208,10 +208,16 @@ void CoilCoolingDX::instantiateFromInputSpec(const CoilCoolingDXInputSpecificati
     } else {
         this->availScheduleIndex = ScheduleManager::GetScheduleIndex(input_data.availability_schedule_name);
     }
+
     if (this->availScheduleIndex == 0) {
         ShowSevereError(routineName + coilCoolingDXObjectName + "=\"" + this->name + "\", invalid");
         ShowContinueError("...Availability Schedule Name=\"" + input_data.availability_schedule_name + "\".");
         errorsFound = true;
+    }
+
+    if (!input_data.condenser_zone_name.empty()) {
+        this->isSecondaryDXCoilInZone = true;
+        // Setup zone data here
     }
 
     BranchNodeConnections::TestCompSet(
@@ -423,6 +429,81 @@ void CoilCoolingDX::oneTimeInit() {
                             "System");
     }
 
+    if (this->isSecondaryDXCoilInZone) {
+        SetupOutputVariable("Secondary Coil Heat Rejection Rate",
+                            OutputProcessor::Unit::W,
+                            this->secCoilSensHeatRejEnergyRate,
+                            "System",
+                            "Average",
+                            this->name);
+
+        SetupOutputVariable("Secondary Coil Heat Rejection Energy",
+                            OutputProcessor::Unit::J,
+                            this->secCoilSensHeatRejEnergy,
+                            "System",
+                            "Sum",
+                            this->name);
+    }
+
+    if (this->performance.compressorFuelType != DataGlobalConstants::iRT_Electricity) {
+        SetupOutputVariable("Cooling Coil " + DataGlobalConstants::GetResourceTypeChar(this->performance.compressorFuelType) + " Rate",
+                            OutputProcessor::Unit::W,
+                            this->performance.compressorFuelRate,
+                            "System",
+                            "Average",
+                            this->name);
+        SetupOutputVariable("Cooling Coil " + DataGlobalConstants::GetResourceTypeChar(this->performance.compressorFuelType) + " Energy",
+                            OutputProcessor::Unit::J,
+                            this->performance.compressorFuelConsumption,
+                            "System",
+                            "Sun",
+                            this->name);
+    }
+
+    // HPWH and/or VRF output variables
+
+    //    SetupOutputVariable("Cooling Coil VRF Super Heating Degrees",
+    //                        OutputProcessor::Unit::C,
+    //                        this->secCoilSensHeatRejEnergy,
+    //                        "System",
+    //                        "Sum",
+    //                        this->name);
+
+    //    SetupOutputVariable("Cooling Coil VRF Evaporating Temperature",
+    //                        OutputProcessor::Unit::C,
+    //                        this->secCoilSensHeatRejEnergy,
+    //                        "System",
+    //                        "Average",
+    //                        this->name);
+
+    //    SetupOutputVariable("Cooling Coil Water Heating Electric Power",
+    //                        OutputProcessor::Unit::W,
+    //                        this->secCoilSensHeatRejEnergy,
+    //                        "System",
+    //                        "Sum",
+    //                        this->name);
+
+    //    SetupOutputVariable("Cooling Coil Water Heating Electric Energy",
+    //                        OutputProcessor::Unit::J,
+    //                        this->secCoilSensHeatRejEnergy,
+    //                        "System",
+    //                        "Average",
+    //                        this->name);
+
+    //    SetupOutputVariable("Cooling Coil Total Water Heating Rate",
+    //                        OutputProcessor::Unit::W,
+    //                        this->secCoilSensHeatRejEnergy,
+    //                        "System",
+    //                        "Sum",
+    //                        this->name);
+
+    //    SetupOutputVariable("Cooling Coil Total Water Heating Energy",
+    //                        OutputProcessor::Unit::J,
+    //                        this->secCoilSensHeatRejEnergy,
+    //                        "System",
+    //                        "Average",
+    //                        this->name);
+
 }
 
 void CoilCoolingDX::setData(int fanIndex, int fanType, std::string const &fanName, int _airLoopNum) {
@@ -560,6 +641,12 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
     this->partLoadRatioReport = PLR;
     this->speedNumReport = speedNum;
     this->speedRatioReport = speedRatio;
+
+    if (this->isSecondaryDXCoilInZone) {
+        // call CalcSecondaryDXCoils ???
+        this->secCoilSensHeatRejEnergyRate = this->totalCoolingEnergyRate + this->elecCoolingPower;
+        this->secCoilSensHeatRejEnergy = this->totalCoolingEnergy + this->elecCoolingConsumption;
+    }
 
     // Fishy global things that need to be set here, try to set the AFN stuff now
     // This appears to be the only location where airLoopNum gets used

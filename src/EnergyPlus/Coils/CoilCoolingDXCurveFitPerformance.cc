@@ -81,14 +81,14 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(const CoilCoolin
     }
     this->evapCondBasinHeatCap = input_data.basin_heater_capacity;
     this->evapCondBasinHeatSetpoint = input_data.basin_heater_setpoint_temperature;
-    if (input_data.basin_heater_operating_shedule_name.empty()) {
+    if (input_data.basin_heater_operating_schedule_name.empty()) {
         this->evapCondBasinHeatSchedulIndex = DataGlobals::ScheduleAlwaysOn;
     } else {
-        this->evapCondBasinHeatSchedulIndex = ScheduleManager::GetScheduleIndex(input_data.basin_heater_operating_shedule_name);
+        this->evapCondBasinHeatSchedulIndex = ScheduleManager::GetScheduleIndex(input_data.basin_heater_operating_schedule_name);
     }
     if (this->evapCondBasinHeatSchedulIndex == 0) {
         ShowSevereError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
-        ShowContinueError("...Evaporative Condenser Basin Heater Operating Schedule Name=\"" + input_data.basin_heater_operating_shedule_name +
+        ShowContinueError("...Evaporative Condenser Basin Heater Operating Schedule Name=\"" + input_data.basin_heater_operating_schedule_name +
                           "\".");
         errorsFound = true;
     }
@@ -139,7 +139,7 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(const std::st
         input_specs.capacity_control = cAlphaArgs(2);
         input_specs.basin_heater_capacity = rNumericArgs(5);
         input_specs.basin_heater_setpoint_temperature = rNumericArgs(6);
-        input_specs.basin_heater_operating_shedule_name = cAlphaArgs(3);
+        input_specs.basin_heater_operating_schedule_name = cAlphaArgs(3);
         input_specs.compressor_fuel_type = DataGlobalConstants::AssignResourceTypeNum(cAlphaArgs(4));
         input_specs.base_operating_mode_name = cAlphaArgs(5);
         if (!lAlphaFieldBlanks(6)) {
@@ -230,6 +230,11 @@ void CoilCoolingDXCurveFitPerformance::calculate(CoilCoolingDXCurveFitOperatingM
     this->RTF = currentMode.OpModeRTF;
     this->electricityConsumption = this->powerUse * reportingConstant;
     this->wasteHeatRate = currentMode.OpModeWasteHeat;
+
+    if (this->compressorFuelType != DataGlobalConstants::iRT_Electricity) {
+        this->compressorFuelRate = this->powerUse;
+        this->compressorFuelConsumption = this->electricityConsumption;
+    }
 
 }
 
