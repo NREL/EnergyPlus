@@ -329,7 +329,18 @@ void CoilCoolingDX::oneTimeInit() {
         "System",
         "Average",
         this->name);
-
+    SetupOutputVariable("Cooling Coil Waste Heat Power",
+        OutputProcessor::Unit::W,
+        this->wasteHeatEnergyRate,
+        "System",
+        "Average",
+        this->name);
+    SetupOutputVariable("Cooling Coil Waste Heat Energy",
+                        OutputProcessor::Unit::J,
+                        this->wasteHeatEnergy,
+                        "System",
+                        "Sum",
+                        this->name);
 
     if (this->performance.evapCondBasinHeatCap > 0) {
         SetupOutputVariable("Cooling Coil Basin Heater Electric Power",
