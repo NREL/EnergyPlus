@@ -383,6 +383,17 @@ void CoilCoolingDX::oneTimeInit() {
                             "COOLING",
                             _,
                             "System");
+        SetupOutputVariable("Cooling Coil Evaporative Condenser Mains Supply Water Volume",
+                            OutputProcessor::Unit::m3,
+                            this->evaporativeCondSupplyTankVolumeFlow,
+                            "System",
+                            "Sum",
+                            this->name,
+                            _,
+                            "MainsWater",
+                            "Cooling",
+                            _,
+                            "System");
     }
 
 }
