@@ -5340,6 +5340,8 @@ namespace UnitarySystems {
                     if (!(thisSys.m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ||
                           thisSys.m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit)) {
                         DXCoils::SetDXCoilTypeData(thisSys.m_CoolingCoilName);
+                    } else if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
+                        coilCoolingDXs[thisSys.m_CoolingCoilIndex].setToHundredPercentDOAS();
                     }
                 }
                 // DOAS DX Cooling Coil Leaving Minimum Air Temperature

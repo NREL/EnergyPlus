@@ -334,7 +334,7 @@ void CoilCoolingDXCurveFitSpeed::size(int const speedNum, int const maxSpeeds)
     std::string CompName = this->parentName;
 
     int SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
-    std::string preFixString = "";
+    std::string preFixString;
     if (maxSpeeds > 1) preFixString = "Speed " + std::to_string(speedNum + 1) + " ";
     std::string SizingString = preFixString + "Rated Air Flow Rate [m3/s]";
     DataSizing::DataConstantUsedForSizing = this->original_input_specs.evaporator_air_flow_fraction;
@@ -367,6 +367,8 @@ void CoilCoolingDXCurveFitSpeed::size(int const speedNum, int const maxSpeeds)
 
     this->RatedCBF = CalcBypassFactor(RatedInletAirTemp,
                                       RatedInletAirHumRat,
+                                      this->rated_total_capacity,
+                                      this->grossRatedSHR,
                                       Psychrometrics::PsyHFnTdbW(RatedInletAirTemp, RatedInletAirHumRat),
                                       DataEnvironment::StdPressureSeaLevel);
     this->RatedEIR = 1.0 / this->original_input_specs.gross_rated_cooling_COP;
@@ -515,15 +517,17 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(
     outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
 }
 
-Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Real64 tdb, Real64 w, Real64 h, Real64 p)
+Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Real64 tdb, Real64 w, Real64 q, Real64 shr, Real64 h, Real64 p)
 {
 
     static std::string const RoutineName("CalcBypassFactor: ");
+    Real64 const SmallDifferenceTest(0.00000001);
+
     // Bypass factors are calculated at rated conditions at sea level (make sure in.p is Standard Pressure)
     Real64 calcCBF;
 
-    Real64 airMassFlowRate = evap_air_flow_rate * Psychrometrics::PsyRhoAirFnPbTdbW(p, tdb, w);
-    Real64 deltaH = rated_total_capacity / airMassFlowRate;
+    Real64 airMassFlowRate = this->evap_air_flow_rate * Psychrometrics::PsyRhoAirFnPbTdbW(p, tdb, w);
+    Real64 deltaH = q / airMassFlowRate;
     Real64 outp = p;
     Real64 outh = h - deltaH;
     Real64 outw = Psychrometrics::PsyWFnTdbH(tdb, h - (1.0 - this->grossRatedSHR) * deltaH); // enthalpy at Tdb,in and Wout
@@ -531,6 +535,27 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Real64 tdb, Real64 w, Real64
     Real64 outrh = Psychrometrics::PsyRhFnTdbWPb(outtdb, outw, outp);
 
     if (outrh >= 1.0) {
+        ShowWarningError("For object = " + this->object_name + ", name = \"" + this->name + "\"");
+        ShowContinueError("Calculated outlet air relative humidity greater than 1. The combination of");
+        ShowContinueError("rated air volume flow rate, total cooling capacity and sensible heat ratio yields coil exiting");
+        ShowContinueError("air conditions above the saturation curve. Possible fixes are to reduce the rated total cooling");
+        ShowContinueError("capacity, increase the rated air volume flow rate, or reduce the rated sensible heat ratio for this coil.");
+        ShowContinueError("If autosizing, it is recommended that all three of these values be autosized.");
+        ShowContinueError("...Inputs used for calculating cooling coil bypass factor.");
+        ShowContinueError("...Inlet Air Temperature     = " + General::RoundSigDigits(tdb, 2) + " C");
+        ShowContinueError("...Outlet Air Temperature    = " + General::RoundSigDigits(outtdb, 2) + " C");
+        ShowContinueError("...Inlet Air Humidity Ratio  = " + General::RoundSigDigits(w, 6) + " kgWater/kgDryAir");
+        ShowContinueError("...Outlet Air Humidity Ratio = " + General::RoundSigDigits(outw, 6) + " kgWater/kgDryAir");
+        ShowContinueError("...Total Cooling Capacity used in calculation = " + General::RoundSigDigits(q, 2) + " W");
+        ShowContinueError("...Air Mass Flow Rate used in calculation     = " + General::RoundSigDigits(airMassFlowRate, 6) + " kg/s");
+        ShowContinueError("...Air Volume Flow Rate used in calculation   = " + General::RoundSigDigits(this->evap_air_flow_rate, 6) + " m3/s");
+        if (q > 0.0) {
+            if (((this->minRatedVolFlowPerRatedTotCap - this->evap_air_flow_rate / q) > SmallDifferenceTest) ||
+                ((this->evap_air_flow_rate / q - this->maxRatedVolFlowPerRatedTotCap) > SmallDifferenceTest)) {
+                ShowContinueError("...Air Volume Flow Rate per Watt of Rated Cooling Capacity is also out of bounds at = " +
+                                  General::RoundSigDigits(this->evap_air_flow_rate / q, 7) + " m3/s/W");
+            }
+        }
         Real64 outletAirTempSat = Psychrometrics::PsyTsatFnHPb(outh, outp, RoutineName);
         if (outtdb < outletAirTempSat) { // Limit to saturated conditions at OutletAirEnthalpy
             outtdb = outletAirTempSat + 0.005;
@@ -546,27 +571,39 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Real64 tdb, Real64 w, Real64
     // ADP conditions
     Real64 adp_tdb = Psychrometrics::PsyTdpFnWPb(outw, outp);
 
-    std::size_t iter = 0;
-    const std::size_t maxIter(50);
-    Real64 errorLast = 100.0;
-    Real64 deltaADPTemp = 5.0;
-    Real64 tolerance = 1.0; // initial conditions for iteration
-    Real64 slopeAtConds = 0.0;
     Real64 deltaT = tdb - outtdb;
     Real64 deltaHumRat = w - outw;
-    bool cbfErrors = false;
-
+    Real64 slopeAtConds = 0.0;
     if (deltaT > 0.0) slopeAtConds = deltaHumRat / deltaT;
     if (slopeAtConds <= 0.0) {
-        // TODO: old dx coil protects against slopeAtConds < 0, but no = 0 - not sure why, 'cause that'll cause divide by zero
-        ShowSevereError(RoutineName + object_name + " \"" + name + "\" -- coil bypass factor calculation invalid input conditions.");
-        ShowContinueError("deltaT = " + General::RoundSigDigits(deltaT, 3) +
-            " and deltaHumRat = " + General::RoundSigDigits(deltaHumRat, 3));
+        ShowSevereError(this->object_name + " \"" + this->name + "\"");
+        ShowContinueError("...Invalid slope or outlet air condition when calculating cooling coil bypass factor.");
+        ShowContinueError("...Slope = " + General::RoundSigDigits(slopeAtConds, 8));
+        ShowContinueError("...Inlet Air Temperature     = " + General::RoundSigDigits(tdb, 2) + " C");
+        ShowContinueError("...Outlet Air Temperature    = " + General::RoundSigDigits(outtdb, 2) + " C");
+        ShowContinueError("...Inlet Air Humidity Ratio  = " + General::RoundSigDigits(w, 6) + " kgWater/kgDryAir");
+        ShowContinueError("...Outlet Air Humidity Ratio = " + General::RoundSigDigits(outw, 6) + " kgWater/kgDryAir");
+        ShowContinueError("...Total Cooling Capacity used in calculation = " + General::RoundSigDigits(q, 2) + " W");
+        ShowContinueError("...Air Mass Flow Rate used in calculation     = " + General::RoundSigDigits(airMassFlowRate, 6) + " kg/s");
+        ShowContinueError("...Air Volume Flow Rate used in calculation   = " + General::RoundSigDigits(this->evap_air_flow_rate, 6) + " m3/s");
+        if (q > 0.0) {
+            if (((this->minRatedVolFlowPerRatedTotCap - this->evap_air_flow_rate / q) > SmallDifferenceTest) ||
+                ((this->evap_air_flow_rate / q - this->maxRatedVolFlowPerRatedTotCap) > SmallDifferenceTest)) {
+                ShowContinueError("...Air Volume Flow Rate per Watt of Rated Cooling Capacity is also out of bounds at = " +
+                                  General::RoundSigDigits(this->evap_air_flow_rate / q, 7) + " m3/s/W");
+            }
+        }
         ShowFatalError("Errors found in calculating coil bypass factors");
     }
 
     Real64 adp_w = min(outw, Psychrometrics::PsyWFnTdpPb(adp_tdb, DataEnvironment::StdPressureSeaLevel));
 
+    int iter = 0;
+    int const maxIter(50);
+    Real64 errorLast = 100.0;
+    Real64 deltaADPTemp = 5.0;
+    Real64 tolerance = 1.0; // initial conditions for iteration
+    bool cbfErrors = false;
     while ((iter <= maxIter) && (tolerance > 0.001)) {
 
         // Do for IterMax iterations or until the error gets below .1%

@@ -763,6 +763,19 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
 
 }
 
+void CoilCoolingDX::setToHundredPercentDOAS() {
+    for (auto & speed : this->performance.normalMode.speeds) {
+        speed.minRatedVolFlowPerRatedTotCap = DataHVACGlobals::MinRatedVolFlowPerRatedTotCap2;
+        speed.maxRatedVolFlowPerRatedTotCap = DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap2;
+    }
+    if (this->performance.hasAlternateMode) {
+        for (auto &speed : this->performance.alternateMode.speeds) {
+            speed.minRatedVolFlowPerRatedTotCap = DataHVACGlobals::MinRatedVolFlowPerRatedTotCap2;
+            speed.maxRatedVolFlowPerRatedTotCap = DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap2;
+        }
+    }
+}
+
 void CoilCoolingDX::passThroughNodeData(EnergyPlus::DataLoopNode::NodeData &in, EnergyPlus::DataLoopNode::NodeData &out)
 {
     // pass through all the other node variables that we don't update as a part of this model calculation

@@ -52,6 +52,7 @@
 #include <string>
 #include <vector>
 
+#include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
@@ -143,10 +144,14 @@ struct CoilCoolingDXCurveFitSpeed
     Real64 RatedOutdoorAirTemp = 35.0;      // 35 C or 95F
     Real64 DryCoilOutletHumRatioMin = 0.00001; // dry coil outlet minimum hum ratio kgH2O/kgdry air
 
+    // flow per capacity values, they will be overridden with alternate values later if it is 100% OA coil
+    Real64 minRatedVolFlowPerRatedTotCap = DataHVACGlobals::MinRatedVolFlowPerRatedTotCap1;
+    Real64 maxRatedVolFlowPerRatedTotCap = DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap1;
+
     void CalcSpeedOutput(
         const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &fanOpMode, Real64 condInletTemp);
-    void size(int const speedNum, int const maxSpeeds);
-    Real64 CalcBypassFactor(Real64 tdb, Real64 w, Real64 h, Real64 p);
+    void size(int speedNum, int maxSpeeds);
+    Real64 CalcBypassFactor(Real64 tdb, Real64 w, Real64 q, Real64 shr, Real64 h, Real64 p);
 
 private:
     bool processCurve(const std::string& curveName,

@@ -149,6 +149,9 @@ struct CoilCoolingDX
     bool isSecondaryDXCoilInZone = false;
     Real64 secCoilSensHeatRejEnergyRate = 0.0;
     Real64 secCoilSensHeatRejEnergy = 0.0;
+
+    void setToHundredPercentDOAS();
+    bool isHundredPercentDOAS = false;
 };
 
 extern std::vector<CoilCoolingDX> coilCoolingDXs;
