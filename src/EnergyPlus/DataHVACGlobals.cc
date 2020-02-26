@@ -197,7 +197,7 @@ namespace DataHVACGlobals {
                                         "AirLoopHVAC:UnitarySystem"});
 
     // parameters describing coil types
-    int const NumAllCoilTypes(34);
+    int const NumAllCoilTypes(35);
 
     int const CoilDX_CoolingSingleSpeed(1);
     int const CoilDX_HeatingEmpirical(2);
@@ -240,6 +240,8 @@ namespace DataHVACGlobals {
     int const CoilVRF_FluidTCtrl_Cooling(33);
     int const CoilVRF_FluidTCtrl_Heating(34);
 
+    int const CoilDX_Cooling(35);
+
     Array1D_string const cAllCoilTypes(NumAllCoilTypes,
                                        {"Coil:Cooling:DX:SingleSpeed",
                                         "Coil:Heating:DX:SingleSpeed",
@@ -274,7 +276,8 @@ namespace DataHVACGlobals {
                                         "Coil:Heating:DX:VariableSpeed",
                                         "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed",
                                         "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl",
-                                        "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl"});
+                                        "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl",
+                                        "Coil:Cooling:DX"});
 
     Array1D_string const cCoolingCoilTypes(NumAllCoilTypes,
                                            {"Coil:Cooling:DX:SingleSpeed",
@@ -310,7 +313,8 @@ namespace DataHVACGlobals {
                                             "",
                                             "",
                                             "Coil:Cooling:DX:VariableRefrigerantFlow:FluidTemperatureControl",
-                                            ""});
+                                            "",
+                                            "Coil:Cooling:DX"});
 
     Array1D_string const cHeatingCoilTypes(NumAllCoilTypes,
                                            {"",
@@ -346,7 +350,8 @@ namespace DataHVACGlobals {
                                             "Coil:Heating:DX:VariableSpeed",
                                             "Coil:WaterHeating:AirToWaterHeatPump:VariableSpeed",
                                             "",
-                                            "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl"});
+                                            "Coil:Heating:DX:VariableRefrigerantFlow:FluidTemperatureControl",
+                                            ""});
 
     // Water to air HP coil types
     int const WatertoAir_Simple(1);
@@ -497,12 +502,12 @@ namespace DataHVACGlobals {
     Real64 deviationFromSetPtThresholdHtg(-0.2); // heating threshold for reporting setpoint deviation
     Real64 deviationFromSetPtThresholdClg(0.2);  // cooling threshold for reporting setpoint deviation
 
-    bool SimAirLoopsFlag;          // True when the air loops need to be (re)simulated
-    bool SimElecCircuitsFlag;      // True when electic circuits need to be (re)simulated
-    bool SimPlantLoopsFlag;        // True when the main plant loops need to be (re)simulated
-    bool SimZoneEquipmentFlag;     // True when zone equipment components need to be (re)simulated
-    bool SimNonZoneEquipmentFlag;  // True when non-zone equipment components need to be (re)simulated
-    bool ZoneMassBalanceHVACReSim; // True when zone air mass flow balance and air loop needs (re)simulated
+    bool SimAirLoopsFlag;                  // True when the air loops need to be (re)simulated
+    bool SimElecCircuitsFlag;              // True when electic circuits need to be (re)simulated
+    bool SimPlantLoopsFlag;                // True when the main plant loops need to be (re)simulated
+    bool SimZoneEquipmentFlag;             // True when zone equipment components need to be (re)simulated
+    bool SimNonZoneEquipmentFlag;          // True when non-zone equipment components need to be (re)simulated
+    bool ZoneMassBalanceHVACReSim;         // True when zone air mass flow balance and air loop needs (re)simulated
     int MinAirLoopIterationsAfterFirst(1); // minimum number of HVAC iterations after FirstHVACIteration
 
     int const NumZoneHVACTerminalTypes(37);

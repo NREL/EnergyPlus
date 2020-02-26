@@ -3191,6 +3191,113 @@ namespace OutputProcessor {
         EXPECT_EQ("Site Outdoor Air Drybulb Temperature", DDVariableTypes(1).VarNameOnly);
     }
 
+
+
+    TEST_F(EnergyPlusFixture, OutputProcessor_setupOutputVariable_endUseSubKey)
+    {
+        std::string const idf_objects = delimited_string({
+            "Output:Variable,*,Chiller Electric Energy,runperiod;",
+            "Output:Variable,*,Lights Electric Energy,runperiod;",
+            "Output:Variable,*,Environmental Impact Fuel Oil #2 CO2 Emissions Mass,runperiod;",
+        });
+
+        ASSERT_TRUE(process_idf(idf_objects));
+
+        GetReportVariableInput(OutputFiles::getSingleton());
+
+        Real64 cooling_consumption = 0.;
+        SetupOutputVariable("Chiller Electric Energy",
+                            OutputProcessor::Unit::J,
+                            cooling_consumption,
+                            "System",
+                            "Sum",
+                            "Cool-1",
+                            _,
+                            "ELECTRICITY",
+                            "Cooling",
+                            _,                        // EndUseSubKey
+                            "Plant");
+
+
+        Real64 light_consumption = 0.;
+        SetupOutputVariable("Lights Electric Energy",
+                            OutputProcessor::Unit::J,
+                            light_consumption,
+                            "Zone",
+                            "Sum",
+                            "LIGHTS 1",
+                            _,
+                            "Electricity",
+                            "InteriorLights",
+                            "RailroadCrossing",    // EndUseSubKey
+                            "Building",
+                            "SPACE1-1",
+                            1,
+                            1);
+
+        Real64 fuel_oil_co2 = 0.;
+        SetupOutputVariable("Environmental Impact Fuel Oil #2 CO2 Emissions Mass",
+                            OutputProcessor::Unit::kg,
+                            fuel_oil_co2,
+                            "System",
+                            "Sum",
+                            "Site",
+                            _,
+                            "CO2",
+                            "FuelOil#2Emissions",
+                            _,                    // EndUseSubKey
+                            "");     
+
+        int found;
+
+        // Cooling
+        // testing an ABUPS end use with no sub end use specified
+        EXPECT_EQ(1, EndUseCategory(2).NumSubcategories); 
+        EXPECT_EQ("General", EndUseCategory(2).SubcategoryName(1)); 
+
+        found = UtilityRoutines::FindItem("Cooling:Electricity", EnergyMeters);
+        EXPECT_NE(0, found);
+        EXPECT_EQ("Electricity", EnergyMeters(found).ResourceType);
+        EXPECT_EQ("Cooling", EnergyMeters(found).EndUse);
+        EXPECT_EQ("", EnergyMeters(found).EndUseSub);
+
+        found = UtilityRoutines::FindItem("General:Cooling:Electricity", EnergyMeters);
+        EXPECT_NE(0, found);
+        EXPECT_EQ("Electricity", EnergyMeters(found).ResourceType);
+        EXPECT_EQ("Cooling", EnergyMeters(found).EndUse);
+        EXPECT_EQ("General", EnergyMeters(found).EndUseSub);
+
+        // lighting
+        // testing an ABUPS end use with a sub end use specified
+        EXPECT_EQ(1, EndUseCategory(3).NumSubcategories); // lighting end use
+        EXPECT_EQ("RailroadCrossing", EndUseCategory(3).SubcategoryName(1)); 
+
+        found = UtilityRoutines::FindItem("InteriorLights:Electricity", EnergyMeters);
+        EXPECT_NE(0, found);
+        EXPECT_EQ("Electricity", EnergyMeters(found).ResourceType);
+        EXPECT_EQ("InteriorLights", EnergyMeters(found).EndUse);
+        EXPECT_EQ("", EnergyMeters(found).EndUseSub);
+
+        found = UtilityRoutines::FindItem("General:InteriorLights:Electricity", EnergyMeters);
+        EXPECT_EQ(0, found);   // should not find this
+
+        found = UtilityRoutines::FindItem("RailroadCrossing:InteriorLights:Electricity", EnergyMeters);
+        EXPECT_NE(0, found);
+        EXPECT_EQ("Electricity", EnergyMeters(found).ResourceType);
+        EXPECT_EQ("InteriorLights", EnergyMeters(found).EndUse);
+        EXPECT_EQ("RailroadCrossing", EnergyMeters(found).EndUseSub);
+
+        // fuel oil CO2 emissions
+        // testing a non-ABUPS end use with no sub end use specified
+        found = UtilityRoutines::FindItem("FuelOil#2Emissions:CO2", EnergyMeters);
+        EXPECT_NE(0, found);
+        EXPECT_EQ("CO2", EnergyMeters(found).ResourceType);
+        EXPECT_EQ("FuelOil#2Emissions", EnergyMeters(found).EndUse);
+        EXPECT_EQ("", EnergyMeters(found).EndUseSub);
+    }
+
+
+
     TEST_F(SQLiteFixture, OutputProcessor_setupOutputVariable_star)
     {
         std::string const idf_objects = delimited_string({"Output:Variable,*,Boiler Gas Rate,runperiod;"});
@@ -4447,7 +4554,7 @@ namespace OutputProcessor {
 
         compare_eso_stream(delimited_string({
             "7,1,,Zone Ideal Loads Supply Air Total Heating Energy [J] !Each Call",
-            "44,11,,Zone Ideal Loads Supply Air Total Heating Energy [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
+            "56,11,,Zone Ideal Loads Supply Air Total Heating Energy [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
             "2,365,12,31, 0,24,10.00,20.00,Tuesday",
             "7,1.1",
             "2,365,12,31, 0,24,20.00,30.00,Tuesday",
@@ -4461,7 +4568,7 @@ namespace OutputProcessor {
             "2,365,12,31, 0,24,60.00,70.00,Tuesday",
             "7,2.2",
             "5,365",
-            "44,9.7,1.1,12,31,24,20,2.2,12,31,24,70",
+            "56,9.7,1.1,12,31,24,20,2.2,12,31,24,70",
         }));
 
         ResetAccumulationWhenWarmupComplete();
@@ -4484,7 +4591,7 @@ namespace OutputProcessor {
             "2,365,12,31, 0,24,10.00,20.00,Tuesday",
             "7,200.0",
             "5,365",
-            "44,300.0,100.0,12,31,24,10,200.0,12,31,24,20",
+            "56,300.0,100.0,12,31,24,10,200.0,12,31,24,20",
         }));
     }
     TEST_F(EnergyPlusFixture, OutputProcessor_GenOutputVariablesAuditReport)
@@ -4919,7 +5026,6 @@ namespace OutputProcessor {
 
         EXPECT_EQ(" [swamps/county]", unitStringFromDDitem(9));
     }
-
 } // namespace OutputProcessor
 
 } // namespace EnergyPlus
