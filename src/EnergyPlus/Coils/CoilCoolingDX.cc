@@ -729,6 +729,7 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
             dummyCondInlet.OutAirWetBulb = ratedOutdoorAirWetBulb;
             dummyCondInlet.Press = condInletNode.Press; // for now; TODO: Investigate
 
+            // overriding outdoor conditions temporarily
             Real64 holdOutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
             Real64 holdOutHumRat = DataEnvironment::OutHumRat;
             Real64 holdOutWetBulb = DataEnvironment::OutWetBulbTemp;
@@ -736,17 +737,15 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
             DataEnvironment::OutDryBulbTemp = RatedOutdoorAirTemp;
             DataEnvironment::OutWetBulbTemp = ratedOutdoorAirWetBulb;
             DataEnvironment::OutBaroPress = DataEnvironment::StdPressureSeaLevel; // assume rating is for sea level.
-            DataEnvironment::OutHumRat =
-                    Psychrometrics::PsyWFnTdbTwbPb(RatedOutdoorAirTemp, ratedOutdoorAirWetBulb, DataEnvironment::StdPressureSeaLevel, "Coil:Cooling:DX::simulate");
+            DataEnvironment::OutHumRat = Psychrometrics::PsyWFnTdbTwbPb(RatedOutdoorAirTemp, ratedOutdoorAirWetBulb, DataEnvironment::StdPressureSeaLevel, "Coil:Cooling:DX::simulate");
 
-            // do I need to override outdoor conditions as well?  If so then that's gross.
             this->performance.simulate(dummyEvapInlet, dummyEvapOutlet, false, dummyPLR, dummySpeedNum, dummySpeedRatio, dummyFanOpMode, dummyCondInlet, dummyCondOutlet);
 
+            // reset outdoor conditions back to previous state
             DataEnvironment::OutDryBulbTemp = holdOutDryBulbTemp;
             DataEnvironment::OutWetBulbTemp = holdOutWetBulb;
             DataEnvironment::OutBaroPress = holdOutBaroPress;
             DataEnvironment::OutHumRat = holdOutHumRat;
-
 
             Real64 const coolingRate = dummyEvapInlet.MassFlowRate * (dummyEvapInlet.Enthalpy - dummyEvapOutlet.Enthalpy);
             Real64 const thisMinAirHumRat = min(dummyEvapInlet.HumRat, dummyEvapOutlet.HumRat);
@@ -754,8 +753,8 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
             Real64 const ratedOutletWetBulb = Psychrometrics::PsyTwbFnTdbWPb(dummyEvapOutlet.Temp, dummyEvapOutlet.HumRat, DataEnvironment::StdPressureSeaLevel, "Coil:Cooling:DX::simulate");
             coilSelectionReportObj->setRatedCoilConditions(this->name,
                                                            coilCoolingDXObjectName,
-                                                           coolingRate, // this is the report variable
-                                                           sensCoolingRate,  // this is the report variable
+                                                           coolingRate,
+                                                           sensCoolingRate,
                                                            ratedInletEvapMassFlowRate,
                                                            RatedInletAirTemp,
                                                            dummyInletAirHumRat,
@@ -765,8 +764,7 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
                                                            ratedOutletWetBulb,
                                                            RatedOutdoorAirTemp,
                                                            ratedOutdoorAirWetBulb,
-                                                           this->performance.normalMode.speeds.back().RatedCBF, // TODO: DXCoil(DXCoilNum).RatedCBF(Mode),
-                                                           -999.0); // coil effectiveness not define for DX
+                                                           this->performance.normalMode.speeds.back().RatedCBF, -999.0);
 
             this->reportCoilFinalSizes = false;
         }
