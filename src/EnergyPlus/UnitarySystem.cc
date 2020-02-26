@@ -7117,7 +7117,7 @@ namespace UnitarySystems {
 
         if ((CoilType_Num == DataHVACGlobals::Coil_HeatingGasOrOtherFuel) || (CoilType_Num == DataHVACGlobals::Coil_HeatingElectric)) {
             HeatingCoils::SimulateHeatingCoilComponents(
-                CompName, FirstHVACIteration, 0.0, this->m_SuppHeatCoilIndex, _, _, this->m_FanOpMode, this->m_SuppHeatPartLoadFrac);
+                CompName, FirstHVACIteration, _, this->m_SuppHeatCoilIndex, _, _, this->m_FanOpMode, this->m_SuppHeatPartLoadFrac);
 
         } else if (CoilType_Num == DataHVACGlobals::Coil_HeatingDesuperheater) {
             HeatingCoils::SimulateHeatingCoilComponents(
@@ -10258,11 +10258,7 @@ namespace UnitarySystems {
                 PackagedThermalStorageCoil::SimTESCoil(CompName, this->m_CoolingCoilIndex, this->m_FanOpMode, this->m_TESOpMode, PartLoadRatio);
             }
         }
-        if (this->m_CoolingSpeedNum == 1) {
-            this->m_CoolingPartLoadFrac = PartLoadRatio;
-        } else {
-            this->m_CoolingPartLoadFrac = 1.0;
-        }
+        this->m_CoolingPartLoadFrac = PartLoadRatio;
     }
 
     void UnitarySys::calcUnitaryHeatingSystem(int const AirLoopNum,           // index to air loop
