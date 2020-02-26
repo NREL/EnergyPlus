@@ -456,7 +456,7 @@ void CoilCoolingDX::oneTimeInit() {
                             OutputProcessor::Unit::J,
                             this->performance.compressorFuelConsumption,
                             "System",
-                            "Sun",
+                            "Sum",
                             this->name);
     }
 
