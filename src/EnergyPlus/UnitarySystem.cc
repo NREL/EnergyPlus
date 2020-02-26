@@ -10259,11 +10259,7 @@ namespace UnitarySystems {
                 PackagedThermalStorageCoil::SimTESCoil(CompName, this->m_CoolingCoilIndex, this->m_FanOpMode, this->m_TESOpMode, PartLoadRatio);
             }
         }
-        if (this->m_CoolingSpeedNum <= 1) {
-            this->m_CoolingPartLoadFrac = PartLoadRatio;
-        } else {
-            this->m_CoolingPartLoadFrac = 1.0;
-        }
+        this->m_CoolingPartLoadFrac = PartLoadRatio;
     }
 
     void UnitarySys::calcUnitaryHeatingSystem(int const AirLoopNum,           // index to air loop
