@@ -48,7 +48,6 @@
 
 #include <utility>
 
-#include <EnergyPlus/Coils/CoilCoolingDXCurveFitOperatingMode.hh>
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitSpeed.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
@@ -314,7 +313,7 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(const std::string& name_t
     }
 }
 
-void CoilCoolingDXCurveFitSpeed::size()
+void CoilCoolingDXCurveFitSpeed::size(int const speedNum, int const maxSpeeds)
 {
 
     std::string RoutineName = "sizeSpeed";
@@ -335,17 +334,29 @@ void CoilCoolingDXCurveFitSpeed::size()
     std::string CompName = this->parentName;
 
     int SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
-    std::string SizingString = "Rated Air Flow Rate [m3/s]";
-    ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, this->evap_air_flow_rate, PrintFlag, RoutineName);
+    std::string preFixString = "";
+    if (maxSpeeds > 1) preFixString = "Speed " + std::to_string(speedNum + 1) + " ";
+    std::string SizingString = preFixString + "Rated Air Flow Rate [m3/s]";
+    DataSizing::DataConstantUsedForSizing = this->original_input_specs.evaporator_air_flow_fraction;
+    Real64 tempSize = this->evap_air_flow_rate;
+    if (this->ratedEvapAirFlowRateIsAutosized) tempSize = DataSizing::AutoSize;
+
+    ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, tempSize, PrintFlag, RoutineName);
+    this->evap_air_flow_rate = tempSize;
 
     SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
-    SizingString = "Gross Cooling Capacity [W]";
-    ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, this->rated_total_capacity, PrintFlag, RoutineName);
+    SizingString = preFixString + "Gross Cooling Capacity [W]";
+    DataSizing::DataConstantUsedForSizing = this->original_input_specs.gross_rated_total_cooling_capacity_ratio_to_nominal;
+    tempSize = this->rated_total_capacity;
+    if (this->ratedGrossTotalCapIsAutosized) tempSize = DataSizing::AutoSize;
+
+    ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, tempSize, PrintFlag, RoutineName);
+    this->rated_total_capacity = tempSize;
 
      //  DataSizing::DataEMSOverrideON = DXCoil( DXCoilNum ).RatedSHREMSOverrideOn( Mode );
     //  DataSizing::DataEMSOverride = DXCoil( DXCoilNum ).RatedSHREMSOverrideValue( Mode );
     SizingMethod = DataHVACGlobals::CoolingSHRSizing;
-    SizingString = "Gross Sensible Heat Ratio";
+    SizingString = preFixString + "Gross Sensible Heat Ratio";
     DataSizing::DataFlowUsedForSizing = this->evap_air_flow_rate;
     DataSizing::DataCapacityUsedForSizing = this->rated_total_capacity;
     ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, this->grossRatedSHR, PrintFlag, RoutineName);
@@ -359,6 +370,9 @@ void CoilCoolingDXCurveFitSpeed::size()
                                       Psychrometrics::PsyHFnTdbW(RatedInletAirTemp, RatedInletAirHumRat),
                                       DataEnvironment::StdPressureSeaLevel);
     this->RatedEIR = 1.0 / this->original_input_specs.gross_rated_cooling_COP;
+
+    // reset for next speed or coil
+    DataSizing::DataConstantUsedForSizing = 0.0;
 }
 
 void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(
@@ -485,15 +499,15 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(
         EIRFlowModFac = CurveManager::CurveValue(indexEIRFFF, AirFF);
     }
 
-    Real64 wastHeatempModFac = 1.0; // waste heat fraction as a function of temperature curve result
+    Real64 wasteHeatTempModFac = 1.0; // waste heat fraction as a function of temperature curve result
     if (indexWHFT > 0) {
-        wastHeatempModFac = CurveManager::CurveValue(indexWHFT, condInletTemp, inletNode.Temp);
+        wasteHeatTempModFac = CurveManager::CurveValue(indexWHFT, condInletTemp, inletNode.Temp);
     }
 
     Real64 EIR = RatedEIR * EIRFlowModFac * EIRTempModFac;
     RTF = _PLR / PLF;
     fullLoadPower = TotCap * EIR;
-    fullLoadWasteHeat = ratedWasteHeatFractionOfPowerInput * wastHeatempModFac * fullLoadPower;
+    fullLoadWasteHeat = ratedWasteHeatFractionOfPowerInput * wasteHeatTempModFac * fullLoadPower;
 
     outletNode.Enthalpy = inletNode.Enthalpy - hDelta;
     Real64 hTinwout = inletNode.Enthalpy - ((1.0 - SHR) * hDelta);

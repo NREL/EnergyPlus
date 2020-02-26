@@ -68,7 +68,7 @@ struct CoilCoolingDXCurveFitPerformanceInputSpecification
     Real64 unit_internal_static_air_pressure;
     Real64 basin_heater_capacity;
     Real64 basin_heater_setpoint_temperature;
-    std::string basin_heater_operating_shedule_name;
+    std::string basin_heater_operating_schedule_name;
     int compressor_fuel_type;
     std::string base_operating_mode_name;
     std::string alternate_operating_mode_name;
@@ -99,9 +99,7 @@ struct CoilCoolingDXCurveFitPerformance
                    int &fanOpMode,
                    DataLoopNode::NodeData &condInletNode,
                    DataLoopNode::NodeData &condOutletNode);
-    void calcStandardRatings(
-        int supplyFanIndex, int supplyFanType, std::string const &supplyFanName, int condInletNodeIndex, EnergyPlus::OutputFiles &outputFiles);
-    Real64 calcIEERResidual(Real64 const SupplyAirMassFlowRate, std::vector<Real64> const &Par);
+    void calcStandardRatings210240();
     CoilCoolingDXCurveFitPerformanceInputSpecification original_input_specs;
     CoilCoolingDXCurveFitPerformance() = default;
     explicit CoilCoolingDXCurveFitPerformance(const std::string &name);
@@ -115,6 +113,9 @@ struct CoilCoolingDXCurveFitPerformance
     Real64 maxOutdoorDrybulbForBasin = 0.0;
     Real64 unitStatic = 0.0;
     bool mySizeFlag = true;
+    int compressorFuelType = 0;
+    Real64 compressorFuelRate;
+    Real64 compressorFuelConsumption;
 
     enum CapControlMethod
     {
@@ -133,6 +134,12 @@ struct CoilCoolingDXCurveFitPerformance
     Real64 RTF = 0.0;
     bool oneTimeEIOHeaderWrite = true;
     Real64 wasteHeatRate = 0.0;
+
+    // standard rating stuff -- for now just 210/240
+    Real64 standardRatingCoolingCapacity = 0.0;
+    Real64 standardRatingSEER = 0.0;
+    Real64 standardRatingEER = 0.0;
+    Real64 standardRatingIEER = 0.0;
 
     CoilCoolingDXCurveFitOperatingMode normalMode;
     bool hasAlternateMode = false;

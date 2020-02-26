@@ -62,8 +62,11 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ReportCoilSelection.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/WaterManager.hh>
@@ -78,6 +81,7 @@ namespace EnergyPlus {
     std::vector<CoilCoolingDX> coilCoolingDXs;
     bool coilCoolingDXGetInputFlag = true;
     std::string const coilCoolingDXObjectName = "Coil:Cooling:DX";
+    bool stillNeedToReportStandardRatings = true;
 }
 
 int CoilCoolingDX::factory(std::string const & coilName) {
@@ -99,6 +103,7 @@ int CoilCoolingDX::factory(std::string const & coilName) {
 void CoilCoolingDX::clear_state() {
     coilCoolingDXs.clear();
     coilCoolingDXGetInputFlag = true;
+    stillNeedToReportStandardRatings = true;
 }
 
 void CoilCoolingDX::getInput() {
@@ -203,10 +208,16 @@ void CoilCoolingDX::instantiateFromInputSpec(const CoilCoolingDXInputSpecificati
     } else {
         this->availScheduleIndex = ScheduleManager::GetScheduleIndex(input_data.availability_schedule_name);
     }
+
     if (this->availScheduleIndex == 0) {
         ShowSevereError(routineName + coilCoolingDXObjectName + "=\"" + this->name + "\", invalid");
         ShowContinueError("...Availability Schedule Name=\"" + input_data.availability_schedule_name + "\".");
         errorsFound = true;
+    }
+
+    if (!input_data.condenser_zone_name.empty()) {
+        this->isSecondaryDXCoilInZone = true;
+        // Setup zone data here
     }
 
     BranchNodeConnections::TestCompSet(
@@ -329,7 +340,18 @@ void CoilCoolingDX::oneTimeInit() {
         "System",
         "Average",
         this->name);
-
+    SetupOutputVariable("Cooling Coil Waste Heat Power",
+        OutputProcessor::Unit::W,
+        this->wasteHeatEnergyRate,
+        "System",
+        "Average",
+        this->name);
+    SetupOutputVariable("Cooling Coil Waste Heat Energy",
+                        OutputProcessor::Unit::J,
+                        this->wasteHeatEnergy,
+                        "System",
+                        "Sum",
+                        this->name);
 
     if (this->performance.evapCondBasinHeatCap > 0) {
         SetupOutputVariable("Cooling Coil Basin Heater Electric Power",
@@ -407,6 +429,81 @@ void CoilCoolingDX::oneTimeInit() {
                             "System");
     }
 
+    if (this->isSecondaryDXCoilInZone) {
+        SetupOutputVariable("Secondary Coil Heat Rejection Rate",
+                            OutputProcessor::Unit::W,
+                            this->secCoilSensHeatRejEnergyRate,
+                            "System",
+                            "Average",
+                            this->name);
+
+        SetupOutputVariable("Secondary Coil Heat Rejection Energy",
+                            OutputProcessor::Unit::J,
+                            this->secCoilSensHeatRejEnergy,
+                            "System",
+                            "Sum",
+                            this->name);
+    }
+
+    if (this->performance.compressorFuelType != DataGlobalConstants::iRT_Electricity) {
+        SetupOutputVariable("Cooling Coil " + DataGlobalConstants::GetResourceTypeChar(this->performance.compressorFuelType) + " Rate",
+                            OutputProcessor::Unit::W,
+                            this->performance.compressorFuelRate,
+                            "System",
+                            "Average",
+                            this->name);
+        SetupOutputVariable("Cooling Coil " + DataGlobalConstants::GetResourceTypeChar(this->performance.compressorFuelType) + " Energy",
+                            OutputProcessor::Unit::J,
+                            this->performance.compressorFuelConsumption,
+                            "System",
+                            "Sun",
+                            this->name);
+    }
+
+    // HPWH and/or VRF output variables
+
+    //    SetupOutputVariable("Cooling Coil VRF Super Heating Degrees",
+    //                        OutputProcessor::Unit::C,
+    //                        this->secCoilSensHeatRejEnergy,
+    //                        "System",
+    //                        "Sum",
+    //                        this->name);
+
+    //    SetupOutputVariable("Cooling Coil VRF Evaporating Temperature",
+    //                        OutputProcessor::Unit::C,
+    //                        this->secCoilSensHeatRejEnergy,
+    //                        "System",
+    //                        "Average",
+    //                        this->name);
+
+    //    SetupOutputVariable("Cooling Coil Water Heating Electric Power",
+    //                        OutputProcessor::Unit::W,
+    //                        this->secCoilSensHeatRejEnergy,
+    //                        "System",
+    //                        "Sum",
+    //                        this->name);
+
+    //    SetupOutputVariable("Cooling Coil Water Heating Electric Energy",
+    //                        OutputProcessor::Unit::J,
+    //                        this->secCoilSensHeatRejEnergy,
+    //                        "System",
+    //                        "Average",
+    //                        this->name);
+
+    //    SetupOutputVariable("Cooling Coil Total Water Heating Rate",
+    //                        OutputProcessor::Unit::W,
+    //                        this->secCoilSensHeatRejEnergy,
+    //                        "System",
+    //                        "Sum",
+    //                        this->name);
+
+    //    SetupOutputVariable("Cooling Coil Total Water Heating Energy",
+    //                        OutputProcessor::Unit::J,
+    //                        this->secCoilSensHeatRejEnergy,
+    //                        "System",
+    //                        "Average",
+    //                        this->name);
+
 }
 
 void CoilCoolingDX::setData(int fanIndex, int fanType, std::string const &fanName, int _airLoopNum) {
@@ -473,14 +570,6 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
     // TODO: check the minOATcompressor and reset data/pass through data as needed
     this->performance.simulate(evapInletNode, evapOutletNode, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
     EnergyPlus::CoilCoolingDX::passThroughNodeData(evapInletNode, evapOutletNode);
-
-    // after we have made a call to simulate, the component should be fully sized, so we can report standard ratings
-    // call that here, and THEN set the one time init flag to false
-    if (!DataGlobals::SysSizingCalc && !DataGlobals::WarmupFlag && this->doStandardRatingFlag) {
-        //TODO: Re-add this carefully
-        // this->performance.calcStandardRatings(this->supplyFanIndex, this->supplyFanType, this->supplyFanName, this->condInletNodeIndex);
-        this->doStandardRatingFlag = false;
-    }
 
     // calculate energy conversion factor
     Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
@@ -553,6 +642,12 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
     this->speedNumReport = speedNum;
     this->speedRatioReport = speedRatio;
 
+    if (this->isSecondaryDXCoilInZone) {
+        // call CalcSecondaryDXCoils ???
+        this->secCoilSensHeatRejEnergyRate = this->totalCoolingEnergyRate + this->elecCoolingPower;
+        this->secCoilSensHeatRejEnergy = this->totalCoolingEnergy + this->elecCoolingConsumption;
+    }
+
     // Fishy global things that need to be set here, try to set the AFN stuff now
     // This appears to be the only location where airLoopNum gets used
     //DataAirLoop::LoopDXCoilRTF = max(this->coolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
@@ -563,6 +658,109 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
         // The original calculation is below, but no heating yet
         //        max(DXCoil(DXCoilNum).CoolingCoilRuntimeFraction, DXCoil(DXCoilNum).HeatingCoilRuntimeFraction);
     }
+
+    // report out to the coil sizing report if needed
+    if (this->reportCoilFinalSizes) {
+        if (!DataGlobals::WarmupFlag && !DataGlobals::DoingHVACSizingSimulations && !DataGlobals::DoingSizing) {
+
+            // report out final coil sizing info
+            Real64 ratedSensCap(0.0);
+            ratedSensCap = this->performance.normalMode.ratedGrossTotalCap * this->performance.normalMode.speeds.back().grossRatedSHR;
+            coilSelectionReportObj->setCoilFinalSizes(this->name,
+                                                      coilCoolingDXObjectName,
+                                                      this->performance.normalMode.ratedGrossTotalCap,
+                                                      ratedSensCap,
+                                                      this->performance.normalMode.ratedEvapAirFlowRate,
+                                                      -999.0);
+
+            // report out fan information
+            if (this->supplyFanType > 0 && this->supplyFanIndex > -1) { // TODO: Seems wrong, should check type first because 0 is only valid for system model right?
+                if (this->supplyFanType == DataHVACGlobals::FanType_SystemModelObject) {
+                    coilSelectionReportObj->setCoilSupplyFanInfo(this->name,
+                                                                 coilCoolingDXObjectName,
+                                                                 HVACFan::fanObjs[this->supplyFanIndex]->name,
+                                                                 DataAirSystems::objectVectorOOFanSystemModel,
+                                                                 this->supplyFanIndex);
+                } else {
+                    coilSelectionReportObj->setCoilSupplyFanInfo(this->name,
+                                                                 coilCoolingDXObjectName,
+                                                                 Fans::Fan(this->supplyFanIndex).FanName,
+                                                                 DataAirSystems::structArrayLegacyFanModels,
+                                                                 this->supplyFanIndex);
+                }
+            }
+
+            // report out coil rating conditions, just create a set of dummy nodes and run calculate on them
+            DataLoopNode::NodeData dummyEvapInlet;
+            DataLoopNode::NodeData dummyEvapOutlet;
+            DataLoopNode::NodeData dummyCondInlet;
+            DataLoopNode::NodeData dummyCondOutlet;
+            Real64 dummyPLR = 1.0;
+            int dummySpeedNum = 1;
+            Real64 dummySpeedRatio = 1.0;
+            int dummyFanOpMode = 1.0;
+
+            Real64 const RatedInletAirTemp(26.6667);        // 26.6667C or 80F
+            Real64 const RatedInletWetBulbTemp(19.44);      // 19.44 or 67F
+            Real64 const RatedOutdoorAirTemp(35.0);         // 35 C or 95F
+            Real64 ratedOutdoorAirWetBulb = 23.9; // from I/O ref. more precise value?
+
+            Real64 ratedInletEvapMassFlowRate = this->performance.normalMode.ratedEvapAirMassFlowRate;
+            dummyEvapInlet.MassFlowRate = ratedInletEvapMassFlowRate;
+            dummyEvapInlet.Temp = RatedInletAirTemp;
+            Real64 dummyInletAirHumRat = Psychrometrics::PsyWFnTdbTwbPb(RatedInletAirTemp, RatedInletWetBulbTemp, DataEnvironment::StdPressureSeaLevel, "Coil:Cooling:DX::simulate");
+            dummyEvapInlet.HumRat = dummyInletAirHumRat;
+            dummyEvapInlet.Enthalpy = Psychrometrics::PsyHFnTdbW(RatedInletAirTemp, dummyInletAirHumRat);
+
+            // maybe we don't actually need to override weather below, we'll see
+            dummyCondInlet.Temp = RatedOutdoorAirTemp;
+            dummyCondInlet.HumRat = Psychrometrics::PsyWFnTdbTwbPb(RatedOutdoorAirTemp, ratedOutdoorAirWetBulb, DataEnvironment::StdPressureSeaLevel, "Coil:Cooling:DX::simulate");
+            dummyCondInlet.OutAirWetBulb = ratedOutdoorAirWetBulb;
+            dummyCondInlet.Press = condInletNode.Press; // for now; TODO: Investigate
+
+            Real64 holdOutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
+            Real64 holdOutHumRat = DataEnvironment::OutHumRat;
+            Real64 holdOutWetBulb = DataEnvironment::OutWetBulbTemp;
+            Real64 holdOutBaroPress = DataEnvironment::OutBaroPress;
+            DataEnvironment::OutDryBulbTemp = RatedOutdoorAirTemp;
+            DataEnvironment::OutWetBulbTemp = ratedOutdoorAirWetBulb;
+            DataEnvironment::OutBaroPress = DataEnvironment::StdPressureSeaLevel; // assume rating is for sea level.
+            DataEnvironment::OutHumRat =
+                    Psychrometrics::PsyWFnTdbTwbPb(RatedOutdoorAirTemp, ratedOutdoorAirWetBulb, DataEnvironment::StdPressureSeaLevel, "Coil:Cooling:DX::simulate");
+
+            // do I need to override outdoor conditions as well?  If so then that's gross.
+            this->performance.simulate(dummyEvapInlet, dummyEvapOutlet, false, dummyPLR, dummySpeedNum, dummySpeedRatio, dummyFanOpMode, dummyCondInlet, dummyCondOutlet);
+
+            DataEnvironment::OutDryBulbTemp = holdOutDryBulbTemp;
+            DataEnvironment::OutWetBulbTemp = holdOutWetBulb;
+            DataEnvironment::OutBaroPress = holdOutBaroPress;
+            DataEnvironment::OutHumRat = holdOutHumRat;
+
+
+            Real64 const coolingRate = dummyEvapInlet.MassFlowRate * (dummyEvapInlet.Enthalpy - dummyEvapOutlet.Enthalpy);
+            Real64 const thisMinAirHumRat = min(dummyEvapInlet.HumRat, dummyEvapOutlet.HumRat);
+            Real64 const sensCoolingRate = dummyEvapInlet.MassFlowRate * (Psychrometrics::PsyHFnTdbW(dummyEvapInlet.Temp, thisMinAirHumRat) - Psychrometrics::PsyHFnTdbW(dummyEvapOutlet.Temp, thisMinAirHumRat));
+            Real64 const ratedOutletWetBulb = Psychrometrics::PsyTwbFnTdbWPb(dummyEvapOutlet.Temp, dummyEvapOutlet.HumRat, DataEnvironment::StdPressureSeaLevel, "Coil:Cooling:DX::simulate");
+            coilSelectionReportObj->setRatedCoilConditions(this->name,
+                                                           coilCoolingDXObjectName,
+                                                           coolingRate, // this is the report variable
+                                                           sensCoolingRate,  // this is the report variable
+                                                           ratedInletEvapMassFlowRate,
+                                                           RatedInletAirTemp,
+                                                           dummyInletAirHumRat,
+                                                           RatedInletWetBulbTemp,
+                                                           dummyEvapOutlet.Temp,
+                                                           dummyEvapOutlet.HumRat,
+                                                           ratedOutletWetBulb,
+                                                           RatedOutdoorAirTemp,
+                                                           ratedOutdoorAirWetBulb,
+                                                           this->performance.normalMode.speeds.back().RatedCBF, // TODO: DXCoil(DXCoilNum).RatedCBF(Mode),
+                                                           -999.0); // coil effectiveness not define for DX
+
+            this->reportCoilFinalSizes = false;
+        }
+    }
+
 }
 
 void CoilCoolingDX::passThroughNodeData(EnergyPlus::DataLoopNode::NodeData &in, EnergyPlus::DataLoopNode::NodeData &out)
@@ -575,4 +773,36 @@ void CoilCoolingDX::passThroughNodeData(EnergyPlus::DataLoopNode::NodeData &in, 
     out.MassFlowRateMin = in.MassFlowRateMin;
     out.MassFlowRateMaxAvail = in.MassFlowRateMaxAvail;
     out.MassFlowRateMinAvail = in.MassFlowRateMinAvail;
+}
+
+void CoilCoolingDX::reportAllStandardRatings(OutputFiles &outputFiles) {
+
+    Real64 const ConvFromSIToIP(3.412141633);              // Conversion from SI to IP [3.412 Btu/hr-W]
+    static constexpr auto Format_990("! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
+                                     "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER {Btu/W-h}, IEER {Btu/W-h}\n");
+    print(outputFiles.eio, "{}", Format_990);
+    for (auto & coil : coilCoolingDXs) {
+        coil.performance.calcStandardRatings210240();
+
+        static constexpr auto Format_991(" DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}\n");
+        print(outputFiles.eio, Format_991,
+                "Coil:Cooling:DX", coil.name,
+                coil.performance.standardRatingCoolingCapacity,
+                coil.performance.standardRatingEER,
+                coil.performance.standardRatingEER * ConvFromSIToIP,
+                coil.performance.standardRatingSEER * ConvFromSIToIP,
+                coil.performance.standardRatingIEER * ConvFromSIToIP);
+
+        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilType, coil.name, "Coil:Cooling:DX");
+        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilNetCapSI, coil.name, coil.performance.standardRatingCoolingCapacity, 1);
+        // W/W is the same as Btuh/Btuh so that's fine too
+        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilCOP, coil.name, coil.performance.standardRatingEER, 2);
+        // Btu/W-h will convert to itself
+        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilEERIP, coil.name, coil.performance.standardRatingEER * ConvFromSIToIP, 2);
+        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilSEERIP, coil.name, coil.performance.standardRatingSEER * ConvFromSIToIP, 2);
+        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilIEERIP, coil.name, coil.performance.standardRatingIEER * ConvFromSIToIP, 2);
+        OutputReportPredefined::addFootNoteSubTable(OutputReportPredefined::pdstDXCoolCoil, "ANSI/AHRI ratings account for supply air fan heat and electric power.");
+
+    }
+    stillNeedToReportStandardRatings = false;
 }

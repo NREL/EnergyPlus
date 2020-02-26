@@ -53,6 +53,7 @@
 
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitPerformance.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/OutputFiles.hh>
 
 namespace EnergyPlus {
 
@@ -76,6 +77,7 @@ struct CoilCoolingDX
     static int factory(std::string const &coilName);
     static void getInput();
     static void clear_state();
+    static void reportAllStandardRatings(OutputFiles &outputFiles);
     void instantiateFromInputSpec(const CoilCoolingDXInputSpecification &input_data);
     void oneTimeInit();
     void simulate(bool useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode);
@@ -117,7 +119,6 @@ struct CoilCoolingDX
     int supplyFanIndex = 0;
     int supplyFanType = 0;
     std::string supplyFanName = "";
-    bool doStandardRatingFlag = true;
 
     // report variables
     Real64 totalCoolingEnergyRate = 0.0;
@@ -144,9 +145,14 @@ struct CoilCoolingDX
     Real64 wasteHeatEnergy = 0.0;
     Real64 condenserInletTemperature = 0.0;
     int dehumidificationMode = 0;
+    bool reportCoilFinalSizes = true;
+    bool isSecondaryDXCoilInZone = false;
+    Real64 secCoilSensHeatRejEnergyRate = 0.0;
+    Real64 secCoilSensHeatRejEnergy = 0.0;
 };
 
 extern std::vector<CoilCoolingDX> coilCoolingDXs;
+extern bool stillNeedToReportStandardRatings; // standard ratings flag for all coils to report at the same time
 extern bool coilCoolingDXGetInputFlag;
 extern std::string const coilCoolingDXObjectName;
 

@@ -58,8 +58,8 @@
 // EnergyPlus Headers
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/HVACManager.hh>
-//#include <CoolTower.hh>
 #include <AirflowNetwork/Elements.hpp>
+#include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/DataContaminantBalance.hh>
@@ -1714,6 +1714,12 @@ namespace HVACManager {
         }
         if (SetPointErrorFlag) {
             ShowFatalError("Previous severe set point errors cause program termination");
+        }
+
+        if (stillNeedToReportStandardRatings) {
+            if (!ZoneSizingCalc && !SysSizingCalc && !WarmupFlag) {
+                CoilCoolingDX::reportAllStandardRatings(OutputFiles::getSingleton());
+            }
         }
     }
 

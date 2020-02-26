@@ -2565,6 +2565,12 @@
 
   Output:Variable,*,Cooling Coil Electric Power,timestep;
 
+  Output:Variable,*,Cooling Coil Condenser Inlet Temperature,timestep;
+
+  Output:Variable,*,Heating Coil Heating Rate,timestep;
+
+  Output:Variable,*,Heating Coil Heating Energy,timestep;
+
   Output:Variable,*,Heating Coil Heating Rate,timestep;
 
   Output:Variable,*,Heating Coil Heating Energy,timestep;
