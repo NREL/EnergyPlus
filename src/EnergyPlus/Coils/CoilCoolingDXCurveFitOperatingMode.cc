@@ -52,6 +52,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
@@ -150,6 +151,24 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(const std
     }
 }
 
+void CoilCoolingDXCurveFitOperatingMode::oneTimeInit() {
+    if (DataGlobals::AnyEnergyManagementSystemInModel) {
+        // TODO: Make sure this is documented - it will be slightly different actuator signature, and also for every mode, and also NO SHR EMS ACTUATOR
+        SetupEMSActuator(this->object_name,
+                         this->name,
+                         "Autosized Rated Air Flow Rate",
+                         "[m3/s]",
+                         this->ratedAirVolFlowEMSOverrideON,
+                         this->ratedAirVolFlowEMSOverrideValue);
+        SetupEMSActuator(this->object_name,
+                         this->name,
+                         "Autosized Rated Total Cooling Capacity",
+                         "[W]",
+                         this->ratedTotCapFlowEMSOverrideON,
+                         this->ratedTotCapFlowEMSOverrideValue);
+    }
+}
+
 void CoilCoolingDXCurveFitOperatingMode::size()
 {
 
@@ -159,20 +178,28 @@ void CoilCoolingDXCurveFitOperatingMode::size()
     bool PrintFlag = true;
 
     int SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
+    DataSizing::DataEMSOverrideON = this->ratedAirVolFlowEMSOverrideON;
+    DataSizing::DataEMSOverride = this->ratedAirVolFlowEMSOverrideValue;
     std::string SizingString = "Rated Evaporator Air Flow Rate";
     Real64 TempSize = this->original_input_specs.rated_evaporator_air_flow_rate;
     ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
     this->ratedEvapAirFlowRate = TempSize;
     Real64 const ratedInletAirTemp(26.6667);        // 26.6667C or 80F
     Real64 const ratedInletAirHumRat(0.01125);      // Humidity ratio corresponding to 80F dry bulb/67F wet bulb
+    DataSizing::DataEMSOverrideON = false;
+    DataSizing::DataEMSOverride = 0.0;
     this->ratedEvapAirMassFlowRate = this->ratedEvapAirFlowRate * Psychrometrics::PsyRhoAirFnPbTdbW(
             DataEnvironment::StdBaroPress, ratedInletAirTemp, ratedInletAirHumRat, RoutineName);
 
     SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
+    DataSizing::DataEMSOverrideON = this->ratedTotCapFlowEMSOverrideON;
+    DataSizing::DataEMSOverride = this->ratedTotCapFlowEMSOverrideValue;
     SizingString = "Rated Gross Total Cooling Capacity";
     DataSizing::DataFlowUsedForSizing = this->ratedEvapAirFlowRate; // TODO: This is volume flow, right?
     TempSize = this->original_input_specs.gross_rated_total_cooling_capacity;
     ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+    DataSizing::DataEMSOverrideON = false;
+    DataSizing::DataEMSOverride = 0.0;
     this->ratedGrossTotalCap = TempSize;
 
     SizingMethod = DataHVACGlobals::AutoCalculateSizing;
@@ -182,6 +209,8 @@ void CoilCoolingDXCurveFitOperatingMode::size()
     SizingString = "Rated Condenser Air Flow Rate";
     TempSize = this->original_input_specs.rated_condenser_air_flow_rate;
     ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+    DataSizing::DataConstantUsedForSizing = 0.0;
+    DataSizing::DataFractionUsedForSizing = 0.0;
     this->ratedCondAirFlowRate = TempSize;
     int numSpeeds = this->speeds.size();
     int thisSpeedNum = 0;
@@ -218,7 +247,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(const DataLoopNode::N
             condInletNode.Temp, condInletNode.HumRat, DataEnvironment::StdPressureSeaLevel, "CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode");
     }
     // thisspeed.ambPressure = inletNode.Press;
-    thisspeed.ambPressure = DataEnvironment::OutBaroPress;
+    thisspeed.ambPressure = condInletNode.Press;
     thisspeed.AirMassFlow = inletNode.MassFlowRate;
     if (fanOpMode == DataHVACGlobals::CycFanCycCoil && speedNum == 1) {
         if (PLR > 0.0) {
@@ -230,8 +259,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(const DataLoopNode::N
         thisspeed.AirMassFlow = DataHVACGlobals::MSHPMassFlowRateHigh;
     }
     if (thisspeed.RatedAirMassFlowRate > 0.0) {
-        // TODO: The original two-speed just grabbed the RatedAirMassFlowRate(mode1), not for a specific speed, so that's what I'll do too
-        thisspeed.AirFF = thisspeed.AirMassFlow / this->ratedEvapAirMassFlowRate;  //thisspeed.RatedAirMassFlowRate;
+        thisspeed.AirFF = thisspeed.AirMassFlow / thisspeed.RatedAirMassFlowRate;
     } else {
         thisspeed.AirFF = 0.0;
     }

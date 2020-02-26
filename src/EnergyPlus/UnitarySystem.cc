@@ -2068,7 +2068,7 @@ namespace UnitarySystems {
 
             // it feels like we are jamming the rectangular DXCoil into an oval box here
             MSHPIndex = this->m_DesignSpecMSHPIndex;
-            if (MSHPIndex > 0) {
+            if (MSHPIndex > -1) {
                 for (Iter = designSpecMSHP[MSHPIndex].numOfSpeedCooling; Iter >= 1;
                      --Iter) { // use reverse order since we divide by HeatVolumeFlowRate(max)
                     if (designSpecMSHP[MSHPIndex].coolingVolFlowRatio[Iter - 1] == DataSizing::AutoSize) {
@@ -2094,16 +2094,17 @@ namespace UnitarySystems {
             }
 
             newCoil.size();
-            for (Iter = 1; Iter <= this->m_NumOfSpeedCooling; ++Iter) {
-                // Need to size each speed here, so call once for each speed - probably need to call each mode too when fully implemented?
-                // newCoil.simulate(this->m_DehumidificationMode, this->m_CoolingPartLoadFrac, Iter, this->m_CoolingSpeedRatio, this->m_FanOpMode);
-                this->m_CoolVolumeFlowRate[Iter] = newCoil.performance.normalMode.speeds[Iter - 1].evap_air_flow_rate;
-                this->m_CoolMassFlowRate[Iter] = this->m_CoolVolumeFlowRate[Iter] * DataEnvironment::StdRhoAir;
-                // it seems the ratio should reference the actual flow rates, not the fan flow ???
-                if (this->m_DesignFanVolFlowRate > 0.0 && this->m_FanExists) {
-                    this->m_MSCoolingSpeedRatio[Iter] = this->m_CoolVolumeFlowRate[Iter] / this->m_DesignFanVolFlowRate;
-                } else {
-                    this->m_MSCoolingSpeedRatio[Iter] = this->m_CoolVolumeFlowRate[Iter] / this->m_CoolVolumeFlowRate[this->m_NumOfSpeedCooling];
+            if (MSHPIndex == -1) {
+                for (Iter = 1; Iter <= this->m_NumOfSpeedCooling; ++Iter) {
+                    this->m_CoolVolumeFlowRate[Iter] = newCoil.performance.normalMode.speeds[Iter - 1].evap_air_flow_rate;
+                    this->m_CoolMassFlowRate[Iter] = this->m_CoolVolumeFlowRate[Iter] * DataEnvironment::StdRhoAir;
+                    // it seems the ratio should reference the actual flow rates, not the fan flow ???
+                    if (this->m_DesignFanVolFlowRate > 0.0 && this->m_FanExists) {
+                        this->m_MSCoolingSpeedRatio[Iter] = this->m_CoolVolumeFlowRate[Iter] / this->m_DesignFanVolFlowRate;
+                    }
+                    else {
+                        this->m_MSCoolingSpeedRatio[Iter] = this->m_CoolVolumeFlowRate[Iter] / this->m_CoolVolumeFlowRate[this->m_NumOfSpeedCooling];
+                    }
                 }
             }
 
@@ -2111,7 +2112,14 @@ namespace UnitarySystems {
             EqSizing.DesCoolingLoad = DataSizing::DXCoolCap;
             if (this->m_HeatPump) EqSizing.DesHeatingLoad = DataSizing::DXCoolCap;
 
-            if (MSHPIndex > 0) {
+            if (MSHPIndex > -1) {
+                for (Iter = designSpecMSHP[MSHPIndex].numOfSpeedCooling; Iter > 0; --Iter) {
+                    if (designSpecMSHP[MSHPIndex].coolingVolFlowRatio[Iter - 1] == DataSizing::AutoSize)
+                        designSpecMSHP[MSHPIndex].coolingVolFlowRatio[Iter - 1] = double(Iter) / double(designSpecMSHP[MSHPIndex].numOfSpeedCooling);
+                    this->m_CoolVolumeFlowRate[Iter] = this->m_MaxCoolAirVolFlow * designSpecMSHP[MSHPIndex].coolingVolFlowRatio[Iter - 1];
+                    this->m_CoolMassFlowRate[Iter] = this->m_CoolVolumeFlowRate[Iter] * DataEnvironment::StdRhoAir;
+                    this->m_MSCoolingSpeedRatio[Iter] = this->m_CoolVolumeFlowRate[Iter] / this->m_DesignFanVolFlowRate;
+                }
                 this->m_IdleVolumeAirRate = this->m_MaxCoolAirVolFlow * designSpecMSHP[MSHPIndex].noLoadAirFlowRateRatio;
                 this->m_IdleMassFlowRate = this->m_IdleVolumeAirRate * DataEnvironment::StdRhoAir;
                 this->m_IdleSpeedRatio = this->m_IdleVolumeAirRate / this->m_DesignFanVolFlowRate;

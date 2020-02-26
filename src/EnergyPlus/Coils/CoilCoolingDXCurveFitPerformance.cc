@@ -45,22 +45,15 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <ObjexxFCL/gio.hh>
 #include <EnergyPlus/Coils/CoilCoolingDXCurveFitPerformance.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/HVACFan.hh>
-#include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/Psychrometrics.hh>
-#include <EnergyPlus/General.hh>
-#include <EnergyPlus/OutputFiles.hh>
 
 using namespace EnergyPlus;
 using namespace DataIPShortCuts;
@@ -75,6 +68,7 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(const CoilCoolin
     this->maxOutdoorDrybulbForBasin = input_data.maximum_outdoor_dry_bulb_temperature_for_crankcase_heater_operation;
     this->crankcaseHeaterCap = input_data.crankcase_heater_capacity;
     this->normalMode = CoilCoolingDXCurveFitOperatingMode(input_data.base_operating_mode_name);
+    this->normalMode.oneTimeInit(); // oneTimeInit does not need to be delayed in this use case
     if (UtilityRoutines::SameString(input_data.capacity_control, "CONTINUOUS")) {
         this->capControlMethod = CapControlMethod::CONTINUOUS;
     } else if (UtilityRoutines::SameString(input_data.capacity_control, "DISCRETE")) {
@@ -87,14 +81,14 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(const CoilCoolin
     }
     this->evapCondBasinHeatCap = input_data.basin_heater_capacity;
     this->evapCondBasinHeatSetpoint = input_data.basin_heater_setpoint_temperature;
-    if (input_data.basin_heater_operating_shedule_name.empty()) {
+    if (input_data.basin_heater_operating_schedule_name.empty()) {
         this->evapCondBasinHeatSchedulIndex = DataGlobals::ScheduleAlwaysOn;
     } else {
-        this->evapCondBasinHeatSchedulIndex = ScheduleManager::GetScheduleIndex(input_data.basin_heater_operating_shedule_name);
+        this->evapCondBasinHeatSchedulIndex = ScheduleManager::GetScheduleIndex(input_data.basin_heater_operating_schedule_name);
     }
     if (this->evapCondBasinHeatSchedulIndex == 0) {
         ShowSevereError(routineName + this->object_name + "=\"" + this->name + "\", invalid");
-        ShowContinueError("...Evaporative Condenser Basin Heater Operating Schedule Name=\"" + input_data.basin_heater_operating_shedule_name +
+        ShowContinueError("...Evaporative Condenser Basin Heater Operating Schedule Name=\"" + input_data.basin_heater_operating_schedule_name +
                           "\".");
         errorsFound = true;
     }
@@ -108,6 +102,7 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(const CoilCoolin
     if (!input_data.alternate_operating_mode_name.empty()) {
         this->hasAlternateMode = true;
         this->alternateMode = CoilCoolingDXCurveFitOperatingMode(input_data.alternate_operating_mode_name);
+        this->alternateMode.oneTimeInit(); // oneTimeInit does not need to be delayed in this use case
     }
 
     if (errorsFound) {
@@ -144,7 +139,7 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(const std::st
         input_specs.capacity_control = cAlphaArgs(2);
         input_specs.basin_heater_capacity = rNumericArgs(5);
         input_specs.basin_heater_setpoint_temperature = rNumericArgs(6);
-        input_specs.basin_heater_operating_shedule_name = cAlphaArgs(3);
+        input_specs.basin_heater_operating_schedule_name = cAlphaArgs(3);
         input_specs.compressor_fuel_type = DataGlobalConstants::AssignResourceTypeNum(cAlphaArgs(4));
         input_specs.base_operating_mode_name = cAlphaArgs(5);
         if (!lAlphaFieldBlanks(6)) {
@@ -236,6 +231,11 @@ void CoilCoolingDXCurveFitPerformance::calculate(CoilCoolingDXCurveFitOperatingM
     this->electricityConsumption = this->powerUse * reportingConstant;
     this->wasteHeatRate = currentMode.OpModeWasteHeat;
 
+    if (this->compressorFuelType != DataGlobalConstants::iRT_Electricity) {
+        this->compressorFuelRate = this->powerUse;
+        this->compressorFuelConsumption = this->electricityConsumption;
+    }
+
 }
 
 void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240() {
@@ -299,12 +299,8 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240() {
     // TODO: mode.ratedEvapAirFlowRate is used a lot in here, make sure it is volume flow rate
 
     if (mode.ratedGrossTotalCap > 0.0) {
-        // Standard Rating Cooling (net) Capacity calculations:
-        TotCapFlowModFac = CurveManager::CurveValue(speed.indexCapFFF, AirMassFlowRatioRated);
-        TotCapTempModFac = CurveManager::CurveValue(speed.indexCapFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
-        NetCoolingCapRated = mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac - FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate;
-
         // SEER calculations:
+        TotCapFlowModFac = CurveManager::CurveValue(speed.indexCapFFF, AirMassFlowRatioRated);
         TotCapTempModFac = CurveManager::CurveValue(speed.indexCapFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTemp);
         TotCoolingCapAHRI = mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac;
         EIRTempModFac = CurveManager::CurveValue(speed.indexEIRFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTemp);
@@ -314,6 +310,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240() {
         } else {
             EIR = 0.0;
         }
+
         // Calculate net cooling capacity
         NetCoolingCapAHRI = TotCoolingCapAHRI - FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate;
         TotalElecPower = EIR * TotCoolingCapAHRI + FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate;

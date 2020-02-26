@@ -82,6 +82,7 @@ struct CoilCoolingDXCurveFitOperatingMode
 
     void instantiateFromInputSpec(CoilCoolingDXCurveFitOperatingModeInputSpecification input_data);
     void size();
+    void oneTimeInit();
     CoilCoolingDXCurveFitOperatingModeInputSpecification original_input_specs;
     CoilCoolingDXCurveFitOperatingMode() = default;
     explicit CoilCoolingDXCurveFitOperatingMode(const std::string& name_to_find);
@@ -119,6 +120,12 @@ struct CoilCoolingDXCurveFitOperatingMode
 
     Real64 nominalEvaporativePumpPower = 0.0;
     int nominalSpeedNum = 0;
+
+    // each mode can now have EMS overridden evap air flow and total cap
+    bool ratedAirVolFlowEMSOverrideON = false;
+    Real64 ratedAirVolFlowEMSOverrideValue = 0.0;
+    bool ratedTotCapFlowEMSOverrideON = false;
+    Real64 ratedTotCapFlowEMSOverrideValue = 0.0;
 
     enum CondenserType
     {

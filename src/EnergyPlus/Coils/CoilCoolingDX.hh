@@ -145,7 +145,10 @@ struct CoilCoolingDX
     Real64 wasteHeatEnergy = 0.0;
     Real64 condenserInletTemperature = 0.0;
     int dehumidificationMode = 0;
-
+    bool reportCoilFinalSizes = true;
+    bool isSecondaryDXCoilInZone = false;
+    Real64 secCoilSensHeatRejEnergyRate = 0.0;
+    Real64 secCoilSensHeatRejEnergy = 0.0;
 };
 
 extern std::vector<CoilCoolingDX> coilCoolingDXs;
