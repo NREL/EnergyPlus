@@ -506,6 +506,17 @@ void CoilCoolingDX::oneTimeInit() {
 
 }
 
+int CoilCoolingDX::getOpModeCapFTIndex(Optional<bool const> isNormalOpMode)
+{
+	if (isNormalOpMode) {
+		int nomSpeedNum = this->performance.normalMode.nominalSpeedNum;
+		return this->performance.normalMode.speeds[nomSpeedNum].indexCapFT;
+	} else {
+		int nomSpeedNum = this->performance.alternateMode.nominalSpeedNum;
+		return this->performance.alternateMode.speeds[nomSpeedNum].indexCapFT;
+	}
+}
+
 void CoilCoolingDX::setData(int fanIndex, int fanType, std::string const &fanName, int _airLoopNum) {
     this->supplyFanIndex = fanIndex;
     this->supplyFanName = fanName;
@@ -777,7 +788,7 @@ void CoilCoolingDX::passThroughNodeData(EnergyPlus::DataLoopNode::NodeData &in, 
 
 void CoilCoolingDX::reportAllStandardRatings(OutputFiles &outputFiles) {
 
-    Real64 const ConvFromSIToIP(3.412141633);              // Conversion from SI to IP [3.412 Btu/hr-W]
+    Real64 constexpr ConvFromSIToIP(3.412141633);              // Conversion from SI to IP [3.412 Btu/hr-W]
     static constexpr auto Format_990("! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
                                      "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER {Btu/W-h}, IEER {Btu/W-h}\n");
     print(outputFiles.eio, "{}", Format_990);

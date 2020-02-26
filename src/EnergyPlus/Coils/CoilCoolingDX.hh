@@ -94,6 +94,7 @@ struct CoilCoolingDX
                             std::vector<Real64> &normalModeRatedCapacities);
     static void inline passThroughNodeData(DataLoopNode::NodeData &in, DataLoopNode::NodeData &out);
     void size();
+    int getOpModeCapFTIndex(Optional<bool const> isNormalOpMode = true);
 
     CoilCoolingDXInputSpecification original_input_specs;
     std::string name;
