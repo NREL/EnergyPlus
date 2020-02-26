@@ -4450,37 +4450,45 @@ namespace UnitarySystems {
                         } else {
                             //                    // call CoilCoolingDX constructor
                             thisSys.m_CoolingCoilIndex = CoilCoolingDX::factory(loc_m_CoolingCoilName);
+                            if (thisSys.m_CoolingCoilIndex == -1) {
+                                ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + thisObjectName);
+                                errorsFound = true;
+                            } else {
 
-                            // mine data from coil object
-                            // TODO: Need to check for autosize on these I guess
-                            auto &newCoil = coilCoolingDXs[thisSys.m_CoolingCoilIndex];
-                            thisSys.m_DesignCoolingCapacity = newCoil.performance.normalMode.ratedGrossTotalCap;
-                            thisSys.m_MaxCoolAirVolFlow = newCoil.performance.normalMode.ratedEvapAirFlowRate;
-                            thisSys.m_CoolingCoilAvailSchPtr = newCoil.availScheduleIndex;
-                            CoolingCoilInletNode = newCoil.evapInletNodeIndex;
-                            CoolingCoilOutletNode = newCoil.evapOutletNodeIndex;
-                            thisSys.m_CondenserNodeNum = newCoil.condInletNodeIndex;
-                            thisSys.m_NumOfSpeedCooling = (int)newCoil.performance.normalMode.speeds.size();
-                            thisSys.m_MinOATCompressorCooling = newCoil.performance.minOutdoorDrybulb;
-                            // also give the new coil object some stuff
-                            newCoil.supplyFanName = thisSys.m_FanName;
-                            newCoil.supplyFanIndex = thisSys.m_FanIndex;
-                            newCoil.supplyFanType = thisSys.m_FanType_Num;
+                                // mine data from coil object
+                                // TODO: Need to check for autosize on these I guess
+                                auto& newCoil = coilCoolingDXs[thisSys.m_CoolingCoilIndex];
+                                thisSys.m_DesignCoolingCapacity = newCoil.performance.normalMode.ratedGrossTotalCap;
+                                thisSys.m_MaxCoolAirVolFlow = newCoil.performance.normalMode.ratedEvapAirFlowRate;
+                                if (thisSys.m_DesignCoolingCapacity == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
+                                if (thisSys.m_MaxCoolAirVolFlow == DataSizing::AutoSize) thisSys.m_RequestAutoSize = true;
+                                thisSys.m_CoolingCoilAvailSchPtr = newCoil.availScheduleIndex;
+                                CoolingCoilInletNode = newCoil.evapInletNodeIndex;
+                                CoolingCoilOutletNode = newCoil.evapOutletNodeIndex;
+                                thisSys.m_CondenserNodeNum = newCoil.condInletNodeIndex;
+                                thisSys.m_NumOfSpeedCooling = (int)newCoil.performance.normalMode.speeds.size();
+                                thisSys.m_MinOATCompressorCooling = newCoil.performance.minOutdoorDrybulb;
+                                // also give the new coil object some stuff
+                                newCoil.supplyFanName = thisSys.m_FanName;
+                                newCoil.supplyFanIndex = thisSys.m_FanIndex;
+                                newCoil.supplyFanType = thisSys.m_FanType_Num;
 
-                            // Push heating coil PLF curve index to DX coil
-                            //                    if ( HeatingCoilPLFCurveIndex > 0 ) {
-                            //                        SetDXCoolingCoilData( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrorsFound,
-                            //                        HeatingCoilPLFCurveIndex );
-                            //                    }
+                                // Push heating coil PLF curve index to DX coil
+                                //                    if ( HeatingCoilPLFCurveIndex > 0 ) {
+                                //                        SetDXCoolingCoilData( UnitarySystem( UnitarySysNum ).CoolingCoilIndex, ErrorsFound,
+                                //                        HeatingCoilPLFCurveIndex );
+                                //                    }
 
-                            // set variable speed coil flag as necessary
-                            if (thisSys.m_NumOfSpeedCooling > 1) {
-                                if (newCoil.performance.capControlMethod == CoilCoolingDXCurveFitPerformance::CapControlMethod::DISCRETE) {
-                                    thisSys.m_DiscreteSpeedCoolingCoil = true;
-                                } else if (newCoil.performance.capControlMethod == CoilCoolingDXCurveFitPerformance::CapControlMethod::CONTINUOUS) {
-                                    thisSys.m_ContSpeedCoolingCoil = true;
+                                // set variable speed coil flag as necessary
+                                if (thisSys.m_NumOfSpeedCooling > 1) {
+                                    if (newCoil.performance.capControlMethod == CoilCoolingDXCurveFitPerformance::CapControlMethod::DISCRETE) {
+                                        thisSys.m_DiscreteSpeedCoolingCoil = true;
+                                    }
+                                    else if (newCoil.performance.capControlMethod == CoilCoolingDXCurveFitPerformance::CapControlMethod::CONTINUOUS) {
+                                        thisSys.m_ContSpeedCoolingCoil = true;
+                                    }
+                                    thisSys.m_MultiOrVarSpeedCoolCoil = true;
                                 }
-                                thisSys.m_MultiOrVarSpeedCoolCoil = true;
                             }
 
                             if (thisSys.m_HeatCoilExists) {
