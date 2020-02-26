@@ -233,8 +233,8 @@ namespace StandardRatings {
         Real64 const RatedAirVolFlowRate,                 // air flow rate through the coil at rated condition
         Real64 const FanPowerPerEvapAirFlowRateFromInput, // Fan power per air volume flow rate through the evaporator coil
         Real64 &NetCoolingCapRated,                       // net cooling capacity of single speed DX cooling coil
-        Real64 &SEER,                                     // seasonale energy efficiency ratio of single speed DX cooling coil
-        Real64 &SEER_default,                             // seasonale energy efficiency ratio of single speed DX cooling coil, from default PLF curve and C_D value 
+        Real64 &SEER,                                     // seasonale energy efficiency ratio of single speed DX cooling coil, from user PLF curve
+        Real64 &SEER_Default,                             // seasonale energy efficiency ratio of single speed DX cooling coil, from AHRI Std 210/240-2008 default PLF curve and C_D value 
         Real64 &EER,                                      // energy efficiency ratio of single speed DX cooling coil
         Real64 &IEER                                      // Integareted energy efficiency ratio of single speed DX cooling coil
     );
@@ -267,7 +267,8 @@ namespace StandardRatings {
         Array1A<Real64> const FanPowerPerEvapAirFlowRateFromInput, // rated fan power per evap air flow rate [W/(m3/s)]
         int const nsp,                                             // Number of compressor speeds
         Real64 &NetCoolingCapRatedMaxSpeed,                        // net cooling capacity at maximum speed
-        Real64 &SEER                                               // seasonale energy efficiency ratio of multi speed DX cooling coil
+        Real64 &SEER,                                              // seasonale energy efficiency ratio of multi speed DX cooling coil, from user PLF curve
+        Real64 &SEER_Default                                       // seasonale energy efficiency ratio of multi speed DX cooling coil, from AHRI Std 210/240-2008 default PLF curve and C_D value 
     );
 
     void MultiSpeedDXHeatingCoilStandardRatings(

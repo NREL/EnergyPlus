@@ -13859,6 +13859,7 @@ namespace DXCoils {
         PreDefTableEntry(pdchDXCoolCoilEERIP, DXCoil(DXCoilNum).Name, EER_TestPoint_IP(1), 2);
         PreDefTableEntry(pdchDXCoolCoilIEERIP, DXCoil(DXCoilNum).Name, IEER, 2);
         PreDefTableEntry(pdchDXCoolCoilSEERIP, DXCoil(DXCoilNum).Name, "N/A");
+        PreDefTableEntry(pdchDXCoolCoilSEERDefIP, DXCoil(DXCoilNum).Name, "N/A");
         addFootNoteSubTable(pdstDXCoolCoil, "ANSI/AHRI ratings include supply fan");
 
         PreDefTableEntry(pdchVAVDXCoolCoilType, DXCoil(DXCoilNum).Name, "Coil:Cooling:DX:TwoSpeed");

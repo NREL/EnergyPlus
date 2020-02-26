@@ -965,7 +965,7 @@ namespace StandardRatings {
 
         // Calculated and reported to the EIO file
         static Real64 SEER(0.0);                       // Seasonal Energy Efficiency Ratio using user PLF curve in SI [W/W]
-        static Real64 SEER_default(0.0);               // Seasonal Energy Efficiency Ratio using AHRI 210/240 PLF default curve & C_D in SI [W/W]
+        static Real64 SEER_Default(0.0);               // Seasonal Energy Efficiency Ratio using AHRI 210/240 PLF default curve & C_D in SI [W/W]
         static Real64 EER(0.0);                        // Energy Efficiency Ratio in SI [W/W]
         static Real64 IEER(0.0);                       // Integerated Energy Efficiency Ratio in SI [W/W]
         static Real64 HSPF(0.0);                       // Heating Seasonal Performance Factor in SI [W/W]
@@ -991,7 +991,7 @@ namespace StandardRatings {
                                                    EIRFFlowCurveIndex(1),
                                                    PLFFPLRCurveIndex(1));
 
-                // Calculated Net Cooling Capacity, SEER, EER, and IEER of single speed DX cooling coils
+                // Calculated Net Cooling Capacity, SEER, SEER Default, EER, and IEER of single speed DX cooling coils
                 SingelSpeedDXCoolingCoilStandardRatings(DXCoilName,
                                                         DXCoilType,
                                                         CapFTempCurveIndex(1),
@@ -1005,18 +1005,18 @@ namespace StandardRatings {
                                                         FanPowerPerEvapAirFlowRateFromInput(1),
                                                         NetCoolingCapRated(1),
                                                         SEER,
-                                                        SEER_default,
+                                                        SEER_Default,
                                                         EER,
                                                         IEER);
 
-                // Writes the net rated cooling capacity, SEER, EER and IEER values to the EIO file and standard tabular output tables
+                // Writes the net rated cooling capacity, SEER, SEER Default, EER and IEER values to the EIO file and standard tabular output tables
                 ReportDXCoilRating(outputFiles,
                                    DXCoilType,
                                    DXCoilName,
                                    DXCoilType_Num,
                                    NetCoolingCapRated(1),
                                    SEER * ConvFromSIToIP,
-                                   SEER_default * ConvFromSIToIP,
+                                   SEER_Default * ConvFromSIToIP,
                                    EER,
                                    EER * ConvFromSIToIP,
                                    IEER * ConvFromSIToIP,
@@ -1077,7 +1077,7 @@ namespace StandardRatings {
                                    DXCoilType_Num,
                                    NetCoolingCapRated(1),
                                    SEER * ConvFromSIToIP,
-                                   SEER_default * ConvFromSIToIP,
+                                   SEER_Default * ConvFromSIToIP,
                                    EER,
                                    EER * ConvFromSIToIP,
                                    IEER * ConvFromSIToIP,
@@ -1110,7 +1110,8 @@ namespace StandardRatings {
                                                        FanPowerPerEvapAirFlowRateFromInput,
                                                        ns,
                                                        NetCoolingCapRated(ns),
-                                                       SEER);
+                                                       SEER,
+                                                       SEER_Default);
                 // Writes the SEER value to the EIO file and standard tabular output tables
                 ReportDXCoilRating(outputFiles,
                                    DXCoilType,
@@ -1118,7 +1119,7 @@ namespace StandardRatings {
                                    DXCoilType_Num,
                                    NetCoolingCapRated(ns),
                                    SEER * ConvFromSIToIP,
-                                   SEER_default * ConvFromSIToIP,
+                                   SEER_Default * ConvFromSIToIP,
                                    0.0,
                                    0.0,
                                    0.0,
@@ -1167,7 +1168,7 @@ namespace StandardRatings {
                                    DXCoilType_Num,
                                    NetCoolingCapRated(ns),
                                    SEER * ConvFromSIToIP,
-                                   SEER_default * ConvFromSIToIP,
+                                   SEER_Default * ConvFromSIToIP,
                                    EER,
                                    EER * ConvFromSIToIP,
                                    IEER * ConvFromSIToIP,
@@ -1523,8 +1524,8 @@ namespace StandardRatings {
         Real64 const RatedAirVolFlowRate,                 // air flow rate through the coil at rated condition
         Real64 const FanPowerPerEvapAirFlowRateFromInput, // Fan power per air volume flow rate through the evaporator coil
         Real64 &NetCoolingCapRated,                       // net cooling capacity of single speed DX cooling coil
-        Real64 &SEER,                                     // seasonale energy efficiency ratio of single speed DX cooling coil, from user curve
-        Real64 &SEER_Default,                             // seasonale energy efficiency ratio of single speed DX cooling coil, from default PLF curve and C_D value 
+        Real64 &SEER,                                     // seasonale energy efficiency ratio of single speed DX cooling coil, from user PLF curve
+        Real64 &SEER_Default,                             // seasonale energy efficiency ratio of single speed DX cooling coil, from AHRI Std 210/240-2008 default PLF curve and C_D value 
         Real64 &EER,                                      // energy efficiency ratio of single speed DX cooling coil
         Real64 &IEER                                      // Integareted energy efficiency ratio of single speed DX cooling coil
     )
@@ -1789,7 +1790,8 @@ namespace StandardRatings {
         Array1A<Real64> const FanPowerPerEvapAirFlowRateFromInput, // rated fan power per evap air flow rate [W/(m3/s)]
         int const nsp,                                             // Number of compressor speeds
         Real64 &NetCoolingCapRatedMaxSpeed,                        // net cooling capacity at maximum speed
-        Real64 &SEER                                               // seasonale energy efficiency ratio of multi speed DX cooling coil
+        Real64 &SEER,                                              // seasonale energy efficiency ratio of multi speed DX cooling coil, from user PLF curve
+        Real64 &SEER_Default                                       // seasonale energy efficiency ratio of multi speed DX cooling coil, from AHRI Std 210/240-2008 default PLF curve and C_D value 
     )
     {
 
@@ -1858,12 +1860,15 @@ namespace StandardRatings {
         static Real64 CoolingElecPowerMax(0.0);          // outdoor unit electric power input at Max speed, [W]
         static Real64 PartLoadRatio(0.0);                // compressor cycling ratio between successive speeds, [-]
         static Real64 PartLoadFraction(0.0);             // part-load fraction that account for the cyclic degradation, [-]
+        static Real64 PartLoadFractionDefault(0.0);      // part-load fraction that account for the cyclic degradation from AHRI 201/240 default PLF curve and C_D value, [-]
         static Real64 NetCoolingCapWeighted(0.0);        // net tot cooling cap weighted by the fraction of the binned cooling hours [W]
-        static Real64 TotCoolingElecPowerWeighted(0.0);  // net total cooling electric power input weighted by the fraction of the
+        static Real64 TotCoolingElecPowerWeighted(0.0);  // net total cooling electric power input weighted by the fraction of the temperature bins
+        static Real64 TotCoolingElecPowerWeightedDefault(0.0);  // net total cooling electric power input weighted by the fraction of the temperature bins from AHRI 201/240 default PLF curve and C_D value,
         // binned cooling hours
         static Real64 BuildingCoolingLoad(0.0);    // Building space cooling load corresponding to an outdoor bin temperature [W]
         static Real64 NetTotCoolCapBinned(0.0);    // Net tot cooling cap corresponding to an outdoor bin temperature [W]
         static Real64 TotCoolElecPowerBinned(0.0); // Total cooling electric power corresponding to an outdoor bin temperature [W]
+        static Real64 TotCoolElecPowerBinnedDefault(0.0); // Total cooling electric power corresponding to an outdoor bin temperature from AHRI 201/240 default PLF curve and C_D value, [W]
         static Real64 LoadFactor(0.0);             // "on" time for last stage at the desired reduced capacity, (dimensionless)
         int BinNum;                                // bin number counter
         int spnum;                                 // compressor speed number
@@ -1961,8 +1966,10 @@ namespace StandardRatings {
                 if (BuildingCoolingLoad <= CoolingCapacityLS) {
                     PartLoadRatio = min(1.0, BuildingCoolingLoad / CoolingCapacityLS);
                     NetTotCoolCapBinned = PartLoadRatio * CoolingCapacityLS;
-                    PartLoadFraction = 1.0 - CyclicDegradationCoeff * (1.0 - PartLoadRatio);
+                    PartLoadFraction = CurveValue(PLFFPLRCurveIndex(spnum), PartLoadRatio);
+                    PartLoadFractionDefault = 1.0 - CyclicDegradationCoeff * (1.0 - PartLoadRatio);
                     TotCoolElecPowerBinned = (PartLoadRatio / PartLoadFraction) * CoolingElecPowerLS;
+                    TotCoolElecPowerBinnedDefault = (PartLoadRatio / PartLoadFractionDefault) * CoolingElecPowerLS;
                     goto SpeedLoop_exit;
                 } else if ((BuildingCoolingLoad > CoolingCapacityLS) && (BuildingCoolingLoad < CoolingCapacityHS)) {
                     // cycle between speed "spnum" and "spnum + 1"
@@ -1970,10 +1977,12 @@ namespace StandardRatings {
                     LoadFactor = max(0.0, LoadFactor);
                     NetTotCoolCapBinned = LoadFactor * CoolingCapacityLS + (1.0 - LoadFactor) * CoolingCapacityHS;
                     TotCoolElecPowerBinned = LoadFactor * CoolingElecPowerLS + (1.0 - LoadFactor) * CoolingElecPowerHS;
+                    TotCoolElecPowerBinnedDefault = TotCoolElecPowerBinned;
                     goto SpeedLoop_exit;
                 } else if (BuildingCoolingLoad >= CoolingCapacityMax) {
                     NetTotCoolCapBinned = CoolingCapacityMax;
                     TotCoolElecPowerBinned = CoolingElecPowerMax;
+                    TotCoolElecPowerBinnedDefault = CoolingElecPowerMax;
                     goto SpeedLoop_exit;
                 }
             }
@@ -1981,11 +1990,14 @@ namespace StandardRatings {
 
             NetCoolingCapWeighted += NetTotCoolCapBinned * CoolFracBinHoursAtOutdoorBinTemp(BinNum);
             TotCoolingElecPowerWeighted += TotCoolElecPowerBinned * CoolFracBinHoursAtOutdoorBinTemp(BinNum);
+            TotCoolingElecPowerWeightedDefault += TotCoolElecPowerBinnedDefault * CoolFracBinHoursAtOutdoorBinTemp(BinNum);
         }
+
+        SEER = 0.0;
+        SEER_Default = 0.0;
         if (TotCoolingElecPowerWeighted > 0.0) {
             SEER = NetCoolingCapWeighted / TotCoolingElecPowerWeighted;
-        } else {
-            SEER = 0.0;
+            SEER_Default = NetCoolingCapWeighted / TotCoolingElecPowerWeightedDefault;
         }
     }
 
@@ -2500,18 +2512,20 @@ namespace StandardRatings {
             } else if (SELECT_CASE_var == CoilDX_MultiSpeedCooling) {
                 if (MyCoolOneTimeFlag) {
                     static constexpr auto Format_994("! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
-                                                          "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER {Btu/W-h}, IEER {Btu/W-h}");
+                                                          "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER {Btu/W-h}, SEER Default {Btu/W-h}, IEER {Btu/W-h}");
                     print(outputFiles.eio, "{}\n", Format_994);
                     MyCoolOneTimeFlag = false;
                 }
 
-                static constexpr auto Format_995(" DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {}, {}, {:.2R}, {}\n");
-                print(outputFiles.eio, Format_995, CompType, CompName, CoolCapVal, ' ', ' ', SEERValueIP, ' ');
+                static constexpr auto Format_995(" DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {}, {}, {:.2R}, {:.2R}, {}\n");
+                print(outputFiles.eio, Format_995, CompType, CompName, CoolCapVal, ' ', ' ', SEERValueIP, SEERValueDefaultIP, ' ');
 
                 PreDefTableEntry(pdchDXCoolCoilType, CompName, CompType);
                 PreDefTableEntry(pdchDXCoolCoilNetCapSI, CompName, CoolCapVal, 1);
                 PreDefTableEntry(pdchDXCoolCoilSEERIP, CompName, SEERValueIP, 2);
-                addFootNoteSubTable(pdstDXCoolCoil, "ANSI/AHRI ratings account for supply air fan heat and electric power.");
+                PreDefTableEntry(pdchDXCoolCoilSEERDefIP, CompName, SEERValueDefaultIP, 2);
+                addFootNoteSubTable(pdstDXCoolCoil, "ANSI/AHRI ratings account for supply air fan heat and electric power. "
+                "SEER is calculated using user PLF curve where as SEER Default is calculated using AHRI Std 210/240-2008 default PLF curve and cooling coefficient of degradation.");  
 
             } else {
             }
