@@ -506,6 +506,17 @@ void CoilCoolingDX::oneTimeInit() {
 
 }
 
+int CoilCoolingDX::getOpModeCapFTIndex(Optional<bool const> isNormalOpMode)
+{
+	if (isNormalOpMode) {
+		int nomSpeedNum = this->performance.normalMode.nominalSpeedNum;
+		return this->performance.normalMode.speeds[nomSpeedNum].indexCapFT;
+	} else {
+		int nomSpeedNum = this->performance.alternateMode.nominalSpeedNum;
+		return this->performance.alternateMode.speeds[nomSpeedNum].indexCapFT;
+	}
+}
+
 void CoilCoolingDX::setData(int fanIndex, int fanType, std::string const &fanName, int _airLoopNum) {
     this->supplyFanIndex = fanIndex;
     this->supplyFanName = fanName;

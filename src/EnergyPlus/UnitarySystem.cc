@@ -1599,7 +1599,7 @@ namespace UnitarySystems {
                     DataSizing::DataFlowUsedForSizing = TempSize;
                     TempSize = DataSizing::AutoSize;
                     if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
-                        DataSizing::DataTotCapCurveIndex = coilCoolingDXs[this->m_CoolingCoilIndex].performance.normalMode.speeds[0].indexCapFT;
+                        DataSizing::DataTotCapCurveIndex = coilCoolingDXs[this->m_CoolingCoilIndex].getOpModeCapFTIndex();
                         DataSizing::DataIsDXCoil = true;
                     } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
                                this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
@@ -1636,7 +1636,7 @@ namespace UnitarySystems {
                 DataSizing::DataFlowUsedForSizing = EqSizing.CoolingAirVolFlow;
                 TempSize = DataSizing::AutoSize;
                 if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling) {
-                    DataSizing::DataTotCapCurveIndex = coilCoolingDXs[this->m_CoolingCoilIndex].performance.normalMode.speeds[0].indexCapFT;
+                    DataSizing::DataTotCapCurveIndex = coilCoolingDXs[this->m_CoolingCoilIndex].getOpModeCapFTIndex();
                     DataSizing::DataIsDXCoil = true;
                 } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingSingleSpeed ||
                            this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
