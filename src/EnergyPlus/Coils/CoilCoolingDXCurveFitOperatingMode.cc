@@ -99,7 +99,7 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(CoilCoolingDXC
     }
 
     // convert speed num in IDF to vector index
-    this->nominalSpeedNum = input_data.nominal_speed_number - 1;
+    this->nominalSpeedIndex = input_data.nominal_speed_number - 1;
 
     if (errorsFound) {
         ShowFatalError(routineName + "Errors found in getting " + this->object_name + " input. Preceding condition(s) causes termination.");

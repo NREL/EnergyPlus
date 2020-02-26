@@ -143,9 +143,8 @@ struct CoilCoolingDXCurveFitSpeed
     Real64 RatedOutdoorAirTemp = 35.0;      // 35 C or 95F
     Real64 DryCoilOutletHumRatioMin = 0.00001; // dry coil outlet minimum hum ratio kgH2O/kgdry air
 
-    void CalcSpeedOutput(
-        const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &fanOpMode, Real64 condInletTemp);
-    void size(int const speedNum, int const maxSpeeds);
+    void CalcSpeedOutput(const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &fanOpMode, Real64 condInletTemp);
+    void size(int speedNum, int maxSpeeds);
     Real64 CalcBypassFactor(Real64 tdb, Real64 w, Real64 h, Real64 p);
 
 private:
