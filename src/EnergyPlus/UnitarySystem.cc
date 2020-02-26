@@ -10093,7 +10093,7 @@ namespace UnitarySystems {
                         CoilPLR = 0.0;
                     }
                 }
-                bool useDehumMode = (this->m_DehumidificationMode == 1);
+                bool useDehumMode = (this->m_DehumidificationMode == 1 || HXUnitOn);
                 coilCoolingDXs[this->m_CoolingCoilIndex].simulate(
                     useDehumMode, CoilPLR, this->m_CoolingSpeedNum, this->m_CoolingSpeedRatio, this->m_FanOpMode);
                 if (this->m_CoolingSpeedNum > 1) {
