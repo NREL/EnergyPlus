@@ -7493,7 +7493,7 @@ namespace UnitarySystems {
         // These initializations are done every iteration
 
         {
-            Real64 MoistureLoad = 0.0;
+            MoistureLoad = 0.0;
             auto const SELECT_CASE_var(this->m_ControlType);
             if (SELECT_CASE_var == ControlType::Load || SELECT_CASE_var == ControlType::CCMASHRAE) {
                 if (AirLoopNum == -1) { // This IF-THEN routine is just for ZoneHVAC:OutdoorAirUnit
