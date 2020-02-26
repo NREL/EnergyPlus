@@ -61,7 +61,6 @@ class OutputFiles;
 struct CoilCoolingDXCurveFitPerformanceInputSpecification
 {
     std::string name;
-    std::string parentName;
     Real64 crankcase_heater_capacity;
     Real64 minimum_outdoor_dry_bulb_temperature_for_compressor_operation;
     Real64 maximum_outdoor_dry_bulb_temperature_for_crankcase_heater_operation;
@@ -111,11 +110,10 @@ struct CoilCoolingDXCurveFitPerformance
     Real64 crankcaseHeaterElectricityConsumption = 0.0;
     Real64 minOutdoorDrybulb = 0.0;
     Real64 maxOutdoorDrybulbForBasin = 0.0;
-    Real64 unitStatic = 0.0;
     bool mySizeFlag = true;
     int compressorFuelType = 0;
-    Real64 compressorFuelRate;
-    Real64 compressorFuelConsumption;
+    Real64 compressorFuelRate = 0.0;
+    Real64 compressorFuelConsumption = 0.0;
 
     enum CapControlMethod
     {

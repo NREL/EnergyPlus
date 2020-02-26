@@ -99,7 +99,7 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(CoilCoolingDXC
     }
 
     // convert speed num in IDF to vector index
-    this->nominalSpeedNum = input_data.nominal_speed_number - 1;
+    this->nominalSpeedIndex = input_data.nominal_speed_number - 1;
 
     if (errorsFound) {
         ShowFatalError(routineName + "Errors found in getting " + this->object_name + " input. Preceding condition(s) causes termination.");
@@ -198,7 +198,7 @@ void CoilCoolingDXCurveFitOperatingMode::size()
     DataSizing::DataEMSOverrideON = this->ratedTotCapFlowEMSOverrideON;
     DataSizing::DataEMSOverride = this->ratedTotCapFlowEMSOverrideValue;
     SizingString = "Rated Gross Total Cooling Capacity";
-    DataSizing::DataFlowUsedForSizing = this->ratedEvapAirFlowRate; // TODO: This is volume flow, right?
+    DataSizing::DataFlowUsedForSizing = this->ratedEvapAirFlowRate;
     TempSize = this->original_input_specs.gross_rated_total_cooling_capacity;
     ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
     DataSizing::DataEMSOverrideON = false;

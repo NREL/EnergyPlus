@@ -93,12 +93,6 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(const CoilCoolin
         errorsFound = true;
     }
 
-    if (input_data.unit_internal_static_air_pressure > 0) {
-        // if this isn't in the input data then we will just keep it initialized at zero and use that as the flag
-        // for whether we are doing static+fan standard ratings or not
-        this->unitStatic = input_data.unit_internal_static_air_pressure;
-    }
-
     if (!input_data.alternate_operating_mode_name.empty()) {
         this->hasAlternateMode = true;
         this->alternateMode = CoilCoolingDXCurveFitOperatingMode(input_data.alternate_operating_mode_name);
@@ -134,8 +128,11 @@ CoilCoolingDXCurveFitPerformance::CoilCoolingDXCurveFitPerformance(const std::st
         input_specs.crankcase_heater_capacity = rNumericArgs(1);
         input_specs.minimum_outdoor_dry_bulb_temperature_for_compressor_operation = rNumericArgs(2);
         input_specs.maximum_outdoor_dry_bulb_temperature_for_crankcase_heater_operation = rNumericArgs(3);
-        // TODO: The static pressure no longer has a default, this needs to check for blank
-        input_specs.unit_internal_static_air_pressure = rNumericArgs(4);
+        if (lNumericFieldBlanks(4)) {
+            input_specs.unit_internal_static_air_pressure = 0.0;
+        } else {
+            input_specs.unit_internal_static_air_pressure = rNumericArgs(4);
+        }
         input_specs.capacity_control = cAlphaArgs(2);
         input_specs.basin_heater_capacity = rNumericArgs(5);
         input_specs.basin_heater_setpoint_temperature = rNumericArgs(6);

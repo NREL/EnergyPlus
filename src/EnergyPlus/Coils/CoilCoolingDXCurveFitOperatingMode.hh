@@ -119,7 +119,7 @@ struct CoilCoolingDXCurveFitOperatingMode
     Real64 OpModeWasteHeat = 0.0;
 
     Real64 nominalEvaporativePumpPower = 0.0;
-    int nominalSpeedNum = 0;
+    int nominalSpeedIndex = 0;
 
     // each mode can now have EMS overridden evap air flow and total cap
     bool ratedAirVolFlowEMSOverrideON = false;

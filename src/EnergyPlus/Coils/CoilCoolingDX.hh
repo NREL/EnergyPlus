@@ -94,7 +94,9 @@ struct CoilCoolingDX
                             std::vector<Real64> &normalModeRatedCapacities);
     static void inline passThroughNodeData(DataLoopNode::NodeData &in, DataLoopNode::NodeData &out);
     void size();
-    int getOpModeCapFTIndex(Optional<bool const> isNormalOpMode = true);
+
+
+    int getOpModeCapFTIndex(bool isNormalOpMode = true);
 
     CoilCoolingDXInputSpecification original_input_specs;
     std::string name;
@@ -102,7 +104,6 @@ struct CoilCoolingDX
     int evapInletNodeIndex = 0;
     int evapOutletNodeIndex = 0;
     int availScheduleIndex = 0;
-    // int condZoneIndex = 0;
     int condInletNodeIndex = 0;
     int condOutletNodeIndex = 0;
     CoilCoolingDXCurveFitPerformance performance;
@@ -113,13 +114,14 @@ struct CoilCoolingDX
     int evaporativeCondSupplyTankIndex = 0;
     int evaporativeCondSupplyTankARRID = 0;
     Real64 evaporativeCondSupplyTankVolumeFlow = 0.0;
-    // Real64 evaporativeCondSupplyTankVolumeConsumption = 0.0;
     Real64 evapCondPumpElecPower = 0.0;
     Real64 evapCondPumpElecConsumption = 0.0;
     int airLoopNum = 0; // Add for AFN compatibility, revisit at a later date
     int supplyFanIndex = 0;
     int supplyFanType = 0;
     std::string supplyFanName = "";
+
+    CoilCoolingDXCurveFitSpeed &nominalSpeed();
 
     // report variables
     Real64 totalCoolingEnergyRate = 0.0;
