@@ -235,7 +235,6 @@
     ,                        !- ASHRAE Clear Sky Optical Depth for Diffuse Irradiance (taud) {dimensionless}
     1.0;                     !- Sky Clearness
 
-
   RunPeriod,
     Run Period 1,            !- Name
     1,                       !- Begin Month
@@ -279,8 +278,8 @@
     Yes,                     !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
-    Yes;                     !- Use Weather File Snow Indicators	
-	
+    Yes;                     !- Use Weather File Snow Indicators    
+    
   RunPeriod,
     Run Period 4,            !- Name
     4,                       !- Begin Month
@@ -294,8 +293,8 @@
     Yes,                     !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
-    Yes;                     !- Use Weather File Snow Indicators	
-	
+    Yes;                     !- Use Weather File Snow Indicators    
+    
   RunPeriod,
     Run Period 5,            !- Name
     5,                       !- Begin Month
@@ -324,7 +323,7 @@
     Yes,                     !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
-    Yes;                     !- Use Weather File Snow Indicators	
+    Yes;                     !- Use Weather File Snow Indicators    
 
   RunPeriod,
     Run Period 7,            !- Name
@@ -340,7 +339,7 @@
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
-	
+    
   RunPeriod,
     Run Period 8,            !- Name
     8,                       !- Begin Month
@@ -384,8 +383,8 @@
     Yes,                     !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
-    Yes;                     !- Use Weather File Snow Indicators	
-	
+    Yes;                     !- Use Weather File Snow Indicators    
+    
   RunPeriod,
     Run Period 11,           !- Name
     11,                      !- Begin Month
@@ -399,8 +398,8 @@
     Yes,                     !- Use Weather File Daylight Saving Period
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
-    Yes;                     !- Use Weather File Snow Indicators	
-	
+    Yes;                     !- Use Weather File Snow Indicators    
+    
   RunPeriod,
     Run Period 12,           !- Name
     12,                      !- Begin Month
@@ -415,7 +414,7 @@
     No,                      !- Apply Weekend Holiday Rule
     Yes,                     !- Use Weather File Rain Indicators
     Yes;                     !- Use Weather File Snow Indicators
-	
+    
 
   Site:GroundTemperature:BuildingSurface,20.03,20.03,20.13,20.30,20.43,20.52,20.62,20.77,20.78,20.55,20.44,20.20;
 
@@ -2059,16 +2058,16 @@
     Fraction,                !- Schedule Type Limits Name
     Through: 12/31,          !- Field 1
     For: Weekdays CustomDay1 CustomDay2, !- Field 2
-    Until: 6:00,0.25,        !- Field 3	
+    Until: 6:00,0.25,        !- Field 3 
     Until: 8:00,0.50,        !- Field 4
     Until: 18:00,1.00,       !- Field 5
-    Until: 21:00,0.50,       !- Field 6	
+    Until: 21:00,0.50,       !- Field 6 
     Until: 24:00,0.25,       !- Field 7
     For: SummerDesignDay WinterDesignDay, !- Field 14
     Until: 24:00,1.0,        !- Field 8
     For: Weekends Holidays,  !- Field 9
     Until: 24:00,0.50;       !- Field 10
-	
+    
   Schedule:Compact,
     Min OA Sched,            !- Name
     Fraction,                !- Schedule Type Limits Name
