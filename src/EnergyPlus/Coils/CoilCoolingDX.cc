@@ -801,7 +801,7 @@ void CoilCoolingDX::passThroughNodeData(EnergyPlus::DataLoopNode::NodeData &in, 
 
 void CoilCoolingDX::reportAllStandardRatings(OutputFiles &outputFiles) {
 
-    if (coilCoolingDXs.size() > 0) {
+    if (!coilCoolingDXs.empty()) {
         Real64 const ConvFromSIToIP(3.412141633);              // Conversion from SI to IP [3.412 Btu/hr-W]
         static constexpr auto Format_990(
                 "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
