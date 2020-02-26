@@ -136,10 +136,10 @@ struct CoilCoolingDXCurveFitPerformance
     Real64 wasteHeatRate = 0.0;
 
     // standard rating stuff -- for now just 210/240
-    Real64 standardRatingCoolingCapacity = 0.0;
-    Real64 standardRatingSEER = 0.0;
-    Real64 standardRatingEER = 0.0;
-    Real64 standardRatingIEER = 0.0;
+    Real64 standardRatingCoolingCapacity = 0.0;  // net cooling capacity of single speed DX cooling coil
+    Real64 standardRatingSEER = 0.0;  // seasonal energy efficiency ratio of single speed DX cooling coil
+    Real64 standardRatingEER = 0.0;  // energy efficiency ratio of single speed DX cooling coil
+    Real64 standardRatingIEER = 0.0;  // Integrated energy efficiency ratio of single speed DX cooling coil
 
     CoilCoolingDXCurveFitOperatingMode normalMode;
     bool hasAlternateMode = false;
