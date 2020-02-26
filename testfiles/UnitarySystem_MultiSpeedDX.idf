@@ -1777,6 +1777,10 @@
 
   Output:Variable,*,Cooling Coil Runtime Fraction,hourly;
 
+  Output:Variable,*,Unitary System DX Coil Speed Ratio,hourly; !- HVAC Average []
+
+  Output:Variable,*,Unitary System DX Coil Speed Level,hourly; !- HVAC Average []
+
   Output:VariableDictionary,IDF;
 
   Output:Meter:MeterFileOnly,Electricity:Facility,monthly;
@@ -2701,8 +2705,8 @@
     Sys 1 Furnace DX Cool Air Loop Inlet,  !- Return Air Node Name
     Sys 1 Furnace DX Cool Mixed Air Outlet,  !- Mixed Air Node Name
     Sys 1 Furnace DX Cool Outdoor Air Inlet,  !- Actuator Node Name
-    autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
-    autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
+    0.0,                !- Minimum Outdoor Air Flow Rate {m3/s}
+    0.0,                !- Maximum Outdoor Air Flow Rate {m3/s}
     DifferentialDryBulb,     !- Economizer Control Type
     ModulateFlow,            !- Economizer Control Action Type
     20,                      !- Economizer Maximum Limit Dry-Bulb Temperature {C}
@@ -3170,8 +3174,8 @@
     Sys 2 Furnace DX Cool Air Loop Inlet,  !- Return Air Node Name
     Sys 2 Furnace DX Cool Mixed Air Outlet,  !- Mixed Air Node Name
     Sys 2 Furnace DX Cool Outdoor Air Inlet,  !- Actuator Node Name
-    autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
-    autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
+    0.0,                !- Minimum Outdoor Air Flow Rate {m3/s}
+    0.0,                !- Maximum Outdoor Air Flow Rate {m3/s}
     DifferentialDryBulb,     !- Economizer Control Type
     ModulateFlow,            !- Economizer Control Action Type
     20,                      !- Economizer Maximum Limit Dry-Bulb Temperature {C}
@@ -3820,8 +3824,8 @@
     Sys 3 Heat Pump Air Source Air Loop Inlet,  !- Return Air Node Name
     Sys 3 Heat Pump Air Source Mixed Air Outlet,  !- Mixed Air Node Name
     Sys 3 Heat Pump Air Source Outdoor Air Inlet,  !- Actuator Node Name
-    autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
-    autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
+    0.0,                !- Minimum Outdoor Air Flow Rate {m3/s}
+    0.0,                !- Maximum Outdoor Air Flow Rate {m3/s}
     DifferentialDryBulb,     !- Economizer Control Type
     ModulateFlow,            !- Economizer Control Action Type
     20,                      !- Economizer Maximum Limit Dry-Bulb Temperature {C}
@@ -4470,8 +4474,8 @@
     Sys 4 Heat Pump Air Source Air Loop Inlet,  !- Return Air Node Name
     Sys 4 Heat Pump Air Source Mixed Air Outlet,  !- Mixed Air Node Name
     Sys 4 Heat Pump Air Source Outdoor Air Inlet,  !- Actuator Node Name
-    autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
-    autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
+    0.0,                !- Minimum Outdoor Air Flow Rate {m3/s}
+    0.0,                !- Maximum Outdoor Air Flow Rate {m3/s}
     DifferentialDryBulb,     !- Economizer Control Type
     ModulateFlow,            !- Economizer Control Action Type
     20,                      !- Economizer Maximum Limit Dry-Bulb Temperature {C}
@@ -4974,8 +4978,8 @@
     Sys 5 Furnace DX Cool Air Loop Inlet,  !- Return Air Node Name
     Sys 5 Furnace DX Cool Mixed Air Outlet,  !- Mixed Air Node Name
     Sys 5 Furnace DX Cool Outdoor Air Inlet,  !- Actuator Node Name
-    autosize,                !- Minimum Outdoor Air Flow Rate {m3/s}
-    autosize,                !- Maximum Outdoor Air Flow Rate {m3/s}
+    0.0,                !- Minimum Outdoor Air Flow Rate {m3/s}
+    0.0,                !- Maximum Outdoor Air Flow Rate {m3/s}
     DifferentialDryBulb,     !- Economizer Control Type
     ModulateFlow,            !- Economizer Control Action Type
     20,                      !- Economizer Maximum Limit Dry-Bulb Temperature {C}

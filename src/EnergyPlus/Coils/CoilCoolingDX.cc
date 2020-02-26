@@ -836,7 +836,6 @@ void CoilCoolingDX::reportAllStandardRatings(OutputFiles &outputFiles) {
                                                      coil.performance.standardRatingIEER * ConvFromSIToIP, 2);
             OutputReportPredefined::addFootNoteSubTable(OutputReportPredefined::pdstDXCoolCoil,
                                                         "ANSI/AHRI ratings account for supply air fan heat and electric power.");
-
         }
     }
     stillNeedToReportStandardRatings = false;
