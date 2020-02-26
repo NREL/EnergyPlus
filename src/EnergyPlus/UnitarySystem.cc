@@ -2129,7 +2129,8 @@ namespace UnitarySystems {
                 this->m_IdleSpeedRatio = this->m_IdleVolumeAirRate / this->m_DesignFanVolFlowRate;
             }
 
-        } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
+        } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
+                   this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
 
             if (this->m_NumOfSpeedCooling > 0) {
                 if (this->m_CoolVolumeFlowRate.empty()) this->m_CoolVolumeFlowRate.resize(this->m_NumOfSpeedCooling + 1);
@@ -2167,6 +2168,15 @@ namespace UnitarySystems {
             } else if (this->m_CoolVolumeFlowRate.empty()) {
                 this->m_IdleVolumeAirRate = this->m_MaxNoCoolHeatAirVolFlow;
                 this->m_IdleMassFlowRate = this->MaxNoCoolHeatAirMassFlow;
+                this->m_IdleSpeedRatio = this->m_IdleVolumeAirRate / this->m_DesignFanVolFlowRate;
+            } else {
+                for (Iter = this->m_NumOfSpeedCooling; Iter > 0; --Iter) {
+                    this->m_CoolVolumeFlowRate[Iter] = this->m_MaxCoolAirVolFlow * Iter / this->m_NumOfSpeedCooling;
+                    this->m_CoolMassFlowRate[Iter] = this->m_CoolVolumeFlowRate[Iter] * DataEnvironment::StdRhoAir;
+                    this->m_MSCoolingSpeedRatio[Iter] = this->m_CoolVolumeFlowRate[Iter] / this->m_DesignFanVolFlowRate;
+                }
+                this->m_IdleVolumeAirRate = this->m_MaxNoCoolHeatAirVolFlow;
+                this->m_IdleMassFlowRate = this->m_IdleVolumeAirRate * DataEnvironment::StdRhoAir;
                 this->m_IdleSpeedRatio = this->m_IdleVolumeAirRate / this->m_DesignFanVolFlowRate;
             }
         } else if (this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWater ||
@@ -4322,7 +4332,10 @@ namespace UnitarySystems {
 
                         } else { // mine data from DX cooling coil
 
-                            if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) thisSys.m_NumOfSpeedCooling = 2;
+                            if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_CoolingTwoSpeed) {
+                                thisSys.m_NumOfSpeedCooling = 2;
+                                thisSys.m_MultiOrVarSpeedCoolCoil = true;
+                            }
 
                             // Get DX cooling coil index
                             DXCoils::GetDXCoilIndex(loc_m_CoolingCoilName, thisSys.m_CoolingCoilIndex, isNotOK);
