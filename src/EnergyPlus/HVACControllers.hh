@@ -235,6 +235,8 @@ namespace HVACControllers {
 
         bool HumRatCtrlOverride; // true if TemperatureAndHumidityRatio control switches to humidity ratio control
 
+        int MinFlowOverrideErrorIndex;
+
         // Default Constructor
         ControllerPropsType()
             : ControllerType_Num(ControllerSimple_Type), ControlVar(iNoControlVariable), ActuatorVar(0), Action(iNoAction), InitFirstPass(true),
@@ -244,7 +246,8 @@ namespace HVACControllers {
               ActuatedNodePlantLoopNum(0), ActuatedNodePlantLoopSide(0), ActuatedNodePlantLoopBranchNum(0), SensedNode(0),
               IsSetPointDefinedFlag(false), SetPointValue(0.0), SensedValue(0.0), DeltaSensed(0.0), Offset(0.0), HumRatCntrlType(0), Range(0.0),
               Limit(0.0), TraceFileUnit(0), FirstTraceFlag(true), BadActionErrCount(0), BadActionErrIndex(0), FaultyCoilSATFlag(false),
-              FaultyCoilSATIndex(0), FaultyCoilSATOffset(0.0), BypassControllerCalc(false), AirLoopControllerIndex(0), HumRatCtrlOverride(false)
+              FaultyCoilSATIndex(0), FaultyCoilSATOffset(0.0), BypassControllerCalc(false), AirLoopControllerIndex(0), HumRatCtrlOverride(false),
+              MinFlowOverrideErrorIndex(0)
         {
         }
     };

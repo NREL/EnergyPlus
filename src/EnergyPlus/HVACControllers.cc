@@ -1158,6 +1158,9 @@ namespace HVACControllers {
             } else if (ControllerProps(ControlNum).MinVolFlowActuated >= ControllerProps(ControlNum).MaxVolFlowActuated) {
                 ShowFatalError("Controller:WaterCoil, Minimum control flow is > or = Maximum control flow; " +
                                ControllerProps(ControlNum).ControllerName);
+            } else if (ControllerProps(ControlNum).MinVolFlowActuated > 0) {
+                ShowWarningError("Controller:WaterCoil, Minimum control flow is greater than zero which isn't recommended; " +
+                                 ControllerProps(ControlNum).ControllerName);
             }
 
             // Setup root finder after sizing calculation
@@ -1319,6 +1322,31 @@ namespace HVACControllers {
                     // (i.e., reset MinAvailActuated based on Node%MassFlowRateMaxAvail)
                     ControllerProps(ControlNum).MinAvailActuated =
                         min(ControllerProps(ControlNum).MinAvailActuated, ControllerProps(ControlNum).MaxAvailActuated);
+
+                    // If the Node flow rate is zero (or just < MinAvail?), we override the min value to zero
+                    if (ControllerProps(ControlNum).ActuatedValue < ControllerProps(ControlNum).MinAvailActuated) {
+
+                        if (!WarmupFlag) {
+                            if (ControllerProps(ControlNum).MinFlowOverrideErrorIndex == 0) {
+                                ShowWarningError("Controller:WaterCoil '" + ControllerProps(ControlNum).ControllerName
+                                               + "', Minimum control flow is greater than requested flow rate:");
+                                ShowContinueError(" Minimum avail actuated=" + General::TrimSigDigits(ControllerProps(ControlNum).MinAvailActuated, NumSigDigits));
+                                ShowContinueError(" Node Mass Flow Rate=" + General::TrimSigDigits(ControllerProps(ControlNum).ActuatedValue, NumSigDigits));
+                                ShowContinueError(" Resetting Mininimum Available Actuated to Node Flow. Check Inputs in Controller:WaterCoil.");
+                                ShowContinueErrorTimeStamp("");
+                            }
+                            ShowRecurringWarningErrorAtEnd("Controller:WaterCoil '" + ControllerProps(ControlNum).ControllerName
+                                    + "', Minimum control flow is greater than requested flow rate hand has been reset.",
+                                    ControllerProps(ControlNum).MinFlowOverrideErrorIndex,
+                                    ControllerProps(ControlNum).MinAvailActuated, // Report Max
+                                    ControllerProps(ControlNum).MinAvailActuated, // Report Min
+                                    _,             // Don't report Sum
+                                    "{kg/s}",         // Max Unit
+                                    "{kg/s}");        // Min Unit
+                        }
+
+                        ControllerProps(ControlNum).MinAvailActuated = ControllerProps(ControlNum).ActuatedValue;
+                    }
                 }
 
             } else {
@@ -1508,6 +1536,9 @@ namespace HVACControllers {
         // Intialize root finder
         if (ControllerProps(ControlNum).NumCalcCalls == 1) {
             // Set min/max boundaries for root finder on first iteration
+
+            // There's no real point doing it if MaxAvailActuated is zero is there?
+
             InitializeRootFinder(RootFinders(ControlNum),
                                  ControllerProps(ControlNum).MinAvailActuated,
                                  ControllerProps(ControlNum).MaxAvailActuated); // XMin | XMax
@@ -1721,10 +1752,22 @@ namespace HVACControllers {
                 if (RootFinders(ControlNum).LowerPoint.DefinedFlag) {
                     ShowContinueError(" Lower bracket is x=" + TrimSigDigits(RootFinders(ControlNum).LowerPoint.X, NumSigDigits));
                 }
+                bool fatalOut = true;
                 if (RootFinders(ControlNum).UpperPoint.DefinedFlag) {
                     ShowContinueError(" Upper bracket is x=" + TrimSigDigits(RootFinders(ControlNum).UpperPoint.X, NumSigDigits));
+                    // If the upper bracket was zero, just use zero
+                    if (RootFinders(ControlNum).UpperPoint.X == 0) {
+                        fatalOut = false;
+                        ControllerProps(ControlNum).ActuatedValue = 0;
+                        ShowContinueError(" Resetting candidate x=" + TrimSigDigits(RootFinders(ControlNum).UpperPoint.X, NumSigDigits));
+                        // Indicate convergence with max value
+                        // Should be the same as ControllerProps(ControlNum)%MaxAvailActuated
+                        ExitCalcController(ControlNum, RootFinders(ControlNum).MaxPoint.X, iModeMaxActive, IsConvergedFlag, IsUpToDateFlag);
+                    }
                 }
-                ShowFatalError("Preceding error causes program termination.");
+                if (fatalOut) {
+                    ShowFatalError("Preceding error causes program termination.");
+                }
 
                 // Detected control function with wrong action between the min and max points.
                 // Should never happen: probably indicative of some serious problems in IDFs
