@@ -790,32 +790,43 @@ void CoilCoolingDX::passThroughNodeData(EnergyPlus::DataLoopNode::NodeData &in, 
 
 void CoilCoolingDX::reportAllStandardRatings(OutputFiles &outputFiles) {
 
-    Real64 const ConvFromSIToIP(3.412141633);              // Conversion from SI to IP [3.412 Btu/hr-W]
-    static constexpr auto Format_990("! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
-                                     "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER {Btu/W-h}, IEER {Btu/W-h}\n");
-    print(outputFiles.eio, "{}", Format_990);
-    for (auto & coil : coilCoolingDXs) {
-        coil.performance.calcStandardRatings210240();
+    if (coilCoolingDXs.size() > 0) {
+        Real64 const ConvFromSIToIP(3.412141633);              // Conversion from SI to IP [3.412 Btu/hr-W]
+        static constexpr auto Format_990(
+                "! <DX Cooling Coil Standard Rating Information>, Component Type, Component Name, Standard Rating (Net) "
+                "Cooling Capacity {W}, Standard Rated Net COP {W/W}, EER {Btu/W-h}, SEER {Btu/W-h}, IEER {Btu/W-h}\n");
+        print(outputFiles.eio, "{}", Format_990);
+        for (auto &coil : coilCoolingDXs) {
+            coil.performance.calcStandardRatings210240();
 
-        static constexpr auto Format_991(" DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}\n");
-        print(outputFiles.eio, Format_991,
-                "Coil:Cooling:DX", coil.name,
-                coil.performance.standardRatingCoolingCapacity,
-                coil.performance.standardRatingEER,
-                coil.performance.standardRatingEER * ConvFromSIToIP,
-                coil.performance.standardRatingSEER * ConvFromSIToIP,
-                coil.performance.standardRatingIEER * ConvFromSIToIP);
+            static constexpr auto Format_991(
+                    " DX Cooling Coil Standard Rating Information, {}, {}, {:.1R}, {:.2R}, {:.2R}, {:.2R}, {:.2R}\n");
+            print(outputFiles.eio, Format_991,
+                  "Coil:Cooling:DX", coil.name,
+                  coil.performance.standardRatingCoolingCapacity,
+                  coil.performance.standardRatingEER,
+                  coil.performance.standardRatingEER * ConvFromSIToIP,
+                  coil.performance.standardRatingSEER * ConvFromSIToIP,
+                  coil.performance.standardRatingIEER * ConvFromSIToIP);
 
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilType, coil.name, "Coil:Cooling:DX");
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilNetCapSI, coil.name, coil.performance.standardRatingCoolingCapacity, 1);
-        // W/W is the same as Btuh/Btuh so that's fine too
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilCOP, coil.name, coil.performance.standardRatingEER, 2);
-        // Btu/W-h will convert to itself
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilEERIP, coil.name, coil.performance.standardRatingEER * ConvFromSIToIP, 2);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilSEERIP, coil.name, coil.performance.standardRatingSEER * ConvFromSIToIP, 2);
-        OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilIEERIP, coil.name, coil.performance.standardRatingIEER * ConvFromSIToIP, 2);
-        OutputReportPredefined::addFootNoteSubTable(OutputReportPredefined::pdstDXCoolCoil, "ANSI/AHRI ratings account for supply air fan heat and electric power.");
+            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilType, coil.name,
+                                                     "Coil:Cooling:DX");
+            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilNetCapSI, coil.name,
+                                                     coil.performance.standardRatingCoolingCapacity, 1);
+            // W/W is the same as Btuh/Btuh so that's fine too
+            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilCOP, coil.name,
+                                                     coil.performance.standardRatingEER, 2);
+            // Btu/W-h will convert to itself
+            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilEERIP, coil.name,
+                                                     coil.performance.standardRatingEER * ConvFromSIToIP, 2);
+            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilSEERIP, coil.name,
+                                                     coil.performance.standardRatingSEER * ConvFromSIToIP, 2);
+            OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchDXCoolCoilIEERIP, coil.name,
+                                                     coil.performance.standardRatingIEER * ConvFromSIToIP, 2);
+            OutputReportPredefined::addFootNoteSubTable(OutputReportPredefined::pdstDXCoolCoil,
+                                                        "ANSI/AHRI ratings account for supply air fan heat and electric power.");
 
+        }
     }
     stillNeedToReportStandardRatings = false;
 }
