@@ -1095,9 +1095,7 @@ namespace StandardRatings {
                                                        PLFFPLRCurveIndex(spnum));
                 }
                 // Calculate the standard ratings for multispeed DX cooling coil
-                MultiSpeedDXCoolingCoilStandardRatings(DXCoilName,
-                                                       DXCoilType,
-                                                       CapFTempCurveIndex,
+                MultiSpeedDXCoolingCoilStandardRatings(CapFTempCurveIndex,
                                                        CapFFlowCurveIndex,
                                                        EIRFTempCurveIndex,
                                                        EIRFFlowCurveIndex,
@@ -1770,8 +1768,6 @@ namespace StandardRatings {
     }
 
     void MultiSpeedDXCoolingCoilStandardRatings(
-        std::string const &EP_UNUSED(DXCoilName),                  // Name of DX coil for which HSPF is calculated
-        std::string const &EP_UNUSED(DXCoilType),                  // Type of DX coil for which HSPF is calculated
         Array1A_int const CapFTempCurveIndex,                      // Index for the capacity as a function of temperature modifier curve
         Array1A_int const CapFFlowCurveIndex,                      // Index for the capacity as a function of flow fraction modifier curve
         Array1A_int const EIRFTempCurveIndex,                      // Index for the EIR as a function of temperature modifier curve
