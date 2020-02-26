@@ -136,7 +136,8 @@ namespace OutputReportPredefined {
 
     int pdchDXCoolCoilNetCapSI; // Standard Rated (Net) Cooling Capacity [W]
     int pdchDXCoolCoilCOP;      // EER/COP value in SI unit at AHRI std. 340/360 conditions [W/W]
-    int pdchDXCoolCoilSEERIP;   // SEER value in IP unit at AHRI std. 210/240 conditions [Btu/W-hr]
+    int pdchDXCoolCoilSEERIP;   // SEER value in IP unit at AHRI std. 210/240 conditions and user PLF curve [Btu/W-hr]
+    int pdchDXCoolCoilSEERDefIP;   // SEER value in IP unit at AHRI std. 210/240 conditions and default PLF curve and C_D value [Btu/W-hr]
     int pdchDXCoolCoilEERIP;    // EER value in IP unit at AHRI std. 340/360 conditions [Btu/W-h]
     int pdchDXCoolCoilIEERIP;   // IEER value in IP unit at AHRI std. 340/360 conditions
 
@@ -950,7 +951,8 @@ namespace OutputReportPredefined {
         pdchDXCoolCoilType = 0;     // DX cooling coil type
         pdchDXCoolCoilNetCapSI = 0; // Standard Rated (Net) Cooling Capacity [W]
         pdchDXCoolCoilCOP = 0;      // EER/COP value in SI unit at AHRI std. 340/360 conditions [W/W]
-        pdchDXCoolCoilSEERIP = 0;   // SEER value in IP unit at AHRI std. 210/240 conditions [Btu/W-hr]
+        pdchDXCoolCoilSEERIP = 0;   // SEER value in IP unit at AHRI std. 210/240 conditions and user PLF curve [Btu/W-hr]
+        pdchDXCoolCoilSEERDefIP = 0;   // SEER value in IP unit at AHRI std. 210/240 conditions and default PLF curve and C_D value [Btu/W-hr]
         pdchDXCoolCoilEERIP = 0;    // EER value in IP unit at AHRI std. 340/360 conditions [Btu/W-h]
         pdchDXCoolCoilIEERIP = 0;   // IEER value in IP unit at AHRI std. 340/360 conditions
         pdstDXCoolCoil2 = 0;
@@ -1842,6 +1844,7 @@ namespace OutputReportPredefined {
         pdchDXCoolCoilCOP = newPreDefColumn(pdstDXCoolCoil, "Standard Rated Net COP [W/W]");
         pdchDXCoolCoilEERIP = newPreDefColumn(pdstDXCoolCoil, "EER [Btu/W-h]");
         pdchDXCoolCoilSEERIP = newPreDefColumn(pdstDXCoolCoil, "SEER [Btu/W-h]");
+        pdchDXCoolCoilSEERDefIP = newPreDefColumn(pdstDXCoolCoil, "SEER Default [Btu/W-h]");
         pdchDXCoolCoilIEERIP = newPreDefColumn(pdstDXCoolCoil, "IEER [Btu/W-h]");
 
         // for DX Cooling Coil ASHRAE 127-12 Report

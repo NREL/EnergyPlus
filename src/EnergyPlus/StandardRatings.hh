@@ -234,6 +234,7 @@ namespace StandardRatings {
         Real64 const FanPowerPerEvapAirFlowRateFromInput, // Fan power per air volume flow rate through the evaporator coil
         Real64 &NetCoolingCapRated,                       // net cooling capacity of single speed DX cooling coil
         Real64 &SEER,                                     // seasonale energy efficiency ratio of single speed DX cooling coil
+        Real64 &SEER_default,                             // seasonale energy efficiency ratio of single speed DX cooling coil, from default PLF curve and C_D value 
         Real64 &EER,                                      // energy efficiency ratio of single speed DX cooling coil
         Real64 &IEER                                      // Integareted energy efficiency ratio of single speed DX cooling coil
     );
@@ -297,7 +298,8 @@ namespace StandardRatings {
                             std::string const &CompName,    // Name of component
                             int const CompTypeNum,          // TypeNum of component
                             Real64 const CoolCapVal,        // Standard total (net) cooling capacity for AHRI Std. 210/240 {W}
-                            Real64 const SEERValueIP,       // SEER value in IP units {Btu/W-h}
+                            Real64 const SEERValueIP,       // SEER value in IP units from user PLR curve {Btu/W-h}
+                            Real64 const SEERValueDefaultIP,// SEER value in IP units from AHRI Std 210/240-2008 default PLF curve and C_D {Btu/W-h}
                             Real64 const EERValueSI,        // EER value in SI units {W/W}
                             Real64 const EERValueIP,        // EER value in IP units {Btu/W-h}
                             Real64 const IEERValueIP,       // IEER value in IP units {Btu/W-h}
