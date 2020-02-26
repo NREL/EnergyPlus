@@ -240,12 +240,6 @@ void CoilCoolingDXCurveFitPerformance::calculate(CoilCoolingDXCurveFitOperatingM
 
 void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240() {
 
-    // "return values"
-    Real64 NetCoolingCapRated;                       // net cooling capacity of single speed DX cooling coil
-    Real64 SEER;                                     // seasonale energy efficiency ratio of single speed DX cooling coil
-    Real64 EER;                                      // energy efficiency ratio of single speed DX cooling coil
-    Real64 IEER;                                     // Integareted energy efficiency ratio of single speed DX cooling coil
-
     // for now this will provide standard ratings for the coil at the normal mode at speed N
     // future iterations will extend the inputs to give the user the flexibility to select different standards to
     // apply and such
@@ -275,7 +269,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240() {
     // The AHRI standard specifies a nominal/default fan electric power consumption per rated air
     // volume flow rate to account for indoor fan electric power consumption
     // when the standard tests are conducted on units that do not have an
-    // indoor air circulting fan. Used if user doesn't enter a specific value.
+    // indoor air circulating fan. Used if user doesn't enter a specific value.
     Real64 const DefaultFanPowerPerEvapAirFlowRate(773.3); // 365 W/1000 scfm or 773.3 W/(m3/s).
     // AHRI Standard 210/240-2008 Performance Test Conditions for Unitary Air-to-Air Air-Conditioning and Heat Pump Equipment
     Real64 const CoolingCoilInletAirWetBulbTempRated(19.44); // 19.44C (67F)  Tests A and B
@@ -295,8 +289,6 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240() {
     if (speed.rated_evap_fan_power_per_volume_flow_rate > 0.0) {
         FanPowerPerEvapAirFlowRate = speed.rated_evap_fan_power_per_volume_flow_rate;
     }
-
-    // TODO: mode.ratedEvapAirFlowRate is used a lot in here, make sure it is volume flow rate
 
     if (mode.ratedGrossTotalCap > 0.0) {
         // SEER calculations:
@@ -318,15 +310,15 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240() {
         // First evaluate the Part Load Factor curve at PLR = 0.5 (AHRI Standard 210/240)
         PartLoadFactor = CurveManager::CurveValue(speed.indexPLRFPLF, PLRforSEER);
         if (TotalElecPower > 0.0) {
-            SEER = (NetCoolingCapAHRI / TotalElecPower) * PartLoadFactor;
+            this->standardRatingSEER = (NetCoolingCapAHRI / TotalElecPower) * PartLoadFactor;
         } else {
-            SEER = 0.0;
+            this->standardRatingSEER = 0.0;
         }
 
         // EER calculations:
         // Calculate the net cooling capacity at the rated conditions (19.44C WB and 35.0C DB )
         TotCapTempModFac = CurveManager::CurveValue(speed.indexCapFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
-        NetCoolingCapRated = mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac - FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate;
+        this->standardRatingCoolingCapacity = mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac - FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate;
         // Calculate Energy Efficiency Ratio (EER) at (19.44C WB and 35.0C DB ), ANSI/AHRI Std. 340/360
         EIRTempModFac = CurveManager::CurveValue(speed.indexEIRFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
         if (speed.ratedCOP > 0.0) {
@@ -337,16 +329,16 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240() {
         }
         TotalElecPowerRated = EIR * (mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac) + FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate;
         if (TotalElecPowerRated > 0.0) {
-            EER = NetCoolingCapRated / TotalElecPowerRated;
+            this->standardRatingEER = this->standardRatingCoolingCapacity / TotalElecPowerRated;
         } else {
-            EER = 0.0;
+            this->standardRatingEER = 0.0;
         }
 
         // IEER calculations:
-        IEER = 0.0;
+        this->standardRatingIEER = 0.0;
         // Calculate the net cooling capacity at the rated conditions (19.44C WB and 35.0C DB )
         TotCapTempModFac = CurveManager::CurveValue(speed.indexCapFT, CoolingCoilInletAirWetBulbTempRated, OutdoorUnitInletAirDryBulbTempRated);
-        NetCoolingCapRated = mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac - FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate;
+        this->standardRatingCoolingCapacity = mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac - FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate;
         for (RedCapNum = 1; RedCapNum <= NumOfReducedCap; ++RedCapNum) {
             // get the outdoor air dry bulb temperature for the reduced capacity test conditions
             if (ReducedPLR(RedCapNum) > 0.444) {
@@ -363,7 +355,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240() {
                 EIR = 0.0;
             }
             if (NetCoolingCapReduced > 0.0) {
-                LoadFactor = ReducedPLR(RedCapNum) * NetCoolingCapRated / NetCoolingCapReduced;
+                LoadFactor = ReducedPLR(RedCapNum) * this->standardRatingCoolingCapacity / NetCoolingCapReduced;
             } else {
                 LoadFactor = 1.0;
             }
@@ -371,14 +363,9 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings210240() {
             ElecPowerReducedCap = DegradationCoeff * EIR * (mode.ratedGrossTotalCap * TotCapTempModFac * TotCapFlowModFac);
             EERReduced =
                     (LoadFactor * NetCoolingCapReduced) / (LoadFactor * ElecPowerReducedCap + FanPowerPerEvapAirFlowRate * mode.ratedEvapAirFlowRate);
-            IEER += IEERWeightingFactor(RedCapNum) * EERReduced;
+            this->standardRatingIEER += IEERWeightingFactor(RedCapNum) * EERReduced;
         }
 
-        // move some things to the struct // TODO: Just remove intermediate variables
-        this->standardRatingCoolingCapacity = NetCoolingCapRated;
-        this->standardRatingEER = EER;
-        this->standardRatingIEER = IEER;
-        this->standardRatingSEER = SEER;
     } else {
         ShowSevereError("Standard Ratings: Coil:Cooling:DX " + this->name +  // TODO: Use dynamic COIL TYPE and COIL INSTANCE name later
                         " has zero rated total cooling capacity. Standard ratings cannot be calculated.");
