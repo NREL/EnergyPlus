@@ -88,7 +88,7 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(CoilCoolingDXC
         ShowContinueError("...At least one of the four input parameters for the latent capacity degradation model");
         ShowContinueError("...is set to zero. Therefore, the latent degradation model will not be used for this simulation.");
         this->latentDegradationActive = false;
-    } else {
+    } else if (this->maxCyclingRate > 0.0 && this->evapRateRatio > 0.0 && this->latentTimeConst > 0.0 && this->timeForCondensateRemoval > 0.0) {
         this->latentDegradationActive = true;
     }
 
