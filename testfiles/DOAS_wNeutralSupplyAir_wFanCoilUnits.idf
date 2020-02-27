@@ -45,8 +45,8 @@
 ! Natural Ventilation:            None
 ! Compact Schedules:              Yes
 !
-! HVAC:                           Four pipe fan coil system with dedicated outdoor air system and neutral air supply, 
-!                                 hot water heating coils, and chilled water cooling coils. Central Plant is single 
+! HVAC:                           Four pipe fan coil system with dedicated outdoor air system and neutral air supply,
+!                                 hot water heating coils, and chilled water cooling coils. Central Plant is single
 !                                 hot water boiler, electric compression chiller with water cooled condenser.
 !                                 All equipment is autosized.
 !
@@ -101,11 +101,10 @@ Building,
 !-   ===========  ALL OBJECTS IN CLASS: SHADOWCALCULATION ===========
 
 ShadowCalculation,
-    AverageOverDaysInFrequency,  !- Calculation Method
-    20,                      !- Calculation Frequency
-    15000,                   !- Maximum Figures in Shadow Overlap Calculations
-    SutherlandHodgman,       !- Polygon Clipping Algorithm
-    SimpleSkyDiffuseModeling;!- Sky Diffuse Modeling Algorithm
+    PolygonClipping,         !- Shading Calculation Method
+    Periodic,                !- Shading Calculation Update Frequency Method
+    20,                       !- Shading Calculation Update Frequency
+    15000;                   !- Maximum Figures in Shadow Overlap Calculations
 
 
 !-   ===========  ALL OBJECTS IN CLASS: HEATBALANCEALGORITHM ===========

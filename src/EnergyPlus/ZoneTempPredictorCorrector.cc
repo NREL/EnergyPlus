@@ -268,7 +268,11 @@ namespace ZoneTempPredictorCorrector {
     // Zone temperature history - used only for oscillation test
     Array2D<Real64> ZoneTempHist;
     Array1D<Real64> ZoneTempOscillate;
+    Array1D<Real64> ZoneTempOscillateDuringOccupancy;
+    Array1D<Real64> ZoneTempOscillateInDeadband;
     Real64 AnyZoneTempOscillate;
+    Real64 AnyZoneTempOscillateDuringOccupancy;
+    Real64 AnyZoneTempOscillateInDeadband;
 
     // SUBROUTINE SPECIFICATIONS:
 
@@ -6933,27 +6937,45 @@ namespace ZoneTempPredictorCorrector {
         // static bool SetupOscillationOutputFlag( true );
         /////////////////////////////////////////////////
         bool isAnyZoneOscillating;
+        bool isAnyZoneOscillatingDuringOccupancy;
+        bool isAnyZoneOscillatingInDeadband;
+
+        using ThermalComfort::ThermalComfortInASH55;
+        using DataZoneEnergyDemands::CurDeadBandOrSetback;
 
         // first time run allocate arrays and setup output variable
         if (SetupOscillationOutputFlag) {
             ZoneTempHist.allocate(4, NumOfZones);
             ZoneTempHist = 0.0;
             ZoneTempOscillate.dimension(NumOfZones, 0.0);
+            ZoneTempOscillateDuringOccupancy.dimension(NumOfZones, 0.0);
+            ZoneTempOscillateInDeadband.dimension(NumOfZones, 0.0);
             // set up zone by zone variables
             // CurrentModuleObject='Zone'
             for (iZone = 1; iZone <= NumOfZones; ++iZone) {
                 SetupOutputVariable(
                     "Zone Oscillating Temperatures Time", OutputProcessor::Unit::hr, ZoneTempOscillate(iZone), "System", "Sum", Zone(iZone).Name);
+                SetupOutputVariable(
+                    "Zone Oscillating Temperatures During Occupancy Time", OutputProcessor::Unit::hr, ZoneTempOscillateDuringOccupancy(iZone), "System", "Sum", Zone(iZone).Name);
+                SetupOutputVariable(
+                    "Zone Oscillating Temperatures in Deadband Time", OutputProcessor::Unit::hr, ZoneTempOscillateInDeadband(iZone), "System", "Sum", Zone(iZone).Name);
             }
             // set up a variable covering all zones
             SetupOutputVariable(
                 "Facility Any Zone Oscillating Temperatures Time", OutputProcessor::Unit::hr, AnyZoneTempOscillate, "System", "Sum", "Facility");
+            SetupOutputVariable(
+                "Facility Any Zone Oscillating Temperatures During Occupancy Time", OutputProcessor::Unit::hr, AnyZoneTempOscillateDuringOccupancy, "System", "Sum", "Facility");
+            SetupOutputVariable(
+                "Facility Any Zone Oscillating Temperatures in Deadband Time", OutputProcessor::Unit::hr, AnyZoneTempOscillateInDeadband, "System", "Sum", "Facility");
             SetupOscillationOutputFlag = false;
         }
         // precalc the negative value for performance
         NegOscillateMagnitude = -OscillateMagnitude;
         // assume no zone is oscillating
         isAnyZoneOscillating = false;
+        isAnyZoneOscillatingDuringOccupancy = false;
+        isAnyZoneOscillatingInDeadband = false;
+
         for (iZone = 1; iZone <= NumOfZones; ++iZone) {
             isOscillate = false;
             ZoneTempHist(4, iZone) = ZoneTempHist(3, iZone);
@@ -6979,9 +7001,21 @@ namespace ZoneTempPredictorCorrector {
                     }
                 }
             }
+            ZoneTempOscillateDuringOccupancy(iZone) = 0.0;
+            ZoneTempOscillateInDeadband(iZone) = 0.0;
             if (isOscillate) {
                 ZoneTempOscillate(iZone) = TimeStepSys;
                 isAnyZoneOscillating = true;
+                if (allocated(ThermalComfortInASH55)) {
+                    if (ThermalComfortInASH55(iZone).ZoneIsOccupied) {
+                        ZoneTempOscillateDuringOccupancy(iZone) = TimeStepSys;
+                        isAnyZoneOscillatingDuringOccupancy = true;
+                    }
+                }
+                if (CurDeadBandOrSetback(iZone)) {
+                    ZoneTempOscillateInDeadband(iZone) = TimeStepSys;
+                    isAnyZoneOscillatingInDeadband = true;
+                }
             } else {
                 ZoneTempOscillate(iZone) = 0.0;
             }
@@ -6991,6 +7025,16 @@ namespace ZoneTempPredictorCorrector {
             AnyZoneTempOscillate = TimeStepSys;
         } else {
             AnyZoneTempOscillate = 0.0;
+        }
+        if (isAnyZoneOscillatingDuringOccupancy) {
+            AnyZoneTempOscillateDuringOccupancy = TimeStepSys;
+        } else {
+            AnyZoneTempOscillateDuringOccupancy = 0.0;
+        }
+        if (isAnyZoneOscillatingInDeadband) {
+            AnyZoneTempOscillateInDeadband = TimeStepSys;
+        } else {
+            AnyZoneTempOscillateInDeadband = 0.0;
         }
     }
 

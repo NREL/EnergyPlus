@@ -100,6 +100,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
+#include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
@@ -378,6 +379,7 @@ namespace HeatBalanceManager {
         ManageEMS(emsCallFromEndZoneTimestepAfterZoneReporting, anyRan); // EMS calling point
 
         UpdateEMSTrendVariables();
+        EnergyPlus::PluginManagement::pluginManager->updatePluginValues();
 
         if (WarmupFlag && EndDayFlag) {
 
@@ -1113,6 +1115,11 @@ namespace HeatBalanceManager {
             ZoneAirSolutionAlgo = Use3rdOrder;
             AlphaName(1) = "ThirdOrderBackwardDifference";
         }
+        if (DataHeatBalance::OverrideZoneAirSolutionAlgo) {
+            ZoneAirSolutionAlgo = UseEulerMethod;
+            AlphaName(1) = "EulerMethod";
+        }
+
 
         // Write Solution Algorithm to the initialization output file for User Verification
         static constexpr auto Format_726(
