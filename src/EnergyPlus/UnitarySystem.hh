@@ -620,7 +620,7 @@ namespace UnitarySystems {
                                         Real64 &OnOffAirFlowRatio,     // ratio of heating PLR to cooling PLR (is this correct?)
                                         Real64 const ZoneLoad,
                                         Real64 &FullSensibleOutput,
-                                        bool HXUnitOn, // Flag to control HX for HXAssisted Cooling Coil
+                                        bool &HXUnitOn, // Flag to control HX for HXAssisted Cooling Coil
                                         int CompOn);
 
         void initLoadBasedControl(int const AirLoopNum, // number of the current air loop being simulated

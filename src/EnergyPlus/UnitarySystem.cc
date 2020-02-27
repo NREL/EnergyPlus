@@ -7648,7 +7648,7 @@ namespace UnitarySystems {
                                                 Real64 &OnOffAirFlowRatio,     // ratio of heating PLR to cooling PLR (is this correct?)
                                                 Real64 const ZoneLoad,
                                                 Real64 &FullSensibleOutput,
-                                                bool HXUnitOn, // Flag to control HX for HXAssisted Cooling Coil
+                                                bool &HXUnitOn, // Flag to control HX for HXAssisted Cooling Coil
                                                 int CompOn)
     {
 
@@ -8267,7 +8267,7 @@ namespace UnitarySystems {
                         if (CoolingLoad) Par[6] = 1.0;
                         Par[7] = 1.0;               // FLAG, 0.0 if latent load, 1.0 if sensible load to be met
                         Par[8] = OnOffAirFlowRatio; // Ratio of compressor ON mass flow rate to AVERAGE mass flow rate over time step
-                        Par[9] = 0.0;               // HXUnitOn is always false for HX
+                        Par[9] = HXUnitOn;          // HXUnitOn is always false for HX
                         Par[10] = this->m_HeatingPartLoadFrac;
                         Par[11] = double(AirLoopNum);
 
@@ -8507,7 +8507,10 @@ namespace UnitarySystems {
         // RETURN if the moisture load is met
         if (MoistureLoad >= 0.0 || MoistureLoad >= TempLatOutput) return;
         // Multimode does not meet the latent load, only the sensible load with or without HX active
+        // what if there is a heating load for a system using Multimode?
         if (!CoolingLoad && this->m_DehumidControlType_Num == DehumCtrlType::Multimode) return;
+        // if HX was previously turned on return since sensible load is already met
+        if (CoolingLoad && this->m_DehumidControlType_Num == DehumCtrlType::Multimode && HXUnitOn) return;
         //  IF(HeatingLoad .AND. UnitarySystem(UnitarySysNum)%m_DehumidControlType_Num .EQ. dehumidm_ControlType::CoolReheat)RETURN
 
         if ((this->m_DehumidControlType_Num == DehumCtrlType::CoolReheat || this->m_DehumidControlType_Num == DehumCtrlType::Multimode)) {
@@ -10107,9 +10110,8 @@ namespace UnitarySystems {
                         CoilPLR = 0.0;
                     }
                 }
-                bool useDehumMode = (this->m_DehumidificationMode == 1 || HXUnitOn);
                 coilCoolingDXs[this->m_CoolingCoilIndex].simulate(
-                    useDehumMode, CoilPLR, this->m_CoolingSpeedNum, this->m_CoolingSpeedRatio, this->m_FanOpMode);
+                    HXUnitOn, CoilPLR, this->m_CoolingSpeedNum, this->m_CoolingSpeedRatio, this->m_FanOpMode);
                 if (this->m_CoolingSpeedNum > 1) {
                     this->m_CoolCompPartLoadRatio = 1.0;
                 } else {
