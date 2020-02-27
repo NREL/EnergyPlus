@@ -889,7 +889,7 @@ int EndEnergyPlus()
     Time_Finish = epElapsedTime();
     if (Time_Finish < Time_Start) Time_Finish += 24.0 * 3600.0;
     Elapsed_Time = Time_Finish - Time_Start;
-    if (DataGlobals::createProfLog) {
+    if (DataGlobals::createPerfLog) {
         UtilityRoutines::appendPerfLog("Run Time [seconds]", RoundSigDigits(Elapsed_Time, 2));
     }
 #ifdef EP_Detailed_Timings
@@ -908,7 +908,7 @@ int EndEnergyPlus()
     ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
     ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
 
-    if (DataGlobals::createProfLog) {
+    if (DataGlobals::createPerfLog) {
         UtilityRoutines::appendPerfLog("Run Time [string]", Elapsed);
         UtilityRoutines::appendPerfLog("Number of Warnings", NumWarnings);
         UtilityRoutines::appendPerfLog("Number of Severe", NumSevere, true); //last item so write the perfLog file

@@ -7651,7 +7651,7 @@ namespace OutputReportTabular {
             collapsedTotal(5) = gatherTotalsBEPS(4) + gatherTotalsBEPS(5); // district heating <- purchased heating | <- steam
             collapsedTotal(6) = gatherTotalsBEPS(7);                       // water
 
-            if (DataGlobals::createProfLog) {
+            if (DataGlobals::createPerfLog) {
                 UtilityRoutines::appendPerfLog("Electricity ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(1), 3));
                 UtilityRoutines::appendPerfLog("Natural Gas ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(2), 3));
                 UtilityRoutines::appendPerfLog("Additional Fuel ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(3), 3));
