@@ -62,7 +62,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -701,8 +701,8 @@ namespace FourPipeBeam {
         Node(this->airInNodeNum).MassFlowRate = this->mDotSystemAir;
         this->tDBZoneAirTemp = Node(this->zoneNodeIndex).Temp;
         this->tDBSystemAir = Node(this->airInNodeNum).Temp;
-        this->cpZoneAir = Psychrometrics::PsyCpAirFnWTdb(Node(this->zoneNodeIndex).HumRat, Node(this->zoneNodeIndex).Temp);
-        this->cpSystemAir = Psychrometrics::PsyCpAirFnWTdb(Node(this->airInNodeNum).HumRat, Node(this->airInNodeNum).Temp);
+        this->cpZoneAir = Psychrometrics::PsyCpAirFnW(Node(this->zoneNodeIndex).HumRat);
+        this->cpSystemAir = Psychrometrics::PsyCpAirFnW(Node(this->airInNodeNum).HumRat);
         this->qDotBeamCooling = 0.0;
         this->qDotBeamHeating = 0.0;
         this->supAirCoolingRate = 0.0;
@@ -724,7 +724,7 @@ namespace FourPipeBeam {
         using FluidProperties::GetSpecificHeatGlycol;
         using PlantUtilities::MyPlantSizingIndex;
         using PlantUtilities::RegisterPlantCompDesignFlow;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using ReportSizingManager::ReportSizingOutput;
         using namespace std::placeholders;
         using General::SolveRoot;
@@ -821,8 +821,7 @@ namespace FourPipeBeam {
             // max flow is as if the air supply was sufficient to provide all the conditioning
 
             if (beamCoolingPresent) {
-                cpAir = PsyCpAirFnWTdb(TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolCoilInHumRatTU,
-                                       TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolCoilInTempTU);
+                cpAir = PsyCpAirFnW(TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolCoilInHumRatTU);
 
                 if ((TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtCoolPeak -
                      TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolCoilInTempTU) > 2.0) { // avoid div by zero and blow up
@@ -847,10 +846,8 @@ namespace FourPipeBeam {
                 this->mDotHW = 0.0;
                 this->tDBZoneAirTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtCoolPeak;
                 this->tDBSystemAir = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolCoilInTempTU;
-                this->cpZoneAir = PsyCpAirFnWTdb(DataSizing::TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneHumRatAtCoolPeak,
-                                                 DataSizing::TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtCoolPeak);
-                this->cpSystemAir = PsyCpAirFnWTdb(DataSizing::TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolCoilInHumRatTU,
-                                                   DataSizing::TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolCoilInTempTU);
+                this->cpZoneAir = PsyCpAirFnW(DataSizing::TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneHumRatAtCoolPeak);
+                this->cpSystemAir = PsyCpAirFnW(DataSizing::TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolCoilInHumRatTU);
                 this->qDotZoneReq = -1.0 * TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolLoad;
                 this->qDotZoneToCoolSetPt = -1.0 * TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolLoad;
                 this->airAvailable = true;
@@ -868,8 +865,7 @@ namespace FourPipeBeam {
             }
 
             if (beamHeatingPresent) {
-                cpAir = PsyCpAirFnWTdb(TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInHumRatTU,
-                                       TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU);
+                cpAir = PsyCpAirFnW(TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInHumRatTU);
                 Real64 maxFlowHeat = 0.0;
                 if ((TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU -
                      TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtHeatPeak) > 2.0) { // avoid div by zero and blow up
@@ -891,10 +887,8 @@ namespace FourPipeBeam {
                 this->mDotCW = 0.0;
                 this->tDBZoneAirTemp = TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtHeatPeak;
                 this->tDBSystemAir = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU;
-                this->cpZoneAir = PsyCpAirFnWTdb(DataSizing::TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneHumRatAtHeatPeak,
-                                                 DataSizing::TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtHeatPeak);
-                this->cpSystemAir = PsyCpAirFnWTdb(DataSizing::TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInHumRatTU,
-                                                   DataSizing::TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInTempTU);
+                this->cpZoneAir = PsyCpAirFnW(DataSizing::TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneHumRatAtHeatPeak);
+                this->cpSystemAir = PsyCpAirFnW(DataSizing::TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatCoilInHumRatTU);
                 this->qDotZoneReq = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatLoad;
                 this->qDotZoneToHeatSetPt = TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatLoad;
                 this->airAvailable = true;

@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/SizingManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
@@ -315,7 +316,7 @@ TEST_F(EnergyPlusFixture, SizingManager_DOASControlStrategyDefaultSpecificationT
     ASSERT_EQ(DataSizing::AutoSize, ZoneSizingInput(1).DOASLowSetpoint);
     ASSERT_EQ(DataSizing::AutoSize, ZoneSizingInput(1).DOASHighSetpoint);
     // set default DOAS control strategy setpoint values
-    ZoneEquipmentManager::AutoCalcDOASControlStrategy();
+    ZoneEquipmentManager::AutoCalcDOASControlStrategy(OutputFiles::getSingleton());
     // check default low and high set point values
     ASSERT_EQ(21.1, ZoneSizingInput(1).DOASLowSetpoint);
     ASSERT_EQ(23.9, ZoneSizingInput(1).DOASHighSetpoint);
@@ -384,7 +385,7 @@ TEST_F(EnergyPlusFixture, SizingManager_DOASControlStrategyDefaultSpecificationT
     ASSERT_EQ(DataSizing::AutoSize, ZoneSizingInput(1).DOASLowSetpoint);
     ASSERT_EQ(DataSizing::AutoSize, ZoneSizingInput(1).DOASHighSetpoint);
     // set default DOAS control strategy setpoint values
-    ZoneEquipmentManager::AutoCalcDOASControlStrategy();
+    ZoneEquipmentManager::AutoCalcDOASControlStrategy(OutputFiles::getSingleton());
     // check default low and high set point values
     ASSERT_EQ(21.1, ZoneSizingInput(1).DOASLowSetpoint);
     ASSERT_EQ(23.9, ZoneSizingInput(1).DOASHighSetpoint);

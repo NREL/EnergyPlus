@@ -63,7 +63,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidCoolers.hh>
@@ -1650,7 +1650,7 @@ namespace FluidCoolers {
         Real64 AirDensity =
             Psychrometrics::PsyRhoAirFnPbTdbW(SimpleFluidCooler(FluidCoolerNum).AirPress, InletAirTemp, SimpleFluidCooler(FluidCoolerNum).AirHumRat);
         Real64 AirMassFlowRate = AirFlowRate * AirDensity;
-        Real64 CpAir = Psychrometrics::PsyCpAirFnWTdb(SimpleFluidCooler(FluidCoolerNum).AirHumRat, InletAirTemp);
+        Real64 CpAir = Psychrometrics::PsyCpAirFnW(SimpleFluidCooler(FluidCoolerNum).AirHumRat);
         Real64 CpWater = FluidProperties::GetSpecificHeatGlycol(DataPlant::PlantLoop(SimpleFluidCooler(FluidCoolerNum).LoopNum).FluidName,
                                                                 _InletWaterTemp,
                                                                 DataPlant::PlantLoop(SimpleFluidCooler(FluidCoolerNum).LoopNum).FluidIndex,

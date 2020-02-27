@@ -2314,7 +2314,7 @@
     Set Mix_H = ((Recirc_Mdot * Recirc_H) + (AirOAMdotDesign * OA_H)) / AirSupMdotDesign,  !- <none>
     Set Mix_W = ((Recirc_Mdot * PrimAir_Winlet) + (AirOAMdotDesign * OA_W)) / AirSupMdotDesign,  !- <none>
     Set Mix_Tdb = @TdbFnHW Mix_H Mix_W,  !- <none>
-    Set Mix_Cp = @CpAirFnWTdb Mix_W Mix_Tdb,  !- <none>
+    Set Mix_Cp = @CpAirFnW Mix_W,  !- <none>
     Set Mix_rho = @RhoAirFnPbTdbW OA_Press Mix_Tdb Mix_W,  !- <none>
     Set FanPower = (AirSupMdotDesign * FanDeltaP) / (FanEff * Mix_rho),  !- <none>
     Set FanPowerToAir = FanPower,  !- <none>

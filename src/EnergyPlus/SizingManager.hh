@@ -56,7 +56,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
-
+    class OutputFiles;
 namespace SizingManager {
 
     // Using/Aliasing
@@ -91,7 +91,7 @@ namespace SizingManager {
     // Functions
     void clear_state();
 
-    void ManageSizing();
+    void ManageSizing(OutputFiles &outputFiles);
 
     bool CalcdoLoadComponentPulseNow(bool const isPulseZoneSizing,
                                      bool const WarmupFlag,
@@ -126,7 +126,7 @@ namespace SizingManager {
 
     void GetAirTerminalSizing();
 
-    void GetSizingParams();
+    void GetSizingParams(OutputFiles &outputFiles);
 
     void GetZoneSizingInput();
 
@@ -139,7 +139,8 @@ namespace SizingManager {
 
     void SetupZoneSizing(bool &ErrorsFound);
 
-    void ReportZoneSizing(std::string const &ZoneName,   // the name of the zone
+    void ReportZoneSizing(OutputFiles &outputFiles,
+                          std::string const &ZoneName,   // the name of the zone
                           std::string const &LoadType,   // the description of the input variable
                           Real64 const CalcDesLoad,      // the value from the sizing calculation [W]
                           Real64 const UserDesLoad,      // the value from the sizing calculation modified by user input [W]
@@ -155,7 +156,8 @@ namespace SizingManager {
                           Real64 const DOASHeatAddRate   // zone design heat addition rate from the DOAS [W]
     );
 
-    void ReportSysSizing(std::string const &SysName,      // the name of the zone
+    void ReportSysSizing(OutputFiles &outputFiles,
+                         std::string const &SysName,      // the name of the zone
                          std::string const &LoadType,     // either "Cooling" or "Heating"
                          std::string const &PeakLoadType, // either "Sensible" or "Total"
                          Real64 const &UserDesCap,        // User  Design Capacity

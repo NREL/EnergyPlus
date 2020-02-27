@@ -58,7 +58,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
@@ -856,7 +856,7 @@ void ReportCoilSelection::doFinalProcessingOfCoilData()
             c->coilFlowPrcntPlantFlow = -999.0;
         }
 
-        c->cpDryAir = Psychrometrics::PsyCpAirFnWTdb(0.0, 20.0);
+        c->cpDryAir = Psychrometrics::PsyCpAirFnW(0.0);
         c->rhoStandAir = DataEnvironment::StdRhoAir;
 
         // apply ADP method to find an SHR for Ideal loads peak, calculate sensible capacity for cooling coils
@@ -1399,7 +1399,7 @@ void ReportCoilSelection::setCoilCoolingCapacity(
     }
 
     // calc sensible capacity from inlet outlet
-    c->cpMoistAir = Psychrometrics::PsyCpAirFnWTdb(c->coilDesEntHumRat, 0.5 * (c->coilDesEntTemp + c->coilDesLvgTemp));
+    c->cpMoistAir = Psychrometrics::PsyCpAirFnW(c->coilDesEntHumRat);
 }
 
 void ReportCoilSelection::setCoilHeatingCapacity(
@@ -1714,7 +1714,7 @@ void ReportCoilSelection::setCoilHeatingCapacity(
     }
 
     // calc sensible capacity from inlet outlet
-    c->cpMoistAir = Psychrometrics::PsyCpAirFnWTdb(c->coilDesLvgHumRat, 0.5 * (c->coilDesEntTemp + c->coilDesLvgTemp));
+    c->cpMoistAir = Psychrometrics::PsyCpAirFnW(c->coilDesLvgHumRat);
     // this is not generally correct but okay for heating coils
     c->coilSensCapAtPeak = std::abs(c->cpMoistAir * c->coilDesMassFlow * (c->coilDesLvgTemp - c->coilDesEntTemp));
     c->coilSensCapAtPeak = min(c->coilSensCapAtPeak, c->coilTotCapAtPeak);
