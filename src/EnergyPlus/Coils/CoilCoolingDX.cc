@@ -231,7 +231,12 @@ void CoilCoolingDX::instantiateFromInputSpec(const CoilCoolingDXInputSpecificati
 void CoilCoolingDX::oneTimeInit() {
 
     // setup output variables, needs to be done after object is instantiated and emplaced
-    SetupOutputVariable("Cooling Coil Total Cooling Rate", OutputProcessor::Unit::W, this->totalCoolingEnergyRate, "System", "Average", this->name);
+    SetupOutputVariable("Cooling Coil Total Cooling Rate",
+                        OutputProcessor::Unit::W,
+                        this->totalCoolingEnergyRate,
+                        "System",
+                        "Average",
+                        this->name);
     SetupOutputVariable("Cooling Coil Total Cooling Energy",
                         OutputProcessor::Unit::J,
                         this->totalCoolingEnergy,
@@ -243,11 +248,36 @@ void CoilCoolingDX::oneTimeInit() {
                         "COOLINGCOILS",
                         _,
                         "System");
-    SetupOutputVariable("Cooling Coil Sensible Cooling Rate", OutputProcessor::Unit::W, this->sensCoolingEnergyRate, "System", "Average", this->name);
-    SetupOutputVariable("Cooling Coil Sensible Cooling Energy", OutputProcessor::Unit::J, this->sensCoolingEnergy, "System", "Sum", this->name);
-    SetupOutputVariable("Cooling Coil Latent Cooling Rate", OutputProcessor::Unit::W, this->latCoolingEnergyRate, "System", "Average", this->name);
-    SetupOutputVariable("Cooling Coil Latent Cooling Energy", OutputProcessor::Unit::J, this->latCoolingEnergy, "System", "Sum", this->name);
-    SetupOutputVariable("Cooling Coil Electric Power", OutputProcessor::Unit::W, this->performance.powerUse, "System", "Average", this->name);
+    SetupOutputVariable("Cooling Coil Sensible Cooling Rate",
+                        OutputProcessor::Unit::W,
+                        this->sensCoolingEnergyRate,
+                        "System",
+                        "Average",
+                        this->name);
+    SetupOutputVariable("Cooling Coil Sensible Cooling Energy",
+                        OutputProcessor::Unit::J,
+                        this->sensCoolingEnergy,
+                        "System",
+                        "Sum",
+                        this->name);
+    SetupOutputVariable("Cooling Coil Latent Cooling Rate",
+                        OutputProcessor::Unit::W,
+                        this->latCoolingEnergyRate,
+                        "System",
+                        "Average",
+                        this->name);
+    SetupOutputVariable("Cooling Coil Latent Cooling Energy",
+                        OutputProcessor::Unit::J,
+                        this->latCoolingEnergy,
+                        "System",
+                        "Sum",
+                        this->name);
+    SetupOutputVariable("Cooling Coil Electric Power",
+                        OutputProcessor::Unit::W,
+                        this->performance.powerUse,
+                        "System",
+                        "Average",
+                        this->name);
     SetupOutputVariable("Cooling Coil Electric Energy",
                         OutputProcessor::Unit::J,
                         this->performance.electricityConsumption,
@@ -255,12 +285,37 @@ void CoilCoolingDX::oneTimeInit() {
                         "Sum",
                         this->name,
                         _,
-                        DataGlobalConstants::GetResourceTypeChar(this->performance.original_input_specs.compressor_fuel_type),
+                        "Electric",
                         "COOLING",
                         _,
                         "System");
-    SetupOutputVariable(
-        "Cooling Coil Runtime Fraction", OutputProcessor::Unit::None, this->coolingCoilRuntimeFraction, "System", "Average", this->name);
+
+    if (this->performance.compressorFuelType != DataGlobalConstants::iRT_Electricity) {
+        SetupOutputVariable("Cooling Coil " + DataGlobalConstants::GetResourceTypeChar(this->performance.compressorFuelType) + " Rate",
+                            OutputProcessor::Unit::W,
+                            this->performance.compressorFuelRate,
+                            "System",
+                            "Average",
+                            this->name);
+        SetupOutputVariable("Cooling Coil " + DataGlobalConstants::GetResourceTypeChar(this->performance.compressorFuelType) + " Energy",
+                            OutputProcessor::Unit::J,
+                            this->performance.compressorFuelConsumption,
+                            "System",
+                            "Sum",
+                            this->name,
+                            _,
+                            DataGlobalConstants::GetResourceTypeChar(this->performance.original_input_specs.compressor_fuel_type),
+                            "COOLING",
+                            _,
+                            "System");
+    }
+
+    SetupOutputVariable("Cooling Coil Runtime Fraction",
+                        OutputProcessor::Unit::None,
+                        this->coolingCoilRuntimeFraction,
+                        "System",
+                        "Average",
+                        this->name);
     SetupOutputVariable("Cooling Coil Crankcase Heater Electric Power",
                         OutputProcessor::Unit::W,
                         this->performance.crankcaseHeaterPower,
@@ -280,72 +335,71 @@ void CoilCoolingDX::oneTimeInit() {
                         "Plant");
    // Ported from variable speed coil
     SetupOutputVariable("Cooling Coil Air Mass Flow Rate",
-        OutputProcessor::Unit::kg_s,
-        this->airMassFlowRate,
-        "System",
-        "Average",
-        this->name);
+                        OutputProcessor::Unit::kg_s,
+                        this->airMassFlowRate,
+                        "System",
+                        "Average",
+                        this->name);
     SetupOutputVariable("Cooling Coil Air Inlet Temperature",
-        OutputProcessor::Unit::C,
-        this->inletAirDryBulbTemp,
-        "System",
-        "Average",
-        this->name);
+                        OutputProcessor::Unit::C,
+                        this->inletAirDryBulbTemp,
+                        "System",
+                        "Average",
+                        this->name);
     SetupOutputVariable("Cooling Coil Air Inlet Humidity Ratio",
-        OutputProcessor::Unit::kgWater_kgDryAir,
-        this->inletAirHumRat,
-        "System",
-        "Average",
-        this->name);
+                        OutputProcessor::Unit::kgWater_kgDryAir,
+                        this->inletAirHumRat,
+                        "System",
+                        "Average",
+                        this->name);
     SetupOutputVariable("Cooling Coil Air Outlet Temperature",
-        OutputProcessor::Unit::C,
-        this->outletAirDryBulbTemp,
-        "System",
-        "Average",
-        this->name);
+                        OutputProcessor::Unit::C,
+                        this->outletAirDryBulbTemp,
+                        "System",
+                        "Average",
+                        this->name);
     SetupOutputVariable("Cooling Coil Air Outlet Humidity Ratio",
-        OutputProcessor::Unit::kgWater_kgDryAir,
-        this->outletAirHumRat,
-        "System",
-        "Average",
-        this->name);
+                        OutputProcessor::Unit::kgWater_kgDryAir,
+                        this->outletAirHumRat,
+                        "System",
+                        "Average",
+                        this->name);
     SetupOutputVariable("Cooling Coil Part Load Ratio",
-        OutputProcessor::Unit::None,
-        this->partLoadRatioReport,
-        "System",
-        "Average",
-        this->name);
+                        OutputProcessor::Unit::None,
+                        this->partLoadRatioReport,
+                        "System",
+                        "Average",
+                        this->name);
     SetupOutputVariable("Cooling Coil Upper Speed Level",
-        OutputProcessor::Unit::None,
-        this->speedNumReport,
-        "System",
-        "Average",
-        this->name);
+                        OutputProcessor::Unit::None,
+                        this->speedNumReport,
+                        "System",
+                        "Average",
+                        this->name);
     SetupOutputVariable("Cooling Coil Neighboring Speed Levels Ratio",
-        OutputProcessor::Unit::None,
-        this->speedRatioReport,
-        "System",
-        "Average",
-        this->name);
+                        OutputProcessor::Unit::None,
+                        this->speedRatioReport,
+                        "System",
+                        "Average",
+                        this->name);
     SetupOutputVariable("Cooling Coil Condenser Inlet Temperature",
-        OutputProcessor::Unit::C,
-        this->condenserInletTemperature,
-        "System",
-        "Average",
-        this->name);
-    SetupOutputVariable(
-        "Cooling Coil Dehumidification Mode",
-        OutputProcessor::Unit::None,
-        this->dehumidificationMode,
-        "System",
-        "Average",
-        this->name);
+                        OutputProcessor::Unit::C,
+                        this->condenserInletTemperature,
+                        "System",
+                        "Average",
+                        this->name);
+    SetupOutputVariable("Cooling Coil Dehumidification Mode",
+                        OutputProcessor::Unit::None,
+                        this->dehumidificationMode,
+                        "System",
+                        "Average",
+                        this->name);
     SetupOutputVariable("Cooling Coil Waste Heat Power",
-        OutputProcessor::Unit::W,
-        this->wasteHeatEnergyRate,
-        "System",
-        "Average",
-        this->name);
+                        OutputProcessor::Unit::W,
+                        this->wasteHeatEnergyRate,
+                        "System",
+                        "Average",
+                        this->name);
     SetupOutputVariable("Cooling Coil Waste Heat Energy",
                         OutputProcessor::Unit::J,
                         this->wasteHeatEnergy,
@@ -373,8 +427,12 @@ void CoilCoolingDX::oneTimeInit() {
                             "System");
     }
     if (this->condensateTankIndex > 0) {
-        SetupOutputVariable(
-                "Cooling Coil Condensate Volume Flow Rate", OutputProcessor::Unit::m3_s, this->condensateVolumeFlow, "System", "Average", this->name);
+        SetupOutputVariable("Cooling Coil Condensate Volume Flow Rate",
+                            OutputProcessor::Unit::m3_s,
+                            this->condensateVolumeFlow,
+                            "System",
+                            "Average",
+                            this->name);
         SetupOutputVariable("Cooling Coil Condensate Volume",
                             OutputProcessor::Unit::m3,
                             this->condensateVolumeConsumption,
@@ -405,25 +463,31 @@ void CoilCoolingDX::oneTimeInit() {
                             "COOLING",
                             _,
                             "System");
-        SetupOutputVariable("Cooling Coil Evaporative Condenser Mains Supply Water Volume",
-                            OutputProcessor::Unit::m3,
-                            this->evaporativeCondSupplyTankVolumeFlow,
+        SetupOutputVariable("Cooling Coil Evaporative Condenser Water Volume Flow Rate",
+                            OutputProcessor::Unit::m3_s,
+                            this->evapCondPumpElecPower,
                             "System",
-                            "Sum",
-                            this->name,
-                            _,
-                            "MainsWater",
-                            "Cooling",
-                            _,
-                            "System");
+                            "Average",
+                            this->name);
         SetupOutputVariable("Cooling Coil Evaporative Condenser Water Volume",
                             OutputProcessor::Unit::m3,
-                            this->evaporativeCondSupplyTankVolumeFlow,
+                            this->evapCondPumpElecConsumption,
                             "System",
                             "Sum",
                             this->name,
                             _,
                             "Water",
+                            "Cooling",
+                            _,
+                            "System");
+        SetupOutputVariable("Cooling Coil Evaporative Condenser Mains Supply Water Volume",
+                            OutputProcessor::Unit::m3,
+                            this->evaporativeCondSupplyTankConsump,
+                            "System",
+                            "Sum",
+                            this->name,
+                            _,
+                            "MainsWater",
                             "Cooling",
                             _,
                             "System");
@@ -440,21 +504,6 @@ void CoilCoolingDX::oneTimeInit() {
         SetupOutputVariable("Secondary Coil Heat Rejection Energy",
                             OutputProcessor::Unit::J,
                             this->secCoilSensHeatRejEnergy,
-                            "System",
-                            "Sum",
-                            this->name);
-    }
-
-    if (this->performance.compressorFuelType != DataGlobalConstants::iRT_Electricity) {
-        SetupOutputVariable("Cooling Coil " + DataGlobalConstants::GetResourceTypeChar(this->performance.compressorFuelType) + " Rate",
-                            OutputProcessor::Unit::W,
-                            this->performance.compressorFuelRate,
-                            "System",
-                            "Average",
-                            this->name);
-        SetupOutputVariable("Cooling Coil " + DataGlobalConstants::GetResourceTypeChar(this->performance.compressorFuelType) + " Energy",
-                            OutputProcessor::Unit::J,
-                            this->performance.compressorFuelConsumption,
                             "System",
                             "Sum",
                             this->name);
@@ -631,6 +680,7 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
             Real64 condAirMassFlow = condInletNode.MassFlowRate; // TODO: How is this getting a value?
             Real64 waterDensity = Psychrometrics::RhoH2O(DataEnvironment::OutDryBulbTemp);
             this->evaporativeCondSupplyTankVolumeFlow = (condInletHumRat - outdoorHumRat) * condAirMassFlow / waterDensity;
+            this->evaporativeCondSupplyTankConsump = this->evaporativeCondSupplyTankVolumeFlow * reportingConstant;
             if (!useAlternateMode) {
                 this->evapCondPumpElecPower = this->performance.normalMode.getCurrentEvapCondPumpPower(speedNum);
             }
