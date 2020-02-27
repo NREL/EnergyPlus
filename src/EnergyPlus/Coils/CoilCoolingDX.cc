@@ -697,14 +697,16 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
                                                       -999.0);
 
             // report out fan information
-            if (this->supplyFanType > 0 && this->supplyFanIndex > -1) { // TODO: Seems wrong, should check type first because 0 is only valid for system model right?
-                if (this->supplyFanType == DataHVACGlobals::FanType_SystemModelObject) {
+            if (this->supplyFanType == DataHVACGlobals::FanType_SystemModelObject) {
+                if (this->supplyFanIndex >= 0) {
                     coilSelectionReportObj->setCoilSupplyFanInfo(this->name,
                                                                  coilCoolingDXObjectName,
                                                                  HVACFan::fanObjs[this->supplyFanIndex]->name,
                                                                  DataAirSystems::objectVectorOOFanSystemModel,
                                                                  this->supplyFanIndex);
-                } else {
+                }
+            } else {
+                if (this->supplyFanIndex >= 1) {
                     coilSelectionReportObj->setCoilSupplyFanInfo(this->name,
                                                                  coilCoolingDXObjectName,
                                                                  Fans::Fan(this->supplyFanIndex).FanName,
