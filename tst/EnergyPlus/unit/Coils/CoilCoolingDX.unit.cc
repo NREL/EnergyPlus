@@ -64,3 +64,84 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXInput )
     EXPECT_EQ("COOLINGCOIL", thisCoil.name);
     EXPECT_EQ("PERFORMANCEOBJECTNAME", thisCoil.performance.name);
 }
+
+TEST_F( CoilCoolingDXTest, CoilCoolingDXAlternateModePerformance )
+{
+    std::string idf_objects = delimited_string({
+        "  Coil:Cooling:DX,",
+        "    Coil,",
+        "    Evaporator Inlet Node,Evaporator Outlet Node,",
+        "    ,,",
+        "    Condenser Inlet Node,Condenser Outlet Node,",
+        "    Coil Performance,",
+        "    ,;",
+
+        "  Coil:Cooling:DX:CurveFit:Performance,",
+        "    Coil Performance,,,,,,,,,Electricity,Coil Mode 1,Coil Mode 2;",
+
+        "  Coil:Cooling:DX:CurveFit:OperatingMode,",
+        "    Coil Mode 1,",
+        "    3000,   !- Rated Gross Total Cooling Capacity {W}",
+        "    0.25,   !- Rated Evaporator Air Flow Rate {m3/s}",
+        "    ,,,,,,,,",
+        "    2,Coil Mode 1 Speed 1,Coil Mode 1 Speed 2;",
+
+        "  Coil:Cooling:DX:CurveFit:Speed,",
+        "    Coil Mode 1 Speed 1,     !- Name",
+        "    0.50,                    !- Gross Total Cooling Capacity Fraction",
+        "    0.50,                    !- Evaporator Air Flow Rate Fraction",
+        "    ,                        !- Condenser Air Flow Rate Fraction",
+        "    0.7,                     !- Gross Sensible Heat Ratio",
+        "    3,                       !- Gross Cooling COP {W/W}",
+        "    0.5,                     !- Active Fraction of Coil Face Area",
+        "    ,,,,,,,,,,,;",
+
+        "  Coil:Cooling:DX:CurveFit:Speed,",
+        "    Coil Mode 1 Speed 2,     !- Name",
+        "    1.0,                     !- Gross Total Cooling Capacity Fraction",
+        "    1.0,                     !- Evaporator Air Flow Rate Fraction",
+        "    ,                        !- Condenser Air Flow Rate Fraction",
+        "    0.7,                     !- Gross Sensible Heat Ratio",
+        "    3,                       !- Gross Cooling COP {W/W}",
+        "    1.0,                     !- Active Fraction of Coil Face Area",
+        "    ,,,,,,,,,,,;",
+
+        "  Coil:Cooling:DX:CurveFit:OperatingMode,",
+        "    Coil Mode 2,",
+        "    3000,   !- Rated Gross Total Cooling Capacity {W}",
+        "    0.25,   !- Rated Evaporator Air Flow Rate {m3/s}",
+        "    ,,,,,,,,",
+        "    2,Coil Mode 2 Speed 1,Coil Mode 2 Speed 2;",
+
+        "  Coil:Cooling:DX:CurveFit:Speed,",
+        "    Coil Mode 2 Speed 1,     !- Name",
+        "    0.45,                    !- Gross Total Cooling Capacity Fraction",
+        "    0.50,                    !- Evaporator Air Flow Rate Fraction",
+        "    ,                        !- Condenser Air Flow Rate Fraction",
+        "    0.6,                     !- Gross Sensible Heat Ratio",
+        "    2.7,                     !- Gross Cooling COP {W/W}",
+        "    0.5,                     !- Active Fraction of Coil Face Area",
+        "    ,,,,,,,,,,,;",
+
+        "  Coil:Cooling:DX:CurveFit:Speed,",
+        "    Coil Mode 2 Speed 2,     !- Name",
+        "    0.9,                     !- Gross Total Cooling Capacity Fraction",
+        "    1.0,                     !- Evaporator Air Flow Rate Fraction",
+        "    ,                        !- Condenser Air Flow Rate Fraction",
+        "    0.6,                     !- Gross Sensible Heat Ratio",
+        "    2.7,                     !- Gross Cooling COP {W/W}",
+        "    1.0,                     !- Active Fraction of Coil Face Area",
+        "    ,,,,,,,,,,,;"
+    });
+    EXPECT_TRUE(process_idf( idf_objects, false ));
+    int coilIndex = CoilCoolingDX::factory("Coil");
+    auto &thisCoil(coilCoolingDXs[coilIndex]);
+    // now, call to run normal mode speed 1
+    bool useAlternateMode = false;
+    Real64 PLR = 1.0;
+    int speedNum = 1;
+    Real64 speedRatio = 1.0;
+    int fanOpMode = 1;
+    thisCoil.simulate(useAlternateMode, PLR, speedNum, speedRatio, fanOpMode);
+    EXPECT_EQ(1000, thisCoil.totalCoolingEnergyRate);
+}

@@ -144,7 +144,7 @@ void CoilCoolingDXCurveFitSpeed::instantiateFromInputSpec(const CoilCoolingDXCur
     errorsFound |= this->processCurve(
         input_data.part_load_fraction_correlation_curve_name, this->indexPLRFPLF, {1}, routineName, "Part Load Fraction Correlation Curve Name", 1.0);
 
-    if (!errorsFound) {
+    if (this->indexPLRFPLF > 0 && !errorsFound) {
         //     Test PLF curve minimum and maximum. Cap if less than 0.7 or greater than 1.0.
         Real64 MinCurveVal = 999.0;
         Real64 MaxCurveVal = -999.0;
