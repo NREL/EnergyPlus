@@ -641,9 +641,9 @@ namespace AirflowNetwork {
         // na
 
         // Argument array dimensioning
-        assert(IK.size() == NetworkNumOfNodes + 1);
-        assert(AD.size() == NetworkNumOfNodes);
-        assert(AU.size() >= IK(NetworkNumOfNodes + 1));
+        EP_SIZE_CHECK(IK, NetworkNumOfNodes + 1);
+        EP_SIZE_CHECK(AD, NetworkNumOfNodes);
+        EP_SIZE_CHECK(AU, IK(NetworkNumOfNodes + 1));
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1736,10 +1736,10 @@ namespace AirflowNetwork {
         // na
 
         // Argument array dimensioning
-        assert(IK.size() == NetworkNumOfNodes + 1);
-        assert(AU.size() >= IK(NetworkNumOfNodes + 1));
-        assert(AD.size() == NetworkNumOfNodes);
-        assert(AL.size() >= IK(NetworkNumOfNodes + 1) - 1);
+        EP_SIZE_CHECK(IK, NetworkNumOfNodes + 1);
+        EP_SIZE_CHECK(AU, IK(NetworkNumOfNodes + 1));
+        EP_SIZE_CHECK(AD, NetworkNumOfNodes);
+        EP_SIZE_CHECK(AL, IK(NetworkNumOfNodes + 1) - 1);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1881,11 +1881,11 @@ namespace AirflowNetwork {
         // na
 
         // Argument array dimensioning
-        assert(IK.size() == NetworkNumOfNodes + 1);
-        assert(AU.size() >= IK(NetworkNumOfNodes + 1));
-        assert(AD.size() == NetworkNumOfNodes);
-        assert(AL.size() >= IK(NetworkNumOfNodes + 1) - 1);
-        assert(B.size() == NetworkNumOfNodes);
+        EP_SIZE_CHECK(IK, NetworkNumOfNodes + 1);
+        EP_SIZE_CHECK(AU, IK(NetworkNumOfNodes + 1));
+        EP_SIZE_CHECK(AD, NetworkNumOfNodes);
+        EP_SIZE_CHECK(AL, IK(NetworkNumOfNodes + 1) - 1);
+        EP_SIZE_CHECK(B, NetworkNumOfNodes);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1981,10 +1981,10 @@ namespace AirflowNetwork {
         // na
 
         // Argument array dimensioning
-        assert(X.size() == 4);
-        assert(IK.size() == NetworkNumOfNodes + 1);
-        assert(AU.size() >= IK(NetworkNumOfNodes + 1));
-        assert(AD.size() == NetworkNumOfNodes);
+        EP_SIZE_CHECK(X, 4);
+        EP_SIZE_CHECK(IK, NetworkNumOfNodes + 1);
+        EP_SIZE_CHECK(AU, IK(NetworkNumOfNodes + 1));
+        EP_SIZE_CHECK(AD, NetworkNumOfNodes);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -2719,12 +2719,12 @@ namespace AirflowNetwork {
         // na
 
         // Argument array dimensioning
-        assert(DpF.size() == 2);
-        assert(DpT.size() == 2);
-        assert(BetaF.size() == 2);
-        assert(BetaT.size() == 2);
-        assert(RhoStF.size() == 2);
-        assert(RhoStT.size() == 2);
+        EP_SIZE_CHECK(DpF, 2);
+        EP_SIZE_CHECK(DpT, 2);
+        EP_SIZE_CHECK(BetaF, 2);
+        EP_SIZE_CHECK(BetaT, 2);
+        EP_SIZE_CHECK(RhoStF, 2);
+        EP_SIZE_CHECK(RhoStT, 2);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

@@ -49,7 +49,6 @@
 #define TARCOGGasses90_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array2A.hh>
 
 // EnergyPlus Headers
