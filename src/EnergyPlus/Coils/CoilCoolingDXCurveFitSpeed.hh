@@ -118,12 +118,15 @@ struct CoilCoolingDXCurveFitSpeed
     Real64 evap_condenser_pump_power_fraction = 0.0;
     Real64 evap_condenser_effectiveness = 0.0;
 
-    int FanOpMode = 0;                   // fan operating mode, constant or cycling fan
-
     // stuff getting assigned by the parent mode
     Real64 parentModeRatedGrossTotalCap = 0.0;
     Real64 parentModeRatedEvapAirFlowRate = 0.0;
     Real64 parentModeRatedCondAirFlowRate = 0.0;
+    Real64 parentModeTimeForCondensateRemoval = 0.0;
+    Real64 parentModeEvapRateRatio = 0.0;
+    Real64 parentModeMaxCyclingRate = 0.0;
+    Real64 parentModeLatentTimeConst = 0.0;
+    bool doLatentDegradation = false; // True if latent degradation is enabled for this speed
 
     // speed class objects
     Real64 ambPressure = 0.0; // outdoor pressure {Pa]
@@ -136,6 +139,7 @@ struct CoilCoolingDXCurveFitSpeed
     Real64 evap_air_flow_rate = 0.0;
     Real64 condenser_air_flow_rate = 0.0;
     Real64 active_fraction_of_face_coil_area = 0.0;
+    Real64 ratedLatentCapacity = 0.0; // Latent capacity at rated conditions {W}
 
     // rating data
     Real64 RatedInletAirTemp = 26.6667;        // 26.6667C or 80F
@@ -149,9 +153,19 @@ struct CoilCoolingDXCurveFitSpeed
     Real64 maxRatedVolFlowPerRatedTotCap = DataHVACGlobals::MaxRatedVolFlowPerRatedTotCap1;
 
     void CalcSpeedOutput(
-        const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &fanOpMode, Real64 condInletTemp);
+        const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int  const fanOpMode, Real64 condInletTemp);
     void size(int speedNum, int maxSpeeds);
     Real64 CalcBypassFactor(Real64 tdb, Real64 w, Real64 q, Real64 shr, Real64 h, Real64 p);
+
+    Real64 calcEffectiveSHR(
+        const DataLoopNode::NodeData& inletNode,
+        Real64 const inletWetBulb,
+        Real64 const SHRss,               // Steady-state sensible heat ratio
+        Real64 const RTF,                 // Compressor run-time fraction
+        Real64 const QLatRated,           // Rated latent capacity
+        Real64 const QLatActual,          // Actual latent capacity
+        Real64 const HeatingRTF // Used to recalculate Toff for cycling fan systems
+    );
 
 private:
     bool processCurve(const std::string& curveName,

@@ -241,7 +241,6 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(const std::string& name_t
       evap_condenser_pump_power_fraction(0.0),
       evap_condenser_effectiveness(0.0),
 
-      FanOpMode(0),              // fan operating mode, constant or cycling fan
       parentModeRatedGrossTotalCap(0.0),
       parentModeRatedEvapAirFlowRate(0.0),
       parentModeRatedCondAirFlowRate(0.0),
@@ -258,6 +257,7 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(const std::string& name_t
 
         // other data members
       evap_air_flow_rate(0.0), condenser_air_flow_rate(0.0), active_fraction_of_face_coil_area(0.0),
+      ratedLatentCapacity(0.0), // Latent capacity at rated conditions {W}
 
       // rating data
       RatedInletAirTemp(26.6667),        // 26.6667C or 80F
@@ -372,13 +372,14 @@ void CoilCoolingDXCurveFitSpeed::size(int const speedNum, int const maxSpeeds)
                                       Psychrometrics::PsyHFnTdbW(RatedInletAirTemp, RatedInletAirHumRat),
                                       DataEnvironment::StdPressureSeaLevel);
     this->RatedEIR = 1.0 / this->original_input_specs.gross_rated_cooling_COP;
+    this->ratedLatentCapacity = this->rated_total_capacity * (1.0 - this->grossRatedSHR);
 
     // reset for next speed or coil
     DataSizing::DataConstantUsedForSizing = 0.0;
 }
 
 void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(
-    const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &_PLR, int &fanOpMode, const Real64 condInletTemp)
+    const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &_PLR, int const fanOpMode, const Real64 condInletTemp)
 {
 
     // SUBROUTINE PARAMETER DEFINITIONS:
@@ -515,6 +516,25 @@ void CoilCoolingDXCurveFitSpeed::CalcSpeedOutput(
     Real64 hTinwout = inletNode.Enthalpy - ((1.0 - SHR) * hDelta);
     outletNode.HumRat = Psychrometrics::PsyWFnTdbH(inletNode.Temp, hTinwout);
     outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
+
+    //  If constant fan with cycling compressor, call function to determine "effective SHR"
+    //  which includes the part-load degradation on latent capacity
+    if (this->doLatentDegradation && (fanOpMode == DataHVACGlobals::ContFanCycCoil)) {
+        Real64 QLatActual = TotCap * (1.0 - SHR);
+        Real64 SHRUnadjusted = SHR;
+        // TODO: Figure out HeatingRTF for this
+        Real64 HeatingRTF = 0.0;
+        SHR = calcEffectiveSHR(inletNode, inletWetBulb, SHR, RTF, ratedLatentCapacity, QLatActual, HeatingRTF);
+        // Calculate full load output conditions
+        if (SHR > 1.0) SHR = 1.0;
+        hTinwout = inletNode.Enthalpy - (1.0 - SHR) * hDelta;
+        if (SHR < 1.0) {
+            outletNode.HumRat = Psychrometrics::PsyWFnTdbH(inletNode.Temp, hTinwout, RoutineName);
+        } else {
+            outletNode.HumRat = inletNode.HumRat;
+        }
+        outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
+    }
 }
 
 Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Real64 tdb, Real64 w, Real64 q, Real64 shr, Real64 h, Real64 p)
@@ -654,4 +674,127 @@ Real64 CoilCoolingDXCurveFitSpeed::CalcBypassFactor(Real64 tdb, Real64 w, Real64
         ShowFatalError(RoutineName + object_name + " \"" + name + "\" Errors found in calculating coil bypass factors");
     }
     return calcCBF;
+}
+
+Real64 CoilCoolingDXCurveFitSpeed::calcEffectiveSHR(
+    const DataLoopNode::NodeData& inletNode,
+    Real64 const inletWetBulb,
+    Real64 const SHRss,               // Steady-state sensible heat ratio
+    Real64 const RTF,                 // Compressor run-time fraction
+    Real64 const QLatRated,           // Rated latent capacity
+    Real64 const QLatActual,          // Actual latent capacity
+    Real64 const HeatingRTF // Used to recalculate Toff for cycling fan systems
+)
+{
+    // PURPOSE OF THIS FUNCTION:
+    //    Adjust sensible heat ratio to account for degradation of DX coil latent
+    //    capacity at part-load (cycling) conditions.
+
+    // METHODOLOGY EMPLOYED:
+    //    With model parameters entered by the user, the part-load latent performance
+    //    of a DX cooling coil is determined for a constant air flow system with
+    //    a cooling coil that cycles on/off. The model calculates the time
+    //    required for condensate to begin falling from the cooling coil.
+    //    Runtimes greater than this are integrated to a "part-load" latent
+    //    capacity which is used to determine the "part-load" sensible heat ratio.
+    //    See reference below for additional details (linear decay model, Eq. 8b).
+    // REFERENCES:
+    //   "A Model to Predict the Latent Capacity of Air Conditioners and
+    //    Heat Pumps at Part-Load Conditions with Constant Fan Operation"
+    //    1996 ASHRAE Transactions, Volume 102, Part 1, Pp. 266 - 274,
+    //    Hugh I. Henderson, Jr., P.E., Kannan Rengarajan, P.E.
+
+    // Return value
+    Real64 SHReff; // Effective sensible heat ratio, includes degradation due to cycling effects
+
+    // FUNCTION LOCAL VARIABLE DECLARATIONS:
+    Real64 Twet; // Nominal time for condensate to begin leaving the coil's condensate drain line
+    //   at the current operating conditions (sec)
+    Real64 Gamma; // Initial moisture evaporation rate divided by steady-state AC latent capacity
+    //   at the current operating conditions
+    Real64 Twet_max;    // Maximum allowed value for Twet
+    Real64 Ton;         // Coil on time (sec)
+    Real64 Toff;        // Coil off time (sec)
+    Real64 Toffa;       // Actual coil off time (sec). Equations valid for Toff <= (2.0 * Twet/Gamma)
+    Real64 aa;          // Intermediate variable
+    Real64 To1;         // Intermediate variable (first guess at To). To = time to the start of moisture removal
+    Real64 To2;         // Intermediate variable (second guess at To). To = time to the start of moisture removal
+    Real64 Error;       // Error for iteration (DO) loop
+    Real64 LHRmult;     // Latent Heat Ratio (LHR) multiplier. The effective latent heat ratio LHR = (1-SHRss)*LHRmult
+    Real64 Ton_heating;
+    Real64 Toff_heating;
+
+    Real64 Twet_Rated = parentModeTimeForCondensateRemoval; // Time wet at rated conditions (sec)
+    Real64 Gamma_Rated = parentModeEvapRateRatio;           // Gamma at rated conditions
+    Real64 Nmax = parentModeMaxCyclingRate;                 // Maximum ON/OFF cycles for the compressor (cycles/hr)
+    Real64 Tcl = parentModeLatentTimeConst;                 // Time constant for latent capacity to reach steady state after startup(sec)
+
+    //  No moisture evaporation (latent degradation) occurs for runtime fraction of 1.0
+    //  All latent degradation model parameters cause divide by 0.0 if not greater than 0.0
+    //  Latent degradation model parameters initialize to 0.0 meaning no evaporation model used.
+    if (RTF >= 1.0) {
+        SHReff = SHRss;
+        return SHReff;
+    }
+
+    Twet_max = 9999.0; // high limit for Twet
+
+    //  Calculate the model parameters at the actual operating conditions
+    Twet = min(Twet_Rated * QLatRated / (QLatActual + 1.e-10), Twet_max);
+    Gamma = Gamma_Rated * QLatRated * (inletNode.Temp - inletWetBulb) / ((26.7 - 19.4) * QLatActual + 1.e-10);
+
+    //  Calculate the compressor on and off times using a converntional thermostat curve
+    Ton = 3600.0 / (4.0 * Nmax * (1.0 - RTF)); // duration of cooling coil on-cycle (sec)
+    Toff = 3600.0 / (4.0 * Nmax * RTF);        // duration of cooling coil off-cycle (sec)
+
+    //  Cap Toff to meet the equation restriction
+    if (Gamma > 0.0) {
+        Toffa = min(Toff, 2.0 * Twet / Gamma);
+    }
+    else {
+        Toffa = Toff;
+    }
+
+    //  Need to include the reheat coil operation to account for actual fan run time. E+ uses a
+    //  separate heating coil for heating and reheat (to separate the heating and reheat loads)
+    //  and real world applications would use a single heating coil for both purposes, the actual
+    //  fan operation is based on HeatingPLR + ReheatPLR. For cycling fan RH control, latent
+    //  degradation only occurs when a heating load exists, in this case the reheat load is
+    //  equal to and oposite in magnitude to the cooling coil sensible output but the reheat
+    //  coil is not always active. This additional fan run time has not been accounted for at this time.
+    //  Recalculate Toff for cycling fan systems when heating is active
+    if (HeatingRTF > 0.0) {
+        if (HeatingRTF < 1.0 && HeatingRTF > RTF) {
+            Ton_heating = 3600.0 / (4.0 * Nmax * (1.0 - HeatingRTF));
+            Toff_heating = 3600.0 / (4.0 * Nmax * HeatingRTF);
+            //    add additional heating coil operation during cooling coil off cycle (due to cycling rate difference of coils)
+            Ton_heating += max(0.0, min(Ton_heating, (Ton + Toffa) - (Ton_heating + Toff_heating)));
+            Toffa = min(Toffa, Ton_heating - Ton);
+        }
+    }
+
+    //  Use sucessive substitution to solve for To
+    aa = (Gamma * Toffa) - (0.25 / Twet) * pow_2(Gamma) * pow_2(Toffa);
+    To1 = aa + Tcl;
+    Error = 1.0;
+    while (Error > 0.001) {
+        To2 = aa - Tcl * (std::exp(-To1 / Tcl) - 1.0);
+        Error = std::abs((To2 - To1) / To1);
+        To1 = To2;
+    }
+
+    //  Adjust Sensible Heat Ratio (SHR) using Latent Heat Ratio (LHR) multiplier
+    //  Floating underflow errors occur when -Ton/Tcl is a large negative number.
+    //  Cap lower limit at -700 to avoid the underflow errors.
+    aa = std::exp(max(-700.0, -Ton / Tcl));
+    //  Calculate latent heat ratio multiplier
+    LHRmult = max(((Ton - To2) / (Ton + Tcl * (aa - 1.0))), 0.0);
+
+    //  Calculate part-load or "effective" sensible heat ratio
+    SHReff = 1.0 - (1.0 - SHRss) * LHRmult;
+
+    if (SHReff < SHRss) SHReff = SHRss; // Effective SHR can be less than the steady-state SHR
+    if (SHReff > 1.0) SHReff = 1.0;     // Effective sensible heat ratio can't be greater than 1.0
+
+    return SHReff;
 }

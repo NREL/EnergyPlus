@@ -563,7 +563,7 @@ void CoilCoolingDX::size() {
     this->performance.size();
 }
 
-void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode)
+void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int const fanOpMode)
 {
     if (this->myOneTimeInitFlag) {
         this->oneTimeInit();

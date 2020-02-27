@@ -92,7 +92,7 @@ struct CoilCoolingDXCurveFitOperatingMode
                            Real64 &PLR,
                            int &speedNum,
                            Real64 &speedRatio,
-                           int &fanOpMode,
+                           int  const fanOpMode,
                            DataLoopNode::NodeData &condInletNode,
                            DataLoopNode::NodeData &condOutletNode);
 
@@ -105,10 +105,12 @@ struct CoilCoolingDXCurveFitOperatingMode
     bool ratedEvapAirFlowRateIsAutosized = false;
 
     // Latent degradation model
-    Real64 maxCyclingRate = 0.0;
-    Real64 evapRateRatio = 0.0;
-    Real64 latentTimeConst = 0.0;
     Real64 timeForCondensateRemoval = 0.0;
+    Real64 evapRateRatio = 0.0;
+    Real64 maxCyclingRate = 0.0;
+    Real64 latentTimeConst = 0.0;
+    bool latentDegradationActive = false;
+    bool applyLatentDegradationAllSpeeds = false;
 
     // results from coil model at speed
 //    Real64 OpModeOutletTemp = 0.0;
