@@ -517,10 +517,9 @@ int CoilCoolingDX::getNumModes() {
 int CoilCoolingDX::getOpModeCapFTIndex(bool const isNormalOpMode)
 {
     if (isNormalOpMode) {
-        return this->nominalSpeed().indexCapFT;
+        return this->normModeNomSpeed().indexCapFT;
     } else {
-        int nomSpeedNum = this->performance.alternateMode.nominalSpeedIndex;
-        return this->performance.alternateMode.speeds[nomSpeedNum].indexCapFT;
+        return this->altModeNomSpeed().indexCapFT;
     }
 }
 
@@ -561,9 +560,14 @@ void CoilCoolingDX::getDataAfterSizing(Real64 &_normalModeRatedEvapAirFlowRate,
     _normalModeRatedCapacity = this->performance.normalMode.ratedGrossTotalCap;
 }
 
-CoilCoolingDXCurveFitSpeed & CoilCoolingDX::nominalSpeed()
+CoilCoolingDXCurveFitSpeed & CoilCoolingDX::normModeNomSpeed()
 {
     return this->performance.normalMode.speeds[this->performance.normalMode.nominalSpeedIndex];
+}
+
+CoilCoolingDXCurveFitSpeed & CoilCoolingDX::altModeNomSpeed()
+{
+    return this->performance.alternateMode.speeds[this->performance.alternateMode.nominalSpeedIndex];
 }
 
 void CoilCoolingDX::size() {
@@ -688,7 +692,7 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
 
             // report out final coil sizing info
             Real64 ratedSensCap(0.0);
-            ratedSensCap = this->performance.normalMode.ratedGrossTotalCap * this->nominalSpeed().grossRatedSHR;
+            ratedSensCap = this->performance.normalMode.ratedGrossTotalCap * this->normModeNomSpeed().grossRatedSHR;
             coilSelectionReportObj->setCoilFinalSizes(this->name,
                                                       coilCoolingDXObjectName,
                                                       this->performance.normalMode.ratedGrossTotalCap,
@@ -778,7 +782,7 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
                                                            ratedOutletWetBulb,
                                                            RatedOutdoorAirTemp,
                                                            ratedOutdoorAirWetBulb,
-                                                           this->nominalSpeed().RatedCBF, -999.0);
+                                                           this->normModeNomSpeed().RatedCBF, -999.0);
 
             this->reportCoilFinalSizes = false;
         }

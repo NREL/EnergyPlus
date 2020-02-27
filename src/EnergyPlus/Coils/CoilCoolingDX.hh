@@ -121,7 +121,8 @@ struct CoilCoolingDX
     int supplyFanType = 0;
     std::string supplyFanName = "";
 
-    CoilCoolingDXCurveFitSpeed &nominalSpeed();
+    CoilCoolingDXCurveFitSpeed &normModeNomSpeed();
+    CoilCoolingDXCurveFitSpeed &altModeNomSpeed();
 
     // report variables
     Real64 totalCoolingEnergyRate = 0.0;
