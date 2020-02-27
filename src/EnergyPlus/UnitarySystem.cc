@@ -6122,8 +6122,7 @@ namespace UnitarySystems {
                     }
                 }
 
-                if (thisSys.m_CoolingCoilType_Num != DataHVACGlobals::CoilDX_Cooling &&
-                    thisSys.m_CoolingCoilType_Num != DataHVACGlobals::CoilDX_CoolingHXAssisted &&
+                if (thisSys.m_CoolingCoilType_Num != DataHVACGlobals::CoilDX_CoolingHXAssisted &&
                     thisSys.m_CoolingCoilType_Num != DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl &&
                     thisSys.m_DehumidControlType_Num == DehumCtrlType::Multimode) {
                     ShowSevereError(cCurrentModuleObject + " = " + thisObjectName);
@@ -6138,6 +6137,17 @@ namespace UnitarySystems {
                             ShowContinueError("Dehumidification control type is assumed to be CoolReheat and the simulation continues.");
                             thisSys.m_DehumidControlType_Num = DehumCtrlType::CoolReheat;
                         }
+                    }
+                }
+
+                if (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling && thisSys.m_DehumidControlType_Num == DehumCtrlType::Multimode) {
+                    int numCoolingCoilModes = coilCoolingDXs[thisSys.m_CoolingCoilIndex].getNumModes();
+                    if (numCoolingCoilModes == 1) {
+                        ShowSevereError(cCurrentModuleObject + " = " + thisObjectName);
+                        ShowContinueError("Illegal Dehumidification Control Type = " + loc_dehumm_ControlType);
+                        ShowContinueError("Multimode control must be used with a Heat Exchanger Assisted or Multimode Cooling Coil.");
+                        ShowContinueError("Cooling coil named: " + coilCoolingDXs[thisSys.m_CoolingCoilIndex].name + " has only one mode");
+                        ShowFatalError("Multimode cooling coil error causes program termination");
                     }
                 }
 
@@ -10659,12 +10669,15 @@ namespace UnitarySystems {
             OutdoorDryBulb = DataEnvironment::OutDryBulbTemp;
         }
 
-        // Check the dehumidification control type. IF it's multimode, turn off the HX to find the sensible PLR. Then check to
-        // see if the humidity load is met without the use of the HX. Always run the HX for the other modes.
-        if (this->m_DehumidControlType_Num != DehumCtrlType::Multimode) {
-            HXUnitOn = true;
-        } else {
-            HXUnitOn = false;
+        // for the new Coil:Cooling:DX, there are ramifications to the HXUnitOn flag that weren't previously seen, so protect from that here
+        if (this->m_CoolingCoilType_Num != DataHVACGlobals::CoilDX_Cooling) {
+            // Check the dehumidification control type. IF it's multimode, turn off the HX to find the sensible PLR. Then check to
+            // see if the humidity load is met without the use of the HX. Always run the HX for the other modes.
+            if (this->m_DehumidControlType_Num != DehumCtrlType::Multimode) {
+                HXUnitOn = true;
+            } else {
+                HXUnitOn = false;
+            }
         }
 
         // IF there is a fault of coil SAT Sensor (zrp_Nov2016)

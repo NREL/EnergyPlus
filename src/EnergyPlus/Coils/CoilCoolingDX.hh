@@ -95,7 +95,7 @@ struct CoilCoolingDX
     static void inline passThroughNodeData(DataLoopNode::NodeData &in, DataLoopNode::NodeData &out);
     void size();
 
-
+    int getNumModes();
     int getOpModeCapFTIndex(bool isNormalOpMode = true);
 
     CoilCoolingDXInputSpecification original_input_specs;

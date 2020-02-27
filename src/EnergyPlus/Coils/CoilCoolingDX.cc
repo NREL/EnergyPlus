@@ -506,6 +506,14 @@ void CoilCoolingDX::oneTimeInit() {
 
 }
 
+int CoilCoolingDX::getNumModes() {
+    int numModes = 1;
+    if (this->performance.hasAlternateMode) {
+        numModes++;
+    }
+    return numModes;
+}
+
 int CoilCoolingDX::getOpModeCapFTIndex(bool const isNormalOpMode)
 {
     if (isNormalOpMode) {
