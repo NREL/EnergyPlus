@@ -85,7 +85,7 @@ struct CoilCoolingDXCurveFitPerformance
                   Real64 &PLR,
                   int &speedNum,
                   Real64 &speedRatio,
-                  int &fanOpMode,
+                  int const fanOpMode,
                   DataLoopNode::NodeData &condInletNode,
                   DataLoopNode::NodeData &condOutletNode);
 
@@ -95,7 +95,7 @@ struct CoilCoolingDXCurveFitPerformance
                    Real64 &PLR,
                    int &speedNum,
                    Real64 &speedRatio,
-                   int &fanOpMode,
+                   int  const fanOpMode,
                    DataLoopNode::NodeData &condInletNode,
                    DataLoopNode::NodeData &condOutletNode);
     void calcStandardRatings210240();

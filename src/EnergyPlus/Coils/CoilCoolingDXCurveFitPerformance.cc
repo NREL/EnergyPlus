@@ -158,7 +158,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &in
                                                 Real64 &PLR,
                                                 int &speedNum,
                                                 Real64 &speedRatio,
-                                                int &fanOpMode,
+                                                int const fanOpMode,
                                                 DataLoopNode::NodeData &condInletNode,
                                                 DataLoopNode::NodeData &condOutletNode)
 {
@@ -188,7 +188,7 @@ void CoilCoolingDXCurveFitPerformance::calculate(CoilCoolingDXCurveFitOperatingM
                                                  Real64 &PLR,
                                                  int &speedNum,
                                                  Real64 &speedRatio,
-                                                 int &fanOpMode,
+                                                 int const fanOpMode,
                                                  DataLoopNode::NodeData &condInletNode,
                                                  DataLoopNode::NodeData &condOutletNode)
 {

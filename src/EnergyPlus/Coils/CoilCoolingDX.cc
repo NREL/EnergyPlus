@@ -555,6 +555,14 @@ void CoilCoolingDX::oneTimeInit() {
 
 }
 
+int CoilCoolingDX::getNumModes() {
+    int numModes = 1;
+    if (this->performance.hasAlternateMode) {
+        numModes++;
+    }
+    return numModes;
+}
+
 int CoilCoolingDX::getOpModeCapFTIndex(bool const isNormalOpMode)
 {
     if (isNormalOpMode) {
@@ -616,7 +624,7 @@ void CoilCoolingDX::size() {
     this->performance.size();
 }
 
-void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode)
+void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int const fanOpMode)
 {
     if (this->myOneTimeInitFlag) {
         this->oneTimeInit();
@@ -743,14 +751,16 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
                                                       -999.0);
 
             // report out fan information
-            if (this->supplyFanType > 0 && this->supplyFanIndex > -1) { // TODO: Seems wrong, should check type first because 0 is only valid for system model right?
-                if (this->supplyFanType == DataHVACGlobals::FanType_SystemModelObject) {
+            if (this->supplyFanType == DataHVACGlobals::FanType_SystemModelObject) {
+                if (this->supplyFanIndex >= 0) {
                     coilSelectionReportObj->setCoilSupplyFanInfo(this->name,
                                                                  coilCoolingDXObjectName,
                                                                  HVACFan::fanObjs[this->supplyFanIndex]->name,
                                                                  DataAirSystems::objectVectorOOFanSystemModel,
                                                                  this->supplyFanIndex);
-                } else {
+                }
+            } else {
+                if (this->supplyFanIndex >= 1) {
                     coilSelectionReportObj->setCoilSupplyFanInfo(this->name,
                                                                  coilCoolingDXObjectName,
                                                                  Fans::Fan(this->supplyFanIndex).FanName,

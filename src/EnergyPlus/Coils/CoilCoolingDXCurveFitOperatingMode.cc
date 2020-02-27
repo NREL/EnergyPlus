@@ -70,10 +70,15 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(CoilCoolingDXC
     if (this->ratedGrossTotalCap == DataSizing::AutoSize) this->ratedGrossTotalCapIsAutosized = true;
     this->ratedEvapAirFlowRate = input_data.rated_evaporator_air_flow_rate;
     if (this->ratedEvapAirFlowRate == DataSizing::AutoSize) this->ratedEvapAirFlowRateIsAutosized = true;
-    this->maxCyclingRate = input_data.maximum_cycling_rate;
-    this->evapRateRatio = input_data.ratio_of_initial_moisture_evaporation_rate_and_steady_state_latent_capacity;
-    this->latentTimeConst = input_data.latent_capacity_time_constant;
     this->timeForCondensateRemoval = input_data.nominal_time_for_condensate_removal_to_begin;
+    this->evapRateRatio = input_data.ratio_of_initial_moisture_evaporation_rate_and_steady_state_latent_capacity;
+    this->maxCyclingRate = input_data.maximum_cycling_rate;
+    this->latentTimeConst = input_data.latent_capacity_time_constant;
+    if (UtilityRoutines::SameString(input_data.apply_latent_degradation_to_speeds_greater_than_1, "Yes")) {
+        this->applyLatentDegradationAllSpeeds = true;
+    } else {
+        this->applyLatentDegradationAllSpeeds = false;
+    }
     this->nominalEvaporativePumpPower = input_data.nominal_evap_condenser_pump_power;
 
     // Must all be greater than zero to use the latent capacity degradation model
@@ -82,6 +87,9 @@ void CoilCoolingDXCurveFitOperatingMode::instantiateFromInputSpec(CoilCoolingDXC
         ShowWarningError(routineName + this->object_name + "=\"" + this->name + "\":");
         ShowContinueError("...At least one of the four input parameters for the latent capacity degradation model");
         ShowContinueError("...is set to zero. Therefore, the latent degradation model will not be used for this simulation.");
+        this->latentDegradationActive = false;
+    } else if (this->maxCyclingRate > 0.0 && this->evapRateRatio > 0.0 && this->latentTimeConst > 0.0 && this->timeForCondensateRemoval > 0.0) {
+        this->latentDegradationActive = true;
     }
 
     if (UtilityRoutines::SameString(input_data.condenser_type, "AirCooled")) {
@@ -224,6 +232,19 @@ void CoilCoolingDXCurveFitOperatingMode::size()
         curSpeed.parentModeRatedEvapAirFlowRate = this->ratedEvapAirFlowRate;
         curSpeed.ratedEvapAirFlowRateIsAutosized = this->ratedEvapAirFlowRateIsAutosized;
         curSpeed.parentModeRatedCondAirFlowRate = this->ratedCondAirFlowRate;
+
+        // Set latent degradation parameters if applicable
+        curSpeed.doLatentDegradation = false;
+        if (this->latentDegradationActive) {
+            if ((thisSpeedNum == 0) || ((thisSpeedNum > 0) && this->applyLatentDegradationAllSpeeds)) {
+                curSpeed.parentModeTimeForCondensateRemoval = this->timeForCondensateRemoval;
+                curSpeed.parentModeEvapRateRatio = this->evapRateRatio;
+                curSpeed.parentModeMaxCyclingRate = this->maxCyclingRate;
+                curSpeed.parentModeLatentTimeConst = this->latentTimeConst;
+                curSpeed.doLatentDegradation = true;
+            }
+        }
+
         curSpeed.size(thisSpeedNum, numSpeeds);
         thisSpeedNum++;
     }
@@ -234,7 +255,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(const DataLoopNode::N
                                                            Real64 &PLR,
                                                            int &speedNum,
                                                            Real64 &speedRatio,
-                                                           int &fanOpMode,
+                                                           int  const fanOpMode,
                                                            DataLoopNode::NodeData &condInletNode,
                                                            DataLoopNode::NodeData &EP_UNUSED(condOutletNode))
 {
