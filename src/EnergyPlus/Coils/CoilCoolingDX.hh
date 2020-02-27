@@ -95,7 +95,7 @@ struct CoilCoolingDX
     static void inline passThroughNodeData(DataLoopNode::NodeData &in, DataLoopNode::NodeData &out);
     void size();
 
-
+    int getNumModes();
     int getOpModeCapFTIndex(bool isNormalOpMode = true);
 
     CoilCoolingDXInputSpecification original_input_specs;
@@ -121,7 +121,8 @@ struct CoilCoolingDX
     int supplyFanType = 0;
     std::string supplyFanName = "";
 
-    CoilCoolingDXCurveFitSpeed &nominalSpeed();
+    CoilCoolingDXCurveFitSpeed &normModeNomSpeed();
+    CoilCoolingDXCurveFitSpeed &altModeNomSpeed();
 
     // report variables
     Real64 totalCoolingEnergyRate = 0.0;
