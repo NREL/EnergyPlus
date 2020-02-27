@@ -96,7 +96,7 @@ struct CoilCoolingDX
     void size();
 
 
-    int getOpModeCapFTIndex(bool isNormalOpMode = true);
+    int getOpModeCapFTIndex(bool isNormalOpMode);
 
     CoilCoolingDXInputSpecification original_input_specs;
     std::string name;
@@ -121,7 +121,8 @@ struct CoilCoolingDX
     int supplyFanType = 0;
     std::string supplyFanName = "";
 
-    CoilCoolingDXCurveFitSpeed &nominalSpeed();
+    CoilCoolingDXCurveFitSpeed &normModeNomSpeed();
+    CoilCoolingDXCurveFitSpeed &altModeNomSpeed();
 
     // report variables
     Real64 totalCoolingEnergyRate = 0.0;
