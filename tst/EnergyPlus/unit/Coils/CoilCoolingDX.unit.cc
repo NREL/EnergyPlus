@@ -167,7 +167,7 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXAlternateModePerformance )
     Real64 speedRatio = 1.0;
     int fanOpMode = 1;
     thisCoil.simulate(useAlternateMode, PLR, speedNum, speedRatio, fanOpMode);
-    EXPECT_EQ(1500, thisCoil.totalCoolingEnergyRate); // expect the coil to run full out, at speed 1
+    EXPECT_NEAR(1500, thisCoil.totalCoolingEnergyRate, 0.01); // expect the coil to run full out, at speed 1
     EXPECT_NEAR(18.098, evapOutletNode.Temp, 0.01);
     EXPECT_NEAR(0.0088, evapOutletNode.HumRat, 0.001);
 
@@ -175,8 +175,23 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXAlternateModePerformance )
     evapInletNode.MassFlowRate = thisCoil.performance.normalMode.speeds.back().RatedAirMassFlowRate;
     speedNum = 2;
     thisCoil.simulate(useAlternateMode, PLR, speedNum, speedRatio, fanOpMode);
-    EXPECT_EQ(3000, thisCoil.totalCoolingEnergyRate); // expect the coil to run full out, at speed 1
+    EXPECT_NEAR(3000, thisCoil.totalCoolingEnergyRate, 0.01); // expect the coil to run full out, at speed 1
     EXPECT_NEAR(18.098, evapOutletNode.Temp, 0.01);
     EXPECT_NEAR(0.0088, evapOutletNode.HumRat, 0.001);
 
+    // ok so now run at alternate mode, speed 1
+    useAlternateMode = true;
+    speedNum = 1;
+    thisCoil.simulate(useAlternateMode, PLR, speedNum, speedRatio, fanOpMode);
+    EXPECT_NEAR(1350, thisCoil.totalCoolingEnergyRate, 0.01); // expect the coil to run full out, at speed 1
+    EXPECT_NEAR(22.59, evapOutletNode.Temp, 0.01);
+    EXPECT_NEAR(0.0093, evapOutletNode.HumRat, 0.0001);
+
+    // ok so now run at alternate mode, speed 2
+    useAlternateMode = true;
+    speedNum = 2;
+    thisCoil.simulate(useAlternateMode, PLR, speedNum, speedRatio, fanOpMode);
+    EXPECT_NEAR(2700, thisCoil.totalCoolingEnergyRate, 0.01); // expect the coil to run full out, at speed 1
+    EXPECT_NEAR(19.75, evapOutletNode.Temp, 0.01);
+    EXPECT_NEAR(0.0086, evapOutletNode.HumRat, 0.0001);
 }
