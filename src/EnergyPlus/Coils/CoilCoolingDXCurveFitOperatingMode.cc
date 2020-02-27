@@ -156,7 +156,6 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(const std
 
 void CoilCoolingDXCurveFitOperatingMode::oneTimeInit() {
     if (DataGlobals::AnyEnergyManagementSystemInModel) {
-        // TODO: Make sure this is documented - it will be slightly different actuator signature, and also for every mode, and also NO SHR EMS ACTUATOR
         SetupEMSActuator(this->object_name,
                          this->name,
                          "Autosized Rated Air Flow Rate",

@@ -54,7 +54,7 @@ Several levels of actuators are available for on/off supervisory control of Plan
 \item
   Each plant (and condenser) loop has a series of actuators called ``Supply Side Branch'' and ``Demand Side Branch'' that are available with the control type ``On/Off Supervisory.''~ These are available for each individual branch in a loop. Setting the value of this actuator to 1.0 directs the plant's branch to run normally based on other controls. Setting the value of this actuator to 0.0 directs the plant's branch to shut down regardless of what other controls indicate.
 \item
-  Each plant (and condenser) loop has a series of actuators called ``Plant Component *'' that are available with the control type ``On/Off Supervisory.''~ These are available for each individual component on a loop. Setting the value of this actuator to 0.0 directs the component's water flow rate to shut down regardless of what other controls indicate. Any other component on the same branch will also be shut down. Setting the value of this actuator to any other value directs this component and any other component on the same branch to run normally based on other controls. 
+  Each plant (and condenser) loop has a series of actuators called ``Plant Component *'' that are available with the control type ``On/Off Supervisory.''~ These are available for each individual component on a loop. Setting the value of this actuator to 0.0 directs the component's water flow rate to shut down regardless of what other controls indicate. Any other component on the same branch will also be shut down. Setting the value of this actuator to any other value directs this component and any other component on the same branch to run normally based on other controls.
 \end{itemize}
 
 \subsection{Outdoor Air System Node Conditions}\label{outdoor-air-system-node-conditions}
@@ -94,7 +94,7 @@ An actuator is also available for overriding the autosize value for the fan's de
 
 \subsection{DX Cooling Coils}\label{dx-cooling-coils}
 
-Actuators are available for overriding the autosize values related to the size of single speed DX coils.~ Actuators called ``Coil:Cooling:DX:SingleSpeed'' are available with control types ``Autosized Rated Air Flow Rate'' (in m3/s), ``Autosized Rated Sensible Heat Ratio'' (in W/W), and ``Autosized Rated Total Cooling Capacity'' (in W).~ These are only useful from the calling point named AfterComponentInputReadIn.
+Actuators are available for overriding the autosize rated airflow rate and total cooling capacity of the Coil:Cooling:DX object.~ Actuators called ``Coil:Cooling:DX:CurveFit:SingleSpeed'' are available with control types ``Autosized Rated Air Flow Rate'' (in m3/s) and ``Autosized Rated Total Cooling Capacity'' (in W).~ These are only useful from the calling point named AfterComponentInputReadIn.
 
 \subsection{Unitary Equipment}\label{unitary-equipment}
 

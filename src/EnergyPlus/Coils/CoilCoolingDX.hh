@@ -114,6 +114,7 @@ struct CoilCoolingDX
     int evaporativeCondSupplyTankIndex = 0;
     int evaporativeCondSupplyTankARRID = 0;
     Real64 evaporativeCondSupplyTankVolumeFlow = 0.0;
+    Real64 evaporativeCondSupplyTankConsump = 0.0;
     Real64 evapCondPumpElecPower = 0.0;
     Real64 evapCondPumpElecConsumption = 0.0;
     int airLoopNum = 0; // Add for AFN compatibility, revisit at a later date
