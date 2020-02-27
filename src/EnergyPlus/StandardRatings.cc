@@ -1873,8 +1873,9 @@ namespace StandardRatings {
         int BinNum;                                // bin number counter
         int spnum;                                 // compressor speed number
 
+        NetCoolingCapWeighted = 0.0;
         TotCoolingElecPowerWeighted = 0.0;
-        TotCoolingElecPowerWeighted = 0.0;
+        TotCoolingElecPowerWeightedDefault = 0.0;
 
         for (spnum = 1; spnum <= nsp; ++spnum) {
             FanPowerPerEvapAirFlowRate(spnum) = 0.0;
