@@ -1183,7 +1183,7 @@ namespace SimulationManager {
             ErrorsFound = true;
             ShowFatalError("GetProjectData: Only one (\"1\") " + CurrentModuleObject + " object per simulation is allowed.");
         }
-        DataGlobals::createPerLog = Num > 0;
+        DataGlobals::createPerfLog = Num > 0;
         std::string overrideModeValue = "Normal";
         if (instances != inputProcessor->epJSON.end()) {
             auto &instancesValue = instances.value();
