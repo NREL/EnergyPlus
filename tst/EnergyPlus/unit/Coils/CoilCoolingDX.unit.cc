@@ -50,6 +50,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/Coils/CoilCoolingDX.hh>
+#include <EnergyPlus/Psychrometrics.hh>
 
 #include "../Coils/CoilCoolingDXFixture.hh"
 
@@ -136,12 +137,46 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXAlternateModePerformance )
     EXPECT_TRUE(process_idf( idf_objects, false ));
     int coilIndex = CoilCoolingDX::factory("Coil");
     auto &thisCoil(coilCoolingDXs[coilIndex]);
-    // now, call to run normal mode speed 1
+
+    // fix the inlet conditions
+    auto &evapInletNode = DataLoopNode::Node(thisCoil.evapInletNodeIndex);
+    auto &condInletNode = DataLoopNode::Node(thisCoil.condInletNodeIndex);
+    evapInletNode.Temp = 25.5;
+    evapInletNode.Press = 101325;
+    evapInletNode.HumRat = 0.01;
+    evapInletNode.Enthalpy = Psychrometrics::PsyHFnTdbW(evapInletNode.Temp, evapInletNode.HumRat);
+    condInletNode.Temp = 35.0;
+    condInletNode.Press = 101325;
+    condInletNode.HumRat = 0.008;
+    condInletNode.Enthalpy = Psychrometrics::PsyHFnTdbW(condInletNode.Temp, condInletNode.HumRat);
+
+    // size it
+    thisCoil.size();
+
+    // for speed > 1 we use the mshp rated high speed flow...
+    DataHVACGlobals::MSHPMassFlowRateHigh = thisCoil.performance.normalMode.speeds.back().RatedAirMassFlowRate;
+
+    // we'll use this later
+    auto &evapOutletNode = DataLoopNode::Node(thisCoil.evapOutletNodeIndex);
+
+    // set some values to run at rated conditions and call to run normal mode speed 1
+    evapInletNode.MassFlowRate = thisCoil.performance.normalMode.speeds.front().RatedAirMassFlowRate;
     bool useAlternateMode = false;
     Real64 PLR = 1.0;
     int speedNum = 1;
     Real64 speedRatio = 1.0;
     int fanOpMode = 1;
     thisCoil.simulate(useAlternateMode, PLR, speedNum, speedRatio, fanOpMode);
-    //EXPECT_EQ(1000, thisCoil.totalCoolingEnergyRate);
+    EXPECT_EQ(1500, thisCoil.totalCoolingEnergyRate); // expect the coil to run full out, at speed 1
+    EXPECT_NEAR(18.098, evapOutletNode.Temp, 0.01);
+    EXPECT_NEAR(0.0088, evapOutletNode.HumRat, 0.001);
+
+    // alter values and run at rated conditions normal mode speed 2
+    evapInletNode.MassFlowRate = thisCoil.performance.normalMode.speeds.back().RatedAirMassFlowRate;
+    speedNum = 2;
+    thisCoil.simulate(useAlternateMode, PLR, speedNum, speedRatio, fanOpMode);
+    EXPECT_EQ(3000, thisCoil.totalCoolingEnergyRate); // expect the coil to run full out, at speed 1
+    EXPECT_NEAR(18.098, evapOutletNode.Temp, 0.01);
+    EXPECT_NEAR(0.0088, evapOutletNode.HumRat, 0.001);
+
 }
