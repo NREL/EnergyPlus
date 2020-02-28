@@ -58,7 +58,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
@@ -344,7 +344,7 @@ namespace EIRPlantLoopHeatPumps {
             CpSrc = FluidProperties::GetSpecificHeatGlycol(
                 thisLoadPlantLoop.FluidName, DataLoopNode::Node(this->loadSideNodes.inlet).Temp, thisLoadPlantLoop.FluidIndex, "PLHPEIR::simulate()");
         } else if (this->airSource) {
-            CpSrc = Psychrometrics::PsyCpAirFnWTdb(DataEnvironment::OutHumRat, DataEnvironment::OutDryBulbTemp);
+            CpSrc = Psychrometrics::PsyCpAirFnW(DataEnvironment::OutHumRat);
         }
         Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
         this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
@@ -836,7 +836,7 @@ namespace EIRPlantLoopHeatPumps {
         }
 
         Real64 const rhoSrc = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::StdBaroPress, sourceSideInitTemp, sourceSideHumRat);
-        Real64 const CpSrc = Psychrometrics::PsyCpAirFnWTdb(sourceSideHumRat, sourceSideInitTemp);
+        Real64 const CpSrc = Psychrometrics::PsyCpAirFnW(sourceSideHumRat);
 
         // set the source-side flow rate
         if (this->sourceSideDesignVolFlowRateWasAutoSized) {
@@ -1057,18 +1057,18 @@ namespace EIRPlantLoopHeatPumps {
                                         "; entered curve name: " + capFtName.get<std::string>());
                         errorsFound = true;
                     }
-                    auto &capEIRtName = fields.at("electric_input_to_output_ratio_modifier_function_of_temperature_curve_name");
-                    thisPLHP.powerRatioFuncTempCurveIndex = CurveManager::GetCurveIndex(UtilityRoutines::MakeUPPERCase(capEIRtName));
+                    auto &eirFtName = fields.at("electric_input_to_output_ratio_modifier_function_of_temperature_curve_name");
+                    thisPLHP.powerRatioFuncTempCurveIndex = CurveManager::GetCurveIndex(UtilityRoutines::MakeUPPERCase(eirFtName));
                     if (thisPLHP.capFuncTempCurveIndex == 0) {
                         ShowSevereError("Invalid curve name for EIR PLHP (name=" + thisPLHP.name +
-                                        "; entered curve name: " + capEIRtName.get<std::string>());
+                                        "; entered curve name: " + eirFtName.get<std::string>());
                         errorsFound = true;
                     }
-                    auto &capEIRplrName = fields.at("electric_input_to_output_ratio_modifier_function_of_temperature_curve_name");
-                    thisPLHP.powerRatioFuncPLRCurveIndex = CurveManager::GetCurveIndex(UtilityRoutines::MakeUPPERCase(capEIRplrName));
+                    auto &eirFplrName = fields.at("electric_input_to_output_ratio_modifier_function_of_part_load_ratio_curve_name");
+                    thisPLHP.powerRatioFuncPLRCurveIndex = CurveManager::GetCurveIndex(UtilityRoutines::MakeUPPERCase(eirFplrName));
                     if (thisPLHP.capFuncTempCurveIndex == 0) {
                         ShowSevereError("Invalid curve name for EIR PLHP (name=" + thisPLHP.name +
-                                        "; entered curve name: " + capEIRplrName.get<std::string>());
+                                        "; entered curve name: " + eirFplrName.get<std::string>());
                         errorsFound = true;
                     }
 
