@@ -31,6 +31,6 @@ add_custom_command( OUTPUT ${PROJECT_BINARY_DIR}/${OUTPUT_FILENAME}.pdf
 		    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/${SOURCE_FILENAME}
 		    DEPENDS ${INCLUDED_TEX} ${INCLUDED_IMAGES}
                  )
-add_custom_target( zPDF_${OUTPUT_FILENAME}
+add_custom_target( zPDF_${OUTPUT_FILENAME} ALL
                    DEPENDS ${PROJECT_BINARY_DIR}/${OUTPUT_FILENAME}.pdf
                  )
