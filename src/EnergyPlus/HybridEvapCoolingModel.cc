@@ -50,8 +50,6 @@
 
 #include <EnergyPlus/UtilityRoutines.hh>
 
-#include <cmath>
-#include <string>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobalConstants.hh>
@@ -61,6 +59,8 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <cmath>
+#include <string>
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
@@ -255,7 +255,7 @@ namespace HybridEvapCoolingModel {
 
             if (ValidPointer(HRsa_curve_pointer)) {
                 Y_val = NormalizationReference * CurveValue(HRsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
-                Y_val = max(min(Y_val,1.0),0.0);
+                Y_val = max(min(Y_val, 1.0), 0.0);
             } else {
                 Y_val = X_4; // return HR
             }
@@ -1564,9 +1564,9 @@ namespace HybridEvapCoolingModel {
             Hsa = 1.006 * Tsa * (2501 + 1.86 * Tsa);
             Hsa = PsyHFnTdbW(Tsa, Wsa);
 
-            Real64 SupplyAirCp = PsyCpAirFnWTdb(Wsa, Tsa);            // J/degreesK.kg
-            Real64 ReturnAirCP = PsyCpAirFnWTdb(Wra, StepIns.Tra);    // J/degreesK.kg
-            Real64 OutdoorAirCP = PsyCpAirFnWTdb(Wosa, StepIns.Tosa); // J/degreesK.kg
+            Real64 SupplyAirCp = PsyCpAirFnW(Wsa);   // J/degreesK.kg
+            Real64 ReturnAirCP = PsyCpAirFnW(Wra);   // J/degreesK.kg
+            Real64 OutdoorAirCP = PsyCpAirFnW(Wosa); // J/degreesK.kg
 
             // Calculations below of system cooling and heating capacity are ultimately reassessed when the resultant part runtime fraction is
             // assessed. However its valuable that they are calculated here to at least provide a check.
@@ -2029,9 +2029,9 @@ namespace HybridEvapCoolingModel {
             // Calculate timestep average unit and system
             PrimaryMode = CurrentPrimaryMode();
             PrimaryModeRuntimeFraction = CurrentPrimaryRuntimeFraction();
-            Real64 Outletcp = PsyCpAirFnWTdb(OutletHumRat, OutletTemp); // J/degreesK.kg
-            Real64 Returncp = PsyCpAirFnWTdb(Wra, StepIns.Tra);         // J/degreesK.kg
-            Real64 Outdoorcp = PsyCpAirFnWTdb(Wosa, StepIns.Tosa);      // J/degreesK.kg
+            Real64 Outletcp = PsyCpAirFnW(OutletHumRat); // J/degreesK.kg
+            Real64 Returncp = PsyCpAirFnW(Wra);          // J/degreesK.kg
+            Real64 Outdoorcp = PsyCpAirFnW(Wosa);        // J/degreesK.kg
             // Zone Sensible Cooling{ W } = m'SA {kg/s} * 0.5*(cpRA+cpSA) {kJ/kg-C} * (T_RA - T_SA) {C}
             // Zone Latent Cooling{ W } = m'SAdryair {kg/s} * L {kJ/kgWater} * (HR_RA - HR_SA) {kgWater/kgDryAir}
             // Zone Total Cooling{ W } = m'SAdryair {kg/s} * (h_RA - h_SA) {kJ/kgDryAir}

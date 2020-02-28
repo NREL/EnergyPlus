@@ -61,7 +61,7 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataPhotovoltaics.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/EMSManager.hh>
@@ -898,7 +898,7 @@ namespace PhotovoltaicThermalCollectors {
 
                 if (this->WorkingFluidType == WorkingFluidEnum::AIR) {
                     Real64 Winlet = DataLoopNode::Node(InletNode).HumRat;
-                    Real64 CpInlet = Psychrometrics::PsyCpAirFnWTdb(Winlet, Tinlet);
+                    Real64 CpInlet = Psychrometrics::PsyCpAirFnW(Winlet);
                     if (mdot * CpInlet > 0.0) {
                         PotentialOutletTemp = Tinlet + PotentialHeatGain / (mdot * CpInlet);
                     } else {
@@ -914,7 +914,7 @@ namespace PhotovoltaicThermalCollectors {
                         }
                         BypassFraction = max(0.0, BypassFraction);
                         PotentialOutletTemp = DataLoopNode::Node(this->HVACOutletNodeNum).TempSetPoint;
-                        PotentialHeatGain = mdot * Psychrometrics::PsyCpAirFnWTdb(Winlet, Tinlet) * (PotentialOutletTemp - Tinlet);
+                        PotentialHeatGain = mdot * Psychrometrics::PsyCpAirFnW(Winlet) * (PotentialOutletTemp - Tinlet);
 
                     } else {
                         BypassFraction = 0.0;
@@ -941,7 +941,6 @@ namespace PhotovoltaicThermalCollectors {
 
             } else if (this->CoolingUseful && this->BypassDamperOff && (mdot > 0.0)) {
                 // calculate cooling using energy balance
-
                 Real64 HrGround(0.0);
                 Real64 HrAir(0.0);
                 Real64 HcExt(0.0);
@@ -963,7 +962,7 @@ namespace PhotovoltaicThermalCollectors {
 
                 if (this->WorkingFluidType == WorkingFluidEnum::AIR) {
                     Real64 Winlet = DataLoopNode::Node(InletNode).HumRat;
-                    CpInlet = Psychrometrics::PsyCpAirFnWTdb(Winlet, Tinlet);
+                    CpInlet = Psychrometrics::PsyCpAirFnW(Winlet);
                     WetBulbInlet = Psychrometrics::PsyTwbFnTdbWPb(Tinlet, Winlet, DataEnvironment::OutBaroPress, RoutineName);
                     DewPointInlet = Psychrometrics::PsyTdpFnTdbTwbPb(Tinlet, WetBulbInlet, DataEnvironment::OutBaroPress, RoutineName);
                 } else if (this->WorkingFluidType == WorkingFluidEnum::LIQUID) {

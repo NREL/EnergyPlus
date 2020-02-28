@@ -58,17 +58,6 @@ namespace EnergyPlus {
 
 namespace ZoneAirLoopEquipmentManager {
 
-    // Data
-    // MODULE PARAMETER DEFINITIONS:
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
-
-    // MODULE VARIABLE DECLARATIONS:
-    // na
-
-    // SUBROUTINE SPECIFICATIONS FOR MODULE ZoneAirLoopEquipmentManager
-
     // Functions
     void clear_state();
 
@@ -94,13 +83,6 @@ namespace ZoneAirLoopEquipmentManager {
                                  bool const FirstHVACIteration,
                                  int const ControlledZoneNum,
                                  int const ActualZoneNum);
-
-    void UpdateZoneAirLoopEquipment();
-
-    // void
-    // ReportZoneAirLoopEquipment(
-    // 	int const AirDistUnitNum
-    // );
 
 } // namespace ZoneAirLoopEquipmentManager
 

@@ -178,11 +178,11 @@ Setting this value determines how EnergyPlus treats beam solar radiation and ref
 
 \textbf{MinimalShadowing}
 
-In this case, there is no exterior shadowing except from window and door reveals. All beam solar radiation entering the zone is assumed to fall on the floor, where it is absorbed according to the floor's solar absorptance. Any reflected by the floor is added to the transmitted diffuse radiation, which is assumed to be uniformly distributed on all interior surfaces. If no floor is present in the zone, the incident beam solar radiation is absorbed on all interior surfaces according to their absorptances. The zone heat balance is then applied at each surface and on the zone's air with the absorbed radiation being treated as a flux on the surface.
+In this case, there is no exterior shadowing except from window and door reveals. All beam solar radiation entering the zone is assumed to fall on the floor, where it is absorbed according to the floor's solar absorptance. Any reflected by the floor is added to the reflected diffuse radiation, which is assumed to be uniformly distributed on all interior surfaces. If no floor is present in the zone, the incident beam solar radiation is absorbed on all interior surfaces according to their absorptances. The zone heat balance is then applied at each surface and on the zone's air with the absorbed radiation being treated as a flux on the surface.
 
 \textbf{FullExterior, FullExteriorWithReflections}
 
-In this case, shadow patterns on exterior surfaces caused by detached shading, wings, overhangs, and exterior surfaces of all zones are computed. As for MinimalShadowing, shadowing by window and door reveals is also calculated. Beam solar radiation entering the zone is treated as for MinimalShadowing -- All beam solar radiation entering the zone is assumed to fall on the floor, where it is absorbed according to the floor's solar absorptance. Any reflected by the floor is added to the transmitted diffuse radiation, which is assumed to be uniformly distributed on all interior surfaces. If no floor is present in the zone, the incident beam solar radiation is absorbed on all interior surfaces according to their absorptances. The zone heat balance is then applied at each surface and on the zone's air with the absorbed radiation being treated as a flux on the surface.
+In this case, shadow patterns on exterior surfaces caused by detached shading, wings, overhangs, and exterior surfaces of all zones are computed. As for MinimalShadowing, shadowing by window and door reveals is also calculated. Beam solar radiation entering the zone is treated as for MinimalShadowing -- All beam solar radiation entering the zone is assumed to fall on the floor, where it is absorbed according to the floor's solar absorptance. Any reflected by the floor is added to the reflected diffuse radiation, which is assumed to be uniformly distributed on all interior surfaces. If no floor is present in the zone, the incident beam solar radiation is absorbed on all interior surfaces according to their absorptances. The zone heat balance is then applied at each surface and on the zone's air with the absorbed radiation being treated as a flux on the surface.
 
 \textbf{FullInteriorAndExterior, FullInteriorAndExteriorWithReflections}
 
@@ -198,9 +198,14 @@ If you use \textbf{FullInteriorAndExterior} the program will also calculate how 
 \caption{Illustration of Convex and Non-convex Zones \protect \label{fig:illustration-of-convex-and-non-convex-zones}}
 \end{figure}
 
+\textbf{Diffuse Radiation}
+
+Diffuse solar transmitted through exterior and interior windows is distributed according to the approximate view factors between the transmitting window and all other heat transfer surfaces in the zone.
+The portion of this diffuse solar that is reflected by all surfaces in the zone is subsequently redistributed uniformly (based on area and solar absorptance) to all heat transfer surfaces in the zone, along with interior reflected beam solar and shortwave radiation from lights. Refer to the section ``Solar Distribution'' in the Engineering Reference Guide for more information including equations.
+
 \textbf{Reflection calculations}
 
-Note: Using the reflection calculations can be very time-consuming. Even error-prone. As a possible alleviation, you can use the \hyperref[outputdiagnostics]{Output:Diagnostics},DoNotMirrorDetachedShading; in many cases to get past a fatal error.
+Note: Using the reflection calculations can be very time-consuming. Even error-prone. As a possible alleviation, you can use the \hyperref[outputdiagnostics]{Output:Diagnostics} ``DoNotMirrorDetachedShading'' in many cases to get past a fatal error.
 
 If using reflections, the program calculates beam and sky solar radiation that is reflected from exterior surfaces and then strikes the building. These reflecting surfaces fall into three categories:
 
@@ -543,21 +548,57 @@ The object also allows input to disable self-shading effect from exterior surfac
 
 \subsubsection{Inputs}\label{inputs-10-019}
 
-\paragraph{Field: Calculation Method}\label{field-calculation-method-000}
+\paragraph{Field: Shading Calculation Method}
 
-This field is used to control how the solar, shading, and daylighting models are calculated with respect to the time of calculations during the simulation. The default and fastest method is selected using the keyword AverageOverDaysInFrequency. A more detailed and slower method can be selected using the keyword TimestepFrequency. The TimestepFrequency method must be used for modeling dynamic fenestration and shading surfaces.
+Select between CPU-based polygon clipping method, the GPU-based pixel counting method, or importing from external shading data.
 
-\paragraph{Field: Calculation Frequency}\label{field-calculation-frequency}
+Choices are:
+\begin{enumerate}
+    \item PolygonClipping
+    \item PixelCounting
+    \item Scheduled
+    \item Imported
+\end{enumerate}
+
+Default: PolygonClipping
+
+If \textbf{PixelCounting} is selected and GPU hardware (or GPU emulation) is not available, a warning will be displayed and EnergyPlus will revert to PolygonClipping.
+
+If \textbf{Scheduled} is chosen, the External Shading Fraction Schedule Name is required in \textbf{\hyperref[surfacePropertylocalEnvironment]{SurfaceProperty:LocalEnvironment}}. If some exterior surfaces do not have their \textbf{\hyperref[surfacePropertylocalEnvironment]{SurfaceProperty:LocalEnvironment}} objects, no shading is assigned on those exterior surfaces.
+
+If \textbf{Imported} is chosen, the \textbf{\hyperref[schedulefileshading]{Schedule:File:Shading}} object is required to define the external file that stores all shading calculation results. The results are imported altogether by reading the \textbf{\hyperref[schedulefileshading]{Schedule:File:Shading}} object during initialization. The file explicitly defines the mappings to the surfaces. If the data for a surface is not listed in the file, no shading is assigned on this surface.
+
+The sunlit fraction to overwrite accounts for the shading of both direct and sky diffuse solar radiation caused by all exterior shadowing surfaces. In this case, shadow patterns on exterior surfaces caused by detached shading, side-fins, overhangs, and exterior surfaces of all zones are overwritten. The interior shading devices, such as window shades and blinds, should be further calculated and applied after the importing.
+
+\paragraph{Field: Shading Calculation Update Frequency Method}\label{field-calculation-method-000}
+
+This field is used to control how the solar, shading, and daylighting models are calculated with respect to the time of calculations during the simulation. The default and fastest method is selected using the keyword Periodic. A more detailed and slower method can be selected using the keyword Timestep. The Timestep method must be used for modeling dynamic fenestration and shading surfaces.
+
+\paragraph{Field: Shading Calculation Update Frequency}\label{field-calculation-frequency}
 
 This numeric field will cause the shadowing calculations to be done periodically using the number in the field as the number of days in each period. This field is only used if the default method AverageOverDaysInFrequency is used in the previous field. Using this field will allow you to synchronize the shadowing calculations with changes in shading devices. Using the default of 20 days in each period is the average number of days between significant changes in solar position angles. For these shadowing calculations, an ``average'' (over the time period) of solar angles, position, equation of time are also used.
 
 \paragraph{Field: Maximum Figures in Shadow Overlap Calculations}\label{field-maximum-figures-in-shadow-overlap-calculations}
 
-This numeric field will allow you to increase the number of figures in shadow overlaps. Due to the shadowing algorithm, the number of shadows in a figure may grow quite large even with fairly reasonable looking structures. Of course, the inclusion of more allowed figures will increase calculation time. Likewise, too few figures may not result in as accurate calculations as you desire.
+This numeric field will allow you to increase the number of figures in shadow overlaps in the PolygonClipping method. Due to the shadowing algorithm, the number of shadows in a figure may grow quite large even with fairly reasonable looking structures. Of course, the inclusion of more allowed figures will increase calculation time. Likewise, too few figures may not result in as accurate calculations as you desire.
 
 \paragraph{Field: Polygon Clipping Algorithm}\label{field-polygon-clipping-algorithm}
 
-This is an advanced feature. Prior to V7, the internal polygon clipping method was a special case of the Weiler-Atherton method. Now, two options are available: \textbf{SutherlandHodgman} (default) and \textbf{ConvexWeilerAtherton}. Theoretically, Sutherland-Hodgman is a simpler algorithm but it works well in cases where receiving surfaces (of shadows) are non-convex. The Weiler-Atherton implementation is only accurate where both casting and receiving surfaces are convex. Warnings/severe errors are displayed when necessary. More details on polygon clipping are contained in the Engineering Reference.
+This is an advanced feature. Prior to V7, the internal polygon clipping method was a special case of the Weiler-Atherton method. Now, three options are available:
+
+\begin{description}
+  \item[SutherlandHodgman] A simpler algorithm but it works well in cases where receiving surfaces (of shadows) are non-convex.
+  \item[ConvexWeilerAtherton] Only accurate where both casting and receiving surfaces are convex. Warnings/severe errors are displayed when necessary.
+  \item[SlaterBarskyandSutherlandHodgman] Slater-Barsky only applies to rectangular surfaces. Polygon clipping for rectangular surfaces will be calculated using the Slater-Barsky algorithm, while the rest adopts the default Sutherl-Hodgman algorithm.
+\end{description}
+
+Default is SutherlandHodgman. More details on polygon clipping are contained in the Engineering Reference.
+
+\paragraph{Field: Pixel Counting Resolution}
+
+Number of pixels in both dimensions of the surface rendering. Higher resolution will create more accurate calculations, but can significantly increase computation time.
+
+Default: 512.
 
 \paragraph{Field: Sky Diffuse Modeling Algorithm}\label{field-sky-diffuse-modeling-algorithm}
 
@@ -566,18 +607,6 @@ Two choices are available here: SimpleSkyDiffuseModeling and DetailedSkyDiffuseM
 In general (and you should also read the previous field description), if shadowing surfaces are used with the transmittance property, the user should be careful to synchronize this calculation with the scheduled occurrence of the transmittance (if any) (or use 1, which will be the most accurate but will cause more time in the calculations).
 
 This field applies to the method called ``AverageOverDaysInFrequency.'' When the method called ``DetailedTimestepIntegration'' is used the diffuse sky modeling always uses DetailedSkyDiffuseModeling.
-
-\paragraph{Field: External Shading Calculation Method}\label{field-external-shading-calculation-method}
-
-The field has three options: \textbf{ScheduledShading}, \textbf{ImportedShading} and \textbf{InternalCalculation}. The field indicates whether the external shading is pre-calculated and imported as schedules, which overwrite the EnergyPlus calculated array of the surface sunlit fraction. If \textbf{ScheduledShading} or \textbf{ImportedShading} is chosen, all external shading calculation would be performed externally (EnergyPlus internal calculations of external shading will be turned off).
-
-If \textbf{ScheduledShading} is chosen, the shading calculation results are imported during the initialization of an EnergyPlus run with the schedule object defined by the \textbf{\hyperref[surfacePropertylocalEnvironment]{SurfaceProperty:LocalEnvironment}} object of this surface. If some exterior surfaces do not have their \textbf{\hyperref[surfacePropertylocalEnvironment]{SurfaceProperty:LocalEnvironment}} objects, no shading is assigned on those exterior surfaces.
-
-If \textbf{ImportedShading} is chosen, a \textbf{\hyperref[schedulefileshading]{Schedule:File:Shading}} object is required to define the external file that stores all shading calculation results. The results are imported altogether by reading the \textbf{\hyperref[schedulefileshading]{Schedule:File:Shading}} object during initialization. The file explicitly defines the mappings to the surfaces. If the data for a surface is not listed in the file, no shading is assigned on this surface.
-
-The default choice is \textbf{InternalCalculation}, indicating EnergyPlus will do the external shading calculations and no external results will be used.
-
-The sunlit fraction to overwrite accounts for the shading of both direct and sky diffuse solar radiation caused by all exterior shadowing surfaces. In this case, shadow patterns on exterior surfaces caused by detached shading, side-fins, overhangs, and exterior surfaces of all zones are overwritten. The interior shading devices, such as window shades and blinds, should be further calculated and applied after the importing.
 
 \paragraph{Field: Output External Shading Calculation Results}\label{field-output-external-shading-calculation results}
 This fields indicates whether or not (\textbf{Yes} or \textbf{No})to save internal shading calculation results to an external file, which can be imported back as needed. This file saves external sunlit fractions for all surfaces. If \textbf{Yes} is chosen, hourly shading fraction of all surfaces will be exported as a CSV file, naming as "output file prefix + shading" (the default name is "eplusshading.csv" if no output file prefix is defined). Each column of the CSV file lists the annually calculated shading fraction of each surface with time-step interval. It only writes data for each simulation day that shadows are calculated, e.g. once every 20 days by default. If the results are intended to be reused to be imported  back using \textbf{ImportedShading} in \textbf{Field: External Shading Calculation Method}, the Calculation Frequency should be set as one to write year-round hourly results. Design days are not included. The default choice is \textbf{No}.
@@ -595,16 +624,16 @@ This field is extensible.
 Examples of this object in IDF: (note this object must be unique in an IDF)
 
 \begin{lstlisting}
-ShadowCalculation,AverageOverDaysInFrequency,1;
+ShadowCalculation, PixelCounting, Periodic, 1;
 
-ShadowCalculation, AverageOverDaysInFrequency, 1, , SutherlandHodgman, DetailedSkyDiffuseModeling;
+ShadowCalculation, PolygonClipping, Periodic, 1, , SutherlandHodgman, , DetailedSkyDiffuseModeling;
 
-ShadowCalculation, AverageOverDaysInFrequency, , , , , ScheduledShading, YES;
+ShadowCalculation, Scheduled, Periodic, , , , , Yes;
 
-ShadowCalculation, AverageOverDaysInFrequency, , , , , , , , Yes, No, ShadingZoneGroup;
+ShadowCalculation, PolygonClipping, Periodic, , , , , , , Yes, No, ShadingZoneGroup;
 \end{lstlisting}
 
-Note that the use of ``1'' in the examples is NOT the same as using DetailedTimestepIntegration -- ``1'' causes daily calculation of the sun position variables but does not change the shadowing calculations more frequently than daily.
+Note that the use of ``1'' in the examples is NOT the same as using Timestep calculation frequency -- ``1'' causes daily calculation of the sun position variables but does not change the shadowing calculations more frequently than daily.
 
 \subsection{Output:Diagnostics}\label{outputdiagnostics}
 
