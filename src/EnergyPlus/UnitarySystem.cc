@@ -13011,6 +13011,7 @@ namespace UnitarySystems {
 
         if ((CoilTypeNum == DataHVACGlobals::CoilDX_MultiSpeedCooling) || (CoilTypeNum == DataHVACGlobals::CoilDX_MultiSpeedHeating)) {
 
+            // TODO: THIS IF SECTION DOES NOTHING
             if (CoilType == DataHVACGlobals::Cooling) {
                 if (this->m_CoolingSpeedNum <= 1.0) {
                     SpeedRatio = 0.0;
