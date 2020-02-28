@@ -2470,7 +2470,7 @@
     Sys 1 Furnace DX Cool Cooling Coil Operating Mode,  !- Name
     autosize,                !- Rated Gross Total Cooling Capacity {W}
     autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
+    autosize,                !- Rated Condenser Air Flow Rate {m3/s}
     0,                       !- Maximum Cycling Rate {cycles/hr}
     0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
     0,                       !- Latent Capacity Time Constant {s}
@@ -2930,7 +2930,7 @@
     Sys 2 Furnace DX Cool Cooling Coil Operating Mode,  !- Name
     autosize,                !- Rated Gross Total Cooling Capacity {W}
     autosize,                !- Rated Evaporator Air Flow Rate {m3/s}
-    ,                        !- Rated Condenser Air Flow Rate {m3/s}
+    autosize,                !- Rated Condenser Air Flow Rate {m3/s}
     0,                       !- Maximum Cycling Rate {cycles/hr}
     0,                       !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity {dimensionless}
     0,                       !- Latent Capacity Time Constant {s}
