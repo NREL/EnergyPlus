@@ -60,6 +60,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneControls.hh>
@@ -79,6 +80,7 @@
 #include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SizingManager.hh>
+#include <EnergyPlus/SystemReports.hh>
 #include <fstream>
 
 using namespace EnergyPlus::MixedAir;
@@ -89,6 +91,7 @@ using namespace EnergyPlus::DataSizing;
 using namespace EnergyPlus::DataHeatBalance;
 using namespace EnergyPlus::ScheduleManager;
 using namespace EnergyPlus::DataEnvironment;
+using namespace EnergyPlus::DataHeatBalFanSys;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::DataLoopNode;
 using namespace EnergyPlus::DataZoneEnergyDemands;
@@ -98,6 +101,7 @@ using namespace EnergyPlus::Humidifiers;
 using namespace EnergyPlus::OutputReportPredefined;
 using namespace EnergyPlus::ReportSizingManager;
 using namespace EnergyPlus::SizingManager;
+using namespace EnergyPlus::SystemReports;
 
 using namespace EnergyPlus::DataContaminantBalance;
 using namespace EnergyPlus::MixedAir;
@@ -620,6 +624,122 @@ TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_NoHeatingCooling_MinVentil
     EXPECT_NEAR(Mreturn, 0, 0.001);
     EXPECT_NEAR(Mrelief, 0, 0.001);
 
+}
+
+TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_VentLoadCheck)
+{
+    std::vector<std::string> snippet = getAllLinesInFile2(configured_source_directory() + "/tst/EnergyPlus/unit/UnitaryHybridUnitTest_DOSA.idf");
+    std::string string = delimited_string(snippet);
+    ASSERT_TRUE(process_idf(string));
+    // setup environment
+    bool ErrorsFound(false);
+    GetZoneData(ErrorsFound);
+    EXPECT_FALSE(ErrorsFound);
+    // Initialize schedule values
+    DataGlobals::TimeStep = 1;
+    DataHVACGlobals::TimeStepSys = 1;
+    DataGlobals::NumOfTimeStepInHour = 1;
+    DataGlobals::MinutesPerTimeStep = 60;
+    DataEnvironment::Month = 1;
+    DataEnvironment::DayOfMonth = 21;
+    DataGlobals::HourOfDay = 1;
+    DataEnvironment::DSTIndicator = 0;
+    DataEnvironment::DayOfWeek = 2;
+    DataEnvironment::HolidayIndex = 0;
+    DataGlobals::WarmupFlag = false;
+    DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(Month, DayOfMonth, 1);
+    ScheduleManager::UpdateScheduleValues();
+    // Initialize zone areas and volumes - too many other things need to be set up to do these in the normal routines
+    DataHeatBalance::Zone(1).FloorArea = 232.26;
+    DataEnvironment::StdRhoAir = 1.225;
+    DataHeatBalance::ZoneIntGain.allocate(1);
+
+    SizingManager::GetOARequirements();
+    GetOAControllerInputs(OutputFiles::getSingleton());
+    using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
+
+    // Setup performnace tables
+    using namespace EnergyPlus::DataEnvironment;
+    // process schedules
+    ProcessScheduleInput(OutputFiles::getSingleton()); // read schedules
+    UpdateScheduleValues();
+    // Get Unitary system
+    GetInputZoneHybridUnitaryAirConditioners(ErrorsFound);
+    // All to get OA requirements
+    GetOARequirements();
+
+    NumOfZones = 1;
+    ZoneSysEnergyDemand.allocate(NumOfZones);
+    DeadBandOrSetback.allocate(NumOfZones);
+
+    HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
+    EXPECT_FALSE(ErrorsFound);                    // expect no errors
+    DataZoneEquipment::GetZoneEquipmentData();    // read zone equipment    SystemReports::ReportMaxVentilationLoads();
+    DataZoneEquipment::ZoneEquipInputsFilled = true;
+    ZoneOAMassFlow.allocate(NumOfZones);
+    ZoneOAMass.allocate(NumOfZones);
+    ZoneOAVolFlowStdRho.allocate(NumOfZones);
+    ZoneOAVolFlowCrntRho.allocate(NumOfZones);
+    ZoneOAVolStdRho.allocate(NumOfZones);
+    ZoneOAVolCrntRho.allocate(NumOfZones);
+    ZoneMechACH.allocate(NumOfZones);
+    MAT.allocate(NumOfZones);
+    ZoneAirHumRatAvg.allocate(NumOfZones);
+    ZoneSysEnergyDemand(1).TotalOutputRequired = 58469.99445;
+    DeadBandOrSetback(1) = false;
+    ZoneEquipList(ZoneEquipConfig(1).EquipListIndex).EquipIndex(1) = 1;
+    CreateEnergyReportStructure();
+
+    EXPECT_FALSE(ErrorsFound);
+    // Initialize unit
+    InitZoneHybridUnitaryAirConditioners(1, 1);
+    Model *pZoneHybridUnitaryAirConditioner = &HybridUnitaryAirConditioners::ZoneHybridUnitaryAirConditioner(1);
+    // setup local variables for model inputs
+    Real64 Tosa, Tra, Wra, Wosa, RHosa, RHra, DesignMinVR, Requestedheating, RequestedCooling, Requested_Humidification, Requested_Dehumidification;
+    RHosa = 0;
+    std::string TimeDate;
+    Real64 MsaRatio, OSAF;
+    MsaRatio = OSAF = 1;
+
+    Requestedheating = RequestedCooling = Requested_Humidification = Requested_Dehumidification = 0;
+
+    // Scenario 1: Hi Cooling
+
+    DesignMinVR = 1.622720855;       // Zone Hybrid Unitary HVAC Requested Outdoor Air Ventilation Mass Flow Rate
+    Tra = 22.93929413;               // Zone Hybrid Unitary HVAC Return Air Temperature
+    Tosa = 26.67733333;              // Zone Hybrid Unitary HVAC Outside Air Temperature
+    RHra = 17.3042157;               // Zone Hybrid Unitary HVAC Return Air Relative Humidity
+    RHosa = 13.1602401;              // Zone Hybrid Unitary HVAC Outside Air Relative Humidity
+    Requestedheating = -122396.255;  // Watts (Zone Predicted Sensible Load to Heating Setpoint Heat Transfer Rate
+    RequestedCooling = -58469.99445; // Watts (Zone Predicted Sensible Load to Cooling Setpoint Heat Transfer Rate
+    // Equivalent to a Zone Predicted Sensible Load to Setpoint Heat Transfer Rate [W] of -58470 w.
+    // A positive value indicates a heating load, a negative value indicates a cooling load.
+    Requested_Humidification = Requested_Dehumidification = 0;
+    Wra = PsyWFnTdbRhPb(Tra, RHra / 100, 101.325);
+    Wosa = PsyWFnTdbRhPb(Tosa, RHosa / 100, 101.325);
+    pZoneHybridUnitaryAirConditioner->InletTemp = Tra;
+    pZoneHybridUnitaryAirConditioner->InletHumRat = Wra;
+    pZoneHybridUnitaryAirConditioner->InletEnthalpy = PsyHFnTdbRhPb(Tra, RHra / 100, 101325, "test");
+    pZoneHybridUnitaryAirConditioner->InletPressure = 101325;
+    pZoneHybridUnitaryAirConditioner->InletRH = RHra / 100;
+    pZoneHybridUnitaryAirConditioner->SecInletTemp = Tosa;
+    pZoneHybridUnitaryAirConditioner->SecInletHumRat = Wosa;
+    pZoneHybridUnitaryAirConditioner->SecInletEnthalpy = PsyHFnTdbRhPb(Tosa, RHosa / 100, 101325, "test");
+    pZoneHybridUnitaryAirConditioner->SecInletPressure = 101325;
+    pZoneHybridUnitaryAirConditioner->SecInletRH = RHosa / 100;
+    pZoneHybridUnitaryAirConditioner->Initialize(1);
+    pZoneHybridUnitaryAirConditioner->InitializeModelParams();
+    pZoneHybridUnitaryAirConditioner->doStep(RequestedCooling, Requestedheating, Requested_Humidification, Requested_Dehumidification, DesignMinVR);
+
+    pZoneHybridUnitaryAirConditioner->InletMassFlowRate = DesignMinVR;
+    pZoneHybridUnitaryAirConditioner->OutletMassFlowRate = DesignMinVR;
+    SystemReports::ReportMaxVentilationLoads();
+    // output results
+    Real64 clg_vent_load = MaxCoolingLoadAddedByVent(1);
+    Real64 htg_vent_load = MaxHeatingLoadAddedByVent(1);
+    // checks
+    EXPECT_EQ(clg_vent_load, 0);
+    EXPECT_EQ(htg_vent_load, 0);
 }
 
 TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_AvailabilityManagerOff)
