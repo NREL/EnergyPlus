@@ -4218,7 +4218,11 @@ namespace HeatBalanceAirManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        ManageHVAC();
+        if(DataGlobals::externalHVACManager) {
+          DataGlobals::externalHVACManager();
+        } else {
+          ManageHVAC();
+        }
 
         // Do Final Temperature Calculations for Heat Balance before next Time step
         SumHmAW = 0.0;
