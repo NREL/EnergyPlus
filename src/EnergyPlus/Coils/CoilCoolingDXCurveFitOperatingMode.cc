@@ -331,7 +331,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(const DataLoopNode::N
 
         lowerspeed.CalcSpeedOutput(inletNode, outletNode, PLR, fanOpMode, condInletTemp); // out
 
-        thisspeed.AirMassFlow /= lowerspeed.active_fraction_of_face_coil_area;
+        lowerspeed.AirMassFlow /= lowerspeed.active_fraction_of_face_coil_area;
         correctedEnthalpy = (1.0 - lowerspeed.active_fraction_of_face_coil_area) * inletNode.Enthalpy + lowerspeed.active_fraction_of_face_coil_area * outletNode.Enthalpy;
         correctedHumRat = (1.0 - lowerspeed.active_fraction_of_face_coil_area) * inletNode.HumRat + lowerspeed.active_fraction_of_face_coil_area * outletNode.HumRat;
         correctedTemp = Psychrometrics::PsyTdbFnHW(correctedEnthalpy, correctedHumRat);

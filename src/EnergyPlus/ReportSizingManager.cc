@@ -498,7 +498,8 @@ namespace ReportSizingManager {
                 HardSizeNoDesRun = true;
                 AutosizeUser = SizingResult;
                 if (PrintWarningFlag && SizingResult > 0.0 && !DataScalableCapSizingON) {
-                    if (UtilityRoutines::SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") &&
+                    if ((UtilityRoutines::SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") ||
+                         UtilityRoutines::SameString(CompType, "COIL:COOLING:DX")) &&
                         SizingType == CoolingAirflowSizing && DataIsDXCoil) {
                         SizingResult /= (1 - DataBypassFrac); // back out bypass fraction applied in GetInput
                         ReportSizingOutput(CompType, CompName, "User-Specified " + SizingString, SizingResult);
@@ -2529,7 +2530,8 @@ namespace ReportSizingManager {
                 HardSizeNoDesRun = true;
                 AutosizeUser = SizingResult;
                 if (PrintWarningFlag && SizingResult > 0.0) {
-                    if (UtilityRoutines::SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") &&
+                    if ((UtilityRoutines::SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") ||
+                         UtilityRoutines::SameString(CompType, "COIL:COOLING:DX")) &&
                         SizingType == CoolingAirflowSizing && DataIsDXCoil) {
                         SizingResult /= (1 - DataBypassFrac); // back out bypass fraction applied in GetInput
                         ReportSizingOutput(CompType, CompName, "User-Specified " + SizingString, SizingResult);
@@ -3899,7 +3901,8 @@ namespace ReportSizingManager {
                     }
                 }
                 if (DataAutosizable && AutosizeUser > 0.0 && AutosizeDes > 0.0 && PrintWarningFlag) {
-                    if (UtilityRoutines::SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") &&
+                    if ((UtilityRoutines::SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") ||
+                         UtilityRoutines::SameString(CompType, "COIL:COOLING:DX")) &&
                         SizingType == CoolingAirflowSizing && DataIsDXCoil) {
                         ReportSizingOutput(
                             CompType, CompName, "Design Size " + SizingString, AutosizeDes, "User-Specified " + SizingString, AutosizeUser);
@@ -3925,7 +3928,8 @@ namespace ReportSizingManager {
                         }
                     }
                 } else if ((DataScalableSizingON || DataScalableCapSizingON) && AutosizeDes > 0.0 && PrintWarningFlag) {
-                    if (UtilityRoutines::SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") &&
+                    if ((UtilityRoutines::SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") ||
+                         UtilityRoutines::SameString(CompType, "COIL:COOLING:DX")) &&
                         SizingType == CoolingAirflowSizing && DataIsDXCoil) {
                         if (DataAutosizable) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString, SizingResult);
                         SizingResult *= (1 - DataBypassFrac); // now apply bypass fraction for second message and remaining simulation calcs
@@ -3934,7 +3938,8 @@ namespace ReportSizingManager {
                         if (DataAutosizable) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString, SizingResult);
                     }
                 } else if (PrintWarningFlag) {
-                    if (UtilityRoutines::SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") &&
+                    if ((UtilityRoutines::SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") ||
+                         UtilityRoutines::SameString(CompType, "COIL:COOLING:DX")) &&
                         SizingType == CoolingAirflowSizing && DataIsDXCoil) {
                         if (DataAutosizable) ReportSizingOutput(CompType, CompName, "Design Size " + SizingString, SizingResult);
                         SizingResult *= (1 - DataBypassFrac); // now apply bypass fraction for second message and remaining simulation calcs
@@ -3975,7 +3980,8 @@ namespace ReportSizingManager {
                         }
                     }
                 } else if ((DataScalableSizingON || DataScalableCapSizingON) && AutosizeDes > 0.0 && PrintWarningFlag) {
-                    if (UtilityRoutines::SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") &&
+                    if ((UtilityRoutines::SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") ||
+                         UtilityRoutines::SameString(CompType, "COIL:COOLING:DX")) &&
                         SizingType == CoolingAirflowSizing && DataIsDXCoil) {
                         if (DataAutosizable) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString, SizingResult);
                         SizingResult *= (1 - DataBypassFrac); // now apply bypass fraction for second message and remaining simulation calcs
@@ -3984,7 +3990,8 @@ namespace ReportSizingManager {
                         if (DataAutosizable) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString, SizingResult);
                     }
                 } else if ((DataScalableSizingON || DataScalableCapSizingON) && AutosizeUser > 0.0 && PrintWarningFlag) {
-                    if (UtilityRoutines::SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") &&
+                    if ((UtilityRoutines::SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") ||
+                         UtilityRoutines::SameString(CompType, "COIL:COOLING:DX")) &&
                         SizingType == CoolingAirflowSizing && DataIsDXCoil) {
                         if (DataAutosizable) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString, SizingResult);
                         SizingResult *= (1 - DataBypassFrac); // now apply bypass fraction for second message and remaining simulation calcs
@@ -3993,7 +4000,8 @@ namespace ReportSizingManager {
                         if (DataAutosizable) ReportSizingOutput(CompType, CompName, ScalableSM + SizingString, SizingResult);
                     }
                 } else if (PrintWarningFlag) {
-                    if (UtilityRoutines::SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") &&
+                    if ((UtilityRoutines::SameString(CompType, "COIL:COOLING:DX:TWOSTAGEWITHHUMIDITYCONTROLMODE") ||
+                         UtilityRoutines::SameString(CompType, "COIL:COOLING:DX")) &&
                         SizingType == CoolingAirflowSizing && DataIsDXCoil) {
                         if (DataAutosizable) ReportSizingOutput(CompType, CompName, "User-Specified " + SizingString, SizingResult);
                         SizingResult *= (1 - DataBypassFrac); // now apply bypass fraction for second message and remaining simulation calcs
