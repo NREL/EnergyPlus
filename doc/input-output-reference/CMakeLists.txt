@@ -322,6 +322,3 @@ add_custom_command(
 add_custom_target( zPDF_${OUTPUT_FILENAME}
                    DEPENDS ${PROJECT_BINARY_DIR}/${OUTPUT_FILENAME}.pdf
                  )
-
-# Make top-level 'documentation' target depend on this one
-add_dependencies(documentation zPDF_${OUTPUT_FILENAME})
