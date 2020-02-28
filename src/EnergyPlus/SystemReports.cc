@@ -70,7 +70,6 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -82,6 +81,7 @@
 #include <EnergyPlus/OutdoorAirUnit.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PackagedTerminalHeatPump.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/PurchasedAirManager.hh>
 #include <EnergyPlus/SplitterComponent.hh>
@@ -2480,16 +2480,16 @@ namespace SystemReports {
         bool IsParent;
 
         // Dimension GetMeteredVariables arrays
-        Array1D_int VarIndexes;                     // Variable Numbers
-        Array1D_int VarTypes;                       // Variable Types (1=integer, 2=real, 3=meter)
-        Array1D_string UnitsStrings;                // UnitsStrings for each variable
+        Array1D_int VarIndexes;                            // Variable Numbers
+        Array1D_int VarTypes;                              // Variable Types (1=integer, 2=real, 3=meter)
+        Array1D_string UnitsStrings;                       // UnitsStrings for each variable
         Array1D<OutputProcessor::TimeStepType> IndexTypes; // Variable Idx Types (1=Zone,2=HVAC)
-        Array1D<OutputProcessor::Unit> unitsForVar; // units from enum for each variable
-        Array1D_int ResourceTypes;                  // ResourceTypes for each variable
-        Array1D_string EndUses;                     // EndUses for each variable
-        Array1D_string Groups;                      // Groups for each variable
-        Array1D_string Names;                       // Variable Names for each variable
-        int NumFound;                               // Number Found
+        Array1D<OutputProcessor::Unit> unitsForVar;        // units from enum for each variable
+        Array1D_int ResourceTypes;                         // ResourceTypes for each variable
+        Array1D_string EndUses;                            // EndUses for each variable
+        Array1D_string Groups;                             // Groups for each variable
+        Array1D_string Names;                              // Variable Names for each variable
+        int NumFound;                                      // Number Found
         int NumVariables;
         int NumLeft; // Counter for deeper components
 
@@ -3863,7 +3863,7 @@ namespace SystemReports {
             AIRTERMINAL_SINGLEDUCT_VAV_REHEAT,
             AIRTERMINAL_SINGLEDUCT_VAV_REHEAT_VARIABLESPEEDFAN,
             COIL_COOLING_DX,
-	        COIL_COOLING_DX_MULTISPEED,
+            COIL_COOLING_DX_MULTISPEED,
             COIL_COOLING_DX_SINGLESPEED,
             COIL_COOLING_DX_SINGLESPEED_THERMALSTORAGE,
             COIL_COOLING_DX_TWOSPEED,
@@ -3957,7 +3957,7 @@ namespace SystemReports {
             {"AIRTERMINAL:SINGLEDUCT:VAV:REHEAT", AIRTERMINAL_SINGLEDUCT_VAV_REHEAT},
             {"AIRTERMINAL:SINGLEDUCT:VAV:REHEAT:VARIABLESPEEDFAN", AIRTERMINAL_SINGLEDUCT_VAV_REHEAT_VARIABLESPEEDFAN},
             {"COIL:COOLING:DX", COIL_COOLING_DX},
-	        {"COIL:COOLING:DX:MULTISPEED", COIL_COOLING_DX_MULTISPEED},
+            {"COIL:COOLING:DX:MULTISPEED", COIL_COOLING_DX_MULTISPEED},
             {"COIL:COOLING:DX:SINGLESPEED", COIL_COOLING_DX_SINGLESPEED},
             {"COIL:COOLING:DX:SINGLESPEED:THERMALSTORAGE", COIL_COOLING_DX_SINGLESPEED_THERMALSTORAGE},
             {"COIL:COOLING:DX:TWOSPEED", COIL_COOLING_DX_TWOSPEED},
@@ -4010,9 +4010,9 @@ namespace SystemReports {
             {"SOLARCOLLECTOR:FLATPLATE:PHOTOVOLTAICTHERMAL", SOLARCOLLECTOR_FLATPLATE_PHOTOVOLTAICTHERMAL},
             {"SOLARCOLLECTOR:UNGLAZEDTRANSPIRED", SOLARCOLLECTOR_UNGLAZEDTRANSPIRED},
             {"ZONEHVAC:AIRDISTRIBUTIONUNIT", ZONEHVAC_AIRDISTRIBUTIONUNIT},
-            {"ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW",ZONEHVAC_TERMINALUNIT_VRF},
-            {"COIL:COOLING:DX:VARIABLEREFRIGERANTFLOW",COIL_COOLING_VRF},
-            {"COIL:HEATING:DX:VARIABLEREFRIGERANTFLOW",COIL_HEATING_VRF},
+            {"ZONEHVAC:TERMINALUNIT:VARIABLEREFRIGERANTFLOW", ZONEHVAC_TERMINALUNIT_VRF},
+            {"COIL:COOLING:DX:VARIABLEREFRIGERANTFLOW", COIL_COOLING_VRF},
+            {"COIL:HEATING:DX:VARIABLEREFRIGERANTFLOW", COIL_HEATING_VRF},
             {"COIL:COOLING:DX:VARIABLEREFRIGERANTFLOW:FLUIDTEMPERATURECONTROL", COIL_COOLING_VRF_FTC},
             {"COIL:HEATING:DX:VARIABLEREFRIGERANTFLOW:FLUIDTEMPERATURECONTROL", COIL_HEATING_VRF_FTC}};
         assert(component_map.size() == n_ComponentTypes);
@@ -5132,16 +5132,21 @@ namespace SystemReports {
         static ObjexxFCL::gio::Fmt Format_707("(1X,A)");
         static ObjexxFCL::gio::Fmt Format_708(
             "('! <AirLoopHVAC>,<Air Loop Name>,<# Return Nodes>,<# Supply Nodes>,','<# Zones Cooled>,<# Zones Heated>,<Outdoor Air Used>')");
-        static ObjexxFCL::gio::Fmt Format_709("('! <AirLoop Return Connections>,<Connection Count>,<AirLoopHVAC Name>,','<Zn Eqp Return Node #>,<Zn Eqp Return "
-                                   "Node Name>,','<AirLoop Return Node #>,<Air Loop Return Node Name>')");
-        static ObjexxFCL::gio::Fmt Format_710("('! <AirLoop Supply Connections>,<Connection Count>,<AirLoopHVAC Name>,','<Zn Eqp Supply Node #>,<Zn Eqp Supply "
-                                   "Node Name>,','<AirLoop Supply Node #>,<Air Loop Supply Node Name>')");
-        static ObjexxFCL::gio::Fmt Format_711("('! <Cooled Zone Info>,<Cooled Zone Count>,<Cooled Zone Name>,','<Cooled Zone Inlet Node #>,<Cooled Zone Inlet "
-                                   "Node Name>,<AirLoopHVAC Name>')");
-        static ObjexxFCL::gio::Fmt Format_712("('! <Heated Zone Info>,<Heated Zone Count>,<Heated Zone Name>,','<Heated Zone Inlet Node #>,<Heated Zone Inlet "
-                                   "Node Name>,<AirLoopHVAC Name>')");
-        static ObjexxFCL::gio::Fmt Format_714("('! <Outdoor Air Connections>,<OA Inlet Node #>,<OA Return Air Inlet Node Name>,','<OA Outlet Node #>,<OA Mixed "
-                                   "Air Outlet Node Name>,<AirLoopHVAC Name>'s)");
+        static ObjexxFCL::gio::Fmt Format_709(
+            "('! <AirLoop Return Connections>,<Connection Count>,<AirLoopHVAC Name>,','<Zn Eqp Return Node #>,<Zn Eqp Return "
+            "Node Name>,','<AirLoop Return Node #>,<Air Loop Return Node Name>')");
+        static ObjexxFCL::gio::Fmt Format_710(
+            "('! <AirLoop Supply Connections>,<Connection Count>,<AirLoopHVAC Name>,','<Zn Eqp Supply Node #>,<Zn Eqp Supply "
+            "Node Name>,','<AirLoop Supply Node #>,<Air Loop Supply Node Name>')");
+        static ObjexxFCL::gio::Fmt Format_711(
+            "('! <Cooled Zone Info>,<Cooled Zone Count>,<Cooled Zone Name>,','<Cooled Zone Inlet Node #>,<Cooled Zone Inlet "
+            "Node Name>,<AirLoopHVAC Name>')");
+        static ObjexxFCL::gio::Fmt Format_712(
+            "('! <Heated Zone Info>,<Heated Zone Count>,<Heated Zone Name>,','<Heated Zone Inlet Node #>,<Heated Zone Inlet "
+            "Node Name>,<AirLoopHVAC Name>')");
+        static ObjexxFCL::gio::Fmt Format_714(
+            "('! <Outdoor Air Connections>,<OA Inlet Node #>,<OA Return Air Inlet Node Name>,','<OA Outlet Node #>,<OA Mixed "
+            "Air Outlet Node Name>,<AirLoopHVAC Name>'s)");
         static ObjexxFCL::gio::Fmt Format_713("(A)");
 
         ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "! ===============================================================";
@@ -5156,10 +5161,12 @@ namespace SystemReports {
         ObjexxFCL::gio::write(OutputFileBNDetails, Format_714);
         ObjexxFCL::gio::write(OutputFileBNDetails, Format_713)
             << "! <AirLoopHVAC Connector>,<Connector Type>,<Connector Name>,<Loop Name>,<Loop Type>,<Number of Inlets/Outlets>";
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_713) << "! <AirLoopHVAC Connector Branches>,<Connector Node Count>,<Connector Type>,<Connector "
-                                                       "Name>,<Inlet Branch>,<Outlet Branch>,<Loop Name>,<Loop Type>";
-        ObjexxFCL::gio::write(OutputFileBNDetails, Format_713) << "! <AirLoopHVAC Connector Nodes>,<Connector Node Count>,<Connector Type>,<Connector "
-                                                       "Name>,<Inlet Node>,<Outlet Node>,<Loop Name>,<Loop Type>";
+        ObjexxFCL::gio::write(OutputFileBNDetails, Format_713)
+            << "! <AirLoopHVAC Connector Branches>,<Connector Node Count>,<Connector Type>,<Connector "
+               "Name>,<Inlet Branch>,<Outlet Branch>,<Loop Name>,<Loop Type>";
+        ObjexxFCL::gio::write(OutputFileBNDetails, Format_713)
+            << "! <AirLoopHVAC Connector Nodes>,<Connector Node Count>,<Connector Type>,<Connector "
+               "Name>,<Inlet Node>,<Outlet Node>,<Loop Name>,<Loop Type>";
         for (Count = 1; Count <= NumPrimaryAirSys; ++Count) {
             ObjexxFCL::gio::write(ChrOut, fmtLD) << AirToZoneNodeInfo(Count).NumReturnNodes;
             ObjexxFCL::gio::write(ChrOut2, fmtLD) << AirToZoneNodeInfo(Count).NumSupplyNodes;
@@ -5174,8 +5181,8 @@ namespace SystemReports {
             } else {
                 ChrOut5 = "No";
             }
-            ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << " AirLoopHVAC," + AirToZoneNodeInfo(Count).AirLoopName + ',' + ChrOut + ',' + ChrOut2 +
-                                                               ',' + ChrOut3 + ',' + ChrOut4 + ',' + ChrOut5;
+            ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << " AirLoopHVAC," + AirToZoneNodeInfo(Count).AirLoopName + ',' + ChrOut + ',' +
+                                                                          ChrOut2 + ',' + ChrOut3 + ',' + ChrOut4 + ',' + ChrOut5;
             for (Count1 = 1; Count1 <= AirToZoneNodeInfo(Count).NumReturnNodes; ++Count1) {
                 ObjexxFCL::gio::write(ChrOut, fmtLD) << Count1;
                 if (AirToZoneNodeInfo(Count).ZoneEquipReturnNodeNum(Count1) > 0) {
@@ -5212,7 +5219,8 @@ namespace SystemReports {
                     }
                 }
                 if (ChrOut3 != errstring) {
-                    ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << ChrOut3 + ',' + NodeID(AirToZoneNodeInfo(Count).AirLoopReturnNodeNum(Count1));
+                    ObjexxFCL::gio::write(OutputFileBNDetails, Format_701)
+                        << ChrOut3 + ',' + NodeID(AirToZoneNodeInfo(Count).AirLoopReturnNodeNum(Count1));
                 } else {
                     ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << errstring + ',' + errstring;
                 }
@@ -5253,7 +5261,8 @@ namespace SystemReports {
                     }
                 }
                 if (ChrOut3 != errstring) {
-                    ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << ChrOut3 + ',' + NodeID(AirToZoneNodeInfo(Count).AirLoopSupplyNodeNum(Count1));
+                    ObjexxFCL::gio::write(OutputFileBNDetails, Format_701)
+                        << ChrOut3 + ',' + NodeID(AirToZoneNodeInfo(Count).AirLoopSupplyNodeNum(Count1));
                 } else {
                     ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << errstring + ',' + errstring;
                 }
@@ -5279,7 +5288,8 @@ namespace SystemReports {
                     ObjexxFCL::gio::write(OutputFileBNDetails, Format_701)
                         << ChrOut2 + ',' + NodeID(AirToZoneNodeInfo(Count).CoolZoneInletNodes(Count1)) + ',' + AirToZoneNodeInfo(Count).AirLoopName;
                 } else {
-                    ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << errstring + ',' + errstring + ',' + AirToZoneNodeInfo(Count).AirLoopName;
+                    ObjexxFCL::gio::write(OutputFileBNDetails, Format_701)
+                        << errstring + ',' + errstring + ',' + AirToZoneNodeInfo(Count).AirLoopName;
                 }
             }
             for (Count1 = 1; Count1 <= AirToZoneNodeInfo(Count).NumZonesHeated; ++Count1) {
@@ -5302,7 +5312,8 @@ namespace SystemReports {
                     ObjexxFCL::gio::write(OutputFileBNDetails, Format_701)
                         << ChrOut2 + ',' + NodeID(AirToZoneNodeInfo(Count).HeatZoneInletNodes(Count1)) + ',' + AirToZoneNodeInfo(Count).AirLoopName;
                 } else {
-                    ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << errstring + ',' + errstring + ',' + AirToZoneNodeInfo(Count).AirLoopName;
+                    ObjexxFCL::gio::write(OutputFileBNDetails, Format_701)
+                        << errstring + ',' + errstring + ',' + AirToZoneNodeInfo(Count).AirLoopName;
                 }
             }
             if (AirToOANodeInfo(Count).OASysExists) {
@@ -5340,14 +5351,16 @@ namespace SystemReports {
                     ObjexxFCL::gio::write(OutputFileBNDetails, Format_701)
                         << ChrOut2 + ',' + NodeID(AirToOANodeInfo(Count).OASysOutletNodeNum) + ',' + AirToZoneNodeInfo(Count).AirLoopName;
                 } else {
-                    ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << errstring + ',' + errstring + ',' + AirToZoneNodeInfo(Count).AirLoopName;
+                    ObjexxFCL::gio::write(OutputFileBNDetails, Format_701)
+                        << errstring + ',' + errstring + ',' + AirToZoneNodeInfo(Count).AirLoopName;
                 }
             }
             //  Report HVAC Air Loop Splitter to BND file
             if (PrimaryAirSystem(Count).Splitter.Exists) {
                 ObjexxFCL::gio::write(ChrOut, fmtLD) << PrimaryAirSystem(Count).Splitter.TotalOutletNodes;
-                ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "   AirLoopHVAC Connector,Splitter," + PrimaryAirSystem(Count).Splitter.Name + ',' +
-                                                                   PrimaryAirSystem(Count).Name + ",Air," + stripped(ChrOut);
+                ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "   AirLoopHVAC Connector,Splitter," +
+                                                                              PrimaryAirSystem(Count).Splitter.Name + ',' +
+                                                                              PrimaryAirSystem(Count).Name + ",Air," + stripped(ChrOut);
                 for (Count1 = 1; Count1 <= PrimaryAirSystem(Count).Splitter.TotalOutletNodes; ++Count1) {
                     ObjexxFCL::gio::write(ChrOut, fmtLD) << Count1;
                     if (PrimaryAirSystem(Count).Splitter.BranchNumIn <= 0) {
@@ -5398,4 +5411,3 @@ namespace SystemReports {
 } // namespace SystemReports
 
 } // namespace EnergyPlus
-

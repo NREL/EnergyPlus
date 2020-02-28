@@ -178,7 +178,6 @@
 
 // C++ Headers
 #include <exception>
-#include <fstream>
 #include <iostream>
 #ifndef NDEBUG
 #ifdef __unix__
@@ -188,9 +187,7 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/environment.hh>
 #include <ObjexxFCL/gio.hh>
-#include <ObjexxFCL/string.functions.hh>
 #include <ObjexxFCL/time.hh>
 
 // EnergyPlus Headers
@@ -203,7 +200,7 @@
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/DataTimings.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
-#include <EnergyPlus/public/EnergyPlusPgm.hh>
+#include <EnergyPlus/api/EnergyPlusPgm.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/InputProcessing/DataStorage.hh>
@@ -231,49 +228,12 @@ void EnergyPlusPgm(std::string const &filepath)
     std::exit(RunEnergyPlus(filepath));
 }
 
-int RunEnergyPlus(std::string const & filepath)
-{
-    // Using/Aliasing
+int initializeEnergyPlus(std::string const & filepath) {
     using namespace EnergyPlus;
-
-    // PROGRAM INFORMATION:
-    //       AUTHOR         Linda K. Lawrie, et al
-    //       DATE WRITTEN   January 1997.....
-    //       MODIFIED       na
-    //       RE-ENGINEERED  na
-
-    // PURPOSE OF THIS PROGRAM:
-    // This program implements the calls for EnergyPlus (originally configured
-    // as the merger of BLAST/IBLAST and DOE-2 energy analysis programs).
-
-    // METHODOLOGY EMPLOYED:
-    // The method used in EnergyPlus is to simplify the main program as much
-    // as possible and contain all "simulation" code in other modules and files.
-
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-    // data only modules
-    using namespace DataPrecisionGlobals;
-    using namespace DataStringGlobals;
-    using namespace DataGlobals;
-    using namespace DataSystemVariables;
-    using namespace DataTimings;
-    using DataEnvironment::IgnoreBeamRadiation;
-    using DataEnvironment::IgnoreDiffuseRadiation;
-    using DataEnvironment::IgnoreSolarRadiation;
-    // routine modules
-    using namespace FileSystem;
-    using namespace OutputProcessor;
-    using namespace SimulationManager;
-    using FluidProperties::ReportOrphanFluids;
-    using Psychrometrics::ShowPsychrometricSummary;
-    using ScheduleManager::ReportOrphanSchedules;
 
     // Disable C++ i/o synching with C methods for speed
     std::ios_base::sync_with_stdio(false);
-    std::cin.tie(0); // Untie cin and cout: Could cause odd behavior for interactive prompts
+    std::cin.tie(nullptr); // Untie cin and cout: Could cause odd behavior for interactive prompts
 
 // Enable floating point exceptions
 #ifndef NDEBUG
@@ -283,7 +243,7 @@ int RunEnergyPlus(std::string const & filepath)
 #endif
 
 #ifdef _MSC_VER
-#ifndef _DEBUG
+    #ifndef _DEBUG
     // If _MSC_VER and not debug then prevent dialogs on error
     SetErrorMode(SEM_NOGPFAULTERRORBOX);
     _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_DEBUG);
@@ -291,127 +251,19 @@ int RunEnergyPlus(std::string const & filepath)
 #endif
 #endif
 
-    // Locals
-    // PROGRAM PARAMETER DEFINITIONS:
-    // Note: General Parameters for the entire EnergyPlus program are contained
-    // in "DataGlobals.cc"
-
-    // INTERFACE BLOCK SPECIFICATIONS
-    // na
-
-    // DERIVED TYPE DEFINITIONS
-    // na
-
-    // PROGRAM LOCAL VARIABLE DECLARATIONS:
-    static std::string cEnvValue;
-
-    //                           INITIALIZE VARIABLES
-    Time_Start = epElapsedTime();
+    DataSystemVariables::Time_Start = DataTimings::epElapsedTime();
 #ifdef EP_Detailed_Timings
     epStartTime("EntireRun=");
 #endif
 
-    CreateCurrentDateTimeString(CurrentDateTime);
+    CreateCurrentDateTimeString(DataStringGlobals::CurrentDateTime);
 
-    ResultsFramework::OutputSchema->SimulationInformation.setProgramVersion(VerString);
-    ResultsFramework::OutputSchema->SimulationInformation.setStartDateTimeStamp(CurrentDateTime.substr(5));
+    ResultsFramework::OutputSchema->SimulationInformation.setProgramVersion(DataStringGlobals::VerString);
+    ResultsFramework::OutputSchema->SimulationInformation.setStartDateTimeStamp(DataStringGlobals::CurrentDateTime.substr(5));
 
-    VerString += "," + CurrentDateTime;
+    DataStringGlobals::VerString += "," + DataStringGlobals::CurrentDateTime;
 
-    get_environment_variable(DDOnlyEnvVar, cEnvValue);
-    DDOnly = env_var_on(cEnvValue); // Yes or True
-    if (DDOnlySimulation) DDOnly = true;
-
-    get_environment_variable(ReverseDDEnvVar, cEnvValue);
-    ReverseDD = env_var_on(cEnvValue); // Yes or True
-
-    get_environment_variable(DisableGLHECachingEnvVar, cEnvValue);
-    DisableGLHECaching = env_var_on(cEnvValue); // Yes or True
-
-    get_environment_variable(FullAnnualSimulation, cEnvValue);
-    FullAnnualRun = env_var_on(cEnvValue); // Yes or True
-    if (AnnualSimulation) FullAnnualRun = true;
-
-    get_environment_variable(cDisplayAllWarnings, cEnvValue);
-    DisplayAllWarnings = env_var_on(cEnvValue); // Yes or True
-    if (DisplayAllWarnings) {
-        DisplayAllWarnings = true;
-        DisplayExtraWarnings = true;
-        DisplayUnusedSchedules = true;
-        DisplayUnusedObjects = true;
-    }
-
-    get_environment_variable(cDisplayExtraWarnings, cEnvValue);
-    if (!cEnvValue.empty()) DisplayExtraWarnings = env_var_on(cEnvValue); // Yes or True
-
-    get_environment_variable(cDisplayUnusedObjects, cEnvValue);
-    if (!cEnvValue.empty()) DisplayUnusedObjects = env_var_on(cEnvValue); // Yes or True
-
-    get_environment_variable(cDisplayUnusedSchedules, cEnvValue);
-    if (!cEnvValue.empty()) DisplayUnusedSchedules = env_var_on(cEnvValue); // Yes or True
-
-    get_environment_variable(cDisplayZoneAirHeatBalanceOffBalance, cEnvValue);
-    if (!cEnvValue.empty()) DisplayZoneAirHeatBalanceOffBalance = env_var_on(cEnvValue); // Yes or True
-
-    get_environment_variable(cDisplayAdvancedReportVariables, cEnvValue);
-    if (!cEnvValue.empty()) DisplayAdvancedReportVariables = env_var_on(cEnvValue); // Yes or True
-
-    get_environment_variable(cReportDuringWarmup, cEnvValue);
-    if (!cEnvValue.empty()) ReportDuringWarmup = env_var_on(cEnvValue); // Yes or True
-    if (ReverseDD) ReportDuringWarmup = false;                          // force to false for ReverseDD runs
-
-    get_environment_variable(cReportDuringWarmup, cEnvValue);
-    if (!cEnvValue.empty()) ReportDuringWarmup = env_var_on(cEnvValue); // Yes or True
-    if (DisableGLHECaching) ReportDuringWarmup = true;                  // force to true for standard runs runs
-
-    get_environment_variable(cReportDuringHVACSizingSimulation, cEnvValue);
-    if (!cEnvValue.empty()) ReportDuringHVACSizingSimulation = env_var_on(cEnvValue); // Yes or True
-
-    get_environment_variable(cIgnoreSolarRadiation, cEnvValue);
-    if (!cEnvValue.empty()) IgnoreSolarRadiation = env_var_on(cEnvValue); // Yes or True
-
-    get_environment_variable(cMinimalSurfaceVariables, cEnvValue);
-    if (!cEnvValue.empty()) CreateMinimalSurfaceVariables = env_var_on(cEnvValue); // Yes or True
-
-    get_environment_variable(cSortIDD, cEnvValue);
-    if (!cEnvValue.empty()) SortedIDD = env_var_on(cEnvValue); // Yes or True
-
-    get_environment_variable(MinReportFrequencyEnvVar, cEnvValue);
-    if (!cEnvValue.empty()) MinReportFrequency = cEnvValue; // turned into value later
-
-    get_environment_variable(cDeveloperFlag, cEnvValue);
-    if (!cEnvValue.empty()) DeveloperFlag = env_var_on(cEnvValue); // Yes or True
-
-    get_environment_variable(cIgnoreBeamRadiation, cEnvValue);
-    if (!cEnvValue.empty()) IgnoreBeamRadiation = env_var_on(cEnvValue); // Yes or True
-
-    get_environment_variable(cIgnoreDiffuseRadiation, cEnvValue);
-    if (!cEnvValue.empty()) IgnoreDiffuseRadiation = env_var_on(cEnvValue); // Yes or True
-
-    get_environment_variable(cSutherlandHodgman, cEnvValue);
-    if (!cEnvValue.empty()) SutherlandHodgman = env_var_on(cEnvValue); // Yes or True
-
-    get_environment_variable(cSlaterBarsky, cEnvValue);
-    if (!cEnvValue.empty()) SlaterBarsky = env_var_on(cEnvValue); // Yes or True
-
-    get_environment_variable(cMinimalShadowing, cEnvValue);
-    if (!cEnvValue.empty()) lMinimalShadowing = env_var_on(cEnvValue); // Yes or True
-
-    get_environment_variable(cTimingFlag, cEnvValue);
-    if (!cEnvValue.empty()) TimingFlag = env_var_on(cEnvValue); // Yes or True
-
-    // Initialize env flags for air loop simulation debugging
-    get_environment_variable(TrackAirLoopEnvVar, cEnvValue);
-    if (!cEnvValue.empty()) TrackAirLoopEnvFlag = env_var_on(cEnvValue); // Yes or True
-
-    get_environment_variable(TraceAirLoopEnvVar, cEnvValue);
-    if (!cEnvValue.empty()) TraceAirLoopEnvFlag = env_var_on(cEnvValue); // Yes or True
-
-    get_environment_variable(TraceHVACControllerEnvVar, cEnvValue);
-    if (!cEnvValue.empty()) TraceHVACControllerEnvFlag = env_var_on(cEnvValue); // Yes or True
-
-    get_environment_variable(cDisplayInputInAuditEnvVar, cEnvValue);
-    if (!cEnvValue.empty()) DisplayInputInAudit = env_var_on(cEnvValue); // Yes or True
+    DataSystemVariables::processEnvironmentVariables();
 
     if (!filepath.empty()) {
         // if filepath is not empty, then we are using E+ as a library API call
@@ -429,146 +281,120 @@ int RunEnergyPlus(std::string const & filepath)
             DisplayString("Couldn't change directory; aborting EnergyPlus");
             return EXIT_FAILURE;
         }
-        ProgramPath = filepath + pathChar;
+        DataStringGlobals::ProgramPath = filepath + DataStringGlobals::pathChar;
         int dummy_argc = 1;
         const char *dummy_argv[1] = {"energyplus"};
         CommandLineInterface::ProcessArgs(dummy_argc, dummy_argv);
     }
 
-    OutputStandardError = GetNewUnitNumber();
-    {
-        IOFlags flags;
-        flags.ACTION("write");
-        flags.STATUS("UNKNOWN");
-        ObjexxFCL::gio::open(OutputStandardError, outputErrFileName, flags);
-        int write_stat = flags.ios();
-        if (write_stat == 600) {
-            DisplayString("ERROR: Could not open file " + outputErrFileName + " for output (write). Write permission denied in output directory.");
-            return EXIT_FAILURE;
-        } else if (write_stat != 0) {
-            DisplayString("ERROR: Could not open file " + outputErrFileName + " for output (write).");
-            return EXIT_FAILURE;
-        }
+    int errStatus = initErrorFile();
+    if (errStatus) {
+        return errStatus;
     }
-    err_stream = ObjexxFCL::gio::out_stream(OutputStandardError);
 
-    TestAllPaths = true;
+    DataSystemVariables::TestAllPaths = true;
 
     DisplayString("EnergyPlus Starting");
-    DisplayString(VerString);
+    DisplayString(DataStringGlobals::VerString);
 
     try {
         EnergyPlus::inputProcessor = InputProcessor::factory();
         EnergyPlus::inputProcessor->processInput();
-
         if (DataGlobals::outputEpJSONConversionOnly) {
             DisplayString("Converted input file format. Exiting.");
             return EndEnergyPlus();
         }
-
         ResultsFramework::OutputSchema->setupOutputOptions();
+    } catch (const FatalError &e) {
+        return AbortEnergyPlus();
+    } catch (const std::exception &e) {
+        ShowSevereError(e.what());
+        return AbortEnergyPlus();
+    }
+    return 0;
+}
 
-        ManageSimulation();
 
+int initializeAsLibrary() {
+    using namespace EnergyPlus;
+
+    // Disable C++ i/o synching with C methods for speed
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(nullptr); // Untie cin and cout: Could cause odd behavior for interactive prompts
+
+// Enable floating point exceptions
+#ifndef NDEBUG
+#ifdef __unix__
+    feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
+#endif
+#endif
+
+#ifdef _MSC_VER
+    #ifndef _DEBUG
+    // If _MSC_VER and not debug then prevent dialogs on error
+    SetErrorMode(SEM_NOGPFAULTERRORBOX);
+    _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_DEBUG);
+    _CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_DEBUG);
+#endif
+#endif
+
+    DataSystemVariables::Time_Start = DataTimings::epElapsedTime();
+#ifdef EP_Detailed_Timings
+    epStartTime("EntireRun=");
+#endif
+
+    CreateCurrentDateTimeString(DataStringGlobals::CurrentDateTime);
+
+    ResultsFramework::OutputSchema->SimulationInformation.setProgramVersion(DataStringGlobals::VerString);
+    ResultsFramework::OutputSchema->SimulationInformation.setStartDateTimeStamp(DataStringGlobals::CurrentDateTime.substr(5));
+
+    DataStringGlobals::VerString += "," + DataStringGlobals::CurrentDateTime;
+
+    DataSystemVariables::processEnvironmentVariables();
+
+    int errStatus = initErrorFile();
+    if (errStatus) {
+        return errStatus;
+    }
+
+    DataSystemVariables::TestAllPaths = true;
+
+    DisplayString("EnergyPlus Starting");
+    DisplayString(DataStringGlobals::VerString);
+
+    try {
+        EnergyPlus::inputProcessor = InputProcessor::factory();
+        EnergyPlus::inputProcessor->processInput();
+        ResultsFramework::OutputSchema->setupOutputOptions();
+    } catch (const FatalError &e) {
+        return AbortEnergyPlus();
+    } catch (const std::exception &e) {
+        ShowSevereError(e.what());
+        return AbortEnergyPlus();
+    }
+    return 0;
+}
+
+int wrapUpEnergyPlus() {
+    using namespace EnergyPlus;
+
+    try {
         ShowMessage("Simulation Error Summary *************");
 
         GenOutputVariablesAuditReport();
 
-        ShowPsychrometricSummary();
+        Psychrometrics::ShowPsychrometricSummary();
 
         EnergyPlus::inputProcessor->reportOrphanRecordObjects();
-        ReportOrphanFluids();
-        ReportOrphanSchedules();
+        FluidProperties::ReportOrphanFluids();
+        ScheduleManager::ReportOrphanSchedules();
 
-        if (runReadVars) {
-            std::string readVarsPath = exeDirectory + "ReadVarsESO" + exeExtension;
-            bool FileExists;
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::inquire(readVarsPath, flags);
-                FileExists = flags.exists();
+        if (DataGlobals::runReadVars) {
+            int status = CommandLineInterface::runReadVarsESO();
+            if (status) {
+                return status;
             }
-            if (!FileExists) {
-                readVarsPath = exeDirectory + "PostProcess" + pathChar + "ReadVarsESO" + exeExtension;
-                {
-                    IOFlags flags;
-                    ObjexxFCL::gio::inquire(readVarsPath, flags);
-                    FileExists = flags.exists();
-                }
-                if (!FileExists) {
-                    DisplayString("ERROR: Could not find ReadVarsESO executable: " + getAbsolutePath(readVarsPath) + ".");
-                    return EXIT_FAILURE;
-                }
-            }
-
-            std::string const RVIfile = inputDirPathName + inputFileNameOnly + ".rvi";
-            std::string const MVIfile = inputDirPathName + inputFileNameOnly + ".mvi";
-
-            int fileUnitNumber;
-            int iostatus;
-            bool rviFileExists;
-            bool mviFileExists;
-
-            ObjexxFCL::gio::Fmt readvarsFmt("(A)");
-
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::inquire(RVIfile, flags);
-                rviFileExists = flags.exists();
-            }
-            if (!rviFileExists) {
-                fileUnitNumber = GetNewUnitNumber();
-                {
-                    IOFlags flags;
-                    flags.ACTION("write");
-                    ObjexxFCL::gio::open(fileUnitNumber, RVIfile, flags);
-                    iostatus = flags.ios();
-                }
-                if (iostatus != 0) {
-                    ShowFatalError("EnergyPlus: Could not open file \"" + RVIfile + "\" for output (write).");
-                }
-                ObjexxFCL::gio::write(fileUnitNumber, readvarsFmt) << outputEsoFileName;
-                ObjexxFCL::gio::write(fileUnitNumber, readvarsFmt) << outputCsvFileName;
-                ObjexxFCL::gio::close(fileUnitNumber);
-            }
-
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::inquire(MVIfile, flags);
-                mviFileExists = flags.exists();
-            }
-            if (!mviFileExists) {
-                fileUnitNumber = GetNewUnitNumber();
-                {
-                    IOFlags flags;
-                    flags.ACTION("write");
-                    ObjexxFCL::gio::open(fileUnitNumber, MVIfile, flags);
-                    iostatus = flags.ios();
-                }
-                if (iostatus != 0) {
-                    ShowFatalError("EnergyPlus: Could not open file \"" + MVIfile + "\" for output (write).");
-                }
-                ObjexxFCL::gio::write(fileUnitNumber, readvarsFmt) << outputMtrFileName;
-                ObjexxFCL::gio::write(fileUnitNumber, readvarsFmt) << outputMtrCsvFileName;
-                ObjexxFCL::gio::close(fileUnitNumber);
-            }
-
-            // We quote the paths in case we have spaces
-            // "/Path/to/ReadVarEso" "/Path/to/folder with spaces/file.rvi" unlimited
-            std::string const readVarsRviCommand = "\"" + readVarsPath + "\" \"" + RVIfile + "\" unlimited";
-            std::string const readVarsMviCommand = "\"" + readVarsPath + "\" \"" + MVIfile + "\" unlimited";
-
-            // systemCall will be responsible to handle to above command on Windows versus Unix
-            systemCall(readVarsRviCommand);
-            systemCall(readVarsMviCommand);
-
-            if (!rviFileExists) removeFile(RVIfile.c_str());
-
-            if (!mviFileExists) removeFile(MVIfile.c_str());
-
-            moveFile("readvars.audit", outputRvauditFileName);
         }
-
     } catch (const FatalError &e) {
         return AbortEnergyPlus();
     } catch (const std::exception &e) {
@@ -577,6 +403,75 @@ int RunEnergyPlus(std::string const & filepath)
     }
 
     return EndEnergyPlus();
+}
+
+int RunEnergyPlus(std::string const & filepath)
+{
+
+
+    // PROGRAM INFORMATION:
+    //       AUTHOR         Linda K. Lawrie, et al
+    //       DATE WRITTEN   January 1997.....
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS PROGRAM:
+    // This program implements the calls for EnergyPlus (originally configured
+    // as the merger of BLAST/IBLAST and DOE-2 energy analysis programs).
+
+    // METHODOLOGY EMPLOYED:
+    // The method used in EnergyPlus is to simplify the main program as much
+    // as possible and contain all "simulation" code in other modules and files.
+
+    int status = initializeEnergyPlus(filepath);
+    if (status) return status;
+    try {
+        EnergyPlus::SimulationManager::ManageSimulation();
+    } catch (const EnergyPlus::FatalError &e) {
+        return EnergyPlus::AbortEnergyPlus();
+    } catch (const std::exception &e) {
+        EnergyPlus::ShowSevereError(e.what());
+        return EnergyPlus::AbortEnergyPlus();
+    }
+    return wrapUpEnergyPlus();
+}
+
+int runEnergyPlusAsLibrary(int argc, const char *argv[])
+{
+    // PROGRAM INFORMATION:
+    //       AUTHOR         Linda K. Lawrie, et al
+    //       DATE WRITTEN   January 1997.....
+    //       MODIFIED       na
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS PROGRAM:
+    // This program implements the calls for EnergyPlus (originally configured
+    // as the merger of BLAST/IBLAST and DOE-2 energy analysis programs).
+
+    // METHODOLOGY EMPLOYED:
+    // The method used in EnergyPlus is to simplify the main program as much
+    // as possible and contain all "simulation" code in other modules and files.
+
+    EnergyPlus::DataGlobals::eplusRunningViaAPI = true;
+
+    // clean out any stdin, stderr, stdout flags from a prior call
+    if (!std::cin.good()) std::cin.clear();
+    if (!std::cerr.good()) std::cerr.clear();
+    if (!std::cout.good()) std::cout.clear();
+
+    EnergyPlus::CommandLineInterface::ProcessArgs( argc, argv );
+
+    int status = initializeAsLibrary();
+    if (status) return status;
+    try {
+        EnergyPlus::SimulationManager::ManageSimulation();
+    } catch (const EnergyPlus::FatalError &e) {
+        return EnergyPlus::AbortEnergyPlus();
+    } catch (const std::exception &e) {
+        EnergyPlus::ShowSevereError(e.what());
+        return EnergyPlus::AbortEnergyPlus();
+    }
+    return wrapUpEnergyPlus();
 }
 
 void StoreProgressCallback(void (*f)(int const))
@@ -603,26 +498,8 @@ void CreateCurrentDateTimeString(std::string &CurrentDateTimeString)
     // Be able to supply a current date/time string from intrinsic calls so
     // that one is always available.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
-    // USE STATEMENTS:
-    // na
-
-    // Locals
-    // SUBROUTINE ARGUMENT DEFINITIONS:
-
     // SUBROUTINE PARAMETER DEFINITIONS:
     ObjexxFCL::gio::Fmt fmtDate("(1X,'YMD=',I4,'.',I2.2,'.',I2.2,1X,I2.2,':',I2.2)");
-
-    // INTERFACE BLOCK SPECIFICATIONS:
-    // na
-
-    // DERIVED TYPE DEFINITIONS:
-    // na
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     Array1D_int value(8);
