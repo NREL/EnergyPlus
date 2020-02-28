@@ -2488,7 +2488,7 @@ namespace StandardRatings {
                 PreDefTableEntry(pdchDXCoolCoilSEERDefIP, CompName, SEERValueDefaultIP, 2);
                 PreDefTableEntry(pdchDXCoolCoilIEERIP, CompName, IEERValueIP, 2);
                 addFootNoteSubTable(pdstDXCoolCoil, "ANSI/AHRI ratings account for supply air fan heat and electric power. " 
-                                    "SEER is calculated using user PLF curve where as SEER Default is calculated using AHRI Std 210/240-2008 default PLF curve and cooling coefficient of degradation.");             
+                                    "SEER is calculated using user PLF curve whereas SEER Default is calculated using AHRI Std 210/240-2008 default PLF curve and cooling coefficient of degradation.");             
 
             } else if ((SELECT_CASE_var == CoilDX_HeatingEmpirical) || (SELECT_CASE_var == CoilDX_MultiSpeedHeating)) {
                 if (MyHeatOneTimeFlag) {
@@ -2526,7 +2526,7 @@ namespace StandardRatings {
                 PreDefTableEntry(pdchDXCoolCoilSEERIP, CompName, SEERValueIP, 2);
                 PreDefTableEntry(pdchDXCoolCoilSEERDefIP, CompName, SEERValueDefaultIP, 2);
                 addFootNoteSubTable(pdstDXCoolCoil, "ANSI/AHRI ratings account for supply air fan heat and electric power. "
-                "SEER is calculated using user PLF curve where as SEER Default is calculated using AHRI Std 210/240-2008 default PLF curve and cooling coefficient of degradation.");  
+                "SEER is calculated using user PLF curve whereas SEER Default is calculated using AHRI Std 210/240-2008 default PLF curve and cooling coefficient of degradation.");  
 
             } else {
             }
