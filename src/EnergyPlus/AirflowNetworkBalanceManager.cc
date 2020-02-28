@@ -3600,12 +3600,12 @@ namespace AirflowNetworkBalanceManager {
                                       "OAMixerOutdoorAirStreamNode, OutdoorAir:NodeList, OutdoorAir:Node or Other.");
                     ErrorsFound = true;
                 }
-                // Avoid ducplication of EPlusName
+                // Avoid duplication of EPlusName
                 for (j = 1; j < i; ++j) {
                     if (!UtilityRoutines::SameString(Alphas(2), "")) {
                         if (UtilityRoutines::SameString(DisSysNodeData(j).EPlusName, Alphas(2))) {
                             ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\" Duplicated " + cAlphaFields(2) + "=\"" +
-                                            Alphas(2) + "\". Please make correction.");
+                                            Alphas(2) + "\". Please make a correction.");
                             ErrorsFound = true;
                         }
                     }
