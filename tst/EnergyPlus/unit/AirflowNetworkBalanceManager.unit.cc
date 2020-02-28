@@ -16968,11 +16968,11 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_DuplicatedNodeNameTest)
         "   ** Warning ** GetHTSurfaceData: Surfaces with interface to Ground found but no \"Ground Temperatures\" were input.",
         "   **   ~~~   ** Found first in surface=ZONE FLOOR",
         "   **   ~~~   ** Defaults, constant throughout the year of (0.0) will be used.",
-        "   ** Severe  ** GetAirflowNetworkInput: AirflowNetwork:Distribution:Node=\"FANINLETNODE\" Duplicated Component Name or Node Name=\"AIR LOOP INLET NODE\". Please make correction.",
+        "   ** Severe  ** GetAirflowNetworkInput: AirflowNetwork:Distribution:Node=\"FANINLETNODE\" Duplicated Component Name or Node Name=\"AIR LOOP INLET NODE\". Please make a correction.",
         "   **  Fatal  ** GetAirflowNetworkInput: Errors found getting inputs. Previous error(s) cause program termination.",
         "   ...Summary of Errors that led to program termination:",
         "   ..... Reference severe error count=1",
-        "   ..... Last severe error=GetAirflowNetworkInput: AirflowNetwork:Distribution:Node=\"FANINLETNODE\" Duplicated Component Name or Node Name=\"AIR LOOP INLET NODE\". Please make correction.",
+        "   ..... Last severe error=GetAirflowNetworkInput: AirflowNetwork:Distribution:Node=\"FANINLETNODE\" Duplicated Component Name or Node Name=\"AIR LOOP INLET NODE\". Please make a correction.",
     });
 
     EXPECT_TRUE(compare_err_stream(error_string, true));
