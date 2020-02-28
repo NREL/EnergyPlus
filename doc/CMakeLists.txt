@@ -41,3 +41,6 @@ else()
   # and if it doesn't, clearly state why it fails
   message( FATAL_ERROR "Expected to find xelatex at: ${XELATEX} ; check your LaTeX installation")
 endif()
+
+# Add custom target until it is no longer used on CI
+add_custom_target(documentation)
