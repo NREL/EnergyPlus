@@ -99,6 +99,8 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(const CoilCoolin
         this->alternateMode.oneTimeInit(); // oneTimeInit does not need to be delayed in this use case
     }
 
+    this->compressorFuelType = input_data.compressor_fuel_type;
+
     if (errorsFound) {
         ShowFatalError(routineName + "Errors found in getting " + this->object_name + " input. Preceding condition(s) causes termination.");
     }
@@ -231,6 +233,10 @@ void CoilCoolingDXCurveFitPerformance::calculate(CoilCoolingDXCurveFitOperatingM
     if (this->compressorFuelType != DataGlobalConstants::iRT_Electricity) {
         this->compressorFuelRate = this->powerUse;
         this->compressorFuelConsumption = this->electricityConsumption;
+
+        // check this after adding parasitic loads
+        this->powerUse = 0.0;
+        this->electricityConsumption = 0.0;
     }
 
 }

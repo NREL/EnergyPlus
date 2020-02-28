@@ -272,6 +272,9 @@ void CoilCoolingDX::oneTimeInit() {
                         "System",
                         "Sum",
                         this->name);
+
+    // Rename (eventually) to make this "compressor" power/energy
+    // Add parasitic loads
     SetupOutputVariable("Cooling Coil Electric Power",
                         OutputProcessor::Unit::W,
                         this->performance.powerUse,
@@ -465,13 +468,13 @@ void CoilCoolingDX::oneTimeInit() {
                             "System");
         SetupOutputVariable("Cooling Coil Evaporative Condenser Water Volume Flow Rate",
                             OutputProcessor::Unit::m3_s,
-                            this->evapCondPumpElecPower,
+                            this->evaporativeCondSupplyTankVolumeFlow,
                             "System",
                             "Average",
                             this->name);
         SetupOutputVariable("Cooling Coil Evaporative Condenser Water Volume",
                             OutputProcessor::Unit::m3,
-                            this->evapCondPumpElecConsumption,
+                            this->evaporativeCondSupplyTankConsump,
                             "System",
                             "Sum",
                             this->name,
@@ -563,12 +566,12 @@ int CoilCoolingDX::getNumModes() {
     return numModes;
 }
 
-int CoilCoolingDX::getOpModeCapFTIndex(bool const isNormalOpMode)
+int CoilCoolingDX::getOpModeCapFTIndex(bool const useAlternateMode)
 {
-    if (isNormalOpMode) {
-        return this->normModeNomSpeed().indexCapFT;
-    } else {
+    if (useAlternateMode) {
         return this->altModeNomSpeed().indexCapFT;
+    } else {
+        return this->normModeNomSpeed().indexCapFT;
     }
 }
 
@@ -619,6 +622,15 @@ CoilCoolingDXCurveFitSpeed & CoilCoolingDX::altModeNomSpeed()
     return this->performance.alternateMode.speeds[this->performance.alternateMode.nominalSpeedIndex];
 }
 
+Real64 CoilCoolingDX::condMassFlowRate(bool const useAlternateMode)
+{
+    if (useAlternateMode) {
+        return this->altModeNomSpeed().condenser_air_flow_rate;
+    } else {
+        return this->normModeNomSpeed().condenser_air_flow_rate;
+    }
+}
+
 void CoilCoolingDX::size() {
     this->performance.parentName = this->name;
     this->performance.size();
@@ -640,6 +652,11 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
     // set some reporting variables
     this->condenserInletTemperature = condInletNode.Temp;
     this->dehumidificationMode = useAlternateMode;
+
+    // set condenser inlet/outlet nodes
+    // once condenser inlet is connected to upstream components, will need to revisit
+    condInletNode.MassFlowRate = this->condMassFlowRate(useAlternateMode);
+    condOutletNode.MassFlowRate = condInletNode.MassFlowRate;
 
     // call the simulation, which returns useful data
     // TODO: check the avail schedule and reset data/pass through data as needed
@@ -677,7 +694,7 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
                                                       (1.0 - this->performance.normalMode.speeds[speedNum - 1].evap_condenser_effectiveness);
             Real64 condInletHumRat = Psychrometrics::PsyWFnTdbTwbPb(condInletTemp, DataEnvironment::OutWetBulbTemp, DataEnvironment::OutBaroPress);
             Real64 outdoorHumRat = DataEnvironment::OutHumRat;
-            Real64 condAirMassFlow = condInletNode.MassFlowRate; // TODO: How is this getting a value?
+            Real64 condAirMassFlow = condInletNode.MassFlowRate;
             Real64 waterDensity = Psychrometrics::RhoH2O(DataEnvironment::OutDryBulbTemp);
             this->evaporativeCondSupplyTankVolumeFlow = (condInletHumRat - outdoorHumRat) * condAirMassFlow / waterDensity;
             this->evaporativeCondSupplyTankConsump = this->evaporativeCondSupplyTankVolumeFlow * reportingConstant;

@@ -96,7 +96,8 @@ struct CoilCoolingDX
     void size();
 
     int getNumModes();
-    int getOpModeCapFTIndex(bool isNormalOpMode = true);
+    int getOpModeCapFTIndex(bool useAlternateMode = false);
+    Real64 condMassFlowRate(bool useAlternateMode);
 
     CoilCoolingDXInputSpecification original_input_specs;
     std::string name;
