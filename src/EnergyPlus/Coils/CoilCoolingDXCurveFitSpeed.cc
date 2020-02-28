@@ -339,9 +339,12 @@ void CoilCoolingDXCurveFitSpeed::size(int const speedNum, int const maxSpeeds)
     std::string SizingString = preFixString + "Rated Air Flow Rate [m3/s]";
     DataSizing::DataConstantUsedForSizing = this->original_input_specs.evaporator_air_flow_fraction;
     Real64 tempSize = this->evap_air_flow_rate;
-    if (this->ratedEvapAirFlowRateIsAutosized) tempSize = DataSizing::AutoSize;
-
+    if (this->ratedEvapAirFlowRateIsAutosized) {
+        DataSizing::DataBypassFrac = 1 - this->active_fraction_of_face_coil_area;
+        tempSize = DataSizing::AutoSize;
+    }
     ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, tempSize, PrintFlag, RoutineName);
+    DataSizing::DataBypassFrac = 0;
     this->evap_air_flow_rate = tempSize;
 
     SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
