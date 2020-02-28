@@ -375,8 +375,9 @@
     25;                      !- Maximum HVAC Iterations
 
   ShadowCalculation,
-    AverageOverDaysInFrequency,  !- Calculation Method
-    7,                       !- Calculation Frequency
+    PolygonClipping,         !- Shading Calculation Method
+    Periodic,                !- Shading Calculation Update Frequency Method
+    7,                       !- Shading Calculation Update Frequency
     15000;                   !- Maximum Figures in Shadow Overlap Calculations
 
   Timestep,6;
@@ -7646,8 +7647,8 @@
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
     ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 2 Object Type
-    Cafeteria_ZN_1_FLR_1 Direct Air,  !- Zone Equipment 2 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type
+    Cafeteria_ZN_1_FLR_1 Direct Air ADU,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
     ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
@@ -7756,8 +7757,8 @@
   ZoneHVAC:EquipmentList,
     Gym_ZN_1_FLR_1 Equipment,!- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Gym_ZN_1_FLR_1 Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Gym_ZN_1_FLR_1 Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -7772,8 +7773,8 @@
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
     ,                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 2 Object Type
-    Kitchen_ZN_1_FLR_1 Direct Air,  !- Zone Equipment 2 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 2 Object Type
+    Kitchen_ZN_1_FLR_1 Direct Air ADU,  !- Zone Equipment 2 Name
     2,                       !- Zone Equipment 2 Cooling Sequence
     2,                       !- Zone Equipment 2 Heating or No-Load Sequence
     ,                        !- Zone Equipment 2 Sequential Cooling Fraction Schedule Name
@@ -10267,23 +10268,59 @@
     VAV_POD_3_OANode List,   !- Name
     VAV_POD_3_OAInlet Node;  !- Node 1 Name
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Cafeteria_ZN_1_FLR_1 Direct Air,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Cafeteria_ZN_1_FLR_1 Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
-    AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
+    Cafeteria_ZN_1_FLR_1 Direct Air Inlet Node Name ATInlet,  !- Air Inlet Node Name
+    Cafeteria_ZN_1_FLR_1 Direct Air Inlet Node Name,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    Cafeteria_ZN_1_FLR_1 Direct Air ADU,  !- Name
+    Cafeteria_ZN_1_FLR_1 Direct Air Inlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Cafeteria_ZN_1_FLR_1 Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Gym_ZN_1_FLR_1 Direct Air,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Gym_ZN_1_FLR_1 Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
-    AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
+    Gym_ZN_1_FLR_1 Direct Air Inlet Node Name ATInlet,  !- Air Inlet Node Name
+    Gym_ZN_1_FLR_1 Direct Air Inlet Node Name,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    Gym_ZN_1_FLR_1 Direct Air ADU,  !- Name
+    Gym_ZN_1_FLR_1 Direct Air Inlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Gym_ZN_1_FLR_1 Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Kitchen_ZN_1_FLR_1 Direct Air,  !- Name
     ALWAYS_ON,               !- Availability Schedule Name
-    Kitchen_ZN_1_FLR_1 Direct Air Inlet Node Name,  !- Zone Supply Air Node Name
-    AUTOSIZE;                !- Maximum Air Flow Rate {m3/s}
+    Kitchen_ZN_1_FLR_1 Direct Air Inlet Node Name ATInlet,  !- Air Inlet Node Name
+    Kitchen_ZN_1_FLR_1 Direct Air Inlet Node Name,  !- Air Outlet Node Name
+    AUTOSIZE,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    Kitchen_ZN_1_FLR_1 Direct Air ADU,  !- Name
+    Kitchen_ZN_1_FLR_1 Direct Air Inlet Node Name,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Kitchen_ZN_1_FLR_1 Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
   AvailabilityManagerAssignmentList,
     PSZ-AC_1:6 Availability Manager List,  !- Name
@@ -10990,17 +11027,17 @@
   AirLoopHVAC:ZoneSplitter,
     PSZ-AC_1:6 Supply Air Splitter,  !- Name
     PSZ-AC_1:6 Zone Equipment Inlet Node,  !- Inlet Node Name
-    Kitchen_ZN_1_FLR_1 Direct Air Inlet Node Name;  !- Outlet 1 Node Name
+    Kitchen_ZN_1_FLR_1 Direct Air Inlet Node Name ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     PSZ-AC_2:5 Supply Air Splitter,  !- Name
     PSZ-AC_2:5 Zone Equipment Inlet Node,  !- Inlet Node Name
-    Gym_ZN_1_FLR_1 Direct Air Inlet Node Name;  !- Outlet 1 Node Name
+    Gym_ZN_1_FLR_1 Direct Air Inlet Node Name ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     PSZ-AC_2:7 Supply Air Splitter,  !- Name
     PSZ-AC_2:7 Zone Equipment Inlet Node,  !- Inlet Node Name
-    Cafeteria_ZN_1_FLR_1 Direct Air Inlet Node Name;  !- Outlet 1 Node Name
+    Cafeteria_ZN_1_FLR_1 Direct Air Inlet Node Name ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     VAV_OTHER Supply Air Splitter,  !- Name

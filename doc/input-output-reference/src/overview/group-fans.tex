@@ -710,7 +710,10 @@ Fan:ConstantVolume,
 
 \subsection{FanPerformance:NightVentilation}\label{fanperformancenightventilation}
 
-This object is used for specifying an alternate set of performance parameters for a fan. These alternate parameters are used when a system manager (such as \emph{\hyperref[availabilitymanagernightventilation]{AvailabilityManager:NightVentilation}}) sets a specified flow rate for a central forced air system. At this time, it can be used with \hyperref[fanconstantvolume]{Fan:ConstantVolume}, \hyperref[fanvariablevolume]{Fan:VariableVolume}, \hyperref[fanzoneexhaust]{Fan:ZoneExhaust}, and , \hyperref[fanonoff]{Fan:OnOff} fans, but not with \hyperref[fancomponentmodel]{Fan:ComponentModel} fans. The fan model checks whether a fixed flow rate has been set; if it has the fan model will use these alternate performance parameters. Note that it is assumed that the fan will run at a fixed speed in the alternate mode. The inputs needed by this object are the fan name, fan total efficiency, pressure rise, flow rate, motor efficiency, and motor in airstream fraction.
+This object is used for specifying an alternate set of performance parameters for a fan.
+These alternate parameters are used when a system manager (such as \emph{\hyperref[availabilitymanagernightventilation]{AvailabilityManager:NightVentilation}}) sets a specified flow rate for a central forced air system.
+At this time, it can be used with \hyperref[fanconstantvolume]{Fan:ConstantVolume}, \hyperref[fanvariablevolume]{Fan:VariableVolume}, \hyperref[fanzoneexhaust]{Fan:ZoneExhaust}, \hyperref[fanonoff]{Fan:OnOff} and \hyperref[fansystemmodel]{Fan:SystemModel} fans, but not with \hyperref[fancomponentmodel]{Fan:ComponentModel} fans.
+The fan model checks whether a fixed flow rate has been set; if it has the fan model will use these alternate performance parameters. Note that it is assumed that the fan will run at a fixed speed in the alternate mode. The inputs needed by this object are the fan name, fan total efficiency, pressure rise, flow rate, motor efficiency, and motor in airstream fraction.
 
 \subsubsection{Inputs}\label{inputs-4-013}
 
