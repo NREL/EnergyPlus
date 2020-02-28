@@ -5656,16 +5656,16 @@ namespace HVACVariableRefrigerantFlow {
                     }
                 }
                 if (VRFTU(VRFTUNum).SuppHeatingCoilPresent) {
-                    // if (SuppHeatCoilAirOutletNode != VRFTU(VRFTUNum).VRFTUOutletNodeNum) {
-                    //    ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name +
-                    //                    "\" Supplemental heating coil air outlet node name must be the same");
-                    //    ShowContinueError("as the terminal unit air outlet node name when draw through fan is specified.");
-                    //    ShowContinueError("... Supplemental heating coil air outlet node = " + DataLoopNode::NodeID(SuppHeatCoilAirOutletNode));
-                    //    ShowContinueError("... Terminal unit air outlet node = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).VRFTUOutletNodeNum));
-                    //    ErrorsFound = true;
-                    //}
+                     if (VRFTU(VRFTUNum).SuppHeatCoilAirOutletNode != VRFTU(VRFTUNum).VRFTUOutletNodeNum) {
+                        ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name +
+                                        "\" Supplemental heating coil air outlet node name must be the same");
+                        ShowContinueError("as the terminal unit air outlet node name when draw through fan is specified.");
+                        ShowContinueError("... Supplemental heating coil air outlet node = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).SuppHeatCoilAirOutletNode));
+                        ShowContinueError("... Terminal unit air outlet node = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).VRFTUOutletNodeNum));
+                        ErrorsFound = true;
+                    }
                 } else {
-                    if (VRFTU(VRFTUNum).isInZone && VRFTU(VRFTUNum).fanOutletNode != VRFTU(VRFTUNum).VRFTUOutletNodeNum) {
+                    if (VRFTU(VRFTUNum).fanOutletNode != VRFTU(VRFTUNum).VRFTUOutletNodeNum) {
                         ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" Fan outlet node name must be the same");
                         ShowContinueError("as the terminal unit air outlet node name when draw through fan is specified.");
                         ShowContinueError("... Fan outlet node = " + DataLoopNode::NodeID(VRFTU(VRFTUNum).fanOutletNode));
