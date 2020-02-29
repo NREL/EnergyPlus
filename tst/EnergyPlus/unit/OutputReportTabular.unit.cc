@@ -2249,7 +2249,7 @@ TEST_F(EnergyPlusFixture, AirloopHVAC_ZoneSumTest)
         "Coil:Heating:Fuel,",
         "  DOAS Heating Coil,       !- Name",
         "  AvailSched,              !- Availability Schedule Name",
-        "  Gas,                     !- Fuel Type",
+        "  NaturalGas,              !- Fuel Type",
         "  0.8,                     !- Gas Burner Efficiency",
         "  autosize,                !- Nominal Capacity {W}",
         "  DOAS Cooling Coil Outlet,  !- Air Inlet Node Name",
@@ -4975,9 +4975,11 @@ TEST_F(EnergyPlusFixture, OutputTableTimeBins_GetInput)
 //"                                                                                          ",
 //"  Timestep,6;                                                                             ",
 //"                                                                                          ",
-//"  ShadowCalculation,                                                                      ",
-//"    AverageOverDaysInFrequency,  !- Calculation Method                                    ",
-//"    20;                      !- Calculation Frequency                                     ",
+//" ShadowCalculation,",
+//"    PolygonClipping,         !- Shading Calculation Method",
+//"    Periodic,                !- Shading Calculation Update Frequency Method",
+//"    20,                      !- Shading Calculation Update Frequency",
+//"    15000;                   !- Maximum Figures in Shadow Overlap Calculations",
 //"                                                                                          ",
 //"  HeatBalanceAlgorithm,ConductionTransferFunction;                                        ",
 //"                                                                                          ",
@@ -6949,7 +6951,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
     EnergyPlus::sqlite->sqliteCommit();
 
     EXPECT_EQ(460ul, tabularData.size());
-    EXPECT_EQ(76ul, strings.size());
+    EXPECT_EQ(77ul, strings.size());
     EXPECT_EQ("AirLoop Component Load Summary", strings[0][2]); // just make sure that the output table was generated and did not crash
 }
 
@@ -7131,7 +7133,13 @@ TEST_F(SQLiteFixture, OutputReportTabular_WriteLoadComponentSummaryTables_AirLoo
         EXPECT_EQ(std::get<2>(v), oa_db) << "Failed for TableName=" << tableName << "; ReportName=" << reportName;
     }
 
+    // https://github.com/NREL/EnergyPlus/pull/7741
+    std::string query_2("SELECT Value From TabularDataWithStrings"
+                        "  WHERE TableName = 'Engineering Checks for Cooling'"
+                        "  AND RowName = 'Outside Air Fraction';");
 
+    auto result = queryResult(query_2, "TabularDataWithStrings")[0][0];
+    EXPECT_EQ(result, "0.0000");
 }
 
 

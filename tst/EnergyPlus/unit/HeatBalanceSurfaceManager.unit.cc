@@ -346,14 +346,6 @@ TEST_F(EnergyPlusFixture, HeatBalanceSurfaceManager_TestSurfTempCalcHeatBalanceI
         "    25,                      !- Maximum Number of Warmup Days",
         "    6;                       !- Minimum Number of Warmup Days",
 
-        "  Timestep,6;",
-
-        "  SurfaceConvectionAlgorithm:Inside,TARP;",
-
-        "  SurfaceConvectionAlgorithm:Outside,DOE-2;",
-
-        "  HeatBalanceAlgorithm,ConductionTransferFunction;",
-
         "  Output:DebuggingData,0,0;",
 
         "  SimulationControl,",
