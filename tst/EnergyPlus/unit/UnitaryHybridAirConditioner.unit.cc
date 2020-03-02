@@ -654,20 +654,6 @@ TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_VentLoadCheck)
     DataEnvironment::StdRhoAir = 1.225;
     DataHeatBalance::ZoneIntGain.allocate(1);
 
-    SizingManager::GetOARequirements();
-    GetOAControllerInputs(OutputFiles::getSingleton());
-    using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
-
-    // Setup performnace tables
-    using namespace EnergyPlus::DataEnvironment;
-    // process schedules
-    ProcessScheduleInput(OutputFiles::getSingleton()); // read schedules
-    UpdateScheduleValues();
-    // Get Unitary system
-    GetInputZoneHybridUnitaryAirConditioners(ErrorsFound);
-    // All to get OA requirements
-    GetOARequirements();
-
     NumOfZones = 1;
     ZoneSysEnergyDemand.allocate(NumOfZones);
     DeadBandOrSetback.allocate(NumOfZones);
@@ -685,10 +671,28 @@ TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_VentLoadCheck)
     ZoneMechACH.allocate(NumOfZones);
     MAT.allocate(NumOfZones);
     ZoneAirHumRatAvg.allocate(NumOfZones);
+    MaxHeatingLoadMetByVent.allocate(NumOfZones);
+    MaxOverheatingByVent.allocate(NumOfZones);
+    MaxCoolingLoadMetByVent.allocate(NumOfZones);
+    MaxOvercoolingByVent.allocate(NumOfZones);
     ZoneSysEnergyDemand(1).TotalOutputRequired = 58469.99445;
     DeadBandOrSetback(1) = false;
     ZoneEquipList(ZoneEquipConfig(1).EquipListIndex).EquipIndex(1) = 1;
     CreateEnergyReportStructure();
+
+    SizingManager::GetOARequirements();
+    GetOAControllerInputs(OutputFiles::getSingleton());
+    using DataZoneEquipment::CalcDesignSpecificationOutdoorAir;
+
+    // Setup performnace tables
+    using namespace EnergyPlus::DataEnvironment;
+    // process schedules
+    ProcessScheduleInput(OutputFiles::getSingleton()); // read schedules
+    UpdateScheduleValues();
+    // Get Unitary system
+    GetInputZoneHybridUnitaryAirConditioners(ErrorsFound);
+    // All to get OA requirements
+    GetOARequirements();
 
     EXPECT_FALSE(ErrorsFound);
     // Initialize unit
@@ -715,31 +719,31 @@ TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_VentLoadCheck)
     // Equivalent to a Zone Predicted Sensible Load to Setpoint Heat Transfer Rate [W] of -58470 w.
     // A positive value indicates a heating load, a negative value indicates a cooling load.
     Requested_Humidification = Requested_Dehumidification = 0;
-    Wra = PsyWFnTdbRhPb(Tra, RHra / 100, 101.325);
-    Wosa = PsyWFnTdbRhPb(Tosa, RHosa / 100, 101.325);
+    Wra = PsyWFnTdbRhPb(Tra, RHra / 100, 101325);
+    Wosa = PsyWFnTdbRhPb(Tosa, RHosa / 100, 101325);
     pZoneHybridUnitaryAirConditioner->InletTemp = Tra;
     pZoneHybridUnitaryAirConditioner->InletHumRat = Wra;
     pZoneHybridUnitaryAirConditioner->InletEnthalpy = PsyHFnTdbRhPb(Tra, RHra / 100, 101325, "test");
     pZoneHybridUnitaryAirConditioner->InletPressure = 101325;
     pZoneHybridUnitaryAirConditioner->InletRH = RHra / 100;
+    pZoneHybridUnitaryAirConditioner->SecInletMassFlowRate = DesignMinVR;
     pZoneHybridUnitaryAirConditioner->SecInletTemp = Tosa;
     pZoneHybridUnitaryAirConditioner->SecInletHumRat = Wosa;
     pZoneHybridUnitaryAirConditioner->SecInletEnthalpy = PsyHFnTdbRhPb(Tosa, RHosa / 100, 101325, "test");
     pZoneHybridUnitaryAirConditioner->SecInletPressure = 101325;
     pZoneHybridUnitaryAirConditioner->SecInletRH = RHosa / 100;
-    pZoneHybridUnitaryAirConditioner->Initialize(1);
-    pZoneHybridUnitaryAirConditioner->InitializeModelParams();
     pZoneHybridUnitaryAirConditioner->doStep(RequestedCooling, Requestedheating, Requested_Humidification, Requested_Dehumidification, DesignMinVR);
+    ReportZoneHybridUnitaryAirConditioners(1);
 
-    pZoneHybridUnitaryAirConditioner->InletMassFlowRate = DesignMinVR;
-    pZoneHybridUnitaryAirConditioner->OutletMassFlowRate = DesignMinVR;
+    ZoneHybridUnitaryAirConditioner(1).InletTemp = Tra;
+    ZoneHybridUnitaryAirConditioner(1).SecInletTemp = Tosa;
     SystemReports::ReportMaxVentilationLoads();
     // output results
-    Real64 clg_vent_load = MaxCoolingLoadAddedByVent(1);
-    Real64 htg_vent_load = MaxHeatingLoadAddedByVent(1);
+    Real64 ovr_htg_vent_load = MaxOverheatingByVent(1);
+    Real64 ovr_clg_vent_load = MaxOvercoolingByVent(1);
     // checks
-    EXPECT_EQ(clg_vent_load, 0);
-    EXPECT_EQ(htg_vent_load, 0);
+    EXPECT_GT(ovr_htg_vent_load, 0); // add heating ventilation load from outside air
+    EXPECT_EQ(ovr_clg_vent_load, 0);
 }
 
 TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_AvailabilityManagerOff)

@@ -432,13 +432,19 @@ namespace HybridUnitaryAirConditioners {
 
         ZoneHybridUnitaryAirConditioner(UnitNum).PrimaryMode = ZoneHybridUnitaryAirConditioner(UnitNum).PrimaryMode;
 
+        Node(ZoneHybridUnitaryAirConditioner(UnitNum).InletNode).Temp = ZoneHybridUnitaryAirConditioner(UnitNum).InletTemp;
+        Node(ZoneHybridUnitaryAirConditioner(UnitNum).InletNode).HumRat = ZoneHybridUnitaryAirConditioner(UnitNum).InletHumRat;
         Node(ZoneHybridUnitaryAirConditioner(UnitNum).InletNode).MassFlowRate = ZoneHybridUnitaryAirConditioner(UnitNum).InletMassFlowRate;
+        Node(ZoneHybridUnitaryAirConditioner(UnitNum).InletNode).Enthalpy = ZoneHybridUnitaryAirConditioner(UnitNum).InletEnthalpy;
 
         Node(ZoneHybridUnitaryAirConditioner(UnitNum).OutletNode).Temp = ZoneHybridUnitaryAirConditioner(UnitNum).OutletTemp;
         Node(ZoneHybridUnitaryAirConditioner(UnitNum).OutletNode).HumRat = ZoneHybridUnitaryAirConditioner(UnitNum).OutletHumRat;
         Node(ZoneHybridUnitaryAirConditioner(UnitNum).OutletNode).MassFlowRate = ZoneHybridUnitaryAirConditioner(UnitNum).OutletMassFlowRate;
         Node(ZoneHybridUnitaryAirConditioner(UnitNum).OutletNode).Enthalpy = ZoneHybridUnitaryAirConditioner(UnitNum).OutletEnthalpy;
 
+        Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).Temp = ZoneHybridUnitaryAirConditioner(UnitNum).SecInletTemp;
+        Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).HumRat = ZoneHybridUnitaryAirConditioner(UnitNum).SecInletHumRat;
+        Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).Enthalpy = ZoneHybridUnitaryAirConditioner(UnitNum).SecInletEnthalpy;
         Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).MassFlowRate = ZoneHybridUnitaryAirConditioner(UnitNum).SecInletMassFlowRate;
 
         Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryOutletNode).Temp = ZoneHybridUnitaryAirConditioner(UnitNum).SecOutletTemp;
