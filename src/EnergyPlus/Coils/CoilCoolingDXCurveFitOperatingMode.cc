@@ -356,8 +356,9 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(const DataLoopNode::N
         outletNode.Enthalpy = outSpeed1Enthalpy * speedRatio + (1.0 - speedRatio) * outletNode.Enthalpy;
         outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);
 
-        OpModePower = OpModePower + (1.0 - thisspeed.RTF) * lowerspeed.fullLoadPower;
-        OpModeWasteHeat = OpModeWasteHeat + (1.0 - thisspeed.RTF) * lowerspeed.fullLoadWasteHeat;
+        this->OpModePower += (1.0 - thisspeed.RTF) * lowerspeed.fullLoadPower;
+        this->OpModeWasteHeat += (1.0 - thisspeed.RTF) * lowerspeed.fullLoadWasteHeat;
+        this->OpModeRTF = 1.0; // if we are on greater than 1 speed, RTF *must* be 1
     }
 }
 
