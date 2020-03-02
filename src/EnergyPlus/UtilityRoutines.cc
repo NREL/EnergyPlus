@@ -54,6 +54,7 @@ extern "C" {
 #include <cstdlib>
 #include <exception>
 #include <iostream>
+#include <sys/stat.h>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -458,15 +459,8 @@ namespace UtilityRoutines {
         valuesRow = valuesRow + colValue + ",";
 
         if (finalColumn) {
-            bool FileExists;
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::inquire(DataStringGlobals::outputPerfLogFileName, flags);
-                FileExists = flags.exists();
-            }
-            // only write the header row if the file does not already exist
             std::fstream fsPerfLog;
-            if (!FileExists) {
+            if (!exists(DataStringGlobals::outputPerfLogFileName)) {
                 fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::out); //open file normally
                 if (!fsPerfLog.fail()) {
                     fsPerfLog << headerRow << std::endl;
@@ -480,6 +474,12 @@ namespace UtilityRoutines {
             }
             fsPerfLog.close();
         }
+    }
+
+    inline bool exists (const std::string& filename) {
+    // https://stackoverflow.com/questions/25225948/how-to-check-if-a-file-exists-in-c-with-fstreamopen/51300933
+      struct stat buffer;   
+      return (stat (filename.c_str(), &buffer) == 0); 
     }
 
 } // namespace UtilityRoutines

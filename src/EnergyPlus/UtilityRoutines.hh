@@ -567,6 +567,8 @@ namespace UtilityRoutines {
 
     void appendPerfLog(std::string const &colHeader, std::string const &colValue, bool finalColumn=false);
 
+    inline bool exists(const std::string& filename);
+
 } // namespace UtilityRoutines
 
 } // namespace EnergyPlus
