@@ -152,6 +152,7 @@ namespace ZoneTempPredictorCorrector {
     extern Real64 AnnualAnyZoneTempOscillate;
     extern Real64 AnnualAnyZoneTempOscillateDuringOccupancy;
     extern Real64 AnnualAnyZoneTempOscillateInDeadband;
+    extern bool OscillationVariablesNeeded;
 
     // SUBROUTINE SPECIFICATIONS:
 

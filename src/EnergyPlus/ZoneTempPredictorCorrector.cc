@@ -259,7 +259,6 @@ namespace ZoneTempPredictorCorrector {
         // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
         bool InitZoneAirSetPointsOneTimeFlag(true);
         bool SetupOscillationOutputFlag(true);
-        bool OscillationVariablesNeeded(false);
     } // namespace
     Array1D<Real64> ZoneSetPointLast;
     Array1D<Real64> TempIndZnLd;
@@ -277,6 +276,7 @@ namespace ZoneTempPredictorCorrector {
     Real64 AnnualAnyZoneTempOscillate(0.0);
     Real64 AnnualAnyZoneTempOscillateDuringOccupancy(0.0);
     Real64 AnnualAnyZoneTempOscillateInDeadband(0.0);
+    bool OscillationVariablesNeeded(false);
 
 
     // SUBROUTINE SPECIFICATIONS:
