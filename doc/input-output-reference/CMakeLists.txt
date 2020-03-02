@@ -223,6 +223,7 @@ SET( INCLUDED_IMAGES
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/image222.png
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/image223.png
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/image236.png
+  ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/image261.png
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/image262.png
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/image263.png
   ${CMAKE_SOURCE_DIR}/doc/input-output-reference/media/image264.png
@@ -311,11 +312,13 @@ SET( INCLUDED_IMAGES
 SET( SOURCE_FILENAME "input-output-reference" )
 SET( OUTPUT_FILENAME "InputOutputReference" )
 
-add_custom_command( OUTPUT ${CMAKE_BINARY_DIR}/doc/${OUTPUT_FILENAME}.pdf
-	COMMAND ${CMAKE_COMMAND} -DXELATEX=${XELATEX} -DINNAME=${SOURCE_FILENAME} -DOUTNAME=${OUTPUT_FILENAME} -DORIGINAL_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -DORIGINAL_CMAKE_BINARY_DIR=${CMAKE_BINARY_DIR} -DTEX_INTERACTION=${TEX_INTERACTION} -P ${CMAKE_SOURCE_DIR}/cmake/BuildDocumentation.cmake
-		    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/doc/${SOURCE_FILENAME}
-		    DEPENDS ${INCLUDED_TEX} ${INCLUDED_IMAGES}
-                 )
+add_custom_command(
+  OUTPUT ${CMAKE_BINARY_DIR}/doc/${OUTPUT_FILENAME}.pdf
+  COMMAND ${CMAKE_COMMAND} -DXELATEX=${XELATEX} -DINNAME=${SOURCE_FILENAME} -DOUTNAME=${OUTPUT_FILENAME} -DORIGINAL_CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR} -DORIGINAL_CMAKE_BINARY_DIR=${CMAKE_BINARY_DIR} -DTEX_INTERACTION=${TEX_INTERACTION} -P ${CMAKE_SOURCE_DIR}/cmake/BuildDocumentation.cmake
+  WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/doc/${SOURCE_FILENAME}
+  DEPENDS ${INCLUDED_TEX} ${INCLUDED_IMAGES}
+)
+
 add_custom_target( zPDF_${OUTPUT_FILENAME}
                    DEPENDS ${CMAKE_BINARY_DIR}/doc/${OUTPUT_FILENAME}.pdf
                  )
