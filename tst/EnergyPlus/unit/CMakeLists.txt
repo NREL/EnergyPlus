@@ -24,6 +24,8 @@ set( test_src
   AirTerminalSingleDuctConstantVolumeNoReheat.unit.cc
   AirTerminalSingleDuctMixer.unit.cc
   AirTerminalSingleDuctPIUReheat.unit.cc
+  Autosizing/AutosizingFixture.hh
+  Autosizing/HeatingAirflowUASizing.unit.cc
   BaseboardRadiator.unit.cc
   BoilerHotWater.unit.cc
   BoilerSteam.unit.cc
