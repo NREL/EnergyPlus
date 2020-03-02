@@ -2650,16 +2650,73 @@ namespace OutputProcessor {
 
     void UpdateMeterValues(Real64 const TimeStepValue,                // Value of this variable at the current time step.
                            int const NumOnMeters,                     // Number of meters this variable is "on".
-                           Array1S_int const OnMeters,                // Which meters this variable is on (index values)
-                           Optional_int_const NumOnCustomMeters,      // Number of custom meters this variable is "on".
-                           Optional<Array1S_int const> OnCustomMeters // Which custom meters this variable is on (index values)
+                           const Array1D_int &OnMeters                // Which meters this variable is on (index values)
     )
     {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   January 2001
-        //       MODIFIED       na
+        //       MODIFIED       Jason DeGraw 2/12/2020, de-optionalized
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This subroutine updates all the meter values in the lists with the current
+        // time step value for this variable.
+
+        // METHODOLOGY EMPLOYED:
+        // Variables, as they are "setup", may or may not be on one or more meters.
+        // All "metered" variables are on the "facility meter".  Index values will be
+        // set from the variables to the appropriate meters.  Then, the updating of
+        // the meter values is quite simple -- just add the time step value of the variable
+        // (which is passed to this routine) to all the values being kept for the meter.
+        // Reporting of the meters is taken care of in a different routine.  During reporting,
+        // some values will also be reset (for example, after reporting the "hour", the new
+        // "hour" value of the meter is reset to 0.0, etc.
+
+        // REFERENCES:
+        // na
+
+        // USE STATEMENTS:
+        // na
+
+        // Argument array dimensioning
+
+        // Locals
+        // SUBROUTINE ARGUMENT DEFINITIONS:
+
+        // SUBROUTINE PARAMETER DEFINITIONS:
+        // na
+
+        // INTERFACE BLOCK SPECIFICATIONS:
+        // na
+
+        // DERIVED TYPE DEFINITIONS:
+        // na
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        int Meter; // Loop Control
+        int Which; // Index value for the meter
+
+        for (Meter = 1; Meter <= NumOnMeters; ++Meter) {
+            Which = OnMeters(Meter);
+            MeterValue(Which) += TimeStepValue;
+        }
+
+    }
+
+    void UpdateMeterValues(Real64 const TimeStepValue,                // Value of this variable at the current time step.
+                           int const NumOnMeters,                     // Number of meters this variable is "on".
+                           const Array1D_int &OnMeters,                // Which meters this variable is on (index values)
+                           int const NumOnCustomMeters,               // Number of custom meters this variable is "on".
+                           const Array1D_int &OnCustomMeters // Which custom meters this variable is on (index values)
+    )
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda Lawrie
+        //       DATE WRITTEN   January 2001
+        //       MODIFIED       Jason DeGraw 2/12/2020, de-optionalized
         //       RE-ENGINEERED  na
 
         // PURPOSE OF THIS SUBROUTINE:
@@ -2706,11 +2763,9 @@ namespace OutputProcessor {
         }
 
         // This calculates the basic values for decrement/difference meters -- UpdateMeters then calculates the actual.
-        if (present(NumOnCustomMeters)) {
-            for (Meter = 1; Meter <= NumOnCustomMeters; ++Meter) {
-                Which = OnCustomMeters()(Meter);
-                MeterValue(Which) += TimeStepValue;
-            }
+        for (Meter = 1; Meter <= NumOnCustomMeters; ++Meter) {
+            Which = OnCustomMeters(Meter);
+            MeterValue(Which) += TimeStepValue;
         }
     }
 
@@ -8253,23 +8308,22 @@ int GetNumMeteredVariables(std::string const &EP_UNUSED(ComponentType), // Given
 
 void GetMeteredVariables(std::string const &ComponentType,                     // Given Component Type
                          std::string const &ComponentName,                     // Given Component Name (user defined)
-                         Array1S_int VarIndexes,                               // Variable Numbers
-                         Array1S_int VarTypes,                                 // Variable Types (1=integer, 2=real, 3=meter)
+                         Array1D_int &VarIndexes,                              // Variable Numbers
+                         Array1D_int &VarTypes,                                // Variable Types (1=integer, 2=real, 3=meter)
                          Array1A<OutputProcessor::TimeStepType> TimeStepTypes, // Variable Index Types (1=Zone,2=HVAC)
                          Array1A<OutputProcessor::Unit> unitsForVar,           // units from enum for each variable
-                         Array1S_int ResourceTypes,                            // ResourceTypes for each variable
-                         Optional<Array1S_string> EndUses,                     // EndUses for each variable
-                         Optional<Array1S_string> Groups,                      // Groups for each variable
-                         Optional<Array1S_string> Names,                       // Variable Names for each variable
-                         Optional_int NumFound,                                // Number Found
-                         Optional<Array1S_int> VarIDs                          // Variable Report Numbers
+                         Array1D_int &ResourceTypes,                           // ResourceTypes for each variable
+                         Array1D_string &EndUses,                              // EndUses for each variable
+                         Array1D_string &Groups,                               // Groups for each variable
+                         Array1D_string &Names,                                // Variable Names for each variable
+                         int &NumFound                                         // Number Found
 )
 {
 
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda Lawrie
     //       DATE WRITTEN   May 2005
-    //       MODIFIED       na
+    //       MODIFIED       Jason DeGraw 2/12/2020, de-optionalized
     //       RE-ENGINEERED  na
 
     // PURPOSE OF THIS SUBROUTINE:
@@ -8306,39 +8360,114 @@ void GetMeteredVariables(std::string const &ComponentType,                     /
             unitsForVar(NumVariables) = RVariableTypes(Loop).units;
 
             ResourceTypes(NumVariables) = AssignResourceTypeNum(UtilityRoutines::MakeUPPERCase(EnergyMeters(MeterPtr).ResourceType));
-            if (present(Names)) {
-                Names()(NumVariables) = RVariableTypes(Loop).VarNameUC;
-            }
-            if (present(EndUses)) {
-                for (MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum) {
-                    MeterPtr = VarMeterArrays(rVar.MeterArrayPtr).OnMeters(MeterNum);
-                    if (!EnergyMeters(MeterPtr).EndUse.empty()) {
-                        EndUses()(NumVariables) = UtilityRoutines::MakeUPPERCase(EnergyMeters(MeterPtr).EndUse);
-                        break;
-                    }
+            
+            Names(NumVariables) = RVariableTypes(Loop).VarNameUC;
+
+            for (MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum) {
+                MeterPtr = VarMeterArrays(rVar.MeterArrayPtr).OnMeters(MeterNum);
+                if (!EnergyMeters(MeterPtr).EndUse.empty()) {
+                    EndUses(NumVariables) = UtilityRoutines::MakeUPPERCase(EnergyMeters(MeterPtr).EndUse);
+                    break;
                 }
             }
-            if (present(Groups)) {
-                for (MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum) {
-                    MeterPtr = VarMeterArrays(rVar.MeterArrayPtr).OnMeters(MeterNum);
-                    if (!EnergyMeters(MeterPtr).Group.empty()) {
-                        Groups()(NumVariables) = UtilityRoutines::MakeUPPERCase(EnergyMeters(MeterPtr).Group);
-                        break;
-                    }
+
+            for (MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum) {
+                MeterPtr = VarMeterArrays(rVar.MeterArrayPtr).OnMeters(MeterNum);
+                if (!EnergyMeters(MeterPtr).Group.empty()) {
+                    Groups(NumVariables) = UtilityRoutines::MakeUPPERCase(EnergyMeters(MeterPtr).Group);
+                    break;
                 }
             }
-            if (present(VarIDs)) {
-                VarIDs()(NumVariables) = rVar.ReportID;
-            }
+
         } else {
             ShowWarningError("Referenced variable or meter used in the wrong context \"" + ComponentName + "\" of type \"" + ComponentType + "\"");
         }
     }
 
-    if (present(NumFound)) {
-        NumFound = NumVariables;
-    }
+    NumFound = NumVariables; // Should just return this
 }
+
+void GetMeteredVariables(std::string const &ComponentType,                      // Given Component Type
+                         std::string const &ComponentName,                      // Given Component Name (user defined)
+                         Array1D_int &VarIndexes,                               // Variable Numbers
+                         Array1D_int &VarTypes,                                 // Variable Types (1=integer, 2=real, 3=meter)
+                         Array1A<OutputProcessor::TimeStepType> TimeStepTypes,  // Variable Index Types (1=Zone,2=HVAC)
+                         Array1A<OutputProcessor::Unit> unitsForVar,            // units from enum for each variable
+                         Array1D_int &ResourceTypes,                            // ResourceTypes for each variable
+                         Array1D_string &EndUses,                               // EndUses for each variable
+                         Array1D_string &Groups,                                // Groups for each variable
+                         Array1D_string &Names,                                 // Variable Names for each variable
+                         Array1D_int &VarIDs                                    // Variable Report Numbers
+)
+{
+
+    // SUBROUTINE INFORMATION:
+    //       AUTHOR         Linda Lawrie
+    //       DATE WRITTEN   May 2005
+    //       MODIFIED       Jason DeGraw 2/12/2020, de-optionalized
+    //       RE-ENGINEERED  na
+
+    // PURPOSE OF THIS SUBROUTINE:
+    // This routine gets the variable names and other associated information
+    // for metered variables associated with the given ComponentType/Name.
+
+    // Using/Aliasing
+    using namespace DataPrecisionGlobals;
+    using namespace DataGlobalConstants;
+    using namespace OutputProcessor;
+
+    // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+    int Loop;
+    int NumVariables;
+    int MeterPtr;
+    int NumOnMeterPtr;
+    int MeterNum;
+
+    NumVariables = 0;
+
+    for (Loop = 1; Loop <= NumOfRVariable; ++Loop) {
+        //    Pos=INDEX(RVariableTypes(Loop)%VarName,':')
+        //    IF (ComponentName /= RVariableTypes(Loop)%VarNameUC(1:Pos-1)) CYCLE
+        if (ComponentName != RVariableTypes(Loop).KeyNameOnlyUC) continue;
+        auto &rVar(RVariableTypes(Loop).VarPtr());
+        if (rVar.MeterArrayPtr == 0) continue;
+        NumOnMeterPtr = VarMeterArrays(rVar.MeterArrayPtr).NumOnMeters;
+        MeterPtr = VarMeterArrays(rVar.MeterArrayPtr).OnMeters(1);
+        if (MeterPtr) {
+            ++NumVariables;
+            VarIndexes(NumVariables) = Loop;
+            VarTypes(NumVariables) = 2;
+            TimeStepTypes(NumVariables) = RVariableTypes(Loop).timeStepType;
+            unitsForVar(NumVariables) = RVariableTypes(Loop).units;
+
+            ResourceTypes(NumVariables) = AssignResourceTypeNum(UtilityRoutines::MakeUPPERCase(EnergyMeters(MeterPtr).ResourceType));
+            Names(NumVariables) = RVariableTypes(Loop).VarNameUC;
+
+            for (MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum) {
+                MeterPtr = VarMeterArrays(rVar.MeterArrayPtr).OnMeters(MeterNum);
+                if (!EnergyMeters(MeterPtr).EndUse.empty()) {
+                    EndUses(NumVariables) = UtilityRoutines::MakeUPPERCase(EnergyMeters(MeterPtr).EndUse);
+                    break;
+                }
+            }
+
+           for (MeterNum = 1; MeterNum <= NumOnMeterPtr; ++MeterNum) {
+                MeterPtr = VarMeterArrays(rVar.MeterArrayPtr).OnMeters(MeterNum);
+                if (!EnergyMeters(MeterPtr).Group.empty()) {
+                    Groups(NumVariables) = UtilityRoutines::MakeUPPERCase(EnergyMeters(MeterPtr).Group);
+                    break;
+                }
+            }
+
+            VarIDs(NumVariables) = rVar.ReportID;
+
+        } else {
+            ShowWarningError("Referenced variable or meter used in the wrong context \"" + ComponentName + "\" of type \"" + ComponentType + "\"");
+        }
+    }
+
+}
+
 
 void GetVariableKeyCountandType(std::string const &varName,                 // Standard variable name
                                 int &numKeys,                               // Number of keys found
@@ -8346,6 +8475,7 @@ void GetVariableKeyCountandType(std::string const &varName,                 // S
                                 OutputProcessor::StoreType &varAvgSum,      // Variable  is Averaged=1 or Summed=2
                                 OutputProcessor::TimeStepType &varStepType, // Variable time step is Zone=1 or HVAC=2
                                 OutputProcessor::Unit &varUnits             // Units enumeration
+
 )
 {
 
@@ -8541,8 +8671,8 @@ void GetVariableKeyCountandType(std::string const &varName,                 // S
 
 void GetVariableKeys(std::string const &varName, // Standard variable name
                      int const varType,          // 1=integer, 2=real, 3=meter
-                     Array1S_string keyNames,    // Specific key name
-                     Array1S_int keyVarIndexes   // Array index for
+                     Array1D_string &keyNames,   // Specific key name
+                     Array1D_int &keyVarIndexes  // Array index for
 )
 {
 
