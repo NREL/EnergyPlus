@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -390,8 +390,8 @@ TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilHeatingTest)
     MyUAAndFlowCalcFlag(2) = true;
     DataGlobals::DoingSizing = true;
 
-    LocalTurnFansOff = false;
-    LocalTurnFansOn = true;
+    ep_globals.fans.LocalTurnFansOff = false;
+    ep_globals.fans.LocalTurnFansOn = true;
 
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
@@ -704,8 +704,8 @@ TEST_F(EnergyPlusFixture, MultiStage4PipeFanCoilCoolingTest)
     MyUAAndFlowCalcFlag(2) = true;
     DataGlobals::DoingSizing = true;
 
-    LocalTurnFansOff = false;
-    LocalTurnFansOn = true;
+    ep_globals.fans.LocalTurnFansOff = false;
+    ep_globals.fans.LocalTurnFansOn = true;
 
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
@@ -1039,8 +1039,8 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilHeatingTest)
     MyUAAndFlowCalcFlag(2) = true;
     DataGlobals::DoingSizing = true;
 
-    LocalTurnFansOff = false;
-    LocalTurnFansOn = true;
+    ep_globals.fans.LocalTurnFansOff = false;
+    ep_globals.fans.LocalTurnFansOn = true;
 
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
@@ -1392,8 +1392,8 @@ TEST_F(EnergyPlusFixture, ElectricCoilFanCoilHeatingTest)
     MyUAAndFlowCalcFlag(2) = true;
     DataGlobals::DoingSizing = true;
 
-    LocalTurnFansOff = false;
-    LocalTurnFansOn = true;
+    ep_globals.fans.LocalTurnFansOff = false;
+    ep_globals.fans.LocalTurnFansOn = true;
 
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
@@ -1737,8 +1737,8 @@ TEST_F(EnergyPlusFixture, ConstantFanVariableFlowFanCoilCoolingTest)
     MyUAAndFlowCalcFlag(2) = true;
     DataGlobals::DoingSizing = true;
 
-    LocalTurnFansOff = false;
-    LocalTurnFansOn = true;
+    ep_globals.fans.LocalTurnFansOff = false;
+    ep_globals.fans.LocalTurnFansOn = true;
 
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
@@ -2071,8 +2071,8 @@ TEST_F(EnergyPlusFixture, FanCoil_ASHRAE90VariableFan)
     MyUAAndFlowCalcFlag(2) = true;
     DataGlobals::DoingSizing = true;
 
-    LocalTurnFansOff = false;
-    LocalTurnFansOn = true;
+    ep_globals.fans.LocalTurnFansOff = false;
+    ep_globals.fans.LocalTurnFansOn = true;
 
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
@@ -2778,8 +2778,8 @@ TEST_F(EnergyPlusFixture, FanCoil_CyclingFanMode)
     MyUAAndFlowCalcFlag(2) = true;
     DataGlobals::DoingSizing = true;
 
-    LocalTurnFansOff = false;
-    LocalTurnFansOn = true;
+    ep_globals.fans.LocalTurnFansOff = false;
+    ep_globals.fans.LocalTurnFansOn = true;
 
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
@@ -3189,8 +3189,8 @@ TEST_F(EnergyPlusFixture, FanCoil_FanSystemModelCyclingFanMode)
     MyUAAndFlowCalcFlag(2) = true;
     DataGlobals::DoingSizing = true;
 
-    LocalTurnFansOff = false;
-    LocalTurnFansOn = true;
+    ep_globals.fans.LocalTurnFansOff = false;
+    ep_globals.fans.LocalTurnFansOn = true;
 
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;

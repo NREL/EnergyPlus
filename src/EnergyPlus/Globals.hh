@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,6 +54,11 @@
 
 #include <string>
 
+struct BaseGlobalStruct
+{
+    virtual void clear_state() = 0;
+};
+
 struct DataGlobal
 {
     // Data
@@ -63,31 +68,58 @@ struct DataGlobal
     std::string DayOfSimChr = "0";       // Counter for days (during the simulation) (character -- for reporting)
 
     // MODULE PARAMETER DEFINITIONS
-    int const EndZoneSizingCalc = 4;
+    static constexpr int EndZoneSizingCalc = 4;
 
     // Parameters for EMS Calling Points
-    int const emsCallFromBeginNewEvironment = 3;  // Identity where EMS called from
+    static constexpr int emsCallFromBeginNewEnvironment = 3;  // Identity where EMS called from
 };
 
 struct ExteriorEnergyUseGlobals
 {
-    // MODULE VARIABLE DECLARATIONS
     int NumExteriorLights = 0; // Number of Exterior Light Inputs
     int NumExteriorEqs = 0;    // Number of Exterior Equipment Inputs
 };
 
-struct FansGlobals
+struct FansGlobals : BaseGlobalStruct
 {
-    //MODULE VARIABLE DECLARATION
-    int NumFans = 0;
+    // constants
+    static constexpr int ExhaustFanCoupledToAvailManagers = 150;
+    static constexpr int ExhaustFanDecoupledFromAvailManagers = 151;
+
+    // members
+    int NumFans;
+    int NumNightVentPerf;      // number of FAN:NIGHT VENT PERFORMANCE objects found in the input
+    bool GetFanInputFlag;      // Flag set to make sure you get input once
+    bool LocalTurnFansOn;      // If True, overrides fan schedule and cycles ZoneHVAC component fans on
+    bool LocalTurnFansOff;     // If True, overrides fan schedule and LocalTurnFansOn and cycles ZoneHVAC component fans off
+
+        FansGlobals() : NumFans(0), NumNightVentPerf(0), GetFanInputFlag(true), LocalTurnFansOn(false), LocalTurnFansOff(false)
+    {
+    }
+
+    void clear_state() override
+    {
+        NumFans = 0;
+        NumNightVentPerf = 0;
+        GetFanInputFlag = true;
+        LocalTurnFansOn = false;
+        LocalTurnFansOff = false;
+    }
 };
 
-struct AllGlobals
+struct AllGlobals : BaseGlobalStruct
 {
+    // module globals
     DataGlobal dataGlobals;
     ExteriorEnergyUseGlobals exteriorEnergyUse;
     FansGlobals fans;
     PipesGlobals pipes;
+
+    // all clear states
+    void clear_state() override
+    {
+        fans.clear_state();
+    };
 };
 
 extern AllGlobals ep_globals;

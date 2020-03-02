@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -65,6 +65,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Globals.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -181,7 +182,7 @@ TEST_F(EnergyPlusFixture, ParallelPIUTest1)
     DataZoneEquipment::GetZoneEquipmentData1();
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
     Fans::GetFanInput();
-    Fans::GetFanInputFlag = false;
+    ep_globals.fans.GetFanInputFlag = false;
     PoweredInductionUnits::GetPIUs();
     EXPECT_TRUE(compare_err_stream(""));
     DataHeatBalFanSys::TempControlType.allocate(1);
@@ -399,7 +400,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUTest1)
     DataZoneEquipment::GetZoneEquipmentData1();
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
     Fans::GetFanInput();
-    Fans::GetFanInputFlag = false;
+    ep_globals.fans.GetFanInputFlag = false;
     PoweredInductionUnits::GetPIUs();
     EXPECT_TRUE(compare_err_stream(""));
     DataHeatBalFanSys::TempControlType.allocate(1);

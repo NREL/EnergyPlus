@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -160,7 +160,7 @@ TEST_F(EnergyPlusFixture, Dual_NodeTempSetpoints)
     bool anyRan;
     EMSManager::ManageEMS(DataGlobals::emsCallFromSetupSimulation, anyRan);
 
-    EMSManager::ManageEMS(ep_globals.dataGlobals.emsCallFromBeginNewEvironment, anyRan);
+    EMSManager::ManageEMS(ep_globals.dataGlobals.emsCallFromBeginNewEnvironment, anyRan);
 
     EXPECT_NEAR(DataLoopNode::Node(1).TempSetPointHi, 20.0, 0.000001);
 
@@ -282,7 +282,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetActuatedBranchFlo
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue = 1.0;
 
     // dummy value set above should be zero'd on this call since EMS 0's values on begin environment (whether EMS program runs on this call or not)
-    EMSManager::ManageEMS(ep_globals.dataGlobals.emsCallFromBeginNewEvironment, anyRan);
+    EMSManager::ManageEMS(ep_globals.dataGlobals.emsCallFromBeginNewEnvironment, anyRan);
 
     EXPECT_FALSE(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
     EXPECT_NEAR(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 0.0, 0.000001);
@@ -445,7 +445,7 @@ TEST_F(EnergyPlusFixture, SupervisoryControl_PlantComponent_SetComponentFlowRate
     PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue = 1.0;
 
     // dummy value set above should be zero'd on this call since EMS 0's values on begin environment (whether EMS program runs on this call or not)
-    EMSManager::ManageEMS(ep_globals.dataGlobals.emsCallFromBeginNewEvironment, anyRan);
+    EMSManager::ManageEMS(ep_globals.dataGlobals.emsCallFromBeginNewEnvironment, anyRan);
 
     EXPECT_FALSE(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideOn);
     EXPECT_NEAR(PlantLoop(1).LoopSide(1).Branch(1).Comp(1).EMSLoadOverrideValue, 0.0, 0.000001);
@@ -701,7 +701,7 @@ TEST_F(EnergyPlusFixture, Test_EMSLogic)
     EMSManager::FinishProcessingUserInput = true;
     bool anyRan;
     EMSManager::ManageEMS(DataGlobals::emsCallFromSetupSimulation, anyRan);
-    EMSManager::ManageEMS(ep_globals.dataGlobals.emsCallFromBeginNewEvironment, anyRan);
+    EMSManager::ManageEMS(ep_globals.dataGlobals.emsCallFromBeginNewEnvironment, anyRan);
 
     EXPECT_NEAR(DataLoopNode::Node(1).TempSetPoint, 11.0, 0.0000001);
     EXPECT_NEAR(DataLoopNode::Node(2).TempSetPoint, 12.0, 0.0000001);
@@ -760,7 +760,7 @@ TEST_F(EnergyPlusFixture, Debug_EMSLogic)
     EMSManager::FinishProcessingUserInput = true;
     bool anyRan;
     EMSManager::ManageEMS(DataGlobals::emsCallFromSetupSimulation, anyRan);
-    EMSManager::ManageEMS(ep_globals.dataGlobals.emsCallFromBeginNewEvironment, anyRan);
+    EMSManager::ManageEMS(ep_globals.dataGlobals.emsCallFromBeginNewEnvironment, anyRan);
 
     EXPECT_NEAR(DataLoopNode::Node(1).TempSetPoint, 1.0, 0.0000001);
 }
@@ -802,7 +802,7 @@ TEST_F(EnergyPlusFixture, TestAnyRanArgument)
     EMSManager::ManageEMS(DataGlobals::emsCallFromSetupSimulation, anyRan);
     EXPECT_FALSE(anyRan);
 
-    EMSManager::ManageEMS(ep_globals.dataGlobals.emsCallFromBeginNewEvironment, anyRan);
+    EMSManager::ManageEMS(ep_globals.dataGlobals.emsCallFromBeginNewEnvironment, anyRan);
     EXPECT_FALSE(anyRan);
 
     EMSManager::ManageEMS(DataGlobals::emsCallFromHVACIterationLoop, anyRan);
@@ -838,7 +838,7 @@ TEST_F(EnergyPlusFixture, TestUnInitializedEMSVariable1)
     // Expect the variable to not yet be initialized
     EXPECT_FALSE(ErlVariable(25).Value.initialized);
     // next run a small program that sets the value
-    EMSManager::ManageEMS(ep_globals.dataGlobals.emsCallFromBeginNewEvironment, anyRan);
+    EMSManager::ManageEMS(ep_globals.dataGlobals.emsCallFromBeginNewEnvironment, anyRan);
     // check that it worked and the value came thru
     EXPECT_NEAR(ErlVariable(25).Value.Number, 21.0, 0.0000001);
     // check of state to see if now initialized

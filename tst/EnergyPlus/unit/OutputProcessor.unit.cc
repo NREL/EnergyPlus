@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -973,21 +973,13 @@ namespace OutputProcessor {
                                                                  {"ELEC", "Electricity"},
                                                                  {"GAS", "Gas"},
                                                                  {"NATURALGAS", "Gas"},
-                                                                 {"NATURAL GAS", "Gas"},
                                                                  {"GASOLINE", "Gasoline"},
                                                                  {"DIESEL", "Diesel"},
                                                                  {"COAL", "Coal"},
-                                                                 {"FUEL OIL #1", "FuelOil#1"},
                                                                  {"FUELOIL#1", "FuelOil#1"},
-                                                                 {"FUEL OIL", "FuelOil#1"},
-                                                                 {"DISTILLATE OIL", "FuelOil#1"},
-                                                                 {"FUEL OIL #2", "FuelOil#2"},
                                                                  {"FUELOIL#2", "FuelOil#2"},
-                                                                 {"RESIDUAL OIL", "FuelOil#2"},
                                                                  {"PROPANE", "Propane"},
-                                                                 {"LPG", "Propane"},
                                                                  {"PROPANEGAS", "Propane"},
-                                                                 {"PROPANE GAS", "Propane"},
                                                                  {"WATER", "Water"},
                                                                  {"H2O", "Water"},
                                                                  {"ONSITEWATER", "OnSiteWater"},

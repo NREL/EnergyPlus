@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -6712,14 +6712,14 @@ namespace SetPointManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 MoistureLoad;         // zone's moisture load predicted to the setpoint [kgH20/s]
+        Real64 MoistureLoad;         // zone's moisture load predicted to the setpoint [kgWater/s]
         Real64 ZoneMassFlowRate;     // zone inlet node actual mass flow rate lagged by system one time step[kg/s]
         int AirLoopNum;              // the index of the air loop served by this setpoint manager
         Real64 SumMoistureLoad;      // sum of the zone moisture loads for this air loop [W]
         Real64 SumMdot;              // sum of the actual mass flow rate for controlled zones in the air loop [kg/s]
         Real64 SumMdotTot;           // sum of the actual mass flow rate for this air loop [kg/s]
         Real64 SumProductMdotHumTot; // sum of product of actual mass flow rate at the zone inlet node,
-        // and humidity ratio at zones air node for all zones in the airloop [kgH20/s]
+        // and humidity ratio at zones air node for all zones in the airloop [kgWater/s]
         Real64 AverageZoneHum; // multizone average zone air node humidity ratio of all zones in the air loop [kg/kg]
         int ZonesCooledIndex;  // DO loop index for zones cooled by the air loop
         int CtrlZoneNum;       // the controlled zone index
@@ -6795,14 +6795,14 @@ namespace SetPointManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 MoistureLoad;         // zone's moisture load predicted to the setpoint [kgH20/s]
+        Real64 MoistureLoad;         // zone's moisture load predicted to the setpoint [kgWater/s]
         Real64 ZoneMassFlowRate;     // zone inlet node actual mass flow rate lagged by system one time step[kg/s]
         int AirLoopNum;              // the index of the air loop served by this setpoint manager
         Real64 SumMoistureLoad;      // sum of the zone moisture loads for this air loop [W]
         Real64 SumMdot;              // sum of the actual mass flow rate for controlled zones in the air loop [kg/s]
         Real64 SumMdotTot;           // sum of the actual mass flow rate for this air loop [kg/s]
         Real64 SumProductMdotHumTot; // sum of product of actual mass flow rate at the zone inlet node,
-        // and humidity ratio at zones air node for all zones in the airloop [kgH20/s]
+        // and humidity ratio at zones air node for all zones in the airloop [kgWater/s]
         Real64 AverageZoneHum; // multizone average zone air node humidity ratio of all zones in the air loop [kg/kg]
         int ZonesCooledIndex;  // DO loop index for zones cooled by the air loop
         int CtrlZoneNum;       // the controlled zone index
@@ -6873,7 +6873,7 @@ namespace SetPointManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const SmallMoistureLoad(0.00001); // small moisture load [kgH2O/s]
+        Real64 const SmallMoistureLoad(0.00001); // small moisture load [kgWater/s]
 
         // INTERFACE BLOCK SPECIFICATIONS
 
@@ -6889,7 +6889,7 @@ namespace SetPointManager {
         Real64 ZoneHum;              // zone air node humidity ratio [kg/kg]
         Real64 SetPointHum;          // system setpoint humidity ratio [kg/kg]
         Real64 ZoneSetPointHum;      // Zone setpoint humidity ratio [kg/kg]
-        Real64 MoistureLoad;         // zone's moisture load predicted to the setpoint [kgH20/s]
+        Real64 MoistureLoad;         // zone's moisture load predicted to the setpoint [kgWater/s]
         Real64 ZoneMassFlowRate;     // zone inlet node actual supply air mass flow rate [kg/s]
         Real64 SumMoistureLoad(0.0); // sum of the zone moisture loads for this air loop [W]
 
@@ -6952,7 +6952,7 @@ namespace SetPointManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const SmallMoistureLoad(0.00001); // small moisture load [kgH2O/s]
+        Real64 const SmallMoistureLoad(0.00001); // small moisture load [kgWater/s]
 
         // INTERFACE BLOCK SPECIFICATIONS
 
@@ -6968,7 +6968,7 @@ namespace SetPointManager {
         Real64 ZoneHum;              // zone air node humidity ratio [kg/kg]
         Real64 SetPointHum;          // system setpoint humidity ratio [kg/kg]
         Real64 ZoneSetPointHum;      // Zone setpoint humidity ratio [kg/kg]
-        Real64 MoistureLoad;         // zone's moisture load predicted to the setpoint [kgH20/s]
+        Real64 MoistureLoad;         // zone's moisture load predicted to the setpoint [kgWater/s]
         Real64 ZoneMassFlowRate;     // zone inlet node actual supply air mass flow rate [kg/s]
         Real64 SumMoistureLoad(0.0); // sum of the zone moisture loads for this air loop [W]
 

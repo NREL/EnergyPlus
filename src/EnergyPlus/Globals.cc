@@ -45,32 +45,18 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/numeric.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/Globals.hh>
 
 
     // MODULE INFORMATION:
-    //       AUTHOR         
-    //       DATE WRITTEN   
-    //       MODIFIED       
+    //       AUTHOR
+    //       DATE WRITTEN
+    //       MODIFIED
     //       RE-ENGINEERED
 
     // PURPOSE OF THIS MODULE:
     // This data-only module is a repository for all variables which are considered
     // to be "global" in nature in EnergyPlus.
 
-    // METHODOLOGY EMPLOYED:
-    // na
-
-    // REFERENCES:
-    // na
-
-    // OTHER NOTES:
-    // na
-
-    // Using/Aliasing
-	
-	AllGlobals ep_globals;
+AllGlobals ep_globals;

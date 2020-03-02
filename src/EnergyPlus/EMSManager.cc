@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -300,7 +300,7 @@ namespace EMSManager {
         anyProgramRan = false;
         if (!AnyEnergyManagementSystemInModel) return; // quick return if nothing to do
 
-        if (iCalledFrom == ep_globals.dataGlobals.emsCallFromBeginNewEvironment) BeginEnvrnInitializeRuntimeLanguage();
+        if (iCalledFrom == ep_globals.dataGlobals.emsCallFromBeginNewEnvironment) BeginEnvrnInitializeRuntimeLanguage();
 
         InitEMS(iCalledFrom);
 
@@ -951,7 +951,7 @@ namespace EMSManager {
                     auto const SELECT_CASE_var(cAlphaArgs(2));
 
                     if (SELECT_CASE_var == "BEGINNEWENVIRONMENT") {
-                        EMSProgramCallManager(CallManagerNum).CallingPoint = ep_globals.dataGlobals.emsCallFromBeginNewEvironment;
+                        EMSProgramCallManager(CallManagerNum).CallingPoint = ep_globals.dataGlobals.emsCallFromBeginNewEnvironment;
                     } else if (SELECT_CASE_var == "AFTERNEWENVIRONMENTWARMUPISCOMPLETE") {
                         EMSProgramCallManager(CallManagerNum).CallingPoint = emsCallFromBeginNewEvironmentAfterWarmUp;
                     } else if (SELECT_CASE_var == "BEGINZONETIMESTEPBEFOREINITHEATBALANCE") {
