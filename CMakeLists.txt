@@ -7,7 +7,7 @@ endif()
 
 Project(EnergyPlus)
 
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+cmake_minimum_required(VERSION 3.5.1)
 
 if(${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER "3.0")
   CMAKE_POLICY(SET CMP0054 NEW) # CMake 3.1 added this policy
@@ -16,12 +16,16 @@ endif()
 set( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH} )
 
 set( CMAKE_VERSION_MAJOR 9 )
-set( CMAKE_VERSION_MINOR 2 )
+set( CMAKE_VERSION_MINOR 3 )
 set( CMAKE_VERSION_PATCH 0 )
 
-set( PREV_RELEASE_SHA "08d2e30" )
+set( CMAKE_POSITION_INDEPENDENT_CODE ON )
+
+set( PREV_RELEASE_SHA "921312f" )
 
 set( ENERGYPLUS_VERSION "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}" )
+
+string( TIMESTAMP CMAKE_YEAR "%Y")
 
 set( CMAKE_VERSION_BUILD "Unknown" CACHE STRING "Build number" )
 find_package(Git)
@@ -35,7 +39,7 @@ endif()
 
 if(GIT_FOUND)
   execute_process(COMMAND "${GIT_EXECUTABLE}" "rev-parse" "--short=10" "HEAD"
-                  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+                  WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
                   TIMEOUT 10
                   RESULT_VARIABLE RESULT
                   OUTPUT_VARIABLE GIT_VERSION
@@ -48,6 +52,17 @@ if(GIT_FOUND)
   get_filename_component(GIT_DIR "${GIT_EXECUTABLE}" PATH)
 else()
   set(GIT_DIR "")
+endif()
+
+set( OPENGL_REQUIRED OFF CACHE BOOL "Require OpenGL in order to build" )
+if(OPENGL_REQUIRED)
+  find_package(OpenGL)
+  if(NOT OPENGL_FOUND)
+    set(CMAKE_VERSION_BUILD "${CMAKE_VERSION_BUILD} (No OpenGL)" CACHE STRING "Build number" FORCE) # git sha
+    message(WARNING "OpenGL libraries were not found. EnergyPlus will be compiled without GPU acceleration capabilities.")
+  endif()
+else()
+  set( OPENGL_FOUND FALSE )
 endif()
 
 # Set a default build type if none was specified
@@ -72,8 +87,8 @@ option( ENABLE_INSTALL_REMOTE "Enable install_remote and install_remote_plist co
 
 mark_as_advanced( ENABLE_INSTALL_REMOTE )
 
-# we are making python a required dependency, so find it here...starting off by requiring at least 2.7
-find_package(PythonInterp 2.7 REQUIRED)
+# we are making *a Python 3 Interpreter* a required dependency, so find it here
+find_package(PythonInterp 3 REQUIRED)
 
 if( BUILD_TESTING )
   option( ENABLE_REGRESSION_TESTING "Enable Regression Tests" OFF )
@@ -124,51 +139,61 @@ if (MINGW)
   set(CMAKE_SHARED_LIBRARY_PREFIX "")
 endif ()
 
-set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
-set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
-set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Products" )
+set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/Products" )
+set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/Products" )
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/Products" )
 
 include(cmake/ProjectMacros.cmake)
 include(cmake/CompilerFlags.cmake)
 
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/re2 )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/doj )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/nlohmann )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/valijson )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/ObjexxFCL/src/ )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/SQLite/ SYSTEM )
-INCLUDE_DIRECTORIES( "${CMAKE_SOURCE_DIR}/third_party/Expat" "${CMAKE_SOURCE_DIR}/third_party/Expat/lib" SYSTEM )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/CLI/ )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/eigen/ )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Chromogenics/include)
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Common/include)
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Gases/include)
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/MultiLayerOptics/include)
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/SingleLayerOptics/include)
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/SpectralAveraging/include)
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Tarcog/include)
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Viewer/include)
-INCLUDE_DIRECTORIES( ${CMAKE_BINARY_DIR}/src/EnergyPlus)  # so that any source can #include <ConfiguredFunctions.hh>
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/src )
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party )
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/btwxt/src )
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/re2 )
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/doj )
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/nlohmann )
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/valijson )
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/ObjexxFCL/src/ )
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/SQLite/ SYSTEM )
+INCLUDE_DIRECTORIES( "${PROJECT_SOURCE_DIR}/third_party/Expat" "${PROJECT_SOURCE_DIR}/third_party/Expat/lib" SYSTEM )
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/CLI/ )
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/eigen/ )
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Chromogenics/include)
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Common/include)
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Gases/include)
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/Windows-CalcEngine/src/MultiLayerOptics/include)
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/Windows-CalcEngine/src/SingleLayerOptics/include)
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/Windows-CalcEngine/src/SpectralAveraging/include)
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Tarcog/include)
+INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/Windows-CalcEngine/src/Viewer/include)
+if( OPENGL_FOUND )
+    INCLUDE_DIRECTORIES( ${PROJECT_SOURCE_DIR}/third_party/penumbra/include )
+endif()
 
 #### Create interface for JSON for Modern C++ so we can include it in targets
 # add_library( ModernJSON INTERFACE )
-# target_include_directories( ModernJSON INTERFACE "${CMAKE_SOURCE_DIR}/third_party/nlohmann" "${CMAKE_SOURCE_DIR}/third_party/doj" )
+# target_include_directories( ModernJSON INTERFACE "${PROJECT_SOURCE_DIR}/third_party/nlohmann" "${PROJECT_SOURCE_DIR}/third_party/doj" )
 
 set(RE2_BUILD_TESTING OFF CACHE BOOL "" FORCE)
+
+
+if( OPENGL_FOUND )
+  set(BUILD_PENUMBRA_TESTING ${BUILD_TESTING} CACHE BOOL "" FORCE)
+endif()
 
 if( BUILD_TESTING )
   set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
   set(BUILD_GTEST ON CACHE BOOL "" FORCE)
-  set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
+  set(BUILD_GMOCK ON CACHE BOOL "" FORCE)
   option( TEST_ANNUAL_SIMULATION "Use annual simulations for tests instead of only design days" OFF )
   enable_testing()
   include(CTest)
+  ADD_SUBDIRECTORY(third_party/gtest)
 endif()
 
 # E+ required libraries
 ADD_SUBDIRECTORY(idd)
+
 ADD_SUBDIRECTORY(third_party/SQLite)
 ADD_SUBDIRECTORY(third_party/ObjexxFCL)
 ADD_SUBDIRECTORY(third_party/BCVTB)
@@ -177,19 +202,27 @@ ADD_SUBDIRECTORY(third_party/FMI)
 ADD_SUBDIRECTORY(third_party/zlib)
 ADD_SUBDIRECTORY(third_party/DElight)
 ADD_SUBDIRECTORY(third_party/re2)
+ADD_SUBDIRECTORY(third_party/fmt-6.1.2 )
+
 ADD_SUBDIRECTORY(scripts/dev/generate_embeddable_epJSON_schema)
 IF( NOT APPLE )
   ADD_SUBDIRECTORY(third_party/FMUParser)
 ENDIF()
 ADD_SUBDIRECTORY(third_party/Windows-CalcEngine)
-if( BUILD_TESTING )
-  ADD_SUBDIRECTORY(third_party/gtest)
-endif()
+
+# Btwxt
+INCLUDE_DIRECTORIES( ${gtest_SOURCE_DIR}/include/ SYSTEM )
+set(BUILD_BTWXT_TESTING ${BUILD_TESTING} CACHE BOOL "" FORCE)
+ADD_SUBDIRECTORY(third_party/btwxt)
 
 # Kiva
 INCLUDE(third_party/cmake/kiva.cmake)
 
-execute_process( COMMAND ${PYTHON_EXECUTABLE} "${CMAKE_SOURCE_DIR}/scripts/dev/generate_epJSON_schema/generate_epJSON_schema.py" "${CMAKE_SOURCE_DIR}" TIMEOUT 30 RESULT_VARIABLE generate_epJSON_schema_result)
+if( OPENGL_FOUND )
+  ADD_SUBDIRECTORY(third_party/penumbra)
+endif()
+
+execute_process( COMMAND ${PYTHON_EXECUTABLE} "${PROJECT_SOURCE_DIR}/scripts/dev/generate_epJSON_schema/generate_epJSON_schema.py" "${PROJECT_SOURCE_DIR}" TIMEOUT 30 RESULT_VARIABLE generate_epJSON_schema_result)
 if( ${generate_epJSON_schema_result} MATCHES ".*timeout.*" )
   message(FATAL_ERROR "Generating epJSON Schema from IDD failed: ${generate_epJSON_schema_result}")
 endif()
@@ -224,15 +257,17 @@ if( BUILD_TESTING )
   endif()
 endif()
 
+ADD_SUBDIRECTORY(src/ConvertInputFormat)
+
 if( BUILD_FORTRAN )
   include(CMakeAddFortranSubdirectory)
   cmake_add_fortran_subdirectory(src/ExpandObjects PROJECT ExpandObjects NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/ReadVars PROJECT ReadVars NO_EXTERNAL_INSTALL )
   set(TRANSITION_EXTRA_FLAGS "-DCMAKE_VERSION_MAJOR:STRING=${CMAKE_VERSION_MAJOR}" "-DCMAKE_VERSION_MINOR:STRING=${CMAKE_VERSION_MINOR}" "-DCMAKE_VERSION_PATCH:STRING=${CMAKE_VERSION_PATCH}")
   cmake_add_fortran_subdirectory(src/Transition PROJECT Transition CMAKE_COMMAND_LINE ${TRANSITION_EXTRA_FLAGS} NO_EXTERNAL_INSTALL )
-  file( COPY "idd/V9-1-0-Energy+.idd" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
-  configure_file( idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V9-2-0-Energy+.idd" )
-  file( COPY "src/Transition/SupportFiles/Report Variables 9-1-0 to 9-2-0.csv" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
+  file( COPY "idd/V9-2-0-Energy+.idd" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
+  configure_file( idd/Energy+.idd.in "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/V9-3-0-Energy+.idd" )
+  file( COPY "src/Transition/SupportFiles/Report Variables 9-2-0 to 9-3-0.csv" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" )
   cmake_add_fortran_subdirectory(src/Basement PROJECT Basement NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/HVAC-Diagram PROJECT HVAC-Diagram NO_EXTERNAL_INSTALL )
   cmake_add_fortran_subdirectory(src/ParametricPreprocessor PROJECT ParametricPreprocessor NO_EXTERNAL_INSTALL )
@@ -243,24 +278,8 @@ if( BUILD_FORTRAN )
 endif()
 
 if( BUILD_PACKAGE )
-  set(CPACK_INSTALL_CMAKE_PROJECTS
-    "${CMAKE_BINARY_DIR};EnergyPlus;ALL;/"
-  )
-
-  if( BUILD_FORTRAN )
-    list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/ExpandObjects/;ExpandObjects;ALL;/")
-    list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/ReadVars/;ReadVars;ALL;/")
-    list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/Transition/;Transition;ALL;/")
-    list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/Basement/;Basement;ALL;/")
-    list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/HVAC-Diagram/;HVAC-Diagram;ALL;/")
-    list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/ParametricPreprocessor/;ParametricPreprocessor;ALL;/")
-    list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/Slab/;Slab;ALL;/")
-    list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/ConvertESOMTR/;ConvertESOMTR;ALL;/")
-    list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/CalcSoilSurfTemp/;CalcSoilSurfTemp;ALL;/")
-    list(APPEND CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_BINARY_DIR}/src/AppGPostProcess/;AppGPostProcess;ALL;/")
-  endif()
-
-  include(cmake/Install.cmake)
+  # We handle everything in a dedicated cmake file
+  include(${PROJECT_SOURCE_DIR}/cmake/Install.cmake)
 endif()
 
 if (BUILD_DOCS)
@@ -306,3 +325,10 @@ mark_as_advanced(gtest_build_tests)
 mark_as_advanced(gtest_disable_pthreads)
 mark_as_advanced(gtest_force_shared_crt)
 mark_as_advanced(gtest_hide_internal_symbols)
+mark_as_advanced(FMT_CUDA_TEST)
+mark_as_advanced(FMT_DOC)
+mark_as_advanced(FMT_FUZZ)
+mark_as_advanced(FMT_INSTALL)
+mark_as_advanced(FMT_PEDANTIC)
+mark_as_advanced(FMT_TEST)
+mark_as_advanced(FMT_WERROR)

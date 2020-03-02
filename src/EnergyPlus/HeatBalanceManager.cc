@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -58,54 +58,59 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <ConductionTransferFunctionCalc.hh>
-#include <CurveManager.hh>
-#include <DataBSDFWindow.hh>
-#include <DataComplexFenestration.hh>
-#include <DataContaminantBalance.hh>
-#include <DataDaylighting.hh>
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalSurface.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataReportingFlags.hh>
-#include <DataRoomAirModel.hh>
-#include <DataStringGlobals.hh>
-#include <DataSurfaces.hh>
-#include <DataSystemVariables.hh>
-#include <DataWindowEquivalentLayer.hh>
-#include <DaylightingDevices.hh>
-#include <DaylightingManager.hh>
-#include <DisplayRoutines.hh>
-#include <EMSManager.hh>
-#include <EconomicTariff.hh>
-#include <General.hh>
-#include <GlobalNames.hh>
-#include <HVACSizingSimulationManager.hh>
-#include <HeatBalanceManager.hh>
-#include <HeatBalanceSurfaceManager.hh>
-#include <HybridModel.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <InternalHeatGains.hh>
-#include <MatrixDataManager.hh>
-#include <NodeInputManager.hh>
-#include <OutAirNodeManager.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportTabular.hh>
-#include <PhaseChangeModeling/HysteresisModel.hh>
-#include <ScheduleManager.hh>
-#include <SolarShading.hh>
-#include <SurfaceGeometry.hh>
-#include <SurfaceOctree.hh>
-#include <UtilityRoutines.hh>
-#include <WindowComplexManager.hh>
-#include <WindowEquivalentLayer.hh>
-#include <WindowManager.hh>
-#include <WindowModel.hh>
+#include "OutputFiles.hh"
+#include <EnergyPlus/ConductionTransferFunctionCalc.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataBSDFWindow.hh>
+#include <EnergyPlus/DataComplexFenestration.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataDaylighting.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataReportingFlags.hh>
+#include <EnergyPlus/DataRoomAirModel.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/DataViewFactorInformation.hh>
+#include <EnergyPlus/DataWindowEquivalentLayer.hh>
+#include <EnergyPlus/DaylightingDevices.hh>
+#include <EnergyPlus/DaylightingManager.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/EconomicTariff.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/HVACSizingSimulationManager.hh>
+#include <EnergyPlus/HeatBalanceIntRadExchange.hh>
+#include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
+#include <EnergyPlus/HybridModel.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/MatrixDataManager.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
+#include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
+#include <EnergyPlus/PluginManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SolarShading.hh>
+#include <EnergyPlus/SurfaceGeometry.hh>
+#include <EnergyPlus/SurfaceOctree.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WindowComplexManager.hh>
+#include <EnergyPlus/WindowEquivalentLayer.hh>
+#include <EnergyPlus/WindowManager.hh>
+#include <EnergyPlus/WindowModel.hh>
 
 namespace EnergyPlus {
 
@@ -278,7 +283,7 @@ namespace HeatBalanceManager {
         UniqueConstructNames.clear();
     }
 
-    void ManageHeatBalance()
+    void ManageHeatBalance(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -331,6 +336,7 @@ namespace HeatBalanceManager {
         // Get the heat balance input at the beginning of the simulation only
         if (ManageHeatBalanceGetInputFlag) {
             GetHeatBalanceInput(); // Obtains heat balance related parameters from input file
+            HeatBalanceIntRadExchange::InitSolarViewFactors(outputFiles);
 
             // Surface octree setup
             //  The surface octree holds live references to surfaces so it must be updated
@@ -363,17 +369,18 @@ namespace HeatBalanceManager {
         // in the Surface Heat Balance Manager).  In the future, this may be improved.
         ManageSurfaceHeatBalance();
         ManageEMS(emsCallFromEndZoneTimestepBeforeZoneReporting, anyRan); // EMS calling point
-        RecKeepHeatBalance();                                             // Do any heat balance related record keeping
+        RecKeepHeatBalance(outputFiles);                                             // Do any heat balance related record keeping
 
         // This call has been moved to the FanSystemModule and does effect the output file
         //   You do get a shift in the Air Handling System Summary for the building electric loads
         // IF ((.NOT.WarmupFlag).AND.(DayOfSim.GT.0)) CALL RCKEEP  ! Do fan system accounting (to be moved later)
 
-        ReportHeatBalance(); // Manage heat balance reporting until the new reporting is in place
+        ReportHeatBalance(outputFiles); // Manage heat balance reporting until the new reporting is in place
 
         ManageEMS(emsCallFromEndZoneTimestepAfterZoneReporting, anyRan); // EMS calling point
 
         UpdateEMSTrendVariables();
+        EnergyPlus::PluginManagement::pluginManager->updatePluginValues();
 
         if (WarmupFlag && EndDayFlag) {
 
@@ -387,7 +394,7 @@ namespace HeatBalanceManager {
         }
 
         if (!WarmupFlag && EndDayFlag && DayOfSim == 1 && !DoingSizing) {
-            ReportWarmupConvergence();
+            ReportWarmupConvergence(outputFiles);
         }
     }
 
@@ -436,13 +443,14 @@ namespace HeatBalanceManager {
 
         // FLOW:
 
-        GetProjectControlData(ErrorsFound);
+        auto &outputFiles = OutputFiles::getSingleton();
+        GetProjectControlData(outputFiles, ErrorsFound);
 
-        GetSiteAtmosphereData(ErrorsFound);
+        GetSiteAtmosphereData(outputFiles, ErrorsFound);
 
         GetWindowGlassSpectralData(ErrorsFound);
 
-        GetMaterialData(ErrorsFound); // Read materials from input file/transfer from legacy data structure
+        GetMaterialData(outputFiles, ErrorsFound); // Read materials from input file/transfer from legacy data structure
 
         GetFrameAndDividerData(ErrorsFound);
 
@@ -645,7 +653,7 @@ namespace HeatBalanceManager {
         // Construction:InternalSource
     }
 
-    void GetProjectControlData(bool &ErrorsFound) // Set to true if errors detected during getting data
+    void GetProjectControlData(OutputFiles &outputFiles, bool &ErrorsFound) // Set to true if errors detected during getting data
     {
 
         // SUBROUTINE INFORMATION:
@@ -697,34 +705,6 @@ namespace HeatBalanceManager {
         int IOStat;
         int NumObjects;
         std::string::size_type TMP;
-
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_721(
-            "('! <Building Information>, Building Name,North Axis {deg},Terrain, ',' Loads Convergence Tolerance "
-            "Value,Temperature Convergence Tolerance Value, ',' Solar Distribution,Maximum Number of Warmup Days,Minimum "
-            "Number of Warmup Days')");
-        static ObjexxFCL::gio::Fmt Format_720("(' Building Information',8(',',A))");
-        static ObjexxFCL::gio::Fmt Format_722("('! <Inside Convection Algorithm>, Algorithm {Simple | TARP | CeilingDiffuser | "
-                                              "AdaptiveConvectionAlgorithm}',/,'Inside Convection Algorithm,',A)");
-        static ObjexxFCL::gio::Fmt Format_723("('! <Outside Convection Algorithm>, ','Algorithm {SimpleCombined | TARP | MoWitt | DOE-2 | "
-                                              "AdaptiveConvectionAlgorithm}',/,'Outside Convection Algorithm,',A)");
-        static ObjexxFCL::gio::Fmt Format_724("('! <Sky Radiance Distribution>, Value {Anisotropic}',/,'Sky Radiance Distribution,Anisotropic')");
-        static ObjexxFCL::gio::Fmt Format_726(
-            "('! <Zone Air Solution Algorithm>, Value {ThirdOrderBackwardDifference | AnalyticalSolution | EulerMethod}')");
-        static ObjexxFCL::gio::Fmt Format_727("(' Zone Air Solution Algorithm, ',A)");
-        static ObjexxFCL::gio::Fmt Format_728(
-            "('! <Zone Air Carbon Dioxide Balance Simulation>, Simulation {Yes/No}, Carbon Dioxide Concentration')");
-        static ObjexxFCL::gio::Fmt Format_730("(' Zone Air Carbon Dioxide Balance Simulation, ',A,',',A)");
-        static ObjexxFCL::gio::Fmt Format_729(
-            "('! <Zone Air Generic Contaminant Balance Simulation>, Simulation {Yes/No}, Generic Contaminant Concentration')");
-        static ObjexxFCL::gio::Fmt Format_731("(' Zone Air Generic Contaminant Balance Simulation, ',A,',',A)");
-        static ObjexxFCL::gio::Fmt Format_732(
-            "('! <Zone Air Mass Flow Balance Simulation>, Enforce Mass Balance, Adjust Zone Mixing, Adjust Zone Infiltration "
-            "{AddInfiltration | AdjustInfiltration | None}, Infiltration Zones {MixingSourceZonesOnly | AllZones}')");
-        static ObjexxFCL::gio::Fmt Format_733("(' Zone Air Mass Flow Balance Simulation, ',A,',',A,',',A,',',A)");
-        static ObjexxFCL::gio::Fmt Format_734(
-            "('! <HVACSystemRootFindingAlgorithm>, Value {RegulaFalsi | Bisection | BisectionThenRegulaFalsi | RegulaFalsiThenBisection}')");
-        static ObjexxFCL::gio::Fmt Format_735("(' HVACSystemRootFindingAlgorithm, ',A)");
 
         // Assign the values to the building data
 
@@ -858,17 +838,7 @@ namespace HeatBalanceManager {
                                  RoundSigDigits(MinNumberOfWarmupDays) + " will be used.");
                 MaxNumberOfWarmupDays = MinNumberOfWarmupDays;
             }
-            if (MinNumberOfWarmupDays < 6) {
-                ShowWarningError(RoutineName + CurrentModuleObject + ": " + cNumericFieldNames(5) +
-                                 " potentially invalid. Experience has shown that most files will converge within " +
-                                 RoundSigDigits(DefaultMaxNumberOfWarmupDays) + " warmup days. ");
-                ShowContinueError("...Choosing less than " + RoundSigDigits(DefaultMinNumberOfWarmupDays) +
-                                  " warmup days may have adverse effects on the simulation results, particularly design day simulations. ");
-                ShowContinueError("...Users should only alter this default if they are certain that less than " +
-                                  RoundSigDigits(DefaultMinNumberOfWarmupDays) + " warmup days is appropriate for a particular file. ");
-                ShowContinueError(
-                    "...Verify that convergence to desired results are achieved. You can report values during warmup days to ascertain convergence.");
-            }
+
         } else {
             ShowSevereError(RoutineName + " A " + CurrentModuleObject + " Object must be entered.");
             ErrorsFound = true;
@@ -879,12 +849,16 @@ namespace HeatBalanceManager {
             MinNumberOfWarmupDays = DefaultMinNumberOfWarmupDays;
         }
 
+        static constexpr auto Format_720(" Building Information,{},{:.3R},{},{:.5R},{:.5R},{},{},{}\n");
+        static constexpr auto Format_721(
+            "! <Building Information>, Building Name,North Axis {{deg}},Terrain,  Loads Convergence Tolerance "
+            "Value,Temperature Convergence Tolerance Value,  Solar Distribution,Maximum Number of Warmup Days,Minimum "
+            "Number of Warmup Days\n");
         // Write Building Information to the initialization output file
-        ObjexxFCL::gio::write(OutputFileInits, Format_721);
-
-        ObjexxFCL::gio::write(OutputFileInits, Format_720)
-            << BuildingName << RoundSigDigits(BuildingAzimuth, 3) << AlphaName(2) << RoundSigDigits(LoadsConvergTol, 5)
-            << RoundSigDigits(TempConvergTol, 5) << AlphaName(3) << RoundSigDigits(MaxNumberOfWarmupDays) << RoundSigDigits(MinNumberOfWarmupDays);
+        print(outputFiles.eio, Format_721);
+        print(outputFiles.eio, Format_720,
+            BuildingName , BuildingAzimuth , AlphaName(2) , LoadsConvergTol
+            , TempConvergTol , AlphaName(3) , MaxNumberOfWarmupDays , MinNumberOfWarmupDays);
         // Above should be validated...
 
         CurrentModuleObject = "SurfaceConvectionAlgorithm:Inside";
@@ -939,7 +913,9 @@ namespace HeatBalanceManager {
             DefaultInsideConvectionAlgo = ASHRAETARP;
             AlphaName(1) = "TARP";
         }
-        ObjexxFCL::gio::write(OutputFileInits, Format_722) << AlphaName(1);
+        static constexpr auto Format_722("! <Inside Convection Algorithm>, Algorithm {{Simple | TARP | CeilingDiffuser | "
+                                              "AdaptiveConvectionAlgorithm}}\nInside Convection Algorithm,{}\n");
+        print(outputFiles.eio, Format_722, AlphaName(1));
 
         // Get only the first (if more were input)
         CurrentModuleObject = "SurfaceConvectionAlgorithm:Outside";
@@ -992,7 +968,9 @@ namespace HeatBalanceManager {
             AlphaName(1) = "DOE-2";
         }
 
-        ObjexxFCL::gio::write(OutputFileInits, Format_723) << AlphaName(1);
+        static constexpr auto Format_723("! <Outside Convection Algorithm>, Algorithm {{SimpleCombined | TARP | MoWitt | DOE-2 | "
+                                              "AdaptiveConvectionAlgorithm}}\nOutside Convection Algorithm,{}\n");
+        print(outputFiles.eio, Format_723, AlphaName(1));
 
         CurrentModuleObject = "HeatBalanceAlgorithm";
         NumObjects = inputProcessor->getNumObjectsFound(CurrentModuleObject);
@@ -1076,7 +1054,8 @@ namespace HeatBalanceManager {
         // algorithm input checks now deferred until surface properties are read in,
         //  moved to SurfaceGeometry.cc routine GetSurfaceHeatTransferAlgorithmOverrides
 
-        ObjexxFCL::gio::write(OutputFileInits, Format_724);
+        static constexpr auto Format_724("! <Sky Radiance Distribution>, Value {{Anisotropic}}\nSky Radiance Distribution,Anisotropic\n");
+        print(outputFiles.eio, Format_724);
 
         CurrentModuleObject = "Compliance:Building";
         NumObjects = inputProcessor->getNumObjectsFound(CurrentModuleObject);
@@ -1115,7 +1094,7 @@ namespace HeatBalanceManager {
             if (NumAlpha > 0) {
                 {
                     auto const SELECT_CASE_var(AlphaName(1));
-                    if ((SELECT_CASE_var == "3RDORDERBACKWARDDIFFERENCE") || (SELECT_CASE_var == "THIRDORDERBACKWARDDIFFERENCE")) {
+                    if (SELECT_CASE_var == "THIRDORDERBACKWARDDIFFERENCE") {
                         ZoneAirSolutionAlgo = Use3rdOrder;
                         AlphaName(1) = "ThirdOrderBackwardDifference";
                     } else if (SELECT_CASE_var == "ANALYTICALSOLUTION") {
@@ -1137,10 +1116,18 @@ namespace HeatBalanceManager {
             ZoneAirSolutionAlgo = Use3rdOrder;
             AlphaName(1) = "ThirdOrderBackwardDifference";
         }
+        if (DataHeatBalance::OverrideZoneAirSolutionAlgo) {
+            ZoneAirSolutionAlgo = UseEulerMethod;
+            AlphaName(1) = "EulerMethod";
+        }
+
 
         // Write Solution Algorithm to the initialization output file for User Verification
-        ObjexxFCL::gio::write(OutputFileInits, Format_726);
-        ObjexxFCL::gio::write(OutputFileInits, Format_727) << AlphaName(1);
+        static constexpr auto Format_726(
+            "! <Zone Air Solution Algorithm>, Value {{ThirdOrderBackwardDifference | AnalyticalSolution | EulerMethod}}\n");
+        print(outputFiles.eio, Format_726);
+        static constexpr auto Format_727(" Zone Air Solution Algorithm, {}\n");
+        print(outputFiles.eio, Format_727, AlphaName(1));
 
         // A new object is added by L. Gu, 06/10
         CurrentModuleObject = "ZoneAirContaminantBalance";
@@ -1221,20 +1208,24 @@ namespace HeatBalanceManager {
 
         WindowManager::initWindowModel();
 
-        ObjexxFCL::gio::write(OutputFileInits, Format_728);
+        static constexpr auto Format_728(
+            "! <Zone Air Carbon Dioxide Balance Simulation>, Simulation {{Yes/No}}, Carbon Dioxide Concentration\n");
+        print(outputFiles.eio, Format_728);
+        static constexpr auto Format_730(" Zone Air Carbon Dioxide Balance Simulation, {},{}\n");
         if (Contaminant.SimulateContaminants && Contaminant.CO2Simulation) {
-            ObjexxFCL::gio::write(OutputFileInits, Format_730) << "Yes" << AlphaName(1);
+            print(outputFiles.eio, Format_730, "Yes", AlphaName(1));
         } else {
-            ObjexxFCL::gio::write(OutputFileInits, Format_730) << "No"
-                                                               << "N/A";
+            print(outputFiles.eio, Format_730, "No", "N/A");
         }
 
-        ObjexxFCL::gio::write(OutputFileInits, Format_729);
+        static constexpr auto Format_729(
+            "! <Zone Air Generic Contaminant Balance Simulation>, Simulation {{Yes/No}}, Generic Contaminant Concentration\n");
+        static constexpr auto Format_731(" Zone Air Generic Contaminant Balance Simulation, {},{}\n");
+        print(outputFiles.eio, Format_729);
         if (Contaminant.SimulateContaminants && Contaminant.GenericContamSimulation) {
-            ObjexxFCL::gio::write(OutputFileInits, Format_731) << "Yes" << AlphaName(3);
+            print(outputFiles.eio, Format_731, "Yes", AlphaName(3));
         } else {
-            ObjexxFCL::gio::write(OutputFileInits, Format_731) << "No"
-                                                               << "N/A";
+            print(outputFiles.eio, Format_731, "No", "N/A");
         }
 
         // A new object is added by B. Nigusse, 02/14
@@ -1328,14 +1319,16 @@ namespace HeatBalanceManager {
             ZoneAirMassFlow.EnforceZoneMassBalance = false;
         }
 
-        ObjexxFCL::gio::write(OutputFileInits, Format_732);
+        static constexpr auto Format_732(
+            "! <Zone Air Mass Flow Balance Simulation>, Enforce Mass Balance, Adjust Zone Mixing, Adjust Zone Infiltration "
+            "{{AddInfiltration | AdjustInfiltration | None}}, Infiltration Zones {{MixingSourceZonesOnly | AllZones}}\n");
+        static constexpr auto Format_733(" Zone Air Mass Flow Balance Simulation, {},{},{},{}\n");
+
+        print(outputFiles.eio, Format_732);
         if (ZoneAirMassFlow.EnforceZoneMassBalance) {
-            ObjexxFCL::gio::write(OutputFileInits, Format_733) << "Yes" << AlphaName(1) << AlphaName(2) << AlphaName(3);
+            print(outputFiles.eio, Format_733, "Yes", AlphaName(1), AlphaName(2), AlphaName(3));
         } else {
-            ObjexxFCL::gio::write(OutputFileInits, Format_733) << "No"
-                                                               << "N/A"
-                                                               << "N/A"
-                                                               << "N/A";
+            print(outputFiles.eio, Format_733, "No", "N/A", "N/A", "N/A");
         }
 
         // A new object is added by L. Gu, 4/17
@@ -1359,7 +1352,7 @@ namespace HeatBalanceManager {
                     auto const SELECT_CASE_var(AlphaName(1));
                     if ((SELECT_CASE_var == "REGULAFALSI")) {
                         HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi;
-                    } else if (SELECT_CASE_var == "BiSECTION") {
+                    } else if (SELECT_CASE_var == "BISECTION") {
                         HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::Bisection;
                     } else if (SELECT_CASE_var == "BISECTIONTHENREGULAFALSI") {
                         HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::BisectionThenRegulaFalsi;
@@ -1385,11 +1378,14 @@ namespace HeatBalanceManager {
         }
 
         // Write Solution Algorithm to the initialization output file for User Verification
-        ObjexxFCL::gio::write(OutputFileInits, Format_734);
-        ObjexxFCL::gio::write(OutputFileInits, Format_735) << HVACSystemRootFinding.Algorithm;
+        static constexpr auto Format_734(
+            "! <HVACSystemRootFindingAlgorithm>, Value {{RegulaFalsi | Bisection | BisectionThenRegulaFalsi | RegulaFalsiThenBisection}}\n");
+        static constexpr auto Format_735(" HVACSystemRootFindingAlgorithm, {}\n");
+        print(outputFiles.eio, Format_734);
+        print(outputFiles.eio, Format_735, HVACSystemRootFinding.Algorithm);
     }
 
-    void GetSiteAtmosphereData(bool &ErrorsFound)
+    void GetSiteAtmosphereData(OutputFiles &outputFiles, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1413,7 +1409,7 @@ namespace HeatBalanceManager {
         Array1D<Real64> NumArray(3); // Numeric data
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_720("('Environment:Site Atmospheric Variation',3(',',A))");
+        static constexpr auto Format_720("Environment:Site Atmospheric Variation,{:.3R},{:.3R},{:.6R}\n");
 
         // FLOW:
         CurrentModuleObject = "Site:HeightVariation";
@@ -1449,15 +1445,14 @@ namespace HeatBalanceManager {
         }
 
         // Write to the initialization output file
-        ObjexxFCL::gio::write(OutputFileInits, fmtA)
-            << "! <Environment:Site Atmospheric Variation>,Wind Speed Profile Exponent {},Wind Speed Profile Boundary "
-               "Layer Thickness {m},Air Temperature Gradient Coefficient {K/m}";
+        print(outputFiles.eio,
+            "! <Environment:Site Atmospheric Variation>,Wind Speed Profile Exponent {{}},Wind Speed Profile Boundary "
+            "Layer Thickness {{m}},Air Temperature Gradient Coefficient {{K/m}}\n");
 
-        ObjexxFCL::gio::write(OutputFileInits, Format_720)
-            << RoundSigDigits(SiteWindExp, 3) << RoundSigDigits(SiteWindBLHeight, 3) << RoundSigDigits(SiteTempGradient, 6);
+        print(outputFiles.eio, Format_720, SiteWindExp, SiteWindBLHeight, SiteTempGradient);
     }
 
-    void GetMaterialData(bool &ErrorsFound) // set to true if errors found in input
+    void GetMaterialData(OutputFiles &outputFiles, bool &ErrorsFound) // set to true if errors found in input
     {
 
         // SUBROUTINE INFORMATION:
@@ -1493,11 +1488,7 @@ namespace HeatBalanceManager {
 
         // Using/Aliasing
         using CurveManager::GetCurveIndex;
-        using CurveManager::GetCurveInterpolationMethodNum;
         using CurveManager::GetCurveMinMaxValues;
-        using CurveManager::LinearInterpolationOfTable;
-        using CurveManager::PerfCurve;
-        using CurveManager::SetSameIndeVariableValues;
         using General::RoundSigDigits;
         using General::ScanForReports;
         using General::TrimSigDigits;
@@ -1553,11 +1544,9 @@ namespace HeatBalanceManager {
         int TotFfactorConstructs; // Number of slabs-on-grade or underground floor constructions defined with F factors
         int TotCfactorConstructs; // Number of underground wall constructions defined with C factors
 
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_701("(' Material Details',10(',',A))");
-        static ObjexxFCL::gio::Fmt Format_702("(' Material:Air',2(',',A))");
 
         // FLOW:
+        std::string RoutineName("GetMaterialData: ");
 
         RegMat = inputProcessor->getNumObjectsFound("Material");
         RegRMat = inputProcessor->getNumObjectsFound("Material:NoMass");
@@ -1601,6 +1590,10 @@ namespace HeatBalanceManager {
             // Add a new fictitious insulation layer and a thermal mass layer for each F or C factor defined construction
             TotMaterials += 1 + TotFfactorConstructs + TotCfactorConstructs;
         }
+
+        // Add an internally generated Material:InfraredTransparent if there are any Construction:AirBoundary objects
+        int totAirBoundaryConstructs = inputProcessor->getNumObjectsFound("Construction:AirBoundary");
+        if (totAirBoundaryConstructs > 0) TotMaterials += 1;
 
         Material.allocate(TotMaterials); // Allocate the array Size to the number of materials
         UniqueMaterialNames.reserve(static_cast<unsigned>(TotMaterials));
@@ -1825,35 +1818,39 @@ namespace HeatBalanceManager {
             // Load the material derived type from the input data.
             Material(MaterNum).Name = MaterialNames(1);
 
-            if (MaterialNumProp >= 1) {
-                Material(MaterNum).Resistance = MaterialProps(1);
-                Material(MaterNum).ROnly = true;
-            } else {
-                Material(MaterNum).Resistance = 0.01;
-            }
-            if (MaterialNumProp >= 2) {
-                Material(MaterNum).AbsorpThermal = MaterialProps(2);
-                Material(MaterNum).AbsorpThermalInput = MaterialProps(2);
-            } else {
-                Material(MaterNum).AbsorpThermal = 0.9999;
-                Material(MaterNum).AbsorpThermalInput = 0.9999;
-            }
-            if (MaterialNumProp >= 3) {
-                Material(MaterNum).AbsorpSolar = MaterialProps(3);
-                Material(MaterNum).AbsorpSolarInput = MaterialProps(3);
-            } else {
-                Material(MaterNum).AbsorpSolar = 1.0;
-                Material(MaterNum).AbsorpSolarInput = 1.0;
-            }
-            if (MaterialNumProp >= 4) {
-                Material(MaterNum).AbsorpVisible = MaterialProps(4);
-                Material(MaterNum).AbsorpVisibleInput = MaterialProps(4);
-            } else {
-                Material(MaterNum).AbsorpVisible = 1.0;
-                Material(MaterNum).AbsorpVisibleInput = 1.0;
-            }
+            // Load data for other properties that need defaults
+            Material(MaterNum).ROnly = true;
+            Material(MaterNum).Resistance = 0.01;
+            Material(MaterNum).AbsorpThermal = 0.9999;
+            Material(MaterNum).AbsorpThermalInput = 0.9999;
+            Material(MaterNum).AbsorpSolar = 1.0;
+            Material(MaterNum).AbsorpSolarInput = 1.0;
+            Material(MaterNum).AbsorpVisible = 1.0;
+            Material(MaterNum).AbsorpVisibleInput = 1.0;
 
             NominalR(MaterNum) = Material(MaterNum).Resistance;
+        }
+
+        // Add an internally generated Material:InfraredTransparent if there are any Construction:AirBoundary objects
+        if (totAirBoundaryConstructs > 0) {
+            ++MaterNum;
+            Material(MaterNum).Group = IRTMaterial;
+            Material(MaterNum).Name = "~AirBoundary-IRTMaterial";
+            Material(MaterNum).ROnly = true;
+            Material(MaterNum).Resistance = 0.01;
+            Material(MaterNum).AbsorpThermal = 0.9999;
+            Material(MaterNum).AbsorpThermalInput = 0.9999;
+            // Air boundaries should not participate in solar or daylighting
+            Material(MaterNum).AbsorpSolar = 0.0;
+            Material(MaterNum).AbsorpSolarInput = 0.0;
+            Material(MaterNum).AbsorpVisible = 0.0;
+            Material(MaterNum).AbsorpVisibleInput = 0.0;
+            NominalR(MaterNum) = Material(MaterNum).Resistance;
+            if (GlobalNames::VerifyUniqueInterObjectName(
+                    UniqueMaterialNames, Material(MaterNum).Name, CurrentModuleObject, cAlphaFieldNames(1), ErrorsFound)) {
+                ShowContinueError("...All Material names must be unique regardless of subtype.");
+                ShowContinueError("...\"~AirBoundary-IRTMaterial\" is a reserved name used internally by Construction:AirBoundary.");
+            }
         }
 
         // Glass materials, regular input: transmittance and front/back reflectance
@@ -2090,54 +2087,41 @@ namespace HeatBalanceManager {
                         ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid name.");
                         ShowContinueError(cAlphaFieldNames(5) + " requires a valid table object name, entered input=" + MaterialNames(5));
                     } else {
-                        // TODO: Use CurveManager::CheckCurveDims and allow any 2D Curve/Table
-                        if (PerfCurve(Material(MaterNum).GlassSpecAngTransDataPtr).ObjectType != "Table:TwoIndependentVariables") {
+                        ErrorsFound |= CurveManager::CheckCurveDims(Material(MaterNum).GlassSpecAngTransDataPtr, // Curve index
+                                                                    {2},                                         // Valid dimensions
+                                                                    RoutineName,                                 // Routine name
+                                                                    CurrentModuleObject,                         // Object Type
+                                                                    Material(MaterNum).Name,                     // Object Name
+                                                                    cAlphaFieldNames(5));                        // Field Name
+
+                        GetCurveMinMaxValues(Material(MaterNum).GlassSpecAngTransDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
+                        if (minAngValue > 1.0e-6) {
                             ErrorsFound = true;
-                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid table type.");
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid minimum value of angle = " + RoundSigDigits(minAngValue, 2) + ".");
                             ShowContinueError(cAlphaFieldNames(5) +
-                                              " requires a valid Table:TwoIndependentVariables object name, entered input=" + MaterialNames(5));
-                        } else {
-                            if (GetCurveInterpolationMethodNum(Material(MaterNum).GlassSpecAngTransDataPtr) != LinearInterpolationOfTable) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid Interpolation Method.");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires LinearInterpolationOfTable, entered table name=" + MaterialNames(5));
-                            }
-                            if (!PerfCurve(Material(MaterNum).GlassSpecAngTransDataPtr).OpticalProperty) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid Table input.");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires X unit is Angle and Y unit is Wavelength, entered table name=" + MaterialNames(5));
-                            }
-                            GetCurveMinMaxValues(Material(MaterNum).GlassSpecAngTransDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
-                            if (minAngValue > 1.0e-6) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid minimum value of angle = " + RoundSigDigits(minAngValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the minumum value = 0.0 in the entered table name=" + MaterialNames(5));
-                            }
-                            if (std::abs(maxAngValue - 90.0) > 1.0e-6) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid maximum value of angle = " + RoundSigDigits(maxAngValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the maximum value = 90.0 in the entered table name=" + MaterialNames(5));
-                            }
-                            if (minLamValue < 0.1) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid minimum value of wavelength = " + RoundSigDigits(minLamValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the minumum value = 0.1 micron in the entered table name=" + MaterialNames(5));
-                            }
-                            if (maxLamValue > 4.0) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid maximum value of wavelength = " + RoundSigDigits(maxLamValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the maximum value = 4.0 microns in the entered table name=" + MaterialNames(5));
-                            }
+                                              " requires the minumum value = 0.0 in the entered table name=" + MaterialNames(5));
+                        }
+                        if (std::abs(maxAngValue - 90.0) > 1.0e-6) {
+                            ErrorsFound = true;
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid maximum value of angle = " + RoundSigDigits(maxAngValue, 2) + ".");
+                            ShowContinueError(cAlphaFieldNames(5) +
+                                              " requires the maximum value = 90.0 in the entered table name=" + MaterialNames(5));
+                        }
+                        if (minLamValue < 0.1) {
+                            ErrorsFound = true;
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid minimum value of wavelength = " + RoundSigDigits(minLamValue, 2) + ".");
+                            ShowContinueError(cAlphaFieldNames(5) +
+                                              " requires the minumum value = 0.1 micron in the entered table name=" + MaterialNames(5));
+                        }
+                        if (maxLamValue > 4.0) {
+                            ErrorsFound = true;
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid maximum value of wavelength = " + RoundSigDigits(maxLamValue, 2) + ".");
+                            ShowContinueError(cAlphaFieldNames(5) +
+                                              " requires the maximum value = 4.0 microns in the entered table name=" + MaterialNames(5));
                         }
                     }
                 }
@@ -2152,48 +2136,41 @@ namespace HeatBalanceManager {
                         ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid name.");
                         ShowContinueError(cAlphaFieldNames(6) + " requires a valid table object name, entered input=" + MaterialNames(6));
                     } else {
-                        // TODO: Use CurveManager::CheckCurveDims and allow any 2D Curve/Table
-                        if (PerfCurve(Material(MaterNum).GlassSpecAngFRefleDataPtr).ObjectType != "Table:TwoIndependentVariables") {
+                        ErrorsFound |= CurveManager::CheckCurveDims(Material(MaterNum).GlassSpecAngFRefleDataPtr, // Curve index
+                                                                    {2},                                          // Valid dimensions
+                                                                    RoutineName,                                  // Routine name
+                                                                    CurrentModuleObject,                          // Object Type
+                                                                    Material(MaterNum).Name,                      // Object Name
+                                                                    cAlphaFieldNames(6));                         // Field Name
+
+                        GetCurveMinMaxValues(Material(MaterNum).GlassSpecAngFRefleDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
+                        if (minAngValue > 1.0e-6) {
                             ErrorsFound = true;
-                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid table type.");
-                            ShowContinueError(cAlphaFieldNames(6) +
-                                              " requires a valid Table:TwoIndependentVariables object name, entered input=" + MaterialNames(6));
-                        } else {
-                            if (GetCurveInterpolationMethodNum(Material(MaterNum).GlassSpecAngFRefleDataPtr) != LinearInterpolationOfTable) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid Interpolation Method.");
-                                ShowContinueError(cAlphaFieldNames(6) +
-                                                  " requires LinearInterpolationOfTable, entered table name=" + MaterialNames(6));
-                            }
-                            GetCurveMinMaxValues(Material(MaterNum).GlassSpecAngTransDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
-                            if (minAngValue > 1.0e-6) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid minimum value of angle = " + RoundSigDigits(minAngValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the minumum value = 0.0 in the entered table name=" + MaterialNames(5));
-                            }
-                            if (std::abs(maxAngValue - 90.0) > 1.0e-6) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid maximum value of angle = " + RoundSigDigits(maxAngValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the maximum value = 90.0 in the entered table name=" + MaterialNames(5));
-                            }
-                            if (minLamValue < 0.1) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid minimum value of wavelength = " + RoundSigDigits(minLamValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the minumum value = 0.1 micron in the entered table name=" + MaterialNames(5));
-                            }
-                            if (maxLamValue > 4.0) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid maximum value of wavelength = " + RoundSigDigits(maxLamValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the maximum value = 4.0 microns in the entered table name=" + MaterialNames(5));
-                            }
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid minimum value of angle = " + RoundSigDigits(minAngValue, 2) + ".");
+                            ShowContinueError(cAlphaFieldNames(5) +
+                                              " requires the minumum value = 0.0 in the entered table name=" + MaterialNames(5));
+                        }
+                        if (std::abs(maxAngValue - 90.0) > 1.0e-6) {
+                            ErrorsFound = true;
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid maximum value of angle = " + RoundSigDigits(maxAngValue, 2) + ".");
+                            ShowContinueError(cAlphaFieldNames(5) +
+                                              " requires the maximum value = 90.0 in the entered table name=" + MaterialNames(5));
+                        }
+                        if (minLamValue < 0.1) {
+                            ErrorsFound = true;
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid minimum value of wavelength = " + RoundSigDigits(minLamValue, 2) + ".");
+                            ShowContinueError(cAlphaFieldNames(5) +
+                                              " requires the minumum value = 0.1 micron in the entered table name=" + MaterialNames(5));
+                        }
+                        if (maxLamValue > 4.0) {
+                            ErrorsFound = true;
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid maximum value of wavelength = " + RoundSigDigits(maxLamValue, 2) + ".");
+                            ShowContinueError(cAlphaFieldNames(5) +
+                                              " requires the maximum value = 4.0 microns in the entered table name=" + MaterialNames(5));
                         }
                     }
                 }
@@ -2208,54 +2185,44 @@ namespace HeatBalanceManager {
                         ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid name.");
                         ShowContinueError(cAlphaFieldNames(7) + " requires a valid table object name, entered input=" + MaterialNames(7));
                     } else {
-                        // TODO: Use CurveManager::CheckCurveDims and allow any 2D Curve/Table
-                        if (PerfCurve(Material(MaterNum).GlassSpecAngBRefleDataPtr).ObjectType != "Table:TwoIndependentVariables") {
+                        ErrorsFound |= CurveManager::CheckCurveDims(Material(MaterNum).GlassSpecAngBRefleDataPtr, // Curve index
+                                                                    {2},                                          // Valid dimensions
+                                                                    RoutineName,                                  // Routine name
+                                                                    CurrentModuleObject,                          // Object Type
+                                                                    Material(MaterNum).Name,                      // Object Name
+                                                                    cAlphaFieldNames(7));                         // Field Name
+
+                        GetCurveMinMaxValues(Material(MaterNum).GlassSpecAngBRefleDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
+                        if (minAngValue > 1.0e-6) {
                             ErrorsFound = true;
-                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid table type.");
-                            ShowContinueError(cAlphaFieldNames(7) +
-                                              " requires a valid Table:TwoIndependentVariables object name, entered input=" + MaterialNames(7));
-                        } else {
-                            if (GetCurveInterpolationMethodNum(Material(MaterNum).GlassSpecAngBRefleDataPtr) != LinearInterpolationOfTable) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) + "\", Invalid Interpolation Method.");
-                                ShowContinueError(cAlphaFieldNames(7) +
-                                                  " requires LinearInterpolationOfTable, entered table name=" + MaterialNames(7));
-                            }
-                            GetCurveMinMaxValues(Material(MaterNum).GlassSpecAngTransDataPtr, minAngValue, maxAngValue, minLamValue, maxLamValue);
-                            if (minAngValue > 1.0e-6) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid minimum value of angle = " + RoundSigDigits(minAngValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the minumum value = 0.0 in the entered table name=" + MaterialNames(5));
-                            }
-                            if (std::abs(maxAngValue - 90.0) > 1.0e-6) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid maximum value of angle = " + RoundSigDigits(maxAngValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the maximum value = 90.0 in the entered table name=" + MaterialNames(5));
-                            }
-                            if (minLamValue < 0.1) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid minimum value of wavelength = " + RoundSigDigits(minLamValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the minumum value = 0.1 micron in the entered table name=" + MaterialNames(5));
-                            }
-                            if (maxLamValue > 4.0) {
-                                ErrorsFound = true;
-                                ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
-                                                "\", Invalid maximum value of wavelength = " + RoundSigDigits(maxLamValue, 2) + ".");
-                                ShowContinueError(cAlphaFieldNames(5) +
-                                                  " requires the maximum value = 4.0 microns in the entered table name=" + MaterialNames(5));
-                            }
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid minimum value of angle = " + RoundSigDigits(minAngValue, 2) + ".");
+                            ShowContinueError(cAlphaFieldNames(5) +
+                                              " requires the minumum value = 0.0 in the entered table name=" + MaterialNames(5));
+                        }
+                        if (std::abs(maxAngValue - 90.0) > 1.0e-6) {
+                            ErrorsFound = true;
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid maximum value of angle = " + RoundSigDigits(maxAngValue, 2) + ".");
+                            ShowContinueError(cAlphaFieldNames(5) +
+                                              " requires the maximum value = 90.0 in the entered table name=" + MaterialNames(5));
+                        }
+                        if (minLamValue < 0.1) {
+                            ErrorsFound = true;
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid minimum value of wavelength = " + RoundSigDigits(minLamValue, 2) + ".");
+                            ShowContinueError(cAlphaFieldNames(5) +
+                                              " requires the minumum value = 0.1 micron in the entered table name=" + MaterialNames(5));
+                        }
+                        if (maxLamValue > 4.0) {
+                            ErrorsFound = true;
+                            ShowSevereError(CurrentModuleObject + "=\"" + MaterialNames(1) +
+                                            "\", Invalid maximum value of wavelength = " + RoundSigDigits(maxLamValue, 2) + ".");
+                            ShowContinueError(cAlphaFieldNames(5) +
+                                              " requires the maximum value = 4.0 microns in the entered table name=" + MaterialNames(5));
                         }
                     }
                 }
-                SetSameIndeVariableValues(Material(MaterNum).GlassSpecAngTransDataPtr,
-                                          Material(MaterNum).GlassSpecAngFRefleDataPtr,
-                                          Material(MaterNum).GlassSpecAngBRefleDataPtr);
             }
         }
 
@@ -2398,6 +2365,8 @@ namespace HeatBalanceManager {
             Material(MaterNum).TausThermal = MaterialProps(23);
             Material(MaterNum).EmissThermalFront = MaterialProps(24);
             Material(MaterNum).EmissThermalBack = MaterialProps(25);
+            Material(MaterNum).Resistance = MaterialProps(26);
+            if (Material(MaterNum).Resistance <= 0.0) Material(MaterNum).Resistance = 0.158; // equivalent to single pane of 1/4" inch standard glass
             // Assumes thermal emissivity is the same as thermal absorptance
             Material(MaterNum).AbsorpThermalFront = Material(MaterNum).EmissThermalFront;
             Material(MaterNum).AbsorpThermalBack = Material(MaterNum).EmissThermalBack;
@@ -3579,9 +3548,13 @@ namespace HeatBalanceManager {
                 Material(MaterNum).ReflFrontDiffDiffVis = MaterialProps(14);
                 Material(MaterNum).ReflBackDiffDiffVis = MaterialProps(15);
             }
-            if (!lNumericFieldBlanks(19) && !lNumericFieldBlanks(20) && !lNumericFieldBlanks(21)) {
+            if (!lNumericFieldBlanks(19)) {
                 Material(MaterNum).TausThermal = MaterialProps(19);
+            }
+            if (!lNumericFieldBlanks(20)) {
                 Material(MaterNum).EmissThermalFront = MaterialProps(20);
+            }
+            if (!lNumericFieldBlanks(21)) {
                 Material(MaterNum).EmissThermalBack = MaterialProps(21);
             }
             // Assumes thermal emissivity is the same as thermal absorptance
@@ -3866,27 +3839,36 @@ namespace HeatBalanceManager {
 
         if (DoReport) {
 
-            ObjexxFCL::gio::write(OutputFileInits, fmtA)
-                << "! <Material Details>,Material Name,ThermalResistance {m2-K/w},Roughness,Thickness {m},Conductivity "
-                   "{w/m-K},Density {kg/m3},Specific Heat "
-                   "{J/kg-K},Absorptance:Thermal,Absorptance:Solar,Absorptance:Visible";
+            print(outputFiles.eio,
+                  "! <Material Details>,Material Name,ThermalResistance {{m2-K/w}},Roughness,Thickness {{m}},Conductivity "
+                  "{{w/m-K}},Density {{kg/m3}},Specific Heat "
+                  "{{J/kg-K}},Absorptance:Thermal,Absorptance:Solar,Absorptance:Visible\n");
 
-            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Material:Air>,Material Name,ThermalResistance {m2-K/w}";
+            print(outputFiles.eio, "! <Material:Air>,Material Name,ThermalResistance {{m2-K/w}}\n");
+
+            // Formats
+            static constexpr auto Format_701(" Material Details,{},{:.4R},{},{:.4R},{:.3R},{:.3R},{:.3R},{:.4R},{:.4R},{:.4R}\n");
+            static constexpr auto Format_702(" Material:Air,{},{:.4R}\n");
 
             for (MaterNum = 1; MaterNum <= TotMaterials; ++MaterNum) {
 
                 {
                     auto const SELECT_CASE_var(Material(MaterNum).Group);
                     if (SELECT_CASE_var == Air) {
-                        ObjexxFCL::gio::write(OutputFileInits, Format_702)
-                            << Material(MaterNum).Name << RoundSigDigits(Material(MaterNum).Resistance, 4);
+                        print(outputFiles.eio, Format_702, Material(MaterNum).Name, Material(MaterNum).Resistance);
                     } else {
-                        ObjexxFCL::gio::write(OutputFileInits, Format_701)
-                            << Material(MaterNum).Name << RoundSigDigits(Material(MaterNum).Resistance, 4)
-                            << DisplayMaterialRoughness(Material(MaterNum).Roughness) << RoundSigDigits(Material(MaterNum).Thickness, 4)
-                            << RoundSigDigits(Material(MaterNum).Conductivity, 3) << RoundSigDigits(Material(MaterNum).Density, 3)
-                            << RoundSigDigits(Material(MaterNum).SpecHeat, 3) << RoundSigDigits(Material(MaterNum).AbsorpThermal, 4)
-                            << RoundSigDigits(Material(MaterNum).AbsorpSolar, 4) << RoundSigDigits(Material(MaterNum).AbsorpVisible, 4);
+                        print(outputFiles.eio,
+                              Format_701,
+                              Material(MaterNum).Name,
+                              Material(MaterNum).Resistance,
+                              DisplayMaterialRoughness(Material(MaterNum).Roughness),
+                              Material(MaterNum).Thickness,
+                              Material(MaterNum).Conductivity,
+                              Material(MaterNum).Density,
+                              Material(MaterNum).SpecHeat,
+                              Material(MaterNum).AbsorpThermal,
+                              Material(MaterNum).AbsorpSolar,
+                              Material(MaterNum).AbsorpVisible);
                     }
                 }
             }
@@ -4191,8 +4173,7 @@ namespace HeatBalanceManager {
         int TotWindow5Constructs; // Number of constructions from Window5 data file
         bool ConstructionFound;   // True if input window construction name is found in the
         //  Window5 data file
-        bool EOFonW5File; // True if EOF encountered reading Window5 data file
-        static bool NoRegularMaterialsUsed(true);
+        bool EOFonW5File;       // True if EOF encountered reading Window5 data file
         int MaterialLayerGroup; // window construction layer material group index
 
         int iMatGlass; // number of glass layers
@@ -4203,6 +4184,7 @@ namespace HeatBalanceManager {
         // Get the Total number of Constructions from the input
         TotRegConstructs = inputProcessor->getNumObjectsFound("Construction");
         TotSourceConstructs = inputProcessor->getNumObjectsFound("Construction:InternalSource");
+        int totAirBoundaryConstructs = inputProcessor->getNumObjectsFound("Construction:AirBoundary");
 
         TotFfactorConstructs = inputProcessor->getNumObjectsFound("Construction:FfactorGroundFloor");
         TotCfactorConstructs = inputProcessor->getNumObjectsFound("Construction:CfactorUndergroundWall");
@@ -4221,8 +4203,8 @@ namespace HeatBalanceManager {
 
         WConstructNames.allocate(TotWindow5Constructs);
 
-        TotConstructs =
-            TotRegConstructs + TotFfactorConstructs + TotCfactorConstructs + TotSourceConstructs + TotComplexFenStates + TotWinEquivLayerConstructs;
+        TotConstructs = TotRegConstructs + TotFfactorConstructs + TotCfactorConstructs + TotSourceConstructs + totAirBoundaryConstructs +
+                        TotComplexFenStates + TotWinEquivLayerConstructs;
 
         NominalRforNominalUCalculation.dimension(TotConstructs, 0.0);
         NominalU.dimension(TotConstructs, 0.0);
@@ -4344,6 +4326,14 @@ namespace HeatBalanceManager {
                 ShowSevereError("Errors found in creating the constructions defined with Ffactor or Cfactor method");
             }
             TotRegConstructs += TotFfactorConstructs + TotCfactorConstructs;
+        }
+
+        if (totAirBoundaryConstructs >= 1) {
+            CreateAirBoundaryConstructions(ConstrNum, ErrorsFound);
+            if (ErrorsFound) {
+                ShowSevereError("Errors found in creating the constructions defined with Construction:AirBoundary.");
+            }
+            TotRegConstructs += totAirBoundaryConstructs;
         }
 
         // Added BG 6/2010 for complex fenestration
@@ -4591,6 +4581,8 @@ namespace HeatBalanceManager {
         // set some (default) properties of the Construction Derived Type
         for (ConstrNum = 1; ConstrNum <= TotConstructs; ++ConstrNum) {
 
+            // For air boundaries, skip TypeIsAirBoundaryGroupedRadiant, process TypeIsAirBoundaryIRTSurface
+            if (Construct(ConstrNum).TypeIsAirBoundaryGroupedRadiant) continue;
             if (NominalRforNominalUCalculation(ConstrNum) != 0.0) {
                 NominalU(ConstrNum) = 1.0 / NominalRforNominalUCalculation(ConstrNum);
             } else {
@@ -4643,7 +4635,7 @@ namespace HeatBalanceManager {
 
         GetZoneData(ErrorsFound); // Read Zone data from input file
 
-        SetupZoneGeometry(ErrorsFound);
+        SetupZoneGeometry(OutputFiles::getSingleton(), ErrorsFound);
     }
 
     void GetZoneData(bool &ErrorsFound) // If errors found in input
@@ -4700,7 +4692,8 @@ namespace HeatBalanceManager {
         NumOfZones = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
         Zone.allocate(NumOfZones);
-
+        DataViewFactorInformation::ZoneRadiantInfo.allocate(NumOfZones);
+        DataViewFactorInformation::ZoneSolarInfo.allocate(NumOfZones);
         ZoneDaylight.allocate(NumOfZones);
 
         ZoneLoop = 0;
@@ -5112,7 +5105,7 @@ namespace HeatBalanceManager {
                 } else if (SELECT_CASE_var == "MOWITT") {
                     Zone(ZoneLoop).OutsideConvectionAlgo = MoWiTTHcOutside;
 
-                } else if ((SELECT_CASE_var == "DOE2") || (SELECT_CASE_var == "DOE-2")) {
+                } else if (SELECT_CASE_var == "DOE-2") {
                     Zone(ZoneLoop).OutsideConvectionAlgo = DOE2HcOutside;
 
                 } else if (SELECT_CASE_var == "ADAPTIVECONVECTIONALGORITHM") {
@@ -5228,7 +5221,7 @@ namespace HeatBalanceManager {
             InitEquivalentLayerWindowCalculations(); // Initialize the EQL window optical properties
             // InitGlassOpticalCalculations(); // Initialize the window optical properties
             InitWindowOpticalCalculations();
-            InitDaylightingDevices(); // Initialize any daylighting devices
+            InitDaylightingDevices(OutputFiles::getSingleton()); // Initialize any daylighting devices
             DisplayString("Initializing Solar Calculations");
             InitSolarCalculations(); // Initialize the shadowing calculations
         }
@@ -5345,10 +5338,26 @@ namespace HeatBalanceManager {
             SetOutAirNodes();
             for (ZoneNum = 1; ZoneNum <= NumOfZones; ++ZoneNum) {
                 if (Zone(ZoneNum).HasLinkedOutAirNode) {
-                    Zone(ZoneNum).OutDryBulbTemp = GetCurrentScheduleValue(Node(Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulbSchedNum);
-                    Zone(ZoneNum).OutWetBulbTemp = GetCurrentScheduleValue(Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulbSchedNum);
-                    Zone(ZoneNum).WindSpeed = GetCurrentScheduleValue(Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeedSchedNum);
-                    Zone(ZoneNum).WindDir = GetCurrentScheduleValue(Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindDirSchedNum);
+                    if (Node(Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulbSchedNum > 0) {
+                        Zone(ZoneNum).OutDryBulbTemp = GetCurrentScheduleValue(Node(Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulbSchedNum);
+                    } else {
+                        Zone(ZoneNum).OutDryBulbTemp = Node(Zone(ZoneNum).LinkedOutAirNode).OutAirDryBulb;
+                    }
+                    if (Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulbSchedNum > 0) {
+                        Zone(ZoneNum).OutWetBulbTemp = GetCurrentScheduleValue(Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulbSchedNum);
+                    } else {
+                        Zone(ZoneNum).OutWetBulbTemp = Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWetBulb;
+                    }
+                    if (Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeedSchedNum > 0) {
+                        Zone(ZoneNum).WindSpeed = GetCurrentScheduleValue(Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeedSchedNum);
+                    } else {
+                        Zone(ZoneNum).WindSpeed = Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindSpeed;
+                    }
+                    if (Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindDirSchedNum > 0) {
+                        Zone(ZoneNum).WindDir = GetCurrentScheduleValue(Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindDirSchedNum);
+                    } else {
+                        Zone(ZoneNum).WindDir = Node(Zone(ZoneNum).LinkedOutAirNode).OutAirWindDir;
+                    }
                 }
             }
         }
@@ -5516,7 +5525,7 @@ namespace HeatBalanceManager {
     // Beginning of Record Keeping subroutines for the HB Module
     // *****************************************************************************
 
-    void RecKeepHeatBalance()
+    void RecKeepHeatBalance(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5538,10 +5547,6 @@ namespace HeatBalanceManager {
         int SurfNum;
         static bool FirstWarmupWrite(true);
 
-        // Formats
-        static ObjexxFCL::gio::Fmt Format_731("(' Warmup Convergence Information, ',A,',',A,',',A,',',A,',',A)");
-        static ObjexxFCL::gio::Fmt Format_732("('! <Warmup Convergence Information>,Zone Name,Time Step,Hour of Day,Warmup Temperature Difference "
-                                              "{deltaC},','Warmup Load Difference {W}')");
 
         // FLOW:
 
@@ -5580,13 +5585,12 @@ namespace HeatBalanceManager {
                 if (ReportDetailedWarmupConvergence) { // only do this detailed thing when requested by user is on
                     // Write Warmup Convergence Information to the initialization output file
                     if (FirstWarmupWrite) {
-                        ObjexxFCL::gio::write(OutputFileInits, Format_732);
+                        static constexpr auto Format_732{"! <Warmup Convergence Information>,Zone Name,Time Step,Hour of Day,Warmup Temperature Difference {{deltaC}},Warmup Load Difference {{W}}\n"};
+                        print(outputFiles.eio, Format_732);
                         FirstWarmupWrite = false;
                     }
-
-                    ObjexxFCL::gio::write(OutputFileInits, Format_731)
-                        << Zone(ZoneNum).Name << RoundSigDigits(TimeStep) << RoundSigDigits(HourOfDay) << RoundSigDigits(WarmupTempDiff(ZoneNum), 10)
-                        << RoundSigDigits(WarmupLoadDiff(ZoneNum), 10);
+                    static constexpr auto Format_731{" Warmup Convergence Information, {},{},{},{:.10R},{:.10R}\n"};
+                    print(outputFiles.eio, Format_731, Zone(ZoneNum).Name, TimeStep, HourOfDay, WarmupTempDiff(ZoneNum), WarmupLoadDiff(ZoneNum));
                 }
             }
         }
@@ -5596,6 +5600,9 @@ namespace HeatBalanceManager {
         for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
             DataSurfaces::Surface(SurfNum).MovInsulIntPresentPrevTS = DataSurfaces::Surface(SurfNum).MovInsulIntPresent;
         }
+
+        // For non-complex windows, update a report variable so this shows up in the output as something other than zero
+        UpdateWindowFaceTempsNonBSDFWin();
     }
 
     void CheckWarmupConvergence()
@@ -5772,7 +5779,7 @@ namespace HeatBalanceManager {
         }
     }
 
-    void ReportWarmupConvergence()
+    void ReportWarmupConvergence(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5817,17 +5824,16 @@ namespace HeatBalanceManager {
         int Num; // loop control
 
         // Formats
-        static ObjexxFCL::gio::Fmt Format_730(
-            "('! <Warmup Convergence Information>,Zone Name,Environment Type/Name,','Average Warmup Temperature Difference "
-            "{deltaC},','Std Dev Warmup Temperature Difference {deltaC},Max Temperature Pass/Fail Convergence,','Min "
-            "Temperature Pass/Fail Convergence,Average Warmup Load Difference {W},Std Dev Warmup Load Difference "
-            "{W},','Heating Load Pass/Fail Convergence,Cooling Load Pass/Fail Convergence')");
-        static ObjexxFCL::gio::Fmt Format_731("(' Warmup Convergence Information',10(',',A))");
+        static constexpr auto Format_730(
+            "! <Warmup Convergence Information>,Zone Name,Environment Type/Name,Average Warmup Temperature Difference "
+            "{{deltaC}},Std Dev Warmup Temperature Difference {{deltaC}},Max Temperature Pass/Fail Convergence,Min "
+            "Temperature Pass/Fail Convergence,Average Warmup Load Difference {{W}},Std Dev Warmup Load Difference "
+            "{{W}},Heating Load Pass/Fail Convergence,Cooling Load Pass/Fail Convergence\n");
 
         if (!WarmupFlag) { // Report out average/std dev
             // Write Warmup Convervence Information to the initialization output file
             if (FirstWarmupWrite && NumOfZones > 0) {
-                ObjexxFCL::gio::write(OutputFileInits, Format_730);
+                print(outputFiles.eio, Format_730);
                 FirstWarmupWrite = false;
             }
 
@@ -5859,12 +5865,36 @@ namespace HeatBalanceManager {
                 StdDevZoneTemp = std::sqrt(sum(TempZoneRptStdDev({1, CountWarmupDayPoints})) / double(CountWarmupDayPoints));
                 StdDevZoneLoad = std::sqrt(sum(LoadZoneRptStdDev({1, CountWarmupDayPoints})) / double(CountWarmupDayPoints));
 
-                ObjexxFCL::gio::write(OutputFileInits, Format_731)
-                    << Zone(ZoneNum).Name << EnvHeader + ' ' + EnvironmentName << RoundSigDigits(AverageZoneTemp, 10)
-                    << RoundSigDigits(StdDevZoneTemp, 10) << PassFail(WarmupConvergenceValues(ZoneNum).PassFlag(1))
-                    << PassFail(WarmupConvergenceValues(ZoneNum).PassFlag(2)) << RoundSigDigits(AverageZoneLoad, 10)
-                    << RoundSigDigits(StdDevZoneLoad, 10) << PassFail(WarmupConvergenceValues(ZoneNum).PassFlag(3))
-                    << PassFail(WarmupConvergenceValues(ZoneNum).PassFlag(4));
+                static constexpr auto Format_731(" Warmup Convergence Information,{},{},{:.10R},{:.10R},{},{},{:.10R},{:.10R},{},{}\n");
+                print(outputFiles.eio,
+                      Format_731,
+                      Zone(ZoneNum).Name,
+                      EnvHeader + ' ' + EnvironmentName,
+                      AverageZoneTemp,
+                      StdDevZoneTemp,
+                      PassFail(WarmupConvergenceValues(ZoneNum).PassFlag(1)),
+                      PassFail(WarmupConvergenceValues(ZoneNum).PassFlag(2)),
+                      AverageZoneLoad,
+                      StdDevZoneLoad,
+                      PassFail(WarmupConvergenceValues(ZoneNum).PassFlag(3)),
+                      PassFail(WarmupConvergenceValues(ZoneNum).PassFlag(4)));
+            }
+        }
+    }
+
+    void UpdateWindowFaceTempsNonBSDFWin()
+    {
+
+        int SurfNum;
+
+        for (SurfNum = 1; SurfNum <= TotSurfaces; ++SurfNum) {
+            auto &thisSurface(DataSurfaces::Surface(SurfNum));
+            if (thisSurface.Class == DataSurfaces::SurfaceClass_Window) {
+                auto &thisConstruct(thisSurface.Construction);
+                if (!Construct(thisConstruct).WindowTypeBSDF) {
+                    FenLaySurfTempFront(1, SurfNum) = TH(1, 1, SurfNum);
+                    FenLaySurfTempBack(Construct(thisConstruct).TotLayers, SurfNum) = TH(2, 1, SurfNum);
+                }
             }
         }
     }
@@ -5875,7 +5905,7 @@ namespace HeatBalanceManager {
     // Beginning of Reporting subroutines for the HB Module
     // *****************************************************************************
 
-    void ReportHeatBalance()
+    void ReportHeatBalance(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5911,8 +5941,9 @@ namespace HeatBalanceManager {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static ObjexxFCL::gio::Fmt EndOfHeaderFormat("('End of Data Dictionary')");          // End of data dictionary marker
+        static constexpr auto EndOfHeaderString("End of Data Dictionary");                   // End of data dictionary marker
         static ObjexxFCL::gio::Fmt EnvironmentStampFormat("(a,',',a,3(',',f7.2),',',f7.2)"); // Format descriptor for environ stamp
-        static ObjexxFCL::gio::Fmt EndOfDataFormat("(\"End of Data\")");                     // Signifies the end of the data block in the output file
+        static constexpr auto EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -5930,12 +5961,12 @@ namespace HeatBalanceManager {
 
         if (!WarmupFlag && DoOutputReporting) {
             CalcMoreNodeInfo();
-            UpdateDataandReport(ZoneTSReporting);
+            UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
             if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                 if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
             }
 
-            UpdateTabularReports(ZoneTSReporting);
+            UpdateTabularReports(OutputProcessor::TimeStepType::TimeStepZone);
             UpdateUtilityBills();
         } else if (!KickOffSimulation && DoOutputReporting && ReportDuringWarmup) {
             if (BeginDayFlag && !PrintEnvrnStampWarmupPrinted) {
@@ -5946,27 +5977,32 @@ namespace HeatBalanceManager {
             if (PrintEnvrnStampWarmup) {
                 if (PrintEndDataDictionary && DoOutputReporting) {
                     ObjexxFCL::gio::write(OutputFileStandard, EndOfHeaderFormat);
-                    ObjexxFCL::gio::write(OutputFileMeters, EndOfHeaderFormat);
+                    print(outputFiles.mtr, "{}\n", EndOfHeaderString);
                     PrintEndDataDictionary = false;
                 }
                 if (DoOutputReporting) {
                     ObjexxFCL::gio::write(OutputFileStandard, EnvironmentStampFormat)
                         << "1"
                         << "Warmup {" + cWarmupDay + "} " + EnvironmentName << Latitude << Longitude << TimeZoneNumber << Elevation;
-                    ObjexxFCL::gio::write(OutputFileMeters, EnvironmentStampFormat)
-                        << "1"
-                        << "Warmup {" + cWarmupDay + "} " + EnvironmentName << Latitude << Longitude << TimeZoneNumber << Elevation;
+                    print(outputFiles.mtr,
+                          EnvironmentStampFormatStr,
+                          "1",
+                          "Warmup {" + cWarmupDay + "} " + EnvironmentName,
+                          Latitude,
+                          Longitude,
+                          TimeZoneNumber,
+                          Elevation);
                     PrintEnvrnStampWarmup = false;
                 }
             }
             CalcMoreNodeInfo();
-            UpdateDataandReport(ZoneTSReporting);
+            UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
             if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                 if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
             }
 
         } else if (UpdateDataDuringWarmupExternalInterface) { // added for FMI
-            UpdateDataandReport(ZoneTSReporting);
+            UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
             if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                 if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
             }
@@ -7485,6 +7521,98 @@ namespace HeatBalanceManager {
         }
     }
 
+    void CreateAirBoundaryConstructions(int &constrNum,   // Counter for Constructions
+                                        bool &errorsFound // If errors found in input
+    )
+    {
+        cCurrentModuleObject = "Construction:AirBoundary";
+        std::string RoutineName = "CreateAirBoundaryConstructions";
+        int numAirBoundaryConstructs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
+        if (numAirBoundaryConstructs > 0) {
+            auto const instances = inputProcessor->epJSON.find(cCurrentModuleObject);
+            if (instances == inputProcessor->epJSON.end()) {
+                // Cannot imagine how you would have numAirBoundaryConstructs > 0 and yet the instances is empty
+                // this would indicate a major problem in the input processor, not a problem here
+                // I'll still catch this with errorsFound but I cannot make a unit test for it so excluding the line from coverage
+                ShowSevereError(                                                                            // LCOV_EXCL_LINE
+                    cCurrentModuleObject + ": Somehow getNumObjectsFound was > 0 but epJSON.find found 0"); // LCOV_EXCL_LINE
+                errorsFound = true;                                                                         // LCOV_EXCL_LINE
+            }
+            auto &instancesValue = instances.value();
+            for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
+                auto const &fields = instance.value();
+                auto thisObjectName = instance.key();
+                inputProcessor->markObjectAsUsed(cCurrentModuleObject, thisObjectName);
+
+                if (GlobalNames::VerifyUniqueInterObjectName(UniqueConstructNames, thisObjectName, cCurrentModuleObject, "Name", errorsFound)) {
+                    continue;
+                }
+
+                ++constrNum;
+                auto &thisConstruct = Construct(constrNum);
+
+                thisConstruct.Name = UtilityRoutines::MakeUPPERCase(thisObjectName);
+                thisConstruct.TypeIsAirBoundary = true;
+                thisConstruct.IsUsedCTF = false;
+
+                // Solar and Daylighting Method
+                std::string const solarMethod = fields.at("solar_and_daylighting_method");
+                if (UtilityRoutines::SameString(solarMethod, "GroupedZones")) {
+                    thisConstruct.TypeIsAirBoundarySolar = true;
+                } else if (UtilityRoutines::SameString(solarMethod, "InteriorWindow")) {
+                    ShowWarningError(RoutineName + ": Construction:AirBoundary Solar and Daylighting Method=InteriorWindow is not functional.");
+                    ShowContinueError("Using GroupedZones method instead for Construction:AirBoundary = " + thisConstruct.Name + ".");
+                    thisConstruct.TypeIsAirBoundarySolar = true;
+                    // thisConstruct.TypeIsAirBoundaryInteriorWindow = true;
+                    // thisConstruct.TransDiff = 1.0;
+                    // thisConstruct.TransDiffVis = 1.0;
+                    // thisConstruct.TotGlassLayers = 0; // Yes, zero, so it doesn't calculate any glass absorbed solar
+                    // thisConstruct.TransSolBeamCoef = 1.0;
+                    // thisConstruct.ReflectSolDiffBack = 0.0;
+                }
+
+                // Radiant Exchange Method
+                std::string const radMethod = fields.at("radiant_exchange_method");
+                if (UtilityRoutines::SameString(radMethod, "GroupedZones")) {
+                    thisConstruct.TypeIsAirBoundaryGroupedRadiant = true;
+                } else if (UtilityRoutines::SameString(radMethod, "IRTSurface")) {
+                    thisConstruct.IsUsedCTF = true;
+                    thisConstruct.TypeIsAirBoundaryIRTSurface = true;
+                    thisConstruct.TotLayers = 1;
+                    // Find the auto-generated special IRT material for air boundaries
+                    int materNum = UtilityRoutines::FindItemInList("~AirBoundary-IRTMaterial", DataHeatBalance::Material);
+                    thisConstruct.LayerPoint(1) = materNum;
+                    NominalRforNominalUCalculation(constrNum) = NominalR(materNum);
+                }
+
+                // Air Exchange Method
+                std::string const airMethod = fields.at("air_exchange_method");
+                if (UtilityRoutines::SameString(airMethod, "SimpleMixing")) {
+                    thisConstruct.TypeIsAirBoundaryMixing = true;
+                    if (fields.find("simple_mixing_air_changes_per_hour") != fields.end()) {
+                        thisConstruct.AirBoundaryACH = fields.at("simple_mixing_air_changes_per_hour");
+                    } else {
+                        if (!inputProcessor->getDefaultValue(
+                                cCurrentModuleObject, "simple_mixing_air_changes_per_hour", thisConstruct.AirBoundaryACH)) {
+                            errorsFound = true;
+                        }
+                    }
+                    if (fields.find("simple_mixing_schedule_name") != fields.end()) {
+                        auto &schedName = fields.at("simple_mixing_schedule_name");
+                        thisConstruct.AirBoundaryMixingSched = ScheduleManager::GetScheduleIndex(UtilityRoutines::MakeUPPERCase(schedName));
+                        if (thisConstruct.AirBoundaryMixingSched == 0) {
+                            ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + thisConstruct.Name + "\", invalid (not found) " +
+                                            "Simple Mixing Schedule Name" + "=\"" + schedName.get<std::string>() + "\".");
+                            errorsFound = true;
+                        }
+                    } else {
+                        thisConstruct.AirBoundaryMixingSched = DataGlobals::ScheduleAlwaysOn;
+                    }
+                }
+            }
+        }
+    }
+
     void GetScheduledSurfaceGains(bool &ErrorsFound) // If errors found in input
     {
 
@@ -8369,14 +8497,14 @@ namespace HeatBalanceManager {
                 ShowContinueError(cNumericFieldNames(3) + " value must be >= 0 and <= 1, entered value = " + RoundSigDigits(rNumericArgs(3), 2));
             }
 
-            if ((rNumericArgs(4) < 0.0) || (rNumericArgs(4) > 1.0)) {
+            if ((rNumericArgs(4) <= 0.0) || (rNumericArgs(4) > 1.0)) {
                 ErrorsFound = true;
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(4) +
                                 " has been found.");
                 ShowContinueError(cNumericFieldNames(4) + " value must be >= 0 and <= 1, entered value = " + RoundSigDigits(rNumericArgs(4), 2));
             }
 
-            if ((rNumericArgs(5) < 0.0) || (rNumericArgs(5) > 1.0)) {
+            if ((rNumericArgs(5) <= 0.0) || (rNumericArgs(5) > 1.0)) {
                 ErrorsFound = true;
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(5) +
                                 " has been found.");

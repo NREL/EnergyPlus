@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,12 +52,12 @@
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <BranchNodeConnections.hh>
-#include <DataBranchNodeConnections.hh>
-#include <DataGlobals.hh>
-#include <DataLoopNode.hh>
-#include <General.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/DataBranchNodeConnections.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -571,15 +571,11 @@ namespace BranchNodeConnections {
             // Only non-parent node connections
             if (NodeConnections(Loop1).ObjectIsParent) continue;
             if (NodeConnections(Loop1).ConnectionType != ValidConnectionTypes(NodeConnectionType_Outlet)) continue;
-            // Skip if DIRECT AIR, because it only has one node which is an outlet, so it dupes the outlet which feeds it
-            if (NodeConnections(Loop1).ObjectType == "AIRTERMINAL:SINGLEDUCT:UNCONTROLLED") continue;
             IsValid = true;
             for (Loop2 = Loop1; Loop2 <= NumOfNodeConnections; ++Loop2) {
                 if (Loop1 == Loop2) continue;
                 if (NodeConnections(Loop2).ObjectIsParent) continue;
                 if (NodeConnections(Loop2).ConnectionType != ValidConnectionTypes(NodeConnectionType_Outlet)) continue;
-                // Skip if DIRECT AIR, because it only has one node which is an outlet, so it dupes the outlet which feeds it
-                if (NodeConnections(Loop2).ObjectType == "AIRTERMINAL:SINGLEDUCT:UNCONTROLLED") continue;
                 if (NodeConnections(Loop2).NodeNumber == NodeConnections(Loop1).NodeNumber) {
                     // Skip if one of the
                     ShowSevereError("Node Connection Error, Node=\"" + NodeConnections(Loop1).NodeName +
@@ -1197,12 +1193,12 @@ namespace BranchNodeConnections {
     void GetChildrenData(std::string const &ComponentType,
                          std::string const &ComponentName,
                          int &NumChildren,
-                         Array1S_string ChildrenCType,
-                         Array1S_string ChildrenCName,
-                         Array1S_string InletNodeName,
-                         Array1S_int InletNodeNum,
-                         Array1S_string OutletNodeName,
-                         Array1S_int OutletNodeNum,
+                         Array1D_string &ChildrenCType,
+                         Array1D_string &ChildrenCName,
+                         Array1D_string &InletNodeName,
+                         Array1D_int &InletNodeNum,
+                         Array1D_string &OutletNodeName,
+                         Array1D_int &OutletNodeNum,
                          bool &ErrorsFound)
     {
 
@@ -1418,11 +1414,15 @@ namespace BranchNodeConnections {
             if (InletNode != "UNDEFINED") {
                 if (CompSets(Count).InletNodeName != "UNDEFINED") {
                     if (InletNode != CompSets(Count).InletNodeName) continue;
+                } else {
+                    CompSets(Count).InletNodeName = InletNode;
                 }
             }
             if (OutletNode != "UNDEFINED") {
                 if (CompSets(Count).OutletNodeName != "UNDEFINED") {
                     if (OutletNode != CompSets(Count).OutletNodeName) continue;
+                } else {
+                    CompSets(Count).OutletNodeName = OutletNode;
                 }
             }
             //  See if something undefined and set here

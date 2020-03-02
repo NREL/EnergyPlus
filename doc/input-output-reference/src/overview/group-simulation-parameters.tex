@@ -154,11 +154,11 @@ Urban & Urban, Industrial, Forest \tabularnewline
 
 \paragraph{Warmup Convergence}\label{warmup-convergence}
 
-The following two fields along with the minimum and maximum number of warmup days (also in this object) define the user specified criteria for when EnergyPlus will ``converge'' at each environment (each sizing period or run period set as Yes in the \hyperref[simulationcontrol]{SimulationControl} object). EnergyPlus ``runs'' the first day of the environment (starting with a set of hard-coded initial conditions: temperatures are initialized to 23C and zone humidity ratios are initialized to the outdoor humidity ratio) until the loads/temperature convergence tolerance values are satisfied (next two fields) or until it reaches ``maximum number of warmup days''. Note that setting the convergence tolerance values too loose will cause the program to be satisfied too early and you may not get the results you expect from the actual simulation.
+The following two fields along with the minimum and maximum number of warmup days (also in this object) define the user specified criteria for when EnergyPlus will ``converge'' at each environment (each sizing period or run period set as Yes in the \hyperref[simulationcontrol]{SimulationControl} object). At the beginning of a new enviroment the building model is reinitialized so that temperatures are initialized to 23C and zone humidity ratios are initialized to the outdoor humidity ratio  (unless this initialization is suppressed using the input field called Begin Environment Reset Mode in the \hyperref[sizingperioddesignday]{SizingPerod:DesignDay} object).  EnergyPlus repeatedly ``runs'' the first day of the environment or until it reaches ``maximum number of warmup days'' or the convergence criteria are met. Note that setting the convergence tolerance values too loose will cause the program to be satisfied too early and you may not get the results you expect from the actual simulation. However too tight of a value and the program will repeat the first day too many times leading to excessive simulation run time.
 
 \paragraph{Field: Loads Convergence Tolerance Value}\label{field-loads-convergence-tolerance-value}
 
-This value represents the number at which the loads values must agree before ``convergence'' is reached. Loads tolerance value is a fraction of the load.
+This value represents the number at which the loads values must agree before ``convergence'' is reached. Loads tolerance is the change in peak zone heating and cooling loads that are predicted from previous warmup day to the current day, in units of W.
 
 \paragraph{Field: Temperature Convergence Tolerance Value}\label{field-temperature-convergence-tolerance-value}
 
@@ -178,11 +178,11 @@ Setting this value determines how EnergyPlus treats beam solar radiation and ref
 
 \textbf{MinimalShadowing}
 
-In this case, there is no exterior shadowing except from window and door reveals. All beam solar radiation entering the zone is assumed to fall on the floor, where it is absorbed according to the floor's solar absorptance. Any reflected by the floor is added to the transmitted diffuse radiation, which is assumed to be uniformly distributed on all interior surfaces. If no floor is present in the zone, the incident beam solar radiation is absorbed on all interior surfaces according to their absorptances. The zone heat balance is then applied at each surface and on the zone's air with the absorbed radiation being treated as a flux on the surface.
+In this case, there is no exterior shadowing except from window and door reveals. All beam solar radiation entering the zone is assumed to fall on the floor, where it is absorbed according to the floor's solar absorptance. Any reflected by the floor is added to the reflected diffuse radiation, which is assumed to be uniformly distributed on all interior surfaces. If no floor is present in the zone, the incident beam solar radiation is absorbed on all interior surfaces according to their absorptances. The zone heat balance is then applied at each surface and on the zone's air with the absorbed radiation being treated as a flux on the surface.
 
 \textbf{FullExterior, FullExteriorWithReflections}
 
-In this case, shadow patterns on exterior surfaces caused by detached shading, wings, overhangs, and exterior surfaces of all zones are computed. As for MinimalShadowing, shadowing by window and door reveals is also calculated. Beam solar radiation entering the zone is treated as for MinimalShadowing -- All beam solar radiation entering the zone is assumed to fall on the floor, where it is absorbed according to the floor's solar absorptance. Any reflected by the floor is added to the transmitted diffuse radiation, which is assumed to be uniformly distributed on all interior surfaces. If no floor is present in the zone, the incident beam solar radiation is absorbed on all interior surfaces according to their absorptances. The zone heat balance is then applied at each surface and on the zone's air with the absorbed radiation being treated as a flux on the surface.
+In this case, shadow patterns on exterior surfaces caused by detached shading, wings, overhangs, and exterior surfaces of all zones are computed. As for MinimalShadowing, shadowing by window and door reveals is also calculated. Beam solar radiation entering the zone is treated as for MinimalShadowing -- All beam solar radiation entering the zone is assumed to fall on the floor, where it is absorbed according to the floor's solar absorptance. Any reflected by the floor is added to the reflected diffuse radiation, which is assumed to be uniformly distributed on all interior surfaces. If no floor is present in the zone, the incident beam solar radiation is absorbed on all interior surfaces according to their absorptances. The zone heat balance is then applied at each surface and on the zone's air with the absorbed radiation being treated as a flux on the surface.
 
 \textbf{FullInteriorAndExterior, FullInteriorAndExteriorWithReflections}
 
@@ -198,9 +198,14 @@ If you use \textbf{FullInteriorAndExterior} the program will also calculate how 
 \caption{Illustration of Convex and Non-convex Zones \protect \label{fig:illustration-of-convex-and-non-convex-zones}}
 \end{figure}
 
+\textbf{Diffuse Radiation}
+
+Diffuse solar transmitted through exterior and interior windows is distributed according to the approximate view factors between the transmitting window and all other heat transfer surfaces in the zone.
+The portion of this diffuse solar that is reflected by all surfaces in the zone is subsequently redistributed uniformly (based on area and solar absorptance) to all heat transfer surfaces in the zone, along with interior reflected beam solar and shortwave radiation from lights. Refer to the section ``Solar Distribution'' in the Engineering Reference Guide for more information including equations.
+
 \textbf{Reflection calculations}
 
-Note: Using the reflection calculations can be very time-consuming. Even error-prone. As a possible alleviation, you can use the \hyperref[outputdiagnostics]{Output:Diagnostics},DoNotMirrorDetachedShading; in many cases to get past a fatal error.
+Note: Using the reflection calculations can be very time-consuming. Even error-prone. As a possible alleviation, you can use the \hyperref[outputdiagnostics]{Output:Diagnostics} ``DoNotMirrorDetachedShading'' in many cases to get past a fatal error.
 
 If using reflections, the program calculates beam and sky solar radiation that is reflected from exterior surfaces and then strikes the building. These reflecting surfaces fall into three categories:
 
@@ -249,9 +254,11 @@ As noted in the message, there will be more information in the .eio file. (Refer
 
 You may be able to increase the Maximum Number of Warmup Days and get convergence, but some anomalous buildings may still not converge. Simulation proceeds for x warmup days until ``convergence'' is reached (see the discussion under the Temperature Convergence Tolerance Value field in this object, just above).
 
+The value in this field is an overall parameter for all types of environments in the simulation.  The maximum nmber of warmup days can also be controlled separately for individual designgdays using the input field Maximum Number Warmup Days in the \hyperref[sizingperioddesignday]{SizingPerod:DesignDay} object. 
+
 \paragraph{Field: Minimum Number of Warmup Days}\label{field-minimum-number-of-warmup-days}
 
-This field specifies the minimum number of ``warmup'' days before EnergyPlus will check if it has achieved convergence and can thus start simulating the particular environment (design day, annual run) in question. Research into the minimum number of warmup days indicates that 6 warmup days is generally enough on the minimum end of the spectrum to avoid false predictions of convergence and thus to produce enough temperature and flux history to start EnergyPlus simulation. This was based on a study that used the benchmark reference buildings. It also was observed that convergence performance improved when the number of warmup days increased. As a result, the default value for the minimum warmup days has been set to 6. Users should decrease this number only if they have knowledge that a specific file converges more quickly than 6 days. Users may wish to increase the value in certain situations when, based on the output variables described in the Output Details document, it is determined that EnergyPlus has not converged. While this parameter should be less than the previous parameter, a value greater than the value entered in the field ``Maximum Number of Warmup Days'' above may be used when users wish to increase warmup days more than the previous field. In this particular case, the previous field will be automatically reset to the value entered in this field and EnergyPlus will run exactly the number of warmup days specified in this field.
+This field specifies the minimum number of ``warmup'' days before EnergyPlus will check if it has achieved convergence and can thus start simulating the particular environment (design day, annual run) in question. Although some older investigations indicated that 6 warmup days is generally enough on the minimum end of the spectrum, current thinking is that the convergence checks (controlled by convergence tolerance values above) can be relied on to determine a minimum number of warm days.  An arbitrary high minimum can lead to excessive run times for lightweight buildings that may converge quickly and not need many warmup days.  Therefore the default is reduced from 6 to just 1. A value of 6 here will replicate older behavior if field was being left blank.  Users may wish to increase the value in certain situations when, based on the output variables described in the Output Details document, it is determined that EnergyPlus has not converged. While this parameter should be less than the previous maximum parameter, a value greater than the value entered in the field ``Maximum Number of Warmup Days'' above may be used when users wish to increase warmup days more than the previous field. In this particular case, the previous field will be automatically reset to the value entered in this field and EnergyPlus will run exactly the number of warmup days specified in this field.
 
 An example from an IDF:
 
@@ -541,21 +548,57 @@ The object also allows input to disable self-shading effect from exterior surfac
 
 \subsubsection{Inputs}\label{inputs-10-019}
 
-\paragraph{Field: Calculation Method}\label{field-calculation-method-000}
+\paragraph{Field: Shading Calculation Method}
 
-This field is used to control how the solar, shading, and daylighting models are calculated with respect to the time of calculations during the simulation. The default and fastest method is selected using the keyword AverageOverDaysInFrequency. A more detailed and slower method can be selected using the keyword TimestepFrequency. The TimestepFrequency method must be used for modeling dynamic fenestration and shading surfaces.
+Select between CPU-based polygon clipping method, the GPU-based pixel counting method, or importing from external shading data.
 
-\paragraph{Field: Calculation Frequency}\label{field-calculation-frequency}
+Choices are:
+\begin{enumerate}
+    \item PolygonClipping
+    \item PixelCounting
+    \item Scheduled
+    \item Imported
+\end{enumerate}
+
+Default: PolygonClipping
+
+If \textbf{PixelCounting} is selected and GPU hardware (or GPU emulation) is not available, a warning will be displayed and EnergyPlus will revert to PolygonClipping.
+
+If \textbf{Scheduled} is chosen, the External Shading Fraction Schedule Name is required in \textbf{\hyperref[surfacePropertylocalEnvironment]{SurfaceProperty:LocalEnvironment}}. If some exterior surfaces do not have their \textbf{\hyperref[surfacePropertylocalEnvironment]{SurfaceProperty:LocalEnvironment}} objects, no shading is assigned on those exterior surfaces.
+
+If \textbf{Imported} is chosen, the \textbf{\hyperref[schedulefileshading]{Schedule:File:Shading}} object is required to define the external file that stores all shading calculation results. The results are imported altogether by reading the \textbf{\hyperref[schedulefileshading]{Schedule:File:Shading}} object during initialization. The file explicitly defines the mappings to the surfaces. If the data for a surface is not listed in the file, no shading is assigned on this surface.
+
+The sunlit fraction to overwrite accounts for the shading of both direct and sky diffuse solar radiation caused by all exterior shadowing surfaces. In this case, shadow patterns on exterior surfaces caused by detached shading, side-fins, overhangs, and exterior surfaces of all zones are overwritten. The interior shading devices, such as window shades and blinds, should be further calculated and applied after the importing.
+
+\paragraph{Field: Shading Calculation Update Frequency Method}\label{field-calculation-method-000}
+
+This field is used to control how the solar, shading, and daylighting models are calculated with respect to the time of calculations during the simulation. The default and fastest method is selected using the keyword Periodic. A more detailed and slower method can be selected using the keyword Timestep. The Timestep method must be used for modeling dynamic fenestration and shading surfaces.
+
+\paragraph{Field: Shading Calculation Update Frequency}\label{field-calculation-frequency}
 
 This numeric field will cause the shadowing calculations to be done periodically using the number in the field as the number of days in each period. This field is only used if the default method AverageOverDaysInFrequency is used in the previous field. Using this field will allow you to synchronize the shadowing calculations with changes in shading devices. Using the default of 20 days in each period is the average number of days between significant changes in solar position angles. For these shadowing calculations, an ``average'' (over the time period) of solar angles, position, equation of time are also used.
 
 \paragraph{Field: Maximum Figures in Shadow Overlap Calculations}\label{field-maximum-figures-in-shadow-overlap-calculations}
 
-This numeric field will allow you to increase the number of figures in shadow overlaps. Due to the shadowing algorithm, the number of shadows in a figure may grow quite large even with fairly reasonable looking structures. Of course, the inclusion of more allowed figures will increase calculation time. Likewise, too few figures may not result in as accurate calculations as you desire.
+This numeric field will allow you to increase the number of figures in shadow overlaps in the PolygonClipping method. Due to the shadowing algorithm, the number of shadows in a figure may grow quite large even with fairly reasonable looking structures. Of course, the inclusion of more allowed figures will increase calculation time. Likewise, too few figures may not result in as accurate calculations as you desire.
 
 \paragraph{Field: Polygon Clipping Algorithm}\label{field-polygon-clipping-algorithm}
 
-This is an advanced feature. Prior to V7, the internal polygon clipping method was a special case of the Weiler-Atherton method. Now, two options are available: \textbf{SutherlandHodgman} (default) and \textbf{ConvexWeilerAtherton}. Theoretically, Sutherland-Hodgman is a simpler algorithm but it works well in cases where receiving surfaces (of shadows) are non-convex. The Weiler-Atherton implementation is only accurate where both casting and receiving surfaces are convex. Warnings/severe errors are displayed when necessary. More details on polygon clipping are contained in the Engineering Reference.
+This is an advanced feature. Prior to V7, the internal polygon clipping method was a special case of the Weiler-Atherton method. Now, three options are available:
+
+\begin{description}
+  \item[SutherlandHodgman] A simpler algorithm but it works well in cases where receiving surfaces (of shadows) are non-convex.
+  \item[ConvexWeilerAtherton] Only accurate where both casting and receiving surfaces are convex. Warnings/severe errors are displayed when necessary.
+  \item[SlaterBarskyandSutherlandHodgman] Slater-Barsky only applies to rectangular surfaces. Polygon clipping for rectangular surfaces will be calculated using the Slater-Barsky algorithm, while the rest adopts the default Sutherl-Hodgman algorithm.
+\end{description}
+
+Default is SutherlandHodgman. More details on polygon clipping are contained in the Engineering Reference.
+
+\paragraph{Field: Pixel Counting Resolution}
+
+Number of pixels in both dimensions of the surface rendering. Higher resolution will create more accurate calculations, but can significantly increase computation time.
+
+Default: 512.
 
 \paragraph{Field: Sky Diffuse Modeling Algorithm}\label{field-sky-diffuse-modeling-algorithm}
 
@@ -564,18 +607,6 @@ Two choices are available here: SimpleSkyDiffuseModeling and DetailedSkyDiffuseM
 In general (and you should also read the previous field description), if shadowing surfaces are used with the transmittance property, the user should be careful to synchronize this calculation with the scheduled occurrence of the transmittance (if any) (or use 1, which will be the most accurate but will cause more time in the calculations).
 
 This field applies to the method called ``AverageOverDaysInFrequency.'' When the method called ``DetailedTimestepIntegration'' is used the diffuse sky modeling always uses DetailedSkyDiffuseModeling.
-
-\paragraph{Field: External Shading Calculation Method}\label{field-external-shading-calculation-method}
-
-The field has three options: \textbf{ScheduledShading}, \textbf{ImportedShading} and \textbf{InternalCalculation}. The field indicates whether the external shading is pre-calculated and imported as schedules, which overwrite the EnergyPlus calculated array of the surface sunlit fraction. If \textbf{ScheduledShading} or \textbf{ImportedShading} is chosen, all external shading calculation would be performed externally (EnergyPlus internal calculations of external shading will be turned off).
-
-If \textbf{ScheduledShading} is chosen, the shading calculation results are imported during the initialization of an EnergyPlus run with the schedule object defined by the \textbf{\hyperref[surfacePropertylocalEnvironment]{SurfaceProperty:LocalEnvironment}} object of this surface. If some exterior surfaces do not have their \textbf{\hyperref[surfacePropertylocalEnvironment]{SurfaceProperty:LocalEnvironment}} objects, no shading is assigned on those exterior surfaces.
-
-If \textbf{ImportedShading} is chosen, a \textbf{\hyperref[schedulefileshading]{Schedule:File:Shading}} object is required to define the external file that stores all shading calculation results. The results are imported altogether by reading the \textbf{\hyperref[schedulefileshading]{Schedule:File:Shading}} object during initialization. The file explicitly defines the mappings to the surfaces. If the data for a surface is not listed in the file, no shading is assigned on this surface.
-
-The default choice is \textbf{InternalCalculation}, indicating EnergyPlus will do the external shading calculations and no external results will be used.
-
-The sunlit fraction to overwrite accounts for the shading of both direct and sky diffuse solar radiation caused by all exterior shadowing surfaces. In this case, shadow patterns on exterior surfaces caused by detached shading, side-fins, overhangs, and exterior surfaces of all zones are overwritten. The interior shading devices, such as window shades and blinds, should be further calculated and applied after the importing.
 
 \paragraph{Field: Output External Shading Calculation Results}\label{field-output-external-shading-calculation results}
 This fields indicates whether or not (\textbf{Yes} or \textbf{No})to save internal shading calculation results to an external file, which can be imported back as needed. This file saves external sunlit fractions for all surfaces. If \textbf{Yes} is chosen, hourly shading fraction of all surfaces will be exported as a CSV file, naming as "output file prefix + shading" (the default name is "eplusshading.csv" if no output file prefix is defined). Each column of the CSV file lists the annually calculated shading fraction of each surface with time-step interval. It only writes data for each simulation day that shadows are calculated, e.g. once every 20 days by default. If the results are intended to be reused to be imported  back using \textbf{ImportedShading} in \textbf{Field: External Shading Calculation Method}, the Calculation Frequency should be set as one to write year-round hourly results. Design days are not included. The default choice is \textbf{No}.
@@ -593,16 +624,16 @@ This field is extensible.
 Examples of this object in IDF: (note this object must be unique in an IDF)
 
 \begin{lstlisting}
-ShadowCalculation,AverageOverDaysInFrequency,1;
+ShadowCalculation, PixelCounting, Periodic, 1;
 
-ShadowCalculation, AverageOverDaysInFrequency, 1, , SutherlandHodgman, DetailedSkyDiffuseModeling;
+ShadowCalculation, PolygonClipping, Periodic, 1, , SutherlandHodgman, , DetailedSkyDiffuseModeling;
 
-ShadowCalculation, AverageOverDaysInFrequency, , , , , ScheduledShading, YES;
+ShadowCalculation, Scheduled, Periodic, , , , , Yes;
 
-ShadowCalculation, AverageOverDaysInFrequency, , , , , , , , Yes, No, ShadingZoneGroup;
+ShadowCalculation, PolygonClipping, Periodic, , , , , , , Yes, No, ShadingZoneGroup;
 \end{lstlisting}
 
-Note that the use of ``1'' in the examples is NOT the same as using DetailedTimestepIntegration -- ``1'' causes daily calculation of the sun position variables but does not change the shadowing calculations more frequently than daily.
+Note that the use of ``1'' in the examples is NOT the same as using Timestep calculation frequency -- ``1'' causes daily calculation of the sun position variables but does not change the shadowing calculations more frequently than daily.
 
 \subsection{Output:Diagnostics}\label{outputdiagnostics}
 
@@ -790,6 +821,116 @@ SimulationControl,
   2;                       !- Maximum Number of HVAC Sizing Simulation Passes
 \end{lstlisting}
 
+\subsection{PerformancePrecisionTradeoffs}\label{performanceprecisiontradeoffs}
+
+The PerformancePrecisionTradeoffs object can be used to control tradeoffs between performance (speed) and precision for certain EnergyPlus features. This object enables users to choose to use selected options that are intended to shorten the time needed for the computer to run EnergyPlus simulations, but may tend to decrease the accuracy of results compared to methods that require longer computing time.
+
+\paragraph{Field: Use Coil Direct Solutions}\label{use-coil-direct-solutions}
+
+If Yes, an analytical or empirical solution will be used instead of iteration based method in calculations that determine how to control the coil model.  The tradeoff is between an iterative solution algorithm, see \hyperref[hvacystemrootfindingalgorithm]{HVACSystemRootFindingAlgorithm}, or a direct solution algorithm as described below.  These calculations are at the level of how the coil component model is to be controlled by the parent system object as it tries to find a part load ratio that just meets a coil load or coil leaving temperature condition.  Once the control calculations have been completed to determine the part load ratio (or speed ratio for variable speed) the full coil model is still used for the final calculation,
+
+Although this input field may eventually affect all coils, the current implementation is available for only the limited number of systems and coil configurations listed in the following table. Since a linear relationship between system output and part load ratio, or speed ratio, is expected, an analytical direct solution is applied to all coils in the listed in the table when Yes is selected. More coils will be allowed when time allows. Note that this simulation parameter is global and when used every such coil model included in the entire building model will be changed to use the direct method.
+
+The Part Load Ratio (PLR) for a single speed coil or a multiple speed coil at speed 1 is calculated using the equation below
+
+\begin{equation}
+{\left {PLR}\right} = \frac{SystemLoad-OutputOff}{OutputFull - OutputOff}
+\end{equation}
+
+where
+
+PLR = Part load ratio for a single speed coil or for a multiple speed coil at speed 1
+
+SystemLoad = Load requested to meet thermostat setpoint
+
+OutputOff = System output at PLR = 0 as coil off
+
+OutputFull = System output at PLR =1 as full output
+
+The Speed Ratio for a multiple speed coil at speed > 1 is calculated using the equation below
+
+\begin{equation}
+{\left {SpeedRatio}\right} = \frac{SystemLoad-OutputFull_{i-1}}{OutputFull_{i} - OutputFull_{i-1}}
+\end{equation}
+
+where
+
+SpeedRatio = Ratio to represent how long the higher speed runs as a fraction of the system timestep, and the lower speed runs in the rest of the system timestep
+
+SystemLoad = Load requested to meet thermostat setpoint
+
+OutputFull_{i} = System full output at the higher speed
+
+OutputFull_{i-1} = System full output at the lower speed
+
+Note: When a DX cooling coil with a constant volume fan is used, latent degradation is disabled.
+
+When coils of Coil:Cooling:DX:VariableSpeed, Coil:Heating:DX:SingleSpeed, and Coil:Heating:DX:VariableSpeed are applied, the desired outlet temperature are used to determine part load ratio or speed ratio.
+
+The Part Load Ratio (PLR) for a single speed coil or a multiple speed coil at speed 1 is calculated using the equation below
+
+\begin{equation}
+{\left {PLR}\right} = \frac{DesOutTemp - InletTemp}{OutTempFull - InletTemp}
+\end{equation}
+
+where
+
+PLR = Part load ratio for a single speed coil or for a multiple speed coil at speed 1
+
+DesOutTemp = Desired outlet temperature to meet setpoint
+
+InletTemp = Inlet temperature
+
+OutTemptFull = Outlet temperature at PLR =1 as full output
+
+The Speed Ratio for a multiple speed coil at speed > 1 is calculated using the equation below
+
+\begin{equation}
+{\left {SpeedRatio}\right} = \frac{DesOutTemp - OutTempFull_{i-1}}{OutTempFull_{i} - OutTempFull_{i-1}}
+\end{equation}
+
+where
+
+SpeedRatio = Ratio to represent how long the higher speed runs as a fraction of the system timestep, and the lower speed runs in the rest of the system timestep
+
+DesOutTemp = Desired outlet temperature to meet setpoint
+
+OutTempFull_{i} = Outlet temperature of full output at the higher speed
+
+OutTempFull_{i-1} = Outlet temperature of full output at the lower speed
+
+% table 2
+\begin{longtable}[c]{p{4in}p{2.5in}}
+\caption{A list of air systems and associated coils allowed for direct solutions\label{table:a_list_of_air_systems_and_associated_coils_allowed_for_direct solutions}} \tabularnewline
+\toprule
+System & Allowed Coil \tabularnewline
+\midrule
+\endfirsthead
+
+AirLoopHVAC:UnitarySystem & Coil:Cooling:DX:SingleSpeed, Coil:Heating:DX:SingleSpeed, Coil:Heating:Electric, Coil:Heating:Fuel,  Coil:Heating:DX:MultiSpeed\tabularnewline
+AirLoopHVAC:UnitaryHeatPump:AirToAir:MultiSpeed & Coil:Heating:DX:MultiSpeed, Coil:Heating:Electric:MultiStage, Coil:Heating:Gas:MultiStage, Coil:Cooling:DX:MultiSpeed\tabularnewline
+CoilSystem:Cooling:DX & Coil:Cooling:DX:SingleSpeed, Coil:Cooling:DX:VariableSpeed \tabularnewline
+CoilSystem:Heating:DX & Coil:Heating:DX:SingleSpeed, Coil:Heating:DX:VariableSpeed \tabularnewline
+
+\bottomrule
+\end{longtable}
+
+Note: The choice of Load in the Control Type of the AirLoopHVAC:UnitarySystem object is required for all coils listed in the above table.
+
+\paragraph{Field: Zone Radiant Exchange Algorithm}\label{zone-radiant-exchange-algorithm}
+
+Allowed choices are: ScriptF (default) and CarrollMRT. ScriptF uses view factors among all surfaces in a zone and calculates radiant heat transfer from each surface in the zone to each other surface in the zone based on their respective temperatures and emissivities. The CarrollMRT algorithm calculates radiant heat transfer between surfaces which exchange heat through a central, mean radiant temperature (MRT) node.
+
+Although, defined view factors cannot be used with CarrollMRT, the algorithm approximates ``view factors'' based on relative areas of the surfaces in a similar way to how EnergyPlus determines its default view factors. One exception is that with CarrollMRT, every surface can ``view'' every other surface in the zone regardless of orientation. For enclosed prism shapes, this approximation is very accurate.
+
+An IDF example:
+
+\begin{lstlisting}
+PerformancePrecisionTradeoffs,
+  Yes,                      !- Use Coil Direct Solutions
+  CarrollMRT;               !- Zone Radiant Exchange Algorithm
+\end{lstlisting}
+
 \subsection{HVACSystemRootFindingAlgorithm}\label{hvacystemrootfindingalgorithm}
 
 The HVACSystemRootFindingAlgorithm object provides a way to select what type of solution
@@ -836,11 +977,11 @@ A fuel type should be specified for the meter. All assignments to this meter wil
 \item
   NaturalGas
 \item
-  PropaneGas
+  Propane
 \item
-  FuelOil\#1
+  FuelOilNo1
 \item
-  FuelOil\#2
+  FuelOilNo2
 \item
   Coal
 \item
@@ -891,11 +1032,11 @@ A fuel type should be specified for the meter. All assignments to this meter wil
 \item
   NaturalGas
 \item
-  PropaneGas
+  Propane
 \item
-  FuelOil\#1
+  FuelOilNo1
 \item
-  FuelOil\#2
+  FuelOilNo2
 \item
   Coal
 \item

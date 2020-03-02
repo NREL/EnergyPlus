@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,8 +57,8 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include <DataAirSystems.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -112,6 +112,9 @@ public:                                  // data
                                  //  2=SupplyAirFlowRate, 3=FlowPerFloorArea, 4=FractionOfAutosizedCoolingAirflow,
                                  //  5=FractionOfAutosizedHeatingAirflow, 6=FlowPerCoolingCapacity, 7=FlowPerHeatingCapacity
     std::string coilSizingMethodAirFlowName;
+
+    bool isCoilSizingForTotalLoad; // Type of peak to size (cooling) coils on: True is TotalCoolingLoad, False is sensible
+    std::string coilPeakLoadTypeToSizeOnName;
 
     // Real64 coilDesCapUser; // coil capacity original input value [W]; -999 means field not applicable to this coil
     bool capIsAutosized;        // true if the coil's capacity was autosized

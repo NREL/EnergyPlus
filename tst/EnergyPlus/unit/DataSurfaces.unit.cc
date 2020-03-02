@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -59,6 +59,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/Vectors.hh>
 
@@ -158,11 +159,11 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     ErrorsFound = false;
-    GetProjectControlData(ErrorsFound); // read project control data
+    GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);          // expect no errors
 
     ErrorsFound = false;
-    GetMaterialData(ErrorsFound); // read material data
+    GetMaterialData(OutputFiles::getSingleton(), ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
     ErrorsFound = false;
@@ -182,7 +183,7 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SetSurfaceOutBulbTempAtTest)
     SinBldgRelNorth = 0.0;
 
     ErrorsFound = false;
-    GetSurfaceData(ErrorsFound); // setup zone geometry and get zone data
+    GetSurfaceData(OutputFiles::getSingleton(), ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
     SetSurfaceOutBulbTempAt();

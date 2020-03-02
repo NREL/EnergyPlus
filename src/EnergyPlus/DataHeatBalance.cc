@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,12 +53,12 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <DataEnvironment.hh>
-#include <DataHeatBalance.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSurfaces.hh>
-#include <General.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -207,7 +207,7 @@ namespace DataHeatBalance {
 
     // Parameters for WarmupDays
     int const DefaultMaxNumberOfWarmupDays(25); // Default maximum number of warmup days allowed
-    int const DefaultMinNumberOfWarmupDays(6);  // Default minimum number of warmup days allowed
+    int const DefaultMinNumberOfWarmupDays(1);  // Default minimum number of warmup days allowed
 
     // Parameters for Sky Radiance Distribution
     int const Isotropic(0);
@@ -485,23 +485,27 @@ namespace DataHeatBalance {
     Real64 TempConvergTol(0.0);         // Tolerance value for Temperature Convergence
     int DefaultInsideConvectionAlgo(1); // 1 = simple (ASHRAE); 2 = detailed (ASHRAE); 3 = ceiling diffuser;
     // 4 = trombe wall
-    int DefaultOutsideConvectionAlgo(1);         // 1 = simple (ASHRAE); 2 = detailed; etc (BLAST, TARP, MOWITT, DOE-2)
-    int SolarDistribution(0);                    // Solar Distribution Algorithm
-    int InsideSurfIterations(0);                 // Counts inside surface iterations
-    int OverallHeatTransferSolutionAlgo(DataSurfaces::HeatTransferModel_CTF); // Global HeatBalanceAlgorithm setting 
-   // Flags for HeatTransfer Algorithms Used
-    bool AnyCTF(false);    // CTF used
-    bool AnyEMPD(false);   // EMPD used
-    bool AnyCondFD(false); // CondFD used
-    bool AnyHAMT(false);   // HAMT used
-    bool AnyKiva(false);   // Kiva used
+    int DefaultOutsideConvectionAlgo(1);                                      // 1 = simple (ASHRAE); 2 = detailed; etc (BLAST, TARP, MOWITT, DOE-2)
+    int SolarDistribution(0);                                                 // Solar Distribution Algorithm
+    int InsideSurfIterations(0);                                              // Counts inside surface iterations
+    int OverallHeatTransferSolutionAlgo(DataSurfaces::HeatTransferModel_CTF); // Global HeatBalanceAlgorithm setting
+
+    // Flags for HeatTransfer Algorithms Used
+    bool AnyCTF(false);                     // CTF used
+    bool AnyEMPD(false);                    // EMPD used
+    bool AnyCondFD(false);                  // CondFD used
+    bool AnyHAMT(false);                    // HAMT used
+    bool AnyKiva(false);                    // Kiva used
+    bool AnyAirBoundary(false);             // Construction:AirBoundary used
+    bool AnyAirBoundaryGroupedSolar(false); // Construction:AirBoundary with GroupedZones for solar used somewhere
+
     int MaxNumberOfWarmupDays(25);      // Maximum number of warmup days allowed
-    int MinNumberOfWarmupDays(6);       // Minimum number of warmup days allowed
+    int MinNumberOfWarmupDays(1);       // Minimum number of warmup days allowed
     Real64 CondFDRelaxFactor(1.0);      // Relaxation factor, for looping across all the surfaces.
     Real64 CondFDRelaxFactorInput(1.0); // Relaxation factor, for looping across all the surfaces, user input value
-    // LOGICAL ::  CondFDVariableProperties = .FALSE. ! if true, then variable conductivity or enthalpy in Cond FD.
 
     int ZoneAirSolutionAlgo(Use3rdOrder);      // ThirdOrderBackwardDifference, AnalyticalSolution, and EulerMethod
+    bool OverrideZoneAirSolutionAlgo(false);   // Do not override the zone air solution algorithm in PerformancePrecisionTradeoffs
     Real64 BuildingRotationAppendixG(0.0);     // Building Rotation for Appendix G
     Real64 ZoneTotalExfiltrationHeatLoss(0.0); // Building total heat emission through zone exfiltration;
     Real64 ZoneTotalExhaustHeatLoss(0.0);      // Building total heat emission through zone air exhaust;
@@ -581,6 +585,7 @@ namespace DataHeatBalance {
 
     bool NoFfactorConstructionsUsed(true);
     bool NoCfactorConstructionsUsed(true);
+    bool NoRegularMaterialsUsed(true);
 
     int NumRefrigeratedRacks(0); // Total number of refrigerated case compressor racks in input
     int NumRefrigSystems(0);     // Total number of detailed refrigeration systems in input
@@ -724,13 +729,13 @@ namespace DataHeatBalance {
     Array1D<Real64> MultHorizonZenith; // Contribution to eff sky view factor from horizon or zenith brightening
 
     Array1D<Real64> QS; // Zone short-wave flux density; used to calculate short-wave
-    //     radiation absorbed on inside surfaces of zone
+    //     radiation absorbed on inside surfaces of zone or enclosure
     Array1D<Real64> QSLights; // Like QS, but Lights short-wave only.
 
     Array1D<Real64> QSDifSol;                // Like QS, but diffuse solar short-wave only.
     Array1D<Real64> ITABSF;                  // FRACTION OF THERMAL FLUX ABSORBED (PER UNIT AREA)
     Array1D<Real64> TMULT;                   // TMULT  - MULTIPLIER TO COMPUTE 'ITABSF'
-    Array1D<Real64> QL;                      // TOTAL THERMAL RADIATION ADDED TO ZONE
+    Array1D<Real64> QL;                      // TOTAL THERMAL RADIATION ADDED TO ZONE or Radiant Enclosure (group of zones)
     Array2D<Real64> SunlitFracHR;            // Hourly fraction of heat transfer surface that is sunlit
     Array2D<Real64> CosIncAngHR;             // Hourly cosine of beam radiation incidence angle on surface
     Array3D<Real64> SunlitFrac;              // TimeStep fraction of heat transfer surface that is sunlit
@@ -776,6 +781,12 @@ namespace DataHeatBalance {
 
     Real64 ZeroPointerVal(0.0);
 
+    int NumAirBoundaryMixing(0);                   // Number of air boundary simple mixing objects needed
+    std::vector<int> AirBoundaryMixingZone1(0);    // Air boundary simple mixing zone 1
+    std::vector<int> AirBoundaryMixingZone2(0);    // Air boundary simple mixing zone 2
+    std::vector<int> AirBoundaryMixingSched(0);    // Air boundary simple mixing schedule index
+    std::vector<Real64> AirBoundaryMixingVol(0.0); // Air boundary simple mixing volume flow rate [m3/s]
+
     // SUBROUTINE SPECIFICATIONS FOR MODULE DataHeatBalance:
 
     // Object Data
@@ -816,6 +827,7 @@ namespace DataHeatBalance {
     Array1D<HeatReclaimRefrigCondenserData> HeatReclaimRefrigCondenser;
     Array1D<HeatReclaimDXCoilData> HeatReclaimDXCoil;
     Array1D<HeatReclaimDXCoilData> HeatReclaimVS_DXCoil;
+    Array1D<HeatReclaimHPCoilData> HeatReclaimSimple_WAHPCoil;
     Array1D<AirReportVars> ZnAirRpt;
     Array1D<TCGlazingsType> TCGlazings;
     Array1D<ZoneEquipData> ZoneCO2Gen;
@@ -858,8 +870,10 @@ namespace DataHeatBalance {
         AnyCondFD = false;
         AnyHAMT = false;
         AnyKiva = false;
+        AnyAirBoundary = false;
+        AnyAirBoundaryGroupedSolar = false;
         MaxNumberOfWarmupDays = 25;
-        MinNumberOfWarmupDays = 6;
+        MinNumberOfWarmupDays = 1;
         CondFDRelaxFactor = 1.0;
         CondFDRelaxFactorInput = 1.0;
         ZoneAirSolutionAlgo = Use3rdOrder;
@@ -933,6 +947,7 @@ namespace DataHeatBalance {
         AdaptiveComfortRequested_ASH55 = false;
         NoFfactorConstructionsUsed = true;
         NoCfactorConstructionsUsed = true;
+        NoRegularMaterialsUsed = true;
         NumRefrigeratedRacks = 0;
         NumRefrigSystems = 0;
         NumRefrigCondensers = 0;
@@ -1083,6 +1098,7 @@ namespace DataHeatBalance {
         HeatReclaimRefrigCondenser.deallocate();
         HeatReclaimDXCoil.deallocate();
         HeatReclaimVS_DXCoil.deallocate();
+        HeatReclaimSimple_WAHPCoil.deallocate();
         ZnAirRpt.deallocate();
         TCGlazings.deallocate();
         ZoneCO2Gen.deallocate();
@@ -1219,34 +1235,10 @@ namespace DataHeatBalance {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Linda Lawrie
         //       DATE WRITTEN   December 2006
-        //       MODIFIED       na
-        //       RE-ENGINEERED  na
 
-        // PURPOSE OF THIS SUBROUTINE:
         // This routine checks some properties of entered constructions; sets some properties; and sets
         // an error flag for certain error conditions.
 
-        // METHODOLOGY EMPLOYED:
-        // na
-
-        // REFERENCES:
-        // na
-
-        // Using/Aliasing
-
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-
-        // SUBROUTINE PARAMETER DEFINITIONS:
-        // na
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
-
-        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int InsideLayer;             // Inside Layer of Construct; for window construct, layer no. of inside glass
         int MaterNum;                // Counters to keep track of the material number for a layer
         int OutsideMaterNum;         // Material "number" of the Outside layer
@@ -1269,9 +1261,9 @@ namespace DataHeatBalance {
         int GlassLayNum;             // Glass layer number
 
         TotLayers = Construct(ConstrNum).TotLayers;
+        if (TotLayers == 0) return; // error condition, hopefully caught elsewhere
         InsideLayer = TotLayers;
         if (Construct(ConstrNum).LayerPoint(InsideLayer) <= 0) return; // Error condition
-        if (TotLayers == 0) return;                                    // error condition, hopefully caught elsewhere
 
         //   window screen is not allowed on inside layer
 

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,31 +55,31 @@
 
 // EnergyPlus Headers
 #include <AirflowNetwork/Elements.hpp>
-#include <DataContaminantBalance.hh>
-#include <DataDefineEquip.hh>
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSurfaces.hh>
-#include <DataZoneControls.hh>
-#include <DataZoneEquipment.hh>
-#include <General.hh>
-#include <HeatBalanceInternalHeatGains.hh>
-#include <HybridModel.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <InternalHeatGains.hh>
-#include <OutputProcessor.hh>
-#include <Psychrometrics.hh>
-#include <ScheduleManager.hh>
-#include <UtilityRoutines.hh>
-#include <ZoneContaminantPredictorCorrector.hh>
-#include <ZonePlenum.hh>
-#include <ZoneTempPredictorCorrector.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataDefineEquip.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataZoneControls.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
+#include <EnergyPlus/HybridModel.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/ZoneContaminantPredictorCorrector.hh>
+#include <EnergyPlus/ZonePlenum.hh>
+#include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
 namespace EnergyPlus {
 namespace ZoneContaminantPredictorCorrector {
@@ -2374,7 +2374,7 @@ namespace ZoneContaminantPredictorCorrector {
 
                 zone_M_CO2 = Zone(ZoneNum).ZoneMeasuredCO2Concentration;
                 delta_CO2 = (Zone(ZoneNum).ZoneMeasuredCO2Concentration - OutdoorCO2) / 1000;
-                CpAir = PsyCpAirFnWTdb(OutHumRat, Zone(ZoneNum).OutDryBulbTemp);
+                CpAir = PsyCpAirFnW(OutHumRat);
                 AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Zone(ZoneNum).OutDryBulbTemp, OutHumRat, RoutineNameInfiltration);
 
                 if (Zone(ZoneNum).ZoneMeasuredCO2Concentration == OutdoorCO2) {

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,20 +52,20 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalSurface.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataSurfaces.hh>
-#include <General.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <OutputProcessor.hh>
-#include <Psychrometrics.hh>
-#include <ScheduleManager.hh>
-#include <ThermalChimney.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/ThermalChimney.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -642,7 +642,7 @@ namespace ThermalChimney {
             }
 
             AirDensityThermalChim = PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum));
-            AirSpecHeatThermalChim = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), MAT(ZoneNum));
+            AirSpecHeatThermalChim = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
             AirOutletCrossAreaTC = ThermalChimneySys(Loop).AirOutletCrossArea;
             DischargeCoeffTC = ThermalChimneySys(Loop).DischargeCoeff;
 
@@ -761,7 +761,7 @@ namespace ThermalChimney {
             for (TCZoneNum = 1; TCZoneNum <= ThermalChimneySys(Loop).TotZoneToDistrib; ++TCZoneNum) {
                 TCZoneNumCounter = ThermalChimneySys(Loop).ZonePtr(TCZoneNum);
                 AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, MAT(TCZoneNumCounter), ZoneAirHumRat(TCZoneNumCounter));
-                CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(TCZoneNumCounter), MAT(TCZoneNumCounter));
+                CpAir = PsyCpAirFnW(ZoneAirHumRat(TCZoneNumCounter));
                 MCPThermChim(TCZoneNumCounter) = TCVolumeAirFlowRate * AirDensity * CpAir * ThermalChimneySys(Loop).RatioThermChimAirFlow(TCZoneNum);
                 if (MCPThermChim(TCZoneNumCounter) <= 0.0) {
                     MCPThermChim(TCZoneNumCounter) = 0.0;
@@ -850,7 +850,7 @@ namespace ThermalChimney {
 
             // Break the infiltration load into heat gain and loss components.
             AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ZoneLoop), ZoneAirHumRat(ZoneLoop));
-            CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneLoop), MAT(ZoneLoop));
+            CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneLoop));
             ZnRptThermChim(ZoneLoop).ThermalChimneyVolume = (MCPThermChim(ZoneLoop) / CpAir / AirDensity) * TSMult;
             ZnRptThermChim(ZoneLoop).ThermalChimneyMass = (MCPThermChim(ZoneLoop) / CpAir) * TSMult;
 

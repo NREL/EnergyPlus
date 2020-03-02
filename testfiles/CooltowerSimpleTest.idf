@@ -73,7 +73,7 @@
 !   Environmental Emissions:        None
 !   Utility Tariffs:                None
 
-  Version,9.2;
+  Version,9.3;
 
   Building,
     BUILDING #1,             !- Name
@@ -367,7 +367,9 @@
   GlobalGeometryRules,
     UpperLeftCorner,         !- Starting Vertex Position
     CounterClockWise,        !- Vertex Entry Direction
-    World;                   !- Coordinate System
+    World,                   !- Coordinate System
+    ,                        !- Daylighting Reference Point Coordinate System
+    World;                   !- Rectangular Surface Coordinate System
 
   BuildingSurface:Detailed,
     Zn001:Wall001,           !- Name

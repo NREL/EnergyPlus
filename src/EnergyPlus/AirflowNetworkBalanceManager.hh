@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,9 +53,10 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class OutputFiles;
 
 namespace AirflowNetworkBalanceManager {
 
@@ -130,10 +131,6 @@ namespace AirflowNetworkBalanceManager {
     struct AirflowNetworkReportVars
     {
         // Members
-        Real64 MeanAirTemp;        // Mean Air Temperature {C}
-        Real64 OperativeTemp;      // Average of Mean Air Temperature {C} and Mean Radiant Temperature {C}
-        Real64 InfilHeatGain;      // Heat Gain {W} due to infiltration
-        Real64 InfilHeatLoss;      // Heat Loss {W} due to infiltration
         Real64 InfilVolume;        // Volume of Air {m3} due to infiltration
         Real64 InfilMass;          // Mass of Air {kg} due to infiltration
         Real64 InfilAirChangeRate; // Infiltration air change rate {ach}
@@ -154,7 +151,7 @@ namespace AirflowNetworkBalanceManager {
 
         // Default Constructor
         AirflowNetworkReportVars()
-            : MeanAirTemp(0.0), OperativeTemp(0.0), InfilHeatGain(0.0), InfilHeatLoss(0.0), InfilVolume(0.0), InfilMass(0.0), InfilAirChangeRate(0.0),
+            : InfilVolume(0.0), InfilMass(0.0), InfilAirChangeRate(0.0),
               VentilHeatLoss(0.0), VentilHeatGain(0.0), VentilVolume(0.0), VentilMass(0.0), VentilFanElec(0.0), VentilAirTemp(0.0), MixVolume(0.0),
               MixMass(0.0), ExfilSensiLoss(0.0), ExfilLatentLoss(0.0), ExfilTotalLoss(0.0), ExfilMass(0.0), InletMass(0.0), OutletMass(0.0)
         {
@@ -173,7 +170,7 @@ namespace AirflowNetworkBalanceManager {
                                      Optional_bool ResimulateAirZone = _         // True when solution technique on third iteration
     );
 
-    void GetAirflowNetworkInput();
+    void GetAirflowNetworkInput(EnergyPlus::OutputFiles &outputFiles);
 
     void InitAirflowNetwork();
 
@@ -227,6 +224,8 @@ namespace AirflowNetworkBalanceManager {
     );
 
     void ValidateDistributionSystem();
+
+    void ValidateFanFlowRate(); // Catch a fan flow rate from EPlus input file and add a flag for VAV terminal damper
 
     void ValidateExhaustFanInput();
 

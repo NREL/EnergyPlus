@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,36 +52,36 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <BranchNodeConnections.hh>
-#include <CurveManager.hh>
-#include <DXCoils.hh>
-#include <DataAirSystems.hh>
-#include <DataContaminantBalance.hh>
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalance.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSizing.hh>
-#include <DataWater.hh>
-#include <Fans.hh>
-#include <FluidProperties.hh>
-#include <General.hh>
-#include <GeneralRoutines.hh>
-#include <GlobalNames.hh>
-#include <HVACFan.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <OutAirNodeManager.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportPredefined.hh>
-#include <PlantUtilities.hh>
-#include <Psychrometrics.hh>
-#include <ReportCoilSelection.hh>
-#include <ReportSizingManager.hh>
-#include <ScheduleManager.hh>
-#include <UnitarySystem.hh>
-#include <VariableSpeedCoils.hh>
-#include <WaterManager.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataWater.hh>
+#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/HVACFan.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ReportCoilSelection.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UnitarySystem.hh>
+#include <EnergyPlus/VariableSpeedCoils.hh>
+#include <EnergyPlus/WaterManager.hh>
 
 namespace EnergyPlus {
 
@@ -4072,7 +4072,7 @@ namespace VariableSpeedCoils {
                     // design fan heat will be added to coil load
                     Real64 FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(DataFanEnumType, DataFanIndex, VolFlowRate);
                     // inlet/outlet temp is adjusted after enthalpy is calculcated so fan heat is not double counted
-                    Real64 CpAir = PsyCpAirFnWTdb(MixHumRat, MixTemp);
+                    Real64 CpAir = PsyCpAirFnW(MixHumRat);
                     if (PrimaryAirSystem(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::BlowThru) {
                         MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
                     } else if (PrimaryAirSystem(CurSysNum).supFanLocation == DataAirSystems::fanPlacement::DrawThru) {
@@ -4142,7 +4142,7 @@ namespace VariableSpeedCoils {
                     // design fan heat will be added to coil load
                     Real64 FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(DataFanEnumType, DataFanIndex, VolFlowRate);
                     // inlet/outlet temp is adjusted after enthalpy is calculcated so fan heat is not double counted
-                    Real64 CpAir = PsyCpAirFnWTdb(MixHumRat, MixTemp);
+                    Real64 CpAir = PsyCpAirFnW(MixHumRat);
 
                     if (DataSizing::DataFanPlacement == DataSizing::zoneFanPlacement::zoneBlowThru) {
                         MixTemp += FanCoolLoad / (CpAir * rhoair * VolFlowRate);
@@ -5042,7 +5042,7 @@ namespace VariableSpeedCoils {
         using DataPlant::PlantLoop;
         using DataWater::WaterStorage;
         using FluidProperties::GetSpecificHeatGlycol;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::PsyTdbFnHW;
@@ -5135,7 +5135,7 @@ namespace VariableSpeedCoils {
             LoadSideInletDBTemp_Init = 26.7;
             LoadSideInletHumRat_Init = 0.0111;
             LoadSideInletEnth_Init = PsyHFnTdbW(LoadSideInletDBTemp_Init, LoadSideInletHumRat_Init);
-            CpAir_Init = PsyCpAirFnWTdb(LoadSideInletHumRat_Init, LoadSideInletDBTemp_Init);
+            CpAir_Init = PsyCpAirFnW(LoadSideInletHumRat_Init);
             firstTime = false;
         }
         LoadSideInletWBTemp_Init = PsyTwbFnTdbWPb(LoadSideInletDBTemp_Init, LoadSideInletHumRat_Init, OutBaroPress, RoutineName);
@@ -5203,7 +5203,7 @@ namespace VariableSpeedCoils {
             SourceSideMassFlowRate = CondAirMassFlow;
             SourceSideInletTemp = CondInletTemp;
             SourceSideInletEnth = PsyHFnTdbW(CondInletTemp, CondInletHumRat);
-            CpSource = PsyCpAirFnWTdb(CondInletHumRat, CondInletTemp);
+            CpSource = PsyCpAirFnW(CondInletHumRat);
             VarSpeedCoil(DXCoilNum).CondInletTemp = CondInletTemp;
 
             // If used in a heat pump, the value of MaxOAT in the heating coil overrides that in the cooling coil (in GetInput)
@@ -5267,7 +5267,7 @@ namespace VariableSpeedCoils {
         LoadSideInletHumRat_Unit = VarSpeedCoil(DXCoilNum).InletAirHumRat;
         LoadSideInletWBTemp_Unit = PsyTwbFnTdbWPb(LoadSideInletDBTemp_Unit, LoadSideInletHumRat_Unit, OutBaroPress, RoutineName);
         LoadSideInletEnth_Unit = VarSpeedCoil(DXCoilNum).InletAirEnthalpy;
-        CpAir_Unit = PsyCpAirFnWTdb(LoadSideInletHumRat_Unit, LoadSideInletDBTemp_Unit);
+        CpAir_Unit = PsyCpAirFnW(LoadSideInletHumRat_Unit);
 
         RuntimeFrac = 1.0;
         OnOffFanPartLoadFraction = 1.0;
@@ -5542,8 +5542,8 @@ namespace VariableSpeedCoils {
             if (VarSpeedCoil(DXCoilNum).CondenserType == EvapCooled) {
                 //******************
                 //             WATER CONSUMPTION IN m3 OF WATER FOR DIRECT
-                //             H2O [m3/sec] = Delta W[KgH2O/Kg air]*Mass Flow Air[Kg air]
-                //                                /RhoWater [kg H2O/m3 H2O]
+                //             H2O [m3/s] = Delta W[kgWater/kgDryAir]*Mass Flow Air[kgDryAir/s]
+                //                                /RhoWater [kgWater/m3]
                 //******************
                 RhoEvapCondWater = RhoH2O(OutdoorDryBulb);
                 VarSpeedCoil(DXCoilNum).EvapWaterConsumpRate = (CondInletHumRat - OutdoorHumRat) * CondAirMassFlow / RhoEvapCondWater * RuntimeFrac;
@@ -6113,7 +6113,7 @@ namespace VariableSpeedCoils {
 
         // calculate coil outlet state variables
         LoadSideOutletEnth = LoadSideInletEnth - QLoadTotal / LoadSideMassFlowRate;
-        CpAir = PsyCpAirFnWTdb(LoadSideInletHumRat, LoadSideInletDBTemp);
+        CpAir = PsyCpAirFnW(LoadSideInletHumRat);
         LoadSideOutletDBTemp = LoadSideInletDBTemp - QSensible / (LoadSideMassFlowRate * CpAir);
 
         MaxHumRat = PsyWFnTdbRhPb(LoadSideOutletDBTemp, 0.9999, VarSpeedCoil(DXCoilNum).InletAirPressure, RoutineName);
@@ -6250,7 +6250,7 @@ namespace VariableSpeedCoils {
         using DataHVACGlobals::TimeStepSys;
         using DataPlant::PlantLoop;
         using FluidProperties::GetSpecificHeatGlycol;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::PsyTdbFnHW;
@@ -6325,7 +6325,7 @@ namespace VariableSpeedCoils {
 
         LoadSideInletWBTemp = PsyTwbFnTdbWPb(LoadSideInletDBTemp, LoadSideInletHumRat, OutBaroPress, RoutineName);
         LoadSideInletEnth = VarSpeedCoil(DXCoilNum).InletAirEnthalpy;
-        CpAir = PsyCpAirFnWTdb(LoadSideInletHumRat, LoadSideInletDBTemp);
+        CpAir = PsyCpAirFnW(LoadSideInletHumRat);
 
         if (VarSpeedCoil(DXCoilNum).VSCoilTypeOfNum == Coil_HeatingAirToAirVariableSpeed) {
             // Get condenser outdoor node info from DX Heating Coil
@@ -6343,7 +6343,7 @@ namespace VariableSpeedCoils {
             SourceSideMassFlowRate = 1.0; // not used and avoid divided by zero
             SourceSideInletTemp = OutdoorDryBulb;
             SourceSideInletEnth = PsyHFnTdbW(OutdoorDryBulb, OutdoorHumRat);
-            CpSource = PsyCpAirFnWTdb(OutHumRat, OutdoorDryBulb);
+            CpSource = PsyCpAirFnW(OutHumRat);
 
             // Initialize crankcase heater, operates below OAT defined in input deck for HP DX heating coil
             if (OutdoorDryBulb < VarSpeedCoil(DXCoilNum).MaxOATCrankcaseHeater) {
@@ -7068,6 +7068,44 @@ namespace VariableSpeedCoils {
             ShowSevereError("GetVSCoilMinOATCompressor: Invalid VS DX Coil, Type= VS DX Coil Name=\"" + CoilName + "\"");
             ErrorsFound = true;
             MinOAT = -1000.0;
+        }
+
+        return MinOAT;
+    }
+
+    Real64 GetVSCoilMinOATCompressorUsingIndex(int const CoilIndex, // index to cooling coil
+                                               bool &ErrorsFound    // set to true if problem
+    )
+    {
+
+        // FUNCTION INFORMATION:
+        //       AUTHOR         R. Raustad
+        //       DATE WRITTEN   August 2019
+
+        // PURPOSE OF THIS FUNCTION:
+        // This function looks up the the min oat for the cooling coil compressor and returns it.  If
+        // incorrect coil index is given, ErrorsFound is returned as true and value is returned
+        // as negative 1000.
+
+        // Return value
+        Real64 MinOAT; // returned min oa temperature of matched coil
+
+        // Obtains and Allocates WatertoAirHP related parameters from input file
+        if (GetCoilsInputFlag) { // First time subroutine has been entered
+            GetVarSpeedCoilInput();
+            GetCoilsInputFlag = false;
+        }
+
+        if (CoilIndex == 0) {
+
+            ShowSevereError("GetVSCoilMinOATCompressorUsingIndex: Index passed = 0");
+            ShowContinueError("... returning Min OAT as -1000.");
+            ErrorsFound = true;
+            MinOAT = -1000.0;
+
+        } else {
+
+            MinOAT = VarSpeedCoil(CoilIndex).MinOATCompressor;
         }
 
         return MinOAT;

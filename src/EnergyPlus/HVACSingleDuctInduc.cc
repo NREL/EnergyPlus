@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,32 +53,32 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <BranchNodeConnections.hh>
-#include <DataDefineEquip.hh>
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPlant.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSizing.hh>
-#include <DataZoneEnergyDemands.hh>
-#include <DataZoneEquipment.hh>
-#include <FluidProperties.hh>
-#include <General.hh>
-#include <GeneralRoutines.hh>
-#include <HVACSingleDuctInduc.hh>
-#include <HeatingCoils.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <MixerComponent.hh>
-#include <NodeInputManager.hh>
-#include <OutputProcessor.hh>
-#include <PlantUtilities.hh>
-#include <Psychrometrics.hh>
-#include <ReportSizingManager.hh>
-#include <ScheduleManager.hh>
-#include <UtilityRoutines.hh>
-#include <WaterCoils.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/DataDefineEquip.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/HVACSingleDuctInduc.hh>
+#include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/MixerComponent.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WaterCoils.hh>
 
 namespace EnergyPlus {
 
@@ -120,7 +120,7 @@ namespace HVACSingleDuctInduc {
     using DataHVACGlobals::SmallAirVolFlow;
     using DataHVACGlobals::SmallLoad;
     using DataHVACGlobals::SmallMassFlow;
-    using Psychrometrics::PsyCpAirFnWTdb;
+    using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyHFnTdbW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
 
@@ -879,8 +879,7 @@ namespace HVACSingleDuctInduc {
 
                             if (TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesHeatMassFlow >= SmallAirVolFlow) {
                                 DesPriVolFlow = IndUnit(IUNum).MaxTotAirVolFlow / (1.0 + IndUnit(IUNum).InducRatio);
-                                CpAir = PsyCpAirFnWTdb(TermUnitFinalZoneSizing(CurTermUnitSizingNum).HeatDesHumRat,
-                                                       TermUnitFinalZoneSizing(CurTermUnitSizingNum).HeatDesTemp);
+                                CpAir = PsyCpAirFnW(TermUnitFinalZoneSizing(CurTermUnitSizingNum).HeatDesHumRat);
                                 // the design heating coil load is the zone load minus whatever the central system does. Note that
                                 // DesHeatCoilInTempTU is really the primary air inlet temperature for the unit.
                                 if (TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtHeatPeak > 0.0) {
@@ -983,8 +982,7 @@ namespace HVACSingleDuctInduc {
 
                             if (TermUnitFinalZoneSizing(CurTermUnitSizingNum).DesCoolMassFlow >= SmallAirVolFlow) {
                                 DesPriVolFlow = IndUnit(IUNum).MaxTotAirVolFlow / (1.0 + IndUnit(IUNum).InducRatio);
-                                CpAir = PsyCpAirFnWTdb(TermUnitFinalZoneSizing(CurTermUnitSizingNum).CoolDesHumRat,
-                                                       TermUnitFinalZoneSizing(CurTermUnitSizingNum).CoolDesTemp);
+                                CpAir = PsyCpAirFnW(TermUnitFinalZoneSizing(CurTermUnitSizingNum).CoolDesHumRat);
                                 // the design cooling coil load is the zone load minus whatever the central system does. Note that
                                 // DesCoolCoilInTempTU is really the primary air inlet temperature for the unit.
                                 if (TermUnitFinalZoneSizing(CurTermUnitSizingNum).ZoneTempAtCoolPeak > 0.0) {
@@ -1395,7 +1393,7 @@ namespace HVACSingleDuctInduc {
         OutletNode = IndUnit(IUNum).OutAirNode;
         PriAirMassFlow = Node(PriNode).MassFlowRateMaxAvail;
         InducRat = IndUnit(IUNum).InducRatio;
-        CpAirZn = PsyCpAirFnWTdb(Node(ZoneNode).HumRat, Node(ZoneNode).Temp);
+        CpAirZn = PsyCpAirFnW(Node(ZoneNode).HumRat);
         SecAirMassFlow = InducRat * PriAirMassFlow;
         TotAirMassFlow = PriAirMassFlow + SecAirMassFlow;
         HotControlNode = IndUnit(IUNum).HWControlNode;

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -49,30 +49,30 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <BranchNodeConnections.hh>
-#include <CurveManager.hh>
-#include <DataContaminantBalance.hh>
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSizing.hh>
-#include <DataWater.hh>
-#include <EMSManager.hh>
-#include <FluidProperties.hh>
-#include <General.hh>
-#include <GeneralRoutines.hh>
-#include <GlobalNames.hh>
-#include <Humidifiers.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <OutputProcessor.hh>
-#include <Psychrometrics.hh>
-#include <ReportSizingManager.hh>
-#include <ScheduleManager.hh>
-#include <UtilityRoutines.hh>
-#include <WaterManager.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataWater.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Humidifiers.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WaterManager.hh>
 
 namespace EnergyPlus {
 
@@ -1010,7 +1010,7 @@ namespace Humidifiers {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool UnitOn;        // unit on flag
-        Real64 HumRatSatIn; // humidity ratio at saturation at the inlet temperature [kg H2O / kg dry air]
+        Real64 HumRatSatIn; // humidity ratio at saturation at the inlet temperature [kgWater/kgDryAir]
 
         UnitOn = true;
         if (HumRatSet <= 0.0) UnitOn = false;
@@ -1068,8 +1068,8 @@ namespace Humidifiers {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        Real64 HumRatSatOut;      // humidity ratio at saturation at the outlet temperature [kg H2O / kg dry air]
-        Real64 HumRatSatIn;       // humidity ratio at saturation at the inlet temperature [kg H2O / kg dry air]
+        Real64 HumRatSatOut;      // humidity ratio at saturation at the outlet temperature [kgWater/kgDryAir]
+        Real64 HumRatSatIn;       // humidity ratio at saturation at the inlet temperature [kgWater/kgDryAir]
         Real64 WaterAddNeededMax; // moisture addition rate set by controller, limited by humidifier capacity
         Real64 WaterInEnthalpy;   // enthalpy of the inlet steam [J/kg]
         Real64 HumRatSatApp;      // the approximate humidity ratio where the line drawn between inlet and desired outlet conditions
@@ -1174,8 +1174,8 @@ namespace Humidifiers {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        Real64 HumRatSatOut;      // humidity ratio at saturation at the outlet temperature [kg H2O / kg dry air]
-        Real64 HumRatSatIn;       // humidity ratio at saturation at the inlet temperature [kg H2O / kg dry air]
+        Real64 HumRatSatOut;      // humidity ratio at saturation at the outlet temperature [kgWater/kgDryAir]
+        Real64 HumRatSatIn;       // humidity ratio at saturation at the inlet temperature [kgWater/kgDryAir]
         Real64 WaterAddNeededMax; // moisture addition rate set by controller, limited by humidifier capacity
         Real64 WaterInEnthalpy;   // enthalpy of the inlet steam [J/kg]
         Real64 HumRatSatApp;      // the approximate humidity ratio where the line drawn between inlet and desired outlet conditions
@@ -1437,6 +1437,67 @@ namespace Humidifiers {
         WaterCons = WaterConsRate * TimeStepSys * SecInHour;
         GasUseEnergy = GasUseRate * TimeStepSys * SecInHour;
         AuxElecUseEnergy = AuxElecUseRate * TimeStepSys * SecInHour;
+    }
+
+    int GetAirInletNodeNum(std::string const &HumidifierName,
+        bool &ErrorsFound
+    )
+    {
+        // FUNCTION INFORMATION:
+        //       AUTHOR         Lixing Gu
+        //       DATE WRITTEN   May 2019
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS FUNCTION:
+        // This function looks up the given humidifier and returns the air inlet node number.
+        // If incorrect humidifier name is given, ErrorsFound is returned as true and node number as zero.
+
+        // Return value
+        int NodeNum; // node number returned
+
+                     // FUNCTION LOCAL VARIABLE DECLARATIONS:
+        int WhichHumidifier;
+
+        // Obtains and Allocates heat exchanger related parameters from input file
+        if (GetInputFlag) {
+            GetHumidifierInput();
+            GetInputFlag = false;
+        }
+
+        WhichHumidifier = UtilityRoutines::FindItemInList(HumidifierName, Humidifier);
+        if (WhichHumidifier != 0) {
+            NodeNum = Humidifier(WhichHumidifier).AirInNode;
+        } else {
+            ShowSevereError("GetAirInletNodeNum: Could not find Humidifier = \"" + HumidifierName + "\"");
+            ErrorsFound = true;
+            NodeNum = 0;
+        }
+
+        return NodeNum;
+    }
+
+    int GetAirOutletNodeNum(std::string const &HumidifierName,
+        bool &ErrorsFound
+    )
+    {
+        // PURPOSE OF THIS FUNCTION:
+        // This function looks up the given humidifier and returns the air outlet node number.
+        // If incorrect humidifier name is given, ErrorsFound is returned as true and node number as zero.
+
+        if (GetInputFlag) {
+            GetHumidifierInput();
+            GetInputFlag = false;
+        }
+
+        int WhichHumidifier = UtilityRoutines::FindItemInList(HumidifierName, Humidifier);
+        if (WhichHumidifier != 0) {
+            return Humidifier(WhichHumidifier).AirOutNode;
+        } else {
+            ShowSevereError("GetAirInletNodeNum: Could not find Humidifier = \"" + HumidifierName + "\"");
+            ErrorsFound = true;
+            return 0;
+        }
     }
 
 } // namespace Humidifiers

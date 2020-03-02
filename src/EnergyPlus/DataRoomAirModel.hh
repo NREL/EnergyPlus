@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,8 +53,8 @@
 #include <ObjexxFCL/Array2D.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -80,7 +80,7 @@ namespace DataRoomAirModel {
     extern int const RoomAirModel_UCSDDV;         // UCSD Displacement Ventilation model
     extern int const RoomAirModel_UCSDCV;         // UCSD-CV
     extern int const RoomAirModel_UCSDUFI;        // UCSD UFAD interior zone model
-    extern int const RoomAirModel_UCSDUFE;        // UCSD UFAD interior zone model
+    extern int const RoomAirModel_UCSDUFE;        // UCSD UFAD exterior zone model
     extern int const RoomAirModel_AirflowNetwork; // RoomAirModel_AirflowNetwork interior zone model
     extern Array1D_string const ChAirModel;
 

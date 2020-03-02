@@ -14,7 +14,7 @@
 ! FCW, 6/17/04: changed height for daylighting illuminance maps from 0.0m to 0.8m to correspond
 !               to reference point height
 
-  Version,9.2;
+  Version,9.3;
 
   Building,
     Daylighting Shelf Example,  !- Name
@@ -29,8 +29,9 @@
   Timestep,6;
 
   ShadowCalculation,
-    AverageOverDaysInFrequency,  !- Calculation Method
-    20;                      !- Calculation Frequency
+    PolygonClipping,         !- Shading Calculation Method
+    Periodic,                !- Shading Calculation Update Frequency Method
+    20;                      !- Shading Calculation Update Frequency
 
   HeatBalanceAlgorithm,ConductionTransferFunction;
 

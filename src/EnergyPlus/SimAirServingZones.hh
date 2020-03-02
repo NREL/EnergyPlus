@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,8 +52,8 @@
 #include <string>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
-#include <UnitarySystem.hh>
+#include <EnergyPlus/DataHVACSystems.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -98,6 +98,7 @@ namespace SimAirServingZones {
     extern int const CoilUserDefined;
     extern int const Fan_System_Object;
     extern int const UnitarySystemModel;
+    extern int const ZoneVRFasAirLoopEquip;
 
     // DERIVED TYPE DEFINITIONS:
     // na
@@ -170,7 +171,7 @@ namespace SimAirServingZones {
                              bool const FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
                              int const AirLoopNum,          // Primary air loop number
                              int &CompIndex,                // numeric pointer for CompType/CompName -- passed back from other routines
-                             UnitarySystems::UnitarySys *CompPointer);
+                             HVACSystemData *CompPointer);
 
     void UpdateBranchConnections(int const AirLoopNum, // primary air system number
                                  int const BranchNum,  // branch reference number
@@ -189,7 +190,7 @@ namespace SimAirServingZones {
 
     void SizeSysOutdoorAir();
 
-    void UpdateSysSizing(int const CallIndicator);
+    void UpdateSysSizing(OutputFiles &outputFiles, int const CallIndicator);
 
     void UpdateSysSizingForScalableInputs(int const AirLoopNum);
 

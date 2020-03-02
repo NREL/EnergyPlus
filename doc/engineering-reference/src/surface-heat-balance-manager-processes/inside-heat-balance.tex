@@ -11,11 +11,11 @@ The heat balance on the inside face can be written as follows:
 
 where:
 
-\({q''_{LWX}}\) = Net longwave radiant exchange flux between zone surfaces.
+\({q''_{LWX}}\) = Net longwave radiant exchange flux between surfaces in a zone or group of zones (enclosure).
 
 \({q''_{SW}}\) ~ = Net short wave radiation flux to surface from lights.
 
-\({q''_{LWS}}\) = Longwave radiation flux from equipment in zone.
+\({q''_{LWS}}\) = Longwave radiation flux from equipment in a zone or group of zones (enclosure).
 
 \({q''_{ki}}\) ~ = Conduction flux through the wall.
 
@@ -33,6 +33,8 @@ Each of these heat balance components is introduced briefly below.
 
 \subsection{Internal Long-Wave Radiation Exchange}\label{internal-long-wave-radiation-exchange}
 
+Long-wave radiation exchange is balanced within an enclosure which may be a single zone or a group of zones connected by air boundaries (see Construction:AirBoundary) using the \textit{GroupedZone} radiant exchange method. Throughout this section, "Zone" refers to either type of enclosure.
+
 \subsubsection{LW Radiation Exchange Among Zone Surfaces}\label{lw-radiation-exchange-among-zone-surfaces}
 
 There are two limiting cases for internal LW radiation exchange that are easily modeled:
@@ -46,7 +48,11 @@ The zone air completely absorbs LW radiation from the surfaces within the zone.
 
 The limiting case of completely absorbing air has been used for load calculations and also in some energy analysis calculations.~ This model is attractive because it can be formulated simply using a combined radiation and convection heat transfer coefficient from each surface to the zone air.~ However, it oversimplifies the zone surface exchange problem, and as a result, the heat balance formulation in EnergyPlus treats air as completely transparent.~ This means that it does not participate in the LW radiation exchange among the surfaces in the zone. The model, which considers room air to be completely transparent, is reasonable physically because of the low water vapor concentrations and the short mean path lengths.~ It also permits separating the radiant and convective parts of the heat transfer at the surface, which is an important attribute of the heat balance method.
 
-EnergyPlus uses a grey interchange model for the longwave radiation among zone surfaces.~ This model is based on the ``ScriptF'' concept developed by Hottel (Hottel and Sarofim, Radiative Transfer, Chapter 3, McGraw Hill, 1967).~ This procedure relies on a matrix of exchange coefficients between pairs of surfaces that include all exchange paths between the surfaces.~ In other words all reflections, absorptions and re-emissions~ from other surfaces in the enclosure are included in the exchange coefficient, which is called ScriptF.~ The major assumptions are that all surface radiation properties are grey and all radiation is diffuse.~ Both assumptions are reasonable for building zone interchange.
+EnergyPlus uses a grey interchange model for the longwave radiation among zone surfaces. EnergyPlus offers two algorithms for modeling long wave radiation: The ``ScriptF'' method, and the ``CarrollMRT'' methods. Users can select between these two algorithms using the ``PerformancePrecisionTradeoffs'' object.
+
+\paragraph{ScriptF}
+
+The ``ScriptF'' algorithm was developed by Hottel (Hottel and Sarofim, Radiative Transfer, Chapter 3, McGraw Hill, 1967).~ This procedure relies on a matrix of exchange coefficients between pairs of surfaces that include all exchange paths between the surfaces.~ In other words all reflections, absorptions and re-emissions~ from other surfaces in the enclosure are included in the exchange coefficient, which is called ScriptF.~ The major assumptions are that all surface radiation properties are grey and all radiation is diffuse.~ Both assumptions are reasonable for building zone interchange.
 
 ~The ScriptF coefficients are developed by starting with the traditional direct radiation view factors.~ In the case of building rooms and zones, there are several complicating factors in finding the direct view factors---the main one being that the location of surfaces such as thermal mass representing furniture and partitions are not known.~ The other limitation is that the exact calculation of direct view factors is computationally very intensive even if the positions of all surfaces are known. Accordingly, EnergyPlus uses a procedure to approximate the direct view factors.~ The procedure has two steps:
 
@@ -85,6 +91,48 @@ Once the ScriptF coefficients are determined, the longwave radiant exchange is c
 \end{equation}
 
 where \textbf{\emph{F}}\(_{i,j}\) is the ScriptF between surfaces i and j.
+
+\paragraph{CarrollMRT}
+
+The Carroll method is an approximation of gray-body long-wave radiation exchange within an enclosure that simplifies the surface-to-surface radiation exchange by using a single, mean radiant temperature node, $Tr$, that acts as a clearinghouse for the radiation heat exchange between surfaces. Instead of solving a dense-matrix, linear algebra problem, the mean radiant temperature can be calculated using a single equation, and subsequently used to determine the net long-wave radiation to/from each surface. Unlike the $O(n^2)$ complexity of the current dense-matrix solution, this approach has linear complexity.
+
+The mean radiant temperature is calculated using three steps:
+
+\begin{enumerate}
+\item Calculation of the mean radiant temperature ``view factor'', $Fi$. These view factors represent each surface's ``view'' to the mean radiant temperature node as though all surfaces were part of a spherical enclosure (i.e., they all have equal view of the node regardless of their orientation to each other). $Fi$ is calculated as:
+
+\begin{equation}
+    F_i=\frac{1}{1-\frac{A_i F_i}{\sum_1^n{A_j F_j} }}
+\end{equation}
+
+Because of the circular reference in this equation, the collection of all ``view factors'' must be solved iteratively, but only once per simulation as surface areas do not change throughout. This converges for realistic enclosures but won't necessarily converge for ``enclosures'' having only two or three surfaces, particularly if there are large area disparities.
+
+\item Calculating the gray-body radiation resistance, $F'i$. This calculation must be computed every time surface emissivity changes. $F'i$ is calculated as:
+
+\begin{equation}
+    F'_i=\frac{\sigma\varepsilon_i}{\frac{\varepsilon_i}{F_i} +1-\varepsilon_i}
+\end{equation}
+
+\item Finally, the mean radiant temperature, $Tr$, is:
+
+\begin{equation}
+    T_r=\frac{\sum_1^nA_i F'_i T_i}{\sum_1^nA_i F'_i}
+\end{equation}
+
+\end{enumerate}
+
+Once the mean radiant temperature is known, the net radiation heat transfer for each surface can be calculated as:
+
+\begin{equation}
+    q=F'_i A_i (T_r^4-T_i^4)
+\end{equation}
+
+Carroll, J. A., 1980, ``An `MRT Method' of Computing Radiant Energy Exchange in Rooms,'' Proceedings of the Second Systems Simulation and Economic Analysis Conference, San Diego, CA.
+
+Carroll, J. A., 1980a, ``An MRT method of computing radiant energy exchange in rooms,'' Proceedings of the 2nd Systems Simulation and Economic Analysis Conference, San Diego, CA.
+
+Carroll, J. A., 1981, ``A Comparison of Radiant Interchange Algorithms,'' Proceedings of the 3rd Annual Systems Simulation and Economics Analysis/Solar Heating and Cooling Operational Results Conference, Reno. Solar Engineering, Proceedings of the ASME Solar division.
+
 
 \subsubsection{Thermal Mass and Furniture}\label{thermal-mass-and-furniture}
 
@@ -354,7 +402,7 @@ This is a component of the CeilingDiffuser overall algorithm described below.
 
 \subsubsection{Fisher Pedersen Ceiling Diffuser Floor}\label{fisher-pedersen-ceiling-diffuser-floor}
 
-Fisher and Pedersen 1997) developed the following equation from laboratory chamber measurements.
+Fisher and Pedersen (1997) developed the following equation from laboratory chamber measurements.
 
 \begin{equation}
 h = 3.873 + 0.082 * AC{H^{0.98}}
@@ -835,6 +883,8 @@ The correlation for walls is illustrated in Figure~\ref{fig:ceiling-diffuser-cor
 \includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image382.png}
 \caption{Ceiling Diffuser Correlation for Walls \protect \label{fig:ceiling-diffuser-correlation-for-walls}}
 \end{figure}
+
+It should be noted that the conditions under which the correlations were developed included ACH values down to around 3.0.  However, extrapolation of the data down to ACH=1.0 is reasonable and so within EnergyPlus, for ACH values of 1.0 or greater, the ceiling diffuser correlations as shown above are used.  Below ACH values of 0.5, the natural convection algorithm is used.  Between ACH values of 0.5 and 1.0, there is a linear interpolation between the two models to avoid any discontinuities in the convection coefficient calculated.
 
 \subsubsection{Trombe Wall Algorithm}\label{trombe-wall-algorithm}
 

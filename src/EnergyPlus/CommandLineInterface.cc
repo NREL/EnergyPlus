@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,19 +52,20 @@
 #include <ObjexxFCL/gio.hh>
 
 // Project headers
-#include <CommandLineInterface.hh>
-#include <DataGlobals.hh>
-#include <DataStringGlobals.hh>
-#include <DataSystemVariables.hh>
-#include <DisplayRoutines.hh>
-#include <EnergyPlus.hh>
-#include <FileSystem.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportTabular.hh>
-#include <OutputReports.hh>
-#include <SimulationManager.hh>
-#include <SolarShading.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/CommandLineInterface.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/FileSystem.hh>
+#include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportTabular.hh>
+#include <EnergyPlus/OutputReports.hh>
+#include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SolarShading.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -150,6 +151,8 @@ namespace CommandLineInterface {
 
         opt.add("", 0, 0, 0, "Output IDF->epJSON or epJSON->IDF, dependent on input file type", "-c", "--convert");
 
+        opt.add("", 0, 0, 0, "Only convert IDF->epJSON or epJSON->IDF, dependent on input file type. No simulation", "--convert-only");
+
         opt.add("L",
                 0,
                 1,
@@ -198,6 +201,8 @@ namespace CommandLineInterface {
         AnnualSimulation = opt.isSet("-a");
 
         outputEpJSONConversion = opt.isSet("-c");
+
+        outputEpJSONConversionOnly = opt.isSet("--convert-only");
 
         // Process standard arguments
         if (opt.isSet("-h")) {
@@ -262,9 +267,19 @@ namespace CommandLineInterface {
         } else if (inputFileExt == "CBOR") {
             isEpJSON = true;
             isCBOR = true;
+            DisplayString("CBOR input format is experimental and unsupported.");
         } else if (inputFileExt == "MSGPACK") {
             isEpJSON = true;
             isMsgPack = true;
+            DisplayString("MsgPack input format is experimental and unsupported.");
+        } else if (inputFileExt == "UBJSON") {
+            isEpJSON = true;
+            isUBJSON = true;
+            DisplayString("UBJSON input format is experimental and unsupported.");
+        } else if (inputFileExt == "BSON") {
+            isEpJSON = true;
+            isBSON = true;
+            DisplayString("BSON input format is experimental and unsupported.");
         } else {
             DisplayString("ERROR: Input file must have IDF, IMF, or epJSON extension.");
             exit(EXIT_FAILURE);
@@ -371,7 +386,7 @@ namespace CommandLineInterface {
         outputAuditFileName = outputFilePrefix + normalSuffix + ".audit";
         outputBndFileName = outputFilePrefix + normalSuffix + ".bnd";
         outputDxfFileName = outputFilePrefix + normalSuffix + ".dxf";
-        outputEioFileName = outputFilePrefix + normalSuffix + ".eio";
+        OutputFiles::getSingleton().eio.fileName = outputFilePrefix + normalSuffix + ".eio";
         outputEndFileName = outputFilePrefix + normalSuffix + ".end";
         outputErrFileName = outputFilePrefix + normalSuffix + ".err";
         outputEsoFileName = outputFilePrefix + normalSuffix + ".eso";
@@ -406,7 +421,7 @@ namespace CommandLineInterface {
 
         outputMtdFileName = outputFilePrefix + normalSuffix + ".mtd";
         outputMddFileName = outputFilePrefix + normalSuffix + ".mdd";
-        outputMtrFileName = outputFilePrefix + normalSuffix + ".mtr";
+        OutputFiles::getSingleton().mtr.fileName = outputFilePrefix + normalSuffix + ".mtr";
         outputRddFileName = outputFilePrefix + normalSuffix + ".rdd";
         outputShdFileName = outputFilePrefix + normalSuffix + ".shd";
         outputDfsFileName = outputFilePrefix + normalSuffix + ".dfs";
@@ -418,6 +433,7 @@ namespace CommandLineInterface {
         outputWrlFileName = outputFilePrefix + normalSuffix + ".wrl";
         outputSqlFileName = outputFilePrefix + normalSuffix + ".sql";
         outputDbgFileName = outputFilePrefix + normalSuffix + ".dbg";
+        outputPerfLogFileName = outputFilePrefix + normalSuffix + "_perflog.csv";
         outputTblCsvFileName = outputFilePrefix + tableSuffix + ".csv";
         outputTblHtmFileName = outputFilePrefix + tableSuffix + ".htm";
         outputTblTabFileName = outputFilePrefix + tableSuffix + ".tab";
@@ -426,12 +442,12 @@ namespace CommandLineInterface {
         outputMapTabFileName = outputFilePrefix + mapSuffix + ".tab";
         outputMapCsvFileName = outputFilePrefix + mapSuffix + ".csv";
         outputMapTxtFileName = outputFilePrefix + mapSuffix + ".txt";
-        outputZszCsvFileName = outputFilePrefix + zszSuffix + ".csv";
-        outputZszTabFileName = outputFilePrefix + zszSuffix + ".tab";
-        outputZszTxtFileName = outputFilePrefix + zszSuffix + ".txt";
-        outputSszCsvFileName = outputFilePrefix + sszSuffix + ".csv";
-        outputSszTabFileName = outputFilePrefix + sszSuffix + ".tab";
-        outputSszTxtFileName = outputFilePrefix + sszSuffix + ".txt";
+        OutputFiles::getSingleton().outputZszCsvFileName = outputFilePrefix + zszSuffix + ".csv";
+        OutputFiles::getSingleton().outputZszTabFileName = outputFilePrefix + zszSuffix + ".tab";
+        OutputFiles::getSingleton().outputZszTxtFileName = outputFilePrefix + zszSuffix + ".txt";
+        OutputFiles::getSingleton().outputSszCsvFileName = outputFilePrefix + sszSuffix + ".csv";
+        OutputFiles::getSingleton().outputSszTabFileName = outputFilePrefix + sszSuffix + ".tab";
+        OutputFiles::getSingleton().outputSszTxtFileName = outputFilePrefix + sszSuffix + ".txt";
         outputAdsFileName = outputFilePrefix + adsSuffix + ".out";
         outputExtShdFracFileName = outputFilePrefix + shdSuffix + ".csv";
         if (suffixType == "L" || suffixType == "l") {
@@ -810,6 +826,96 @@ namespace CommandLineInterface {
                 }
             }
         }
+    }
+
+    int runReadVarsESO() {
+        std::string readVarsPath = exeDirectory + "ReadVarsESO" + exeExtension;
+        bool FileExists;
+        {
+            IOFlags flags;
+            ObjexxFCL::gio::inquire(readVarsPath, flags);
+            FileExists = flags.exists();
+        }
+        if (!FileExists) {
+            readVarsPath = exeDirectory + "PostProcess" + pathChar + "ReadVarsESO" + exeExtension;
+            {
+                IOFlags flags;
+                ObjexxFCL::gio::inquire(readVarsPath, flags);
+                FileExists = flags.exists();
+            }
+            if (!FileExists) {
+                DisplayString("ERROR: Could not find ReadVarsESO executable: " + getAbsolutePath(readVarsPath) + ".");
+                return EXIT_FAILURE;
+            }
+        }
+
+        std::string const RVIfile = inputDirPathName + inputFileNameOnly + ".rvi";
+        std::string const MVIfile = inputDirPathName + inputFileNameOnly + ".mvi";
+
+        int fileUnitNumber;
+        int iostatus;
+        bool rviFileExists;
+        bool mviFileExists;
+
+        ObjexxFCL::gio::Fmt readvarsFmt("(A)");
+
+        {
+            IOFlags flags;
+            ObjexxFCL::gio::inquire(RVIfile, flags);
+            rviFileExists = flags.exists();
+        }
+        if (!rviFileExists) {
+            fileUnitNumber = GetNewUnitNumber();
+            {
+                IOFlags flags;
+                flags.ACTION("write");
+                ObjexxFCL::gio::open(fileUnitNumber, RVIfile, flags);
+                iostatus = flags.ios();
+            }
+            if (iostatus != 0) {
+                ShowFatalError("EnergyPlus: Could not open file \"" + RVIfile + "\" for output (write).");
+            }
+            ObjexxFCL::gio::write(fileUnitNumber, readvarsFmt) << outputEsoFileName;
+            ObjexxFCL::gio::write(fileUnitNumber, readvarsFmt) << outputCsvFileName;
+            ObjexxFCL::gio::close(fileUnitNumber);
+        }
+
+        {
+            IOFlags flags;
+            ObjexxFCL::gio::inquire(MVIfile, flags);
+            mviFileExists = flags.exists();
+        }
+        if (!mviFileExists) {
+            fileUnitNumber = GetNewUnitNumber();
+            {
+                IOFlags flags;
+                flags.ACTION("write");
+                ObjexxFCL::gio::open(fileUnitNumber, MVIfile, flags);
+                iostatus = flags.ios();
+            }
+            if (iostatus != 0) {
+                ShowFatalError("EnergyPlus: Could not open file \"" + MVIfile + "\" for output (write).");
+            }
+            ObjexxFCL::gio::write(fileUnitNumber, readvarsFmt) << OutputFiles::getSingleton().mtr.fileName;
+            ObjexxFCL::gio::write(fileUnitNumber, readvarsFmt) << outputMtrCsvFileName;
+            ObjexxFCL::gio::close(fileUnitNumber);
+        }
+
+        // We quote the paths in case we have spaces
+        // "/Path/to/ReadVarEso" "/Path/to/folder with spaces/file.rvi" unlimited
+        std::string const readVarsRviCommand = "\"" + readVarsPath + "\" \"" + RVIfile + "\" unlimited";
+        std::string const readVarsMviCommand = "\"" + readVarsPath + "\" \"" + MVIfile + "\" unlimited";
+
+        // systemCall will be responsible to handle to above command on Windows versus Unix
+        systemCall(readVarsRviCommand);
+        systemCall(readVarsMviCommand);
+
+        if (!rviFileExists) removeFile(RVIfile.c_str());
+
+        if (!mviFileExists) removeFile(MVIfile.c_str());
+
+        moveFile("readvars.audit", outputRvauditFileName);
+        return EXIT_SUCCESS;
     }
 
 } // namespace CommandLineInterface

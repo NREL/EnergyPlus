@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,17 +54,17 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataIPShortCuts.hh>
-#include <DataReportingFlags.hh>
-#include <General.hh>
-#include <GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh>
-#include <GroundTemperatureModeling/GroundTemperatureModelManager.hh>
-#include <GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <UtilityRoutines.hh>
-#include <WeatherManager.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataReportingFlags.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh>
+#include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
+#include <EnergyPlus/GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 namespace EnergyPlus {
 
@@ -241,7 +241,7 @@ void FiniteDiffGroundTempsModel::getWeatherData()
     WeatherManager::Envrn = originalNumOfEnvn;
     Available = true;
     ErrorsFound = false;
-    GetNextEnvironment(Available, ErrorsFound);
+    GetNextEnvironment(OutputFiles::getSingleton(), Available, ErrorsFound);
     if (ErrorsFound) {
         ShowFatalError("Site:GroundTemperature:Undisturbed:FiniteDifference: error in reading weather file data");
     }

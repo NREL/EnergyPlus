@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,20 +52,20 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <CoolTower.hh>
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalance.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataWater.hh>
-#include <General.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <OutputProcessor.hh>
-#include <Psychrometrics.hh>
-#include <ScheduleManager.hh>
-#include <UtilityRoutines.hh>
-#include <WaterManager.hh>
+#include <EnergyPlus/CoolTower.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataWater.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WaterManager.hh>
 
 namespace EnergyPlus {
 
@@ -604,7 +604,7 @@ namespace CoolTower {
         using DataHeatBalFanSys::MCPTC;
         using DataHeatBalFanSys::ZoneAirHumRat;
         using DataHeatBalFanSys::ZT;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using Psychrometrics::PsyWFnTdbH;
         using Psychrometrics::PsyWFnTdbTwbPb;
@@ -716,7 +716,7 @@ namespace CoolTower {
                 // From the mass balance W_in*(m_air + m_water) = W_out*m_air
                 RhoWater = RhoH2O(OutletTemp); // Assume T_water = T_outlet
                 OutletHumRat = (InletHumRat * (AirMassFlowRate + (CoolTowerSys(CoolTowerNum).ActualWaterFlowRate * RhoWater))) / AirMassFlowRate;
-                AirSpecHeat = PsyCpAirFnWTdb(OutletHumRat, OutletTemp);
+                AirSpecHeat = PsyCpAirFnW(OutletHumRat);
                 AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, OutletTemp, OutletHumRat); // Outlet air density
                 CVF_ZoneNum = CoolTowerSys(CoolTowerNum).ActualAirVolFlowRate * GetCurrentScheduleValue(CoolTowerSys(CoolTowerNum).SchedPtr);
                 MCPC(ZoneNum) = CVF_ZoneNum * AirDensity * AirSpecHeat;

@@ -3,6 +3,10 @@
 ADD_CXX_DEFINITIONS("-DOBJEXXFCL_ALIGN=64") # Align ObjexxFCL arrays to 64B
 ADD_CXX_DEBUG_DEFINITIONS("-DOBJEXXFCL_ARRAY_INIT_DEBUG") # Initialize ObjexxFCL arrays to aid debugging
 
+if (NOT OPENGL_FOUND)
+  add_definitions("-DEP_NO_OPENGL")
+endif()
+
 # Make sure expat is compiled as a static library
 ADD_DEFINITIONS("-DXML_STATIC")
 
@@ -253,5 +257,12 @@ if("Ninja" STREQUAL ${CMAKE_GENERATOR})
     endif()
 
   endif()
+endif()
+
+# Xcode/Ninja generators undefined MAKE
+if(CMAKE_GENERATOR MATCHES "Make")
+  set(MAKE "$(MAKE)")
+else()
+  set(MAKE make)
 endif()
 

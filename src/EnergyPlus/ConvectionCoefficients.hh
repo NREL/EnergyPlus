@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -54,11 +54,12 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <DataVectorTypes.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class OutputFiles;
 
 namespace ConvectionCoefficients {
 
@@ -441,7 +442,7 @@ namespace ConvectionCoefficients {
 
     // Functions
 
-    void InitInteriorConvectionCoeffs(Array1S<Real64> const SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
+    void InitInteriorConvectionCoeffs(const Array1D<Real64> &SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
                                       Optional_int_const ZoneToResimulate = _    // if passed in, then only calculate surfaces that have this zone
     );
 
@@ -492,10 +493,10 @@ namespace ConvectionCoefficients {
                                         Real64 const ZoneMeanAirTemperature // Mean Air Temperature of Zone
     );
 
-    void CalcDetailedHcInForDVModel(int const SurfNum,                         // surface number for which coefficients are being calculated
-                                    Array1S<Real64> const SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
-                                    Array1S<Real64> HcIn,                      // Interior Convection Coeff Array
-                                    Optional<Array1S<Real64> const> Vhc = _    // Velocity array for forced convection coeff calculation
+    void CalcDetailedHcInForDVModel(int const SurfNum,                          // surface number for which coefficients are being calculated
+                                    const Array1D<Real64> &SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
+                                    Array1D<Real64> &HcIn,                      // Interior Convection Coeff Array
+                                    Optional<Array1S<Real64> const> Vhc = _     // Velocity array for forced convection coeff calculation
     );
 
     Real64 CalcZoneSupplyAirTemp(int const ZoneNum);
@@ -514,17 +515,17 @@ namespace ConvectionCoefficients {
                                            Real64 const height,
                                            bool const isWindow=false);
 
-    void CalcCeilingDiffuserIntConvCoeff(int const ZoneNum, Array1S<Real64> const SurfaceTemperatures); // zone number for which coefficients are being calculated
+    void CalcCeilingDiffuserIntConvCoeff(int const ZoneNum, const Array1D<Real64> &SurfaceTemperatures); // zone number for which coefficients are being calculated
 
     // CalcCeilingDiffuserInletCorr should replace CalcCeilingDiffuser (above), if ZoneTempPredictorCorrector can
     // ever be made to work correctly with the inlet air temperature.
 
     void CalcCeilingDiffuserInletCorr(int const ZoneNum,                        // Zone number
-                                      Array1S<Real64> const SurfaceTemperatures // For CalcASHRAEDetailed, if called
+                                      const Array1D<Real64> &SurfaceTemperatures // For CalcASHRAEDetailed, if called
     );
 
     void CalcTrombeWallIntConvCoeff(int const ZoneNum,                        // Zone number for which coefficients are being calculated
-                                    Array1S<Real64> const SurfaceTemperatures // Temperature of surfaces for evaluation of HcIn
+                                    const Array1D<Real64> &SurfaceTemperatures // Temperature of surfaces for evaluation of HcIn
     );
 
     void CalcNusselt(int const SurfNum, // Surface number
@@ -553,7 +554,7 @@ namespace ConvectionCoefficients {
                                         Real64 const AirTemperature      // Mean Air Temperature of Zone (or adjacent air temperature)
     );
 
-    void SetupAdaptiveConvectionStaticMetaData();
+    void SetupAdaptiveConvectionStaticMetaData(EnergyPlus::OutputFiles &outputFiles);
 
     void SetupAdaptiveConvectionRadiantSurfaceData();
 
@@ -618,6 +619,15 @@ namespace ConvectionCoefficients {
                                                Real64 const height,
                                                bool const isWindow=false);
 
+    Real64 CalcFisherPedersenCeilDiffuserNatConv(Real64 const Hforced,
+                                                 Real64 const ACH,
+                                                 Real64 const Tsurf,
+                                                 Real64 const Tair,
+                                                 Real64 const cosTilt,
+                                                 Real64 const humRat,
+                                                 Real64 const height,
+                                                 bool const isWindow);
+    
     Real64 CalcAlamdariHammondUnstableHorizontal(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
                                                    Real64 const HydraulicDiameter  // [m] characteristic size, = (4 * area) / perimeter
     );

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,7 +52,7 @@
 #include <ObjexxFCL/numeric.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
+#include <EnergyPlus/DataGlobals.hh>
 
 namespace EnergyPlus {
 
@@ -89,9 +89,12 @@ namespace DataGlobals {
     bool DDOnlySimulation(false);
     bool AnnualSimulation(false);
     bool outputEpJSONConversion(false);
+    bool outputEpJSONConversionOnly(false);
     bool isEpJSON(false);
     bool isCBOR(false);
     bool isMsgPack(false);
+    bool isUBJSON(false);
+    bool isBSON(false);
     bool preserveIDFOrder(true);
 
     // MODULE PARAMETER DEFINITIONS:
@@ -108,9 +111,6 @@ namespace DataGlobals {
     int const ksHVACSizeDesignDay(4);       // a regular design day run during HVAC Sizing Simulation
     int const ksHVACSizeRunPeriodDesign(5); // a weather period design day run during HVAC Sizing Simulation
     int const ksReadAllWeatherData(6);      // a weather period for reading all weather data prior to the simulation
-
-    int const ZoneTSReporting(1); // value for Zone Time Step Reporting (UpdateDataAndReport)
-    int const HVACTSReporting(2); // value for HVAC Time Step Reporting (UpdateDataAndReport)
 
     Real64 const MaxEXPArg(709.78);       // maximum exponent in EXP() function
     Real64 const Pi(3.14159265358979324); // Pi 3.1415926535897932384626435
@@ -173,6 +173,7 @@ namespace DataGlobals {
 
     bool BeginDayFlag(false);           // True at the start of each day, False after first time step in day
     bool BeginEnvrnFlag(false);         // True at the start of each environment, False after first time step in environ
+    bool beginEnvrnWarmStartFlag(false); // Sizing Speed Up
     bool BeginHourFlag(false);          // True at the start of each hour, False after first time step in hour
     bool BeginSimFlag(false);           // True until any actual simulation (full or sizing) has begun, False after first time step
     bool BeginFullSimFlag(false);       // True until full simulation has begun, False after first time step
@@ -202,12 +203,8 @@ namespace DataGlobals {
     int OutputStandardError(0);                      // Unit number for the standard error output file
     std::ostream *err_stream(nullptr);               // Internal stream used for err output (used for performance)
     int StdOutputRecordCount(0);                     // Count of Standard output records
-    int OutputFileInits(0);                          // Unit number for the standard Initialization output file
-    std::ostream *eio_stream(nullptr);               // Internal stream used for eio output (used for unit tests)
     int OutputFileDebug(0);                          // Unit number for debug outputs
-    int OutputFileZoneSizing(0);                     // Unit number of zone sizing calc output file
-    int OutputFileSysSizing(0);                      // Unit number of system sizing calc output file
-    int OutputFileMeters(0);                         // Unit number for meters output
+    int OutputFilePerfLog(0);                        // Unit number for performance log outputs
     std::ostream *mtr_stream(nullptr);               // Internal stream used for mtr output (used for performance)
     int OutputFileShadingFrac(0);                    // Unit number for shading output
     int StdMeterRecordCount(0);                      // Count of Meter output records
@@ -259,19 +256,29 @@ namespace DataGlobals {
     bool ShowDecayCurvesInEIO(false);    // true if the Radiant to Convective Decay Curves should appear in the EIO file
     bool AnySlabsInModel(false);         // true if there are any zone-coupled ground domains in the input file
     bool AnyBasementsInModel(false);     // true if there are any basements in the input file
+    // Performance tradeoff globals
+    bool DoCoilDirectSolutions(false);       //true if use coil direction solutions
+    bool createProfLog(false); //true if the _proflog.csv file should be created and a PerformancePrecisionTradeoffs object is used
 
     int Progress(0); // current progress (0-100)
     void (*fProgressPtr)(int const);
     void (*fMessagePtr)(std::string const &);
+    void (*progressCallback)(int const);
+    void (*messageCallback)(const char * message);
+    void (*errorCallback)(const char * errorMessage);
+
+    bool eplusRunningViaAPI;
 
     // Clears the global data in DataGlobals.
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
+
         runReadVars = false;
         DDOnlySimulation = false;
         AnnualSimulation = false;
         outputEpJSONConversion = false;
+        outputEpJSONConversionOnly = false;
         isEpJSON = false;
         isCBOR = false;
         isMsgPack = false;
@@ -303,11 +310,8 @@ namespace DataGlobals {
         OutputFileStandard = 0;
         OutputStandardError = 0;
         StdOutputRecordCount = 0;
-        OutputFileInits = 0;
         OutputFileDebug = 0;
-        OutputFileZoneSizing = 0;
-        OutputFileSysSizing = 0;
-        OutputFileMeters = 0;
+        OutputFilePerfLog = 0;
         OutputFileShadingFrac = 0;
         StdMeterRecordCount = 0;
         OutputFileBNDetails = 0;
@@ -356,12 +360,18 @@ namespace DataGlobals {
         ShowDecayCurvesInEIO = false;
         AnySlabsInModel = false;
         AnyBasementsInModel = false;
+        DoCoilDirectSolutions = false;
         Progress = 0;
+        fProgressPtr = nullptr;
+        fMessagePtr = nullptr;
+        progressCallback = nullptr;
+        messageCallback = nullptr;
+        errorCallback = nullptr;
         eso_stream = nullptr;
         mtr_stream = nullptr;
         err_stream = nullptr;
-        eio_stream = nullptr;
         delightin_stream = nullptr;
+        eplusRunningViaAPI = false;
     }
 
 } // namespace DataGlobals

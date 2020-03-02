@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,10 +56,15 @@
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Array3D.hh>
 
+// Penumbra Headers
+#ifndef EP_NO_OPENGL
+#include <penumbra/penumbra.h>
+#endif
+
 // EnergyPlus Headers
-#include <DataBSDFWindow.hh>
-#include <DataVectorTypes.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataBSDFWindow.hh>
+#include <EnergyPlus/DataVectorTypes.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -167,6 +172,11 @@ namespace SolarShading {
     extern int maxNumberOfFigures;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE SolarShading
+#ifdef EP_NO_OPENGL
+    extern bool penumbra;
+#else
+    extern std::unique_ptr<Pumbra::Penumbra> penumbra;
+#endif
 
     // Types
 
@@ -193,7 +203,7 @@ namespace SolarShading {
 
     void InitSolarCalculations();
 
-    void GetShadowingInput();
+    void GetShadowingInput(OutputFiles &outputFiles);
 
     void AllocateModuleArrays();
 
@@ -388,9 +398,9 @@ namespace SolarShading {
     void CalcWinTransDifSolInitialDistribution();
 
     void CalcInteriorWinTransDifSolInitialDistribution(
-        int const ZoneNum,                // Zone index number
-        int const IntWinSurfNum,          // Interior Window Surface number in Zone ZoneNum
-        Real64 const IntWinDifSolarTransW // Diffuse Solar transmitted through Interior Window IntWinSurfNum from adjacent zone [W]
+        int const IntWinEnclosureNum,     // Interior Window Enclosure index number
+        int const IntWinSurfNum,          // Interior Window Surface number
+        Real64 const IntWinDifSolarTransW // Diffuse Solar transmitted through Interior Window IntWinSurfNum from adjacent enclosure [W]
     );
 
     void CalcComplexWindowOverlap(BSDFGeomDescr &Geom,               // State Geometry

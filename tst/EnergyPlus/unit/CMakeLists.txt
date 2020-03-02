@@ -1,6 +1,10 @@
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src )
-INCLUDE_DIRECTORIES( ${CMAKE_SOURCE_DIR}/src/EnergyPlus )
-INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR} )
+
+# this is repeated from the core E+ build, which is unfortunate
+# we need to either:
+# - figure out how to build the unit tests without the Python dependency, which would mean putting a conditional DEFINE in the PluginManager.hh code, or
+# - just get this once at highest level configure time and save it for everywhere
+find_package(PythonLibs 3 REQUIRED)
+include_directories(${PYTHON_INCLUDE_DIRS})
 
 set( test_src
   TestHelpers/IdfParser.cc
@@ -15,6 +19,7 @@ set( test_src
   AirflowNetworkSimulationControl.unit.cc
   AirflowNetworkBalanceManager.unit.cc
   AirflowNetworkSolver.unit.cc
+  AirLoopHVACDOAS.unit.cc
   AirTerminalSingleDuct.unit.cc
   AirTerminalSingleDuctConstantVolumeNoReheat.unit.cc
   AirTerminalSingleDuctMixer.unit.cc
@@ -32,12 +37,18 @@ set( test_src
   ChillerExhaustAbsorption.unit.cc
   ChillerGasAbsorption.unit.cc
   ChillerIndirectAbsorption.unit.cc
+  Coils/CoilCoolingDXFixture.hh
+  Coils/CoilCoolingDX.unit.cc
+  Coils/CoilCoolingDXCurveFitPerformance.unit.cc
+  Coils/CoilCoolingDXCurveFitOperatingMode.unit.cc
+  Coils/CoilCoolingDXCurveFitSpeed.unit.cc
   CondenserLoopTowers.unit.cc
   ConstructionInternalSource.unit.cc
   ConvectionCoefficients.unit.cc
   CrossVentMgr.unit.cc
   CurveManager.unit.cc
   DataEnvironment.unit.cc
+  DataGlobalConstants.unit.cc
   DataHeatBalance.unit.cc
   DataPlant.unit.cc
   Datasets.unit.cc
@@ -72,6 +83,7 @@ set( test_src
   GeneralRoutines.unit.cc
   GroundHeatExchangers.unit.cc
   HeatBalanceAirManager.unit.cc
+  HeatBalanceKivaManager.unit.cc
   HeatBalanceManager.unit.cc
   HeatBalanceMovableInsulation.unit.cc
   HeatBalanceIntRadExchange.unit.cc
@@ -112,6 +124,7 @@ set( test_src
   OASystemHWPreheatCoil.unit.cc
   OutAirNodeManager.unit.cc
   OutdoorAirUnit.unit.cc
+  OutputFiles.unit.cc
   OutputProcessor.unit.cc
   OutputReportData.unit.cc
   OutputReports.unit.cc
@@ -130,8 +143,11 @@ set( test_src
   PlantComponentTemperatureSources.unit.cc
   PlantChillers.unit.cc
   PlantCondLoopOperation.unit.cc
+  PlantLoopHeatPumpEIR.unit.cc
   PlantUtilities.unit.cc
+  PluginManager.unit.cc
   PoweredInductionUnits.unit.cc
+  Psychrometrics.unit.cc
   Pumps.unit.cc
   PurchasedAirManager.unit.cc
   PVWatts.unit.cc
@@ -180,7 +196,6 @@ set( test_src
   WaterThermalTanks.unit.cc
   WaterToAirHeatPump.unit.cc
   WaterToAirHeatPumpSimple.unit.cc
-  WaterToWaterHeatPumpEIR.unit.cc
   WeatherManager.unit.cc
   WinCalcEngine.unit.cc
   WindowAC.unit.cc
@@ -190,6 +205,7 @@ set( test_src
   XingGroundTemperatureModel.unit.cc
   ZoneContaminantPredictorCorrector.unit.cc
   ZoneEquipmentManager.unit.cc
+  ZoneHVACEvaporativeCooler.unit.cc
   ZonePlenum.unit.cc
   ZoneTempPredictorCorrector.unit.cc
   main.cc
@@ -203,6 +219,8 @@ if(CMAKE_HOST_UNIX)
     list(APPEND test_dependencies dl )
   endif()
 endif()
+
+list(APPEND test_dependencies ${PYTHON_LIBRARIES} )
 
 # Executable name will be EnergyPlus_tests
 # Execute energyplus_tests --help for options using gtest runner

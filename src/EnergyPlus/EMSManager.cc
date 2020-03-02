@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,25 +55,26 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include <CommandLineInterface.hh>
-#include <DataAirLoop.hh>
-#include <DataAirSystems.hh>
-#include <DataGlobals.hh>
-#include <DataHeatBalance.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataRuntimeLanguage.hh>
-#include <DataStringGlobals.hh>
-#include <DataSurfaces.hh>
-#include <DataZoneControls.hh>
-#include <EMSManager.hh>
-#include <General.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <OutAirNodeManager.hh>
-#include <OutputProcessor.hh>
-#include <RuntimeLanguageProcessor.hh>
-#include <ScheduleManager.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/CommandLineInterface.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataRuntimeLanguage.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataZoneControls.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/PluginManager.hh>
+#include <EnergyPlus/RuntimeLanguageProcessor.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -213,12 +214,16 @@ namespace EMSManager {
         cCurrentModuleObject = "Output:EnergyManagementSystem";
         int NumOutputEMSs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
+        // Python plugin instances also count since actuators need to be set up for them
+        int numPythonPlugins = inputProcessor->getNumObjectsFound("PythonPlugin:Instance");
+        int numActiveCallbacks = PluginManagement::PluginManager::numActiveCallbacks();
+
         // added for FMU
         if ((NumSensors + numActuatorsUsed + NumProgramCallManagers + NumErlPrograms + NumErlSubroutines + NumUserGlobalVariables +
              NumEMSOutputVariables + NumEMSCurveIndices + NumExternalInterfaceGlobalVariables + NumExternalInterfaceActuatorsUsed +
              NumEMSConstructionIndices + NumEMSMeteredOutputVariables + NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed +
              NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables + NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed +
-             NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables + NumOutputEMSs) > 0) {
+             NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables + NumOutputEMSs + numPythonPlugins + numActiveCallbacks) > 0) {
             AnyEnergyManagementSystemInModel = true;
         } else {
             AnyEnergyManagementSystemInModel = false;
@@ -302,6 +307,13 @@ namespace EMSManager {
         if (iCalledFrom == emsCallFromBeginNewEvironment) BeginEnvrnInitializeRuntimeLanguage();
 
         InitEMS(iCalledFrom);
+
+        // also call plugins and callbacks here for convenience
+        bool anyPluginsOrCallbacksRan = false;
+        PluginManagement::runAnyRegisteredCallbacks(iCalledFrom, anyPluginsOrCallbacksRan);
+        if (anyPluginsOrCallbacksRan) {
+            anyProgramRan = true;
+        }
 
         if (iCalledFrom == emsCallFromSetupSimulation) {
             ProcessEMSInput(true);
@@ -1307,7 +1319,7 @@ namespace EMSManager {
         int NumKeys;
         int KeyNum;
         OutputProcessor::StoreType AvgOrSum;
-        int StepType;
+        OutputProcessor::TimeStepType StepType;
         OutputProcessor::Unit Units(OutputProcessor::Unit::None);
         Array1D_string KeyName;
         Array1D_int KeyIndex;

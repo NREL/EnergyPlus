@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,8 +53,8 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -279,6 +279,22 @@ namespace DesiccantDehumidifiers {
 
     Real64 HotWaterCoilResidual(Real64 const HWFlow,      // hot water flow rate in kg/s
                                 Array1<Real64> const &Par // Par(5) is the requested coil load
+    );
+
+    int GetProcAirInletNodeNum(std::string const &DesicDehumName,
+        bool &ErrorsFound
+    );
+
+    int GetProcAirOutletNodeNum(std::string const &DesicDehumName,
+        bool &ErrorsFound
+    );
+
+    int GetRegAirInletNodeNum(std::string const &DesicDehumName,
+        bool &ErrorsFound
+    );
+
+    int GetRegAirOutletNodeNum(std::string const &DesicDehumName,
+        bool &ErrorsFound
     );
 
     // Clears the global data in HeatingCoils.

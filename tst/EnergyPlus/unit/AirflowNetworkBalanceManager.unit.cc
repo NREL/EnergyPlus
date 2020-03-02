@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,10 +52,10 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <AirflowNetworkBalanceManager.hh>
-#include <AirflowNetwork/Solver.hpp>
 #include <AirflowNetwork/Elements.hpp>
-#include <DataSurfaces.hh>
+#include <AirflowNetwork/Solver.hpp>
+#include <EnergyPlus/AirflowNetworkBalanceManager.hh>
+#include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataAirLoop.hh>
@@ -71,6 +71,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -218,7 +219,7 @@ TEST_F(EnergyPlusFixture, TestZoneVentingSch)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    GetAirflowNetworkInput();
+    GetAirflowNetworkInput(OutputFiles::getSingleton());
 
     // MultizoneZoneData has only 1 element so may be hardcoded
     auto GetIndex = UtilityRoutines::FindItemInList(AirflowNetwork::MultizoneZoneData(1).VentingSchName, Schedule({1, NumSchedules}));
@@ -341,7 +342,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestTriangularWindowWarni
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    GetAirflowNetworkInput();
+    GetAirflowNetworkInput(OutputFiles::getSingleton());
     std::string const error_string = delimited_string({
         "   ** Warning ** GetAirflowNetworkInput: AirflowNetwork:MultiZone:Surface=\"WINDOW1\".",
         "   **   ~~~   ** The opening is a Triangular subsurface. A rectangular subsurface will be used with equivalent width and height.",
@@ -2233,26 +2234,26 @@ TEST_F(EnergyPlusFixture, TestAFNPressureStat)
 
     bool ErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(ErrorsFound);
+    SurfaceGeometry::GetSurfaceData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
-    GetAirflowNetworkInput();
+    GetAirflowNetworkInput(OutputFiles::getSingleton());
 
     Real64 PressureSet = 0.5;
 
@@ -2333,8 +2334,6 @@ TEST_F(EnergyPlusFixture, TestAFNPressureStat)
     EXPECT_NEAR(0.0, AirflowNetwork::AirflowNetworkLinkReport(20).FLOW, 0.0001);
     EXPECT_NEAR(0.0, AirflowNetwork::AirflowNetworkLinkReport(50).FLOW, 0.0001);
 
-    AirflowNetwork::AirflowNetworkExchangeData.deallocate();
-
     // Start a test for #6005
     AirflowNetwork::ANZT = 26.0;
     AirflowNetwork::MultizoneSurfaceData(2).HybridVentClose = true;
@@ -2348,7 +2347,37 @@ TEST_F(EnergyPlusFixture, TestAFNPressureStat)
     EXPECT_EQ(0.0, SurfaceWindow(5).VentingOpenFactorMultRep);
     EXPECT_EQ(0.0, SurfaceWindow(14).VentingOpenFactorMultRep);
 
-    Node.deallocate();
+    // Test for #7162
+    DataHeatBalFanSys::ZoneAirHumRat.allocate(4);
+    DataHeatBalFanSys::MAT.allocate(4);
+    DataHeatBalFanSys::ZoneAirHumRatAvg.allocate(NumOfZones);
+
+    DataHeatBalFanSys::MAT(1) = 23.0;
+    DataHeatBalFanSys::MAT(2) = 23.0;
+    DataHeatBalFanSys::MAT(3) = 23.0;
+    DataHeatBalFanSys::MAT(4) = 5.0;
+    DataHeatBalFanSys::ZoneAirHumRat(1) = 0.0007;
+    DataHeatBalFanSys::ZoneAirHumRat(2) = 0.0011;
+    DataHeatBalFanSys::ZoneAirHumRat(3) = 0.0012;
+    DataHeatBalFanSys::ZoneAirHumRat(4) = 0.0008;
+    DataHeatBalFanSys::ZoneAirHumRatAvg = DataHeatBalFanSys::ZoneAirHumRat;
+    DataZoneEquipment::ZoneEquipConfig.allocate(4);
+    DataZoneEquipment::ZoneEquipConfig(1).IsControlled = false;
+    DataZoneEquipment::ZoneEquipConfig(2).IsControlled = false;
+    DataZoneEquipment::ZoneEquipConfig(3).IsControlled = false;
+    DataZoneEquipment::ZoneEquipConfig(4).IsControlled = false;
+    DataHVACGlobals::TimeStepSys = 0.1;
+
+    AirflowNetwork::AirflowNetworkLinkSimu(1).FLOW2 = 0.1;
+    AirflowNetwork::AirflowNetworkLinkSimu(10).FLOW2 = 0.15;
+    AirflowNetwork::AirflowNetworkLinkSimu(13).FLOW2 = 0.1;
+
+    ReportAirflowNetwork();
+
+    EXPECT_NEAR(34.3673036, AirflowNetwork::AirflowNetworkReportData(1).MultiZoneInfiLatGainW, 0.0001);
+    EXPECT_NEAR(36.7133377, AirflowNetwork::AirflowNetworkReportData(2).MultiZoneMixLatGainW, 0.0001);
+    EXPECT_NEAR(89.3450925, AirflowNetwork::AirflowNetworkReportData(3).MultiZoneInfiLatLossW, 0.0001);
+
 }
 TEST_F(EnergyPlusFixture, TestZoneVentingSchWithAdaptiveCtrl)
 {
@@ -2437,7 +2466,7 @@ TEST_F(EnergyPlusFixture, TestZoneVentingSchWithAdaptiveCtrl)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetAirflowNetworkInput();
+    GetAirflowNetworkInput(OutputFiles::getSingleton());
 
     // The original value before fix is zero. After the fix, the correct schedule number is assigned.
 
@@ -2979,7 +3008,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManagerTest_PolygonalWindows)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetAirflowNetworkInput();
+    GetAirflowNetworkInput(OutputFiles::getSingleton());
 
     // Choice: Height; Base Surface: Vertical Rectangular
     EXPECT_NEAR(1.0, AirflowNetwork::MultizoneSurfaceData(1).Width, 0.0001);
@@ -3018,7 +3047,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AFNUserDefinedDuctViewFac
 {
 
     std::string const idf_objects = delimited_string({
-        "  Version,9.2;",
+        "  Version,9.3;",
 
         "  SimulationControl,",
         "    No,                      !- Do Zone Sizing Calculation",
@@ -3036,10 +3065,6 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AFNUserDefinedDuctViewFac
         "    FullInteriorAndExterior, !- Solar Distribution",
         "    ,                        !- Maximum Number of Warmup Days",
         "    6;                       !- Minimum Number of Warmup Days",
-
-        "  ShadowCalculation,",
-        "    AverageOverDaysInFrequency,  !- Calculation Method",
-        "    20;                      !- Calculation Frequency",
 
         "  SurfaceConvectionAlgorithm:Inside,",
         "    TARP;                    !- Algorithm",
@@ -4374,14 +4399,14 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AFNUserDefinedDuctViewFac
 
     bool ErrorsFound = false;
     // Read objects
-    SimulationManager::GetProjectData();
-    HeatBalanceManager::GetProjectControlData(ErrorsFound);
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -4389,16 +4414,16 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AFNUserDefinedDuctViewFac
     HeatBalanceManager::AllocateHeatBalArrays();
     DataEnvironment::OutBaroPress = 101000;
     DataHVACGlobals::TimeStepSys = DataGlobals::TimeStepZone;
-    SurfaceGeometry::GetGeometryParameters(ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(ErrorsFound);
+    SurfaceGeometry::GetSurfaceData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
-    GetAirflowNetworkInput();
+    GetAirflowNetworkInput(OutputFiles::getSingleton());
     InitAirflowNetwork();
 
     // Check inputs
@@ -4522,44 +4547,60 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AirPrandtl)
 
 TEST_F(EnergyPlusFixture, TestWindPressureTable)
 {
-    // Test a Table:OneIV object as a wind pressure curve
-    std::string const idf_objects = delimited_string({"Table:OneIndependentVariable,",
-                                                      "  EFacade_WPCCurve,        !- Name",
-                                                      "  Linear,                  !- Curve Type",
-                                                      "  LinearInterpolationOfTable,  !- Interpolation Method",
-                                                      "  0,                       !- Minimum Value of X",
-                                                      "  360,                     !- Maximum Value of X",
-                                                      "  -1,                      !- Minimum Table Output",
-                                                      "  1,                       !- Maximum Table Output",
-                                                      "  Dimensionless,           !- Input Unit Type for X",
-                                                      "  Dimensionless,           !- Output Unit Type",
-                                                      "  1,                       !- Normalization Reference",
-                                                      "  0,                       !- X Value #1",
-                                                      "  -0.56,                   !- Output Value #1",
-                                                      "  30,                      !- X Value #2",
-                                                      "  0.04,                    !- Output Value #2",
-                                                      "  60,                      !- X Value #3",
-                                                      "  0.48,                    !- Output Value #3",
-                                                      "  90,                      !- X Value #4",
-                                                      "  0.6,                     !- Output Value #4",
-                                                      "  120,                     !- X Value #5",
-                                                      "  0.48,                    !- Output Value #5",
-                                                      "  150,                     !- X Value #6",
-                                                      "  0.04,                    !- Output Value #6",
-                                                      "  180,                     !- X Value #7",
-                                                      "  -0.56,                   !- Output Value #7",
-                                                      "  210,                     !- N20",
-                                                      "  -0.56,                   !- N21",
-                                                      "  240,                     !- N22",
-                                                      "  -0.42,                   !- N23",
-                                                      "  270,                     !- N24",
-                                                      "  -0.37,                   !- N25",
-                                                      "  300,                     !- N26",
-                                                      "  -0.42,                   !- N27",
-                                                      "  330,                     !- N28",
-                                                      "  -0.56,                   !- N29",
-                                                      "  360,                     !- N30",
-                                                      "  -0.56;                   !- N31"});
+    // Test a Table:Lookup object as a wind pressure curve
+    std::string const idf_objects = delimited_string({"Table:IndependentVariable,",
+                                                      "  Wind_Direction_30_deg,     !- Name",
+                                                      "  Linear,                    !- Interpolation Method",
+                                                      "  Constant,                  !- Extrapolation Method",
+                                                      "  0,                         !- Minimum Value",
+                                                      "  360,                       !- Maximum Value",
+                                                      "  ,                          !- Normalization Reference Value",
+                                                      "  Dimensionless,             !- Unit Type",
+                                                      "  ,                          !- External File Name",
+                                                      "  ,                          !- External File Column Number",
+                                                      "  ,                          !- External File Starting Row Number",
+                                                      "  0,                         !- Value 1",
+                                                      "  30,",
+                                                      "  60,",
+                                                      "  90,",
+                                                      "  120,",
+                                                      "  150,",
+                                                      "  180,",
+                                                      "  210,",
+                                                      "  240,",
+                                                      "  270,",
+                                                      "  300,",
+                                                      "  330,",
+                                                      "  360;",
+
+                                                      "Table:IndependentVariableList,",
+                                                      "  Wind_Pressure_Variables,   !- Name",
+                                                      "  Wind_Direction_30_deg;     !- Independent Variable 1 Name",
+
+                                                      "Table:Lookup,",
+                                                      "  EFacade_WPCCurve,          !- Name",
+                                                      "  Wind_Pressure_Variables,   !- Independent Variable List Name",
+                                                      "  ,                          !- Normalization Method",
+                                                      "  ,                          !- Normalization Divisor",
+                                                      "  -1,                        !- Minimum Output",
+                                                      "  1,                         !- Maximum Output",
+                                                      "  Dimensionless,             !- Output Unit Type",
+                                                      "  ,                          !- External File Name",
+                                                      "  ,                          !- External File Column Number",
+                                                      "  ,                          !- External File Starting Row Number",
+                                                      "  -0.56,                     !- Output Value 1",
+                                                      "  0.04,",
+                                                      "  0.48,",
+                                                      "  0.6,",
+                                                      "  0.48,",
+                                                      "  0.04,",
+                                                      "  -0.56,",
+                                                      "  -0.56,",
+                                                      "  -0.42,",
+                                                      "  -0.37,",
+                                                      "  -0.42,",
+                                                      "  -0.56,",
+                                                      "  -0.56;"});
 
     // Load and verify the table
     ASSERT_TRUE(process_idf(idf_objects));
@@ -4570,7 +4611,7 @@ TEST_F(EnergyPlusFixture, TestWindPressureTable)
     EXPECT_EQ(1, CurveManager::PerfCurve(1).NumDims);
     EXPECT_EQ("EFACADE_WPCCURVE", CurveManager::GetCurveName(1));
     EXPECT_EQ(1, CurveManager::GetCurveIndex("EFACADE_WPCCURVE"));
-    EXPECT_EQ("Table:OneIndependentVariable", CurveManager::PerfCurve(1).ObjectType);
+    EXPECT_EQ("Table:Lookup", CurveManager::PerfCurve(1).ObjectType);
     EXPECT_DOUBLE_EQ(-0.56, CurveManager::CurveValue(1, 0.0));   // In-range value
     EXPECT_DOUBLE_EQ(0.54, CurveManager::CurveValue(1, 105.0));  // In-range value
     EXPECT_DOUBLE_EQ(-0.56, CurveManager::CurveValue(1, -10.0)); // Minimum x
@@ -4612,7 +4653,7 @@ TEST_F(EnergyPlusFixture, TestWindPressureTable)
 
 TEST_F(EnergyPlusFixture, TestWPCValue)
 {
-    // Test loading a WPC object into a Table:OneIV
+    // Test loading a WPC object into a Table:Lookup
     std::string const idf_objects = delimited_string({"AirflowNetwork:MultiZone:WindPressureCoefficientArray,",
                                                       "  Every 30 Degrees,        !- Name",
                                                       "  0,                       !- Wind Direction 1 {deg}",
@@ -5572,7 +5613,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodes)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(errors); // read material data
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errors); // read material data
     EXPECT_FALSE(errors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(errors); // read construction data
@@ -5586,13 +5627,13 @@ TEST_F(EnergyPlusFixture, TestExternalNodes)
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(errors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(OutputFiles::getSingleton(), errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                    // expect no errors
 
     CurveManager::GetCurveInput();
     EXPECT_EQ(CurveManager::NumCurves, 2);
 
-    AirflowNetworkBalanceManager::GetAirflowNetworkInput();
+    AirflowNetworkBalanceManager::GetAirflowNetworkInput(OutputFiles::getSingleton());
 
     // Check the airflow elements
     EXPECT_EQ(2u, AirflowNetwork::MultizoneExternalNodeData.size());
@@ -6125,54 +6166,86 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithTables)
          "  0.01,                    !- Air Mass Flow Coefficient at Reference Conditions{ kg / s }",
          "  0.667,                   !- Air Mass Flow Exponent{ dimensionless }",
          "  ReferenceCrackConditions;!- Reference Crack Conditions",
-         "Table:OneIndependentVariable,",
-         "  NFacade_WPCCurve,        !- Name",
-         "  Linear,                  !- Curve Type",
-         "  LinearInterpolationOfTable,  !- Interpolation Method",
-         "  0,                       !- Minimum Value of X",
-         "  360,                     !- Maximum Value of X",
-         "  -1,                      !- Minimum Table Output",
-         "  1,                       !- Maximum Table Output",
-         "  Dimensionless,           !- Input Unit Type for X",
-         "  Dimensionless,           !- Output Unit Type",
-         "  1,                       !- Normalization Reference",
-         "  0, 0.60,                 !- X,Y Pair #1",
-         "  30, 0.48,                !- X,Y Pair #2",
-         "  60, 0.04,                !- X,Y Pair #3",
-         "  90, -0.56,               !- X,Y Pair #4",
-         "  120, -0.56,              !- X,Y Pair #5",
-         "  150, -0.42,              !- X,Y Pair #6",
-         "  180, -0.37,              !- X,Y Pair #7",
-         "  210, -0.42,              !- X,Y Pair #8",
-         "  240, -0.56,              !- X,Y Pair #9",
-         "  270, -0.56,              !- X,Y Pair #10",
-         "  300, 0.04,               !- X,Y Pair #11",
-         "  330, 0.48,               !- X,Y Pair #12",
-         "  360, 0.60;               !- X,Y Pair #13",
-         "Table:OneIndependentVariable,",
-         "  SFacade_WPCCurve,        !- Name",
-         "  Linear,                  !- Curve Type",
-         "  LinearInterpolationOfTable,  !- Interpolation Method",
-         "  0,                       !- Minimum Value of X",
-         "  360,                     !- Maximum Value of X",
-         "  -1,                      !- Minimum Table Output",
-         "  1,                       !- Maximum Table Output",
-         "  Dimensionless,           !- Input Unit Type for X",
-         "  Dimensionless,           !- Output Unit Type",
-         "  1,                       !- Normalization Reference",
-         "  0, -0.37,                !- X,Y Pair #1",
-         "  30, -0.42,               !- X,Y Pair #2",
-         "  60, -0.56,               !- X,Y Pair #3",
-         "  90, -0.56,               !- X,Y Pair #4",
-         "  120, 0.04,               !- X,Y Pair #5",
-         "  150, 0.48,               !- X,Y Pair #6",
-         "  180, 0.60,               !- X,Y Pair #7",
-         "  210, 0.48,               !- X,Y Pair #8",
-         "  240, 0.04,               !- X,Y Pair #9",
-         "  270, -0.56,              !- X,Y Pair #10",
-         "  300, -0.56,              !- X,Y Pair #11",
-         "  330, -0.42,              !- X,Y Pair #12",
-         "  360, -0.37;              !- X,Y Pair #13",
+
+         "Table:IndependentVariable,",
+         "  Wind_Direction_30_deg,     !- Name",
+         "  Linear,                    !- Interpolation Method",
+         "  Constant,                  !- Extrapolation Method",
+         "  0,                         !- Minimum Value",
+         "  360,                       !- Maximum Value",
+         "  ,                          !- Normalization Reference Value",
+         "  Dimensionless,             !- Unit Type",
+         "  ,                          !- External File Name",
+         "  ,                          !- External File Column Number",
+         "  ,                          !- External File Starting Row Number",
+         "  0,                         !- Value 1",
+         "  30,",
+         "  60,",
+         "  90,",
+         "  120,",
+         "  150,",
+         "  180,",
+         "  210,",
+         "  240,",
+         "  270,",
+         "  300,",
+         "  330,",
+         "  360;",
+
+         "Table:IndependentVariableList,",
+         "  Wind_Pressure_Variables,   !- Name",
+         "  Wind_Direction_30_deg;     !- Independent Variable 1 Name",
+
+         "Table:Lookup,",
+         "  NFacade_WPCCurve,          !- Name",
+         "  Wind_Pressure_Variables,   !- Independent Variable List Name",
+         "  ,                          !- Normalization Method",
+         "  ,                          !- Normalization Divisor",
+         "  -1,                        !- Minimum Output",
+         "  1,                         !- Maximum Output",
+         "  Dimensionless,             !- Output Unit Type",
+         "  ,                          !- External File Name",
+         "  ,                          !- External File Column Number",
+         "  ,                          !- External File Starting Row Number",
+         "  0.60,                      !- Output Value 1",
+         "  0.48,",
+         "  0.04,",
+         "  -0.56,",
+         "  -0.56,",
+         "  -0.42,",
+         "  -0.37,",
+         "  -0.42,",
+         "  -0.56,",
+         "  -0.56,",
+         "  0.04,",
+         "  0.48,",
+         "  0.60;",
+
+         "Table:Lookup,",
+         "  SFacade_WPCCurve,          !- Name",
+         "  Wind_Pressure_Variables,   !- Independent Variable List Name",
+         "  ,                          !- Normalization Method",
+         "  ,                          !- Normalization Divisor",
+         "  -1,                        !- Minimum Output",
+         "  1,                         !- Maximum Output",
+         "  Dimensionless,             !- Output Unit Type",
+         "  ,                          !- External File Name",
+         "  ,                          !- External File Column Number",
+         "  ,                          !- External File Starting Row Number",
+         "  -0.37,                     !- Output Value 1",
+         "  -0.42,",
+         "  -0.56,",
+         "  -0.56,",
+         "  0.04,",
+         "  0.48,",
+         "  0.60,",
+         "  0.48,",
+         "  0.04,",
+         "  -0.56,",
+         "  -0.56,",
+         "  -0.42,",
+         "  -0.37;",
+
          "SurfaceConvectionAlgorithm:Inside,TARP;",
          "SurfaceConvectionAlgorithm:Outside,DOE-2;",
          "HeatBalanceAlgorithm,ConductionTransferFunction;",
@@ -6182,7 +6255,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithTables)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(errors); // read material data
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errors); // read material data
     EXPECT_FALSE(errors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(errors); // read construction data
@@ -6196,13 +6269,13 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithTables)
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(errors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(OutputFiles::getSingleton(), errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                    // expect no errors
 
     CurveManager::GetCurveInput();
     EXPECT_EQ(CurveManager::NumCurves, 2);
 
-    AirflowNetworkBalanceManager::GetAirflowNetworkInput();
+    AirflowNetworkBalanceManager::GetAirflowNetworkInput(OutputFiles::getSingleton());
 
     // Check the airflow elements
     EXPECT_EQ(2u, AirflowNetwork::MultizoneExternalNodeData.size());
@@ -6805,7 +6878,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithNoInput)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(errors); // read material data
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errors); // read material data
     EXPECT_FALSE(errors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(errors); // read construction data
@@ -6819,13 +6892,13 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithNoInput)
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(errors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(OutputFiles::getSingleton(), errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                    // expect no errors
 
     CurveManager::GetCurveInput();
     EXPECT_EQ(CurveManager::NumCurves, 1);
 
-    AirflowNetworkBalanceManager::GetAirflowNetworkInput();
+    AirflowNetworkBalanceManager::GetAirflowNetworkInput(OutputFiles::getSingleton());
 
     EXPECT_EQ(CurveManager::NumCurves, 6);
 
@@ -7380,24 +7453,49 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithSymmetricTable)
          "  0.01,                    !- Air Mass Flow Coefficient at Reference Conditions{ kg / s }",
          "  0.667,                   !- Air Mass Flow Exponent{ dimensionless }",
          "  ReferenceCrackConditions;!- Reference Crack Conditions",
-         "Table:OneIndependentVariable,",
-         "  NFacade_WPCCurve,        !- Name",
-         "  Linear,                  !- Curve Type",
-         "  LinearInterpolationOfTable,  !- Interpolation Method",
-         "  0,                       !- Minimum Value of X",
-         "  180,                     !- Maximum Value of X",
-         "  -1,                      !- Minimum Table Output",
-         "  1,                       !- Maximum Table Output",
-         "  Dimensionless,           !- Input Unit Type for X",
-         "  Dimensionless,           !- Output Unit Type",
-         "  1,                       !- Normalization Reference",
-         "  0, 0.60,                 !- X,Y Pair #1",
-         "  30, 0.48,                !- X,Y Pair #2",
-         "  60, 0.04,                !- X,Y Pair #3",
-         "  90, -0.56,               !- X,Y Pair #4",
-         "  120, -0.56,              !- X,Y Pair #5",
-         "  150, -0.42,              !- X,Y Pair #6",
-         "  180, -0.37;              !- X,Y Pair #7",
+
+         "Table:IndependentVariable,",
+         "  Wind_Direction_30_deg,     !- Name",
+         "  Linear,                    !- Interpolation Method",
+         "  Constant,                  !- Extrapolation Method",
+         "  0,                         !- Minimum Value",
+         "  180,                       !- Maximum Value",
+         "  ,                          !- Normalization Reference Value",
+         "  Dimensionless,             !- Unit Type",
+         "  ,                          !- External File Name",
+         "  ,                          !- External File Column Number",
+         "  ,                          !- External File Starting Row Number",
+         "  0,                         !- Value 1",
+         "  30,",
+         "  60,",
+         "  90,",
+         "  120,",
+         "  150,",
+         "  180;",
+
+         "Table:IndependentVariableList,",
+         "  Wind_Pressure_Variables,   !- Name",
+         "  Wind_Direction_30_deg;     !- Independent Variable 1 Name",
+
+         "Table:Lookup,",
+         "  NFacade_WPCCurve,          !- Name",
+         "  Wind_Pressure_Variables,   !- Independent Variable List Name",
+         "  ,                          !- Normalization Method",
+         "  ,                          !- Normalization Divisor",
+         "  -1,                        !- Minimum Output",
+         "  1,                         !- Maximum Output",
+         "  Dimensionless,             !- Output Unit Type",
+         "  ,                          !- External File Name",
+         "  ,                          !- External File Column Number",
+         "  ,                          !- External File Starting Row Number",
+         "  0.60,                      !- Output Value 1",
+         "  0.48,",
+         "  0.04,",
+         "  -0.56,",
+         "  -0.56,",
+         "  -0.42,",
+         "  -0.37;",
+
          "SurfaceConvectionAlgorithm:Inside,TARP;",
          "SurfaceConvectionAlgorithm:Outside,DOE-2;",
          "HeatBalanceAlgorithm,ConductionTransferFunction;",
@@ -7407,7 +7505,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithSymmetricTable)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(errors); // read material data
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errors); // read material data
     EXPECT_FALSE(errors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(errors); // read construction data
@@ -7421,13 +7519,13 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithSymmetricTable)
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(errors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(OutputFiles::getSingleton(), errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                    // expect no errors
 
     CurveManager::GetCurveInput();
     EXPECT_EQ(CurveManager::NumCurves, 1);
 
-    AirflowNetworkBalanceManager::GetAirflowNetworkInput();
+    AirflowNetworkBalanceManager::GetAirflowNetworkInput(OutputFiles::getSingleton());
 
     // Check the airflow elements
     EXPECT_EQ(2u, AirflowNetwork::MultizoneExternalNodeData.size());
@@ -8041,7 +8139,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithSymmetricCurve)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(errors); // read material data
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errors); // read material data
     EXPECT_FALSE(errors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(errors); // read construction data
@@ -8055,13 +8153,13 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithSymmetricCurve)
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(errors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(OutputFiles::getSingleton(), errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                    // expect no errors
 
     CurveManager::GetCurveInput();
     EXPECT_EQ(CurveManager::NumCurves, 1);
 
-    AirflowNetworkBalanceManager::GetAirflowNetworkInput();
+    AirflowNetworkBalanceManager::GetAirflowNetworkInput(OutputFiles::getSingleton());
 
     // Check the airflow elements
     EXPECT_EQ(2u, AirflowNetwork::MultizoneExternalNodeData.size());
@@ -8125,7 +8223,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithSymmetricCurve)
 TEST_F(EnergyPlusFixture, TestExternalNodesWithLocalAirNode)
 {
     std::string const idf_objects = delimited_string(
-        {"Version,9.2;",
+        {"Version,9.3;",
          "Material,",
          "  A1 - 1 IN STUCCO,        !- Name",
          "  Smooth,                  !- Roughness",
@@ -8666,54 +8764,86 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithLocalAirNode)
          "  0.01,                    !- Air Mass Flow Coefficient at Reference Conditions{ kg / s }",
          "  0.667,                   !- Air Mass Flow Exponent{ dimensionless }",
          "  ReferenceCrackConditions;!- Reference Crack Conditions",
-         "Table:OneIndependentVariable,",
-         "  NFacade_WPCCurve,        !- Name",
-         "  Linear,                  !- Curve Type",
-         "  LinearInterpolationOfTable,  !- Interpolation Method",
-         "  0,                       !- Minimum Value of X",
-         "  360,                     !- Maximum Value of X",
-         "  -1,                      !- Minimum Table Output",
-         "  1,                       !- Maximum Table Output",
-         "  Dimensionless,           !- Input Unit Type for X",
-         "  Dimensionless,           !- Output Unit Type",
-         "  1,                       !- Normalization Reference",
-         "  0, 0.60,                 !- X,Y Pair #1",
-         "  30, 0.48,                !- X,Y Pair #2",
-         "  60, 0.04,                !- X,Y Pair #3",
-         "  90, -0.56,               !- X,Y Pair #4",
-         "  120, -0.56,              !- X,Y Pair #5",
-         "  150, -0.42,              !- X,Y Pair #6",
-         "  180, -0.37,              !- X,Y Pair #7",
-         "  210, -0.42,              !- X,Y Pair #8",
-         "  240, -0.56,              !- X,Y Pair #9",
-         "  270, -0.56,              !- X,Y Pair #10",
-         "  300, 0.04,               !- X,Y Pair #11",
-         "  330, 0.48,               !- X,Y Pair #12",
-         "  360, 0.60;               !- X,Y Pair #13",
-         "Table:OneIndependentVariable,",
-         "  SFacade_WPCCurve,        !- Name",
-         "  Linear,                  !- Curve Type",
-         "  LinearInterpolationOfTable,  !- Interpolation Method",
-         "  0,                       !- Minimum Value of X",
-         "  360,                     !- Maximum Value of X",
-         "  -1,                      !- Minimum Table Output",
-         "  1,                       !- Maximum Table Output",
-         "  Dimensionless,           !- Input Unit Type for X",
-         "  Dimensionless,           !- Output Unit Type",
-         "  1,                       !- Normalization Reference",
-         "  0, -0.37,                !- X,Y Pair #1",
-         "  30, -0.42,               !- X,Y Pair #2",
-         "  60, -0.56,               !- X,Y Pair #3",
-         "  90, -0.56,               !- X,Y Pair #4",
-         "  120, 0.04,               !- X,Y Pair #5",
-         "  150, 0.48,               !- X,Y Pair #6",
-         "  180, 0.60,               !- X,Y Pair #7",
-         "  210, 0.48,               !- X,Y Pair #8",
-         "  240, 0.04,               !- X,Y Pair #9",
-         "  270, -0.56,              !- X,Y Pair #10",
-         "  300, -0.56,              !- X,Y Pair #11",
-         "  330, -0.42,              !- X,Y Pair #12",
-         "  360, -0.37;              !- X,Y Pair #13",
+
+         "Table:IndependentVariable,",
+         "  Wind_Direction_30_deg,     !- Name",
+         "  Linear,                    !- Interpolation Method",
+         "  Constant,                  !- Extrapolation Method",
+         "  0,                         !- Minimum Value",
+         "  360,                       !- Maximum Value",
+         "  ,                          !- Normalization Reference Value",
+         "  Dimensionless,             !- Unit Type",
+         "  ,                          !- External File Name",
+         "  ,                          !- External File Column Number",
+         "  ,                          !- External File Starting Row Number",
+         "  0,                         !- Value 1",
+         "  30,",
+         "  60,",
+         "  90,",
+         "  120,",
+         "  150,",
+         "  180,",
+         "  210,",
+         "  240,",
+         "  270,",
+         "  300,",
+         "  330,",
+         "  360;",
+
+         "Table:IndependentVariableList,",
+         "  Wind_Pressure_Variables,   !- Name",
+         "  Wind_Direction_30_deg;     !- Independent Variable 1 Name",
+
+         "Table:Lookup,",
+         "  NFacade_WPCCurve,          !- Name",
+         "  Wind_Pressure_Variables,   !- Independent Variable List Name",
+         "  ,                          !- Normalization Method",
+         "  ,                          !- Normalization Divisor",
+         "  -1,                        !- Minimum Output",
+         "  1,                         !- Maximum Output",
+         "  Dimensionless,             !- Output Unit Type",
+         "  ,                          !- External File Name",
+         "  ,                          !- External File Column Number",
+         "  ,                          !- External File Starting Row Number",
+         "  0.60,                      !- Output Value 1",
+         "  0.48,",
+         "  0.04,",
+         "  -0.56,",
+         "  -0.56,",
+         "  -0.42,",
+         "  -0.37,",
+         "  -0.42,",
+         "  -0.56,",
+         "  -0.56,",
+         "  0.04,",
+         "  0.48,",
+         "  0.60;",
+
+         "Table:Lookup,",
+         "  SFacade_WPCCurve,          !- Name",
+         "  Wind_Pressure_Variables,   !- Independent Variable List Name",
+         "  ,                          !- Normalization Method",
+         "  ,                          !- Normalization Divisor",
+         "  -1,                        !- Minimum Output",
+         "  1,                         !- Maximum Output",
+         "  Dimensionless,             !- Output Unit Type",
+         "  ,                          !- External File Name",
+         "  ,                          !- External File Column Number",
+         "  ,                          !- External File Starting Row Number",
+         "  -0.37,                     !- Output Value 1",
+         "  -0.42,",
+         "  -0.56,",
+         "  -0.56,",
+         "  0.04,",
+         "  0.48,",
+         "  0.60,",
+         "  0.48,",
+         "  0.04,",
+         "  -0.56,",
+         "  -0.56,",
+         "  -0.42,",
+         "  -0.37;",
+
          "SurfaceConvectionAlgorithm:Inside,TARP;",
          "SurfaceConvectionAlgorithm:Outside,DOE-2;",
          "HeatBalanceAlgorithm,ConductionTransferFunction;",
@@ -8734,28 +8864,28 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithLocalAirNode)
 
     bool ErrorsFound = false;
     // Read objects
-    SimulationManager::GetProjectData();
-    HeatBalanceManager::GetProjectControlData(ErrorsFound);
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetHeatBalanceInput();
     HeatBalanceManager::AllocateHeatBalArrays();
     DataHVACGlobals::TimeStepSys = DataGlobals::TimeStepZone;
-    SurfaceGeometry::GetGeometryParameters(ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // Magic to get surfaces read in correctly
     DataHeatBalance::AnyCTF = true;
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(errors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(OutputFiles::getSingleton(), errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                    // expect no errors
 
     CurveManager::GetCurveInput();
@@ -8763,7 +8893,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithLocalAirNode)
 
     DataGlobals::AnyLocalEnvironmentsInModel = true;
     OutAirNodeManager::SetOutAirNodes();
-    GetAirflowNetworkInput();
+    GetAirflowNetworkInput(OutputFiles::getSingleton());
     InitAirflowNetwork();
 
     // Check the airflow elements
@@ -8816,7 +8946,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithLocalAirNode)
 TEST_F(EnergyPlusFixture, BasicAdvancedSingleSided)
 {
     std::string const idf_objects = delimited_string(
-        {"Version,9.2;",
+        {"Version,9.3;",
          "SimulationControl,",
          "  No,                      !- Do Zone Sizing Calculation",
          "  No,                      !- Do System Sizing Calculation",
@@ -9210,7 +9340,7 @@ TEST_F(EnergyPlusFixture, BasicAdvancedSingleSided)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(errors); // read material data
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errors); // read material data
     EXPECT_FALSE(errors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(errors); // read construction data
@@ -9224,13 +9354,13 @@ TEST_F(EnergyPlusFixture, BasicAdvancedSingleSided)
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(errors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(OutputFiles::getSingleton(), errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                    // expect no errors
 
     CurveManager::GetCurveInput();
     EXPECT_EQ(0, CurveManager::NumCurves);
 
-    AirflowNetworkBalanceManager::GetAirflowNetworkInput();
+    AirflowNetworkBalanceManager::GetAirflowNetworkInput(OutputFiles::getSingleton());
 
     // Check that the correct number of curves has been generated (5 facade directions + 2 windows)
     EXPECT_EQ(7, CurveManager::NumCurves);
@@ -9247,15 +9377,17 @@ TEST_F(EnergyPlusFixture, BasicAdvancedSingleSided)
     EXPECT_EQ(270.0, AirflowNetwork::MultizoneExternalNodeData(3).azimuth);
 
     // Check the curve values for the left window, taken from v8.6.0 on Windows
-    unsigned i = 0;
-    for (auto value : CurveManager::PerfCurveTableData(7).Y) {
-        EXPECT_NEAR(valsForLeftWindow[i++], value, 1.0e-12) << ("Issue at index: " + std::to_string(i));
+    for (unsigned i = 0; i <= 36; i++) {
+        Real64 angle = i*10.0;
+        Real64 value = CurveManager::CurveValue(7, angle);
+        EXPECT_NEAR(valsForLeftWindow[i], value, 1.0e-12) << ("Issue at index: " + std::to_string(i));
     }
 
     // Check the curve values for the left window, taken from v8.6.0 on Windows
-    i = 0;
-    for (auto value : CurveManager::PerfCurveTableData(6).Y) {
-        EXPECT_NEAR(valsForRightWindow[i++], value, 1.0e-12) << ("Issue at index: " + std::to_string(i));
+    for (unsigned i = 0; i <= 36; i++) {
+        Real64 angle = i*10.0;
+        Real64 value = CurveManager::CurveValue(6, angle);
+        EXPECT_NEAR(valsForRightWindow[i], value, 1.0e-12) << ("Issue at index: " + std::to_string(i));
     }
 }
 
@@ -10769,7 +10901,7 @@ TEST_F(EnergyPlusFixture, MultiAirLoopTest)
 
         "  NodeList,",
         "    Zone1Inlets,             !- Name",
-        "    Zone 1 Inlet Node;  !- Node 1 Name",
+        "    Zone 1 NoReheat Air Outlet Node;  !- Node 1 Name",
 
         "  NodeList,",
         "    Zone2Inlets,             !- Name",
@@ -11249,7 +11381,7 @@ TEST_F(EnergyPlusFixture, MultiAirLoopTest)
 
         "  AirflowNetwork:Distribution:Node,",
         "    Zone1SupplyRegisterNode, !- Name",
-        "    Zone 1 Inlet Node,       !- Component Name or Node Name",
+        "    Zone 1 NoReheat Air Outlet Node,       !- Component Name or Node Name",
         "    Other,                   !- Component Object Type or Node Type",
         "    3.0;                     !- Node Height {m}",
 
@@ -11782,7 +11914,7 @@ TEST_F(EnergyPlusFixture, MultiAirLoopTest)
 
         "  AirflowNetwork:Distribution:Node,",
         "    Heat Pump 1 Zone1SupplyRegisterNode, !- Name",
-        "    NORTH ZONE Zone Equip Inlet,  !- Component Name or Node Name",
+        "    NORTH ZONE NoReheat Air Outlet Node,  !- Component Name or Node Name",
         "    Other,                   !- Component Object Type or Node Type",
         "    3.0;                     !- Node Height {m}",
 
@@ -12101,7 +12233,7 @@ TEST_F(EnergyPlusFixture, MultiAirLoopTest)
         "    45.,                     !- Maximum Supply Air Temperature {C}",
         "    WEST ZONE,              !- Control Zone Name",
         "    Zone 1 Node,             !- Zone Node Name",
-        "    Zone 1 Inlet Node,       !- Zone Inlet Node Name",
+        "    Zone 1 NoReheat Air Outlet Node,       !- Zone Inlet Node Name",
         "    Supply Air Temp Nodes;   !- Setpoint Node or NodeList Name",
 
         "  Controller:OutdoorAir,",
@@ -12141,8 +12273,8 @@ TEST_F(EnergyPlusFixture, MultiAirLoopTest)
         "  ZoneHVAC:EquipmentList,",
         "    Zone1Equipment,          !- Name",
         "    SequentialLoad,          !- Load Distribution Scheme",
-        "    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type",
-        "    Zone1DirectAir,          !- Zone Equipment 1 Name",
+        "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+        "    Zone1NoReheat,           !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
         "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
@@ -12158,10 +12290,17 @@ TEST_F(EnergyPlusFixture, MultiAirLoopTest)
         "    ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
         "    ;                        !- Zone Equipment 1 Sequential Heating Fraction",
 
-        "  AirTerminal:SingleDuct:Uncontrolled,",
-        "    Zone1DirectAir,          !- Name",
+        "  ZoneHVAC:AirDistributionUnit,",
+        "    Zone1NoReheat,         !- Name",
+        "    Zone 1 NoReheat Air Outlet Node,  !- Air Distribution Unit Outlet Node Name",
+        "    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+        "    No Reheat Zone 1;           !- Air Terminal Name",
+
+        "  AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+        "    No Reheat Zone 1,           !- Name",
         "    FanAndCoilAvailSched,    !- Availability Schedule Name",
-        "    Zone 1 Inlet Node,       !- Zone Supply Air Node Name",
+        "    Zone 1 NoReheat Air Inlet Node,  !- Air Inlet Node Name",
+        "    Zone 1 NoReheat Air Outlet Node,  !- Air Outlet Node Name",
         "    0.64;                    !- Maximum Air Flow Rate {m3/s}",
 
         "  ZoneHVAC:AirDistributionUnit,",
@@ -12220,7 +12359,7 @@ TEST_F(EnergyPlusFixture, MultiAirLoopTest)
         "  AirLoopHVAC:ZoneSplitter,",
         "    Zone Supply Air Splitter,!- Name",
         "    Zone Equipment Inlet Node,  !- Inlet Node Name",
-        "    Zone 1 Inlet Node,  !- Outlet 1 Node Name",
+        "    Zone 1 NoReheat Air Inlet Node,  !- Outlet 1 Node Name",
         "    Zone 2 Reheat Air Inlet Node;  !- Outlet 2 Node Name",
 
         "  AirLoopHVAC:ZoneMixer,",
@@ -12330,7 +12469,7 @@ TEST_F(EnergyPlusFixture, MultiAirLoopTest)
         "ZoneHVAC:EquipmentConnections,",
         "  NORTH ZONE,                                              !- Zone Name",
         "  NORTH ZONE Equipment,                                    !- Zone Conditioning Equipment List Name",
-        "  NORTH ZONE Zone Equip Inlet,                             !- Zone Air Inlet Node or NodeList Name",
+        "  NORTH ZONE NoReheat Air Outlet Node,                     !- Zone Air Inlet Node or NodeList Name",
         "  NORTH ZONE Exhaust Node,                                                        !- Zone Air Exhaust Node or NodeList Name",
         "  NORTH ZONE Zone Air Node,                                !- Zone Air Node Name",
         "  NORTH ZONE Return Outlet;                                !- Zone Return Air Node Name",
@@ -12338,8 +12477,8 @@ TEST_F(EnergyPlusFixture, MultiAirLoopTest)
         "ZoneHVAC:EquipmentList,",
         "  NORTH ZONE Equipment,                                    !- Name",
         "  SequentialLoad,          !- Load Distribution Scheme",
-        "  AirTerminal:SingleDuct:Uncontrolled,                     !- Zone Equipment Object Type",
-        "  NORTH ZONE Air Terminal,                                 !- Zone Equipment Name",
+        "  ZoneHVAC:AirDistributionUnit,                     !- Zone Equipment Object Type",
+        "  NORTHZONENoReheat,                                 !- Zone Equipment Name",
         "  1,                                                       !- Zone Equipment Cooling Sequence",
         "  1,                                                       !- Zone Equipment Heating or No-Load Sequence",
         "  ,                        !- Zone Equipment 1 Sequential Cooling Fraction",
@@ -12361,11 +12500,18 @@ TEST_F(EnergyPlusFixture, MultiAirLoopTest)
         "  NORTH ZONE Exhaust Fan Outlet Node,  !- Air Outlet Node Name",
         "  NORTH ZONE Exhaust;            !- End-Use Subcategory",
 
-        "AirTerminal:SingleDuct:Uncontrolled,",
-        "  NORTH ZONE Air Terminal,                                 !- Name",
-        "  ,                                                        !- Availability Schedule Name",
-        "  NORTH ZONE Zone Equip Inlet,                             !- Zone Supply Air Node Name",
-        "  0.5;                                                !- Maximum air flow rate {m3/s}",
+        "  ZoneHVAC:AirDistributionUnit,",
+        "    NORTHZONENoReheat,         !- Name",
+        "    NORTH ZONE NoReheat Air Outlet Node,  !- Air Distribution Unit Outlet Node Name",
+        "    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+        "    NORTH ZONE Air Terminal;           !- Air Terminal Name",
+
+        "  AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+        "    NORTH ZONE Air Terminal,           !- Name",
+        "    FanAndCoilAvailSched,    !- Availability Schedule Name",
+        "    NORTH ZONE NoReheat Air Inlet Node,  !- Air Inlet Node Name",
+        "    NORTH ZONE NoReheat Air Outlet Node,  !- Air Outlet Node Name",
+        "    0.5;                    !- Maximum Air Flow Rate {m3/s}",
 
         "AirLoopHVAC,",
         "  Heat Pump 1,                                             !- Name",
@@ -12404,7 +12550,7 @@ TEST_F(EnergyPlusFixture, MultiAirLoopTest)
         "AirLoopHVAC:ZoneSplitter,",
         "  Heat Pump 1 Zone Splitter,                               !- Name",
         "  Heat Pump 1 Supply Path Inlet,                           !- Inlet Node Name",
-        "  NORTH ZONE Zone Equip Inlet;                             !- Outlet Node Name",
+        "  NORTH ZONE NoReheat Air Inlet Node;                      !- Outlet Node Name",
 
         "AirLoopHVAC:ReturnPath,",
         "  Heat Pump 1 Return Path,                                 !- Name",
@@ -12686,7 +12832,7 @@ TEST_F(EnergyPlusFixture, MultiAirLoopTest)
         "  45,                                                      !- maximum supply air temperature {C}",
         "  NORTH ZONE,                                              !- Control Zone Name",
         "  NORTH ZONE Zone Air Node,                                !- Zone Node Name",
-        "  NORTH ZONE Zone Equip Inlet,                             !- Zone Inlet Node Name",
+        "  NORTH ZONE NoReheat Air Outlet Node,                     !- Zone Inlet Node Name",
         "  Heat Pump 1 Air Loop Outlet;                             !- Setpoint Node or NodeList Name",
 
         "SetpointManager:MixedAir,",
@@ -12741,26 +12887,26 @@ TEST_F(EnergyPlusFixture, MultiAirLoopTest)
 
     bool ErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(ErrorsFound);
+    SurfaceGeometry::GetSurfaceData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
-    GetAirflowNetworkInput();
+    GetAirflowNetworkInput(OutputFiles::getSingleton());
 
     Real64 PresssureSet = 0.5;
     // Assign values
@@ -12861,7 +13007,7 @@ TEST_F(EnergyPlusFixture, AFN_CheckNumOfFansInAirLoopTest)
 TEST_F(EnergyPlusFixture, BasicAdvancedSingleSidedAvoidCrashTest)
 {
     std::string const idf_objects = delimited_string(
-        { "Version,9.2;",
+        { "Version,9.3;",
         "SimulationControl,",
         "  No,                      !- Do Zone Sizing Calculation",
         "  No,                      !- Do System Sizing Calculation",
@@ -13255,7 +13401,7 @@ TEST_F(EnergyPlusFixture, BasicAdvancedSingleSidedAvoidCrashTest)
 
     bool errors = false;
 
-    HeatBalanceManager::GetMaterialData(errors); // read material data
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), errors); // read material data
     EXPECT_FALSE(errors);                        // expect no errors
 
     HeatBalanceManager::GetConstructData(errors); // read construction data
@@ -13269,7 +13415,7 @@ TEST_F(EnergyPlusFixture, BasicAdvancedSingleSidedAvoidCrashTest)
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
 
-    SurfaceGeometry::GetSurfaceData(errors); // setup zone geometry and get zone data
+    SurfaceGeometry::GetSurfaceData(OutputFiles::getSingleton(), errors); // setup zone geometry and get zone data
     EXPECT_FALSE(errors);                    // expect no errors
 
     CurveManager::GetCurveInput();
@@ -13290,7 +13436,7 @@ TEST_F(EnergyPlusFixture, BasicAdvancedSingleSidedAvoidCrashTest)
     bool resimu = false;
 
     Zone(1).OutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
-    AirflowNetworkBalanceManager::GetAirflowNetworkInput();
+    AirflowNetworkBalanceManager::GetAirflowNetworkInput(OutputFiles::getSingleton());
     AirflowNetworkGetInputFlag = false;
     AirflowNetwork::AirflowNetworkExchangeData.allocate(1);
     ManageAirflowNetworkBalance(First, iter, resimu);
@@ -13304,7 +13450,7 @@ TEST_F(EnergyPlusFixture, TestAFNFanModel)
     int i;
 
     std::string const idf_objects = delimited_string({
-        "  Version,9.2;",
+        "  Version,9.3;",
 
         "  Building,",
         "    House with AirflowNetwork simulation,  !- Name",
@@ -14444,7 +14590,7 @@ TEST_F(EnergyPlusFixture, TestAFNFanModel)
 
         "  NodeList,",
         "    ZoneInlets,              !- Name",
-        "    Zone Inlet Node;         !- Node 1 Name",
+        "    LIVING ZONE NoReheat Air Outlet Node;         !- Node 1 Name",
 
         "  NodeList,",
         "    Supply Air Temp Nodes,   !- Name",
@@ -14705,7 +14851,7 @@ TEST_F(EnergyPlusFixture, TestAFNFanModel)
 
         "  AirflowNetwork:Distribution:Node,",
         "    ZoneSupplyRegisterNode,  !- Name",
-        "    Zone Inlet Node,         !- Component Name or Node Name",
+        "    LIVING ZONE NoReheat Air Outlet Node,         !- Component Name or Node Name",
         "    Other,                   !- Component Object Type or Node Type",
         "    3.0;                     !- Node Height {m}",
 
@@ -15018,8 +15164,8 @@ TEST_F(EnergyPlusFixture, TestAFNFanModel)
         "  ZoneHVAC:EquipmentList,",
         "    ZoneEquipment,           !- Name",
         "    SequentialLoad,          !- Load Distribution Scheme",
-        "    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type",
-        "    ZoneDirectAir,           !- Zone Equipment 1 Name",
+        "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+        "    LIVINGZONENoReheat,           !- Zone Equipment 1 Name",
         "    1,                       !- Zone Equipment 1 Cooling Sequence",
         "    1,                       !- Zone Equipment 1 Heating or No-Load Sequence",
         "    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction",
@@ -15060,10 +15206,17 @@ TEST_F(EnergyPlusFixture, TestAFNFanModel)
         "    SupplyAirFlowRate,       !- No Load Supply Air Flow Rate Method",
         "    0;                       !- No Load Supply Air Flow Rate {m3/s}",
 
-        "  AirTerminal:SingleDuct:Uncontrolled,",
-        "    ZoneDirectAir,           !- Name",
-        "    HVACAvailSched,          !- Availability Schedule Name",
-        "    Zone Inlet Node,         !- Zone Supply Air Node Name",
+        "  ZoneHVAC:AirDistributionUnit,",
+        "    LIVINGZONENoReheat,         !- Name",
+        "    Zone 1 NoReheat Air Outlet Node,  !- Air Distribution Unit Outlet Node Name",
+        "    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+        "    No Reheat LIVING ZONE;           !- Air Terminal Name",
+
+        "  AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+        "    No Reheat LIVING ZONE,           !- Name",
+        "    HVACAvailSched,    !- Availability Schedule Name",
+        "    LIVING ZONE NoReheat Air Inlet Node,  !- Air Inlet Node Name",
+        "    LIVING ZONE NoReheat Air Outlet Node,  !- Air Outlet Node Name",
         "    1.18;                    !- Maximum Air Flow Rate {m3/s}",
 
         "  ZoneControl:Thermostat,",
@@ -15093,7 +15246,7 @@ TEST_F(EnergyPlusFixture, TestAFNFanModel)
         "  AirLoopHVAC:ZoneSplitter,",
         "    Zone Supply Air Splitter,!- Name",
         "    Zone Equipment Inlet Node,  !- Inlet Node Name",
-        "    Zone Inlet Node;         !- Outlet 1 Node Name",
+        "    LIVING ZONE NoReheat Air Inlet Node;         !- Outlet 1 Node Name",
 
         "  AirLoopHVAC:ZoneMixer,",
         "    Zone Return Air Mixer,   !- Name",
@@ -15193,26 +15346,26 @@ TEST_F(EnergyPlusFixture, TestAFNFanModel)
 
     bool ErrorsFound = false;
     // Read objects
-    HeatBalanceManager::GetProjectControlData(ErrorsFound);
+    HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetWindowGlassSpectralData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    SurfaceGeometry::GetGeometryParameters(ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     SurfaceGeometry::CosBldgRotAppGonly = 1.0;
     SurfaceGeometry::SinBldgRotAppGonly = 0.0;
-    SurfaceGeometry::GetSurfaceData(ErrorsFound);
+    SurfaceGeometry::GetSurfaceData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
-    GetAirflowNetworkInput();
+    GetAirflowNetworkInput(OutputFiles::getSingleton());
 
     Schedule(1).CurrentValue = 1.0;
     Schedule(2).CurrentValue = 100.0;

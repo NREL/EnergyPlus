@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -56,11 +56,13 @@
 #include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
-#include <DataPrecisionGlobals.hh>
-#include <FluidProperties.hh>
-#include <General.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+
+#define EP_cache_GlycolSpecificHeat
 
 namespace EnergyPlus {
 
@@ -151,6 +153,12 @@ namespace FluidProperties {
     int FluidIndex_EthyleneGlycol(0);
     int FluidIndex_PropoleneGlycol(0);
 
+#ifdef EP_cache_GlycolSpecificHeat
+    int const t_sh_cache_size(1024 * 1024);
+    int const t_sh_precision_bits(24);
+    Int64 const t_sh_cache_mask(t_sh_cache_size - 1);
+#endif
+
     // ACCESSIBLE SPECIFICATIONS OF MODULE SUBROUTINES OR FUNCTONS:
 
     // Object Data
@@ -159,6 +167,10 @@ namespace FluidProperties {
     Array1D<FluidPropsGlycolRawData> GlyRawData;
     Array1D<FluidPropsGlycolData> GlycolData;
     Array1D<FluidPropsGlycolErrors> GlycolErrorTracking;
+
+#ifdef EP_cache_GlycolSpecificHeat
+    Array1D<cached_tsh> cached_t_sh; // DIMENSION(t_sh_cache_size)
+#endif
 
     // Data Initializer Forward Declarations
     // See GetFluidPropertiesData "SUBROUTINE LOCAL DATA" for actual data.
@@ -182,6 +194,9 @@ namespace FluidProperties {
         GlyRawData.deallocate();
         GlycolData.deallocate();
         GlycolErrorTracking.deallocate();
+#ifdef EP_cache_GlycolSpecificHeat
+        cached_t_sh.deallocate();
+#endif
     }
 
     void DefaultEthGlyCpData_initializer(Array2D<Real64> &, Array1D<Real64> const &);
@@ -207,6 +222,13 @@ namespace FluidProperties {
     // MODULE SUBROUTINES:
 
     // Functions
+
+    void InitializeGlycRoutines()
+    {
+#ifdef EP_cache_GlycolSpecificHeat
+        cached_t_sh.allocate({0, t_sh_cache_size});
+#endif
+    }
 
     void GetFluidPropertiesData()
     {
@@ -574,6 +596,8 @@ namespace FluidProperties {
         cNumericFieldNames = "";
         lNumericFieldBlanks = false;
 
+        InitializeGlycRoutines();
+
         // Check to see if there is any FluidName input.  If not, this is okay as
         // long as the user only desires to simulate loops with water.  More than
         // one FluidName input is not allowed.
@@ -714,7 +738,7 @@ namespace FluidProperties {
                 if (FluidTemps(Loop).Temps(TempLoop) <= FluidTemps(Loop).Temps(TempLoop - 1)) {
                     ShowSevereError(RoutineName + CurrentModuleObject + " name=" + FluidTemps(Loop).Name +
                                     ", lists must have data in ascending order");
-                    ShowContinueError("First out of order occurance at Temperature #(" + RoundSigDigits(TempLoop - 1) + ") {" +
+                    ShowContinueError("First out of order occurrence at Temperature #(" + RoundSigDigits(TempLoop - 1) + ") {" +
                                       RoundSigDigits(FluidTemps(Loop).Temps(TempLoop - 1), 3) + "} >= Temp(" + RoundSigDigits(TempLoop) + ") {" +
                                       RoundSigDigits(FluidTemps(Loop).Temps(TempLoop), 3) + '}');
                     ErrorsFound = true;
@@ -1255,7 +1279,7 @@ namespace FluidProperties {
             //          String2=ADJUSTL(String2)
             //          String4=TrimSigDigits(RefrigData(Loop)%CpTemps(TempLoop),3)
             //          String4=ADJUSTL(String4)
-            //          CALL ShowContinueError('First Occurance at CpTemp('//TRIM(String1)//') {'//TRIM(String2)//'} /= {'//TRIM(String4)//'}')
+            //          CALL ShowContinueError('First Occurrence at CpTemp('//TRIM(String1)//') {'//TRIM(String2)//'} /= {'//TRIM(String4)//'}')
             //          ErrorsFound=.TRUE.
             //          EXIT
             //        ENDIF
@@ -1446,7 +1470,7 @@ namespace FluidProperties {
                     if (RefrigData(Loop).SHPress(InData) <= RefrigData(Loop).SHPress(InData - 1)) {
                         ShowSevereError(RoutineName + CurrentModuleObject + " Name=" + RefrigData(Loop).Name);
                         ShowContinueError("Pressures must be entered in ascending order for fluid property data");
-                        ShowContinueError("First Occurance at Pressure(" + RoundSigDigits(InData - 1) + ") {" +
+                        ShowContinueError("First Occurrence at Pressure(" + RoundSigDigits(InData - 1) + ") {" +
                                           RoundSigDigits(RefrigData(Loop).SHPress(InData - 1), 3) + "} >= Pressure(" + RoundSigDigits(InData) +
                                           ") {" + RoundSigDigits(RefrigData(Loop).SHPress(InData), 3) + '}');
                         ErrorsFound = true;
@@ -2033,6 +2057,8 @@ namespace FluidProperties {
         NumOfGlyConcs = NumOfOptionalInput + 1;
         GlycolData.allocate(NumOfGlyConcs);
         GlycolUsed.dimension(NumOfGlyConcs, false);
+
+
         GlycolUsed(1) = true; // mark Water as always used
 
         // First "glycol" is always pure water.  Load data from default arrays
@@ -4780,12 +4806,12 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    void InterpDefValuesForGlycolConc(int const NumOfConcs,              // number of concentrations (dimension of raw data)
-                                      int const NumOfTemps,              // number of temperatures (dimension of raw data)
-                                      Array1S<Real64> const RawConcData, // concentrations for raw data
-                                      Array2S<Real64> const RawPropData, // raw property data (concentration, temperature)
-                                      Real64 const Concentration,        // concentration of actual fluid mix
-                                      Array1S<Real64> InterpData         // interpolated output data at proper concentration
+    void InterpDefValuesForGlycolConc(int const NumOfConcs,               // number of concentrations (dimension of raw data)
+                                      int const NumOfTemps,               // number of temperatures (dimension of raw data)
+                                      const Array1D<Real64> &RawConcData, // concentrations for raw data
+                                      Array2S<Real64> const RawPropData,  // raw property data (concentration, temperature)
+                                      Real64 const Concentration,         // concentration of actual fluid mix
+                                      Array1D<Real64> &InterpData         // interpolated output data at proper concentration
     )
     {
 
@@ -4880,12 +4906,12 @@ namespace FluidProperties {
 
     //*****************************************************************************
 
-    void InterpValuesForGlycolConc(int const NumOfConcs,              // number of concentrations (dimension of raw data)
-                                   int const NumOfTemps,              // number of temperatures (dimension of raw data)
-                                   Array1S<Real64> const RawConcData, // concentrations for raw data
-                                   Array2S<Real64> const RawPropData, // raw property data (temperature,concentration)
-                                   Real64 const Concentration,        // concentration of actual fluid mix
-                                   Array1S<Real64> InterpData         // interpolated output data at proper concentration
+    void InterpValuesForGlycolConc(int const NumOfConcs,               // number of concentrations (dimension of raw data)
+                                   int const NumOfTemps,               // number of temperatures (dimension of raw data)
+                                   const Array1D<Real64> &RawConcData, // concentrations for raw data
+                                   Array2S<Real64> const RawPropData,  // raw property data (temperature,concentration)
+                                   Real64 const Concentration,         // concentration of actual fluid mix
+                                   Array1D<Real64> &InterpData         // interpolated output data at proper concentration
     )
     {
 
@@ -8031,12 +8057,19 @@ namespace FluidProperties {
     }
 
     //*****************************************************************************
-
+#ifdef EP_cache_GlycolSpecificHeat
+    Real64 GetSpecificHeatGlycol_raw(std::string const &Glycol,    // carries in substance name
+                                     Real64 const Temperature,     // actual temperature given as input
+                                     int &GlycolIndex,             // Index to Glycol Properties
+                                     std::string const &CalledFrom // routine this function was called from (error messages)
+    )
+#else
     Real64 GetSpecificHeatGlycol(std::string const &Glycol,    // carries in substance name
                                  Real64 const Temperature,     // actual temperature given as input
                                  int &GlycolIndex,             // Index to Glycol Properties
                                  std::string const &CalledFrom // routine this function was called from (error messages)
     )
+#endif
     {
 
         // FUNCTION INFORMATION:
@@ -9499,6 +9532,60 @@ namespace FluidProperties {
             MinTempLimit = GlycolData(FluidIndex).CpLowTempValue;
             MaxTempLimit = GlycolData(FluidIndex).CpHighTempValue;
         }
+    }
+
+    GlycolAPI::GlycolAPI(std::string const &glycolName) {
+        this->glycolName = EnergyPlus::UtilityRoutines::MakeUPPERCase(glycolName);
+        this->glycolIndex = 0;
+        this->cf = "GlycolAPI:Instance";
+        if (this->glycolName != "WATER") {
+            EnergyPlus::ShowFatalError("Can only do water right now");
+        }
+    }
+    Real64 GlycolAPI::specificHeat(Real64 temperature) {
+        return FluidProperties::GetSpecificHeatGlycol(this->glycolName, temperature, this->glycolIndex, this->cf);
+    }
+    Real64 GlycolAPI::density(Real64 temperature) {
+        return FluidProperties::GetDensityGlycol(this->glycolName, temperature, this->glycolIndex, this->cf);
+    }
+    Real64 GlycolAPI::conductivity(Real64 temperature) {
+        return FluidProperties::GetConductivityGlycol(this->glycolName, temperature, this->glycolIndex, this->cf);
+    }
+    Real64 GlycolAPI::viscosity(Real64 temperature) {
+        return FluidProperties::GetViscosityGlycol(this->glycolName, temperature, this->glycolIndex, this->cf);
+    }
+
+    RefrigerantAPI::RefrigerantAPI(std::string const &refrigName) {
+        this->rName = EnergyPlus::UtilityRoutines::MakeUPPERCase(refrigName);
+        this->rIndex = 0;
+        this->cf = "RefrigerantAPI:Instance";
+        if (this->rName != "STEAM") {
+            EnergyPlus::ShowFatalError("Can only do steam right now");
+        }
+    }
+    Real64 RefrigerantAPI::saturationPressure(Real64 temperature) {
+        return FluidProperties::GetSatPressureRefrig(this->rName, temperature, this->rIndex, this->cf);
+    }
+    Real64 RefrigerantAPI::saturationTemperature(Real64 pressure) {
+        return FluidProperties::GetSatTemperatureRefrig(this->rName, pressure, this->rIndex, this->cf);
+    }
+    Real64 RefrigerantAPI::saturatedEnthalpy(Real64 temperature, Real64 quality) {
+        return FluidProperties::GetSatEnthalpyRefrig(this->rName, temperature, quality, this->rIndex, this->cf);
+    }
+    Real64 RefrigerantAPI::saturatedDensity(Real64 temperature, Real64 quality) {
+        return FluidProperties::GetSatDensityRefrig(this->rName, temperature, quality, this->rIndex, this->cf);
+    }
+    Real64 RefrigerantAPI::saturatedSpecificHeat(Real64 temperature, Real64 quality) {
+        return FluidProperties::GetSatSpecificHeatRefrig(this->rName, temperature, quality, this->rIndex, this->cf);
+    }
+    Real64 RefrigerantAPI::superHeatedEnthalpy(Real64 temperature, Real64 pressure) {
+        return FluidProperties::GetSupHeatEnthalpyRefrig(this->rName, temperature, pressure, this->rIndex, this->cf);
+    }
+    Real64 RefrigerantAPI::superHeatedPressure(Real64 temperature, Real64 enthalpy) {
+        return FluidProperties::GetSupHeatPressureRefrig(this->rName, temperature, enthalpy, this->rIndex, this->cf);
+    }
+    Real64 RefrigerantAPI::superHeatedDensity(Real64 temperature, Real64 pressure) {
+        return FluidProperties::GetSupHeatDensityRefrig(this->rName, temperature, pressure, this->rIndex, this->cf);
     }
 
 } // namespace FluidProperties

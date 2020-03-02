@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -57,35 +57,35 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <CrossVentMgr.hh>
 #include <AirflowNetwork/Elements.hpp>
-#include <DataEnvironment.hh>
-#include <DataErrorTracking.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataRoomAirModel.hh>
-#include <DataSurfaces.hh>
-#include <DataUCSDSharedData.hh>
-#include <DataZoneEquipment.hh>
-#include <DisplacementVentMgr.hh>
-#include <Fans.hh>
-#include <General.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <InternalHeatGains.hh>
-#include <MundtSimMgr.hh>
-#include <OutputProcessor.hh>
-#include <Psychrometrics.hh>
-#include <RoomAirModelAirflowNetwork.hh>
-#include <RoomAirModelManager.hh>
-#include <RoomAirModelUserTempPattern.hh>
-#include <ScheduleManager.hh>
-#include <UFADManager.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/CrossVentMgr.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataRoomAirModel.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataUCSDSharedData.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DisplacementVentMgr.hh>
+#include <EnergyPlus/Fans.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/InternalHeatGains.hh>
+#include <EnergyPlus/MundtSimMgr.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/RoomAirModelAirflowNetwork.hh>
+#include <EnergyPlus/RoomAirModelManager.hh>
+#include <EnergyPlus/RoomAirModelUserTempPattern.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UFADManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -336,7 +336,7 @@ namespace RoomAirModelManager {
         int NumNumbers; // Number of numbers encountered
         int Status;     // Notes if there was an error in processing the input
 
-        int thisSurfinZone; // working variable for indexing surfaces within a ZoneInfo structure
+        int thisSurfinZone; // working variable for indexing surfaces within a ZoneRadiantInfo structure
         int thisHBsurfID;   // working variable for indexing surfaces in main Surface structure
         int thisPattern;
 
@@ -2785,8 +2785,8 @@ namespace RoomAirModelManager {
                         std::string const &EquipName, // Equipment Name
                         std::string &SupplyNodeName,  // Supply node name
                         std::string &ReturnNodeName,  // Return node name
-                        int TotNumEquip,              // equipment type number
-                        int TypeNum                   // Supply air node number
+                        int TotNumEquip,              // how many of this equipment type
+                        int TypeNum                   // equipment type number
     )
     {
 
@@ -2858,112 +2858,112 @@ namespace RoomAirModelManager {
             }
         }
 
-        if (TypeNum == 1) { // ZoneHVAC:TerminalUnit : VariableRefrigerantFlow
+        if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_VariableRefrigerantFlow) { // ZoneHVAC:TerminalUnit : VariableRefrigerantFlow
             SupplyNodeName = Alphas(4);
             ReturnNodeName = "";   // Zone return node
-        } else if (TypeNum == 2) { // ZoneHVAC : EnergyRecoveryVentilator
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_EnergyRecoveryVentilator) { // ZoneHVAC : EnergyRecoveryVentilator
             I = GetFanOutletNode("Fan:OnOff", Alphas(4), errorfound);
             if (errorfound) {
             }
             SupplyNodeName = NodeID(I); // ?????
             ReturnNodeName = "";        // Zone exhaust node
-        } else if (TypeNum == 3) {      // ZoneHVAC : FourPipeFanCoil
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_FourPipeFanCoil) {      // ZoneHVAC : FourPipeFanCoil
             SupplyNodeName = Alphas(6);
             ReturnNodeName = Alphas(5);
-        } else if (TypeNum == 4) { // ZoneHVAC : OutdoorAirUnit
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_OutdoorAirUnit) { // ZoneHVAC : OutdoorAirUnit
             SupplyNodeName = Alphas(13);
             ReturnNodeName = Alphas(14);
-        } else if (TypeNum == 5) { // ZoneHVAC : PackagedTerminalAirConditioner
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_PackagedTerminalAirConditioner) { // ZoneHVAC : PackagedTerminalAirConditioner
             SupplyNodeName = Alphas(4);
             ReturnNodeName = Alphas(3);
-        } else if (TypeNum == 6) { // ZoneHVAC : PackagedTerminalHeatPump
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_PackagedTerminalHeatPump) { // ZoneHVAC : PackagedTerminalHeatPump
             SupplyNodeName = Alphas(4);
             ReturnNodeName = Alphas(3);
-        } else if (TypeNum == 7) { // ZoneHVAC : UnitHeater
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_UnitHeater) { // ZoneHVAC : UnitHeater
             SupplyNodeName = Alphas(4);
             ReturnNodeName = Alphas(3);
-        } else if (TypeNum == 8) { // ZoneHVAC : UnitVentilator
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_UnitVentilator) { // ZoneHVAC : UnitVentilator
             SupplyNodeName = Alphas(7);
             ReturnNodeName = Alphas(6);
-        } else if (TypeNum == 9) { // ZoneHVAC : VentilatedSlab
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_VentilatedSlab) { // ZoneHVAC : VentilatedSlab
             SupplyNodeName = Alphas(20);
             ReturnNodeName = Alphas(18);
-        } else if (TypeNum == 10) { // ZoneHVAC : WaterToAirHeatPump
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_WaterToAirHeatPump) { // ZoneHVAC : WaterToAirHeatPump
             SupplyNodeName = Alphas(4);
             ReturnNodeName = Alphas(3);
-        } else if (TypeNum == 11) { // ZoneHVAC : WindowAirConditioner
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_WindowAirConditioner) { // ZoneHVAC : WindowAirConditioner
             SupplyNodeName = Alphas(4);
             ReturnNodeName = Alphas(3);
-        } else if (TypeNum == 12) { // ZoneHVAC : Baseboard : RadiantConvective : Electric
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_BaseboardRadiantConvectiveElectric) { // ZoneHVAC : Baseboard : RadiantConvective : Electric
             SupplyNodeName = "";    // convection only
-        } else if (TypeNum == 13) { // ZoneHVAC : Baseboard : RadiantConvective : Water
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_BaseboardRadiantConvectiveWater) { // ZoneHVAC : Baseboard : RadiantConvective : Water
             SupplyNodeName = "";
-        } else if (TypeNum == 14) { // ZoneHVAC : Baseboard : RadiantConvective : Steam
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_BaseboardRadiantConvectiveSteam) { // ZoneHVAC : Baseboard : RadiantConvective : Steam
             SupplyNodeName = "";
-        } else if (TypeNum == 15) { // ZoneHVAC : Baseboard : Convective : Electric
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_BaseboardConvectiveElectric) { // ZoneHVAC : Baseboard : Convective : Electric
             SupplyNodeName = "";
-        } else if (TypeNum == 16) { // ZoneHVAC : Baseboard : Convective : Water
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_BaseboardConvectiveWater) { // ZoneHVAC : Baseboard : Convective : Water
             SupplyNodeName = "";
-        } else if (TypeNum == 17) { // ZoneHVAC : HighTemperatureRadiant
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_HighTemperatureRadiant) { // ZoneHVAC : HighTemperatureRadiant
             SupplyNodeName = "";
-        } else if (TypeNum == 18) { // ZoneHVAC : Dehumidifier : DX
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_DehumidifierDX) { // ZoneHVAC : Dehumidifier : DX
             SupplyNodeName = Alphas(4);
             ReturnNodeName = Alphas(3);
-        } else if (TypeNum == 19) { // ZoneHVAC : IdealLoadsAirSystem
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_IdealLoadsAirSystem) { // ZoneHVAC : IdealLoadsAirSystem
             SupplyNodeName = Alphas(3);
             ReturnNodeName = Alphas(4);
-        } else if (TypeNum == 20) { // ZoneHVAC : RefrigerationChillerSet
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_RefrigerationChillerSet) { // ZoneHVAC : RefrigerationChillerSet
             SupplyNodeName = Alphas(5);
             ReturnNodeName = Alphas(4);
-        } else if (TypeNum == 21) { // Fan : ZoneExhaust
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_FanZoneExhaust) { // Fan : ZoneExhaust
             SupplyNodeName = "";    // ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? May not use
-        } else if (TypeNum == 22) { // WaterHeater : HeatPump
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_WaterHeaterHeatPump) { // WaterHeater : HeatPump
             SupplyNodeName = Alphas(8);
             ReturnNodeName = Alphas(7);
             // For AirTerminals, find matching return node later
-        } else if (TypeNum == 23) { // AirTerminal : SingleDuct : Uncontrolled
-            SupplyNodeName = Alphas(3);
-            ReturnNodeName = "";
-        } else if (TypeNum == 24) { // AirTerminal : DualDuct : ConstantVolume
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_AirTerminalDualDuctConstantVolume) { // AirTerminal : DualDuct : ConstantVolume
             SupplyNodeName = Alphas(1);
             ReturnNodeName = "";
-        } else if (TypeNum == 25) { // AirTerminal : DualDuct : VAV
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_AirTerminalDualDuctVAV) { // AirTerminal : DualDuct : VAV
             SupplyNodeName = Alphas(1);
             ReturnNodeName = "";
-        } else if (TypeNum == 26) { // AirTerminal : SingleDuct : ConstantVolume : Reheat
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeReheat) { // AirTerminal : SingleDuct : ConstantVolume : Reheat
             SupplyNodeName = Alphas(1);
             ReturnNodeName = "";
-        } else if (TypeNum == 27) { // AirTerminal : SingleDuct : VAV : Reheat
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeNoReheat) { // AirTerminal : SingleDuct : ConstantVolume : NoReheat
+            SupplyNodeName = Alphas(4);
+            ReturnNodeName = "";
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_AirTerminalSingleDuctVAVReheat) { // AirTerminal : SingleDuct : VAV : Reheat
             SupplyNodeName = Alphas(1);
             ReturnNodeName = "";
-        } else if (TypeNum == 28) { // AirTerminal : SingleDuct : VAV : NoReheat
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_AirTerminalSingleDuctVAVNoReheat) { // AirTerminal : SingleDuct : VAV : NoReheat
             SupplyNodeName = Alphas(1);
             ReturnNodeName = "";
-        } else if (TypeNum == 29) { // AirTerminal : SingleDuct : SeriesPIU : Reheat
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_AirTerminalSingleDuctSeriesPIUReheat) { // AirTerminal : SingleDuct : SeriesPIU : Reheat
             SupplyNodeName = Alphas(1);
             ReturnNodeName = "";
-        } else if (TypeNum == 30) { // AirTerminal : SingleDuct : ParallelPIU : Reheat
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_AirTerminalSingleDuctParallelPIUReheat) { // AirTerminal : SingleDuct : ParallelPIU : Reheat
             SupplyNodeName = Alphas(1);
             ReturnNodeName = "";
-        } else if (TypeNum == 31) { // AirTerminal : SingleDuct : ConstantVolume : FourPipeInduction
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_AirTerminalSingleDuctCAVFourPipeInduction) { // AirTerminal : SingleDuct : ConstantVolume : FourPipeInduction
             SupplyNodeName = Alphas(1);
             ReturnNodeName = "";
-        } else if (TypeNum == 32) { // AirTerminal : SingleDuct : VAV : Reheat : VariableSpeedFan
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_AirTerminalSingleDuctVAVReheatVariableSpeedFan) { // AirTerminal : SingleDuct : VAV : Reheat : VariableSpeedFan
             SupplyNodeName = Alphas(1);
             ReturnNodeName = "";
-        } else if (TypeNum == 33) { // AirTerminal : SingleDuct : VAV : HeatAndCool : Reheat
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_AirTerminalSingleDuctVAVHeatAndCoolReheat) { // AirTerminal : SingleDuct : VAV : HeatAndCool : Reheat
             SupplyNodeName = Alphas(1);
             ReturnNodeName = "";
-        } else if (TypeNum == 34) { // AirTerminal : SingleDuct : VAV : HeatAndCool : NoReheat
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_AirTerminalSingleDuctVAVHeatAndCoolNoReheat) { // AirTerminal : SingleDuct : VAV : HeatAndCool : NoReheat
             SupplyNodeName = Alphas(1);
             ReturnNodeName = "";
-        } else if (TypeNum == 35) { // AirTerminal : SingleDuct : ConstantVolume : CooledBeam
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_AirTerminalSingleDuctConstantVolumeCooledBeam) { // AirTerminal : SingleDuct : ConstantVolume : CooledBeam
             SupplyNodeName = Alphas(5);
             ReturnNodeName = "";
-        } else if (TypeNum == 36) { // AirTerminal : DualDuct : VAV : OutdoorAir
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_AirTerminalDualDuctVAVOutdoorAir) { // AirTerminal : DualDuct : VAV : OutdoorAir
             SupplyNodeName = Alphas(3);
             ReturnNodeName = "";
-        } else if (TypeNum == 37) {     // AirLoopHVACReturnAir
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_AirLoopHVACReturnAir) {     // AirLoopHVACReturnAir
             SupplyNodeName = Alphas(4); //
             ReturnNodeName = "";        //
         }

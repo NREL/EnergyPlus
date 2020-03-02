@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,7 +53,7 @@
 #include <string>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -67,9 +67,12 @@ namespace DataGlobals {
     extern bool DDOnlySimulation;
     extern bool AnnualSimulation;
     extern bool outputEpJSONConversion;
+    extern bool outputEpJSONConversionOnly;
     extern bool isEpJSON;
     extern bool isCBOR;
     extern bool isMsgPack;
+    extern bool isUBJSON;
+    extern bool isBSON;
     extern bool preserveIDFOrder;
 
     // MODULE PARAMETER DEFINITIONS:
@@ -86,9 +89,6 @@ namespace DataGlobals {
     extern int const ksHVACSizeDesignDay;       // a regular design day run during HVAC Sizing Simulation
     extern int const ksHVACSizeRunPeriodDesign; // a weather period design day run during HVAC Sizing Simulation
     extern int const ksReadAllWeatherData;      // a weather period for reading all weather data prior to the simulation
-
-    extern int const ZoneTSReporting; // value for Zone Time Step Reporting (UpdateDataAndReport)
-    extern int const HVACTSReporting; // value for HVAC Time Step Reporting (UpdateDataAndReport)
 
     extern Real64 const MaxEXPArg; // maximum exponent in EXP() function
     extern Real64 const Pi;        // Pi 3.1415926535897932384626435
@@ -210,6 +210,7 @@ namespace DataGlobals {
 
     extern bool BeginDayFlag;           // True at the start of each day, False after first time step in day
     extern bool BeginEnvrnFlag;         // True at the start of each environment, False after first time step in environ
+    extern bool beginEnvrnWarmStartFlag;  // Sizing Speed Up true if at the start of each environment, would rather retain thermal history and the like.
     extern bool BeginHourFlag;          // True at the start of each hour, False after first time step in hour
     extern bool BeginSimFlag;           // True until any actual simulation (full or sizing) has begun, False after first time step
     extern bool BeginFullSimFlag;       // True until full simulation has begun, False after first time step
@@ -239,13 +240,8 @@ namespace DataGlobals {
     extern int OutputStandardError;                  // Unit number for the standard error output file
     extern std::ostream *err_stream;                 // Internal stream used for err output (used for performance)
     extern int StdOutputRecordCount;                 // Count of Standard output records
-    extern int OutputFileInits;                      // Unit number for the standard Initialization output file
-    extern std::ostream *eio_stream;                 // Internal stream used for eio output (used for unit tests)
     extern int OutputFileDebug;                      // Unit number for debug outputs
-    extern int OutputFileZoneSizing;                 // Unit number of zone sizing calc output file
-    extern int OutputFileSysSizing;                  // Unit number of system sizing calc output file
-    extern int OutputFileMeters;                     // Unit number for meters output
-    extern std::ostream *mtr_stream;                 // Internal stream used for mtr output (used for performance)
+    extern int OutputFilePerfLog;                    // Unit number for performance log outputs
     extern int OutputFileShadingFrac;                // Unit number for shading output
     extern int StdMeterRecordCount;                  // Count of Meter output records
     extern int OutputFileBNDetails;                  // Unit number for Branch-Node Details
@@ -297,10 +293,16 @@ namespace DataGlobals {
     extern bool ShowDecayCurvesInEIO;    // true if the Radiant to Convective Decay Curves should appear in the EIO file
     extern bool AnySlabsInModel;         // true if there are any zone-coupled ground domains in the input file
     extern bool AnyBasementsInModel;     // true if there are any basements in the input file
-
+    extern bool DoCoilDirectSolutions;        //true if use coil direction solutions
+    extern bool createProfLog; //true if the _proflog.csv file should be created and a PerformancePrecisionTradeoffs object is used
     extern int Progress;
     extern void (*fProgressPtr)(int const);
     extern void (*fMessagePtr)(std::string const &);
+    // these are the new ones
+    extern void (*progressCallback)(int const);
+    extern void (*messageCallback)(const char * message);
+    extern void (*errorCallback)(const char * errorMessage);
+    extern bool eplusRunningViaAPI; // a flag for capturing whether we are running via API - if so we can't do python plugins
 
     // Clears the global data in DataGlobals.
     // Needed for unit tests, should not be normally called.

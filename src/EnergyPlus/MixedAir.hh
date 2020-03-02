@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,11 +53,12 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <EnergyPlus.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class OutputFiles;
 
 namespace MixedAir {
 
@@ -86,7 +87,6 @@ namespace MixedAir {
     extern int const OAMixer_Num;
     extern int const Fan_Simple_CV;
     extern int const Fan_Simple_VAV;
-    extern int const Fan_System_Object;
     extern int const WaterCoil_SimpleCool;
     extern int const WaterCoil_Cooling;
     extern int const WaterCoil_SimpleHeat;
@@ -104,8 +104,10 @@ namespace MixedAir {
     extern int const Fan_ComponentModel; // cpw22Aug2010 (new)
     extern int const DXHeatPumpSystem;
     extern int const Coil_UserDefined;
-    extern int const UnitarySystem;
     extern int const Humidifier;
+    extern int const Fan_System_Object;
+    extern int const UnitarySystem;
+    extern int const VRFTerminalUnit;
 
     extern int const ControllerOutsideAir;
     extern int const ControllerStandAloneERV;
@@ -458,7 +460,7 @@ namespace MixedAir {
 
     void GetOutsideAirSysInputs();
 
-    void GetOAControllerInputs();
+    void GetOAControllerInputs(OutputFiles &outputFiles);
 
     void AllocateOAControllers();
 

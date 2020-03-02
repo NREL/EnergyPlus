@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,16 +55,15 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Array2S.hh>
 #include <ObjexxFCL/Array3D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
-#include <OutputReportData.hh>
-#include <ScheduleManager.hh>
+#include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/OutputReportData.hh>
+#include <EnergyPlus/ScheduleManager.hh>
 
 namespace EnergyPlus {
 
@@ -76,7 +75,7 @@ namespace OutputReportTabularAnnual {
 
     void checkAggregationOrderForAnnual();
 
-    void GatherAnnualResultsForTimeStep(int kindOfTypeStep);
+    void GatherAnnualResultsForTimeStep(OutputProcessor::TimeStepType kindOfTypeStep);
 
     void ResetAnnualGathering();
 
@@ -115,7 +114,7 @@ namespace OutputReportTabularAnnual {
 
         bool invalidAggregationOrder();
 
-        void gatherForTimestep(int kindOfTypeStep);
+        void gatherForTimestep(OutputProcessor::TimeStepType kindOfTypeStep);
 
         void resetGathering();
 
@@ -142,9 +141,9 @@ namespace OutputReportTabularAnnual {
         std::vector<std::string> m_objectNames;     // for each row of annual table
         std::vector<AnnualFieldSet> m_annualFields; // for each column
 
-        Real64 getElapsedTime(int);
+        Real64 getElapsedTime(OutputProcessor::TimeStepType kindOfTimeStep);
 
-        Real64 getSecondsInTimeStep(int);
+        Real64 getSecondsInTimeStep(OutputProcessor::TimeStepType kindOfTimeStep);
 
         void computeBinColumns();
 

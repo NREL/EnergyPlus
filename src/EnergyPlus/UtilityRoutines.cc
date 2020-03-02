@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -65,32 +65,32 @@ extern "C" {
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <BranchInputManager.hh>
-#include <BranchNodeConnections.hh>
-#include <CommandLineInterface.hh>
-#include <DataEnvironment.hh>
-#include <DataErrorTracking.hh>
-#include <DataGlobals.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataReportingFlags.hh>
-#include <DataStringGlobals.hh>
-#include <DataSystemVariables.hh>
-#include <DataTimings.hh>
-#include <DaylightingManager.hh>
-#include <DisplayRoutines.hh>
-#include <ExternalInterface.hh>
-#include <General.hh>
-#include <GeneralRoutines.hh>
-#include <NodeInputManager.hh>
-#include <OutputReports.hh>
-#include <Plant/PlantManager.hh>
-#include <ResultsSchema.hh>
-#include <SimulationManager.hh>
-#include <SolarShading.hh>
-#include <SystemReports.hh>
-#include <SQLiteProcedures.hh>
-#include <Timer.h>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/BranchInputManager.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/CommandLineInterface.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataErrorTracking.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataReportingFlags.hh>
+#include <EnergyPlus/DataStringGlobals.hh>
+#include <EnergyPlus/DataSystemVariables.hh>
+#include <EnergyPlus/DataTimings.hh>
+#include <EnergyPlus/DaylightingManager.hh>
+#include <EnergyPlus/DisplayRoutines.hh>
+#include <EnergyPlus/ExternalInterface.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputReports.hh>
+#include <EnergyPlus/Plant/PlantManager.hh>
+#include <EnergyPlus/ResultsSchema.hh>
+#include <EnergyPlus/SimulationManager.hh>
+#include <EnergyPlus/SolarShading.hh>
+#include <EnergyPlus/SystemReports.hh>
+#include <EnergyPlus/SQLiteProcedures.hh>
+#include <EnergyPlus/Timer.h>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -437,6 +437,51 @@ namespace UtilityRoutines {
     bool case_insensitive_comparator::operator()(const std::string& a, const std::string& b) const noexcept {
         return SameString(a, b);
     }
+
+    void appendPerfLog(std::string const &colHeader, std::string const &colValue, bool finalColumn) 
+    // Add column to the performance log file (comma separated) which is appended to existing log.
+    // The finalColumn (an optional argument) being true triggers the actual file to be written or appended.
+    // J.Glazer February 2020
+    {
+        static std::string headerRow = "";
+        static std::string valuesRow = "";
+
+        // the following was added for unit testing to clear the static strings
+        if (colHeader == "RESET" && colValue == "RESET") {
+            headerRow = "";
+            valuesRow = "";
+            return;
+        }
+
+        //accumuate the row until ready to be written to the file.
+        headerRow = headerRow + colHeader + ",";
+        valuesRow = valuesRow + colValue + ",";
+
+        if (finalColumn) {
+            bool FileExists;
+            {
+                IOFlags flags;
+                ObjexxFCL::gio::inquire(DataStringGlobals::outputPerfLogFileName, flags);
+                FileExists = flags.exists();
+            }
+            // only write the header row if the file does not already exist
+            std::fstream fsPerfLog;
+            if (!FileExists) {
+                fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::out); //open file normally
+                if (!fsPerfLog.fail()) {
+                    fsPerfLog << headerRow << std::endl;
+                    fsPerfLog << valuesRow << std::endl;
+                }
+            } else {
+                fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::app); //append to already existing file
+                if (!fsPerfLog.fail()) {
+                    fsPerfLog << valuesRow << std::endl;
+                }
+            }
+            fsPerfLog.close();
+        }
+    }
+
 } // namespace UtilityRoutines
 
 int AbortEnergyPlus()
@@ -844,6 +889,9 @@ int EndEnergyPlus()
     Time_Finish = epElapsedTime();
     if (Time_Finish < Time_Start) Time_Finish += 24.0 * 3600.0;
     Elapsed_Time = Time_Finish - Time_Start;
+    if (DataGlobals::createProfLog) {
+        UtilityRoutines::appendPerfLog("Run Time [seconds]", RoundSigDigits(Elapsed_Time, 2));
+    }
 #ifdef EP_Detailed_Timings
     epStopTime("EntireRun=");
 #endif
@@ -860,6 +908,11 @@ int EndEnergyPlus()
     ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
     ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
 
+    if (DataGlobals::createProfLog) {
+        UtilityRoutines::appendPerfLog("Run Time [string]", Elapsed);
+        UtilityRoutines::appendPerfLog("Number of Warnings", NumWarnings);
+        UtilityRoutines::appendPerfLog("Number of Severe", NumSevere, true); //last item so write the perfLog file
+    }
     ShowMessage("EnergyPlus Warmup Error Summary. During Warmup: " + NumWarningsDuringWarmup + " Warning; " + NumSevereDuringWarmup +
                 " Severe Errors.");
     ShowMessage("EnergyPlus Sizing Error Summary. During Sizing: " + NumWarningsDuringSizing + " Warning; " + NumSevereDuringSizing +
@@ -1652,7 +1705,7 @@ void ShowRecurringSevereErrorAtEnd(std::string const &Message,         // Messag
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine stores a recurring ErrorMessage with a Severe designation
     // for output at the end of the simulation with automatic tracking of number
-    // of occurences and optional tracking of associated min, max, and sum values
+    // of occurrences and optional tracking of associated min, max, and sum values
 
     // METHODOLOGY EMPLOYED:
     // Calls StoreRecurringErrorMessage utility routine.
@@ -1664,7 +1717,7 @@ void ShowRecurringSevereErrorAtEnd(std::string const &Message,         // Messag
 
     // INTERFACE BLOCK SPECIFICATIONS
     //  Use for recurring "severe" error messages shown once at end of simulation
-    //  with count of occurences and optional max, min, sum
+    //  with count of occurrences and optional max, min, sum
 
     for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
         if (has(Message, MessageSearch(Loop))) {
@@ -1707,7 +1760,7 @@ void ShowRecurringWarningErrorAtEnd(std::string const &Message,         // Messa
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine stores a recurring ErrorMessage with a Warning designation
     // for output at the end of the simulation with automatic tracking of number
-    // of occurences and optional tracking of associated min, max, and sum values
+    // of occurrences and optional tracking of associated min, max, and sum values
 
     // METHODOLOGY EMPLOYED:
     // Calls StoreRecurringErrorMessage utility routine.
@@ -1719,7 +1772,7 @@ void ShowRecurringWarningErrorAtEnd(std::string const &Message,         // Messa
 
     // INTERFACE BLOCK SPECIFICATIONS
     //  Use for recurring "warning" error messages shown once at end of simulation
-    //  with count of occurences and optional max, min, sum
+    //  with count of occurrences and optional max, min, sum
 
     for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
         if (has(Message, MessageSearch(Loop))) {
@@ -1762,7 +1815,7 @@ void ShowRecurringContinueErrorAtEnd(std::string const &Message,         // Mess
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine stores a recurring ErrorMessage with a continue designation
     // for output at the end of the simulation with automatic tracking of number
-    // of occurences and optional tracking of associated min, max, and sum values
+    // of occurrences and optional tracking of associated min, max, and sum values
 
     // METHODOLOGY EMPLOYED:
     // Calls StoreRecurringErrorMessage utility routine.
@@ -1774,7 +1827,7 @@ void ShowRecurringContinueErrorAtEnd(std::string const &Message,         // Mess
 
     // INTERFACE BLOCK SPECIFICATIONS
     //  Use for recurring "continue" error messages shown once at end of simulation
-    //  with count of occurences and optional max, min, sum
+    //  with count of occurrences and optional max, min, sum
 
     for (int Loop = 1; Loop <= SearchCounts; ++Loop) {
         if (has(Message, MessageSearch(Loop))) {
@@ -1817,7 +1870,7 @@ void StoreRecurringErrorMessage(std::string const &ErrorMessage,         // Mess
     // PURPOSE OF THIS SUBROUTINE:
     // This subroutine stores a recurring ErrorMessage with
     // for output at the end of the simulation with automatic tracking of number
-    // of occurences and optional tracking of associated min, max, and sum values
+    // of occurrences and optional tracking of associated min, max, and sum values
 
     // Using/Aliasing
     using namespace DataPrecisionGlobals;
@@ -1941,6 +1994,8 @@ void ShowErrorMessage(std::string const &ErrorMessage, Optional_int OutUnit1, Op
     if (present(OutUnit2)) {
         ObjexxFCL::gio::write(OutUnit2, ErrorFormat) << ErrorMessage;
     }
+    std::string tmp = "  " + ErrorMessage + DataStringGlobals::NL;
+    if (DataGlobals::errorCallback) DataGlobals::errorCallback(tmp.c_str());
 }
 
 void SummarizeErrors()

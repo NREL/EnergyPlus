@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -45,8 +45,6 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include "AirflowNetwork/Solver.hpp"
-#include "AirflowNetwork/Elements.hpp"
 #include "AirflowNetwork/Properties.hpp"
 
 namespace EnergyPlus {
@@ -123,7 +121,7 @@ namespace AirflowNetwork {
             T = UpperLimit;
         }
 
-        return airThermConductivity(T) / (AIRCP(W, T) * AIRDENSITY(P, T, W));
+        return airThermConductivity(T) / (AIRCP(W) * AIRDENSITY(P, T, W));
     }
 
     Real64 airPrandtl(Real64 T, // Temperature in Celsius

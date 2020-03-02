@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -50,25 +50,25 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <BranchNodeConnections.hh>
-#include <DataContaminantBalance.hh>
-#include <DataDefineEquip.hh>
-#include <DataEnvironment.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalance.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSizing.hh>
-#include <DataZoneEquipment.hh>
-#include <DirectAirManager.hh>
-#include <General.hh>
-#include <GeneralRoutines.hh>
-#include <GlobalNames.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <Psychrometrics.hh>
-#include <ScheduleManager.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataDefineEquip.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UnitarySystem.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -117,23 +117,22 @@ namespace DataZoneEquipment {
     int const ZoneEvaporativeCoolerUnit_Num(13);
     int const ZoneHybridEvaporativeCooler_Num(14);
     int const AirDistUnit_Num(15);
-    int const DirectAir_Num(16);
-    int const BBWaterConvective_Num(17);
-    int const BBElectricConvective_Num(18);
-    int const HiTempRadiant_Num(19);
-    int const LoTempRadiant_Num(20);
-    int const ZoneExhaustFan_Num(21);
-    int const HeatXchngr_Num(22);
-    int const HPWaterHeater_Num(23);
-    int const BBWater_Num(24);
-    int const ZoneDXDehumidifier_Num(25);
-    int const BBSteam_Num(26);
-    int const BBElectric_Num(27);
-    int const RefrigerationAirChillerSet_Num(28);
-    int const UserDefinedZoneHVACForcedAir_Num(29);
-    int const CoolingPanel_Num(30);
-    int const ZoneUnitarySys_Num(31);
-    int const TotalNumZoneEquipType(31);
+    int const BBWaterConvective_Num(16);
+    int const BBElectricConvective_Num(17);
+    int const HiTempRadiant_Num(18);
+    int const LoTempRadiant_Num(19);
+    int const ZoneExhaustFan_Num(20);
+    int const HeatXchngr_Num(21);
+    int const HPWaterHeater_Num(22);
+    int const BBWater_Num(23);
+    int const ZoneDXDehumidifier_Num(24);
+    int const BBSteam_Num(25);
+    int const BBElectric_Num(26);
+    int const RefrigerationAirChillerSet_Num(27);
+    int const UserDefinedZoneHVACForcedAir_Num(28);
+    int const CoolingPanel_Num(29);
+    int const ZoneUnitarySys_Num(30);
+    int const TotalNumZoneEquipType(30);
     // **NOTE**... if you add another zone equipment object, then increment
     // TotalNumZoneEquipType above to match the total number of zone equipment types
     // End zone equip objects
@@ -659,9 +658,6 @@ namespace DataZoneEquipment {
                         if (SELECT_CASE_var == "ZONEHVAC:AIRDISTRIBUTIONUNIT") {
                             thisZoneEquipList.EquipType_Num(ZoneEquipTypeNum) = AirDistUnit_Num;
 
-                        } else if (SELECT_CASE_var == "AIRTERMINAL:SINGLEDUCT:UNCONTROLLED") {
-                            thisZoneEquipList.EquipType_Num(ZoneEquipTypeNum) = DirectAir_Num;
-
                         } else if (SELECT_CASE_var == "ZONEHVAC:WINDOWAIRCONDITIONER") { // Window Air Conditioner
                             thisZoneEquipList.EquipType_Num(ZoneEquipTypeNum) = WindowAC_Num;
 
@@ -821,7 +817,6 @@ namespace DataZoneEquipment {
                 ZoneEquipConfig(ControlledZoneNum).InletNode.allocate(NumNodes);
                 ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum.allocate(NumNodes);
                 ZoneEquipConfig(ControlledZoneNum).InletNodeADUNum.allocate(NumNodes);
-                ZoneEquipConfig(ControlledZoneNum).InletNodeSDUNum.allocate(NumNodes);
                 ZoneEquipConfig(ControlledZoneNum).AirDistUnitCool.allocate(NumNodes);
                 ZoneEquipConfig(ControlledZoneNum).AirDistUnitHeat.allocate(NumNodes);
 
@@ -835,7 +830,6 @@ namespace DataZoneEquipment {
                     }
                     ZoneEquipConfig(ControlledZoneNum).InletNodeAirLoopNum(NodeNum) = 0;
                     ZoneEquipConfig(ControlledZoneNum).InletNodeADUNum(NodeNum) = 0;
-                    ZoneEquipConfig(ControlledZoneNum).InletNodeSDUNum(NodeNum) = 0;
                     ZoneEquipConfig(ControlledZoneNum).AirDistUnitCool(NodeNum).InNode = 0;
                     ZoneEquipConfig(ControlledZoneNum).AirDistUnitHeat(NodeNum).InNode = 0;
                     ZoneEquipConfig(ControlledZoneNum).AirDistUnitCool(NodeNum).OutNode = 0;
@@ -1844,10 +1838,6 @@ namespace DataZoneEquipment {
         for (int equipNum = 1; equipNum <= this->NumOfEquipTypes; ++equipNum) {
             if (this->EquipType_Num(equipNum) == AirDistUnit_Num) {
                 if (inletNodeNum == DataDefineEquip::AirDistUnit(this->EquipIndex(equipNum)).OutletNodeNum) {
-                    equipFound = true;
-                }
-            } else if (this->EquipType_Num(equipNum) == DirectAir_Num) {
-                if (inletNodeNum == DirectAirManager::DirectAir(this->EquipIndex(equipNum)).ZoneSupplyAirNode) {
                     equipFound = true;
                 }
             }

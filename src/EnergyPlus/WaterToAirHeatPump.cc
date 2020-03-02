@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,24 +53,24 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <BranchNodeConnections.hh>
-#include <CurveManager.hh>
-#include <DataContaminantBalance.hh>
-#include <DataHVACGlobals.hh>
-#include <DataLoopNode.hh>
-#include <DataPlant.hh>
-#include <DataPrecisionGlobals.hh>
-#include <FluidProperties.hh>
-#include <General.hh>
-#include <GlobalNames.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportPredefined.hh>
-#include <PlantUtilities.hh>
-#include <Psychrometrics.hh>
-#include <UtilityRoutines.hh>
-#include <WaterToAirHeatPump.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/WaterToAirHeatPump.hh>
 
 namespace EnergyPlus {
 
@@ -1114,7 +1114,7 @@ namespace WaterToAirHeatPump {
         using DataPlant::PlantLoop;
         using General::RoundSigDigits;
         using General::SolveRoot;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW; // ,PsyHFnTdbRhPb,PsyWFnTdpPb
         using Psychrometrics::PsyTdbFnHW;
         using Psychrometrics::PsyTsatFnHPb;
@@ -1287,7 +1287,7 @@ namespace WaterToAirHeatPump {
         // Set indoor air conditions to the actual condition
         LoadSideInletDBTemp_Unit = WatertoAirHP(HPNum).InletAirDBTemp;
         LoadSideInletHumRat_Unit = WatertoAirHP(HPNum).InletAirHumRat;
-        CpAir = PsyCpAirFnWTdb(LoadSideInletHumRat_Unit, LoadSideInletDBTemp_Unit);
+        CpAir = PsyCpAirFnW(LoadSideInletHumRat_Unit);
         LoadSideAirInletEnth_Unit = PsyHFnTdbW(LoadSideInletDBTemp_Unit, LoadSideInletHumRat_Unit);
 
         SourceSideInletTemp = WatertoAirHP(HPNum).InletWaterTemp;
@@ -1783,7 +1783,7 @@ namespace WaterToAirHeatPump {
 
         // Using/Aliasing
         using namespace FluidProperties;
-        using Psychrometrics::PsyCpAirFnWTdb; // ,PsyHFnTdbRhPb,PsyWFnTdpPb
+        using Psychrometrics::PsyCpAirFnW; // ,PsyHFnTdbRhPb,PsyWFnTdpPb
         using Psychrometrics::PsyTdbFnHW;
         using Psychrometrics::PsyWFnTdbH;
         //  USE DataZoneEnergyDemands
@@ -1920,7 +1920,7 @@ namespace WaterToAirHeatPump {
         LoadSideMassFlowRate = WatertoAirHP(HPNum).InletAirMassFlowRate;
         LoadSideInletDBTemp = WatertoAirHP(HPNum).InletAirDBTemp;
         LoadSideInletHumRat = WatertoAirHP(HPNum).InletAirHumRat;
-        CpAir = PsyCpAirFnWTdb(LoadSideInletHumRat, LoadSideInletDBTemp);
+        CpAir = PsyCpAirFnW(LoadSideInletHumRat);
 
         SourceSideInletTemp = WatertoAirHP(HPNum).InletWaterTemp;
         SourceSideWaterInletEnth = WatertoAirHP(HPNum).InletWaterEnthalpy;

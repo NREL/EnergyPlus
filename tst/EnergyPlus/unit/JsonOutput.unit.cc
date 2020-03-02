@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -169,7 +169,7 @@ TEST_F(EnergyPlusFixture, JsonOutput_VariableInfo)
     // EXPECT_EQ( "SALESFLOOR INLET NODE:System Node Mass Flow Rate", OutputProcessor::RVariableTypes( 2 ).VarName );
     // EXPECT_EQ( 1, OutputProcessor::RVariableTypes( 1 ).ReportID );
     // EXPECT_EQ( 2, OutputProcessor::RVariableTypes( 2 ).ReportID );
-    int indexType = 1;
+    OutputProcessor::TimeStepType indexType = OutputProcessor::TimeStepType::TimeStepZone;
     int repordId = 1;
 
     Variable var("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, repordId, Unit::C);
@@ -191,7 +191,7 @@ TEST_F(EnergyPlusFixture, JsonOutput_DataFrameInfo1)
 {
 
     json OutputVars;
-    int indexType = 1;
+    OutputProcessor::TimeStepType indexType = OutputProcessor::TimeStepType::TimeStepZone;
     int reportId = 1;
 
     Variable var0("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);
@@ -225,7 +225,7 @@ TEST_F(EnergyPlusFixture, JsonOutput_DataFrameInfo2)
 {
 
     json OutputData;
-    int indexType = 1;
+    OutputProcessor::TimeStepType indexType = OutputProcessor::TimeStepType::TimeStepZone;
     int reportId = 1;
 
     Variable var0("SALESFLOOR INLET NODE:System Node Temperature", ReportingFrequency::TimeStep, indexType, reportId, Unit::C);
@@ -320,7 +320,7 @@ TEST_F(EnergyPlusFixture, JsonOutput_TableInfo)
     tableBody(1, 1) = "5.22";
     tableBody(1, 2) = "0.275000";
 
-    Table tbl(tableBody, rowLabels, columnLabels, "AirTerminal:SingleDuct:Uncontrolled",
+    Table tbl(tableBody, rowLabels, columnLabels, "AirTerminal:SingleDuct:ConstantVolume:NoReheat",
               "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
 
     json result = tbl.getJSON();
@@ -337,7 +337,7 @@ TEST_F(EnergyPlusFixture, JsonOutput_TableInfo)
                    "0.275000"
                 ]
             },
-            "TableName": "AirTerminal:SingleDuct:Uncontrolled"
+            "TableName": "AirTerminal:SingleDuct:ConstantVolume:NoReheat"
         } )"_json;
 
     EXPECT_EQ(result.dump(), expectedResult.dump());
@@ -359,7 +359,7 @@ TEST_F(EnergyPlusFixture, JsonOutput_ReportInfo)
     tableBody(1, 1) = "5.22";
     tableBody(1, 2) = "0.275000";
 
-    Table tbl(tableBody, rowLabels, columnLabels, "AirTerminal:SingleDuct:Uncontrolled",
+    Table tbl(tableBody, rowLabels, columnLabels, "AirTerminal:SingleDuct:ConstantVolume:NoReheat",
               "User-Specified values were used. Design Size values were used if no User-Specified values were provided.");
 
     rowLabels.deallocate();
@@ -407,7 +407,7 @@ TEST_F(EnergyPlusFixture, JsonOutput_ReportInfo)
                             "0.275000"
                         ]
                     },
-                    "TableName": "AirTerminal:SingleDuct:Uncontrolled"
+                    "TableName": "AirTerminal:SingleDuct:ConstantVolume:NoReheat"
                 },
                 {
                     "Cols": [

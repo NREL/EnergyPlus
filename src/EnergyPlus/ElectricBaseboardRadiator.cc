@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -52,28 +52,29 @@
 #include <ObjexxFCL/Array.functions.hh>
 
 // EnergyPlus Headers
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalFanSys.hh>
-#include <DataHeatBalSurface.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSizing.hh>
-#include <DataSurfaces.hh>
-#include <DataZoneEnergyDemands.hh>
-#include <DataZoneEquipment.hh>
-#include <ElectricBaseboardRadiator.hh>
-#include <General.hh>
-#include <GeneralRoutines.hh>
-#include <GlobalNames.hh>
-#include <HeatBalanceSurfaceManager.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <OutputProcessor.hh>
-#include <Psychrometrics.hh>
-#include <ReportSizingManager.hh>
-#include <ScheduleManager.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalFanSys.hh>
+#include <EnergyPlus/DataHeatBalSurface.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/DataZoneEnergyDemands.hh>
+#include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/ElectricBaseboardRadiator.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/HeatBalanceIntRadExchange.hh>
+#include <EnergyPlus/HeatBalanceSurfaceManager.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -419,16 +420,32 @@ namespace ElectricBaseboardRadiator {
             ElecBaseboard(BaseboardNum).FracDistribToSurf.allocate(ElecBaseboard(BaseboardNum).TotSurfToDistrib);
             ElecBaseboard(BaseboardNum).FracDistribToSurf = 0.0;
 
+            // search zone equipment list structure for zone index
+            for (int ctrlZone = 1; ctrlZone <= DataGlobals::NumOfZones; ++ctrlZone) {
+                for (int zoneEquipTypeNum = 1; zoneEquipTypeNum <= DataZoneEquipment::ZoneEquipList(ctrlZone).NumOfEquipTypes; ++zoneEquipTypeNum) {
+                    if (DataZoneEquipment::ZoneEquipList(ctrlZone).EquipType_Num(zoneEquipTypeNum) == DataZoneEquipment::BBElectric_Num &&
+                        DataZoneEquipment::ZoneEquipList(ctrlZone).EquipName(zoneEquipTypeNum) == ElecBaseboard(BaseboardNum).EquipName) {
+                        ElecBaseboard(BaseboardNum).ZonePtr = ctrlZone;
+                    }
+                }
+            }
+            if (ElecBaseboard(BaseboardNum).ZonePtr <= 0) {
+                ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + ElecBaseboard(BaseboardNum).EquipName +
+                                "\" is not on any ZoneHVAC:EquipmentList.");
+                ErrorsFound = true;
+                break;
+            }
+
             AllFracsSummed = ElecBaseboard(BaseboardNum).FracDistribPerson;
             for (SurfNum = 1; SurfNum <= ElecBaseboard(BaseboardNum).TotSurfToDistrib; ++SurfNum) {
                 ElecBaseboard(BaseboardNum).SurfaceName(SurfNum) = cAlphaArgs(SurfNum + 3);
-                ElecBaseboard(BaseboardNum).SurfacePtr(SurfNum) = UtilityRoutines::FindItemInList(cAlphaArgs(SurfNum + 3), Surface);
+                ElecBaseboard(BaseboardNum).SurfacePtr(SurfNum) =
+                    HeatBalanceIntRadExchange::GetRadiantSystemSurface(cCurrentModuleObject,
+                                                                       ElecBaseboard(BaseboardNum).EquipName,
+                                                                       ElecBaseboard(BaseboardNum).ZonePtr,
+                                                                       ElecBaseboard(BaseboardNum).SurfaceName(SurfNum),
+                                                                       ErrorsFound);
                 ElecBaseboard(BaseboardNum).FracDistribToSurf(SurfNum) = rNumericArgs(SurfNum + 6);
-                if (ElecBaseboard(BaseboardNum).SurfacePtr(SurfNum) == 0) {
-                    ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cAlphaFieldNames(SurfNum + 3) + "=\"" +
-                                    cAlphaArgs(SurfNum + 3) + "\" invalid - not found.");
-                    ErrorsFound = true;
-                }
                 if (ElecBaseboard(BaseboardNum).FracDistribToSurf(SurfNum) > MaxFraction) {
                     ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", " + cNumericFieldNames(SurfNum + 6) +
                                      "was greater than the allowable maximum.");
@@ -459,15 +476,6 @@ namespace ElectricBaseboardRadiator {
                 ShowWarningError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) +
                                  "\", Summed radiant fractions for people + surface groups < 1.0");
                 ShowContinueError("The rest of the radiant energy delivered by the baseboard heater will be lost");
-            }
-            // search zone equipment list structure for zone index
-            for (int ctrlZone = 1; ctrlZone <= DataGlobals::NumOfZones; ++ctrlZone) {
-                for (int zoneEquipTypeNum = 1; zoneEquipTypeNum <= DataZoneEquipment::ZoneEquipList(ctrlZone).NumOfEquipTypes; ++zoneEquipTypeNum) {
-                    if (DataZoneEquipment::ZoneEquipList(ctrlZone).EquipType_Num(zoneEquipTypeNum) == DataZoneEquipment::BBElectric_Num &&
-                        DataZoneEquipment::ZoneEquipList(ctrlZone).EquipName(zoneEquipTypeNum) == ElecBaseboard(BaseboardNum).EquipName) {
-                        ElecBaseboard(BaseboardNum).ZonePtr = ctrlZone;
-                    }
-                }
             }
         }
 
@@ -762,7 +770,7 @@ namespace ElectricBaseboardRadiator {
         using DataZoneEnergyDemands::CurDeadBandOrSetback;
         using DataZoneEnergyDemands::ZoneSysEnergyDemand;
         using DataZoneEquipment::ZoneEquipConfig;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using ScheduleManager::GetCurrentScheduleValue;
         using ScheduleManager::GetScheduleIndex;
 
@@ -786,7 +794,7 @@ namespace ElectricBaseboardRadiator {
         QZnReq = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP;
         AirInletTemp = ElecBaseboard(BaseboardNum).AirInletTemp;
         AirOutletTemp = AirInletTemp;
-        CpAir = PsyCpAirFnWTdb(ElecBaseboard(BaseboardNum).AirInletHumRat, AirInletTemp);
+        CpAir = PsyCpAirFnW(ElecBaseboard(BaseboardNum).AirInletHumRat);
         AirMassFlowRate = SimpConvAirFlowSpeed;
         CapacitanceAir = CpAir * AirMassFlowRate;
 

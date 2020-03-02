@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -55,32 +55,31 @@
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
-#include <DataEnvironment.hh>
-#include <DataGlobals.hh>
-#include <DataHVACGlobals.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPlant.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataRuntimeLanguage.hh>
-#include <DataSizing.hh>
-#include <EMSManager.hh>
-#include <FluidProperties.hh>
-#include <General.hh>
-#include <GeneralRoutines.hh>
-#include <GlobalNames.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <PlantCondLoopOperation.hh>
-#include <PlantUtilities.hh>
-#include <ReportSizingManager.hh>
-#include <ScheduleManager.hh>
-#include <SetPointManager.hh>
-#include <UtilityRoutines.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataRuntimeLanguage.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/PlantCondLoopOperation.hh>
+#include <EnergyPlus/PlantUtilities.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/SetPointManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
 
 namespace EnergyPlus {
 
@@ -1320,13 +1319,10 @@ namespace PlantCondLoopOperation {
         using SetPointManager::SetUpNewScheduledTESSetPtMgr;
 
         // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        std::string EquipNum;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const Plant(1);     // Used to identify whether the current loop is Plant
         int const Condenser(2); // Used to identify whether the current loop is Condenser
-        static ObjexxFCL::gio::Fmt fmtLD("*");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NumAlphas;
@@ -1335,7 +1331,6 @@ namespace PlantCondLoopOperation {
         int CompInNode;
         int IOStat;
         Real64 CompFlowRate(0.0);
-        int Num;
         std::string LoopOpSchemeObj; // Used to identify the object name for loop equipment operation scheme
         bool SchemeNameFound;        // Set to FALSE if a match of OpScheme object and OpScheme name is not found
         bool NodeEMSSetPointMissing;
@@ -1358,7 +1353,7 @@ namespace PlantCondLoopOperation {
         }
 
         if (NumSchemes > 0) {
-            for (Num = 1; Num <= NumSchemes; ++Num) {
+            for (int Num = 1; Num <= NumSchemes; ++Num) {
                 inputProcessor->getObjectItem(CurrentModuleObject, Num, cAlphaArgs, NumAlphas, rNumericArgs, NumNums, IOStat);
                 if (UtilityRoutines::SameString(PlantLoop(LoopNum).OpScheme(SchemeNum).Name, cAlphaArgs(1))) break;
                 if (Num == NumSchemes) {
@@ -1428,7 +1423,8 @@ namespace PlantCondLoopOperation {
                         PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).SetPointFlowRate = rNumericArgs(CompNumN);
 
                         if (rNumericArgs(CompNumN) == AutoSize) {
-                            for (Num = 1; Num <= SaveNumPlantComps; ++Num) {
+                            int Num = 1;
+                            for (; Num <= SaveNumPlantComps; ++Num) {
                                 CompInNode = CompDesWaterFlow(Num).SupNode;
                                 CompFlowRate = CompDesWaterFlow(Num).DesVolFlowRate;
                                 if (CompInNode == PlantLoop(LoopNum).OpScheme(SchemeNum).EquipList(1).Comp(CompNum).DemandNodeNum) {
@@ -1437,10 +1433,9 @@ namespace PlantCondLoopOperation {
                                     // call error...Demand node must be component inlet node for autosizing
                                 }
                             }
-                            ObjexxFCL::gio::write(EquipNum, fmtLD) << Num;
                             ReportSizingOutput(CurrentModuleObject,
                                                PlantLoop(LoopNum).OpScheme(SchemeNum).Name,
-                                               "Design Water Flow Rate [m3/s] Equipment # " + stripped(EquipNum),
+                                               "Design Water Flow Rate [m3/s] Equipment # " + std::to_string(Num),
                                                CompFlowRate);
                         }
 
@@ -3236,7 +3231,7 @@ namespace PlantCondLoopOperation {
                 for (MachineOnBranch = 1; MachineOnBranch <= PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).TotalComponents;
                      ++MachineOnBranch) {
                     // Sankar Non Integrated Economizer
-                    if (PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).GeneralEquipType != GenEquipTypes_Pump) {
+                    if (!PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).isPump()) {
                         PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).ON = false;
                         PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).MyLoad = 0.0;
                     }
@@ -3277,7 +3272,7 @@ namespace PlantCondLoopOperation {
         for (Num = 1; Num <= PlantLoop(LoopNum).LoopSide(LoopSideNum).TotalBranches; ++Num) {
             for (MachineOnBranch = 1; MachineOnBranch <= PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).TotalComponents; ++MachineOnBranch) {
                 // Sankar Non Integrated Economizer
-                if (PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).GeneralEquipType != GenEquipTypes_Pump) {
+                if (!PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).isPump()) {
                     PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).ON = false;
                     PlantLoop(LoopNum).LoopSide(LoopSideNum).Branch(Num).Comp(MachineOnBranch).MyLoad = 0.0;
                 }

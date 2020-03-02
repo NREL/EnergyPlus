@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -51,7 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <ConfiguredFunctions.hh>
+#include <EnergyPlus/ConfiguredFunctions.hh>
 #include <EnergyPlus/DataOutputs.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -3007,7 +3007,7 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_heating_fuel)
         "Coil:Heating:Fuel,",
         "  name number one, ! A1 , \field Name",
         "  schedule_name1, ! A2 , \field Availability Schedule Name",
-        "  Gas, ! A3 , \field Fuel Type",
+        "  NaturalGas, ! A3 , \field Fuel Type",
         "  0.45, ! N1 , \field Burner Efficiency",
         "  0.1, ! N2 , \field Nominal Capacity",
         "  this_is_an_air_inlet_name, ! A4 , \field Air Inlet Node Name",
@@ -3020,7 +3020,7 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_heating_fuel)
         "Coil:Heating:Fuel,",
         "  the second name, ! A1 , \field Name",
         "  schedule_name2, ! A2 , \field Availability Schedule Name",
-        "  Gas, ! A3 , \field Fuel Type",
+        "  NaturalGas, ! A3 , \field Fuel Type",
         "  0.55, ! N1 , \field Burner Efficiency",
         "  0.2, ! N2 , \field Nominal Capacity",
         "  this_is_an_air_inlet_name2, ! A4 , \field Air Inlet Node Name",
@@ -3058,7 +3058,7 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_heating_fuel)
     EXPECT_EQ(7, NumAlphas);
     EXPECT_TRUE(compare_containers(
         std::vector<std::string>(
-            {"NAME NUMBER ONE", "SCHEDULE_NAME1", "GAS", "THIS_IS_AN_AIR_INLET_NAME", "THIS_IS_OUTLET", "OTHER_NAME", "CURVE_BLAH_NAME"}),
+            {"NAME NUMBER ONE", "SCHEDULE_NAME1", "NATURALGAS", "THIS_IS_AN_AIR_INLET_NAME", "THIS_IS_OUTLET", "OTHER_NAME", "CURVE_BLAH_NAME"}),
         Alphas));
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, false, false, false}), lAlphaBlanks));
 
@@ -3085,7 +3085,7 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_heating_fuel)
     EXPECT_EQ(7, NumAlphas);
     EXPECT_TRUE(compare_containers(
         std::vector<std::string>(
-            {"THE SECOND NAME", "SCHEDULE_NAME2", "GAS", "THIS_IS_AN_AIR_INLET_NAME2", "THIS_IS_OUTLET2", "OTHER_NAME2", "CURVE_BLAH_NAME2"}),
+            {"THE SECOND NAME", "SCHEDULE_NAME2", "NATURALGAS", "THIS_IS_AN_AIR_INLET_NAME2", "THIS_IS_OUTLET2", "OTHER_NAME2", "CURVE_BLAH_NAME2"}),
         Alphas2));
     EXPECT_TRUE(compare_containers(std::vector<bool>({false, false, false, false, false, false, false}), lAlphaBlanks2));
 
@@ -3865,6 +3865,48 @@ TEST_F(InputProcessorFixture, FalseDuplicates_LowestLevel_AlphaNum) {
 
     EXPECT_TRUE(doj::alphanum_comp<std::string>("n_010", "n_01") > 0);
 
+}
+
+TEST_F(InputProcessorFixture, clean_epjson)
+{
+    std::string const input("{\"Building\":{"
+                            "\"Zone1\":{"
+                            "\"idf_max_extensible_fields\":0,"
+                            "\"idf_max_fields\":8,"
+                            "\"idf_order\":1"
+                            "}"
+                            "},"
+                            "\"GlobalGeometryRules\":{"
+                            "\"\":{"
+                            "\"coordinate_system\":\"Relative\","
+                            "\"daylighting_reference_point_coordinate_system\":\"Relative\","
+                            "\"idf_order\":0,"
+                            "\"rectangular_surface_coordinate_system\":\"Relative\","
+                            "\"starting_vertex_position\":\"UpperLeftCorner\","
+                            "\"vertex_entry_direction\":\"Counterclockwise\""
+                            "}"
+                            "}}");
+
+    std::string const expected("{\"Building\":{"
+                               "\"Zone1\":{"
+                               "}"
+                               "},"
+                               "\"GlobalGeometryRules\":{"
+                               "\"\":{"
+                               "\"coordinate_system\":\"Relative\","
+                               "\"daylighting_reference_point_coordinate_system\":\"Relative\","
+                               "\"rectangular_surface_coordinate_system\":\"Relative\","
+                               "\"starting_vertex_position\":\"UpperLeftCorner\","
+                               "\"vertex_entry_direction\":\"Counterclockwise\""
+                               "}"
+                               "}}");
+
+    json cleanInput = json::parse(input);
+
+    cleanEPJSON(cleanInput);
+    std::string cleanstring = cleanInput.dump();
+
+    EXPECT_EQ(expected, cleanstring);
 }
 
 /*

@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,7 +53,7 @@
 #include <ObjexxFCL/Optional.fwd.hh>
 
 // EnergyPlus Headers
-#include <EnergyPlus.hh>
+#include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
 
@@ -469,6 +469,10 @@ namespace VariableSpeedCoils {
 
     Real64 GetVSCoilMinOATCompressor(std::string const &CoilName, // must match coil names for the coil type
                                      bool &ErrorsFound            // set to true if problem
+    );
+
+    Real64 GetVSCoilMinOATCompressorUsingIndex(int const CoilIndex, // index to cooling coil
+                                               bool &ErrorsFound    // set to true if problem
     );
 
     int GetVSCoilNumOfSpeeds(std::string const &CoilName, // must match coil names for the coil type

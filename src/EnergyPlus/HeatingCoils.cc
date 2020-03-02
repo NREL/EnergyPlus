@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -53,37 +53,37 @@
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
-#include <BranchNodeConnections.hh>
-#include <CurveManager.hh>
-#include <DXCoils.hh>
-#include <DataAirLoop.hh>
-#include <DataAirSystems.hh>
-#include <DataContaminantBalance.hh>
-#include <DataEnvironment.hh>
-#include <DataGlobalConstants.hh>
-#include <DataHVACGlobals.hh>
-#include <DataHeatBalance.hh>
-#include <DataIPShortCuts.hh>
-#include <DataLoopNode.hh>
-#include <DataPrecisionGlobals.hh>
-#include <DataSizing.hh>
-#include <EMSManager.hh>
-#include <FaultsManager.hh>
-#include <General.hh>
-#include <GeneralRoutines.hh>
-#include <GlobalNames.hh>
-#include <HeatingCoils.hh>
-#include <InputProcessing/InputProcessor.hh>
-#include <NodeInputManager.hh>
-#include <OutputProcessor.hh>
-#include <OutputReportPredefined.hh>
-#include <Psychrometrics.hh>
-#include <RefrigeratedCase.hh>
-#include <ReportCoilSelection.hh>
-#include <ReportSizingManager.hh>
-#include <ScheduleManager.hh>
-#include <UtilityRoutines.hh>
-#include <VariableSpeedCoils.hh>
+#include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/CurveManager.hh>
+#include <EnergyPlus/DXCoils.hh>
+#include <EnergyPlus/DataAirLoop.hh>
+#include <EnergyPlus/DataAirSystems.hh>
+#include <EnergyPlus/DataContaminantBalance.hh>
+#include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/DataGlobalConstants.hh>
+#include <EnergyPlus/DataHVACGlobals.hh>
+#include <EnergyPlus/DataHeatBalance.hh>
+#include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/DataLoopNode.hh>
+#include <EnergyPlus/DataPrecisionGlobals.hh>
+#include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/FaultsManager.hh>
+#include <EnergyPlus/General.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/OutputReportPredefined.hh>
+#include <EnergyPlus/Psychrometrics.hh>
+#include <EnergyPlus/RefrigeratedCase.hh>
+#include <EnergyPlus/ReportCoilSelection.hh>
+#include <EnergyPlus/ReportSizingManager.hh>
+#include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/VariableSpeedCoils.hh>
 
 namespace EnergyPlus {
 
@@ -125,7 +125,7 @@ namespace HeatingCoils {
     using DataHeatBalance::RefrigCondenserTypeWater;
     using DataHeatBalance::RefrigSystemTypeDetailed;
     using DataHeatBalance::RefrigSystemTypeRack;
-    using Psychrometrics::PsyCpAirFnWTdb;
+    using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyHFnTdbW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
     using namespace ScheduleManager;
@@ -1114,34 +1114,21 @@ namespace HeatingCoils {
                     HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum == HeatingCoil(RemainingCoils).ReclaimHeatingSourceIndexNum) {
                     SourceIndexNum = HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum;
                     if (HeatingCoil(CoilNum).ReclaimHeatingSource == COMPRESSORRACK_REFRIGERATEDCASE) {
-                        SourceTypeString = "Refrigeration:CompressorRack";
+                        SourceTypeString = HeatReclaimRefrigeratedRack(SourceIndexNum).SourceType;
                         SourceNameString = HeatReclaimRefrigeratedRack(SourceIndexNum).Name;
                     }
                     if (HeatingCoil(CoilNum).ReclaimHeatingSource == CONDENSER_REFRIGERATION) {
+                        SourceTypeString = HeatReclaimRefrigCondenser(SourceIndexNum).SourceType;
                         SourceNameString = HeatReclaimRefrigCondenser(SourceIndexNum).Name;
-                        if (HeatReclaimRefrigCondenser(SourceIndexNum).SourceType == RefrigCondenserTypeAir)
-                            SourceTypeString = "Refrigeration:Condenser:AirCooled";
-                        if (HeatReclaimRefrigCondenser(SourceIndexNum).SourceType == RefrigCondenserTypeEvap)
-                            SourceTypeString = "Refrigeration:Condenser:EvaporativeCooled";
-                        if (HeatReclaimRefrigCondenser(SourceIndexNum).SourceType == RefrigCondenserTypeWater)
-                            SourceTypeString = "Refrigeration:Condenser:WaterCooled";
                     }
-                    if (HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_COOLING) {
-                        SourceTypeString = "Coil:Cooling:DX:SingleSpeed";
+                    if (HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_COOLING ||
+                        HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_MULTISPEED ||
+                        HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_MULTIMODE ||
+                        HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_VARIABLE_COOLING) {
+                        SourceTypeString = HeatReclaimDXCoil(SourceIndexNum).SourceType;
                         SourceNameString = HeatReclaimDXCoil(SourceIndexNum).Name;
                     }
-                    if (HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_MULTISPEED) {
-                        SourceTypeString = "Coil:Cooling:DX:TwoSpeed";
-                        SourceNameString = HeatReclaimDXCoil(SourceIndexNum).Name;
-                    }
-                    if (HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_MULTIMODE) {
-                        SourceTypeString = "Coil:Cooling:DX:TwoStageWithHumidityControlMode";
-                        SourceNameString = HeatReclaimDXCoil(SourceIndexNum).Name;
-                    }
-                    if (HeatingCoil(CoilNum).ReclaimHeatingSource == COIL_DX_VARIABLE_COOLING) {
-                        SourceTypeString = "Coil:Cooling:DX:VariableSpeed";
-                        SourceNameString = DataHeatBalance::HeatReclaimVS_DXCoil(SourceIndexNum).Name;
-                    }
+
                     ShowSevereError("Coil:Heating:Desuperheater, \"" + HeatingCoil(CoilNum).Name + "\" and \"" + HeatingCoil(RemainingCoils).Name +
                                     "\" cannot use the same");
                     ShowContinueError(" heat source object " + SourceTypeString + ", \"" + SourceNameString + "\"");
@@ -1645,7 +1632,7 @@ namespace HeatingCoils {
             AirMassFlow = HeatingCoil(CoilNum).InletAirMassFlowRate;
         }
 
-        CapacitanceAir = PsyCpAirFnWTdb(Win, TempAirIn) * AirMassFlow;
+        CapacitanceAir = PsyCpAirFnW(Win) * AirMassFlow;
 
         // If the coil is operating there should be some heating capacitance
         //  across the coil, so do the simulation. If not set outlet to inlet and no load.
@@ -1720,12 +1707,13 @@ namespace HeatingCoils {
         QCoilActual = HeatingCoilLoad;
         if (std::abs(HeatingCoil(CoilNum).NominalCapacity) < 1.e-8) {
             if (HeatingCoil(CoilNum).AirLoopNum > 0) {
-                AirLoopAFNInfo(HeatingCoil(CoilNum).AirLoopNum).AFNLoopHeatingCoilMaxRTF = max(AirLoopAFNInfo(HeatingCoil(CoilNum).AirLoopNum).AFNLoopHeatingCoilMaxRTF, 0.0);
+                AirLoopAFNInfo(HeatingCoil(CoilNum).AirLoopNum).AFNLoopHeatingCoilMaxRTF =
+                    max(AirLoopAFNInfo(HeatingCoil(CoilNum).AirLoopNum).AFNLoopHeatingCoilMaxRTF, 0.0);
             }
         } else {
             if (HeatingCoil(CoilNum).AirLoopNum > 0) {
-                AirLoopAFNInfo(HeatingCoil(CoilNum).AirLoopNum).AFNLoopHeatingCoilMaxRTF =
-                    max(AirLoopAFNInfo(HeatingCoil(CoilNum).AirLoopNum).AFNLoopHeatingCoilMaxRTF, HeatingCoilLoad / HeatingCoil(CoilNum).NominalCapacity);
+                AirLoopAFNInfo(HeatingCoil(CoilNum).AirLoopNum).AFNLoopHeatingCoilMaxRTF = max(
+                    AirLoopAFNInfo(HeatingCoil(CoilNum).AirLoopNum).AFNLoopHeatingCoilMaxRTF, HeatingCoilLoad / HeatingCoil(CoilNum).NominalCapacity);
             }
         }
 
@@ -2013,7 +2001,7 @@ namespace HeatingCoils {
         TempSetPoint = HeatingCoil(CoilNum).DesiredOutletTemp;
         AirMassFlow = HeatingCoil(CoilNum).InletAirMassFlowRate;
 
-        CapacitanceAir = PsyCpAirFnWTdb(Win, TempAirIn) * AirMassFlow;
+        CapacitanceAir = PsyCpAirFnW(Win) * AirMassFlow;
 
         // If there is a fault of coil SAT Sensor (zrp_Jul2016)
         if (HeatingCoil(CoilNum).FaultyCoilSATFlag && (!WarmupFlag) && (!DoingSizing) && (!KickOffSimulation)) {
@@ -2342,9 +2330,13 @@ namespace HeatingCoils {
                     OutletAirHumRat = FullLoadOutAirHumRat;
                     OutletAirTemp = FullLoadOutAirTemp;
                 } else {
-                    OutletAirEnthalpy = PartLoadRat * FullLoadOutAirEnth + (1.0 - PartLoadRat) * InletAirEnthalpy;
-                    OutletAirHumRat = PartLoadRat * FullLoadOutAirHumRat + (1.0 - PartLoadRat) * InletAirHumRat;
-                    OutletAirTemp = PartLoadRat * FullLoadOutAirTemp + (1.0 - PartLoadRat) * InletAirDryBulbTemp;
+                    OutletAirEnthalpy =
+                        PartLoadRat * AirMassFlow / HeatingCoil(CoilNum).InletAirMassFlowRate * (FullLoadOutAirEnth - InletAirEnthalpy) +
+                        InletAirEnthalpy;
+                    OutletAirHumRat =
+                        PartLoadRat * AirMassFlow / HeatingCoil(CoilNum).InletAirMassFlowRate * (FullLoadOutAirHumRat - InletAirHumRat) +
+                        InletAirHumRat;
+                    OutletAirTemp = PsyTdbFnHW(OutletAirEnthalpy, OutletAirHumRat);
                 }
 
                 EffLS = HeatingCoil(CoilNum).MSEfficiency(StageNumLS);
@@ -2502,7 +2494,7 @@ namespace HeatingCoils {
         AirMassFlow = HeatingCoil(CoilNum).InletAirMassFlowRate;
         TempAirIn = HeatingCoil(CoilNum).InletAirTemp;
         Win = HeatingCoil(CoilNum).InletAirHumRat;
-        CapacitanceAir = PsyCpAirFnWTdb(Win, TempAirIn) * AirMassFlow;
+        CapacitanceAir = PsyCpAirFnW(Win) * AirMassFlow;
         TempSetPoint = HeatingCoil(CoilNum).DesiredOutletTemp;
 
         // If there is a fault of coil SAT Sensor (zrp_Jul2016)
@@ -3123,24 +3115,6 @@ namespace HeatingCoils {
         SuppressWarning = true;
         CoilFound = 0;
 
-        // This function only used for dessicant regeneration and refrigeration desuperheat not a valid source
-        // IF (UtilityRoutines::SameString(CoilType,'REFRIGERATION:COMPRESSORRACK')) THEN
-        //    CALL GetRefrigeratedRackIndex(CoilName, CoilNum,RefrigSystemTypeRack, GetCoilErrFlag, CoilType, SuppressWarning)
-        //    DO NumCoil = 1, NumHeatingCoils
-        //      IF(HeatingCoil(NumCoil)%ReclaimHeatingSource .NE. COMPRESSORRACK_REFRIGERATEDCASE .AND. &
-        //         HeatingCoil(NumCoil)%ReclaimHeatingCoilName .NE. CoilName)CYCLE
-        //      CoilFound = CoilNum
-        //      EXIT
-        //    END DO
-        // ELSEIF (UtilityRoutines::SameString(CoilType,'REFRIGERATION:CONDENSER')) THEN   bbb
-        //    CALL GetRefrigeratedRackIndex(CoilName, CoilNum,RefrigSystemTypeDetailed, GetCoilErrFlag, CoilType, SuppressWarning)
-        //    DO NumCoil = 1, NumHeatingCoils
-        //      IF(HeatingCoil(NumCoil)%ReclaimHeatingSource .NE. CONDENSER_REFRIGERATION .AND. &
-        //         HeatingCoil(NumCoil)%ReclaimHeatingCoilName .NE. CoilName)CYCLE
-        //      CoilFound = CoilNum
-        //      EXIT
-        //    END DO
-        // ELSEIF
         // note should eventually get rid of this string comparison
         if (UtilityRoutines::SameString(CoilType, "COIL:COOLING:DX:SINGLESPEED") ||
             UtilityRoutines::SameString(CoilType, "COIL:COOLING:DX:TWOSPEED") ||

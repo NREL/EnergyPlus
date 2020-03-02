@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -48,9 +48,9 @@
 #ifndef PlantReportingReportCompData_hh_INCLUDED
 #define PlantReportingReportCompData_hh_INCLUDED
 
-#include <Plant/Connection.hh>
-#include <Plant/MeterData.hh>
-#include <Plant/Subcomponents.hh>
+#include <EnergyPlus/Plant/Connection.hh>
+#include <EnergyPlus/Plant/MeterData.hh>
+#include <EnergyPlus/Plant/Subcomponents.hh>
 
 namespace EnergyPlus {
 namespace DataPlant {
@@ -58,7 +58,6 @@ namespace DataPlant {
     struct ReportCompData
     {
         // Members
-        bool Parent;             // TRUE = designated component is made up of sub-components
         std::string TypeOf;      // The 'keyWord' identifying  component type
         std::string Name;        // Component name
         int CompIndex;           // Component Index in whatever is using this component
@@ -79,7 +78,7 @@ namespace DataPlant {
 
         // Default Constructor
         ReportCompData()
-            : Parent(false), CompIndex(0), NodeNumIn(0), NodeNumOut(0), NumMeteredVars(0), NumSubComps(0), LoopLoadFrac(0.0), TotPlantSupplyElec(0.0),
+            : CompIndex(0), NodeNumIn(0), NodeNumOut(0), NumMeteredVars(0), NumSubComps(0), LoopLoadFrac(0.0), TotPlantSupplyElec(0.0),
               TotPlantSupplyGas(0.0), TotPlantSupplyPurch(0.0), TotPlantSupplyOther(0.0)
         {
         }
