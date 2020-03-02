@@ -49,7 +49,6 @@
 #define SOLVER_HPP
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array2D.hh>
 
 #include "AirflowNetwork/Properties.hpp"
