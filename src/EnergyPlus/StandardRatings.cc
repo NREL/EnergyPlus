@@ -1573,7 +1573,7 @@ namespace StandardRatings {
         static Real64 TotalElecPowerRated(0.0);       // Net power consumption (Cond Fan+Compressor+Indoor Fan) at Rated test conditions [W]
         static Real64 EIR(0.0);                       // Energy Efficiency Ratio at AHRI test conditions for SEER [-]
         static Real64 PartLoadFactor(0.0);            // Part load factor, accounts for thermal lag at compressor startup [-]
-        static Real64 PartLoadFractionDefault(0.0);   // part-load fraction that account for the cyclic degradation from AHRI 201/240 default PLF curve and C_D value, [-]
+        static Real64 PartLoadFactorDefault(0.0);     // part-load factor that account for the cyclic degradation from AHRI 201/240 default PLF curve and C_D value, [-]
         static Real64 EERReduced(0.0);                // EER at reduced capacity test conditions (100%, 75%, 50%, and 25%)
         static Real64 ElecPowerReducedCap(0.0);       // Net power consumption (Cond Fan+Compressor) at reduced test condition [W]
         static Real64 NetCoolingCapReduced(0.0);      // Net Cooling Coil capacity at reduced conditions, accounting for supply fan heat [W]
@@ -1611,12 +1611,12 @@ namespace StandardRatings {
             // Calculate SEER value from the Energy Efficiency Ratio (EER) at the AHRI test conditions and the part load factor.
             // First evaluate the Part Load Factor curve at PLR = 0.5 (AHRI Standard 210/240)
             PartLoadFactor = CurveValue(PLFFPLRCurveIndex, PLRforSEER);
-            PartLoadFractionDefault = 1.0 - CyclicDegradationCoeff * (1.0 - PLRforSEER);
+            PartLoadFactorDefault = 1.0 - CyclicDegradationCoeff * (1.0 - PLRforSEER);
             SEER = 0.0;
             SEER_Default = 0.0;
             if (TotalElecPower > 0.0) {
                 SEER = (NetCoolingCapAHRI / TotalElecPower) * PartLoadFactor;
-                SEER_Default = (NetCoolingCapAHRI / TotalElecPower) * PartLoadFractionDefault;
+                SEER_Default = (NetCoolingCapAHRI / TotalElecPower) * PartLoadFactorDefault;
             }
 
             // EER calculations:
@@ -1859,8 +1859,8 @@ namespace StandardRatings {
         static Real64 CoolingCapacityMax(0.0);           // cooling capacity of Mult-speed DX coil at max speed, [W]
         static Real64 CoolingElecPowerMax(0.0);          // outdoor unit electric power input at Max speed, [W]
         static Real64 PartLoadRatio(0.0);                // compressor cycling ratio between successive speeds, [-]
-        static Real64 PartLoadFraction(0.0);             // part-load fraction that account for the cyclic degradation, [-]
-        static Real64 PartLoadFractionDefault(0.0);      // part-load fraction that account for the cyclic degradation from AHRI 201/240 default PLF curve and C_D value, [-]
+        static Real64 PartLoadFactor(0.0);               // part-load factor that account for the cyclic degradation, [-]
+        static Real64 PartLoadFactorDefault(0.0);        // part-load factorn that account for the cyclic degradation from AHRI 201/240 default PLF curve and C_D value, [-]
         static Real64 NetCoolingCapWeighted(0.0);        // net tot cooling cap weighted by the fraction of the binned cooling hours [W]
         static Real64 TotCoolingElecPowerWeighted(0.0);  // net total cooling electric power input weighted by the fraction of the temperature bins
         static Real64 TotCoolingElecPowerWeightedDefault(0.0);  // net total cooling electric power input weighted by the fraction of the temperature bins from AHRI 201/240 default PLF curve and C_D value,
@@ -1967,10 +1967,10 @@ namespace StandardRatings {
                 if (BuildingCoolingLoad <= CoolingCapacityLS) {
                     PartLoadRatio = min(1.0, BuildingCoolingLoad / CoolingCapacityLS);
                     NetTotCoolCapBinned = PartLoadRatio * CoolingCapacityLS;
-                    PartLoadFraction = CurveValue(PLFFPLRCurveIndex(spnum), PartLoadRatio);
-                    PartLoadFractionDefault = 1.0 - CyclicDegradationCoeff * (1.0 - PartLoadRatio);
-                    TotCoolElecPowerBinned = (PartLoadRatio / PartLoadFraction) * CoolingElecPowerLS;
-                    TotCoolElecPowerBinnedDefault = (PartLoadRatio / PartLoadFractionDefault) * CoolingElecPowerLS;
+                    PartLoadFactor = CurveValue(PLFFPLRCurveIndex(spnum), PartLoadRatio);
+                    PartLoadFactorDefault = 1.0 - CyclicDegradationCoeff * (1.0 - PartLoadRatio);
+                    TotCoolElecPowerBinned = (PartLoadRatio / PartLoadFactor) * CoolingElecPowerLS;
+                    TotCoolElecPowerBinnedDefault = (PartLoadRatio / PartLoadFactorDefault) * CoolingElecPowerLS;
                     goto SpeedLoop_exit;
                 } else if ((BuildingCoolingLoad > CoolingCapacityLS) && (BuildingCoolingLoad < CoolingCapacityHS)) {
                     // cycle between speed "spnum" and "spnum + 1"
