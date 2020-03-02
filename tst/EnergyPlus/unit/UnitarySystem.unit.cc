@@ -11797,7 +11797,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_AllFlowFieldsBlankInputTest)
         "Coil:Heating:Fuel,",
         "  Furnace Heating Coil,   !- Name",
         "  FanAndCoilAvailSched,   !- Availability Schedule Name",
-        "  Gas,                    !- Fuel Type",
+        "  NaturalGas,             !- Fuel Type",
         "  0.8,                    !- Gas Burner Efficiency",
         "  autosize,               !- Nominal Capacity{ W }",
         "  Heating Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -11806,7 +11806,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_AllFlowFieldsBlankInputTest)
         "Coil:Heating:Fuel,",
         "  Humidistat Reheat Coil, !- Name",
         "  FanAndCoilAvailSched,   !- Availability Schedule Name",
-        "  Gas,                    !- Fuel Type",
+        "  NaturalGas,             !- Fuel Type",
         "  0.8,                    !- Gas Burner Efficiency",
         "  autosize,               !- Nominal Capacity{ W }",
         "  Reheat Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -11903,9 +11903,9 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_AllFlowFieldsBlankInputTest)
     UnitarySys mySys;
     std::string compName = "UNITARY SYSTEM MODEL";
     int compTypeOfNum = DataHVACGlobals::UnitarySys_AnyCoilType;
-    UnitarySys *thisSys;
     bool zoneEquipment(true);
-    thisSys = mySys.factory(compTypeOfNum, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys *thisSys = &UnitarySystems::unitarySys[0];
     DataZoneEquipment::ZoneEquipInputsFilled = true;
     thisSys->getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -11958,7 +11958,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_AllFlowFieldsBlankInputTest)
     int AirLoopNum(0);
     bool FirstHVACIteration(true);
 
-    thisSys->sizeUnitarySystem(FirstHVACIteration, AirLoopNum);
+    thisSys->sizeSystem(FirstHVACIteration, AirLoopNum);
     // check autosized flows and capacity
     EXPECT_EQ(thisSys->m_MaxCoolAirVolFlow, 1.005);
     EXPECT_EQ(thisSys->m_MaxHeatAirVolFlow, 1.005);
