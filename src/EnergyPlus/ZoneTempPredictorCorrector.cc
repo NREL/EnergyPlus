@@ -274,6 +274,10 @@ namespace ZoneTempPredictorCorrector {
     Real64 AnyZoneTempOscillate;
     Real64 AnyZoneTempOscillateDuringOccupancy;
     Real64 AnyZoneTempOscillateInDeadband;
+    Real64 AnnualAnyZoneTempOscillate(0.0);
+    Real64 AnnualAnyZoneTempOscillateDuringOccupancy(0.0);
+    Real64 AnnualAnyZoneTempOscillateInDeadband(0.0);
+
 
     // SUBROUTINE SPECIFICATIONS:
 
@@ -313,6 +317,11 @@ namespace ZoneTempPredictorCorrector {
         ZoneTempHist.deallocate();
         ZoneTempOscillate.deallocate();
         AnyZoneTempOscillate = 0.0;
+        AnyZoneTempOscillateDuringOccupancy = 0.0;
+        AnyZoneTempOscillateInDeadband = 0.0;
+        AnnualAnyZoneTempOscillate = 0.0;
+        AnnualAnyZoneTempOscillateDuringOccupancy = 0.0;
+        AnnualAnyZoneTempOscillateInDeadband = 0.0;
         SetPointSingleHeating.deallocate();
         SetPointSingleCooling.deallocate();
         SetPointSingleHeatCool.deallocate();
@@ -6922,6 +6931,7 @@ namespace ZoneTempPredictorCorrector {
 
         // first time run allocate arrays and setup output variable
         if (SetupOscillationOutputFlag) {
+            if (!DataGlobals::DoWeathSim) return;
             ZoneTempHist.allocate(4, NumOfZones);
             ZoneTempHist = 0.0;
             ZoneTempOscillate.dimension(NumOfZones, 0.0);
@@ -7023,6 +7033,11 @@ namespace ZoneTempPredictorCorrector {
             } else {
                 AnyZoneTempOscillateInDeadband = 0.0;
             }
+
+            // annual/runperiod sum for _perflog.csv file
+            AnnualAnyZoneTempOscillate += AnyZoneTempOscillate;
+            AnnualAnyZoneTempOscillateDuringOccupancy += AnyZoneTempOscillateDuringOccupancy;
+            AnnualAnyZoneTempOscillateInDeadband += AnyZoneTempOscillateInDeadband;
         }
     }
 

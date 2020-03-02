@@ -7659,6 +7659,9 @@ namespace OutputReportTabular {
                 UtilityRoutines::appendPerfLog("District Heating ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(5), 3));
                 UtilityRoutines::appendPerfLog("Water ABUPS Total [m3]", General::RoundSigDigits(collapsedTotal(6), 3));
                 UtilityRoutines::appendPerfLog("Values Gathered Over [hours]", General::RoundSigDigits(gatherElapsedTimeBEPS, 2));
+                UtilityRoutines::appendPerfLog("Facility Any Zone Oscillating Temperatures Time [hours]", General::RoundSigDigits(ZoneTempPredictorCorrector::AnnualAnyZoneTempOscillate, 2));
+                UtilityRoutines::appendPerfLog("Facility Any Zone Oscillating Temperatures During Occupancy Time [hours]", General::RoundSigDigits(ZoneTempPredictorCorrector::AnnualAnyZoneTempOscillateDuringOccupancy, 2));
+                UtilityRoutines::appendPerfLog("Facility Any Zone Oscillating Temperatures in Deadband Time [hours]", General::RoundSigDigits(ZoneTempPredictorCorrector::AnnualAnyZoneTempOscillateInDeadband, 2));
             }
             for (jEndUse = 1; jEndUse <= NumEndUses; ++jEndUse) {
                 for (kEndUseSub = 1; kEndUseSub <= EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
