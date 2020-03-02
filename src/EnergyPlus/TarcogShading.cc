@@ -102,7 +102,7 @@ namespace TarcogShading {
                  Array2_int const &iprop,
                  Array1<Real64> const &pressure,
                  Array1_int const &nmix,
-                 Array1<Real64> const &xwght,
+                 const Array1D<Real64> &xwght,
                  Array2<Real64> const &xgcon,
                  Array2<Real64> const &xgvis,
                  Array2<Real64> const &xgcp,
@@ -475,11 +475,11 @@ namespace TarcogShading {
         }
     }
 
-    void forcedventilation(Array1A_int const iprop,
-                           Array1A<Real64> const frct,
+    void forcedventilation(const Array1D_int &iprop,
+                           const Array1D<Real64> &frct,
                            Real64 const press,
                            int const nmix,
-                           Array1A<Real64> const xwght,
+                           const Array1D<Real64> &xwght,
                            Array2A<Real64> const xgcon,
                            Array2A<Real64> const xgvis,
                            Array2A<Real64> const xgcp,
@@ -515,9 +515,9 @@ namespace TarcogShading {
         //**************************************************************************************************************
 
         // Argument array dimensioning
-        iprop.dim(maxgas);
-        frct.dim(maxgas);
-        xwght.dim(maxgas);
+        EP_SIZE_CHECK(iprop, maxgas);
+        EP_SIZE_CHECK(frct, maxgas);
+        EP_SIZE_CHECK(xwght, maxgas);
         xgcon.dim(3, maxgas);
         xgvis.dim(3, maxgas);
         xgcp.dim(3, maxgas);
@@ -543,15 +543,15 @@ namespace TarcogShading {
         hcv = 2.0 * hc + 4.0 * forcedspeed;
     }
 
-    void shadingin(Array1A_int const iprop1,
-                   Array1A<Real64> const frct1,
+    void shadingin(const Array1D_int &iprop1,
+                   const Array1D<Real64> &frct1,
                    Real64 const press1,
                    int const nmix1,
-                   Array1A_int const iprop2,
-                   Array1A<Real64> const frct2,
+                   const Array1D_int &iprop2,
+                   const Array1D<Real64> &frct2,
                    Real64 const press2,
                    int const nmix2,
-                   Array1A<Real64> const xwght,
+                   const Array1D<Real64> &xwght,
                    Array2A<Real64> const xgcon,
                    Array2A<Real64> const xgvis,
                    Array2A<Real64> const xgcp,
@@ -615,11 +615,11 @@ namespace TarcogShading {
         using DataGlobals::Pi;
 
         // Argument array dimensioning
-        iprop1.dim(maxgas);
-        frct1.dim(maxgas);
-        iprop2.dim(maxgas);
-        frct2.dim(maxgas);
-        xwght.dim(maxgas);
+        EP_SIZE_CHECK(iprop1, maxgas);
+        EP_SIZE_CHECK(frct1, maxgas);
+        EP_SIZE_CHECK(iprop2, maxgas);
+        EP_SIZE_CHECK(frct2, maxgas);
+        EP_SIZE_CHECK(xwght, maxgas);
         xgcon.dim(3, maxgas);
         xgvis.dim(3, maxgas);
         xgcp.dim(3, maxgas);
@@ -843,15 +843,15 @@ namespace TarcogShading {
         }
     }
 
-    void shadingedge(Array1A_int const iprop1,
-                     Array1A<Real64> const frct1,
+    void shadingedge(const Array1D_int &iprop1,
+                     const Array1D<Real64> &frct1,
                      Real64 const press1,
                      int const nmix1,
-                     Array1A_int const iprop2,
-                     Array1A<Real64> const frct2,
+                     const Array1D_int &iprop2,
+                     const Array1D<Real64> &frct2,
                      Real64 const press2,
                      int const nmix2,
-                     Array1A<Real64> const xwght,
+                     const Array1D<Real64> &xwght,
                      Array2A<Real64> const xgcon,
                      Array2A<Real64> const xgvis,
                      Array2A<Real64> const xgcp,
@@ -912,11 +912,11 @@ namespace TarcogShading {
         using DataGlobals::Pi;
 
         // Argument array dimensioning
-        iprop1.dim(maxgas);
-        frct1.dim(maxgas);
-        iprop2.dim(maxgas);
-        frct2.dim(maxgas);
-        xwght.dim(maxgas);
+        EP_SIZE_CHECK(iprop1, maxgas);
+        EP_SIZE_CHECK(frct1, maxgas);
+        EP_SIZE_CHECK(iprop2, maxgas);
+        EP_SIZE_CHECK(frct2, maxgas);
+        EP_SIZE_CHECK(xwght, maxgas);
         xgcon.dim(3, maxgas);
         xgvis.dim(3, maxgas);
         xgcp.dim(3, maxgas);

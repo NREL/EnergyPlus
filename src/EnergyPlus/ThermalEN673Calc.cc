@@ -110,7 +110,7 @@ namespace ThermalEN673Calc {
                     Array2A<Real64> const xgcon,
                     Array2A<Real64> const xgvis,
                     Array2A<Real64> const xgcp,
-                    Array1A<Real64> const xwght,
+                    const Array1D<Real64> &xwght,
                     Array1A<Real64> theta,
                     Real64 &ufactor,
                     Real64 &hcin,
@@ -150,7 +150,7 @@ namespace ThermalEN673Calc {
         xgcon.dim(3, maxgas);
         xgvis.dim(3, maxgas);
         xgcp.dim(3, maxgas);
-        xwght.dim(maxgas);
+        EP_SIZE_CHECK(xwght, maxgas);
         theta.dim(maxlay2);
         ibc.dim(2);
         hg.dim(maxlay);
@@ -239,7 +239,7 @@ namespace ThermalEN673Calc {
                        Array2A<Real64> const xgcon,
                        Array2A<Real64> const xgvis,
                        Array2A<Real64> const xgcp,
-                       Array1A<Real64> const xwght,
+                       const Array1D<Real64> &xwght,
                        Array1A<Real64> const presure,
                        Array1A_int const nmix,
                        Array1A<Real64> theta,
@@ -272,7 +272,7 @@ namespace ThermalEN673Calc {
         xgcon.dim(3, maxgas);
         xgvis.dim(3, maxgas);
         xgcp.dim(3, maxgas);
-        xwght.dim(maxgas);
+        EP_SIZE_CHECK(xwght, maxgas);
         presure.dim(maxlay1);
         nmix.dim(maxlay1);
         theta.dim(maxlay2);
