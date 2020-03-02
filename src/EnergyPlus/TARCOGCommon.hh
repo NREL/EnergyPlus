@@ -49,7 +49,6 @@
 #define TARCOGCommon_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array2A.hh>
 
 // EnergyPlus Headers
@@ -94,11 +93,11 @@ namespace TARCOGCommon {
                         Array1<Real64> const &emis,
                         Real64 const edgeGlCorrFac);
 
-    void EquationsSolver(Array2<Real64> &a, Array1<Real64> &b, int const n, int &nperr, std::string &ErrorMessage);
+    void EquationsSolver(Array2<Real64> &a, Array1D<Real64> &b, int const n, int &nperr, std::string &ErrorMessage);
 
     void ludcmp(Array2<Real64> &a, int const n, Array1_int &indx, Real64 &d, int &nperr, std::string &ErrorMessage);
 
-    void lubksb(Array2A<Real64> const a, int const n, Array1A_int const indx, Array1A<Real64> b);
+    void lubksb(Array2A<Real64> const a, int const n, const Array1D_int &indx, Array1D<Real64> &b);
 
     Real64 pos(Real64 const x);
 
