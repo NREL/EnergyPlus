@@ -172,8 +172,9 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
         "    25;                      !- Maximum HVAC Iterations",
 
         "  ShadowCalculation,",
-        "    AverageOverDaysInFrequency,  !- Calculation Method",
-        "    7,                       !- Calculation Frequency",
+        "    PolygonClipping,         !- Shading Calculation Method",
+        "    Periodic,                !- Shading Calculation Update Frequency Method",
+        "    7,                       !- Shading Calculation Update Frequency",
         "    15000;                   !- Maximum Figures in Shadow Overlap Calculations",
 
         "  Timestep,6;",
@@ -4013,7 +4014,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
     // Mixer outlet
     EXPECT_NEAR(23.0, DataLoopNode::Node(68).Temp, 0.0001);
     EXPECT_NEAR(0.5, DataLoopNode::Node(68).MassFlowRate, 0.0001);
-    // Outlet of HX 
+    // Outlet of HX
     EXPECT_NEAR(-8.0710884, DataLoopNode::Node(67).Temp, 0.0001);
     // Outlet of Central DOAS
     EXPECT_NEAR(4.5, DataLoopNode::Node(70).Temp, 0.0001);
