@@ -297,18 +297,22 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(const DataLoopNode::N
     thisspeed.CalcSpeedOutput(inletNode, outletNode, plr1, fanOpMode, this->condInletTemp);
 
     // the outlet node conditions are based on it running at the truncated flow, we need to merge the bypassed air back in and ramp up flow rate
-    thisspeed.AirMassFlow /= thisspeed.active_fraction_of_face_coil_area;
-    Real64 correctedEnthalpy = (1.0 - thisspeed.active_fraction_of_face_coil_area) * inletNode.Enthalpy + thisspeed.active_fraction_of_face_coil_area * outletNode.Enthalpy;
-    Real64 correctedHumRat = (1.0 - thisspeed.active_fraction_of_face_coil_area) * inletNode.HumRat + thisspeed.active_fraction_of_face_coil_area * outletNode.HumRat;
-    Real64 correctedTemp = Psychrometrics::PsyTdbFnHW(correctedEnthalpy, correctedHumRat);
-    // Check for saturation error and modify temperature at constant enthalpy
-//    if (correctedTemp < Psychrometrics::PsyTsatFnHPb(correctedEnthalpy, inletNode.Press)) {
-//        correctedTemp = Psychrometrics::PsyTsatFnHPb(correctedEnthalpy, inletNode.Press);
-//        correctedHumRat = Psychrometrics::PsyWFnTdbH(correctedTemp, correctedEnthalpy);
-//    }
-    outletNode.Temp = correctedTemp;
-    outletNode.HumRat = correctedHumRat;
-    outletNode.Enthalpy = correctedEnthalpy;
+    if (thisspeed.adjustForFaceArea) {
+        thisspeed.AirMassFlow /= thisspeed.active_fraction_of_face_coil_area;
+        Real64 correctedEnthalpy = (1.0 - thisspeed.active_fraction_of_face_coil_area) * inletNode.Enthalpy +
+                                   thisspeed.active_fraction_of_face_coil_area * outletNode.Enthalpy;
+        Real64 correctedHumRat =
+            (1.0 - thisspeed.active_fraction_of_face_coil_area) * inletNode.HumRat + thisspeed.active_fraction_of_face_coil_area * outletNode.HumRat;
+        Real64 correctedTemp = Psychrometrics::PsyTdbFnHW(correctedEnthalpy, correctedHumRat);
+        // Check for saturation error and modify temperature at constant enthalpy
+        //    if (correctedTemp < Psychrometrics::PsyTsatFnHPb(correctedEnthalpy, inletNode.Press)) {
+        //        correctedTemp = Psychrometrics::PsyTsatFnHPb(correctedEnthalpy, inletNode.Press);
+        //        correctedHumRat = Psychrometrics::PsyWFnTdbH(correctedTemp, correctedEnthalpy);
+        //    }
+        outletNode.Temp = correctedTemp;
+        outletNode.HumRat = correctedHumRat;
+        outletNode.Enthalpy = correctedEnthalpy;
+    }
 
     Real64 outSpeed1HumRat = outletNode.HumRat;
     Real64 outSpeed1Enthalpy = outletNode.Enthalpy;
@@ -331,19 +335,23 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(const DataLoopNode::N
 
         lowerspeed.CalcSpeedOutput(inletNode, outletNode, PLR, fanOpMode, condInletTemp); // out
 
-        lowerspeed.AirMassFlow /= lowerspeed.active_fraction_of_face_coil_area;
-        correctedEnthalpy = (1.0 - lowerspeed.active_fraction_of_face_coil_area) * inletNode.Enthalpy + lowerspeed.active_fraction_of_face_coil_area * outletNode.Enthalpy;
-        correctedHumRat = (1.0 - lowerspeed.active_fraction_of_face_coil_area) * inletNode.HumRat + lowerspeed.active_fraction_of_face_coil_area * outletNode.HumRat;
-        correctedTemp = Psychrometrics::PsyTdbFnHW(correctedEnthalpy, correctedHumRat);
-        // Check for saturation error and modify temperature at constant enthalpy
-//        if (correctedTemp < Psychrometrics::PsyTsatFnHPb(correctedEnthalpy, inletNode.Press)) {
-//            correctedTemp = Psychrometrics::PsyTsatFnHPb(correctedEnthalpy, inletNode.Press);
-//            correctedHumRat = Psychrometrics::PsyWFnTdbH(correctedTemp, correctedEnthalpy);
-//        }
-        outletNode.Temp = correctedTemp;
-        outletNode.HumRat = correctedHumRat;
-        outletNode.Enthalpy = correctedEnthalpy;
-        
+        if (lowerspeed.adjustForFaceArea) {
+            lowerspeed.AirMassFlow /= lowerspeed.active_fraction_of_face_coil_area;
+            Real64 correctedEnthalpy = (1.0 - lowerspeed.active_fraction_of_face_coil_area) * inletNode.Enthalpy +
+                                       lowerspeed.active_fraction_of_face_coil_area * outletNode.Enthalpy;
+            Real64 correctedHumRat = (1.0 - lowerspeed.active_fraction_of_face_coil_area) * inletNode.HumRat +
+                                     lowerspeed.active_fraction_of_face_coil_area * outletNode.HumRat;
+            Real64 correctedTemp = Psychrometrics::PsyTdbFnHW(correctedEnthalpy, correctedHumRat);
+            // Check for saturation error and modify temperature at constant enthalpy
+            //        if (correctedTemp < Psychrometrics::PsyTsatFnHPb(correctedEnthalpy, inletNode.Press)) {
+            //            correctedTemp = Psychrometrics::PsyTsatFnHPb(correctedEnthalpy, inletNode.Press);
+            //            correctedHumRat = Psychrometrics::PsyWFnTdbH(correctedTemp, correctedEnthalpy);
+            //        }
+            outletNode.Temp = correctedTemp;
+            outletNode.HumRat = correctedHumRat;
+            outletNode.Enthalpy = correctedEnthalpy;
+        }
+
         outletNode.HumRat = outSpeed1HumRat * speedRatio + (1.0 - speedRatio) * outletNode.HumRat;
         outletNode.Enthalpy = outSpeed1Enthalpy * speedRatio + (1.0 - speedRatio) * outletNode.Enthalpy;
         outletNode.Temp = Psychrometrics::PsyTdbFnHW(outletNode.Enthalpy, outletNode.HumRat);

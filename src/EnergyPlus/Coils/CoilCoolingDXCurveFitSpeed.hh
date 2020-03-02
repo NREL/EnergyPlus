@@ -139,6 +139,7 @@ struct CoilCoolingDXCurveFitSpeed
     Real64 evap_air_flow_rate = 0.0;
     Real64 condenser_air_flow_rate = 0.0;
     Real64 active_fraction_of_face_coil_area = 0.0;
+    bool adjustForFaceArea = false;
     Real64 ratedLatentCapacity = 0.0; // Latent capacity at rated conditions {W}
 
     // rating data
