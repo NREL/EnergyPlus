@@ -136,7 +136,7 @@ namespace Vectors {
         Real64 areap;
 
         // Argument array dimensioning
-        EP_SIZE_CHECK(p, n - 1);
+        EP_SIZE_CHECK(p, n);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -151,8 +151,8 @@ namespace Vectors {
         Vector edgex;
         Vector csum;
 
-        edge0 = p(1) - p(0);
-        edge1 = p(2) - p(0);
+        edge0 = p[1] - p[0];
+        edge1 = p[2] - p[0];
 
         edgex = cross(edge0, edge1);
         nor = VecNormalize(edgex);
@@ -161,9 +161,9 @@ namespace Vectors {
         csum = 0.0;
 
         for (i = 0; i <= n - 2; ++i) {
-            csum += cross(p(i), p(i + 1));
+            csum += cross(p[i], p[i + 1]);
         }
-        csum += cross(p(n - 1), p(0));
+        csum += cross(p[n - 1], p[0]);
 
         areap = 0.5 * std::abs(dot(nor, csum));
 
@@ -470,8 +470,8 @@ namespace Vectors {
         normal = Vector(0.0, 0.0, 0.0);
         refpt = Vector(0.0, 0.0, 0.0);
         for (i = 0; i <= nverts - 1; ++i) {
-            Vector const &u(verts(i));
-            Vector const &v(i < nverts - 1 ? verts(i + 1) : verts(0));
+            Vector const &u(verts[i]);
+            Vector const &v(i < nverts - 1 ? verts[i + 1] : verts[0]);
             normal.x += (u.y - v.y) * (u.z + v.z);
             normal.y += (u.z - v.z) * (u.x + v.x);
             normal.z += (u.x - v.x) * (u.y + v.y);

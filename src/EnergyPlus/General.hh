@@ -53,6 +53,7 @@
 #include <type_traits>
 
 // ObjexxFCL Headers
+#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Array2A.hh>
@@ -152,7 +153,7 @@ namespace General {
     );
 
     Real64 InterpBlind(Real64 const ProfAng,           // Profile angle (rad)
-                       const Array1D<Real64> &PropArray // Array of blind properties
+                       Array1A<Real64> const PropArray // Array of blind properties
     );
 
     Real64 InterpProfAng(Real64 const ProfAng,           // Profile angle (rad)
@@ -185,7 +186,7 @@ namespace General {
     );
 
     Real64 POLYF(Real64 const X,         // Cosine of angle of incidence
-                 const Array1D<Real64> &A // Polynomial coefficients
+                 Array1A<Real64> const A // Polynomial coefficients
     );
 
     Real64 POLYF(Real64 const X,         // Cosine of angle of incidence
@@ -197,12 +198,12 @@ namespace General {
     );
 
     Real64 POLY1F(Real64 &X,         // independent variable
-                  Array1D<Real64> &A, // array of polynomial coefficients
+                  Array1A<Real64> A, // array of polynomial coefficients
                   int &N             // number of terms in polynomial
     );
 
     Real64 POLY2F(Real64 &X,         // independent variable
-                  Array1D<Real64> &A, // array of polynomial coefficients
+                  Array1A<Real64> A, // array of polynomial coefficients
                   int &N             // number of terms in polynomial
     );
 
@@ -222,10 +223,10 @@ namespace General {
 
     std::string &strip_trailing_zeros(std::string &InputString);
 
-    void MovingAvg(const Array1D<Real64> &DataIn, // input data that needs smoothing
+    void MovingAvg(Array1A<Real64> const DataIn, // input data that needs smoothing
                    int const NumDataItems,       // number of values in DataIn
                    int const NumItemsInAvg,      // number of items in the averaging window
-                   Array1D<Real64> &SmoothedData  // output data after smoothing
+                   Array1A<Real64> SmoothedData  // output data after smoothing
     );
 
     void ProcessDateString(std::string const &String,

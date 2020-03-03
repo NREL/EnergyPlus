@@ -3673,8 +3673,8 @@ namespace ScheduleManager {
         // na
 
         // Argument array dimensioning
-        TheseDays.dim(MaxDayTypes);
-        AlReady.dim(MaxDayTypes);
+        EP_SIZE_CHECK(TheseDays, MaxDayTypes);
+        EP_SIZE_CHECK(AlReady, MaxDayTypes);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
