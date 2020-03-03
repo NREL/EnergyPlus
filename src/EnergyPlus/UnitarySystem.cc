@@ -2811,8 +2811,13 @@ namespace UnitarySystems {
                 }
 
                 Real64 loc_DesignMinOutletTemp(2.0);
-                if (fields.find("minimum_supply_air_temperature") != fields.end()) { // not required field, has default
-                    loc_DesignMinOutletTemp = fields.at("minimum_supply_air_temperature");
+                if (fields.find("minimum_supply_air_temperature") != fields.end()) { // not required field, has default (2C), and autosizable
+                    auto tempFieldVal = fields.at("minimum_supply_air_temperature");
+                    if (tempFieldVal == "Autosize") {
+                        loc_DesignMinOutletTemp = DataSizing::AutoSize;
+                    } else {
+                        loc_DesignMinOutletTemp = fields.at("minimum_supply_air_temperature");
+                    }
                 }
 
                 std::string loc_latentControlFlag("SensibleOnlyLoadControl");
