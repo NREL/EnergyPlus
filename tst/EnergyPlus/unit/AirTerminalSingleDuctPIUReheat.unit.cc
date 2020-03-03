@@ -1476,7 +1476,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SimTest)
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    ManageSimulation(); // run the design day over the warmup period (24 hrs, 25 days)
+    ManageSimulation(OutputFiles::getSingleton()); // run the design day over the warmup period (24 hrs, 25 days)
 
     int const PIUNum = 1;
     int const ADUNum = 1;
