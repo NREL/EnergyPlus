@@ -144,6 +144,10 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
   LOGICAL :: nodeFound = .false.
   INTEGER DuctObjNum
 
+  ! For EMS Function name update
+  CHARACTER(len=MaxNameLength) ::  EMSOldName=blank
+  CHARACTER(len=MaxNameLength) ::  EMSNewName=blank
+
 
   If (FirstTime) THEN  ! do things that might be applicable only to this new version
     FirstTime=.false.
@@ -546,7 +550,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                 NoDiff=.true.
               ENDIF
-                
+
               ! This is still part of the transition for AirTerminal:SingleDuct:Uncontrolled
               CASE('AIRLOOPHVAC:SUPPLYPLENUM')
               IF(TotATSDUObjs > 0) THEN
@@ -609,7 +613,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                 NoDiff=.true.
               ENDIF
-                
+
               ! This is yet another part of the transition for AirTerminal:SingleDuct:Uncontrolled
               ! The node name could be referenced in an AirLoopHVAC F9 "Demand Side Inlet Node Names" either directly or in a NodeList
               CASE('AIRLOOPHVAC')
@@ -676,7 +680,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                 NoDiff=.true.
               ENDIF
-                
+
               ! Wait - there's more for the transition for AirTerminal:SingleDuct:Uncontrolled
               CASE('ROOMAIR:NODE:AIRFLOWNETWORK:HVACEQUIPMENT')
               IF(TotATSDUObjs > 0) THEN
@@ -696,7 +700,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
                 OutArgs(1:CurArgs)=InArgs(1:CurArgs)
                 NoDiff=.true.
               ENDIF
-                
+
               ! And even more for the transition for AirTerminal:SingleDuct:Uncontrolled
               CASE('AIRFLOWNETWORK:DISTRIBUTION:NODE')
               IF(TotATSDUObjs > 0) THEN
@@ -859,6 +863,32 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! If your original object starts with D, insert the rules here
 
               ! If your original object starts with E, insert the rules here
+
+             CASE('ENERGYMANAGEMENTSYSTEM:PROGRAM')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                ! UpdateEMSFunctionName will set NoDiff = .false. if it makes a change
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                EMSOldName='@CpAirFnWTdb'
+                EMSNewName='@CpAirFnW'
+
+                IF (CurArgs .GE. 2) THEN
+                  DO I = 2, CurArgs, 1
+                    CALL UpdateEMSFunctionName(OutArgs(I), EMSOldName, EMSNewName, NoDiff)
+                  END DO
+                END IF
+
+             CASE('ENERGYMANAGEMENTSYSTEM:SUBROUTINE')
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                ! UpdateEMSFunctionName will set NoDiff = .false. if it makes a change
+                OutArgs(1:CurArgs)=InArgs(1:CurArgs)
+                EMSOldName='@CpAirFnWTdb'
+                EMSNewName='@CpAirFnW'
+
+                IF (CurArgs .GE. 2) THEN
+                  DO I = 2, CurArgs, 1
+                    CALL UpdateEMSFunctionName(OutArgs(I), EMSOldName, EMSNewName, NoDiff)
+                  END DO
+                END IF
 
              CASE('ENERGYMANAGEMENTSYSTEM:METEREDOUTPUTVARIABLE')
                  CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
@@ -1064,7 +1094,7 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
              !      CALL FixFuelTypes(OutArgs(2), NoDiff)
              !    END IF
 
-             !CASE('METER:CUSTOMDECREMENT') - resource type cleanup done below along with variable name changes 
+             !CASE('METER:CUSTOMDECREMENT') - resource type cleanup done below along with variable name changes
              !    CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
              !    ! FixFuelTypes will set NoDiff = .false. if it makes a change
              !    OutArgs(1:CurArgs)=InArgs(1:CurArgs)
@@ -1115,6 +1145,28 @@ SUBROUTINE CreateNewIDFUsingRules(EndOfFile,DiffOnly,InLfn,AskForInput,InputFile
               ! CASE('ROOMAIR:NODE:AIRFLOWNETWORK:HVACEQUIPMENT')
 
               ! If your original object starts with S, insert the rules here
+
+              CASE('SHADOWCALCULATION')
+                ObjectName = "ShadowCalculation"
+                CALL GetNewObjectDefInIDD(ObjectName,NwNumArgs,NwAorN,NwReqFld,NwObjMinFlds,NwFldNames,NwFldDefaults,NwFldUnits)
+                IF (SameString(InArgs(6),"ScheduledShading")) THEN
+                  OutArgs(1)="Scheduled"
+                ELSE IF (SameString(InArgs(6),"ImportedShading")) THEN
+                  OutArgs(1)="Imported"
+                ELSE
+                  OutArgs(1)="PolygonClipping"
+                END IF
+                IF (SameString(InArgs(1),"AverageOverDaysInFrequency")) THEN
+                  OutArgs(2)="Periodic"
+                ELSE IF (SameString(InArgs(1),"TimestepFrequency")) THEN
+                  OutArgs(2)="Timestep"
+                END IF
+                OutArgs(3:5) = InArgs(2:4)
+                OutArgs(6) = Blank
+                OutArgs(7) = InArgs(5)
+                OutArgs(8:NwNumArgs) = InArgs(7:NumArgs)
+                CurArgs = CurArgs + 1
+                NoDiff = .false.
 
               ! If your original object starts with T, insert the rules here
 
@@ -1846,3 +1898,140 @@ SUBROUTINE SortUnique(StrArray, Size, Order)
   END DO
 
 END SUBROUTINE SortUnique
+
+SUBROUTINE UpdateEMSFunctionName(InOutArg, OldName, NewName, NoDiffArg)
+  USE InputProcessor, ONLY: SameString
+  CHARACTER(len=*), INTENT(INOUT) :: InOutArg
+  CHARACTER(len=100) ::  NewInOutArg
+  CHARACTER(len=*), INTENT(IN) :: OldName
+  CHARACTER(len=*), INTENT(IN) :: NewName
+  LOGICAL, INTENT(INOUT) :: NoDiffArg
+
+  PARAMETER(N=20)
+  CHARACTER*20 ARRAY(N)
+  INTEGER ICOUNT, IBEGIN(N),ITERM(N),ILEN, J, LenToken, IDXStart, IDXEnd
+
+  Call DELIM(InOutArg, ARRAY, N, ICOUNT, IBEGIN, ITERM, ILEN, ' ')
+
+  NewInOutArg = ''
+
+  IF (SameString( ARRAY(4), OldName )) THEN
+    IDXStart = 1
+    IDXEnd = 0
+    ARRAY(4)=NewName
+
+    ! NOTE: "ICOUNT - 1" b/c of deleting the 'Tdb' EMS function argument
+    DO J = 1, ICOUNT - 1, 1
+      LenToken = LEN_TRIM(ADJUSTL(ARRAY(J)))
+      IDXEnd = LenToken + IDXStart - 1
+      NewInOutArg(IDXStart:IDXEnd) = ARRAY(J)
+      IDXStart = IDXEnd + 2
+    END DO
+
+    InOutArg=NewInOutArg
+    NoDiffArg=.false.
+  END IF
+
+END SUBROUTINE UpdateEMSFunctionName
+
+SUBROUTINE DELIM(LINE0,ARRAY,N,ICOUNT,IBEGIN,ITERM,ILEN,DLIM)
+! ADAPTED FROM: http://fortranwiki.org/fortran/show/delim
+
+!  C     @(#) parse a string and store tokens into an array
+!  C
+!  C     given a line of structure " par1 par2 par3 ... parn "
+!  C     store each par(n) into a separate variable in array.
+!  C
+!  C     IF ARRAY(1).eq.'#NULL#' do not store into string array  (KLUDGE))
+!  C
+!  C     also count number of elements of array initialized, and
+!  C     return beginning and ending positions for each element.
+!  C     also return position of last non-blank character (even if more
+!          C     than n elements were found).
+!  C
+!  C     no quoting of delimiter is allowed
+!  C     no checking for more than n parameters, if any more they are ignored
+!  C
+!  C     input line limited to 1024 characters
+!  C
+  CHARACTER*(*)     LINE0, DLIM*(*)
+  PARAMETER (MAXLEN=1024)
+  CHARACTER*(MAXLEN) LINE
+  CHARACTER ARRAY(N)*(*)
+  INTEGER ICOUNT, IBEGIN(N),ITERM(N),ILEN
+  LOGICAL LSTORE
+  ICOUNT=0
+  ILEN=LEN_TRIM(LINE0)
+  IF(ILEN.GT.MAXLEN)THEN
+    write(*,*)'*delim* input line too long'
+  ENDIF
+  LINE=LINE0
+
+  IDLIM=LEN(DLIM)
+  IF(IDLIM.GT.5)THEN
+!    C        dlim a lot of blanks on some machines if dlim is a big string
+    IDLIM=LEN_TRIM(DLIM)
+!    C        blank string
+    IF(IDLIM.EQ.0)IDLIM=1
+  ENDIF
+
+!  C     command was totally blank
+  IF(ILEN.EQ.0)RETURN
+!  C
+!  C     there is at least one non-blank character in the command
+!  C     ilen is the column position of the last non-blank character
+!  C     find next non-delimiter
+  icol=1
+
+!  C     special flag to not store into character array
+  IF(ARRAY(1).EQ.'#NULL#')THEN
+    LSTORE=.FALSE.
+  ELSE
+    LSTORE=.TRUE.
+  ENDIF
+
+!  C     store into each array element until done or too many words
+  DO 100 IARRAY=1,N,1
+    200      CONTINUE
+!    C        if current character is not a delimiter
+    IF(INDEX(DLIM(1:IDLIM),LINE(ICOL:ICOL)).EQ.0)THEN
+!      C          start new token on the non-delimiter character
+      ISTART=ICOL
+      IBEGIN(IARRAY)=ICOL
+!      C          assume no delimiters so put past end of line
+        IEND=ILEN-ISTART+1+1
+
+        DO 10 I10=1,IDLIM
+                IFOUND=INDEX(LINE(ISTART:ILEN),DLIM(I10:I10))
+                IF(IFOUND.GT.0)THEN
+                IEND=MIN(IEND,IFOUND)
+                ENDIF
+                10         CONTINUE
+
+!                C          no remaining delimiters
+                IF(IEND.LE.0)THEN
+        ITERM(IARRAY)=ILEN
+        IF(LSTORE)ARRAY(IARRAY)=LINE(ISTART:ILEN)
+                ICOUNT=IARRAY
+                RETURN
+                ELSE
+                IEND=IEND+ISTART-2
+                ITERM(IARRAY)=IEND
+        IF(LSTORE)ARRAY(IARRAY)=LINE(ISTART:IEND)
+                ENDIF
+                ICOL=IEND+2
+                ELSE
+                ICOL=ICOL+1
+                GOTO 200
+                ENDIF
+!                C        last character in line was a delimiter, so no text left
+!                C        (should not happen where blank=delimiter)
+        IF(ICOL.GT.ILEN)THEN
+        ICOUNT=IARRAY
+        RETURN
+        ENDIF
+100   CONTINUE
+!        C     more than n elements
+        ICOUNT=N
+RETURN
+END
