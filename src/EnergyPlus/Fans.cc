@@ -2864,9 +2864,9 @@ namespace Fans {
         int NodeNumber = 0; // returned outlet node of matched fan
 
         // Obtains and Allocates fan related parameters from input file
-        if (GetFanInputFlag) { // First time subroutine has been entered
+        if (ep_globals.fans.GetFanInputFlag) { // First time subroutine has been entered
             GetFanInput();
-            GetFanInputFlag = false;
+            ep_globals.fans.GetFanInputFlag = false;
         }
 
         if (FanIndex != 0) {

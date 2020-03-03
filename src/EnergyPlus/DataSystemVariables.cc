@@ -59,6 +59,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataEnvironment.hh>
+#include <EnergyPlus/Globals.hh>
 
 namespace EnergyPlus {
 
@@ -431,7 +432,7 @@ namespace DataSystemVariables {
 
         get_environment_variable(FullAnnualSimulation, cEnvValue);
         FullAnnualRun = env_var_on(cEnvValue); // Yes or True
-        if (DataGlobals::AnnualSimulation) FullAnnualRun = true;
+        if (ep_globals.dataGlobals.AnnualSimulation) FullAnnualRun = true;
 
         get_environment_variable(cDisplayAllWarnings, cEnvValue);
         DataGlobals::DisplayAllWarnings = env_var_on(cEnvValue); // Yes or True
