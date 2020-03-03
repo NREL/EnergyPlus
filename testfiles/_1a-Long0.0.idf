@@ -924,8 +924,9 @@
     0.0;                     !- Air Temperature Gradient Coefficient {K/m}
 
   ShadowCalculation,
-    AverageOverDaysInFrequency,  !- Calculation Method
-    1;                       !- Calculation Frequency
+    PolygonClipping,         !- Shading Calculation Method
+    Periodic,                !- Shading Calculation Update Frequency Method
+    1;                       !- Shading Calculation Update Frequency
 
 !  Ground temps according to Table 2 of specification is the mean monthly external air temp
 !  For June the temp ranges from 22C to 34 C, mean is 28C

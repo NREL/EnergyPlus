@@ -203,8 +203,8 @@ namespace UnitarySystems {
         int m_CoolingCoilIndex;
         bool m_HeatPump;
         int m_ActualDXCoilIndexForHXAssisted;
-        bool m_MultiSpeedCoolingCoil;
-        bool m_VarSpeedCoolingCoil;
+        bool m_DiscreteSpeedCoolingCoil;
+        bool m_ContSpeedCoolingCoil;
         int m_SystemCoolControlNodeNum;
         int m_WaterCyclingMode;
         bool m_ISHundredPercentDOASDXCoil;

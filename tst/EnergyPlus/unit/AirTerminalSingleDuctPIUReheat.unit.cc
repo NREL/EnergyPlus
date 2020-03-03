@@ -335,10 +335,12 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SimTest)
         "    ;                        !- Minimum Number of Warmup Days",
 
         "ShadowCalculation,",
-        "    AverageOverDaysInFrequency,  !- Calculation Method",
-        "    20,                      !- Calculation Frequency",
+        "    PolygonClipping,         !- Shading Calculation Method",
+        "    Periodic,                !- Shading Calculation Update Frequency Method",
+        "    ,                        !- Shading Calculation Update Frequency",
         "    15000,                   !- Maximum Figures in Shadow Overlap Calculations",
         "    ,                        !- Polygon Clipping Algorithm",
+        "    ,                        !- Pixel Counting Resolution",
         "    SimpleSkyDiffuseModeling;!- Sky Diffuse Modeling Algorithm",
 
         "SurfaceConvectionAlgorithm:Inside,",
@@ -1474,7 +1476,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SimTest)
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    ManageSimulation(); // run the design day over the warmup period (24 hrs, 25 days)
+    ManageSimulation(OutputFiles::getSingleton()); // run the design day over the warmup period (24 hrs, 25 days)
 
     int const PIUNum = 1;
     int const ADUNum = 1;
