@@ -58,7 +58,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
@@ -344,7 +344,7 @@ namespace EIRPlantLoopHeatPumps {
             CpSrc = FluidProperties::GetSpecificHeatGlycol(
                 thisLoadPlantLoop.FluidName, DataLoopNode::Node(this->loadSideNodes.inlet).Temp, thisLoadPlantLoop.FluidIndex, "PLHPEIR::simulate()");
         } else if (this->airSource) {
-            CpSrc = Psychrometrics::PsyCpAirFnWTdb(DataEnvironment::OutHumRat, DataEnvironment::OutDryBulbTemp);
+            CpSrc = Psychrometrics::PsyCpAirFnW(DataEnvironment::OutHumRat);
         }
         Real64 const sourceMCp = this->sourceSideMassFlowRate * CpSrc;
         this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
@@ -836,7 +836,7 @@ namespace EIRPlantLoopHeatPumps {
         }
 
         Real64 const rhoSrc = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::StdBaroPress, sourceSideInitTemp, sourceSideHumRat);
-        Real64 const CpSrc = Psychrometrics::PsyCpAirFnWTdb(sourceSideHumRat, sourceSideInitTemp);
+        Real64 const CpSrc = Psychrometrics::PsyCpAirFnW(sourceSideHumRat);
 
         // set the source-side flow rate
         if (this->sourceSideDesignVolFlowRateWasAutoSized) {

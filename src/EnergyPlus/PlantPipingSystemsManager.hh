@@ -926,7 +926,7 @@ namespace EnergyPlus {
 
         void clear_state();
 
-        void SimulateGroundDomains(bool initOnly);
+        void SimulateGroundDomains(OutputFiles &outputFiles, bool initOnly);
 
         void CheckIfAnySlabs();
 
