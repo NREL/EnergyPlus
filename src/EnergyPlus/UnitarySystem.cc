@@ -5219,7 +5219,14 @@ namespace UnitarySystems {
                                           "LatentWithSensibleLoadControl.");
                     }
                 }
-
+                if ((thisSys.m_DehumidControlType_Num == DehumCtrlType::CoolReheat || thisSys.m_DehumidControlType_Num == DehumCtrlType::Multimode) &&
+                    !thisSys.m_RunOnLatentLoad && !thisSys.m_RunOnLatentOnlyWithSensible) {
+                    ShowWarningError(cCurrentModuleObject + " = " + thisObjectName);
+                    ShowContinueError("Inconsistent moisture control inputs.");
+                    ShowContinueError("Dehumidification Control Type = " + loc_dehumm_ControlType);
+                    ShowContinueError("Latent Load Control = " + loc_latentControlFlag);
+                    ShowContinueError("Humidity/Moisture will not be controlled with these settings.");
+                }
                 // Get reheat coil data if humidistat is used
                 thisSys.m_SuppHeatCoilName = loc_m_SuppHeatCoilName;
                 thisSys.m_SuppHeatCoilTypeName = loc_suppHeatCoilType;
