@@ -122,11 +122,11 @@ TEST_F(EnergyPlusFixture, TestDualDuctOAMassFlowRateUsingStdRhoAir)
     DataEnvironment::StdRhoAir = 1.20;
     DataHeatBalance::ZoneIntGain(1).NOFOCC = 0.1;
 
-    DualDuct::dd_airterminal(1).CalcOAMassFlow(1, SAMassFlow, AirLoopOAFrac);
+    DualDuct::dd_airterminal(1).CalcOAMassFlow(SAMassFlow, AirLoopOAFrac);
     EXPECT_NEAR(0.01052376, SAMassFlow, 0.00001);
     EXPECT_NEAR(0.5, AirLoopOAFrac, 0.00001);
 
-    DualDuct::dd_airterminal(2).CalcOAOnlyMassFlow(2, OAMassFlow);
+    DualDuct::dd_airterminal(2).CalcOAOnlyMassFlow(OAMassFlow);
     EXPECT_NEAR(0.004884, OAMassFlow, 0.00001);
 
     // Cleanup
@@ -482,11 +482,11 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
     DataLoopNode::Node(HotInNode).MassFlowRateMaxAvail = SysMaxMassFlowRes;
     DataGlobals::BeginEnvrnFlag = true;
     FirstHVACIteration = true;
-    DualDuct::dd_airterminal(DDNum).InitDualDuct(DDNum, FirstHVACIteration);
+    DualDuct::dd_airterminal(DDNum).InitDualDuct(FirstHVACIteration);
     DataGlobals::BeginEnvrnFlag = false;
     FirstHVACIteration = false;
-    thisDDAirTerminal.InitDualDuct(DDNum, FirstHVACIteration);
-    thisDDAirTerminal.SimDualDuctVarVol(DDNum, ZoneNum, ZoneNodeNum);
+    thisDDAirTerminal.InitDualDuct(FirstHVACIteration);
+    thisDDAirTerminal.SimDualDuctVarVol(ZoneNum, ZoneNodeNum);
     // check inputs and calculated values for turndown fraction set to 1.0
     EXPECT_EQ(0.3, thisDDAirTerminal.ZoneMinAirFracDes);
     EXPECT_EQ(1.0, thisDDAirTerminal.ZoneTurndownMinAirFrac);
@@ -506,11 +506,11 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
     DataLoopNode::Node(HotInNode).MassFlowRateMaxAvail = SysMaxMassFlowRes;
     DataGlobals::BeginEnvrnFlag = true;
     FirstHVACIteration = true;
-    DualDuct::dd_airterminal(DDNum).InitDualDuct(DDNum, FirstHVACIteration);
+    DualDuct::dd_airterminal(DDNum).InitDualDuct(FirstHVACIteration);
     DataGlobals::BeginEnvrnFlag = false;
     FirstHVACIteration = false;
-    thisDDAirTerminal.InitDualDuct(DDNum, FirstHVACIteration);
-    thisDDAirTerminal.SimDualDuctVarVol(DDNum, ZoneNum, ZoneNodeNum);
+    thisDDAirTerminal.InitDualDuct(FirstHVACIteration);
+    thisDDAirTerminal.SimDualDuctVarVol(ZoneNum, ZoneNodeNum);
     // check inputs and calculated values for turndown fraction set to 0.5
     EXPECT_EQ(0.3, thisDDAirTerminal.ZoneMinAirFracDes);
     EXPECT_EQ(0.5, thisDDAirTerminal.ZoneTurndownMinAirFrac);

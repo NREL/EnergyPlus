@@ -121,7 +121,7 @@ namespace DualDuct {
         Real64 AirMassFlowRateHist3; // flow history back 3 iteration kg/s
         Real64 AirMassFlowDiffMag;   // flow difference scale, kg/s
 
-                                     // Default Constructor
+        // Default Constructor
         DualDuctAirTerminalFlowConditions()
             : AirMassFlowRate(0.0), AirMassFlowRateMaxAvail(0.0), AirMassFlowRateMinAvail(0.0), AirMassFlowRateMax(0.0), AirTemp(0.0), AirHumRat(0.0),
             AirEnthalpy(0.0), AirMassFlowRateHist1(0.0), AirMassFlowRateHist2(0.0), AirMassFlowRateHist3(0.0), AirMassFlowDiffMag(0.0)
@@ -168,6 +168,9 @@ namespace DualDuct {
         int ZoneTurndownMinAirFracSchPtr;    // pointer to the schedule for turndown minimum airflow fraction
         Real64 ZoneTurndownMinAirFrac;       // turndown minimum airflow fraction value, multiplier of zone design minimum air flow 
         bool ZoneTurndownMinAirFracSchExist; // if true, if zone turndown min air frac schedule exist
+        bool MyEnvrnFlag;            // environment flag
+        bool MySizeFlag;             // sizing flag
+        bool MyAirLoopFlag;          // airloop flag
         DualDuctAirTerminalFlowConditions dd_airterminalHotAirInlet;
         DualDuctAirTerminalFlowConditions dd_airterminalColdAirInlet;
         DualDuctAirTerminalFlowConditions dd_airterminalOutlet;
@@ -181,11 +184,12 @@ namespace DualDuct {
               RecircAirInletNodeNum(0), RecircIsUsed(true), DesignOAFlowRate(0.0), DesignRecircFlowRate(0.0), OAControlMode(0),
               RecircAirDamperPosition(0.0), OADamperPosition(0.0), OAFraction(0.0), ADUNum(0), CtrlZoneNum(0), CtrlZoneInNodeIndex(0),
               ActualZoneNum(0), OutdoorAirFlowRate(0.0), NoOAFlowInputFromUser(true), OARequirementsPtr(0), OAPerPersonMode(PerPersonModeNotSet),
-              OAPerPersonByDesignLevel(0.0), AirLoopNum(0), ZoneTurndownMinAirFracSchPtr(0), ZoneTurndownMinAirFrac(1.0), ZoneTurndownMinAirFracSchExist(false)
+              OAPerPersonByDesignLevel(0.0), AirLoopNum(0), ZoneTurndownMinAirFracSchPtr(0), ZoneTurndownMinAirFrac(1.0), ZoneTurndownMinAirFracSchExist(false), 
+              MyEnvrnFlag(true), MySizeFlag(true), MyAirLoopFlag(true)
         {
         }
 
-        void InitDualDuct(int const DDNum, bool const FirstHVACIteration);
+        void InitDualDuct(bool const FirstHVACIteration);
 
         void SizeDualDuct();
 
@@ -195,19 +199,17 @@ namespace DualDuct {
         // Begin Algorithm Section of the Module
         //******************************************************************************
 
-        void SimDualDuctConstVol(int const DDNum, int const ZoneNum, int const ZoneNodeNum);
+        void SimDualDuctConstVol(int const ZoneNum, int const ZoneNodeNum);
 
-        void SimDualDuctVarVol(int const DDNum, int const ZoneNum, int const ZoneNodeNum);
+        void SimDualDuctVarVol(int const ZoneNum, int const ZoneNodeNum);
 
-        void SimDualDuctVAVOutdoorAir(int const DDNum, int const ZoneNum, int const ZoneNodeNum);
+        void SimDualDuctVAVOutdoorAir(int const ZoneNum, int const ZoneNodeNum);
 
-        void CalcOAMassFlow(int const DDNum,  // index to terminal unit
-            Real64 &SAMassFlow,   // outside air based on optional user input
+        void CalcOAMassFlow(Real64 &SAMassFlow,   // outside air based on optional user input
             Real64 &AirLoopOAFrac // outside air based on optional user input
         );
 
-        void CalcOAOnlyMassFlow(int const DDNum,              // index to terminal unit
-            Real64 &OAMassFlow,               // outside air flow from user input kg/s
+        void CalcOAOnlyMassFlow(Real64 &OAMassFlow,               // outside air flow from user input kg/s
             Optional<Real64> MaxOAVolFlow = _ // design level for outside air m3/s
         );
 
@@ -217,7 +219,7 @@ namespace DualDuct {
         // Beginning of Update subroutines for the Damper Module
         // *****************************************************************************
 
-        void UpdateDualDuct(int const DDNum);
+        void UpdateDualDuct();
 
         //        End of Update subroutines for the Damper Module
         // *****************************************************************************
@@ -225,7 +227,7 @@ namespace DualDuct {
         // Beginning of Reporting subroutines for the Damper Module
         // *****************************************************************************
 
-        void ReportDualDuct(int const DDNum); // unused1208
+        void ReportDualDuct(); // unused1208
 
     };
 

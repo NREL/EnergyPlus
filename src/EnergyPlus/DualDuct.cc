@@ -202,7 +202,7 @@ namespace DualDuct {
         if (CompIndex > 0) {
             DataSizing::CurTermUnitSizingNum = DataDefineEquip::AirDistUnit(thisDualDuct.ADUNum).TermUnitSizingNum;
             // With the correct DDNum Initialize
-            thisDualDuct.InitDualDuct(DDNum, FirstHVACIteration); // Initialize all Damper related parameters
+            thisDualDuct.InitDualDuct(FirstHVACIteration); // Initialize all Damper related parameters
 
             // Calculate the Correct Damper Model with the current DDNum
             {
@@ -210,23 +210,23 @@ namespace DualDuct {
 
                 if (SELECT_CASE_var == DualDuct_ConstantVolume) { // 'AirTerminal:DualDuct:ConstantVolume'
 
-                    thisDualDuct.SimDualDuctConstVol(DDNum, ZoneNum, ZoneNodeNum);
+                    thisDualDuct.SimDualDuctConstVol(ZoneNum, ZoneNodeNum);
 
                 } else if (SELECT_CASE_var == DualDuct_VariableVolume) { // 'AirTerminal:DualDuct:VAV'
 
-                    thisDualDuct.SimDualDuctVarVol(DDNum, ZoneNum, ZoneNodeNum);
+                    thisDualDuct.SimDualDuctVarVol(ZoneNum, ZoneNodeNum);
 
                 } else if (SELECT_CASE_var == DualDuct_OutdoorAir) {
 
-                    thisDualDuct.SimDualDuctVAVOutdoorAir(DDNum, ZoneNum, ZoneNodeNum); // 'AirTerminal:DualDuct:VAV:OutdoorAir'
+                    thisDualDuct.SimDualDuctVAVOutdoorAir(ZoneNum, ZoneNodeNum); // 'AirTerminal:DualDuct:VAV:OutdoorAir'
                 }
             }
 
             // Update the current Damper to the outlet nodes
-            thisDualDuct.UpdateDualDuct(DDNum);
+            thisDualDuct.UpdateDualDuct();
 
             // Report the current Damper
-            thisDualDuct.ReportDualDuct(DDNum);
+            thisDualDuct.ReportDualDuct();
         } else {
             ShowFatalError("SimulateDualDuct: Damper not found=" + CompName);
         }
@@ -740,7 +740,7 @@ namespace DualDuct {
                      dd_airterminal(DDNum).NoOAFlowInputFromUser = false;
 
                     // now fill design OA rate
-                     dd_airterminal(DDNum).CalcOAOnlyMassFlow(DDNum, DummyOAFlow,  dd_airterminal(DDNum).DesignOAFlowRate);
+                     dd_airterminal(DDNum).CalcOAOnlyMassFlow(DummyOAFlow,  dd_airterminal(DDNum).DesignOAFlowRate);
 
                     if (  dd_airterminal(DDNum).MaxAirVolFlowRate != AutoSize) {
                         ReportSizingOutput(CurrentModuleObject,
@@ -818,7 +818,7 @@ namespace DualDuct {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void DualDuctAirTerminal::InitDualDuct(int const DDNum, bool const FirstHVACIteration)
+    void DualDuctAirTerminal::InitDualDuct(bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -850,9 +850,9 @@ namespace DualDuct {
         int RAInNode; // Reciruclated Air Inlet Node for VAV:OutdoorAir units
         int OutNode;
         static bool MyOneTimeFlag(true);
-        static Array1D_bool MyEnvrnFlag;
-        static Array1D_bool MySizeFlag;
-        static Array1D_bool MyAirLoopFlag;
+        //static Array1D_bool MyEnvrnFlag;
+        //static Array1D_bool MySizeFlag;
+        //static Array1D_bool MyAirLoopFlag;
         static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         int Loop;                                    // Loop checking control variable
         Real64 PeopleFlow;                           // local sum variable, m3/s
@@ -861,11 +861,11 @@ namespace DualDuct {
         // Do the Begin Simulation initializations
         if (MyOneTimeFlag) {
 
-            MyEnvrnFlag.allocate(NumDDAirTerminal);
-            MySizeFlag.allocate(NumDDAirTerminal);
-            MyAirLoopFlag.dimension(NumDDAirTerminal, true);
-            MyEnvrnFlag = true;
-            MySizeFlag = true;
+            //MyEnvrnFlag.allocate(NumDDAirTerminal);
+            //MySizeFlag.allocate(NumDDAirTerminal);
+            //MyAirLoopFlag.dimension(NumDDAirTerminal, true);
+            //MyEnvrnFlag = true;
+            //MySizeFlag = true;
             MassFlowSetToler = HVACFlowRateToler * 0.00001;
 
             MyOneTimeFlag = false;
@@ -891,15 +891,15 @@ namespace DualDuct {
             }
         }
 
-        if (!SysSizingCalc && MySizeFlag(DDNum)) {
+        if (!SysSizingCalc && this->MySizeFlag) {
 
             this->SizeDualDuct();
 
-            MySizeFlag(DDNum) = false;
+            this->MySizeFlag = false;
         }
 
         // Do the Begin Environment initializations
-        if (BeginEnvrnFlag && MyEnvrnFlag(DDNum)) {
+        if (BeginEnvrnFlag && this->MyEnvrnFlag) {
 
             if (this->DamperType == DualDuct_ConstantVolume || this->DamperType == DualDuct_VariableVolume) {
                 OutNode = this->OutletNodeNum;
@@ -925,7 +925,7 @@ namespace DualDuct {
                 Node(ColdInNode).MassFlowRateMax = Node(OutNode).MassFlowRateMax;
                 Node(HotInNode).MassFlowRateMin = 0.0;
                 Node(ColdInNode).MassFlowRateMin = 0.0;
-                MyEnvrnFlag(DDNum) = false;
+                this->MyEnvrnFlag = false;
 
             } else if (this->DamperType == DualDuct_OutdoorAir) {
                 // Initialize for DualDuct:VAV:OutdoorAir
@@ -955,16 +955,16 @@ namespace DualDuct {
                 }
                 this->OAPerPersonByDesignLevel = PeopleFlow;
 
-                MyEnvrnFlag(DDNum) = false;
+                this->MyEnvrnFlag = false;
             }
         }
 
         if (!BeginEnvrnFlag) {
-            MyEnvrnFlag(DDNum) = true;
+            this->MyEnvrnFlag = true;
         }
 
         // Find air loop associated with this terminal unit
-        if (MyAirLoopFlag(DDNum)) {
+        if (this->MyAirLoopFlag) {
             if (this->AirLoopNum == 0) {
                 if ((this->CtrlZoneNum > 0) && (this->CtrlZoneInNodeIndex > 0)) {
                     this->AirLoopNum = ZoneEquipConfig(this->CtrlZoneNum).InletNodeAirLoopNum(this->CtrlZoneInNodeIndex);
@@ -972,7 +972,7 @@ namespace DualDuct {
                     // Don't set MyAirLoopFlag to false yet because airloopnums might not be populated yet
                 }
             } else {
-                MyAirLoopFlag(DDNum) = false;
+                this->MyAirLoopFlag = false;
             }
         }
 
@@ -1188,7 +1188,7 @@ namespace DualDuct {
     // Begin Algorithm Section of the Module
     //******************************************************************************
 
-    void DualDuctAirTerminal::SimDualDuctConstVol(int const DDNum, int const ZoneNum, int const ZoneNodeNum)
+    void DualDuctAirTerminal::SimDualDuctConstVol(int const ZoneNum, int const ZoneNodeNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1322,7 +1322,7 @@ namespace DualDuct {
         }
     }
 
-    void DualDuctAirTerminal::SimDualDuctVarVol(int const DDNum, int const ZoneNum, int const ZoneNodeNum)
+    void DualDuctAirTerminal::SimDualDuctVarVol(int const ZoneNum, int const ZoneNodeNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1384,7 +1384,7 @@ namespace DualDuct {
         CpAirSysCold = CpAirZn;
 
         // calculate supply air flow rate based on user specified OA requirement
-        CalcOAMassFlow(DDNum, MassFlowBasedOnOA, AirLoopOAFrac);
+        this->CalcOAMassFlow(MassFlowBasedOnOA, AirLoopOAFrac);
 
         // Then depending on if the Load is for heating or cooling it is handled differently.  First
         // the massflow rate of either heating or cooling is determined to meet the entire load.  Then
@@ -1542,7 +1542,7 @@ namespace DualDuct {
         }
     }
 
-    void DualDuctAirTerminal::SimDualDuctVAVOutdoorAir(int const DDNum, int const ZoneNum, int const ZoneNodeNum)
+    void DualDuctAirTerminal::SimDualDuctVAVOutdoorAir(int const ZoneNum, int const ZoneNodeNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1612,11 +1612,11 @@ namespace DualDuct {
         int RecircInletNodeNum;
 
         OAInletNodeNum = this->OAInletNodeNum;
-        if ( this->RecircIsUsed) {
+        if (this->RecircIsUsed) {
             RecircInletNodeNum = this->RecircAirInletNodeNum;
         }
         // Calculate required ventilation air flow rate based on user specified OA requirement
-        CalcOAOnlyMassFlow(DDNum, OAMassFlow);
+        this->CalcOAOnlyMassFlow(OAMassFlow);
 
         // The calculated load from the Heat Balance, adjusted for any equipment sequenced before terminal
         QTotLoadRemain = ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired;
@@ -1811,8 +1811,7 @@ namespace DualDuct {
         this->dd_airterminalRecircAirInlet.AirMassFlowRateHist1 = this->dd_airterminalRecircAirInlet.AirMassFlowRate;
     }
 
-    void DualDuctAirTerminal::CalcOAMassFlow(int const DDNum,  // index to terminal unit
-                        Real64 &SAMassFlow,   // outside air based on optional user input
+    void DualDuctAirTerminal::CalcOAMassFlow(Real64 &SAMassFlow,   // outside air based on optional user input
                         Real64 &AirLoopOAFrac // outside air based on optional user input
     )
     {
@@ -1865,8 +1864,7 @@ namespace DualDuct {
         }
     }
 
-    void DualDuctAirTerminal::CalcOAOnlyMassFlow(int const DDNum,          // index to terminal unit
-                            Real64 &OAMassFlow,           // outside air flow from user input kg/s
+    void DualDuctAirTerminal::CalcOAOnlyMassFlow(Real64 &OAMassFlow,           // outside air flow from user input kg/s
                             Optional<Real64> MaxOAVolFlow // design level for outside air m3/s
     )
     {
@@ -1948,7 +1946,7 @@ namespace DualDuct {
     // Beginning of Update subroutines for the Damper Module
     // *****************************************************************************
 
-    void DualDuctAirTerminal::UpdateDualDuct(int const DDNum)
+    void DualDuctAirTerminal::UpdateDualDuct()
     {
 
         // SUBROUTINE INFORMATION:
@@ -2085,7 +2083,7 @@ namespace DualDuct {
     // Beginning of Reporting subroutines for the Damper Module
     // *****************************************************************************
 
-    void DualDuctAirTerminal::ReportDualDuct(int const EP_UNUSED(DDNum)) // unused1208
+    void DualDuctAirTerminal::ReportDualDuct() // unused1208
     {
 
         // SUBROUTINE INFORMATION:
