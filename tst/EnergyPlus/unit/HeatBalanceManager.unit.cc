@@ -67,6 +67,7 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -127,7 +128,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirBalance_OutdoorAir)
     auto numZones = inputProcessor->getNumObjectsFound("Zone");
     ZoneReOrder.allocate(numZones);
     GetZoneData(ErrorsFound);
-    GetAirFlowFlag(ErrorsFound);
+    GetAirFlowFlag(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_TRUE(ErrorsFound);
 }
 
@@ -452,7 +453,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     bool ErrorsFound(false); // If errors detected in input
 
     // call to process input
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     ErrorsFound = false;
     GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound); // returns ErrorsFound false, ZoneAirMassFlowConservation never sets it
     EXPECT_FALSE(ErrorsFound);
@@ -469,7 +470,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationData2)
     EXPECT_FALSE(ErrorsFound);
     AllocateHeatBalArrays();
     ErrorsFound = false;
-    GetSimpleAirModelInputs(ErrorsFound);
+    GetSimpleAirModelInputs(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     SetZoneMassConservationFlag();
     // setup zone equipment configuration
@@ -668,7 +669,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_ZoneAirMassFlowConservationReportVa
     GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     ErrorsFound = false;
-    GetSimpleAirModelInputs(ErrorsFound);
+    GetSimpleAirModelInputs(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     // first 2 have indexes swapped now since they are in lexicigraphical order now according to the new input processor
@@ -1204,7 +1205,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_TestZonePropertyLocalEnv)
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    ScheduleManager::ProcessScheduleInput();
+    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
 
     HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -1536,8 +1537,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
         "    2.5,                     !- Y-Coordinate of Reference Point {m}",
         "    0.8;                     !- Z-Coordinate of Reference Point {m}",
         "  ShadowCalculation,",
-        "    TimestepFrequency,       !- Calculation Method",
-        "    30,                      !- Calculation Frequency",
+        "    PolygonClipping,         !- Shading Calculation Method",
+        "    Timestep,                !- Shading Calculation Update Frequency Method",
+        "    30,                       !- Shading Calculation Update Frequency",
         "    15000;                   !- Maximum Figures in Shadow Overlap Calculations",
         "EnergyManagementSystem:ConstructionIndexVariable, Win_1, WINDOWCONSTRUCTION1;",
         "EnergyManagementSystem:ConstructionIndexVariable, Win_2, WINDOWCONSTRUCTION2;",
@@ -1565,7 +1567,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2);
-    SimulationManager::ManageSimulation();
+    SimulationManager::ManageSimulation(OutputFiles::getSingleton());
     DataGlobals::DayOfSim = 2; // avoid array bounds problem in RecKeepHeatBalance
     WeatherManager::Envrn = 1;
 
@@ -1574,9 +1576,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     DataGlobals::HourOfDay = 11;
     DataGlobals::CurrentTime = 11.0;
     WeatherManager::SetCurrentWeather();
-    HeatBalanceManager::ManageHeatBalance();
+    HeatBalanceManager::ManageHeatBalance(OutputFiles::getSingleton());
     // For now, must call this twice in order to hit the BeginTimeStepBeforePredictor EMS calling point
-    HeatBalanceManager::ManageHeatBalance();
+    HeatBalanceManager::ManageHeatBalance(OutputFiles::getSingleton());
     // Find the fenestration surface
     int winSurfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", DataSurfaces::Surface);
     int win1ConstNum = UtilityRoutines::FindItemInList("WINDOWCONSTRUCTION1", DataHeatBalance::Construct);
@@ -1591,9 +1593,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     DataGlobals::HourOfDay = 14;
     DataGlobals::CurrentTime = 14.0;
     WeatherManager::SetCurrentWeather();
-    HeatBalanceManager::ManageHeatBalance();
+    HeatBalanceManager::ManageHeatBalance(OutputFiles::getSingleton());
     // For now, must call this twice in order to hit the BeginTimeStepBeforePredictor EMS calling point
-    HeatBalanceManager::ManageHeatBalance();
+    HeatBalanceManager::ManageHeatBalance(OutputFiles::getSingleton());
     int win2ConstNum = UtilityRoutines::FindItemInList("WINDOWCONSTRUCTION2", DataHeatBalance::Construct);
     EXPECT_EQ(DataSurfaces::Surface(winSurfNum).Construction, win2ConstNum);
     transSol = DataSurfaces::WinSysSolTransmittance(winSurfNum);
@@ -1805,7 +1807,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
 
     // call get material data to auto-generate IRTSurface material
     ErrorsFound = false;
@@ -1904,7 +1906,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData2)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool ErrorsFound(false);
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
 
     // skip call to get material data since this doesn't use IRT
     ErrorsFound = false;

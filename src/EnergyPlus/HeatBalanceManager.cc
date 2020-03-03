@@ -98,9 +98,11 @@
 #include <EnergyPlus/MatrixDataManager.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/PhaseChangeModeling/HysteresisModel.hh>
+#include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
@@ -282,7 +284,7 @@ namespace HeatBalanceManager {
         UniqueConstructNames.clear();
     }
 
-    void ManageHeatBalance()
+    void ManageHeatBalance(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -335,7 +337,7 @@ namespace HeatBalanceManager {
         // Get the heat balance input at the beginning of the simulation only
         if (ManageHeatBalanceGetInputFlag) {
             GetHeatBalanceInput(); // Obtains heat balance related parameters from input file
-            HeatBalanceIntRadExchange::InitSolarViewFactors();
+            HeatBalanceIntRadExchange::InitSolarViewFactors(outputFiles);
 
             // Surface octree setup
             //  The surface octree holds live references to surfaces so it must be updated
@@ -368,17 +370,18 @@ namespace HeatBalanceManager {
         // in the Surface Heat Balance Manager).  In the future, this may be improved.
         ManageSurfaceHeatBalance();
         ManageEMS(emsCallFromEndZoneTimestepBeforeZoneReporting, anyRan); // EMS calling point
-        RecKeepHeatBalance(OutputFiles::getSingleton());                                             // Do any heat balance related record keeping
+        RecKeepHeatBalance(outputFiles);                                             // Do any heat balance related record keeping
 
         // This call has been moved to the FanSystemModule and does effect the output file
         //   You do get a shift in the Air Handling System Summary for the building electric loads
         // IF ((.NOT.WarmupFlag).AND.(DayOfSim.GT.0)) CALL RCKEEP  ! Do fan system accounting (to be moved later)
 
-        ReportHeatBalance(); // Manage heat balance reporting until the new reporting is in place
+        ReportHeatBalance(outputFiles); // Manage heat balance reporting until the new reporting is in place
 
         ManageEMS(emsCallFromEndZoneTimestepAfterZoneReporting, anyRan); // EMS calling point
 
         UpdateEMSTrendVariables();
+        EnergyPlus::PluginManagement::pluginManager->updatePluginValues();
 
         if (WarmupFlag && EndDayFlag) {
 
@@ -392,7 +395,7 @@ namespace HeatBalanceManager {
         }
 
         if (!WarmupFlag && EndDayFlag && DayOfSim == 1 && !DoingSizing) {
-            ReportWarmupConvergence(OutputFiles::getSingleton());
+            ReportWarmupConvergence(outputFiles);
         }
     }
 
@@ -1114,6 +1117,11 @@ namespace HeatBalanceManager {
             ZoneAirSolutionAlgo = Use3rdOrder;
             AlphaName(1) = "ThirdOrderBackwardDifference";
         }
+        if (DataHeatBalance::OverrideZoneAirSolutionAlgo) {
+            ZoneAirSolutionAlgo = UseEulerMethod;
+            AlphaName(1) = "EulerMethod";
+        }
+
 
         // Write Solution Algorithm to the initialization output file for User Verification
         static constexpr auto Format_726(
@@ -4628,7 +4636,7 @@ namespace HeatBalanceManager {
 
         GetZoneData(ErrorsFound); // Read Zone data from input file
 
-        SetupZoneGeometry(ErrorsFound);
+        SetupZoneGeometry(OutputFiles::getSingleton(), ErrorsFound);
     }
 
     void GetZoneData(bool &ErrorsFound) // If errors found in input
@@ -5214,7 +5222,7 @@ namespace HeatBalanceManager {
             InitEquivalentLayerWindowCalculations(); // Initialize the EQL window optical properties
             // InitGlassOpticalCalculations(); // Initialize the window optical properties
             InitWindowOpticalCalculations();
-            InitDaylightingDevices(); // Initialize any daylighting devices
+            InitDaylightingDevices(OutputFiles::getSingleton()); // Initialize any daylighting devices
             DisplayString("Initializing Solar Calculations");
             InitSolarCalculations(); // Initialize the shadowing calculations
         }
@@ -5898,7 +5906,7 @@ namespace HeatBalanceManager {
     // Beginning of Reporting subroutines for the HB Module
     // *****************************************************************************
 
-    void ReportHeatBalance()
+    void ReportHeatBalance(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5934,8 +5942,9 @@ namespace HeatBalanceManager {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static ObjexxFCL::gio::Fmt EndOfHeaderFormat("('End of Data Dictionary')");          // End of data dictionary marker
+        static constexpr auto EndOfHeaderString("End of Data Dictionary");                   // End of data dictionary marker
         static ObjexxFCL::gio::Fmt EnvironmentStampFormat("(a,',',a,3(',',f7.2),',',f7.2)"); // Format descriptor for environ stamp
-        static ObjexxFCL::gio::Fmt EndOfDataFormat("(\"End of Data\")");                     // Signifies the end of the data block in the output file
+        static constexpr auto EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -5969,16 +5978,21 @@ namespace HeatBalanceManager {
             if (PrintEnvrnStampWarmup) {
                 if (PrintEndDataDictionary && DoOutputReporting) {
                     ObjexxFCL::gio::write(OutputFileStandard, EndOfHeaderFormat);
-                    ObjexxFCL::gio::write(OutputFileMeters, EndOfHeaderFormat);
+                    print(outputFiles.mtr, "{}\n", EndOfHeaderString);
                     PrintEndDataDictionary = false;
                 }
                 if (DoOutputReporting) {
                     ObjexxFCL::gio::write(OutputFileStandard, EnvironmentStampFormat)
                         << "1"
                         << "Warmup {" + cWarmupDay + "} " + EnvironmentName << Latitude << Longitude << TimeZoneNumber << Elevation;
-                    ObjexxFCL::gio::write(OutputFileMeters, EnvironmentStampFormat)
-                        << "1"
-                        << "Warmup {" + cWarmupDay + "} " + EnvironmentName << Latitude << Longitude << TimeZoneNumber << Elevation;
+                    print(outputFiles.mtr,
+                          EnvironmentStampFormatStr,
+                          "1",
+                          "Warmup {" + cWarmupDay + "} " + EnvironmentName,
+                          Latitude,
+                          Longitude,
+                          TimeZoneNumber,
+                          Elevation);
                     PrintEnvrnStampWarmup = false;
                 }
             }
@@ -8484,14 +8498,14 @@ namespace HeatBalanceManager {
                 ShowContinueError(cNumericFieldNames(3) + " value must be >= 0 and <= 1, entered value = " + RoundSigDigits(rNumericArgs(3), 2));
             }
 
-            if ((rNumericArgs(4) < 0.0) || (rNumericArgs(4) > 1.0)) {
+            if ((rNumericArgs(4) <= 0.0) || (rNumericArgs(4) > 1.0)) {
                 ErrorsFound = true;
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(4) +
                                 " has been found.");
                 ShowContinueError(cNumericFieldNames(4) + " value must be >= 0 and <= 1, entered value = " + RoundSigDigits(rNumericArgs(4), 2));
             }
 
-            if ((rNumericArgs(5) < 0.0) || (rNumericArgs(5) > 1.0)) {
+            if ((rNumericArgs(5) <= 0.0) || (rNumericArgs(5) > 1.0)) {
                 ErrorsFound = true;
                 ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + cAlphaArgs(1) + ", object. Illegal value for " + cNumericFieldNames(5) +
                                 " has been found.");

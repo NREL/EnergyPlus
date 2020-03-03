@@ -62,7 +62,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FaultsManager.hh>
@@ -1865,7 +1865,7 @@ namespace PlantChillers {
             // If Heat Recovery specified for this vapor compression chiller, then Qcondenser will be adjusted by this subroutine
             if (this->HeatRecActive) this->calcHeatRecovery(this->QCondenser, this->CondMassFlowRate, _CondInletTemp, this->QHeatRecovered);
             if (this->CondMassFlowRate > 0.0) {
-                CpCond = Psychrometrics::PsyCpAirFnWTdb(Node(CondInletNode).HumRat, _CondInletTemp);
+                CpCond = Psychrometrics::PsyCpAirFnW(Node(CondInletNode).HumRat);
                 this->CondOutletTemp = _CondInletTemp + this->QCondenser / this->CondMassFlowRate / CpCond;
             } else {
                 this->CondOutletTemp = _CondInletTemp;
@@ -1950,7 +1950,7 @@ namespace PlantChillers {
             CpCond = FluidProperties::GetSpecificHeatGlycol(
                 DataPlant::PlantLoop(this->CDLoopNum).FluidName, _CondInletTemp, DataPlant::PlantLoop(this->CDLoopNum).FluidIndex, RoutineName);
         } else {
-            CpCond = Psychrometrics::PsyCpAirFnWTdb(Node(this->CondInletNodeNum).HumRat, _CondInletTemp);
+            CpCond = Psychrometrics::PsyCpAirFnW(Node(this->CondInletNodeNum).HumRat);
         }
 
         // Before we modify the QCondenser, the total or original value is transferred to QTot

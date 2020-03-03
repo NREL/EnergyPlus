@@ -52,7 +52,6 @@
 #include <istream>
 #include <unordered_set>
 
-// ObjexxFCL Headers
 #include <ObjexxFCL/Array1S.hh>
 
 // EnergyPlus Headers
@@ -69,6 +68,7 @@
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InputProcessing/InputValidation.hh>
+#include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/SortAndStringUtilities.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <milo/dtoa.h>
@@ -624,7 +624,7 @@ void InputProcessor::setObjectItemValue(json const &ep_object,
                                         bool within_max_fields,
                                         Array1S_string Alphas,
                                         int &NumAlphas,
-                                        Array1S<Real64> Numbers,
+                                        Array1D<Real64> &Numbers,
                                         int &NumNumbers,
                                         Optional<Array1D_bool> NumBlank,
                                         Optional<Array1D_bool> AlphaBlank,
@@ -711,7 +711,7 @@ void InputProcessor::getObjectItem(std::string const &Object,
                                    int const Number,
                                    Array1S_string Alphas,
                                    int &NumAlphas,
-                                   Array1S<Real64> Numbers,
+                                   Array1D<Real64> &Numbers,
                                    int &NumNumbers,
                                    int &Status,
                                    Optional<Array1D_bool> NumBlank,
@@ -1453,6 +1453,9 @@ void InputProcessor::preScanReportingVariables()
     // consider those variables for output.  (At this time, all metered variables are
     // allowed to pass through).
 
+    // This routine also scans any variables requested by API call for library usage.
+    // These variables are stored in a vector in output processor, and the values are added before E+ begins.
+
     // METHODOLOGY EMPLOYED:
     // Uses internal records and structures.
     // Looks at:
@@ -1560,6 +1563,10 @@ void InputProcessor::preScanReportingVariables()
         for (auto obj = epJSON_object.begin(); obj != epJSON_object.end(); ++obj) {
             addRecordToOutputVariableStructure("*", obj.key());
         }
+    }
+
+    for (auto const & requestedVar : OutputProcessor::apiVarRequests) {
+        addRecordToOutputVariableStructure(requestedVar.varKey, requestedVar.varName);
     }
 
     epJSON_objects = epJSON.find(OutputTableTimeBins);

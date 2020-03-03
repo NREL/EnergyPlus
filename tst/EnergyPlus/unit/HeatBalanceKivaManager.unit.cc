@@ -192,7 +192,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceKiva_SetInitialBCs)
     DataGlobals::TimeStep = 1;                  // must initialize this to get schedules initialized
     DataGlobals::NumOfTimeStepInHour = 1;       // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;       // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput();    // read schedules
+    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());    // read schedules
 
     ZoneTempPredictorCorrector::GetZoneAirSetPoints(OutputFiles::getSingleton());
 

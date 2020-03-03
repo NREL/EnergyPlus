@@ -52,8 +52,8 @@
 #include <string>
 
 // EnergyPlus Headers
+#include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/UnitarySystem.hh>
 
 namespace EnergyPlus {
 
@@ -98,6 +98,7 @@ namespace SimAirServingZones {
     extern int const CoilUserDefined;
     extern int const Fan_System_Object;
     extern int const UnitarySystemModel;
+    extern int const ZoneVRFasAirLoopEquip;
 
     // DERIVED TYPE DEFINITIONS:
     // na
@@ -170,7 +171,7 @@ namespace SimAirServingZones {
                              bool const FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
                              int const AirLoopNum,          // Primary air loop number
                              int &CompIndex,                // numeric pointer for CompType/CompName -- passed back from other routines
-                             UnitarySystems::UnitarySys *CompPointer);
+                             HVACSystemData *CompPointer);
 
     void UpdateBranchConnections(int const AirLoopNum, // primary air system number
                                  int const BranchNum,  // branch reference number
@@ -189,7 +190,7 @@ namespace SimAirServingZones {
 
     void SizeSysOutdoorAir();
 
-    void UpdateSysSizing(int const CallIndicator);
+    void UpdateSysSizing(OutputFiles &outputFiles, int const CallIndicator);
 
     void UpdateSysSizingForScalableInputs(int const AirLoopNum);
 

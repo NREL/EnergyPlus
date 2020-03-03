@@ -67,6 +67,7 @@
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SetPointManager.hh>
 
@@ -429,9 +430,9 @@ TEST_F(EnergyPlusFixture, FaultsManager_EconomizerFaultGetInput)
     // Process inputs
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ScheduleManager::ProcessScheduleInput(); // read schedules
+    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton()); // read schedules
 
-    MixedAir::GetOAControllerInputs();
+    MixedAir::GetOAControllerInputs(OutputFiles::getSingleton());
 
     // there are two OA controller objects
     EXPECT_EQ(MixedAir::NumOAControllers, 2);
