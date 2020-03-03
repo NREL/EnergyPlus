@@ -53,6 +53,7 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PollutionModule.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -102,7 +103,6 @@ namespace PollutionModule {
     using DataGlobals::EndEnvrnFlag;
     using DataGlobals::EndHourFlag;
     using DataGlobals::HourOfDay;
-    using DataGlobals::OutputFileMeters;
     using DataGlobals::StdMeterRecordCount;
     using DataGlobals::TimeStep;
     using DataGlobals::TimeStepZone;
@@ -643,9 +643,9 @@ namespace PollutionModule {
             //  necessary to make sure that the Meter file is opened and written to by the OP so that time stamps
             //  and the like are happening as expected.
             if (!lAlphaFieldBlanks(1)) {
-                InitPollutionMeterReporting(cAlphaArgs(1));
+                InitPollutionMeterReporting(OutputFiles::getSingleton(), cAlphaArgs(1));
             } else {
-                InitPollutionMeterReporting("RunPeriod");
+                InitPollutionMeterReporting(OutputFiles::getSingleton(), "RunPeriod");
             }
         }
     }

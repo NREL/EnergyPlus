@@ -48,7 +48,7 @@
 #ifndef CommandLineInterface_hh_INCLUDED
 #define CommandLineInterface_hh_INCLUDED
 
-#include <EnergyPlus/public/EnergyPlusAPI.hh>
+#include <EnergyPlus/api/EnergyPlusAPI.hh>
 #include <string>
 
 namespace EnergyPlus {
@@ -63,6 +63,8 @@ namespace CommandLineInterface {
                      std::string const &KindofParameter, // Kind of parameter to be found (String)
                      std::string &DataOut                // Output from the retrieval
     );
+
+    int runReadVarsESO();
 
 } // namespace CommandLineInterface
 

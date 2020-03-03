@@ -132,7 +132,7 @@ public:
                        int const Number,
                        Array1S_string Alphas,
                        int &NumAlphas,
-                       Array1S<Real64> Numbers,
+                       Array1D<Real64> &Numbers,
                        int &NumNumbers,
                        int &Status,
                        Optional<Array1D_bool> NumBlank = _,
@@ -180,6 +180,8 @@ public:
     void reportOrphanRecordObjects();
 
     const json &getObjectInstances(std::string const &ObjType);
+
+    void clear_state();
 
 private:
     struct ObjectInfo
@@ -243,7 +245,7 @@ private:
                             bool within_max_fields,
                             Array1S_string Alphas,
                             int &NumAlphas,
-                            Array1S<Real64> Numbers,
+                            Array1D<Real64> &Numbers,
                             int &NumNumbers,
                             Optional<Array1D_bool> NumBlank = _,
                             Optional<Array1D_bool> AlphaBlank = _,
@@ -277,8 +279,6 @@ private:
         }
         return s;
     }
-
-    void clear_state();
 
     using UnorderedObjectTypeMap = std::unordered_map<std::string, std::string>;
     using UnorderedObjectCacheMap = std::unordered_map<std::string, ObjectCache>;
