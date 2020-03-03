@@ -1140,7 +1140,7 @@ TEST_F(PlantHXFixture, PlantHXModulatedDualDeadDefectFileHi)
 
                     WeatherManager::ManageWeather();
 
-                    HeatBalanceManager::ManageHeatBalance();
+                    HeatBalanceManager::ManageHeatBalance(OutputFiles::getSingleton());
 
                     //  After the first iteration of HeatBalance, all the 'input' has been gotten
 
@@ -2231,7 +2231,7 @@ TEST_F(PlantHXFixture, PlantHXModulatedDualDeadDefectFileLo)
 
                     WeatherManager::ManageWeather();
 
-                    HeatBalanceManager::ManageHeatBalance();
+                    HeatBalanceManager::ManageHeatBalance(OutputFiles::getSingleton());
 
                     //  After the first iteration of HeatBalance, all the 'input' has been gotten
 
