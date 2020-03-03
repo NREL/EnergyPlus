@@ -107,7 +107,7 @@ extern "C" {
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/Globals.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
@@ -542,7 +542,7 @@ namespace SimulationManager {
             HVACManager::ResetNodeData(); // Reset here, because some zone calcs rely on node data (e.g. ZoneITEquip)
 
             bool anyEMSRan;
-            ManageEMS(ep_globals.dataGlobals.emsCallFromBeginNewEnvironment, anyEMSRan); // calling point
+            ManageEMS(DataGlobals::emsCallFromBeginNewEvironment, anyEMSRan); // calling point
 
             while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
 

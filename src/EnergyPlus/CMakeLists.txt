@@ -249,8 +249,8 @@ SET( SRC
   GeneratorFuelSupply.hh
   GlobalNames.cc
   GlobalNames.hh
-  Globals.cc
-  Globals.hh
+  Globals/Globals.cc
+  Globals/Globals.hh
   GroundHeatExchangers.cc
   GroundHeatExchangers.hh
   GroundTemperatureModeling/BaseGroundTemperatureModel.hh
@@ -330,7 +330,6 @@ SET( SRC
   HybridEvapCoolingModel.hh
   HybridModel.cc
   HybridModel.hh
-  Globals/PipesGlobals.hh
   GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.cc
   GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh
   GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.cc

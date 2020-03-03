@@ -47,7 +47,6 @@
 
 #include <EnergyPlus/api/EnergyPlusPgm.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/Globals.hh>
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/api/runtime.h>
 #include <EnergyPlus/StateManagement.hh>
@@ -87,7 +86,7 @@ void registerStdOutCallback(void (*f)(const char * message)) {
 }
 
 void callbackBeginNewEnvironment(void (*f)()) {
-    EnergyPlus::PluginManagement::registerNewCallback(ep_globals.dataGlobals.emsCallFromBeginNewEnvironment, f);
+    EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromBeginNewEvironment, f);
 }
 
 void callbackAfterNewEnvironmentWarmupComplete(void (*f)()) {

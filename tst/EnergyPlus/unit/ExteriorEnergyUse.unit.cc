@@ -57,7 +57,7 @@
 
 #include "Fixtures/EnergyPlusFixture.hh"
 
-#include <EnergyPlus/Globals.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::ExteriorEnergyUse;

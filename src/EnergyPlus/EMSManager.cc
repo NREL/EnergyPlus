@@ -68,7 +68,7 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Globals.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -305,7 +305,7 @@ namespace EMSManager {
         anyProgramRan = false;
         if (!AnyEnergyManagementSystemInModel) return; // quick return if nothing to do
 
-        if (iCalledFrom == ep_globals.dataGlobals.emsCallFromBeginNewEnvironment) BeginEnvrnInitializeRuntimeLanguage();
+        if (iCalledFrom == DataGlobals::emsCallFromBeginNewEvironment) BeginEnvrnInitializeRuntimeLanguage();
 
         InitEMS(iCalledFrom);
 
@@ -963,7 +963,7 @@ namespace EMSManager {
                     auto const SELECT_CASE_var(cAlphaArgs(2));
 
                     if (SELECT_CASE_var == "BEGINNEWENVIRONMENT") {
-                        EMSProgramCallManager(CallManagerNum).CallingPoint = ep_globals.dataGlobals.emsCallFromBeginNewEnvironment;
+                        EMSProgramCallManager(CallManagerNum).CallingPoint = DataGlobals::emsCallFromBeginNewEvironment;
                     } else if (SELECT_CASE_var == "AFTERNEWENVIRONMENTWARMUPISCOMPLETE") {
                         EMSProgramCallManager(CallManagerNum).CallingPoint = emsCallFromBeginNewEvironmentAfterWarmUp;
                     } else if (SELECT_CASE_var == "BEGINZONETIMESTEPBEFOREINITHEATBALANCE") {

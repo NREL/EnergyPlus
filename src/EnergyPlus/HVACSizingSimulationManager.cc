@@ -64,7 +64,7 @@
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Globals.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/OutputFiles.hh>
@@ -306,7 +306,7 @@ void ManageHVACSizingSimulation(OutputFiles &outputFiles, bool &ErrorsFound)
             NumOfWarmupDays = 0;
 
             bool anyEMSRan;
-            ManageEMS(ep_globals.dataGlobals.emsCallFromBeginNewEnvironment, anyEMSRan); // calling point
+            ManageEMS(DataGlobals::emsCallFromBeginNewEvironment, anyEMSRan); // calling point
 
             while ((DayOfSim < NumOfDayInEnvrn) || (WarmupFlag)) { // Begin day loop ...
 

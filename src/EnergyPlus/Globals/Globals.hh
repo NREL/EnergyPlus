@@ -50,7 +50,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Globals/PipesGlobals.hh>
 
 #include <string>
 
@@ -70,8 +69,6 @@ struct DataGlobal
     // MODULE PARAMETER DEFINITIONS
     static constexpr int EndZoneSizingCalc = 4;
 
-    // Parameters for EMS Calling Points
-    static constexpr int emsCallFromBeginNewEnvironment = 3;  // Identity where EMS called from
 };
 
 struct ExteriorEnergyUseGlobals
@@ -105,6 +102,13 @@ struct FansGlobals : BaseGlobalStruct
         LocalTurnFansOn = false;
         LocalTurnFansOff = false;
     }
+};
+
+struct PipesGlobals
+{
+    // MODULE VARIABLE DECLARATIONS
+    int NumLocalPipes = 0;
+    bool GetPipeInputFlag = true;
 };
 
 struct AllGlobals : BaseGlobalStruct
