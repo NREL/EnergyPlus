@@ -678,7 +678,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctVAVReheat_NormalActionTest)
     // run SimulateSingleDuct() function
     SimulateSingleDuct(thisAirDistUnit.EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, thisAirDistUnit.EquipIndex(1));
     // check min, actual and max air mass flow rates during reheat with Normal Action
-    EXPECT_EQ(expectedMassFlowAirReheatMin, sd_airterminalOutlet(SysNum).AirMassFlowRate);
+    EXPECT_EQ(expectedMassFlowAirReheatMin, sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
     EXPECT_EQ(expectedMassFlowAirReheatMin, Node(InletNode).MassFlowRate);
     EXPECT_EQ(expectedMassFlowAirReheatMin, Node(OutletNode).MassFlowRate);
     EXPECT_EQ(1.0, sd_airterminal(SysNum).AirMassFlowRateMax);
@@ -1069,8 +1069,8 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatAirTerminal_MinFlowTurnDownTest)
     EXPECT_EQ(1.0, sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
     EXPECT_EQ(0.3, sd_airterminal(SysNum).ZoneMinAirFracDes * sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
     EXPECT_EQ(0.3, sd_airterminal(SysNum).ZoneMinAirFrac);
-    EXPECT_EQ(SysMaxMassFlowRes, SingleDuct::sd_airterminalOutlet(SysNum).AirMassFlowRateMaxAvail);
-    EXPECT_EQ(SysMinMassFlowRes, SingleDuct::sd_airterminalOutlet(SysNum).AirMassFlowRate);
+    EXPECT_EQ(SysMaxMassFlowRes, SingleDuct::sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRateMaxAvail);
+    EXPECT_EQ(SysMinMassFlowRes, SingleDuct::sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
     EXPECT_EQ(SysMinMassFlowRes, SingleDuct::sd_airterminal(SysNum).AirMassFlowRateMax * sd_airterminal(SysNum).ZoneMinAirFrac);
     EXPECT_EQ(SysMinMassFlowRes,
               SingleDuct::sd_airterminal(SysNum).AirMassFlowRateMax * sd_airterminal(SysNum).ZoneMinAirFracDes *
@@ -1093,8 +1093,8 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatAirTerminal_MinFlowTurnDownTest)
     EXPECT_EQ(0.5, sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
     EXPECT_EQ(0.15, sd_airterminal(SysNum).ZoneMinAirFracDes * sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
     EXPECT_EQ(0.15, sd_airterminal(SysNum).ZoneMinAirFrac);
-    EXPECT_EQ(SysMaxMassFlowRes, SingleDuct::sd_airterminalOutlet(SysNum).AirMassFlowRateMaxAvail);
-    EXPECT_EQ(SysMinMassFlowRes, SingleDuct::sd_airterminalOutlet(SysNum).AirMassFlowRate);
+    EXPECT_EQ(SysMaxMassFlowRes, SingleDuct::sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRateMaxAvail);
+    EXPECT_EQ(SysMinMassFlowRes, SingleDuct::sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
     EXPECT_EQ(SysMinMassFlowRes, SingleDuct::sd_airterminal(SysNum).AirMassFlowRateMax * sd_airterminal(SysNum).ZoneMinAirFrac);
     EXPECT_EQ(SysMinMassFlowRes,
               SingleDuct::sd_airterminal(SysNum).AirMassFlowRateMax * sd_airterminal(SysNum).ZoneMinAirFracDes *
@@ -1274,8 +1274,8 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFanAirTerminal_MinFlowTurnDownTes
     EXPECT_EQ(1.0, sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
     EXPECT_EQ(0.1, sd_airterminal(SysNum).ZoneMinAirFracDes * sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
     EXPECT_EQ(0.1, sd_airterminal(SysNum).ZoneMinAirFrac);
-    EXPECT_EQ(SysMaxMassFlowRes, SingleDuct::sd_airterminalOutlet(SysNum).AirMassFlowRateMaxAvail);
-    EXPECT_EQ(SysMinMassFlowRes, SingleDuct::sd_airterminalOutlet(SysNum).AirMassFlowRate);
+    EXPECT_EQ(SysMaxMassFlowRes, SingleDuct::sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRateMaxAvail);
+    EXPECT_EQ(SysMinMassFlowRes, SingleDuct::sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
     EXPECT_EQ(SysMinMassFlowRes, SingleDuct::sd_airterminal(SysNum).AirMassFlowRateMax * sd_airterminal(SysNum).ZoneMinAirFrac);
     EXPECT_EQ(SysMinMassFlowRes,
               SingleDuct::sd_airterminal(SysNum).AirMassFlowRateMax * sd_airterminal(SysNum).ZoneMinAirFracDes *
@@ -1298,8 +1298,8 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFanAirTerminal_MinFlowTurnDownTes
     EXPECT_EQ(0.5, sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
     EXPECT_EQ(0.05, sd_airterminal(SysNum).ZoneMinAirFracDes * sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
     EXPECT_EQ(0.05, sd_airterminal(SysNum).ZoneMinAirFrac);
-    EXPECT_EQ(SysMaxMassFlowRes, SingleDuct::sd_airterminalOutlet(SysNum).AirMassFlowRateMaxAvail);
-    EXPECT_EQ(SysMinMassFlowRes, SingleDuct::sd_airterminalOutlet(SysNum).AirMassFlowRate);
+    EXPECT_EQ(SysMaxMassFlowRes, SingleDuct::sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRateMaxAvail);
+    EXPECT_EQ(SysMinMassFlowRes, SingleDuct::sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
     EXPECT_EQ(SysMinMassFlowRes, SingleDuct::sd_airterminal(SysNum).AirMassFlowRateMax * sd_airterminal(SysNum).ZoneMinAirFrac);
     EXPECT_EQ(SysMinMassFlowRes,
               SingleDuct::sd_airterminal(SysNum).AirMassFlowRateMax * sd_airterminal(SysNum).ZoneMinAirFracDes *
@@ -1446,8 +1446,8 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVHeatCoolReheatAirTerminal_MinFlowTurnDown
     EXPECT_EQ(1.0, sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
     EXPECT_EQ(0.2, sd_airterminal(SysNum).ZoneMinAirFracDes * sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
     EXPECT_EQ(0.2, sd_airterminal(SysNum).ZoneMinAirFrac);
-    EXPECT_EQ(SysMaxMassFlowRes, SingleDuct::sd_airterminalOutlet(SysNum).AirMassFlowRateMaxAvail);
-    EXPECT_EQ(SysMinMassFlowRes, SingleDuct::sd_airterminalOutlet(SysNum).AirMassFlowRate);
+    EXPECT_EQ(SysMaxMassFlowRes, SingleDuct::sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRateMaxAvail);
+    EXPECT_EQ(SysMinMassFlowRes, SingleDuct::sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
     EXPECT_EQ(SysMinMassFlowRes, SingleDuct::sd_airterminal(SysNum).AirMassFlowRateMax * sd_airterminal(SysNum).ZoneMinAirFrac);
     EXPECT_EQ(SysMinMassFlowRes,
               SingleDuct::sd_airterminal(SysNum).AirMassFlowRateMax * sd_airterminal(SysNum).ZoneMinAirFracDes *
@@ -1470,8 +1470,8 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVHeatCoolReheatAirTerminal_MinFlowTurnDown
     EXPECT_EQ(0.5, sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
     EXPECT_EQ(0.1, sd_airterminal(SysNum).ZoneMinAirFracDes * sd_airterminal(SysNum).ZoneTurndownMinAirFrac);
     EXPECT_EQ(0.1, sd_airterminal(SysNum).ZoneMinAirFrac);
-    EXPECT_EQ(SysMaxMassFlowRes, SingleDuct::sd_airterminalOutlet(SysNum).AirMassFlowRateMaxAvail);
-    EXPECT_EQ(SysMinMassFlowRes, SingleDuct::sd_airterminalOutlet(SysNum).AirMassFlowRate);
+    EXPECT_EQ(SysMaxMassFlowRes, SingleDuct::sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRateMaxAvail);
+    EXPECT_EQ(SysMinMassFlowRes, SingleDuct::sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
     EXPECT_EQ(SysMinMassFlowRes, SingleDuct::sd_airterminal(SysNum).AirMassFlowRateMax * sd_airterminal(SysNum).ZoneMinAirFrac);
     EXPECT_EQ(SysMinMassFlowRes,
               SingleDuct::sd_airterminal(SysNum).AirMassFlowRateMax * sd_airterminal(SysNum).ZoneMinAirFracDes *
@@ -1602,7 +1602,7 @@ TEST_F(EnergyPlusFixture, SingleDuctVAVReheatVSFan_DamperPositionTest)
     EXPECT_TRUE(compare_err_stream(""));
 
     auto &thisAirTerminal = SingleDuct::sd_airterminal(SysNum);
-    auto &thisAirTerminalOutlet = SingleDuct::sd_airterminalOutlet(SysNum);
+    auto &thisAirTerminalOutlet = SingleDuct::sd_airterminal(SysNum).sd_airterminalOutlet;
 
     // check VAV reheat VS Fan air terminal inputs
     EXPECT_EQ("AirTerminal:SingleDuct:VAV:Reheat:VariableSpeedFan", thisAirTerminal.SysType);
