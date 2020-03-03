@@ -23,11 +23,11 @@ endif()
 
 if( DOWNLOAD_GTEST STREQUAL ON ) # Do not need gtest since it will be processed by E+
 	# include(CMakeLists-GTest.txt)
-	configure_file(CMakeLists.txt.in ${CMAKE_BINARY_DIR}/googletest-download/CMakeLists.txt)
+	configure_file(CMakeLists.txt.in ${CMAKE_CURRENT_BINARY_DIR}/googletest-download/CMakeLists.txt)
 	execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
-  		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download )
+  		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/googletest-download )
 	execute_process(COMMAND ${CMAKE_COMMAND} --build .
-  		WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download )
+  		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/googletest-download )
   		
   	# Prevent GoogleTest from overriding our compiler/linker options
 	# when building with Visual Studio
@@ -36,13 +36,13 @@ if( DOWNLOAD_GTEST STREQUAL ON ) # Do not need gtest since it will be processed 
 	# Add googletest directly to our build. This adds
 	# the following targets: gtest, gtest_main, gmock
 	# and gmock_main
-	add_subdirectory(${CMAKE_BINARY_DIR}/googletest-src
-    	${CMAKE_BINARY_DIR}/googletest-build)
+	add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/googletest-src
+    	${CMAKE_CURRENT_BINARY_DIR}/googletest-build)
  
 	# Now simply link your own targets against gtest, gmock,
 	# etc. as appropriate
   		
-    include_directories( ${CMAKE_BINARY_DIR}/googletest-src/include )
+    include_directories( ${CMAKE_CURRENT_BINARY_DIR}/googletest-src/include )
 endif ()
 
 # foreach( _variableName ${SOURCES})

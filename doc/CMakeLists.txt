@@ -14,8 +14,8 @@ set_property(CACHE TEX_INTERACTION PROPERTY STRINGS "nonstopmode" "batchmode")
 if( EXISTS ${XELATEX} )
 # and if it does, just add the doc/CMakeLists commands
   # let's create a folder to drop ONLY PDFs in once they are built, this will allow easy upload to s3
-  file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/doc-pdf)
-  file(COPY ${PROJECT_SOURCE_DIR}/index.html DESTINATION ${CMAKE_BINARY_DIR}/doc-pdf)
+  file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/doc-pdf)
+  file(COPY ${PROJECT_SOURCE_DIR}/index.html DESTINATION ${PROJECT_BINARY_DIR}/doc-pdf)
 
   include("${PROJECT_SOURCE_DIR}/../cmake/Version.cmake")
   # add a configure rule to the header file though
