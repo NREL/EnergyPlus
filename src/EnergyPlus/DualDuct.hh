@@ -185,9 +185,9 @@ namespace DualDuct {
         {
         }
 
-        void InitDualDuct(int const DamperNum, bool const FirstHVACIteration);
+        void InitDualDuct(int const DDNum, bool const FirstHVACIteration);
 
-        void SizeDualDuct(int const DamperNum);
+        void SizeDualDuct();
 
         // End Initialization Section of the Module
         //******************************************************************************
@@ -195,18 +195,18 @@ namespace DualDuct {
         // Begin Algorithm Section of the Module
         //******************************************************************************
 
-        void SimDualDuctConstVol(int const DamperNum, int const ZoneNum, int const ZoneNodeNum);
+        void SimDualDuctConstVol(int const DDNum, int const ZoneNum, int const ZoneNodeNum);
 
-        void SimDualDuctVarVol(int const DamperNum, int const ZoneNum, int const ZoneNodeNum);
+        void SimDualDuctVarVol(int const DDNum, int const ZoneNum, int const ZoneNodeNum);
 
-        void SimDualDuctVAVOutdoorAir(int const DamperNum, int const ZoneNum, int const ZoneNodeNum);
+        void SimDualDuctVAVOutdoorAir(int const DDNum, int const ZoneNum, int const ZoneNodeNum);
 
-        void CalcOAMassFlow(int const DamperNum,  // index to terminal unit
+        void CalcOAMassFlow(int const DDNum,  // index to terminal unit
             Real64 &SAMassFlow,   // outside air based on optional user input
             Real64 &AirLoopOAFrac // outside air based on optional user input
         );
 
-        void CalcOAOnlyMassFlow(int const DamperNum,              // index to terminal unit
+        void CalcOAOnlyMassFlow(int const DDNum,              // index to terminal unit
             Real64 &OAMassFlow,               // outside air flow from user input kg/s
             Optional<Real64> MaxOAVolFlow = _ // design level for outside air m3/s
         );
@@ -217,7 +217,7 @@ namespace DualDuct {
         // Beginning of Update subroutines for the Damper Module
         // *****************************************************************************
 
-        void UpdateDualDuct(int const DamperNum);
+        void UpdateDualDuct(int const DDNum);
 
         //        End of Update subroutines for the Damper Module
         // *****************************************************************************
@@ -225,7 +225,7 @@ namespace DualDuct {
         // Beginning of Reporting subroutines for the Damper Module
         // *****************************************************************************
 
-        void ReportDualDuct(int const DamperNum); // unused1208
+        void ReportDualDuct(int const DDNum); // unused1208
 
     };
 
