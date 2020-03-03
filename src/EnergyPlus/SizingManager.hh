@@ -131,7 +131,7 @@ namespace SizingManager {
 
     void GetPlantSizingInput();
 
-    void SetupZoneSizing(bool &ErrorsFound);
+    void SetupZoneSizing(OutputFiles &outputFiles, bool &ErrorsFound);
 
     void ReportZoneSizing(OutputFiles &outputFiles,
                           std::string const &ZoneName,   // the name of the zone

@@ -4218,7 +4218,7 @@ namespace HeatBalanceAirManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        ManageHVAC();
+        ManageHVAC(OutputFiles::getSingleton());
 
         // Do Final Temperature Calculations for Heat Balance before next Time step
         SumHmAW = 0.0;
