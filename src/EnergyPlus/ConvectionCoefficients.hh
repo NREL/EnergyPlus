@@ -442,7 +442,7 @@ namespace ConvectionCoefficients {
 
     // Functions
 
-    void InitInteriorConvectionCoeffs(Array1S<Real64> const SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
+    void InitInteriorConvectionCoeffs(const Array1D<Real64> &SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
                                       Optional_int_const ZoneToResimulate = _    // if passed in, then only calculate surfaces that have this zone
     );
 
@@ -493,10 +493,10 @@ namespace ConvectionCoefficients {
                                         Real64 const ZoneMeanAirTemperature // Mean Air Temperature of Zone
     );
 
-    void CalcDetailedHcInForDVModel(int const SurfNum,                         // surface number for which coefficients are being calculated
-                                    Array1S<Real64> const SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
-                                    Array1S<Real64> HcIn,                      // Interior Convection Coeff Array
-                                    Optional<Array1S<Real64> const> Vhc = _    // Velocity array for forced convection coeff calculation
+    void CalcDetailedHcInForDVModel(int const SurfNum,                          // surface number for which coefficients are being calculated
+                                    const Array1D<Real64> &SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
+                                    Array1D<Real64> &HcIn,                      // Interior Convection Coeff Array
+                                    Optional<Array1S<Real64> const> Vhc = _     // Velocity array for forced convection coeff calculation
     );
 
     Real64 CalcZoneSupplyAirTemp(int const ZoneNum);
@@ -515,17 +515,17 @@ namespace ConvectionCoefficients {
                                            Real64 const height,
                                            bool const isWindow=false);
 
-    void CalcCeilingDiffuserIntConvCoeff(int const ZoneNum, Array1S<Real64> const SurfaceTemperatures); // zone number for which coefficients are being calculated
+    void CalcCeilingDiffuserIntConvCoeff(int const ZoneNum, const Array1D<Real64> &SurfaceTemperatures); // zone number for which coefficients are being calculated
 
     // CalcCeilingDiffuserInletCorr should replace CalcCeilingDiffuser (above), if ZoneTempPredictorCorrector can
     // ever be made to work correctly with the inlet air temperature.
 
     void CalcCeilingDiffuserInletCorr(int const ZoneNum,                        // Zone number
-                                      Array1S<Real64> const SurfaceTemperatures // For CalcASHRAEDetailed, if called
+                                      const Array1D<Real64> &SurfaceTemperatures // For CalcASHRAEDetailed, if called
     );
 
     void CalcTrombeWallIntConvCoeff(int const ZoneNum,                        // Zone number for which coefficients are being calculated
-                                    Array1S<Real64> const SurfaceTemperatures // Temperature of surfaces for evaluation of HcIn
+                                    const Array1D<Real64> &SurfaceTemperatures // Temperature of surfaces for evaluation of HcIn
     );
 
     void CalcNusselt(int const SurfNum, // Surface number
