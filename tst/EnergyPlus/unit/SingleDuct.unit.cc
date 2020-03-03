@@ -828,7 +828,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
         "  Coil:Heating:Fuel,",
         "    SPACE1-1 Zone Coil,      !- Name",
         "    AvailSched,              !- Availability Schedule Name",
-        "    Gas,                     !- Fuel Type",
+        "    NaturalGas,              !- Fuel Type",
         "    0.8,                     !- Gas Burner Efficiency",
         "    autosize,                !- Nominal Capacity {W}",
         "    SPACE1-1 Zone Coil Air In Node,  !- Air Inlet Node Name",
@@ -837,7 +837,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
         "  Coil:Heating:Fuel,",
         "    SPACE2-1 Zone Coil,      !- Name",
         "    AvailSched,              !- Availability Schedule Name",
-        "    Gas,                     !- Fuel Type",
+        "    NaturalGas,              !- Fuel Type",
         "    0.8,                     !- Gas Burner Efficiency",
         "    autosize,                !- Nominal Capacity {W}",
         "    SPACE2-1 Zone Coil Air In Node,  !- Air Inlet Node Name",
@@ -883,7 +883,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
         "  Coil:Heating:Fuel,",
         "    Main heating Coil 1,     !- Name",
         "    AvailSched,              !- Availability Schedule Name",
-        "    Gas,                     !- Fuel Type",
+        "    NaturalGas,              !- Fuel Type",
         "    0.8,                     !- Gas Burner Efficiency",
         "    autosize,                !- Nominal Capacity {W}",
         "    Main Cooling Coil 1 Outlet Node,  !- Air Inlet Node Name",
@@ -1255,7 +1255,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
 
     // OutputProcessor::TimeValue.allocate(2);
 
-    ManageSimulation(); // run the design day over the warmup period (24 hrs, 25 days)
+    ManageSimulation(OutputFiles::getSingleton()); // run the design day over the warmup period (24 hrs, 25 days)
 
     // compare_err_stream( "" ); // just for debugging
 
@@ -2033,7 +2033,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
         "  Coil:Heating:Fuel,",
         "    SPACE2-1 Zone Coil,      !- Name",
         "    AvailSched,              !- Availability Schedule Name",
-        "    Gas,                     !- Fuel Type",
+        "    NaturalGas,              !- Fuel Type",
         "    0.8,                     !- Gas Burner Efficiency",
         "    autosize,                !- Nominal Capacity {W}",
         "    SPACE2-1 Zone Coil Air In Node,  !- Air Inlet Node Name",
@@ -2079,7 +2079,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
         "  Coil:Heating:Fuel,",
         "    Main heating Coil 1,     !- Name",
         "    AvailSched,              !- Availability Schedule Name",
-        "    Gas,                     !- Fuel Type",
+        "    NaturalGas,              !- Fuel Type",
         "    0.8,                     !- Gas Burner Efficiency",
         "    autosize,                !- Nominal Capacity {W}",
         "    Main Cooling Coil 1 Outlet Node,  !- Air Inlet Node Name",
@@ -2454,7 +2454,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
 
     // OutputProcessor::TimeValue.allocate(2);
 
-    ManageSimulation(); // run the design days
+    ManageSimulation(OutputFiles::getSingleton()); // run the design days
 
     // size the reheat coil with no design zone heating load
     // DesZoneHeatLoad = 0 from simulating design days and forcing heating load = 0
