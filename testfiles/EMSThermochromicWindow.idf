@@ -119,8 +119,9 @@
     20;                      !- Maximum HVAC Iterations
 
   ShadowCalculation,
-    TimestepFrequency,       !- Calculation Method
-    30,                      !- Calculation Frequency
+    PolygonClipping,         !- Shading Calculation Method
+    Timestep,                !- Shading Calculation Update Frequency Method
+    30,                      !- Shading Calculation Update Frequency
     15000;                   !- Maximum Figures in Shadow Overlap Calculations
 
   GlobalGeometryRules,
