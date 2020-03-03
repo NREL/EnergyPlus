@@ -168,7 +168,6 @@ namespace DualDuct {
         int ZoneTurndownMinAirFracSchPtr;    // pointer to the schedule for turndown minimum airflow fraction
         Real64 ZoneTurndownMinAirFrac;       // turndown minimum airflow fraction value, multiplier of zone design minimum air flow 
         bool ZoneTurndownMinAirFracSchExist; // if true, if zone turndown min air frac schedule exist
-        //DualDuctAirTerminalFlowConditions dd_airterminalInlet; //  unused
         DualDuctAirTerminalFlowConditions dd_airterminalHotAirInlet;
         DualDuctAirTerminalFlowConditions dd_airterminalColdAirInlet;
         DualDuctAirTerminalFlowConditions dd_airterminalOutlet;
