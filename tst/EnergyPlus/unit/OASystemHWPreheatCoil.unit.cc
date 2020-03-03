@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/MixedAir.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -1040,7 +1041,7 @@ TEST_F(EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOffSim)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2);
-    SimulationManager::ManageSimulation();
+    SimulationManager::ManageSimulation(OutputFiles::getSingleton());
 
     EXPECT_EQ(1, NumOASystems);
     EXPECT_EQ("OA SYS 1", OutsideAirSys(OASysNum).Name);
@@ -2018,7 +2019,7 @@ TEST_F(EnergyPlusFixture, OASystem_HotWaterPreheatCoilScheduledOnSim)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2);
-    SimulationManager::ManageSimulation();
+    SimulationManager::ManageSimulation(OutputFiles::getSingleton());
 
     EXPECT_EQ(1, NumOASystems);
     EXPECT_EQ("OA SYS 1", OutsideAirSys(OASysNum).Name);

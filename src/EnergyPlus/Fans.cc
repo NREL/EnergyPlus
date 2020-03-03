@@ -2874,6 +2874,29 @@ namespace Fans {
         return NodeNumber;
     }
 
+    int getFanInNodeIndex(int const &FanIndex, // fan index
+                          bool &ErrorsFound    // set to true if problem
+    )
+    {
+
+        int NodeNumber = 0; // returned outlet node of matched fan
+
+        // Obtains and Allocates fan related parameters from input file
+        if (GetFanInputFlag) { // First time subroutine has been entered
+            GetFanInput();
+            GetFanInputFlag = false;
+        }
+
+        if (FanIndex != 0) {
+            NodeNumber = Fan(FanIndex).InletNodeNum;
+        } else {
+            ShowSevereError("getFanInNodeIndex: Could not find Fan");
+            ErrorsFound = true;
+        }
+
+        return NodeNumber;
+    }
+
     int GetFanOutletNode(std::string const &FanType, // must match fan types in this module
                          std::string const &FanName, // must match fan names for the fan type
                          bool &ErrorsFound           // set to true if problem

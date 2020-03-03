@@ -59,7 +59,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PlantComponent.hh>

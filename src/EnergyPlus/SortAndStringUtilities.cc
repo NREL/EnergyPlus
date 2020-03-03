@@ -94,8 +94,8 @@ namespace SortAndStringUtilities {
 
     // Functions
 
-    void SetupAndSort(Array1S_string Alphas, // Alphas to be sorted
-                      Array1S_int iAlphas    // Indexes of sorted array
+    void SetupAndSort(Array1D_string &Alphas, // Alphas to be sorted
+                      Array1D_int &iAlphas    // Indexes of sorted array
     )
     {
 
