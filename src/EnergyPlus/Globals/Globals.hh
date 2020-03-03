@@ -58,7 +58,7 @@ struct BaseGlobalStruct
     virtual void clear_state() = 0;
 };
 
-struct DataGlobal
+struct DataGlobal : BaseGlobalStruct
 {
     // Data
     bool AnnualSimulation = false;
@@ -69,12 +69,21 @@ struct DataGlobal
     // MODULE PARAMETER DEFINITIONS
     static constexpr int EndZoneSizingCalc = 4;
 
+    void clear_state() override {
+        AnnualSimulation = false;
+        DayOfSimChr = "0";
+    }
 };
 
-struct ExteriorEnergyUseGlobals
+struct ExteriorEnergyUseGlobals : BaseGlobalStruct
 {
     int NumExteriorLights = 0; // Number of Exterior Light Inputs
     int NumExteriorEqs = 0;    // Number of Exterior Equipment Inputs
+
+    void clear_state() override {
+        NumExteriorLights = 0;
+        NumExteriorEqs = 0;
+    }
 };
 
 struct FansGlobals : BaseGlobalStruct
@@ -90,7 +99,7 @@ struct FansGlobals : BaseGlobalStruct
     bool LocalTurnFansOn;      // If True, overrides fan schedule and cycles ZoneHVAC component fans on
     bool LocalTurnFansOff;     // If True, overrides fan schedule and LocalTurnFansOn and cycles ZoneHVAC component fans off
 
-        FansGlobals() : NumFans(0), NumNightVentPerf(0), GetFanInputFlag(true), LocalTurnFansOn(false), LocalTurnFansOff(false)
+    FansGlobals() : NumFans(0), NumNightVentPerf(0), GetFanInputFlag(true), LocalTurnFansOn(false), LocalTurnFansOff(false)
     {
     }
 
@@ -104,11 +113,16 @@ struct FansGlobals : BaseGlobalStruct
     }
 };
 
-struct PipesGlobals
+struct PipesGlobals : BaseGlobalStruct
 {
     // MODULE VARIABLE DECLARATIONS
     int NumLocalPipes = 0;
     bool GetPipeInputFlag = true;
+
+    void clear_state() override {
+        NumLocalPipes = 0;
+        GetPipeInputFlag = true;
+    }
 };
 
 struct AllGlobals : BaseGlobalStruct
@@ -122,7 +136,10 @@ struct AllGlobals : BaseGlobalStruct
     // all clear states
     void clear_state() override
     {
+        dataGlobals.clear_state();
+        exteriorEnergyUse.clear_state();
         fans.clear_state();
+        pipes.clear_state();
     };
 };
 
