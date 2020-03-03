@@ -3255,7 +3255,6 @@ namespace SingleDuct {
         Real64 QTotLoad;     // [Watts] Remaining load required for this zone
         Real64 QZnReq;       // [Watts] Load calculated for heating coil
         Real64 QToHeatSetPt; // [W]  remaining load to heating setpoint
-        int ADUNum;          // index of air distribution unit for this terminal unit
         Real64 CpAirAvg;
         Real64 DeltaTemp;
         int SysOutletNode;                       // The node number of the terminal unit outlet node
@@ -3291,8 +3290,7 @@ namespace SingleDuct {
         // sd_airterminal(SysNum)%ReheatAirOutletNode is the outlet node of the terminal unit and the heating coil
 
         // The calculated load from the Heat Balance
-        ADUNum = this->ADUNum;
-        LeakLoadMult = AirDistUnit(ADUNum).LeakLoadMult;
+        LeakLoadMult = AirDistUnit(this->ADUNum).LeakLoadMult;
         QTotLoad = ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired * LeakLoadMult;
         QToHeatSetPt = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP * LeakLoadMult;
         SysOutletNode = this->ReheatAirOutletNode;
@@ -3828,7 +3826,6 @@ namespace SingleDuct {
         Real64 MaxFlowWater;  // This is the value passed to the Controller depending if FirstHVACIteration or not
         Real64 MinFlowWater;  // This is the value passed to the Controller depending if FirstHVACIteration or not
         Real64 LeakLoadMult;  // Load multiplier to adjust for downstream leaks
-        int ADUNum;           // Index of air distribution unit for this terminal unit
         int SysOutletNode;    // The node number of the terminal unit outlet node
         int SysInletNode;     // The node number of the terminal unit inlet node
         int WaterControlNode; // This is the Actuated Reheat Control Node
@@ -3850,8 +3847,7 @@ namespace SingleDuct {
         // sd_airterminal(SysNum)%ReheatAirOutletNode is the outlet node of the terminal unit and the heating coil
 
         // The calculated load from the Heat Balance
-        ADUNum = this->ADUNum;
-        LeakLoadMult = AirDistUnit(ADUNum).LeakLoadMult;
+        LeakLoadMult = AirDistUnit(this->ADUNum).LeakLoadMult;
         QTotLoad = ZoneSysEnergyDemand(ZoneNum).RemainingOutputRequired * LeakLoadMult;
         QToHeatSetPt = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToHeatSP * LeakLoadMult;
         SysOutletNode = this->ReheatAirOutletNode;
@@ -4271,7 +4267,6 @@ namespace SingleDuct {
                 MaxFlowSteam = this->MaxReheatSteamFlow;
                 MinFlowSteam = this->MinReheatSteamFlow;
             } else {
-                SteamControlNode = this->ReheatControlNode;
                 MaxFlowSteam = Node(SteamControlNode).MassFlowRateMaxAvail;
                 MinFlowSteam = Node(SteamControlNode).MassFlowRateMinAvail;
             }
