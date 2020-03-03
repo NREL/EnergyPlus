@@ -100,7 +100,7 @@
 ! Environmental Emissions:        None
 ! Utility Tariffs:                None
 
-  Version,9.2;
+  Version,9.3;
 
   Building,
     Building,                !- Name
@@ -165,7 +165,7 @@
     1,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
-    1,                      !- End Month
+    1,                       !- End Month
     31,                      !- End Day of Month
     ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
@@ -180,7 +180,7 @@
     7,                       !- Begin Month
     1,                       !- Begin Day of Month
     ,                        !- Begin Year
-    7,                      !- End Month
+    7,                       !- End Month
     31,                      !- End Day of Month
     ,                        !- End Year
     Tuesday,                 !- Day of Week for Start Day
@@ -1577,7 +1577,7 @@
   Daylighting:ReferencePoint,
     SPACE5-1 Reference Point1,  !- Name
     SPACE5-1,                !- Zone Name
-    8.0,                    !- X-Coordinate of Reference Point {m}
+    8.0,                     !- X-Coordinate of Reference Point {m}
     8.0,                     !- Y-Coordinate of Reference Point {m}
     0.7;                     !- Z-Coordinate of Reference Point {m}
 
@@ -1676,7 +1676,7 @@
   BuildingSurface:Detailed,
     SB54,                    !- Name
     WALL,                    !- Surface Type
-    Air Wall  ,              !- Construction Name
+    Air Wall,                !- Construction Name
     SPACE5-1,                !- Zone Name
     Surface,                 !- Outside Boundary Condition
     SB45,                    !- Outside Boundary Condition Object
@@ -2206,8 +2206,8 @@
     SPACE1-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SPACE2-1 Eq,             !- Name
@@ -2216,8 +2216,8 @@
     SPACE2-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SPACE3-1 Eq,             !- Name
@@ -2226,8 +2226,8 @@
     SPACE3-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SPACE4-1 Eq,             !- Name
@@ -2236,8 +2236,8 @@
     SPACE4-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:EquipmentList,
     SPACE5-1 Eq,             !- Name
@@ -2246,8 +2246,8 @@
     SPACE5-1 ATU,            !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
-    ,                        !- Zone Equipment 1 Sequential Cooling Load Fraction Schedule Name
-    ;                        !- Zone Equipment 1 Sequential Heating Load Fraction Schedule Name
+    ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
+    ;                        !- Zone Equipment 1 Sequential Heating Fraction Schedule Name
 
   ZoneHVAC:AirDistributionUnit,
     SPACE1-1 ATU,            !- Name
@@ -3504,8 +3504,11 @@
     ZoneComponentLoadSummary;!- Report 2 Name
 
   Output:Surfaces:List,Details;
+
   Output:Surfaces:List,ViewFactorInfo;
+
   Output:Surfaces:List,ViewFactorInfo,idf;
+
   Output:Surfaces:Drawing,dxf;
 
   Output:Variable,*,Surface Outside Face Temperature,Hourly;
@@ -3516,13 +3519,19 @@
 
   Output:Variable,*,Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,hourly;
 
-  Output:Variable,*,Daylighting Reference Point 1 Illuminance,hourly; !- Zone Average [lux]
-  Output:Variable,*,Daylighting Reference Point 1 Daylight Illuminance Setpoint Exceeded Time,hourly; !- Zone Sum [hr]
-  Output:Variable,*,Daylighting Reference Point 1 Glare Index,hourly; !- Zone Average []
-  Output:Variable,*,Daylighting Reference Point 1 Glare Index Setpoint Exceeded Time,hourly; !- Zone Sum [hr]
-  Output:Variable,*,Daylighting Lighting Power Multiplier,hourly; !- Zone Average []
-  Output:Variable,*,Daylighting Window Reference Point Illuminance,hourly; !- Zone Average [lux]
-  Output:Variable,*,Daylighting Window Reference Point View Luminance,hourly; !- Zone Average [cd/m2]
+  Output:Variable,*,Daylighting Reference Point 1 Illuminance,hourly;
+
+  Output:Variable,*,Daylighting Reference Point 1 Daylight Illuminance Setpoint Exceeded Time,hourly;
+
+  Output:Variable,*,Daylighting Reference Point 1 Glare Index,hourly;
+
+  Output:Variable,*,Daylighting Reference Point 1 Glare Index Setpoint Exceeded Time,hourly;
+
+  Output:Variable,*,Daylighting Lighting Power Multiplier,hourly;
+
+  Output:Variable,*,Daylighting Window Reference Point Illuminance,hourly;
+
+  Output:Variable,*,Daylighting Window Reference Point View Luminance,hourly;
 
   Meter:Custom,
     Total Building Inside Face Solar Radiation Heat Gain Energy,  !- Name
@@ -3549,52 +3558,52 @@
     Surface Inside Face Solar Radiation Heat Gain Energy,  !- Output Variable or Meter Name 10
     FRONT-1,                 !- Key Name 11
     Surface Inside Face Solar Radiation Heat Gain Energy,  !- Output Variable or Meter Name 11
-    SB12,                    !- Key Name 14
+    SB12,                    !- Key Name 12
+    Surface Inside Face Solar Radiation Heat Gain Energy,  !- Output Variable or Meter Name 12
+    F1-1,                    !- Key Name 13
+    Surface Inside Face Solar Radiation Heat Gain Energy,  !- Output Variable or Meter Name 13
+    C1-1,                    !- Key Name 14
     Surface Inside Face Solar Radiation Heat Gain Energy,  !- Output Variable or Meter Name 14
-    F1-1,                    !- Key Name 15
+    RIGHT-1,                 !- Key Name 15
     Surface Inside Face Solar Radiation Heat Gain Energy,  !- Output Variable or Meter Name 15
-    C1-1,                    !- Key Name 16
+    SB21,                    !- Key Name 16
     Surface Inside Face Solar Radiation Heat Gain Energy,  !- Output Variable or Meter Name 16
-    RIGHT-1,                 !- Key Name 17
+    SB23,                    !- Key Name 17
     Surface Inside Face Solar Radiation Heat Gain Energy,  !- Output Variable or Meter Name 17
-    SB21,                    !- Key Name 20
+    SB25,                    !- Key Name 18
+    Surface Inside Face Solar Radiation Heat Gain Energy,  !- Output Variable or Meter Name 18
+    F2-1,                    !- Key Name 19
+    Surface Inside Face Solar Radiation Heat Gain Energy,  !- Output Variable or Meter Name 19
+    C2-1,                    !- Key Name 20
     Surface Inside Face Solar Radiation Heat Gain Energy,  !- Output Variable or Meter Name 20
-    SB23,                    !- Key Name 20
-    Surface Inside Face Solar Radiation Heat Gain Energy,  !- Output Variable or Meter Name 20
-    SB25,                    !- Key Name 20
-    Surface Inside Face Solar Radiation Heat Gain Energy,  !- Output Variable or Meter Name 20
-    F2-1,                    !- Key Name 21
+    BACK-1,                  !- Key Name 21
     Surface Inside Face Solar Radiation Heat Gain Energy,  !- Output Variable or Meter Name 21
-    C2-1,                    !- Key Name 22
+    F3-1,                    !- Key Name 22
     Surface Inside Face Solar Radiation Heat Gain Energy,  !- Output Variable or Meter Name 22
-    BACK-1,                  !- Extended Field
-    Surface Inside Face Solar Radiation Heat Gain Energy,  !- Extended Field
-    F3-1,                    !- Extended Field
-    Surface Inside Face Solar Radiation Heat Gain Energy,  !- Extended Field
-    C3-1,                    !- Extended Field
-    Surface Inside Face Solar Radiation Heat Gain Energy,  !- Extended Field
-    LEFT-1,                  !- Extended Field
-    Surface Inside Face Solar Radiation Heat Gain Energy,  !- Extended Field
-    SB32,                    !- Extended Field
-    Surface Inside Face Solar Radiation Heat Gain Energy,  !- Extended Field
-    SB34,                    !- Extended Field
-    Surface Inside Face Solar Radiation Heat Gain Energy,  !- Extended Field
-    SB35,                    !- Extended Field
-    Surface Inside Face Solar Radiation Heat Gain Energy,  !- Extended Field
-    F4-1,                    !- Extended Field
-    Surface Inside Face Solar Radiation Heat Gain Energy,  !- Extended Field
-    C4-1,                    !- Extended Field
-    Surface Inside Face Solar Radiation Heat Gain Energy,  !- Extended Field
-    SB43,                    !- Extended Field
-    Surface Inside Face Solar Radiation Heat Gain Energy,  !- Extended Field
-    SB52,                    !- Extended Field
-    Surface Inside Face Solar Radiation Heat Gain Energy,  !- Extended Field
-    SB53,                    !- Extended Field
-    Surface Inside Face Solar Radiation Heat Gain Energy,  !- Extended Field
-    F5-1,                    !- Extended Field
-    Surface Inside Face Solar Radiation Heat Gain Energy,  !- Extended Field
-    C5-1,                    !- Extended Field
-    Surface Inside Face Solar Radiation Heat Gain Energy;  !- Extended Field
+    C3-1,                    !- Key Name 23
+    Surface Inside Face Solar Radiation Heat Gain Energy,  !- Output Variable or Meter Name 23
+    LEFT-1,                  !- Key Name 24
+    Surface Inside Face Solar Radiation Heat Gain Energy,  !- Output Variable or Meter Name 24
+    SB32,                    !- Key Name 25
+    Surface Inside Face Solar Radiation Heat Gain Energy,  !- Output Variable or Meter Name 25
+    SB34,                    !- Key Name 26
+    Surface Inside Face Solar Radiation Heat Gain Energy,  !- Output Variable or Meter Name 26
+    SB35,                    !- Key Name 27
+    Surface Inside Face Solar Radiation Heat Gain Energy,  !- Output Variable or Meter Name 27
+    F4-1,                    !- Key Name 28
+    Surface Inside Face Solar Radiation Heat Gain Energy,  !- Output Variable or Meter Name 28
+    C4-1,                    !- Key Name 29
+    Surface Inside Face Solar Radiation Heat Gain Energy,  !- Output Variable or Meter Name 29
+    SB43,                    !- Key Name 30
+    Surface Inside Face Solar Radiation Heat Gain Energy,  !- Output Variable or Meter Name 30
+    SB52,                    !- Key Name 31
+    Surface Inside Face Solar Radiation Heat Gain Energy,  !- Output Variable or Meter Name 31
+    SB53,                    !- Key Name 32
+    Surface Inside Face Solar Radiation Heat Gain Energy,  !- Output Variable or Meter Name 32
+    F5-1,                    !- Key Name 33
+    Surface Inside Face Solar Radiation Heat Gain Energy,  !- Output Variable or Meter Name 33
+    C5-1,                    !- Key Name 34
+    Surface Inside Face Solar Radiation Heat Gain Energy;  !- Output Variable or Meter Name 34
 
   Meter:Custom,
     Total Building Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Name
@@ -3625,60 +3634,60 @@
     Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Output Variable or Meter Name 12
     DF-1,                    !- Key Name 13
     Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Output Variable or Meter Name 13
-    SB12,                    !- Key Name 16
+    SB12,                    !- Key Name 14
+    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Output Variable or Meter Name 14
+    F1-1,                    !- Key Name 15
+    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Output Variable or Meter Name 15
+    C1-1,                    !- Key Name 16
     Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Output Variable or Meter Name 16
-    F1-1,                    !- Key Name 17
+    RIGHT-1,                 !- Key Name 17
     Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Output Variable or Meter Name 17
-    C1-1,                    !- Key Name 18
+    WR-1,                    !- Key Name 18
     Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Output Variable or Meter Name 18
-    RIGHT-1,                 !- Key Name 19
+    SB21,                    !- Key Name 19
     Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Output Variable or Meter Name 19
-    WR-1,                    !- Key Name 20
+    SB23,                    !- Key Name 20
     Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Output Variable or Meter Name 20
-    SB21,                    !- Extended Field
-    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Extended Field
-    SB23,                    !- Extended Field
-    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Extended Field
-    SB25,                    !- Extended Field
-    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Extended Field
-    F2-1,                    !- Extended Field
-    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Extended Field
-    C2-1,                    !- Extended Field
-    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Extended Field
-    BACK-1,                  !- Extended Field
-    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Extended Field
-    WB-1,                    !- Extended Field
-    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Extended Field
-    DB-1,                    !- Extended Field
-    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Extended Field
-    F3-1,                    !- Extended Field
-    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Extended Field
-    C3-1,                    !- Extended Field
-    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Extended Field
-    LEFT-1,                  !- Extended Field
-    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Extended Field
-    WL-1,                    !- Extended Field
-    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Extended Field
-    SB32,                    !- Extended Field
-    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Extended Field
-    SB34,                    !- Extended Field
-    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Extended Field
-    SB35,                    !- Extended Field
-    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Extended Field
-    F4-1,                    !- Extended Field
-    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Extended Field
-    C4-1,                    !- Extended Field
-    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Extended Field
-    SB43,                    !- Extended Field
-    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Extended Field
-    SB52,                    !- Extended Field
-    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Extended Field
-    SB53,                    !- Extended Field
-    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Extended Field
-    F5-1,                    !- Extended Field
-    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Extended Field
-    C5-1,                    !- Extended Field
-    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy;  !- Extended Field
+    SB25,                    !- Key Name 21
+    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Output Variable or Meter Name 21
+    F2-1,                    !- Key Name 22
+    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Output Variable or Meter Name 22
+    C2-1,                    !- Key Name 23
+    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Output Variable or Meter Name 23
+    BACK-1,                  !- Key Name 24
+    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Output Variable or Meter Name 24
+    WB-1,                    !- Key Name 25
+    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Output Variable or Meter Name 25
+    DB-1,                    !- Key Name 26
+    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Output Variable or Meter Name 26
+    F3-1,                    !- Key Name 27
+    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Output Variable or Meter Name 27
+    C3-1,                    !- Key Name 28
+    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Output Variable or Meter Name 28
+    LEFT-1,                  !- Key Name 29
+    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Output Variable or Meter Name 29
+    WL-1,                    !- Key Name 30
+    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Output Variable or Meter Name 30
+    SB32,                    !- Key Name 31
+    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Output Variable or Meter Name 31
+    SB34,                    !- Key Name 32
+    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Output Variable or Meter Name 32
+    SB35,                    !- Key Name 33
+    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Output Variable or Meter Name 33
+    F4-1,                    !- Key Name 34
+    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Output Variable or Meter Name 34
+    C4-1,                    !- Key Name 35
+    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Output Variable or Meter Name 35
+    SB43,                    !- Key Name 36
+    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Output Variable or Meter Name 36
+    SB52,                    !- Key Name 37
+    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Output Variable or Meter Name 37
+    SB53,                    !- Key Name 38
+    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Output Variable or Meter Name 38
+    F5-1,                    !- Key Name 39
+    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy,  !- Output Variable or Meter Name 39
+    C5-1,                    !- Key Name 40
+    Surface Inside Face Net Surface Thermal Radiation Heat Gain Energy;  !- Output Variable or Meter Name 40
 
   Output:Meter,Total Building Inside Face Solar Radiation Heat Gain Energy,hourly;
 

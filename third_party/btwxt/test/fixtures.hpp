@@ -94,7 +94,7 @@ protected:
 
   TwoDFixture() {
     std::vector<std::vector<double>> grid = {{0, 10, 15}, {4, 6}};
-    //  4   6
+    //         4  6
     values = {{6, 3,  // 0
                2, 8,  // 10
                4, 2}, // 15
@@ -104,6 +104,32 @@ protected:
     test_gridded_data.set_axis_extrap_method(0, Method::LINEAR);
     test_rgi = RegularGridInterpolator(test_gridded_data);
   }
+};
+
+class TwoDSimpleNormalizationFixture : public testing::Test {
+    // TODO: Create a fixture which this one can inherit from
+    // takes a vector of functions as a parameter (these become separate value tables)
+    // takes a vector of vectors which is the data structure that stores the grid
+protected:
+    RegularGridInterpolator test_rgi;
+    GriddedData test_gridded_data;
+    double test_function (std::vector<double> target){
+        assert(target.size() == 2);
+        return target[0]*target[1];
+    }
+
+    TwoDSimpleNormalizationFixture() {
+        std::vector<std::vector<double>> grid = {{2.0, 7.0}, {1.0, 2.0, 3.0}};
+        std::vector<double> values;
+        for (auto x : grid[0]){
+            for (auto y : grid[1] ){
+                values.push_back(test_function({x,y}));
+            }
+        }
+        test_gridded_data = GriddedData(grid, {values});
+        test_gridded_data.set_axis_extrap_method(0, Method::LINEAR);
+        test_rgi = RegularGridInterpolator(test_gridded_data);
+    }
 };
 
 class CubicFixture : public testing::Test {

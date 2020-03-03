@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -74,8 +74,6 @@ TEST_F(EnergyPlusFixture, CurveExponentialSkewNormal_MaximumCurveOutputTest)
         "  0.1,                     !- Minimum Curve Output",
         "  1.;                      !- Maximum Curve Output",
     });
-
-    //documentation input output reference should tell me how to plot this equation
 
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_EQ(0, CurveManager::NumCurves);

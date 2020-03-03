@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -2086,16 +2086,19 @@ namespace CurveManager {
                         ShowContinueError("    b) no normalization reference values are defined.");
                         ErrorsFound = true;
                     } else if (pointsSpecified) {
-                        // normalizeGridValues normalizes to 1.0 at the reference values. We must redivide by passing in the 1.0/normalizationDivisor as the scalar here.
+                        // normalizeGridValues normalizes curve values to 1.0 at the normalization target, and returns the scalar needed to perform this normalization.
+                        // The result is multiplied by the input normalizationDivisor again for the AutomaticWithDivisor case, in which normalizeGridValues returns a compound scalar.
                         normalizationDivisor = btwxtManager.normalizeGridValues(gridIndex, PerfCurve(CurveNum).GridValueIndex, normalizeTarget, normalizationDivisor)*normalizationDivisor;
                     }
                 }
-
-                if ((normalizeMethod == NM_DIVISOR_ONLY && PerfCurve(CurveNum).CurveMaxPresent) || (normalizeMethod == NM_AUTO_WITH_DIVISOR && PerfCurve(CurveNum).CurveMaxPresent)){
-                    PerfCurve(CurveNum).CurveMax = PerfCurve(CurveNum).CurveMax / normalizationDivisor;
-                }
-                if ((normalizeMethod == NM_DIVISOR_ONLY && PerfCurve(CurveNum).CurveMinPresent) || (normalizeMethod == NM_AUTO_WITH_DIVISOR && PerfCurve(CurveNum).CurveMinPresent)){
-                    PerfCurve(CurveNum).CurveMin = PerfCurve(CurveNum).CurveMin / normalizationDivisor;
+                
+                if ((normalizeMethod == NM_DIVISOR_ONLY) || (normalizeMethod == NM_AUTO_WITH_DIVISOR)) {
+                    if (PerfCurve(CurveNum).CurveMaxPresent) {
+                        PerfCurve(CurveNum).CurveMax = PerfCurve(CurveNum).CurveMax / normalizationDivisor;
+                    }
+                    if (PerfCurve(CurveNum).CurveMinPresent) {
+                        PerfCurve(CurveNum).CurveMin = PerfCurve(CurveNum).CurveMin / normalizationDivisor;
+                    }
                 }
             }
         }

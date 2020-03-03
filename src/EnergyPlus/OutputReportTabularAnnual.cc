@@ -1,4 +1,4 @@
-// EnergyPlus, Copyright (c) 1996-2019, The Board of Trustees of the University of Illinois,
+// EnergyPlus, Copyright (c) 1996-2020, The Board of Trustees of the University of Illinois,
 // The Regents of the University of California, through Lawrence Berkeley National Laboratory
 // (subject to receipt of any required approvals from the U.S. Dept. of Energy), Oak Ridge
 // National Laboratory, managed by UT-Battelle, Alliance for Sustainable Energy, LLC, and other
@@ -542,7 +542,7 @@ namespace OutputReportTabularAnnual {
                                         if (fldStRemainIt->m_varAvgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
                                             scanValue /= secondsInTimeStep;
                                         }
-                                        if (scanValue > oldScanValue) {
+                                        if (scanValue < oldScanValue) {
                                             fldStRemainIt->m_cell[row].result = scanValue;
                                             fldStRemainIt->m_cell[row].timeStamp = timestepTimeStamp;
                                         }
@@ -550,7 +550,7 @@ namespace OutputReportTabularAnnual {
                                         if (fldStRemainIt->m_varAvgSum == OutputProcessor::StoreType::Summed) { // if it is a summed variable
                                             scanValue /= secondsInTimeStep;
                                         }
-                                        if (scanValue < oldScanValue) {
+                                        if (scanValue > oldScanValue) {
                                             fldStRemainIt->m_cell[row].result = scanValue;
                                             fldStRemainIt->m_cell[row].timeStamp = timestepTimeStamp;
                                         }
@@ -1412,6 +1412,11 @@ namespace OutputReportTabularAnnual {
         ret.push_back(outStr);
         outStr = std::to_string(fldSt.m_timeBelowBottomBinTotal);
         ret.push_back(outStr);
+        // cell value
+        if (fldSt.m_cell.size() > 0) {
+            outStr = std::to_string(fldSt.m_cell[0].result);
+            ret.push_back(outStr);
+        }
         return ret;
     }
 
