@@ -281,7 +281,8 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(const DataLoopNode::N
     } else if (speedNum > 1) {
         thisspeed.AirMassFlow = DataHVACGlobals::MSHPMassFlowRateHigh;
     }
-    //thisspeed.AirMassFlow *= thisspeed.active_fraction_of_face_coil_area;
+    // rated flow rate is adjusted by coil face area fraction so adjustment is before next IF
+    thisspeed.AirMassFlow *= thisspeed.active_fraction_of_face_coil_area;
     if (thisspeed.RatedAirMassFlowRate > 0.0) {
         thisspeed.AirFF = thisspeed.AirMassFlow / thisspeed.RatedAirMassFlowRate;
     } else {

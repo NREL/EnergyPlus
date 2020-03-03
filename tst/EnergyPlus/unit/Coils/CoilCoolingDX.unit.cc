@@ -308,8 +308,8 @@ TEST_F( CoilCoolingDXTest, CoilCoolingDXAlternateModePerformanceHitsSaturation )
         std::cout << thisCoil.totalCoolingEnergyRate << ',' << evapOutletNode.Temp << ',' << evapOutletNode.HumRat << std::endl;
     } else {
         EXPECT_NEAR(5000, thisCoil.totalCoolingEnergyRate, 0.1); // expect the coil to run full out, at speed 1
-        EXPECT_NEAR(10.247, evapOutletNode.Temp, 0.01);
-        EXPECT_NEAR(0.00774, evapOutletNode.HumRat, 0.0001);
+        EXPECT_NEAR(9.934, evapOutletNode.Temp, 0.01);
+        EXPECT_NEAR(0.00787, evapOutletNode.HumRat, 0.0001);
     }
     // alter values and run at rated conditions normal mode speed 2
     evapInletNode.MassFlowRate = thisCoil.performance.normalMode.speeds.back().RatedAirMassFlowRate;
