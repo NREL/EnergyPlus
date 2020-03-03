@@ -53,7 +53,6 @@
 #include <vector>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Array2S.hh>
