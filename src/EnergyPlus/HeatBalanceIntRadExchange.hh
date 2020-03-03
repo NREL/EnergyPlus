@@ -49,7 +49,6 @@
 #define HeatBalanceIntRadExchange_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Array2A.hh>
 #include <ObjexxFCL/Array2S.hh>
@@ -102,7 +101,7 @@ namespace HeatBalanceIntRadExchange {
     void GetInputViewFactors(std::string const &EnclosureName, // Needed to check for user input view factors.
                              int const N,                      // NUMBER OF SURFACES
                              Array2A<Real64> F,                // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
-                             Array1A_int const SPtr,           // pointer to actual surface number
+                             const Array1D_int &SPtr,          // pointer to actual surface number
                              bool &NoUserInputF,               // Flag signifying no input F's for this
                              bool &ErrorsFound                 // True when errors are found in number of fields vs max args
     );
@@ -110,21 +109,21 @@ namespace HeatBalanceIntRadExchange {
     void GetInputViewFactorsbyName(std::string const &ZoneName, // Needed to check for user input view factors.
                                    int const N,                 // NUMBER OF SURFACES
                                    Array2A<Real64> F,           // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
-                                   Array1A_int const SPtr,      // pointer to actual surface number
+                                   const Array1D_int &SPtr,     // pointer to actual surface number
                                    bool &NoUserInputF,          // Flag signifying no input F's for this
                                    bool &ErrorsFound            // True when errors are found in number of fields vs max args
     );
 
-    void CalcApproximateViewFactors(int const N,                   // NUMBER OF SURFACES
-                                    Array1A<Real64> const A,       // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
-                                    Array1A<Real64> const Azimuth, // Facing angle of the surface (in degrees)
-                                    Array1A<Real64> const Tilt,    // Tilt angle of the surface (in degrees)
-                                    Array2A<Real64> F,             // APPROXIMATE DIRECT VIEW FACTOR MATRIX (N X N)
-                                    Array1A_int const SPtr         // pointer to REAL(r64) surface number (for error message)
+    void CalcApproximateViewFactors(int const N,                    // NUMBER OF SURFACES
+                                    const Array1D<Real64> &A,       // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
+                                    const Array1D<Real64> &Azimuth, // Facing angle of the surface (in degrees)
+                                    const Array1D<Real64> &Tilt,    // Tilt angle of the surface (in degrees)
+                                    Array2A<Real64> F,              // APPROXIMATE DIRECT VIEW FACTOR MATRIX (N X N)
+                                    const Array1D_int &SPtr         // pointer to REAL(r64) surface number (for error message)
     );
 
     void FixViewFactors(int const N,                     // NUMBER OF SURFACES
-                        Array1A<Real64> const A,         // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
+                        const Array1D<Real64> &A,        // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
                         Array2A<Real64> F,               // APPROXIMATE DIRECT VIEW FACTOR MATRIX (N X N)
                         std::string &enclName,           // Name of Enclosure being fixed
                         std::vector<int> const zoneNums, // Zones which are part of this enclosure

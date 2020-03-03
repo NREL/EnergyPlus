@@ -3647,8 +3647,8 @@ namespace ScheduleManager {
     }
 
     void ProcessForDayTypes(std::string const &ForDayField, // Field containing the "FOR:..."
-                            Array1A_bool TheseDays,         // Array to contain returned "true" days
-                            Array1A_bool AlReady,           // Array of days already done
+                            Array1D_bool &TheseDays,        // Array to contain returned "true" days
+                            Array1D_bool &AlReady,          // Array of days already done
                             bool &ErrorsFound               // Will be true if error found.
     )
     {

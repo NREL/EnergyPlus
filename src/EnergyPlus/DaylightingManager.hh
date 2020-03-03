@@ -49,7 +49,6 @@
 #define DaylightingManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array2A.hh>
 #include <ObjexxFCL/Array2S.hh>
 #include <ObjexxFCL/Array3D.hh>
@@ -363,8 +362,8 @@ namespace DaylightingManager {
                                 int const ZoneNum       // Zone number
     );
 
-    void DayltgExtHorizIllum(Array1A<Real64> HISK, // Horizontal illuminance from sky for different sky types
-                             Real64 &HISU          // Horizontal illuminance from sun for unit beam normal
+    void DayltgExtHorizIllum(Array1D<Real64> &HISK, // Horizontal illuminance from sky for different sky types
+                             Real64 &HISU           // Horizontal illuminance from sun for unit beam normal
     );
 
     void DayltgHitObstruction(int const IHOUR,           // Hour number

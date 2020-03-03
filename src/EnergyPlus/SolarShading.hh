@@ -52,7 +52,6 @@
 #include <fstream>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Array3D.hh>
 
@@ -224,9 +223,9 @@ namespace SolarShading {
                 int const SBSNR  // Surface number of subsurface
     );
 
-    bool polygon_contains_point(int const nsides,           // number of sides (vertices)
-                                Array1A<Vector> polygon_3d, // points of polygon
-                                Vector const &point_3d,     // point to be tested
+    bool polygon_contains_point(int const nsides,            // number of sides (vertices)
+                                Array1D<Vector> &polygon_3d, // points of polygon
+                                Vector const &point_3d,      // point to be tested
                                 bool const ignorex,
                                 bool const ignorey,
                                 bool const ignorez);

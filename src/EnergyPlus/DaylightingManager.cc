@@ -5939,8 +5939,8 @@ namespace DaylightingManager {
         }
     }
 
-    void DayltgExtHorizIllum(Array1A<Real64> HISK, // Horizontal illuminance from sky for different sky types
-                             Real64 &HISU          // Horizontal illuminance from sun for unit beam normal
+    void DayltgExtHorizIllum(Array1D<Real64> &HISK, // Horizontal illuminance from sky for different sky types
+                             Real64 &HISU           // Horizontal illuminance from sun for unit beam normal
     )
     {
 
@@ -5965,7 +5965,7 @@ namespace DaylightingManager {
         // na
 
         // Argument array dimensioning
-        HISK.dim(4);
+        EP_SIZE_CHECK(HISK, 4);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

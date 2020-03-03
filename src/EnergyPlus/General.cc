@@ -991,8 +991,8 @@ namespace General {
         return InterpSw;
     }
 
-    Real64 InterpBlind(Real64 const ProfAng,           // Profile angle (rad)
-                       Array1A<Real64> const PropArray // Array of blind properties
+    Real64 InterpBlind(Real64 const ProfAng,            // Profile angle (rad)
+                       const Array1D<Real64> &PropArray // Array of blind properties
     )
     {
 
@@ -1019,7 +1019,7 @@ namespace General {
         Real64 InterpBlind;
 
         // Argument array dimensioning
-        PropArray.dim(37);
+        EP_SIZE_CHECK(PropArray, 37);
 
         // Locals
         // FUNCTION ARGUMENT DEFINITIONS:
@@ -1378,7 +1378,7 @@ namespace General {
     }
 
     Real64 POLYF(Real64 const X,         // Cosine of angle of incidence
-                 Array1A<Real64> const A // Polynomial coefficients
+                 const Array1D<Real64> &A // Polynomial coefficients
     )
     {
         // FUNCTION INFORMATION:
@@ -1405,7 +1405,7 @@ namespace General {
         Real64 POLYF;
 
         // Argument array dimensioning
-        A.dim(6);
+        EP_SIZE_CHECK(A, 6);
 
         // Locals
         // FUNCTION ARGUMENT DEFINITIONS:
@@ -1460,9 +1460,9 @@ namespace General {
         return POLYF;
     }
 
-    Real64 POLY1F(Real64 &X,         // independent variable
-                  Array1A<Real64> A, // array of polynomial coefficients
-                  int &N             // number of terms in polynomial
+    Real64 POLY1F(Real64 &X,          // independent variable
+                  Array1D<Real64> &A, // array of polynomial coefficients
+                  int &N              // number of terms in polynomial
     )
     {
 
@@ -1489,7 +1489,7 @@ namespace General {
         Real64 POLY1F;
 
         // Argument array dimensioning
-        A.dim(N);
+        EP_SIZE_CHECK(A, N);
 
         // Locals
         // FUNCTION ARGUMENT DEFINITIONS:
@@ -1517,9 +1517,9 @@ namespace General {
         return POLY1F;
     }
 
-    Real64 POLY2F(Real64 &X,         // independent variable
-                  Array1A<Real64> A, // array of polynomial coefficients
-                  int &N             // number of terms in polynomial
+    Real64 POLY2F(Real64 &X,          // independent variable
+                  Array1D<Real64> &A, // array of polynomial coefficients
+                  int &N              // number of terms in polynomial
     )
     {
         // FUNCTION INFORMATION:
@@ -1545,7 +1545,7 @@ namespace General {
         Real64 POLY2F;
 
         // Argument array dimensioning
-        A.dim(N);
+        EP_SIZE_CHECK(A, N);
 
         // Locals
         // FUNCTION ARGUMENT DEFINITIONS:
@@ -1705,10 +1705,10 @@ namespace General {
         return InputString; // Allows chaining
     }
 
-    void MovingAvg(Array1A<Real64> const DataIn, // input data that needs smoothing
-                   int const NumDataItems,       // number of values in DataIn
-                   int const NumItemsInAvg,      // number of items in the averaging window
-                   Array1A<Real64> SmoothedData  // output data after smoothing
+    void MovingAvg(const Array1D<Real64> &DataIn, // input data that needs smoothing
+                   int const NumDataItems,        // number of values in DataIn
+                   int const NumItemsInAvg,       // number of items in the averaging window
+                   Array1D<Real64> &SmoothedData  // output data after smoothing
     )
     {
 
@@ -1733,8 +1733,8 @@ namespace General {
         // na
 
         // Argument array dimensioning
-        DataIn.dim(NumDataItems);
-        SmoothedData.dim(NumDataItems);
+        EP_SIZE_CHECK(DataIn, NumDataItems);
+        EP_SIZE_CHECK(SmoothedData, NumDataItems);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

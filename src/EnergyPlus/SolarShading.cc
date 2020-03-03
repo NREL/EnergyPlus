@@ -3026,9 +3026,9 @@ namespace SolarShading {
         }
     }
 
-    bool polygon_contains_point(int const nsides,           // number of sides (vertices)
-                                Array1A<Vector> polygon_3d, // points of polygon
-                                Vector const &point_3d,     // point to be tested
+    bool polygon_contains_point(int const nsides,            // number of sides (vertices)
+                                Array1D<Vector> &polygon_3d, // points of polygon
+                                Vector const &point_3d,      // point to be tested
                                 bool const ignorex,
                                 bool const ignorey,
                                 bool const ignorez)
@@ -3059,7 +3059,7 @@ namespace SolarShading {
         bool inside; // return value, true=inside, false = not inside
 
         // Argument array dimensioning
-        polygon_3d.dim(nsides);
+        EP_SIZE_CHECK(polygon_3d, nsides);
 
         // Locals
         // Function argument definitions:
