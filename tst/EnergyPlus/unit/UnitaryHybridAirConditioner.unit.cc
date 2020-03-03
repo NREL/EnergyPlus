@@ -234,13 +234,14 @@ TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_HighCooling)
     Real64 deliveredSC = pZoneHybridUnitaryAirConditioner->UnitSensibleCoolingRate;
     Real64 deliveredSH = pZoneHybridUnitaryAirConditioner->UnitSensibleHeatingRate;
     Real64 returnOSAF = pZoneHybridUnitaryAirConditioner->averageOSAF;
-    pZoneHybridUnitaryAirConditioner->Initialize(1);
+    Real64 electricpower = pZoneHybridUnitaryAirConditioner->FinalElectricalPower;
     // checks
     EXPECT_NEAR(1.0, returnOSAF, 0.001);
     EXPECT_GT(deliveredSC, 0);
     EXPECT_NEAR(0.0, deliveredSH, 0.001);
     EXPECT_LT(Tsa, Tra);
     EXPECT_GT(Msa, DesignMinVR);
+    EXPECT_NEAR(electricpower, 10988.26, 0.1);
 }
 
 TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_HighCoolingLargeSys)
@@ -338,12 +339,14 @@ TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_HighCoolingLargeSys)
     Real64 deliveredSC = pZoneHybridUnitaryAirConditioner->UnitSensibleCoolingRate;
     Real64 deliveredSH = pZoneHybridUnitaryAirConditioner->UnitSensibleHeatingRate;
     Real64 returnOSAF = pZoneHybridUnitaryAirConditioner->averageOSAF;
+    Real64 electricpower = pZoneHybridUnitaryAirConditioner->FinalElectricalPower;
     // checks
     EXPECT_NEAR(1.0, returnOSAF, 0.001);
     EXPECT_GT(deliveredSC, 0);
     EXPECT_NEAR(0.0, deliveredSH, 0.001);
     EXPECT_LT(Tsa, Tra);
     EXPECT_GT(Msa, DesignMinVR);
+    EXPECT_NEAR(electricpower, 4749.14, 0.1);
 }
 TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_OutsideEnvConditions)
 {
@@ -429,8 +432,10 @@ TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_OutsideEnvConditions)
 
     pZoneHybridUnitaryAirConditioner->doStep(RequestedCooling, Requestedheating, Requested_Humidification, Requested_Dehumidification, DesignMinVR);
     modenumber = pZoneHybridUnitaryAirConditioner->PrimaryMode;
+    Real64 electricpower = pZoneHybridUnitaryAirConditioner->FinalElectricalPower;
     // checks
     EXPECT_EQ(0, modenumber);
+    EXPECT_NEAR(electricpower, 244, 10);
 }
 
 TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_LowCooling)
@@ -526,11 +531,13 @@ TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_LowCooling)
     Real64 deliveredSC = pZoneHybridUnitaryAirConditioner->UnitSensibleCoolingRate;
     Real64 deliveredSH = pZoneHybridUnitaryAirConditioner->UnitSensibleHeatingRate;
     Real64 returnOSAF = pZoneHybridUnitaryAirConditioner->averageOSAF;
+    Real64 electricpower = pZoneHybridUnitaryAirConditioner->FinalElectricalPower;
     // checks
     EXPECT_NEAR(1.0, returnOSAF, 0.001);
     EXPECT_GT(deliveredSC, 0);
     EXPECT_NEAR(0.0, deliveredSH, 0.001);
     EXPECT_LT(Tsa, Tra);
+    EXPECT_NEAR(electricpower, 2712.5, 0.1);
 }
 
 TEST_F(EnergyPlusFixture, UnitaryHybridAirConditioner_NoHeatingCooling_MinVentilation)

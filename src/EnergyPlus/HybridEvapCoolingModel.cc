@@ -1632,7 +1632,7 @@ namespace HybridEvapCoolingModel {
 
             Real64 Y_val =
                 thisSetting.oMode.CalculateCurveVal(StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, POWER_CURVE); // fix modenumber not set
-            ElectricalPower = Y_val; // [Kw] calculations for fuel in Kw
+            ElectricalPower = Y_val; // [W] calculations for fuel in W
             thisSetting.ElectricalPower = ElectricalPower;
 
             thisSetting.SupplyFanElectricPower =
@@ -2131,18 +2131,17 @@ namespace HybridEvapCoolingModel {
         }
 
         // set timestep outputs calculated considering different runtime fractions.
-        SupplyFanElectricPower = 1000 * CalculateTimeStepAverage(SYSTEMOUTPUTS::OSUPPLY_FAN_POWER); // Watts
+        SupplyFanElectricPower = CalculateTimeStepAverage(SYSTEMOUTPUTS::OSUPPLY_FAN_POWER); // Watts
         SupplyFanElectricEnergy = SupplyFanElectricPower * TimeStepSys * SecInHour;
-        SecondaryFuelConsumptionRate = 1000 * CalculateTimeStepAverage(SYSTEMOUTPUTS::OSECOND_FUEL_USE);
+        SecondaryFuelConsumptionRate = CalculateTimeStepAverage(SYSTEMOUTPUTS::OSECOND_FUEL_USE);
         SecondaryFuelConsumption = SecondaryFuelConsumptionRate * TimeStepSys * SecInHour;
-        ThirdFuelConsumptionRate = 1000 * CalculateTimeStepAverage(SYSTEMOUTPUTS::OTHIRD_FUEL_USE);
+        ThirdFuelConsumptionRate = CalculateTimeStepAverage(SYSTEMOUTPUTS::OTHIRD_FUEL_USE);
         ThirdFuelConsumption = ThirdFuelConsumptionRate * TimeStepSys * SecInHour;
         WaterConsumptionRate = CalculateTimeStepAverage(SYSTEMOUTPUTS::OWATER_USE);
         WaterConsumption = WaterConsumptionRate * TimeStepSys * SecInHour;
         ExternalStaticPressure = CalculateTimeStepAverage(SYSTEMOUTPUTS::OEXTERNAL_STATIC_PRESSURE);
 
-        // fuel use in calculation is in Kw, powers are typically output in EP in Watts, so do conversion here.
-        FinalElectricalPower = 1000 * CalculateTimeStepAverage(SYSTEMOUTPUTS::SYSTEM_FUEL_USE);
+        FinalElectricalPower = CalculateTimeStepAverage(SYSTEMOUTPUTS::SYSTEM_FUEL_USE);
         FinalElectricalEnergy = FinalElectricalPower * TimeStepSys * SecInHour;
     }
 
