@@ -52,14 +52,4 @@ SET( INCLUDED_IMAGES
   ${PROJECT_SOURCE_DIR}/output-details-and-examples/media/image027.jpg
 )
 
-SET( SOURCE_FILENAME "output-details-and-examples" )
-SET( OUTPUT_FILENAME "OutputDetailsAndExamples" )
-
-add_custom_command( OUTPUT ${PROJECT_BINARY_DIR}/${OUTPUT_FILENAME}.pdf
-	COMMAND ${CMAKE_COMMAND} -DXELATEX=${XELATEX} -DINNAME=${SOURCE_FILENAME} -DOUTNAME=${OUTPUT_FILENAME} -DORIGINAL_CMAKE_SOURCE_DIR=${PROJECT_SOURCE_DIR} -DORIGINAL_CMAKE_BINARY_DIR=${PROJECT_BINARY_DIR} -DTEX_INTERACTION=${TEX_INTERACTION} -P ${PROJECT_SOURCE_DIR}/cmake/BuildDocumentation.cmake
-		    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/${SOURCE_FILENAME}
-		    DEPENDS ${INCLUDED_TEX} ${INCLUDED_IMAGES}
-                 )
-add_custom_target( zPDF_${OUTPUT_FILENAME} ALL
-                   DEPENDS ${PROJECT_BINARY_DIR}/${OUTPUT_FILENAME}.pdf
-                 )
+CREATE_DOC_TARGET("output-details-and-examples" "OutputDetailsAndExamples")

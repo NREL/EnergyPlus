@@ -21,6 +21,11 @@ if( EXISTS ${XELATEX} )
   # add a configure rule to the header file though
   configure_file(${PROJECT_SOURCE_DIR}/title.tex.in ${PROJECT_SOURCE_DIR}/title.tex)
 
+  # Add custom target to build only documentation
+  add_custom_target(docs ALL)
+
+  include(cmake/doc-targets.cmake)
+
   # add each of the documents, they have their own CMakeLists.txt files
   add_subdirectory(acknowledgments)
   add_subdirectory(auxiliary-programs)
@@ -41,6 +46,3 @@ else()
   # and if it doesn't, clearly state why it fails
   message( FATAL_ERROR "Expected to find xelatex at: ${XELATEX} ; check your LaTeX installation")
 endif()
-
-# Add custom target until it is no longer used on CI
-add_custom_target(documentation)
