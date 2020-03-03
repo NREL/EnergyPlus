@@ -459,9 +459,9 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
     EXPECT_EQ(dd_airterminal(DDNum).ZoneTurndownMinAirFrac, 1.0);         // turndown fraction initialized to 1.0
     EXPECT_EQ(dd_airterminal(DDNum).ZoneMinAirFracDes, 0.3);              // design minimum flow fraction
 
-    int OutNode =  dd_airterminal(DDNum).OutletNodeNum;
-    int HotInNode =  dd_airterminal(DDNum).HotAirInletNodeNum;
-    int ColdInNode =  dd_airterminal(DDNum).ColdAirInletNodeNum;
+    int OutNode = dd_airterminal(DDNum).OutletNodeNum;
+    int HotInNode = dd_airterminal(DDNum).HotAirInletNodeNum;
+    int ColdInNode = dd_airterminal(DDNum).ColdAirInletNodeNum;
 
     // calculate mass flow rates
     Real64 SysMinMassFlowRes = 1.0 * DataEnvironment::StdRhoAir * 0.30 * 1.0; // min flow rate at 1.0 turndown fraction
@@ -490,10 +490,10 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
     EXPECT_EQ(1.0, dd_airterminal(DDNum).ZoneTurndownMinAirFrac);
     EXPECT_EQ(0.3, dd_airterminal(DDNum).ZoneMinAirFracDes * dd_airterminal(DDNum).ZoneTurndownMinAirFrac);
     EXPECT_EQ(0.3, dd_airterminal(DDNum).ZoneMinAirFrac);
-    EXPECT_EQ(SysMinMassFlowRes, DualDuct::dd_airterminalOutlet(DDNum).AirMassFlowRate);
-    EXPECT_EQ(SysMinMassFlowRes, DualDuct::dd_airterminalOutlet(DDNum).AirMassFlowRateMinAvail);
-    EXPECT_EQ(SysMinMassFlowRes, DualDuct::dd_airterminalHotAirInlet(DDNum).AirMassFlowRateMax * dd_airterminal(DDNum).ZoneMinAirFrac);
-    EXPECT_EQ(SysMinMassFlowRes, DualDuct::dd_airterminalHotAirInlet(DDNum).AirMassFlowRateMax * dd_airterminal(DDNum).ZoneMinAirFracDes * dd_airterminal(DDNum).ZoneTurndownMinAirFrac);
+    EXPECT_EQ(SysMinMassFlowRes, dd_airterminal(DDNum).dd_airterminalOutlet.AirMassFlowRate);
+    EXPECT_EQ(SysMinMassFlowRes, dd_airterminal(DDNum).dd_airterminalOutlet.AirMassFlowRateMinAvail);
+    EXPECT_EQ(SysMinMassFlowRes, dd_airterminal(DDNum).dd_airterminalHotAirInlet.AirMassFlowRateMax * dd_airterminal(DDNum).ZoneMinAirFrac);
+    EXPECT_EQ(SysMinMassFlowRes, dd_airterminal(DDNum).dd_airterminalHotAirInlet.AirMassFlowRateMax * dd_airterminal(DDNum).ZoneMinAirFracDes * dd_airterminal(DDNum).ZoneTurndownMinAirFrac);
     EXPECT_EQ(0.0, DataLoopNode::Node(ColdInNode).MassFlowRate);
 
     // test with heating load and turndown fraction schedule value set 0.5
@@ -514,9 +514,9 @@ TEST_F(EnergyPlusFixture, DualDuctVAVAirTerminals_MinFlowTurnDownTest)
     EXPECT_EQ(0.5, dd_airterminal(DDNum).ZoneTurndownMinAirFrac);
     EXPECT_EQ(0.15, dd_airterminal(DDNum).ZoneMinAirFracDes * dd_airterminal(DDNum).ZoneTurndownMinAirFrac);
     EXPECT_EQ(0.15, dd_airterminal(DDNum).ZoneMinAirFrac);
-    EXPECT_EQ(SysMinMassFlowRes, DualDuct::dd_airterminalOutlet(DDNum).AirMassFlowRate);
-    EXPECT_EQ(SysMinMassFlowRes, DualDuct::dd_airterminalOutlet(DDNum).AirMassFlowRateMinAvail);
-    EXPECT_EQ(SysMinMassFlowRes, DualDuct::dd_airterminalHotAirInlet(DDNum).AirMassFlowRateMax * dd_airterminal(DDNum).ZoneMinAirFrac);
-    EXPECT_EQ(SysMinMassFlowRes, DualDuct::dd_airterminalHotAirInlet(DDNum).AirMassFlowRateMax * dd_airterminal(DDNum).ZoneMinAirFracDes * dd_airterminal(DDNum).ZoneTurndownMinAirFrac);
+    EXPECT_EQ(SysMinMassFlowRes, dd_airterminal(DDNum).dd_airterminalOutlet.AirMassFlowRate);
+    EXPECT_EQ(SysMinMassFlowRes, dd_airterminal(DDNum).dd_airterminalOutlet.AirMassFlowRateMinAvail);
+    EXPECT_EQ(SysMinMassFlowRes, dd_airterminal(DDNum).dd_airterminalHotAirInlet.AirMassFlowRateMax * dd_airterminal(DDNum).ZoneMinAirFrac);
+    EXPECT_EQ(SysMinMassFlowRes, dd_airterminal(DDNum).dd_airterminalHotAirInlet.AirMassFlowRateMax * dd_airterminal(DDNum).ZoneMinAirFracDes * dd_airterminal(DDNum).ZoneTurndownMinAirFrac);
     EXPECT_EQ(0.0, DataLoopNode::Node(ColdInNode).MassFlowRate);
 }

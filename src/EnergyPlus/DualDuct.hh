@@ -106,6 +106,29 @@ namespace DualDuct {
 
     // Types
 
+    struct DualDuctAirTerminalFlowConditions
+    {
+        // Members
+        Real64 AirMassFlowRate;         // MassFlow through the Damper being Simulated [kg/Sec]
+        Real64 AirMassFlowRateMaxAvail; // MassFlow through the Damper being Simulated [kg/Sec]
+        Real64 AirMassFlowRateMinAvail; // MassFlow through the Damper being Simulated [kg/Sec]
+        Real64 AirMassFlowRateMax;      // Max Mass Flow Rate or the Design Mass Flow Rate
+        Real64 AirTemp;
+        Real64 AirHumRat;
+        Real64 AirEnthalpy;
+        Real64 AirMassFlowRateHist1; // flow history back 1 iteration kg/s
+        Real64 AirMassFlowRateHist2; // flow history back 2 iteration kg/s
+        Real64 AirMassFlowRateHist3; // flow history back 3 iteration kg/s
+        Real64 AirMassFlowDiffMag;   // flow difference scale, kg/s
+
+                                     // Default Constructor
+        DualDuctAirTerminalFlowConditions()
+            : AirMassFlowRate(0.0), AirMassFlowRateMaxAvail(0.0), AirMassFlowRateMinAvail(0.0), AirMassFlowRateMax(0.0), AirTemp(0.0), AirHumRat(0.0),
+            AirEnthalpy(0.0), AirMassFlowRateHist1(0.0), AirMassFlowRateHist2(0.0), AirMassFlowRateHist3(0.0), AirMassFlowDiffMag(0.0)
+        {
+        }
+    };
+
     struct DualDuctAirTerminal
     {
         // Members
@@ -145,6 +168,12 @@ namespace DualDuct {
         int ZoneTurndownMinAirFracSchPtr;    // pointer to the schedule for turndown minimum airflow fraction
         Real64 ZoneTurndownMinAirFrac;       // turndown minimum airflow fraction value, multiplier of zone design minimum air flow 
         bool ZoneTurndownMinAirFracSchExist; // if true, if zone turndown min air frac schedule exist
+        //DualDuctAirTerminalFlowConditions dd_airterminalInlet; //  unused
+        DualDuctAirTerminalFlowConditions dd_airterminalHotAirInlet;
+        DualDuctAirTerminalFlowConditions dd_airterminalColdAirInlet;
+        DualDuctAirTerminalFlowConditions dd_airterminalOutlet;
+        DualDuctAirTerminalFlowConditions dd_airterminalOAInlet;
+        DualDuctAirTerminalFlowConditions dd_airterminalRecircAirInlet;
 
         // Default Constructor
         DualDuctAirTerminal()
@@ -201,37 +230,8 @@ namespace DualDuct {
 
     };
 
-    struct DualDuctAirTerminalFlowConditions
-    {
-        // Members
-        Real64 AirMassFlowRate;         // MassFlow through the Damper being Simulated [kg/Sec]
-        Real64 AirMassFlowRateMaxAvail; // MassFlow through the Damper being Simulated [kg/Sec]
-        Real64 AirMassFlowRateMinAvail; // MassFlow through the Damper being Simulated [kg/Sec]
-        Real64 AirMassFlowRateMax;      // Max Mass Flow Rate or the Design Mass Flow Rate
-        Real64 AirTemp;
-        Real64 AirHumRat;
-        Real64 AirEnthalpy;
-        Real64 AirMassFlowRateHist1; // flow history back 1 iteration kg/s
-        Real64 AirMassFlowRateHist2; // flow history back 2 iteration kg/s
-        Real64 AirMassFlowRateHist3; // flow history back 3 iteration kg/s
-        Real64 AirMassFlowDiffMag;   // flow difference scale, kg/s
-
-        // Default Constructor
-        DualDuctAirTerminalFlowConditions()
-            : AirMassFlowRate(0.0), AirMassFlowRateMaxAvail(0.0), AirMassFlowRateMinAvail(0.0), AirMassFlowRateMax(0.0), AirTemp(0.0), AirHumRat(0.0),
-              AirEnthalpy(0.0), AirMassFlowRateHist1(0.0), AirMassFlowRateHist2(0.0), AirMassFlowRateHist3(0.0), AirMassFlowDiffMag(0.0)
-        {
-        }
-    };
-
     // Object Data
     extern Array1D<DualDuctAirTerminal> dd_airterminal;
-    extern Array1D<DualDuctAirTerminalFlowConditions> dd_airterminalInlet;
-    extern Array1D<DualDuctAirTerminalFlowConditions> dd_airterminalHotAirInlet;
-    extern Array1D<DualDuctAirTerminalFlowConditions> dd_airterminalColdAirInlet;
-    extern Array1D<DualDuctAirTerminalFlowConditions> dd_airterminalOutlet;
-    extern Array1D<DualDuctAirTerminalFlowConditions> dd_airterminalOAInlet;        // VAV:OutdoorAir Outdoor Air Inlet
-    extern Array1D<DualDuctAirTerminalFlowConditions> dd_airterminalRecircAirInlet; // VAV:OutdoorAir Recirculated Air Inlet
 
     // Functions
 
