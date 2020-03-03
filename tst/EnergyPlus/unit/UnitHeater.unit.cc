@@ -56,7 +56,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSurfaceLists.hh>
 #include <EnergyPlus/DataSurfaces.hh>
@@ -67,6 +67,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/PlantUtilities.hh>
@@ -1106,7 +1107,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
 
     NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
-    ProcessScheduleInput();  // read schedule data
+    ProcessScheduleInput(OutputFiles::getSingleton());  // read schedule data
 
     ErrorsFound = false;
     HeatBalanceManager::GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound); // read project control data
@@ -1115,7 +1116,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    GetProjectData();
+    GetProjectData(OutputFiles::getSingleton());
     OutputReportPredefined::SetPredefinedTables();
     SetPreConstructionInputParameters(); // establish array bounds for constructions early
 
@@ -1123,7 +1124,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     BeginEnvrnFlag = true;
     ZoneSizingCalc = true;
     createFacilityElectricPowerServiceObject();
-    SizingManager::ManageSizing();
+    SizingManager::ManageSizing(OutputFiles::getSingleton());
 
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(1, NumOfUnitHeats);
@@ -1134,7 +1135,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     DataSizing::CurZoneEqNum = 1;
 
     InitUnitHeater(UnitHeatNum, ZoneNum, FirstHVACIteration);
-    InitWaterCoil(CoilNum, FirstHVACIteration); // init hot water heating coil
+    InitWaterCoil(OutputFiles::getSingleton(), CoilNum, FirstHVACIteration); // init hot water heating coil
 
     PltSizHeatNum = PlantUtilities::MyPlantSizingIndex("Coil:Heating:Water",
                                                        UnitHeat(UnitHeatNum).HCoilName,
@@ -1280,7 +1281,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
 
     NumOfTimeStepInHour = 4; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 15; // must initialize this to get schedules initialized
-    ProcessScheduleInput();  // read schedule data
+    ProcessScheduleInput(OutputFiles::getSingleton());  // read schedule data
 
     ErrorsFound = false;
     HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data

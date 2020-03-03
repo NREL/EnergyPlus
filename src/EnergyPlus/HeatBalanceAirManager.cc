@@ -69,6 +69,7 @@
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -110,7 +111,7 @@ namespace HeatBalanceAirManager {
     using namespace DataSurfaces;
 
     // Use statements for access to subroutines in other modules
-    using Psychrometrics::PsyCpAirFnWTdb;
+    using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyHFnTdbW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
     using Psychrometrics::PsyTdbFnHW;

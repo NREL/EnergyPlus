@@ -7055,8 +7055,8 @@
   ZoneHVAC:EquipmentList,
     Zone1 Office Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Zone1 Office Direct Air, !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Zone1 Office Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -7065,8 +7065,8 @@
   ZoneHVAC:EquipmentList,
     Zone2 Fine Storage Equipment,  !- Name
     SequentialLoad,          !- Load Distribution Scheme
-    AirTerminal:SingleDuct:Uncontrolled,  !- Zone Equipment 1 Object Type
-    Zone2 Fine Storage Direct Air,  !- Zone Equipment 1 Name
+    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type
+    Zone2 Fine Storage Direct Air ADU,  !- Zone Equipment 1 Name
     1,                       !- Zone Equipment 1 Cooling Sequence
     1,                       !- Zone Equipment 1 Heating or No-Load Sequence
     ,                        !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name
@@ -7130,17 +7130,41 @@
 
  !-   ===========  ALL OBJECTS IN CLASS: DIRECT AIR ===========
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Zone1 Office Direct Air, !- Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
-    Zone1 Office Zone Equip Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    Zone1 Office Zone Equip Inlet ATInlet,  !- Air Inlet Node Name
+    Zone1 Office Zone Equip Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
 
-  AirTerminal:SingleDuct:Uncontrolled,
+  ZoneHVAC:AirDistributionUnit,
+    Zone1 Office Direct Air ADU,  !- Name
+    Zone1 Office Zone Equip Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Zone1 Office Direct Air, !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
+
+  AirTerminal:SingleDuct:ConstantVolume:NoReheat,
     Zone2 Fine Storage Direct Air,  !- Name
     COMPACT HVAC-ALWAYS 1,   !- Availability Schedule Name
-    Zone2 Fine Storage Zone Equip Inlet,  !- Zone Supply Air Node Name
-    autosize;                !- Maximum Air Flow Rate {m3/s}
+    Zone2 Fine Storage Zone Equip Inlet ATInlet,  !- Air Inlet Node Name
+    Zone2 Fine Storage Zone Equip Inlet,  !- Air Outlet Node Name
+    autosize,                !- Maximum Air Flow Rate {m3/s}
+    ,                        !- Design Specification Outdoor Air Object Name
+    ;                        !- Per Person Ventilation Rate Mode
+
+  ZoneHVAC:AirDistributionUnit,
+    Zone2 Fine Storage Direct Air ADU,  !- Name
+    Zone2 Fine Storage Zone Equip Inlet,  !- Air Distribution Unit Outlet Node Name
+    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type
+    Zone2 Fine Storage Direct Air,  !- Air Terminal Name
+    ,                        !- Nominal Upstream Leakage Fraction
+    ,                        !- Constant Downstream Leakage Fraction
+    ;                        !- Design Specification Air Terminal Sizing Object Name
 
 !-   ===========  ALL OBJECTS IN CLASS: HIGH TEMP RADIANT SYSTEM ===========
                         !- Availability Schedule Name
@@ -7245,12 +7269,12 @@
   AirLoopHVAC:ZoneSplitter,
     PSZ-Office Zone Splitter,!- Name
     PSZ-Office Supply Path Inlet,  !- Inlet Node Name
-    Zone1 Office Zone Equip Inlet;  !- Outlet 1 Node Name
+    Zone1 Office Zone Equip Inlet ATInlet;  !- Outlet 1 Node Name
 
   AirLoopHVAC:ZoneSplitter,
     PSZ-Fine Storage Zone Splitter,  !- Name
     PSZ-Fine Storage Supply Path Inlet,  !- Inlet Node Name
-    Zone2 Fine Storage Zone Equip Inlet;  !- Outlet 1 Node Name
+    Zone2 Fine Storage Zone Equip Inlet ATInlet;  !- Outlet 1 Node Name
 
  !-   ===========  ALL OBJECTS IN CLASS: ZONE MIXER ===========
 

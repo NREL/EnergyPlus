@@ -58,6 +58,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -210,7 +211,7 @@ TEST_F(EnergyPlusFixture, HVACStandAloneERV_Test2)
 
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput();  // read schedules
+    ProcessScheduleInput(OutputFiles::getSingleton());  // read schedules
 
     GetFanInput();
 
