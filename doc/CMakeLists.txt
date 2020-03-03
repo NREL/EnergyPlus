@@ -1,11 +1,11 @@
 # the only thing that really needs to be set outside of here is the XELATEX variable, the path to the xelatex compiler
 
 # let's create a folder to drop ONLY PDFs in once they are built, this will allow easy upload to s3
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/doc-pdf)
-file(COPY ${CMAKE_SOURCE_DIR}/doc/index.html DESTINATION ${CMAKE_BINARY_DIR}/doc-pdf)
+file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/doc-pdf)
+file(COPY ${PROJECT_SOURCE_DIR}/doc/index.html DESTINATION ${PROJECT_BINARY_DIR}/doc-pdf)
 
 # add a configure rule to the header file though
-configure_file(${CMAKE_SOURCE_DIR}/doc/title.tex.in ${CMAKE_SOURCE_DIR}/doc/title.tex)
+configure_file(${PROJECT_SOURCE_DIR}/doc/title.tex.in ${PROJECT_SOURCE_DIR}/doc/title.tex)
 
 # Because we don't want to rebuild doc automatically, we add a custom target called "documentation", which will depends on all individual PDFs
 add_custom_target(documentation)

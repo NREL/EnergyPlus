@@ -56,6 +56,11 @@
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Array3D.hh>
 
+// Penumbra Headers
+#ifndef EP_NO_OPENGL
+#include <penumbra/penumbra.h>
+#endif
+
 // EnergyPlus Headers
 #include <EnergyPlus/DataBSDFWindow.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
@@ -167,6 +172,11 @@ namespace SolarShading {
     extern int maxNumberOfFigures;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE SolarShading
+#ifdef EP_NO_OPENGL
+    extern bool penumbra;
+#else
+    extern std::unique_ptr<Pumbra::Penumbra> penumbra;
+#endif
 
     // Types
 

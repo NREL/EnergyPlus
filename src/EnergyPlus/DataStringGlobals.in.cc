@@ -154,7 +154,6 @@ namespace DataStringGlobals {
     std::string outputSMMsgPackFileName("eplusout_runperiod.msgpack");
     std::string outputMtdFileName("eplusout.mtd");
     std::string outputMddFileName("eplusout.mdd");
-    std::string outputMtrFileName("eplusout.mtr");
     std::string outputRddFileName("eplusout.rdd");
     std::string outputShdFileName("eplusout.shd");
     std::string outputTblCsvFileName("eplustbl.csv");
@@ -175,15 +174,10 @@ namespace DataStringGlobals {
     std::string outputEddFileName("eplusout.edd");
     std::string outputIperrFileName("eplusout.iperr");
     std::string outputDbgFileName("eplusout.dbg");
+    std::string outputPerfLogFileName("eplusout_perflog.csv");
     std::string outputSlnFileName("eplusout.sln");
     std::string outputSciFileName("eplusout.sci");
     std::string outputWrlFileName("eplusout.wrl");
-    std::string outputZszCsvFileName("epluszsz.csv");
-    std::string outputZszTabFileName("epluszsz.tab");
-    std::string outputZszTxtFileName("epluszsz.txt");
-    std::string outputSszCsvFileName("eplusssz.csv");
-    std::string outputSszTabFileName("eplusssz.tab");
-    std::string outputSszTxtFileName("eplusssz.txt");
     std::string outputScreenCsvFileName("eplusscreen.csv");
     std::string outputSqlFileName("eplusout.sql");
     std::string outputSqliteErrFileName("eplussqlite.err");

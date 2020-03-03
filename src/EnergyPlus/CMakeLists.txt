@@ -17,10 +17,10 @@ else()
 endif()
 
 SET( SRC
-  "${CMAKE_SOURCE_DIR}/third_party/milo/dtoa.h"
-  "${CMAKE_SOURCE_DIR}/third_party/milo/itoa.h"
-  "${CMAKE_SOURCE_DIR}/third_party/milo/diyfp.h"
-  "${CMAKE_SOURCE_DIR}/third_party/milo/ieee754.h"
+  "${PROJECT_SOURCE_DIR}/third_party/milo/dtoa.h"
+  "${PROJECT_SOURCE_DIR}/third_party/milo/itoa.h"
+  "${PROJECT_SOURCE_DIR}/third_party/milo/diyfp.h"
+  "${PROJECT_SOURCE_DIR}/third_party/milo/ieee754.h"
   AirflowNetworkBalanceManager.cc
   AirflowNetworkBalanceManager.hh
   AirLoopHVACDOAS.cc
@@ -54,6 +54,14 @@ SET( SRC
   ChillerIndirectAbsorption.hh
   ChillerReformulatedEIR.cc
   ChillerReformulatedEIR.hh
+  Coils/CoilCoolingDX.cc
+  Coils/CoilCoolingDX.hh
+  Coils/CoilCoolingDXCurveFitPerformance.cc
+  Coils/CoilCoolingDXCurveFitPerformance.hh
+  Coils/CoilCoolingDXCurveFitOperatingMode.cc
+  Coils/CoilCoolingDXCurveFitOperatingMode.hh
+  Coils/CoilCoolingDXCurveFitSpeed.cc
+  Coils/CoilCoolingDXCurveFitSpeed.hh
   CondenserLoopTowers.cc
   CondenserLoopTowers.hh
   ConductionTransferFunctionCalc.cc
@@ -664,11 +672,11 @@ endif()
 add_custom_target( GenerateEmbeddedEpJSONSchema
                    COMMAND ${CMAKE_COMMAND} -D "EnergyPlus_SOURCE_DIR:PATH=${CMAKE_CURRENT_SOURCE_DIR}"
                            -D "EnergyPlus_RUNTIME_OUTPUT_DIRECTORY:PATH=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
-                           -D "EnergyPlus_BINARY_DIR:PATH=${CMAKE_BINARY_DIR}"
+                           -D "EnergyPlus_BINARY_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}"
                            -D "EnergyPlus_CURRENT_BINARY_DIR:PATH=${CMAKE_CURRENT_BINARY_DIR}"
                            -D "EnergyPlus_embeddable_epJSON_schema:PATH=$<TARGET_FILE:generate_embeddedable_epJSON_schema>"
-                           -P "${CMAKE_SOURCE_DIR}/scripts/dev/generate_embeddable_epJSON_schema/generate_embedded_epJSON_schema.cmake"
-                   WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                           -P "${PROJECT_SOURCE_DIR}/scripts/dev/generate_embeddable_epJSON_schema/generate_embedded_epJSON_schema.cmake"
+                   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                    DEPENDS generate_embeddedable_epJSON_schema )
 
 add_subdirectory(AirflowNetwork)
@@ -678,12 +686,12 @@ if(LINK_WITH_PYTHON)
   # if we aren't, then the identified interpreter can be whatever bit it wants
   if(MSVC)
     execute_process(COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/cmake/PythonGetBitSize.py" OUTPUT_VARIABLE PYTHON_BIT_SIZE)
-    if(("${PYTHON_BIT_SIZE}" STREQUAL "64") AND NOT ("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "Win64"))
-      message(SEND_ERROR "Found 64-bit Python but attempting to generate 32-bit EnergyPlus; this is invalid")
-    endif()
-    if(("${PYTHON_BIT_SIZE}" STREQUAL "32") AND ("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "Win64"))
-      message(SEND_ERROR "Found 32-bit Python but attempting to generate 64-bit EnergyPlus; this is invalid")
-    endif()
+#    if(("${PYTHON_BIT_SIZE}" STREQUAL "64") AND NOT ("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "x64"))
+#      message(SEND_ERROR "Found 64-bit Python but attempting to generate non-64-bit EnergyPlus; this is invalid")
+#    endif()
+#    if(("${PYTHON_BIT_SIZE}" STREQUAL "32") AND NOT ("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "Win32"))
+#      message(SEND_ERROR "Found 32-bit Python but attempting to generate non-32-bit EnergyPlus; this is invalid")
+#    endif()
   endif()
 
   # now we need to get the Python libs and add the include path for further compiling
@@ -705,6 +713,9 @@ endif()
 # this will be linked statically to create the DLL and also the unit tests
 add_library( energypluslib STATIC ${SRC} )
 target_link_libraries( energypluslib fmt::fmt objexx sqlite bcvtb epexpat epfmiimport re2 DElight libkiva btwxt Windows-CalcEngine airflownetworklib )
+if (OPENGL_FOUND)
+  target_link_libraries( energypluslib penumbra )
+endif()
 add_dependencies( energypluslib GenerateEmbeddedEpJSONSchema )
 if(BUILD_GROUND_PLOT)
   set_source_files_properties(HeatBalanceKivaManager.cc PROPERTIES COMPILE_DEFINITIONS GROUND_PLOT)
@@ -836,11 +847,11 @@ if( BUILD_TESTING )
   target_link_libraries( TestEnergyPlusCallbacks energyplusapi )
   add_test(NAME "API.LegacyCallbackTest"
            COMMAND ${CMAKE_COMMAND}
-           -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
-           -DBINARY_DIR=${CMAKE_BINARY_DIR}
+           -DSOURCE_DIR=${PROJECT_SOURCE_DIR}
+           -DBINARY_DIR=${PROJECT_BINARY_DIR}
            -DIDF_FILE=1ZoneUncontrolled.idf
            -DEPW_FILE=USA_CO_Golden-NREL.724666_TMY3.epw
-           -P ${CMAKE_SOURCE_DIR}/cmake/RunCallbackTest.cmake)
+           -P ${PROJECT_SOURCE_DIR}/cmake/RunCallbackTest.cmake)
 
   set(EPW_FILE "${CMAKE_SOURCE_DIR}/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw")
   set(IDF_FILE "${CMAKE_SOURCE_DIR}/testfiles/1ZoneUncontrolled.idf")
@@ -894,11 +905,11 @@ if( BUILD_TESTING )
             COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/plugin_tester.py" "${CMAKE_SOURCE_DIR}/testfiles/PythonPluginCustomTrendVariable.py"
             WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
   endif()
-
 endif()
 
 if(UNIX AND NOT APPLE)
   ADD_CUSTOM_COMMAND(TARGET energyplus POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E create_symlink energyplus EnergyPlus
-  COMMAND ${CMAKE_COMMAND} -E rename EnergyPlus "${CMAKE_BINARY_DIR}/Products/EnergyPlus")
+  COMMAND ${CMAKE_COMMAND} -E rename EnergyPlus "${PROJECT_BINARY_DIR}/Products/EnergyPlus")
 endif()
+

@@ -100,7 +100,6 @@ namespace DataStringGlobals {
 
     extern std::string outputMtdFileName;
     extern std::string outputMddFileName;
-    extern std::string outputMtrFileName;
     extern std::string outputRddFileName;
     extern std::string outputShdFileName;
     extern std::string outputTblCsvFileName;
@@ -126,15 +125,10 @@ namespace DataStringGlobals {
     extern std::string outputEddFileName;
     extern std::string outputIperrFileName;
     extern std::string outputDbgFileName;
+    extern std::string outputPerfLogFileName;
     extern std::string outputSlnFileName;
     extern std::string outputSciFileName;
     extern std::string outputWrlFileName;
-    extern std::string outputZszCsvFileName;
-    extern std::string outputZszTabFileName;
-    extern std::string outputZszTxtFileName;
-    extern std::string outputSszCsvFileName;
-    extern std::string outputSszTabFileName;
-    extern std::string outputSszTxtFileName;
     extern std::string outputScreenCsvFileName;
     extern std::string outputSqlFileName;
     extern std::string outputSqliteErrFileName;
