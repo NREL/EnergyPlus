@@ -215,6 +215,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 
 #ifdef _WIN32
 #include <direct.h>
@@ -224,9 +225,9 @@
 #include <unistd.h>
 #endif
 
-void EnergyPlusPgm(std::string const &filepath)
+void EnergyPlusPgm(AllGlobals const &state, std::string const &filepath)
 {
-    std::exit(RunEnergyPlus(filepath));
+    std::exit(RunEnergyPlus(state, filepath));
 }
 
 int initializeEnergyPlus(std::string const & filepath) {
@@ -405,7 +406,7 @@ int wrapUpEnergyPlus() {
     return EndEnergyPlus();
 }
 
-int RunEnergyPlus(std::string const & filepath)
+int RunEnergyPlus(AllGlobals const &state, std::string const & filepath)
 {
 
 
@@ -426,7 +427,7 @@ int RunEnergyPlus(std::string const & filepath)
     int status = initializeEnergyPlus(filepath);
     if (status) return status;
     try {
-        EnergyPlus::SimulationManager::ManageSimulation(EnergyPlus::OutputFiles::getSingleton());
+        EnergyPlus::SimulationManager::ManageSimulation(state,EnergyPlus::OutputFiles::getSingleton());
     } catch (const EnergyPlus::FatalError &e) {
         return EnergyPlus::AbortEnergyPlus();
     } catch (const std::exception &e) {
@@ -436,7 +437,7 @@ int RunEnergyPlus(std::string const & filepath)
     return wrapUpEnergyPlus();
 }
 
-int runEnergyPlusAsLibrary(int argc, const char *argv[])
+int runEnergyPlusAsLibrary( int argc, const char *argv[])
 {
     // PROGRAM INFORMATION:
     //       AUTHOR         Linda K. Lawrie, et al
@@ -464,7 +465,7 @@ int runEnergyPlusAsLibrary(int argc, const char *argv[])
     int status = initializeAsLibrary();
     if (status) return status;
     try {
-        EnergyPlus::SimulationManager::ManageSimulation(EnergyPlus::OutputFiles::getSingleton());
+        EnergyPlus::SimulationManager::ManageSimulation(state, EnergyPlus::OutputFiles::getSingleton());
     } catch (const EnergyPlus::FatalError &e) {
         return EnergyPlus::AbortEnergyPlus();
     } catch (const std::exception &e) {

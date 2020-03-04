@@ -49,6 +49,7 @@
 #define EnergyPlusPgm_hh_INCLUDED
 
 #include <EnergyPlus/api/EnergyPlusAPI.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 
 // C++ Headers
 #include <string>
@@ -61,9 +62,9 @@ int initializeEnergyPlus(std::string const & filepath);
 
 int wrapUpEnergyPlus();
 
-void ENERGYPLUSLIB_API EnergyPlusPgm(std::string const &filepath = std::string());
+void ENERGYPLUSLIB_API EnergyPlusPgm(AllGlobals const &state, std::string const &filepath = std::string());
 
-int ENERGYPLUSLIB_API RunEnergyPlus(std::string const & filepath = std::string());
+int ENERGYPLUSLIB_API RunEnergyPlus(AllGlobals const &state, std::string const & filepath = std::string());
 
 int runEnergyPlusAsLibrary(int argc, const char *argv[]);
 

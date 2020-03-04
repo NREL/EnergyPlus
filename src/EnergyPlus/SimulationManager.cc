@@ -146,6 +146,7 @@ extern "C" {
 #include <EnergyPlus/ZoneContaminantPredictorCorrector.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 
 namespace EnergyPlus {
 namespace SimulationManager {
@@ -218,7 +219,7 @@ namespace SimulationManager {
         PreP_Fatal = false;
     }
 
-    void ManageSimulation(OutputFiles &outputFiles)
+    void ManageSimulation(AllGlobals const &state, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:

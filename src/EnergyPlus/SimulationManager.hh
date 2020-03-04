@@ -50,6 +50,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 
 namespace EnergyPlus {
     class OutputFiles;
@@ -75,7 +76,7 @@ namespace SimulationManager {
     // Functions
     void clear_state();
 
-    void ManageSimulation(OutputFiles &outputFiles);
+    void ManageSimulation(AllGlobals const &state, OutputFiles &outputFiles);
 
     void GetProjectData(OutputFiles &outputFiles);
 
