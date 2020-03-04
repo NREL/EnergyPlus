@@ -195,20 +195,15 @@ int getActuatorHandle(const char* uniqueKey, const char* componentType, const ch
 void resetActuator(int handle) {
     // resets the actuator so that E+ will use the internally calculated value again
     auto & theActuator(EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable(handle));
-    theActuator.Actuated = false;
+    *theActuator.Actuated = false;
 }
 
 void setActuatorValue(const int handle, const Real64 value) {
     // I could imagine returning a 0 or 1, but it would really only be validating the handle was in range
     // the handle is based on the available actuator list
     auto & theActuator(EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable(handle));
-    if (theActuator.RealValue.associated()) {
-        theActuator.RealValue = value;
-    } else {
-        // try falling back to integer assignment; // TODO: Address this later
-        theActuator.IntValue = value;
-    }
-    theActuator.Actuated = true;
+    *theActuator.RealValue = value; // TODO: Handle other actuator types
+    *theActuator.Actuated = true;
 }
 
 
