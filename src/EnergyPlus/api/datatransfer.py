@@ -108,14 +108,21 @@ class DataExchange:
         self.api.getPluginTrendVariableDirection.argtypes = [c_int, c_int]
         self.api.getPluginTrendVariableDirection.restype = RealEP
 
-    def list_available_api_data_csv(self) -> str:
+    def list_available_api_data_csv(self) -> bytes:
         """
         Lists out all API data stuff in an easily parseable CSV form
-        :return:
+
+        :return: Returns a raw bytes CSV representation of the available API data
         """
         return self.api.listAllAPIDataCSV()
 
     def api_data_fully_ready(self) -> bool:
+        """
+        Check whether the data exchange API is ready.
+        Handles to variables, actuators, and other data are not reliably defined prior to this being true.
+
+        :return:
+        """
         success = self.api.apiDataFullyReady()
         if success == 0:
             return True
@@ -387,26 +394,56 @@ class DataExchange:
         return self.api.getPluginTrendVariableValue(trend_handle, time_index)
 
     def get_trend_average(self, trend_handle: int, count: int) -> RealEP:
+        """
+
+        :param trend_handle:
+        :param count:
+        :return:
+        """
         if not self.running_as_python_plugin:
             raise EnergyPlusException("get_trend_average is only available as part of a Python Plugin workflow")
         return self.api.getPluginTrendVariableAverage(trend_handle, count)
 
     def get_trend_min(self, trend_handle: int, count: int) -> RealEP:
+        """
+
+        :param trend_handle:
+        :param count:
+        :return:
+        """
         if not self.running_as_python_plugin:
             raise EnergyPlusException("get_trend_min is only available as part of a Python Plugin workflow")
         return self.api.getPluginTrendVariableMin(trend_handle, count)
 
     def get_trend_max(self, trend_handle: int, count: int) -> RealEP:
+        """
+
+        :param trend_handle:
+        :param count:
+        :return:
+        """
         if not self.running_as_python_plugin:
             raise EnergyPlusException("get_trend_max is only available as part of a Python Plugin workflow")
         return self.api.getPluginTrendVariableMax(trend_handle, count)
 
     def get_trend_sum(self, trend_handle: int, count: int) -> RealEP:
+        """
+
+        :param trend_handle:
+        :param count:
+        :return:
+        """
         if not self.running_as_python_plugin:
             raise EnergyPlusException("get_trend_sum is only available as part of a Python Plugin workflow")
         return self.api.getPluginTrendVariableSum(trend_handle, count)
 
     def get_trend_direction(self, trend_handle: int, count: int) -> RealEP:
+        """
+
+        :param trend_handle:
+        :param count:
+        :return:
+        """
         if not self.running_as_python_plugin:
             raise EnergyPlusException("get_trend_direction is only available as part of a Python Plugin workflow")
         return self.api.getPluginTrendVariableDirection(trend_handle, count)
