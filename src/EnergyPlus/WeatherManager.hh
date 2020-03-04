@@ -840,9 +840,10 @@ namespace WeatherManager {
 
     void CheckWeatherFileValidity();
 
-    void ReportOutputFileHeaders();
+    void ReportOutputFileHeaders(OutputFiles &outputFiles);
 
-    void ReportWeatherAndTimeInformation(bool &PrintEnvrnStamp); // Set to true when the environment header should be printed
+    void ReportWeatherAndTimeInformation(OutputFiles &outputFiles,
+                                         bool &PrintEnvrnStamp); // Set to true when the environment header should be printed
 
     void ReadUserWeatherInput(OutputFiles &outputFiles);
 
