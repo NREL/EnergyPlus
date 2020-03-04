@@ -254,7 +254,7 @@ json IdfParser::parse_idf(std::string const &idf, size_t &index, bool &success, 
                 auto found_index = idf.find_first_of('\n', beginning_of_line_index);
                 std::string line;
                 if (found_index != std::string::npos) {
-                    line = idf.substr(beginning_of_line_index, index - beginning_of_line_index);
+                    line = idf.substr(beginning_of_line_index, found_index - beginning_of_line_index);
                 }
                 errors_.emplace_back("Line: " + std::to_string(cur_line_num) + " Index: " + std::to_string(index_into_cur_line) +
                                      " - Error parsing \"" + obj_name + "\". Error in following line.");
@@ -389,6 +389,8 @@ json IdfParser::parse_object(
             eat_comment(idf, index);
         } else if (legacy_idd_index >= legacy_idd_fields_array.size()) {
             if (legacy_idd_extensibles_iter == legacy_idd.end()) {
+                errors_.emplace_back("Line: " + std::to_string(cur_line_num) + " Index: " + std::to_string(index_into_cur_line) +
+                                     " - Object contains more field values than maximum number of IDD fields and is not extensible.");
                 success = false;
                 return root;
             }
