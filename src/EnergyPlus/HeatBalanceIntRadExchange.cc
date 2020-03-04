@@ -1083,7 +1083,7 @@ namespace HeatBalanceIntRadExchange {
     void GetInputViewFactors(std::string const &ZoneName, // Needed to check for user input view factors.
                              int const N,                 // NUMBER OF SURFACES
                              Array2A<Real64> F,           // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
-                             const Array1D_int &SPtr,     // pointer to actual surface number
+                             const Array1D_int &EP_UNUSED(SPtr),     // pointer to actual surface number
                              bool &NoUserInputF,          // Flag signifying no input F's for this
                              bool &ErrorsFound            // True when errors are found in number of fields vs max args
     )
@@ -1104,7 +1104,7 @@ namespace HeatBalanceIntRadExchange {
 
         // Argument array dimensioning
         F.dim(N, N);
-        EP_SIZE_CHECK(SPtr, N);
+        //EP_SIZE_CHECK(SPtr, N);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         //  INTEGER   :: NumZonesWithUserF

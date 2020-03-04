@@ -1565,9 +1565,9 @@ namespace ThermalComfort {
         }
     }
 
-    void DERIV(int &EP_UNUSED(TempIndiceNum),  // Number of temperature indices  unused1208
-               Array1D<Real64> &Temp,          // Temperature unused1208
-               Array1D<Real64> &TempChange     // Change of temperature
+    void DERIV(int &EP_UNUSED(TempIndiceNum),    // Number of temperature indices  unused1208
+               Array1D<Real64> &EP_UNUSED(Temp), // Temperature unused1208
+               Array1D<Real64> &TempChange       // Change of temperature
     )
     {
 
@@ -1590,7 +1590,7 @@ namespace ThermalComfort {
         // Maloney, Dan, M.S. Thesis, University of Illinois at Urbana-Champaign
 
         // Argument array dimensioning
-        EP_SIZE_CHECK(Temp, 2);
+        //EP_SIZE_CHECK(Temp, 2);
         EP_SIZE_CHECK(TempChange, 2);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
