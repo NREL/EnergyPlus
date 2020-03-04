@@ -50,7 +50,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -601,6 +600,7 @@ namespace HVACVariableRefrigerantFlow {
         // Members
         std::string Name;                     // Name of the VRF Terminal Unit List
         int NumTUInList;                      // Number of VRF Terminal Units in List
+        bool reset_isSimulatedFlags;           // used to align simulate flags with order of each TU in simulation
         Array1D_int ZoneTUPtr;                // index to VRF Terminal Unit
         Array1D_string ZoneTUName;            // Name of the VRF Terminal Unit
         Array1D_bool IsSimulated;             // TRUE if TU has been simulated
@@ -618,7 +618,7 @@ namespace HVACVariableRefrigerantFlow {
         Array1D_int HeatingCoilAvailSchPtr;   // heating coil availability schedule index
 
         // Default Constructor
-        TerminalUnitListData() : NumTUInList(0)
+        TerminalUnitListData() : NumTUInList(0), reset_isSimulatedFlags(true)
         {
         }
     };
@@ -711,7 +711,6 @@ namespace HVACVariableRefrigerantFlow {
         Real64 EMSValueForPartLoadFrac;  // user defined value for EMS function
         int IterLimitExceeded;           // index used for warning messages
         int FirstIterfailed;             // index used for warning messages
-        int ZonePtr;                     // pointer to a zone served by a VRF terminal unit
         int HVACSizingIndex;             // index of a HVACSizing object for a VRF terminal
         bool ATMixerExists;              // True if there is an ATMixer
         std::string ATMixerName;         // name of air terminal mixer
@@ -731,9 +730,27 @@ namespace HVACVariableRefrigerantFlow {
         int SuppHeatCoilCompNum;         // supplemental heating coil plant component index
         Real64 coilInNodeT;              // coil inlet node temp at full flow (C)
         Real64 coilInNodeW;              // coil inlet node humidity ratio at full flow (kg/kg)
+        int fanInletNode;                // fan inlet node index
         int fanOutletNode;               // fan outlet node index
         bool MySuppCoilPlantScanFlag;    // flag used to initialize plant comp for water and steam heating coils
-
+        int airLoopNum;                  // index to air loop
+        bool isInOASys;                  // true if TU is configured in outside air system
+        bool isInAirLoop;                // true if TU is configured in an air loop
+        bool isInZone;                   // true if TU is configured as zone equipment
+        bool isSetPointControlled;       // TU is controlled via setpoint instead of the standard load control
+        bool coolSPActive;               // set point controlled cooling coil active (needs to operate)
+        bool heatSPActive;               // set point controlled heating coil active (needs to operate)
+        Real64 coolLoadToSP;             // load to set point in cooling mode
+        Real64 heatLoadToSP;             // load to set point in heating mode
+        Real64 coilTempSetPoint;         // coil control temperature
+        Real64 suppTempSetPoint;         // supplemental heating coil control temperature
+        Real64 controlZoneMassFlowFrac;  // ratio of control zone air mass flow rate to total zone air mass flow rate
+        int zoneSequenceCoolingNum;      // zone equipment cooling sequence
+        int zoneSequenceHeatingNum;      // zone equipment heating sequence
+        int coolCoilAirInNode;           // cooling coil air inlet node number
+        int coolCoilAirOutNode;          // cooling coil air outlet node number
+        int heatCoilAirInNode;           // heating coil air inlet node number
+        int heatCoilAirOutNode;          // heating coil air outlet node number
         // Default Constructor
         VRFTerminalUnitEquipment()
             : VRFTUType_Num(0), SchedPtr(-1), VRFSysNum(0), TUListIndex(0), IndexToTUInTUList(0), ZoneNum(0), ZoneAirNode(0), VRFTUInletNodeNum(0),
@@ -742,19 +759,23 @@ namespace HVACVariableRefrigerantFlow {
               MaxNoCoolAirMassFlow(0.0), MaxNoHeatAirMassFlow(0.0), CoolOutAirVolFlow(0.0), HeatOutAirVolFlow(0.0), NoCoolHeatOutAirVolFlow(0.0),
               CoolOutAirMassFlow(0.0), HeatOutAirMassFlow(0.0), NoCoolHeatOutAirMassFlow(0.0), MinOperatingPLR(1.0E-20),
               SuppHeatCoilFluidMaxFlow(0.0), DesignSuppHeatingCapacity(0.0), MaxSATFromSuppHeatCoil(0.0), MaxOATSuppHeatingCoil(0.0),
-              SuppHeatPartLoadRatio(0.0), SuppHeatingCoilLoad(0.0), fanType_Num(0), FanOpModeSchedPtr(0), FanAvailSchedPtr(0), FanIndex(0), FanPower(0.0), OpMode(0),
-              FanPlace(0), ActualFanVolFlowRate(0.0), OAMixerIndex(0), OAMixerUsed(false), CoolCoilIndex(0), HeatCoilIndex(0), SuppHeatCoilIndex(0),
-              DXCoolCoilType_Num(0), DXHeatCoilType_Num(0), SuppHeatCoilType_Num(0), ParasiticElec(0.0), ParasiticOffElec(0.0),
-              HeatingSpeedRatio(1.0), HeatingCapacitySizeRatio(1.0), CoolingSpeedRatio(1.0), ParasiticCoolElecPower(0.0), ParasiticHeatElecPower(0.0),
-              ParasiticElecCoolConsumption(0.0), ParasiticElecHeatConsumption(0.0), CoolingCoilPresent(true), HeatingCoilPresent(true),
-              SuppHeatingCoilPresent(false), AvailStatus(0), TerminalUnitSensibleRate(0.0), TerminalUnitLatentRate(0.0), TotalCoolingRate(0.0),
-              TotalHeatingRate(0.0), SensibleCoolingRate(0.0), SensibleHeatingRate(0.0), LatentCoolingRate(0.0), LatentHeatingRate(0.0),
-              TotalCoolingEnergy(0.0), TotalHeatingEnergy(0.0), SensibleCoolingEnergy(0.0), SensibleHeatingEnergy(0.0), LatentCoolingEnergy(0.0),
-              LatentHeatingEnergy(0.0), EMSOverridePartLoadFrac(false), EMSValueForPartLoadFrac(0.0), IterLimitExceeded(0), FirstIterfailed(0),
-              ZonePtr(0), HVACSizingIndex(0), ATMixerExists(false), ATMixerIndex(0), ATMixerType(0), ATMixerPriNode(0), ATMixerSecNode(0),
-              ATMixerOutNode(0), SuppHeatCoilAirInletNode(0), SuppHeatCoilAirOutletNode(0), SuppHeatCoilFluidInletNode(0), SuppHeatCoilFluidOutletNode(0),
-              firstPass(true), SuppHeatCoilLoopNum(), SuppHeatCoilLoopSide(), SuppHeatCoilBranchNum(), SuppHeatCoilCompNum(), coilInNodeT(0.0), coilInNodeW(0.0),
-              fanOutletNode(0), MySuppCoilPlantScanFlag(true)
+              SuppHeatPartLoadRatio(0.0), SuppHeatingCoilLoad(0.0), fanType_Num(0), FanOpModeSchedPtr(0), FanAvailSchedPtr(-1), FanIndex(0),
+              FanPower(0.0), OpMode(0), FanPlace(0), ActualFanVolFlowRate(0.0), OAMixerIndex(0), OAMixerUsed(false), CoolCoilIndex(0),
+              HeatCoilIndex(0), SuppHeatCoilIndex(0), DXCoolCoilType_Num(0), DXHeatCoilType_Num(0), SuppHeatCoilType_Num(0), ParasiticElec(0.0),
+              ParasiticOffElec(0.0), HeatingSpeedRatio(1.0), HeatingCapacitySizeRatio(1.0), CoolingSpeedRatio(1.0), ParasiticCoolElecPower(0.0),
+              ParasiticHeatElecPower(0.0), ParasiticElecCoolConsumption(0.0), ParasiticElecHeatConsumption(0.0), CoolingCoilPresent(true),
+              HeatingCoilPresent(true), SuppHeatingCoilPresent(false), AvailStatus(0), TerminalUnitSensibleRate(0.0), TerminalUnitLatentRate(0.0),
+              TotalCoolingRate(0.0), TotalHeatingRate(0.0), SensibleCoolingRate(0.0), SensibleHeatingRate(0.0), LatentCoolingRate(0.0),
+              LatentHeatingRate(0.0), TotalCoolingEnergy(0.0), TotalHeatingEnergy(0.0), SensibleCoolingEnergy(0.0), SensibleHeatingEnergy(0.0),
+              LatentCoolingEnergy(0.0), LatentHeatingEnergy(0.0), EMSOverridePartLoadFrac(false), EMSValueForPartLoadFrac(0.0), IterLimitExceeded(0),
+              FirstIterfailed(0), HVACSizingIndex(0), ATMixerExists(false), ATMixerIndex(0), ATMixerType(0), ATMixerPriNode(0), ATMixerSecNode(0),
+              ATMixerOutNode(0), SuppHeatCoilAirInletNode(0), SuppHeatCoilAirOutletNode(0), SuppHeatCoilFluidInletNode(0),
+              SuppHeatCoilFluidOutletNode(0), firstPass(true), SuppHeatCoilLoopNum(), SuppHeatCoilLoopSide(), SuppHeatCoilBranchNum(),
+              SuppHeatCoilCompNum(), coilInNodeT(0.0), coilInNodeW(0.0), fanInletNode(0), fanOutletNode(0), MySuppCoilPlantScanFlag(true),
+              airLoopNum(0), isInOASys(false), isInAirLoop(false), isInZone(false), isSetPointControlled(false), coolSPActive(false),
+              heatSPActive(false), coolLoadToSP(0.0), heatLoadToSP(0.0), coilTempSetPoint(0.0), suppTempSetPoint(0.0), controlZoneMassFlowFrac(1.0),
+              zoneSequenceCoolingNum(0), zoneSequenceHeatingNum(0), coolCoilAirInNode(0), coolCoilAirOutNode(0), heatCoilAirInNode(0),
+              heatCoilAirOutNode(0)
         {
         }
 
@@ -799,9 +820,17 @@ namespace HVACVariableRefrigerantFlow {
                         Real64 &SuppHeatCoilLoad       // supplemental heating coil load (W)
         );
 
-        void CalcVRF(int VRFTUNum,                    // Unit index in VRF terminal unit array
-                     bool FirstHVACIteration,         // flag for 1st HVAC iteration in the time step
-                     Real64 PartLoadRatio,            // compressor part load fraction
+        void ControlVRFToLoad(int const VRFTUNum,            // Index to VRF terminal unit
+                              Real64 const QZnReq,           // Index to zone number
+                              bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
+                              Real64 &PartLoadRatio,         // unit part load ratio
+                              Real64 &OnOffAirFlowRatio,     // ratio of compressor ON airflow to AVERAGE airflow over timestep
+                              Real64 &SuppHeatCoilLoad       // supplemental heating coil load (W)
+        );
+
+        void CalcVRF(int const VRFTUNum,                    // Unit index in VRF terminal unit array
+                     bool const FirstHVACIteration,         // flag for 1st HVAC iteration in the time step
+                     Real64 const PartLoadRatio,            // compressor part load fraction
                      Real64 &LoadMet,                       // load met by unit (W)
                      Real64 &OnOffAirFlowRatio,             // ratio of ON air flow to average air flow
                      Real64 &SuppHeatCoilLoad,              // supplemental heating coil load (W)
@@ -844,15 +873,18 @@ namespace HVACVariableRefrigerantFlow {
     // Functions
 
     void SimulateVRF(std::string const &CompName,
-                     int ZoneNum,
-                     bool FirstHVACIteration,
+                     bool const FirstHVACIteration,
+                     int const ZoneNum,
+                     int &CompIndex,
+                     bool &HeatingActive,
+                     bool &CoolingActive,
+                     int const OAUnitNum,         // If the system is an equipment of OutdoorAirUnit
+                     Real64 const OAUCoilOutTemp, // the coil inlet temperature of OutdoorAirUnit
+                     bool const ZoneEquipment,    // TRUE if called as zone equipment
                      Real64 &SysOutputProvided,
-                     Real64 &LatOutputProvided,
-                     int &CompIndex);
+                     Real64 &LatOutputProvided);
 
-    void CalcVRFCondenser(int VRFCond,            // index to VRF condenser
-                          bool FirstHVACIteration // flag for first time through HVAC system simulation
-    );
+    void CalcVRFCondenser(int VRFCond);
 
     void GetVRFInput();
 
@@ -878,13 +910,23 @@ namespace HVACVariableRefrigerantFlow {
 
     int GetVRFTUMixedAirNode(int VRFTUNum);
 
-    int GetVRFTUReturnAirNode(int VRFTUNum);
+    int GetVRFTUOutAirNodeFromName(std::string const VRFTUName, bool &errorsFound);
+
+    int GetVRFTUInAirNodeFromName(std::string const VRFTUName, bool &errorsFound);
+
+    int GetVRFTUMixedAirNode(int const VRFTUNum);
+
+    int GetVRFTUReturnAirNode(int const VRFTUNum);
+
+    void getVRFTUZoneLoad(int const VRFTUNum, Real64 &zoneLoad, Real64 &LoadToHeatingSP, Real64 &LoadToCoolingSP, bool const InitFlag);
 
     void ReportVRFTerminalUnit(int VRFTUNum); // index to VRF terminal unit
 
     void ReportVRFCondenser(int VRFCond); // index to VRF condensing unit
 
     void UpdateVRFCondenser(int VRFCond); // index to VRF condensing unit
+
+    void isVRFCoilPresent(std::string const VRFTUName, bool &CoolCoilPresent, bool & HeatCoilPresent);
 
     Real64 PLRResidual(Real64 PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                        Array1<Real64> const &Par   // par(1) = VRFTUNum
@@ -904,16 +946,16 @@ namespace HVACVariableRefrigerantFlow {
     void LimitTUCapacity(int VRFCond,              // Condenser Unit index
                          int NumTUInList,          // Number of terminal units in list
                          Real64 StartingCapacity,  // temporary variable holding condenser capacity [W]
-                         Array1S<Real64> CapArray, // Array of coil capacities in either cooling or heating mode [W]
+                         const Array1D<Real64> &CapArray, // Array of coil capacities in either cooling or heating mode [W]
                          Real64 &MaxLimit,               // Maximum terminal unit capacity for coils in same operating mode [W]
                          Real64 AltCapacity,       // temporary variable holding heat recovery capacity [W]
-                         Array1S<Real64> AltArray, // Array of coil capacities of heat recovery [W]
+                         const Array1D<Real64> &AltArray, // Array of coil capacities of heat recovery [W]
                          Real64 &AltLimit                // Maximum terminal unit capacity of heat recovery coils [W]
     );
 
     void LimitCoilCapacity(int NumTUInList,          // Number of terminal units in list
                            Real64 TotalCapacity,     // temporary variable holding condenser capacity [W]
-                           Array1S<Real64> CapArray, // Array of coil capacities in either cooling or heating mode [W]
+                           const Array1D<Real64> &CapArray, // Array of coil capacities in either cooling or heating mode [W]
                            Real64 &MaxLimit                // Maximum terminal unit capacity for coils in same operating mode [W]
     );
 

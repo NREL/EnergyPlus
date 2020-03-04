@@ -870,9 +870,9 @@ namespace OutputReportTabular {
     void WriteTextLine(std::string const &lineOfText, Optional_bool_const isBold = _);
 
     void WriteTable(Array2S_string const body, // row,column
-                    Array1S_string const rowLabels,
-                    Array1S_string const columnLabels,
-                    Array1S_int widthColumn,
+                    const Array1D_string &rowLabels,
+                    const Array1D_string &columnLabels,
+                    Array1D_int &widthColumn,
                     Optional_bool_const transposeXML = _,
                     Optional_string_const footnoteText = _);
 

@@ -208,7 +208,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_GetInputPTAC_InletSide)
         "Coil:Heating:Fuel,",
         "    SPACE1-1 Heating Coil,   !- Name",
         "    FanAvailSched,           !- Availability Schedule Name",
-        "    Gas,                     !- Fuel Type",
+        "    NaturalGas,              !- Fuel Type",
         "    0.8,                     !- Gas Burner Efficiency",
         "    10000.0,                 !- Nominal Capacity {W}",
         "    SPACE1-1 Cooling Coil Outlet,  !- Air Inlet Node Name",
@@ -455,7 +455,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMInletSide)
         "Coil:Heating:Fuel,",
         "    SPACE1-1 Heating Coil,   !- Name",
         "    FanAvailSched,           !- Availability Schedule Name",
-        "    Gas,                     !- Fuel Type",
+        "    NaturalGas,              !- Fuel Type",
         "    0.8,                     !- Gas Burner Efficiency",
         "    10000.0,                 !- Nominal Capacity {W}",
         "    SPACE1-1 Cooling Coil Outlet,  !- Air Inlet Node Name",
@@ -786,7 +786,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_ATMSupplySide)
         "Coil:Heating:Fuel,",
         "    SPACE1-1 Heating Coil,   !- Name",
         "    FanAvailSched,           !- Availability Schedule Name",
-        "    Gas,                     !- Fuel Type",
+        "    NaturalGas,              !- Fuel Type",
         "    0.8,                     !- Gas Burner Efficiency",
         "    10000.0,                 !- Nominal Capacity {W}",
         "    SPACE1-1 Cooling Coil Outlet,  !- Air Inlet Node Name",
@@ -1165,7 +1165,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMInletSide)
         "Coil:Heating:Fuel,",
         "    SPACE1-1 HP Supp Coil,   !- Name",
         "    FanAvailSched,           !- Availability Schedule Name",
-        "    Gas,                     !- Fuel Type",
+        "    NaturalGas,              !- Fuel Type",
         "    0.8,                     !- Gas Burner Efficiency",
         "    10000.0,                 !- Nominal Capacity {W}",
         "    SPACE1-1 Heating Coil Outlet,  !- Air Inlet Node Name",
@@ -1578,7 +1578,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTHP_ATMSupplySide)
         "Coil:Heating:Fuel,",
         "    SPACE1-1 HP Supp Coil,   !- Name",
         "    FanAvailSched,           !- Availability Schedule Name",
-        "    Gas,                     !- Fuel Type,",
+        "    NaturalGas,              !- Fuel Type",
         "    0.8,                     !- Gas Burner Efficiency",
         "    10000.0,                 !- Nominal Capacity {W}",
         "    SPACE1-1 Heating Coil Outlet,  !- Air Inlet Node Name",
@@ -2470,6 +2470,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRF_ATMInletSide)
     VRFNum = 1;
     VRFTUNum = 1;
     VRFTU(VRFTUNum).OpMode = ContFanCycCoil;
+    VRFTU(VRFTUNum).isInZone = true;
+    VRFTU(VRFTUNum).ZoneAirNode = ZoneEquipConfig(1).ZoneNode;
     // VRFTU( VRFTUNum ).VRFTUOutletNodeNum
     // initialize mass flow rates
     Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate = HVACInletMassFlowRate;
@@ -4897,6 +4899,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMInletSi
     VRFNum = 1;
     VRFTUNum = 1;
     VRFTU(VRFTUNum).OpMode = CycFanCycCoil;
+    VRFTU(VRFTUNum).isInZone = true;
+    VRFTU(VRFTUNum).ZoneAirNode = ZoneEquipConfig(1).ZoneNode;
     // initialize mass flow rates
     Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate = HVACInletMassFlowRate;
     Node(VRFTU(VRFTUNum).ATMixerPriNode).MassFlowRate = PrimaryAirMassFlowRate;
@@ -6647,6 +6651,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimVRFfluidCntrl_ATMSupplyS
     VRFNum = 1;
     VRFTUNum = 1;
     VRFTU(VRFTUNum).OpMode = CycFanCycCoil;
+    VRFTU(VRFTUNum).isInZone = true;
+    VRFTU(VRFTUNum).ZoneAirNode = ZoneEquipConfig(1).ZoneNode;
     // initialize mass flow rates
     Node(VRFTU(VRFTUNum).VRFTUInletNodeNum).MassFlowRate = HVACInletMassFlowRate;
     Node(VRFTU(VRFTUNum).ATMixerPriNode).MassFlowRate = PrimaryAirMassFlowRate;
@@ -6806,7 +6812,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMInletSide)
         "  Coil:Heating:Fuel,",
         "    Zone1UnitVentHeatingCoil,!- Name",
         "    FanAvailSched,           !- Availability Schedule Name",
-        "    Gas,                     !- Fuel Type",
+        "    NaturalGas,              !- Fuel Type",
         "    0.8,                     !- Gas Burner Efficiency",
         "    10000.0,                 !- Nominal Capacity {W}",
         "    SPACE1-1 Fan Outlet,     !- Air Inlet Node Name",
@@ -7043,7 +7049,7 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimUnitVent_ATMSupplySide)
         "  Coil:Heating:Fuel,",
         "    Zone1UnitVentHeatingCoil,!- Name",
         "    FanAvailSched,           !- Availability Schedule Name",
-        "    Gas,                     !- Fuel Type,",
+        "    NaturalGas,              !- Fuel Type",
         "    0.8,                     !- Gas Burner Efficiency",
         "    10000.0,                 !- Nominal Capacity {W}",
         "    SPACE1-1 Fan Outlet,     !- Air Inlet Node Name",

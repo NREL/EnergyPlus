@@ -58,7 +58,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/Furnaces.hh>
 #include <EnergyPlus/OutputFiles.hh>
@@ -1168,7 +1168,7 @@ TEST_F(EnergyPlusFixture, UnitaryHeatPumpAirToAir_MaxSuppAirTempTest)
     bool FirstHVACIteration(false);
 
     // OutputProcessor::TimeValue.allocate(2);
-    ManageSimulation();
+    ManageSimulation(OutputFiles::getSingleton());
     // check the design max air outlet temperature
     EXPECT_DOUBLE_EQ(45.0, Furnace(1).DesignMaxOutletTemp);
 

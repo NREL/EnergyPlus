@@ -50,7 +50,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -212,7 +211,7 @@ namespace RuntimeLanguageProcessor {
                          std::string const &Line      // Actual line from string
     );
 
-    int ProcessTokens(Array1S<TokenType> const TokenIN, int const NumTokensIN, int const StackNum, std::string const &ParsingString);
+    int ProcessTokens(const Array1D<TokenType> &TokenIN, int const NumTokensIN, int const StackNum, std::string const &ParsingString);
 
     int NewExpression();
 

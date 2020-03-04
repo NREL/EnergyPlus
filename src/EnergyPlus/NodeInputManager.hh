@@ -50,7 +50,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
-#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -116,7 +115,7 @@ namespace NodeInputManager {
 
     void GetNodeNums(std::string const &Name,                      // Name for which to obtain information
                      int &NumNodes,                                // Number of nodes accompanying this Name
-                     Array1S_int NodeNumbers,                      // Node Numbers accompanying this Name
+                     Array1D_int &NodeNumbers,                     // Node Numbers accompanying this Name
                      bool &ErrorsFound,                            // True when errors are found...
                      int const NodeFluidType,                      // Fluidtype for checking/setting node FluidType
                      std::string const &NodeObjectType,            // Node Object Type (i.e. "Chiller:Electric")

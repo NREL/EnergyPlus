@@ -52,6 +52,7 @@ extern "C" {
 
 // C++ Headers
 #include <cmath>
+#include <memory>
 #include <string>
 
 // ObjexxFCL Headers
@@ -63,6 +64,7 @@ extern "C" {
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include <EnergyPlus/api/datatransfer.h>
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CommandLineInterface.hh>
@@ -82,7 +84,7 @@ extern "C" {
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataOutputs.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataRuntimeLanguage.hh>
@@ -123,6 +125,7 @@ extern "C" {
 #include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
+#include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/PollutionModule.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/RefrigeratedCase.hh>
@@ -214,7 +217,7 @@ namespace SimulationManager {
         PreP_Fatal = false;
     }
 
-    void ManageSimulation()
+    void ManageSimulation(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -339,7 +342,6 @@ namespace SimulationManager {
         AskForConnectionsReport = false; // set to false until sizing is finished
 
         OpenOutputFiles();
-        auto &outputFiles = OutputFiles::getSingleton();
         GetProjectData(outputFiles);
         CheckForMisMatchedEnvironmentSpecifications();
         CheckForRequestedReporting();
@@ -358,6 +360,15 @@ namespace SimulationManager {
         createCoilSelectionReportObj();
 
         ManageBranchInput(); // just gets input and returns.
+
+        // Create a new plugin manager which starts up the Python interpreter
+        // Note this cannot be done if we are running within the library environment, nor would you really to do so
+        // If we are already within a Python interpreter context, and we try to start up a new Python interpreter environment, it segfaults
+        // Note that some setup is deferred until later such as setting up output variables
+        if (!eplusRunningViaAPI) {
+            EnergyPlus::PluginManagement::pluginManager =
+                std::unique_ptr<EnergyPlus::PluginManagement::PluginManager>(new EnergyPlus::PluginManagement::PluginManager);
+        }
 
         DoingSizing = true;
         ManageSizing(OutputFiles::getSingleton());
@@ -410,12 +421,15 @@ namespace SimulationManager {
             SetupNodeVarsForReporting();
             MetersHaveBeenInitialized = true;
             SetupPollutionMeterReporting();
-            UpdateMeterReporting();
+            SystemReports::AllocateAndSetUpVentReports();
+            if (EnergyPlus::PluginManagement::pluginManager) {
+                EnergyPlus::PluginManagement::pluginManager->setupOutputVariables();
+            }
+            UpdateMeterReporting(outputFiles);
             CheckPollutionMeterReporting();
             facilityElectricServiceObj->verifyCustomMetersElecPowerMgr();
             SetupPollutionCalculations();
             InitDemandManagers();
-
             TestBranchIntegrity(ErrFound);
             if (ErrFound) TerminalError = true;
             TestAirPathIntegrity(ErrFound);
@@ -437,7 +451,6 @@ namespace SimulationManager {
                 //      CALL ReportCompSetMeterVariables
                 //      CALL ReportParentChildren
             }
-
             CreateEnergyReportStructure();
             bool anyEMSRan;
             ManageEMS(emsCallFromSetupSimulation, anyEMSRan); // point to finish setup processing EMS, sensor ready now
@@ -448,6 +461,9 @@ namespace SimulationManager {
                 ShowFatalError("Previous Conditions cause program termination.");
             }
         }
+
+        // up until this point, output vars, meters, actuators, etc., may not have been registered; they are now
+        PluginManagement::fullyReady = true;
 
         if (sqlite) {
             sqlite->sqliteBegin();
@@ -613,7 +629,7 @@ namespace SimulationManager {
 
                         ManageExteriorEnergyUse();
 
-                        ManageHeatBalance();
+                        ManageHeatBalance(outputFiles);
 
                         if (oneTimeUnderwaterBoundaryCheck) {
                             AnyUnderwaterBoundaries = WeatherManager::CheckIfAnyUnderwaterBoundaries();
@@ -625,7 +641,6 @@ namespace SimulationManager {
                         BeginEnvrnFlag = false;
                         BeginSimFlag = false;
                         BeginFullSimFlag = false;
-
                     } // TimeStep loop
 
                     PreviousHour = HourOfDay;
@@ -733,7 +748,7 @@ namespace SimulationManager {
         static Array1D_int const Div60(12, {1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60});
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D_string Alphas(6);
+        Array1D_string Alphas(8);
         Array1D<Real64> Number(4);
         int NumAlpha;
         int NumNumber;
@@ -1167,6 +1182,8 @@ namespace SimulationManager {
             ErrorsFound = true;
             ShowFatalError("GetProjectData: Only one (\"1\") " + CurrentModuleObject + " object per simulation is allowed.");
         }
+        DataGlobals::createProfLog = Num > 0;
+        std::string overrideModeValue = "Normal";
         if (instances != inputProcessor->epJSON.end()) {
             auto &instancesValue = instances.value();
             for (auto instance = instancesValue.begin(); instance != instancesValue.end(); ++instance) {
@@ -1174,12 +1191,90 @@ namespace SimulationManager {
                 auto const &thisObjectName = instance.key();
                 inputProcessor->markObjectAsUsed(CurrentModuleObject, thisObjectName);
                 if (fields.find("use_coil_direct_solutions") != fields.end()) {
-                    DoCoilDirectSolutions =
-                        UtilityRoutines::MakeUPPERCase(fields.at("use_coil_direct_solutions"))=="YES";
+                    DataGlobals::DoCoilDirectSolutions =
+                        UtilityRoutines::MakeUPPERCase(fields.at("use_coil_direct_solutions")) == "YES";
                 }
                 if (fields.find("zone_radiant_exchange_algorithm") != fields.end()) {
                     HeatBalanceIntRadExchange::CarrollMethod =
-                        UtilityRoutines::MakeUPPERCase(fields.at("zone_radiant_exchange_algorithm"))=="CARROLLMRT";
+                        UtilityRoutines::MakeUPPERCase(fields.at("zone_radiant_exchange_algorithm")) == "CARROLLMRT";
+                }
+                bool overrideTimestep(false);
+                bool overrideZoneAirHeatBalAlg(false);
+                bool overrideMinNumWarmupDays(false);
+                bool overrideBeginEnvResetSuppress(false);
+                bool overrideMaxZoneTempDiff(false);
+                if (fields.find("override_mode") != fields.end()) {
+                    overrideModeValue = UtilityRoutines::MakeUPPERCase(fields.at("override_mode"));
+                    if (overrideModeValue == "NORMAL") {
+                        // no overrides
+                    }
+                    else if (overrideModeValue == "MODE01") {
+                        // Zone Time step (TimeStep object) will be set to one timestep per hour
+                        overrideTimestep = true;
+                    }
+                    else if (overrideModeValue == "MODE02") {
+                        // Mode01 plus ZoneAirHeatBalanceAlgorithm will be set to Euler
+                        overrideTimestep = true;
+                        overrideZoneAirHeatBalAlg = true;
+                    }
+                    else if (overrideModeValue == "MODE03") {
+                        // Mode02 plus Minimum Number of Warmup Days will be set to 1
+                        overrideTimestep = true;
+                        overrideZoneAirHeatBalAlg = true;
+                        overrideMinNumWarmupDays = true;
+                    }
+                    else if (overrideModeValue == "MODE04") {
+                        // Mode03 plus Begin Environment Reset Mode will be set to SuppressAllBeginEnvironmentResets
+                        overrideTimestep = true;
+                        overrideZoneAirHeatBalAlg = true;
+                        overrideMinNumWarmupDays = true;
+                        overrideBeginEnvResetSuppress = true;
+                    }
+                    else if (overrideModeValue == "MODE05") {
+                        // Mode04 plus internal variable MaxZoneTempDiff will be set to 1.00
+                        overrideTimestep = true;
+                        overrideZoneAirHeatBalAlg = true;
+                        overrideMinNumWarmupDays = true;
+                        overrideBeginEnvResetSuppress = true;
+                        overrideMaxZoneTempDiff = true;
+                    }
+                    else if (overrideModeValue == "ADVANCED") {
+                        bool advancedModeUsed = false;
+                        if (fields.find("maxzonetempdiff") != fields.end()) { // not required field, has default value
+                            DataConvergParams::MaxZoneTempDiff = fields.at("maxzonetempdiff");
+                            ShowWarningError("PerformancePrecisionTradeoffs using the Advanced Override Mode, MaxZoneTempDiff set to: " + RoundSigDigits(DataConvergParams::MaxZoneTempDiff, 4));
+                            advancedModeUsed = true;
+                        }
+                        if (advancedModeUsed) {
+                            ShowContinueError("...Care should be used when using the Advanced Overrude Mode. Results may be signficantly different than a simulation not using this mode.");
+                        } else {
+                            ShowWarningError("PerformancePrecisionTradeoffs using the Advanced Override Mode but no specific parameters have been set.");
+                        }
+                    }
+                    else {
+                        ShowSevereError("Invalid over ride mode specified in PerformancePrecisionTradeoffs object: " + overrideModeValue);
+                    }
+
+                    if (overrideTimestep) {
+                        ShowWarningError("Due to PerformancePrecisionTradeoffs Override Mode, the Number of TimeSteps has been changed to 1.");
+                        DataGlobals::NumOfTimeStepInHour = 1;
+                    }
+                    if (overrideZoneAirHeatBalAlg) {
+                        ShowWarningError("Due to PerformancePrecisionTradeoffs Override Mode, the ZoneAirHeatBalanceAlgorithm has been changed to EulerMethod.");
+                        DataHeatBalance::OverrideZoneAirSolutionAlgo = true;
+                    }
+                    if (overrideMinNumWarmupDays) {
+                        ShowWarningError("Due to PerformancePrecisionTradeoffs Override Mode, the Minimum Number of Warmup Days has been changed to 1.");
+                        DataHeatBalance::MinNumberOfWarmupDays = 1;
+                    }
+                    if (overrideBeginEnvResetSuppress) {
+                        ShowWarningError("Due to PerformancePrecisionTradeoffs Override Mode, the Begin Environment Reset Mode has been changed to SuppressAllBeginEnvironmentResets.");
+                        DataEnvironment::forceBeginEnvResetSuppress = true;
+                    }
+                    if (overrideMaxZoneTempDiff) {
+                        ShowWarningError("Due to PerformancePrecisionTradeoffs Override Mode, internal variable MaxZoneTempDiff will be set to 1.0 .");
+                        DataConvergParams::MaxZoneTempDiff = 1.0;
+                    }
                 }
             }
         }
@@ -1253,6 +1348,44 @@ namespace SimulationManager {
         }
         print(outputFiles.eio, "\n");
 
+        // Performance Precision Tradeoffs
+        if (DataGlobals::DoCoilDirectSolutions) {
+            Alphas(1) = "Yes";
+            ShowWarningError("PerformancePrecisionTradeoffs: Coil Direct Solution simulation is selected.");
+        } else {
+            Alphas(1) = "No";
+        }
+        if (HeatBalanceIntRadExchange::CarrollMethod) {
+            Alphas(2) = "CarrollMRT";
+            ShowWarningError("PerformancePrecisionTradeoffs: Carroll MRT radiant exchange method is selected.");
+        } else {
+            Alphas(2) = "ScriptF";
+        }
+        Alphas(3) = overrideModeValue;
+        Alphas(4) = General::RoundSigDigits(DataGlobals::NumOfTimeStepInHour);
+        if (DataHeatBalance::OverrideZoneAirSolutionAlgo) {
+            Alphas(5) = "Yes";
+        } else {
+            Alphas(5) = "No";
+        }
+        Alphas(6) = General::RoundSigDigits(DataHeatBalance::MinNumberOfWarmupDays);
+        if (DataEnvironment::forceBeginEnvResetSuppress) {
+            Alphas(7) = "Yes";
+        } else {
+            Alphas(7) = "No";
+        }
+        Alphas(8) = General::RoundSigDigits(DataConvergParams::MaxZoneTempDiff,3);
+        std::string pptHeader = "! <Performance Precision Tradeoffs>, Use Coil Direct Simulation, "
+            "Zone Radiant Exchange Algorithm, Override Mode, Number of Timestep In Hour, "
+            "Force Euler Method, Minimum Number of Warmup Days, Force Suppress All Begin Environment Resets, "
+            "MaxZoneTempDiff";
+        print(outputFiles.eio, "{}\n", pptHeader);
+        print(outputFiles.eio, " Performance Precision Tradeoffs");
+        for (Num = 1; Num <= 8; ++Num) {
+            print(outputFiles.eio, ", {}", Alphas(Num));
+        }
+        print(outputFiles.eio, "\n");
+
         print(outputFiles.eio,
               "{}\n",
               "! <Output Reporting Tolerances>, Tolerance for Time Heating Setpoint Not Met, Tolerance for Zone Cooling Setpoint Not Met Time");
@@ -1277,6 +1410,36 @@ namespace SimulationManager {
         //    ENDIF
         // unused0909743 Format(' Display Extra Warnings',2(', ',A))
         //  ENDIF
+        if (DataGlobals::createProfLog) {
+            writeIntialPerfLogValues(overrideModeValue);
+        }
+    }
+
+    void writeIntialPerfLogValues(std::string const &currentOverrideModeValue)
+    // write the input related portions of the .perflog
+    // J.Glazer February 2020
+    {
+        UtilityRoutines::appendPerfLog("Program, Version, TimeStamp", DataStringGlobals::VerString); // this string already includes three portions and has commas
+        UtilityRoutines::appendPerfLog("Use Coil Direct Solution", bool_to_string(DoCoilDirectSolutions));
+        if (HeatBalanceIntRadExchange::CarrollMethod) {
+            UtilityRoutines::appendPerfLog("Zone Radiant Exchange Algorithm", "CarrollMRT");
+        } else {
+            UtilityRoutines::appendPerfLog("Zone Radiant Exchange Algorithm", "ScriptF");
+        }
+        UtilityRoutines::appendPerfLog("Override Mode", currentOverrideModeValue);
+        UtilityRoutines::appendPerfLog("Number of Timesteps per Hour", General::RoundSigDigits(DataGlobals::NumOfTimeStepInHour));
+        UtilityRoutines::appendPerfLog("Minimum Number of Warmup Days", General::RoundSigDigits(DataHeatBalance::MinNumberOfWarmupDays));
+        UtilityRoutines::appendPerfLog("SuppressAllBeginEnvironmentResets", bool_to_string(DataEnvironment::forceBeginEnvResetSuppress));
+        UtilityRoutines::appendPerfLog("MaxZoneTempDiff", General::RoundSigDigits(DataConvergParams::MaxZoneTempDiff));
+     }
+
+    std::string bool_to_string(bool logical)
+    {
+        if (logical) {
+            return("True");
+        } else {
+            return("False");
+        }
     }
 
     void CheckForMisMatchedEnvironmentSpecifications()
@@ -1644,20 +1807,12 @@ namespace SimulationManager {
         print(OutputFiles::getSingleton().eio, "Program Version,{}\n", VerString);
 
         // Open the Meters Output File
-        OutputFileMeters = GetNewUnitNumber();
+        OutputFiles::getSingleton().mtr.open();
         StdMeterRecordCount = 0;
-        {
-            IOFlags flags;
-            flags.ACTION("write");
-            flags.STATUS("UNKNOWN");
-            ObjexxFCL::gio::open(OutputFileMeters, DataStringGlobals::outputMtrFileName, flags);
-            write_stat = flags.ios();
+        if (!OutputFiles::getSingleton().mtr.good()) {
+            ShowFatalError("OpenOutputFiles: Could not open file " + OutputFiles::getSingleton().mtr.fileName + " for output (write).");
         }
-        if (write_stat != 0) {
-            ShowFatalError("OpenOutputFiles: Could not open file " + DataStringGlobals::outputMtrFileName + " for output (write).");
-        }
-        mtr_stream = ObjexxFCL::gio::out_stream(OutputFileMeters);
-        ObjexxFCL::gio::write(OutputFileMeters, fmtA) << "Program Version," + VerString;
+        print(OutputFiles::getSingleton().mtr, "Program Version,{}\n", VerString);
 
         // Open the Branch-Node Details Output File
         OutputFileBNDetails = GetNewUnitNumber();
@@ -1730,7 +1885,8 @@ namespace SimulationManager {
         // na
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static constexpr auto EndOfDataFormat("End of Data\n"); // Signifies the end of the data block in the output file
+        static constexpr auto EndOfDataString("End of Data"); // Signifies the end of the data block in the output file
+        static ObjexxFCL::gio::Fmt EndOfDataFormat("(\"End of Data\")");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -1766,7 +1922,11 @@ namespace SimulationManager {
         ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumReportList=" << NumReportList;
         ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "InstMeterCacheSize=" << InstMeterCacheSize;
         if (SutherlandHodgman) {
-            ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "ClippingAlgorithm=SutherlandHodgman";
+            if (SlaterBarsky) {
+                ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "ClippingAlgorithm=SlaterBarskyandSutherlandHodgman";
+            } else {
+                ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "ClippingAlgorithm=SutherlandHodgman";
+            }
         } else {
             ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "ClippingAlgorithm=ConvexWeilerAtherton";
         }
@@ -1875,22 +2035,17 @@ namespace SimulationManager {
         }
 
         // Close the Initialization Output File
-        print(outputFiles.eio, EndOfDataFormat);
+        print(outputFiles.eio, "{}\n", EndOfDataString);
         outputFiles.eio.close();
 
         // Close the Meters Output File
-        ObjexxFCL::gio::write(OutputFileMeters, EndOfDataFormat);
-        ObjexxFCL::gio::write(OutputFileMeters, fmtLD) << "Number of Records Written=" << StdMeterRecordCount;
+        print(outputFiles.mtr, "{}\n", EndOfDataString);
+        print(outputFiles.mtr, " Number of Records Written={:12}\n", StdMeterRecordCount);
         if (StdMeterRecordCount > 0) {
-            ObjexxFCL::gio::close(OutputFileMeters);
+            outputFiles.mtr.close();
         } else {
-            {
-                IOFlags flags;
-                flags.DISPOSE("DELETE");
-                ObjexxFCL::gio::close(OutputFileMeters, flags);
-            }
+            outputFiles.mtr.del();
         }
-        mtr_stream = nullptr;
 
         // Close the External Shading Output File
 
@@ -1969,7 +2124,7 @@ namespace SimulationManager {
 
             ManageExteriorEnergyUse();
 
-            ManageHeatBalance();
+            ManageHeatBalance(outputFiles);
 
             BeginHourFlag = false;
             BeginDayFlag = false;
@@ -1984,7 +2139,7 @@ namespace SimulationManager {
 
             ManageExteriorEnergyUse();
 
-            ManageHeatBalance();
+            ManageHeatBalance(outputFiles);
 
             //         do an end of day, end of environment time step
 
@@ -1997,7 +2152,7 @@ namespace SimulationManager {
 
             ManageExteriorEnergyUse();
 
-            ManageHeatBalance();
+            ManageHeatBalance(outputFiles);
 
         } // ... End environment loop.
 
@@ -2315,7 +2470,7 @@ namespace SimulationManager {
                            PlantLoop(Count).LoopSide(LoopSideNum).NodeNameOut + ',' + PlantLoop(Count).LoopSide(LoopSideNum).BranchList + ',' +
                            PlantLoop(Count).LoopSide(LoopSideNum).ConnectList;
                 //  Plant Supply Side Splitter
-                if (PlantLoop(Count).LoopSide(LoopSideNum).SplitterExists) {
+                if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Exists) {
                     ObjexxFCL::gio::write(ChrOut, fmtLD) << PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes;
                     ObjexxFCL::gio::write(OutputFileBNDetails, Format_713) << "   Plant Loop Connector,Splitter," +
                                                                        PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name + ',' +
@@ -2375,7 +2530,7 @@ namespace SimulationManager {
                 }
 
                 //  Plant Supply Side Mixer
-                if (PlantLoop(Count).LoopSide(LoopSideNum).MixerExists) {
+                if (PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Exists) {
                     ObjexxFCL::gio::write(ChrOut, fmtLD) << PlantLoop(Count).LoopSide(LoopSideNum).Mixer.TotalInletNodes;
                     ObjexxFCL::gio::write(OutputFileBNDetails, Format_713)
                         << "   Plant Loop Connector,Mixer," + PlantLoop(Count).LoopSide(LoopSideNum).Mixer.Name + ',' +
@@ -2476,7 +2631,7 @@ namespace SimulationManager {
                            PlantLoop(Count).LoopSide(LoopSideNum).NodeNameOut + ',' + PlantLoop(Count).LoopSide(LoopSideNum).BranchList + ',' +
                            PlantLoop(Count).LoopSide(LoopSideNum).ConnectList;
                 //  Plant Supply Side Splitter
-                if (PlantLoop(Count).LoopSide(LoopSideNum).SplitterExists) {
+                if (PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Exists) {
                     ObjexxFCL::gio::write(ChrOut, fmtLD) << PlantLoop(Count).LoopSide(LoopSideNum).Splitter.TotalOutletNodes;
                     ObjexxFCL::gio::write(OutputFileBNDetails, Format_713) << "   Plant Loop Connector,Splitter," +
                                                                        PlantLoop(Count).LoopSide(LoopSideNum).Splitter.Name + ',' +
@@ -2878,7 +3033,6 @@ namespace SimulationManager {
                                 EndUses,
                                 Groups,
                                 VarNames,
-                                _,
                                 VarIDs);
             for (Loop1 = 1; Loop1 <= NumVariables; ++Loop1) {
                 ObjexxFCL::gio::write(OutputFileDebug, "(1X,'RepVar,',I5,',',I5,',',A,',[',A,'],',A,',',A,',',A,',',I5)")

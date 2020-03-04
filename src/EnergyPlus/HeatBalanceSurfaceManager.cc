@@ -2220,7 +2220,6 @@ namespace HeatBalanceSurfaceManager {
         using namespace HeatBalanceMovableInsulation;
         using General::BlindBeamBeamTrans;
         using General::InterpBlind;
-        using General::InterpProfAng;
         using General::InterpProfSlatAng;
         using General::InterpSlatAng;
         using General::InterpSw;
@@ -5957,7 +5956,7 @@ namespace HeatBalanceSurfaceManager {
                         NodeTemp = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
                         MassFlowRate = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
                         CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
-                        // Real64 CpAir2 = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), NodeTemp);
+                        // Real64 CpAir2 = PsyCpAirFnW(ZoneAirHumRat(ZoneNum), NodeTemp);
                         SumSysMCp += MassFlowRate * CpAir;
                         SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                     }
