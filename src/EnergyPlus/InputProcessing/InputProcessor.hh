@@ -181,6 +181,8 @@ public:
 
     const json &getObjectInstances(std::string const &ObjType);
 
+    void clear_state();
+
 private:
     struct ObjectInfo
     {
@@ -277,8 +279,6 @@ private:
         }
         return s;
     }
-
-    void clear_state();
 
     using UnorderedObjectTypeMap = std::unordered_map<std::string, std::string>;
     using UnorderedObjectCacheMap = std::unordered_map<std::string, ObjectCache>;
