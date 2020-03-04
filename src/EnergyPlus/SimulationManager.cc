@@ -146,7 +146,6 @@ extern "C" {
 #include <EnergyPlus/ZoneContaminantPredictorCorrector.hh>
 #include <EnergyPlus/ZoneEquipmentManager.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
-#include <EnergyPlus/Globals/Globals.hh>
 
 namespace EnergyPlus {
 namespace SimulationManager {

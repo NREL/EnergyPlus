@@ -215,7 +215,6 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
-#include <EnergyPlus/Globals/Globals.hh>
 
 #ifdef _WIN32
 #include <direct.h>
@@ -437,7 +436,7 @@ int RunEnergyPlus(AllGlobals const &state, std::string const & filepath)
     return wrapUpEnergyPlus();
 }
 
-int runEnergyPlusAsLibrary( int argc, const char *argv[])
+int runEnergyPlusAsLibrary(int argc, const char *argv[])
 {
     // PROGRAM INFORMATION:
     //       AUTHOR         Linda K. Lawrie, et al

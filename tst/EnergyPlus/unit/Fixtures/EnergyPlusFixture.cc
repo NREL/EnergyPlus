@@ -82,6 +82,7 @@ void EnergyPlusFixture::SetUpTestCase()
 void EnergyPlusFixture::SetUp()
 {
     EnergyPlus::clearAllStates();
+    AllGlobals state;
 
     show_message();
 
