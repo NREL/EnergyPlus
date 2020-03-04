@@ -432,7 +432,7 @@ namespace DataSystemVariables {
 
         get_environment_variable(FullAnnualSimulation, cEnvValue);
         FullAnnualRun = env_var_on(cEnvValue); // Yes or True
-        if (ep_globals.dataGlobals.AnnualSimulation) FullAnnualRun = true;
+        if (state.dataGlobals.AnnualSimulation) FullAnnualRun = true;
 
         get_environment_variable(cDisplayAllWarnings, cEnvValue);
         DataGlobals::DisplayAllWarnings = env_var_on(cEnvValue); // Yes or True

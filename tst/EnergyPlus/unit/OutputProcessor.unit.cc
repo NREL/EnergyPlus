@@ -149,7 +149,7 @@ namespace OutputProcessor {
         TimeStepStampReportNbr = 1;
         TimeStepStampReportChr = "1";
         DataGlobals::DayOfSim = 1;
-        ep_globals.dataGlobals.DayOfSimChr = "1";
+        state.dataGlobals.DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 21;
@@ -215,7 +215,7 @@ namespace OutputProcessor {
         TimeStepStampReportNbr = 1;
         TimeStepStampReportChr = "1";
         DataGlobals::DayOfSim = 1;
-        ep_globals.dataGlobals.DayOfSimChr = "1";
+        state.dataGlobals.DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 21;
@@ -279,7 +279,7 @@ namespace OutputProcessor {
         TimeStepStampReportNbr = 1;
         TimeStepStampReportChr = "1";
         DataGlobals::DayOfSim = 1;
-        ep_globals.dataGlobals.DayOfSimChr = "1";
+        state.dataGlobals.DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 21;
@@ -347,7 +347,7 @@ namespace OutputProcessor {
         DailyStampReportNbr = 1;
         DailyStampReportChr = "1";
         DataGlobals::DayOfSim = 1;
-        ep_globals.dataGlobals.DayOfSimChr = "1";
+        state.dataGlobals.DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 21;
@@ -419,7 +419,7 @@ namespace OutputProcessor {
         MonthlyStampReportNbr = 1;
         MonthlyStampReportChr = "1";
         DataGlobals::DayOfSim = 1;
-        ep_globals.dataGlobals.DayOfSimChr = "1";
+        state.dataGlobals.DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 21;
@@ -491,7 +491,7 @@ namespace OutputProcessor {
         RunPeriodStampReportNbr = 1;
         RunPeriodStampReportChr = "1";
         DataGlobals::DayOfSim = 1;
-        ep_globals.dataGlobals.DayOfSimChr = "1";
+        state.dataGlobals.DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 21;
@@ -563,7 +563,7 @@ namespace OutputProcessor {
         YearlyStampReportNbr = 1;
         YearlyStampReportChr = "1";
         DataGlobals::DayOfSim = 1;
-        ep_globals.dataGlobals.DayOfSimChr = "1";
+        state.dataGlobals.DayOfSimChr = "1";
         DataGlobals::HourOfDay = 1;
         DataGlobals::CalendarYear = 2017;
         DataGlobals::CalendarYearChr = "2017";
@@ -4077,7 +4077,7 @@ namespace OutputProcessor {
         ASSERT_TRUE(process_idf(idf_objects));
 
         DataGlobals::DayOfSim = 365;
-        ep_globals.dataGlobals.DayOfSimChr = "365";
+        state.dataGlobals.DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;
@@ -4321,7 +4321,7 @@ namespace OutputProcessor {
         ASSERT_TRUE(process_idf(idf_objects));
 
         DataGlobals::DayOfSim = 365;
-        ep_globals.dataGlobals.DayOfSimChr = "365";
+        state.dataGlobals.DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;
@@ -4578,7 +4578,7 @@ namespace OutputProcessor {
         ASSERT_TRUE(process_idf(idf_objects));
 
         DataGlobals::DayOfSim = 365;
-        ep_globals.dataGlobals.DayOfSimChr = "365";
+        state.dataGlobals.DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;
@@ -4783,7 +4783,7 @@ namespace OutputProcessor {
 
         // Setup so that UpdateDataandReport can be called.
         DataGlobals::DayOfSim = 365;
-        ep_globals.dataGlobals.DayOfSimChr = "365";
+        state.dataGlobals.DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;
@@ -4917,7 +4917,7 @@ namespace OutputProcessor {
         ASSERT_TRUE(process_idf(idf_objects));
 
         DataGlobals::DayOfSim = 365;
-        ep_globals.dataGlobals.DayOfSimChr = "365";
+        state.dataGlobals.DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;
@@ -4995,7 +4995,7 @@ namespace OutputProcessor {
         ASSERT_TRUE(process_idf(idf_objects));
 
         DataGlobals::DayOfSim = 365;
-        ep_globals.dataGlobals.DayOfSimChr = "365";
+        state.dataGlobals.DayOfSimChr = "365";
         DataEnvironment::Month = 12;
         DataEnvironment::DayOfMonth = 31;
         DataEnvironment::DSTIndicator = 0;

@@ -183,7 +183,7 @@ TEST_F(EnergyPlusFixture, ParallelPIUTest1)
     DataZoneEquipment::GetZoneEquipmentData1();
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
     Fans::GetFanInput();
-    ep_globals.fans.GetFanInputFlag = false;
+    state.fans.GetFanInputFlag = false;
     PoweredInductionUnits::GetPIUs();
     EXPECT_TRUE(compare_err_stream(""));
     DataHeatBalFanSys::TempControlType.allocate(1);
@@ -401,7 +401,7 @@ TEST_F(EnergyPlusFixture, SeriesPIUTest1)
     DataZoneEquipment::GetZoneEquipmentData1();
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
     Fans::GetFanInput();
-    ep_globals.fans.GetFanInputFlag = false;
+    state.fans.GetFanInputFlag = false;
     PoweredInductionUnits::GetPIUs();
     EXPECT_TRUE(compare_err_stream(""));
     DataHeatBalFanSys::TempControlType.allocate(1);

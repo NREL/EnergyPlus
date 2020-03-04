@@ -198,7 +198,7 @@ namespace CommandLineInterface {
 
         DDOnlySimulation = opt.isSet("-D");
 
-        ep_globals.dataGlobals.AnnualSimulation = opt.isSet("-a");
+        state.dataGlobals.AnnualSimulation = opt.isSet("-a");
 
         outputEpJSONConversion = opt.isSet("-c");
 
@@ -510,7 +510,7 @@ namespace CommandLineInterface {
         }
 
         // Error for cases where both design-day and annual simulation switches are set
-        if (DDOnlySimulation && ep_globals.dataGlobals.AnnualSimulation) {
+        if (DDOnlySimulation && state.dataGlobals.AnnualSimulation) {
             DisplayString("ERROR: Cannot force both design-day and annual simulations. Set either '-D' or '-a', but not both.");
             DisplayString(errorFollowUp);
             exit(EXIT_FAILURE);

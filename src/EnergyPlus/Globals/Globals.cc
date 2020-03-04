@@ -59,4 +59,4 @@
     // This data-only module is a repository for all variables which are considered
     // to be "global" in nature in EnergyPlus.
 
-AllGlobals ep_globals;
+//AllGlobals state;

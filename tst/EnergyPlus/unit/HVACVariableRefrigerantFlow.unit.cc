@@ -11219,7 +11219,7 @@ TEST_F(HVACVRFFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     // check model inputs
     ASSERT_EQ(1, NumVRFCond);
     ASSERT_EQ(1, NumVRFTU);
-    ASSERT_EQ(1, ep_globals.fans.NumFans);
+    ASSERT_EQ(1, state.fans.NumFans);
     ASSERT_EQ(2, NumDXCoils);
     ASSERT_EQ("TU1 VRF DX COOLING COIL", thisDXCoolingCoil.Name);
     ASSERT_EQ("TU1 VRF DX HEATING COIL", thisDXHeatingCoil.Name);
@@ -12950,7 +12950,7 @@ TEST_F(HVACVRFFixture, VRF_FluidTCtrl_ReportOutputVerificationTest)
     // check model inputs
     ASSERT_EQ(1, NumVRFCond);
     ASSERT_EQ(1, NumVRFTU);
-    ASSERT_EQ(1, ep_globals.fans.NumFans);
+    ASSERT_EQ(1, state.fans.NumFans);
     ASSERT_EQ(2, NumDXCoils);
     ASSERT_EQ("TU1 VRF DX COOLING COIL", thisDXCoolingCoil.Name);
     ASSERT_EQ("TU1 VRF DX HEATING COIL", thisDXHeatingCoil.Name);

@@ -143,6 +143,6 @@ struct AllGlobals : BaseGlobalStruct
     };
 };
 
-extern AllGlobals ep_globals;
+//extern AllGlobals state;
 
 #endif

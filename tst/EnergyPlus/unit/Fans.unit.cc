@@ -71,10 +71,10 @@ TEST_F(EnergyPlusFixture, Fans_FanSizing)
     CurZoneEqNum = 0;
     CurSysNum = 0;
     CurOASysNum = 0;
-    ep_globals.fans.NumFans = 1;
-    Fan.allocate(ep_globals.fans.NumFans);
-    FanNumericFields.allocate(ep_globals.fans.NumFans);
-    FanNumericFields(ep_globals.fans.NumFans).FieldNames.allocate(3);
+    state.fans.NumFans = 1;
+    Fan.allocate(state.fans.NumFans);
+    FanNumericFields.allocate(state.fans.NumFans);
+    FanNumericFields(state.fans.NumFans).FieldNames.allocate(3);
 
     int FanNum = 1;
     Fan(FanNum).FanName = "Test Fan";
@@ -104,10 +104,10 @@ TEST_F(EnergyPlusFixture, Fans_ConstantVolume_EMSPressureRiseResetTest)
 {
 
     //!$Fans::NumFans = 1;
-    ep_globals.fans.NumFans = 1;
-    Fans::Fan.allocate(ep_globals.fans.NumFans);
-    Fans::FanNumericFields.allocate(ep_globals.fans.NumFans);
-    Fans::FanNumericFields(ep_globals.fans.NumFans).FieldNames.allocate(2);
+    state.fans.NumFans = 1;
+    Fans::Fan.allocate(state.fans.NumFans);
+    Fans::FanNumericFields.allocate(state.fans.NumFans);
+    Fans::FanNumericFields(state.fans.NumFans).FieldNames.allocate(2);
     // set standard air density
     DataEnvironment::StdRhoAir = 1.0;
     // set fan model inputs
@@ -131,8 +131,8 @@ TEST_F(EnergyPlusFixture, Fans_ConstantVolume_EMSPressureRiseResetTest)
     thisFan.RhoAirStdInit = DataEnvironment::StdRhoAir;
     thisFan.EMSFanPressureOverrideOn = false;
     thisFan.EMSFanPressureValue = 0.0;
-    ep_globals.fans.LocalTurnFansOn = true;
-    ep_globals.fans.LocalTurnFansOff = false;
+    state.fans.LocalTurnFansOn = true;
+    state.fans.LocalTurnFansOff = false;
     // simulate the fan
     Fans::SimSimpleFan(FanNum);
     // fan power = MassFlow * DeltaPress / (FanEff * RhoAir)
@@ -152,10 +152,10 @@ TEST_F(EnergyPlusFixture, Fans_OnOff_EMSPressureRiseResetTest)
 {
 
     //!$Fans::NumFans = 1;
-    ep_globals.fans.NumFans = 1;
-    Fans::Fan.allocate(ep_globals.fans.NumFans);
-    Fans::FanNumericFields.allocate(ep_globals.fans.NumFans);
-    Fans::FanNumericFields(ep_globals.fans.NumFans).FieldNames.allocate(2);
+    state.fans.NumFans = 1;
+    Fans::Fan.allocate(state.fans.NumFans);
+    Fans::FanNumericFields.allocate(state.fans.NumFans);
+    Fans::FanNumericFields(state.fans.NumFans).FieldNames.allocate(2);
     // set standard air density
     DataEnvironment::StdRhoAir = 1.0;
     // set fan model inputs
@@ -179,8 +179,8 @@ TEST_F(EnergyPlusFixture, Fans_OnOff_EMSPressureRiseResetTest)
     thisFan.RhoAirStdInit = DataEnvironment::StdRhoAir;
     thisFan.EMSFanPressureOverrideOn = false;
     thisFan.EMSFanPressureValue = 0.0;
-    ep_globals.fans.LocalTurnFansOn = true;
-    ep_globals.fans.LocalTurnFansOff = false;
+    state.fans.LocalTurnFansOn = true;
+    state.fans.LocalTurnFansOff = false;
     // simulate the fan
     Fans::SimOnOffFan(FanNum);
     // fan power = MassFlow * DeltaPress / (FanEff * RhoAir)
@@ -200,10 +200,10 @@ TEST_F(EnergyPlusFixture, Fans_VariableVolume_EMSPressureRiseResetTest)
 {
 
     //!$Fans::NumFans = 1;
-    ep_globals.fans.NumFans = 1;
-    Fans::Fan.allocate(ep_globals.fans.NumFans);
-    Fans::FanNumericFields.allocate(ep_globals.fans.NumFans);
-    Fans::FanNumericFields(ep_globals.fans.NumFans).FieldNames.allocate(2);
+    state.fans.NumFans = 1;
+    Fans::Fan.allocate(state.fans.NumFans);
+    Fans::FanNumericFields.allocate(state.fans.NumFans);
+    Fans::FanNumericFields(state.fans.NumFans).FieldNames.allocate(2);
     // set standard air density
     DataEnvironment::StdRhoAir = 1.0;
     // set fan model inputs
@@ -233,8 +233,8 @@ TEST_F(EnergyPlusFixture, Fans_VariableVolume_EMSPressureRiseResetTest)
     thisFan.FanCoeff(5) = 0.000;
     thisFan.EMSFanPressureOverrideOn = false;
     thisFan.EMSFanPressureValue = 0.0;
-    ep_globals.fans.LocalTurnFansOn = true;
-    ep_globals.fans.LocalTurnFansOff = false;
+    state.fans.LocalTurnFansOn = true;
+    state.fans.LocalTurnFansOff = false;
     // simulate the fan
     Fans::SimVariableVolumeFan(FanNum);
     // fan power = PartLoadFrac * MassFlow * DeltaPress / (FanEff * RhoAir)

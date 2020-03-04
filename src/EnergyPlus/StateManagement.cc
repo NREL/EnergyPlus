@@ -314,7 +314,7 @@ void EnergyPlus::clearAllStates()
     FluidProperties::clear_state();
     Furnaces::clear_state();
     GlobalNames::clear_state();
-    ep_globals.clear_state();
+    state.clear_state();
     GroundHeatExchangers::clear_state();
     GroundTemperatureManager::clear_state();
     HeatBalanceAirManager::clear_state();

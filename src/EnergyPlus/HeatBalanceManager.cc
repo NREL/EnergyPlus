@@ -388,7 +388,7 @@ namespace HeatBalanceManager {
             CheckWarmupConvergence();
             if (!WarmupFlag) {
                 DayOfSim = 0; // Reset DayOfSim if Warmup converged
-                ep_globals.dataGlobals.DayOfSimChr = "0";
+                state.dataGlobals.DayOfSimChr = "0";
 
                 ManageEMS(emsCallFromBeginNewEvironmentAfterWarmUp, anyRan); // calling point
             }
