@@ -2038,8 +2038,8 @@ namespace FuelCellElectricGenerator {
         }
     }
 
-    Real64 FCDataStruct::FuelCellProductGasEnthResidual(Real64 const TprodGas,    // temperature, this is "x" being searched
-                                                        Array1<Real64> const &Par // par(1) = Generator Number
+    Real64 FCDataStruct::FuelCellProductGasEnthResidual(Real64 const TprodGas,     // temperature, this is "x" being searched
+                                                        Array1D<Real64> const &Par // par(1) = Generator Number
     )
     {
 

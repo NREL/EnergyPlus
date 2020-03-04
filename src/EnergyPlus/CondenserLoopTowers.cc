@@ -5103,8 +5103,8 @@ namespace CondenserLoopTowers {
         }
     }
 
-    Real64 CoolingTower::residualMerkelLoad(Real64 _AirFlowRateRatio, // fan speed ratio (1.0 is continuous, 0.0 is off)
-                                            Array1<Real64> const &Par // par(1) = Tower number
+    Real64 CoolingTower::residualMerkelLoad(Real64 _AirFlowRateRatio,  // fan speed ratio (1.0 is continuous, 0.0 is off)
+                                            Array1D<Real64> const &Par // par(1) = Tower number
     )
     {
 
@@ -5642,8 +5642,8 @@ namespace CondenserLoopTowers {
         }
     }
 
-    Real64 CoolingTower::residualUA(Real64 UA,                // UA of cooling tower
-                                    Array1<Real64> const &Par // par(1) = design tower load [W]
+    Real64 CoolingTower::residualUA(Real64 UA,                 // UA of cooling tower
+                                    Array1D<Real64> const &Par // par(1) = design tower load [W]
     )
     {
         // FUNCTION INFORMATION:
@@ -5671,8 +5671,8 @@ namespace CondenserLoopTowers {
         return (Par(1) - CoolingOutput) / Par(1);
     }
 
-    Real64 CoolingTower::residualTr(Real64 Trange,            // cooling tower range temperature [C]
-                                    Array1<Real64> const &Par // par(1) = tower number
+    Real64 CoolingTower::residualTr(Real64 Trange,             // cooling tower range temperature [C]
+                                    Array1D<Real64> const &Par // par(1) = tower number
     )
     {
         // FUNCTION INFORMATION:
@@ -5704,8 +5704,8 @@ namespace CondenserLoopTowers {
         return (InletAirWB + Tapproach + Trange) - DataLoopNode::Node(this->WaterInletNodeNum).Temp;
     }
 
-    Real64 CoolingTower::residualTa(Real64 FlowRatio,         // water or air flow ratio of cooling tower
-                                    Array1<Real64> const &Par // par(1) = tower number
+    Real64 CoolingTower::residualTa(Real64 FlowRatio,          // water or air flow ratio of cooling tower
+                                    Array1D<Real64> const &Par // par(1) = tower number
     )
     {
         // FUNCTION INFORMATION:

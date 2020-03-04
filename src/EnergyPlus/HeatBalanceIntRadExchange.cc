@@ -144,7 +144,7 @@ namespace HeatBalanceIntRadExchange {
 
     void CalcInteriorRadExchange(Array1S<Real64> const SurfaceTemp,   // Current surface temperatures
                                  int const SurfIterations,            // Number of iterations in calling subroutine
-                                 Array1<Real64> &NetLWRadToSurf,      // Net long wavelength radiant exchange from other surfaces
+                                 Array1D<Real64> &NetLWRadToSurf,      // Net long wavelength radiant exchange from other surfaces
                                  Optional_int_const ZoneToResimulate, // if passed in, then only calculate for this zone
 #ifdef EP_Count_Calls
                                  std::string const &CalledFrom)
@@ -169,7 +169,7 @@ namespace HeatBalanceIntRadExchange {
         // Hottel, H. C. and A. F. Sarofim, Radiative Transfer, Ch 3, McGraw Hill, 1967.
 
         // Types
-        typedef Array1<Real64>::size_type size_type;
+        typedef Array1D<Real64>::size_type size_type;
 
         // Using/Aliasing
         using General::InterpSlatAng; // Function for slat angle interpolation
@@ -1717,9 +1717,9 @@ namespace HeatBalanceIntRadExchange {
     }
 
     void CalcScriptF(int const N,             // Number of surfaces
-                     Array1<Real64> const &A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
+                     Array1D<Real64> const &A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
                      Array2<Real64> const &F, // DIRECT VIEW FACTOR MATRIX (N X N)
-                     Array1<Real64> &EMISS,   // VECTOR OF SURFACE EMISSIVITIES
+                     Array1D<Real64> &EMISS,   // VECTOR OF SURFACE EMISSIVITIES
                      Array2<Real64> &ScriptF  // MATRIX OF SCRIPT F FACTORS (N X N) //Tuned Transposed
     )
     {
@@ -1936,8 +1936,8 @@ namespace HeatBalanceIntRadExchange {
     }
 
     void CalcFMRT(int const N,             // Number of surfaces
-                  Array1<Real64> const &A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
-                  Array1<Real64> &FMRT     // VECTOR OF MEAN RADIANT TEMPERATURE "VIEW FACTORS"
+                  Array1D<Real64> const &A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
+                  Array1D<Real64> &FMRT     // VECTOR OF MEAN RADIANT TEMPERATURE "VIEW FACTORS"
     )
     {
         double sumAF = 0.0;
@@ -1982,9 +1982,9 @@ namespace HeatBalanceIntRadExchange {
     }
 
     void CalcFp(int const N,             // Number of surfaces
-                Array1<Real64> &EMISS,   // VECTOR OF SURFACE EMISSIVITIES
-                Array1<Real64> &FMRT,    // VECTOR OF MEAN RADIANT TEMPERATURE "VIEW FACTORS"
-                Array1<Real64> &Fp       // VECTOR OF OPPENHEIM RESISTANCE VALUES
+                Array1D<Real64> &EMISS,   // VECTOR OF SURFACE EMISSIVITIES
+                Array1D<Real64> &FMRT,    // VECTOR OF MEAN RADIANT TEMPERATURE "VIEW FACTORS"
+                Array1D<Real64> &Fp       // VECTOR OF OPPENHEIM RESISTANCE VALUES
     )
     {
         Real64 SB = DataGlobals::StefanBoltzmann;

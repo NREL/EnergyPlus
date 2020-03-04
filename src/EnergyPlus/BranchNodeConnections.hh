@@ -171,7 +171,7 @@ namespace BranchNodeConnections {
     void GetNodeConnectionType(int const NodeNumber, Array1D_int &NodeConnectType, bool &errFlag);
 
     void FindAllNodeNumbersInList(int const WhichNumber,
-                                  Array1<DataBranchNodeConnections::NodeConnectionDef> const &NodeConnections,
+                                  Array1D<DataBranchNodeConnections::NodeConnectionDef> const &NodeConnections,
                                   int const NumItems,
                                   int &CountOfItems,            // Number of items found
                                   Array1D_int &AllNumbersInList // Index array to all numbers found

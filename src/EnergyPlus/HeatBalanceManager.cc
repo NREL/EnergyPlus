@@ -5002,7 +5002,7 @@ namespace HeatBalanceManager {
                          int const ZoneLoop,
                          Array1_string const &cAlphaArgs,
                          int &NumAlphas,
-                         Array1<Real64> const &rNumericArgs,
+                         Array1D<Real64> const &rNumericArgs,
                          int &NumNumbers,
                          Array1_bool const &EP_UNUSED(lNumericFieldBlanks), // Unused
                          Array1_bool const &lAlphaFieldBlanks,

@@ -6087,7 +6087,7 @@ namespace AirflowNetworkBalanceManager {
     }
 
     Real64 AFNPressureResidual(Real64 const ControllerMassFlowRate, // Pressure setpoint
-                               Array1<Real64> const &Par            // par(1) = PressureSet
+                               Array1D<Real64> const &Par           // par(1) = PressureSet
     )
     {
         // FUNCTION INFORMATION:

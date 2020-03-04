@@ -2125,7 +2125,7 @@ namespace SizingManager {
                                     int const OAIndex,
                                     Array1_string const &Alphas,
                                     int &NumAlphas,
-                                    Array1<Real64> const &Numbers,
+                                    Array1D<Real64> const &Numbers,
                                     int &NumNumbers,
                                     Array1_bool const &EP_UNUSED(lNumericBlanks), // Unused
                                     Array1_bool const &lAlphaBlanks,

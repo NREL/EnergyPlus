@@ -4804,7 +4804,7 @@ namespace WindowManager {
     void LUsolution(Array2<Real64> const &a, // Matrix and vector in a.x = b;
                     int const n,             // Dimension of a and b
                     Array1_int const &indx,  // Vector of row permutations
-                    Array1<Real64> &b        // Matrix and vector in a.x = b;
+                    Array1D<Real64> &b       // Matrix and vector in a.x = b;
     )
     {
 

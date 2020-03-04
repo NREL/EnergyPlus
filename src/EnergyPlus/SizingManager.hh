@@ -105,7 +105,7 @@ namespace SizingManager {
                                     int const OAIndex,
                                     Array1_string const &cAlphaArgs,
                                     int &NumAlphas,
-                                    Array1<Real64> const &rNumericArgs,
+                                    Array1D<Real64> const &rNumericArgs,
                                     int &NumNumbers,
                                     Array1_bool const &lNumericFieldBlanks, // Unused
                                     Array1_bool const &lAlphaFieldBlanks,
