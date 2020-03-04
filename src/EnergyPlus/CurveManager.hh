@@ -269,7 +269,7 @@ namespace CurveManager {
             gridMap.emplace(indVarListName,grids.size() - 1 );
             return grids.size() - 1;
         };
-        void normalizeGridValues(int gridIndex, int outputIndex, const std::vector<double> target, const double scalar = 1.0);
+        double normalizeGridValues(int gridIndex, int outputIndex, const std::vector<double> target, const double scalar = 1.0);
         int addOutputValues(int gridIndex, std::vector<double> values);
         int getGridIndex(std::string indVarListName, bool &ErrorsFound);
         int getNumGridDims(int gridIndex);
