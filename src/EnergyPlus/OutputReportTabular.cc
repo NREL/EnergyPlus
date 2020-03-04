@@ -8456,7 +8456,7 @@ namespace OutputReportTabular {
             rowHead.allocate(numRows);
             columnHead.allocate(7);
             columnWidth.allocate(7);
-            columnWidth = 14; // array assignment - same for all columns
+            columnWidth = 14;               // array assignment - same for all columns
             tableBody.allocate(7, numRows); // TODO: this appears to be (column, row)...
             rowHead = "";
             tableBody = "";
@@ -8544,16 +8544,24 @@ namespace OutputReportTabular {
                 }
 
                 // Erase the SubCategory (first column), using slicing
-                Array2D_string tableBodyTemp(tableBody({2, _, _ }, {_, _, _}));
-                Array1D_string columnHeadTemp(columnHead({2, _, _ }));
+                Array2D_string tableBodyTemp(tableBody({2, _, _}, {_, _, _}));
+                Array1D_string columnHeadTemp(columnHead({2, _, _}));
 
                 if (sqlite) {
-                    sqlite->createSQLiteTabularDataRecords(
-                        tableBodyTemp, rowHeadTemp, columnHeadTemp, "AnnualBuildingUtilityPerformanceSummary", "Entire Facility", "End Uses By Subcategory");
+                    sqlite->createSQLiteTabularDataRecords(tableBodyTemp,
+                                                           rowHeadTemp,
+                                                           columnHeadTemp,
+                                                           "AnnualBuildingUtilityPerformanceSummary",
+                                                           "Entire Facility",
+                                                           "End Uses By Subcategory");
                 }
                 if (ResultsFramework::OutputSchema->timeSeriesAndTabularEnabled()) {
-                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(
-                        tableBodyTemp, rowHeadTemp, columnHeadTemp, "Annual Building Utility Performance Summary", "Entire Facility", "End Uses By Subcategory");
+                    ResultsFramework::OutputSchema->TabularReportsCollection.addReportTable(tableBodyTemp,
+                                                                                            rowHeadTemp,
+                                                                                            columnHeadTemp,
+                                                                                            "Annual Building Utility Performance Summary",
+                                                                                            "Entire Facility",
+                                                                                            "End Uses By Subcategory");
                 }
                 rowHeadTemp.deallocate();
                 tableBodyTemp.deallocate();
@@ -9889,8 +9897,8 @@ namespace OutputReportTabular {
             }
 
             // Erase the SubCategory (first column), using slicing
-            Array2D_string tableBodyTemp(tableBody({2, _, _ }, {_, _, _}));
-            Array1D_string columnHeadTemp(columnHead({2, _, _ }));
+            Array2D_string tableBodyTemp(tableBody({2, _, _}, {_, _, _}));
+            Array1D_string columnHeadTemp(columnHead({2, _, _}));
 
             if (sqlite) {
                 sqlite->createSQLiteTabularDataRecords(
@@ -12293,10 +12301,12 @@ namespace OutputReportTabular {
 
         if (ShowDecayCurvesInEIO) {
             // show the line definition for the decay curves
-            print(outputFiles.eio,  "! <Radiant to Convective Decay Curves for Cooling>,Zone Name, Surface Name, Time "
-                                    "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36");
-            print(outputFiles.eio,  "! <Radiant to Convective Decay Curves for Heating>,Zone Name, Surface Name, Time "
-                                                 "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36");
+            print(outputFiles.eio,
+                  "! <Radiant to Convective Decay Curves for Cooling>,Zone Name, Surface Name, Time "
+                  "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36");
+            print(outputFiles.eio,
+                  "! <Radiant to Convective Decay Curves for Heating>,Zone Name, Surface Name, Time "
+                  "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36");
             // Put the decay curve into the EIO file
             for (int iZone = 1; iZone <= NumOfZones; ++iZone) {
                 ZoneData &zd(Zone(iZone));
@@ -14157,12 +14167,12 @@ namespace OutputReportTabular {
                     rowHead(6) = "Number of People";
                 }
 
-                tableBody(1, 1) = fmt::format("{:.{}f}", curCompLoad.outsideAirRatio, 4);   // outside Air
-                tableBody(1, 2) = fmt::format("{:0.3E}", curCompLoad.airflowPerFlrArea); // airflow per floor area
-                tableBody(1, 3) = fmt::format("{:0.3E}", curCompLoad.airflowPerTotCap);  // airflow per total capacity
-                tableBody(1, 4) = fmt::format("{:0.3E}", curCompLoad.areaPerTotCap);     // area per total capacity
-                tableBody(1, 5) = fmt::format("{:0.3E}", curCompLoad.totCapPerArea);     // total capacity per area
-                tableBody(1, 6) = fmt::format("{:.{}f}", curCompLoad.numPeople, 1); // number of people
+                tableBody(1, 1) = fmt::format("{:.{}f}", curCompLoad.outsideAirRatio, 4); // outside Air
+                tableBody(1, 2) = fmt::format("{:0.3E}", curCompLoad.airflowPerFlrArea);  // airflow per floor area
+                tableBody(1, 3) = fmt::format("{:0.3E}", curCompLoad.airflowPerTotCap);   // airflow per total capacity
+                tableBody(1, 4) = fmt::format("{:0.3E}", curCompLoad.areaPerTotCap);      // area per total capacity
+                tableBody(1, 5) = fmt::format("{:0.3E}", curCompLoad.totCapPerArea);      // total capacity per area
+                tableBody(1, 6) = fmt::format("{:.{}f}", curCompLoad.numPeople, 1);       // number of people
 
                 WriteSubtitle(engineeringCheckName);
                 WriteTable(tableBody, rowHead, columnHead, columnWidth);
@@ -14378,9 +14388,9 @@ namespace OutputReportTabular {
     }
 
     void WriteTable(Array2S_string const body, // row,column
-                    Array1S_string const rowLabels,
-                    Array1S_string const columnLabels,
-                    Array1S_int widthColumn,
+                    const Array1D_string &rowLabels,
+                    const Array1D_string &columnLabels,
+                    Array1D_int &widthColumn,
                     Optional_bool_const transposeXML,
                     Optional_string_const footnoteText)
     {
@@ -15109,7 +15119,7 @@ namespace OutputReportTabular {
         }
     }
 
-    void FillRowHead(Array1D_string & rowHead)
+    void FillRowHead(Array1D_string &rowHead)
     {
         // Forward fill the blanks in rowHead (eg End use column)
         std::string currentEndUseName;
@@ -15122,7 +15132,6 @@ namespace OutputReportTabular {
             }
         }
     }
-
 
     //======================================================================================================================
     //======================================================================================================================
@@ -15963,7 +15972,7 @@ namespace OutputReportTabular {
         UnitConv(69).siName = "W";
         UnitConv(70).siName = "W";
         UnitConv(71).siName = "W/KG";
-        UnitConv(72).siName = "W/KG H2O";   // TODO: replace with W/kgWater? or rather just remove
+        UnitConv(72).siName = "W/KG H2O"; // TODO: replace with W/kgWater? or rather just remove
         UnitConv(73).siName = "W/K";
         UnitConv(74).siName = "W/M2";
         UnitConv(75).siName = "W/M2";

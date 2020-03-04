@@ -871,7 +871,7 @@ namespace RoomAirModelAirflowNetwork {
         using DataSurfaces::SurfaceWindow;
         using DataZoneEquipment::ZoneEquipConfig;
         using InternalHeatGains::SumInternalConvectionGainsByIndices;
-        using InternalHeatGains::SumInternalConvectionGainsByTypes;
+        //using InternalHeatGains::SumInternalConvectionGainsByTypes;
         using InternalHeatGains::SumInternalLatentGainsByIndices;
         using InternalHeatGains::SumReturnAirConvectionGainsByIndices;
         using InternalHeatGains::SumReturnAirConvectionGainsByTypes;
