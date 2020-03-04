@@ -148,7 +148,7 @@ Real64 getVariableValue(const int handle) {
     //    if (handle < 0) {
     //        return -999;
     //    }
-    return EnergyPlus::OutputProcessor::RVariableTypes(handle).VarPtr().Which;
+    return *EnergyPlus::OutputProcessor::RVariableTypes(handle).VarPtr().Which;
 }
 
 
@@ -229,9 +229,9 @@ Real64 getInternalVariableValue(int handle) {
     }
     auto thisVar = EnergyPlus::DataRuntimeLanguage::EMSInternalVarsAvailable(handle);
     if (thisVar.PntrVarTypeUsed == EnergyPlus::DataRuntimeLanguage::PntrReal) {
-        return thisVar.RealValue();
+        return *thisVar.RealValue;
     } else if (thisVar.PntrVarTypeUsed == EnergyPlus::DataRuntimeLanguage::PntrInteger) {
-        return (Real64)thisVar.IntValue();
+        return (Real64)(*thisVar.IntValue);
     } // Doesn't look like this struct actually has a logical member type, so skipping that
     return 1;
 }

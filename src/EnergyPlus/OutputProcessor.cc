@@ -533,7 +533,7 @@ namespace OutputProcessor {
         TimeStepType timeStepType = ValidateTimeStepType(TimeStepTypeKey, "SetupTimePointers");
 
         TimeSteps tPtr;
-        tPtr.TimeStep >>= TimeStep;
+        tPtr.TimeStep = &TimeStep;
         if (!TimeValue.insert(std::make_pair(timeStepType, tPtr)).second) {
             // The element was already present... shouldn't happen
             ShowFatalError("SetupTimePointers was already called for " + TimeStepTypeKey);
@@ -5494,9 +5494,9 @@ namespace OutputProcessor {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         if (varType == 1) { // Integer
-            IVariableTypes(keyVarIndex).VarPtr().Which() = SetIntVal;
+            *IVariableTypes(keyVarIndex).VarPtr().Which = SetIntVal;
         } else if (varType == 2) { // real
-            RVariableTypes(keyVarIndex).VarPtr().Which() = SetRealVal;
+            *RVariableTypes(keyVarIndex).VarPtr().Which = SetRealVal;
         } else if (varType == 3) { // meter
             EnergyMeters(keyVarIndex).CurTSValue = SetRealVal;
         }
@@ -5956,7 +5956,7 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
         RVariable().minValueDate = 0;
 
         RVariableTypes(CV).VarPtr >>= RVariable;
-        RVariable().Which >>= ActualVariable;
+        RVariable().Which = &ActualVariable;
         RVariable().ReportID = CurrentReportNumber;
         RVariableTypes(CV).ReportID = CurrentReportNumber;
         RVariable().ReportIDChr = IDOut.substr(0, 15);
@@ -6146,7 +6146,7 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
         IVariable().minValueDate = 0;
 
         IVariableTypes(CV).VarPtr >>= IVariable;
-        IVariable().Which >>= ActualVariable;
+        IVariable().Which = &ActualVariable;
         IVariable().ReportID = CurrentReportNumber;
         IVariableTypes(CV).ReportID = CurrentReportNumber;
         IVariable().ReportIDChr = IDOut.substr(0, 15);
@@ -6347,7 +6347,7 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
 
     // Basic record keeping and report out if "detailed"
     StartMinute = TimeValue.at(t_TimeStepTypeKey).CurMinute;
-    TimeValue.at(t_TimeStepTypeKey).CurMinute += TimeValue.at(t_TimeStepTypeKey).TimeStep * 60.0;
+    TimeValue.at(t_TimeStepTypeKey).CurMinute += (*TimeValue.at(t_TimeStepTypeKey).TimeStep) * 60.0;
     if (t_TimeStepTypeKey == TimeStepType::TimeStepSystem &&
         (TimeValue.at(TimeStepType::TimeStepSystem).CurMinute == TimeValue.at(TimeStepType::TimeStepZone).CurMinute)) {
         EndTimeStepFlag = true;
@@ -6405,29 +6405,29 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
         auto &rVar(RVariableTypes(Loop).VarPtr());
         rVar.Stored = true;
         if (rVar.storeType == StoreType::Averaged) {
-            CurVal = rVar.Which * rxTime;
+            CurVal = (*rVar.Which) * rxTime;
             //        CALL SetMinMax(RVar%Which,MDHM,RVar%MaxValue,RVar%maxValueDate,RVar%MinValue,RVar%minValueDate)
-            if (rVar.Which > rVar.MaxValue) {
-                rVar.MaxValue = rVar.Which;
+            if ((*rVar.Which) > rVar.MaxValue) {
+                rVar.MaxValue = (*rVar.Which);
                 rVar.maxValueDate = MDHM;
             }
-            if (rVar.Which < rVar.MinValue) {
-                rVar.MinValue = rVar.Which;
+            if ((*rVar.Which) < rVar.MinValue) {
+                rVar.MinValue = (*rVar.Which);
                 rVar.minValueDate = MDHM;
             }
             rVar.TSValue += CurVal;
             rVar.EITSValue = rVar.TSValue; // CR - 8481 fix - 09/06/2011
         } else {
             //        CurVal=RVar%Which
-            if (rVar.Which > rVar.MaxValue) {
-                rVar.MaxValue = rVar.Which;
+            if ((*rVar.Which) > rVar.MaxValue) {
+                rVar.MaxValue = (*rVar.Which);
                 rVar.maxValueDate = MDHM;
             }
-            if (rVar.Which < rVar.MinValue) {
-                rVar.MinValue = rVar.Which;
+            if ((*rVar.Which) < rVar.MinValue) {
+                rVar.MinValue = (*rVar.Which);
                 rVar.minValueDate = MDHM;
             }
-            rVar.TSValue += rVar.Which;
+            rVar.TSValue += (*rVar.Which);
             rVar.EITSValue = rVar.TSValue; // CR - 8481 fix - 09/06/2011
         }
 
@@ -6470,15 +6470,15 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
                 }
                 TimePrint = false;
             }
-            WriteNumericData(rVar.ReportID, rVar.ReportIDChr, rVar.Which);
+            WriteNumericData(rVar.ReportID, rVar.ReportIDChr, *rVar.Which);
             ++StdOutputRecordCount;
 
             if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
                 if (t_TimeStepTypeKey == TimeStepType::TimeStepZone) {
-                    ResultsFramework::OutputSchema->RIDetailedZoneTSData.pushVariableValue(rVar.ReportID, rVar.Which);
+                    ResultsFramework::OutputSchema->RIDetailedZoneTSData.pushVariableValue(rVar.ReportID, *rVar.Which);
                 }
                 if (t_TimeStepTypeKey == TimeStepType::TimeStepSystem) {
-                    ResultsFramework::OutputSchema->RIDetailedHVACTSData.pushVariableValue(rVar.ReportID, rVar.Which);
+                    ResultsFramework::OutputSchema->RIDetailedHVACTSData.pushVariableValue(rVar.ReportID, *rVar.Which);
                 }
             }
         }
@@ -6492,7 +6492,7 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
         iVar.Stored = true;
         //      ICurVal=IVar%Which
         if (iVar.storeType == StoreType::Averaged) {
-            ICurVal = iVar.Which * rxTime;
+            ICurVal = (*iVar.Which) * rxTime;
             iVar.TSValue += ICurVal;
             iVar.EITSValue = iVar.TSValue; // CR - 8481 fix - 09/06/2011
             if (nint(ICurVal) > iVar.MaxValue) {
@@ -6504,15 +6504,15 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
                 iVar.minValueDate = MDHM; //+ TimeValue.at(t_TimeStepTypeKey)%TimeStep
             }
         } else {
-            if (iVar.Which > iVar.MaxValue) {
-                iVar.MaxValue = iVar.Which; // Record keeping for date and time go here too
+            if ((*iVar.Which) > iVar.MaxValue) {
+                iVar.MaxValue = (*iVar.Which); // Record keeping for date and time go here too
                 iVar.maxValueDate = MDHM;   //+ TimeValue(TimeStepType)%TimeStep
             }
-            if (iVar.Which < iVar.MinValue) {
-                iVar.MinValue = iVar.Which;
+            if ((*iVar.Which) < iVar.MinValue) {
+                iVar.MinValue = (*iVar.Which);
                 iVar.minValueDate = MDHM; //+ TimeValue(TimeStepType)%TimeStep
             }
-            iVar.TSValue += iVar.Which;
+            iVar.TSValue += (*iVar.Which);
             iVar.EITSValue = iVar.TSValue; // CR - 8481 fix - 09/06/2011
         }
 
@@ -6555,15 +6555,15 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
                 TimePrint = false;
             }
             // only time integer vars actual report as integer only is "detailed"
-            WriteNumericData(iVar.ReportID, iVar.ReportIDChr, iVar.Which);
+            WriteNumericData(iVar.ReportID, iVar.ReportIDChr, *iVar.Which);
             ++StdOutputRecordCount;
 
             if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
                 if (t_TimeStepTypeKey == TimeStepType::TimeStepZone) {
-                    ResultsFramework::OutputSchema->RIDetailedZoneTSData.pushVariableValue(iVar.ReportID, iVar.Which);
+                    ResultsFramework::OutputSchema->RIDetailedZoneTSData.pushVariableValue(iVar.ReportID, *iVar.Which);
                 }
                 if (t_TimeStepTypeKey == TimeStepType::TimeStepSystem) {
-                    ResultsFramework::OutputSchema->RIDetailedHVACTSData.pushVariableValue(iVar.ReportID, iVar.Which);
+                    ResultsFramework::OutputSchema->RIDetailedHVACTSData.pushVariableValue(iVar.ReportID, *iVar.Which);
                 }
             }
         }
@@ -7978,7 +7978,7 @@ Real64 GetInstantMeterValue(int const MeterNumber,                             /
             if (r_var_loop.timeStepType == t_timeStepType) {
                 auto &rVar(r_var_loop.VarPtr());
                 // Add to the total all of the appropriate variables
-                InstantMeterValue += rVar.Which * rVar.ZoneMult * rVar.ZoneListMult;
+                InstantMeterValue += (*rVar.Which) * rVar.ZoneMult * rVar.ZoneListMult;
             }
         }
     } else { // MeterType_CustomDec
@@ -7994,7 +7994,7 @@ Real64 GetInstantMeterValue(int const MeterNumber,                             /
                     if (r_var_loop.timeStepType == t_timeStepType) {
                         auto &rVar(r_var_loop.VarPtr());
                         // Add to the total all of the appropriate variables
-                        InstantMeterValue += rVar.Which * rVar.ZoneMult * rVar.ZoneListMult;
+                        InstantMeterValue += (*rVar.Which) * rVar.ZoneMult * rVar.ZoneListMult;
                         break;
                     }
                 }
@@ -8007,7 +8007,7 @@ Real64 GetInstantMeterValue(int const MeterNumber,                             /
                     if (r_var_loop.timeStepType == t_timeStepType) {
                         auto &rVar(r_var_loop.VarPtr());
                         // Add to the total all of the appropriate variables
-                        InstantMeterValue += rVar.Which * rVar.ZoneMult * rVar.ZoneListMult;
+                        InstantMeterValue += (*rVar.Which) * rVar.ZoneMult * rVar.ZoneListMult;
                         break;
                     }
                 }
@@ -8024,7 +8024,7 @@ Real64 GetInstantMeterValue(int const MeterNumber,                             /
                     if (r_var_loop.timeStepType == t_timeStepType) {
                         auto &rVar(r_var_loop.VarPtr());
                         // Add to the total all of the appropriate variables
-                        InstantMeterValue -= rVar.Which * rVar.ZoneMult * rVar.ZoneListMult;
+                        InstantMeterValue -= (*rVar.Which) * rVar.ZoneMult * rVar.ZoneListMult;
                         break;
                     }
                 }
@@ -8037,7 +8037,7 @@ Real64 GetInstantMeterValue(int const MeterNumber,                             /
                     if (r_var_loop.timeStepType == t_timeStepType) {
                         auto &rVar(r_var_loop.VarPtr());
                         // Add to the total all of the appropriate variables
-                        InstantMeterValue -= rVar.Which * rVar.ZoneMult * rVar.ZoneListMult;
+                        InstantMeterValue -= (*rVar.Which) * rVar.ZoneMult * rVar.ZoneListMult;
                         break;
                     }
                 }
@@ -8141,7 +8141,7 @@ Real64 GetInternalVariableValue(int const varType,    // 1=integer, 2=real, 3=me
         }
 
         // must use %Which, %Value is always zero if variable is not a requested report variable
-        resultVal = double(IVariableTypes(keyVarIndex).VarPtr().Which);
+        resultVal = double(*IVariableTypes(keyVarIndex).VarPtr().Which);
     } else if (varType == 2) { // real
         if (keyVarIndex > NumOfRVariable) {
             ShowFatalError("GetInternalVariableValue: Real variable passed index beyond range of array.");
@@ -8153,7 +8153,7 @@ Real64 GetInternalVariableValue(int const varType,    // 1=integer, 2=real, 3=me
         }
 
         // must use %Which, %Value is always zero if variable is not a requested report variable
-        resultVal = RVariableTypes(keyVarIndex).VarPtr().Which;
+        resultVal = *RVariableTypes(keyVarIndex).VarPtr().Which;
     } else if (varType == 3) { // Meter
         resultVal = GetCurrentMeterValue(keyVarIndex);
     } else if (varType == 4) { // Schedule

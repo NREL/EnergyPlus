@@ -266,7 +266,7 @@ namespace OutputProcessor {
     struct TimeSteps
     {
         // Members
-        Reference<Real64> TimeStep; // fortran POINTER Pointer to the Actual Time Step Variable (Zone or HVAC)
+        Real64 * TimeStep; // fortran POINTER Pointer to the Actual Time Step Variable (Zone or HVAC)
         Real64 CurMinute;           // Current minute (decoded from real Time Step Value)
 
         // Default Constructor
@@ -279,7 +279,7 @@ namespace OutputProcessor {
     struct RealVariables
     {
         // Members
-        Reference<Real64> Which; // The POINTER to the actual variable holding the value
+        Real64 * Which; // The POINTER to the actual variable holding the value
         Real64 Value;            // Current Value of the variable (to resolution of Zone Time Step)
         Real64 TSValue;          // Value of this variable at the Zone Time Step
         Real64 EITSValue;        // Value of this variable at the Zone Time Step for external interface
@@ -315,7 +315,7 @@ namespace OutputProcessor {
     struct IntegerVariables
     {
         // Members
-        Reference_int Which; // The POINTER to the actual variable holding the value
+        int * Which; // The POINTER to the actual variable holding the value
         Real64 Value;        // Current Value of the variable (to resolution of Zone Time Step)
         Real64 TSValue;      // Value of this variable at the Zone Time Step
         Real64 EITSValue;    // Value of this variable at the Zone Time Step for external interface

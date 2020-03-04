@@ -487,11 +487,11 @@ namespace EMSManager {
 
                     if (SELECT_CASE_var == PntrReal) {
 
-                        ErlVariable(ErlVariableNum).Value = SetErlValueNumber(EMSInternalVarsAvailable(InternVarAvailNum).RealValue);
+                        ErlVariable(ErlVariableNum).Value = SetErlValueNumber(*EMSInternalVarsAvailable(InternVarAvailNum).RealValue);
 
                     } else if (SELECT_CASE_var == PntrInteger) {
 
-                        tmpReal = double(EMSInternalVarsAvailable(InternVarAvailNum).IntValue);
+                        tmpReal = double(*EMSInternalVarsAvailable(InternVarAvailNum).IntValue);
                         ErlVariable(ErlVariableNum).Value = SetErlValueNumber(tmpReal);
                     }
                 }
@@ -2479,7 +2479,7 @@ void SetupEMSInternalVariable(std::string const &cDataTypeName, std::string cons
         EMSInternalVarsAvailable(InternalVarAvailNum).DataTypeName = cDataTypeName;
         EMSInternalVarsAvailable(InternalVarAvailNum).UniqueIDName = cUniqueIDName;
         EMSInternalVarsAvailable(InternalVarAvailNum).Units = cUnits;
-        EMSInternalVarsAvailable(InternalVarAvailNum).RealValue >>= rValue;
+        EMSInternalVarsAvailable(InternalVarAvailNum).RealValue = &rValue;
         EMSInternalVarsAvailable(InternalVarAvailNum).PntrVarTypeUsed = PntrReal;
     }
 }
@@ -2539,7 +2539,7 @@ void SetupEMSInternalVariable(std::string const &cDataTypeName, std::string cons
         EMSInternalVarsAvailable(InternalVarAvailNum).DataTypeName = cDataTypeName;
         EMSInternalVarsAvailable(InternalVarAvailNum).UniqueIDName = cUniqueIDName;
         EMSInternalVarsAvailable(InternalVarAvailNum).Units = cUnits;
-        EMSInternalVarsAvailable(InternalVarAvailNum).IntValue >>= iValue;
+        EMSInternalVarsAvailable(InternalVarAvailNum).IntValue = &iValue;
         EMSInternalVarsAvailable(InternalVarAvailNum).PntrVarTypeUsed = PntrInteger;
     }
 }
