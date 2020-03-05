@@ -156,12 +156,12 @@ namespace TARCOGCommon {
         return LDSumMean;
     }
 
-    void modifyHcGap(Array1<Real64> const &hcgap, // Convective coefficient for gap
-                     Array1<Real64> const &qv,    // Heat flow from ventilation [W/m2]
-                     Array1<Real64> const &hcv,   // Convective heat flow coefficient due to ventilation
-                     Array1<Real64> &hcgapMod,    // Modified heat flow coefficient for gap
-                     int const nlayer,            // Number of layers
-                     Real64 const edgeGlCorFac    // Edge of glass correction factor
+    void modifyHcGap(Array1D<Real64> const &hcgap, // Convective coefficient for gap
+                     Array1D<Real64> const &qv,    // Heat flow from ventilation [W/m2]
+                     Array1D<Real64> const &hcv,   // Convective heat flow coefficient due to ventilation
+                     Array1D<Real64> &hcgapMod,    // Modified heat flow coefficient for gap
+                     int const nlayer,             // Number of layers
+                     Real64 const edgeGlCorFac     // Edge of glass correction factor
     )
     {
         for (int i = 1; i <= nlayer + 1; ++i) {
@@ -175,21 +175,21 @@ namespace TARCOGCommon {
 
     void matrixQBalance(int const nlayer,
                         Array2<Real64> &a,
-                        Array1<Real64> &b,
-                        Array1<Real64> const &sconScaled, // Solid layer coduction coefficient divided by thickness
-                        Array1<Real64> const &hcgas,
-                        Array1<Real64> &hcgapMod, // Modified heat flow coefficient for gap
-                        Array1<Real64> const &asol,
-                        Array1<Real64> const &qv,
-                        Array1<Real64> const &hcv, // Convective heat flow coefficient due to ventilation
+                        Array1D<Real64> &b,
+                        Array1D<Real64> const &sconScaled, // Solid layer coduction coefficient divided by thickness
+                        Array1D<Real64> const &hcgas,
+                        Array1D<Real64> &hcgapMod, // Modified heat flow coefficient for gap
+                        Array1D<Real64> const &asol,
+                        Array1D<Real64> const &qv,
+                        Array1D<Real64> const &hcv, // Convective heat flow coefficient due to ventilation
                         Real64 const Tin,
                         Real64 const Tout,
                         Real64 const Gin,
                         Real64 const Gout,
-                        Array1<Real64> const &theta,
-                        Array1<Real64> const &tir,
-                        Array1<Real64> const &rir,
-                        Array1<Real64> const &emis,
+                        Array1D<Real64> const &theta,
+                        Array1D<Real64> const &tir,
+                        Array1D<Real64> const &rir,
+                        Array1D<Real64> const &emis,
                         Real64 const edgeGlCorrFac // Edge of glass correction factor
     )
     {
@@ -325,7 +325,7 @@ namespace TARCOGCommon {
         lubksb(a, n, indx, b);
     }
 
-    void ludcmp(Array2<Real64> &a, int const n, Array1_int &indx, Real64 &d, int &nperr, std::string &ErrorMessage)
+    void ludcmp(Array2<Real64> &a, int const n, Array1D_int &indx, Real64 &d, int &nperr, std::string &ErrorMessage)
     {
 
         // Locals

@@ -493,7 +493,7 @@ namespace FluidProperties {
     );
 
     Real64 GetSupHeatTempRefrigResidual(Real64 Temperature, // temperature of the refrigerant
-                                        Array1<Real64> const &Par);
+                                        Array1D<Real64> const &Par);
 
     //*****************************************************************************
 

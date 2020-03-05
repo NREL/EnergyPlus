@@ -93,15 +93,15 @@ namespace TarcogShading {
 
     // Functions
 
-    void shading(Array1<Real64> const &theta,
-                 Array1<Real64> const &gap,
-                 Array1<Real64> &hgas,
-                 Array1<Real64> &hcgas,
-                 Array1<Real64> &hrgas,
+    void shading(Array1D<Real64> const &theta,
+                 Array1D<Real64> const &gap,
+                 Array1D<Real64> &hgas,
+                 Array1D<Real64> &hcgas,
+                 Array1D<Real64> &hrgas,
                  Array2<Real64> const &frct,
                  Array2_int const &iprop,
-                 Array1<Real64> const &pressure,
-                 Array1_int const &nmix,
+                 Array1D<Real64> const &pressure,
+                 Array1D_int const &nmix,
                  const Array1D<Real64> &xwght,
                  Array2<Real64> const &xgcon,
                  Array2<Real64> const &xgvis,
@@ -112,20 +112,20 @@ namespace TarcogShading {
                  Real64 const angle,
                  Real64 const Tout,
                  Real64 const Tin,
-                 Array1<Real64> const &Atop,
-                 Array1<Real64> const &Abot,
-                 Array1<Real64> const &Al,
-                 Array1<Real64> const &Ar,
-                 Array1<Real64> const &Ah,
-                 Array1<Real64> const &vvent,
-                 Array1<Real64> const &tvent,
-                 Array1_int const &LayerType,
-                 Array1<Real64> &Tgaps,
-                 Array1<Real64> &qv,
-                 Array1<Real64> &hcv, // Heat transfer coeefficient in gaps including airlow
+                 Array1D<Real64> const &Atop,
+                 Array1D<Real64> const &Abot,
+                 Array1D<Real64> const &Al,
+                 Array1D<Real64> const &Ar,
+                 Array1D<Real64> const &Ah,
+                 Array1D<Real64> const &vvent,
+                 Array1D<Real64> const &tvent,
+                 Array1D_int const &LayerType,
+                 Array1D<Real64> &Tgaps,
+                 Array1D<Real64> &qv,
+                 Array1D<Real64> &hcv, // Heat transfer coeefficient in gaps including airlow
                  int &nperr,
                  std::string &ErrorMessage,
-                 Array1<Real64> &vfreevent)
+                 Array1D<Real64> &vfreevent)
     {
         //**************************************************************************************************************
         //  Input:
