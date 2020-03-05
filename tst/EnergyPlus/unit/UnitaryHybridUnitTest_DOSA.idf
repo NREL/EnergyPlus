@@ -1377,12 +1377,12 @@ ZoneHVAC:HybridUnitaryHVAC,
 
   Table:IndependentVariableList,
     Mode0_IndependentVariableList,  !- Name
-    Mode0_Toa,                      !- Independent Variable 1 Name
-    Mode0_Woa,                      !- Independent Variable 2 Name
-    Mode0_Tra,                      !- Extended Field
-    Mode0_Wra,                      !- Extended Field
-    Mode0_Ma,                       !- Extended Field
-    Mode0_OAF;                      !- Extended Field
+    Mode0_Toa,               !- Independent Variable 1 Name
+    Mode0_Woa,               !- Independent Variable 2 Name
+    Mode0_Tra,               !- Extended Field
+    Mode0_Wra,               !- Extended Field
+    Mode0_Ma,                !- Extended Field
+    Mode0_OAF;               !- Extended Field
 
   Table:Lookup,
     Mode0_Power_lookup,      !- Name
@@ -2220,12 +2220,12 @@ ZoneHVAC:HybridUnitaryHVAC,
 
   Table:IndependentVariableList,
     Mode1_IndependentVariableList,  !- Name
-    Mode1_Toa,                      !- Independent Variable 1 Name
-    Mode1_Woa,                      !- Independent Variable 2 Name
-    Mode1_Tra,                      !- Extended Field
-    Mode1_Wra,                      !- Extended Field
-    Mode1_Ma,                       !- Extended Field
-    Mode1_OAF;                      !- Extended Field
+    Mode1_Toa,               !- Independent Variable 1 Name
+    Mode1_Woa,               !- Independent Variable 2 Name
+    Mode1_Tra,               !- Extended Field
+    Mode1_Wra,               !- Extended Field
+    Mode1_Ma,                !- Extended Field
+    Mode1_OAF;               !- Extended Field
 
   Table:Lookup,
     Mode1_ESP_lookup,        !- Name
@@ -9687,12 +9687,12 @@ ZoneHVAC:HybridUnitaryHVAC,
 
   Table:IndependentVariableList,
     Mode2_IndependentVariableList,  !- Name
-    Mode2_Toa,                      !- Independent Variable 1 Name
-    Mode2_Woa,                      !- Independent Variable 2 Name
-    Mode2_Tra,                      !- Extended Field
-    Mode2_Wra,                      !- Extended Field
-    Mode2_Ma,                       !- Extended Field
-    Mode2_OAF;                      !- Extended Field
+    Mode2_Toa,               !- Independent Variable 1 Name
+    Mode2_Woa,               !- Independent Variable 2 Name
+    Mode2_Tra,               !- Extended Field
+    Mode2_Wra,               !- Extended Field
+    Mode2_Ma,                !- Extended Field
+    Mode2_OAF;               !- Extended Field
 
   Table:Lookup,
     Mode2_ESP_lookup,        !- Name
@@ -17154,12 +17154,12 @@ ZoneHVAC:HybridUnitaryHVAC,
 
   Table:IndependentVariableList,
     Mode3_IndependentVariableList,  !- Name
-    Mode3_Toa,                      !- Independent Variable 1 Name
-    Mode3_Woa,                      !- Independent Variable 2 Name
-    Mode3_Tra,                      !- Extended Field
-    Mode3_Wra,                      !- Extended Field
-    Mode3_Ma,                       !- Extended Field
-    Mode3_OAF;                      !- Extended Field
+    Mode3_Toa,               !- Independent Variable 1 Name
+    Mode3_Woa,               !- Independent Variable 2 Name
+    Mode3_Tra,               !- Extended Field
+    Mode3_Wra,               !- Extended Field
+    Mode3_Ma,                !- Extended Field
+    Mode3_OAF;               !- Extended Field
 
   Table:Lookup,
     Mode3_ESP_lookup,        !- Name
@@ -23164,12 +23164,12 @@ ZoneHVAC:HybridUnitaryHVAC,
 
   Table:IndependentVariableList,
     Mode4_IndependentVariableList,  !- Name
-    Mode4_Toa,                      !- Independent Variable 1 Name
-    Mode4_Woa,                      !- Independent Variable 2 Name
-    Mode4_Tra,                      !- Extended Field
-    Mode4_Wra,                      !- Extended Field
-    Mode4_Ma,                       !- Extended Field
-    Mode4_OAF;                      !- Extended Field
+    Mode4_Toa,               !- Independent Variable 1 Name
+    Mode4_Woa,               !- Independent Variable 2 Name
+    Mode4_Tra,               !- Extended Field
+    Mode4_Wra,               !- Extended Field
+    Mode4_Ma,                !- Extended Field
+    Mode4_OAF;               !- Extended Field
 
   Table:Lookup,
     Mode4_ESP_lookup,        !- Name
@@ -30621,12 +30621,12 @@ ZoneHVAC:HybridUnitaryHVAC,
 
   Table:IndependentVariableList,
     Mode5_IndependentVariableList,  !- Name
-    Mode5_Toa,                      !- Independent Variable 1 Name
-    Mode5_Woa,                      !- Independent Variable 2 Name
-    Mode5_Tra,                      !- Extended Field
-    Mode5_Wra,                      !- Extended Field
-    Mode5_Ma,                       !- Extended Field
-    Mode5_OAF;                      !- Extended Field
+    Mode5_Toa,               !- Independent Variable 1 Name
+    Mode5_Woa,               !- Independent Variable 2 Name
+    Mode5_Tra,               !- Extended Field
+    Mode5_Wra,               !- Extended Field
+    Mode5_Ma,                !- Extended Field
+    Mode5_OAF;               !- Extended Field
 
   Table:Lookup,
     Mode5_ESP_lookup,        !- Name
