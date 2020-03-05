@@ -426,7 +426,7 @@ namespace SizingManager {
                                 }
 
                                 // set flag for pulse used in load component reporting
-                                doLoadComponentPulseNow = CalcdoLoadComponentPulseNow(isPulseZoneSizing,WarmupFlag,HourOfDay,TimeStep);
+                                doLoadComponentPulseNow = CalcdoLoadComponentPulseNow(isPulseZoneSizing,WarmupFlag,HourOfDay,TimeStep,KindOfSim,DayOfSim);
 
                                 ManageWeather();
 
@@ -878,7 +878,9 @@ namespace SizingManager {
     bool CalcdoLoadComponentPulseNow(bool const isPulseZoneSizing,
                                      bool const WarmupFlag,
                                      int const HourOfDay,
-                                     int const TimeStep
+                                     int const TimeStep,
+                                     int const KindOfSim,
+                                     int const DayOfSim
                                      )
     {
         // This routine decides whether or not to do a Load Component Pulse.  True when yes it should, false when in shouldn't
@@ -889,7 +891,8 @@ namespace SizingManager {
         int const HourDayToPulse (10);
         int const TimeStepToPulse (1);
         
-        if ( (isPulseZoneSizing) && (!WarmupFlag) && (HourOfDay == HourDayToPulse) && (TimeStep == TimeStepToPulse) ) {
+        if ( (isPulseZoneSizing) && (!WarmupFlag) && (HourOfDay == HourDayToPulse) && (TimeStep == TimeStepToPulse) &&
+             ((KindOfSim == ksRunPeriodDesign) || (DayOfSim == 1)) ) {
             return true;
         } else {
             return false;
