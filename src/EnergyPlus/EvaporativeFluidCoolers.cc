@@ -978,9 +978,9 @@ namespace EvaporativeFluidCoolers {
 
             this->InitEvapFluidCooler();
             this->SizeEvapFluidCooler();
-            MinLoad = 0.0; // signifies non-load based model (i.e. forward
-            MaxLoad = 0.0; // heat exhanger model)
-            OptLoad = 0.0;
+            MinLoad = 0.0; // signifies non-load based model (i.e. forward heat exhanger model)
+            MaxLoad = this->HighSpeedStandardDesignCapacity * this->HeatRejectCapNomCapSizingRatio;
+            OptLoad = this->HighSpeedStandardDesignCapacity;
 
         } else {
             ShowFatalError("SimEvapFluidCoolers: Invalid evaporative fluid cooler Type Requested = " + EvapFluidCoolerType);
