@@ -71,6 +71,7 @@
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/RuntimeLanguageProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
@@ -213,12 +214,16 @@ namespace EMSManager {
         cCurrentModuleObject = "Output:EnergyManagementSystem";
         int NumOutputEMSs = inputProcessor->getNumObjectsFound(cCurrentModuleObject);
 
+        // Python plugin instances also count since actuators need to be set up for them
+        int numPythonPlugins = inputProcessor->getNumObjectsFound("PythonPlugin:Instance");
+        int numActiveCallbacks = PluginManagement::PluginManager::numActiveCallbacks();
+
         // added for FMU
         if ((NumSensors + numActuatorsUsed + NumProgramCallManagers + NumErlPrograms + NumErlSubroutines + NumUserGlobalVariables +
              NumEMSOutputVariables + NumEMSCurveIndices + NumExternalInterfaceGlobalVariables + NumExternalInterfaceActuatorsUsed +
              NumEMSConstructionIndices + NumEMSMeteredOutputVariables + NumExternalInterfaceFunctionalMockupUnitImportActuatorsUsed +
              NumExternalInterfaceFunctionalMockupUnitImportGlobalVariables + NumExternalInterfaceFunctionalMockupUnitExportActuatorsUsed +
-             NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables + NumOutputEMSs) > 0) {
+             NumExternalInterfaceFunctionalMockupUnitExportGlobalVariables + NumOutputEMSs + numPythonPlugins + numActiveCallbacks) > 0) {
             AnyEnergyManagementSystemInModel = true;
         } else {
             AnyEnergyManagementSystemInModel = false;
@@ -302,6 +307,13 @@ namespace EMSManager {
         if (iCalledFrom == emsCallFromBeginNewEvironment) BeginEnvrnInitializeRuntimeLanguage();
 
         InitEMS(iCalledFrom);
+
+        // also call plugins and callbacks here for convenience
+        bool anyPluginsOrCallbacksRan = false;
+        PluginManagement::runAnyRegisteredCallbacks(iCalledFrom, anyPluginsOrCallbacksRan);
+        if (anyPluginsOrCallbacksRan) {
+            anyProgramRan = true;
+        }
 
         if (iCalledFrom == emsCallFromSetupSimulation) {
             ProcessEMSInput(true);
