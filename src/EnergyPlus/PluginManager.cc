@@ -108,6 +108,17 @@ namespace PluginManagement {
 #endif
     }
 
+#if LINK_WITH_PYTHON == 1
+    std::string pythonStringForUsage() {
+        std::string sVersion = Py_GetVersion();
+        return "Linked to Python Version: \"" + sVersion + "\"";
+    }
+#else
+    std::string pythonStringForUsage() {
+        return "This version of EnergyPlus not linked to Python library.";
+    }
+#endif
+
     void PluginManager::setupOutputVariables() {
 #if LINK_WITH_PYTHON == 1
         // with the PythonPlugin:Variables all set in memory, we can now set them up as outputs as needed

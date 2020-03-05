@@ -75,6 +75,7 @@ namespace PluginManagement {
 
     void registerNewCallback(int iCalledFrom, void (*f)());
     void runAnyRegisteredCallbacks(int iCalledFrom, bool &anyRan);
+    std::string pythonStringForUsage();
 
     void clear_state();
 
