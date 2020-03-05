@@ -5705,13 +5705,13 @@ namespace InternalHeatGains {
         Real64 CPULoadSchedFrac;                          // CPU loading schedule fraction
         Real64 AirConnection;                             // Air connection type
         Real64 TSupply;                                   // Supply air temperature [C]
-        Real64 WSupply;                                   // Supply air humidity ratio [kgWater/kgDryair]
+        Real64 WSupply;                                   // Supply air humidity ratio [kgWater/kgDryAir]
         Real64 RecircFrac;                                // Recirulation fraction - current
         Real64 TRecirc;                                   // Recirulation air temperature [C]
-        Real64 WRecirc;                                   // Recirulation air humidity ratio [kgWater/kgDryair]
+        Real64 WRecirc;                                   // Recirulation air humidity ratio [kgWater/kgDryAir]
         Real64 TAirIn;                                    // Entering air dry-bulb temperature [C]
         Real64 TAirInDesign;                              // Design entering air dry-bulb temperature [C]
-        Real64 WAirIn;                                    // Entering air humidity ratio [kgWater/kgDryair]
+        Real64 WAirIn;                                    // Entering air humidity ratio [kgWater/kgDryAir]
         Real64 TDPAirIn;                                  // Entering air dewpoint temperature [C]
         Real64 RHAirIn;                                   // Entering air relative humidity [%]
         Real64 SupplyHeatIndex;                           // Supply heat index
