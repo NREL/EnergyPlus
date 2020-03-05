@@ -3264,7 +3264,7 @@ namespace SolarShading {
         } // enclosure loop
     }
 
-    void CLIP(int const NVT, Array1<Real64> &XVT, Array1<Real64> &YVT, Array1<Real64> &ZVT)
+    void CLIP(int const NVT, Array1D<Real64> &XVT, Array1D<Real64> &YVT, Array1D<Real64> &ZVT)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3379,12 +3379,12 @@ namespace SolarShading {
         }
     }
 
-    void CTRANS(int const NS,        // Surface number whose vertex coordinates are being transformed
-                int const NGRS,      // Base surface number for surface NS
-                int &NVT,            // Number of vertices for surface NS
-                Array1<Real64> &XVT, // XYZ coordinates of vertices of NS in plane of NGRS
-                Array1<Real64> &YVT,
-                Array1<Real64> &ZVT)
+    void CTRANS(int const NS,         // Surface number whose vertex coordinates are being transformed
+                int const NGRS,       // Base surface number for surface NS
+                int &NVT,             // Number of vertices for surface NS
+                Array1D<Real64> &XVT, // XYZ coordinates of vertices of NS in plane of NGRS
+                Array1D<Real64> &YVT,
+                Array1D<Real64> &ZVT)
     {
 
         // SUBROUTINE INFORMATION:

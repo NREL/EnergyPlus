@@ -175,19 +175,19 @@ namespace HVACDXHeatPumpSystem {
     );
 
     Real64 DXHeatingCoilResidual(Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                 Array1<Real64> const &Par  // par(1) = DX coil number
+                                 Array1D<Real64> const &Par // par(1) = DX coil number
     );
 
     //******************************************************************************
 
     Real64 VSCoilCyclingResidual(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                 Array1<Real64> const &Par   // par(1) = DX coil number
+                                 Array1D<Real64> const &Par  // par(1) = DX coil number
     );
 
     //******************************************************************************
 
-    Real64 VSCoilSpeedResidual(Real64 const SpeedRatio,  // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                               Array1<Real64> const &Par // par(1) = DX coil number
+    Real64 VSCoilSpeedResidual(Real64 const SpeedRatio,   // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+                               Array1D<Real64> const &Par // par(1) = DX coil number
     );
 
     int GetHeatingCoilInletNodeNum(std::string const &DXCoilSysName);

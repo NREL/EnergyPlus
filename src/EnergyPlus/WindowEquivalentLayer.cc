@@ -7472,8 +7472,8 @@ namespace WindowEquivalentLayer {
                 Array1S<CFSSWP> const LSWP_ON, // layer SW (solar) properties (off-normal adjusted)
                 Real64 const RHO_room,         // effective solar reflectance of room (at inside)
                 Real64 const ISOL,             // incident flux (W/m2)
-                Array1<Real64> &QPLUS,         // returned: see Edwards paper
-                Array1<Real64> &QMINUS         // returned: see Edwards paper
+                Array1D<Real64> &QPLUS,        // returned: see Edwards paper
+                Array1D<Real64> &QMINUS        // returned: see Edwards paper
     )
     {
         // SUBROUTINE INFORMATION:

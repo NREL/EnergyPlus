@@ -9666,7 +9666,7 @@ namespace WaterThermalTanks {
     }
 
     Real64 WaterThermalTankData::PLRResidualIterSpeed(Real64 const SpeedRatio, // speed ratio between two speed levels
-                                                      Array1<Real64> const &Par)
+                                                      Array1D<Real64> const &Par)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         B.Shen, ORNL, 12/2014
@@ -9755,7 +9755,7 @@ namespace WaterThermalTanks {
     }
 
     Real64 WaterThermalTankData::PLRResidualWaterThermalTank(Real64 const HPPartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                                             Array1<Real64> const &Par     // par(1) = HP set point temperature [C]
+                                                             Array1D<Real64> const &Par    // par(1) = HP set point temperature [C]
 
     )
     {
@@ -9790,7 +9790,7 @@ namespace WaterThermalTanks {
         return PLRResidualWaterThermalTank;
     }
 
-    Real64 WaterThermalTankData::PLRResidualHPWH(Real64 const HPPartLoadRatio, Array1<Real64> const &Par)
+    Real64 WaterThermalTankData::PLRResidualHPWH(Real64 const HPPartLoadRatio, Array1D<Real64> const &Par)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         B.Griffith,  Richard Raustad

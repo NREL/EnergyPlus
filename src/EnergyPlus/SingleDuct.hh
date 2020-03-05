@@ -248,13 +248,13 @@ namespace SingleDuct {
 
         void CalcVAVVS(int const SysNum, bool const FirstHVACIteration, int const ZoneNode, int const HCoilType, Real64 const HWFlow, Real64 const HCoilReq, int const FanType, Real64 const AirFlow, int const FanOn, Real64 &LoadMet);
 
-        static Real64 VAVVSCoolingResidual(Real64 const SupplyAirMassFlow, Array1<Real64> const &Par);
+        static Real64 VAVVSCoolingResidual(Real64 const SupplyAirMassFlow, Array1D<Real64> const &Par);
 
-        static Real64 VAVVSHWNoFanResidual(Real64 const HWMassFlow, Array1<Real64> const &Par);
+        static Real64 VAVVSHWNoFanResidual(Real64 const HWMassFlow, Array1D<Real64> const &Par);
 
-        static Real64 VAVVSHWFanOnResidual(Real64 const SupplyAirMassFlow, Array1<Real64> const &Par);
+        static Real64 VAVVSHWFanOnResidual(Real64 const SupplyAirMassFlow, Array1D<Real64> const &Par);
 
-        static Real64 VAVVSHCFanOnResidual(Real64 const HeatingFrac, Array1<Real64> const &Par);
+        static Real64 VAVVSHCFanOnResidual(Real64 const HeatingFrac, Array1D<Real64> const &Par);
 
         void SimConstVolNoReheat(int const SysNum, int const ZoneNodeNum);
 

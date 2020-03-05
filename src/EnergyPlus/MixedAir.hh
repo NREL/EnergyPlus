@@ -470,7 +470,7 @@ namespace MixedAir {
                                    int const OutAirNum,
                                    Array1_string const &AlphArray,
                                    int &NumAlphas,
-                                   Array1<Real64> const &NumArray,
+                                   Array1D<Real64> const &NumArray,
                                    int &NumNums,
                                    Array1_bool const &lNumericBlanks, // Unused
                                    Array1_bool const &lAlphaBlanks,
@@ -521,12 +521,12 @@ namespace MixedAir {
     // Beginning Utility Section of the Module
     //******************************************************************************
 
-    Real64 MixedAirControlTempResidual(Real64 const OASignal,    // Relative outside air flow rate (0 to 1)
-                                       Array1<Real64> const &Par // par(1) = mixed node number
+    Real64 MixedAirControlTempResidual(Real64 const OASignal,     // Relative outside air flow rate (0 to 1)
+                                       Array1D<Real64> const &Par // par(1) = mixed node number
     );
 
-    Real64 MultiCompControlTempResidual(Real64 const OASignal,    // Relative outside air flow rate (0 to 1)
-                                        Array1<Real64> const &Par // par(1) = mixed node number
+    Real64 MultiCompControlTempResidual(Real64 const OASignal,     // Relative outside air flow rate (0 to 1)
+                                        Array1D<Real64> const &Par // par(1) = mixed node number
     );
 
     Array1D_int GetOAMixerNodeNumbers(std::string const &OAMixerName, // must match OA mixer names for the OA mixer type
