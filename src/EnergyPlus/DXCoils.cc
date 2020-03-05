@@ -13514,7 +13514,7 @@ namespace DXCoils {
 
         // Get fan index and name if not already available
         if (DXCoil(DXCoilNum).SupplyFanIndex == -1)
-            GetFanIndexForTwoSpeedCoil(
+            GetFanIndexForTwoSpeedCoil(state, 
                 DXCoilNum, DXCoil(DXCoilNum).SupplyFanIndex, DXCoil(DXCoilNum).SupplyFanName, DXCoil(DXCoilNum).SupplyFan_TypeNum);
         if (DXCoil(DXCoilNum).SupplyFanIndex == -1) { // didn't find VAV fan, do not rate this coil
             DXCoil(DXCoilNum).RateWithInternalStaticAndFanObject = false;

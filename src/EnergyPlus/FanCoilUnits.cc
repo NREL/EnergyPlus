@@ -4648,7 +4648,7 @@ namespace FanCoilUnits {
         return GetFanCoilReturnAirNode;
     }
 
-    int GetFanCoilMixedAirNode(int const FanCoilNum)
+    int GetFanCoilMixedAirNode(AllGlobals &state, int const FanCoilNum)
     {
 
         // FUNCTION INFORMATION:
@@ -4704,7 +4704,7 @@ namespace FanCoilUnits {
         return GetFanCoilMixedAirNode;
     }
 
-    int GetFanCoilInletAirNode(int const FanCoilNum)
+    int GetFanCoilInletAirNode(AllGlobals &state, int const FanCoilNum)
     {
 
         // FUNCTION INFORMATION:
@@ -4756,7 +4756,7 @@ namespace FanCoilUnits {
         return GetFanCoilInletAirNode;
     }
 
-    void GetFanCoilIndex(std::string const &FanCoilName, int &FanCoilIndex)
+    void GetFanCoilIndex(AllGlobals &state, std::string const &FanCoilName, int &FanCoilIndex)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4784,7 +4784,7 @@ namespace FanCoilUnits {
         ErrorsFound = true;
     }
 
-    Real64 CalcFanCoilLoadResidual(Real64 const PartLoadRatio, // coil part load ratio
+    Real64 CalcFanCoilLoadResidual(AllGlobals &state, Real64 const PartLoadRatio, // coil part load ratio
                                    Array1<Real64> const &Par   // Function parameters
     )
     {
@@ -4847,7 +4847,7 @@ namespace FanCoilUnits {
         ControlledZoneNum = int(Par(3));
         QZnReq = Par(4);
 
-        Calc4PipeFanCoil(FanCoilNum,
+        Calc4PipeFanCoil(state, FanCoilNum,
                          ControlledZoneNum,
                          FirstHVACIteration,
                          QUnitOut,
@@ -4863,7 +4863,7 @@ namespace FanCoilUnits {
         return Residuum;
     }
 
-    Real64 CalcFanCoilPLRResidual(Real64 const PLR,         // part-load ratio of air and water mass flow rate
+    Real64 CalcFanCoilPLRResidual(AllGlobals &state, Real64 const PLR,         // part-load ratio of air and water mass flow rate
                                   Array1<Real64> const &Par // Function parameters
     )
     {
@@ -4914,20 +4914,20 @@ namespace FanCoilUnits {
 
         if (WaterControlNode == FanCoil(FanCoilNum).CoolCoilFluidInletNode) {
             Node(WaterControlNode).MassFlowRate = PLR * FanCoil(FanCoilNum).MaxCoolCoilFluidFlow;
-            Calc4PipeFanCoil(FanCoilNum,
+            Calc4PipeFanCoil(state, FanCoilNum,
                              ControlledZoneNum,
                              FirstHVACIteration,
                              QUnitOut,
                              PLR); // needs PLR=0 for electric heating coil, otherwise will run a full capacity
         } else if (WaterControlNode == FanCoil(FanCoilNum).HeatCoilFluidInletNode && FanCoil(FanCoilNum).HCoilType_Num != HCoil_Electric) {
             Node(WaterControlNode).MassFlowRate = PLR * FanCoil(FanCoilNum).MaxHeatCoilFluidFlow;
-            Calc4PipeFanCoil(FanCoilNum,
+            Calc4PipeFanCoil(state, FanCoilNum,
                              ControlledZoneNum,
                              FirstHVACIteration,
                              QUnitOut,
                              PLR); // needs PLR=0 for electric heating coil, otherwise will run a full capacity
         } else {
-            Calc4PipeFanCoil(FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR); // needs PLR=1 for electric heating coil
+            Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR); // needs PLR=1 for electric heating coil
         }
 
         // Calculate residual based on output magnitude
@@ -4940,7 +4940,7 @@ namespace FanCoilUnits {
         return Residuum;
     }
 
-    Real64 CalcFanCoilHWLoadResidual(Real64 const HWFlow,      // water mass flow rate [kg/s]
+    Real64 CalcFanCoilHWLoadResidual(AllGlobals &state, Real64 const HWFlow,      // water mass flow rate [kg/s]
                                      Array1<Real64> const &Par // Function parameters
     )
     {
@@ -5004,7 +5004,7 @@ namespace FanCoilUnits {
         QZnReq = Par(4);
 
         Node(FanCoil(FanCoilNum).HeatCoilFluidInletNode).MassFlowRate = HWFlow;
-        Calc4PipeFanCoil(FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0);
+        Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0);
 
         // Calculate residual based on output magnitude
         if (std::abs(QZnReq) <= 100.0) {
@@ -5016,7 +5016,7 @@ namespace FanCoilUnits {
         return Residuum;
     }
 
-    Real64 CalcFanCoilCWLoadResidual(Real64 const CWFlow,      // water mass flow rate [kg/s]
+    Real64 CalcFanCoilCWLoadResidual(AllGlobals &state, Real64 const CWFlow,      // water mass flow rate [kg/s]
                                      Array1<Real64> const &Par // Function parameters
     )
     {
@@ -5080,7 +5080,7 @@ namespace FanCoilUnits {
         QZnReq = Par(4);
 
         Node(FanCoil(FanCoilNum).CoolCoilFluidInletNode).MassFlowRate = CWFlow;
-        Calc4PipeFanCoil(FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0);
+        Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0);
 
         // Calculate residual based on output magnitude
         if (std::abs(QZnReq) <= 100.0) {
@@ -5091,7 +5091,7 @@ namespace FanCoilUnits {
 
         return Residuum;
     }
-    Real64 CalcFanCoilWaterFlowTempResidual(Real64 const WaterFlow,   // water mass flow rate [kg/s]
+    Real64 CalcFanCoilWaterFlowTempResidual(AllGlobals &state, Real64 const WaterFlow,   // water mass flow rate [kg/s]
                                             Array1<Real64> const &Par // Function parameters
     )
     {
@@ -5164,13 +5164,13 @@ namespace FanCoilUnits {
         if (WaterControlNode == FanCoil(FanCoilNum).CoolCoilFluidInletNode ||
             (WaterControlNode == FanCoil(FanCoilNum).HeatCoilFluidInletNode && FanCoil(FanCoilNum).HCoilType_Num != HCoil_Electric)) {
             Node(WaterControlNode).MassFlowRate = WaterFlow;
-            Calc4PipeFanCoil(FanCoilNum,
+            Calc4PipeFanCoil(state, FanCoilNum,
                              ControlledZoneNum,
                              FirstHVACIteration,
                              QUnitOut,
                              0.0); // needs PLR=0 for electric heating coil, otherwise will run a full capacity
         } else {
-            Calc4PipeFanCoil(FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0); // needs PLR=1 for electric heating coil
+            Calc4PipeFanCoil(state,FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0); // needs PLR=1 for electric heating coil
         }
 
         FCOutletTempOn = Node(FanCoil(FanCoilNum).AirOutNode).Temp;
@@ -5180,7 +5180,7 @@ namespace FanCoilUnits {
         return Residuum;
     }
 
-    Real64 CalcFanCoilWaterFlowResidual(Real64 const PLR,         // coil part load ratio
+    Real64 CalcFanCoilWaterFlowResidual(AllGlobals &state, Real64 const PLR,         // coil part load ratio
                                         Array1<Real64> const &Par // Function parameters
     )
     {
@@ -5256,14 +5256,14 @@ namespace FanCoilUnits {
         if (WaterControlNode == FanCoil(FanCoilNum).CoolCoilFluidInletNode ||
             (WaterControlNode == FanCoil(FanCoilNum).HeatCoilFluidInletNode && FanCoil(FanCoilNum).HCoilType_Num != HCoil_Electric)) {
 
-            Calc4PipeFanCoil(FanCoilNum,
+            Calc4PipeFanCoil(state, FanCoilNum,
                              ControlledZoneNum,
                              FirstHVACIteration,
                              QUnitOut,
                              0.0); // needs PLR=0 for electric heating coil, otherwise will run a full capacity
 
         } else {
-            Calc4PipeFanCoil(FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR);
+            Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR);
         }
 
         // Calculate residual based on output magnitude
@@ -5276,7 +5276,7 @@ namespace FanCoilUnits {
         return Residuum;
     }
 
-    Real64 CalcFanCoilAirAndWaterFlowResidual(Real64 const PLR,         // water and air part load ratio
+    Real64 CalcFanCoilAirAndWaterFlowResidual(AllGlobals &state, Real64 const PLR,         // water and air part load ratio
                                               Array1<Real64> const &Par // Function parameters
     )
     {
@@ -5353,7 +5353,7 @@ namespace FanCoilUnits {
             // developer error
             ShowFatalError("Developer Error - CalcFanCoilAirAndWaterFlowResidual: Water control node not found for " + FanCoil(FanCoilNum).Name);
         }
-        Calc4PipeFanCoil(FanCoilNum,
+        Calc4PipeFanCoil(state, FanCoilNum,
                          ControlledZoneNum,
                          FirstHVACIteration,
                          QUnitOut,
@@ -5369,7 +5369,7 @@ namespace FanCoilUnits {
         return Residuum;
     }
 
-    Real64 CalcFanCoilAirAndWaterInStepResidual(Real64 const PLR,         // water and air part load ratio
+    Real64 CalcFanCoilAirAndWaterInStepResidual(AllGlobals &state, Real64 const PLR,         // water and air part load ratio
                                                 Array1<Real64> const &Par // Function parameters
     )
     {
@@ -5445,14 +5445,14 @@ namespace FanCoilUnits {
         if (WaterControlNode == FanCoil(FanCoilNum).CoolCoilFluidInletNode) {
             MinWaterFlow = Par(6);
             Node(WaterControlNode).MassFlowRate = MinWaterFlow + (PLR * (FanCoil(FanCoilNum).MaxCoolCoilFluidFlow - MinWaterFlow));
-            Calc4PipeFanCoil(FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0);
+            Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0);
         } else if (WaterControlNode == 0) { // do this before the water coil else if block because 0 = 0
             MinHeaterPLR = Par(6);
-            Calc4PipeFanCoil(FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, MinHeaterPLR + (PLR * (1.0 - MinHeaterPLR)));
+            Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, MinHeaterPLR + (PLR * (1.0 - MinHeaterPLR)));
         } else if (WaterControlNode == FanCoil(FanCoilNum).HeatCoilFluidInletNode) {
             MinWaterFlow = Par(6);
             Node(WaterControlNode).MassFlowRate = MinWaterFlow + (PLR * (FanCoil(FanCoilNum).MaxHeatCoilFluidFlow - MinWaterFlow));
-            Calc4PipeFanCoil(FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0);
+            Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, 1.0);
         } else {
             // developer error
             ShowFatalError("Developer Error - CalcFanCoilAirAndWaterFlowResidual: Water control node not found for " + FanCoil(FanCoilNum).Name);
@@ -5468,7 +5468,7 @@ namespace FanCoilUnits {
         return Residuum;
     }
 
-    Real64 CalcFanCoilBothFlowResidual(Real64 const PLR,         // water and air part load ratio
+    Real64 CalcFanCoilBothFlowResidual(AllGlobals &state, Real64 const PLR,         // water and air part load ratio
                                        Array1<Real64> const &Par // Function parameters
     )
     {
@@ -5544,7 +5544,7 @@ namespace FanCoilUnits {
             FanCoil(FanCoilNum).MaxAirMassFlow * (FanCoil(FanCoilNum).LowSpeedRatio + (PLR * (1.0 - FanCoil(FanCoilNum).LowSpeedRatio)));
         // set water flow rate
         Node(WaterControlNode).MassFlowRate = MinWaterFlow + (PLR * (MaxWaterFlow - MinWaterFlow));
-        Calc4PipeFanCoil(FanCoilNum,
+        Calc4PipeFanCoil(state, FanCoilNum,
                          ControlledZoneNum,
                          FirstHVACIteration,
                          QUnitOut,
@@ -5560,7 +5560,7 @@ namespace FanCoilUnits {
         return Residuum;
     }
 
-    Real64 CalcFanCoilElecHeatResidual(Real64 const PLR,         // water and air part load ratio
+    Real64 CalcFanCoilElecHeatResidual(AllGlobals &state, Real64 const PLR,         // water and air part load ratio
                                        Array1<Real64> const &Par // Function parameters
     )
     {
@@ -5630,7 +5630,7 @@ namespace FanCoilUnits {
             // set air flow rate
             Node(FanCoil(FanCoilNum).AirInNode).MassFlowRate = PLR * MaxAirFlow;
         }
-        Calc4PipeFanCoil(FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR);
+        Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR);
 
         // Calculate residual based on output magnitude
         if (std::abs(QZnReq) <= 100.0) {
@@ -5642,7 +5642,7 @@ namespace FanCoilUnits {
         return Residuum;
     }
 
-    Real64 CalcFanCoilElecHeatTempResidual(Real64 const PLR,         // water and air part load ratio
+    Real64 CalcFanCoilElecHeatTempResidual(AllGlobals &state, Real64 const PLR,         // water and air part load ratio
                                            Array1<Real64> const &Par // Function parameters
     )
     {
@@ -5713,7 +5713,7 @@ namespace FanCoilUnits {
             // set air flow rate
             Node(FanCoil(FanCoilNum).AirInNode).MassFlowRate = max(Par(7), PLR * MaxAirFlow);
         }
-        Calc4PipeFanCoil(FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR);
+        Calc4PipeFanCoil(state, FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut, PLR);
         FCOutletTempOn = Node(FanCoil(FanCoilNum).AirOutNode).Temp;
 
         // Calculate residual based on output magnitude

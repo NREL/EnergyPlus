@@ -1551,7 +1551,7 @@ namespace AirflowNetworkBalanceManager {
         return success;
     }
 
-    void GetAirflowNetworkInput(OutputFiles &outputFiles)
+    void GetAirflowNetworkInput(AllGlobals &state, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2456,7 +2456,7 @@ namespace AirflowNetworkBalanceManager {
         }
 
         // *** Read AirflowNetwork element data
-        ErrorsFound = ErrorsFound || !getAirflowElementInput();
+        ErrorsFound = ErrorsFound || !getAirflowElementInput(state);
 
         // *** Read AirflowNetwork simulation surface data
         CurrentModuleObject = "AirflowNetwork:MultiZone:Surface";

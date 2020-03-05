@@ -524,7 +524,7 @@ namespace Furnaces {
                                                  OnOffAirFlowRatio,
                                                  EconomizerFlag);
                     } else {
-                        SimDXCoil(BlankString,
+                        SimDXCoil(state, BlankString,
                                   CompOp,
                                   FirstHVACIteration,
                                   Furnace(FurnaceNum).CoolingCoilIndex,
@@ -624,7 +624,7 @@ namespace Furnaces {
                                                  OnOffAirFlowRatio,
                                                  EconomizerFlag);
                     } else {
-                        SimDXCoil(BlankString,
+                        SimDXCoil(state, BlankString,
                                   CompOp,
                                   FirstHVACIteration,
                                   Furnace(FurnaceNum).CoolingCoilIndex,
@@ -632,7 +632,7 @@ namespace Furnaces {
                                   Furnace(FurnaceNum).CoolPartLoadRatio,
                                   OnOffAirFlowRatio);
                     }
-                    SimDXCoil(BlankString,
+                    SimDXCoil(state, BlankString,
                               CompOp,
                               FirstHVACIteration,
                               Furnace(FurnaceNum).HeatingCoilIndex,
@@ -3781,7 +3781,7 @@ namespace Furnaces {
             FanType = Alphas(6);
             FanName = Alphas(7);
             errFlag = false;
-            GetFanType(FanName, Furnace(FurnaceNum).FanType_Num, errFlag, CurrentModuleObject, Alphas(1));
+            GetFanType(state, FanName, Furnace(FurnaceNum).FanType_Num, errFlag, CurrentModuleObject, Alphas(1));
             if (errFlag) {
                 ErrorsFound = true;
             }
@@ -3793,25 +3793,25 @@ namespace Furnaces {
                     ErrorsFound = true;
                 } else {
                     errFlag = false;
-                    GetFanIndex(FanName, Furnace(FurnaceNum).FanIndex, errFlag);
+                    GetFanIndex(state, FanName, Furnace(FurnaceNum).FanIndex, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
                     }
                     errFlag = false;
-                    FanInletNode = GetFanInletNode(FanType, FanName, errFlag);
+                    FanInletNode = GetFanInletNode(state, FanType, FanName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
                     }
                     errFlag = false;
-                    FanOutletNode = GetFanOutletNode(FanType, FanName, errFlag);
+                    FanOutletNode = GetFanOutletNode(state, FanType, FanName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
                     }
                     errFlag = false;
-                    Furnace(FurnaceNum).FanAvailSchedPtr = GetFanAvailSchPtr(FanType, FanName, errFlag);
+                    Furnace(FurnaceNum).FanAvailSchedPtr = GetFanAvailSchPtr(state, FanType, FanName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -4304,7 +4304,7 @@ namespace Furnaces {
 
             // Set the Design Fan Volume Flow Rate
             errFlag = false;
-            FanVolFlowRate = GetFanDesignVolumeFlowRate(FanType, FanName, errFlag);
+            FanVolFlowRate = GetFanDesignVolumeFlowRate(state, FanType, FanName, errFlag);
             Furnace(FurnaceNum).ActualFanVolFlowRate = FanVolFlowRate;
             if (errFlag) {
                 ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
@@ -4694,7 +4694,7 @@ namespace Furnaces {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitFurnace(int const FurnaceNum,         // index to Furnace
+    void InitFurnace(AllGlobals &state, int const FurnaceNum,         // index to Furnace
                      int const AirLoopNum,         // index to air loop
                      Real64 &OnOffAirFlowRatio,    // ratio of on to off air mass flow rate
                      int &OpMode,                  // fan operating mode
@@ -4888,7 +4888,7 @@ namespace Furnaces {
         if (!DoingSizing && MySecondOneTimeFlag(FurnaceNum)) {
             // sizing all done.  check fan air flow rates
             errFlag = false;
-            FanVolFlowRate = GetFanDesignVolumeFlowRate(BlankString, BlankString, errFlag, Furnace(FurnaceNum).FanIndex);
+            FanVolFlowRate = GetFanDesignVolumeFlowRate(state, BlankString, BlankString, errFlag, Furnace(FurnaceNum).FanIndex);
             Furnace(FurnaceNum).ActualFanVolFlowRate = FanVolFlowRate;
             if (errFlag) {
                 ShowContinueError("...occurs in " + cFurnaceTypes(Furnace(FurnaceNum).FurnaceType_Num) + " =" + Furnace(FurnaceNum).Name);
@@ -5159,7 +5159,7 @@ namespace Furnaces {
                     Furnace(FurnaceNum).CoolingSpeedRatio = Furnace(FurnaceNum).MaxCoolAirVolFlow / Furnace(FurnaceNum).ActualFanVolFlowRate;
                     Furnace(FurnaceNum).NoHeatCoolSpeedRatio = Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow / Furnace(FurnaceNum).ActualFanVolFlowRate;
                 }
-                if (GetFanSpeedRatioCurveIndex(FanType, FanName, Furnace(FurnaceNum).FanIndex) > 0) {
+                if (GetFanSpeedRatioCurveIndex(state, FanType, FanName, Furnace(FurnaceNum).FanIndex) > 0) {
                     if (Furnace(FurnaceNum).ActualFanVolFlowRate == Furnace(FurnaceNum).MaxHeatAirVolFlow &&
                         Furnace(FurnaceNum).ActualFanVolFlowRate == Furnace(FurnaceNum).MaxCoolAirVolFlow &&
                         Furnace(FurnaceNum).ActualFanVolFlowRate == Furnace(FurnaceNum).MaxNoCoolHeatAirVolFlow) {
@@ -5176,7 +5176,7 @@ namespace Furnaces {
                 MyFanFlag(FurnaceNum) = false;
             } else {
                 Furnace(FurnaceNum).ActualFanVolFlowRate =
-                    GetFanDesignVolumeFlowRate(BlankString, BlankString, errFlag, Furnace(FurnaceNum).FanIndex);
+                    GetFanDesignVolumeFlowRate(state, BlankString, BlankString, errFlag, Furnace(FurnaceNum).FanIndex);
             }
         }
 
@@ -5952,7 +5952,7 @@ namespace Furnaces {
         SetAverageAirFlow(FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
     }
 
-    void SizeFurnace(int const FurnaceNum, bool const FirstHVACIteration)
+    void SizeFurnace(AllGlobals &state, int const FurnaceNum, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -6034,7 +6034,7 @@ namespace Furnaces {
         }
 
         if (Furnace(FurnaceNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
-            SimDXCoil(BlankString, On, true, Furnace(FurnaceNum).CoolingCoilIndex, 1, 0.0);
+            SimDXCoil(state, BlankString, On, true, Furnace(FurnaceNum).CoolingCoilIndex, 1, 0.0);
         } else if (Furnace(FurnaceNum).CoolingCoilType_Num == CoilDX_CoolingHXAssisted) {
             SimHXAssistedCoolingCoil(BlankString, true, On, 0.0, Furnace(FurnaceNum).CoolingCoilIndex, 1, false, 1.0, false);
         } else if (Furnace(FurnaceNum).CoolingCoilType_Num == Coil_CoolingWaterToAirHPSimple) {
@@ -8481,7 +8481,7 @@ namespace Furnaces {
         Node(FurnaceInletNode).MassFlowRate = Furnace(FurnaceNum).MdotFurnace;
     }
 
-    void CalcFurnaceOutput(int const FurnaceNum,
+    void CalcFurnaceOutput(AllGlobals &state, int const FurnaceNum,
                            bool const FirstHVACIteration,
                            int const FanOpMode,            // Cycling fan or constant fan
                            int const CompOp,               // Compressor on/off; 1=on, 0=off
@@ -8600,7 +8600,7 @@ namespace Furnaces {
         if (Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatPump_AirToAir) {
             //   Simulate blow-thru fan and non-linear coils twice to update PLF used by the ONOFF Fan
             if (Furnace(FurnaceNum).FanPlace == BlowThru) {
-                SimulateFanComponents(BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
+                SimulateFanComponents(state, BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
                 if (CoolingCoilType_Num == CoilDX_CoolingHXAssisted) {
                     SimHXAssistedCoolingCoil(BlankString,
                                              FirstHVACIteration,
@@ -8612,7 +8612,7 @@ namespace Furnaces {
                                              OnOffAirFlowRatio,
                                              EconomizerFlag);
                 } else {
-                    SimDXCoil(BlankString,
+                    SimDXCoil(state, BlankString,
                               CompOp,
                               FirstHVACIteration,
                               Furnace(FurnaceNum).CoolingCoilIndex,
@@ -8620,9 +8620,9 @@ namespace Furnaces {
                               CoolPartLoadRatio,
                               OnOffAirFlowRatio);
                 }
-                SimDXCoil(
+                SimDXCoil(state, 
                     BlankString, CompOp, FirstHVACIteration, Furnace(FurnaceNum).HeatingCoilIndex, FanOpMode, HeatPartLoadRatio, OnOffAirFlowRatio);
-                SimulateFanComponents(BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
+                SimulateFanComponents(state, BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
             }
             //   Simulate cooling and heating coils
             if (CoolingCoilType_Num == CoilDX_CoolingHXAssisted) {
@@ -8636,13 +8636,13 @@ namespace Furnaces {
                                          OnOffAirFlowRatio,
                                          EconomizerFlag);
             } else {
-                SimDXCoil(
+                SimDXCoil(state, 
                     BlankString, CompOp, FirstHVACIteration, Furnace(FurnaceNum).CoolingCoilIndex, FanOpMode, CoolPartLoadRatio, OnOffAirFlowRatio);
             }
-            SimDXCoil(BlankString, CompOp, FirstHVACIteration, Furnace(FurnaceNum).HeatingCoilIndex, FanOpMode, HeatPartLoadRatio, OnOffAirFlowRatio);
+            SimDXCoil(state, BlankString, CompOp, FirstHVACIteration, Furnace(FurnaceNum).HeatingCoilIndex, FanOpMode, HeatPartLoadRatio, OnOffAirFlowRatio);
             //   Simulate the draw-thru fan
             if (Furnace(FurnaceNum).FanPlace == DrawThru) {
-                SimulateFanComponents(BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
+                SimulateFanComponents(state, BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
             }
             //   Simulate the supplemental heating coil
             if (Furnace(FurnaceNum).DehumidControlType_Num == DehumidControl_CoolReheat && ReheatCoilLoad > 0.0) {
@@ -8658,7 +8658,7 @@ namespace Furnaces {
                    Furnace(FurnaceNum).WatertoAirHPType == WatertoAir_Simple) {
             //    Simulate blow-thru fan and non-linear coils twice to update PLF used by the ONOFF Fan
             if (Furnace(FurnaceNum).FanPlace == BlowThru) {
-                SimulateFanComponents(BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
+                SimulateFanComponents(state, BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
                 // COIL:WATERTOAIRHPSIMPLE:COOLING
                 SimWatertoAirHPSimple(BlankString,
                                       Furnace(FurnaceNum).CoolingCoilIndex,
@@ -8687,11 +8687,11 @@ namespace Furnaces {
                                       HeatPartLoadRatio,
                                       FirstHVACIteration); // HeatPartLoadRatio
                 //      Simulate the whole thing a second time so that the correct PLF required by the coils is used by the Fan. *******
-                SimulateFanComponents(BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
+                SimulateFanComponents(state, BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
             }
             //    Simulate the cooling and heating coils
             // COIL:WATERTOAIRHPSIMPLE:COOLING
-            SimWatertoAirHPSimple(BlankString,
+            SimWatertoAirHPSimple(state, BlankString,
                                   Furnace(FurnaceNum).CoolingCoilIndex,
                                   Furnace(FurnaceNum).CoolingCoilSensDemand,
                                   Furnace(FurnaceNum).CoolingCoilLatentDemand,
@@ -8719,7 +8719,7 @@ namespace Furnaces {
                                   FirstHVACIteration); // HeatPartLoadRatio
             //     Simulate the draw-thru fan
             if (Furnace(FurnaceNum).FanPlace == BlowThru) {
-                SimulateFanComponents(BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
+                SimulateFanComponents(state, BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
             }
             //     Simulate the supplemental heating coil
             if (Furnace(FurnaceNum).DehumidControlType_Num == DehumidControl_CoolReheat && ReheatCoilLoad > 0.0) {
@@ -8734,7 +8734,7 @@ namespace Furnaces {
                    Furnace(FurnaceNum).WatertoAirHPType == WatertoAir_ParEst) {
             //    Simulate the draw-thru fan
             if (Furnace(FurnaceNum).FanPlace == BlowThru) {
-                SimulateFanComponents(BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
+                SimulateFanComponents(state, BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
             }
             //    Simulate the cooling and heating coils
             SimWatertoAirHP(BlankString,
@@ -8768,7 +8768,7 @@ namespace Furnaces {
                             HeatPartLoadRatio);
             //    Simulate the draw-thru fan
             if (Furnace(FurnaceNum).FanPlace == DrawThru) {
-                SimulateFanComponents(BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
+                SimulateFanComponents(state, BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
             }
             //    Simulate the supplemental heating coil
             SimulateHeatingCoilComponents(BlankString, FirstHVACIteration, HeatCoilLoad, Furnace(FurnaceNum).SuppHeatCoilIndex, _, true, FanOpMode);
@@ -8777,7 +8777,7 @@ namespace Furnaces {
             //   Simulate blow-thru fan
             if (Furnace(FurnaceNum).FanPlace == BlowThru) {
 
-                SimulateFanComponents(BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
+                SimulateFanComponents(state, BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
 
                 //     For non-linear coils, simulate coil to update PLF used by the ONOFF Fan
                 if (Furnace(FurnaceNum).FanType_Num == FanType_SimpleOnOff) {
@@ -8799,7 +8799,7 @@ namespace Furnaces {
                                                      OnOffAirFlowRatio,
                                                      EconomizerFlag);
                         } else {
-                            SimDXCoil(BlankString,
+                            SimDXCoil(state, BlankString,
                                       CompOp,
                                       FirstHVACIteration,
                                       Furnace(FurnaceNum).CoolingCoilIndex,
@@ -8814,7 +8814,7 @@ namespace Furnaces {
                         SuppHeatingCoilFlag = false; // if false simulates heating coil
                         CalcNonDXHeatingCoils(FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, FanOpMode, QActual);
                     }
-                    SimulateFanComponents(BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
+                    SimulateFanComponents(state, BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
                 } // Simple OnOff fan
 
             } // Blow thru fan
@@ -8838,7 +8838,7 @@ namespace Furnaces {
                                              OnOffAirFlowRatio,
                                              EconomizerFlag);
                 } else {
-                    SimDXCoil(BlankString,
+                    SimDXCoil(state, BlankString,
                               CompOp,
                               FirstHVACIteration,
                               Furnace(FurnaceNum).CoolingCoilIndex,
@@ -8855,7 +8855,7 @@ namespace Furnaces {
             }
             //   Simulate the draw-thru fan
             if (Furnace(FurnaceNum).FanPlace == DrawThru) {
-                SimulateFanComponents(BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
+                SimulateFanComponents(state, BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
             }
             if (Furnace(FurnaceNum).DehumidControlType_Num == DehumidControl_CoolReheat || Furnace(FurnaceNum).SuppHeatCoilIndex > 0) {
                 SuppHeatingCoilFlag = true; // if truee simulates supplemental heating coil
@@ -10475,7 +10475,7 @@ namespace Furnaces {
 
     //******************************************************************************
 
-    void CalcVarSpeedHeatPump(int const FurnaceNum,          // Variable speed heat pump number
+    void CalcVarSpeedHeatPump(AllGlobals &state, int const FurnaceNum,          // Variable speed heat pump number
                               bool const FirstHVACIteration, // Flag for 1st HVAC iteration
                               int const CompOp,              // Compressor on/off; 1=on, 0=off
                               int const SpeedNum,            // Speed number
@@ -10554,7 +10554,7 @@ namespace Furnaces {
         AirMassFlow = Node(InletNode).MassFlowRate;
         // if blow through, simulate fan then coils
         if (Furnace(FurnaceNum).FanPlace == BlowThru) {
-            SimulateFanComponents(BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
+            SimulateFanComponents(state, BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
 
             if ((!Furnace(FurnaceNum).CoolingCoilUpstream) && (Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatCool)) {
                 // simulate furnace heating coil
@@ -10713,7 +10713,7 @@ namespace Furnaces {
             }
 
             // Call twice to ensure the fan outlet conditions are updated
-            SimulateFanComponents(BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
+            SimulateFanComponents(state, BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
 
             if ((!Furnace(FurnaceNum).CoolingCoilUpstream) && (Furnace(FurnaceNum).FurnaceType_Num == UnitarySys_HeatCool)) {
                 // simulate furnace heating coil
@@ -11031,7 +11031,7 @@ namespace Furnaces {
                 CalcNonDXHeatingCoils(FurnaceNum, SuppHeatingCoilFlag, FirstHVACIteration, HeatCoilLoad, Furnace(FurnaceNum).OpMode, QCoilActual);
             }
 
-            SimulateFanComponents(BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
+            SimulateFanComponents(state, BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
             //  Simulate supplemental heating coil for draw through fan
             if (Furnace(FurnaceNum).SuppHeatCoilIndex > 0) {
                 SuppHeatingCoilFlag = true; // if true simulates supplemental heating coil

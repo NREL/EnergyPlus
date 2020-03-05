@@ -249,7 +249,7 @@ namespace OutdoorAirUnit {
 
         // FLOW:
         if (GetOutdoorAirUnitInputFlag) {
-            GetOutdoorAirUnitInputs();
+            GetOutdoorAirUnitInputs(state);
             GetOutdoorAirUnitInputFlag = false;
         }
 
@@ -282,7 +282,7 @@ namespace OutdoorAirUnit {
 
         InitOutdoorAirUnit(OAUnitNum, ZoneNum, FirstHVACIteration);
 
-        CalcOutdoorAirUnit(OAUnitNum, ZoneNum, FirstHVACIteration, PowerMet, LatOutputProvided);
+        CalcOutdoorAirUnit(state, OAUnitNum, ZoneNum, FirstHVACIteration, PowerMet, LatOutputProvided);
 
         // CALL UpdateOutdoorAirUnit(OAUnitNum, FirstHVACIteration)
 
@@ -1219,7 +1219,7 @@ namespace OutdoorAirUnit {
 
         if (!SysSizingCalc && MySizeFlag(OAUnitNum) && !MyPlantScanFlag(OAUnitNum)) {
 
-            SizeOutdoorAirUnit(OAUnitNum);
+            SizeOutdoorAirUnit(state, OAUnitNum);
 
             MySizeFlag(OAUnitNum) = false;
         }

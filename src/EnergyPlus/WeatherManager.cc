@@ -8099,25 +8099,25 @@ namespace WeatherManager {
 
         // FLOW:
         // Initialize Site:GroundTemperature:BuildingSurface object
-        siteBuildingSurfaceGroundTempsPtr = GetGroundTempModelAndInit("SITE:GROUNDTEMPERATURE:BUILDINGSURFACE", "");
+        siteBuildingSurfaceGroundTempsPtr = GetGroundTempModelAndInit(state, "SITE:GROUNDTEMPERATURE:BUILDINGSURFACE", "");
         if (siteBuildingSurfaceGroundTempsPtr) {
             ErrorsFound = siteBuildingSurfaceGroundTempsPtr->errorsFound ? true : ErrorsFound;
         }
 
         // Initialize Site:GroundTemperature:FCFactorMethod object
-        siteFCFactorMethodGroundTempsPtr = GetGroundTempModelAndInit("SITE:GROUNDTEMPERATURE:FCFACTORMETHOD", "");
+        siteFCFactorMethodGroundTempsPtr = GetGroundTempModelAndInit(state, "SITE:GROUNDTEMPERATURE:FCFACTORMETHOD", "");
         if (siteFCFactorMethodGroundTempsPtr) {
             ErrorsFound = siteFCFactorMethodGroundTempsPtr->errorsFound ? true : ErrorsFound;
         }
 
         // Initialize Site:GroundTemperature:Shallow object
-        siteShallowGroundTempsPtr = GetGroundTempModelAndInit("SITE:GROUNDTEMPERATURE:SHALLOW", "");
+        siteShallowGroundTempsPtr = GetGroundTempModelAndInit(state, "SITE:GROUNDTEMPERATURE:SHALLOW", "");
         if (siteShallowGroundTempsPtr) {
             ErrorsFound = siteShallowGroundTempsPtr->errorsFound ? true : ErrorsFound;
         }
 
         // Initialize Site:GroundTemperature:Deep object
-        siteDeepGroundTempsPtr = GetGroundTempModelAndInit("SITE:GROUNDTEMPERATURE:DEEP", "");
+        siteDeepGroundTempsPtr = GetGroundTempModelAndInit(state, "SITE:GROUNDTEMPERATURE:DEEP", "");
         if (siteDeepGroundTempsPtr) {
             ErrorsFound = siteDeepGroundTempsPtr->errorsFound ? true : ErrorsFound;
         }

@@ -488,11 +488,11 @@ namespace WindowAC {
                     WindAC(WindACNum).FanAvailSchedPtr = HVACFan::fanObjs[WindAC(WindACNum).FanIndex]->availSchedIndex;
                 } else {
 
-                    GetFanType(WindAC(WindACNum).FanName, WindAC(WindACNum).FanType_Num, FanErrFlag, CurrentModuleObject, WindAC(WindACNum).Name);
+                    GetFanType(state, WindAC(WindACNum).FanName, WindAC(WindACNum).FanType_Num, FanErrFlag, CurrentModuleObject, WindAC(WindACNum).Name);
                     {
                         auto const SELECT_CASE_var(WindAC(WindACNum).FanType_Num);
                         if ((SELECT_CASE_var == FanType_SimpleOnOff) || (SELECT_CASE_var == FanType_SimpleConstVolume)) {
-                            GetFanIndex(WindAC(WindACNum).FanName, WindAC(WindACNum).FanIndex, FanErrFlag, CurrentModuleObject);
+                            GetFanIndex(state, WindAC(WindACNum).FanName, WindAC(WindACNum).FanIndex, FanErrFlag, CurrentModuleObject);
                             if (FanErrFlag) {
                                 ShowContinueError(" specified in " + CurrentModuleObject + " = \"" + WindAC(WindACNum).Name + "\".");
                                 ErrorsFound = true;
@@ -518,7 +518,7 @@ namespace WindowAC {
                         }
                     }
                     // Get the fan's availability schedule
-                    WindAC(WindACNum).FanAvailSchedPtr = GetFanAvailSchPtr(WindAC(WindACNum).FanType, WindAC(WindACNum).FanName, FanErrFlag);
+                    WindAC(WindACNum).FanAvailSchedPtr = GetFanAvailSchPtr(state, WindAC(WindACNum).FanType, WindAC(WindACNum).FanName, FanErrFlag);
                 }
                 if (FanErrFlag) {
                     ShowContinueError("...occurs in " + CurrentModuleObject + " = " + WindAC(WindACNum).Name);
@@ -982,7 +982,7 @@ namespace WindowAC {
         if (WindAC(WindACNum).OpMode == ContFanCycCoil && WindAC(WindACNum).PartLoadFrac > 0.0 &&
             (GetCurrentScheduleValue(WindAC(WindACNum).FanAvailSchedPtr) > 0.0 || ZoneCompTurnFansOn) && !ZoneCompTurnFansOn) {
 
-            CalcWindowACOutput(WindACNum, FirstHVACIteration, WindAC(WindACNum).OpMode, 0.0, false, NoCompOutput);
+            CalcWindowACOutput(state, WindACNum, FirstHVACIteration, WindAC(WindACNum).OpMode, 0.0, false, NoCompOutput);
 
             QToCoolSetPt = ZoneSysEnergyDemand(ZoneNum).RemainingOutputReqToCoolSP;
 
@@ -1288,7 +1288,7 @@ namespace WindowAC {
 
         WindAC(WindACNum).PartLoadFrac = PartLoadFrac;
 
-        CalcWindowACOutput(WindACNum, FirstHVACIteration, OpMode, PartLoadFrac, HXUnitOn, QUnitOut);
+        CalcWindowACOutput(state, WindACNum, FirstHVACIteration, OpMode, PartLoadFrac, HXUnitOn, QUnitOut);
 
         // Reseting AirMassFlow to inlet node mass flow rate since inlet mass flow rate may be getting
         // manipulated in subroutine CalcWindowACOutput
@@ -1493,7 +1493,7 @@ namespace WindowAC {
                                                       OnOffAirFlowRatio);
 
         } else {
-            SimDXCoil(WindAC(WindACNum).DXCoilName, On, FirstHVACIteration, WindAC(WindACNum).DXCoilIndex, WindAC(WindACNum).OpMode, PartLoadFrac);
+            SimDXCoil(state, WindAC(WindACNum).DXCoilName, On, FirstHVACIteration, WindAC(WindACNum).DXCoilIndex, WindAC(WindACNum).OpMode, PartLoadFrac);
         }
 
         if (WindAC(WindACNum).FanPlace == DrawThru) {
@@ -1579,7 +1579,7 @@ namespace WindowAC {
         }
 
         // Get result when DX coil is off
-        CalcWindowACOutput(WindACNum, FirstHVACIteration, OpMode, 0.0, HXUnitOn, NoCoolOutput);
+        CalcWindowACOutput(state, WindACNum, FirstHVACIteration, OpMode, 0.0, HXUnitOn, NoCoolOutput);
 
         // If NoCoolOutput < QZnReq, the coil needs to be off
         if (NoCoolOutput < QZnReq) {
@@ -1588,7 +1588,7 @@ namespace WindowAC {
         }
 
         // Get full load result
-        CalcWindowACOutput(WindACNum, FirstHVACIteration, OpMode, 1.0, HXUnitOn, FullOutput);
+        CalcWindowACOutput(state, WindACNum, FirstHVACIteration, OpMode, 1.0, HXUnitOn, FullOutput);
 
         // Since we are cooling, we expect FullOutput to be < 0 and FullOutput < NoCoolOutput
         // Check that this is the case; if not set PartLoadFrac = 0.0 (off) and return
@@ -1623,7 +1623,7 @@ namespace WindowAC {
 
         while ((std::abs(Error) > ErrorToler) && (Iter <= MaxIter) && PartLoadFrac > MinPLF) {
             // Get result when DX coil is operating at partloadfrac
-            CalcWindowACOutput(WindACNum, FirstHVACIteration, OpMode, PartLoadFrac, HXUnitOn, ActualOutput);
+            CalcWindowACOutput(state, WindACNum, FirstHVACIteration, OpMode, PartLoadFrac, HXUnitOn, ActualOutput);
             Error = (QZnReq - ActualOutput) / QZnReq;
             DelPLF = (QZnReq - ActualOutput) / FullOutput;
             PartLoadFrac += Relax * DelPLF;
@@ -1654,7 +1654,7 @@ namespace WindowAC {
             HXUnitOn = true;
 
             //   Get full load result
-            CalcWindowACOutput(WindACNum, FirstHVACIteration, OpMode, 1.0, HXUnitOn, FullOutput);
+            CalcWindowACOutput(state, WindACNum, FirstHVACIteration, OpMode, 1.0, HXUnitOn, FullOutput);
 
             if (Node(WindAC(WindACNum).CoilOutletNodeNum).HumRatMax < Node(WindAC(WindACNum).CoilOutletNodeNum).HumRat || QZnReq <= FullOutput) {
                 PartLoadFrac = 1.0;
@@ -1667,7 +1667,7 @@ namespace WindowAC {
 
             while ((std::abs(Error) > ErrorToler) && (Iter <= MaxIter) && PartLoadFrac > MinPLF) {
                 // Get result when DX coil is operating at partloadfrac
-                CalcWindowACOutput(WindACNum, FirstHVACIteration, OpMode, PartLoadFrac, HXUnitOn, ActualOutput);
+                CalcWindowACOutput(state, WindACNum, FirstHVACIteration, OpMode, PartLoadFrac, HXUnitOn, ActualOutput);
                 Error = (QZnReq - ActualOutput) / QZnReq;
                 DelPLF = (QZnReq - ActualOutput) / FullOutput;
                 PartLoadFrac += Relax * DelPLF;

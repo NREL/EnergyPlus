@@ -3700,7 +3700,7 @@ namespace ZoneEquipmentManager {
                                                  // next Predict-Correct series of calcs via SysDepZoneLoads
 
                     } else if (SELECT_CASE_var == FanCoil4Pipe_Num) { // 'ZoneHVAC:FourPipeFanCoil'
-                        SimFanCoilUnit(PrioritySimOrder(EquipTypeNum).EquipName,
+                        SimFanCoilUnit(state, PrioritySimOrder(EquipTypeNum).EquipName,
                                        ActualZoneNum,
                                        ControlledZoneNum,
                                        FirstHVACIteration,

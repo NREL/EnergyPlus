@@ -152,7 +152,7 @@ namespace BaseboardRadiator {
         BaseboardParamsNumericFields.deallocate();
     }
 
-    void SimBaseboard(std::string const &EquipName,
+    void SimBaseboard(AllGlobals &state, std::string const &EquipName,
                       int const ActualZoneNum,
                       int const ControlledZoneNum,
                       bool const FirstHVACIteration,
@@ -259,7 +259,7 @@ namespace BaseboardRadiator {
                 MinWaterFlow = Node(Baseboard(BaseboardNum).WaterInletNode).MassFlowRateMinAvail;
             }
 
-            ControlCompOutput(Baseboard(BaseboardNum).EquipID,
+            ControlCompOutput(state, Baseboard(BaseboardNum).EquipID,
                               cCMO_BBRadiator_Water,
                               BaseboardNum,
                               FirstHVACIteration,
