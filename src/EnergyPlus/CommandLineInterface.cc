@@ -81,7 +81,7 @@ namespace CommandLineInterface {
     using namespace SolarShading;
     using namespace ez;
 
-    int ProcessArgs(int argc, const char *argv[])
+    int ProcessArgs(AllGlobals &state, int argc, const char *argv[])
     {
         typedef std::string::size_type size_type;
 

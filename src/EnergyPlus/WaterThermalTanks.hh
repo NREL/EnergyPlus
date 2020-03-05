@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
@@ -690,7 +691,7 @@ namespace WaterThermalTanks {
 
         void CalcWaterThermalTankMixed(); // Water Heater being simulated
 
-        void CalcStandardRatings(OutputFiles &outputFiles);
+        void CalcStandardRatings(AllGlobals &state, OutputFiles &outputFiles);
 
         void ReportCWTankInits(OutputFiles &outputFiles);
 
@@ -766,11 +767,11 @@ namespace WaterThermalTanks {
                                            Array1<Real64> const &Par // par(1) = HP set point temperature [C]
         );
 
-        void CalcHeatPumpWaterHeater(bool FirstHVACIteration);
+        void CalcHeatPumpWaterHeater(AllGlobals &state, bool FirstHVACIteration);
 
         void ConvergeSingleSpeedHPWHCoilAndTank(Real64 partLoadRatio);
 
-        void SetVSHPWHFlowRates(HeatPumpWaterHeaterData &HPWH,
+        void SetVSHPWHFlowRates(AllGlobals &state, HeatPumpWaterHeaterData &HPWH,
                                 int SpeedNum,
                                 Real64 SpeedRatio,
                                 Real64 WaterDens,
@@ -780,7 +781,7 @@ namespace WaterThermalTanks {
 
         Real64 PLRResidualHPWH(Real64 HPPartLoadRatio, Array1<Real64> const &Par);
 
-        Real64 PLRResidualIterSpeed(Real64 SpeedRatio,        // speed ratio between two speed levels
+        Real64 PLRResidualIterSpeed(AllGlobals &state, Real64 SpeedRatio,        // speed ratio between two speed levels
                                     Array1<Real64> const &Par //
         );
 
@@ -888,7 +889,7 @@ namespace WaterThermalTanks {
 
     bool getDesuperHtrInput();
 
-    bool getHPWaterHeaterInput();
+    bool getHPWaterHeaterInput(AllGlobals &state);
 
     bool getWaterHeaterMixedInputs();
 

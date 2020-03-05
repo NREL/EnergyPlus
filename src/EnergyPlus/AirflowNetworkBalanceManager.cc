@@ -524,7 +524,7 @@ namespace AirflowNetworkBalanceManager {
         UpdateAirflowNetwork(FirstHVACIteration);
     }
 
-    static bool getAirflowElementInput()
+    static bool getAirflowElementInput(AllGlobals &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason DeGraw
@@ -663,7 +663,7 @@ namespace AirflowNetworkBalanceManager {
                 // This breaks the component model, need to fix
                 bool fanErrorFound = false;
                 int fanIndex;
-                GetFanIndex(thisObjectName, fanIndex, fanErrorFound);
+                GetFanIndex(state, thisObjectName, fanIndex, fanErrorFound);
                 if (fanErrorFound) {
                     ShowSevereError(RoutineName + ": " + CurrentModuleObject + " = " + thisObjectName + " is not found in Fan:ZoneExhaust objects.");
                     success = false;
@@ -673,13 +673,13 @@ namespace AirflowNetworkBalanceManager {
                 GetFanVolFlow(fanIndex, flowRate);
                 flowRate *= StdRhoAir;
                 bool nodeErrorsFound{false};
-                int inletNode = GetFanInletNode("Fan:ZoneExhaust", thisObjectName, nodeErrorsFound);
-                int outletNode = GetFanOutletNode("Fan:ZoneExhaust", thisObjectName, nodeErrorsFound);
+                int inletNode = GetFanInletNode(state, "Fan:ZoneExhaust", thisObjectName, nodeErrorsFound);
+                int outletNode = GetFanOutletNode(state, "Fan:ZoneExhaust", thisObjectName, nodeErrorsFound);
                 if (nodeErrorsFound) {
                     success = false;
                 }
                 int fanType_Num;
-                GetFanType(thisObjectName, fanType_Num, fanErrorFound);
+                GetFanType(state, thisObjectName, fanType_Num, fanErrorFound);
                 if (fanType_Num != FanType_ZoneExhaust) {
                     ShowSevereError(RoutineName + CurrentModuleObject + " = " + thisObjectName + ". The specified " + "Name" +
                                     " is not found as a valid Fan:ZoneExhaust object.");
@@ -1384,7 +1384,7 @@ namespace AirflowNetworkBalanceManager {
 
                 } else {
 
-                    GetFanIndex(fan_name, fanIndex, FanErrorFound);
+                    GetFanIndex(state, fan_name, fanIndex, FanErrorFound);
 
                     if (FanErrorFound) {
                         ShowSevereError("...occurs in " + CurrentModuleObject + " = " + DisSysCompCVFData(i).Name);
@@ -1394,7 +1394,7 @@ namespace AirflowNetworkBalanceManager {
                     GetFanVolFlow(fanIndex, flowRate);
                     flowRate *= StdRhoAir;
 
-                    GetFanType(fan_name, fanType_Num, FanErrorFound);
+                    GetFanType(state, fan_name, fanType_Num, FanErrorFound);
                     SupplyFanType = fanType_Num;
                 }
 
@@ -1417,16 +1417,16 @@ namespace AirflowNetworkBalanceManager {
                 }
                 bool ErrorsFound{false};
                 if (fanType_Num == FanType_SimpleConstVolume) {
-                    inletNode = GetFanInletNode("Fan:ConstantVolume", fan_name, ErrorsFound);
-                    outletNode = GetFanOutletNode("Fan:ConstantVolume", fan_name, ErrorsFound);
+                    inletNode = GetFanInletNode(state, "Fan:ConstantVolume", fan_name, ErrorsFound);
+                    outletNode = GetFanOutletNode(state, "Fan:ConstantVolume", fan_name, ErrorsFound);
                 }
                 if (fanType_Num == FanType_SimpleOnOff && !DisSysCompCVFData(i).FanModelFlag) {
-                    inletNode = GetFanInletNode("Fan:OnOff", fan_name, ErrorsFound);
-                    outletNode = GetFanOutletNode("Fan:OnOff", fan_name, ErrorsFound);
+                    inletNode = GetFanInletNode(state, "Fan:OnOff", fan_name, ErrorsFound);
+                    outletNode = GetFanOutletNode(state, "Fan:OnOff", fan_name, ErrorsFound);
                 }
                 if (fanType_Num == FanType_SimpleVAV && !DisSysCompCVFData(i).FanModelFlag) {
-                    inletNode = GetFanInletNode("Fan:VariableVolume", fan_name, ErrorsFound);
-                    outletNode = GetFanOutletNode("Fan:VariableVolume", fan_name, ErrorsFound);
+                    inletNode = GetFanInletNode(state, "Fan:VariableVolume", fan_name, ErrorsFound);
+                    outletNode = GetFanOutletNode(state, "Fan:VariableVolume", fan_name, ErrorsFound);
                     VAVSystem = true;
                 }
                 SupplyFanInletNode = inletNode;

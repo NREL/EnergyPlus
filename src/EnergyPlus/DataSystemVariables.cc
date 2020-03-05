@@ -416,7 +416,7 @@ namespace DataSystemVariables {
         Threading = false;
     }
 
-    void processEnvironmentVariables() {
+    void processEnvironmentVariables(AllGlobals &state) {
 
         static std::string cEnvValue;
 

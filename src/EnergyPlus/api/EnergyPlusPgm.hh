@@ -58,13 +58,13 @@
 
 void CreateCurrentDateTimeString(std::string &CurrentDateTimeString);
 
-int initializeEnergyPlus(std::string const & filepath);
+int initializeEnergyPlus(AllGlobals &state, std::string const & filepath);
 
 int wrapUpEnergyPlus();
 
-void ENERGYPLUSLIB_API EnergyPlusPgm(AllGlobals const &state, std::string const &filepath = std::string());
+void ENERGYPLUSLIB_API EnergyPlusPgm(AllGlobals &state, std::string const &filepath = std::string());
 
-int ENERGYPLUSLIB_API RunEnergyPlus(AllGlobals const &state, std::string const & filepath = std::string());
+int ENERGYPLUSLIB_API RunEnergyPlus(AllGlobals &state, std::string const & filepath = std::string());
 
 int runEnergyPlusAsLibrary(int argc, const char *argv[]);
 

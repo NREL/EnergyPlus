@@ -237,7 +237,7 @@ void CoilCoolingDXCurveFitPerformance::calculate(CoilCoolingDXCurveFitOperatingM
 }
 
 
-void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, int const supplyFanType, std::string const &supplyFanName, int condInletNodeIndex, OutputFiles &outputFiles) {
+void CoilCoolingDXCurveFitPerformance::calcStandardRatings(AllGlobals &state, int supplyFanIndex, int const supplyFanType, std::string const &supplyFanName, int condInletNodeIndex, OutputFiles &outputFiles) {
 
     // If fan index hasn't been set, we can't do anything
     if (supplyFanIndex == -1) { // didn't find VAV fan, do not rate this coil
@@ -315,8 +315,8 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
                 fanInletNode = HVACFan::fanObjs[supplyFanIndex]->inletNodeNum;
                 fanOutletNode = HVACFan::fanObjs[supplyFanIndex]->outletNodeNum;
             } else { // TODO: Are there other fan types to be considered here??
-                fanInletNode = Fans::GetFanInletNode("FAN:VARIABLEVOLUME", supplyFanName, errorsFound);
-                fanOutletNode = Fans::GetFanOutletNode("FAN:VARIABLEVOLUME", supplyFanName, errorsFound);
+                fanInletNode = Fans::GetFanInletNode(state, "FAN:VARIABLEVOLUME", supplyFanName, errorsFound);
+                fanOutletNode = Fans::GetFanOutletNode(state, "FAN:VARIABLEVOLUME", supplyFanName, errorsFound);
             }
 
             // set node state variables in preparation for fan model.
@@ -330,7 +330,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
                 HVACFan::fanObjs[supplyFanIndex]->simulate(_, true, false, FanStaticPressureRise);
                 fanPowerCorrection = HVACFan::fanObjs[supplyFanIndex]->fanPower();
             } else {
-                Fans::SimulateFanComponents(supplyFanName, true, supplyFanIndex, _, true, false, FanStaticPressureRise);
+                Fans::SimulateFanComponents(state, supplyFanName, true, supplyFanIndex, _, true, false, FanStaticPressureRise);
                 fanPowerCorrection = Fans::GetFanPower(supplyFanIndex);
             }
 
@@ -480,7 +480,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
                     HVACFan::fanObjs[supplyFanIndex]->simulate(_, true, false, FanStaticPressureRise);
                     fanPowerCorrection = HVACFan::fanObjs[supplyFanIndex]->fanPower();
                 } else {
-                    Fans::SimulateFanComponents(supplyFanName, true, supplyFanIndex, _, true, false, FanStaticPressureRise);
+                    Fans::SimulateFanComponents(state, supplyFanName, true, supplyFanIndex, _, true, false, FanStaticPressureRise);
                     fanPowerCorrection = Fans::GetFanPower(supplyFanIndex);
                 }
 
@@ -644,7 +644,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(int supplyFanIndex, i
 }
 
 
-Real64 CoilCoolingDXCurveFitPerformance::calcIEERResidual(
+Real64 CoilCoolingDXCurveFitPerformance::calcIEERResidual(AllGlobals &state, 
         Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
         std::vector<Real64> const &Par
 )
@@ -718,7 +718,7 @@ Real64 CoilCoolingDXCurveFitPerformance::calcIEERResidual(
             HVACFan::fanObjs[supplyFanIndex]->simulate(_, true, false, FanStaticPressureRise);
         } else {
             // TODO: I am hoping we can just pass in the supply fan name
-            Fans::SimulateFanComponents("", true, supplyFanIndex, _, true, false, FanStaticPressureRise);
+            Fans::SimulateFanComponents(state, "", true, supplyFanIndex, _, true, false, FanStaticPressureRise);
         }
 
         FanHeatCorrection = DataLoopNode::Node(FanOutletNodeNum).Enthalpy - DataLoopNode::Node(FanInletNodeNum).Enthalpy;

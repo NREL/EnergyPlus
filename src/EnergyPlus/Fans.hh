@@ -240,7 +240,7 @@ namespace Fans {
     // Functions
     void clear_state();
 
-    void SimulateFanComponents(std::string const &CompName,
+    void SimulateFanComponents(AllGlobals &state, std::string const &CompName,
                                bool const FirstHVACIteration,
                                int &CompIndex,
                                Optional<Real64 const> SpeedRatio = _,
@@ -252,7 +252,7 @@ namespace Fans {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetFanInput();
+    void GetFanInput(AllGlobals &state);
 
     // End of Get Input subroutines for the HB Module
     //******************************************************************************
@@ -260,11 +260,11 @@ namespace Fans {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitFan(int const FanNum,
+    void InitFan(AllGlobals &state, int const FanNum,
                  bool const FirstHVACIteration // unused1208
     );
 
-    void SizeFan(int const FanNum);
+    void SizeFan(AllGlobals &state, int const FanNum);
 
     // End Initialization Section of the Module
     //******************************************************************************
@@ -272,17 +272,17 @@ namespace Fans {
     // Begin Algorithm Section of the Module
     //******************************************************************************
 
-    void SimSimpleFan(int const FanNum);
+    void SimSimpleFan(AllGlobals &state, int const FanNum);
 
-    void SimVariableVolumeFan(int const FanNum, Optional<Real64 const> PressureRise = _);
+    void SimVariableVolumeFan(AllGlobals &state, int const FanNum, Optional<Real64 const> PressureRise = _);
 
-    void SimOnOffFan(int const FanNum, Optional<Real64 const> SpeedRatio = _);
+    void SimOnOffFan(AllGlobals &state, int const FanNum, Optional<Real64 const> SpeedRatio = _);
 
-    void SimZoneExhaustFan(int const FanNum);
+    void SimZoneExhaustFan(AllGlobals &state, int const FanNum);
 
     // cpw22Aug2010 Added Component Model fan algorithm
 
-    void SimComponentModelFan(int const FanNum);
+    void SimComponentModelFan(AllGlobals &state, int const FanNum);
 
     // End Algorithm Section of the Module
     // *****************************************************************************
@@ -306,50 +306,50 @@ namespace Fans {
     // Beginning of Utility subroutines for the Fan Module
     // *****************************************************************************
 
-    void GetFanIndex(std::string const &FanName, int &FanIndex, bool &ErrorsFound, Optional_string_const ThisObjectType = _);
+    void GetFanIndex(AllGlobals &state, std::string const &FanName, int &FanIndex, bool &ErrorsFound, Optional_string_const ThisObjectType = _);
 
     void GetFanVolFlow(int const FanIndex, Real64 &FanVolFlow);
 
     Real64 GetFanPower(int const FanIndex);
 
-    void GetFanType(std::string const &FanName,               // Fan name
+    void GetFanType(AllGlobals &state, std::string const &FanName,               // Fan name
                     int &FanType,                             // returned fantype number
                     bool &ErrorsFound,                        // error indicator
                     Optional_string_const ThisObjectType = _, // parent object type (for error message)
                     Optional_string_const ThisObjectName = _  // parent object name (for error message)
     );
 
-    Real64 GetFanDesignVolumeFlowRate(std::string const &FanType,     // must match fan types in this module
+    Real64 GetFanDesignVolumeFlowRate(AllGlobals &state, std::string const &FanType,     // must match fan types in this module
                                       std::string const &FanName,     // must match fan names for the fan type
                                       bool &ErrorsFound,              // set to true if problem
                                       Optional_int_const FanIndex = _ // index to fan
     );
 
-    int GetFanInletNode(std::string const &FanType, // must match fan types in this module
+    int GetFanInletNode(AllGlobals &state, std::string const &FanType, // must match fan types in this module
                         std::string const &FanName, // must match fan names for the fan type
                         bool &ErrorsFound           // set to true if problem
     );
 
-    int getFanInNodeIndex(int const &FanIndex, // fan index
+    int getFanInNodeIndex(AllGlobals &state, int const &FanIndex, // fan index
                           bool &ErrorsFound    // set to true if problem
     );
         
-    int GetFanOutletNode(std::string const &FanType, // must match fan types in this module
+    int GetFanOutletNode(AllGlobals &state, std::string const &FanType, // must match fan types in this module
                          std::string const &FanName, // must match fan names for the fan type
                          bool &ErrorsFound           // set to true if problem
     );
 
-    int GetFanAvailSchPtr(std::string const &FanType, // must match fan types in this module
+    int GetFanAvailSchPtr(AllGlobals &state, std::string const &FanType, // must match fan types in this module
                           std::string const &FanName, // must match fan names for the fan type
                           bool &ErrorsFound           // set to true if problem
     );
 
-    int GetFanSpeedRatioCurveIndex(std::string &FanType,    // must match fan types in this module (set if nonzero index passed)
+    int GetFanSpeedRatioCurveIndex(AllGlobals &state, std::string &FanType,    // must match fan types in this module (set if nonzero index passed)
                                    std::string &FanName,    // must match fan names for the fan type (set if nonzero index passed)
                                    Optional_int IndexIn = _ // optional fan index if fan type and name are unknown or index needs setting
     );
 
-    void SetFanData(int const FanNum,                         // Index of fan
+    void SetFanData(AllGlobals &state, int const FanNum,                         // Index of fan
                     bool &ErrorsFound,                        // Set to true if certain errors found
                     std::string const &FanName,               // Name of fan
                     Optional<Real64 const> MaxAirVolFlow = _, // Fan air volumetric flow rate    [m3/s]
@@ -367,7 +367,7 @@ namespace Fans {
                                         int const FanCurvePtr                // Fan Curve Pointer
     );
 
-    Real64 FanDesHeatGain(int const FanNum,       // index of fan in Fan array
+    Real64 FanDesHeatGain(AllGlobals &state, int const FanNum,       // index of fan in Fan array
                           Real64 const FanVolFlow // fan volumetric flow rate [m3/s]
     );
 

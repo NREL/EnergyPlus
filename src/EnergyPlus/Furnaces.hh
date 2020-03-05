@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 
 namespace EnergyPlus {
@@ -327,7 +328,7 @@ namespace Furnaces {
 
     void clear_state();
 
-    void SimFurnace(std::string const &FurnaceName,
+    void SimFurnace(AllGlobals &state, std::string const &FurnaceName,
                     bool const FirstHVACIteration,
                     int const AirLoopNum, // Primary air loop number
                     int &CompIndex        // Pointer to which furnace
@@ -336,7 +337,7 @@ namespace Furnaces {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetFurnaceInput();
+    void GetFurnaceInput(AllGlobals &state);
 
     // End of Get Input subroutines for this Module
     //******************************************************************************

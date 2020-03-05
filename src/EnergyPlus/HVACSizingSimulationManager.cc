@@ -189,7 +189,7 @@ void HVACSizingSimulationManager::ProcessCoincidentPlantSizeAdjustments(int cons
     // as more sizing adjustments are added this will need to change to consider all not just plant coincident
     FinalSizingHVACSizingSimIteration = plantCoinAnalyRequestsAnotherIteration;
 }
-void HVACSizingSimulationManager::RedoKickOffAndResize()
+void HVACSizingSimulationManager::RedoKickOffAndResize(AllGlobals &state)
 {
     using DataGlobals::KickOffSimulation;
     using DataGlobals::RedoSizesHVACSimulation;
@@ -200,7 +200,7 @@ void HVACSizingSimulationManager::RedoKickOffAndResize()
     RedoSizesHVACSimulation = true;
 
     ResetEnvironmentCounter();
-    SetupSimulation(OutputFiles::getSingleton(), ErrorsFound);
+    SetupSimulation(state, OutputFiles::getSingleton(), ErrorsFound);
 
     KickOffSimulation = false;
     RedoSizesHVACSimulation = false;
@@ -218,7 +218,7 @@ void HVACSizingSimulationManager::UpdateSizingLogsSystemStep()
 
 std::unique_ptr<HVACSizingSimulationManager> hvacSizingSimulationManager;
 
-void ManageHVACSizingSimulation(OutputFiles &outputFiles, bool &ErrorsFound)
+void ManageHVACSizingSimulation(AllGlobals &state, OutputFiles &outputFiles, bool &ErrorsFound)
 {
     using DataEnvironment::CurMnDy;
     using DataEnvironment::CurrentOverallSimDay;
@@ -371,7 +371,7 @@ void ManageHVACSizingSimulation(OutputFiles &outputFiles, bool &ErrorsFound)
 
                         ManageExteriorEnergyUse();
 
-                        ManageHeatBalance(outputFiles);
+                        ManageHeatBalance(state, outputFiles);
 
                         BeginHourFlag = false;
                         BeginDayFlag = false;
@@ -399,7 +399,7 @@ void ManageHVACSizingSimulation(OutputFiles &outputFiles, bool &ErrorsFound)
 
         hvacSizingSimulationManager->ProcessCoincidentPlantSizeAdjustments(HVACSizingIterCount);
 
-        hvacSizingSimulationManager->RedoKickOffAndResize();
+        hvacSizingSimulationManager->RedoKickOffAndResize(state);
 
         if (!hvacSizingSimulationManager->plantCoinAnalyRequestsAnotherIteration) {
             // jump out of for loop, or change for to a while

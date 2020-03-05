@@ -55,6 +55,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 
 namespace EnergyPlus {
 
@@ -248,16 +249,16 @@ namespace OutdoorAirUnit {
                            Real64 &LatOutputProvided,     // Latent add/removal supplied by window AC (kg/s), dehumid = negative
                            int &CompIndex);
 
-    void GetOutdoorAirUnitInputs();
+    void GetOutdoorAirUnitInputs(AllGlobals &state);
 
     void InitOutdoorAirUnit(int const OAUnitNum,          // index for the current outdoor air unit
                             int const ZoneNum,            // number of zone being served
                             bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     );
 
-    void SizeOutdoorAirUnit(int const OAUnitNum);
+    void SizeOutdoorAirUnit(AllGlobals &state, int const OAUnitNum);
 
-    void CalcOutdoorAirUnit(int &OAUnitNum,                // number of the current unit being simulated
+    void CalcOutdoorAirUnit(AllGlobals &state, int &OAUnitNum,                // number of the current unit being simulated
                             int const ZoneNum,             // number of zone being served
                             bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                             Real64 &PowerMet,              // power supplied

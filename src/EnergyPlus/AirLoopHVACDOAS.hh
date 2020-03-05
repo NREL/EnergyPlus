@@ -49,6 +49,7 @@
 #define ENERGYPLUS_AIRLOOPHVACDOAS_HH
 
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <string>
 #include <vector>
 
@@ -184,15 +185,15 @@ namespace AirLoopHVACDOAS {
         {
         }
 
-        static void getAirLoopDOASInput();
+        static void getAirLoopDOASInput(AllGlobals &state);
 
-        void SimAirLoopHVACDOAS(bool const firstHVACIteration, int &CompIndex);
+        void SimAirLoopHVACDOAS(AllGlobals &state, bool const firstHVACIteration, int &CompIndex);
 
-        void initAirLoopDOAS(bool const FirstHVACIteration);
+        void initAirLoopDOAS(AllGlobals &state, bool const FirstHVACIteration);
 
         void CalcAirLoopDOAS(bool const FirstHVACIteration);
 
-        void SizingAirLoopDOAS();
+        void SizingAirLoopDOAS(AllGlobals &state);
 
         void GetDesignDayConditions();
     };
@@ -200,7 +201,7 @@ namespace AirLoopHVACDOAS {
     extern std::vector<AirLoopDOAS> airloopDOAS;
     int getAirLoopMixerIndex(std::string const &objectName);
     int getAirLoopSplitterIndex(std::string const &objectName);
-    void getAirLoopHVACDOASInput();
+    void getAirLoopHVACDOASInput(AllGlobals &state);
     extern bool GetInputOnceFlag;
 } // namespace AirLoopHVACDOAS
 } // namespace EnergyPlus

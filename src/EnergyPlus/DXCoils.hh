@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 
 namespace EnergyPlus {
     class OutputFiles;
@@ -602,7 +603,7 @@ namespace DXCoils {
 
     // Functions
 
-    void SimDXCoil(std::string const &CompName,   // name of the fan coil unit
+    void SimDXCoil(AllGlobals &state, std::string const &CompName,   // name of the fan coil unit
                    int const CompOp,              // compressor operation; 1=on, 0=off
                    bool const FirstHVACIteration, // True when first HVAC iteration
                    int &CompIndex,
@@ -614,7 +615,7 @@ namespace DXCoils {
                    Optional<Real64 const> CompCyclingRatio = _            // cycling ratio of VRF condenser connected to this TU
     );
 
-    void SimDXCoilMultiSpeed(std::string const &CompName, // name of the fan coil unit
+    void SimDXCoilMultiSpeed(AllGlobals &state, std::string const &CompName, // name of the fan coil unit
                              Real64 const SpeedRatio,     // = (CompressorSpeed - CompressorSpeedMin) /
                              Real64 const CycRatio,       // cycling part load ratio for variable speed
                              int &CompIndex,
@@ -624,7 +625,7 @@ namespace DXCoils {
                              Optional_int_const SingleMode = _ // Single mode operation Yes/No; 1=Yes, 0=No
     );
 
-    void SimDXCoilMultiMode(std::string const &CompName,   // name of the fan coil unit
+    void SimDXCoilMultiMode(AllGlobals &state, std::string const &CompName,   // name of the fan coil unit
                             int const CompOp,              // compressor operation; 1=on, 0=off !unused1208
                             bool const FirstHVACIteration, // true if first hvac iteration
                             Real64 const PartLoadRatio,    // part load ratio
@@ -635,7 +636,7 @@ namespace DXCoils {
 
     void GetDXCoils();
 
-    void InitDXCoil(int const DXCoilNum); // number of the current DX coil unit being simulated
+    void InitDXCoil(AllGlobals &state, int const DXCoilNum); // number of the current DX coil unit being simulated
 
     void SizeDXCoil(int const DXCoilNum);
 
@@ -754,11 +755,11 @@ namespace DXCoils {
 
     void ReportDXCoil(int const DXCoilNum); // number of the current fan coil unit being simulated
 
-    void CalcTwoSpeedDXCoilStandardRating(OutputFiles &outputFiles, int const DXCoilNum);
+    void CalcTwoSpeedDXCoilStandardRating(AllGlobals &state, OutputFiles &outputFiles, int const DXCoilNum);
 
-    void GetFanIndexForTwoSpeedCoil(int const CoolingCoilIndex, int &SupplyFanIndex, std::string &SupplyFanName, int &SupplyFan_TypeNum);
+    void GetFanIndexForTwoSpeedCoil(AllGlobals &state, int const CoolingCoilIndex, int &SupplyFanIndex, std::string &SupplyFanName, int &SupplyFan_TypeNum);
 
-    Real64 CalcTwoSpeedDXCoilIEERResidual(Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 CalcTwoSpeedDXCoilIEERResidual(AllGlobals &state, Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                           Array1<Real64> const &Par           // par(1) = DX coil number
     );
 

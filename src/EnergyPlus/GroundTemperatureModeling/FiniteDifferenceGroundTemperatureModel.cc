@@ -80,7 +80,7 @@ Real64 iterationTempConvergenceCriteria = 0.00001;
 //******************************************************************************
 
 // Finite difference model factory
-std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(int objectType, std::string objectName)
+std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(AllGlobals &state, int objectType, std::string objectName)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -135,7 +135,7 @@ std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDi
         groundTempModels.push_back(thisModel);
 
         // Simulate
-        thisModel->initAndSim();
+        thisModel->initAndSim(state);
 
         // Return the pointer
         return thisModel;
@@ -147,7 +147,7 @@ std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDi
 
 //******************************************************************************
 
-void FiniteDiffGroundTempsModel::initAndSim()
+void FiniteDiffGroundTempsModel::initAndSim(AllGlobals &state)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -158,7 +158,7 @@ void FiniteDiffGroundTempsModel::initAndSim()
     // PURPOSE OF THIS SUBROUTINE:
     // Initalizes and simulated finite difference ground temps model
 
-    FiniteDiffGroundTempsModel::getWeatherData();
+    FiniteDiffGroundTempsModel::getWeatherData(state);
 
     FiniteDiffGroundTempsModel::developMesh();
 
@@ -167,7 +167,7 @@ void FiniteDiffGroundTempsModel::initAndSim()
 
 //******************************************************************************
 
-void FiniteDiffGroundTempsModel::getWeatherData()
+void FiniteDiffGroundTempsModel::getWeatherData(AllGlobals &state)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell

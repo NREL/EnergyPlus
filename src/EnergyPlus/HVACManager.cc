@@ -219,7 +219,7 @@ namespace HVACManager {
         ReportAirHeatBalanceFirstTimeFlag = true;
     }
 
-    void ManageHVAC(OutputFiles &outputFiles)
+    void ManageHVAC(AllGlobals &state, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -529,20 +529,20 @@ namespace HVACManager {
                     ReportSystemEnergyUse();
                 }
                 if (DoOutputReporting || (ZoneSizingCalc && CompLoadReportIsReq)) {
-                    ReportAirHeatBalance();
+                    ReportAirHeatBalance(state);
                     if (ZoneSizingCalc) GatherComponentLoadsHVAC();
                 }
                 if (DoOutputReporting) {
                     ReportMaxVentilationLoads();
-                    UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
+                    UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
                     if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                         if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsSystemStep();
                     }
                     UpdateTabularReports(OutputProcessor::TimeStepType::TimeStepSystem);
                 }
                 if (ZoneSizingCalc) {
-                    UpdateZoneSizing(OutputFiles::getSingleton(), DuringDay);
-                    UpdateFacilitySizing(DuringDay);
+                    UpdateZoneSizing(state, OutputFiles::getSingleton(), DuringDay);
+                    UpdateFacilitySizing(state, DuringDay);
                 }
                 EIRPlantLoopHeatPumps::EIRPlantLoopHeatPump::checkConcurrentOperation();
             } else if (!KickOffSimulation && DoOutputReporting && ReportDuringWarmup) {
@@ -574,7 +574,7 @@ namespace HVACManager {
                     PrintedWarmup = true;
                 }
                 CalcMoreNodeInfo();
-                UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
+                UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
                 if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                     if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsSystemStep();
                 }
@@ -606,7 +606,7 @@ namespace HVACManager {
                     }
                     PrintedWarmup = true;
                 }
-                UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
+                UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
             }
             ManageEMS(emsCallFromEndSystemTimestepAfterHVACReporting, anyEMSRan); // EMS calling point
             // UPDATE SYSTEM CLOCKS
@@ -657,7 +657,7 @@ namespace HVACManager {
         }
     }
 
-    void SimHVAC()
+    void SimHVAC(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -821,7 +821,7 @@ namespace HVACManager {
         }
 
         if (ZoneSizingCalc) {
-            ManageZoneEquipment(FirstHVACIteration, SimZoneEquipmentFlag, SimAirLoopsFlag);
+            ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipmentFlag, SimAirLoopsFlag);
             // need to call non zone equipment so water use zone gains can be included in sizing calcs
             ManageNonZoneEquipment(FirstHVACIteration, SimNonZoneEquipmentFlag);
             facilityElectricServiceObj->manageElectricPowerService(FirstHVACIteration, SimElecCircuitsFlag, false);
@@ -1729,7 +1729,7 @@ namespace HVACManager {
         }
     }
 
-    void SimSelectedEquipment(bool &SimAirLoops,         // True when the air loops need to be (re)simulated
+    void SimSelectedEquipment(AllGlobals &state, bool &SimAirLoops,         // True when the air loops need to be (re)simulated
                               bool &SimZoneEquipment,    // True when zone equipment components need to be (re)simulated
                               bool &SimNonZoneEquipment, // True when non-zone equipment components need to be (re)simulated
                               bool &SimPlantLoops,       // True when the main plant loops need to be (re)simulated
@@ -1806,7 +1806,7 @@ namespace HVACManager {
             // determination of which zones are connected to which air loops.
             // This call of ManageZoneEquipment does nothing except force the
             // zone equipment data to be read in.
-            ManageZoneEquipment(FirstHVACIteration, SimZoneEquipment, SimAirLoops);
+            ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
             MyEnvrnFlag = false;
         }
         if (!BeginEnvrnFlag) {
@@ -1825,7 +1825,7 @@ namespace HVACManager {
             AirLoopsSimOnce = true;     // air loops simulated once for this environment
             ResetTerminalUnitFlowLimits();
             FlowMaxAvailAlreadyReset = true;
-            ManageZoneEquipment(FirstHVACIteration, SimZoneEquipment, SimAirLoops);
+            ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
             SimZoneEquipment = true; // needs to be simulated at least twice for flow resolution to propagate to this routine
             ManageNonZoneEquipment(FirstHVACIteration, SimNonZoneEquipment);
             facilityElectricServiceObj->manageElectricPowerService(FirstHVACIteration, SimElecCircuitsFlag, false);
@@ -1860,7 +1860,7 @@ namespace HVACManager {
                         ResolveAirLoopFlowLimits();
                         FlowResolutionNeeded = false;
                     }
-                    ManageZoneEquipment(FirstHVACIteration, SimZoneEquipment, SimAirLoops);
+                    ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
                     SimElecCircuits = true; // If this was simulated there are possible electric changes that need to be simulated
                 }
                 FlowMaxAvailAlreadyReset = false;
@@ -2330,7 +2330,7 @@ namespace HVACManager {
         } // GroupNum
     }
 
-    void ReportAirHeatBalance()
+    void ReportAirHeatBalance(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:

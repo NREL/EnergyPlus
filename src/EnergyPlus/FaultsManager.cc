@@ -246,7 +246,7 @@ namespace FaultsManager {
 
     // Functions
 
-    void CheckAndReadFaults()
+    void CheckAndReadFaults(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1560,7 +1560,7 @@ namespace FaultsManager {
             }
 
             // Check whether the specified fan curve covers the design operational point of the fan
-            if (!FaultsFouledAirFilters(jFault_AirFilter).CheckFaultyAirFilterFanCurve()) {
+            if (!FaultsFouledAirFilters(jFault_AirFilter).CheckFaultyAirFilterFanCurve(state)) {
                 ShowSevereError(cFaultCurrentObject + " = \"" + cAlphaArgs(1) + "\"");
                 ShowContinueError("Invalid " + cAlphaFieldNames(6) + " = \"" + cAlphaArgs(6) + "\" does not cover ");
                 ShowContinueError("the operational point of Fan " + FaultsFouledAirFilters(jFault_AirFilter).FaultyAirFilterFanName);
@@ -2025,7 +2025,7 @@ namespace FaultsManager {
         QEvaporator = QEvaporator_f;
     }
 
-    bool FaultPropertiesAirFilter::CheckFaultyAirFilterFanCurve()
+    bool FaultPropertiesAirFilter::CheckFaultyAirFilterFanCurve(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:

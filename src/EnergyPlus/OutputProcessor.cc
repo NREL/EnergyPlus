@@ -3054,7 +3054,7 @@ namespace OutputProcessor {
         }
     }
 
-    void ReportTSMeters(Real64 const StartMinute, // Start Minute for TimeStep
+    void ReportTSMeters(AllGlobals &state, Real64 const StartMinute, // Start Minute for TimeStep
                         Real64 const EndMinute,   // End Minute for TimeStep
                         bool &PrintESOTimeStamp,  // True if the ESO Time Stamp also needs to be printed
                         bool PrintTimeStampToSQL  // Print Time Stamp to SQL file
@@ -3184,7 +3184,7 @@ namespace OutputProcessor {
         }
     }
 
-    void ReportHRMeters(bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+    void ReportHRMeters(AllGlobals &state, bool PrintTimeStampToSQL // Print Time Stamp to SQL file
     )
     {
 
@@ -3287,7 +3287,7 @@ namespace OutputProcessor {
         }
     }
 
-    void ReportDYMeters(bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+    void ReportDYMeters(AllGlobals &state, bool PrintTimeStampToSQL // Print Time Stamp to SQL file
     )
     {
 
@@ -3385,7 +3385,7 @@ namespace OutputProcessor {
         }
     }
 
-    void ReportMNMeters(bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+    void ReportMNMeters(AllGlobals &state, bool PrintTimeStampToSQL // Print Time Stamp to SQL file
     )
     {
 
@@ -3545,7 +3545,7 @@ namespace OutputProcessor {
         }
     }
 
-    void ReportSMMeters(bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+    void ReportSMMeters(AllGlobals &state, bool PrintTimeStampToSQL // Print Time Stamp to SQL file
     )
     {
 
@@ -6278,7 +6278,7 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
                         indexGroupKey);
 }
 
-void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) // What kind of data to update (Zone, HVAC)
+void UpdateDataandReport(AllGlobals &state, OutputProcessor::TimeStepType const t_TimeStepTypeKey) // What kind of data to update (Zone, HVAC)
 {
 
     // SUBROUTINE INFORMATION:
@@ -6715,7 +6715,7 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
 
         UpdateMeters(MDHM);
 
-        ReportTSMeters(StartMinute, TimeValue.at(TimeStepType::TimeStepZone).CurMinute, TimePrint, TimePrint);
+        ReportTSMeters(state, StartMinute, TimeValue.at(TimeStepType::TimeStepZone).CurMinute, TimePrint, TimePrint);
 
     } // TimeStep Block
 
@@ -6814,7 +6814,7 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
             } // Number of I Variables
         }     // thisTimeStepType (Zone or HVAC)
 
-        ReportHRMeters(TimePrint);
+        ReportHRMeters(state, TimePrint);
 
     } // Hour Block
 
@@ -6868,7 +6868,7 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
             } // Number of I Variables
         }     // thisTimeStepType (Zone or HVAC)
 
-        ReportDYMeters(TimePrint);
+        ReportDYMeters(state, TimePrint);
 
     } // Day Block
 
@@ -6909,7 +6909,7 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
             } // Number of I Variables
         }     // thisTimeStepType (Zone, HVAC)
 
-        ReportMNMeters(TimePrint);
+        ReportMNMeters(state, TimePrint);
 
         NumHoursInMonth = 0;
     } // Month Block
@@ -6945,7 +6945,7 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
             } // Number of I Variables
         }     // thisTimeStepType (Zone, HVAC)
 
-        ReportSMMeters(TimePrint);
+        ReportSMMeters(state, TimePrint);
 
         NumHoursInSim = 0;
     }

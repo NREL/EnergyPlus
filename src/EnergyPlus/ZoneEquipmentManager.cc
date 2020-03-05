@@ -216,7 +216,7 @@ namespace ZoneEquipmentManager {
         reportDOASZoneSizingHeader = true;
     }
 
-    void ManageZoneEquipment(bool const FirstHVACIteration,
+    void ManageZoneEquipment(AllGlobals &state, bool const FirstHVACIteration,
                              bool &SimZone, // Set to false at the end of the routine
                              bool &SimAir   // Eventually set to true via SimZoneEquipment if AirLoop must be resimulated
     )
@@ -268,7 +268,7 @@ namespace ZoneEquipmentManager {
         if (ZoneSizingCalc) {
             SizeZoneEquipment();
         } else {
-            SimZoneEquipment(FirstHVACIteration, SimAir);
+            SimZoneEquipment(state, FirstHVACIteration, SimAir);
             ZoneEquipSimulatedOnce = true;
         }
 
@@ -2165,7 +2165,7 @@ namespace ZoneEquipmentManager {
         }
     }
 
-    void UpdateZoneSizing(OutputFiles &outputFiles, int const CallIndicator)
+    void UpdateZoneSizing(AllGlobals &state, OutputFiles &outputFiles, int const CallIndicator)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3354,7 +3354,7 @@ namespace ZoneEquipmentManager {
         }
     }
 
-    void SimZoneEquipment(bool const FirstHVACIteration, bool &SimAir)
+    void SimZoneEquipment(AllGlobals &state, bool const FirstHVACIteration, bool &SimAir)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3816,7 +3816,7 @@ namespace ZoneEquipmentManager {
                             TurnFansOff = true;
                         }
 
-                        Fans::SimulateFanComponents(
+                        Fans::SimulateFanComponents(state,
                             PrioritySimOrder(EquipTypeNum).EquipName, FirstHVACIteration, ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
 
                         //            reset status flags for other zone equipment

@@ -266,7 +266,7 @@ namespace DXCoils {
     } // namespace
     // Functions
 
-    void SimDXCoil(std::string const &CompName,   // name of the fan coil unit
+    void SimDXCoil(AllGlobals &state, std::string const &CompName,   // name of the fan coil unit
                    int const CompOp,              // compressor operation; 1=on, 0=off
                    bool const FirstHVACIteration, // True when first HVAC iteration
                    int &CompIndex,
@@ -337,7 +337,7 @@ namespace DXCoils {
         CurDXCoilNum = DXCoilNum;
 
         // Initialize the DX coil unit
-        InitDXCoil(DXCoilNum);
+        InitDXCoil(state, DXCoilNum);
 
         // Select the correct unit type
         {
@@ -393,7 +393,7 @@ namespace DXCoils {
         ReportDXCoil(DXCoilNum);
     }
 
-    void SimDXCoilMultiSpeed(std::string const &CompName, // name of the fan coil unit
+    void SimDXCoilMultiSpeed(AllGlobals &state, std::string const &CompName, // name of the fan coil unit
                              Real64 const SpeedRatio,     // = (CompressorSpeed - CompressorSpeedMin) /
                              Real64 const CycRatio,       // cycling part load ratio for variable speed
                              int &CompIndex,
@@ -465,7 +465,7 @@ namespace DXCoils {
         CurDXCoilNum = DXCoilNum;
 
         // Initialize the DX coil unit
-        InitDXCoil(DXCoilNum);
+        InitDXCoil(state, DXCoilNum);
 
         // Select the correct unit type
         {
@@ -508,7 +508,7 @@ namespace DXCoils {
         ReportDXCoil(DXCoilNum);
     }
 
-    void SimDXCoilMultiMode(std::string const &CompName,   // name of the fan coil unit
+    void SimDXCoilMultiMode(AllGlobals &state, std::string const &CompName,   // name of the fan coil unit
                             int const EP_UNUSED(CompOp),   // compressor operation; 1=on, 0=off !unused1208
                             bool const FirstHVACIteration, // true if first hvac iteration
                             Real64 const PartLoadRatio,    // part load ratio
@@ -607,7 +607,7 @@ namespace DXCoils {
         CurDXCoilNum = DXCoilNum;
 
         // Initialize the DX coil unit
-        InitDXCoil(DXCoilNum);
+        InitDXCoil(state, DXCoilNum);
 
         // Select the correct unit type
         {
@@ -6045,7 +6045,7 @@ namespace DXCoils {
         ManageEMS(emsCallFromComponentGetInput, anyEMSRan);
     }
 
-    void InitDXCoil(int const DXCoilNum) // number of the current DX coil unit being simulated
+    void InitDXCoil(AllGlobals &state, int const DXCoilNum) // number of the current DX coil unit being simulated
     {
 
         // SUBROUTINE INFORMATION:
@@ -6503,7 +6503,7 @@ namespace DXCoils {
 
                 // call for standard ratings for two-speeed DX coil
                 if (DXCoil(DXCoilNum).CondenserType(1) == AirCooled) {
-                    CalcTwoSpeedDXCoilStandardRating(OutputFiles::getSingleton(), DXCoilNum);
+                    CalcTwoSpeedDXCoilStandardRating(state, OutputFiles::getSingleton(), DXCoilNum);
                 }
             }
 
@@ -13406,7 +13406,7 @@ namespace DXCoils {
         }
     }
 
-    void CalcTwoSpeedDXCoilStandardRating(OutputFiles &outputFiles, int const DXCoilNum)
+    void CalcTwoSpeedDXCoilStandardRating(AllGlobals &state, OutputFiles &outputFiles, int const DXCoilNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith, (Derived from CalcDXCoilStandardRating by Bereket Nigusse & Chandan Sharma)
@@ -13557,8 +13557,8 @@ namespace DXCoils {
                     FanInletNode = HVACFan::fanObjs[DXCoil(DXCoilNum).SupplyFanIndex]->inletNodeNum;
                     FanOutletNode = HVACFan::fanObjs[DXCoil(DXCoilNum).SupplyFanIndex]->outletNodeNum;
                 } else {
-                    FanInletNode = Fans::GetFanInletNode("FAN:VARIABLEVOLUME", DXCoil(DXCoilNum).SupplyFanName, ErrorsFound);
-                    FanOutletNode = Fans::GetFanOutletNode("FAN:VARIABLEVOLUME", DXCoil(DXCoilNum).SupplyFanName, ErrorsFound);
+                    FanInletNode = Fans::GetFanInletNode(state, "FAN:VARIABLEVOLUME", DXCoil(DXCoilNum).SupplyFanName, ErrorsFound);
+                    FanOutletNode = Fans::GetFanOutletNode(state, "FAN:VARIABLEVOLUME", DXCoil(DXCoilNum).SupplyFanName, ErrorsFound);
                 }
 
                 // set node state variables in preparation for fan model.
@@ -13572,7 +13572,7 @@ namespace DXCoils {
                     HVACFan::fanObjs[DXCoil(DXCoilNum).SupplyFanIndex]->simulate(_, true, false, FanStaticPressureRise);
                     FanPowerCorrection = HVACFan::fanObjs[DXCoil(DXCoilNum).SupplyFanIndex]->fanPower();
                 } else {
-                    Fans::SimulateFanComponents(
+                    Fans::SimulateFanComponents(state,
                         DXCoil(DXCoilNum).SupplyFanName, true, DXCoil(DXCoilNum).SupplyFanIndex, _, true, false, FanStaticPressureRise);
                     FanPowerCorrection = Fans::GetFanPower(DXCoil(DXCoilNum).SupplyFanIndex);
                 }
@@ -13712,7 +13712,7 @@ namespace DXCoils {
                         HVACFan::fanObjs[DXCoil(DXCoilNum).SupplyFanIndex]->simulate(_, true, false, FanStaticPressureRise);
                         FanPowerCorrection = HVACFan::fanObjs[DXCoil(DXCoilNum).SupplyFanIndex]->fanPower();
                     } else {
-                        Fans::SimulateFanComponents(
+                        Fans::SimulateFanComponents(state,
                             DXCoil(DXCoilNum).SupplyFanName, true, DXCoil(DXCoilNum).SupplyFanIndex, _, true, false, FanStaticPressureRise);
                         FanPowerCorrection = Fans::GetFanPower(DXCoil(DXCoilNum).SupplyFanIndex);
                     }
@@ -13885,7 +13885,7 @@ namespace DXCoils {
         OutDryBulbTemp = heldOutDryBulb; // reset the outdoor dry bulb when done with it
     }
 
-    void GetFanIndexForTwoSpeedCoil(int const CoolingCoilIndex, int &SupplyFanIndex, std::string &SupplyFanName, int &SupplyFan_TypeNum)
+    void GetFanIndexForTwoSpeedCoil(AllGlobals &state, int const CoolingCoilIndex, int &SupplyFanIndex, std::string &SupplyFanName, int &SupplyFan_TypeNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -13941,7 +13941,7 @@ namespace DXCoils {
                     for (CompNum = 1; CompNum <= PrimaryAirSystem(FoundAirSysNum).Branch(FoundBranch).TotalComponents; ++CompNum) {
                         if (PrimaryAirSystem(FoundAirSysNum).Branch(FoundBranch).Comp(CompNum).CompType_Num == SimAirServingZones::Fan_Simple_VAV) {
                             SupplyFanName = PrimaryAirSystem(FoundAirSysNum).Branch(FoundBranch).Comp(CompNum).Name;
-                            Fans::GetFanIndex(SupplyFanName, SupplyFanIndex, ErrorsFound);
+                            Fans::GetFanIndex(state, SupplyFanName, SupplyFanIndex, ErrorsFound);
                             SupplyFan_TypeNum = DataHVACGlobals::FanType_SimpleVAV;
                             break;
                             // these are specified in SimAirServingZones and need to be moved to a Data* file. UnitarySystem=19
@@ -13962,7 +13962,7 @@ namespace DXCoils {
         }
     }
 
-    Real64 CalcTwoSpeedDXCoilIEERResidual(Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 CalcTwoSpeedDXCoilIEERResidual(AllGlobals &state, Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                           Array1<Real64> const &Par           // par(1) = DX coil number
     )
     {
@@ -14056,7 +14056,7 @@ namespace DXCoils {
             if (DXCoil(DXCoilNum).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
                 HVACFan::fanObjs[DXCoil(DXCoilNum).SupplyFanIndex]->simulate(_, true, false, FanStaticPressureRise);
             } else {
-                Fans::SimulateFanComponents(
+                Fans::SimulateFanComponents(state,
                     DXCoil(DXCoilNum).SupplyFanName, true, DXCoil(DXCoilNum).SupplyFanIndex, _, true, false, FanStaticPressureRise);
             }
 

@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 
 namespace EnergyPlus {
 
@@ -270,7 +271,7 @@ namespace FaultsManager {
         virtual ~FaultPropertiesAirFilter() = default;
 
     public:
-        bool CheckFaultyAirFilterFanCurve();
+        bool CheckFaultyAirFilterFanCurve(AllGlobals &state);
     };
 
     struct FaultPropertiesCoilSAT : public FaultProperties // Class for FaultModel:TemperatureSensorOffset:CoilSupplyAir
@@ -405,7 +406,7 @@ namespace FaultsManager {
 
     // Functions
 
-    void CheckAndReadFaults();
+    void CheckAndReadFaults(AllGlobals &state);
 
     void clear_state();
 

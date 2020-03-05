@@ -668,7 +668,7 @@ namespace OutputReportTabular {
     extern Array1D<UnitConvType> UnitConv;
 
     // Functions
-    void clear_state();
+    void clear_state(AllGlobals &state);
 
     void UpdateTabularReports(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 
@@ -754,7 +754,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void WriteTabularReports();
+    void WriteTabularReports(AllGlobals &state);
 
     void FillWeatherPredefinedEntries();
 
@@ -762,7 +762,7 @@ namespace OutputReportTabular {
                                    int const colNum             // Column number
     );
 
-    void FillRemainingPredefinedEntries();
+    void FillRemainingPredefinedEntries(AllGlobals &state);
 
     void WriteMonthlyTables();
 
@@ -903,7 +903,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void ResetTabularReports();
+    void ResetTabularReports(AllGlobals &state);
 
     void ResetMonthlyGathering();
 
@@ -917,7 +917,7 @@ namespace OutputReportTabular {
 
     void ResetHeatGainGathering();
 
-    void ResetRemainingPredefinedEntries();
+    void ResetRemainingPredefinedEntries(AllGlobals &state);
 
     void ResetAdaptiveComfort();
 

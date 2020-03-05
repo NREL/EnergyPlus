@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 
 namespace EnergyPlus {
 
@@ -100,7 +101,7 @@ namespace ZoneEquipmentManager {
     // Functions
     void clear_state();
 
-    void ManageZoneEquipment(bool const FirstHVACIteration,
+    void ManageZoneEquipment(AllGlobals &state, bool const FirstHVACIteration,
                              bool &SimZone,                     // Set to false at the end of the routine
                              bool &SimAir                       // Eventually set to true via SimZoneEquipment if AirLoop must be resimulated
     );
@@ -115,9 +116,9 @@ namespace ZoneEquipmentManager {
 
     void RezeroZoneSizingArrays();
 
-    void UpdateZoneSizing(OutputFiles &outputFiles, int const CallIndicator);
+    void UpdateZoneSizing(AllGlobals &state, OutputFiles &outputFiles, int const CallIndicator);
 
-    void SimZoneEquipment(bool const FirstHVACIteration, bool &SimAir);
+    void SimZoneEquipment(AllGlobals &state, bool const FirstHVACIteration, bool &SimAir);
 
     void SetZoneEquipSimOrder(int const ControlledZoneNum, int const ActualZoneNum);
 

@@ -87,7 +87,7 @@ namespace GroundTemperatureManager {
 
     //******************************************************************************
 
-    std::shared_ptr<BaseGroundTempsModel> GetGroundTempModelAndInit(std::string const &objectType_str, std::string const &objectName)
+    std::shared_ptr<BaseGroundTempsModel> GetGroundTempModelAndInit(AllGlobals &state, std::string const &objectType_str, std::string const &objectName)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Matt Mitchell
@@ -141,7 +141,7 @@ namespace GroundTemperatureManager {
         if (objectType == objectType_KusudaGroundTemp) {
             return KusudaGroundTempsModel::KusudaGTMFactory(objectType, objectName);
         } else if (objectType == objectType_FiniteDiffGroundTemp) {
-            return FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(objectType, objectName);
+            return FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(state, objectType, objectName);
         } else if (objectType == objectType_SiteBuildingSurfaceGroundTemp) {
             return SiteBuildingSurfaceGroundTemps::BuildingSurfaceGTMFactory(outputFiles, objectType, objectName);
         } else if (objectType == objectType_SiteShallowGroundTemp) {

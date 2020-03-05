@@ -218,7 +218,7 @@ namespace SimulationManager {
         PreP_Fatal = false;
     }
 
-    void ManageSimulation(AllGlobals const &state, OutputFiles &outputFiles)
+    void ManageSimulation(AllGlobals &state, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -372,7 +372,7 @@ namespace SimulationManager {
         }
 
         DoingSizing = true;
-        ManageSizing(OutputFiles::getSingleton());
+        ManageSizing(state, OutputFiles::getSingleton());
 
         BeginFullSimFlag = true;
         SimsDone = false;
@@ -401,9 +401,9 @@ namespace SimulationManager {
         KickOffSimulation = true;
 
         ResetEnvironmentCounter();
-        SetupSimulation(outputFiles, ErrorsFound);
+        SetupSimulation(state, outputFiles, ErrorsFound);
 
-        CheckAndReadFaults();
+        CheckAndReadFaults(state);
 
         InitCurveReporting();
 
@@ -479,7 +479,7 @@ namespace SimulationManager {
 
         // if user requested HVAC Sizing Simulation, call HVAC sizing simulation manager
         if (DoHVACSizingSimulation) {
-            ManageHVACSizingSimulation(OutputFiles::getSingleton(), ErrorsFound);
+            ManageHVACSizingSimulation(state, OutputFiles::getSingleton(), ErrorsFound);
         }
 
         ShowMessage("Beginning Simulation");
@@ -584,7 +584,7 @@ namespace SimulationManager {
                 // for simulations that last longer than a week, identify when the last year of the simulation is started
                 if ((DayOfSim > 365) && ((NumOfDayInEnvrn - DayOfSim) == 364) && !WarmupFlag) {
                     DisplayString("Starting last  year of environment at:  " + state.dataGlobals.DayOfSimChr);
-                    ResetTabularReports();
+                    ResetTabularReports(state);
                 }
 
                 for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
@@ -630,7 +630,7 @@ namespace SimulationManager {
 
                         ManageExteriorEnergyUse();
 
-                        ManageHeatBalance(outputFiles);
+                        ManageHeatBalance(state, outputFiles);
 
                         if (oneTimeUnderwaterBoundaryCheck) {
                             AnyUnderwaterBoundaries = WeatherManager::CheckIfAnyUnderwaterBoundaries();
@@ -687,7 +687,7 @@ namespace SimulationManager {
 
         OpenOutputTabularFile();
 
-        WriteTabularReports(); //     Create the tabular reports at completion of each
+        WriteTabularReports(state); //     Create the tabular reports at completion of each
 
         WriteTabularTariffReports();
 
@@ -2055,7 +2055,7 @@ namespace SimulationManager {
         }
     }
 
-    void SetupSimulation(OutputFiles &outputFiles, bool &ErrorsFound)
+    void SetupSimulation(AllGlobals &state, OutputFiles &outputFiles, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2125,7 +2125,7 @@ namespace SimulationManager {
 
             ManageExteriorEnergyUse();
 
-            ManageHeatBalance(outputFiles);
+            ManageHeatBalance(state, outputFiles);
 
             BeginHourFlag = false;
             BeginDayFlag = false;
@@ -2140,7 +2140,7 @@ namespace SimulationManager {
 
             ManageExteriorEnergyUse();
 
-            ManageHeatBalance(outputFiles);
+            ManageHeatBalance(state, outputFiles);
 
             //         do an end of day, end of environment time step
 
@@ -2153,7 +2153,7 @@ namespace SimulationManager {
 
             ManageExteriorEnergyUse();
 
-            ManageHeatBalance(outputFiles);
+            ManageHeatBalance(state, outputFiles);
 
         } // ... End environment loop.
 

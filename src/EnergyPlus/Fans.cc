@@ -174,7 +174,7 @@ namespace Fans {
     // MODULE SUBROUTINES:
     //*************************************************************************
 
-    void SimulateFanComponents(std::string const &CompName,
+    void SimulateFanComponents(AllGlobals &state, std::string const &CompName,
                                bool const FirstHVACIteration,
                                int &CompIndex,
                                Optional<Real64 const> SpeedRatio,
@@ -203,7 +203,7 @@ namespace Fans {
 
         // Obtains and Allocates fan related parameters from input file
         if (state.fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput();
+            GetFanInput(state);
             state.fans.GetFanInputFlag = false;
         }
 
@@ -231,7 +231,7 @@ namespace Fans {
         state.fans.LocalTurnFansOn = false;
         state.fans.LocalTurnFansOff = false;
         // With the correct FanNum Initialize
-        InitFan(FanNum, FirstHVACIteration); // Initialize all fan related parameters
+        InitFan(state, FanNum, FirstHVACIteration); // Initialize all fan related parameters
 
         if (present(ZoneCompTurnFansOn) && present(ZoneCompTurnFansOff)) {
             // Set module-level logic flags equal to ZoneCompTurnFansOn and ZoneCompTurnFansOff values passed into this routine
@@ -247,20 +247,20 @@ namespace Fans {
 
         // Calculate the Correct Fan Model with the current FanNum
         if (Fan(FanNum).FanType_Num == FanType_SimpleConstVolume) {
-            SimSimpleFan(FanNum);
+            SimSimpleFan(state, FanNum);
         } else if (Fan(FanNum).FanType_Num == FanType_SimpleVAV) {
             if (present(PressureRise)) {
-                SimVariableVolumeFan(FanNum, PressureRise);
+                SimVariableVolumeFan(state, FanNum, PressureRise);
             } else {
-                SimVariableVolumeFan(FanNum);
+                SimVariableVolumeFan(state, FanNum);
             }
         } else if (Fan(FanNum).FanType_Num == FanType_SimpleOnOff) {
-            SimOnOffFan(FanNum, SpeedRatio);
+            SimOnOffFan(state, FanNum, SpeedRatio);
         } else if (Fan(FanNum).FanType_Num == FanType_ZoneExhaust) {
-            SimZoneExhaustFan(FanNum);
+            SimZoneExhaustFan(state, FanNum);
             // cpw22Aug2010 Add call for Component Model fan
         } else if (Fan(FanNum).FanType_Num == FanType_ComponentModel) {
-            SimComponentModelFan(FanNum);
+            SimComponentModelFan(state, FanNum);
         }
 
         // Update the current fan to the outlet nodes
@@ -273,7 +273,7 @@ namespace Fans {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetFanInput()
+    void GetFanInput(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1003,7 +1003,7 @@ namespace Fans {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitFan(int const FanNum,
+    void InitFan(AllGlobals &state, int const FanNum,
                  bool const EP_UNUSED(FirstHVACIteration) // unused1208
     )
     {
@@ -1069,7 +1069,7 @@ namespace Fans {
 
         if (!SysSizingCalc && MySizeFlag(FanNum)) {
 
-            SizeFan(FanNum);
+            SizeFan(state, FanNum);
             // Set the loop cycling flag
             if (Fan(FanNum).FanType_Num == FanType_SimpleOnOff) {
                 if (CurSysNum > 0) {
@@ -1163,7 +1163,7 @@ namespace Fans {
         Fan(FanNum).InletAirEnthalpy = Node(InletNode).Enthalpy;
     }
 
-    void SizeFan(int const FanNum)
+    void SizeFan(AllGlobals &state, int const FanNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1516,7 +1516,7 @@ namespace Fans {
     // Begin Algorithm Section of the Module
     //******************************************************************************
 
-    void SimSimpleFan(int const FanNum)
+    void SimSimpleFan(AllGlobals &state, int const FanNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1645,7 +1645,7 @@ namespace Fans {
         }
     }
 
-    void SimVariableVolumeFan(int const FanNum, Optional<Real64 const> PressureRise)
+    void SimVariableVolumeFan(AllGlobals &state, int const FanNum, Optional<Real64 const> PressureRise)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1856,7 +1856,7 @@ namespace Fans {
         }
     }
 
-    void SimOnOffFan(int const FanNum, Optional<Real64 const> SpeedRatio)
+    void SimOnOffFan(AllGlobals &state, int const FanNum, Optional<Real64 const> SpeedRatio)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2056,7 +2056,7 @@ namespace Fans {
         }
     }
 
-    void SimZoneExhaustFan(int const FanNum)
+    void SimZoneExhaustFan(AllGlobals &state, int const FanNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2177,7 +2177,7 @@ namespace Fans {
 
     // cpw22Aug2010 Added Component Model fan algorithm
 
-    void SimComponentModelFan(int const FanNum)
+    void SimComponentModelFan(AllGlobals &state, int const FanNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2610,7 +2610,7 @@ namespace Fans {
     // Beginning of Utility subroutines for the Fan Module
     // *****************************************************************************
 
-    void GetFanIndex(std::string const &FanName, int &FanIndex, bool &ErrorsFound, Optional_string_const ThisObjectType)
+    void GetFanIndex(AllGlobals &state, std::string const &FanName, int &FanIndex, bool &ErrorsFound, Optional_string_const ThisObjectType)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2624,7 +2624,7 @@ namespace Fans {
         // is not legal fan.
 
         if (state.fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput();
+            GetFanInput(state);
             state.fans.GetFanInputFlag = false;
         }
 
@@ -2726,7 +2726,7 @@ namespace Fans {
         }
     }
 
-    void GetFanType(std::string const &FanName,           // Fan name
+    void GetFanType(AllGlobals &state, std::string const &FanName,           // Fan name
                     int &FanType,                         // returned fantype number
                     bool &ErrorsFound,                    // error indicator
                     Optional_string_const ThisObjectType, // parent object type (for error message)
@@ -2748,7 +2748,7 @@ namespace Fans {
         int FanIndex;
 
         if (state.fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput();
+            GetFanInput(state);
             state.fans.GetFanInputFlag = false;
         }
 
@@ -2768,7 +2768,7 @@ namespace Fans {
         }
     }
 
-    Real64 GetFanDesignVolumeFlowRate(std::string const &FanType, // must match fan types in this module
+    Real64 GetFanDesignVolumeFlowRate(AllGlobals &state, std::string const &FanType, // must match fan types in this module
                                       std::string const &FanName, // must match fan names for the fan type
                                       bool &ErrorsFound,          // set to true if problem
                                       Optional_int_const FanIndex // index to fan
@@ -2794,7 +2794,7 @@ namespace Fans {
 
         // Obtains and Allocates fan related parameters from input file
         if (state.fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput();
+            GetFanInput(state);
             state.fans.GetFanInputFlag = false;
         }
 
@@ -2815,7 +2815,7 @@ namespace Fans {
         return DesignVolumeFlowRate;
     }
 
-    int GetFanInletNode(std::string const &FanType, // must match fan types in this module
+    int GetFanInletNode(AllGlobals &state, std::string const &FanType, // must match fan types in this module
                         std::string const &FanName, // must match fan names for the fan type
                         bool &ErrorsFound           // set to true if problem
     )
@@ -2840,7 +2840,7 @@ namespace Fans {
 
         // Obtains and Allocates fan related parameters from input file
         if (state.fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput();
+            GetFanInput(state);
             state.fans.GetFanInputFlag = false;
         }
 
@@ -2856,7 +2856,7 @@ namespace Fans {
         return NodeNumber;
     }
 
-    int getFanInNodeIndex(int const &FanIndex, // fan index
+    int getFanInNodeIndex(AllGlobals &state, int const &FanIndex, // fan index
                           bool &ErrorsFound    // set to true if problem
     )
     {
@@ -2865,7 +2865,7 @@ namespace Fans {
 
         // Obtains and Allocates fan related parameters from input file
         if (state.fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput();
+            GetFanInput(state);
             state.fans.GetFanInputFlag = false;
         }
 
@@ -2879,7 +2879,7 @@ namespace Fans {
         return NodeNumber;
     }
 
-    int GetFanOutletNode(std::string const &FanType, // must match fan types in this module
+    int GetFanOutletNode(AllGlobals &state, std::string const &FanType, // must match fan types in this module
                          std::string const &FanName, // must match fan names for the fan type
                          bool &ErrorsFound           // set to true if problem
     )
@@ -2904,7 +2904,7 @@ namespace Fans {
 
         // Obtains and Allocates fan related parameters from input file
         if (state.fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput();
+            GetFanInput(state);
             state.fans.GetFanInputFlag = false;
         }
 
@@ -2920,7 +2920,7 @@ namespace Fans {
         return NodeNumber;
     }
 
-    int GetFanAvailSchPtr(std::string const &FanType, // must match fan types in this module
+    int GetFanAvailSchPtr(AllGlobals &state, std::string const &FanType, // must match fan types in this module
                           std::string const &FanName, // must match fan names for the fan type
                           bool &ErrorsFound           // set to true if problem
     )
@@ -2945,7 +2945,7 @@ namespace Fans {
 
         // Obtains and Allocates fan related parameters from input file
         if (state.fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput();
+            GetFanInput(state);
             state.fans.GetFanInputFlag = false;
         }
 
@@ -2961,7 +2961,7 @@ namespace Fans {
         return FanAvailSchPtr;
     }
 
-    int GetFanSpeedRatioCurveIndex(std::string &FanType, // must match fan types in this module (set if nonzero index passed)
+    int GetFanSpeedRatioCurveIndex(AllGlobals &state, std::string &FanType, // must match fan types in this module (set if nonzero index passed)
                                    std::string &FanName, // must match fan names for the fan type (set if nonzero index passed)
                                    Optional_int IndexIn  // optional fan index if fan type and name are unknown or index needs setting
     )
@@ -2986,7 +2986,7 @@ namespace Fans {
 
         // Obtains and Allocates fan related parameters from input file
         if (state.fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput();
+            GetFanInput(state);
             state.fans.GetFanInputFlag = false;
         }
 
@@ -3013,7 +3013,7 @@ namespace Fans {
         return FanSpeedRatioCurveIndex;
     }
 
-    void SetFanData(int const FanNum,                     // Index of fan
+    void SetFanData(AllGlobals &state, int const FanNum,                     // Index of fan
                     bool &ErrorsFound,                    // Set to true if certain errors found
                     std::string const &FanName,           // Name of fan
                     Optional<Real64 const> MaxAirVolFlow, // Fan air volumetric flow rate    [m3/s]
@@ -3058,7 +3058,7 @@ namespace Fans {
 
         // Obtains and Allocates fan related parameters from input file
         if (state.fans.GetFanInputFlag) { // First time subroutine has been entered
-            GetFanInput();
+            GetFanInput(state);
             state.fans.GetFanInputFlag = false;
         }
 
@@ -3208,7 +3208,7 @@ namespace Fans {
         return FanDesignAirFlowRate - FanFaultyAirFlowRate;
     }
 
-    Real64 FanDesHeatGain(int const FanNum,       // index of fan in Fan array
+    Real64 FanDesHeatGain(AllGlobals &state, int const FanNum,       // index of fan in Fan array
                           Real64 const FanVolFlow // fan volumetric flow rate [m3/s]
     )
     {
@@ -3251,7 +3251,7 @@ namespace Fans {
             DesignHeatGain = MotEff * FanPowerTot + (FanPowerTot - MotEff * FanPowerTot) * MotInAirFrac;
         } else {
             if (!SysSizingCalc && MySizeFlag(FanNum)) {
-                SizeFan(FanNum);
+                SizeFan(state, FanNum);
                 MySizeFlag(FanNum) = false;
             }
             DesignHeatGain = Fan(FanNum).FanShaftPower + (Fan(FanNum).MotorInputPower - Fan(FanNum).FanShaftPower) * Fan(FanNum).MotInAirFrac;

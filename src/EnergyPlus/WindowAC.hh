@@ -207,7 +207,7 @@ namespace WindowAC {
 
     void ReportWindowAC(int const WindACNum); // number of the current AC unit being simulated
 
-    void CalcWindowACOutput(int const WindACNum,           // Unit index in fan coil array
+    void CalcWindowACOutput(AllGlobals &state, int const WindACNum,           // Unit index in fan coil array
                             bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
                             int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
                             Real64 const PartLoadFrac,     // unit part load fraction

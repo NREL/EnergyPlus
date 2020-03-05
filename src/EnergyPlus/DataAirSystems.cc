@@ -117,7 +117,7 @@ namespace DataAirSystems {
         AirSysSubSubCompToPlant.deallocate(); // Connections
     }
 
-    Real64 calcFanDesignHeatGain(int const &dataFanEnumType, int const &dataFanIndex, Real64 const &desVolFlow)
+    Real64 calcFanDesignHeatGain(AllGlobals &state, int const &dataFanEnumType, int const &dataFanIndex, Real64 const &desVolFlow)
     {
         Real64 fanDesHeatLoad = 0.0; // design fan heat load (W)
 
@@ -125,7 +125,7 @@ namespace DataAirSystems {
 
         switch (dataFanEnumType) {
         case DataAirSystems::structArrayLegacyFanModels: {
-            fanDesHeatLoad = Fans::FanDesHeatGain(dataFanIndex, desVolFlow);
+            fanDesHeatLoad = Fans::FanDesHeatGain(state, dataFanIndex, desVolFlow);
             break;
         }
         case DataAirSystems::objectVectorOOFanSystemModel: {

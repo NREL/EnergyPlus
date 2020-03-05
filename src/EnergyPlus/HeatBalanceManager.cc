@@ -284,7 +284,7 @@ namespace HeatBalanceManager {
         UniqueConstructNames.clear();
     }
 
-    void ManageHeatBalance(OutputFiles &outputFiles)
+    void ManageHeatBalance(AllGlobals &state, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -376,7 +376,7 @@ namespace HeatBalanceManager {
         //   You do get a shift in the Air Handling System Summary for the building electric loads
         // IF ((.NOT.WarmupFlag).AND.(DayOfSim.GT.0)) CALL RCKEEP  ! Do fan system accounting (to be moved later)
 
-        ReportHeatBalance(outputFiles); // Manage heat balance reporting until the new reporting is in place
+        ReportHeatBalance(state, outputFiles); // Manage heat balance reporting until the new reporting is in place
 
         ManageEMS(emsCallFromEndZoneTimestepAfterZoneReporting, anyRan); // EMS calling point
 
@@ -5906,7 +5906,7 @@ namespace HeatBalanceManager {
     // Beginning of Reporting subroutines for the HB Module
     // *****************************************************************************
 
-    void ReportHeatBalance(OutputFiles &outputFiles)
+    void ReportHeatBalance(AllGlobals &state, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5962,7 +5962,7 @@ namespace HeatBalanceManager {
 
         if (!WarmupFlag && DoOutputReporting) {
             CalcMoreNodeInfo();
-            UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
+            UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
             if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                 if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
             }
@@ -5997,13 +5997,13 @@ namespace HeatBalanceManager {
                 }
             }
             CalcMoreNodeInfo();
-            UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
+            UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
             if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                 if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
             }
 
         } else if (UpdateDataDuringWarmupExternalInterface) { // added for FMI
-            UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
+            UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
             if (KindOfSim == ksHVACSizeDesignDay || KindOfSim == ksHVACSizeRunPeriodDesign) {
                 if (hvacSizingSimulationManager) hvacSizingSimulationManager->UpdateSizingLogsZoneStep();
             }

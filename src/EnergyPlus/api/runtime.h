@@ -49,13 +49,14 @@
 #define EnergyPlusAPIRuntime_h_INCLUDED
 
 #include <EnergyPlus/api/EnergyPlusAPI.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/TypeDefs.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-ENERGYPLUSLIB_API void cClearAllStates();
+ENERGYPLUSLIB_API void cClearAllStates(AllGlobals &state);
 
 // Program level functions
 ENERGYPLUSLIB_API int energyplus(int argc, const char *argv[]);

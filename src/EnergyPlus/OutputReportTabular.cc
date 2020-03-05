@@ -549,7 +549,7 @@ namespace OutputReportTabular {
     } // namespace
 
     // Functions
-    void clear_state()
+    void clear_state(AllGlobals &state)
     {
         GatherMonthlyResultsForTimestepRunOnce = true;
         UpdateTabularReportsGetInput = true;
@@ -724,7 +724,7 @@ namespace OutputReportTabular {
         TOCEntries.deallocate();
         UnitConv.deallocate();
 
-        OutputReportTabular::ResetTabularReports();
+        OutputReportTabular::ResetTabularReports(state);
     }
 
     void UpdateTabularReports(OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
@@ -5658,7 +5658,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void WriteTabularReports()
+    void WriteTabularReports(AllGlobals &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -5675,7 +5675,7 @@ namespace OutputReportTabular {
         int EchoInputFile; // found unit number for 'eplusout.audit'
 
         FillWeatherPredefinedEntries();
-        FillRemainingPredefinedEntries();
+        FillRemainingPredefinedEntries(state);
 
         if (WriteTabularFiles) {
             // call each type of report in turn
@@ -6434,7 +6434,7 @@ namespace OutputReportTabular {
         return inString.substr(startPos, endPos - startPos);
     }
 
-    void FillRemainingPredefinedEntries()
+    void FillRemainingPredefinedEntries(AllGlobals &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason Glazer
@@ -15142,7 +15142,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void ResetTabularReports()
+    void ResetTabularReports(AllGlobals &state)
     {
         // Jason Glazer - October 2015
         // Reset all gathering arrays to zero for multi-year simulations
@@ -15159,7 +15159,7 @@ namespace OutputReportTabular {
         ResetSourceEnergyEndUseGathering();
         ResetPeakDemandGathering();
         ResetHeatGainGathering();
-        ResetRemainingPredefinedEntries();
+        ResetRemainingPredefinedEntries(state);
         ResetThermalComfortSimpleASH55();
         ResetSetPointMet();
         ResetAdaptiveComfort();
@@ -15392,7 +15392,7 @@ namespace OutputReportTabular {
         BuildingPreDefRep.SHGSClOtherRem = 0.0;
     }
 
-    void ResetRemainingPredefinedEntries()
+    void ResetRemainingPredefinedEntries(AllGlobals &state)
     {
         // Jason Glazer - October 2015
         // Reset all entries that are added to the predefined reports in the FillRemainingPredefinedEntries() function to zero for multi-year

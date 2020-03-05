@@ -76,6 +76,7 @@
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HWBaseboardRadiator.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -116,7 +117,7 @@ enum GeneralRoutinesEquipNums
     VentilatedSlabNum = 11
 };
 
-void ControlCompOutput(std::string const &CompName,           // the component Name
+void ControlCompOutput(AllGlobals &state, std::string const &CompName,           // the component Name
                        std::string const &CompType,           // Type of component
                        int &CompNum,                          // Index of component in component array
                        bool const FirstHVACIteration,         // flag for 1st HVAV iteration in the time step
@@ -557,7 +558,7 @@ void ControlCompOutput(std::string const &CompName,           // the component N
 
         case FourPipeFanCoilNum: // 'ZONEHVAC:FOURPIPEFANCOIL'
             // Simulate fancoil unit
-            Calc4PipeFanCoil(CompNum, ControlledZoneIndex, FirstHVACIteration, LoadMet);
+            Calc4PipeFanCoil(state, CompNum, ControlledZoneIndex, FirstHVACIteration, LoadMet);
             // Calculate the control signal (the variable we are forcing to zero)
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
             break;

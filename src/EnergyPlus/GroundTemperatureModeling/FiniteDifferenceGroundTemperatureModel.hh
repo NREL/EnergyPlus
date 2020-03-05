@@ -58,6 +58,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
 
 namespace EnergyPlus {
@@ -127,11 +128,11 @@ public:
 
     Array1D<instanceOfWeatherData> weatherDataArray;
 
-    static std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGTMFactory(int objectType, std::string objectName);
+    static std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGTMFactory(AllGlobals &state, int objectType, std::string objectName);
 
-    void getWeatherData();
+    void getWeatherData(AllGlobals &state);
 
-    void initAndSim();
+    void initAndSim(AllGlobals &state);
 
     void developMesh();
 

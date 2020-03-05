@@ -2194,7 +2194,7 @@ namespace HVACUnitaryBypassVAV {
             if (CBVAV(CBVAVNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 HVACFan::fanObjs[CBVAV(CBVAVNum).FanIndex]->simulate(1.0 / OnOffAirFlowRatio, _, _, _);
             } else {
-                Fans::SimulateFanComponents(CBVAV(CBVAVNum).FanName, FirstHVACIteration, CBVAV(CBVAVNum).FanIndex, FanSpeedRatio);
+                Fans::SimulateFanComponents(states, CBVAV(CBVAVNum).FanName, FirstHVACIteration, CBVAV(CBVAVNum).FanIndex, FanSpeedRatio);
             }
         }
         // Simulate cooling coil if zone load is negative (cooling load)

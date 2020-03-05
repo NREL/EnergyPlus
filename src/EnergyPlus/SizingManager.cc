@@ -147,7 +147,7 @@ namespace SizingManager {
         NumAirLoops = 0;
     }
 
-    void ManageSizing(OutputFiles &outputFiles)
+    void ManageSizing(AllGlobals &state, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -302,7 +302,7 @@ namespace SizingManager {
 
             ResetEnvironmentCounter();
             KickOffSizing = true;
-            SetupZoneSizing(outputFiles, ErrorsFound); // Should only be done ONCE
+            SetupZoneSizing(state, outputFiles, ErrorsFound); // Should only be done ONCE
             KickOffSizing = false;
 
             for (iZoneCalcIter = 1; iZoneCalcIter <= numZoneSizeIter; ++iZoneCalcIter) { // normally this is performed once but if load component
@@ -374,8 +374,8 @@ namespace SizingManager {
                                     DisplayString("...for Sizing Period: #" + RoundSigDigits(NumSizingPeriodsPerformed) + ' ' + EnvironmentName);
                                 }
                             }
-                            UpdateZoneSizing(outputFiles, BeginDay);
-                            UpdateFacilitySizing(BeginDay);
+                            UpdateZoneSizing(state, outputFiles, BeginDay);
+                            UpdateFacilitySizing(state, BeginDay);
                         }
 
                         for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...
@@ -430,7 +430,7 @@ namespace SizingManager {
                                     DesDayWeath(CurOverallSimDay).Press(TimeStepInDay) = OutBaroPress;
                                 }
 
-                                ManageHeatBalance(outputFiles);
+                                ManageHeatBalance(state, outputFiles);
 
                                 BeginHourFlag = false;
                                 BeginDayFlag = false;
@@ -444,8 +444,8 @@ namespace SizingManager {
                         } // ... End hour loop.
 
                         if (EndDayFlag) {
-                            UpdateZoneSizing(outputFiles, EndDay);
-                            UpdateFacilitySizing(EndDay);
+                            UpdateZoneSizing(state, outputFiles, EndDay);
+                            UpdateFacilitySizing(state, EndDay);
                         }
 
                         if (!WarmupFlag && (DayOfSim > 0) && (DayOfSim < NumOfDayInEnvrn)) {
@@ -460,8 +460,8 @@ namespace SizingManager {
                 } // ... End environment loop
 
                 if (NumSizingPeriodsPerformed > 0) {
-                    UpdateZoneSizing(outputFiles, state.dataGlobals.EndZoneSizingCalc);
-                    UpdateFacilitySizing(state.dataGlobals.EndZoneSizingCalc);
+                    UpdateZoneSizing(state, outputFiles, state.dataGlobals.EndZoneSizingCalc);
+                    UpdateFacilitySizing(state, state.dataGlobals.EndZoneSizingCalc);
                     ZoneSizingRunDone = true;
                 } else {
                     ShowSevereError(RoutineName + "No Sizing periods were performed for Zone Sizing. No Zone Sizing calculations saved.");
@@ -515,7 +515,7 @@ namespace SizingManager {
             SimAir = true;
             SimZoneEquip = true;
 
-            ManageZoneEquipment(true, SimZoneEquip, SimAir);
+            ManageZoneEquipment(state, true, SimZoneEquip, SimAir);
             ManageAirLoops(true, SimAir, SimZoneEquip);
             SizingManager::UpdateTermUnitFinalZoneSizing(); // AirDistUnits have been loaded now so TermUnitSizing values are all in place
             SimAirServingZones::SizeSysOutdoorAir();        // System OA can be sized now that TermUnitFinalZoneSizing is initialized
@@ -636,7 +636,7 @@ namespace SizingManager {
             SimAir = true;
             SimZoneEquip = true;
 
-            ManageZoneEquipment(true, SimZoneEquip, SimAir);
+            ManageZoneEquipment(state, true, SimZoneEquip, SimAir);
             SizingManager::UpdateTermUnitFinalZoneSizing(); // AirDistUnits have been loaded now so TermUnitSizing values are all in place
         }
         SysSizingCalc = false;
@@ -845,7 +845,7 @@ namespace SizingManager {
         }
     }
 
-    void ManageSystemSizingAdjustments()
+    void ManageSystemSizingAdjustments(AllGlobals &state)
     {
         // This routine adjusts system sizing outcomes based on how the zone air terminals finish out their sizing.
         // The zone models are executed to trigger their sizing routines
@@ -862,7 +862,7 @@ namespace SizingManager {
             bool t_SimZoneEquip(true);
             bool t_SimAir(false);
             DataGlobals::BeginEnvrnFlag = true; // trigger begin envrn blocks in zone equipment models
-            ZoneEquipmentManager::ManageZoneEquipment(true, t_SimZoneEquip, t_SimAir);
+            ZoneEquipmentManager::ManageZoneEquipment(state, true, t_SimZoneEquip, t_SimAir);
             DataGlobals::BeginEnvrnFlag = false;
 
             for (int AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
@@ -3864,7 +3864,7 @@ namespace SizingManager {
         }
     }
 
-    void SetupZoneSizing(OutputFiles &outputFiles, bool &ErrorsFound)
+    void SetupZoneSizing(AllGlobals &state, OutputFiles &outputFiles, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3930,7 +3930,7 @@ namespace SizingManager {
 
             ManageWeather();
 
-            ManageHeatBalance(outputFiles);
+            ManageHeatBalance(state, outputFiles);
 
             BeginHourFlag = false;
             BeginDayFlag = false;
@@ -3941,7 +3941,7 @@ namespace SizingManager {
             //          ! do another timestep=1
             ManageWeather();
 
-            ManageHeatBalance(outputFiles);
+            ManageHeatBalance(state, outputFiles);
 
             //         do an end of day, end of environment time step
 
@@ -3951,7 +3951,7 @@ namespace SizingManager {
 
             ManageWeather();
 
-            ManageHeatBalance(outputFiles);
+            ManageHeatBalance(state, outputFiles);
 
         } // ... End environment loop.
     }
@@ -4774,7 +4774,7 @@ namespace SizingManager {
     }
 
     // Update the sizing for the entire facilty to gather values for reporting - Glazer January 2017
-    void UpdateFacilitySizing(int const CallIndicator)
+    void UpdateFacilitySizing(AllGlobals &state, int const CallIndicator)
     {
         int NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
 

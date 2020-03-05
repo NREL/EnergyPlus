@@ -1468,7 +1468,7 @@ namespace SimAirServingZones {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitAirLoops(bool const FirstHVACIteration) // TRUE if first full HVAC iteration in an HVAC timestep
+    void InitAirLoops(AllGlobals &state, bool const FirstHVACIteration) // TRUE if first full HVAC iteration in an HVAC timestep
     {
 
         // SUBROUTINE INFORMATION:
@@ -2068,16 +2068,16 @@ namespace SimAirServingZones {
                             if (PrimaryAirSystem(AirLoopNum).OASysExists && !PrimaryAirSystem(AirLoopNum).isAllOA) {
                                 if (FoundOASys) {
                                     if (PrimaryAirSystem(AirLoopNum).Branch(BranchNum).DuctType != 3) {
-                                        GetFanIndex(PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, SupFanIndex, ErrorsFound);
+                                        GetFanIndex(state, PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, SupFanIndex, ErrorsFound);
                                         supFanModelType = structArrayLegacyFanModels;
                                         goto EndOfAirLoop;
                                     }
                                 } else {
-                                    GetFanIndex(PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, RetFanIndex, ErrorsFound);
+                                    GetFanIndex(state, PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, RetFanIndex, ErrorsFound);
                                     retFanModelType = structArrayLegacyFanModels;
                                 }
                             } else {
-                                GetFanIndex(PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, SupFanIndex, ErrorsFound);
+                                GetFanIndex(state, PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).Name, SupFanIndex, ErrorsFound);
                                 supFanModelType = structArrayLegacyFanModels;
                                 goto EndOfAirLoop;
                             }
@@ -3567,10 +3567,10 @@ namespace SimAirServingZones {
 
                 // Fan Types for the air sys simulation
             } else if (SELECT_CASE_var == Fan_Simple_CV) { // 'Fan:ConstantVolume'
-                Fans::SimulateFanComponents(CompName, FirstHVACIteration, CompIndex);
+                Fans::SimulateFanComponents(state, CompName, FirstHVACIteration, CompIndex);
 
             } else if (SELECT_CASE_var == Fan_Simple_VAV) { // 'Fan:VariableVolume'
-                Fans::SimulateFanComponents(CompName, FirstHVACIteration, CompIndex);
+                Fans::SimulateFanComponents(state, CompName, FirstHVACIteration, CompIndex);
 
             } else if (SELECT_CASE_var == Fan_System_Object) { // "Fan:SystemModel" new for V8.6
                 if (CompIndex == 0) {                          // 0 means has not been filled because of 1-based arrays in old fortran
@@ -3583,7 +3583,7 @@ namespace SimAirServingZones {
 
                 // cpw22Aug2010 Add Fan:ComponentModel (new)
             } else if (SELECT_CASE_var == Fan_ComponentModel) { // 'Fan:ComponentModel'
-                Fans::SimulateFanComponents(CompName, FirstHVACIteration, CompIndex);
+                Fans::SimulateFanComponents(state, CompName, FirstHVACIteration, CompIndex);
 
                 // Coil Types for the air sys simulation
                 //  Currently no control for HX Assisted coils

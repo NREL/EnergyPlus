@@ -59,6 +59,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HVACFan.hh>
 
 namespace EnergyPlus {
@@ -297,7 +298,7 @@ namespace FanCoilUnits {
 
     void clear_state();
 
-    void SimFanCoilUnit(std::string const &CompName,   // name of the fan coil unit
+    void SimFanCoilUnit(AllGlobals &state, std::string const &CompName,   // name of the fan coil unit
                         int const ZoneNum,             // number of zone being served
                         int const ControlledZoneNum,   // index into ZoneEquipConfig array; may not be equal to ZoneNum
                         bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
@@ -305,16 +306,16 @@ namespace FanCoilUnits {
                         Real64 &LatOutputProvided,     // Latent add/removal supplied by window AC (kg/s), dehumid = negative
                         int &CompIndex);
 
-    void GetFanCoilUnits();
+    void GetFanCoilUnits(AllGlobals &state);
 
-    void InitFanCoilUnits(int const FanCoilNum,         // number of the current fan coil unit being simulated
+    void InitFanCoilUnits(AllGlobals &state, int const FanCoilNum,         // number of the current fan coil unit being simulated
                           int const ZoneNum,            // number of zone being served
                           int const ControlledZoneNum); // index into ZoneEquipConfig array; may not be equal to ZoneNum
 
-    void SizeFanCoilUnit(int const FanCoilNum,
+    void SizeFanCoilUnit(AllGlobals &state, int const FanCoilNum,
                          int const ControlledZoneNum); // index into ZoneEquipConfig array; may not be equal to ZoneNum
 
-    void Sim4PipeFanCoil(int &FanCoilNum,               // number of the current fan coil unit being simulated
+    void Sim4PipeFanCoil(AllGlobals &state, int &FanCoilNum,               // number of the current fan coil unit being simulated
                          int const ZoneNum,             // number of zone being served
                          int const ControlledZoneNum,   // index into ZoneEqupConfig
                          bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
@@ -322,7 +323,7 @@ namespace FanCoilUnits {
                          Real64 &LatOutputProvided      // Latent power supplied (kg/s), negative = dehumidification
     );
 
-    void TightenWaterFlowLimits(int const FanCoilNum,          // Unit index in fan coil array
+    void TightenWaterFlowLimits(AllGlobals &state, int const FanCoilNum,          // Unit index in fan coil array
                                 bool const CoolingLoad,        // true if zone requires cooling
                                 bool const HeatingLoad,        // true if zone requires heating
                                 int const WaterControlNode,    // water control node, either cold or hot water
@@ -333,7 +334,7 @@ namespace FanCoilUnits {
                                 Real64 &MaxWaterFlow           // maximum water flow rate
     );
 
-    void TightenAirAndWaterFlowLimits(int const FanCoilNum,          // Unit index in fan coil array
+    void TightenAirAndWaterFlowLimits(AllGlobals &state, int const FanCoilNum,          // Unit index in fan coil array
                                       bool const CoolingLoad,        // true if zone requires cooling
                                       bool const HeatingLoad,        // true if zone requires heating
                                       int const WaterControlNode,    // water control node, either cold or hot water
@@ -344,7 +345,7 @@ namespace FanCoilUnits {
                                       Real64 &PLRMax                 // maximum part-load ratio
     );
 
-    void Calc4PipeFanCoil(int const FanCoilNum,          // Unit index in fan coil array
+    void Calc4PipeFanCoil(AllGlobals &state, int const FanCoilNum,          // Unit index in fan coil array
                           int const ControlledZoneNum,   // ZoneEquipConfig index
                           bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
                           Real64 &LoadMet,               // load met by unit (watts)
@@ -368,7 +369,7 @@ namespace FanCoilUnits {
 
     void ReportFanCoilUnit(int const FanCoilNum); // number of the current fan coil unit being simulated
 
-    int GetFanCoilZoneInletAirNode(int const FanCoilNum);
+    int GetFanCoilZoneInletAirNode(AllGlobals &state, int const FanCoilNum);
 
     int GetFanCoilOutAirNode(int const FanCoilNum);
 

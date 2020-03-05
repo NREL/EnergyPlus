@@ -57,6 +57,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
@@ -289,7 +290,7 @@ namespace EnergyPlus {
             void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad,
                           bool const RunFlag) override;
 
-            static PlantComponent *factory(int const objectType, std::string objectName);
+            static PlantComponent *factory(AllGlobals &state, int const objectType, std::string objectName);
 
             virtual Real64 getGFunc(Real64) = 0;
 
@@ -438,7 +439,7 @@ namespace EnergyPlus {
 
         void clear_state();
 
-        void GetGroundHeatExchangerInput();
+        void GetGroundHeatExchangerInput(AllGlobals &state);
 
         std::shared_ptr<GLHEResponseFactorsStruct>
         BuildAndGetResponseFactorObjectFromArray(std::shared_ptr<GLHEVertArrayStruct> const &arrayObjectPtr);

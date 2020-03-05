@@ -289,7 +289,7 @@ namespace Furnaces {
         UniqueFurnaceNames.clear();
     }
 
-    void SimFurnace(std::string const &FurnaceName,
+    void SimFurnace(AllGlobals &state, std::string const &FurnaceName,
                     bool const FirstHVACIteration,
                     int const AirLoopNum, // Primary air loop number
                     int &CompIndex        // Pointer to which furnace
@@ -348,7 +348,7 @@ namespace Furnaces {
         // Obtains and Allocates Furnace related parameters from input file
         if (GetFurnaceInputFlag) { // First time subroutine has been entered
             // Get the furnace input
-            GetFurnaceInput();
+            GetFurnaceInput(state);
             GetFurnaceInputFlag = false;
         }
 
@@ -436,7 +436,7 @@ namespace Furnaces {
 
                 if (Furnace(FurnaceNum).FanPlace == BlowThru) {
                     // simulate fan
-                    SimulateFanComponents(BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
+                    SimulateFanComponents(state, BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
                 }
 
                 // simulate furnace heating coil
@@ -445,7 +445,7 @@ namespace Furnaces {
 
                 if (Furnace(FurnaceNum).FanPlace == DrawThru) {
                     // simulate fan
-                    SimulateFanComponents(BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
+                    SimulateFanComponents(state, BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
                 }
 
                 // Simulate HeatCool sytems:
@@ -503,7 +503,7 @@ namespace Furnaces {
 
                     if (Furnace(FurnaceNum).FanPlace == BlowThru) {
                         // simulate fan
-                        SimulateFanComponents(BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
+                        SimulateFanComponents(state, BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
                     }
 
                     if (!Furnace(FurnaceNum).CoolingCoilUpstream) {
@@ -542,7 +542,7 @@ namespace Furnaces {
 
                     if (Furnace(FurnaceNum).FanPlace == DrawThru) {
                         // simulate fan
-                        SimulateFanComponents(BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
+                        SimulateFanComponents(state, BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
                     }
 
                     // Simulate furnace reheat coil if a humidistat is used or if the reheat coil is present
@@ -610,7 +610,7 @@ namespace Furnaces {
                     }
 
                     if (Furnace(FurnaceNum).FanPlace == BlowThru) {
-                        SimulateFanComponents(BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
+                        SimulateFanComponents(state, BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
                     }
 
                     if (Furnace(FurnaceNum).CoolingCoilType_Num == CoilDX_CoolingHXAssisted) {
@@ -640,7 +640,7 @@ namespace Furnaces {
                               Furnace(FurnaceNum).HeatPartLoadRatio,
                               OnOffAirFlowRatio);
                     if (Furnace(FurnaceNum).FanPlace == DrawThru) {
-                        SimulateFanComponents(BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
+                        SimulateFanComponents(state, BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
                     }
 
                     // Simulate furnace reheat coil if a humidistat is present, the dehumidification type of coolreheat and
@@ -701,7 +701,7 @@ namespace Furnaces {
                                                      HXUnitOn);
                     }
                     if (Furnace(FurnaceNum).FanPlace == BlowThru) {
-                        SimulateFanComponents(BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
+                        SimulateFanComponents(state, BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
                     }
 
                     SimWatertoAirHPSimple(BlankString,
@@ -730,7 +730,7 @@ namespace Furnaces {
                                           FirstHVACIteration);
 
                     if (Furnace(FurnaceNum).FanPlace == DrawThru) {
-                        SimulateFanComponents(BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
+                        SimulateFanComponents(state, BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
                     }
                     if (Furnace(FurnaceNum).DehumidControlType_Num == DehumidControl_CoolReheat && ReheatCoilLoad > 0.0) {
                         SuppHeatingCoilFlag = true; // if true simulates supplemental heating coil
@@ -796,7 +796,7 @@ namespace Furnaces {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetFurnaceInput()
+    void GetFurnaceInput(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1166,7 +1166,7 @@ namespace Furnaces {
             FanType = Alphas(7);
             FanName = Alphas(8);
             errFlag = false;
-            GetFanType(FanName, Furnace(FurnaceNum).FanType_Num, errFlag, CurrentModuleObject, Alphas(1));
+            GetFanType(state, FanName, Furnace(FurnaceNum).FanType_Num, errFlag, CurrentModuleObject, Alphas(1));
             if (errFlag) {
                 ErrorsFound = true;
             }
@@ -1181,7 +1181,7 @@ namespace Furnaces {
 
                     // Get the fan index
                     errFlag = false;
-                    GetFanIndex(FanName, Furnace(FurnaceNum).FanIndex, errFlag);
+                    GetFanIndex(state, FanName, Furnace(FurnaceNum).FanIndex, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -1189,7 +1189,7 @@ namespace Furnaces {
 
                     // Set the Design Fan Volume Flow Rate
                     errFlag = false;
-                    FanVolFlowRate = GetFanDesignVolumeFlowRate(FanType, FanName, errFlag);
+                    FanVolFlowRate = GetFanDesignVolumeFlowRate(state, FanType, FanName, errFlag);
                     Furnace(FurnaceNum).ActualFanVolFlowRate = FanVolFlowRate;
 
                     if (errFlag) {
@@ -1199,7 +1199,7 @@ namespace Furnaces {
 
                     // Get the Fan Inlet Node
                     errFlag = false;
-                    FanInletNode = GetFanInletNode(FanType, FanName, errFlag);
+                    FanInletNode = GetFanInletNode(state, FanType, FanName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -1207,7 +1207,7 @@ namespace Furnaces {
 
                     // Get the Fan Outlet Node
                     errFlag = false;
-                    FanOutletNode = GetFanOutletNode(FanType, FanName, errFlag);
+                    FanOutletNode = GetFanOutletNode(state, FanType, FanName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -1215,7 +1215,7 @@ namespace Furnaces {
 
                     // Get the fan's availabitlity schedule
                     errFlag = false;
-                    Furnace(FurnaceNum).FanAvailSchedPtr = GetFanAvailSchPtr(FanType, FanName, errFlag);
+                    Furnace(FurnaceNum).FanAvailSchedPtr = GetFanAvailSchPtr(state, FanType, FanName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -1703,7 +1703,7 @@ namespace Furnaces {
             FanName = Alphas(8);
 
             errFlag = false;
-            GetFanType(FanName, Furnace(FurnaceNum).FanType_Num, errFlag, CurrentModuleObject, Alphas(1));
+            GetFanType(state, FanName, Furnace(FurnaceNum).FanType_Num, errFlag, CurrentModuleObject, Alphas(1));
             if (errFlag) {
                 ErrorsFound = true;
             }
@@ -1718,7 +1718,7 @@ namespace Furnaces {
 
                     // Get the fan index
                     errFlag = false;
-                    GetFanIndex(FanName, Furnace(FurnaceNum).FanIndex, errFlag);
+                    GetFanIndex(state, FanName, Furnace(FurnaceNum).FanIndex, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -1726,7 +1726,7 @@ namespace Furnaces {
 
                     // Get the Design Fan Volume Flow Rate
                     errFlag = false;
-                    FanVolFlowRate = GetFanDesignVolumeFlowRate(FanType, FanName, errFlag);
+                    FanVolFlowRate = GetFanDesignVolumeFlowRate(state, FanType, FanName, errFlag);
                     Furnace(FurnaceNum).ActualFanVolFlowRate = FanVolFlowRate;
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
@@ -1735,7 +1735,7 @@ namespace Furnaces {
 
                     // Get the Fan Inlet Node
                     errFlag = false;
-                    FanInletNode = GetFanInletNode(FanType, FanName, errFlag);
+                    FanInletNode = GetFanInletNode(state, FanType, FanName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -1743,7 +1743,7 @@ namespace Furnaces {
 
                     // Get the Fan Outlet Node
                     errFlag = false;
-                    FanOutletNode = GetFanOutletNode(FanType, FanName, errFlag);
+                    FanOutletNode = GetFanOutletNode(state, FanType, FanName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -1751,7 +1751,7 @@ namespace Furnaces {
 
                     // Get the fan's availability schedule
                     errFlag = false;
-                    Furnace(FurnaceNum).FanAvailSchedPtr = GetFanAvailSchPtr(FanType, FanName, errFlag);
+                    Furnace(FurnaceNum).FanAvailSchedPtr = GetFanAvailSchPtr(state, FanType, FanName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;

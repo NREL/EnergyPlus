@@ -76,7 +76,7 @@ namespace SimulationManager {
     // Functions
     void clear_state();
 
-    void ManageSimulation(AllGlobals const &state, OutputFiles &outputFiles);
+    void ManageSimulation(AllGlobals &state, OutputFiles &outputFiles);
 
     void GetProjectData(OutputFiles &outputFiles);
 
@@ -96,7 +96,7 @@ namespace SimulationManager {
 
     void CloseOutputFiles(OutputFiles &outputFiles);
 
-    void SetupSimulation(OutputFiles &outputFiles, bool &ErrorsFound);
+    void SetupSimulation(AllGlobals &state, OutputFiles &outputFiles, bool &ErrorsFound);
 
     void ReportNodeConnections();
 

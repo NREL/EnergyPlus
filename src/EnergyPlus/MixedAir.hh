@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 
 namespace EnergyPlus {
     class OutputFiles;
@@ -453,14 +454,14 @@ namespace MixedAir {
 
     void SimOAMixer(std::string const &CompName, bool const FirstHVACIteration, int &CompIndex);
 
-    void SimOAController(std::string const &CtrlName, int &CtrlIndex, bool const FirstHVACIteration, int const AirLoopNum);
+    void SimOAController(AllGlobals &state, std::string const &CtrlName, int &CtrlIndex, bool const FirstHVACIteration, int const AirLoopNum);
 
     // Get Input Section of the Module
     //******************************************************************************
 
     void GetOutsideAirSysInputs();
 
-    void GetOAControllerInputs(OutputFiles &outputFiles);
+    void GetOAControllerInputs(AllGlobals &state, OutputFiles &outputFiles);
 
     void AllocateOAControllers();
 
@@ -485,7 +486,7 @@ namespace MixedAir {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitOutsideAirSys(int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum);
+    void InitOutsideAirSys(AllGlobals &state, int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum);
 
     void InitOAController(int const OAControllerNum, bool const FirstHVACIteration, int const AirLoopNum);
 

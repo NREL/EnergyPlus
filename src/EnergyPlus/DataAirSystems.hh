@@ -56,6 +56,7 @@
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 
 namespace EnergyPlus {
 
@@ -422,7 +423,7 @@ namespace DataAirSystems {
     // Functions
     void clear_state();
 
-    Real64 calcFanDesignHeatGain(int const &dataFanEnumType, int const &dataFanIndex, Real64 const &desVolFlow);
+    Real64 calcFanDesignHeatGain(AllGlobals &state, int const &dataFanEnumType, int const &dataFanIndex, Real64 const &desVolFlow);
 
 } // namespace DataAirSystems
 

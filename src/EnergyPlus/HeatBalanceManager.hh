@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 
 namespace EnergyPlus {
     class OutputFiles;
@@ -141,7 +142,7 @@ namespace HeatBalanceManager {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void ManageHeatBalance(OutputFiles &outputFiles);
+    void ManageHeatBalance(AllGlobals &state, OutputFiles &outputFiles);
 
     // Get Input Section of the Module
     //******************************************************************************
@@ -218,7 +219,7 @@ namespace HeatBalanceManager {
     // Beginning of Reporting subroutines for the HB Module
     // *****************************************************************************
 
-    void ReportHeatBalance(OutputFiles &outputFiles);
+    void ReportHeatBalance(AllGlobals &state, OutputFiles &outputFiles);
 
     //        End of Reporting subroutines for the HB Module
 

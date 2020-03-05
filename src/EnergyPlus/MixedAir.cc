@@ -560,7 +560,7 @@ namespace MixedAir {
         }
     }
 
-    void SimOAComponent(std::string const &CompType, // the component type
+    void SimOAComponent(AllGlobals &state, std::string const &CompType, // the component type
                         std::string const &CompName, // the component Name
                         int const CompTypeNum,       // Component Type -- Integerized for this module
                         bool const FirstHVACIteration,
@@ -637,11 +637,11 @@ namespace MixedAir {
                 // Fan Types
             } else if (SELECT_CASE_var == Fan_Simple_CV) { // 'Fan:ConstantVolume'
                 if (Sim) {
-                    Fans::SimulateFanComponents(CompName, FirstHVACIteration, CompIndex);
+                    Fans::SimulateFanComponents(state, CompName, FirstHVACIteration, CompIndex);
                 }
             } else if (SELECT_CASE_var == Fan_Simple_VAV) { // 'Fan:VariableVolume'
                 if (Sim) {
-                    Fans::SimulateFanComponents(CompName, FirstHVACIteration, CompIndex);
+                    Fans::SimulateFanComponents(state, CompName, FirstHVACIteration, CompIndex);
                 }
 
             } else if (SELECT_CASE_var == Fan_System_Object) { // 'Fan:SystemModel'
@@ -654,7 +654,7 @@ namespace MixedAir {
                 // cpw22Aug2010 Add Fan:ComponentModel (new num=18)
             } else if (SELECT_CASE_var == Fan_ComponentModel) { // 'Fan:ComponentModel'
                 if (Sim) {
-                    Fans::SimulateFanComponents(CompName, FirstHVACIteration, CompIndex);
+                    Fans::SimulateFanComponents(state, CompName, FirstHVACIteration, CompIndex);
                 }
 
                 // Coil Types
@@ -927,7 +927,7 @@ namespace MixedAir {
         ReportOAMixer(OAMixerNum);
     }
 
-    void SimOAController(std::string const &CtrlName, int &CtrlIndex, bool const FirstHVACIteration, int const AirLoopNum)
+    void SimOAController(AllGlobals &state, std::string const &CtrlName, int &CtrlIndex, bool const FirstHVACIteration, int const AirLoopNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -943,7 +943,7 @@ namespace MixedAir {
         int OAControllerNum;
 
         if ((GetOAControllerInputFlag) && (AirLoopNum > 0)) { // Gets input for object  first time Sim routine is called from an airloop
-            GetOAControllerInputs(OutputFiles::getSingleton());
+            GetOAControllerInputs(state, OutputFiles::getSingleton());
             GetOAControllerInputFlag = false;
         }
 
@@ -1338,7 +1338,7 @@ namespace MixedAir {
         GetOASysInputFlag = false;
     }
 
-    void GetOAControllerInputs(OutputFiles &outputFiles)
+    void GetOAControllerInputs(AllGlobals &state, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1423,7 +1423,7 @@ namespace MixedAir {
             GetOAMixerInputFlag = false;
         }
 
-        FaultsManager::CheckAndReadFaults();
+        FaultsManager::CheckAndReadFaults(state);
 
         inputProcessor->getObjectDefMaxArgs(CurrentModuleObjects(CMO_OAController), NumArg, NumAlphas, NumNums);
         MaxAlphas = NumAlphas;

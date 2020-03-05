@@ -118,7 +118,7 @@ namespace Pipes {
     std::unordered_map<std::string, std::string> LocalPipeUniqueNames;
 
     // Functions
-    void clear_state()
+    void clear_state(AllGlobals &state)
     {
         state.pipes.NumLocalPipes = 0;
         state.pipes.GetPipeInputFlag = true;
@@ -181,7 +181,7 @@ namespace Pipes {
         PlantUtilities::SafeCopyPlantNode(this->InletNodeNum, this->OutletNodeNum, this->LoopNum);
     }
 
-    void GetPipeInput()
+    void GetPipeInput(AllGlobals &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher

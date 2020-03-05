@@ -47,13 +47,14 @@
 
 #include <EnergyPlus/api/EnergyPlusPgm.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/api/runtime.h>
 #include <EnergyPlus/StateManagement.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
-void cClearAllStates() {
-    EnergyPlus::clearAllStates();
+void cClearAllStates(AllGlobals &state) {
+    EnergyPlus::clearAllStates(state);
 }
 
 int energyplus(int argc, const char *argv[]) {

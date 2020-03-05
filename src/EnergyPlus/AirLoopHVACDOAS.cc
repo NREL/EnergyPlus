@@ -131,13 +131,13 @@ namespace AirLoopHVACDOAS {
         numAirLoopDOAS = 0;
     }
 
-    void AirLoopDOAS::SimAirLoopHVACDOAS(bool const FirstHVACIteration, int &CompIndex)
+    void AirLoopDOAS::SimAirLoopHVACDOAS(AllGlobals &state, bool const FirstHVACIteration, int &CompIndex)
     {
 
         // Obtains and Allocates unitary system related parameters from input file
         if (GetInputOnceFlag) {
             // Get the AirLoopHVACDOAS input
-            getAirLoopDOASInput();
+            getAirLoopDOASInput(state);
             GetInputOnceFlag = false;
         }
 
@@ -146,11 +146,11 @@ namespace AirLoopHVACDOAS {
         }
 
         if (this->SizingOnceFlag) {
-            this->SizingAirLoopDOAS();
+            this->SizingAirLoopDOAS(state);
             this->SizingOnceFlag = false;
         }
 
-        this->initAirLoopDOAS(FirstHVACIteration);
+        this->initAirLoopDOAS(state, FirstHVACIteration);
 
         if (this->SumMassFlowRate == 0.0 && !DataGlobals::BeginEnvrnFlag) {
             DataLoopNode::Node(this->m_CompPointerAirLoopMixer->OutletNodeNum).MassFlowRate = 0.0;
@@ -399,7 +399,7 @@ namespace AirLoopHVACDOAS {
         }
     } // namespace AirLoopSplitter
 
-    void AirLoopDOAS::getAirLoopDOASInput()
+    void AirLoopDOAS::getAirLoopDOASInput(AllGlobals &state)
     {
 
         using DataAirLoop::OutsideAirSys;
@@ -500,16 +500,16 @@ namespace AirLoopHVACDOAS {
                         }
                     } else if (SELECT_CASE_var == "FAN:COMPONENTMODEL") {
                         thisDOAS.m_FanTypeNum = SimAirServingZones::Fan_ComponentModel;
-                        Fans::GetFanIndex(CompName, thisDOAS.m_FanIndex, errorsFound);
+                        Fans::GetFanIndex(state, CompName, thisDOAS.m_FanIndex, errorsFound);
                         thisDOAS.FanName = CompName;
                         if (CompNum == 1) {
                             thisDOAS.FanBlowTroughFlag = true;
                         }
                         OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) =
-                            Fans::GetFanInletNode(SELECT_CASE_var, OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), errorsFound);
+                            Fans::GetFanInletNode(state, SELECT_CASE_var, OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), errorsFound);
                         if (errorsFound) InletNodeErrFlag = true;
                         OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum) =
-                            Fans::GetFanOutletNode(SELECT_CASE_var, OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), errorsFound);
+                            Fans::GetFanOutletNode(state, SELECT_CASE_var, OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), errorsFound);
                         if (errorsFound) OutletNodeErrFlag = true;
                         thisDOAS.m_FanInletNodeNum = OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum);
                         thisDOAS.m_FanOutletNodeNum = OutsideAirSys(thisDOAS.m_OASystemNum).OutletNodeNum(CompNum);
@@ -913,7 +913,7 @@ namespace AirLoopHVACDOAS {
         }
     }
 
-    void AirLoopDOAS::initAirLoopDOAS(bool const FirstHVACIteration)
+    void AirLoopDOAS::initAirLoopDOAS(AllGlobals &state, bool const FirstHVACIteration)
     {
         int LoopOA;
         int NodeNum;
@@ -939,7 +939,7 @@ namespace AirLoopHVACDOAS {
                     HVACFan::fanObjs[this->m_FanIndex]->simulate();
                 }
                 if (UtilityRoutines::SameString(CompType, "FAN:COMPONENTMODEL")) {
-                    Fans::SimulateFanComponents(CompName, FirstHVACIteration, this->m_FanIndex);
+                    Fans::SimulateFanComponents(state, CompName, FirstHVACIteration, this->m_FanIndex);
                 }
 
                 if (UtilityRoutines::SameString(CompType, "COIL:HEATING:WATER")) {
@@ -1044,7 +1044,7 @@ namespace AirLoopHVACDOAS {
         this->m_CompPointerAirLoopSplitter->CalcAirLoopSplitter(Temp, HumRat);
     }
 
-    void AirLoopDOAS::SizingAirLoopDOAS()
+    void AirLoopDOAS::SizingAirLoopDOAS(AllGlobals &state)
     {
         Real64 SizingMassFlow = 0;
         int AirLoopNum;
@@ -1068,7 +1068,7 @@ namespace AirLoopHVACDOAS {
         }
         bool errorsFound = false;
         if (this->m_FanIndex > 0 && this->m_FanTypeNum == SimAirServingZones::Fan_ComponentModel) {
-            Fans::SetFanData(this->m_FanIndex, errorsFound, Name, SizingMassFlow / DataEnvironment::StdRhoAir, 0);
+            Fans::SetFanData(state, this->m_FanIndex, errorsFound, Name, SizingMassFlow / DataEnvironment::StdRhoAir, 0);
             Fans::Fan(this->m_FanIndex).MaxAirMassFlowRate = SizingMassFlow;
             DataLoopNode::Node(this->m_FanInletNodeNum).MassFlowRateMaxAvail = SizingMassFlow;
             DataLoopNode::Node(this->m_FanOutletNodeNum).MassFlowRateMaxAvail = SizingMassFlow;
@@ -1081,10 +1081,10 @@ namespace AirLoopHVACDOAS {
         DataSizing::CurOASysNum = this->m_OASystemNum;
     }
 
-    void getAirLoopHVACDOASInput()
+    void getAirLoopHVACDOASInput(AllGlobals &state)
     {
         if (GetInputOnceFlag) {
-            AirLoopDOAS::getAirLoopDOASInput();
+            AirLoopDOAS::getAirLoopDOASInput(state);
             GetInputOnceFlag = false;
         }
     }

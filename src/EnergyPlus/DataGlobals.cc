@@ -272,9 +272,8 @@ namespace DataGlobals {
 
     // Clears the global data in DataGlobals.
     // Needed for unit tests, should not be normally called.
-    void clear_state()
+    void clear_state(AllGlobals &state)
     {
-
         runReadVars = false;
         DDOnlySimulation = false;
         state.dataGlobals.AnnualSimulation = false;

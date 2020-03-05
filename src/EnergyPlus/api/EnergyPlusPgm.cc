@@ -224,12 +224,12 @@
 #include <unistd.h>
 #endif
 
-void EnergyPlusPgm(AllGlobals const &state, std::string const &filepath)
+void EnergyPlusPgm(AllGlobals &state, std::string const &filepath)
 {
     std::exit(RunEnergyPlus(state, filepath));
 }
 
-int initializeEnergyPlus(std::string const & filepath) {
+int initializeEnergyPlus(AllGlobals &state, std::string const & filepath) {
     using namespace EnergyPlus;
 
     // Disable C++ i/o synching with C methods for speed
@@ -285,7 +285,7 @@ int initializeEnergyPlus(std::string const & filepath) {
         DataStringGlobals::ProgramPath = filepath + DataStringGlobals::pathChar;
         int dummy_argc = 1;
         const char *dummy_argv[1] = {"energyplus"};
-        CommandLineInterface::ProcessArgs(dummy_argc, dummy_argv);
+        CommandLineInterface::ProcessArgs(state, dummy_argc, dummy_argv);
     }
 
     int errStatus = initErrorFile();
@@ -405,7 +405,7 @@ int wrapUpEnergyPlus() {
     return EndEnergyPlus();
 }
 
-int RunEnergyPlus(AllGlobals const &state, std::string const & filepath)
+int RunEnergyPlus(AllGlobals &state, std::string const & filepath)
 {
 
 
@@ -423,7 +423,7 @@ int RunEnergyPlus(AllGlobals const &state, std::string const & filepath)
     // The method used in EnergyPlus is to simplify the main program as much
     // as possible and contain all "simulation" code in other modules and files.
 
-    int status = initializeEnergyPlus(filepath);
+    int status = initializeEnergyPlus(state, filepath);
     if (status) return status;
     try {
         EnergyPlus::SimulationManager::ManageSimulation(state,EnergyPlus::OutputFiles::getSingleton());
@@ -461,7 +461,7 @@ int runEnergyPlusAsLibrary(int argc, const char *argv[])
     if (!std::cerr.good()) std::cerr.clear();
     if (!std::cout.good()) std::cout.clear();
 
-    EnergyPlus::CommandLineInterface::ProcessArgs( argc, argv );
+    EnergyPlus::CommandLineInterface::ProcessArgs(state, argc, argv );
 
     int status = initializeAsLibrary();
     if (status) return status;

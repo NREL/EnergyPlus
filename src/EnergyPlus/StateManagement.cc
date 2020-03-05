@@ -236,7 +236,7 @@
 #include <EnergyPlus/ZonePlenum.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
-void EnergyPlus::clearAllStates()
+void EnergyPlus::clearAllStates(AllGlobals &state)
 {
     using namespace EnergyPlus;
     // A to Z order
@@ -354,12 +354,12 @@ void EnergyPlus::clearAllStates()
     OutdoorAirUnit::clear_state();
     OutputProcessor::clear_state();
     OutputReportPredefined::clear_state();
-    OutputReportTabular::clear_state();
+    OutputReportTabular::clear_state(state);
     OutputReportTabularAnnual::clear_state();
     OutsideEnergySources::clear_state();
     PackagedTerminalHeatPump::clear_state();
     PhotovoltaicThermalCollectors::clear_state();
-    Pipes::clear_state();
+    Pipes::clear_state(state);
     PipeHeatTransfer::clear_state();
     PlantCentralGSHP::clear_state();
     PlantChillers::clear_state();

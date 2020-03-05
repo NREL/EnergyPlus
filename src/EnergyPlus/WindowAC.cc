@@ -1385,7 +1385,7 @@ namespace WindowAC {
         }
     }
 
-    void CalcWindowACOutput(int const WindACNum,           // Unit index in fan coil array
+    void CalcWindowACOutput(AllGlobals &state, int const WindACNum,           // Unit index in fan coil array
                             bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
                             int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
                             Real64 const PartLoadFrac,     // unit part load fraction
@@ -1455,7 +1455,7 @@ namespace WindowAC {
         // if blow through, simulate fan then coil. For draw through, simulate coil then fan.
         if (WindAC(WindACNum).FanPlace == BlowThru) {
             if (WindAC(WindACNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                Fans::SimulateFanComponents(
+                Fans::SimulateFanComponents(state,
                     WindAC(WindACNum).FanName, FirstHVACIteration, WindAC(WindACNum).FanIndex, PartLoadFrac, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
             } else {
                 HVACFan::fanObjs[WindAC(WindACNum).FanIndex]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
@@ -1498,7 +1498,7 @@ namespace WindowAC {
 
         if (WindAC(WindACNum).FanPlace == DrawThru) {
             if (WindAC(WindACNum).FanType_Num != DataHVACGlobals::FanType_SystemModelObject) {
-                Fans::SimulateFanComponents(
+                Fans::SimulateFanComponents(state,
                     WindAC(WindACNum).FanName, FirstHVACIteration, WindAC(WindACNum).FanIndex, PartLoadFrac, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
             } else {
                 HVACFan::fanObjs[WindAC(WindACNum).FanIndex]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);

@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 
 namespace EnergyPlus {
     class OutputFiles;
@@ -74,11 +75,11 @@ namespace HVACManager {
     // Functions
     void clear_state();
 
-    void ManageHVAC(OutputFiles &outputFiles);
+    void ManageHVAC(AllGlobals &state, OutputFiles &outputFiles);
 
-    void SimHVAC();
+    void SimHVAC(AllGlobals &state);
 
-    void SimSelectedEquipment(bool &SimAirLoops,         // True when the air loops need to be (re)simulated
+    void SimSelectedEquipment(AllGlobals &state, bool &SimAirLoops,         // True when the air loops need to be (re)simulated
                               bool &SimZoneEquipment,    // True when zone equipment components need to be (re)simulated
                               bool &SimNonZoneEquipment, // True when non-zone equipment components need to be (re)simulated
                               bool &SimPlantLoops,       // True when the main plant loops need to be (re)simulated
@@ -98,7 +99,7 @@ namespace HVACManager {
 
     void UpdateZoneListAndGroupLoads();
 
-    void ReportAirHeatBalance();
+    void ReportAirHeatBalance(AllGlobals &state);
 
     void SetHeatToReturnAirFlag();
 
