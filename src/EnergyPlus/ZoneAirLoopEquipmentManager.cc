@@ -820,11 +820,18 @@ namespace ZoneAirLoopEquipmentManager {
             SpecHumIn = Node(ZoneEquipConfig(ControlledZoneNum).ZoneNode).HumRat;
             if (AirDistUnit(AirDistUnitNum).EquipType_Num(1) == SingleDuctConstVolNoReheat) {
                 // Use old direct air method to avoid diffs for now
-                SysOutputProvided = Node(AirDistUnit(AirDistUnitNum).OutletNodeNum).MassFlowRate *
-                                    (Psychrometrics::PsyHFnTdbW(Node(AirDistUnit(AirDistUnitNum).OutletNodeNum).Temp,
-                                                                Node(ZoneEquipConfig(ControlledZoneNum).ZoneNode).HumRat) -
-                                     Psychrometrics::PsyHFnTdbW(Node(ZoneEquipConfig(ControlledZoneNum).ZoneNode).Temp,
-                                                                Node(ZoneEquipConfig(ControlledZoneNum).ZoneNode).HumRat));
+                //SysOutputProvided = Node(AirDistUnit(AirDistUnitNum).OutletNodeNum).MassFlowRate *
+                //                    (Psychrometrics::PsyHFnTdbW(Node(AirDistUnit(AirDistUnitNum).OutletNodeNum).Temp,
+                //                                                Node(ZoneEquipConfig(ControlledZoneNum).ZoneNode).HumRat) -
+                //                     Psychrometrics::PsyHFnTdbW(Node(ZoneEquipConfig(ControlledZoneNum).ZoneNode).Temp,
+                //                                                Node(ZoneEquipConfig(ControlledZoneNum).ZoneNode).HumRat));
+                // the above equation was replaced with Cpair * DeltaT equivalent expression
+                // the following equations are mathematically identical, but needs to see what the regression test shows  
+                // SysOutputProvided == m_dot * [h(t2, w1) - h(t1, w1)] ==  m_dot * cpair(w1) * (t2 - t1)
+                Real64 CpAirAvg = PsyCpAirFnW(SpecHumIn);
+                SysOutputProvided = Node(AirDistUnit(AirDistUnitNum).OutletNodeNum).MassFlowRate * CpAirAvg *
+                    (Node(AirDistUnit(AirDistUnitNum).OutletNodeNum).Temp - Node(ZoneEquipConfig(ControlledZoneNum).ZoneNode).Temp);
+
             } else {
                 Real64 CpAirAvg = PsyCpAirFnW(0.5 * (SpecHumOut + SpecHumOut));
                 SysOutputProvided = Node(AirDistUnit(AirDistUnitNum).OutletNodeNum).MassFlowRate * CpAirAvg *
