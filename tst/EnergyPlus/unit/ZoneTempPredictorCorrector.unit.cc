@@ -1471,3 +1471,96 @@ TEST_F(EnergyPlusFixture, TempAtPrevTimeStepWithCutoutDeltaT_test)
     EXPECT_EQ(22.0, ZoneThermostatSetPointLo(1));
     EXPECT_EQ(24.0, ZoneThermostatSetPointHi(1));
 }
+
+TEST_F(EnergyPlusFixture, ReportMoistLoadsZoneMultiplier_Test)
+{
+    Real64 TotOutReq;
+    Real64 OutReqToHumSP;
+    Real64 OutReqToDehumSP;
+    Real64 SingleZoneTotRate;
+    Real64 SingleZoneHumRate;
+    Real64 SingleZoneDehRate;
+    Real64 ZoneMultiplier;
+    Real64 ZoneMultiplierList;
+    Real64 ExpectedResult;
+    Real64 AcceptableTolerance = 0.00001;
+
+    // Test 1: Zone Multipliers are all unity (1.0).  So, single zone loads should be the same as total loads
+    TotOutReq = 1000.0;
+    OutReqToHumSP = 2000.0;
+    OutReqToDehumSP = 3000.0;
+    ZoneMultiplier = 1.0;
+    ZoneMultiplierList = 1.0;
+    ReportMoistLoadsZoneMultiplier(TotOutReq,OutReqToHumSP,OutReqToDehumSP,
+                                   SingleZoneTotRate,SingleZoneHumRate,SingleZoneDehRate,
+                                   ZoneMultiplier,ZoneMultiplierList);
+    EXPECT_NEAR(TotOutReq,SingleZoneTotRate,AcceptableTolerance);
+    EXPECT_NEAR(OutReqToHumSP,SingleZoneHumRate,AcceptableTolerance);
+    EXPECT_NEAR(OutReqToDehumSP,SingleZoneDehRate,AcceptableTolerance);
+
+    // Test 2a: Zone Multiplier (non-list) is greater than 1, list Zone Multiplier is still one
+    TotOutReq = 1000.0;
+    OutReqToHumSP = 2000.0;
+    OutReqToDehumSP = 3000.0;
+    ZoneMultiplier = 7.0;
+    ZoneMultiplierList = 1.0;
+    ReportMoistLoadsZoneMultiplier(TotOutReq,OutReqToHumSP,OutReqToDehumSP,
+                                   SingleZoneTotRate,SingleZoneHumRate,SingleZoneDehRate,
+                                   ZoneMultiplier,ZoneMultiplierList);
+    ExpectedResult = 1000.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneTotRate,AcceptableTolerance);
+    ExpectedResult = 2000.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneHumRate,AcceptableTolerance);
+    ExpectedResult = 3000.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneDehRate,AcceptableTolerance);
+    ExpectedResult = 7000.0;
+    EXPECT_NEAR(TotOutReq,ExpectedResult,AcceptableTolerance);
+    ExpectedResult = 14000.0;
+    EXPECT_NEAR(OutReqToHumSP,ExpectedResult,AcceptableTolerance);
+    ExpectedResult = 21000.0;
+    EXPECT_NEAR(OutReqToDehumSP,ExpectedResult,AcceptableTolerance);
+
+    // Test 2a: list Zone Multiplier is greater than 1, non-list Zone Multiplier is one
+    TotOutReq = 1000.0;
+    OutReqToHumSP = 2000.0;
+    OutReqToDehumSP = 3000.0;
+    ZoneMultiplier = 1.0;
+    ZoneMultiplierList = 7.0;
+    ReportMoistLoadsZoneMultiplier(TotOutReq,OutReqToHumSP,OutReqToDehumSP,
+                                   SingleZoneTotRate,SingleZoneHumRate,SingleZoneDehRate,
+                                   ZoneMultiplier,ZoneMultiplierList);
+    ExpectedResult = 1000.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneTotRate,AcceptableTolerance);
+    ExpectedResult = 2000.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneHumRate,AcceptableTolerance);
+    ExpectedResult = 3000.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneDehRate,AcceptableTolerance);
+    ExpectedResult = 7000.0;
+    EXPECT_NEAR(TotOutReq,ExpectedResult,AcceptableTolerance);
+    ExpectedResult = 14000.0;
+    EXPECT_NEAR(OutReqToHumSP,ExpectedResult,AcceptableTolerance);
+    ExpectedResult = 21000.0;
+    EXPECT_NEAR(OutReqToDehumSP,ExpectedResult,AcceptableTolerance);
+
+    // Test 3: both zone multipliers are greater than 1.0
+    TotOutReq = 300.0;
+    OutReqToHumSP = 150.0;
+    OutReqToDehumSP = 100.0;
+    ZoneMultiplier = 2.0;
+    ZoneMultiplierList = 3.0;
+    ReportMoistLoadsZoneMultiplier(TotOutReq,OutReqToHumSP,OutReqToDehumSP,
+                                   SingleZoneTotRate,SingleZoneHumRate,SingleZoneDehRate,
+                                   ZoneMultiplier,ZoneMultiplierList);
+    ExpectedResult = 300.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneTotRate,AcceptableTolerance);
+    ExpectedResult = 150.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneHumRate,AcceptableTolerance);
+    ExpectedResult = 100.0;
+    EXPECT_NEAR(ExpectedResult,SingleZoneDehRate,AcceptableTolerance);
+    ExpectedResult = 1800.0;
+    EXPECT_NEAR(TotOutReq,ExpectedResult,AcceptableTolerance);
+    ExpectedResult = 900.0;
+    EXPECT_NEAR(OutReqToHumSP,ExpectedResult,AcceptableTolerance);
+    ExpectedResult = 600.0;
+    EXPECT_NEAR(OutReqToDehumSP,ExpectedResult,AcceptableTolerance);
+}

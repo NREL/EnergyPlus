@@ -712,7 +712,7 @@ TEST_F(EnergyPlusFixture, ThermalComfort_CalcThermalComfortFanger)
     // OutputProcessor::TimeValue.allocate(2);
     DataGlobals::DDOnlySimulation = true;
 
-    ManageSimulation();
+    ManageSimulation(OutputFiles::getSingleton());
 
     //	compare_err_stream( "" );
 
