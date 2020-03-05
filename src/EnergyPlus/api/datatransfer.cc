@@ -45,6 +45,8 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <cmath>
+
 #include <EnergyPlus/api/datatransfer.h>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -202,7 +204,14 @@ void setActuatorValue(const int handle, const Real64 value) {
     // I could imagine returning a 0 or 1, but it would really only be validating the handle was in range
     // the handle is based on the available actuator list
     auto & theActuator(EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable(handle));
-    *theActuator.RealValue = value; // TODO: Handle other actuator types
+    if (theActuator.RealValue) {
+        *theActuator.RealValue = value;
+    } else if (theActuator.IntValue) {
+        *theActuator.IntValue = (int)std::lround(value);
+    } else {
+        // what should we do for logicals?
+    }
+
     *theActuator.Actuated = true;
 }
 
