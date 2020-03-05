@@ -320,8 +320,6 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationNone)
     CurveManager::GetCurvesInputFlag = false;
     ASSERT_EQ(1, CurveManager::NumCurves);
 
-    //EXPECT_EQ(expected_divisor, CurveManager::PerfCurve(1).NormalizationValue);
-
     EXPECT_TRUE(CurveManager::PerfCurve(1).CurveMinPresent);
     EXPECT_EQ(expected_curve_min, CurveManager::PerfCurve(1).CurveMin);
 
