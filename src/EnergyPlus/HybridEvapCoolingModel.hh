@@ -195,9 +195,9 @@ namespace HybridEvapCoolingModel {
         Real64 TotalSystem;
         Real64 SensibleSystem;
         Real64 LatentSystem;
-        Real64 TotalZone;    // kW
-        Real64 SensibleZone; // kW
-        Real64 LatentZone;   // kW
+        Real64 TotalZone;    // W
+        Real64 SensibleZone; // W
+        Real64 LatentZone;   // W
         Real64 ElectricalPower;
         Real64 SupplyFanElectricPower;
         Real64 SecondaryFuelConsumptionRate;
