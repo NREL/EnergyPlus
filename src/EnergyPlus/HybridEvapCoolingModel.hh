@@ -310,7 +310,7 @@ namespace HybridEvapCoolingModel {
         int InletNode;
         int OutletNode;
         int SecondaryInletNode;       // This is usually OA node feeding into the purge/secondary side
-        int SecondaryOutletNode;      // This outlet node of the secondary side and ilet to the secondary fan
+        int SecondaryOutletNode;      // This outlet node of the secondary side and inlet to the secondary fan
         Real64 FinalElectricalPower;  // Output fuel use in W
         Real64 FinalElectricalEnergy; // Output fuel energy use in J
         Real64 ZoneTemp;     // Zone Temp

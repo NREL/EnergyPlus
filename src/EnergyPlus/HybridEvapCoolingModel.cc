@@ -1263,9 +1263,9 @@ namespace HybridEvapCoolingModel {
 
         // METHODOLOGY EMPLOYED:
         // Calculate the minimum runtime fractions for each load that needs to be met and find the lowest of those runtime fractions.
-        // Go through each of the requirements (ventilation, heating, cooling, dehumidifcation, humidification and work out what the minimum runtime
-        // fraction you would need in order to meet all these rewuirements. Importantly the SensibleRoomORZone is either (-) for heating or (+) for
-        // cooling, where as the RequestedCoolingLoad and RequestedHeatingLoad, are both possitive (never below 0).
+        // Go through each of the requirements (ventilation, heating, cooling, dehumidification, humidification and work out what the minimum runtime
+        // fraction you would need in order to meet all these requirements. Importantly the SensibleRoomORZone is either (-) for heating or (+) for
+        // cooling, where as the RequestedCoolingLoad and RequestedHeatingLoad, are both positive (never below 0).
 
         // REFERENCES:
         // na
@@ -1516,11 +1516,12 @@ namespace HybridEvapCoolingModel {
                             CandidateSetting.Outdoor_Air_Fraction = OSAF;
                             CandidateSetting.Supply_Air_Mass_Flow_Rate_Ratio = MsaRatio;
                             CandidateSetting.Unscaled_Supply_Air_Mass_Flow_Rate = UnscaledMsa;
+                            // If no load is requested but ventilation is required, set the supply air mass flow rate to the minimum of the required ventilation flow rate and the maximum supply air flow rate
                             if (!CoolingRequested && !HeatingRequested && !DehumidificationRequested && !HumidificationRequested) {
                                 CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate = min(MinOA_Msa, MsaRatio * ScaledSystemMaximumSupplyAirMassFlowRate);
                                 CandidateSetting.ScaledSupply_Air_Ventilation_Volume = min(MinOA_Msa, MsaRatio * ScaledSystemMaximumSupplyAirMassFlowRate) / StdRhoAir;
                             } else {
-                                CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate = MsaRatio * ScaledSystemMaximumSupplyAirMassFlowRate; // spencer is this the same as Correction? If so make them the same.
+                                CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate = MsaRatio * ScaledSystemMaximumSupplyAirMassFlowRate;
                                 CandidateSetting.ScaledSupply_Air_Ventilation_Volume = MsaRatio * ScaledSystemMaximumSupplyAirMassFlowRate / StdRhoAir;
                             }                           
                             CandidateSetting.oMode = Mode;
@@ -1551,7 +1552,7 @@ namespace HybridEvapCoolingModel {
             UnscaledMsa = thisSetting.Unscaled_Supply_Air_Mass_Flow_Rate;
             Real64 ScaledMsa = thisSetting.ScaledSupply_Air_Mass_Flow_Rate;
 
-            // send the scales Msa to calculate energyies and the unscaled for sending to curves.
+            // send the scaled Msa to calculate energy and the unscaled for sending to curves.
             Tsa = thisSetting.SupplyAirTemperature;
             modenumber = thisSetting.Mode;
             Wsa = thisSetting.SupplyAirW;
@@ -1910,9 +1911,9 @@ namespace HybridEvapCoolingModel {
         //  CoolingRequested, HeatingRequested, VentilationRequested, DehumidificationRequested, HumidificationRequested
         // 4)Take the first operating mode which is always standby and calculate the NormalizationReference
         //  and then use curves to determine performance metrics for the standby mode including energy use and other outputs
-        // 5)Test system availbility status and go into standby if unit is off or not needed (booleans listed in 3 are all false)
-        // 6) Set the operating conditions and respective part load fractions.
-        // 7) Set timestep average outlet condition, considering all operating conditions and runtimes.
+        // 5)Test system availability status and go into standby if unit is off or not needed (booleans listed in 3 are all false)
+        // 6)Set the operating conditions and respective part load fractions.
+        // 7)Set timestep average outlet condition, considering all operating conditions and runtimes.
         // METHODOLOGY EMPLOYED:
         // na
 
@@ -1964,7 +1965,7 @@ namespace HybridEvapCoolingModel {
                             "fractions and supply air mass flow rate, called in object " +
                             ObjectID);
         }
-        // Test system availbility status
+        // Test system availability status
         UnitOn = 1;
         bool ForceOff = false;
         StandBy = false;
@@ -1974,7 +1975,7 @@ namespace HybridEvapCoolingModel {
         }
         // Go into standby if unit is off or not needed
         if ((!CoolingRequested && !HeatingRequested && !VentilationRequested && !HumidificationRequested && !DehumidificationRequested) ||
-            ForceOff) // what about humid / dehumid
+            ForceOff)
         {
             StandBy = true;
             oStandBy.Runtime_Fraction = 1;
@@ -2007,11 +2008,11 @@ namespace HybridEvapCoolingModel {
         OutletTemp = CheckVal_T(CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_AIR_TEMP));
         OutletHumRat = CheckVal_W(CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_AIR_HR), OutletTemp, OutletPressure);
 
-        OutletRH = PsyRhFnTdbWPb(OutletTemp, OutletHumRat, OutletPressure); // could also use outlet pressure instead of fixed
+        OutletRH = PsyRhFnTdbWPb(OutletTemp, OutletHumRat, OutletPressure);
         Real64 OperatingAverageMixedAirTemperature = CalculateTimeStepAverage(SYSTEMOUTPUTS::MIXED_AIR_TEMP);
         Real64 OperatingMixedAirW = CalculateTimeStepAverage(SYSTEMOUTPUTS::MIXED_AIR_HR);
         Real64 MixedAirEnthalpy = PsyHFnTdbW(OperatingAverageMixedAirTemperature, OperatingMixedAirW);
-        OutletEnthalpy = PsyHFnTdbRhPb(OutletTemp, OutletRH, InletPressure); // consider if inlet and outlet presures are different
+        OutletEnthalpy = PsyHFnTdbRhPb(OutletTemp, OutletRH, InletPressure); // consider if inlet and outlet pressures are different
         OutletMassFlowRate = CalculateTimeStepAverage(SYSTEMOUTPUTS::SUPPLY_MASS_FLOW);
 
         if (StdRhoAir > 1) {
@@ -2073,7 +2074,7 @@ namespace HybridEvapCoolingModel {
                 UnitTotalHeatingEnergy = UnitTotalHeatingRate * TimeStepSys * SecInHour; // J
             }
 
-            if (QSensZoneOut > 0) // zone cooling is possitive, else remain zero
+            if (QSensZoneOut > 0) // zone cooling is positive, else remain zero
             {
                 UnitSensibleCoolingRate = std::abs(QSensZoneOut);                              // Watts
                 UnitSensibleCoolingEnergy = UnitSensibleCoolingRate * TimeStepSys * SecInHour; // J
