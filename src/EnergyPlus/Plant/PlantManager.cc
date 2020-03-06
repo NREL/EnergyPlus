@@ -171,7 +171,7 @@ namespace EnergyPlus {
             DemandSideInletNode.deallocate();
         }
 
-        void ManagePlantLoops(bool const FirstHVACIteration,
+        void ManagePlantLoops(AllGlobals &state, bool const FirstHVACIteration,
                               bool &SimAirLoops,                    // True when the air loops need to be (re)simulated
                               bool &SimZoneEquipment,               // True when zone equipment components need to be (re)simulated
                               bool &EP_UNUSED(
@@ -242,7 +242,7 @@ namespace EnergyPlus {
 
                     if (SimHalfLoopFlag || IterPlant <= CurntMinPlantSubIterations) {
 
-                        this_loop_side.solve(FirstHVACIteration, other_loop_side.SimLoopSideNeeded);
+                        this_loop_side.solve(state, FirstHVACIteration, other_loop_side.SimLoopSideNeeded);
 
                         // Always set this side to false,  so that it won't keep being turned on just because of first hvac
                         this_loop_side.SimLoopSideNeeded = false;

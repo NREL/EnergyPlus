@@ -162,7 +162,7 @@ namespace DataPlant {
 
         Real64 DetermineLoopSideFlowRate(int ThisSideInletNode, Real64 ThisSideLoopFlowRequest);
 
-        void SimulateAllLoopSideBranches(Real64 ThisLoopSideFlow, bool FirstHVACIteration, bool &LoopShutDownFlag);
+        void SimulateAllLoopSideBranches(AllGlobals &state, Real64 ThisLoopSideFlow, bool FirstHVACIteration, bool &LoopShutDownFlag);
 
         void SimulateLoopSideBranchGroup(AllGlobals &state, int FirstBranchNum,
                                          int LastBranchNum,
@@ -178,7 +178,7 @@ namespace DataPlant {
 
         void DisableAnyBranchPumpsConnectedToUnloadedEquipment();
 
-        void DoFlowAndLoadSolutionPass(int OtherSide, int ThisSideInletNode, bool FirstHVACIteration);
+        void DoFlowAndLoadSolutionPass(AllGlobals &state, int OtherSide, int ThisSideInletNode, bool FirstHVACIteration);
 
         Real64 CalcOtherSideDemand(Real64 ThisLoopSideFlow);
 
@@ -207,7 +207,7 @@ namespace DataPlant {
 
         bool CheckPlantConvergence(bool FirstHVACIteration);
 
-        void solve(bool FirstHVACIteration, bool &ReSimOtherSideNeeded);
+        void solve(AllGlobals &state, bool FirstHVACIteration, bool &ReSimOtherSideNeeded);
 
     };
 } // namespace DataPlant

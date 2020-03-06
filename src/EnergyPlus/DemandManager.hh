@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 
 namespace EnergyPlus {
 
@@ -181,7 +182,7 @@ namespace DemandManager {
 
     // Functions
 
-    void ManageDemand();
+    void ManageDemand(AllGlobals &state);
 
     void SimulateDemandManagerList(int const ListNum,
                                    bool &ResimExt, // Flag to resimulate the exterior energy use simulation

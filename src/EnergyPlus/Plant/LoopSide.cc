@@ -68,7 +68,7 @@ namespace DataPlant {
 
     static std::string const fluidNameSteam("STEAM");
 
-    void HalfLoopData::solve(bool const FirstHVACIteration, bool &ReSimOtherSideNeeded) {
+    void HalfLoopData::solve(AllGlobals &state, bool const FirstHVACIteration, bool &ReSimOtherSideNeeded) {
 
         // SUBROUTINE INFORMATION:
         //       AUTHORS:         Dan Fisher, Sankaranarayanan K P, Edwin Lee
@@ -129,13 +129,13 @@ namespace DataPlant {
         this->TurnOnAllLoopSideBranches();
 
         // Do the actual simulation here every time
-        this->DoFlowAndLoadSolutionPass(this->myOtherLoopSideNum, ThisSideInletNode, FirstHVACIteration);
+        this->DoFlowAndLoadSolutionPass(state, this->myOtherLoopSideNum, ThisSideInletNode, FirstHVACIteration);
 
         // On constant speed branch pump loop sides we need to re-simulate
         if (this->hasConstSpeedBranchPumps) {
             // turn off any pumps connected to unloaded equipment and re-do the flow/load solution pass
             this->DisableAnyBranchPumpsConnectedToUnloadedEquipment();
-            this->DoFlowAndLoadSolutionPass(this->myOtherLoopSideNum, ThisSideInletNode, FirstHVACIteration);
+            this->DoFlowAndLoadSolutionPass(state, this->myOtherLoopSideNum, ThisSideInletNode, FirstHVACIteration);
         }
 
         // A couple things are specific to which LoopSide we are on  // TODO: This whole block needs to be moved up to the loop level
@@ -541,7 +541,7 @@ namespace DataPlant {
         }
     }
 
-    void HalfLoopData::SimulateAllLoopSideBranches(Real64 const ThisLoopSideFlow, bool const FirstHVACIteration, bool &LoopShutDownFlag)
+    void HalfLoopData::SimulateAllLoopSideBranches(AllGlobals &state, Real64 const ThisLoopSideFlow, bool const FirstHVACIteration, bool &LoopShutDownFlag)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1216,7 +1216,7 @@ namespace DataPlant {
     }
 
 
-    void HalfLoopData::DoFlowAndLoadSolutionPass(int OtherSide, int ThisSideInletNode, bool FirstHVACIteration) {
+    void HalfLoopData::DoFlowAndLoadSolutionPass(AllGlobals &state, int OtherSide, int ThisSideInletNode, bool FirstHVACIteration) {
     
         // This is passed in-out deep down into the depths where the load op manager calls EMS and EMS can shut down pumps
         bool LoopShutDownFlag = false;
@@ -1238,7 +1238,7 @@ namespace DataPlant {
         // Normal "supply side" components will set a mass flow rate on their outlet node to request flow,
         // while "Demand side" components will set a a mass flow request on their inlet node to request flow.
         this->FlowLock = DataPlant::FlowUnlocked;
-        this->SimulateAllLoopSideBranches(ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag);
+        this->SimulateAllLoopSideBranches(state, ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag);
     
         // DSU? discussion/comments about loop solver/flow resolver interaction
         // At this point, the components have been simulated.  They should have either:
@@ -1275,7 +1275,7 @@ namespace DataPlant {
         //  SetFlowRequest routine, but this routine will also set the outlet flow rate
         //  equal to the inlet flow rate, according to flowlock logic.
         this->FlowLock = DataPlant::FlowLocked;
-        this->SimulateAllLoopSideBranches(ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag);
+        this->SimulateAllLoopSideBranches(state, ThisLoopSideFlow, FirstHVACIteration, LoopShutDownFlag);
     }
     
     void HalfLoopData::ResolveParallelFlows(

@@ -60,6 +60,7 @@
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -159,7 +160,7 @@ namespace DemandManager {
         UniqueDemandMgrNames.clear();
     }
 
-    void ManageDemand()
+    void ManageDemand(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -242,7 +243,7 @@ namespace DemandManager {
                 while (firstTime || ResimExt || ResimHB || ResimHVAC) {
                     firstTime = false;
 
-                    Resimulate(ResimExt, ResimHB, ResimHVAC);
+                    Resimulate(state, ResimExt, ResimHB, ResimHVAC);
                     ResimExt = false;
                     ResimHB = false;
                     ResimHVAC = false;

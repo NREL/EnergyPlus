@@ -429,7 +429,7 @@ namespace HVACManager {
 
         // Only simulate once per zone timestep; must be after SimHVAC
         if (FirstTimeStepSysFlag && MetersHaveBeenInitialized) {
-            ManageDemand();
+            ManageDemand(state);
         }
 
         BeginTimeStepFlag = false; // At this point, we have been through the first pass through SimHVAC so this needs to be set
@@ -1830,7 +1830,7 @@ namespace HVACManager {
             ManageNonZoneEquipment(FirstHVACIteration, SimNonZoneEquipment);
             facilityElectricServiceObj->manageElectricPowerService(FirstHVACIteration, SimElecCircuitsFlag, false);
 
-            ManagePlantLoops(FirstHVACIteration, SimAirLoops, SimZoneEquipment, SimNonZoneEquipment, SimPlantLoops, SimElecCircuits);
+            ManagePlantLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment, SimNonZoneEquipment, SimPlantLoops, SimElecCircuits);
 
             AskForPlantCheckOnAbort = true; // need to make a first pass through plant calcs before this check make sense
             facilityElectricServiceObj->manageElectricPowerService(FirstHVACIteration, SimElecCircuitsFlag, false);
@@ -1900,7 +1900,7 @@ namespace HVACManager {
             }
 
             if (SimPlantLoops) {
-                ManagePlantLoops(FirstHVACIteration, SimAirLoops, SimZoneEquipment, SimNonZoneEquipment, SimPlantLoops, SimElecCircuits);
+                ManagePlantLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment, SimNonZoneEquipment, SimPlantLoops, SimElecCircuits);
             }
 
             if (SimElecCircuits) {

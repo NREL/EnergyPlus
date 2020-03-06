@@ -80,7 +80,7 @@ namespace PlantManager {
 
     void clear_state();
 
-    void ManagePlantLoops(bool FirstHVACIteration,
+    void ManagePlantLoops(AllGlobals &state, bool FirstHVACIteration,
                           bool &SimAirLoops,         // True when the air loops need to be (re)simulated
                           bool &SimZoneEquipment,    // True when zone equipment components need to be (re)simulated
                           bool &SimNonZoneEquipment, // True when non-zone equipment components need to be (re)simulated

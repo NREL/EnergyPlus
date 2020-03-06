@@ -3080,7 +3080,7 @@ namespace FanCoilUnits {
                         auto &SZVAVModel(FanCoil(FanCoilNum));
                         // seems like passing these (arguments 2-n) as an array (similar to Par) would make this more uniform across different
                         // models
-                        SZVAVModel::calcSZVAVModel(SZVAVModel,
+                        SZVAVModel::calcSZVAVModel(state, SZVAVModel,
                                                    FanCoilNum,
                                                    FirstHVACIteration,
                                                    CoolingLoad,

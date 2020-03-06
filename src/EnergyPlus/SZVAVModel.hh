@@ -62,6 +62,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/PackagedTerminalHeatPump.hh>
 #include <EnergyPlus/UnitarySystem.hh>
 
@@ -105,7 +106,7 @@ namespace SZVAVModel {
 
     );
 
-    void calcSZVAVModel(FanCoilUnits::FanCoilData &SZVAVModel,
+    void calcSZVAVModel(AllGlobals &state, FanCoilUnits::FanCoilData &SZVAVModel,
                         int const &SysIndex,
                         bool const &FirstHVACIteration,
                         bool const &CoolingLoad,
