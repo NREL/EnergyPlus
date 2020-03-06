@@ -255,6 +255,7 @@ namespace HybridUnitaryAirConditioners {
         ZoneHybridUnitaryAirConditioner(UnitNum).UnitLatentCoolingEnergy = 0.0;
         ZoneHybridUnitaryAirConditioner(UnitNum).AvailStatus = 0;
 
+        // set the availability status based on the availability manager list name
         if (allocated(ZoneComp)) {
             if (MyZoneEqFlag(UnitNum)) { // initialize the name of each availability manager list and zone number
                 ZoneComp(ZoneHybridEvaporativeCooler_Num).ZoneCompAvailMgrs(UnitNum).AvailManagerListName =
@@ -287,6 +288,8 @@ namespace HybridUnitaryAirConditioners {
         // Transfer the node data to EvapCond data structure
         InletNode = ZoneHybridUnitaryAirConditioner(UnitNum).InletNode;
         ZoneHybridUnitaryAirConditioner(UnitNum).InletMassFlowRate = Node(InletNode).MassFlowRate;
+
+        // Set the inlet volumetric flow rate from the mass flow rate
         if (DataEnvironment::StdRhoAir > 1) {
             ZoneHybridUnitaryAirConditioner(UnitNum).InletVolumetricFlowRate = ZoneHybridUnitaryAirConditioner(UnitNum).InletMassFlowRate / DataEnvironment::StdRhoAir;
         } else {
@@ -294,7 +297,7 @@ namespace HybridUnitaryAirConditioners {
         }
 
         // Set all of the inlet state variables from the inlet nodes
-        ZoneHybridUnitaryAirConditioner(UnitNum).InletTemp = Node(InletNode).Temp;  //Return Air Node
+        ZoneHybridUnitaryAirConditioner(UnitNum).InletTemp = Node(InletNode).Temp;
         ZoneHybridUnitaryAirConditioner(UnitNum).InletHumRat = Node(InletNode).HumRat;
         ZoneHybridUnitaryAirConditioner(UnitNum).InletEnthalpy = Node(InletNode).Enthalpy;
         ZoneHybridUnitaryAirConditioner(UnitNum).InletPressure = Node(InletNode).Press;
@@ -305,7 +308,7 @@ namespace HybridUnitaryAirConditioners {
 
 
         // Set default outlet state to inlet states, just to be safe
-        ZoneHybridUnitaryAirConditioner(UnitNum).OutletTemp = ZoneHybridUnitaryAirConditioner(UnitNum).InletTemp;   // Supply Air Node
+        ZoneHybridUnitaryAirConditioner(UnitNum).OutletTemp = ZoneHybridUnitaryAirConditioner(UnitNum).InletTemp;
         ZoneHybridUnitaryAirConditioner(UnitNum).OutletHumRat = ZoneHybridUnitaryAirConditioner(UnitNum).InletHumRat;
         ZoneHybridUnitaryAirConditioner(UnitNum).OutletEnthalpy = ZoneHybridUnitaryAirConditioner(UnitNum).InletEnthalpy;
         ZoneHybridUnitaryAirConditioner(UnitNum).OutletPressure = ZoneHybridUnitaryAirConditioner(UnitNum).InletPressure;
@@ -315,7 +318,7 @@ namespace HybridUnitaryAirConditioners {
                                                                           "InitZoneHybridUnitaryAirConditioners");
         ZoneHybridUnitaryAirConditioner(UnitNum).OutletMassFlowRate = ZoneHybridUnitaryAirConditioner(UnitNum).InletMassFlowRate;
 
-        ZoneHybridUnitaryAirConditioner(UnitNum).SecInletTemp = Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).Temp; // Outdoor Air Node
+        ZoneHybridUnitaryAirConditioner(UnitNum).SecInletTemp = Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).Temp;
         ZoneHybridUnitaryAirConditioner(UnitNum).SecInletHumRat = Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).HumRat;
         ZoneHybridUnitaryAirConditioner(UnitNum).SecInletEnthalpy = Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).Enthalpy;
         ZoneHybridUnitaryAirConditioner(UnitNum).SecInletPressure = Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).Press;
@@ -324,7 +327,8 @@ namespace HybridUnitaryAirConditioners {
                                                                             ZoneHybridUnitaryAirConditioner(UnitNum).SecInletPressure,
                                                                             "InitZoneHybridUnitaryAirConditioners");
         ZoneHybridUnitaryAirConditioner(UnitNum).SecInletMassFlowRate = ZoneHybridUnitaryAirConditioner(UnitNum).SupplyVentilationAir;
-        ZoneHybridUnitaryAirConditioner(UnitNum).SecOutletTemp = Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).Temp;    // Relief/Exhaust Node
+
+        ZoneHybridUnitaryAirConditioner(UnitNum).SecOutletTemp = Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).Temp;
         ZoneHybridUnitaryAirConditioner(UnitNum).SecOutletHumRat = Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).HumRat;
         ZoneHybridUnitaryAirConditioner(UnitNum).SecOutletEnthalpy = Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).Enthalpy;
         ZoneHybridUnitaryAirConditioner(UnitNum).SecOutletPressure = Node(ZoneHybridUnitaryAirConditioner(UnitNum).SecondaryInletNode).Press;
@@ -665,6 +669,7 @@ namespace HybridUnitaryAirConditioners {
                         break;
                     }
                 }
+                // add the ZoneHVAC:HybridUnitaryHVAC Scaled Maximum Supply Air Volume Flow Rate to the Component Sizing Report Summary
                 ReportSizingOutput(CurrentModuleObject, ZoneHybridUnitaryAirConditioner(UnitLoop).Name, "Scaled Maximum Supply Air Volume Flow Rate [m3/s]", ZoneHybridUnitaryAirConditioner(UnitLoop).ScaledSystemMaximumSupplyAirVolumeFlowRate);
             }
         }
