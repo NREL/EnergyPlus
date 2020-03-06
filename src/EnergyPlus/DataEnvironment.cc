@@ -599,7 +599,7 @@ namespace DataEnvironment {
         ShowFatalError("Program terminates due to preceding condition(s).");
     }
 
-    void SetWindSpeedAt(int const NumItems, Array1S<Real64> const Heights, Array1S<Real64> LocalWindSpeed, std::string const &EP_UNUSED(Settings))
+    void SetWindSpeedAt(int const NumItems, const Array1D<Real64> &Heights, Array1D<Real64> &LocalWindSpeed, std::string const &EP_UNUSED(Settings))
     {
 
         // SUBROUTINE INFORMATION:

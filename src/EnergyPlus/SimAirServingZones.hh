@@ -190,7 +190,7 @@ namespace SimAirServingZones {
 
     void SizeSysOutdoorAir();
 
-    void UpdateSysSizing(int const CallIndicator);
+    void UpdateSysSizing(OutputFiles &outputFiles, int const CallIndicator);
 
     void UpdateSysSizingForScalableInputs(int const AirLoopNum);
 
