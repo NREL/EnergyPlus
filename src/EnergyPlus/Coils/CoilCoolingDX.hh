@@ -149,7 +149,7 @@ struct CoilCoolingDX
 
 extern int const coilNormalMode; // Normal operation mode
 extern int const coilEnhancedMode; // Enhanced operation mode
-extern int const coilSubcooReheatMode; // SubcoolReheat operation mode
+extern int const coilSubcoolReheatMode; // SubcoolReheat operation mode
 
 extern std::vector<CoilCoolingDX> coilCoolingDXs;
 extern bool coilCoolingDXGetInputFlag;

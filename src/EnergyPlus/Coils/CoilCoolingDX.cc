@@ -78,7 +78,7 @@ namespace EnergyPlus {
 
     int const coilNormalMode = 0;       // Normal operation mode
     int const coilEnhancedMode = 1;     // Enhanced operation mode
-    int const coilSubcooReheatMode = 2; // SubcoolReheat operation mode
+    int const coilSubcoolReheatMode = 2; // SubcoolReheat operation mode
 
     std::vector<CoilCoolingDX> coilCoolingDXs;
     bool coilCoolingDXGetInputFlag = true;
@@ -384,25 +384,25 @@ void CoilCoolingDX::oneTimeInit() {
                             "System");
     }
     if (this->CoolingCoilType == DataHVACGlobals::CoilDX_SubcoolReheat) {
-        SetupOutputVariable("SubcooReheat Cooling Coil Operation Mode",
+        SetupOutputVariable("SubcoolReheat Cooling Coil Operation Mode",
                             OutputProcessor::Unit::None,
                             this->performance.OperatingMode,
                             "System",
                             "Average",
                             this->name);
-        SetupOutputVariable("SubcooReheat Cooling Coil Operation Mode Ratio", 
+        SetupOutputVariable("SubcoolReheat Cooling Coil Operation Mode Ratio", 
                             OutputProcessor::Unit::None, 
                             this->performance.ModeRatio, 
                             "System", 
                             "Average", 
                             this->name);
-        SetupOutputVariable("SubcooReheat Cooling Coil Recovered Heat Energy Rate",
+        SetupOutputVariable("SubcoolReheat Cooling Coil Recovered Heat Energy Rate",
                             OutputProcessor::Unit::W,
                             this->recoveredHeatEnergyRate,
                             "System",
                             "Average",
                             this->name);
-        SetupOutputVariable("SubcooReheat Cooling Coil Recovered Heat Energy",
+        SetupOutputVariable("SubcoolReheat Cooling Coil Recovered Heat Energy",
                             OutputProcessor::Unit::J,
                             this->recoveredHeatEnergy,
                             "System",
@@ -559,7 +559,7 @@ void CoilCoolingDX::simulate(int useAlternateMode, Real64 PLR, int speedNum, Rea
     this->speedNumReport = speedNum;
     this->speedRatioReport = speedRatio;
 
-    if (useAlternateMode == coilSubcooReheatMode) {
+    if (useAlternateMode == coilSubcoolReheatMode) {
         this->recoveredHeatEnergyRate = this->performance.recoveredEnergyRate;
         this->recoveredHeatEnergy = this->recoveredHeatEnergyRate * reportingConstant;
     }

@@ -114,9 +114,13 @@ This alpha field determines the type of fuel that this cooling coil's compressor
 
 The name corresponding to a Coil:Cooling:DX:CurveFit:OperatingMode object. Operating Mode is always used as the base design operating mode. This field is required.
 
-\paragraph{Field: Alternate Operating Mode}\label{field-alternate-operating-mode}
+\paragraph{Field: Alternate Operating Mode 1}\label{field-alternate-operating-mode-1}
 
 The name corresponding to a Coil:Cooling:DX:CurveFit:OperatingMode object. Operating Mode is used as the alternate operating mode operating mode to be used for enhanced deumidification when needed. If field is blank, the base operating mode will be used. This field is optional.
+
+\paragraph{Field: Alternate Operating Mode 1}\label{field-alternate-operating-mode-2}
+
+The name corresponding to a Coil:Cooling:DX:CurveFit:OperatingMode object. Operating Mode is used as to represent a reheat mode as a subcool reheat coil. If field is blank, the base operating mode will be used. This field is optional.
 
 If there are 3 operating modes, it represents a subcool-reheat mode coil. The Operating Mode 1 represents a base operating mode coil. The Operating Mode 2 represents a subcool mode coil with lower SHR than the Operating Mode 1. The Operating Mode 3 represents a rehaet mode coil with lower SHR than the Operating Mode 2. All 3 operation modes work together to represent a subcool reheat coil model. The operation procedure is described in \ref{coilcoolingdx}  
 
@@ -643,13 +647,13 @@ Following are the list of possible output variables from this coil model:
 \item
   HVAC,Average,Cooling Coil Runtime Fraction {[]}
 \item
-  HVAC,Average,SubcooReheat Cooling Coil Operation Mode {[]}
+  HVAC,Average,SubcoolReheat Cooling Coil Operation Mode {[]}
 \item
-  HVAC,Average,SubcooReheat Cooling Coil Operation Mode Ratio {[]}
+  HVAC,Average,SubcoolReheat Cooling Coil Operation Mode Ratio {[]}
 \item
-  HVAC,Average,SubcooReheat Cooling Coil Recovered Heat Energy Rate {[}W{]}
+  HVAC,Average,SubcoolReheat Cooling Coil Recovered Heat Energy Rate {[}W{]}
 \item
-  HVAC,Average,SubcooReheat Cooling Coil Recovered Heat Energy {[}J{]}
+  HVAC,Average,SubcoolReheat Cooling Coil Recovered Heat Energy {[}J{]}
 \end{itemize}
 
 \paragraph{Cooling Coil Total Cooling Rate {[}W{]}}\label{cooling-coil-total-cooling-rate-w}
@@ -688,19 +692,19 @@ This is the electricity consumption of the DX coil compressor and condenser fan(
 
 This is the runtime fraction of the DX coil compressor and condenser fan(s) for the timestep being reported.
 
-\paragraph{SubcooReheat Cooling Coil Operation Mode {[]}}\label{subcooreheat-cooling-coil-operation-mode}
+\paragraph{SubcoolReheat Cooling Coil Operation Mode {[]}}\label{subcoolreheat-cooling-coil-operation-mode}
 
-This output variable reports operating mode for a subcool reheat coil. When the value is 1, the coil operates at normal mode. When the value is 2, the coil operation is determined by the mode ratio through linear iterpolation between normal mode and subcool mode. For example, when the mode ratio is 0.4, the coil operates at subcool mode for 40\% of timestep and at normal mode for 60\% of timestep. When the value is 3, the coil operation is determined by the mode ratio through linear iterpolation between normal mode and reheat mode.
+This output variable reports operating mode for a subcool reheat coil. When the value is 1, the coil operates at normal mode. When the value is 2, the coil operation is determined by the mode ratio through linear interpolation between normal mode and subcool mode. For example, when the mode ratio is 0.4, the coil operates at subcool mode for 40\% of timestep and at normal mode for 60\% of timestep. When the value is 3, the coil operation is determined by the mode ratio through linear interpolation between normal mode and reheat mode.
 
-\paragraph{SubcooReheat Cooling Coil Operation Mode Ratio {[]}}\label{subcooreheat-cooling-coil-operation-mode-ratio}
+\paragraph{SubcoolReheat Cooling Coil Operation Mode Ratio {[]}}\label{subcoolreheat-cooling-coil-operation-mode-ratio}
 
 This output variable reports the ratio of time in a system timestep between normal mode and subcool mode when the operation mode = 2. The mode ratio represents how long the subcool mode runs as a fraction of the system timestep, and the normal mode runs in the rest of the system timestep. The output variable also reports the ratio of time in a system tiemstep between normal mode and reheat mode when the operation mode = 3. The value is 0.0 when the operation mode = 1.
 
-\paragraph{SubcooReheat Cooling Coil Recovered Heat Energy Rate {[}W{]}}\label{subcooreheat-cooling-coil-recovered-heat-energy-rate-w}
+\paragraph{SubcoolReheat Cooling Coil Recovered Heat Energy Rate {[}W{]}}\label{subcoolreheat-cooling-coil-recovered-heat-energy-rate-w}
 
 This output is the recovered heat energy rate output of the DX coil in Watts. This is determined by energy use difference between normal mode and subcool or reheat mode, multiplied by the mode ratio.
 
-\paragraph{SubcooReheat Cooling Coil Recovered Heat Energy {[}J{]}}\label{subcooreheat-cooling-coil-recovered-heat-energy-j}
+\paragraph{SubcoolReheat Cooling Coil Recovered Heat Energy {[}J{]}}\label{subcoolreheat-cooling-coil-recovered-heat-energy-j}
 
 This output is the recovered heat energy rate output of the DX coil in Jouals. This is determined by energy use difference between normal mode and subcool or reheat mode, multiplied by the mode ratio.
 

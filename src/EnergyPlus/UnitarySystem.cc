@@ -10264,7 +10264,7 @@ namespace UnitarySystems {
                 }
                 int OperationMode = coilNormalMode;
                 if (coilCoolingDXs[this->m_CoolingCoilIndex].CoolingCoilType == DataHVACGlobals::CoilDX_SubcoolReheat) {
-                    OperationMode = coilSubcooReheatMode;
+                    OperationMode = coilSubcoolReheatMode;
                 } else if (this->m_DehumidificationMode == 1) {
                     OperationMode = coilEnhancedMode;
                 }
@@ -13097,7 +13097,7 @@ namespace UnitarySystems {
             }
             int OperationMode = coilNormalMode;
             if (coilCoolingDXs[this->m_CoolingCoilIndex].CoolingCoilType == DataHVACGlobals::CoilDX_SubcoolReheat) {
-                OperationMode = coilSubcooReheatMode;
+                OperationMode = coilSubcoolReheatMode;
             } else if (this->m_DehumidificationMode == 1) {
                 OperationMode = coilEnhancedMode;
             }

@@ -115,7 +115,7 @@ void CoilCoolingDXCurveFitPerformance::instantiateFromInputSpec(const CoilCoolin
     }
 
     if (!input_data.alternate_operating_mode2_name.empty() && !input_data.alternate_operating_mode_name.empty()) {
-        this->hasAlternateMode = coilSubcooReheatMode;
+        this->hasAlternateMode = coilSubcoolReheatMode;
         this->alternateMode = CoilCoolingDXCurveFitOperatingMode(input_data.alternate_operating_mode_name);
         this->alternateMode2 = CoilCoolingDXCurveFitOperatingMode(input_data.alternate_operating_mode2_name);
         setOperMode(this->normalMode, 1);
@@ -189,7 +189,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &in
 {
     Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
-    if (useAlternateMode == coilSubcooReheatMode) {
+    if (useAlternateMode == coilSubcoolReheatMode) {
         Real64 totalCoolingRate;
         Real64 sensNorRate;
         Real64 sensSubRate;
@@ -303,7 +303,7 @@ void CoilCoolingDXCurveFitPerformance::size()
         if (this->hasAlternateMode == coilEnhancedMode) {
             this->alternateMode.size();
         }
-        if (this->hasAlternateMode == coilSubcooReheatMode) {
+        if (this->hasAlternateMode == coilSubcoolReheatMode) {
             this->alternateMode.size();
             this->alternateMode2.size();
         }

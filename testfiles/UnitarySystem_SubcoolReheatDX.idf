@@ -2273,9 +2273,9 @@
 
   Output:Variable,*,Cooling Coil Sensible Cooling Rate,Timestep;
 
-  Output:Variable,*,SubcooReheat Cooling Coil Operation Mode,Timestep;
+  Output:Variable,*,SubcoolReheat Cooling Coil Operation Mode,Timestep;
 
-  Output:Variable,*,SubcooReheat Cooling Coil Operation Mode Ratio,Timestep;
+  Output:Variable,*,SubcoolReheat Cooling Coil Operation Mode Ratio,Timestep;
 
   Output:Variable,*,Unitary System Zone Load Sensible Heat Ratio,Timestep;
 
