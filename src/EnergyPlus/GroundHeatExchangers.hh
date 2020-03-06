@@ -285,9 +285,9 @@ namespace EnergyPlus {
 
             virtual void readCacheFileAndCompareWithThisGLHECache() = 0;
 
-            void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
+            void onInitLoopEquip(AllGlobals &state, const PlantLocation &calledFromLocation) override;
 
-            void simulate(const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad,
+            void simulate(AllGlobals &state, const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad,
                           bool const RunFlag) override;
 
             static PlantComponent *factory(AllGlobals &state, int const objectType, std::string objectName);

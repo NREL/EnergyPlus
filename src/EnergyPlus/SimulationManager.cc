@@ -3206,7 +3206,7 @@ void Resimulate(bool &ResimExt, // Flag to resimulate the exterior energy use si
         CalcAirFlowSimple(0, ZoneAirMassFlow.EnforceZoneMassBalance);
         ManageZoneAirUpdates(iPredictStep, ZoneTempChange, false, UseZoneTimeStepHistory, 0.0);
         if (Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(iPredictStep, false, UseZoneTimeStepHistory, 0.0);
-        SimHVAC();
+        SimHVAC(state);
 
         ++DemandManagerHVACIterations;
     }

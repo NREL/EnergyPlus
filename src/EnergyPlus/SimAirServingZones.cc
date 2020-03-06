@@ -1456,7 +1456,7 @@ namespace SimAirServingZones {
         numAirLoopDOAS = inputProcessor->getNumObjectsFound("AirLoopHVAC:DedicatedOutdoorAirSystem");
         if (numAirLoopDOAS > 0) {
             if (AirLoopHVACDOAS::GetInputOnceFlag) {
-                AirLoopHVACDOAS::getAirLoopHVACDOASInput();
+                AirLoopHVACDOAS::getAirLoopHVACDOASInput(state);
                 AirLoopHVACDOAS::GetInputOnceFlag = false;
             }
         }
@@ -2646,7 +2646,7 @@ namespace SimAirServingZones {
                 } else {
                     index = -1;
                 }
-                thisAirLoopDOASObjec.SimAirLoopHVACDOAS(FirstHVACIteration, index);
+                thisAirLoopDOASObjec.SimAirLoopHVACDOAS(state, FirstHVACIteration, index);
                 OAMassFLowrate += thisAirLoopDOASObjec.SumMassFlowRate;
             }
 
@@ -3653,7 +3653,7 @@ namespace SimAirServingZones {
                 // 'AirLoopHVAC:Unitary:Furnace:HeatOnly', 'AirLoopHVAC:Unitary:Furnace:HeatCool',
                 // 'AirLoopHVAC:UnitaryHeatOnly', 'AirLoopHVAC:UnitaryHeatCool'
                 // 'AirLoopHVAC:UnitaryHeatPump:AirToAir', 'AirLoopHVAC:UnitaryHeatPump:WaterToAir'
-                SimFurnace(CompName, FirstHVACIteration, AirLoopNum, CompIndex);
+                SimFurnace(state, CompName, FirstHVACIteration, AirLoopNum, CompIndex);
 
             } else if (SELECT_CASE_var == UnitarySystem_BypassVAVSys) { // 'AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass'
                 SimUnitaryBypassVAV(CompName, FirstHVACIteration, AirLoopNum, CompIndex);
@@ -3696,7 +3696,7 @@ namespace SimAirServingZones {
                 bool const ZoneEquipment = false;
                 Real64 sysOut = 0.0;
                 Real64 latOut = 0.0;
-                HVACVariableRefrigerantFlow::SimulateVRF(CompName,
+                HVACVariableRefrigerantFlow::SimulateVRF(state, CompName,
                                                          FirstHVACIteration,
                                                          ControlledZoneNum,
                                                          CompIndex,

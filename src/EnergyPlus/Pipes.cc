@@ -130,7 +130,7 @@ namespace Pipes {
     {
         // Process the input data for pipes if it hasn't been done already
         if (state.pipes.GetPipeInputFlag) {
-            GetPipeInput();
+            GetPipeInput(state);
             state.pipes.GetPipeInputFlag = false;
         }
         // Now look for this particular pipe in the list
@@ -145,7 +145,7 @@ namespace Pipes {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void LocalPipeData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+    void LocalPipeData::simulate(AllGlobals &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                  bool const EP_UNUSED(FirstHVACIteration),
                                  Real64 &EP_UNUSED(CurLoad),
                                  bool const EP_UNUSED(RunFlag))

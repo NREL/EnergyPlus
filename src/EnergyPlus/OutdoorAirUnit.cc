@@ -220,7 +220,7 @@ namespace OutdoorAirUnit {
         ZoneEquipmentListChecked = false;
     }
 
-    void SimOutdoorAirUnit(std::string const &CompName,   // name of the outdoor air unit
+    void SimOutdoorAirUnit(AllGlobals &state, std::string const &CompName,   // name of the outdoor air unit
                            int const ZoneNum,             // number of zone being served
                            bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                            Real64 &PowerMet,              // Sensible power supplied (W)
@@ -1068,7 +1068,7 @@ namespace OutdoorAirUnit {
         }
     }
 
-    void InitOutdoorAirUnit(int const OAUnitNum,          // index for the current outdoor air unit
+    void InitOutdoorAirUnit(AllGlobals &state, int const OAUnitNum,          // index for the current outdoor air unit
                             int const ZoneNum,            // number of zone being served
                             bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     )
@@ -1787,7 +1787,7 @@ namespace OutdoorAirUnit {
                 SimZoneOutAirUnitComps(OAUnitNum, FirstHVACIteration);
                 if (OutAirUnit(OAUnitNum).ExtFan) {
                     if (OutAirUnit(OAUnitNum).ExtFanType != DataHVACGlobals::FanType_SystemModelObject) {
-                        Fans::SimulateFanComponents(OutAirUnit(OAUnitNum).ExtFanName,
+                        Fans::SimulateFanComponents(state, OutAirUnit(OAUnitNum).ExtFanName,
                                                     FirstHVACIteration,
                                                     OutAirUnit(OAUnitNum).ExtFan_Index,
                                                     _,
@@ -2063,7 +2063,7 @@ namespace OutdoorAirUnit {
         CurOAUnitNum = 0;
     }
 
-    void SimOutdoorAirEquipComps(int const OAUnitNum,          // actual outdoor air unit num
+    void SimOutdoorAirEquipComps(AllGlobals &state, int const OAUnitNum,          // actual outdoor air unit num
                                  std::string const &EquipType, // the component type
                                  std::string const &EquipName, // the component Name
                                  int const EquipNum,
@@ -2206,7 +2206,7 @@ namespace OutdoorAirUnit {
                         if (QCompReq < 0.0) QCompReq = 0.0; // coil can heat only
                     }
 
-                    ControlCompOutput(OutAirUnit(OAUnitNum).Name,
+                    ControlCompOutput(state, OutAirUnit(OAUnitNum).Name,
                                       cMO_OutdoorAirUnit,
                                       UnitNum,
                                       FirstHVACIteration,
@@ -2275,7 +2275,7 @@ namespace OutdoorAirUnit {
                         if (QCompReq > 0.0) QCompReq = 0.0; // coil can cool only
                     }
 
-                    ControlCompOutput(OutAirUnit(OAUnitNum).Name,
+                    ControlCompOutput(state, OutAirUnit(OAUnitNum).Name,
                                       cMO_OutdoorAirUnit,
                                       UnitNum,
                                       FirstHVACIteration,
@@ -2322,7 +2322,7 @@ namespace OutdoorAirUnit {
                         if (QCompReq > 0.0) QCompReq = 0.0; // coil can cool only
                     }
 
-                    ControlCompOutput(OutAirUnit(OAUnitNum).Name,
+                    ControlCompOutput(state, OutAirUnit(OAUnitNum).Name,
                                       "ZONEHVAC:OUTDOORAIRUNIT",
                                       UnitNum,
                                       FirstHVACIteration,
@@ -2365,7 +2365,7 @@ namespace OutdoorAirUnit {
                         if (std::abs(QCompReq) < SmallLoad) QCompReq = 0.0;
                         if (QCompReq > 0.0) QCompReq = 0.0; // coil can cool only
                     }
-                    ControlCompOutput(OutAirUnit(OAUnitNum).Name,
+                    ControlCompOutput(state, OutAirUnit(OAUnitNum).Name,
                                       "ZONEHVAC:OUTDOORAIRUNIT",
                                       UnitNum,
                                       FirstHVACIteration,
@@ -2667,7 +2667,7 @@ namespace OutdoorAirUnit {
         }
     }
 
-    int GetOutdoorAirUnitOutAirNode(int const OAUnitNum)
+    int GetOutdoorAirUnitOutAirNode(AllGlobals &state, int const OAUnitNum)
     {
 
         // FUNCTION INFORMATION:
@@ -2706,7 +2706,7 @@ namespace OutdoorAirUnit {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
         if (GetOutdoorAirUnitInputFlag) {
-            GetOutdoorAirUnitInputs();
+            GetOutdoorAirUnitInputs(state);
             GetOutdoorAirUnitInputFlag = false;
         }
 
@@ -2718,7 +2718,7 @@ namespace OutdoorAirUnit {
         return GetOutdoorAirUnitOutAirNode;
     }
 
-    int GetOutdoorAirUnitZoneInletNode(int const OAUnitNum)
+    int GetOutdoorAirUnitZoneInletNode(AllGlobals &state, int const OAUnitNum)
     {
 
         // FUNCTION INFORMATION:
@@ -2757,7 +2757,7 @@ namespace OutdoorAirUnit {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
         if (GetOutdoorAirUnitInputFlag) {
-            GetOutdoorAirUnitInputs();
+            GetOutdoorAirUnitInputs(state);
             GetOutdoorAirUnitInputFlag = false;
         }
 
@@ -2769,7 +2769,7 @@ namespace OutdoorAirUnit {
         return GetOutdoorAirUnitZoneInletNode;
     }
 
-    int GetOutdoorAirUnitReturnAirNode(int const OAUnitNum)
+    int GetOutdoorAirUnitReturnAirNode(AllGlobals &state, int const OAUnitNum)
     {
 
         // FUNCTION INFORMATION:
@@ -2808,7 +2808,7 @@ namespace OutdoorAirUnit {
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         // na
         if (GetOutdoorAirUnitInputFlag) {
-            GetOutdoorAirUnitInputs();
+            GetOutdoorAirUnitInputs(state);
             GetOutdoorAirUnitInputFlag = false;
         }
 

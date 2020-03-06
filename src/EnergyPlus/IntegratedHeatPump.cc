@@ -2242,7 +2242,7 @@ namespace IntegratedHeatPump {
                 tank.callerLoopNum = IntegratedHeatPumps(DXCoilNum).LoopNum;
 
                 PlantLocation A(0, 0, 0, 0);
-                tank.simulate(A, true, MyLoad, true);
+                tank.simulate(state, A, true, MyLoad, true);
 
                 tank.callerLoopNum = 0;
 
@@ -2256,7 +2256,7 @@ namespace IntegratedHeatPump {
                 IntegratedHeatPump::IntegratedHeatPumps(DXCoilNum).WHtankType = tankType;
 
                 PlantLocation A(0, 0, 0, 0);
-                HPWH.simulate(A, true, MyLoad, true);
+                HPWH.simulate(state, A, true, MyLoad, true);
 
                 tank.callerLoopNum = 0;
 

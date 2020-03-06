@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
@@ -160,7 +161,7 @@ namespace SwimmingPool {
         {
         }
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(AllGlobals &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void initialize(bool FirstHVACIteration // true during the first HVAC iteration
         );
@@ -190,7 +191,7 @@ namespace SwimmingPool {
 
     void GetSwimmingPool();
 
-    void SimSwimmingPool(bool FirstHVACIteration);
+    void SimSwimmingPool(AllGlobals &state, bool FirstHVACIteration);
 
     void UpdatePoolSourceValAvg(bool &SwimmingPoolOn); // .TRUE. if the swimming pool has "run" this zone time step
 

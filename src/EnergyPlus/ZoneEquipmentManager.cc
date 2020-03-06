@@ -3503,7 +3503,7 @@ namespace ZoneEquipmentManager {
 
         // Simulate all of the pools. These have a potential impact on surface heat balances, zone air heat balances, and moisture balances.
         // These should be simulated first so that any systems or zone equipment devices deal with the effects of the pool properly.
-        SimSwimmingPool(FirstHVACIteration);
+        SimSwimmingPool(state, FirstHVACIteration);
 
         // Loop over all the primary air loop; simulate their components (equipment)
         // and controllers
@@ -3632,7 +3632,7 @@ namespace ZoneEquipmentManager {
                         int const OAUnitNum = 0;
                         Real64 const OAUCoilOutTemp = 0.0;
                         bool const ZoneEquipment = true;
-                        SimulateVRF(PrioritySimOrder(EquipTypeNum).EquipName,
+                        SimulateVRF(state, PrioritySimOrder(EquipTypeNum).EquipName,
                                     FirstHVACIteration,
                                     ControlledZoneNum,
                                     ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),

@@ -48,6 +48,7 @@
 #ifndef PlantTopologyComponent_hh_INCLUDED
 #define PlantTopologyComponent_hh_INCLUDED
 
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/Plant/Enums.hh>
 #include <EnergyPlus/Plant/EquipAndOperations.hh>
 #include <EnergyPlus/PlantComponent.hh>
@@ -109,7 +110,7 @@ namespace DataPlant {
         {
         }
 
-        void simulate(bool FirstHVACIteration, bool &InitLoopEquip, bool GetCompSizFac);
+        void simulate(AllGlobals &state, bool FirstHVACIteration, bool &InitLoopEquip, bool GetCompSizFac);
 
         bool isPump();
     };

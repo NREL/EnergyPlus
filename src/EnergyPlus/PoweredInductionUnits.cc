@@ -70,6 +70,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -174,7 +175,7 @@ namespace PoweredInductionUnits {
         PIU.deallocate();
     }
 
-    void SimPIU(std::string const &CompName,   // name of the PIU
+    void SimPIU(AllGlobals &state, std::string const &CompName,   // name of the PIU
                 bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
                 int const ZoneNum,             // index of zone served by PIU
                 int const ZoneNodeNum,         // zone node number of zone served by PIU
@@ -203,7 +204,7 @@ namespace PoweredInductionUnits {
 
         // First time SimPIU is called, get the input for all the fan coil units
         if (GetPIUInputFlag) {
-            GetPIUs();
+            GetPIUs(state);
             GetPIUInputFlag = false;
         }
 
@@ -241,11 +242,11 @@ namespace PoweredInductionUnits {
 
             if (SELECT_CASE_var == SingleDuct_SeriesPIU_Reheat) { //  'AirTerminal:SingleDuct:SeriesPIU:Reheat'
 
-                CalcSeriesPIU(PIUNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
+                CalcSeriesPIU(state, PIUNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
 
             } else if (SELECT_CASE_var == SingleDuct_ParallelPIU_Reheat) { // 'AirTerminal:SingleDuct:ParallelPIU:Reheat'
 
-                CalcParallelPIU(PIUNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
+                CalcParallelPIU(state, PIUNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
 
             } else {
                 ShowSevereError("Illegal PI Unit Type used=" + PIU(PIUNum).UnitType);
@@ -263,7 +264,7 @@ namespace PoweredInductionUnits {
         ReportPIU(PIUNum);
     }
 
-    void GetPIUs()
+    void GetPIUs(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -447,8 +448,8 @@ namespace PoweredInductionUnits {
                     ErrorsFound = true;
                 }
                 PIU(PIUNum).Fan_Num = DataHVACGlobals::FanType_SimpleConstVolume;
-                Fans::GetFanType(PIU(PIUNum).FanName, FanType_Num, ErrorsFound);
-                PIU(PIUNum).FanAvailSchedPtr = Fans::GetFanAvailSchPtr(DataHVACGlobals::cFanTypes(FanType_Num), PIU(PIUNum).FanName, ErrorsFound);
+                Fans::GetFanType(state,PIU(PIUNum).FanName, FanType_Num, ErrorsFound);
+                PIU(PIUNum).FanAvailSchedPtr = Fans::GetFanAvailSchPtr(state, DataHVACGlobals::cFanTypes(FanType_Num), PIU(PIUNum).FanName, ErrorsFound);
             }
 
             PIU(PIUNum).HCoil = cAlphaArgs(10); // name of heating coil object
@@ -654,8 +655,8 @@ namespace PoweredInductionUnits {
                     ErrorsFound = true;
                 }
                 PIU(PIUNum).Fan_Num = DataHVACGlobals::FanType_SimpleConstVolume;
-                Fans::GetFanType(PIU(PIUNum).FanName, FanType_Num, ErrorsFound);
-                PIU(PIUNum).FanAvailSchedPtr = Fans::GetFanAvailSchPtr(DataHVACGlobals::cFanTypes(FanType_Num), PIU(PIUNum).FanName, ErrorsFound);
+                Fans::GetFanType(state, PIU(PIUNum).FanName, FanType_Num, ErrorsFound);
+                PIU(PIUNum).FanAvailSchedPtr = Fans::GetFanAvailSchPtr(state, DataHVACGlobals::cFanTypes(FanType_Num), PIU(PIUNum).FanName, ErrorsFound);
             }
             PIU(PIUNum).HCoil = cAlphaArgs(10); // name of heating coil object
             ValidateComponent(PIU(PIUNum).HCoilType, PIU(PIUNum).HCoil, IsNotOK, cCurrentModuleObject + " - Heating Coil");
@@ -1471,7 +1472,7 @@ namespace PoweredInductionUnits {
         }
     }
 
-    void CalcSeriesPIU(int const PIUNum,             // number of the current PIU being simulated
+    void CalcSeriesPIU(AllGlobals &state, int const PIUNum,             // number of the current PIU being simulated
                        int const ZoneNum,            // number of zone being served
                        int const ZoneNode,           // zone node number
                        bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
@@ -1625,7 +1626,7 @@ namespace PoweredInductionUnits {
                 if (PIU(PIUNum).Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
                     HVACFan::fanObjs[PIU(PIUNum).Fan_Index]->simulate(_, PIUTurnFansOn, PIUTurnFansOff, _);
                 } else if (PIU(PIUNum).Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-                    Fans::SimulateFanComponents(PIU(PIUNum).FanName,
+                    Fans::SimulateFanComponents(state, PIU(PIUNum).FanName,
                                                 FirstHVACIteration,
                                                 PIU(PIUNum).Fan_Index,
                                                 _,
@@ -1665,7 +1666,7 @@ namespace PoweredInductionUnits {
         if (PIU(PIUNum).Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
             HVACFan::fanObjs[PIU(PIUNum).Fan_Index]->simulate(_, PIUTurnFansOn, PIUTurnFansOff, _);
         } else if (PIU(PIUNum).Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-            Fans::SimulateFanComponents(PIU(PIUNum).FanName,
+            Fans::SimulateFanComponents(state, PIU(PIUNum).FanName,
                                         FirstHVACIteration,
                                         PIU(PIUNum).Fan_Index,
                                         _,
@@ -1698,7 +1699,7 @@ namespace PoweredInductionUnits {
                     SimulateWaterCoilComponents(PIU(PIUNum).HCoil, FirstHVACIteration, PIU(PIUNum).HCoil_Index);
                 } else {
                     // control water flow to obtain output matching QZnReq
-                    ControlCompOutput(PIU(PIUNum).HCoil,
+                    ControlCompOutput(state, PIU(PIUNum).HCoil,
                                       PIU(PIUNum).UnitType,
                                       PIU(PIUNum).HCoil_Index,
                                       FirstHVACIteration,
@@ -1761,7 +1762,7 @@ namespace PoweredInductionUnits {
         Node(OutletNode).MassFlowRateMax = PIU(PIUNum).MaxTotAirMassFlow;
     }
 
-    void CalcParallelPIU(int const PIUNum,             // number of the current PIU being simulated
+    void CalcParallelPIU(AllGlobals &state, int const PIUNum,             // number of the current PIU being simulated
                          int const ZoneNum,            // number of zone being served
                          int const ZoneNode,           // zone node number
                          bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
@@ -1905,7 +1906,7 @@ namespace PoweredInductionUnits {
                 if (PIU(PIUNum).Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
                     HVACFan::fanObjs[PIU(PIUNum).Fan_Index]->simulate(_, PIUTurnFansOn, PIUTurnFansOff, _);
                 } else if (PIU(PIUNum).Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-                    Fans::SimulateFanComponents(PIU(PIUNum).FanName,
+                    Fans::SimulateFanComponents(state, PIU(PIUNum).FanName,
                                                 FirstHVACIteration,
                                                 PIU(PIUNum).Fan_Index,
                                                 _,
@@ -1947,7 +1948,7 @@ namespace PoweredInductionUnits {
         if (PIU(PIUNum).Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
             HVACFan::fanObjs[PIU(PIUNum).Fan_Index]->simulate(_, PIUTurnFansOn, PIUTurnFansOff, _);
         } else if (PIU(PIUNum).Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
-            Fans::SimulateFanComponents(PIU(PIUNum).FanName,
+            Fans::SimulateFanComponents(state, PIU(PIUNum).FanName,
                                         FirstHVACIteration,
                                         PIU(PIUNum).Fan_Index,
                                         _,
@@ -1980,7 +1981,7 @@ namespace PoweredInductionUnits {
                     SimulateWaterCoilComponents(PIU(PIUNum).HCoil, FirstHVACIteration, PIU(PIUNum).HCoil_Index);
                 } else {
                     // control water flow to obtain output matching QZnReq
-                    ControlCompOutput(PIU(PIUNum).HCoil,
+                    ControlCompOutput(state, PIU(PIUNum).HCoil,
                                       PIU(PIUNum).UnitType,
                                       PIU(PIUNum).HCoil_Index,
                                       FirstHVACIteration,
@@ -2084,7 +2085,7 @@ namespace PoweredInductionUnits {
 
     // ===================== Utilities =====================================
 
-    bool PIUnitHasMixer(std::string const &CompName) // component (mixer) name
+    bool PIUnitHasMixer(AllGlobals &state, std::string const &CompName) // component (mixer) name
     {
 
         // FUNCTION INFORMATION:
@@ -2104,7 +2105,7 @@ namespace PoweredInductionUnits {
         int ItemNum;
 
         if (GetPIUInputFlag) {
-            GetPIUs();
+            GetPIUs(state);
             GetPIUInputFlag = false;
         }
 
@@ -2117,7 +2118,7 @@ namespace PoweredInductionUnits {
         return YesNo;
     }
 
-    void PIUInducesPlenumAir(int const NodeNum) // induced air node number
+    void PIUInducesPlenumAir(AllGlobals &state, int const NodeNum) // induced air node number
     {
 
         // SUBROUTINE INFORMATION:
@@ -2134,7 +2135,7 @@ namespace PoweredInductionUnits {
         int PIUIndex;
 
         if (GetPIUInputFlag) {
-            GetPIUs();
+            GetPIUs(state);
             GetPIUInputFlag = false;
         }
 

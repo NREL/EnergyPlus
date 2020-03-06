@@ -176,7 +176,7 @@ namespace HVACDXSystem {
         DXCoolingSystem.deallocate();
     }
 
-    void SimDXCoolingSystem(std::string const &DXCoolingSystemName, // Name of DXSystem:Airloop object
+    void SimDXCoolingSystem(AllGlobals &state, std::string const &DXCoolingSystemName, // Name of DXSystem:Airloop object
                             bool const FirstHVACIteration,          // True when first HVAC iteration
                             int const AirLoopNum,                   // Primary air loop number
                             int &CompIndex,                         // Index to DXSystem:Airloop object
@@ -268,7 +268,7 @@ namespace HVACDXSystem {
 
             if (SELECT_CASE_var == CoilDX_CoolingSingleSpeed) { // COIL:DX:COOLINGBYPASSFACTOREMPIRICAL
 
-                SimDXCoil(CompName,
+                SimDXCoil(state, CompName,
                           On,
                           FirstHVACIteration,
                           DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
@@ -290,7 +290,7 @@ namespace HVACDXSystem {
             } else if (SELECT_CASE_var == CoilDX_CoolingTwoSpeed) { // Coil:Cooling:DX:TwoSpeed
                 // formerly (v3 and beyond)COIL:DX:MULTISPEED:COOLINGEMPIRICAL
 
-                SimDXCoilMultiSpeed(CompName,
+                SimDXCoilMultiSpeed(state, CompName,
                                     DXCoolingSystem(DXSystemNum).SpeedRatio,
                                     DXCoolingSystem(DXSystemNum).CycRatio,
                                     DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
@@ -298,7 +298,7 @@ namespace HVACDXSystem {
             } else if (SELECT_CASE_var == CoilDX_CoolingTwoStageWHumControl) { // Coil:Cooling:DX:TwoStageWithHumidityControlMode
                 // formerly (v3 and beyond) COIL:DX:MULTIMODE:COOLINGEMPIRICAL
 
-                SimDXCoilMultiMode(CompName,
+                SimDXCoilMultiMode(state, CompName,
                                    On,
                                    FirstHVACIteration,
                                    DXCoolingSystem(DXSystemNum).PartLoadFrac,
@@ -982,7 +982,7 @@ namespace HVACDXSystem {
     // Beginning of Calculation subroutines for the DXCoolingSystem Module
     // *****************************************************************************
 
-    void ControlDXSystem(int const DXSystemNum,         // index to DXSystem
+    void ControlDXSystem(AllGlobals &state, int const DXSystemNum,         // index to DXSystem
                          bool const FirstHVACIteration, // First HVAC iteration flag
                          bool &HXUnitOn                 // flag to enable heat exchanger heat recovery
     )
@@ -1141,14 +1141,14 @@ namespace HVACDXSystem {
 
                         // Get no load result
                         PartLoadFrac = 0.0;
-                        SimDXCoil(CompName, On, FirstHVACIteration, DXCoolingSystem(DXSystemNum).CoolingCoilIndex, FanOpMode, PartLoadFrac);
+                        SimDXCoil(state, CompName, On, FirstHVACIteration, DXCoolingSystem(DXSystemNum).CoolingCoilIndex, FanOpMode, PartLoadFrac);
                         NoOutput = Node(InletNode).MassFlowRate * (PsyHFnTdbW(Node(OutletNode).Temp, Node(OutletNode).HumRat) -
                                                                    PsyHFnTdbW(Node(InletNode).Temp, Node(OutletNode).HumRat));
                         NoLoadHumRatOut = DXCoilOutletHumRat(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
 
                         // Get full load result
                         PartLoadFrac = 1.0;
-                        SimDXCoil(CompName, On, FirstHVACIteration, DXCoolingSystem(DXSystemNum).CoolingCoilIndex, FanOpMode, PartLoadFrac);
+                        SimDXCoil(state, CompName, On, FirstHVACIteration, DXCoolingSystem(DXSystemNum).CoolingCoilIndex, FanOpMode, PartLoadFrac);
                         FullLoadHumRatOut = DXCoilOutletHumRat(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
 
                         FullOutput = Node(InletNode).MassFlowRate * (PsyHFnTdbW(Node(OutletNode).Temp, Node(OutletNode).HumRat) -
@@ -1175,7 +1175,7 @@ namespace HVACDXSystem {
                             } else {
                                 if (DataGlobals::DoCoilDirectSolutions) {
                                     PartLoadFrac = (ReqOutput - NoOutput) / (FullOutput - NoOutput);
-                                    SimDXCoil(
+                                    SimDXCoil(state,
                                         CompName, On, FirstHVACIteration, DXCoolingSystem(DXSystemNum).CoolingCoilIndex, FanOpMode, PartLoadFrac);
                                 } else {
                                     Par(1) = double(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
@@ -1257,7 +1257,7 @@ namespace HVACDXSystem {
                             } else {
                                 if (DataGlobals::DoCoilDirectSolutions) {
                                     PartLoadFrac = (ReqOutput - NoOutput) / (FullOutput - NoOutput);
-                                    SimDXCoil(
+                                    SimDXCoil(state,
                                         CompName, On, FirstHVACIteration, DXCoolingSystem(DXSystemNum).CoolingCoilIndex, FanOpMode, PartLoadFrac);
                                 } else {
                                     Par(1) = double(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
@@ -1764,11 +1764,11 @@ namespace HVACDXSystem {
                     } else if (SELECT_CASE_var == CoilDX_CoolingTwoSpeed) { // Coil:Cooling:DX:TwoSpeed
                         // formerly (v3 and beyond)COIL:DX:MULTISPEED:COOLINGEMPIRICAL
                         //         SUBROUTINE SimDXCoilMultiSpeed(CompName,SpeedRatio,CycRatio,CompIndex,SpeedNum,FanMode,CompOp)
-                        SimDXCoilMultiSpeed(CompName, 0.0, 1.0, DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                        SimDXCoilMultiSpeed(state, CompName, 0.0, 1.0, DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                         OutletTempLS = DXCoilOutletTemp(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                         if (OutletTempLS > DesOutTemp && SensibleLoad) {
                             CycRatio = 1.0;
-                            SimDXCoilMultiSpeed(CompName, 1.0, 1.0, DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                            SimDXCoilMultiSpeed(state, CompName, 1.0, 1.0, DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                             OutletTempHS = DXCoilOutletTemp(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                             if (OutletTempHS < DesOutTemp) {
                                 Par(1) = double(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
@@ -1842,7 +1842,7 @@ namespace HVACDXSystem {
                         if (DXCoolingSystem(DXSystemNum).DehumidControlType == DehumidControl_CoolReheat) {
 
                             //           Simulate MultiSpeed DX coil at sensible result
-                            SimDXCoilMultiSpeed(CompName, SpeedRatio, CycRatio, DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                            SimDXCoilMultiSpeed(state, CompName, SpeedRatio, CycRatio, DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
 
                             OutletHumRatDXCoil = DXCoilOutletHumRat(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                             // If humidity setpoint is not satisfied and humidity control type is CoolReheat,
@@ -1854,11 +1854,11 @@ namespace HVACDXSystem {
                                 SpeedRatio = 0.0;
 
                                 //             SUBROUTINE SimDXCoilMultiSpeed(CompName,SpeedRatio,CycRatio,CompIndex,SpeedNum,FanMode,CompOp)
-                                SimDXCoilMultiSpeed(CompName, 0.0, 1.0, DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                                SimDXCoilMultiSpeed(state, CompName, 0.0, 1.0, DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                                 OutletHumRatLS = DXCoilOutletHumRat(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                                 if (OutletHumRatLS > DesOutHumRat) {
                                     CycRatio = 1.0;
-                                    SimDXCoilMultiSpeed(CompName, 1.0, 1.0, DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
+                                    SimDXCoilMultiSpeed(state, CompName, 1.0, 1.0, DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                                     OutletHumRatHS = DXCoilOutletHumRat(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
                                     if (OutletHumRatHS < DesOutHumRat) {
                                         Par(1) = double(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
@@ -1932,7 +1932,7 @@ namespace HVACDXSystem {
 
                         // Get no load result
                         PartLoadFrac = 0.0;
-                        SimDXCoilMultiMode(
+                        SimDXCoilMultiMode(state,
                             CompName, On, FirstHVACIteration, PartLoadFrac, DehumidMode, DXCoolingSystem(DXSystemNum).CoolingCoilIndex, FanOpMode);
                         NoOutput = Node(InletNode).MassFlowRate * (PsyHFnTdbW(Node(OutletNode).Temp, Node(OutletNode).HumRat) -
                                                                    PsyHFnTdbW(Node(InletNode).Temp, Node(OutletNode).HumRat));
@@ -1940,7 +1940,7 @@ namespace HVACDXSystem {
 
                         // Get full load result
                         PartLoadFrac = 1.0;
-                        SimDXCoilMultiMode(
+                        SimDXCoilMultiMode(state,
                             CompName, On, FirstHVACIteration, PartLoadFrac, DehumidMode, DXCoolingSystem(DXSystemNum).CoolingCoilIndex, FanOpMode);
                         FullLoadHumRatOut = DXCoilOutletHumRat(DXCoolingSystem(DXSystemNum).CoolingCoilIndex);
 
@@ -2013,7 +2013,7 @@ namespace HVACDXSystem {
                             PartLoadFrac = 1.0;
                             DehumidMode = 1;
                             DXCoolingSystem(DXSystemNum).DehumidificationMode = DehumidMode;
-                            SimDXCoilMultiMode(CompName,
+                            SimDXCoilMultiMode(state,CompName,
                                                On,
                                                FirstHVACIteration,
                                                PartLoadFrac,
@@ -2994,7 +2994,7 @@ namespace HVACDXSystem {
         return Residuum;
     }
 
-    Real64 MultiModeDXCoilResidual(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 MultiModeDXCoilResidual(AllGlobals &state, Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                    Array1<Real64> const &Par   // par(1) = DX coil number
     )
     {
@@ -3048,14 +3048,14 @@ namespace HVACDXSystem {
         CoilIndex = int(Par(1));
         DehumidMode = int(Par(3));
         FanOpMode = int(Par(4));
-        SimDXCoilMultiMode("", On, false, PartLoadRatio, DehumidMode, CoilIndex, FanOpMode);
+        SimDXCoilMultiMode(state,"", On, false, PartLoadRatio, DehumidMode, CoilIndex, FanOpMode);
         OutletAirTemp = DXCoilOutletTemp(CoilIndex);
         Residuum = Par(2) - OutletAirTemp;
 
         return Residuum;
     }
 
-    Real64 MultiModeDXCoilHumRatResidual(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 MultiModeDXCoilHumRatResidual(AllGlobals &state, Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                          Array1<Real64> const &Par   // par(1) = DX coil number
     )
     {
@@ -3108,7 +3108,7 @@ namespace HVACDXSystem {
         CoilIndex = int(Par(1));
         DehumidMode = int(Par(3));
         FanOpMode = int(Par(4));
-        SimDXCoilMultiMode("", On, false, PartLoadRatio, DehumidMode, CoilIndex, FanOpMode);
+        SimDXCoilMultiMode(state,"", On, false, PartLoadRatio, DehumidMode, CoilIndex, FanOpMode);
         OutletAirHumRat = DXCoilOutletHumRat(CoilIndex);
         Residuum = Par(2) - OutletAirHumRat;
 

@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/SingleDuct.hh>
 
@@ -440,13 +441,13 @@ namespace HVACVariableRefrigerantFlow {
         // Begin of Methods for New VRF Model: Fluid Temperature Control
         //******************************************************************************
 
-        void onInitLoopEquip(const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip(AllGlobals &state, const PlantLocation &calledFromLocation) override;
 
         void getDesignCapacities(const PlantLocation &calledFromLocation, Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
 
-        void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(AllGlobals &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(AllGlobals &state, std::string const &objectName);
 
         void SizeVRFCondenser();
 
@@ -788,7 +789,7 @@ namespace HVACVariableRefrigerantFlow {
                                    Real64 &CondTemp  // condensing temperature
         );
 
-        void ControlVRF_FluidTCtrl(int VRFTUNum,            // Index to VRF terminal unit
+        void ControlVRF_FluidTCtrl(AllGlobals &state, int VRFTUNum,            // Index to VRF terminal unit
                                    Real64 QZnReq,           // Index to zone number
                                    bool FirstHVACIteration, // flag for 1st HVAC iteration in the time step
                                    Real64 &PartLoadRatio,         // unit part load ratio
@@ -796,7 +797,7 @@ namespace HVACVariableRefrigerantFlow {
                                    Real64 &SuppHeatCoilLoad       // supplemental heating coil load (W)
         );
 
-        void CalcVRF_FluidTCtrl(int VRFTUNum,                    // Index to VRF terminal unit
+        void CalcVRF_FluidTCtrl(AllGlobals &state, int VRFTUNum,                    // Index to VRF terminal unit
                                 bool FirstHVACIteration,         // flag for 1st HVAC iteration in the time step
                                 Real64 PartLoadRatio,            // compressor part load fraction
                                 Real64 &LoadMet,                       // load met by unit (W)
@@ -812,7 +813,7 @@ namespace HVACVariableRefrigerantFlow {
 
         // Methods for cruve based VRF Model
         //******************************************************************************
-        void ControlVRF(int VRFTUNum,            // Index to VRF terminal unit
+        void ControlVRF(AllGlobals &state, int VRFTUNum,            // Index to VRF terminal unit
                         Real64 QZnReq,           // Index to zone number
                         bool FirstHVACIteration, // flag for 1st HVAC iteration in the time step
                         Real64 &PartLoadRatio,         // unit part load ratio
@@ -820,7 +821,7 @@ namespace HVACVariableRefrigerantFlow {
                         Real64 &SuppHeatCoilLoad       // supplemental heating coil load (W)
         );
 
-        void ControlVRFToLoad(int const VRFTUNum,            // Index to VRF terminal unit
+        void ControlVRFToLoad(AllGlobals &state, int const VRFTUNum,            // Index to VRF terminal unit
                               Real64 const QZnReq,           // Index to zone number
                               bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
                               Real64 &PartLoadRatio,         // unit part load ratio
@@ -828,7 +829,7 @@ namespace HVACVariableRefrigerantFlow {
                               Real64 &SuppHeatCoilLoad       // supplemental heating coil load (W)
         );
 
-        void CalcVRF(int const VRFTUNum,                    // Unit index in VRF terminal unit array
+        void CalcVRF(AllGlobals &state, int const VRFTUNum,                    // Unit index in VRF terminal unit array
                      bool const FirstHVACIteration,         // flag for 1st HVAC iteration in the time step
                      Real64 const PartLoadRatio,            // compressor part load fraction
                      Real64 &LoadMet,                       // load met by unit (W)
@@ -872,7 +873,7 @@ namespace HVACVariableRefrigerantFlow {
 
     // Functions
 
-    void SimulateVRF(std::string const &CompName,
+    void SimulateVRF(AllGlobals &state, std::string const &CompName,
                      bool const FirstHVACIteration,
                      int const ZoneNum,
                      int &CompIndex,
@@ -886,37 +887,37 @@ namespace HVACVariableRefrigerantFlow {
 
     void CalcVRFCondenser(int VRFCond);
 
-    void GetVRFInput();
+    void GetVRFInput(AllGlobals &state);
 
-    void GetVRFInputData(bool &ErrorsFound // flag for errors in GetInput
+    void GetVRFInputData(AllGlobals &state, bool &ErrorsFound // flag for errors in GetInput
     );
 
-    void InitVRF(int VRFTUNum, int ZoneNum, bool FirstHVACIteration, Real64 &OnOffAirFlowRatio, Real64 &QZnReq);
+    void InitVRF(AllGlobals &state, int VRFTUNum, int ZoneNum, bool FirstHVACIteration, Real64 &OnOffAirFlowRatio, Real64 &QZnReq);
 
     void SetCompFlowRate(int VRFTUNum, int VRFCond, Optional_bool_const UseCurrentMode = _);
 
-    void SizeVRF(OutputFiles &outputFiles, int const VRFTUNum);
+    void SizeVRF(AllGlobals &state, OutputFiles &outputFiles, int const VRFTUNum);
 
-    void SimVRF(int VRFTUNum,
+    void SimVRF(AllGlobals &state, int VRFTUNum,
                 bool FirstHVACIteration,
                 Real64 &OnOffAirFlowRatio,
                 Real64 &SysOutputProvided,
                 Real64 &LatOutputProvided,
                 Real64 QZnReq);
 
-    int GetVRFTUOutAirNode(int VRFTUNum);
+    int GetVRFTUOutAirNode(AllGlobals &state, int VRFTUNum);
 
-    int GetVRFTUZoneInletAirNode(int VRFTUNum);
+    int GetVRFTUZoneInletAirNode(AllGlobals &state, int VRFTUNum);
 
-    int GetVRFTUMixedAirNode(int VRFTUNum);
+    int GetVRFTUMixedAirNode(AllGlobals &state, int VRFTUNum);
 
-    int GetVRFTUOutAirNodeFromName(std::string const VRFTUName, bool &errorsFound);
+    int GetVRFTUOutAirNodeFromName(AllGlobals &state, std::string const VRFTUName, bool &errorsFound);
 
-    int GetVRFTUInAirNodeFromName(std::string const VRFTUName, bool &errorsFound);
+    int GetVRFTUInAirNodeFromName(AllGlobals &state, std::string const VRFTUName, bool &errorsFound);
 
-    int GetVRFTUMixedAirNode(int const VRFTUNum);
+    int GetVRFTUMixedAirNode(AllGlobals &state,int const VRFTUNum);
 
-    int GetVRFTUReturnAirNode(int const VRFTUNum);
+    int GetVRFTUReturnAirNode(AllGlobals &state, int const VRFTUNum);
 
     void getVRFTUZoneLoad(int const VRFTUNum, Real64 &zoneLoad, Real64 &LoadToHeatingSP, Real64 &LoadToCoolingSP, bool const InitFlag);
 
@@ -926,7 +927,7 @@ namespace HVACVariableRefrigerantFlow {
 
     void UpdateVRFCondenser(int VRFCond); // index to VRF condensing unit
 
-    void isVRFCoilPresent(std::string const VRFTUName, bool &CoolCoilPresent, bool & HeatCoilPresent);
+    void isVRFCoilPresent(AllGlobals &state, std::string const VRFTUName, bool &CoolCoilPresent, bool & HeatCoilPresent);
 
     Real64 PLRResidual(Real64 PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                        Array1<Real64> const &Par   // par(1) = VRFTUNum
@@ -937,7 +938,7 @@ namespace HVACVariableRefrigerantFlow {
                            Real64 &OnOffAirFlowRatio   // ratio of compressor ON airflow to average airflow over timestep
     );
 
-    void InitializeOperatingMode(bool FirstHVACIteration, // flag for first time through HVAC systems
+    void InitializeOperatingMode(AllGlobals &state, bool FirstHVACIteration, // flag for first time through HVAC systems
                                  int VRFCond,             // Condenser Unit index
                                  int TUListNum,           // Condenser Unit terminal unit list
                                  Real64 &OnOffAirFlowRatio      // ratio of on to off flow rate
@@ -961,7 +962,7 @@ namespace HVACVariableRefrigerantFlow {
 
     void clear_state();
 
-    Real64 VRFTUAirFlowResidual_FluidTCtrl(Real64 FanSpdRatio, // fan speed ratio of VRF VAV TU
+    Real64 VRFTUAirFlowResidual_FluidTCtrl(AllGlobals &state, Real64 FanSpdRatio, // fan speed ratio of VRF VAV TU
                                            Array1<Real64> const &Par // par(1) = VRFTUNum
     );
 

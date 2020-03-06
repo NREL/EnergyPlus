@@ -3628,7 +3628,7 @@ namespace EvaporativeCoolers {
         ReportZoneEvaporativeCoolerUnit(CompNum);
     }
 
-    void GetInputZoneEvaporativeCoolerUnit()
+    void GetInputZoneEvaporativeCoolerUnit(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:

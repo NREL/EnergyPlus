@@ -1717,7 +1717,7 @@ namespace ReportSizingManager {
                                       (PsyHFnTdbW(CoilInTemp, CoilInHumRat) - PsyHFnTdbW(CoilOutTemp, CoilOutHumRat));
                         DesVolFlow = FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow / StdRhoAir;
                         // add fan heat to coil load
-                        DesCoilLoad += DataAirSystems::calcFanDesignHeatGain(DataFanEnumType, DataFanIndex, DesVolFlow);
+                        DesCoilLoad += DataAirSystems::calcFanDesignHeatGain(state, DataFanEnumType, DataFanIndex, DesVolFlow);
                         if (DesCoilLoad >= SmallLoad) {
                             AutosizeDes = DesCoilLoad / (CoilDesWaterDeltaT * Cp * rho);
                         } else {
@@ -1839,7 +1839,7 @@ namespace ReportSizingManager {
                     Real64 fanDeltaT = 0.0;
                     if (DataSizing::DataFanPlacement == DataSizing::zoneFanPlacement::zoneBlowThru) {
                         // calculate fan heat to get fan air-side delta T
-                        FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(DataFanEnumType, DataFanIndex, DataAirFlowUsedForSizing);
+                        FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(state, DataFanEnumType, DataFanIndex, DataAirFlowUsedForSizing);
                         if (DataDesInletAirHumRat > 0.0 && DataAirFlowUsedForSizing > 0.0) {
                             CpAir = PsyCpAirFnW(DataDesInletAirHumRat);
                             fanDeltaT = FanCoolLoad / (CpAir * StdRhoAir * DataAirFlowUsedForSizing);
@@ -1874,7 +1874,7 @@ namespace ReportSizingManager {
                     Real64 fanDeltaT = 0.0;
                     if (DataSizing::DataFanPlacement == DataSizing::zoneFanPlacement::zoneDrawThru) {
                         // calculate fan heat to get fan air-side delta T
-                        FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(DataFanEnumType, DataFanIndex, DataAirFlowUsedForSizing);
+                        FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(state, DataFanEnumType, DataFanIndex, DataAirFlowUsedForSizing);
                         if (DataDesInletAirHumRat > 0.0 && DataAirFlowUsedForSizing > 0.0) {
                             CpAir = PsyCpAirFnW(DataDesInletAirHumRat);
                             fanDeltaT = FanCoolLoad / (CpAir * StdRhoAir * DataAirFlowUsedForSizing);
@@ -2018,7 +2018,7 @@ namespace ReportSizingManager {
                                               (PsyHFnTdbW(CoilInTemp, CoilInHumRat) - PsyHFnTdbW(CoilOutTemp, CoilOutHumRat));
                                 DesVolFlow = FinalZoneSizing(CurZoneEqNum).DesCoolMassFlow / StdRhoAir;
                                 // add fan heat to coil load
-                                FanCoolLoad += DataAirSystems::calcFanDesignHeatGain(DataFanEnumType, DataFanIndex, DesVolFlow);
+                                FanCoolLoad += DataAirSystems::calcFanDesignHeatGain(state, DataFanEnumType, DataFanIndex, DesVolFlow);
                                 AutosizeDes += FanCoolLoad;
                             }
                         } else {
@@ -2072,7 +2072,7 @@ namespace ReportSizingManager {
                                     PeakCoilLoad = max(0.0, (rhoair * DesVolFlow * (CoilInEnth - CoilOutEnth)));
                                 }
                                 // add fan heat to coil load
-                                FanCoolLoad += DataAirSystems::calcFanDesignHeatGain(DataFanEnumType, DataFanIndex, DesVolFlow);
+                                FanCoolLoad += DataAirSystems::calcFanDesignHeatGain(state, DataFanEnumType, DataFanIndex, DesVolFlow);
                                 PeakCoilLoad += FanCoolLoad;
                                 CpAir = PsyCpAirFnW(CoilInHumRat);
                                 // adjust coil inlet/outlet temp with fan temperature rise
@@ -2893,7 +2893,7 @@ namespace ReportSizingManager {
                                 }
                             }
                             // calculate fan heat to get fan air-side delta T
-                            FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(DataFanEnumType, DataFanIndex, DataAirFlowUsedForSizing);
+                            FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(state, DataFanEnumType, DataFanIndex, DataAirFlowUsedForSizing);
                             if (DataDesInletAirHumRat > 0.0 && DataAirFlowUsedForSizing > 0.0) {
                                 CpAir = PsyCpAirFnW(DataDesInletAirHumRat);
                                 fanDeltaT = FanCoolLoad / (CpAir * StdRhoAir * DataAirFlowUsedForSizing);
@@ -2931,7 +2931,7 @@ namespace ReportSizingManager {
                                 }
                             }
                             // calculate fan heat to get fan air-side delta T
-                            FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(DataFanEnumType, DataFanIndex, DataAirFlowUsedForSizing);
+                            FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(state, DataFanEnumType, DataFanIndex, DataAirFlowUsedForSizing);
                             if (DataDesInletAirHumRat > 0.0 && DataAirFlowUsedForSizing > 0.0) {
                                 CpAir = PsyCpAirFnW(DataDesInletAirHumRat);
                                 fanDeltaT = FanCoolLoad / (CpAir * StdRhoAir * DataAirFlowUsedForSizing);
@@ -2954,7 +2954,7 @@ namespace ReportSizingManager {
                                 }
                             }
                             // calculate fan heat to get fan air-side delta T
-                            FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(DataFanEnumType, DataFanIndex, DataAirFlowUsedForSizing);
+                            FanCoolLoad = DataAirSystems::calcFanDesignHeatGain(state, DataFanEnumType, DataFanIndex, DataAirFlowUsedForSizing);
                             if (DataDesInletAirHumRat > 0.0 && DataAirFlowUsedForSizing > 0.0) {
                                 CpAir = PsyCpAirFnW(DataDesInletAirHumRat);
                                 fanDeltaT = FanCoolLoad / (CpAir * StdRhoAir * DataAirFlowUsedForSizing);
@@ -3231,7 +3231,7 @@ namespace ReportSizingManager {
                             RetFanNum = PrimaryAirSystem(CurSysNum).RetFanNum;
                             switch (PrimaryAirSystem(CurSysNum).supFanModelTypeEnum) {
                             case DataAirSystems::structArrayLegacyFanModels: {
-                                FanCoolLoad = FanDesHeatGain(PrimaryAirSystem(CurSysNum).SupFanNum, DesVolFlow);
+                                FanCoolLoad = FanDesHeatGain(state, PrimaryAirSystem(CurSysNum).SupFanNum, DesVolFlow);
                                 if (coilSelectionReportObj->isCompTypeCoil(CompType) && (SupFanNum > 0)) {
                                     coilSelectionReportObj->setCoilSupplyFanInfo(CompName,
                                                                                  CompType,
@@ -3261,7 +3261,7 @@ namespace ReportSizingManager {
 
                             switch (PrimaryAirSystem(CurSysNum).retFanModelTypeEnum) {
                             case DataAirSystems::structArrayLegacyFanModels: {
-                                FanCoolLoad += (1.0 - OutAirFrac) * FanDesHeatGain(PrimaryAirSystem(CurSysNum).RetFanNum, DesVolFlow);
+                                FanCoolLoad += (1.0 - OutAirFrac) * FanDesHeatGain(state, PrimaryAirSystem(CurSysNum).RetFanNum, DesVolFlow);
                                 break;
                             }
                             case DataAirSystems::objectVectorOOFanSystemModel: {

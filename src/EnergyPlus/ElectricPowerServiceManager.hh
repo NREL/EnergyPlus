@@ -60,6 +60,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 
@@ -480,7 +481,7 @@ public: // Method
                         std::string const &availSchedName,
                         Real64 const thermalToElectRatio);
 
-    void simGeneratorGetPowerOutput(bool const runFlag,             // true if generator is on
+    void simGeneratorGetPowerOutput(AllGlobals &state, bool const runFlag,             // true if generator is on
                                     Real64 const myElecLoadRequest, // target electric power production request
                                     bool const FirstHVACIteration,  //
                                     Real64 &electricPowerOutput,    // Actual generator electric power output

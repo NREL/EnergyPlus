@@ -51,6 +51,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/Branch.hh>
 #include <EnergyPlus/Plant/ConnectedLoopData.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/Plant/LoopSidePumpInformation.hh>
 #include <EnergyPlus/Plant/MixerData.hh>
 #include <EnergyPlus/Plant/PlantConvergencePoint.hh>
@@ -163,7 +164,7 @@ namespace DataPlant {
 
         void SimulateAllLoopSideBranches(Real64 ThisLoopSideFlow, bool FirstHVACIteration, bool &LoopShutDownFlag);
 
-        void SimulateLoopSideBranchGroup(int FirstBranchNum,
+        void SimulateLoopSideBranchGroup(AllGlobals &state, int FirstBranchNum,
                                          int LastBranchNum,
                                          Real64 FlowRequest,
                                          bool FirstHVACIteration,

@@ -386,7 +386,7 @@ namespace MixedAir {
         OAControllerUniqueNames.clear();
     }
 
-    void ManageOutsideAirSystem(std::string const &OASysName, bool const FirstHVACIteration, int const AirLoopNum, int &OASysNum)
+    void ManageOutsideAirSystem(AllGlobals &state, std::string const &OASysName, bool const FirstHVACIteration, int const AirLoopNum, int &OASysNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -410,7 +410,7 @@ namespace MixedAir {
             }
         }
 
-        InitOutsideAirSys(OASysNum, FirstHVACIteration, AirLoopNum);
+        InitOutsideAirSys(state, OASysNum, FirstHVACIteration, AirLoopNum);
 
         SimOutsideAirSys(OASysNum, FirstHVACIteration, AirLoopNum);
     }
@@ -481,7 +481,7 @@ namespace MixedAir {
         }
     }
 
-    void SimOutsideAirSys(int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum)
+    void SimOutsideAirSys(AllGlobals &state, int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -512,7 +512,7 @@ namespace MixedAir {
         CurOASysNum = OASysNum;
         auto &CurrentOASystem(OutsideAirSys(OASysNum));
         if (OutsideAirSys(OASysNum).AirLoopDOASNum == -1) {
-            SimOAController(CurrentOASystem.OAControllerName, CurrentOASystem.OAControllerIndex, FirstHVACIteration, AirLoopNum);
+            SimOAController(state, CurrentOASystem.OAControllerName, CurrentOASystem.OAControllerIndex, FirstHVACIteration, AirLoopNum);
         }
         SimOASysComponents(OASysNum, FirstHVACIteration, AirLoopNum);
 
@@ -867,7 +867,7 @@ namespace MixedAir {
                     bool const ZoneEquipment = false;
                     Real64 sysOut = 0.0;
                     Real64 latOut = 0.0;
-                    HVACVariableRefrigerantFlow::SimulateVRF(CompName,
+                    HVACVariableRefrigerantFlow::SimulateVRF(state, CompName,
                         FirstHVACIteration,
                         ControlledZoneNum,
                         CompIndex,
@@ -879,7 +879,7 @@ namespace MixedAir {
                         sysOut,
                         latOut);
                 } else {
-                    HVACVariableRefrigerantFlow::isVRFCoilPresent(CompName, OACoolingCoil, OAHeatingCoil);
+                    HVACVariableRefrigerantFlow::isVRFCoilPresent(state, CompName, OACoolingCoil, OAHeatingCoil);
                 }
 
             } else {

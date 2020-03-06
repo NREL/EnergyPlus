@@ -71,6 +71,7 @@
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -407,14 +408,14 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GLHEBase::onInitLoopEquip(const PlantLocation &EP_UNUSED(calledFromLocation))
+    void GLHEBase::onInitLoopEquip(AllGlobals &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
         this->initGLHESimVars();
     }
 
     //******************************************************************************
 
-    void GLHEBase::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+    void GLHEBase::simulate(AllGlobals &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                             bool const EP_UNUSED(FirstHVACIteration),
                             Real64 &EP_UNUSED(CurLoad),
                             bool const EP_UNUSED(RunFlag))

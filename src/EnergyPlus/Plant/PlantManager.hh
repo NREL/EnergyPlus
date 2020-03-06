@@ -55,6 +55,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 
 namespace EnergyPlus {
 
@@ -89,11 +90,11 @@ namespace PlantManager {
 
     void GetPlantLoopData();
 
-    void GetPlantInput();
+    void GetPlantInput(AllGlobals &state);
 
     void SetupReports();
 
-    void InitializeLoops(bool FirstHVACIteration); // true if first iteration of the simulation
+    void InitializeLoops(AllGlobals &state, bool FirstHVACIteration); // true if first iteration of the simulation
 
     void ReInitPlantLoopsAtFirstHVACIteration();
 
@@ -103,7 +104,7 @@ namespace PlantManager {
 
     void InitOneTimePlantSizingInfo(int LoopNum); // loop being initialized for sizing
 
-    void SizePlantLoop(int LoopNum, // Supply side loop being simulated
+    void SizePlantLoop(AllGlobals &state, int LoopNum, // Supply side loop being simulated
                        bool OkayToFinish);
 
     void ResizePlantLoopLevelSizes(int LoopNum);

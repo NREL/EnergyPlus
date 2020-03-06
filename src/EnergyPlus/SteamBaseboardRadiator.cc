@@ -246,7 +246,7 @@ namespace SteamBaseboardRadiator {
                     auto const SELECT_CASE_var(SteamBaseboard(BaseboardNum).EquipType);
 
                     if (SELECT_CASE_var == TypeOf_Baseboard_Rad_Conv_Steam) { // 'ZoneHVAC:Baseboard:RadiantConvective:Steam'
-                        ControlCompOutput(SteamBaseboard(BaseboardNum).EquipID,
+                        ControlCompOutput(state, SteamBaseboard(BaseboardNum).EquipID,
                                           cCMO_BBRadiator_Steam,
                                           BaseboardNum,
                                           FirstHVACIteration,

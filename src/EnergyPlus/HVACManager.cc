@@ -416,12 +416,12 @@ namespace HVACManager {
 
         if (Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(iPredictStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
-        SimHVAC();
+        SimHVAC(state);
 
         if (AnyIdealCondEntSetPointInModel && MetersHaveBeenInitialized && !WarmupFlag) {
             RunOptCondEntTemp = true;
             while (RunOptCondEntTemp) {
-                SimHVAC();
+                SimHVAC(state);
             }
         }
 
@@ -470,12 +470,12 @@ namespace HVACManager {
 
                 if (Contaminant.SimulateContaminants)
                     ManageZoneContaminanUpdates(iPredictStep, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
-                SimHVAC();
+                SimHVAC(state);
 
                 if (AnyIdealCondEntSetPointInModel && MetersHaveBeenInitialized && !WarmupFlag) {
                     RunOptCondEntTemp = true;
                     while (RunOptCondEntTemp) {
-                        SimHVAC();
+                        SimHVAC(state);
                     }
                 }
 
@@ -798,7 +798,7 @@ namespace HVACManager {
             SetupOutputVariable("Air System Solver Iteration Count", OutputProcessor::Unit::None, RepIterAir, "HVAC", "Sum", "SimHVAC");
             ManageSetPoints(); // need to call this before getting plant loop data so setpoint checks can complete okay
             GetPlantLoopData();
-            GetPlantInput();
+            GetPlantInput(state);
             SetupInitialPlantCallingOrder();
             SetupBranchControlTypes(); // new routine to do away with input for branch control type
             //    CALL CheckPlantLoopData
@@ -854,7 +854,7 @@ namespace HVACManager {
         // first explicitly call each system type with FirstHVACIteration,
 
         // Manages the various component simulations
-        SimSelectedEquipment(SimAirLoopsFlag,
+        SimSelectedEquipment(state, SimAirLoopsFlag,
                              SimZoneEquipmentFlag,
                              SimNonZoneEquipmentFlag,
                              SimPlantLoopsFlag,
@@ -880,7 +880,7 @@ namespace HVACManager {
             ManageEMS(emsCallFromHVACIterationLoop, anyEMSRan); // calling point id
 
             // Manages the various component simulations
-            SimSelectedEquipment(SimAirLoopsFlag,
+            SimSelectedEquipment(state, SimAirLoopsFlag,
                                  SimZoneEquipmentFlag,
                                  SimNonZoneEquipmentFlag,
                                  SimPlantLoopsFlag,
@@ -914,7 +914,7 @@ namespace HVACManager {
                 SimNonZoneEquipmentFlag = false;
                 SimPlantLoopsFlag = true;
                 SimElecCircuitsFlag = false;
-                SimSelectedEquipment(SimAirLoopsFlag,
+                SimSelectedEquipment(state, SimAirLoopsFlag,
                                      SimZoneEquipmentFlag,
                                      SimNonZoneEquipmentFlag,
                                      SimPlantLoopsFlag,
@@ -927,7 +927,7 @@ namespace HVACManager {
                 SimNonZoneEquipmentFlag = true;
                 SimPlantLoopsFlag = false;
                 SimElecCircuitsFlag = true;
-                SimSelectedEquipment(SimAirLoopsFlag,
+                SimSelectedEquipment(state, SimAirLoopsFlag,
                                      SimZoneEquipmentFlag,
                                      SimNonZoneEquipmentFlag,
                                      SimPlantLoopsFlag,
@@ -941,7 +941,7 @@ namespace HVACManager {
                 SimNonZoneEquipmentFlag = false;
                 SimPlantLoopsFlag = true;
                 SimElecCircuitsFlag = false;
-                SimSelectedEquipment(SimAirLoopsFlag,
+                SimSelectedEquipment(state, SimAirLoopsFlag,
                                      SimZoneEquipmentFlag,
                                      SimNonZoneEquipmentFlag,
                                      SimPlantLoopsFlag,
@@ -954,7 +954,7 @@ namespace HVACManager {
                 SimNonZoneEquipmentFlag = true;
                 SimPlantLoopsFlag = false;
                 SimElecCircuitsFlag = true;
-                SimSelectedEquipment(SimAirLoopsFlag,
+                SimSelectedEquipment(state, SimAirLoopsFlag,
                                      SimZoneEquipmentFlag,
                                      SimNonZoneEquipmentFlag,
                                      SimPlantLoopsFlag,

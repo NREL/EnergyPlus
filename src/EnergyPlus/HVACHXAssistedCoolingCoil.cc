@@ -849,7 +849,7 @@ namespace HVACHXAssistedCoolingCoil {
     // End Initialization Section of the Module
     //******************************************************************************
 
-    void CalcHXAssistedCoolingCoil(int const HXAssistedCoilNum,         // Index number for HXAssistedCoolingCoil
+    void CalcHXAssistedCoolingCoil(AllGlobals &state, int const HXAssistedCoilNum,         // Index number for HXAssistedCoolingCoil
                                    bool const FirstHVACIteration,       // FirstHVACIteration flag
                                    int const CompOp,                    // compressor operation; 1=on, 0=off
                                    Real64 const PartLoadRatio,          // Cooling coil part load ratio
@@ -953,7 +953,7 @@ namespace HVACHXAssistedCoolingCoil {
                             HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num);
 
             if (HXAssistedCoil(HXAssistedCoilNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
-                SimDXCoil(HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName,
+                SimDXCoil(state, HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName,
                           CompOp,
                           FirstHVACIteration,
                           HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex,

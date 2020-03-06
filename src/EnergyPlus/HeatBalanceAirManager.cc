@@ -66,6 +66,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -4182,7 +4183,7 @@ namespace HeatBalanceAirManager {
     // Begin Algorithm Section of the Module
     //******************************************************************************
 
-    void CalcHeatBalanceAir()
+    void CalcHeatBalanceAir(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4218,7 +4219,7 @@ namespace HeatBalanceAirManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // na
 
-        ManageHVAC(OutputFiles::getSingleton());
+        ManageHVAC(state, OutputFiles::getSingleton());
 
         // Do Final Temperature Calculations for Heat Balance before next Time step
         SumHmAW = 0.0;

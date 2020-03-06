@@ -1763,14 +1763,14 @@ namespace SingleDuct {
             } else if (sd_airterminal(SysNum).Fan_Num == DataHVACGlobals::FanType_SimpleVAV) {
                 IsNotOK = false;
 
-                sd_airterminal(SysNum).OutletNodeNum = GetFanOutletNode(sd_airterminal(SysNum).FanType, sd_airterminal(SysNum).FanName, IsNotOK);
+                sd_airterminal(SysNum).OutletNodeNum = GetFanOutletNode(state, sd_airterminal(SysNum).FanType, sd_airterminal(SysNum).FanName, IsNotOK);
                 if (IsNotOK) {
                     ShowContinueError("..Occurs in " + sd_airterminal(SysNum).SysType + " = " + sd_airterminal(SysNum).SysName);
                     ErrorsFound = true;
                 }
 
                 IsNotOK = false;
-                sd_airterminal(SysNum).InletNodeNum = GetFanInletNode(sd_airterminal(SysNum).FanType, sd_airterminal(SysNum).FanName, IsNotOK);
+                sd_airterminal(SysNum).InletNodeNum = GetFanInletNode(state, sd_airterminal(SysNum).FanType, sd_airterminal(SysNum).FanName, IsNotOK);
                 if (IsNotOK) {
                     ShowContinueError("..Occurs in " + sd_airterminal(SysNum).SysType + " = " + sd_airterminal(SysNum).SysName);
                     ErrorsFound = true;
@@ -3531,7 +3531,7 @@ namespace SingleDuct {
                     // Simulate the reheat coil at constant air flow. Control by varying the
                     // hot water flow rate.
                     // FB use QActualHeating, change ControlCompOutput to use new
-                    ControlCompOutput(sd_airterminal(SysNum).ReheatName,
+                    ControlCompOutput(state, sd_airterminal(SysNum).ReheatName,
                                       sd_airterminal(SysNum).ReheatComp,
                                       sd_airterminal(SysNum).ReheatComp_Index,
                                       FirstHVACIteration,
@@ -3568,7 +3568,7 @@ namespace SingleDuct {
 
                             Node(sd_airterminal(SysNum).OutletNodeNum).MassFlowRateMaxAvail =
                                 MaxAirMassFlowRevAct; // suspect, check how/if used in ControlCompOutput
-                            ControlCompOutput(sd_airterminal(SysNum).ReheatName,
+                            ControlCompOutput(state, sd_airterminal(SysNum).ReheatName,
                                               sd_airterminal(SysNum).ReheatComp,
                                               sd_airterminal(SysNum).ReheatComp_Index,
                                               FirstHVACIteration,
@@ -3598,7 +3598,7 @@ namespace SingleDuct {
                                 // Although this equation looks strange (using temp instead of deltaT), it is corrected later in ControlCompOutput
                                 // and is working as-is, temperature setpoints are maintained as expected.
                                 QZnReq = QZoneMax2 + MassFlow * CpAirAvg * ZoneTemp;
-                                ControlCompOutput(sd_airterminal(SysNum).ReheatName,
+                                ControlCompOutput(state, sd_airterminal(SysNum).ReheatName,
                                                   sd_airterminal(SysNum).ReheatComp,
                                                   sd_airterminal(SysNum).ReheatComp_Index,
                                                   FirstHVACIteration,
@@ -4000,7 +4000,7 @@ namespace SingleDuct {
 
                     // Simulate the reheat coil at constant air flow. Control by varying the
                     // hot water flow rate.
-                    ControlCompOutput(sd_airterminal(SysNum).ReheatName,
+                    ControlCompOutput(state, sd_airterminal(SysNum).ReheatName,
                                       sd_airterminal(SysNum).ReheatComp,
                                       sd_airterminal(SysNum).ReheatComp_Index,
                                       FirstHVACIteration,
@@ -4025,7 +4025,7 @@ namespace SingleDuct {
                     // vary up to the maximum (air damper opens to try to meet zone load).
                     if (sd_airterminal(SysNum).DamperHeatingAction == ReverseAction) {
                         if (Node(sd_airterminal(SysNum).ReheatControlNode).MassFlowRate == sd_airterminal(SysNum).MaxReheatWaterFlow) {
-                            ControlCompOutput(sd_airterminal(SysNum).ReheatName,
+                            ControlCompOutput(state, sd_airterminal(SysNum).ReheatName,
                                               sd_airterminal(SysNum).ReheatComp,
                                               sd_airterminal(SysNum).ReheatComp_Index,
                                               FirstHVACIteration,
@@ -4053,7 +4053,7 @@ namespace SingleDuct {
                             MassFlow = MassFlow1(SysNum);
                             sd_airterminalOutlet(SysNum).AirMassFlowRate = MassFlow;
                             sd_airterminal(SysNum).UpdateSys(SysNum);
-                            ControlCompOutput(sd_airterminal(SysNum).ReheatName,
+                            ControlCompOutput(state, sd_airterminal(SysNum).ReheatName,
                                               sd_airterminal(SysNum).ReheatComp,
                                               sd_airterminal(SysNum).ReheatComp_Index,
                                               FirstHVACIteration,
@@ -4705,7 +4705,7 @@ namespace SingleDuct {
 
                     // Simulate reheat coil for the Const Volume system
                     // Set Converged to True & when controller is not converged it will set to False.
-                    ControlCompOutput(sd_airterminal(SysNum).ReheatName,
+                    ControlCompOutput(state, sd_airterminal(SysNum).ReheatName,
                                       sd_airterminal(SysNum).ReheatComp,
                                       sd_airterminal(SysNum).ReheatComp_Index,
                                       FirstHVACIteration,
@@ -4890,14 +4890,14 @@ namespace SingleDuct {
         Node(FanInNode).MassFlowRate = AirMassFlow;
         CpAirZn = PsyCpAirFnW(Node(ZoneNode).HumRat);
         if (FanType == DataHVACGlobals::FanType_SimpleVAV && FanOn == 1) {
-            Fans::SimulateFanComponents(sd_airterminal(SysNum).FanName, FirstHVACIteration, sd_airterminal(SysNum).Fan_Index);
+            Fans::SimulateFanComponents(state, sd_airterminal(SysNum).FanName, FirstHVACIteration, sd_airterminal(SysNum).Fan_Index);
         } else if (FanType == DataHVACGlobals::FanType_SystemModelObject && FanOn == 1) {
             HVACFan::fanObjs[sd_airterminal(SysNum).Fan_Index]->simulate(_, _, _, _);
 
         } else { // pass through conditions
             TurnFansOff = true;
             if (FanType == DataHVACGlobals::FanType_SimpleVAV) {
-                Fans::SimulateFanComponents(sd_airterminal(SysNum).FanName, FirstHVACIteration, sd_airterminal(SysNum).Fan_Index);
+                Fans::SimulateFanComponents(state, sd_airterminal(SysNum).FanName, FirstHVACIteration, sd_airterminal(SysNum).Fan_Index);
             } else if (FanType == DataHVACGlobals::FanType_SystemModelObject) {
                 HVACFan::fanObjs[sd_airterminal(SysNum).Fan_Index]->simulate(_, _, TurnFansOff, _);
             }

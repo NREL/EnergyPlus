@@ -139,7 +139,7 @@ namespace GroundTemperatureManager {
 
         // If not found, create new instance of the model
         if (objectType == objectType_KusudaGroundTemp) {
-            return KusudaGroundTempsModel::KusudaGTMFactory(objectType, objectName);
+            return KusudaGroundTempsModel::KusudaGTMFactory(state, objectType, objectName);
         } else if (objectType == objectType_FiniteDiffGroundTemp) {
             return FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(state, objectType, objectName);
         } else if (objectType == objectType_SiteBuildingSurfaceGroundTemp) {

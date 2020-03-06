@@ -75,6 +75,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HeatingCoils.hh>
@@ -513,7 +514,7 @@ namespace PackagedTerminalHeatPump {
         }
     }
 
-    void GetPTUnit()
+    void GetPTUnit(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -838,19 +839,19 @@ namespace PackagedTerminalHeatPump {
                 PTUnit(PTUnitNum).FanAvailSchedPtr = HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->availSchedIndex;
             } else {
                 errFlag = false;
-                GetFanType(PTUnit(PTUnitNum).FanName, PTUnit(PTUnitNum).FanType_Num, errFlag, CurrentModuleObject, PTUnit(PTUnitNum).Name);
+                GetFanType(state, PTUnit(PTUnitNum).FanName, PTUnit(PTUnitNum).FanType_Num, errFlag, CurrentModuleObject, PTUnit(PTUnitNum).Name);
                 FanVolFlow = 0.0;
                 if (errFlag) {
                     ShowContinueError("specified in " + CurrentModuleObject + " = " + PTUnit(PTUnitNum).Name);
                     ErrorsFound = true;
                 } else {
-                    GetFanIndex(PTUnit(PTUnitNum).FanName, PTUnit(PTUnitNum).FanIndex, errFlag, CurrentModuleObject);
-                    FanInletNodeNum = GetFanInletNode(PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
-                    FanOutletNodeNum = GetFanOutletNode(PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
+                    GetFanIndex(state, PTUnit(PTUnitNum).FanName, PTUnit(PTUnitNum).FanIndex, errFlag, CurrentModuleObject);
+                    FanInletNodeNum = GetFanInletNode(state, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
+                    FanOutletNodeNum = GetFanOutletNode(state, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
                     GetFanVolFlow(PTUnit(PTUnitNum).FanIndex, FanVolFlow);
                     PTUnit(PTUnitNum).ActualFanVolFlowRate = FanVolFlow;
                     // Get the fan's availability schedule
-                    PTUnit(PTUnitNum).FanAvailSchedPtr = GetFanAvailSchPtr(PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
+                    PTUnit(PTUnitNum).FanAvailSchedPtr = GetFanAvailSchPtr(state, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...specified in " + CurrentModuleObject + " = " + PTUnit(PTUnitNum).Name);
                         ErrorsFound = true;
@@ -1722,22 +1723,22 @@ namespace PackagedTerminalHeatPump {
 
                 // Get the fan's availability schedule
                 errFlag = false;
-                PTUnit(PTUnitNum).FanAvailSchedPtr = GetFanAvailSchPtr(PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
+                PTUnit(PTUnitNum).FanAvailSchedPtr = GetFanAvailSchPtr(state, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
                 if (errFlag) {
                     ShowContinueError("...specified in " + CurrentModuleObject + " = " + PTUnit(PTUnitNum).Name);
                     ErrorsFound = true;
                 }
 
                 errFlag = false;
-                GetFanType(PTUnit(PTUnitNum).FanName, PTUnit(PTUnitNum).FanType_Num, errFlag, CurrentModuleObject, PTUnit(PTUnitNum).Name);
+                GetFanType(state, PTUnit(PTUnitNum).FanName, PTUnit(PTUnitNum).FanType_Num, errFlag, CurrentModuleObject, PTUnit(PTUnitNum).Name);
                 FanVolFlow = 0.0;
                 if (errFlag) {
                     ShowContinueError("...specified in " + PTUnit(PTUnitNum).UnitType + " \"" + PTUnit(PTUnitNum).Name + "\"");
                     ErrorsFound = true;
                 } else {
-                    GetFanIndex(PTUnit(PTUnitNum).FanName, PTUnit(PTUnitNum).FanIndex, errFlag, CurrentModuleObject);
-                    FanInletNodeNum = GetFanInletNode(PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
-                    FanOutletNodeNum = GetFanOutletNode(PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
+                    GetFanIndex(state, PTUnit(PTUnitNum).FanName, PTUnit(PTUnitNum).FanIndex, errFlag, CurrentModuleObject);
+                    FanInletNodeNum = GetFanInletNode(state, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
+                    FanOutletNodeNum = GetFanOutletNode(state, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
                     GetFanVolFlow(PTUnit(PTUnitNum).FanIndex, FanVolFlow);
                     PTUnit(PTUnitNum).ActualFanVolFlowRate = FanVolFlow;
                 }
@@ -2455,7 +2456,7 @@ namespace PackagedTerminalHeatPump {
                     PTUnit(PTUnitNum).FanAvailSchedPtr = HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->availSchedIndex;
                 } else {
                     errFlag = false;
-                    GetFanType(PTUnit(PTUnitNum).FanName, PTUnit(PTUnitNum).FanType_Num, errFlag, CurrentModuleObject, Alphas(1));
+                    GetFanType(state, PTUnit(PTUnitNum).FanName, PTUnit(PTUnitNum).FanType_Num, errFlag, CurrentModuleObject, Alphas(1));
                     FanVolFlow = 0.0;
                     if (errFlag) {
                         ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\".");
@@ -2465,19 +2466,19 @@ namespace PackagedTerminalHeatPump {
                     if (PTUnit(PTUnitNum).FanType_Num == FanType_SimpleOnOff) {
 
                         errFlag = false;
-                        GetFanIndex(PTUnit(PTUnitNum).FanName, PTUnit(PTUnitNum).FanIndex, errFlag);
+                        GetFanIndex(state, PTUnit(PTUnitNum).FanName, PTUnit(PTUnitNum).FanIndex, errFlag);
                         if (errFlag) {
                             ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + Alphas(1) + "\".");
                             ErrorsFound = true;
                         }
                         errFlag = false;
-                        FanInletNodeNum = GetFanInletNode(PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
+                        FanInletNodeNum = GetFanInletNode(state, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
                         if (errFlag) {
                             ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + Alphas(1) + "\".");
                             ErrorsFound = true;
                         }
                         errFlag = false;
-                        FanOutletNodeNum = GetFanOutletNode(PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
+                        FanOutletNodeNum = GetFanOutletNode(state, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
                         if (errFlag) {
                             ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + Alphas(1) + "\".");
                             ErrorsFound = true;
@@ -2486,7 +2487,7 @@ namespace PackagedTerminalHeatPump {
                             PTUnit(PTUnitNum).ActualFanVolFlowRate = FanVolFlow;
                         }
                         errFlag = false;
-                        PTUnit(PTUnitNum).FanAvailSchedPtr = GetFanAvailSchPtr(PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
+                        PTUnit(PTUnitNum).FanAvailSchedPtr = GetFanAvailSchPtr(state, PTUnit(PTUnitNum).FanType, PTUnit(PTUnitNum).FanName, errFlag);
                         if (errFlag) {
                             ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + Alphas(1) + "\".");
                             ErrorsFound = true;
@@ -5720,7 +5721,7 @@ namespace PackagedTerminalHeatPump {
         }
     }
 
-    void CalcPTUnit(int const PTUnitNum,           // Unit index in fan coil array
+    void CalcPTUnit(AllGlobals &state, int const PTUnitNum,           // Unit index in fan coil array
                     bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
                     Real64 const PartLoadFrac,     // compressor part load fraction
                     Real64 &LoadMet,               // load met by unit (W)
@@ -5839,7 +5840,7 @@ namespace PackagedTerminalHeatPump {
             if (PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             } else {
-                Fans::SimulateFanComponents(PTUnit(PTUnitNum).FanName,
+                Fans::SimulateFanComponents(state, PTUnit(PTUnitNum).FanName,
                                             FirstHVACIteration,
                                             PTUnit(PTUnitNum).FanIndex,
                                             FanSpeedRatio,
@@ -5861,7 +5862,7 @@ namespace PackagedTerminalHeatPump {
                                                  PTUnit(PTUnitNum).OpMode,
                                                  HXUnitOn);
                     } else {
-                        SimDXCoil(PTUnit(PTUnitNum).DXCoolCoilName,
+                        SimDXCoil(state, PTUnit(PTUnitNum).DXCoolCoilName,
                                   On,
                                   FirstHVACIteration,
                                   PTUnit(PTUnitNum).CoolCoilCompIndex,
@@ -5902,7 +5903,7 @@ namespace PackagedTerminalHeatPump {
                                                  PTUnit(PTUnitNum).OpMode,
                                                  HXUnitOn);
                     } else {
-                        SimDXCoil(PTUnit(PTUnitNum).DXCoolCoilName,
+                        SimDXCoil(state, PTUnit(PTUnitNum).DXCoolCoilName,
                                   Off,
                                   FirstHVACIteration,
                                   PTUnit(PTUnitNum).CoolCoilCompIndex,
@@ -5985,7 +5986,7 @@ namespace PackagedTerminalHeatPump {
                 {
                     auto const SELECT_CASE_var(PTUnit(PTUnitNum).UnitType_Num);
                     if (SELECT_CASE_var == PTHPUnit) {
-                        SimDXCoil(PTUnit(PTUnitNum).DXHeatCoilName,
+                        SimDXCoil(state, PTUnit(PTUnitNum).DXHeatCoilName,
                                   On,
                                   FirstHVACIteration,
                                   PTUnit(PTUnitNum).DXHeatCoilIndexNum,
@@ -6053,7 +6054,7 @@ namespace PackagedTerminalHeatPump {
                 {
                     auto const SELECT_CASE_var(PTUnit(PTUnitNum).UnitType_Num);
                     if (SELECT_CASE_var == PTHPUnit) {
-                        SimDXCoil(PTUnit(PTUnitNum).DXHeatCoilName,
+                        SimDXCoil(state, PTUnit(PTUnitNum).DXHeatCoilName,
                                   Off,
                                   FirstHVACIteration,
                                   PTUnit(PTUnitNum).DXHeatCoilIndexNum,
@@ -6085,7 +6086,7 @@ namespace PackagedTerminalHeatPump {
             if (PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             } else {
-                Fans::SimulateFanComponents(PTUnit(PTUnitNum).FanName,
+                Fans::SimulateFanComponents(state, PTUnit(PTUnitNum).FanName,
                                             FirstHVACIteration,
                                             PTUnit(PTUnitNum).FanIndex,
                                             FanSpeedRatio,
@@ -7911,7 +7912,7 @@ namespace PackagedTerminalHeatPump {
 
     //******************************************************************************
 
-    void CalcVarSpeedHeatPump(int const PTUnitNum,           // Unit index in fan coil array
+    void CalcVarSpeedHeatPump(AllGlobals &state, int const PTUnitNum,           // Unit index in fan coil array
                               int const ZoneNum,             // Zone index
                               bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
                               int const CompOp,              // Compressor on/off; 1=on, 0=off
@@ -8016,7 +8017,7 @@ namespace PackagedTerminalHeatPump {
             if (PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             } else {
-                Fans::SimulateFanComponents(PTUnit(PTUnitNum).FanName,
+                Fans::SimulateFanComponents (state, PTUnit(PTUnitNum).FanName,
                                             FirstHVACIteration,
                                             PTUnit(PTUnitNum).FanIndex,
                                             FanSpeedRatio,
@@ -8188,7 +8189,7 @@ namespace PackagedTerminalHeatPump {
             if (PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
                 HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             } else {
-                Fans::SimulateFanComponents(PTUnit(PTUnitNum).FanName,
+                Fans::SimulateFanComponents(state, PTUnit(PTUnitNum).FanName,
                                             FirstHVACIteration,
                                             PTUnit(PTUnitNum).FanIndex,
                                             FanSpeedRatio,

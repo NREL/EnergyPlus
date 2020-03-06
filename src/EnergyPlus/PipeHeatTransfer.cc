@@ -69,6 +69,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -192,7 +193,7 @@ namespace PipeHeatTransfer {
         PipeHTUniqueNames.clear();
     }
 
-    void PipeHTData::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+    void PipeHTData::simulate(AllGlobals &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                               bool const FirstHVACIteration,
                               Real64 &EP_UNUSED(CurLoad),
                               bool const EP_UNUSED(RunFlag))
@@ -640,7 +641,7 @@ namespace PipeHeatTransfer {
             }
 
             // Get ground temperature model
-            PipeHT(Item).groundTempModel = GetGroundTempModelAndInit(cAlphaArgs(7), cAlphaArgs(8));
+            PipeHT(Item).groundTempModel = GetGroundTempModelAndInit(state, cAlphaArgs(7), cAlphaArgs(8));
 
             // Select number of pipe sections.  Hanby's optimal number of 20 section is selected.
             NumSections = NumPipeSections;

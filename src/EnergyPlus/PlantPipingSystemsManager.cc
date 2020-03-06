@@ -76,6 +76,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -178,7 +179,7 @@ namespace EnergyPlus {
             return nullptr; // LCOV_EXCL_LINE
         }
 
-        void Circuit::simulate(const PlantLocation &EP_UNUSED(calledFromLocation),
+        void Circuit::simulate(AllGlobals &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                bool const EP_UNUSED(FirstHVACIteration),
                                Real64 &EP_UNUSED(CurLoad),
                                bool const EP_UNUSED(RunFlag)) {
@@ -816,12 +817,12 @@ namespace EnergyPlus {
                 }
 
                 // Initialize ground temperature model and get pointer reference
-                thisDomain.groundTempModel = GetGroundTempModelAndInit(groundTempType, groundTempName);
+                thisDomain.groundTempModel = GetGroundTempModelAndInit(state, groundTempType, groundTempName);
 
             }
         }
 
-        void ReadZoneCoupledDomainInputs(int const StartingDomainNumForZone, int const NumZoneCoupledDomains,
+        void ReadZoneCoupledDomainInputs(AllGlobals &state, int const StartingDomainNumForZone, int const NumZoneCoupledDomains,
                                          bool &ErrorsFound) {
 
             // SUBROUTINE INFORMATION:
@@ -1121,7 +1122,7 @@ namespace EnergyPlus {
                         thisDomain.Mesh.Y.RegionMeshCount; // Need to clean this out at some point
 
                 // Farfield model
-                thisDomain.groundTempModel = GetGroundTempModelAndInit(DataIPShortCuts::cAlphaArgs(2),
+                thisDomain.groundTempModel = GetGroundTempModelAndInit(state, DataIPShortCuts::cAlphaArgs(2),
                                                                                 DataIPShortCuts::cAlphaArgs(3));
 
                 // Other parameters
@@ -1136,7 +1137,7 @@ namespace EnergyPlus {
             }
         }
 
-        void ReadBasementInputs(int const StartingDomainNumForBasement, int const NumBasements, bool &ErrorsFound) {
+        void ReadBasementInputs(AllGlobals &state, int const StartingDomainNumForBasement, int const NumBasements, bool &ErrorsFound) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -1429,7 +1430,7 @@ namespace EnergyPlus {
 
                 // Farfield ground temperature model -- note this will overwrite the DataIPShortCuts variables
                 // so any other processing below this line won't have access to the cAlphaArgs, etc., here
-                thisDomain.groundTempModel = GetGroundTempModelAndInit(DataIPShortCuts::cAlphaArgs(2),
+                thisDomain.groundTempModel = GetGroundTempModelAndInit(state, DataIPShortCuts::cAlphaArgs(2),
                                                                                 DataIPShortCuts::cAlphaArgs(3));
 
                 // Total surface area
@@ -1832,7 +1833,7 @@ namespace EnergyPlus {
             }
         }
 
-        void ReadHorizontalTrenchInputs(int const StartingDomainNumForHorizontal,
+        void ReadHorizontalTrenchInputs(AllGlobals &state, int const StartingDomainNumForHorizontal,
                                         int const StartingCircuitNumForHorizontal,
                                         bool &ErrorsFound) {
 
@@ -1929,7 +1930,7 @@ namespace EnergyPlus {
 
                 // Farfield model parameters -- this is pushed down pretty low because it internally calls GetObjectItem
                 // using DataIPShortCuts, so it will overwrite the cAlphaArgs and rNumericArgs values
-                thisDomain.groundTempModel = GetGroundTempModelAndInit(DataIPShortCuts::cAlphaArgs(4),
+                thisDomain.groundTempModel = GetGroundTempModelAndInit(state, DataIPShortCuts::cAlphaArgs(4),
                                                                                 DataIPShortCuts::cAlphaArgs(5));
 
                 //******* Then we'll do the segments *******!
