@@ -85,14 +85,12 @@ namespace HybridEvapCoolingModel {
     class CModeSolutionSpace
     {
     public:
-        std::vector<Real64> PointX;
-        std::vector<Real64> PointY;
-        std::vector<Real64> PointMeta;
-        void AddItem(Real64 X, Real64 Y, Real64 M)
+        std::vector<Real64> MassFlowRatio;
+        std::vector<Real64> OutdoorAirFraction;
+        void AddItem(Real64 X, Real64 Y)
         {
-            PointX.push_back(X);
-            PointY.push_back(Y);
-            PointMeta.push_back(M);
+            MassFlowRatio.push_back(X);
+            OutdoorAirFraction.push_back(Y);
         }
     };
 
@@ -334,7 +332,6 @@ namespace HybridEvapCoolingModel {
         Real64 Wsa;
         Real64 SupplyVentilationAir;
         Real64 SupplyVentilationVolume;
-        Real64 ModelNormalizationReference;
 
         bool OutdoorAir;
         Real64 MinOA_Msa;
