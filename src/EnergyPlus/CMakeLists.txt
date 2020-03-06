@@ -776,7 +776,7 @@ add_custom_command(
         TARGET energyplus
         POST_BUILD
         COMMAND ${CMAKE_COMMAND}
-        -DREPO_ROOT="${CMAKE_SOURCE_DIR}"
+        -DREPO_ROOT=${CMAKE_SOURCE_DIR}
         -DEXECUTABLE_PATH=$<TARGET_FILE:energyplus>
         -DCMAKE_VERSION_MAJOR="${CMAKE_VERSION_MAJOR}"
         -DCMAKE_VERSION_MINOR="${CMAKE_VERSION_MINOR}"
