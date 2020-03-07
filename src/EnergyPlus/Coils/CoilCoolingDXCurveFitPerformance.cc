@@ -644,7 +644,8 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(AllGlobals &state, in
 }
 
 
-Real64 CoilCoolingDXCurveFitPerformance::calcIEERResidual(AllGlobals &state, 
+Real64 CoilCoolingDXCurveFitPerformance::calcIEERResidual(
+//Real64 CoilCoolingDXCurveFitPerformance::calcIEERResidual(AllGlobals &state, 
         Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
         std::vector<Real64> const &Par
 )

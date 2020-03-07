@@ -759,7 +759,8 @@ namespace DXCoils {
 
     void GetFanIndexForTwoSpeedCoil(AllGlobals &state, int const CoolingCoilIndex, int &SupplyFanIndex, std::string &SupplyFanName, int &SupplyFan_TypeNum);
 
-    Real64 CalcTwoSpeedDXCoilIEERResidual(AllGlobals &state, Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    //Real64 CalcTwoSpeedDXCoilIEERResidual(AllGlobals &state, Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 CalcTwoSpeedDXCoilIEERResidual(Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                           Array1<Real64> const &Par           // par(1) = DX coil number
     );
 

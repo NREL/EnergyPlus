@@ -962,7 +962,8 @@ namespace HVACVariableRefrigerantFlow {
 
     void clear_state();
 
-    Real64 VRFTUAirFlowResidual_FluidTCtrl(AllGlobals &state, Real64 FanSpdRatio, // fan speed ratio of VRF VAV TU
+    //Real64 VRFTUAirFlowResidual_FluidTCtrl(AllGlobals &state, Real64 FanSpdRatio, // fan speed ratio of VRF VAV TU
+    Real64 VRFTUAirFlowResidual_FluidTCtrl( Real64 FanSpdRatio, // fan speed ratio of VRF VAV TU
                                            Array1<Real64> const &Par // par(1) = VRFTUNum
     );
 

@@ -781,7 +781,8 @@ namespace WaterThermalTanks {
 
         Real64 PLRResidualHPWH(Real64 HPPartLoadRatio, Array1<Real64> const &Par);
 
-        Real64 PLRResidualIterSpeed(AllGlobals &state, Real64 SpeedRatio,        // speed ratio between two speed levels
+        //Real64 PLRResidualIterSpeed(AllGlobals &state, Real64 SpeedRatio,        // speed ratio between two speed levels
+        Real64 PLRResidualIterSpeed(Real64 SpeedRatio,        // speed ratio between two speed levels
                                     Array1<Real64> const &Par //
         );
 

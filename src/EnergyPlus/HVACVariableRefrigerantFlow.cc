@@ -8780,7 +8780,8 @@ namespace HVACVariableRefrigerantFlow {
 
     // Utility subroutines for the Module
 
-    Real64 PLRResidual(AllGlobals &state, Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    //Real64 PLRResidual(AllGlobals &state, Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 PLRResidual(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                        Array1<Real64> const &Par   // par(1) = VRFTUNum
     )
     {
@@ -11752,7 +11753,8 @@ namespace HVACVariableRefrigerantFlow {
         return AirMassFlowRate;
     }
 
-    Real64 VRFTUAirFlowResidual_FluidTCtrl(AllGlobals &state, Real64 const FanSpdRatio, // fan speed ratio of VRF VAV TU
+    //Real64 VRFTUAirFlowResidual_FluidTCtrl(AllGlobals &state, Real64 const FanSpdRatio, // fan speed ratio of VRF VAV TU
+    Real64 VRFTUAirFlowResidual_FluidTCtrl(Real64 const FanSpdRatio, // fan speed ratio of VRF VAV TU
                                            Array1<Real64> const &Par // par(1) = VRFTUNum
     )
     {

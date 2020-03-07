@@ -9666,7 +9666,8 @@ namespace WaterThermalTanks {
         }
     }
 
-    Real64 WaterThermalTankData::PLRResidualIterSpeed(AllGlobals &state, Real64 const SpeedRatio, // speed ratio between two speed levels
+    //Real64 WaterThermalTankData::PLRResidualIterSpeed(AllGlobals &state, Real64 const SpeedRatio, // speed ratio between two speed levels
+    Real64 WaterThermalTankData::PLRResidualIterSpeed(Real64 const SpeedRatio, // speed ratio between two speed levels
                                                       Array1<Real64> const &Par)
     {
         // FUNCTION INFORMATION:
