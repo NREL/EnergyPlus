@@ -501,7 +501,7 @@ void ControlCompOutput(AllGlobals &state, std::string const &CompName,          
         switch (SimCompNum) {      // Tuned If block changed to switch
         case ParallelPIUReheatNum: // 'AIRTERMINAL:SINGLEDUCT:PARALLELPIU:REHEAT'
             // simulate series piu reheat coil
-            SimulateWaterCoilComponents(CompName, FirstHVACIteration, CompNum);
+            SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompNum);
             // Calculate the control signal (the variable we are forcing to zero)
             CpAir = PsyCpAirFnW(Node(TempOutNode).HumRat); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
             LoadMet = CpAir * Node(TempOutNode).MassFlowRate *
@@ -511,7 +511,7 @@ void ControlCompOutput(AllGlobals &state, std::string const &CompName,          
 
         case SeriesPIUReheatNum: // 'AIRTERMINAL:SINGLEDUCT:SERIESPIU:REHEAT'
             // simulate series piu reheat coil
-            SimulateWaterCoilComponents(CompName, FirstHVACIteration, CompNum);
+            SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompNum);
             // Calculate the control signal (the variable we are forcing to zero)
             CpAir = PsyCpAirFnW(Node(TempOutNode).HumRat); // Autodesk:OPTIONAL TempInNode, TempOutNode used without PRESENT check
             LoadMet = CpAir * Node(TempOutNode).MassFlowRate *
@@ -521,7 +521,7 @@ void ControlCompOutput(AllGlobals &state, std::string const &CompName,          
 
         case HeatingCoilWaterNum: // 'COIL:HEATING:WATER'
             // Simulate reheat coil for the VAV system
-            SimulateWaterCoilComponents(CompName, FirstHVACIteration, CompNum);
+            SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompNum);
             // Calculate the control signal (the variable we are forcing to zero)
             CpAir = PsyCpAirFnW(Node(TempOutNode).HumRat);
             if (present(AirMassFlow)) {

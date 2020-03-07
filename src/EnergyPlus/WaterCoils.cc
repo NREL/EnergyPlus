@@ -244,7 +244,7 @@ namespace WaterCoils {
         WaterCoilControllerCheckOneTimeFlag = true;
     }
 
-    void SimulateWaterCoilComponents(std::string const &CompName,
+    void SimulateWaterCoilComponents(AllGlobals &state, std::string const &CompName,
                                      bool const FirstHVACIteration,
                                      int &CompIndex,
                                      Optional<Real64> QActual,
@@ -300,7 +300,7 @@ namespace WaterCoils {
         }
 
         // With the correct CoilNum Initialize
-        InitWaterCoil(OutputFiles::getSingleton(), CoilNum, FirstHVACIteration); // Initialize all WaterCoil related parameters
+        InitWaterCoil(state, OutputFiles::getSingleton(), CoilNum, FirstHVACIteration); // Initialize all WaterCoil related parameters
 
         if (present(FanOpMode)) {
             OpMode = FanOpMode;
@@ -971,7 +971,7 @@ namespace WaterCoils {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitWaterCoil(OutputFiles &outputFiles,
+    void InitWaterCoil(AllGlobals &state, OutputFiles &outputFiles,
                        int const CoilNum,
                        bool const FirstHVACIteration // unused1208
     )
@@ -1141,7 +1141,7 @@ namespace WaterCoils {
                         CompType = cAllCoilTypes(DataHVACGlobals::Coil_HeatingWater);
                     }
                     WaterCoilOnAirLoop = true;
-                    CheckWaterCoilIsOnAirLoop(CoilTypeNum, CompType, CompName, WaterCoilOnAirLoop);
+                    CheckWaterCoilIsOnAirLoop(state, CoilTypeNum, CompType, CompName, WaterCoilOnAirLoop);
                     if (!WaterCoilOnAirLoop) {
                         ShowContinueError("Controller:WaterCoil = " + WaterCoil(tempCoilNum).ControllerName + ". Invalid water controller entry.");
                         ErrorsFound = true;

@@ -3628,10 +3628,10 @@ namespace FanCoilUnits {
                 SimHXAssistedCoolingCoil(
                     FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, On, 0.0, FanCoil(FanCoilNum).CCoilName_Index, ContFanCycCoil);
             } else {
-                SimulateWaterCoilComponents(FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, FanCoil(FanCoilNum).CCoilName_Index, _, 1, PLR);
+                SimulateWaterCoilComponents(state, FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, FanCoil(FanCoilNum).CCoilName_Index, _, 1, PLR);
             }
             if (FanCoil(FanCoilNum).HCoilType_Num == HCoil_Water) {
-                SimulateWaterCoilComponents(FanCoil(FanCoilNum).HCoilName, FirstHVACIteration, FanCoil(FanCoilNum).HCoilName_Index, _, 1, PLR);
+                SimulateWaterCoilComponents(state, FanCoil(FanCoilNum).HCoilName, FirstHVACIteration, FanCoil(FanCoilNum).HCoilName_Index, _, 1, PLR);
             } else {
                 if (Node(FanCoil(FanCoilNum).CoolCoilFluidInletNode).MassFlowRate > 0.0) ElecHeaterControl = 0.0;
                 SimulateHeatingCoilComponents(FanCoil(FanCoilNum).HCoilName,
@@ -3661,9 +3661,9 @@ namespace FanCoilUnits {
                 SimHXAssistedCoolingCoil(
                     FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, On, 0.0, FanCoil(FanCoilNum).CCoilName_Index, ContFanCycCoil);
             } else {
-                SimulateWaterCoilComponents(FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, FanCoil(FanCoilNum).CCoilName_Index, _, 1, PLR);
+                SimulateWaterCoilComponents(state, FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, FanCoil(FanCoilNum).CCoilName_Index, _, 1, PLR);
             }
-            SimulateWaterCoilComponents(FanCoil(FanCoilNum).HCoilName, FirstHVACIteration, FanCoil(FanCoilNum).HCoilName_Index, _, 1, PLR);
+            SimulateWaterCoilComponents(state, FanCoil(FanCoilNum).HCoilName, FirstHVACIteration, FanCoil(FanCoilNum).HCoilName_Index, _, 1, PLR);
 
         } else { // capacity control method is VariableFanVariableFlow, VariableFanConstantFlow, or ASHRAE90.1
 
@@ -3688,10 +3688,10 @@ namespace FanCoilUnits {
                 SimHXAssistedCoolingCoil(
                     FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, On, 0.0, FanCoil(FanCoilNum).CCoilName_Index, ContFanCycCoil);
             } else {
-                SimulateWaterCoilComponents(FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, FanCoil(FanCoilNum).CCoilName_Index);
+                SimulateWaterCoilComponents(state, FanCoil(FanCoilNum).CCoilName, FirstHVACIteration, FanCoil(FanCoilNum).CCoilName_Index);
             }
             if (FanCoil(FanCoilNum).HCoilType_Num == HCoil_Water) {
-                SimulateWaterCoilComponents(FanCoil(FanCoilNum).HCoilName, FirstHVACIteration, FanCoil(FanCoilNum).HCoilName_Index);
+                SimulateWaterCoilComponents(state, FanCoil(FanCoilNum).HCoilName, FirstHVACIteration, FanCoil(FanCoilNum).HCoilName_Index);
             } else {
                 if (Node(FanCoil(FanCoilNum).CoolCoilFluidInletNode).MassFlowRate > 0.0) ElecHeaterControl = 0.0;
                 SimulateHeatingCoilComponents(FanCoil(FanCoilNum).HCoilName,

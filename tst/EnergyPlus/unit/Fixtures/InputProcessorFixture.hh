@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include "EnergyPlusFixture.hh"
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
 
 namespace EnergyPlus {
@@ -75,9 +76,9 @@ protected:
         EnergyPlusFixture::SetUp(); // Sets up individual test cases.
     }
 
-    virtual void TearDown()
+    virtual void TearDown(AllGlobals &state)
     {
-        EnergyPlusFixture::TearDown(); // Remember to tear down the base fixture after cleaning up derived fixture!
+        EnergyPlusFixture::TearDown(state); // Remember to tear down the base fixture after cleaning up derived fixture!
     }
 
     bool process_idd(std::string const &idd, bool &errors_found)

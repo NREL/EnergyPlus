@@ -1755,7 +1755,7 @@ namespace UnitHeater {
 
                 if (SELECT_CASE_var == WaterHeatingCoil) {
 
-                    SimulateWaterCoilComponents(UnitHeat(UnitHeatNum).HCoilName, FirstHVACIteration, UnitHeat(UnitHeatNum).HCoil_Index);
+                    SimulateWaterCoilComponents(state, UnitHeat(UnitHeatNum).HCoilName, FirstHVACIteration, UnitHeat(UnitHeatNum).HCoil_Index);
                 } else if (SELECT_CASE_var == SteamCoil) {
 
                     if (!HCoilOn) {
@@ -1825,7 +1825,7 @@ namespace UnitHeater {
                                          UnitHeat(UnitHeatNum).HWLoopSide,
                                          UnitHeat(UnitHeatNum).HWBranchNum,
                                          UnitHeat(UnitHeatNum).HWCompNum);
-                    SimulateWaterCoilComponents(
+                    SimulateWaterCoilComponents(state,
                         UnitHeat(UnitHeatNum).HCoilName, FirstHVACIteration, UnitHeat(UnitHeatNum).HCoil_Index, QCoilReq, FanOpMode, PartLoadFrac);
                 } else if (SELECT_CASE_var == SteamCoil) {
                     if (!HCoilOn) {

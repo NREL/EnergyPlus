@@ -112,7 +112,7 @@ protected:
     virtual void SetUp();
 
     // This is run every unit test and makes sure to clear all state in global variables this fixture touches.
-    virtual void TearDown();
+    virtual void TearDown(AllGlobals &state);
 
     // This will output the "Begin Test" ShowMessage for every unit test that uses or inherits from this fixture.
     // Now this does not need to be manually entered for every unit test as well as it will automatically be updated as the

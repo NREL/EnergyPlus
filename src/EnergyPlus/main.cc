@@ -61,6 +61,6 @@ int main(int argc, const char *argv[])
 
     AllGlobals state;
 
-    ProcessArgs(argc, argv);
+    ProcessArgs(state, argc, argv);
     EnergyPlusPgm(state);
 }

@@ -59,6 +59,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -2183,7 +2184,7 @@ namespace IntegratedHeatPump {
         }
     }
 
-    void DecideWorkMode(int const DXCoilNum,
+    void DecideWorkMode(AllGlobals &state, int const DXCoilNum,
                         Real64 const SensLoad,  // Sensible demand load [W]
                         Real64 const LatentLoad // Latent demand load [W]
                         )                       // shall be called from a air loop parent

@@ -872,31 +872,31 @@ namespace EnergyPlus {
                             if (UtilityRoutines::SameString(this_comp_type, "Pipe:Adiabatic")) {
                                 this_comp.TypeOf_Num = TypeOf_Pipe;
                                 this_comp.CurOpSchemeType = NoControlOpSchemeType;
-                                this_comp.compPtr = Pipes::LocalPipeData::factory(TypeOf_Pipe, CompNames(CompNum));
+                                this_comp.compPtr = Pipes::LocalPipeData::factory(state, TypeOf_Pipe, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Pipe:Adiabatic:Steam")) {
                                 this_comp.TypeOf_Num = TypeOf_PipeSteam;
                                 this_comp.CurOpSchemeType = NoControlOpSchemeType;
-                                this_comp.compPtr = Pipes::LocalPipeData::factory(TypeOf_PipeSteam, CompNames(CompNum));
+                                this_comp.compPtr = Pipes::LocalPipeData::factory(state, TypeOf_PipeSteam, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Pipe:Outdoor")) {
                                 this_comp.TypeOf_Num = TypeOf_PipeExterior;
                                 this_comp.CurOpSchemeType = NoControlOpSchemeType;
-                                this_comp.compPtr = PipeHeatTransfer::PipeHTData::factory(TypeOf_PipeExterior,
+                                this_comp.compPtr = PipeHeatTransfer::PipeHTData::factory(state, TypeOf_PipeExterior,
                                                                                           CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Pipe:Indoor")) {
                                 this_comp.TypeOf_Num = TypeOf_PipeInterior;
                                 this_comp.CurOpSchemeType = NoControlOpSchemeType;
-                                this_comp.compPtr = PipeHeatTransfer::PipeHTData::factory(TypeOf_PipeInterior,
+                                this_comp.compPtr = PipeHeatTransfer::PipeHTData::factory(state, TypeOf_PipeInterior,
                                                                                           CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Pipe:Underground")) {
                                 this_comp.TypeOf_Num = TypeOf_PipeUnderground;
                                 this_comp.CurOpSchemeType = NoControlOpSchemeType;
-                                this_comp.compPtr = PipeHeatTransfer::PipeHTData::factory(TypeOf_PipeUnderground,
+                                this_comp.compPtr = PipeHeatTransfer::PipeHTData::factory(state, TypeOf_PipeUnderground,
                                                                                           CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "PipingSystem:Underground:PipeCircuit")) {
                                 this_comp.TypeOf_Num = TypeOf_PipingSystemPipeCircuit;
                                 this_comp.CurOpSchemeType = NoControlOpSchemeType;
-                                this_comp.compPtr = PlantPipingSystemsManager::Circuit::factory(
+                                this_comp.compPtr = PlantPipingSystemsManager::Circuit::factory(state, 
                                         TypeOf_PipingSystemPipeCircuit, CompNames(CompNum));
                             } else if (has_prefixi(this_comp_type, "Pump") ||
                                        has_prefixi(this_comp_type, "HeaderedPumps")) {
@@ -1391,7 +1391,7 @@ namespace EnergyPlus {
                                                                    "GroundHeatExchanger:HorizontalTrench")) {
                                 this_comp.TypeOf_Num = TypeOf_GrndHtExchgHorizTrench;
                                 this_comp.CurOpSchemeType = TypeOf_GrndHtExchgHorizTrench;
-                                this_comp.compPtr = PlantPipingSystemsManager::Circuit::factory(
+                                this_comp.compPtr = PlantPipingSystemsManager::Circuit::factory(state, 
                                         TypeOf_GrndHtExchgHorizTrench, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type,
                                                                    "Coil:Cooling:DX:SingleSpeed:ThermalStorage")) {

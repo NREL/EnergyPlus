@@ -3745,7 +3745,7 @@ namespace ZoneEquipmentManager {
                         LatOutputProvided = 0.0; // This baseboard does not add/remove any latent heat
 
                     } else if (SELECT_CASE_var == BBSteam_Num) { // 'ZoneHVAC:Baseboard:RadiantConvective:Steam'
-                        SimSteamBaseboard(PrioritySimOrder(EquipTypeNum).EquipName,
+                        SimSteamBaseboard(state, PrioritySimOrder(EquipTypeNum).EquipName,
                                           ActualZoneNum,
                                           ControlledZoneNum,
                                           FirstHVACIteration,

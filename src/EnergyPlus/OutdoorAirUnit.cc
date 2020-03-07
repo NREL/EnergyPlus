@@ -1612,13 +1612,13 @@ namespace OutdoorAirUnit {
             if ((OutAirUnit(OAUnitNum).OAEquip(CompNum).CoilPlantTypeOfNum == TypeOf_CoilWaterCooling) ||
                 (OutAirUnit(OAUnitNum).OAEquip(CompNum).CoilPlantTypeOfNum == TypeOf_CoilWaterDetailedFlatCooling)) {
                 if (OutAirUnit(OAUnitNum).OAEquip(CompNum).MaxVolWaterFlow == AutoSize) {
-                    SimulateWaterCoilComponents(
+                    SimulateWaterCoilComponents(state, 
                         OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName, true, OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentIndex, _, 1, 0.0);
                 }
             }
             if (OutAirUnit(OAUnitNum).OAEquip(CompNum).CoilPlantTypeOfNum == TypeOf_CoilWaterSimpleHeating) {
                 if (OutAirUnit(OAUnitNum).OAEquip(CompNum).MaxVolWaterFlow == AutoSize) {
-                    SimulateWaterCoilComponents(
+                    SimulateWaterCoilComponents(state, 
                         OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName, true, OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentIndex, _, 1, 0.0);
                 }
             }
@@ -2178,7 +2178,7 @@ namespace OutdoorAirUnit {
                 // Desiccant Dehumidifier
             } else if (SELECT_CASE_var == Desiccant) { // 'Dehumidifier:Desiccant:NoFans'
                 if (Sim) {
-                    SimDesiccantDehumidifier(EquipName, FirstHVACIteration, CompIndex);
+                    SimDesiccantDehumidifier(state, EquipName, FirstHVACIteration, CompIndex);
                 }
 
             } else if (SELECT_CASE_var == WaterCoil_SimpleHeat) { // ('Coil:Heating:Water')
@@ -2570,7 +2570,7 @@ namespace OutdoorAirUnit {
                           (PsyHFnTdbW(Node(OutletNode).Temp, Node(InletNode).HumRat) - PsyHFnTdbW(Node(InletNode).Temp, Node(InletNode).HumRat));
 
             } else if (SELECT_CASE_var == WaterCoil_SimpleHeat) { // 'Coil:Heating:Water')
-                SimulateWaterCoilComponents(OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, CoilIndex);
+                SimulateWaterCoilComponents(state, OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, CoilIndex);
                 InletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirInletNode;
                 OutletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirOutletNode;
                 AirMassFlow = Node(InletNode).MassFlowRate;
@@ -2578,7 +2578,7 @@ namespace OutdoorAirUnit {
                           (PsyHFnTdbW(Node(OutletNode).Temp, Node(InletNode).HumRat) - PsyHFnTdbW(Node(InletNode).Temp, Node(InletNode).HumRat));
 
             } else if (SELECT_CASE_var == WaterCoil_Cooling) { // 'Coil:Cooling:Water'
-                SimulateWaterCoilComponents(OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, CoilIndex);
+                SimulateWaterCoilComponents(state, OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, CoilIndex);
                 InletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirInletNode;
                 OutletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirOutletNode;
                 AirMassFlow = Node(InletNode).MassFlowRate;
@@ -2586,7 +2586,7 @@ namespace OutdoorAirUnit {
                           (PsyHFnTdbW(Node(OutletNode).Temp, Node(InletNode).HumRat) - PsyHFnTdbW(Node(InletNode).Temp, Node(InletNode).HumRat));
 
             } else if (SELECT_CASE_var == WaterCoil_DetailedCool) {
-                SimulateWaterCoilComponents(OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, CoilIndex);
+                SimulateWaterCoilComponents(state, OutAirUnit(OAUnitNum).OAEquip(CompoNum).ComponentName, FirstHVACIteration, CoilIndex);
                 InletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirInletNode;
                 OutletNode = OutAirUnit(OAUnitNum).OAEquip(CompoNum).CoilAirOutletNode;
                 AirMassFlow = Node(InletNode).MassFlowRate;

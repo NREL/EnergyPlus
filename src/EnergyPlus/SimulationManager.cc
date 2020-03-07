@@ -355,7 +355,7 @@ namespace SimulationManager {
         CheckIfAnyEMS();
         CheckIfAnyPlant();
         CheckIfAnySlabs();
-        CheckIfAnyBasements();
+        CheckIfAnyBasements(state);
         CheckIfAnyIdealCondEntSetPoint();
         createFacilityElectricPowerServiceObject();
         createCoilSelectionReportObj();
@@ -594,7 +594,7 @@ namespace SimulationManager {
 
                     for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
                         if (AnySlabsInModel || AnyBasementsInModel) {
-                            SimulateGroundDomains(OutputFiles::getSingleton(), false);
+                            SimulateGroundDomains(state, OutputFiles::getSingleton(), false);
                         }
 
                         if (AnyUnderwaterBoundaries) {
@@ -2158,7 +2158,7 @@ namespace SimulationManager {
         } // ... End environment loop.
 
         if (AnySlabsInModel || AnyBasementsInModel) {
-            SimulateGroundDomains(outputFiles, true);
+            SimulateGroundDomains(state, outputFiles, true);
         }
 
         if (!ErrorsFound) SimCostEstimate(); // basically will get and check input

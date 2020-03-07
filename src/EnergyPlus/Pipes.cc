@@ -126,7 +126,7 @@ namespace Pipes {
         LocalPipeUniqueNames.clear();
     }
 
-    PlantComponent *LocalPipeData::factory(int objectType, std::string objectName)
+    PlantComponent *LocalPipeData::factory(AllGlobals &state, int objectType, std::string objectName)
     {
         // Process the input data for pipes if it hasn't been done already
         if (state.pipes.GetPipeInputFlag) {

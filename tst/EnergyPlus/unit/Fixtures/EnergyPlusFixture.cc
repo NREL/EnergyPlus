@@ -81,8 +81,8 @@ void EnergyPlusFixture::SetUpTestCase()
 
 void EnergyPlusFixture::SetUp()
 {
-    EnergyPlus::clearAllStates();
     AllGlobals state;
+    EnergyPlus::clearAllStates(state);
 
     show_message();
 
@@ -110,10 +110,10 @@ void EnergyPlusFixture::SetUp()
     createCoilSelectionReportObj();
 }
 
-void EnergyPlusFixture::TearDown()
+void EnergyPlusFixture::TearDown(AllGlobals &state)
 {
 
-    clearAllStates();
+    clearAllStates(state);
 
     {
         IOFlags flags;

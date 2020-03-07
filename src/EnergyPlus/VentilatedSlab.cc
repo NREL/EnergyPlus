@@ -3343,7 +3343,7 @@ namespace VentilatedSlab {
             if (VentSlab(Item).CCoilType == Cooling_CoilHXAssisted) {
                 SimHXAssistedCoolingCoil(VentSlab(Item).CCoilName, FirstHVACIteration, On, 0.0, VentSlab(Item).CCoil_Index, ContFanCycCoil);
             } else {
-                SimulateWaterCoilComponents(VentSlab(Item).CCoilName, FirstHVACIteration, VentSlab(Item).CCoil_Index);
+                SimulateWaterCoilComponents(state, VentSlab(Item).CCoilName, FirstHVACIteration, VentSlab(Item).CCoil_Index);
             }
         }
 
@@ -3354,7 +3354,7 @@ namespace VentilatedSlab {
 
                 if (SELECT_CASE_var == Heating_WaterCoilType) {
 
-                    SimulateWaterCoilComponents(VentSlab(Item).HCoilName, FirstHVACIteration, VentSlab(Item).HCoil_Index);
+                    SimulateWaterCoilComponents(state, VentSlab(Item).HCoilName, FirstHVACIteration, VentSlab(Item).HCoil_Index);
 
                 } else if (SELECT_CASE_var == Heating_SteamCoilType) {
 

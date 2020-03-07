@@ -980,7 +980,7 @@ namespace HVACHXAssistedCoolingCoil {
                                                           QLatReq,
                                                           OnOffAirFlowRatio); // call vs coil model at top speed.
             } else {
-                SimulateWaterCoilComponents(
+                SimulateWaterCoilComponents(state,
                     HXAssistedCoil(HXAssistedCoilNum).CoolingCoilName, FirstHVACIteration, HXAssistedCoil(HXAssistedCoilNum).CoolingCoilIndex);
             }
 

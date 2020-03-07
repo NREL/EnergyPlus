@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include "EnergyPlusFixture.hh"
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
 
 namespace EnergyPlus {
@@ -88,9 +89,9 @@ protected:
         ss->str(std::string());
     }
 
-    virtual void TearDown()
+    virtual void TearDown(AllGlobals &state)
     {
-        EnergyPlusFixture::TearDown(); // Remember to tear down the base fixture after cleaning up derived fixture!
+        EnergyPlusFixture::TearDown(state); // Remember to tear down the base fixture after cleaning up derived fixture!
     }
 
     void resetDatabase()

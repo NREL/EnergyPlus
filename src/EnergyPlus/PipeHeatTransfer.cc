@@ -169,11 +169,11 @@ namespace PipeHeatTransfer {
 
     // Functions
 
-    PlantComponent *PipeHTData::factory(int objectType, std::string objectName)
+    PlantComponent *PipeHTData::factory(AllGlobals &state, int objectType, std::string objectName)
     {
         // Process the input data for pipes if it hasn't been done already
         if (GetPipeInputFlag) {
-            GetPipesHeatTransfer();
+            GetPipesHeatTransfer(state);
             GetPipeInputFlag = false;
         }
         // Now look for this particular pipe in the list
@@ -236,7 +236,7 @@ namespace PipeHeatTransfer {
         this->PreviousPipeTemp = this->PipeTemp;
     }
 
-    void GetPipesHeatTransfer()
+    void GetPipesHeatTransfer(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:

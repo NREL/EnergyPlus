@@ -3362,7 +3362,7 @@ namespace UnitVentilator {
                     SimHXAssistedCoolingCoil(
                         UnitVent(UnitVentNum).CCoilName, FirstHVACIteration, On, 0.0, UnitVent(UnitVentNum).CCoil_Index, ContFanCycCoil);
                 } else {
-                    SimulateWaterCoilComponents(UnitVent(UnitVentNum).CCoilName, FirstHVACIteration, UnitVent(UnitVentNum).CCoil_Index);
+                    SimulateWaterCoilComponents(state, UnitVent(UnitVentNum).CCoilName, FirstHVACIteration, UnitVent(UnitVentNum).CCoil_Index);
                 }
             }
 
@@ -3373,7 +3373,7 @@ namespace UnitVentilator {
 
                     if (SELECT_CASE_var == Heating_WaterCoilType) {
 
-                        SimulateWaterCoilComponents(UnitVent(UnitVentNum).HCoilName, FirstHVACIteration, UnitVent(UnitVentNum).HCoil_Index);
+                        SimulateWaterCoilComponents(state, UnitVent(UnitVentNum).HCoilName, FirstHVACIteration, UnitVent(UnitVentNum).HCoil_Index);
 
                     } else if (SELECT_CASE_var == Heating_SteamCoilType) {
 
@@ -3452,7 +3452,7 @@ namespace UnitVentilator {
                     SimHXAssistedCoolingCoil(
                         UnitVent(UnitVentNum).CCoilName, FirstHVACIteration, On, PartLoadRatio, UnitVent(UnitVentNum).CCoil_Index, FanOpMode);
                 } else {
-                    SimulateWaterCoilComponents(
+                    SimulateWaterCoilComponents(state, 
                         UnitVent(UnitVentNum).CCoilName, FirstHVACIteration, UnitVent(UnitVentNum).CCoil_Index, QCoilReq, FanOpMode, PartLoadRatio);
                 }
             }
@@ -3482,7 +3482,7 @@ namespace UnitVentilator {
                                              UnitVent(UnitVentNum).HWLoopSide,
                                              UnitVent(UnitVentNum).HWBranchNum,
                                              UnitVent(UnitVentNum).HWCompNum);
-                        SimulateWaterCoilComponents(UnitVent(UnitVentNum).HCoilName,
+                        SimulateWaterCoilComponents(state, UnitVent(UnitVentNum).HCoilName,
                                                     FirstHVACIteration,
                                                     UnitVent(UnitVentNum).HCoil_Index,
                                                     QCoilReq,

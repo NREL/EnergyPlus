@@ -457,7 +457,7 @@ namespace Furnaces {
                     if (Furnace(FurnaceNum).bIsIHP)
                         IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).ControlledZoneTemp =
                             Node(Furnace(FurnaceNum).NodeNumOfControlledZone).Temp;
-                    SimVariableSpeedHP(FurnaceNum, FirstHVACIteration, AirLoopNum, ZoneLoad, MoistureLoad, OnOffAirFlowRatio);
+                    SimVariableSpeedHP(state, FurnaceNum, FirstHVACIteration, AirLoopNum, ZoneLoad, MoistureLoad, OnOffAirFlowRatio);
                 } else {
                     // calculate the system flow rate
                     if (!FirstHVACIteration && Furnace(FurnaceNum).OpMode == CycFanCycCoil && CoolingLoad &&
@@ -565,7 +565,7 @@ namespace Furnaces {
                         IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).IDFanPlace = Furnace(FurnaceNum).FanPlace;
                     }
 
-                    SimVariableSpeedHP(FurnaceNum, FirstHVACIteration, AirLoopNum, ZoneLoad, MoistureLoad, OnOffAirFlowRatio);
+                    SimVariableSpeedHP(state, FurnaceNum, FirstHVACIteration, AirLoopNum, ZoneLoad, MoistureLoad, OnOffAirFlowRatio);
                 } else {
                     // Update the furnace flow rates
                     if (!FirstHVACIteration && Furnace(FurnaceNum).OpMode == CycFanCycCoil && CoolingLoad &&
@@ -750,7 +750,7 @@ namespace Furnaces {
                     if (Furnace(FurnaceNum).bIsIHP)
                         IntegratedHeatPumps(Furnace(FurnaceNum).CoolingCoilIndex).ControlledZoneTemp =
                             Node(Furnace(FurnaceNum).NodeNumOfControlledZone).Temp;
-                    SimVariableSpeedHP(FurnaceNum, FirstHVACIteration, AirLoopNum, ZoneLoad, MoistureLoad, OnOffAirFlowRatio);
+                    SimVariableSpeedHP(state, FurnaceNum, FirstHVACIteration, AirLoopNum, ZoneLoad, MoistureLoad, OnOffAirFlowRatio);
 
                 } else if (Furnace(FurnaceNum).WatertoAirHPType == WatertoAir_VarSpeedLooUpTable) {
                     HeatCoilLoad = 0.0; // Added: Used below
@@ -5073,7 +5073,7 @@ namespace Furnaces {
                 if (Furnace(FurnaceNum).MaxHeatCoilFluidFlow == AutoSize) {
                     // If water coil max water flow rate is autosized, simulate once in order to mine max flow rate
                     if (Furnace(FurnaceNum).HeatingCoilType_Num == Coil_HeatingWater) {
-                        SimulateWaterCoilComponents(Furnace(FurnaceNum).HeatingCoilName, FirstHVACIteration, Furnace(FurnaceNum).HeatingCoilIndex);
+                        SimulateWaterCoilComponents(state, Furnace(FurnaceNum).HeatingCoilName, FirstHVACIteration, Furnace(FurnaceNum).HeatingCoilIndex);
                         CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate("Coil:Heating:Water", Furnace(FurnaceNum).HeatingCoilName, ErrorsFound);
                         if (CoilMaxVolFlowRate != AutoSize) {
                             rho = GetDensityGlycol(PlantLoop(Furnace(FurnaceNum).LoopNum).FluidName,
@@ -5112,7 +5112,7 @@ namespace Furnaces {
                 if (Furnace(FurnaceNum).MaxSuppCoilFluidFlow == AutoSize) {
                     if (Furnace(FurnaceNum).SuppHeatCoilType_Num == Coil_HeatingWater) {
                         // If water coil max water flow rate is autosized, simulate once in order to mine max flow rate
-                        SimulateWaterCoilComponents(Furnace(FurnaceNum).SuppHeatCoilName, FirstHVACIteration, Furnace(FurnaceNum).SuppHeatCoilIndex);
+                        SimulateWaterCoilComponents(state, Furnace(FurnaceNum).SuppHeatCoilName, FirstHVACIteration, Furnace(FurnaceNum).SuppHeatCoilIndex);
                         CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate("Coil:Heating:Water", Furnace(FurnaceNum).SuppHeatCoilName, ErrorsFound);
                         if (CoilMaxVolFlowRate != AutoSize) {
                             rho = GetDensityGlycol(PlantLoop(Furnace(FurnaceNum).LoopNumSupp).FluidName,
@@ -5362,7 +5362,7 @@ namespace Furnaces {
                                      Furnace(FurnaceNum).BranchNum,
                                      Furnace(FurnaceNum).CompNum);
                 //     simulate water coil to find operating capacity
-                SimulateWaterCoilComponents(Furnace(FurnaceNum).HeatingCoilName, FirstHVACIteration, Furnace(FurnaceNum).HeatingCoilIndex, QActual);
+                SimulateWaterCoilComponents(state, Furnace(FurnaceNum).HeatingCoilName, FirstHVACIteration, Furnace(FurnaceNum).HeatingCoilIndex, QActual);
                 Furnace(FurnaceNum).DesignHeatingCapacity = QActual;
 
             } // from IF(Furnace(FurnaceNum)%HeatingCoilType_Num == Coil_HeatingWater) THEN
@@ -5404,7 +5404,7 @@ namespace Furnaces {
                                      Furnace(FurnaceNum).CompNumSupp);
 
                 //     simulate water coil to find operating capacity
-                SimulateWaterCoilComponents(Furnace(FurnaceNum).SuppHeatCoilName, FirstHVACIteration, Furnace(FurnaceNum).SuppHeatCoilIndex, QActual);
+                SimulateWaterCoilComponents(state, Furnace(FurnaceNum).SuppHeatCoilName, FirstHVACIteration, Furnace(FurnaceNum).SuppHeatCoilIndex, QActual);
                 Furnace(FurnaceNum).DesignSuppHeatingCapacity = QActual;
 
             } // from IF(Furnace(FurnaceNum)%SuppHeatCoilType_Num == Coil_HeatingWater) THEN
@@ -9582,7 +9582,7 @@ namespace Furnaces {
             } else if (SELECT_CASE_var == Coil_HeatingWater) {
                 if (QCoilLoad > SmallLoad) {
                     SetComponentFlowRate(MaxHotWaterFlow, CoilControlNode, CoilOutletNode, LoopNum, LoopSideNum, BranchNum, CompNum);
-                    SimulateWaterCoilComponents(HeatingCoilName, FirstHVACIteration, HeatingCoilIndex, QActual, FanMode);
+                    SimulateWaterCoilComponents(state, HeatingCoilName, FirstHVACIteration, HeatingCoilIndex, QActual, FanMode);
 
                     if (QActual > (QCoilLoad + SmallLoad)) {
                         // control water flow to obtain output matching QCoilLoad
@@ -9637,7 +9637,7 @@ namespace Furnaces {
                     SetComponentFlowRate(mdot, CoilControlNode, CoilOutletNode, LoopNum, LoopSideNum, BranchNum, CompNum);
                 }
                 // simulate the hot water heating coil
-                SimulateWaterCoilComponents(HeatingCoilName, FirstHVACIteration, HeatingCoilIndex, QActual, FanMode);
+                SimulateWaterCoilComponents(state, HeatingCoilName, FirstHVACIteration, HeatingCoilIndex, QActual, FanMode);
             } else if (SELECT_CASE_var == Coil_HeatingSteam) {
                 if (QCoilLoad > SmallLoad) {
                     SetComponentFlowRate(MaxHotWaterFlow, CoilControlNode, CoilOutletNode, LoopNum, LoopSideNum, BranchNum, CompNum);
@@ -9703,7 +9703,7 @@ namespace Furnaces {
                                  Furnace(FurnaceNum).LoopSide,
                                  Furnace(FurnaceNum).BranchNum,
                                  Furnace(FurnaceNum).CompNum);
-            SimulateWaterCoilComponents(Furnace(FurnaceNum).HeatingCoilName,
+            SimulateWaterCoilComponents(state, Furnace(FurnaceNum).HeatingCoilName,
                                         FirstHVACIteration,
                                         Furnace(FurnaceNum).HeatingCoilIndex,
                                         QCoilActual,
@@ -9718,7 +9718,7 @@ namespace Furnaces {
                                  Furnace(FurnaceNum).BranchNumSupp,
                                  Furnace(FurnaceNum).CompNumSupp);
             // simulate the hot water supplemental heating coil
-            SimulateWaterCoilComponents(Furnace(FurnaceNum).SuppHeatCoilName,
+            SimulateWaterCoilComponents(state, Furnace(FurnaceNum).SuppHeatCoilName,
                                         FirstHVACIteration,
                                         Furnace(FurnaceNum).SuppHeatCoilIndex,
                                         QCoilActual,
@@ -9736,7 +9736,7 @@ namespace Furnaces {
 
     //******************************************************************************
 
-    void SimVariableSpeedHP(int const FurnaceNum,          // number of the current engine driven Heat Pump being simulated
+    void SimVariableSpeedHP(AllGlobals &state, int const FurnaceNum,          // number of the current engine driven Heat Pump being simulated
                             bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                             int const AirLoopNum,          // index to air loop
                             Real64 const QZnReq,           // required zone load
@@ -9846,7 +9846,7 @@ namespace Furnaces {
         SaveMassFlowRate = Node(InletNode).MassFlowRate;
         // decide current working mode for IHP
         if ((FirstHVACIteration) && (Furnace(FurnaceNum).bIsIHP))
-            DecideWorkMode(Furnace(FurnaceNum).CoolingCoilIndex, TotalZoneSensibleLoad, TotalZoneLatentLoad);
+            DecideWorkMode(state, Furnace(FurnaceNum).CoolingCoilIndex, TotalZoneSensibleLoad, TotalZoneLatentLoad);
 
         if (!FirstHVACIteration && Furnace(FurnaceNum).OpMode == CycFanCycCoil &&
             (QZnReq < (-1.0 * SmallLoad) || TotalZoneLatentLoad < (-1.0 * SmallLoad)) && EconoActive) {

@@ -1170,7 +1170,7 @@ namespace PhotovoltaicThermalCollectors {
         return 0; // Shutup compiler
     }
 
-    void simPVTfromOASys(int const index, bool const FirstHVACIteration)
+    void simPVTfromOASys(AllGlobals &state, int const index, bool const FirstHVACIteration)
     {
         PlantLocation dummyLoc(0, 0, 0, 0);
         Real64 dummyCurLoad(0.0);

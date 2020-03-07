@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 
 namespace EnergyPlus {
 
@@ -264,7 +265,7 @@ namespace IntegratedHeatPump {
 
     void UpdateIHP(int const DXCoilNum);
 
-    void DecideWorkMode(int const DXCoilNum,
+    void DecideWorkMode(AllGlobals &state, int const DXCoilNum,
                         Real64 const SensLoad,  // Sensible demand load [W]
                         Real64 const LatentLoad // Latent demand load [W]
     );

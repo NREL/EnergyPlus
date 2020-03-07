@@ -108,7 +108,7 @@ namespace Pipes {
         }
 
     public:
-        static PlantComponent *factory(int objectType, std::string objectName);
+        static PlantComponent *factory(AllGlobals &state, int objectType, std::string objectName);
 
     public:
         void simulate(AllGlobals &state, const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;

@@ -661,7 +661,7 @@ namespace MixedAir {
             } else if (SELECT_CASE_var == WaterCoil_Cooling) { // 'Coil:Cooling:Water'
                 if (Sim) {
                     // get water coil and controller data if not called previously
-                    if (CompIndex == 0) SimulateWaterCoilComponents(CompName, FirstHVACIteration, CompIndex);
+                    if (CompIndex == 0) SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
                     // iterate on OA sys controller and water coil at the same time
                     SolveWaterCoilController(FirstHVACIteration,
                                              AirLoopNum,
@@ -677,7 +677,7 @@ namespace MixedAir {
             } else if (SELECT_CASE_var == WaterCoil_SimpleHeat) { // 'Coil:Heating:Water')
                 if (Sim) {
                     // get water coil and controller data if not called previously
-                    if (CompIndex == 0) SimulateWaterCoilComponents(CompName, FirstHVACIteration, CompIndex);
+                    if (CompIndex == 0) SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
                     // iterate on OA sys controller and water coil at the same time
                     SolveWaterCoilController(FirstHVACIteration,
                                              AirLoopNum,
@@ -698,7 +698,7 @@ namespace MixedAir {
             } else if (SELECT_CASE_var == WaterCoil_DetailedCool) { // 'Coil:Cooling:Water:DetailedGeometry'
                 if (Sim) {
                     // get water coil and controller data if not called previously
-                    if (CompIndex == 0) SimulateWaterCoilComponents(CompName, FirstHVACIteration, CompIndex);
+                    if (CompIndex == 0) SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
                     // iterate on OA sys controller and water coil at the same time
                     SolveWaterCoilController(FirstHVACIteration,
                                              AirLoopNum,
@@ -824,7 +824,7 @@ namespace MixedAir {
             } else if (SELECT_CASE_var == Desiccant) { // 'Dehumidifier:Desiccant:NoFans'
                 // 'Dehumidifier:Desiccant:System'
                 if (Sim) {
-                    SimDesiccantDehumidifier(CompName, FirstHVACIteration, CompIndex);
+                    SimDesiccantDehumidifier(state, CompName, FirstHVACIteration, CompIndex);
                 }
                 OAHX = true;
 
@@ -847,7 +847,7 @@ namespace MixedAir {
                     if (CompIndex == 0) {
                         CompIndex = PhotovoltaicThermalCollectors::getPVTindexFromName(CompName);
                     }
-                    PhotovoltaicThermalCollectors::simPVTfromOASys(CompIndex, FirstHVACIteration);
+                    PhotovoltaicThermalCollectors::simPVTfromOASys(state, CompIndex, FirstHVACIteration);
                 }
 
                 // Evaporative Cooler Types

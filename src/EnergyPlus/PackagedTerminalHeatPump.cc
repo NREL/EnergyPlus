@@ -4241,7 +4241,7 @@ namespace PackagedTerminalHeatPump {
                 // If coil max fluid flow rate is autosized, simulate once in order to mine max flow rate
                 if (PTUnit(PTUnitNum).MaxHeatCoilFluidFlow == AutoSize) {
                     if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingWater) {
-                        SimulateWaterCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).ACHeatCoilIndex);
+                        SimulateWaterCoilComponents(state, PTUnit(PTUnitNum).ACHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).ACHeatCoilIndex);
                         CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate("Coil:Heating:Water", PTUnit(PTUnitNum).ACHeatCoilName, ErrorsFound);
                         if (CoilMaxVolFlowRate != AutoSize) {
                             rho = GetDensityGlycol(PlantLoop(PTUnit(PTUnitNum).HeatCoilLoopNum).FluidName,
@@ -4278,7 +4278,7 @@ namespace PackagedTerminalHeatPump {
                 // If coil max fluid flow rate is autosized, simulate once in order to mine max flow rate
                 if (PTUnit(PTUnitNum).MaxSuppCoilFluidFlow == AutoSize) {
                     if (PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingWater) {
-                        SimulateWaterCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).SuppHeatCoilIndex);
+                        SimulateWaterCoilComponents(state, PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).SuppHeatCoilIndex);
                         CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate("Coil:Heating:Water", PTUnit(PTUnitNum).SuppHeatCoilName, ErrorsFound);
                         if (CoilMaxVolFlowRate != AutoSize) {
                             rho = GetDensityGlycol(PlantLoop(PTUnit(PTUnitNum).SuppCoilLoopNum).FluidName,
@@ -4526,7 +4526,7 @@ namespace PackagedTerminalHeatPump {
                                      PTUnit(PTUnitNum).HeatCoilCompNum);
 
                 //     simulate water coil to find operating capacity
-                SimulateWaterCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).ACHeatCoilIndex, QActual);
+                SimulateWaterCoilComponents(state, PTUnit(PTUnitNum).ACHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).ACHeatCoilIndex, QActual);
                 PTUnit(PTUnitNum).ACHeatCoilCap = QActual;
 
             } // from IF(PTUnit(PTUnitNum)%ACHeatCoilType_Num == Coil_HeatingWater) THEN
@@ -4570,7 +4570,7 @@ namespace PackagedTerminalHeatPump {
                                      PTUnit(PTUnitNum).SuppCoilCompNum);
 
                 //     simulate water coil to find operating capacity
-                SimulateWaterCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).SuppHeatCoilIndex, QActual);
+                SimulateWaterCoilComponents(state, PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).SuppHeatCoilIndex, QActual);
                 PTUnit(PTUnitNum).SupHeatCoilCap = QActual;
 
             } // from IF(PTUnit(PTUnitNum)%SuppHeatCoilType_Num == Coil_HeatingWater) THEN
@@ -5685,7 +5685,7 @@ namespace PackagedTerminalHeatPump {
                                              PTUnit(PTUnitNum).SuppCoilLoopSide,
                                              PTUnit(PTUnitNum).SuppCoilBranchNum,
                                              PTUnit(PTUnitNum).SuppCoilCompNum);
-                        SimulateWaterCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName,
+                        SimulateWaterCoilComponents(state, PTUnit(PTUnitNum).SuppHeatCoilName,
                                                     FirstHVACIteration,
                                                     PTUnit(PTUnitNum).SuppHeatCoilIndex,
                                                     SupHeaterLoad,
@@ -5957,7 +5957,7 @@ namespace PackagedTerminalHeatPump {
                                          PTUnit(PTUnitNum).HeatCoilBranchNum,
                                          PTUnit(PTUnitNum).HeatCoilCompNum);
 
-                    SimulateWaterCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName,
+                    SimulateWaterCoilComponents(state, PTUnit(PTUnitNum).ACHeatCoilName,
                                                 FirstHVACIteration,
                                                 PTUnit(PTUnitNum).ACHeatCoilIndex,
                                                 QActual,
@@ -6031,7 +6031,7 @@ namespace PackagedTerminalHeatPump {
                                          PTUnit(PTUnitNum).HeatCoilBranchNum,
                                          PTUnit(PTUnitNum).HeatCoilCompNum);
 
-                    SimulateWaterCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).ACHeatCoilIndex);
+                    SimulateWaterCoilComponents(state, PTUnit(PTUnitNum).ACHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).ACHeatCoilIndex);
                 } else if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingSteam) {
                     mdot = 0.0;
                     SetComponentFlowRate(mdot,
@@ -6115,7 +6115,7 @@ namespace PackagedTerminalHeatPump {
                                              PTUnit(PTUnitNum).SuppCoilLoopSide,
                                              PTUnit(PTUnitNum).SuppCoilBranchNum,
                                              PTUnit(PTUnitNum).SuppCoilCompNum);
-                        SimulateWaterCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName,
+                        SimulateWaterCoilComponents(state, PTUnit(PTUnitNum).SuppHeatCoilName,
                                                     FirstHVACIteration,
                                                     PTUnit(PTUnitNum).SuppHeatCoilIndex,
                                                     SupHeaterLoad,
@@ -6159,7 +6159,7 @@ namespace PackagedTerminalHeatPump {
                                              PTUnit(PTUnitNum).SuppCoilCompNum);
                         QActual = SupHeaterLoad;
                         // simulate the hot water supplemental heating coil
-                        SimulateWaterCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName,
+                        SimulateWaterCoilComponents(state, PTUnit(PTUnitNum).SuppHeatCoilName,
                                                     FirstHVACIteration,
                                                     PTUnit(PTUnitNum).SuppHeatCoilIndex,
                                                     QActual,
@@ -6209,7 +6209,7 @@ namespace PackagedTerminalHeatPump {
                             }
                             QActual = SupHeaterLoad;
                             // simulate the hot water supplemental heating coil
-                            SimulateWaterCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName,
+                            SimulateWaterCoilComponents(state, PTUnit(PTUnitNum).SuppHeatCoilName,
                                                         FirstHVACIteration,
                                                         PTUnit(PTUnitNum).SuppHeatCoilIndex,
                                                         QActual,
@@ -6450,7 +6450,7 @@ namespace PackagedTerminalHeatPump {
                              PTUnit(PTUnitNum).SuppCoilBranchNum,
                              PTUnit(PTUnitNum).SuppCoilCompNum);
         // simulate the hot water supplemental heating coil
-        SimulateWaterCoilComponents(
+        SimulateWaterCoilComponents(state, 
             PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACSoln, PTUnit(PTUnitNum).SuppHeatCoilIndex, QCoilActual, PTUnit(PTUnitNum).OpMode);
 
         if (SupHeaterLoad != 0.0) {
@@ -7626,7 +7626,7 @@ namespace PackagedTerminalHeatPump {
                                              PTUnit(PTUnitNum).SuppCoilLoopSide,
                                              PTUnit(PTUnitNum).SuppCoilBranchNum,
                                              PTUnit(PTUnitNum).SuppCoilCompNum);
-                        SimulateWaterCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName,
+                        SimulateWaterCoilComponents(state, PTUnit(PTUnitNum).SuppHeatCoilName,
                                                     FirstHVACIteration,
                                                     PTUnit(PTUnitNum).SuppHeatCoilIndex,
                                                     SupHeaterLoad,
@@ -8117,7 +8117,7 @@ namespace PackagedTerminalHeatPump {
                                              PTUnit(PTUnitNum).HeatCoilBranchNum,
                                              PTUnit(PTUnitNum).HeatCoilCompNum);
 
-                        SimulateWaterCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName,
+                        SimulateWaterCoilComponents(state, PTUnit(PTUnitNum).ACHeatCoilName,
                                                     FirstHVACIteration,
                                                     PTUnit(PTUnitNum).ACHeatCoilIndex,
                                                     QActual,
@@ -8161,7 +8161,7 @@ namespace PackagedTerminalHeatPump {
                                              PTUnit(PTUnitNum).HeatCoilBranchNum,
                                              PTUnit(PTUnitNum).HeatCoilCompNum);
 
-                        SimulateWaterCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).ACHeatCoilIndex);
+                        SimulateWaterCoilComponents(state, PTUnit(PTUnitNum).ACHeatCoilName, FirstHVACIteration, PTUnit(PTUnitNum).ACHeatCoilIndex);
                     } else if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingSteam) {
                         mdot = 0.0;
                         SetComponentFlowRate(mdot,
@@ -8219,7 +8219,7 @@ namespace PackagedTerminalHeatPump {
                                              PTUnit(PTUnitNum).SuppCoilLoopSide,
                                              PTUnit(PTUnitNum).SuppCoilBranchNum,
                                              PTUnit(PTUnitNum).SuppCoilCompNum);
-                        SimulateWaterCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName,
+                        SimulateWaterCoilComponents(state, PTUnit(PTUnitNum).SuppHeatCoilName,
                                                     FirstHVACIteration,
                                                     PTUnit(PTUnitNum).SuppHeatCoilIndex,
                                                     SupHeaterLoad,
@@ -8263,7 +8263,7 @@ namespace PackagedTerminalHeatPump {
                                              PTUnit(PTUnitNum).SuppCoilCompNum);
                         QActual = SupHeaterLoad;
                         // simulate the hot water supplemental heating coil
-                        SimulateWaterCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName,
+                        SimulateWaterCoilComponents(state, PTUnit(PTUnitNum).SuppHeatCoilName,
                                                     FirstHVACIteration,
                                                     PTUnit(PTUnitNum).SuppHeatCoilIndex,
                                                     QActual,
@@ -8314,7 +8314,7 @@ namespace PackagedTerminalHeatPump {
                             }
                             QActual = SupHeaterLoad;
                             // simulate the hot water supplemental heating coil
-                            SimulateWaterCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName,
+                            SimulateWaterCoilComponents(state, PTUnit(PTUnitNum).SuppHeatCoilName,
                                                         FirstHVACIteration,
                                                         PTUnit(PTUnitNum).SuppHeatCoilIndex,
                                                         QActual,

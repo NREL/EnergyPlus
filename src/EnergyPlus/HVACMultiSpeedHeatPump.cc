@@ -2138,7 +2138,7 @@ namespace HVACMultiSpeedHeatPump {
             if (MSHeatPump(MSHeatPumpNum).CoilControlNode > 0) {
                 if (MSHeatPump(MSHeatPumpNum).MaxCoilFluidFlow == AutoSize) {
                     if (MSHeatPump(MSHeatPumpNum).HeatCoilType == Coil_HeatingWater) {
-                        SimulateWaterCoilComponents(
+                        SimulateWaterCoilComponents(state, 
                             MSHeatPump(MSHeatPumpNum).HeatCoilName, FirstHVACIteration, MSHeatPump(MSHeatPumpNum).HeatCoilNum);
 
                         CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate("Coil:Heating:Water", MSHeatPump(MSHeatPumpNum).HeatCoilName, ErrorsFound);
@@ -2186,7 +2186,7 @@ namespace HVACMultiSpeedHeatPump {
             if (MSHeatPump(MSHeatPumpNum).SuppCoilControlNode > 0) {
                 if (MSHeatPump(MSHeatPumpNum).MaxSuppCoilFluidFlow == AutoSize) {
                     if (MSHeatPump(MSHeatPumpNum).SuppHeatCoilType == Coil_HeatingWater) {
-                        SimulateWaterCoilComponents(
+                        SimulateWaterCoilComponents(state, 
                             MSHeatPump(MSHeatPumpNum).SuppHeatCoilName, FirstHVACIteration, MSHeatPump(MSHeatPumpNum).SuppHeatCoilNum);
 
                         CoilMaxVolFlowRate = GetCoilMaxWaterFlowRate("Coil:Heating:Water", MSHeatPump(MSHeatPumpNum).SuppHeatCoilName, ErrorsFound);
@@ -2565,7 +2565,7 @@ namespace HVACMultiSpeedHeatPump {
                                      MSHeatPump(MSHeatPumpNum).BranchNum,
                                      MSHeatPump(MSHeatPumpNum).CompNum);
                 //     simulate water coil to find operating capacity
-                SimulateWaterCoilComponents(
+                SimulateWaterCoilComponents(state, 
                     MSHeatPump(MSHeatPumpNum).HeatCoilName, FirstHVACIteration, MSHeatPump(MSHeatPumpNum).HeatCoilNum, QActual);
             } // from IF(MSHeatPump(MSHeatPumpNum)%HeatCoilType == Coil_HeatingWater) THEN
 
@@ -2602,7 +2602,7 @@ namespace HVACMultiSpeedHeatPump {
                                      MSHeatPump(MSHeatPumpNum).SuppBranchNum,
                                      MSHeatPump(MSHeatPumpNum).SuppCompNum);
                 //     simulate water coil to find operating capacity
-                SimulateWaterCoilComponents(
+                SimulateWaterCoilComponents(state,
                     MSHeatPump(MSHeatPumpNum).SuppHeatCoilName, FirstHVACIteration, MSHeatPump(MSHeatPumpNum).SuppHeatCoilNum, QActual);
                 MSHeatPump(MSHeatPumpNum).DesignSuppHeatingCapacity = QActual;
 
@@ -4270,11 +4270,11 @@ namespace HVACMultiSpeedHeatPump {
                     if (present(PartLoadFrac)) {
                         MaxHotWaterFlow = MaxCoilFluidFlow * PartLoadFrac;
                         SetComponentFlowRate(MaxHotWaterFlow, CoilControlNode, CoilOutletNode, LoopNum, LoopSide, BranchNum, CompNum);
-                        SimulateWaterCoilComponents(HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
+                        SimulateWaterCoilComponents(state, HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
                     } else {
                         MaxHotWaterFlow = MaxCoilFluidFlow;
                         SetComponentFlowRate(MaxHotWaterFlow, CoilControlNode, CoilOutletNode, LoopNum, LoopSide, BranchNum, CompNum);
-                        SimulateWaterCoilComponents(HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
+                        SimulateWaterCoilComponents(state, HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
                         if (QCoilActual > (HeatingLoad + SmallLoad)) {
                             // control water flow to obtain output matching HeatingLoad
                             SolFlag = 0;
@@ -4318,7 +4318,7 @@ namespace HVACMultiSpeedHeatPump {
                                                                "[kg/s]");
                             }
                             // simulate hot water supplemental heating coil
-                            SimulateWaterCoilComponents(HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
+                            SimulateWaterCoilComponents(state, HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
                         }
                     }
                 } else if (SELECT_CASE_var == Coil_HeatingSteam) {
@@ -4344,7 +4344,7 @@ namespace HVACMultiSpeedHeatPump {
                 } else if (SELECT_CASE_var == Coil_HeatingWater) {
                     mdot = 0.0;
                     SetComponentFlowRate(mdot, CoilControlNode, CoilOutletNode, LoopNum, LoopSide, BranchNum, CompNum);
-                    SimulateWaterCoilComponents(HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
+                    SimulateWaterCoilComponents(state, HeatCoilName, FirstHVACIteration, HeatCoilNum, QCoilActual, FanMode);
                 } else if (SELECT_CASE_var == Coil_HeatingSteam) {
                     mdot = 0.0;
                     SetComponentFlowRate(mdot, CoilControlNode, CoilOutletNode, LoopNum, LoopSide, BranchNum, CompNum);
@@ -4418,7 +4418,7 @@ namespace HVACMultiSpeedHeatPump {
                              MSHeatPump(MSHeatPumpNum).HotWaterBranchNum,
                              MSHeatPump(MSHeatPumpNum).HotWaterCompNum);
         // simulate the hot water supplemental heating coil
-        SimulateWaterCoilComponents(MSHeatPump(MSHeatPumpNum).HotWaterCoilName,
+        SimulateWaterCoilComponents(state, MSHeatPump(MSHeatPumpNum).HotWaterCoilName,
                                     FirstHVACSoln,
                                     MSHeatPump(MSHeatPumpNum).HotWaterCoilNum,
                                     QCoilActual,

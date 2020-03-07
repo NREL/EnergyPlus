@@ -1559,7 +1559,7 @@ namespace HVACUnitaryBypassVAV {
                 //    If water coil max water flow rate is autosized, simulate once in order to mine max water flow rate
                 if (CBVAV(CBVAVNum).MaxHeatCoilFluidFlow == DataSizing::AutoSize) {
                     if (CBVAV(CBVAVNum).HeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
-                        WaterCoils::SimulateWaterCoilComponents(CBVAV(CBVAVNum).HeatCoilName, FirstHVACIteration, CBVAV(CBVAVNum).HeatCoilIndex);
+                        WaterCoils::SimulateWaterCoilComponents(state, CBVAV(CBVAVNum).HeatCoilName, FirstHVACIteration, CBVAV(CBVAVNum).HeatCoilIndex);
                         ErrorFlag = false;
                         Real64 CoilMaxVolFlowRate =
                             WaterCoils::GetCoilMaxWaterFlowRate("Coil:Heating:Water", CBVAV(CBVAVNum).HeatCoilName, ErrorFlag);
@@ -1869,7 +1869,7 @@ namespace HVACUnitaryBypassVAV {
 
         if (FirstHVACIteration) {
             if (CBVAV(CBVAVNum).HeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
-                WaterCoils::SimulateWaterCoilComponents(CBVAV(CBVAVNum).HeatCoilName, FirstHVACIteration, CBVAV(CBVAVNum).HeatCoilIndex);
+                WaterCoils::SimulateWaterCoilComponents(state, CBVAV(CBVAVNum).HeatCoilName, FirstHVACIteration, CBVAV(CBVAVNum).HeatCoilIndex);
 
                 //     set air-side and steam-side mass flow rates
                 DataLoopNode::Node(CBVAV(CBVAVNum).HeatingCoilInletNode).MassFlowRate = CompOnMassFlow;
@@ -1883,7 +1883,7 @@ namespace HVACUnitaryBypassVAV {
                                                      CBVAV(CBVAVNum).CompNum);
 
                 //     simulate water coil to find operating capacity
-                WaterCoils::SimulateWaterCoilComponents(CBVAV(CBVAVNum).HeatCoilName, FirstHVACIteration, CBVAV(CBVAVNum).HeatCoilIndex, QCoilActual);
+                WaterCoils::SimulateWaterCoilComponents(state, CBVAV(CBVAVNum).HeatCoilName, FirstHVACIteration, CBVAV(CBVAVNum).HeatCoilIndex, QCoilActual);
                 CBVAV(CBVAVNum).DesignSuppHeatingCapacity = QCoilActual;
 
             } // from IF(MSHeatPump(MSHeatPumpNum)%SuppHeatCoilType == DataHVACGlobals::Coil_HeatingWater) THEN
@@ -3937,7 +3937,7 @@ namespace HVACUnitaryBypassVAV {
                                                          CBVAV(CBVAVNum).LoopSide,
                                                          CBVAV(CBVAVNum).BranchNum,
                                                          CBVAV(CBVAVNum).CompNum);
-                    WaterCoils::SimulateWaterCoilComponents(
+                    WaterCoils::SimulateWaterCoilComponents(state,
                         CBVAV(CBVAVNum).HeatCoilName, FirstHVACIteration, CBVAV(CBVAVNum).HeatCoilIndex, QCoilActual, FanMode);
                     if (QCoilActual > (HeatCoilLoad + DataHVACGlobals::SmallLoad)) {
                         // control water flow to obtain output matching HeatCoilLoad
@@ -3985,7 +3985,7 @@ namespace HVACUnitaryBypassVAV {
                         // simulate the hot water heating coil
                         QCoilActual = HeatCoilLoad;
                         // simulate the hot water heating coil
-                        WaterCoils::SimulateWaterCoilComponents(
+                        WaterCoils::SimulateWaterCoilComponents(state,
                             CBVAV(CBVAVNum).HeatCoilName, FirstHVACIteration, CBVAV(CBVAVNum).HeatCoilIndex, QCoilActual, FanMode);
                     }
                 } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingSteam) {
@@ -4020,7 +4020,7 @@ namespace HVACUnitaryBypassVAV {
                                                          CBVAV(CBVAVNum).CompNum);
                     QCoilActual = HeatCoilLoad;
                     // simulate the hot water heating coil
-                    WaterCoils::SimulateWaterCoilComponents(
+                    WaterCoils::SimulateWaterCoilComponents(state,
                         CBVAV(CBVAVNum).HeatCoilName, FirstHVACIteration, CBVAV(CBVAVNum).HeatCoilIndex, QCoilActual, FanMode);
                 } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingSteam) {
                     mdot = 0.0;
@@ -4073,7 +4073,7 @@ namespace HVACUnitaryBypassVAV {
                                              CBVAV(CBVAVNum).CompNum);
 
         // simulate the hot water supplemental heating coil
-        WaterCoils::SimulateWaterCoilComponents(
+        WaterCoils::SimulateWaterCoilComponents(state,
             CBVAV(CBVAVNum).HeatCoilName, FirstHVACSoln, CBVAV(CBVAVNum).HeatCoilIndex, QCoilActual, CBVAV(CBVAVNum).OpMode);
         if (HeatCoilLoad != 0.0) {
             Residuum = (QCoilActual - HeatCoilLoad) / HeatCoilLoad;

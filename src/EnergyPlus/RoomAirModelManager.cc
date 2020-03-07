@@ -137,7 +137,7 @@ namespace RoomAirModelManager {
         GetAirModelData = true;
     }
 
-    void ManageAirModel(int &ZoneNum)
+    void ManageAirModel(AllGlobals &state, int &ZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -221,7 +221,7 @@ namespace RoomAirModelManager {
 
             } else if (SELECT_CASE_var == RoomAirModel_AirflowNetwork) { // RoomAirflowNetwork zone model
                 // simulate room airflow using the AirflowNetwork - based model
-                SimRoomAirModelAirflowNetwork(ZoneNum);
+                SimRoomAirModelAirflowNetwork(state, ZoneNum);
 
             } else { // mixing air model
                      // do nothing
@@ -2781,7 +2781,7 @@ namespace RoomAirModelManager {
         }
     }
 
-    bool CheckEquipName(std::string const &EquipType, // Equipment type
+    bool CheckEquipName(AllGlobals &state, std::string const &EquipType, // Equipment type
                         std::string const &EquipName, // Equipment Name
                         std::string &SupplyNodeName,  // Supply node name
                         std::string &ReturnNodeName,  // Return node name

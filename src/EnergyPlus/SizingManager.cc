@@ -516,7 +516,7 @@ namespace SizingManager {
             SimZoneEquip = true;
 
             ManageZoneEquipment(state, true, SimZoneEquip, SimAir);
-            ManageAirLoops(true, SimAir, SimZoneEquip);
+            ManageAirLoops(state, true, SimAir, SimZoneEquip);
             SizingManager::UpdateTermUnitFinalZoneSizing(); // AirDistUnits have been loaded now so TermUnitSizing values are all in place
             SimAirServingZones::SizeSysOutdoorAir();        // System OA can be sized now that TermUnitFinalZoneSizing is initialized
             ResetEnvironmentCounter();

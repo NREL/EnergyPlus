@@ -150,7 +150,7 @@ namespace EnergyPlus {
             DataGlobals::AnySlabsInModel = (numSlabsCheck > 0);
         }
 
-        void CheckIfAnyBasements() {
+        void CheckIfAnyBasements(AllGlobals &state) {
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Matt Mitchell
             //       DATE WRITTEN   May 2014
@@ -160,10 +160,10 @@ namespace EnergyPlus {
             DataGlobals::AnyBasementsInModel = (numBasementsCheck > 0);
         }
 
-        PlantComponent *Circuit::factory(int EP_UNUSED(objectType), std::string objectName) {
+        PlantComponent *Circuit::factory(AllGlobals &state, int EP_UNUSED(objectType), std::string objectName) {
             // Process the input data for circuits if it hasn't been done already
             if (GetInputFlag) {
-                GetPipingSystemsAndGroundDomainsInput();
+                GetPipingSystemsAndGroundDomainsInput(state);
                 GetInputFlag = false;
             }
             // Now look for this particular pipe in the list
@@ -196,7 +196,7 @@ namespace EnergyPlus {
             thisDomain.UpdatePipingSystems(this);
         }
 
-        void SimulateGroundDomains(OutputFiles &outputFiles, bool initOnly)
+        void SimulateGroundDomains(AllGlobals &state, OutputFiles &outputFiles, bool initOnly)
         {
 
             // SUBROUTINE INFORMATION:
@@ -210,7 +210,7 @@ namespace EnergyPlus {
 
             // Read input if necessary
             if (GetInputFlag) {
-                GetPipingSystemsAndGroundDomainsInput();
+                GetPipingSystemsAndGroundDomainsInput(state);
                 GetInputFlag = false;
             }
 
@@ -411,7 +411,7 @@ namespace EnergyPlus {
             }
         }
 
-        void GetPipingSystemsAndGroundDomainsInput() {
+        void GetPipingSystemsAndGroundDomainsInput(AllGlobals &state) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -436,16 +436,16 @@ namespace EnergyPlus {
             int NumPipeCircuits = inputProcessor->getNumObjectsFound(ObjName_Circuit);
 
             // Read in raw inputs, don't try to interpret dependencies yet
-            ReadGeneralDomainInputs(1, NumGeneralizedDomains, ErrorsFound);
+            ReadGeneralDomainInputs(state, 1, NumGeneralizedDomains, ErrorsFound);
             //ReadPipeCircuitInputs(ErrorsFound);
-            ReadHorizontalTrenchInputs(NumGeneralizedDomains + 1, NumPipeCircuits + 1, ErrorsFound);
+            ReadHorizontalTrenchInputs(state, NumGeneralizedDomains + 1, NumPipeCircuits + 1, ErrorsFound);
 
             // This is heavily dependent on the order of the domains in the main array.
-            ReadZoneCoupledDomainInputs(NumGeneralizedDomains + NumHorizontalTrenches + 1, NumZoneCoupledDomains,
+            ReadZoneCoupledDomainInputs(state, NumGeneralizedDomains + NumHorizontalTrenches + 1, NumZoneCoupledDomains,
                                         ErrorsFound);
 
             // This is heavily dependent on the order of the domains in the main array.
-            ReadBasementInputs(NumGeneralizedDomains + NumHorizontalTrenches + NumZoneCoupledDomains + 1, NumBasements,
+            ReadBasementInputs(state, NumGeneralizedDomains + NumHorizontalTrenches + NumZoneCoupledDomains + 1, NumBasements,
                                ErrorsFound);
 
             // Report errors that are purely input problems
@@ -506,7 +506,7 @@ namespace EnergyPlus {
             }
         }
 
-        void ReadGeneralDomainInputs(int const IndexStart, int const NumGeneralizedDomains, bool &ErrorsFound) {
+        void ReadGeneralDomainInputs(AllGlobals &state, int const IndexStart, int const NumGeneralizedDomains, bool &ErrorsFound) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee

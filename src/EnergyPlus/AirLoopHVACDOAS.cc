@@ -709,16 +709,16 @@ namespace AirLoopHVACDOAS {
                         // Desiccant Dehumidifier
                     } else if (SELECT_CASE_var == "DEHUMIDIFIER:DESICCANT:NOFANS") {
                         OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) =
-                            DesiccantDehumidifiers::GetProcAirInletNodeNum(OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), errorsFound);
+                            DesiccantDehumidifiers::GetProcAirInletNodeNum(state, OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), errorsFound);
                         if (errorsFound) InletNodeErrFlag = true;
-                        OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) = DesiccantDehumidifiers::GetProcAirOutletNodeNum(
+                        OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) = DesiccantDehumidifiers::GetProcAirOutletNodeNum(state, 
                             OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), errorsFound);
                         if (errorsFound) OutletNodeErrFlag = true;
                     } else if (SELECT_CASE_var == "DEHUMIDIFIER:DESICCANT:SYSTEM") {
                         OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) =
-                            DesiccantDehumidifiers::GetProcAirInletNodeNum(OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), errorsFound);
+                            DesiccantDehumidifiers::GetProcAirInletNodeNum(state, OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), errorsFound);
                         if (errorsFound) InletNodeErrFlag = true;
-                        OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) = DesiccantDehumidifiers::GetProcAirOutletNodeNum(
+                        OutsideAirSys(thisDOAS.m_OASystemNum).InletNodeNum(CompNum) = DesiccantDehumidifiers::GetProcAirOutletNodeNum(state, 
                             OutsideAirSys(thisDOAS.m_OASystemNum).ComponentName(CompNum), errorsFound);
                         if (errorsFound) OutletNodeErrFlag = true;
                         // Humidifiers: Humidifier:Steam:Electric and Humidifier:Steam:Gas
@@ -943,7 +943,7 @@ namespace AirLoopHVACDOAS {
                 }
 
                 if (UtilityRoutines::SameString(CompType, "COIL:HEATING:WATER")) {
-                    WaterCoils::SimulateWaterCoilComponents(CompName, FirstHVACIteration, this->m_HeatCoilNum);
+                    WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, this->m_HeatCoilNum);
                     Real64 CoilMaxVolFlowRate = WaterCoils::GetCoilMaxWaterFlowRate("Coil:Heating:Water", CompName, ErrorsFound);
                     rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->HWLoopNum).FluidName,
                                                             DataGlobals::HWInitConvTemp,
@@ -959,7 +959,7 @@ namespace AirLoopHVACDOAS {
                                                        this->HWCompNum);
                 }
                 if (UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER")) {
-                    WaterCoils::SimulateWaterCoilComponents(CompName, FirstHVACIteration, this->m_CoolCoilNum);
+                    WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, this->m_CoolCoilNum);
                     Real64 CoilMaxVolFlowRate = WaterCoils::GetCoilMaxWaterFlowRate("Coil:Cooling:Water", CompName, ErrorsFound);
                     rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
                                                             DataGlobals::CWInitConvTemp,
@@ -975,7 +975,7 @@ namespace AirLoopHVACDOAS {
                                                        this->CWCompNum);
                 }
                 if (UtilityRoutines::SameString(CompType, "COIL:COOLING:WATER:DETAILEDGEOMETRY")) {
-                    WaterCoils::SimulateWaterCoilComponents(CompName, FirstHVACIteration, this->m_CoolCoilNum);
+                    WaterCoils::SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, this->m_CoolCoilNum);
                     Real64 CoilMaxVolFlowRate = WaterCoils::GetCoilMaxWaterFlowRate("Coil:Cooling:Water:DetailedGeometry", CompName, ErrorsFound);
                     rho = FluidProperties::GetDensityGlycol(DataPlant::PlantLoop(this->CWLoopNum).FluidName,
                                                             DataGlobals::CWInitConvTemp,

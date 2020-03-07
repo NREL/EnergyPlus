@@ -1819,7 +1819,7 @@ namespace HVACManager {
             if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                 ManageAirflowNetworkBalance(FirstHVACIteration);
             }
-            ManageAirLoops(FirstHVACIteration, SimAirLoops, SimZoneEquipment);
+            ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
             AirLoopInputsFilled = true; // all air loop inputs have been read in
             SimAirLoops = true;         // Need to make sure that SimAirLoop is simulated at min twice to calculate PLR in some air loop equipment
             AirLoopsSimOnce = true;     // air loops simulated once for this environment
@@ -1844,7 +1844,7 @@ namespace HVACManager {
                     ManageAirflowNetworkBalance(FirstHVACIteration, IterAir, ResimulateAirZone);
                 }
                 if (SimAirLoops) {
-                    ManageAirLoops(FirstHVACIteration, SimAirLoops, SimZoneEquipment);
+                    ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
                     SimElecCircuits = true; // If this was simulated there are possible electric changes that need to be simulated
                 }
 

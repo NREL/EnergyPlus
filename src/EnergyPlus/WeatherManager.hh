@@ -60,6 +60,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 
 namespace EnergyPlus {
     class OutputFiles;
@@ -866,7 +867,7 @@ namespace WeatherManager {
 
     void GetWeatherProperties(bool &ErrorsFound);
 
-    void GetGroundTemps(bool &ErrorsFound);
+    void GetGroundTemps(AllGlobals &state, bool &ErrorsFound);
 
     void GetGroundReflectances(OutputFiles &outputFiles, bool &ErrorsFound);
 

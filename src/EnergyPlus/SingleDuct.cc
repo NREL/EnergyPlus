@@ -3681,7 +3681,7 @@ namespace SingleDuct {
                         DummyMdot, sd_airterminal(SysNum).ReheatControlNode, sd_airterminal(SysNum).HWLoopNum, sd_airterminal(SysNum).HWLoopSide, sd_airterminal(SysNum).HWBranchIndex, true);
                     // call the reheat coil with the NO FLOW condition to make sure that the Node values
                     // are passed through to the coil outlet correctly
-                    SimulateWaterCoilComponents(sd_airterminal(SysNum).ReheatName, FirstHVACIteration, sd_airterminal(SysNum).ReheatComp_Index);
+                    SimulateWaterCoilComponents(state, sd_airterminal(SysNum).ReheatName, FirstHVACIteration, sd_airterminal(SysNum).ReheatComp_Index);
                 } else if (SELECT_CASE_var == HCoilType_SteamAirHeating) { // COIL:STEAM:AIRHEATING
                     // Simulate reheat coil for the VAV system
                     SimulateSteamCoilComponents(sd_airterminal(SysNum).ReheatName, FirstHVACIteration, sd_airterminal(SysNum).ReheatComp_Index, 0.0);
@@ -4128,7 +4128,7 @@ namespace SingleDuct {
 
                     // call the reheat coil with the NO FLOW condition to make sure that the Node values
                     // are passed through to the coil outlet correctly
-                    SimulateWaterCoilComponents(sd_airterminal(SysNum).ReheatName, FirstHVACIteration, sd_airterminal(SysNum).ReheatComp_Index);
+                    SimulateWaterCoilComponents(state, sd_airterminal(SysNum).ReheatName, FirstHVACIteration, sd_airterminal(SysNum).ReheatComp_Index);
                 } else if (SELECT_CASE_var == HCoilType_SteamAirHeating) { // COIL:STEAM:AIRHEATING
                     // Simulate reheat coil for the VAV system
                     SimulateSteamCoilComponents(sd_airterminal(SysNum).ReheatName, FirstHVACIteration, sd_airterminal(SysNum).ReheatComp_Index, 0.0);
@@ -4764,7 +4764,7 @@ namespace SingleDuct {
 
                     // call the reheat coil with the NO FLOW condition to make sure that the Node values
                     // are passed through to the coil outlet correctly
-                    SimulateWaterCoilComponents(sd_airterminal(SysNum).ReheatName, FirstHVACIteration, sd_airterminal(SysNum).ReheatComp_Index);
+                    SimulateWaterCoilComponents(state, sd_airterminal(SysNum).ReheatName, FirstHVACIteration, sd_airterminal(SysNum).ReheatComp_Index);
                 } else if (SELECT_CASE_var == HCoilType_SteamAirHeating) { // COIL:STEAM:AIRHEATING
                     // Simulate reheat coil for the Const Volume system
                     SimulateSteamCoilComponents(sd_airterminal(SysNum).ReheatName, FirstHVACIteration, sd_airterminal(SysNum).ReheatComp_Index, 0.0);
@@ -4920,7 +4920,7 @@ namespace SingleDuct {
                                          sd_airterminal(SysNum).HWCompIndex);
                 }
 
-                SimulateWaterCoilComponents(sd_airterminal(SysNum).ReheatName, FirstHVACIteration, sd_airterminal(SysNum).ReheatComp_Index);
+                SimulateWaterCoilComponents(state, sd_airterminal(SysNum).ReheatName, FirstHVACIteration, sd_airterminal(SysNum).ReheatComp_Index);
             } else if (SELECT_CASE_var == HCoilType_SteamAirHeating) { // HW Flow is steam mass flow here
                 mdot = HWFlow;
                 if (sd_airterminal(SysNum).HWLoopNum > 0) {

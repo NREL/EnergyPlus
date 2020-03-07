@@ -1696,7 +1696,7 @@ namespace PoweredInductionUnits {
                                          PIU(PIUNum).HWBranchNum,
                                          PIU(PIUNum).HWCompNum);
 
-                    SimulateWaterCoilComponents(PIU(PIUNum).HCoil, FirstHVACIteration, PIU(PIUNum).HCoil_Index);
+                    SimulateWaterCoilComponents(state, PIU(PIUNum).HCoil, FirstHVACIteration, PIU(PIUNum).HCoil_Index);
                 } else {
                     // control water flow to obtain output matching QZnReq
                     ControlCompOutput(state, PIU(PIUNum).HCoil,
@@ -1978,7 +1978,7 @@ namespace PoweredInductionUnits {
                                          PIU(PIUNum).HWLoopSide,
                                          PIU(PIUNum).HWBranchNum,
                                          PIU(PIUNum).HWCompNum);
-                    SimulateWaterCoilComponents(PIU(PIUNum).HCoil, FirstHVACIteration, PIU(PIUNum).HCoil_Index);
+                    SimulateWaterCoilComponents(state, PIU(PIUNum).HCoil, FirstHVACIteration, PIU(PIUNum).HCoil_Index);
                 } else {
                     // control water flow to obtain output matching QZnReq
                     ControlCompOutput(state, PIU(PIUNum).HCoil,

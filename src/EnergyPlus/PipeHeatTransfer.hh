@@ -238,7 +238,7 @@ namespace PipeHeatTransfer {
         {
         }
 
-        static PlantComponent *factory(int objectType, std::string objectName);
+        static PlantComponent *factory(AllGlobals &state, int objectType, std::string objectName);
 
         void clear_state();
 
@@ -281,7 +281,7 @@ namespace PipeHeatTransfer {
     // Object Data
     extern Array1D<PipeHTData> PipeHT;
 
-    void GetPipesHeatTransfer();
+    void GetPipesHeatTransfer(AllGlobals &state);
 
 } // namespace PipeHeatTransfer
 

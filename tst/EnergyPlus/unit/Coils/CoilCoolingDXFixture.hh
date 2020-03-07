@@ -50,6 +50,7 @@
 
 // EnergyPlus Headers
 #include "../Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Globals/Globals.hh>
 
 class CoilCoolingDXTest : public EnergyPlus::EnergyPlusFixture {
 public:
@@ -220,8 +221,8 @@ protected:
     return fullObject;
   }
 
-  void TearDown() override {
-    EnergyPlus::EnergyPlusFixture::TearDown(); // Remember to tear down the base
+  void TearDown(AllGlobals &state) override {
+    EnergyPlus::EnergyPlusFixture::TearDown(state); // Remember to tear down the base
                                                // fixture after cleaning up
                                                // derived fixture!
   }

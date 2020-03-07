@@ -155,7 +155,7 @@ namespace RoomAirModelAirflowNetwork {
         RAFN.deallocate();
     }
 
-    void SimRoomAirModelAirflowNetwork(int const ZoneNum) // index number for the specified zone
+    void SimRoomAirModelAirflowNetwork(AllGlobals &state, int const ZoneNum) // index number for the specified zone
     {
 
         // SUBROUTINE INFORMATION:
@@ -195,7 +195,7 @@ namespace RoomAirModelAirflowNetwork {
 
             thisRAFN.RoomAirNode = ThisRoomAirNode;
 
-            thisRAFN.InitRoomAirModelAirflowNetwork(ThisRoomAirNode);
+            thisRAFN.InitRoomAirModelAirflowNetwork(state, ThisRoomAirNode);
 
             thisRAFN.CalcRoomAirModelAirflowNetwork(ThisRoomAirNode);
         }
@@ -206,7 +206,7 @@ namespace RoomAirModelAirflowNetwork {
 
     //****************************************************
 
-    void LoadPredictionRoomAirModelAirflowNetwork(int const ZoneNum, int const RoomAirNode) // index number for the specified zone and node
+    void LoadPredictionRoomAirModelAirflowNetwork(AllGlobals &state, int const ZoneNum, int const RoomAirNode) // index number for the specified zone and node
     {
 
         // SUBROUTINE INFORMATION:
@@ -248,13 +248,13 @@ namespace RoomAirModelAirflowNetwork {
         auto &thisRAFN(RAFN(RAFNNum));
         thisRAFN.ZoneNum = ZoneNum;
 
-        thisRAFN.InitRoomAirModelAirflowNetwork(RoomAirNode);
+        thisRAFN.InitRoomAirModelAirflowNetwork(state, RoomAirNode);
 
     } // LoadPredictionRoomAirModelAirflowNetwork
 
     //****************************************************
 
-    void RAFNData::InitRoomAirModelAirflowNetwork(int const RoomAirNode) // index number for the specified zone
+    void RAFNData::InitRoomAirModelAirflowNetwork(AllGlobals &state, int const RoomAirNode) // index number for the specified zone
     {
 
         // SUBROUTINE INFORMATION:
@@ -575,7 +575,7 @@ namespace RoomAirModelAirflowNetwork {
         // reuse code in ZoneTempPredictorCorrector for sensible components.
         CalcNodeSums(RoomAirNode);
 
-        SumNonAirSystemResponseForNode(RoomAirNode);
+        SumNonAirSystemResponseForNode(state, RoomAirNode);
 
         // latent gains.
         auto &ThisRAFNNode(RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNode));
@@ -1251,7 +1251,7 @@ namespace RoomAirModelAirflowNetwork {
 
     } // CalcSurfaceMoistureSums
 
-    void RAFNData::SumNonAirSystemResponseForNode(int const RAFNNodeNum)
+    void RAFNData::SumNonAirSystemResponseForNode(AllGlobals &state, int const RAFNNodeNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1314,7 +1314,7 @@ namespace RoomAirModelAirflowNetwork {
 
             if (ThisRAFNNode.HVAC(I).TypeOfNum == ZoneEquipTypeOf_BaseboardRadiantConvectiveSteam) {
                 // CASE(BBSteam_Num) !'ZoneHVAC:Baseboard:RadiantConvective:Steam' 14
-                SimSteamBaseboard(ThisRAFNNode.HVAC(I).Name,
+                SimSteamBaseboard(state, ThisRAFNNode.HVAC(I).Name,
                                   ZoneNum,
                                   RoomAirflowNetworkZoneInfo(ZoneNum).ActualZoneID,
                                   false,

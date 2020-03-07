@@ -56,6 +56,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 
 namespace EnergyPlus {
 
@@ -315,7 +316,7 @@ namespace WaterCoils {
     // Functions
     void clear_state();
 
-    void SimulateWaterCoilComponents(std::string const &CompName,
+    void SimulateWaterCoilComponents(AllGlobals &state, std::string const &CompName,
                                      bool const FirstHVACIteration,
                                      int &CompIndex,
                                      Optional<Real64> QActual = _,
@@ -333,7 +334,7 @@ namespace WaterCoils {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitWaterCoil(OutputFiles &outputFiles,
+    void InitWaterCoil(AllGlobals &state, OutputFiles &outputFiles,
                        int const CoilNum,
                        bool const FirstHVACIteration // unused1208
     );

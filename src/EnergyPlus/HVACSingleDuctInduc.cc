@@ -1330,7 +1330,7 @@ namespace HVACSingleDuctInduc {
         // conditions have been set by CalcFourPipeIndUnit either explicitly or as a result of the simple component calls.
     }
 
-    void CalcFourPipeIndUnit(int const IUNum,               // Unit index
+    void CalcFourPipeIndUnit(AllGlobals &state, int const IUNum,               // Unit index
                              bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
                              int const ZoneNode,            // zone node number
                              Real64 const HWFlow,           // hot water flow (kg/s)
@@ -1431,8 +1431,8 @@ namespace HVACSingleDuctInduc {
                              IndUnit(IUNum).CWCompNum);
         //  Node(ColdControlNode)%MassFlowRate = CWFlow
 
-        SimulateWaterCoilComponents(IndUnit(IUNum).HCoil, FirstHVACIteration, IndUnit(IUNum).HCoil_Num);
-        SimulateWaterCoilComponents(IndUnit(IUNum).CCoil, FirstHVACIteration, IndUnit(IUNum).CCoil_Num);
+        SimulateWaterCoilComponents(state, IndUnit(IUNum).HCoil, FirstHVACIteration, IndUnit(IUNum).HCoil_Num);
+        SimulateWaterCoilComponents(state, IndUnit(IUNum).CCoil, FirstHVACIteration, IndUnit(IUNum).CCoil_Num);
         SimAirMixer(IndUnit(IUNum).MixerName, IndUnit(IUNum).Mixer_Num);
         LoadMet = TotAirMassFlow * CpAirZn * (Node(OutletNode).Temp - Node(ZoneNode).Temp);
     }

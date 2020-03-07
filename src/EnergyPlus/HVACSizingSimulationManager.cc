@@ -345,7 +345,7 @@ void ManageHVACSizingSimulation(AllGlobals &state, OutputFiles &outputFiles, boo
 
                     for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
                         if (AnySlabsInModel || AnyBasementsInModel) {
-                            SimulateGroundDomains(OutputFiles::getSingleton(), false);
+                            SimulateGroundDomains(state, OutputFiles::getSingleton(), false);
                         }
 
                         BeginTimeStepFlag = true;

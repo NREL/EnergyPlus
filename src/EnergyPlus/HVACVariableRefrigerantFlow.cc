@@ -5758,7 +5758,7 @@ namespace HVACVariableRefrigerantFlow {
             if (VRFTU(VRFTUNum).SuppHeatCoilFluidInletNode > 0) {
                 if (VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
                     if (VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow == DataSizing::AutoSize) {
-                        WaterCoils::SimulateWaterCoilComponents(
+                        WaterCoils::SimulateWaterCoilComponents(state, 
                             VRFTU(VRFTUNum).SuppHeatCoilName, FirstHVACIteration, VRFTU(VRFTUNum).SuppHeatCoilIndex);
                         // design hot water volume flow rate
                         Real64 CoilMaxVolFlowRate =
@@ -5854,7 +5854,7 @@ namespace HVACVariableRefrigerantFlow {
                                                          VRFTU(VRFTUNum).SuppHeatCoilCompNum);
 
                     //     simulate water coil to find operating capacity
-                    WaterCoils::SimulateWaterCoilComponents(
+                    WaterCoils::SimulateWaterCoilComponents(state,
                         VRFTU(VRFTUNum).SuppHeatCoilName, FirstHVACIteration, VRFTU(VRFTUNum).SuppHeatCoilIndex, SuppHeatCoilCapacity);
                     VRFTU(VRFTUNum).DesignSuppHeatingCapacity = SuppHeatCoilCapacity;
                 } // from iF VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingWater
@@ -14069,7 +14069,7 @@ namespace HVACVariableRefrigerantFlow {
                     Real64 mdot = this->SuppHeatCoilFluidMaxFlow;
                     DataLoopNode::Node(this->SuppHeatCoilFluidInletNode).MassFlowRate = mdot;
                     //     simulate hot water coil to find the full flow operating capacity
-                    WaterCoils::SimulateWaterCoilComponents(
+                    WaterCoils::SimulateWaterCoilComponents(state,
                         this->SuppHeatCoilName, FirstHVACIteration, this->SuppHeatCoilIndex, QActual, this->OpMode, PartLoadRatio);
                     if (QActual > SuppHeatCoilLoad) {
                         Par[1] = double(VRFTUNum);
@@ -14099,7 +14099,7 @@ namespace HVACVariableRefrigerantFlow {
                                                          this->SuppHeatCoilCompNum);
                 }
                 //     simulate water heating coil
-                WaterCoils::SimulateWaterCoilComponents(
+                WaterCoils::SimulateWaterCoilComponents(state, 
                     this->SuppHeatCoilName, FirstHVACIteration, this->SuppHeatCoilIndex, SuppHeatCoilLoad, this->OpMode, this->SuppHeatPartLoadRatio);
 
             } else if (SELECT_CASE_var == DataHVACGlobals::Coil_HeatingSteam) {
@@ -14142,7 +14142,7 @@ namespace HVACVariableRefrigerantFlow {
 
         Real64 mdot = HVACVariableRefrigerantFlow::VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow * PartLoadFrac;
         DataLoopNode::Node(VRFTU(VRFTUNum).SuppHeatCoilFluidInletNode).MassFlowRate = mdot;
-        WaterCoils::SimulateWaterCoilComponents(
+        WaterCoils::SimulateWaterCoilComponents(state, 
             VRFTU(VRFTUNum).SuppHeatCoilName, FirstHVACIteration, VRFTU(VRFTUNum).SuppHeatCoilIndex, QActual, VRFTU(VRFTUNum).OpMode, PartLoadFrac);
 
         if (std::abs(SuppHeatCoilLoad) == 0.0) {

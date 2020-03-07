@@ -183,7 +183,7 @@ namespace PhotovoltaicThermalCollectors {
 
     void GetPVTcollectorsInput();
 
-    void simPVTfromOASys(int index, bool FirstHVACIteration);
+    void simPVTfromOASys(AllGlobals &state, int index, bool FirstHVACIteration);
 
     int getPVTindexFromName(std::string const &name);
 

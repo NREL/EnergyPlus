@@ -75,6 +75,7 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -5975,7 +5976,7 @@ namespace WeatherManager {
 
         GetLocationInfo(ErrorsFound);
 
-        GetGroundTemps(ErrorsFound);
+        GetGroundTemps(state, ErrorsFound);
 
         GetGroundReflectances(outputFiles, ErrorsFound);
 
@@ -8077,7 +8078,7 @@ namespace WeatherManager {
         }
     }
 
-    void GetGroundTemps(bool &ErrorsFound)
+    void GetGroundTemps(AllGlobals &state, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:

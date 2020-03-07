@@ -637,7 +637,7 @@ namespace EnergyPlus {
 
             void initInOutCells(CartesianCell const &in, CartesianCell const &out);
 
-            static PlantComponent *factory(int objectType, std::string objectName);
+            static PlantComponent *factory(AllGlobals &state, int objectType, std::string objectName);
 
             void simulate(AllGlobals &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
                           bool RunFlag) override;
@@ -927,19 +927,19 @@ namespace EnergyPlus {
 
         void clear_state();
 
-        void SimulateGroundDomains(OutputFiles &outputFiles, bool initOnly);
+        void SimulateGroundDomains(AllGlobals &state, OutputFiles &outputFiles, bool initOnly);
 
         void CheckIfAnySlabs();
 
-        void CheckIfAnyBasements();
+        void CheckIfAnyBasements(AllGlobals &state);
 
-        void GetPipingSystemsAndGroundDomainsInput();
+        void GetPipingSystemsAndGroundDomainsInput(AllGlobals &state);
 
-        void ReadGeneralDomainInputs(int IndexStart, int NumGeneralizedDomains, bool &ErrorsFound);
+        void ReadGeneralDomainInputs(AllGlobals &state, int IndexStart, int NumGeneralizedDomains, bool &ErrorsFound);
 
-        void ReadZoneCoupledDomainInputs(int StartingDomainNumForZone, int NumZoneCoupledDomains, bool &ErrorsFound);
+        void ReadZoneCoupledDomainInputs(AllGlobals &state, int StartingDomainNumForZone, int NumZoneCoupledDomains, bool &ErrorsFound);
 
-        void ReadBasementInputs(int StartingDomainNumForBasement, int NumBasements, bool &ErrorsFound);
+        void ReadBasementInputs(AllGlobals &state, int StartingDomainNumForBasement, int NumBasements, bool &ErrorsFound);
         
         bool SiteGroundDomainUsingNoMassMat(Real64 const MaterialThickness,
                                             int const MaterialNum);
@@ -952,7 +952,7 @@ namespace EnergyPlus {
 
         void ReadPipeSegmentInputs(bool &ErrorsFound);
 
-        void ReadHorizontalTrenchInputs(int StartingDomainNumForHorizontal,
+        void ReadHorizontalTrenchInputs(AllGlobals &state, int StartingDomainNumForHorizontal,
                                         int StartingCircuitNumForHorizontal,
                                         bool &ErrorsFound);
 
