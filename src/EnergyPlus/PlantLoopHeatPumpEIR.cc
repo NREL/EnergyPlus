@@ -384,7 +384,7 @@ namespace EIRPlantLoopHeatPumps {
             SetupOutputVariable(
                 "Heat Pump Source Side Outlet Temperature", OutputProcessor::Unit::C, this->sourceSideOutletTemp, "System", "Average", this->name);
             SetupOutputVariable("Heat Pump Electric Power", OutputProcessor::Unit::W, this->powerUsage, "System", "Average", this->name);
-            if (this->plantTypeOfNum == 95) { // energy from HeatPump:PlantLoop:EIR:Cooling object
+            if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRCooling) { // energy from HeatPump:PlantLoop:EIR:Cooling object
                 SetupOutputVariable("Heat Pump Electric Energy",
                                     OutputProcessor::Unit::J,
                                     this->powerEnergy,
@@ -396,7 +396,7 @@ namespace EIRPlantLoopHeatPumps {
                                     "Cooling",
                                     "Heat Pump",
                                     "Plant");
-            } else if (this->plantTypeOfNum == 96) { // energy from HeatPump:PlantLoop:EIR:Heating object
+            } else if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRHeating) { // energy from HeatPump:PlantLoop:EIR:Heating object
                 SetupOutputVariable("Heat Pump Electric Energy",
                                     OutputProcessor::Unit::J,
                                     this->powerEnergy,
