@@ -453,6 +453,8 @@ namespace DataHeatBalance {
     extern Array1D<Real64> SNLoadPredictedHSPRate; // Predicted load to heating setpoint (unmultiplied)
     extern Array1D<Real64> SNLoadPredictedCSPRate; // Predicted load to cooling setpoint (unmultiplied)
     extern Array1D<Real64> MoisturePredictedRate;
+    extern Array1D<Real64> MoisturePredictedHumSPRate;   // Predicted latent load to humidification setpoint (unmultiplied)
+    extern Array1D<Real64> MoisturePredictedDehumSPRate; // Predicted latent load to dehumidification setpoint (unmultiplied)
 
     extern Array1D<Real64> ListSNLoadHeatEnergy;
     extern Array1D<Real64> ListSNLoadCoolEnergy;

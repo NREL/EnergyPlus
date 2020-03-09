@@ -600,6 +600,8 @@ namespace DataHeatBalance {
     Array1D<Real64> SNLoadPredictedHSPRate; // Predicted load to heating setpoint (unmultiplied)
     Array1D<Real64> SNLoadPredictedCSPRate; // Predicted load to cooling setpoint (unmultiplied)
     Array1D<Real64> MoisturePredictedRate;
+    Array1D<Real64> MoisturePredictedHumSPRate;   // Predicted latent load to humidification setpoint (unmultiplied)
+    Array1D<Real64> MoisturePredictedDehumSPRate; // Predicted latent load to dehumidification setpoint (unmultiplied)
 
     Array1D<Real64> ListSNLoadHeatEnergy;
     Array1D<Real64> ListSNLoadCoolEnergy;
@@ -961,6 +963,8 @@ namespace DataHeatBalance {
         SNLoadPredictedHSPRate.deallocate();
         SNLoadPredictedCSPRate.deallocate();
         MoisturePredictedRate.deallocate();
+        MoisturePredictedHumSPRate.deallocate();
+        MoisturePredictedDehumSPRate.deallocate();
         ListSNLoadHeatEnergy.deallocate();
         ListSNLoadCoolEnergy.deallocate();
         ListSNLoadHeatRate.deallocate();

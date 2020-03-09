@@ -145,6 +145,10 @@ def parse_idd(data):
             if 'memo' in obj_data:
                 root['properties'][obj_name]['memo'] = obj_data.pop('memo')
             if 'min_fields' in obj_data:
+                num_fields_with_name = len(obj_data['properties']) + 1
+                if int(obj_data['min_fields']) > num_fields_with_name:
+                    if 'extensions' not in obj_data['properties']:
+                        raise RuntimeError("Object with min-fields > num_fields. Object name = " + obj_name)
                 root['properties'][obj_name]['min_fields'] = obj_data.pop('min_fields')
             if 'extensible_size' in obj_data:
                 root['properties'][obj_name]['extensible_size'] = obj_data.pop('extensible_size')
