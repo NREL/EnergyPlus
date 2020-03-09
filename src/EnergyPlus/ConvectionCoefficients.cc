@@ -252,8 +252,8 @@ namespace ConvectionCoefficients {
         BMMixedUnstableCeilingErrorIDX2 = 0;
     }
 
-    void InitInteriorConvectionCoeffs(Array1S<Real64> const SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
-                                      Optional_int_const ZoneToResimulate        // if passed in, then only calculate surfaces that have this zone
+    void InitInteriorConvectionCoeffs(const Array1D<Real64> &SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
+                                      Optional_int_const ZoneToResimulate         // if passed in, then only calculate surfaces that have this zone
     )
     {
 
@@ -3940,8 +3940,8 @@ namespace ConvectionCoefficients {
     }
 
     void CalcDetailedHcInForDVModel(int const SurfNum,                         // surface number for which coefficients are being calculated
-                                    Array1S<Real64> const SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
-                                    Array1S<Real64> HcIn,                      // Interior Convection Coeff Array
+                                    const Array1D<Real64> &SurfaceTemperatures, // Temperature of surfaces for evaluation of HcIn
+                                    Array1D<Real64> &HcIn,                      // Interior Convection Coeff Array
                                     Optional<Array1S<Real64> const> Vhc        // Velocity array for forced convection coeff calculation
     )
     {
@@ -4162,7 +4162,7 @@ namespace ConvectionCoefficients {
     }
 
     void CalcCeilingDiffuserIntConvCoeff(int const ZoneNum,
-                                         Array1S<Real64> const SurfaceTemperatures) // zone number for which coefficients are being calculated
+                                         const Array1D<Real64> &SurfaceTemperatures) // zone number for which coefficients are being calculated
     {
 
         Real64 ACH = CalcCeilingDiffuserACH(ZoneNum);
@@ -4195,7 +4195,7 @@ namespace ConvectionCoefficients {
     // ever be made to work correctly with the inlet air temperature.
 
     void CalcCeilingDiffuserInletCorr(int const ZoneNum,                        // Zone number
-                                      Array1S<Real64> const SurfaceTemperatures // For CalcASHRAEDetailed, if called
+                                      const Array1S<Real64> &SurfaceTemperatures // For CalcASHRAEDetailed, if called
     )
     {
 
@@ -4295,8 +4295,8 @@ namespace ConvectionCoefficients {
         if (ACH > 100.0) ShowWarningError("CeilingDiffuser convection correlation is out of range: ACH > 100");
     }
 
-    void CalcTrombeWallIntConvCoeff(int const ZoneNum,                        // Zone number for which coefficients are being calculated
-                                    Array1S<Real64> const SurfaceTemperatures // Temperature of surfaces for evaluation of HcIn
+    void CalcTrombeWallIntConvCoeff(int const ZoneNum,                         // Zone number for which coefficients are being calculated
+                                    const Array1D<Real64> &SurfaceTemperatures // Temperature of surfaces for evaluation of HcIn
     )
     {
 

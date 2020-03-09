@@ -53,7 +53,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1A.hh>
-#include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Array3D.hh>
 #include <ObjexxFCL/Optional.hh>
@@ -688,7 +687,7 @@ namespace WeatherManager {
 
     void ResetEnvironmentCounter();
 
-    void GetNextEnvironment(OutputFiles &outputFiles,
+    bool GetNextEnvironment(OutputFiles &outputFiles,
                             bool &Available,  // true if there is another environment, false if the end
                             bool &ErrorsFound // will be set to true if severe errors are found in inputs
     );
@@ -719,14 +718,14 @@ namespace WeatherManager {
                               bool const Rollover,
                               Optional_bool_const MidSimReset = _);
 
-    void SetDSTDateRanges(Array1S_int MonWeekDay, // Weekday of each day 1 of month
-                          Array1S_int DSTIndex,   // DST Index for each julian day (1:366)
+    void SetDSTDateRanges(Array1D_int &MonWeekDay, // Weekday of each day 1 of month
+                          Array1D_int &DSTIndex,   // DST Index for each julian day (1:366)
                           Optional_int DSTActStMon = _,
                           Optional_int DSTActStDay = _,
                           Optional_int DSTActEnMon = _,
                           Optional_int DSTActEnDay = _);
 
-    void SetSpecialDayDates(Array1S_int MonWeekDay); // Weekday of each day 1 of month
+    void SetSpecialDayDates(Array1D_int &MonWeekDay); // Weekday of each day 1 of month
 
     void InitializeWeather(bool &PrintEnvrnStamp); // Set to true when the environment header should be printed
 
@@ -842,9 +841,10 @@ namespace WeatherManager {
 
     void CheckWeatherFileValidity();
 
-    void ReportOutputFileHeaders();
+    void ReportOutputFileHeaders(OutputFiles &outputFiles);
 
-    void ReportWeatherAndTimeInformation(bool &PrintEnvrnStamp); // Set to true when the environment header should be printed
+    void ReportWeatherAndTimeInformation(OutputFiles &outputFiles,
+                                         bool &PrintEnvrnStamp); // Set to true when the environment header should be printed
 
     void ReadUserWeatherInput(OutputFiles &outputFiles);
 

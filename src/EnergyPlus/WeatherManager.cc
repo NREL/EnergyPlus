@@ -606,7 +606,7 @@ namespace WeatherManager {
 
         SetCurrentWeather();
 
-        ReportWeatherAndTimeInformation(PrintEnvrnStamp);
+        ReportWeatherAndTimeInformation(OutputFiles::getSingleton(), PrintEnvrnStamp);
     }
 
     void ResetEnvironmentCounter()
@@ -725,7 +725,7 @@ namespace WeatherManager {
         int NumAlpha = 0, NumNumber = 0, IOStat = 0;
         DataIPShortCuts::cCurrentModuleObject = "Site:VariableLocation";
         if (inputProcessor->getNumObjectsFound(DataIPShortCuts::cCurrentModuleObject) == 0) return;
-        inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
+            inputProcessor->getObjectItem(DataIPShortCuts::cCurrentModuleObject,
                                       1,
                                       DataIPShortCuts::cAlphaArgs,
                                       NumAlpha,
@@ -786,7 +786,7 @@ namespace WeatherManager {
         }
     }
 
-    void GetNextEnvironment(OutputFiles &outputFiles,
+    bool GetNextEnvironment(OutputFiles &outputFiles,
                             bool &Available,  // true if there is another environment, false if the end
                             bool &ErrorsFound // will be set to true if severe errors are found in inputs
     )
@@ -877,7 +877,7 @@ namespace WeatherManager {
 
             PrintEndDataDictionary = true;
 
-            ReportOutputFileHeaders(); // Write the output file header information
+            ReportOutputFileHeaders(outputFiles); // Write the output file header information
 
             // Setup Output Variables, CurrentModuleObject='All Simulations'
 
@@ -1434,6 +1434,7 @@ namespace WeatherManager {
         } else if (ErrorsFound) {
             Available = false;
         }
+        return Available && !ErrorsFound;
     }
 
     void AddDesignSetToEnvironmentStruct(int const HVACSizingIterCount)
@@ -1829,8 +1830,8 @@ namespace WeatherManager {
         }
     }
 
-    void SetDSTDateRanges(Array1S_int MonWeekDay, // Weekday of each day 1 of month
-                          Array1S_int DSTIndex,   // DST Index for each julian day (1:366)
+    void SetDSTDateRanges(Array1D_int &MonWeekDay, // Weekday of each day 1 of month
+                          Array1D_int &DSTIndex,   // DST Index for each julian day (1:366)
                           Optional_int DSTActStMon,
                           Optional_int DSTActStDay,
                           Optional_int DSTActEnMon,
@@ -1958,7 +1959,7 @@ namespace WeatherManager {
         }
     }
 
-    void SetSpecialDayDates(Array1S_int MonWeekDay) // Weekday of each day 1 of month
+    void SetSpecialDayDates(Array1D_int &MonWeekDay) // Weekday of each day 1 of month
     {
 
         // SUBROUTINE INFORMATION:
@@ -5712,7 +5713,7 @@ namespace WeatherManager {
         } // ... end of WeatherFileExists IF-THEN
     }
 
-    void ReportOutputFileHeaders()
+    void ReportOutputFileHeaders(OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5768,40 +5769,40 @@ namespace WeatherManager {
         EnvironmentReportChr = std::to_string(EnvironmentReportNbr);
         strip(EnvironmentReportChr);
         ObjexxFCL::gio::write(OutputFileStandard, A) << EnvironmentReportChr + EnvironmentString;
-        ObjexxFCL::gio::write(OutputFileMeters, A) << EnvironmentReportChr + EnvironmentString;
+        print(outputFiles.mtr, "{}{}\n", EnvironmentReportChr, EnvironmentString);
 
         AssignReportNumber(OutputProcessor::TimeStepStampReportNbr);
         OutputProcessor::TimeStepStampReportChr = std::to_string(OutputProcessor::TimeStepStampReportNbr);
         strip(OutputProcessor::TimeStepStampReportChr);
         ObjexxFCL::gio::write(OutputFileStandard, A) << OutputProcessor::TimeStepStampReportChr + TimeStepString;
-        ObjexxFCL::gio::write(OutputFileMeters, A) << OutputProcessor::TimeStepStampReportChr + TimeStepString;
+        print(outputFiles.mtr, "{}{}\n", OutputProcessor::TimeStepStampReportChr, TimeStepString);
 
         AssignReportNumber(OutputProcessor::DailyStampReportNbr);
         OutputProcessor::DailyStampReportChr = std::to_string(OutputProcessor::DailyStampReportNbr);
         strip(OutputProcessor::DailyStampReportChr);
         ObjexxFCL::gio::write(OutputFileStandard, A) << OutputProcessor::DailyStampReportChr + DailyString + "Report Variables Requested";
-        ObjexxFCL::gio::write(OutputFileMeters, A) << OutputProcessor::DailyStampReportChr + DailyString + "Meters Requested";
+        print(outputFiles.mtr, "{}{}{}\n", OutputProcessor::DailyStampReportChr, DailyString, "Meters Requested");
 
         AssignReportNumber(OutputProcessor::MonthlyStampReportNbr);
         OutputProcessor::MonthlyStampReportChr = std::to_string(OutputProcessor::MonthlyStampReportNbr);
         strip(OutputProcessor::MonthlyStampReportChr);
         ObjexxFCL::gio::write(OutputFileStandard, A) << OutputProcessor::MonthlyStampReportChr + MonthlyString + "Report Variables Requested";
-        ObjexxFCL::gio::write(OutputFileMeters, A) << OutputProcessor::MonthlyStampReportChr + MonthlyString + "Meters Requested";
+        print(outputFiles.mtr, "{}{}{}\n", OutputProcessor::MonthlyStampReportChr, MonthlyString, "Meters Requested");
 
         AssignReportNumber(OutputProcessor::RunPeriodStampReportNbr);
         OutputProcessor::RunPeriodStampReportChr = std::to_string(OutputProcessor::RunPeriodStampReportNbr);
         strip(OutputProcessor::RunPeriodStampReportChr);
         ObjexxFCL::gio::write(OutputFileStandard, A) << OutputProcessor::RunPeriodStampReportChr + RunPeriodString + "Report Variables Requested";
-        ObjexxFCL::gio::write(OutputFileMeters, A) << OutputProcessor::RunPeriodStampReportChr + RunPeriodString + "Meters Requested";
+        print(outputFiles.mtr, "{}{}{}\n", OutputProcessor::RunPeriodStampReportChr, RunPeriodString, "Meters Requested");
 
         AssignReportNumber(OutputProcessor::YearlyStampReportNbr);
         OutputProcessor::YearlyStampReportChr = std::to_string(OutputProcessor::YearlyStampReportNbr);
         strip(OutputProcessor::YearlyStampReportChr);
         ObjexxFCL::gio::write(OutputFileStandard, A) << OutputProcessor::YearlyStampReportChr + YearlyString + "Report Variables Requested";
-        ObjexxFCL::gio::write(OutputFileMeters, A) << OutputProcessor::YearlyStampReportChr + YearlyString + "Meters Requested";
+        print(outputFiles.mtr, "{}{}{}\n", OutputProcessor::YearlyStampReportChr, YearlyString, "Meters Requested");
     }
 
-    void ReportWeatherAndTimeInformation(bool &PrintEnvrnStamp) // Set to true when the environment header should be printed
+    void ReportWeatherAndTimeInformation(OutputFiles &outputFiles, bool &PrintEnvrnStamp) // Set to true when the environment header should be printed
     {
 
         // SUBROUTINE INFORMATION:
@@ -5833,7 +5834,9 @@ namespace WeatherManager {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static ObjexxFCL::gio::Fmt EndOfHeaderFormat("('End of Data Dictionary')");          // End of data dictionary marker
+        static constexpr auto EndOfHeaderString("End of Data Dictionary");          // End of data dictionary marker
         static ObjexxFCL::gio::Fmt EnvironmentStampFormat("(a,',',a,3(',',f7.2),',',f7.2)"); // Format descriptor for environ stamp
+        static constexpr auto EnvironmentStampFormatStr("{},{},{:7.2F},{:7.2F},{:7.2F},{:7.2F}\n"); // Format descriptor for environ stamp
         //  CHARACTER(len=*), PARAMETER :: TimeStampFormat = "(i3,',',i4,',',i2,',',i2,',',i2)" ! Format descriptor for the date/time stamp
 
         // INTERFACE BLOCK SPECIFICATIONS:
@@ -5864,15 +5867,14 @@ namespace WeatherManager {
 
                 if (PrintEndDataDictionary && DoOutputReporting) {
                     ObjexxFCL::gio::write(OutputFileStandard, EndOfHeaderFormat);
-                    ObjexxFCL::gio::write(OutputFileMeters, EndOfHeaderFormat);
+                    print(outputFiles.mtr, "{}\n", EndOfHeaderString);
                     PrintEndDataDictionary = false;
                 }
                 if (DoOutputReporting) {
                     std::string const &Title(Environment(Envrn).Title);
                     ObjexxFCL::gio::write(OutputFileStandard, EnvironmentStampFormat)
                         << EnvironmentReportChr << Title << Latitude << Longitude << TimeZoneNumber << Elevation;
-                    ObjexxFCL::gio::write(OutputFileMeters, EnvironmentStampFormat)
-                        << EnvironmentReportChr << Title << Latitude << Longitude << TimeZoneNumber << Elevation;
+                    print(outputFiles.mtr, EnvironmentStampFormatStr, EnvironmentReportChr, Title, Latitude, Longitude, TimeZoneNumber, Elevation);
                     PrintEnvrnStamp = false;
                 }
             }
@@ -7129,6 +7131,10 @@ namespace WeatherManager {
                 } else if (UtilityRoutines::SameString(cAlphaArgs(13), "SuppressThermalResetAtBeginEnvironment")) {
                     DesDayInput(EnvrnNum).suppressBegEnvReset = true;
                 }
+            }
+            // for PerformancePrecisionTradeoffs
+            if (DataEnvironment::forceBeginEnvResetSuppress) {
+                DesDayInput(EnvrnNum).suppressBegEnvReset = true;
             }
             //   A7,  \field Rain Indicator
             if (UtilityRoutines::SameString(cAlphaArgs(7), "Yes")) {
