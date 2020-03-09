@@ -1518,13 +1518,9 @@ namespace HybridEvapCoolingModel {
                             CandidateSetting.Unscaled_Supply_Air_Mass_Flow_Rate = UnscaledMsa;
                             // If no load is requested but ventilation is required, set the supply air mass flow rate to the minimum of the required ventilation flow rate and the maximum supply air flow rate
                             if (!CoolingRequested && !HeatingRequested && !DehumidificationRequested && !HumidificationRequested) {
-                                CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate = min(MinOA_Msa, MsaRatio * ScaledSystemMaximumSupplyAirMassFlowRate);
-                                CandidateSetting.ScaledSupply_Air_Ventilation_Volume = min(MinOA_Msa, MsaRatio * ScaledSystemMaximumSupplyAirMassFlowRate) / StdRhoAir;
-                                Tsa = StepIns.Tosa;
-                            } else {
-                                CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate = MsaRatio * ScaledSystemMaximumSupplyAirMassFlowRate;
-                                CandidateSetting.ScaledSupply_Air_Ventilation_Volume = MsaRatio * ScaledSystemMaximumSupplyAirMassFlowRate / StdRhoAir;
-                            }                           
+                                CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate = min(MinOA_Msa, CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate);
+                                CandidateSetting.ScaledSupply_Air_Ventilation_Volume = min(MinOA_Msa / StdRhoAir, CandidateSetting.ScaledSupply_Air_Ventilation_Volume);
+                            }
                             CandidateSetting.oMode = Mode;
                             CandidateSetting.SupplyAirTemperature = Tsa;
                             CandidateSetting.SupplyAirW = CheckVal_W(Wsa, Tsa, OutletPressure);
