@@ -825,6 +825,15 @@ SimulationControl,
 
 The PerformancePrecisionTradeoffs object can be used to control tradeoffs between performance (speed) and precision for certain EnergyPlus features. This object enables users to choose to use selected options that are intended to shorten the time needed for the computer to run EnergyPlus simulations, but may tend to decrease the accuracy of results compared to methods that require longer computing time.
 
+\paragraph{Tuning using the \_perflog.csv file}\label{tuning-using-perlog-csv-file}
+
+Everytime a simulation includes the PerformancePrecisionTradeoffs object, a file is generated with the same name as the input but ending with _perflog.csv file (performanc log file). This file can be opened using a spreadsheet program and will be helpful in adjusting the input field values for the PerformancePrecisionTradeoffs object. Unlike most EnergyPlus output files, a new line of results is appended (added to the end of the file) everytime the input file is simulated. This creates a log of each run and allows the examination of the impacts of the changes to the simulation values. You are encouraged to not make changes to any other portions of your input file other than the PerformancePrecisionTradeoffs object when you are tuning that object. Also if you are looking at the \_perflog.csv in a spreadsheet program, make sure you close the file before each simulation. A spreadsheet program will often lock a csv file and prevent it from being modified by another program like EnergyPlus.
+
+To illistrate how to use the PerformancePrecisionTradeoffs object and the \_perflog.csv file together, here is an example using the LgOffVAV.idf file that comes with EnergyPlus in the ExampleFiles folder. Several simulations were made and the results in the LgOffVAV\_perflog.csv for various options in the PerformancePrecisionTradeoffs object are shown below:
+
+
+
+
 \paragraph{Field: Use Coil Direct Solutions}\label{use-coil-direct-solutions}
 
 If Yes, an analytical or empirical solution will be used instead of iteration based method in calculations that determine how to control the coil model.  The tradeoff is between an iterative solution algorithm, see \hyperref[hvacystemrootfindingalgorithm]{HVACSystemRootFindingAlgorithm}, or a direct solution algorithm as described below.  These calculations are at the level of how the coil component model is to be controlled by the parent system object as it tries to find a part load ratio that just meets a coil load or coil leaving temperature condition.  Once the control calculations have been completed to determine the part load ratio (or speed ratio for variable speed) the full coil model is still used for the final calculation,
