@@ -923,12 +923,44 @@ Allowed choices are: ScriptF (default) and CarrollMRT. ScriptF uses view factors
 
 Although, defined view factors cannot be used with CarrollMRT, the algorithm approximates ``view factors'' based on relative areas of the surfaces in a similar way to how EnergyPlus determines its default view factors. One exception is that with CarrollMRT, every surface can ``view'' every other surface in the zone regardless of orientation. For enclosed prism shapes, this approximation is very accurate.
 
+\paragraph{Field: Override Mode}\label{override-mode}
+
+The Override Mode field provides a single field that will override other inputs located in the IDF/epJSON file as well as convergence related values that appear in the remaining fields of the PerformancePrecisionTradeoffs object. The Normal option (default) provides no overrides while the Mode options provide overrides based on the follow table. The Advanced option, allows the remaining fields of the PerformancePrecisionTradeoffs to be used. 
+
+% table 2
+\begin{longtable}[c]{p{1.5in}p{5.0in}}
+\caption{Override Modes\label{table:override_modes}} \tabularnewline
+\toprule
+Mode & Description \tabularnewline
+\midrule
+\endfirsthead
+
+Normal & no overrides\tabularnewline
+Mode01 & Zone Time step (TimeStep object) will be set to one timestep per hour\tabularnewline
+Mode02 & Mode01 plus ZoneAirHeatBalanceAlgorithm will be set to Euler\tabularnewline
+Mode03 & Mode02 plus Minimum Number of Warmup Days will be set to 1\tabularnewline
+Mode04 & Mode03 plus Begin Environment Reset Mode will be set to SuppressAllBeginEnvironmentResets\tabularnewline
+Mode05 & Mode04 MaxZoneTempDiff will be set to 1.00\tabularnewline
+Advanced& Allow direct input of convergence field values\tabularnewline
+
+\bottomrule
+\end{longtable}
+
+The increasing mode number roughly correspond with increased speed. Mode01 to Mode04 are overriding inputs in other parts of the IDF/epJSON file and is equivalent to changing those input directly. Mode05 is changing a convergence parameter previously not available to modified by the user.
+
+\paragraph{Field: MaxZoneTempDiff}\label{max-zone-temp-diff}
+
+This field is only active and used when Override Mode is set to Advanced. The value provided here is used for the MaxZoneTempDiff variable within EnergyPlus. This variable sets the maximum zone temperature change before HVAC timestep is shortened. Larger values result in fewer iterations. To understand this input completely, please review the use of the MaxZoneTempDiff variable in the ManageHVAC() routine located in the HVACManager.cc source file of EnergyPlus. The value normally used in EnergyPlus is 0.3 which is also the default value. Testing has been done with a value of 1.0 which increased the overall speed of EnergyPlus for most of a set of selected files that were tested. Values larger than 1.0 have not been tested.
+
+
 An IDF example:
 
 \begin{lstlisting}
 PerformancePrecisionTradeoffs,
   Yes,                      !- Use Coil Direct Solutions
   CarrollMRT;               !- Zone Radiant Exchange Algorithm
+  Mode05,                   !- Override Mode
+  0.3;                      !- MaxZoneTempDiff
 \end{lstlisting}
 
 \subsection{HVACSystemRootFindingAlgorithm}\label{hvacystemrootfindingalgorithm}
