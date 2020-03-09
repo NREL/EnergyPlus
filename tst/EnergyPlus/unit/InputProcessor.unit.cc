@@ -588,6 +588,46 @@ TEST_F(InputProcessorFixture, parse_bad_utf_8_json_3)
     EXPECT_EQ( expected, input_file );
 }
 
+TEST_F(InputProcessorFixture, parse_malformed_idf)
+{
+    std::string const idf(delimited_string({
+        "Connector:Splitter,",
+        " Chiled Water Loop CndW Supply Splitter,                  !- Name",
+        " Chiled Water Loop CndW Supply Inlet Branch,              !- Inlet Branch Name",
+        " Chiled Water Loop CndW Supply Bypass Branch,             !- Outlet Branch Name",
+        "",
+        "Connector:Mixer,",
+        " Chiled Water Loop CndW Supply Mixer,                     !- Name",
+        " Chiled Water Loop CndW Supply Outlet Branch,             !- Outlet Branch Name",
+        " Chiled Water Loop CndW Supply Bypass Branch,             !- Inlet Branch Name",
+        "",
+        "! Pump part load coefficients are linear to represent condenser pumps dedicated to each chiller.",
+        "Pump:VariableSpeed,",
+        " Chiled Water Loop CndW Supply Pump,                      !- Name",
+        " Chiled Water Loop CndW Supply Inlet,                     !- Inlet Node Name",
+        " Chiled Water Loop CndW Pump Outlet,                      !- Outlet Node Name",
+        " autosize,                                                !- Rated Volumetric Flow Rate {m3/s}",
+        " 179352,                                                  !- Rated Pump Head {Pa}",
+        " autosize,                                                !- Rated Power Consumption {W}",
+        " 0.9,                                                     !- Motor Efficiency",
+        " 0,                                                       !- Fraction of Motor Inefficiencies to Fluid Stream",
+        " 0,                                                       !- Coefficient 1 of the Part Load Performance Curve",
+        " 0,                                                       !- Coefficient 2 of the Part Load Performance Curve",
+        " 1,                                                       !- Coefficient 3 of the Part Load Performance Curve",
+        " 0,                                                       !- Coefficient 4 of the Part Load Performance Curve",
+        " 0,                                                       !- Min Flow Rate while operating in variable flow capacity {m3/s}",
+        " Intermittent,                                            !- Pump Control Type",
+        " ;                                                        !- Pump Flow Rate Schedule Name",
+    }));
+
+    EXPECT_FALSE(process_idf(idf, false));
+    EXPECT_TRUE(compare_err_stream(delimited_string({
+        "   ** Severe  ** Line: 16 Index: 9 - Field cannot be Autosize or Autocalculate",
+        "   ** Severe  ** Line: 18 Index: 9 - Field cannot be Autosize or Autocalculate",
+        "   ** Severe  ** <root>[Connector:Splitter][Chiled Water Loop CndW Supply Splitter][branches][20] - Missing required property 'outlet_branch_name'."
+    })));
+}
+
 TEST_F(InputProcessorFixture, parse_two_RunPeriod)
 {
     std::string const idf(delimited_string({
