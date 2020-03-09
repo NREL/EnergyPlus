@@ -3098,8 +3098,8 @@ namespace WindowManager {
         QRadOutReport(SurfNum) = QdotRadOutRep(SurfNum) * TimeStepZoneSec;
 
         // Radiation emission to air
-        QAirExtReport(SurfNum) = -SurfOutsideEmiss * sigma * (1.0 - AirSkyRadSplit(SurfNum)) * surface.ViewFactorSkyIR * (Tsout_4 - pow_4(tout));
-        QHeatEmiReport(SurfNum) = Surface(SurfNum).Area * hcout * (Tsout - tout) + QAirExtReport(SurfNum);
+        QAirExtReport(SurfNum) = - SurfOutsideEmiss * sigma * (1.0 - AirSkyRadSplit(SurfNum)) * surface.ViewFactorSkyIR * (Tsout_4 - pow_4(tout));
+        QHeatEmiReport(SurfNum) = QAirExtReport(SurfNum) - QdotConvOutRep(SurfNum);
 
     }
 
