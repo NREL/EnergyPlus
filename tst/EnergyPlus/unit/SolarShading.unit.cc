@@ -1848,9 +1848,9 @@ TEST_F(EnergyPlusFixture, SolarShadingTest_PolygonClippingDirect)
     CalcSkyDifShading = false;
 
     FigureSolarBeamAtTimestep(DataGlobals::HourOfDay, DataGlobals::TimeStep);
-
-    EXPECT_NEAR(0.6504, DifShdgRatioIsoSkyHRTS(4, 9, 6), 0.0001);
-    EXPECT_NEAR(0.9152, DifShdgRatioHorizHRTS(4, 9, 6), 0.0001);
+    int surfNum = UtilityRoutines::FindItemInList("ZN001:WALL-SOUTH:WIN001", DataSurfaces::Surface);
+    EXPECT_NEAR(0.6504, DifShdgRatioIsoSkyHRTS(4, 9, surfNum), 0.0001);
+    EXPECT_NEAR(0.9152, DifShdgRatioHorizHRTS(4, 9, surfNum), 0.0001);
 
     DataSystemVariables::SlaterBarsky = false;
 }
