@@ -1520,6 +1520,7 @@ namespace HybridEvapCoolingModel {
                             if (!CoolingRequested && !HeatingRequested && !DehumidificationRequested && !HumidificationRequested) {
                                 CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate = min(MinOA_Msa, CandidateSetting.ScaledSupply_Air_Mass_Flow_Rate);
                                 CandidateSetting.ScaledSupply_Air_Ventilation_Volume = min(MinOA_Msa / StdRhoAir, CandidateSetting.ScaledSupply_Air_Ventilation_Volume);
+                                Tsa = StepIns.Tosa;
                             }
                             CandidateSetting.oMode = Mode;
                             CandidateSetting.SupplyAirTemperature = Tsa;
