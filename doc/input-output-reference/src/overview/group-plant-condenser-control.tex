@@ -299,6 +299,10 @@ This alpha field contains the identifying name for the Equipment List (i.e., the
 
 In addition to load range based control on the plant loop, sequencing the plant components based on the outlet temperature of individual equipment is allowed. This scheme is common to many present-day Energy Management Systems sequencing. In this scheme, the sequencing is done based on the order specified in the control object described below.
 
+However, when sequencing a boiler and a cooling tower to control the heating and cooling set point temperatures of a condenser loop, it is recommended that the boiler and the cooling tower be placed in a parallel configuration. The series configuration of these two equipment, though possible to model them, may result in simultaneous heating and cooling operation when the boiler is ON and the cooling tower operates in free cooling mode, i.e., 
+the cooling tower may provide free cooling that could over cool the water below the boiler heating setpoint temperature.  
+
+
 \subsubsection{Inputs}\label{inputs-12-011}
 
 \paragraph{Field: Name}\label{field-name-6-014}
