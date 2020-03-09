@@ -150,7 +150,7 @@ Real64 getVariableValue(const int handle) {
     //    if (handle < 0) {
     //        return -999;
     //    }
-    return *EnergyPlus::OutputProcessor::RVariableTypes(handle).VarPtr().Which;
+    return *EnergyPlus::OutputProcessor::RVariableTypes(handle).VarPtr.Which;
 }
 
 

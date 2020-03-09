@@ -378,7 +378,7 @@ namespace OutputProcessor {
         std::string KeyNameOnlyUC;       // Name of key only witht out variable in uppercase
         OutputProcessor::Unit units;     // Units for Variable
         std::string unitNameCustomEMS;   // name of units when customEMS is used for EMS variables that are unusual
-        Reference<RealVariables> VarPtr; // Pointer used to real Variables structure
+        RealVariables VarPtr;            // Pointer used to real Variables structure
 
         // Default Constructor
         RealVariableType() : timeStepType(TimeStepType::TimeStepZone), storeType(StoreType::Averaged), ReportID(0), units(OutputProcessor::Unit::None)
@@ -396,7 +396,7 @@ namespace OutputProcessor {
         std::string VarNameUC;              // Name of Variable
         std::string VarNameOnly;            // Name of Variable
         OutputProcessor::Unit units;        // Units for Variable
-        Reference<IntegerVariables> VarPtr; // Pointer used to integer Variables structure
+        IntegerVariables VarPtr;            // Pointer used to integer Variables structure
 
         // Default Constructor
         IntegerVariableType() : timeStepType(TimeStepType::TimeStepZone), storeType(StoreType::Averaged), ReportID(0), units(OutputProcessor::Unit::None)
@@ -572,8 +572,6 @@ namespace OutputProcessor {
     extern Array1D<RealVariableType> RVariableTypes;         // Variable Types structure (use NumOfRVariables to traverse)
     extern Array1D<IntegerVariableType> IVariableTypes;      // Variable Types structure (use NumOfIVariables to traverse)
     extern Array1D<VariableTypeForDDOutput> DDVariableTypes; // Variable Types structure (use NumVariablesForOutput to traverse)
-    extern Reference<RealVariables> RVariable;
-    extern Reference<IntegerVariables> IVariable;
     extern Array1D<ReqReportVariables> ReqRepVars;
     extern Array1D<MeterArrayType> VarMeterArrays;
     extern Array1D<MeterType> EnergyMeters;
