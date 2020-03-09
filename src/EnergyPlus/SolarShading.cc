@@ -6301,7 +6301,6 @@ namespace SolarShading {
         typedef Array2D<Int64>::size_type size_type;
         int JBKS;           // Counter of back surfaces with non-zero overlap with HTSS
         int BackSurfNum;    // Back surface number
-        Real64 OverlapArea; // Overlap area (m2)
 
         bool UseSimpleDistribution; // TRUE means simple interior solar distribution
         // (all incoming beam assumed to strike floor),
@@ -6381,7 +6380,7 @@ namespace SolarShading {
                         if (pssas[Surface(bkSurfNum).PenumbraID] > 0) {
                             ++JBKS;
                             BackSurfaces(TS, iHour, JBKS, HTSS) = bkSurfNum;
-                            OverlapArea = pssas[Surface(bkSurfNum).PenumbraID]/CTHETA(HTSS);
+                            Real64 OverlapArea = pssas[Surface(bkSurfNum).PenumbraID]/CTHETA(HTSS);
                             OverlapAreas(TS, iHour, JBKS, HTSS) = OverlapArea * SurfaceWindow(HTSS).GlazedFrac;
                         }
                     }
@@ -6394,7 +6393,6 @@ namespace SolarShading {
                     FINSHC = FSBSHC + NSBSHC;
 
                     JBKS = 0;
-                    JBKSbase = 0;
 
                     for (int IBKS = 1; IBKS <= NBKSHC; ++IBKS) { // Loop over back surfaces to GRSNR this hour. NBKSHC is the number of
                         // back surfaces that would receive beam radiation from the base surface, GRSNR,
@@ -6404,19 +6402,36 @@ namespace SolarShading {
 
                         BackSurfNum = HCNS(FBKSHC - 1 + IBKS);
 
-                    if (OverlapArea > 0.001) {
-                        ++JBKS;
-                        if (JBKS <= MaxBkSurf) {
-                            BackSurfaces(TS, iHour, JBKS, HTSS) = BackSurfNum;
-                            int baseSurfaceNum = DataSurfaces::Surface(BackSurfNum).BaseSurf;
-                            OverlapAreas(TS, iHour, JBKS, HTSS) = OverlapArea * SurfaceWindow(HTSS).GlazedFrac;
-                            // If this is a subsurface, subtract its overlap area from its base surface
-                            if (baseSurfaceNum != BackSurfNum) {
-                                for (int iBaseBKS = 1; iBaseBKS <= JBKS; ++iBaseBKS) {
-                                    if (baseSurfaceNum == BackSurfaces(TS, iHour, iBaseBKS, HTSS)) {
-                                        OverlapAreas(TS, iHour, iBaseBKS, HTSS) =
-                                            max(0.0, OverlapAreas(TS, iHour, iBaseBKS, HTSS) - OverlapAreas(TS, iHour, JBKS, HTSS));
-                                        break;
+                        // Determine if this back surface number can receive beam radiation from the
+                        // exterior window, HTSS, this hour, i.e., overlap area is positive
+
+                        LOCHCA = FINSHC - 1;
+
+                        MULTOL(FBKSHC - 1 + IBKS, FSBSHC - 1, NSBSHC);
+
+                        // Compute overlap area for this back surface
+
+                        NINSHC = LOCHCA - FINSHC + 1;
+                        if (NINSHC <= 0) continue;
+                        Real64 OverlapArea = HCAREA(FINSHC);
+                        for (int J = 2; J <= NINSHC; ++J) {
+                            OverlapArea += HCAREA(FINSHC - 1 + J) * (1.0 - HCT(FINSHC - 1 + J));
+                        }
+
+                        if (OverlapArea > 0.001) {
+                            ++JBKS;
+                            if (JBKS <= MaxBkSurf) {
+                                BackSurfaces(TS, iHour, JBKS, HTSS) = BackSurfNum;
+                                int baseSurfaceNum = DataSurfaces::Surface(BackSurfNum).BaseSurf;
+                                OverlapAreas(TS, iHour, JBKS, HTSS) = OverlapArea * SurfaceWindow(HTSS).GlazedFrac;
+                                // If this is a subsurface, subtract its overlap area from its base surface
+                                if (baseSurfaceNum != BackSurfNum) {
+                                    for (int iBaseBKS = 1; iBaseBKS <= JBKS; ++iBaseBKS) {
+                                        if (baseSurfaceNum == BackSurfaces(TS, iHour, iBaseBKS, HTSS)) {
+                                            OverlapAreas(TS, iHour, iBaseBKS, HTSS) =
+                                                max(0.0, OverlapAreas(TS, iHour, iBaseBKS, HTSS) - OverlapAreas(TS, iHour, JBKS, HTSS));
+                                            break;
+                                        }
                                     }
                                 }
                             }
