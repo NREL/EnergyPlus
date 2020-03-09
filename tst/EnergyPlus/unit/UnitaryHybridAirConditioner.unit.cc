@@ -234,15 +234,15 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     Real64 deliveredSH = pZoneHybridUnitaryAirConditioner->UnitSensibleHeatingRate;
     Real64 averageOSAF = pZoneHybridUnitaryAirConditioner->averageOSAF;
     Real64 Electricpower = pZoneHybridUnitaryAirConditioner->FinalElectricalPower;
-    pZoneHybridUnitaryAirConditioner->Initialize(1);
 
     // checks
+    EXPECT_EQ(modenumber, 3); // IEC and DX2 Mode
     EXPECT_NEAR(1.0, averageOSAF, 0.001);
     EXPECT_GT(deliveredSC, 0);
     EXPECT_NEAR(0.0, deliveredSH, 0.001);
     EXPECT_LT(Tsa, Tra);
     EXPECT_GT(Msa, DesignMinVR);
-    EXPECT_NEAR(Electricpower, 10988.26, 0.1);
+    EXPECT_NEAR(Electricpower, 10188.37, 0.1);
 
     // Scenario 2: high cooling larger system
 
@@ -254,6 +254,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     pZoneHybridUnitaryAirConditioner->doStep(RequestedCooling, Requestedheating, Requested_Humidification, Requested_Dehumidification, DesignMinVR);
 
     // output results
+    modenumber = pZoneHybridUnitaryAirConditioner->PrimaryMode;
     Tsa = pZoneHybridUnitaryAirConditioner->OutletTemp;
     Msa = pZoneHybridUnitaryAirConditioner->OutletMassFlowRate;
     deliveredSC = pZoneHybridUnitaryAirConditioner->UnitSensibleCoolingRate;
@@ -262,6 +263,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     Electricpower = pZoneHybridUnitaryAirConditioner->FinalElectricalPower;
 
     // checks
+    EXPECT_EQ(modenumber, 1); // IEC Mode
     EXPECT_NEAR(1.0, averageOSAF, 0.001);
     EXPECT_GT(deliveredSC, 0);
     EXPECT_NEAR(0.0, deliveredSH, 0.001);
@@ -274,18 +276,17 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     pZoneHybridUnitaryAirConditioner->InitializeModelParams();
     pZoneHybridUnitaryAirConditioner->SecInletTemp = 150;
     pZoneHybridUnitaryAirConditioner->SecInletHumRat = 0;
-
     pZoneHybridUnitaryAirConditioner->doStep(RequestedCooling, Requestedheating, Requested_Humidification, Requested_Dehumidification, DesignMinVR);
+
+    // output results
     modenumber = pZoneHybridUnitaryAirConditioner->PrimaryMode;
     Electricpower = pZoneHybridUnitaryAirConditioner->FinalElectricalPower;
 
     // checks
-    EXPECT_EQ(0, modenumber);
+    EXPECT_EQ(modenumber, 0); // Standby Mode
     EXPECT_NEAR(Electricpower, 244, 10);
 
     // Scenario 4: Low Cooling
-    pZoneHybridUnitaryAirConditioner->Initialize(1);
-    pZoneHybridUnitaryAirConditioner->InitializeModelParams();
     Requestedheating = -64358.68966; //-
     RequestedCooling = -633.6613591; // W
     /// add all the correct values to set in pZoneHybridUnitaryAirConditioner
@@ -296,12 +297,14 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     pZoneHybridUnitaryAirConditioner->doStep(RequestedCooling, Requestedheating, Requested_Humidification, Requested_Dehumidification, DesignMinVR);
 
     // output results
+    modenumber = pZoneHybridUnitaryAirConditioner->PrimaryMode;
     Tsa = pZoneHybridUnitaryAirConditioner->OutletTemp;
     deliveredSC = pZoneHybridUnitaryAirConditioner->UnitSensibleCoolingRate;
     deliveredSH = pZoneHybridUnitaryAirConditioner->UnitSensibleHeatingRate;
     averageOSAF = pZoneHybridUnitaryAirConditioner->averageOSAF;
     Electricpower = pZoneHybridUnitaryAirConditioner->FinalElectricalPower;
     // checks
+    EXPECT_EQ(modenumber, 1); // IEC Mode
     EXPECT_NEAR(1.0, averageOSAF, 0.001);
     EXPECT_GT(deliveredSC, 0);
     EXPECT_NEAR(0.0, deliveredSH, 0.001);
@@ -318,15 +321,15 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     pZoneHybridUnitaryAirConditioner->doStep(RequestedCooling, Requestedheating, Requested_Humidification, Requested_Dehumidification, DesignMinVR);
 
     // output results
+    modenumber = pZoneHybridUnitaryAirConditioner->PrimaryMode;
     Tsa = pZoneHybridUnitaryAirConditioner->OutletTemp;
     Msa = pZoneHybridUnitaryAirConditioner->OutletMassFlowRate;
-    Real64 Mreturn = pZoneHybridUnitaryAirConditioner->InletMassFlowRate;
-    Real64 Mrelief = pZoneHybridUnitaryAirConditioner->SecOutletMassFlowRate;
+    Electricpower = pZoneHybridUnitaryAirConditioner->FinalElectricalPower;
     // checks
+    EXPECT_EQ(modenumber, 4); // Ventilation Mode
     EXPECT_NEAR(Tsa, Tosa, 1.0);
     EXPECT_NEAR(Msa, DesignMinVR, 0.001);
-    EXPECT_NEAR(Mreturn, 0, 0.001);
-    EXPECT_NEAR(Mrelief, 0, 0.001);
+    EXPECT_NEAR(Electricpower, 3453.89, 0.1);
 
     // Scenario 6: Availability Manager Off
     Requestedheating = -122396.255;  // Watts (Zone Predicted Sensible Load to Heating Setpoint Heat Transfer Rate
@@ -342,11 +345,13 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     modenumber = pZoneHybridUnitaryAirConditioner->PrimaryMode;
     Msa = pZoneHybridUnitaryAirConditioner->OutletMassFlowRate;
     deliveredSC = pZoneHybridUnitaryAirConditioner->UnitSensibleCoolingRate;
+    Electricpower = pZoneHybridUnitaryAirConditioner->FinalElectricalPower;
 
     // checks
-    EXPECT_EQ(modenumber, 0);
+    EXPECT_EQ(modenumber, 0); // Standby Mode
     EXPECT_EQ(Msa, 0);
     EXPECT_EQ(deliveredSC, 0);
+    EXPECT_NEAR(Electricpower, 244, 10);
 
     // Scenario 7: Check ventilation load is being accounted for
     NumOfZones = 1;
