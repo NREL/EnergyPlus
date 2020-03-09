@@ -57,6 +57,7 @@
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -468,10 +469,10 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetProjectControlData(ErrorsFound); // read project control data
+    GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);          // expect no errors
 
-    GetMaterialData(ErrorsFound); // read material data
+    GetMaterialData(OutputFiles::getSingleton(), ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
     GetConstructData(ErrorsFound); // read construction data
@@ -488,7 +489,7 @@ TEST_F(EnergyPlusFixture, DataSurfaces_SurfaceShape)
     CosBldgRelNorth = 1.0;
     SinBldgRelNorth = 0.0;
 
-    GetSurfaceData(ErrorsFound); // setup zone geometry and get zone data
+    GetSurfaceData(OutputFiles::getSingleton(), ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
     // compare_err_stream( "" ); // just for debugging
@@ -694,11 +695,11 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_MakeMirrorSurface)
     ASSERT_TRUE(process_idf(idf_objects));
 
     bool FoundError = false;
-    GetMaterialData(FoundError);
+    GetMaterialData(OutputFiles::getSingleton(), FoundError);
     GetConstructData(FoundError);
     GetZoneData(FoundError); // Read Zone data from input file
     DataHeatBalance::AnyCTF = true;
-    SetupZoneGeometry(FoundError); // this calls GetSurfaceData()
+    SetupZoneGeometry(OutputFiles::getSingleton(), FoundError); // this calls GetSurfaceData()
 
     EXPECT_FALSE(FoundError);
 
@@ -927,13 +928,13 @@ TEST_F(EnergyPlusFixture, MakeEquivalentRectangle)
 
     // Prepare data for the test
     ASSERT_TRUE(process_idf(idf_objects));
-    GetMaterialData(ErrorsFound); // read material data
+    GetMaterialData(OutputFiles::getSingleton(), ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);
     GetConstructData(ErrorsFound); // read construction data
     EXPECT_FALSE(ErrorsFound);
     GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);
-    GetProjectControlData(ErrorsFound); // read project control data
+    GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);
     CosZoneRelNorth.allocate(1);
     SinZoneRelNorth.allocate(1);
@@ -941,7 +942,7 @@ TEST_F(EnergyPlusFixture, MakeEquivalentRectangle)
     SinZoneRelNorth(1) = std::sin(-Zone(1).RelNorth * DataGlobals::DegToRadians);
     CosBldgRelNorth = 1.0;
     SinBldgRelNorth = 0.0;
-    GetSurfaceData(ErrorsFound); // setup zone geometry and get zone data
+    GetSurfaceData(OutputFiles::getSingleton(), ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
     // For each surface Run the test then Check the result
@@ -3035,7 +3036,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_VertexNumberMismatchTest)
     Array1D_int const BaseSurfIDs(3, {1, 2, 3});
     int NeedToAddSurfaces;
 
-    GetGeometryParameters(ErrorsFound);
+    GetGeometryParameters(OutputFiles::getSingleton(), ErrorsFound);
     CosZoneRelNorth.allocate(2);
     SinZoneRelNorth.allocate(2);
 
@@ -3044,7 +3045,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_VertexNumberMismatchTest)
     SinBldgRelNorth = 0.0;
     CosBldgRelNorth = 1.0;
 
-    GetHTSurfaceData(ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
+    GetHTSurfaceData(OutputFiles::getSingleton(), ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
 
     EXPECT_EQ(2, SurfNum);
     std::string const error_string =
@@ -3591,10 +3592,10 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetProjectControlData(ErrorsFound); // read project control data
+    GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);          // expect no errors
 
-    GetMaterialData(ErrorsFound); // read material data
+    GetMaterialData(OutputFiles::getSingleton(), ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
     GetConstructData(ErrorsFound); // read construction data
@@ -3613,7 +3614,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_HeatTransferAlgorithmTest)
     CosBldgRelNorth = 1.0;
     SinBldgRelNorth = 0.0;
 
-    GetSurfaceData(ErrorsFound); // setup zone geometry and get zone data
+    GetSurfaceData(OutputFiles::getSingleton(), ErrorsFound); // setup zone geometry and get zone data
     EXPECT_FALSE(ErrorsFound);   // expect no errors
 
     int surfNum = UtilityRoutines::FindItemInList("DATATELCOM_CEILING_1_0_0", DataSurfaces::Surface);
@@ -3707,7 +3708,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_SurfaceReferencesNonExistingSurface)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Read Material and Construction, and expect no errors
-    GetMaterialData(ErrorsFound);
+    GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
@@ -3723,7 +3724,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_SurfaceReferencesNonExistingSurface)
     Array1D_int const BaseSurfIDs(3, {1, 2, 3});
     int NeedToAddSurfaces;
 
-    GetGeometryParameters(ErrorsFound);
+    GetGeometryParameters(OutputFiles::getSingleton(), ErrorsFound);
     CosZoneRelNorth.allocate(1);
     SinZoneRelNorth.allocate(1);
 
@@ -3732,7 +3733,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_SurfaceReferencesNonExistingSurface)
     SinBldgRelNorth = 0.0;
     CosBldgRelNorth = 1.0;
 
-    GetHTSurfaceData(ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
+    GetHTSurfaceData(OutputFiles::getSingleton(), ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);
 
     // We expect one surface, but an error since Surface B cannot be located
     EXPECT_EQ(1, SurfNum);
@@ -4062,7 +4063,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_InternalMassSurfacesCount)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Read Materials
-    GetMaterialData(ErrorsFound);
+    GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     // Construction
     GetConstructData(ErrorsFound);
@@ -4400,7 +4401,7 @@ TEST_F(EnergyPlusFixture, SurfaceGeometry_CreateInternalMassSurfaces)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Read Materials
-    GetMaterialData(ErrorsFound);
+    GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     // Construction
     GetConstructData(ErrorsFound);
@@ -4476,7 +4477,7 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test1)
     Zone(1).OriginY = 0;
     Zone(1).OriginZ = 0;
 
-    GetGeometryParameters(ErrorsFound);
+    GetGeometryParameters(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(has_err_output(true));
 }
 
@@ -4506,7 +4507,7 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test2)
     Zone(1).OriginY = 0;
     Zone(1).OriginZ = 0;
 
-    GetGeometryParameters(ErrorsFound);
+    GetGeometryParameters(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(has_err_output(true));
 }
 
@@ -4536,7 +4537,7 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test3)
     Zone(1).OriginY = 6;
     Zone(1).OriginZ = 0;
 
-    GetGeometryParameters(ErrorsFound);
+    GetGeometryParameters(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_TRUE(has_err_output(false));
     
     std::string error_string = delimited_string({
@@ -4571,7 +4572,7 @@ TEST_F(EnergyPlusFixture, WorldCoord_with_RelativeRectSurfCoord_test4)
     Zone(1).OriginY = 6;
     Zone(1).OriginZ = 0;
 
-    GetGeometryParameters(ErrorsFound);
+    GetGeometryParameters(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_TRUE(has_err_output(false));
 
     std::string error_string = delimited_string({
@@ -4832,7 +4833,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresNoAirBoundari
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    GetMaterialData(ErrorsFound); // read material data
+    GetMaterialData(OutputFiles::getSingleton(), ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
     GetConstructData(ErrorsFound); // read construction data
@@ -4841,7 +4842,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresNoAirBoundari
     GetZoneData(ErrorsFound);  // read zone data
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
-    SetupZoneGeometry(ErrorsFound); 
+    SetupZoneGeometry(OutputFiles::getSingleton(), ErrorsFound);
     // SetupZoneGeometry calls SurfaceGeometry::GetSurfaceData
     // SetupZoneGeometry calls SurfaceGeometry::SetupSolarEnclosuresAndAirBoundaries
     // SetupZoneGeometry calls SurfaceGeometry::SetupRadiantEnclosuresAndAirBoundaries
@@ -4970,7 +4971,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    GetMaterialData(ErrorsFound); // read material data
+    GetMaterialData(OutputFiles::getSingleton(), ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
     GetConstructData(ErrorsFound); // read construction data
@@ -4979,7 +4980,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     GetZoneData(ErrorsFound);  // read zone data
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
-    SetupZoneGeometry(ErrorsFound);
+    SetupZoneGeometry(OutputFiles::getSingleton(), ErrorsFound);
     // SetupZoneGeometry calls SurfaceGeometry::GetSurfaceData
     // SetupZoneGeometry calls SurfaceGeometry::SetupSolarEnclosuresAndAirBoundaries
     // SetupZoneGeometry calls SurfaceGeometry::SetupRadiantEnclosuresAndAirBoundaries
@@ -5111,7 +5112,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
 
-    GetMaterialData(ErrorsFound); // read material data
+    GetMaterialData(OutputFiles::getSingleton(), ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
     GetConstructData(ErrorsFound); // read construction data
@@ -5120,7 +5121,7 @@ TEST_F(EnergyPlusFixture, HeatBalanceIntRadExchange_SetupEnclosuresWithAirBounda
     GetZoneData(ErrorsFound);  // read zone data
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
-    SetupZoneGeometry(ErrorsFound);
+    SetupZoneGeometry(OutputFiles::getSingleton(), ErrorsFound);
     // SetupZoneGeometry calls SurfaceGeometry::GetSurfaceData
     // SetupZoneGeometry calls SurfaceGeometry::SetupSolarEnclosuresAndAirBoundaries
     // SetupZoneGeometry calls SurfaceGeometry::SetupRadiantEnclosuresAndAirBoundaries

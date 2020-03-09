@@ -359,6 +359,7 @@ namespace DataHeatBalance {
     extern Real64 CondFDRelaxFactorInput; // Relaxation factor, for looping across all the surfaces, user input value
 
     extern int ZoneAirSolutionAlgo;              // ThirdOrderBackwardDifference, AnalyticalSolution, and EulerMethod
+    extern bool OverrideZoneAirSolutionAlgo;
     extern Real64 BuildingRotationAppendixG;     // Building Rotation for Appendix G
     extern bool ZoneAirMassBalanceSimulation;    // if true, then enforces zone mass flow conservation
     extern Real64 ZoneTotalExfiltrationHeatLoss; // Building total heat emission through zone exfiltration

@@ -56,6 +56,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class OutputFiles;
 
 namespace AirflowNetworkBalanceManager {
 
@@ -169,7 +170,7 @@ namespace AirflowNetworkBalanceManager {
                                      Optional_bool ResimulateAirZone = _         // True when solution technique on third iteration
     );
 
-    void GetAirflowNetworkInput();
+    void GetAirflowNetworkInput(EnergyPlus::OutputFiles &outputFiles);
 
     void InitAirflowNetwork();
 

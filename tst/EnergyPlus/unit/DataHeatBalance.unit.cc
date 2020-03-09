@@ -58,6 +58,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimulationManager.hh>
@@ -800,14 +801,14 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
 
     // OutputProcessor::TimeValue.allocate(2);
 
-    ScheduleManager::ProcessScheduleInput(); // read schedules
+    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton()); // read schedules
 
     ErrorsFound = false;
-    GetProjectControlData(ErrorsFound); // read project control data
+    GetProjectControlData(OutputFiles::getSingleton(), ErrorsFound); // read project control data
     EXPECT_FALSE(ErrorsFound);          // expect no errors
 
     ErrorsFound = false;
-    GetMaterialData(ErrorsFound); // read material data
+    GetMaterialData(OutputFiles::getSingleton(), ErrorsFound); // read material data
     EXPECT_FALSE(ErrorsFound);    // expect no errors
 
     ErrorsFound = false;
@@ -825,11 +826,12 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     EXPECT_FALSE(ErrorsFound); // expect no errors
 
     ErrorsFound = false;
-    SurfaceGeometry::GetGeometryParameters(ErrorsFound);
+    SurfaceGeometry::GetGeometryParameters(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
-    SurfaceGeometry::SetupZoneGeometry(ErrorsFound); // this calls GetSurfaceData() and SetFlagForWindowConstructionWithShadeOrBlindLayer()
+    SurfaceGeometry::SetupZoneGeometry(OutputFiles::getSingleton(),
+                                       ErrorsFound); // this calls GetSurfaceData() and SetFlagForWindowConstructionWithShadeOrBlindLayer()
     EXPECT_FALSE(ErrorsFound);
 
     EXPECT_EQ(Construct(4).Name, "WIN-CON-DOUBLEPANE"); // glass, air gap, glass

@@ -64,7 +64,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/FuelCellElectricGenerator.hh>
 #include <EnergyPlus/General.hh>
@@ -72,6 +72,7 @@
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -366,7 +367,7 @@ namespace FuelCellElectricGenerator {
         GeneratorFuelSupply::GetGeneratorFuelSupplyInput();
 
         for (int FuelSupNum = 1; FuelSupNum <= DataGenerators::NumGeneratorFuelSups; ++FuelSupNum) {
-            GeneratorFuelSupply::SetupFuelConstituentData(FuelSupNum, ErrorsFound);
+            GeneratorFuelSupply::SetupFuelConstituentData(OutputFiles::getSingleton(), FuelSupNum, ErrorsFound);
         }
 
         // set fuel supply ID in Fuel cell structure
@@ -774,6 +775,7 @@ namespace FuelCellElectricGenerator {
             int thisFuelCell = UtilityRoutines::FindItemInList(AlphArray(1), FuelCell, &FCDataStruct::NameExhaustHX);
 
             if (thisFuelCell > 0) {
+                FuelCell(thisFuelCell).TypeOf = DataPlant::TypeOf_Generator_FCExhaust;
                 FuelCell(thisFuelCell).ExhaustHX.Name = AlphArray(1);
                 FuelCell(thisFuelCell).ExhaustHX.WaterInNodeName = AlphArray(2);
                 FuelCell(thisFuelCell).ExhaustHX.WaterOutNodeName = AlphArray(3);
@@ -989,6 +991,7 @@ namespace FuelCellElectricGenerator {
                 int thisFuelCell = UtilityRoutines::FindItemInList(AlphArray(1), FuelCell, &FCDataStruct::NameStackCooler);
 
                 if (thisFuelCell > 0) {
+                    FuelCell(thisFuelCell).TypeOf = DataPlant::TypeOf_Generator_FCStackCooler;
                     FuelCell(thisFuelCell).StackCooler.Name = AlphArray(1);
                     FuelCell(thisFuelCell).StackCooler.WaterInNodeName = AlphArray(2);
 

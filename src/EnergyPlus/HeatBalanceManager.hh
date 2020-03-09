@@ -56,6 +56,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class OutputFiles;
 
 namespace HeatBalanceManager {
 
@@ -153,11 +154,11 @@ namespace HeatBalanceManager {
 
     void SetPreConstructionInputParameters();
 
-    void GetProjectControlData(bool &ErrorsFound); // Set to true if errors detected during getting data
+    void GetProjectControlData(OutputFiles &outputFiles, bool &ErrorsFound); // Set to true if errors detected during getting data
 
-    void GetSiteAtmosphereData(bool &ErrorsFound);
+    void GetSiteAtmosphereData(EnergyPlus::OutputFiles &outputFiles, bool &ErrorsFound);
 
-    void GetMaterialData(bool &ErrorsFound); // set to true if errors found in input
+    void GetMaterialData(OutputFiles &outputFiles, bool &ErrorsFound); // set to true if errors found in input
 
     void GetWindowGlassSpectralData(bool &ErrorsFound); // set to true if errors found in input
 
@@ -203,11 +204,11 @@ namespace HeatBalanceManager {
     // Beginning of Record Keeping subroutines for the HB Module
     // *****************************************************************************
 
-    void RecKeepHeatBalance();
+    void RecKeepHeatBalance(OutputFiles &outputFiles);
 
     void CheckWarmupConvergence();
 
-    void ReportWarmupConvergence();
+    void ReportWarmupConvergence(OutputFiles &outputFiles);
     
     void UpdateWindowFaceTempsNonBSDFWin();
 

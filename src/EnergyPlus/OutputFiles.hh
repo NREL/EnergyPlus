@@ -48,7 +48,6 @@
 #ifndef OutputFiles_hh_INCLUDED
 #define OutputFiles_hh_INCLUDED
 
-
 #include "DataGlobals.hh"
 #include <ObjexxFCL/gio.hh>
 #include <fmt/format.h>
@@ -56,10 +55,44 @@
 #include <ostream>
 
 namespace EnergyPlus {
-struct OutputFiles
+class OutputFiles
 {
-    std::ostream &eio;
+public:
+    class OutputFile
+    {
+    public:
+        void close();
+        bool good() const;
+        void open_at_end();
+        std::string fileName;
+        void open();
+        std::vector<std::string> getLines();
+        void open_as_stringstream();
+        std::string get_output();
 
+    private:
+        explicit OutputFile(std::string FileName);
+        std::unique_ptr<std::iostream> os;
+        template <typename... Args> friend void print(OutputFiles::OutputFile &of, fmt::string_view format_str, const Args &... args);
+        friend class OutputFiles;
+    };
+
+    class GIOOutputFile
+    {
+    public:
+        void close();
+        void open_at_end();
+
+    private:
+        explicit GIOOutputFile(int const FileID, std::string FileName);
+        int fileID;
+        std::string fileName;
+        std::reference_wrapper<std::ostream> os;
+        template <typename... Args> friend void print(OutputFiles::GIOOutputFile &of, fmt::string_view format_str, const Args &... args);
+        friend class OutputFiles;
+    };
+
+    OutputFile eio{"eplusout.eio"};
     static OutputFiles makeOutputFiles();
     static OutputFiles &getSingleton();
 
@@ -67,22 +100,45 @@ private:
     OutputFiles();
 };
 
-void vprint(std::ostream &os, fmt::string_view format_str, fmt::format_args args);
+void vprint(std::ostream &os, fmt::string_view format_str, fmt::format_args args, const std::size_t count);
+std::string vprint(fmt::string_view format_str, fmt::format_args args, const std::size_t count);
 
-// Defines a custom formatting type `r` which chooses between `e` and `g` depending
+// Uses lib {fmt} (which has been accepted for C++20)
+// Formatting syntax guide is here: https://fmt.dev/latest/syntax.html
+// The syntax is similar to printf, but uses {} to indicate parameters to be formatted
+// you must escape any {} that you want with {}, like `{{}}`
+//
+// Defines a custom formatting type 'R' (round_ which chooses between `E` and `G` depending
 // on the value being printed.
-template <typename... Args>
-void print(std::ostream &os, fmt::string_view format_str, const Args &... args)
+// This is necessary for parity with the old "RoundSigDigits" utility function
+//
+// Defines a custom formatting type 'N' that behaves like Fortran's G type.
+// 'N' was chosen for "Number"
+//
+// Defines a custom formatting type 'T' that that truncates the value
+// to match the behavior of TrimSigDigits utility function
+//
+template <typename... Args> void print(std::ostream &os, fmt::string_view format_str, const Args &... args)
 {
-    if (sizeof...(Args) == 0) {
-        // assume 0 args is intentional and just print the string
-        os.write(format_str.data(), format_str.size());
-    } else {
-        EnergyPlus::vprint(os, format_str, fmt::make_format_args(args...));
-    }
+    EnergyPlus::vprint(os, format_str, fmt::make_format_args(args...), sizeof...(Args));
+}
+
+template <typename... Args> void print(OutputFiles::GIOOutputFile &outputFile, fmt::string_view format_str, const Args &... args)
+{
+    EnergyPlus::vprint(outputFile.os, format_str, fmt::make_format_args(args...), sizeof...(Args));
+}
+
+template <typename... Args> void print(OutputFiles::OutputFile &outputFile, fmt::string_view format_str, const Args &... args)
+{
+    assert(outputFile.os);
+    EnergyPlus::vprint(*outputFile.os, format_str, fmt::make_format_args(args...), sizeof...(Args));
+}
+
+template <typename... Args> std::string format(fmt::string_view format_str, const Args &... args)
+{
+    return EnergyPlus::vprint(format_str, fmt::make_format_args(args...), sizeof...(Args));
 }
 
 } // namespace EnergyPlus
 
 #endif
-

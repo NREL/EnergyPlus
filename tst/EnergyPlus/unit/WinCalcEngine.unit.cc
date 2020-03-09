@@ -59,6 +59,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/WindowManager.hh>
 #include <EnergyPlus/WindowManagerExteriorData.hh>
 #include <WCEMultiLayerOptics.hpp>
@@ -100,7 +101,7 @@ TEST_F(EnergyPlusFixture, WCEClear)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     WindowManager::initWindowModel();
     WindowManager::InitWindowOpticalCalculations();
@@ -193,7 +194,7 @@ TEST_F(EnergyPlusFixture, WCEVenetian)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     WindowManager::initWindowModel();
     WindowManager::InitWindowOpticalCalculations();
@@ -272,7 +273,7 @@ TEST_F(EnergyPlusFixture, WCEShade)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    HeatBalanceManager::GetMaterialData(ErrorsFound);
+    HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     WindowManager::initWindowModel();
     WindowManager::InitWindowOpticalCalculations();

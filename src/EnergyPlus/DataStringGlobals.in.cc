@@ -122,7 +122,6 @@ namespace DataStringGlobals {
     std::string outputAuditFileName("eplusout.audit");
     std::string outputBndFileName("eplusout.bnd");
     std::string outputDxfFileName("eplusout.dxf");
-    std::string outputEioFileName("eplusout.eio");
     std::string outputEndFileName("eplusout.end");
     std::string outputErrFileName("eplusout.err");
     std::string outputEsoFileName("eplusout.eso");
@@ -176,6 +175,7 @@ namespace DataStringGlobals {
     std::string outputEddFileName("eplusout.edd");
     std::string outputIperrFileName("eplusout.iperr");
     std::string outputDbgFileName("eplusout.dbg");
+    std::string outputPerfLogFileName("eplusout_perflog.csv");
     std::string outputSlnFileName("eplusout.sln");
     std::string outputSciFileName("eplusout.sci");
     std::string outputWrlFileName("eplusout.wrl");
@@ -221,6 +221,7 @@ namespace DataStringGlobals {
                                                                                                                                       // version
                                                                                                                                       // information
     std::string MatchVersion("${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}"); // String to be matched by Version object
+    std::string PythonAPIVersion("${PYTHON_API_VERSION_MAJOR}.${PYTHON_API_VERSION_MINOR}"); // API version string to be matched when using the Python API
 
 
     void clear_state()
