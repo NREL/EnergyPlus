@@ -1313,7 +1313,6 @@ namespace HybridEvapCoolingModel {
         bool DidWePartlyMeetLoad = false;
         int modenumber = 0;
         Real64 OptimalSetting_RunFractionTotalFuel = IMPLAUSIBLE_POWER;
-        Real64 EIR;
         Real64 ElectricalPower;
         Real64 Tma;
         Real64 Wma;
@@ -1342,14 +1341,15 @@ namespace HybridEvapCoolingModel {
 
         Real64 Wosa = PsyWFnTdbRhPb(StepIns.Tosa, StepIns.RHosa, 101325);
         Real64 Wra = PsyWFnTdbRhPb(StepIns.Tra, StepIns.RHra, 101325);
-        bool EnvironmentConditionsMet, EnvironmentConditionsMetOnce, MinVRMet, MinVRMetOnce, SAT_OC_Met, SAT_OC_MetOnce, SARH_OC_Met, SAHR_OC_MetOnce;
+        bool EnvironmentConditionsMet, EnvironmentConditionsMetOnce, MinVRMet, SAT_OC_Met, SAT_OC_MetOnce, SARH_OC_Met, SAHR_OC_MetOnce;
         EnvironmentConditionsMetOnce = SAT_OC_Met = SAT_OC_MetOnce = SARH_OC_Met = SAHR_OC_MetOnce = false;
+
 
         MinOA_Msa = StepIns.MinimumOA; // Set object version of minimum VR Kg/s
 
         std::vector<CMode>::const_iterator iterator;
         iterator = OperatingModes.begin();
-        // skip the first one becuase that is standby
+        // skip the first one because that is standby
         ++iterator;
         for (; iterator != OperatingModes.end(); ++iterator) // iterate though the modes.
         {
@@ -1394,7 +1394,7 @@ namespace HybridEvapCoolingModel {
                     }
 
                     if (Mvent > MinOA_Msa) {
-                        MinVRMet = MinVRMetOnce = true;
+                        MinVRMet = true;
                     } else {
                         MinVRMet = false;
                     }
@@ -1546,9 +1546,6 @@ namespace HybridEvapCoolingModel {
                 thisSetting.oMode.CalculateCurveVal(StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, THIRD_FUEL_USE);
             thisSetting.WaterConsumptionRate =
                 thisSetting.oMode.CalculateCurveVal(StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, WATER_USE);
-
-            // Calculate EIR
-            EIR = ElectricalPower / TotalSystem;
 
             // Calculate partload fraction required to meet all requirements
             Real64 PartRuntimeFraction = 0;
