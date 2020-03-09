@@ -2463,8 +2463,6 @@ namespace WindowManager {
         using DataHeatBalSurface::QdotRadOutRepPerArea;
         using DataHeatBalSurface::QRadLWOutSrdSurfs;
         using DataHeatBalSurface::QRadOutReport;
-        using DataHeatBalSurface::QAirExtReport;
-        using DataHeatBalSurface::QHeatEmiReport;
         using DataLoopNode::Node;
         using DataZoneEquipment::ZoneEquipConfig;
         using General::InterpSlatAng; // Function for slat angle interpolation
@@ -3098,8 +3096,8 @@ namespace WindowManager {
         QRadOutReport(SurfNum) = QdotRadOutRep(SurfNum) * TimeStepZoneSec;
 
         // Radiation emission to air
-        QAirExtReport(SurfNum) = - SurfOutsideEmiss * sigma * (1.0 - AirSkyRadSplit(SurfNum)) * surface.ViewFactorSkyIR * (Tsout_4 - pow_4(tout));
-        QHeatEmiReport(SurfNum) = QAirExtReport(SurfNum) - QdotConvOutRep(SurfNum);
+        DataHeatBalSurface::QAirExtReport(SurfNum) = - SurfOutsideEmiss * sigma * (1.0 - AirSkyRadSplit(SurfNum)) * surface.ViewFactorSkyIR * (Tsout_4 - pow_4(tout));
+        DataHeatBalSurface::QHeatEmiReport(SurfNum) = DataHeatBalSurface::QAirExtReport(SurfNum) - QdotConvOutRep(SurfNum);
 
     }
 
