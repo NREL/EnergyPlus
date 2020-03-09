@@ -1757,8 +1757,8 @@ namespace SurfaceGeometry {
                         // Non window surfaces are grouped first within each zone
                         Zone(ZoneNum).NonWindowSurfaceFirst = SurfNum;
                     }
-                    if ((Zone(ZoneNum).WindowSurfaceFirst == 0) && (Surface(SurfNum).Class == DataSurfaces::SurfaceClass_Window) ||
-                        (Surface(SurfNum).Class == DataSurfaces::SurfaceClass_GlassDoor)) {
+                    if ((Zone(ZoneNum).WindowSurfaceFirst == 0) && ((Surface(SurfNum).Class == DataSurfaces::SurfaceClass_Window) ||
+                                                                    (Surface(SurfNum).Class == DataSurfaces::SurfaceClass_GlassDoor))) {
                         // Window surfaces are grouped last within each zone
                         Zone(ZoneNum).WindowSurfaceFirst = SurfNum;
                         Zone(ZoneNum).NonWindowSurfaceLast = SurfNum - 1;
