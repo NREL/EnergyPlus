@@ -3204,7 +3204,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SetOnOffMassFlowRateTest)
     // same test for cooling mode (flow @ 0.3 * PLR @ 0.7 = 0.21)
     thisSys.m_HeatingSpeedNum = 0;
     thisSys.m_CoolingSpeedNum = 1;
-    thisSys.m_MultiSpeedCoolingCoil = true;
+    thisSys.m_DiscreteSpeedCoolingCoil = true;
     UnitarySystems::HeatingLoad = false;
     UnitarySystems::CoolingLoad = true;
     thisSys.setOnOffMassFlowRate(OnOffAirFlowRatio, PartLoadRatio);
@@ -3516,7 +3516,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryHeatingSystem)
     AirMassFlowRate = 1.0;
     HotWaterMassFlowRate = 1.0;
     thisSys.MaxHeatCoilFluidFlow = HotWaterMassFlowRate;
-    thisSys.m_MultiSpeedCoolingCoil = true;
+    thisSys.m_DiscreteSpeedCoolingCoil = true;
     thisSys.m_HeatingCoilType_Num = DataHVACGlobals::Coil_HeatingWater;
     thisSys.m_HeatingSpeedRatio = 1.0;
     thisSys.m_HeatingCycRatio = 1.0;
@@ -3656,7 +3656,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_CalcUnitaryCoolingSystem)
     ColdWaterMassFlowRate = 1.0;
 
     thisSys.MaxCoolCoilFluidFlow = ColdWaterMassFlowRate;
-    thisSys.m_MultiSpeedCoolingCoil = true;
+    thisSys.m_DiscreteSpeedCoolingCoil = true;
     thisSys.m_CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingWater;
     thisSys.m_CoolingSpeedRatio = 1.0;
     thisSys.m_CoolingCycRatio = 1.0;
@@ -3867,7 +3867,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput)
         "Coil:Heating:Fuel,",
         "  Furnace Heating Coil 1, !- Name",
         "  FanAndCoilAvailSched,   !- Availability Schedule Name",
-        "  Gas,                    !- Fuel Type",
+        "  NaturalGas,             !- Fuel Type",
         "  0.8,                    !- Gas Burner Efficiency",
         "  32000,                  !- Nominal Capacity{ W }",
         "  Heating Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -3876,7 +3876,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput)
         "Coil:Heating:Fuel,",
         "  Humidistat Reheat Coil 1, !- Name",
         "  FanAndCoilAvailSched, !- Availability Schedule Name",
-        "  Gas,                    !- Fuel Type",
+        "  NaturalGas,             !- Fuel Type",
         "  0.8, !- Gas Burner Efficiency",
         "  32000, !- Nominal Capacity{ W }",
         "  Reheat Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -4389,7 +4389,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VSDXCoilSizing)
         "Coil:Heating:Fuel,",
         "  Humidistat Reheat Coil 1,    !- Name",
         "  FanAndCoilAvailSched,        !- Availability Schedule Name",
-        "  Gas,                         !- Fuel Type",
+        "  NaturalGas,             !- Fuel Type",
         "  0.8,                         !- Gas Burner Efficiency",
         "  32000,                       !- Nominal Capacity{ W }",
         "  Reheat Coil Air Inlet Node,  !- Air Inlet Node Name",
@@ -4717,7 +4717,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils)
         "Coil:Heating:Fuel,",
         "  Furnace Heating Coil 1, !- Name",
         "  FanAndCoilAvailSched,   !- Availability Schedule Name",
-        "  Gas,                    !- Fuel Type",
+        "  NaturalGas,             !- Fuel Type",
         "  0.8,                    !- Gas Burner Efficiency",
         "  32000,                  !- Nominal Capacity{ W }",
         "  Heating Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -4726,7 +4726,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils)
         "Coil:Heating:Fuel,",
         "  Humidistat Reheat Coil 1, !- Name",
         "  FanAndCoilAvailSched, !- Availability Schedule Name",
-        "  Gas,                    !- Fuel Type",
+        "  NaturalGas,             !- Fuel Type",
         "  0.8, !- Gas Burner Efficiency",
         "  32000, !- Nominal Capacity{ W }",
         "  Reheat Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -5179,7 +5179,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils_CyclingFan)
         "Coil:Heating:Fuel,",
         "  Furnace Heating Coil 1, !- Name",
         "  FanAndCoilAvailSched,   !- Availability Schedule Name",
-        "  Gas,                    !- Fuel Type",
+        "  NaturalGas,             !- Fuel Type",
         "  0.8,                    !- Gas Burner Efficiency",
         "  32000,                  !- Nominal Capacity{ W }",
         "  Heating Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -5188,7 +5188,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_VarSpeedCoils_CyclingFan)
         "Coil:Heating:Fuel,",
         "  Humidistat Reheat Coil 1, !- Name",
         "  FanAndCoilAvailSched,   !- Availability Schedule Name",
-        "  Gas,                    !- Fuel Type",
+        "  NaturalGas,             !- Fuel Type",
         "  0.8,                    !- Gas Burner Efficiency",
         "  32000,                  !- Nominal Capacity{ W }",
         "  Reheat Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -5552,7 +5552,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetBadSupplyAirMethodInput)
         "Coil:Heating:Fuel,",
         "  Furnace Heating Coil 1, !- Name",
         "  FanAndCoilAvailSched,   !- Availability Schedule Name",
-        "  Gas,                    !- Fuel Type",
+        "  NaturalGas,             !- Fuel Type",
         "  0.8,                    !- Gas Burner Efficiency",
         "  32000,                  !- Nominal Capacity{ W }",
         "  Heating Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -6481,7 +6481,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXCoilSizing)
         "Coil:Heating:Fuel,",
         "  Humidistat Reheat Coil 1, !- Name",
         "  FanAndCoilAvailSched, !- Availability Schedule Name",
-        "  Gas,                    !- Fuel Type",
+        "  NaturalGas,             !- Fuel Type",
         "  0.8, !- Gas Burner Efficiency",
         "  32000, !- Nominal Capacity{ W }",
         "  Reheat Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -7003,7 +7003,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_WaterToAirHeatPump)
         "Coil:Heating:Fuel,",
         "  Humidistat Reheat Coil 1, !- Name",
         "  FanAndCoilAvailSched, !- Availability Schedule Name",
-        "  Gas,                    !- Fuel Type",
+        "  NaturalGas,             !- Fuel Type",
         "  0.8, !- Gas Burner Efficiency",
         "  32000, !- Nominal Capacity{ W }",
         "  Reheat Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -8575,7 +8575,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultiSpeedCoils_SingleMode)
         "Coil:Heating:Fuel,",
         "  Heat Pump DX Supp Heating Coil 1, !- Name",
         "  FanAndCoilAvailSched, !- Availability Schedule Name",
-        "  Gas,                    !- Fuel Type",
+        "  NaturalGas,             !- Fuel Type",
         "  0.8, !- Gas Burner Efficiency",
         "  45000, !- Nominal Capacity{ W }",
         "  SuppHeating Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -9940,7 +9940,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_MultispeedDXCoilHeatRecoveryHandlin
         "Coil:Heating:Fuel,",
         "  Humidistat Reheat Coil 1, !- Name",
         "  FanAndCoilAvailSched, !- Availability Schedule Name",
-        "  Gas,                    !- Fuel Type",
+        "  NaturalGas,             !- Fuel Type",
         "  0.8, !- Gas Burner Efficiency",
         "  32000, !- Nominal Capacity{ W }",
         "  Reheat Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -11092,7 +11092,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FractionOfAutoSizedCoolingValueTes
                                            // call the UnitarySystem factory
     bool ErrorsFound = false;
     bool zoneEquipment = true;
-    std::string compName = "UNITARY SYSTEM MODEL";   
+    std::string compName = "UNITARY SYSTEM MODEL";
     UnitarySystems::UnitarySys::factory(DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &UnitarySystems::unitarySys[0];
 
@@ -11235,7 +11235,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_FlowPerCoolingCapacityTest)
                                            // call the UnitarySystem factory
     bool ErrorsFound = false;
     bool zoneEquipment = true;
-    std::string compName = "UNITARY SYSTEM MODEL";   
+    std::string compName = "UNITARY SYSTEM MODEL";
     UnitarySystems::UnitarySys::factory(DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &UnitarySystems::unitarySys[0];
 
@@ -11394,7 +11394,7 @@ TEST_F(ZoneUnitarySysTest, UnitarySystemModel_getUnitarySystemInputDataTest)
         "  Coil:Heating:Fuel,",
         "    Supplemental Heating Coil,              !- Name",
         "    ,                                       !- Availability Schedule Name",
-        "    Gas,                                    !- Fuel Type",
+        "    NaturalGas,                             !- Fuel Type",
         "    0.8,                                    !- Gas Burner Efficiency",
         "    32000,                                  !- Nominal Capacity{ W }",
         "    Supplemental Heating Coil Inlet Node,   !- Air Inlet Node Name",
@@ -11572,7 +11572,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputwithTradeOff)
         "Coil:Heating:Fuel,",
         "  Furnace Heating Coil 1, !- Name",
         "  FanAndCoilAvailSched,   !- Availability Schedule Name",
-        "  Gas,                    !- Fuel Type",
+        "  NaturalGas,             !- Fuel Type",
         "  0.8,                    !- Gas Burner Efficiency",
         "  32000,                  !- Nominal Capacity{ W }",
         "  Heating Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -11581,7 +11581,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputwithTradeOff)
         "Coil:Heating:Fuel,",
         "  Humidistat Reheat Coil 1, !- Name",
         "  FanAndCoilAvailSched, !- Availability Schedule Name",
-        "  Gas,                    !- Fuel Type",
+        "  NaturalGas,             !- Fuel Type",
         "  0.8, !- Gas Burner Efficiency",
         "  32000, !- Nominal Capacity{ W }",
         "  Reheat Coil Air Inlet Node, !- Air Inlet Node Name",
@@ -11687,4 +11687,254 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputwithTradeOff)
     DataZoneEquipment::ZoneEquipInputsFilled = true;                             // indicate zone data is available
     thisSys->getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     EXPECT_FALSE(ErrorsFound);                                                   // expect no errors
+}
+
+// This issue tests for GetInput with respect to Autosizing, especially for issue #7771 where
+// 'Minimum Supply Air Temperature' == 'Autosize' produces a crash
+TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInput_Autosizing)
+{
+
+    std::string const idf_objects = delimited_string({
+        "Zone,",
+        "  EAST ZONE,                !- Name",
+        "  0,                        !- Direction of Relative North",
+        "  0,                        !- X Origin",
+        "  0,                        !- Y Origin",
+        "  0,                        !- Z Origin",
+        "  1,                        !- Type",
+        "  1,                        !- Multiplier",
+        "  autocalculate,            !- Ceiling Height",
+        "  autocalculate;            !- Volume",
+
+        "ZoneHVAC:EquipmentConnections,",
+        "  EAST ZONE,                !- Zone Name",
+        "  Zone2Equipment,           !- Zone Conditioning Equipment List Name",
+        "  Zone 2 Inlet Node,        !- Zone Air Inlet Node or NodeList Name",
+        "  Zone Exhaust Node,        !- Zone Air Exhaust Node or NodeList Name",
+        "  Zone 2 Node,              !- Zone Air Node Name",
+        "  Zone 2 Outlet Node;       !- Zone Return Air Node or NodeList Name",
+
+        "ZoneHVAC:EquipmentList,",
+        "  Zone2Equipment,           !- Name",
+        "  SequentialLoad,           !- Load Distribution Scheme",
+        "  AirLoopHVAC:UnitarySystem,    !- Zone Equipment 1 Object Type",
+        "  Unitary System Model,     !- Zone Equipment 1 Name",
+        "  1,                        !- Zone Equipment 1 Cooling Sequence",
+        "  1,                        !- Zone Equipment 1 Heating or NoLoad Sequence",
+        "  ,                         !- Zone Equipment 1 Sequential Cooling Fraction Schedule Name",
+        "  ;                         !- Zone Equipment 1 Sequential Heating Fraction Schedule Name",
+
+        // Note: Control type MUST be SingleZoneVAV if you are autosizing 'Minimum Supply Air Temperature'
+        "AirLoopHVAC:UnitarySystem,",
+        "  Unitary System Model,     !- Name",
+        "  SingleZoneVAV,            !- Control Type",
+        "  East Zone,                !- Controlling Zone or Thermostat Location",
+        "  None,                     !- Dehumidification Control Type",
+        "  FanAndCoilAvailSched,     !- Availability Schedule Name",
+        "  Zone Exhaust Node,        !- Air Inlet Node Name",
+        "  Zone 2 Inlet Node,        !- Air Outlet Node Name",
+        "  Fan:OnOff,                !- Supply Fan Object Type",
+        "  Supply Fan 1,             !- Supply Fan Name",
+        "  BlowThrough,              !- Fan Placement",
+        "  ContinuousFanSchedule,    !- Supply Air Fan Operating Mode Schedule Name",
+        "  Coil:Heating:Fuel,        !- Heating Coil Object Type",
+        "  Furnace Heating Coil 1,    !- Heating Coil Name",
+        "  ,                         !- DX Heating Coil Sizing Ratio",
+        "  Coil:Cooling:DX:SingleSpeed,    !- Cooling Coil Object Type",
+        "  Furnace ACDXCoil 1,       !- Cooling Coil Name",
+        "  No,                       !- Use DOAS DX Cooling Coil",
+        "  Autosize,                 !- Minimum Supply Air Temperature",
+        "  ,                         !- Latent Load Control",
+        "  Coil:Heating:Fuel,        !- Supplemental Heating Coil Object Type",
+        "  Humidistat Reheat Coil 1,    !- Supplemental Heating Coil Name",
+        "  SupplyAirFlowRate,        !- Cooling Supply Air Flow Rate Method",
+        "  Autosize,                 !- Cooling Supply Air Flow Rate",
+        "  ,                         !- Cooling Supply Air Flow Rate Per Floor Area",
+        "  ,                         !- Cooling Fraction of Autosized Cooling Supply Air Flow Rate",
+        "  ,                         !- Cooling Supply Air Flow Rate Per Unit of Capacity",
+        "  SupplyAirFlowRate,        !- Heating Supply Air Flow Rate Method",
+        "  Autosize,                 !- Heating Supply Air Flow Rate",
+        "  ,                         !- Heating Supply Air Flow Rate Per Floor Area",
+        "  ,                         !- Heating Fraction of Autosized Heating Supply Air Flow Rate",
+        "  ,                         !- Heating Supply Air Flow Rate Per Unit of Capacity",
+        "  SupplyAirFlowRate,        !- No Load Supply Air Flow Rate Method",
+        "  Autosize,                 !- No Load Supply Air Flow Rate",
+        "  ,                         !- No Load Supply Air Flow Rate Per Floor Area",
+        "  ,                         !- No Load Fraction of Autosized Cooling Supply Air Flow Rate",
+        "  ,                         !- No Load Fraction of Autosized Heating Supply Air Flow Rate",
+        "  ,                         !- No Load Supply Air Flow Rate Per Unit of Capacity During Cooling Operation",
+        "  ,                         !- No Load Supply Air Flow Rate Per Unit of Capacity During Heating Operation",
+        "  Autosize;                 !- Maximum Supply Air Temperature",
+
+        "Fan:OnOff,",
+        "  Supply Fan 1,             !- Name",
+        "  FanAndCoilAvailSched,     !- Availability Schedule Name",
+        "  0.7,                      !- Fan Total Efficiency",
+        "  600,                      !- Pressure Rise",
+        "  1.6,                      !- Maximum Flow Rate",
+        "  0.9,                      !- Motor Efficiency",
+        "  1,                        !- Motor In Airstream Fraction",
+        "  Zone Exhaust Node,        !- Air Inlet Node Name",
+        "  DX Cooling Coil Air Inlet Node;    !- Air Outlet Node Name",
+
+        "Coil:Cooling:DX:SingleSpeed,",
+        "  Furnace ACDXCoil 1,       !- Name",
+        "  FanAndCoilAvailSched,     !- Availability Schedule Name",
+        "  32000,                    !- Gross Rated Total Cooling Capacity",
+        "  0.75,                     !- Gross Rated Sensible Heat Ratio",
+        "  3,                        !- Gross Rated Cooling COP",
+        "  1.6,                      !- Rated Air Flow Rate",
+        "  ,                         !- Rated Evaporator Fan Power Per Volume Flow Rate",
+        "  DX Cooling Coil Air Inlet Node,    !- Air Inlet Node Name",
+        "  Heating Coil Air Inlet Node,    !- Air Outlet Node Name",
+        "  WindACCoolCapFT,          !- Total Cooling Capacity Function of Temperature Curve Name",
+        "  WindACCoolCapFFF,         !- Total Cooling Capacity Function of Flow Fraction Curve Name",
+        "  WindACEIRFT,              !- Energy Input Ratio Function of Temperature Curve Name",
+        "  WindACEIRFFF,             !- Energy Input Ratio Function of Flow Fraction Curve Name",
+        "  WindACPLFFPLR,            !- Part Load Fraction Correlation Curve Name",
+        "  ,                         !- Minimum Outdoor DryBulb Temperature for Compressor Operation",
+        "  1000,                     !- Nominal Time for Condensate Removal to Begin",
+        "  0.4,                      !- Ratio of Initial Moisture Evaporation Rate and Steady State Latent Capacity",
+        "  4,                        !- Maximum Cycling Rate",
+        "  45;                       !- Latent Capacity Time Constant",
+
+        "Coil:Heating:Fuel,",
+        "  Furnace Heating Coil 1,    !- Name",
+        "  FanAndCoilAvailSched,     !- Availability Schedule Name",
+        "  NaturalGas,               !- Fuel Type",
+        "  0.8,                      !- Burner Efficiency",
+        "  32000,                    !- Nominal Capacity",
+        "  Heating Coil Air Inlet Node,    !- Air Inlet Node Name",
+        "  Reheat Coil Air Inlet Node;    !- Air Outlet Node Name",
+
+        "Coil:Heating:Fuel,",
+        "  Humidistat Reheat Coil 1, !- Name",
+        "  FanAndCoilAvailSched,     !- Availability Schedule Name",
+        "  NaturalGas,               !- Fuel Type",
+        "  0.8,                      !- Burner Efficiency",
+        "  32000,                    !- Nominal Capacity",
+        "  Reheat Coil Air Inlet Node,    !- Air Inlet Node Name",
+        "  Zone 2 Inlet Node;        !- Air Outlet Node Name",
+
+        "ScheduleTypeLimits,",
+        "  Any Number;               !- Name",
+
+        "Schedule:Compact,",
+        "  FanAndCoilAvailSched,     !- Name",
+        "  Any Number,               !- Schedule Type Limits Name",
+        "  Through: 12/31,           !- Field 1",
+        "  For: AllDays,             !- Field 2",
+        "  Until: 24:00,             !- Field 3",
+        "  1.0;                      !- Field 4",
+
+        "Schedule:Compact,",
+        "  ContinuousFanSchedule,    !- Name",
+        "  Any Number,               !- Schedule Type Limits Name",
+        "  Through: 12/31,           !- Field 1",
+        "  For: AllDays,             !- Field 2",
+        "  Until: 24:00,             !- Field 3",
+        "  1.0;                      !- Field 4",
+
+        "Curve:Quadratic,",
+        "  WindACCoolCapFFF,         !- Name",
+        "  0.8,                      !- Coefficient1 Constant",
+        "  0.2,                      !- Coefficient2 x",
+        "  0,                        !- Coefficient3 x2",
+        "  0.5,                      !- Minimum Value of x",
+        "  1.5;                      !- Maximum Value of x",
+
+        "Curve:Quadratic,",
+        "  WindACEIRFFF,             !- Name",
+        "  1.1552,                   !- Coefficient1 Constant",
+        "  -0.1808,                  !- Coefficient2 x",
+        "  0.0256,                   !- Coefficient3 x2",
+        "  0.5,                      !- Minimum Value of x",
+        "  1.5;                      !- Maximum Value of x",
+
+        "Curve:Quadratic,",
+        "  WindACPLFFPLR,            !- Name",
+        "  0.85,                     !- Coefficient1 Constant",
+        "  0.15,                     !- Coefficient2 x",
+        "  0,                        !- Coefficient3 x2",
+        "  0,                        !- Minimum Value of x",
+        "  1;                        !- Maximum Value of x",
+
+        "Curve:Biquadratic,",
+        "  WindACCoolCapFT,          !- Name",
+        "  0.942587793,              !- Coefficient1 Constant",
+        "  0.009543347,              !- Coefficient2 x",
+        "  0.00068377,               !- Coefficient3 x2",
+        "  -0.011042676,             !- Coefficient4 y",
+        "  5.249e-06,                !- Coefficient5 y2",
+        "  -9.72e-06,                !- Coefficient6 xy",
+        "  12.77778,                 !- Minimum Value of x",
+        "  23.88889,                 !- Maximum Value of x",
+        "  18,                       !- Minimum Value of y",
+        "  46.11111,                 !- Maximum Value of y",
+        "  ,                         !- Minimum Curve Output",
+        "  ,                         !- Maximum Curve Output",
+        "  Temperature,              !- Input Unit Type for X",
+        "  Temperature,              !- Input Unit Type for Y",
+        "  Dimensionless;            !- Output Unit Type",
+
+        "Curve:Biquadratic,",
+        "  WindACEIRFT,              !- Name",
+        "  0.342414409,              !- Coefficient1 Constant",
+        "  0.034885008,              !- Coefficient2 x",
+        "  -0.0006237,               !- Coefficient3 x2",
+        "  0.004977216,              !- Coefficient4 y",
+        "  0.000437951,              !- Coefficient5 y2",
+        "  -0.000728028,             !- Coefficient6 xy",
+        "  12.77778,                 !- Minimum Value of x",
+        "  23.88889,                 !- Maximum Value of x",
+        "  18,                       !- Minimum Value of y",
+        "  46.11111,                 !- Maximum Value of y",
+        "  ,                         !- Minimum Curve Output",
+        "  ,                         !- Maximum Curve Output",
+        "  Temperature,              !- Input Unit Type for X",
+        "  Temperature,              !- Input Unit Type for Y",
+        "  Dimensionless;            !- Output Unit Type",
+    });
+
+
+    ASSERT_TRUE(process_idf(idf_objects)); // read idf objects
+
+    bool ErrorsFound(false);
+    HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
+    EXPECT_FALSE(ErrorsFound);                    // expect no errors
+
+    DataZoneEquipment::GetZoneEquipmentData1(); // read zone equipment configuration and list objects
+
+    DataSizing::ZoneEqSizing.allocate(1);
+    DataZoneEquipment::ZoneEquipList(1).EquipIndex.allocate(1);
+    DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1; // initialize equipment index for ZoneHVAC
+
+    std::string compName = "UNITARY SYSTEM MODEL";
+    bool zoneEquipment = true;
+    int compTypeOfNum = DataHVACGlobals::UnitarySys_AnyCoilType;
+
+    UnitarySystems::UnitarySys::factory(compTypeOfNum, compName, zoneEquipment, 0);
+    // only 1 unitary system above so expect 1 as number of unitary system objects
+    ASSERT_EQ(1, UnitarySystems::numUnitarySystems);
+    // Now retrieve it
+    UnitarySystems::UnitarySys *thisSys = &UnitarySystems::unitarySys[0];
+
+    // indicate zone data is available
+    DataZoneEquipment::ZoneEquipInputsFilled = true;
+
+    // get UnitarySystem input from object above
+    // Before fix for #7771, it throws
+    // C++ exception with description "[json.exception.type_error.302] type must be number, but is string" thrown in the test body.
+    ASSERT_NO_THROW(thisSys->getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound));
+    EXPECT_FALSE(ErrorsFound);
+
+    // Like I said above in the IDF snippet section, control type has to be SingleZoneVAV or autosizing of
+    // 'Minimum Supply Air Temperature' (DesignMinOutletTemp) isn't allowed
+    EXPECT_EQ(thisSys->m_ControlType, EnergyPlus::UnitarySystems::UnitarySys::ControlType::CCMASHRAE);
+    EXPECT_EQ(thisSys->DesignMinOutletTemp, DataSizing::AutoSize);
+    EXPECT_EQ(thisSys->m_MaxCoolAirVolFlow, DataSizing::AutoSize);
+    EXPECT_EQ(thisSys->m_MaxHeatAirVolFlow, DataSizing::AutoSize);
+    EXPECT_EQ(thisSys->m_MaxNoCoolHeatAirVolFlow, DataSizing::AutoSize);
+    EXPECT_EQ(thisSys->DesignMaxOutletTemp, DataSizing::AutoSize);
+    EXPECT_TRUE(thisSys->m_RequestAutoSize);
 }

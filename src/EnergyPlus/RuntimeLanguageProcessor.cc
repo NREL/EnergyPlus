@@ -1755,7 +1755,7 @@ namespace RuntimeLanguageProcessor {
         ExpressionNum = ProcessTokens(Token, NumTokens, StackNum, String);
     }
 
-    int ProcessTokens(Array1S<TokenType> const TokenIN, int const NumTokensIN, int const StackNum, std::string const &ParsingString)
+    int ProcessTokens(const Array1D<TokenType> &TokenIN, int const NumTokensIN, int const StackNum, std::string const &ParsingString)
     {
 
         // SUBROUTINE INFORMATION:
