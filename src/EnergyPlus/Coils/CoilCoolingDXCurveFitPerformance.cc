@@ -60,6 +60,7 @@
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/OutputFiles.hh>
 
 using namespace EnergyPlus;
@@ -239,6 +240,8 @@ void CoilCoolingDXCurveFitPerformance::calculate(CoilCoolingDXCurveFitOperatingM
 
 void CoilCoolingDXCurveFitPerformance::calcStandardRatings(AllGlobals &state, int supplyFanIndex, int const supplyFanType, std::string const &supplyFanName, int condInletNodeIndex, OutputFiles &outputFiles) {
 
+    using General::SolveRoot;
+    using TempSolveRoot::SolveRoot;
     // If fan index hasn't been set, we can't do anything
     if (supplyFanIndex == -1) { // didn't find VAV fan, do not rate this coil
         ShowWarningError("CalcTwoSpeedDXCoilStandardRating: Did not find an appropriate fan associated with DX coil named = \"" +
@@ -436,8 +439,8 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(AllGlobals &state, in
         Real64 const AccuracyTolerance(0.2); // tolerance in AHRI 340/360 Table 6 note 1
         int const MaximumIterations(1000);
         Real64 PartLoadAirMassFlowRate = 0.0;
-        auto f = std::bind(&CoilCoolingDXCurveFitPerformance::calcIEERResidual, this, std::placeholders::_1, std::placeholders::_2);
-        General::SolveRoot(AccuracyTolerance,
+        auto f = std::bind(&CoilCoolingDXCurveFitPerformance::calcIEERResidual, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+        SolveRoot(state, AccuracyTolerance,
                   MaximumIterations,
                   SolverFlag,
                   PartLoadAirMassFlowRate,
@@ -643,9 +646,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(AllGlobals &state, in
     OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchVAVDXCoolCoilMdotD, this->name, SupAirMdot_TestPoint[3], 4);
 }
 
-
-Real64 CoilCoolingDXCurveFitPerformance::calcIEERResidual(
-//Real64 CoilCoolingDXCurveFitPerformance::calcIEERResidual(AllGlobals &state, 
+Real64 CoilCoolingDXCurveFitPerformance::calcIEERResidual(AllGlobals &state, 
         Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
         std::vector<Real64> const &Par
 )
