@@ -11501,7 +11501,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputwithTradeOff)
         "  Load,                   !- Control Type",
         "  East Zone,              !- Controlling Zone or Thermostat Location",
         "  None,                   !- Dehumidification Control Type",
-        "  FanAndCoilAvailSched,   !- Availability Schedule Name",
+        "  FanAndCoilAvailTest,   !- Availability Schedule Name",
         "  Zone Exhaust Node,         !- Air Inlet Node Name",
         "  Zone 2 Inlet Node,   !- Air Outlet Node Name",
         "  Fan:OnOff,              !- Supply Fan Object Type",
@@ -11687,6 +11687,14 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_GetInputwithTradeOff)
     DataZoneEquipment::ZoneEquipInputsFilled = true;                             // indicate zone data is available
     thisSys->getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound); // get UnitarySystem input from object above
     EXPECT_FALSE(ErrorsFound);                                                   // expect no errors
+
+    // Issue 7777
+    std::string const error_string = delimited_string({
+        "   ** Warning ** getUnitarySystemInputDataAirLoopHVAC:UnitarySystem=\"UNITARY SYSTEM MODEL\", invalid Availability Schedule Name = FANANDCOILAVAILTEST",   
+        "   **   ~~~   ** Set the default as Always On. Simulation continues.",
+    });
+
+    EXPECT_TRUE(compare_err_stream(error_string, true));
 }
 
 // This issue tests for GetInput with respect to Autosizing, especially for issue #7771 where
