@@ -3233,6 +3233,7 @@ namespace DesiccantDehumidifiers {
         using DataHVACGlobals::SmallLoad;
         using General::RoundSigDigits;
         using General::SolveRoot;
+        using TempSolveRoot::SolveRoot;
         using HeatingCoils::SimulateHeatingCoilComponents;
         using PlantUtilities::SetComponentFlowRate;
         using SteamCoils::SimulateSteamCoilComponents;
@@ -3296,7 +3297,7 @@ namespace DesiccantDehumidifiers {
                             Par(2) = 0.0;
                         }
                         Par(3) = RegenCoilLoad;
-                        SolveRoot(ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par);
+                        SolveRoot(state, ErrTolerance, SolveMaxIter, SolFlag, HotWaterMdot, HotWaterCoilResidual, MinWaterFlow, MaxHotWaterFlow, Par);
                         if (SolFlag == -1) {
                             if (DesicDehum(DesicDehumNum).HotWaterCoilMaxIterIndex == 0) {
                                 ShowWarningMessage("CalcNonDXHeatingCoils: Hot water coil control failed for " + DesicDehum(DesicDehumNum).DehumType +
@@ -3394,7 +3395,7 @@ namespace DesiccantDehumidifiers {
     }
 
     Real64 HotWaterCoilResidual(AllGlobals &state, Real64 const HWFlow,      // hot water flow rate in kg/s
-                                Array1<Real64> const &Par // Par(5) is the requested coil load
+                                Array1<Real64> const &Par // Par(5) is the requested coil load                            
     )
     {
 
