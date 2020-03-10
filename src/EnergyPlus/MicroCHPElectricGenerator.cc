@@ -525,9 +525,9 @@ namespace MicroCHPElectricGenerator {
                                   "Generator:MicroCHP",
                                   this->Name,
                                   DataHeatBalance::IntGainTypeOf_GeneratorMicroCHP,
-                                  this->A42Model.SkinLossConvect,
-                                  _,
-                                  this->A42Model.SkinLossRadiat);
+                                  &this->A42Model.SkinLossConvect,
+                                  nullptr,
+                                  &this->A42Model.SkinLossRadiat);
         }
     }
 
