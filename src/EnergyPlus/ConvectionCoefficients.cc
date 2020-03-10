@@ -8619,11 +8619,11 @@ namespace ConvectionCoefficients {
         return Hc;
     }
 
-    Real64 CalcBeausoleilMorrisonMixedAssistedWall(Real64 const DeltaTemp,     // [C] temperature difference between surface and air
-                                                   Real64 const Height,        // [m] characteristic size
-                                                   Real64 const SurfTemp,      // [C] surface temperature
-                                                   Real64 const SupplyAirTemp, // [C] temperature of supply air into zone
-                                                   Real64 const AirChangeRate  // [ACH] [1/hour] supply air ACH for zone
+    Real64 CalcBeausoleilMorrisonMixedAssistedWall(Real64 const &DeltaTemp,     // [C] temperature difference between surface and air
+                                                   Real64 const &Height,        // [m] characteristic size
+                                                   Real64 const &SurfTemp,      // [C] surface temperature
+                                                   Real64 const &SupplyAirTemp, // [C] temperature of supply air into zone
+                                                   Real64 const &AirChangeRate  // [ACH] [1/hour] supply air ACH for zone
     )
     {
 
@@ -8657,9 +8657,9 @@ namespace ConvectionCoefficients {
         return Hc;
     }
 
-    Real64 CalcBeausoleilMorrisonMixedAssistedWall(Real64 const DeltaTemp, // [C] temperature difference between surface and air
-                                                   Real64 const Height,    // [m] characteristic size
-                                                   Real64 const SurfTemp,  // [C] surface temperature
+    Real64 CalcBeausoleilMorrisonMixedAssistedWall(Real64 const &DeltaTemp, // [C] temperature difference between surface and air
+                                                   Real64 const &Height,    // [m] characteristic size
+                                                   Real64 const &SurfTemp,  // [C] surface temperature
                                                    int const ZoneNum       // index of zone for messaging
     )
     {
@@ -8695,11 +8695,11 @@ namespace ConvectionCoefficients {
         }
     }
 
-    Real64 CalcBeausoleilMorrisonMixedOpposingWall(Real64 const DeltaTemp,     // [C] temperature difference between surface and air
-                                                   Real64 const Height,        // [m] characteristic size
-                                                   Real64 const SurfTemp,      // [C] surface temperature
-                                                   Real64 const SupplyAirTemp, // [C] temperature of supply air into zone
-                                                   Real64 const AirChangeRate  // [ACH] [1/hour] supply air ACH for zone
+    Real64 CalcBeausoleilMorrisonMixedOpposingWall(Real64 const &DeltaTemp,     // [C] temperature difference between surface and air
+                                                   Real64 const &Height,        // [m] characteristic size
+                                                   Real64 const &SurfTemp,      // [C] surface temperature
+                                                   Real64 const &SupplyAirTemp, // [C] temperature of supply air into zone
+                                                   Real64 const &AirChangeRate  // [ACH] [1/hour] supply air ACH for zone
     )
     {
 
@@ -8748,9 +8748,9 @@ namespace ConvectionCoefficients {
         return max(max(HcTmp1, HcTmp2), HcTmp3);
     }
 
-    Real64 CalcBeausoleilMorrisonMixedOpposingWall(Real64 const DeltaTemp, // [C] temperature difference between surface and air
-                                                   Real64 const Height,    // [m] characteristic size
-                                                   Real64 const SurfTemp,  // [C] surface temperature
+    Real64 CalcBeausoleilMorrisonMixedOpposingWall(Real64 const &DeltaTemp, // [C] temperature difference between surface and air
+                                                   Real64 const &Height,    // [m] characteristic size
+                                                   Real64 const &SurfTemp,  // [C] surface temperature
                                                    int const ZoneNum       // index of zone for messaging
     )
     {
@@ -8788,11 +8788,11 @@ namespace ConvectionCoefficients {
         }
     }
 
-    Real64 CalcBeausoleilMorrisonMixedStableFloor(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
-                                                  Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
-                                                  Real64 const SurfTemp,          // [C] surface temperature
-                                                  Real64 const SupplyAirTemp,     // [C] temperature of supply air into zone
-                                                  Real64 const AirChangeRate      // [ACH] [1/hour] supply air ACH for zone
+    Real64 CalcBeausoleilMorrisonMixedStableFloor(Real64 const &DeltaTemp,         // [C] temperature difference between surface and air
+                                                  Real64 const &HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
+                                                  Real64 const &SurfTemp,          // [C] surface temperature
+                                                  Real64 const &SupplyAirTemp,     // [C] temperature of supply air into zone
+                                                  Real64 const &AirChangeRate      // [ACH] [1/hour] supply air ACH for zone
     )
     {
 
@@ -8823,9 +8823,9 @@ namespace ConvectionCoefficients {
         return Hc;
     }
 
-    Real64 CalcBeausoleilMorrisonMixedStableFloor(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
-                                                  Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
-                                                  Real64 const SurfTemp,          // [C] surface temperature
+    Real64 CalcBeausoleilMorrisonMixedStableFloor(Real64 const &DeltaTemp,         // [C] temperature difference between surface and air
+                                                  Real64 const &HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
+                                                  Real64 const &SurfTemp,          // [C] surface temperature
                                                   int const ZoneNum               // index of zone for messaging
     )
     {
@@ -8862,11 +8862,11 @@ namespace ConvectionCoefficients {
         }
     }
 
-    Real64 CalcBeausoleilMorrisonMixedUnstableFloor(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
-                                                    Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
-                                                    Real64 const SurfTemp,          // [C] surface temperature
-                                                    Real64 const SupplyAirTemp,     // [C] temperature of supply air into zone
-                                                    Real64 const AirChangeRate      // [ACH] [1/hour] supply air ACH for zone
+    Real64 CalcBeausoleilMorrisonMixedUnstableFloor(Real64 const &DeltaTemp,         // [C] temperature difference between surface and air
+                                                    Real64 const &HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
+                                                    Real64 const &SurfTemp,          // [C] surface temperature
+                                                    Real64 const &SupplyAirTemp,     // [C] temperature of supply air into zone
+                                                    Real64 const &AirChangeRate      // [ACH] [1/hour] supply air ACH for zone
     )
     {
 
@@ -8899,9 +8899,9 @@ namespace ConvectionCoefficients {
         return Hc;
     }
 
-    Real64 CalcBeausoleilMorrisonMixedUnstableFloor(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
-                                                    Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
-                                                    Real64 const SurfTemp,          // [C] surface temperature
+    Real64 CalcBeausoleilMorrisonMixedUnstableFloor(Real64 const &DeltaTemp,         // [C] temperature difference between surface and air
+                                                    Real64 const &HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
+                                                    Real64 const &SurfTemp,          // [C] surface temperature
                                                     int const ZoneNum               // index of zone for messaging
     )
     {
@@ -8939,11 +8939,11 @@ namespace ConvectionCoefficients {
         }
     }
 
-    Real64 CalcBeausoleilMorrisonMixedStableCeiling(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
-                                                    Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
-                                                    Real64 const SurfTemp,          // [C] surface temperature
-                                                    Real64 const SupplyAirTemp,     // [C] temperature of supply air into zone
-                                                    Real64 const AirChangeRate      // [ACH] [1/hour] supply air ACH for zone
+    Real64 CalcBeausoleilMorrisonMixedStableCeiling(Real64 const &DeltaTemp,         // [C] temperature difference between surface and air
+                                                    Real64 const &HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
+                                                    Real64 const &SurfTemp,          // [C] surface temperature
+                                                    Real64 const &SupplyAirTemp,     // [C] temperature of supply air into zone
+                                                    Real64 const &AirChangeRate      // [ACH] [1/hour] supply air ACH for zone
     )
     {
 
@@ -8974,9 +8974,9 @@ namespace ConvectionCoefficients {
         return Hc;
     }
 
-    Real64 CalcBeausoleilMorrisonMixedStableCeiling(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
-                                                    Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
-                                                    Real64 const SurfTemp,          // [C] surface temperature
+    Real64 CalcBeausoleilMorrisonMixedStableCeiling(Real64 const &DeltaTemp,         // [C] temperature difference between surface and air
+                                                    Real64 const &HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
+                                                    Real64 const &SurfTemp,          // [C] surface temperature
                                                     int const ZoneNum               // index of zone for messaging
     )
     {
@@ -9014,11 +9014,11 @@ namespace ConvectionCoefficients {
         }
     }
 
-    Real64 CalcBeausoleilMorrisonMixedUnstableCeiling(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
-                                                      Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
-                                                      Real64 const SurfTemp,          // [C] surface temperature
-                                                      Real64 const SupplyAirTemp,     // [C] temperature of supply air into zone
-                                                      Real64 const AirChangeRate      // [ACH] [1/hour] supply air ACH for zone
+    Real64 CalcBeausoleilMorrisonMixedUnstableCeiling(Real64 const &DeltaTemp,         // [C] temperature difference between surface and air
+                                                      Real64 const &HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
+                                                      Real64 const &SurfTemp,          // [C] surface temperature
+                                                      Real64 const &SupplyAirTemp,     // [C] temperature of supply air into zone
+                                                      Real64 const &AirChangeRate      // [ACH] [1/hour] supply air ACH for zone
     )
     {
 
@@ -9050,9 +9050,9 @@ namespace ConvectionCoefficients {
         return Hc;
     }
 
-    Real64 CalcBeausoleilMorrisonMixedUnstableCeiling(Real64 const DeltaTemp,         // [C] temperature difference between surface and air
-                                                      Real64 const HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
-                                                      Real64 const SurfTemp,          // [C] surface temperature
+    Real64 CalcBeausoleilMorrisonMixedUnstableCeiling(Real64 const &DeltaTemp,         // [C] temperature difference between surface and air
+                                                      Real64 const &HydraulicDiameter, // [m] characteristic size, = (4 * area) / perimeter
+                                                      Real64 const &SurfTemp,          // [C] surface temperature
                                                       int const ZoneNum               // index of zone for messaging
     )
     {
