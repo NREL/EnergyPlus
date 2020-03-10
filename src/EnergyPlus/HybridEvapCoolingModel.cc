@@ -187,7 +187,6 @@ namespace HybridEvapCoolingModel {
         Maximum_Return_Air_Relative_Humidity = max;
         return true;
     }
-
     bool CMode::InitializeOSAFConstraints(Real64 minOSAF, Real64 maxOSAF)
     {
         // minimum 0.00, maximum 1.00, Outdoor air fractions below this value will not be considered.
@@ -212,7 +211,7 @@ namespace HybridEvapCoolingModel {
         else
             return false;
     }
-    Real64 CMode::CalculateCurveVal(Real64 X_1, Real64 X_2, Real64 X_3, Real64 X_4, Real64 X_5, Real64 X_6, int curveType)
+    Real64 CMode::CalculateCurveVal(Real64 Tosa, Real64 Wosa, Real64 Tra, Real64 Wra, Real64 Msa, Real64 OSAF, int curveType)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Spencer Maxwell Dutton
@@ -231,10 +230,12 @@ namespace HybridEvapCoolingModel {
         // following tables are for intensive variables : Supply Air Temperature, Supply Air Humidity, External Static Pressure, The following tables
         // are for extensive variables : Electric Power, Fan Electric Power, Second Fuel Consumption, Third Fuel Consumption, Water Use Lookup Table
         //
-        // X_1 is the outside air temperature (Tosa), X_2 is the outside humidity ratio (Wosa),
-        // X_3 return air temp (Tra),X_4 return humidity ratio Wra,
-        // X_5 supply air mass flow rate, Msa, X_6 outside air fraction OSAF
-        // the curveType
+        // Tosa is the outside air temperature
+        // Wosa is the outside humidity ratio
+        // Tra return air temp
+        // Wra return humidity ratio,
+        // Msa supply air mass flow rate
+        // OSAF outside air fraction
 
         // REFERENCES:
         // na
@@ -245,70 +246,70 @@ namespace HybridEvapCoolingModel {
         switch (curveType) {
         case TEMP_CURVE:
             if (ValidPointer(Tsa_curve_pointer)) {
-                Y_val = CurveValue(Tsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
+                Y_val = CurveValue(Tsa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
             } else {
-                Y_val = X_3; // return air temp
+                Y_val = Tra; // return air temp
             }
             break;
-        case W_CURVE:
 
+        case W_CURVE:
             if (ValidPointer(HRsa_curve_pointer)) {
-                Y_val = CurveValue(HRsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
+                Y_val = CurveValue(HRsa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
                 Y_val = max(min(Y_val,1.0),0.0);
             } else {
-                Y_val = X_4; // return HR
+                Y_val = Wra; // return HR
             }
             break;
-        case POWER_CURVE:
 
+        case POWER_CURVE:
             if (ValidPointer(Psa_curve_pointer)) {
                 // Correction= scaling factor *System Maximum Supply Air Flow Rate*StdRhoAir
-                Y_val = Correction * CurveValue(Psa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
+                Y_val = Correction * CurveValue(Psa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
             } else {
                 Y_val = 0;
             }
             break;
-        case SUPPLY_FAN_POWER:
 
+        case SUPPLY_FAN_POWER:
             if (ValidPointer(SFPsa_curve_pointer)) {
                 // Correction= scaling factor *System Maximum Supply Air Flow Rate*StdRhoAir
-                Y_val = Correction * CurveValue(SFPsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
+                Y_val = Correction * CurveValue(SFPsa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
             } else {
                 Y_val = 0;
             }
             break;
-        case EXTERNAL_STATIC_PRESSURE:
 
+        case EXTERNAL_STATIC_PRESSURE:
             if (ValidPointer(ESPsa_curve_pointer)) {
                 // Correction= scaling factor *System Maximum Supply Air Flow Rate*StdRhoAir
-                Y_val = CurveValue(ESPsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
+                Y_val = CurveValue(ESPsa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
             } else {
                 Y_val = 0; // or set a more reasonable default
             }
             break;
-        case SECOND_FUEL_USE:
 
+        case SECOND_FUEL_USE:
             if (ValidPointer(SFUsa_curve_pointer)) {
                 // Correction= scaling factor *System Maximum Supply Air Flow Rate*StdRhoAir
-                Y_val = Correction * CurveValue(SFUsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
+                Y_val = Correction * CurveValue(SFUsa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
             } else {
                 Y_val = 0; // or set a more reasonable default
             }
             break;
-        case THIRD_FUEL_USE:
 
+        case THIRD_FUEL_USE:
             if (ValidPointer(TFUsa_curve_pointer)) {
                 // Correction= scaling factor *System Maximum Supply Air Flow Rate*StdRhoAir
-                Y_val = Correction * CurveValue(TFUsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
+                Y_val = Correction * CurveValue(TFUsa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
             } else {
                 Y_val = 0; // or set a more reasonable default
             }
             break;
-        case WATER_USE:
 
+        case WATER_USE:
             if (ValidPointer(WUsa_curve_pointer)) {
                 // Correction= scaling factor *System Maximum Supply Air Flow Rate*StdRhoAir
-                Y_val = Correction * CurveValue(WUsa_curve_pointer, X_1, X_2, X_3, X_4, X_5, X_6);
+                Y_val = Correction * CurveValue(WUsa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
             } else {
                 Y_val = 0; // or set a more reasonable default
             }

@@ -150,7 +150,7 @@ namespace HybridEvapCoolingModel {
                        Array1D<bool> lAlphaBlanks,
                        std::string cCurrentModuleObject);
         void InitializeCurve(int curveType, int CurveID);
-        Real64 CalculateCurveVal(Real64 X_1, Real64 X_2, Real64 X_3, Real64 X_4, Real64 X_5, Real64 X_6, int curve_ID);
+        Real64 CalculateCurveVal(Real64 Tosa, Real64 Wosa, Real64 Tra, Real64 Wra, Real64 Msa, Real64 OSAF, int curveType);
         bool InitializeOSAFConstraints(Real64 minOSAF, Real64 maxOSAF);
         bool InitializeMsaRatioConstraints(Real64 minMsa, Real64 maxMsa);
         bool InitializeOutdoorAirTemperatureConstraints(Real64 min, Real64 max);
