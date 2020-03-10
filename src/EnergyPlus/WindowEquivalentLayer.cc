@@ -7989,7 +7989,7 @@ namespace WindowEquivalentLayer {
 
     Real64 Specular_F(Real64 const THETA,     // incidence angle, radians
                       int const OPT,          // options (unused)
-                      const Array1D<Real64> &P // parameters (none defined)
+                      const Array1D<Real64> &EP_UNUSED(P) // parameters (none defined)
     )
     {
         // FUNCTION INFORMATION:
