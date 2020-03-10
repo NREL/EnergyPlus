@@ -5828,20 +5828,18 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
     StoreType VariableType;    // 1=Average, 2=Sum, 3=Min/Max
     int Loop;
     ReportingFrequency RepFreq(ReportingFrequency::Hourly);
-    bool OnMeter;                   // True if this variable is on a meter
     std::string ResourceType;       // Will hold value of ResourceTypeKey
     std::string EndUse;             // Will hold value of EndUseKey
     std::string EndUseSub;          // Will hold value of EndUseSubKey
     std::string Group;              // Will hold value of GroupKey
     std::string ZoneName;           // Will hold value of ZoneKey
     static bool ErrorsFound(false); // True if Errors Found
-    bool ThisOneOnTheList;
     int localIndexGroupKey;
 
     if (!OutputInitialized) InitializeOutput();
 
     // Variable name without units
-    std::string VarName = VariableName;
+    const std::string& VarName = VariableName;
 
     // Determine whether to Report or not
     CheckReportVariable(KeyedValue, VarName);
@@ -5859,8 +5857,8 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
     }
 
     // DataOutputs::OutputVariablesForSimulation is case-insensitive
-    ThisOneOnTheList = DataOutputs::FindItemInVariableList(KeyedValue, VarName);
-    OnMeter = false; // just a safety initialization
+    bool const ThisOneOnTheList = DataOutputs::FindItemInVariableList(KeyedValue, VarName);
+    bool OnMeter = false; // True if this variable is on a meter
 
     for (Loop = 1; Loop <= NumExtraVars; ++Loop) {
 
@@ -5928,43 +5926,45 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
             ReallocateRVar();
         }
         CV = NumOfRVariable;
-        RVariableTypes(CV).timeStepType = TimeStepType;
-        RVariableTypes(CV).storeType = VariableType;
-        RVariableTypes(CV).VarName = KeyedValue + ':' + VarName;
-        RVariableTypes(CV).VarNameOnly = VarName;
-        RVariableTypes(CV).VarNameOnlyUC = UtilityRoutines::MakeUPPERCase(VarName);
-        RVariableTypes(CV).VarNameUC = UtilityRoutines::MakeUPPERCase(RVariableTypes(CV).VarName);
-        RVariableTypes(CV).KeyNameOnlyUC = UtilityRoutines::MakeUPPERCase(KeyedValue);
-        RVariableTypes(CV).units = VariableUnit;
+        auto &thisRvar = RVariableTypes(CV);
+        thisRvar.timeStepType = TimeStepType;
+        thisRvar.storeType = VariableType;
+        thisRvar.VarName = KeyedValue + ':' + VarName;
+        thisRvar.VarNameOnly = VarName;
+        thisRvar.VarNameOnlyUC = UtilityRoutines::MakeUPPERCase(VarName);
+        thisRvar.VarNameUC = UtilityRoutines::MakeUPPERCase(thisRvar.VarName);
+        thisRvar.KeyNameOnlyUC = UtilityRoutines::MakeUPPERCase(KeyedValue);
+        thisRvar.units = VariableUnit;
         if (VariableUnit == OutputProcessor::Unit::customEMS) {
-            RVariableTypes(CV).unitNameCustomEMS = customUnitName;
+            thisRvar.unitNameCustomEMS = customUnitName;
         }
         AssignReportNumber(CurrentReportNumber);
         ObjexxFCL::gio::write(IDOut, fmtLD) << CurrentReportNumber;
         strip(IDOut);
-        RVariableTypes(CV).VarPtr.Value = 0.0;
-        RVariableTypes(CV).VarPtr.TSValue = 0.0;
-        RVariableTypes(CV).VarPtr.StoreValue = 0.0;
-        RVariableTypes(CV).VarPtr.NumStored = 0.0;
-        RVariableTypes(CV).VarPtr.MaxValue = MaxSetValue;
-        RVariableTypes(CV).VarPtr.maxValueDate = 0;
-        RVariableTypes(CV).VarPtr.MinValue = MinSetValue;
-        RVariableTypes(CV).VarPtr.minValueDate = 0;
-        RVariableTypes(CV).VarPtr.Which = &ActualVariable;
-        RVariableTypes(CV).VarPtr.ReportID = CurrentReportNumber;
-        RVariableTypes(CV).ReportID = CurrentReportNumber;
-        RVariableTypes(CV).VarPtr.ReportIDChr = IDOut.substr(0, 15);
-        RVariableTypes(CV).VarPtr.storeType = VariableType;
-        RVariableTypes(CV).VarPtr.Stored = false;
-        RVariableTypes(CV).VarPtr.Report = false;
-        RVariableTypes(CV).VarPtr.frequency = ReportingFrequency::Hourly;
-        RVariableTypes(CV).VarPtr.SchedPtr = 0;
-        RVariableTypes(CV).VarPtr.MeterArrayPtr = 0;
-        RVariableTypes(CV).VarPtr.ZoneMult = 1;
-        RVariableTypes(CV).VarPtr.ZoneListMult = 1;
+        thisRvar.ReportID = CurrentReportNumber;
+        auto &thisVarPtr = thisRvar.VarPtr;
+        thisVarPtr.Value = 0.0;
+        thisVarPtr.TSValue = 0.0;
+        thisVarPtr.StoreValue = 0.0;
+        thisVarPtr.NumStored = 0.0;
+        thisVarPtr.MaxValue = MaxSetValue;
+        thisVarPtr.maxValueDate = 0;
+        thisVarPtr.MinValue = MinSetValue;
+        thisVarPtr.minValueDate = 0;
+        thisVarPtr.Which = &ActualVariable;
+        thisVarPtr.ReportID = CurrentReportNumber;
+        thisVarPtr.ReportIDChr = IDOut.substr(0, 15);
+        thisVarPtr.storeType = VariableType;
+        thisVarPtr.Stored = false;
+        thisVarPtr.Report = false;
+        thisVarPtr.frequency = ReportingFrequency::Hourly;
+        thisVarPtr.SchedPtr = 0;
+        thisVarPtr.MeterArrayPtr = 0;
+        thisVarPtr.ZoneMult = 1;
+        thisVarPtr.ZoneListMult = 1;
         if (present(ZoneMult) && present(ZoneListMult)) {
-            RVariableTypes(CV).VarPtr.ZoneMult = ZoneMult;
-            RVariableTypes(CV).VarPtr.ZoneListMult = ZoneListMult;
+            thisVarPtr.ZoneMult = ZoneMult;
+            thisVarPtr.ZoneListMult = ZoneListMult;
         }
 
         if (Loop == 1) {
@@ -5976,7 +5976,7 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
                 } else {
                     Unit mtrUnits = RVariableTypes(CV).units;
                     ErrorsFound = false;
-                    AttachMeters(mtrUnits, ResourceType, EndUse, EndUseSub, Group, ZoneName, CV, RVariableTypes(CV).VarPtr.MeterArrayPtr, ErrorsFound);
+                    AttachMeters(mtrUnits, ResourceType, EndUse, EndUseSub, Group, ZoneName, CV, thisVarPtr.MeterArrayPtr, ErrorsFound);
                     if (ErrorsFound) {
                         ShowContinueError("Invalid Meter spec for variable=" + KeyedValue + ':' + VariableName);
                         ErrorsLogged = true;
@@ -5987,48 +5987,48 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
 
         if (ReportList(Loop) == -1) continue;
 
-        RVariableTypes(CV).VarPtr.Report = true;
+        thisVarPtr.Report = true;
 
         if (ReportList(Loop) == 0) {
-            RVariableTypes(CV).VarPtr.frequency = RepFreq;
-            RVariableTypes(CV).VarPtr.SchedPtr = 0;
+            thisVarPtr.frequency = RepFreq;
+            thisVarPtr.SchedPtr = 0;
         } else {
-            RVariableTypes(CV).VarPtr.frequency = ReqRepVars(ReportList(Loop)).frequency;
-            RVariableTypes(CV).VarPtr.SchedPtr = ReqRepVars(ReportList(Loop)).SchedPtr;
+            thisVarPtr.frequency = ReqRepVars(ReportList(Loop)).frequency;
+            thisVarPtr.SchedPtr = ReqRepVars(ReportList(Loop)).SchedPtr;
         }
 
-        if (RVariableTypes(CV).VarPtr.Report) {
+        if (thisVarPtr.Report) {
             if (present(indexGroupKey)) {
                 localIndexGroupKey = indexGroupKey;
             } else {
                 localIndexGroupKey = -999; // Unknown Group
             }
 
-            if (RVariableTypes(CV).VarPtr.SchedPtr != 0) {
-                WriteReportVariableDictionaryItem(RVariableTypes(CV).VarPtr.frequency,
-                                                  RVariableTypes(CV).VarPtr.storeType,
-                                                  RVariableTypes(CV).VarPtr.ReportID,
+            if (thisVarPtr.SchedPtr != 0) {
+                WriteReportVariableDictionaryItem(thisVarPtr.frequency,
+                                                  thisVarPtr.storeType,
+                                                  thisVarPtr.ReportID,
                                                   localIndexGroupKey,
                                                   TimeStepTypeKey,
-                                                  RVariableTypes(CV).VarPtr.ReportIDChr,
+                                                  thisVarPtr.ReportIDChr,
                                                   KeyedValue,
                                                   VarName,
-                                                  RVariableTypes(CV).timeStepType,
-                                                  RVariableTypes(CV).units,
-                                                  RVariableTypes(CV).unitNameCustomEMS,
+                                                  thisRvar.timeStepType,
+                                                  thisRvar.units,
+                                                  thisRvar.unitNameCustomEMS,
                                                   ReqRepVars(ReportList(Loop)).SchedName);
             } else {
-                WriteReportVariableDictionaryItem(RVariableTypes(CV).VarPtr.frequency,
-                                                  RVariableTypes(CV).VarPtr.storeType,
-                                                  RVariableTypes(CV).VarPtr.ReportID,
+                WriteReportVariableDictionaryItem(thisVarPtr.frequency,
+                                                  thisVarPtr.storeType,
+                                                  thisVarPtr.ReportID,
                                                   localIndexGroupKey,
                                                   TimeStepTypeKey,
-                                                  RVariableTypes(CV).VarPtr.ReportIDChr,
+                                                  thisVarPtr.ReportIDChr,
                                                   KeyedValue,
                                                   VarName,
-                                                  RVariableTypes(CV).timeStepType,
-                                                  RVariableTypes(CV).units,
-                                                  RVariableTypes(CV).unitNameCustomEMS);
+                                                  thisRvar.timeStepType,
+                                                  thisRvar.units,
+                                                  thisRvar.unitNameCustomEMS);
             }
         }
     }
@@ -6066,18 +6066,16 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int CV;
     std::string IDOut;
-    //  CHARACTER(len=MaxNameLength) :: VariableNamewithUnits ! Variable name with units std format
     TimeStepType TimeStepType; // 1=TimeStepZone, 2=TimeStepSys
     StoreType VariableType;    // 1=Average, 2=Sum, 3=Min/Max
     int localIndexGroupKey;
-    bool ThisOneOnTheList;
     int Loop;
     ReportingFrequency RepFreq(ReportingFrequency::Hourly);
 
     if (!OutputInitialized) InitializeOutput();
 
     // Variable name without units
-    std::string VarName = VariableName;
+    const std::string& VarName = VariableName;
 
     // Determine whether to Report or not
     CheckReportVariable(KeyedValue, VarName);
@@ -6095,7 +6093,7 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
     }
 
     // DataOutputs::OutputVariablesForSimulation is case-insentitive
-    ThisOneOnTheList = DataOutputs::FindItemInVariableList(KeyedValue, VarName);
+    bool const ThisOneOnTheList = DataOutputs::FindItemInVariableList(KeyedValue, VarName);
 
     for (Loop = 1; Loop <= NumExtraVars; ++Loop) {
 
@@ -6118,77 +6116,78 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
         }
 
         CV = NumOfIVariable;
-        IVariableTypes(CV).timeStepType = TimeStepType;
-        IVariableTypes(CV).storeType = VariableType;
-        IVariableTypes(CV).VarName = KeyedValue + ':' + VarName;
-        IVariableTypes(CV).VarNameOnly = VarName;
-        IVariableTypes(CV).VarNameUC = UtilityRoutines::MakeUPPERCase(IVariableTypes(CV).VarName);
-        IVariableTypes(CV).units = VariableUnit;
+        auto &thisIVar = IVariableTypes(CV);
+        thisIVar.timeStepType = TimeStepType;
+        thisIVar.storeType = VariableType;
+        thisIVar.VarName = KeyedValue + ':' + VarName;
+        thisIVar.VarNameOnly = VarName;
+        thisIVar.VarNameUC = UtilityRoutines::MakeUPPERCase(thisIVar.VarName);
+        thisIVar.units = VariableUnit;
         AssignReportNumber(CurrentReportNumber);
         ObjexxFCL::gio::write(IDOut, fmtLD) << CurrentReportNumber;
         strip(IDOut);
-
-        IVariableTypes(CV).VarPtr.Value = 0.0;
-        IVariableTypes(CV).VarPtr.StoreValue = 0.0;
-        IVariableTypes(CV).VarPtr.TSValue = 0.0;
-        IVariableTypes(CV).VarPtr.NumStored = 0.0;
+        thisIVar.ReportID = CurrentReportNumber;
+        auto &thisVarPtr = thisIVar.VarPtr;
+        thisVarPtr.Value = 0.0;
+        thisVarPtr.StoreValue = 0.0;
+        thisVarPtr.TSValue = 0.0;
+        thisVarPtr.NumStored = 0.0;
         //    IVariable%LastTSValue=0
-        IVariableTypes(CV).VarPtr.MaxValue = IMaxSetValue;
-        IVariableTypes(CV).VarPtr.maxValueDate = 0;
-        IVariableTypes(CV).VarPtr.MinValue = IMinSetValue;
-        IVariableTypes(CV).VarPtr.minValueDate = 0;
-        IVariableTypes(CV).VarPtr.Which = &ActualVariable;
-        IVariableTypes(CV).VarPtr.ReportID = CurrentReportNumber;
-        IVariableTypes(CV).ReportID = CurrentReportNumber;
-        IVariableTypes(CV).VarPtr.ReportIDChr = IDOut.substr(0, 15);
-        IVariableTypes(CV).VarPtr.storeType = VariableType;
-        IVariableTypes(CV).VarPtr.Stored = false;
-        IVariableTypes(CV).VarPtr.Report = false;
-        IVariableTypes(CV).VarPtr.frequency = ReportingFrequency::Hourly;
-        IVariableTypes(CV).VarPtr.SchedPtr = 0;
+        thisVarPtr.MaxValue = IMaxSetValue;
+        thisVarPtr.maxValueDate = 0;
+        thisVarPtr.MinValue = IMinSetValue;
+        thisVarPtr.minValueDate = 0;
+        thisVarPtr.Which = &ActualVariable;
+        thisVarPtr.ReportID = CurrentReportNumber;
+        thisVarPtr.ReportIDChr = IDOut.substr(0, 15);
+        thisVarPtr.storeType = VariableType;
+        thisVarPtr.Stored = false;
+        thisVarPtr.Report = false;
+        thisVarPtr.frequency = ReportingFrequency::Hourly;
+        thisVarPtr.SchedPtr = 0;
 
         if (ReportList(Loop) == -1) continue;
 
-        IVariableTypes(CV).VarPtr.Report = true;
+        thisVarPtr.Report = true;
 
         if (ReportList(Loop) == 0) {
-            IVariableTypes(CV).VarPtr.frequency = RepFreq;
-            IVariableTypes(CV).VarPtr.SchedPtr = 0;
+            thisVarPtr.frequency = RepFreq;
+            thisVarPtr.SchedPtr = 0;
         } else {
-            IVariableTypes(CV).VarPtr.frequency = ReqRepVars(ReportList(Loop)).frequency;
-            IVariableTypes(CV).VarPtr.SchedPtr = ReqRepVars(ReportList(Loop)).SchedPtr;
+            thisVarPtr.frequency = ReqRepVars(ReportList(Loop)).frequency;
+            thisVarPtr.SchedPtr = ReqRepVars(ReportList(Loop)).SchedPtr;
         }
 
-        if (IVariableTypes(CV).VarPtr.Report) {
+        if (thisVarPtr.Report) {
             if (present(indexGroupKey)) {
                 localIndexGroupKey = indexGroupKey;
             } else {
                 localIndexGroupKey = -999; // Unknown Group
             }
 
-            if (IVariableTypes(CV).VarPtr.SchedPtr != 0) {
-                WriteReportVariableDictionaryItem(IVariableTypes(CV).VarPtr.frequency,
-                                                  IVariableTypes(CV).VarPtr.storeType,
-                                                  IVariableTypes(CV).VarPtr.ReportID,
+            if (thisVarPtr.SchedPtr != 0) {
+                WriteReportVariableDictionaryItem(thisVarPtr.frequency,
+                                                  thisVarPtr.storeType,
+                                                  thisVarPtr.ReportID,
                                                   localIndexGroupKey,
                                                   TimeStepTypeKey,
-                                                  IVariableTypes(CV).VarPtr.ReportIDChr,
+                                                  thisVarPtr.ReportIDChr,
                                                   KeyedValue,
                                                   VarName,
-                                                  IVariableTypes(CV).timeStepType,
-                                                  IVariableTypes(CV).units,
+                                                  thisIVar.timeStepType,
+                                                  thisIVar.units,
                                                   ReqRepVars(ReportList(Loop)).SchedName);
             } else {
-                WriteReportVariableDictionaryItem(IVariableTypes(CV).VarPtr.frequency,
-                                                  IVariableTypes(CV).VarPtr.storeType,
-                                                  IVariableTypes(CV).VarPtr.ReportID,
+                WriteReportVariableDictionaryItem(thisVarPtr.frequency,
+                                                  thisVarPtr.storeType,
+                                                  thisVarPtr.ReportID,
                                                   localIndexGroupKey,
                                                   TimeStepTypeKey,
-                                                  IVariableTypes(CV).VarPtr.ReportIDChr,
+                                                  thisVarPtr.ReportIDChr,
                                                   KeyedValue,
                                                   VarName,
-                                                  IVariableTypes(CV).timeStepType,
-                                                  IVariableTypes(CV).units);
+                                                  thisIVar.timeStepType,
+                                                  thisIVar.units);
             }
         }
     }
