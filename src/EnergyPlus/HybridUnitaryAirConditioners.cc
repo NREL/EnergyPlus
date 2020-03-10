@@ -93,19 +93,12 @@
 namespace EnergyPlus {
 
 namespace HybridUnitaryAirConditioners {
-    // Using/Aliasing
-    using General::TrimSigDigits;
-    using HybridEvapCoolingModel::Model;
-
-    using CurveManager::CurveValue;
-    using CurveManager::GetCurveIndex;
-    using CurveManager::GetCurveMinMaxValues;
-    using HybridEvapCoolingModel::CMode;
 
     Array1D<Model> ZoneHybridUnitaryAirConditioner;
     int NumZoneHybridEvap(0);
     Array1D_bool CheckZoneHybridEvapName;
     bool GetInputZoneHybridEvap(true);
+
     // Begin routines for zone HVAC Hybrid Evaporative cooler unit
     //_______________________________________________________________________________________________________________________
     //***************
