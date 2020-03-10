@@ -781,7 +781,7 @@ namespace DataHeatBalance {
     Array1D<Real64> const
         GasSpecificHeatRatio(10, {1.4, 1.67, 1.68, 1.66, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}); // Gas specific heat ratios.  Used for gasses in low pressure
 
-    Real64 ZeroPointerVal(0.0);
+    Real64 zeroPointerVal(0.0);
 
     int NumAirBoundaryMixing(0);                   // Number of air boundary simple mixing objects needed
     std::vector<int> AirBoundaryMixingZone1(0);    // Air boundary simple mixing zone 1
@@ -1064,7 +1064,6 @@ namespace DataHeatBalance {
         CosIncAng.deallocate();
         BackSurfaces.deallocate();
         OverlapAreas.deallocate();
-        ZeroPointerVal = 0.0;
         ZonePreDefRep.deallocate();
         BuildingPreDefRep = ZonePreDefRepType();
         ZoneIntGain.deallocate();
@@ -1119,6 +1118,7 @@ namespace DataHeatBalance {
         MassConservation.deallocate();
         ZoneLocalEnvironment.deallocate();
         ZoneAirMassFlow = ZoneAirMassFlowConservation();
+        zeroPointerVal = 0;
     }
 
     void ZoneData::SetOutBulbTempAt()
