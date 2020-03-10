@@ -192,6 +192,7 @@ namespace DataLoopNode {
                                0.0,
                                0.0,
                                0.0,
+                               false,
                                false); // Autodesk:Note If intent is default construction drop initializer to elim bug exposure | FluidType |
                                        // FluidIndex | Temp {C} | TempMin {C} | TempMax {C} | TempSetPoint {C} | TempLastTimeStep {C} |
                                        // MassFlowRateRequest {kg/s} | MassFlowRate {kg/s} | MassFlowRateMin {kg/s} | MassFlowRateMax {kg/s}
@@ -260,6 +261,7 @@ namespace DataLoopNode {
                                      0.0,
                                      0.0,
                                      0.0,
+                                     false,
                                      false);
         MoreNodeInfo.deallocate();
         MarkedNode.deallocate();
