@@ -1259,6 +1259,9 @@ namespace SimulationManager {
                     if (overrideTimestep) {
                         ShowWarningError("Due to PerformancePrecisionTradeoffs Override Mode, the Number of TimeSteps has been changed to 1.");
                         DataGlobals::NumOfTimeStepInHour = 1;
+                        DataGlobals::TimeStepZone = 1.0 / double(DataGlobals::NumOfTimeStepInHour);
+                        DataGlobals::MinutesPerTimeStep = DataGlobals::TimeStepZone * 60;
+                        DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * SecInHour;
                     }
                     if (overrideZoneAirHeatBalAlg) {
                         ShowWarningError("Due to PerformancePrecisionTradeoffs Override Mode, the ZoneAirHeatBalanceAlgorithm has been changed to EulerMethod.");
