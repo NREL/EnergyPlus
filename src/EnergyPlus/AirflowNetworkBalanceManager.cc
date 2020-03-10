@@ -86,6 +86,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HeatingCoils.hh>
@@ -9559,7 +9560,7 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    void ValidateDistributionSystem()
+    void ValidateDistributionSystem(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -10003,9 +10004,9 @@ namespace AirflowNetworkBalanceManager {
                 UtilityRoutines::SameString(DisSysCompTermUnitData(i).EPlusType, "AirTerminal:SingleDuct:VAV:Reheat")) {
                 LocalError = false;
                 if (UtilityRoutines::SameString(DisSysCompTermUnitData(i).EPlusType, "AirTerminal:SingleDuct:ConstantVolume:Reheat"))
-                    GetHVACSingleDuctSysIndex(DisSysCompTermUnitData(i).Name, n, LocalError, "AirflowNetwork:Distribution:Component:TerminalUnit");
+                    GetHVACSingleDuctSysIndex(state, DisSysCompTermUnitData(i).Name, n, LocalError, "AirflowNetwork:Distribution:Component:TerminalUnit");
                 if (UtilityRoutines::SameString(DisSysCompTermUnitData(i).EPlusType, "AirTerminal:SingleDuct:VAV:Reheat"))
-                    GetHVACSingleDuctSysIndex(DisSysCompTermUnitData(i).Name,
+                    GetHVACSingleDuctSysIndex(state, DisSysCompTermUnitData(i).Name,
                                               n,
                                               LocalError,
                                               "AirflowNetwork:Distribution:Component:TerminalUnit",
@@ -11046,7 +11047,7 @@ namespace AirflowNetworkBalanceManager {
         return ACH;
     }
 
-    int GetAirLoopNumber(int const NodeNumber) // Get air loop number for each distribution node and linkage
+    int GetAirLoopNumber(AllGlobals &state, int const NodeNumber) // Get air loop number for each distribution node and linkage
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
@@ -11294,7 +11295,7 @@ namespace AirflowNetworkBalanceManager {
                             for (TUNum = 1; TUNum <= DisSysNumOfTermUnits; ++TUNum) {
                                 if (UtilityRoutines::SameString(DisSysCompTermUnitData(TUNum).EPlusType, "AirTerminal:SingleDuct:VAV:Reheat")) {
                                     LocalError = false;
-                                    GetHVACSingleDuctSysIndex(DisSysCompTermUnitData(TUNum).Name,
+                                    GetHVACSingleDuctSysIndex(state, DisSysCompTermUnitData(TUNum).Name,
                                                               TermNum,
                                                               LocalError,
                                                               "AirflowNetwork:Distribution:Component:TerminalUnit",

@@ -241,7 +241,7 @@ namespace HVACDXHeatPumpSystem {
                           DXHeatPumpSystem(DXSystemNum).PartLoadFrac);
 
             } else if (SELECT_CASE_var == Coil_HeatingAirToAirVariableSpeed) { // Coil:Heating:DX:VariableSpeed
-                SimVariableSpeedCoils(CompName,
+                SimVariableSpeedCoils(state, CompName,
                                       DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex,
                                       DXHeatPumpSystem(DXSystemNum).FanOpMode,
                                       MaxONOFFCyclesperHour,
@@ -805,7 +805,7 @@ namespace HVACDXHeatPumpSystem {
                         OnOffAirFlowRatio = 1.0;
                         SpeedRatio = 0.0;
 
-                        SimVariableSpeedCoils(CompName,
+                        SimVariableSpeedCoils(state, CompName,
                                               DXHeatPumpSystem(DXSystemNum).HeatPumpCoilIndex,
                                               FanOpMode,
                                               MaxONOFFCyclesperHour,
@@ -831,7 +831,7 @@ namespace HVACDXHeatPumpSystem {
                         SpeedNum = NumOfSpeeds;
                         SpeedRatio = 1.0;
                         QZnReq = 0.001; // to indicate the coil is running
-                        SimVariableSpeedCoils(CompName,
+                        SimVariableSpeedCoils(state, CompName,
                                               VSCoilIndex,
                                               FanOpMode,
                                               MaxONOFFCyclesperHour,
@@ -876,7 +876,7 @@ namespace HVACDXHeatPumpSystem {
                                 SpeedNum = 1;
                                 SpeedRatio = 1.0;
                                 QZnReq = 0.001; // to indicate the coil is running
-                                SimVariableSpeedCoils(CompName,
+                                SimVariableSpeedCoils(state, CompName,
                                                       VSCoilIndex,
                                                       FanOpMode,
                                                       MaxONOFFCyclesperHour,
@@ -899,7 +899,7 @@ namespace HVACDXHeatPumpSystem {
                                     TempOut1 = TempSpeedOut;
                                     for (I = 2; I <= NumOfSpeeds; ++I) {
                                         SpeedNum = I;
-                                        SimVariableSpeedCoils(CompName,
+                                        SimVariableSpeedCoils(state, CompName,
                                                               VSCoilIndex,
                                                               FanOpMode,
                                                               MaxONOFFCyclesperHour,
@@ -923,7 +923,7 @@ namespace HVACDXHeatPumpSystem {
                                     }
                                     if (DataGlobals::DoCoilDirectSolutions) {
                                         SpeedRatio = (DesOutTemp - TempOut1) / (TempSpeedOut - TempOut1);
-                                        SimVariableSpeedCoils(CompName,
+                                        SimVariableSpeedCoils(state, CompName,
                                                               VSCoilIndex,
                                                               FanOpMode,
                                                               MaxONOFFCyclesperHour,
@@ -992,7 +992,7 @@ namespace HVACDXHeatPumpSystem {
                                 } else {
                                     if (DataGlobals::DoCoilDirectSolutions) {
                                         PartLoadFrac = (DesOutTemp - Node(InletNode).Temp) / (TempSpeedOut - Node(InletNode).Temp);
-                                        SimVariableSpeedCoils(CompName,
+                                        SimVariableSpeedCoils(state, CompName,
                                                               VSCoilIndex,
                                                               FanOpMode,
                                                               MaxONOFFCyclesperHour,
@@ -1140,7 +1140,7 @@ namespace HVACDXHeatPumpSystem {
 
     //******************************************************************************
 
-    Real64 VSCoilCyclingResidual(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 VSCoilCyclingResidual(AllGlobals &state, Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                  Array1<Real64> const &Par   // Par(1) = DX coil number
     )
     {
@@ -1197,7 +1197,7 @@ namespace HVACDXHeatPumpSystem {
         CoilIndex = int(Par(1));
         FanOpMode = int(Par(5));
 
-        SimVariableSpeedCoils("",
+        SimVariableSpeedCoils(state, "",
                               CoilIndex,
                               FanOpMode,
                               MaxONOFFCyclesperHour,
@@ -1219,7 +1219,7 @@ namespace HVACDXHeatPumpSystem {
 
     //******************************************************************************
 
-    Real64 VSCoilSpeedResidual(Real64 const SpeedRatio,  // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 VSCoilSpeedResidual(AllGlobals &state, Real64 const SpeedRatio,  // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                Array1<Real64> const &Par // Par(1) = DX coil number
     )
     {
@@ -1277,7 +1277,7 @@ namespace HVACDXHeatPumpSystem {
         FanOpMode = int(Par(5));
         SpeedNum = int(Par(3));
 
-        SimVariableSpeedCoils("",
+        SimVariableSpeedCoils(state, "",
                               CoilIndex,
                               FanOpMode,
                               MaxONOFFCyclesperHour,

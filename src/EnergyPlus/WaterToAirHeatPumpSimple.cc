@@ -1125,7 +1125,7 @@ namespace WaterToAirHeatPumpSimple {
         DataHeatBalance::HeatReclaimSimple_WAHPCoil(HPNum).AvailCapacity = 0.0;
     }
 
-    void SizeHVACWaterToAir(int const HPNum)
+    void SizeHVACWaterToAir(AllGlobals &state, int const HPNum)
     {
 
         // SUBROUTINE INFORMATION:

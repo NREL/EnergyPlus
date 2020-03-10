@@ -93,7 +93,7 @@ namespace IntegratedHeatPump {
         IntegratedHeatPumps.deallocate();
     }
 
-    void SimIHP(std::string const &CompName,              // Coil Name
+    void SimIHP(AllGlobals &state, std::string const &CompName,              // Coil Name
                 int &CompIndex,                           // Index for Component name
                 int const CyclingScheme,                  // Continuous fan OR cycling compressor
                 Real64 &MaxONOFFCyclesperHour,            // Maximum cycling rate of heat pump [cycles/hr]
@@ -154,7 +154,7 @@ namespace IntegratedHeatPump {
             }
         };
 
-        if (!IntegratedHeatPumps(DXCoilNum).IHPCoilsSized) SizeIHP(DXCoilNum);
+        if (!IntegratedHeatPumps(DXCoilNum).IHPCoilsSized) SizeIHP(state, DXCoilNum);
 
         InitializeIHP(DXCoilNum);
 
@@ -166,7 +166,7 @@ namespace IntegratedHeatPump {
         case IHPOperationMode::SCMode:
             if (!IsCallbyWH) // process when called from air loop
             {
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -179,7 +179,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -192,7 +192,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -205,7 +205,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -218,7 +218,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -231,7 +231,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).DWHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -245,7 +245,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       OnOffAirFlowRat);
 
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SCCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -259,7 +259,7 @@ namespace IntegratedHeatPump {
                                       LatentLoad,
                                       OnOffAirFlowRat);
 
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -281,7 +281,7 @@ namespace IntegratedHeatPump {
         case IHPOperationMode::SHMode:
             if (!IsCallbyWH) // process when called from air loop
             {
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -294,7 +294,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -307,7 +307,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -320,7 +320,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -333,7 +333,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -346,7 +346,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SCCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -359,7 +359,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).DWHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -373,7 +373,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       OnOffAirFlowRat);
 
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -394,7 +394,7 @@ namespace IntegratedHeatPump {
         case IHPOperationMode::DWHMode:
             if (IsCallbyWH) // process when called from water loop
             {
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -407,7 +407,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -420,7 +420,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -433,7 +433,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -446,7 +446,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -459,7 +459,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SCCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -472,7 +472,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -486,7 +486,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       OnOffAirFlowRat);
 
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).DWHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -508,7 +508,7 @@ namespace IntegratedHeatPump {
         case IHPOperationMode::SCWHMatchSCMode:
             if (!IsCallbyWH) // process when called from air loop
             {
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -521,7 +521,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -534,7 +534,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -547,7 +547,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -560,7 +560,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SCCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -573,7 +573,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).DWHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -587,7 +587,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       OnOffAirFlowRat);
 
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -601,7 +601,7 @@ namespace IntegratedHeatPump {
                                       LatentLoad,
                                       OnOffAirFlowRat);
 
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -624,7 +624,7 @@ namespace IntegratedHeatPump {
         case IHPOperationMode::SCWHMatchWHMode:
             if (IsCallbyWH) // process when called from water loop
             {
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -637,7 +637,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -650,7 +650,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -663,7 +663,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -676,7 +676,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SCCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -689,7 +689,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).DWHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -703,7 +703,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       OnOffAirFlowRat);
 
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -717,7 +717,7 @@ namespace IntegratedHeatPump {
                                       LatentLoad,
                                       OnOffAirFlowRat);
 
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -739,7 +739,7 @@ namespace IntegratedHeatPump {
         case IHPOperationMode::SCDWHMode:
             if (!IsCallbyWH) // process when called from air loop
             {
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -752,7 +752,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -765,7 +765,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -778,7 +778,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SCCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -791,7 +791,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).DWHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -805,7 +805,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       OnOffAirFlowRat);
 
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -818,7 +818,7 @@ namespace IntegratedHeatPump {
                                       SensLoad,
                                       LatentLoad,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -832,7 +832,7 @@ namespace IntegratedHeatPump {
                                       LatentLoad,
                                       OnOffAirFlowRat);
 
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -855,7 +855,7 @@ namespace IntegratedHeatPump {
         case IHPOperationMode::SHDWHElecHeatOnMode:
             if (!IsCallbyWH) // process when called from air loop
             {
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -868,7 +868,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -881,7 +881,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -894,7 +894,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SCCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -907,7 +907,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -920,7 +920,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       0.0,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).DWHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -934,7 +934,7 @@ namespace IntegratedHeatPump {
                                       0.0,
                                       OnOffAirFlowRat);
 
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -947,7 +947,7 @@ namespace IntegratedHeatPump {
                                       SensLoad,
                                       LatentLoad,
                                       OnOffAirFlowRat);
-                SimVariableSpeedCoils(BlankString,
+                SimVariableSpeedCoils(state, BlankString,
                                       IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex,
                                       CyclingScheme,
                                       MaxONOFFCyclesperHour,
@@ -968,7 +968,7 @@ namespace IntegratedHeatPump {
             break;
         case IHPOperationMode::IdleMode:
         default: // clear up
-            SimVariableSpeedCoils(BlankString,
+            SimVariableSpeedCoils(state, BlankString,
                                   IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilIndex,
                                   CyclingScheme,
                                   MaxONOFFCyclesperHour,
@@ -981,7 +981,7 @@ namespace IntegratedHeatPump {
                                   0.0,
                                   0.0,
                                   OnOffAirFlowRat);
-            SimVariableSpeedCoils(BlankString,
+            SimVariableSpeedCoils(state, BlankString,
                                   IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex,
                                   CyclingScheme,
                                   MaxONOFFCyclesperHour,
@@ -994,7 +994,7 @@ namespace IntegratedHeatPump {
                                   0.0,
                                   0.0,
                                   OnOffAirFlowRat);
-            SimVariableSpeedCoils(BlankString,
+            SimVariableSpeedCoils(state, BlankString,
                                   IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex,
                                   CyclingScheme,
                                   MaxONOFFCyclesperHour,
@@ -1007,7 +1007,7 @@ namespace IntegratedHeatPump {
                                   0.0,
                                   0.0,
                                   OnOffAirFlowRat);
-            SimVariableSpeedCoils(BlankString,
+            SimVariableSpeedCoils(state, BlankString,
                                   IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex,
                                   CyclingScheme,
                                   MaxONOFFCyclesperHour,
@@ -1020,7 +1020,7 @@ namespace IntegratedHeatPump {
                                   0.0,
                                   0.0,
                                   OnOffAirFlowRat);
-            SimVariableSpeedCoils(BlankString,
+            SimVariableSpeedCoils(state, BlankString,
                                   IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex,
                                   CyclingScheme,
                                   MaxONOFFCyclesperHour,
@@ -1033,7 +1033,7 @@ namespace IntegratedHeatPump {
                                   0.0,
                                   0.0,
                                   OnOffAirFlowRat);
-            SimVariableSpeedCoils(BlankString,
+            SimVariableSpeedCoils(state, BlankString,
                                   IntegratedHeatPumps(DXCoilNum).SCCoilIndex,
                                   CyclingScheme,
                                   MaxONOFFCyclesperHour,
@@ -1046,7 +1046,7 @@ namespace IntegratedHeatPump {
                                   0.0,
                                   0.0,
                                   OnOffAirFlowRat);
-            SimVariableSpeedCoils(BlankString,
+            SimVariableSpeedCoils(state, BlankString,
                                   IntegratedHeatPumps(DXCoilNum).SHCoilIndex,
                                   CyclingScheme,
                                   MaxONOFFCyclesperHour,
@@ -1059,7 +1059,7 @@ namespace IntegratedHeatPump {
                                   0.0,
                                   0.0,
                                   OnOffAirFlowRat);
-            SimVariableSpeedCoils(BlankString,
+            SimVariableSpeedCoils(state, BlankString,
                                   IntegratedHeatPumps(DXCoilNum).DWHCoilIndex,
                                   CyclingScheme,
                                   MaxONOFFCyclesperHour,
@@ -1922,7 +1922,7 @@ namespace IntegratedHeatPump {
         }
     }
 
-    void SizeIHP(int const DXCoilNum)
+    void SizeIHP(AllGlobals &state, int const DXCoilNum)
     {
         using DataSizing::AutoSize;
         using General::TrimSigDigits;
@@ -1957,7 +1957,7 @@ namespace IntegratedHeatPump {
             ErrorsFound = false;
         };
 
-        SizeVarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex); // size cooling coil
+        SizeVarSpeedCoil(state, IntegratedHeatPumps(DXCoilNum).SCCoilIndex); // size cooling coil
         if (ErrorsFound) {
             ShowFatalError("SizeIHP: failed to size SC coil\"" + IntegratedHeatPumps(DXCoilNum).SCCoilName + "\"");
             ErrorsFound = false;
@@ -1965,7 +1965,7 @@ namespace IntegratedHeatPump {
             RatedCapacity = VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCCoilIndex).RatedCapCoolTotal;
         };
 
-        SizeVarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHCoilIndex); // size heating coil
+        SizeVarSpeedCoil(state, IntegratedHeatPumps(DXCoilNum).SHCoilIndex); // size heating coil
         if (ErrorsFound) {
             ShowSevereError("SizeIHP: failed to size SH coil\"" + IntegratedHeatPumps(DXCoilNum).SHCoilName + "\"");
             ErrorsFound = false;
@@ -1980,14 +1980,14 @@ namespace IntegratedHeatPump {
         SetVarSpeedCoilData(IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilIndex, ErrorsFound, _, IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex);
 
         // size SCDWH air coil
-        SizeVarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilIndex);
+        SizeVarSpeedCoil(state, IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilIndex);
         if (ErrorsFound) {
             ShowSevereError("SizeIHP: failed to size SCDWH cooling coil\"" + IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilName + "\"");
             ErrorsFound = false;
         };
 
         // size SHDWH air coil
-        SizeVarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex);
+        SizeVarSpeedCoil(state, IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex);
         if (ErrorsFound) {
             ShowSevereError("SizeIHP: failed to size SHDWH heating coil\"" + IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilName + "\"");
             ErrorsFound = false;
@@ -2000,7 +2000,7 @@ namespace IntegratedHeatPump {
                 RatedCapacity / (1.0 - 1.0 / VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex).RatedCOPHeat);
         }
 
-        SizeVarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex);
+        SizeVarSpeedCoil(state, IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex);
         if (ErrorsFound) {
             ShowSevereError("SizeIHP: failed to size SCWH coil\"" + IntegratedHeatPumps(DXCoilNum).SCWHCoilName + "\"");
             ErrorsFound = false;
@@ -2011,7 +2011,7 @@ namespace IntegratedHeatPump {
             VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).DWHCoilIndex).RatedCapWH = RatedCapacity;
         }
 
-        SizeVarSpeedCoil(IntegratedHeatPumps(DXCoilNum).DWHCoilIndex);
+        SizeVarSpeedCoil(state, IntegratedHeatPumps(DXCoilNum).DWHCoilIndex);
         if (ErrorsFound) {
             ShowSevereError("SizeIHP: failed to size DWH coil\"" + IntegratedHeatPumps(DXCoilNum).DWHCoilName + "\"");
             ErrorsFound = false;
@@ -2022,7 +2022,7 @@ namespace IntegratedHeatPump {
             VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex).RatedCapWH = RatedCapacity * 0.13;
         }
 
-        SizeVarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex);
+        SizeVarSpeedCoil(state, IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex);
         if (ErrorsFound) {
             ShowSevereError("SizeIHP: failed to size SCDWH water heating coil\"" + IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilName + "\"");
             ErrorsFound = false;
@@ -2033,7 +2033,7 @@ namespace IntegratedHeatPump {
             VarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex).RatedCapWH = RatedCapacity * 0.1;
         }
 
-        SizeVarSpeedCoil(IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex);
+        SizeVarSpeedCoil(state, IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex);
 
         if (ErrorsFound) {
             ShowSevereError("SizeIHP: failed to size SHDWH water heating coil\"" + IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilName + "\"");
@@ -2219,7 +2219,7 @@ namespace IntegratedHeatPump {
                            ", Number of Integrated HPs=" + TrimSigDigits(IntegratedHeatPumps.size()) + ", IHP name=" + "AS-IHP");
         }
 
-        if (IntegratedHeatPumps(DXCoilNum).IHPCoilsSized == false) SizeIHP(DXCoilNum);
+        if (IntegratedHeatPumps(DXCoilNum).IHPCoilsSized == false) SizeIHP(state, DXCoilNum);
 
         // decide working mode at the first moment
         // check if there is a water heating call
@@ -2230,7 +2230,7 @@ namespace IntegratedHeatPump {
             IntegratedHeatPumps(DXCoilNum).IsWHCallAvail = false;
         } else {
             Node(IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).MassFlowRate =
-                GetWaterVolFlowRateIHP(DXCoilNum, 1.0, 1.0, true) * 987.0; // 987.0 water density at 60 C.
+                GetWaterVolFlowRateIHP(state, DXCoilNum, 1.0, 1.0, true) * 987.0; // 987.0 water density at 60 C.
             Node(IntegratedHeatPumps(DXCoilNum).WaterOutletNodeNum).Temp = Node(IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).Temp;
 
             int tankType = IntegratedHeatPumps(DXCoilNum).WHtankType;
@@ -2238,7 +2238,7 @@ namespace IntegratedHeatPump {
             if ((tankType == DataPlant::TypeOf_WtrHeaterMixed) || (tankType == DataPlant::TypeOf_WtrHeaterStratified) ||
                 (tankType == DataPlant::TypeOf_ChilledWaterTankMixed) || (tankType == DataPlant::TypeOf_ChilledWaterTankStratified)) {
 
-                int tankIDX = WaterThermalTanks::getTankIDX(IntegratedHeatPumps(DXCoilNum).WHtankName, IntegratedHeatPumps(DXCoilNum).WHtankID);
+                int tankIDX = WaterThermalTanks::getTankIDX(state, IntegratedHeatPumps(DXCoilNum).WHtankName, IntegratedHeatPumps(DXCoilNum).WHtankID);
                 auto &tank = WaterThermalTanks::WaterThermalTank(tankIDX);
                 tank.callerLoopNum = IntegratedHeatPumps(DXCoilNum).LoopNum;
 
@@ -2249,7 +2249,7 @@ namespace IntegratedHeatPump {
 
             } else if (tankType == DataPlant::TypeOf_HeatPumpWtrHeaterPumped || tankType == DataPlant::TypeOf_HeatPumpWtrHeaterWrapped) {
 
-                int hpIDX = WaterThermalTanks::getHPTankIDX(IntegratedHeatPumps(DXCoilNum).WHtankName, IntegratedHeatPumps(DXCoilNum).WHtankID);
+                int hpIDX = WaterThermalTanks::getHPTankIDX(state, IntegratedHeatPumps(DXCoilNum).WHtankName, IntegratedHeatPumps(DXCoilNum).WHtankID);
                 auto &HPWH = WaterThermalTanks::HPWaterHeater(hpIDX);
                 int tankIDX = HPWH.WaterHeaterTankNum;
                 auto &tank = WaterThermalTanks::WaterThermalTank(tankIDX);
@@ -2328,10 +2328,10 @@ namespace IntegratedHeatPump {
         }
 
         // clear up, important
-        ClearCoils(DXCoilNum);
+        ClearCoils(state, DXCoilNum);
     }
 
-    void ClearCoils(int const DXCoilNum)
+    void ClearCoils(AllGlobals &state, int const DXCoilNum)
     {
         using General::TrimSigDigits;
         using VariableSpeedCoils::SimVariableSpeedCoils;
@@ -2352,27 +2352,27 @@ namespace IntegratedHeatPump {
         }
 
         // clear up
-        SimVariableSpeedCoils(
+        SimVariableSpeedCoils(state, 
             BlankString, IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilIndex, CycFanCycCoil, EMP1, EMP2, EMP3, 1, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-        SimVariableSpeedCoils(
+        SimVariableSpeedCoils(state, 
             BlankString, IntegratedHeatPumps(DXCoilNum).SCDWHWHCoilIndex, CycFanCycCoil, EMP1, EMP2, EMP3, 1, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-        SimVariableSpeedCoils(
+        SimVariableSpeedCoils(state, 
             BlankString, IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex, CycFanCycCoil, EMP1, EMP2, EMP3, 1, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-        SimVariableSpeedCoils(
+        SimVariableSpeedCoils(state, 
             BlankString, IntegratedHeatPumps(DXCoilNum).SHDWHWHCoilIndex, CycFanCycCoil, EMP1, EMP2, EMP3, 1, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-        SimVariableSpeedCoils(
+        SimVariableSpeedCoils(state, 
             BlankString, IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex, CycFanCycCoil, EMP1, EMP2, EMP3, 1, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-        SimVariableSpeedCoils(
+        SimVariableSpeedCoils(state, 
             BlankString, IntegratedHeatPumps(DXCoilNum).SCCoilIndex, CycFanCycCoil, EMP1, EMP2, EMP3, 1, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-        SimVariableSpeedCoils(
+        SimVariableSpeedCoils(state, 
             BlankString, IntegratedHeatPumps(DXCoilNum).SHCoilIndex, CycFanCycCoil, EMP1, EMP2, EMP3, 1, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
-        SimVariableSpeedCoils(
+        SimVariableSpeedCoils(state, 
             BlankString, IntegratedHeatPumps(DXCoilNum).DWHCoilIndex, CycFanCycCoil, EMP1, EMP2, EMP3, 1, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0);
 
         return;
     }
 
-    IHPOperationMode GetCurWorkMode(int const DXCoilNum)
+    IHPOperationMode GetCurWorkMode(AllGlobals &state, int const DXCoilNum)
     {
         using General::TrimSigDigits;
 
@@ -2388,7 +2388,7 @@ namespace IntegratedHeatPump {
                            ", Number of Integrated HPs=" + TrimSigDigits(IntegratedHeatPumps.size()) + ", IHP name=" + "AS-IHP");
         }
 
-        if (IntegratedHeatPumps(DXCoilNum).IHPCoilsSized == false) SizeIHP(DXCoilNum);
+        if (IntegratedHeatPumps(DXCoilNum).IHPCoilsSized == false) SizeIHP(state, DXCoilNum);
 
         return (IntegratedHeatPumps(DXCoilNum).CurMode);
     }
@@ -2618,7 +2618,7 @@ namespace IntegratedHeatPump {
         return PLRNumber;
     }
 
-    Real64 GetDWHCoilCapacityIHP(std::string const &CoilType,            // must match coil types in this module
+    Real64 GetDWHCoilCapacityIHP(AllGlobals &state, std::string const &CoilType,            // must match coil types in this module
                                  std::string const &CoilName,            // must match coil names for the coil type
                                  IHPOperationMode const EP_UNUSED(Mode), // mode coil type
                                  bool &ErrorsFound                       // set to true if problem
@@ -2652,7 +2652,7 @@ namespace IntegratedHeatPump {
         int WhichCoil = UtilityRoutines::FindItemInList(CoilName, IntegratedHeatPumps);
         if (WhichCoil != 0) {
 
-            if (IntegratedHeatPumps(WhichCoil).IHPCoilsSized == false) SizeIHP(WhichCoil);
+            if (IntegratedHeatPumps(WhichCoil).IHPCoilsSized == false) SizeIHP(state, WhichCoil);
 
             if (IntegratedHeatPumps(WhichCoil).DWHCoilIndex > 0) {
                 CoilCapacity =
@@ -2775,7 +2775,7 @@ namespace IntegratedHeatPump {
         return (SpeedNum);
     }
 
-    Real64 GetAirVolFlowRateIHP(int const DXCoilNum,
+    Real64 GetAirVolFlowRateIHP(AllGlobals &state, int const DXCoilNum,
                                 int const SpeedNum,
                                 Real64 const SpeedRatio,
                                 bool const IsCallbyWH // whether the call from the water heating loop or air loop, true = from water heating loop
@@ -2800,7 +2800,7 @@ namespace IntegratedHeatPump {
                            ", Number of Integrated HPs=" + TrimSigDigits(IntegratedHeatPumps.size()) + ", IHP name=" + "AS-IHP");
         }
 
-        if (!IntegratedHeatPumps(DXCoilNum).IHPCoilsSized) SizeIHP(DXCoilNum);
+        if (!IntegratedHeatPumps(DXCoilNum).IHPCoilsSized) SizeIHP(state, DXCoilNum);
 
         FlowScale = 0.0;
         switch (IntegratedHeatPumps(DXCoilNum).CurMode) {
@@ -2882,7 +2882,7 @@ namespace IntegratedHeatPump {
         return (AirVolFlowRate);
     }
 
-    Real64 GetWaterVolFlowRateIHP(
+    Real64 GetWaterVolFlowRateIHP(AllGlobals &state, 
         int const DXCoilNum,
         int const SpeedNum,
         Real64 const SpeedRatio,
@@ -2906,7 +2906,7 @@ namespace IntegratedHeatPump {
                            ", Number of Integrated HPs=" + TrimSigDigits(IntegratedHeatPumps.size()) + ", IHP name=" + "AS-IHP");
         }
 
-        if (!IntegratedHeatPumps(DXCoilNum).IHPCoilsSized) SizeIHP(DXCoilNum);
+        if (!IntegratedHeatPumps(DXCoilNum).IHPCoilsSized) SizeIHP(state, DXCoilNum);
 
         switch (IntegratedHeatPumps(DXCoilNum).CurMode) {
         case IHPOperationMode::IdleMode:
@@ -2960,7 +2960,7 @@ namespace IntegratedHeatPump {
         return (WaterVolFlowRate);
     }
 
-    Real64 GetAirMassFlowRateIHP(int const DXCoilNum,
+    Real64 GetAirMassFlowRateIHP(AllGlobals &state, int const DXCoilNum,
                                  int const SpeedNum,
                                  Real64 const SpeedRatio,
                                  bool const IsCallbyWH // whether the call from the water heating loop or air loop, true = from water heating loop
@@ -2986,7 +2986,7 @@ namespace IntegratedHeatPump {
                            ", Number of Integrated HPs=" + TrimSigDigits(IntegratedHeatPumps.size()) + ", IHP name=" + "AS-IHP");
         }
 
-        if (!IntegratedHeatPumps(DXCoilNum).IHPCoilsSized) SizeIHP(DXCoilNum);
+        if (!IntegratedHeatPumps(DXCoilNum).IHPCoilsSized) SizeIHP(state, DXCoilNum);
 
         FlowScale = 0.0;
         switch (IntegratedHeatPumps(DXCoilNum).CurMode) {
@@ -3020,7 +3020,7 @@ namespace IntegratedHeatPump {
             IHPCoilIndex = IntegratedHeatPumps(DXCoilNum).SCWHCoilIndex;
             FlowScale = IntegratedHeatPumps(DXCoilNum).CoolVolFlowScale;
             Node(IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).MassFlowRate =
-                GetWaterVolFlowRateIHP(DXCoilNum, SpeedNum, SpeedRatio, true) * WaterDensity;
+                GetWaterVolFlowRateIHP(state, DXCoilNum, SpeedNum, SpeedRatio, true) * WaterDensity;
             if (IsCallbyWH) {
                 IsResultFlow = true;
                 AirMassFlowRate = IntegratedHeatPumps(DXCoilNum).AirFlowSavInAirLoop;
@@ -3038,7 +3038,7 @@ namespace IntegratedHeatPump {
             IHPCoilIndex = IntegratedHeatPumps(DXCoilNum).SCDWHCoolCoilIndex;
             FlowScale = IntegratedHeatPumps(DXCoilNum).CoolVolFlowScale;
             Node(IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).MassFlowRate =
-                GetWaterVolFlowRateIHP(DXCoilNum, SpeedNum, SpeedRatio, true) * WaterDensity;
+                GetWaterVolFlowRateIHP(state, DXCoilNum, SpeedNum, SpeedRatio, true) * WaterDensity;
             if (IsCallbyWH) {
                 IsResultFlow = true;
                 AirMassFlowRate = IntegratedHeatPumps(DXCoilNum).AirFlowSavInAirLoop;
@@ -3049,7 +3049,7 @@ namespace IntegratedHeatPump {
             IHPCoilIndex = IntegratedHeatPumps(DXCoilNum).SHDWHHeatCoilIndex;
             FlowScale = IntegratedHeatPumps(DXCoilNum).HeatVolFlowScale;
             Node(IntegratedHeatPumps(DXCoilNum).WaterInletNodeNum).MassFlowRate =
-                GetWaterVolFlowRateIHP(DXCoilNum, SpeedNum, SpeedRatio, true) * WaterDensity;
+                GetWaterVolFlowRateIHP(state, DXCoilNum, SpeedNum, SpeedRatio, true) * WaterDensity;
             if (IsCallbyWH) {
                 IsResultFlow = true;
                 AirMassFlowRate = IntegratedHeatPumps(DXCoilNum).AirFlowSavInAirLoop;

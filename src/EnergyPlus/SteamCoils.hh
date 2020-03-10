@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 
 namespace EnergyPlus {
 
@@ -201,7 +202,7 @@ namespace SteamCoils {
 
     void InitSteamCoil(int const CoilNum, bool const FirstHVACIteration);
 
-    void SizeSteamCoil(int const CoilNum);
+    void SizeSteamCoil(AllGlobals &state, int const CoilNum);
 
     // End Initialization Section of the Module
 

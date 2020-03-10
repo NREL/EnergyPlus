@@ -242,7 +242,7 @@ namespace OutdoorAirUnit {
 
     void clear_state();
 
-    void SimOutdoorAirUnit(std::string const &CompName,   // name of the outdoor air unit
+    void SimOutdoorAirUnit(AllGlobals &state, std::string const &CompName,   // name of the outdoor air unit
                            int const ZoneNum,             // number of zone being served
                            bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                            Real64 &PowerMet,              // Sensible power supplied (W)
@@ -251,7 +251,7 @@ namespace OutdoorAirUnit {
 
     void GetOutdoorAirUnitInputs(AllGlobals &state);
 
-    void InitOutdoorAirUnit(int const OAUnitNum,          // index for the current outdoor air unit
+    void InitOutdoorAirUnit(AllGlobals &state, int const OAUnitNum,          // index for the current outdoor air unit
                             int const ZoneNum,            // number of zone being served
                             bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     );
@@ -265,9 +265,9 @@ namespace OutdoorAirUnit {
                             Real64 &LatOutputProvided      // Latent power supplied (kg/s), negative = dehumidification
     );
 
-    void SimZoneOutAirUnitComps(int const OAUnitNum, bool const FirstHVACIteration);
+    void SimZoneOutAirUnitComps(AllGlobals &state, int const OAUnitNum, bool const FirstHVACIteration);
 
-    void SimOutdoorAirEquipComps(int const OAUnitNum,          // actual outdoor air unit num
+    void SimOutdoorAirEquipComps(AllGlobals &state, int const OAUnitNum,          // actual outdoor air unit num
                                  std::string const &EquipType, // the component type
                                  std::string const &EquipName, // the component Name
                                  int const EquipNum,
@@ -277,7 +277,7 @@ namespace OutdoorAirUnit {
                                  bool const Sim // if TRUE, simulate component
     );
 
-    void CalcOAUnitCoilComps(int const CompNum, // actual outdoor air unit num
+    void CalcOAUnitCoilComps(AllGlobals &state, int const CompNum, // actual outdoor air unit num
                              bool const FirstHVACIteration,
                              int const EquipIndex, // Component Type -- Integerized for this module
                              Real64 &LoadMet);
@@ -291,11 +291,11 @@ namespace OutdoorAirUnit {
 
     void ReportOutdoorAirUnit(int const OAUnitNum); // Index for the outdoor air unit under consideration within the derived types
 
-    int GetOutdoorAirUnitOutAirNode(int const OAUnitNum);
+    int GetOutdoorAirUnitOutAirNode(AllGlobals &state, int const OAUnitNum);
 
-    int GetOutdoorAirUnitZoneInletNode(int const OAUnitNum);
+    int GetOutdoorAirUnitZoneInletNode(AllGlobals &state, int const OAUnitNum);
 
-    int GetOutdoorAirUnitReturnAirNode(int const OAUnitNum);
+    int GetOutdoorAirUnitReturnAirNode(AllGlobals &state, int const OAUnitNum);
 
     //*****************************************************************************************
 

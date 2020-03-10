@@ -67,6 +67,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -180,7 +181,7 @@ namespace UnitHeater {
         GetUnitHeaterInputFlag = true;
     }
 
-    void SimUnitHeater(std::string const &CompName,   // name of the fan coil unit
+    void SimUnitHeater(AllGlobals &state, std::string const &CompName,   // name of the fan coil unit
                        int const ZoneNum,             // number of zone being served
                        bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                        Real64 &PowerMet,              // Sensible power supplied (W)
@@ -210,7 +211,7 @@ namespace UnitHeater {
 
         // FLOW:
         if (GetUnitHeaterInputFlag) {
-            GetUnitHeaterInput();
+            GetUnitHeaterInput(state);
             GetUnitHeaterInputFlag = false;
         }
 
@@ -242,7 +243,7 @@ namespace UnitHeater {
 
         ZoneHeatingOnlyFan = true;
 
-        CalcUnitHeater(UnitHeatNum, ZoneNum, FirstHVACIteration, PowerMet, LatOutputProvided);
+        CalcUnitHeater(state, UnitHeatNum, ZoneNum, FirstHVACIteration, PowerMet, LatOutputProvided);
 
         ZoneHeatingOnlyFan = false;
 
@@ -253,7 +254,7 @@ namespace UnitHeater {
         ZoneEqUnitHeater = false;
     }
 
-    void GetUnitHeaterInput()
+    void GetUnitHeaterInput(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -685,13 +686,13 @@ namespace UnitHeater {
 
         for (UnitHeatNum = 1; UnitHeatNum <= NumOfUnitHeats; ++UnitHeatNum) {
             if (UnitHeat(UnitHeatNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                coilSelectionReportObj->setCoilSupplyFanInfo(UnitHeat(UnitHeatNum).HCoilName,
+                coilSelectionReportObj->setCoilSupplyFanInfo(state, UnitHeat(UnitHeatNum).HCoilName,
                                                              UnitHeat(UnitHeatNum).HCoilTypeCh,
                                                              UnitHeat(UnitHeatNum).FanName,
                                                              DataAirSystems::objectVectorOOFanSystemModel,
                                                              UnitHeat(UnitHeatNum).Fan_Index);
             } else {
-                coilSelectionReportObj->setCoilSupplyFanInfo(UnitHeat(UnitHeatNum).HCoilName,
+                coilSelectionReportObj->setCoilSupplyFanInfo(state, UnitHeat(UnitHeatNum).HCoilName,
                                                              UnitHeat(UnitHeatNum).HCoilTypeCh,
                                                              UnitHeat(UnitHeatNum).FanName,
                                                              DataAirSystems::structArrayLegacyFanModels,
@@ -1360,7 +1361,7 @@ namespace UnitHeater {
         }
     }
 
-    void CalcUnitHeater(int &UnitHeatNum,              // number of the current fan coil unit being simulated
+    void CalcUnitHeater(AllGlobals &state, int &UnitHeatNum,              // number of the current fan coil unit being simulated
                         int const ZoneNum,             // number of zone being served
                         bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                         Real64 &PowerMet,              // Sensible power supplied (W)
@@ -1668,7 +1669,7 @@ namespace UnitHeater {
         LatOutputProvided = LatentOutput;
     }
 
-    void CalcUnitHeaterComponents(int const UnitHeatNum,               // Unit index in unit heater array
+    void CalcUnitHeaterComponents(AllGlobals &state, int const UnitHeatNum,               // Unit index in unit heater array
                                   bool const FirstHVACIteration,       // flag for 1st HVAV iteration in the time step
                                   Real64 &LoadMet,                     // load met by unit (watts)
                                   Optional_int_const OpMode,           // fan operating mode

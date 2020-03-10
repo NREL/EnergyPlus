@@ -1047,23 +1047,23 @@ namespace FanCoilUnits {
 
         for (FanCoilNum = 1; FanCoilNum <= NumFanCoils; ++FanCoilNum) {
             if (FanCoil(FanCoilNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                coilSelectionReportObj->setCoilSupplyFanInfo(FanCoil(FanCoilNum).CCoilName,
+                coilSelectionReportObj->setCoilSupplyFanInfo(state, FanCoil(FanCoilNum).CCoilName,
                                                              FanCoil(FanCoilNum).CCoilType,
                                                              FanCoil(FanCoilNum).FanName,
                                                              DataAirSystems::objectVectorOOFanSystemModel,
                                                              FanCoil(FanCoilNum).FanIndex);
-                coilSelectionReportObj->setCoilSupplyFanInfo(FanCoil(FanCoilNum).HCoilName,
+                coilSelectionReportObj->setCoilSupplyFanInfo(state, FanCoil(FanCoilNum).HCoilName,
                                                              FanCoil(FanCoilNum).HCoilType,
                                                              FanCoil(FanCoilNum).FanName,
                                                              DataAirSystems::objectVectorOOFanSystemModel,
                                                              FanCoil(FanCoilNum).FanIndex);
             } else {
-                coilSelectionReportObj->setCoilSupplyFanInfo(FanCoil(FanCoilNum).CCoilName,
+                coilSelectionReportObj->setCoilSupplyFanInfo(state, FanCoil(FanCoilNum).CCoilName,
                                                              FanCoil(FanCoilNum).CCoilType,
                                                              FanCoil(FanCoilNum).FanName,
                                                              DataAirSystems::structArrayLegacyFanModels,
                                                              FanCoil(FanCoilNum).FanIndex);
-                coilSelectionReportObj->setCoilSupplyFanInfo(FanCoil(FanCoilNum).HCoilName,
+                coilSelectionReportObj->setCoilSupplyFanInfo(state, FanCoil(FanCoilNum).HCoilName,
                                                              FanCoil(FanCoilNum).HCoilType,
                                                              FanCoil(FanCoilNum).FanName,
                                                              DataAirSystems::structArrayLegacyFanModels,

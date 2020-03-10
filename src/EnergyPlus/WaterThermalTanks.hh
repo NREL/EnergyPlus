@@ -399,7 +399,7 @@ namespace WaterThermalTanks {
         {
         }
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(AllGlobals &state, std::string const &objectName);
 
         void simulate(AllGlobals &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
@@ -647,7 +647,7 @@ namespace WaterThermalTanks {
         {
         }
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(AllGlobals &state, std::string const &objectName);
 
         void setupOutputVars();
 
@@ -665,7 +665,7 @@ namespace WaterThermalTanks {
 
         void SetupStratifiedNodes();
 
-        void initialize(bool FirstHVACIteration);
+        void initialize(AllGlobals &state, bool FirstHVACIteration);
 
         bool SourceHeatNeed(Real64 OutletTemp, Real64 DeadBandTemp, Real64 SetPointTemp_loc);
 
@@ -781,8 +781,7 @@ namespace WaterThermalTanks {
 
         Real64 PLRResidualHPWH(Real64 HPPartLoadRatio, Array1<Real64> const &Par);
 
-        //Real64 PLRResidualIterSpeed(AllGlobals &state, Real64 SpeedRatio,        // speed ratio between two speed levels
-        Real64 PLRResidualIterSpeed(Real64 SpeedRatio,        // speed ratio between two speed levels
+        Real64 PLRResidualIterSpeed(AllGlobals &state, Real64 SpeedRatio,        // speed ratio between two speed levels
                                     Array1<Real64> const &Par //
         );
 
@@ -880,9 +879,9 @@ namespace WaterThermalTanks {
 
     // Functions
 
-    void SimulateWaterHeaterStandAlone(int WaterHeaterNum, bool FirstHVACIteration);
+    void SimulateWaterHeaterStandAlone(AllGlobals &state, int WaterHeaterNum, bool FirstHVACIteration);
 
-    void SimHeatPumpWaterHeater(std::string const &CompName,
+    void SimHeatPumpWaterHeater(AllGlobals &state, std::string const &CompName,
                                 bool FirstHVACIteration,
                                 Real64 &SensLoadMet, // sensible load met by this equipment and sent to zone, W
                                 Real64 &LatLoadMet,  // net latent load met and sent to zone (kg/s), dehumid = negative
@@ -900,13 +899,13 @@ namespace WaterThermalTanks {
 
     bool getWaterTankStratifiedInput();
 
-    bool GetWaterThermalTankInput(OutputFiles &outputFiles);
+    bool GetWaterThermalTankInput(AllGlobals &state, OutputFiles &outputFiles);
 
-    void CalcWaterThermalTankZoneGains();
+    void CalcWaterThermalTankZoneGains(AllGlobals &state);
 
-    int getTankIDX(std::string const &CompName, int &CompIndex);
+    int getTankIDX(AllGlobals &state, std::string const &CompName, int &CompIndex);
 
-    int getHPTankIDX(std::string const &CompName, int &CompIndex);
+    int getHPTankIDX(AllGlobals &state, std::string const &CompName, int &CompIndex);
 
     void clear_state();
 

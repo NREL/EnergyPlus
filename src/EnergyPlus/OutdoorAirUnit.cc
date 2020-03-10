@@ -73,6 +73,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HVACFan.hh>
@@ -280,7 +281,7 @@ namespace OutdoorAirUnit {
 
         if (ZoneSizingCalc || SysSizingCalc) return;
 
-        InitOutdoorAirUnit(OAUnitNum, ZoneNum, FirstHVACIteration);
+        InitOutdoorAirUnit(state, OAUnitNum, ZoneNum, FirstHVACIteration);
 
         CalcOutdoorAirUnit(state, OAUnitNum, ZoneNum, FirstHVACIteration, PowerMet, LatOutputProvided);
 
@@ -855,9 +856,9 @@ namespace OutdoorAirUnit {
                             } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM") {
                                 OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentType_Num = UnitarySystemModel;
                                 UnitarySystems::UnitarySys thisSys;
-                                OutAirUnit(OAUnitNum).OAEquip(CompNum).compPointer = thisSys.factory(
+                                OutAirUnit(OAUnitNum).OAEquip(CompNum).compPointer = thisSys.factory(state, 
                                     DataHVACGlobals::UnitarySys_AnyCoilType, OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName, false, OAUnitNum);
-                                UnitarySystems::UnitarySys::checkUnitarySysCoilInOASysExists(OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName,
+                                UnitarySystems::UnitarySys::checkUnitarySysCoilInOASysExists(state, OutAirUnit(OAUnitNum).OAEquip(CompNum).ComponentName,
                                                                                              OAUnitNum);
 
                                 // Heat recovery
@@ -1784,7 +1785,7 @@ namespace OutdoorAirUnit {
                     HVACFan::fanObjs[OutAirUnit(OAUnitNum).SFan_Index]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
                 }
 
-                SimZoneOutAirUnitComps(OAUnitNum, FirstHVACIteration);
+                SimZoneOutAirUnitComps(state, OAUnitNum, FirstHVACIteration);
                 if (OutAirUnit(OAUnitNum).ExtFan) {
                     if (OutAirUnit(OAUnitNum).ExtFanType != DataHVACGlobals::FanType_SystemModelObject) {
                         Fans::SimulateFanComponents(state, OutAirUnit(OAUnitNum).ExtFanName,
@@ -1799,7 +1800,7 @@ namespace OutdoorAirUnit {
                 }
 
             } else if (OutAirUnit(OAUnitNum).FanPlace == DrawThru) {
-                SimZoneOutAirUnitComps(OAUnitNum, FirstHVACIteration);
+                SimZoneOutAirUnitComps(state, OAUnitNum, FirstHVACIteration);
                 if (OutAirUnit(OAUnitNum).SFanType != DataHVACGlobals::FanType_SystemModelObject) {
                     Fans::SimulateFanComponents(state, OutAirUnit(OAUnitNum).SFanName,
                                                 FirstHVACIteration,
@@ -1878,18 +1879,18 @@ namespace OutdoorAirUnit {
                         OutAirUnit(OAUnitNum).OperatingMode = NeutralMode;
                         AirOutletTemp = DesOATemp;
                         OutAirUnit(OAUnitNum).CompOutSetTemp = DesOATemp;
-                        SimZoneOutAirUnitComps(OAUnitNum, FirstHVACIteration);
+                        SimZoneOutAirUnitComps(state, OAUnitNum, FirstHVACIteration);
                     } else {
                         if (DesOATemp < SetPointTemp) { // Heating MODE
                             OutAirUnit(OAUnitNum).OperatingMode = HeatingMode;
                             AirOutletTemp = SetPointTemp;
                             OutAirUnit(OAUnitNum).CompOutSetTemp = AirOutletTemp;
-                            SimZoneOutAirUnitComps(OAUnitNum, FirstHVACIteration);
+                            SimZoneOutAirUnitComps(state, OAUnitNum, FirstHVACIteration);
                         } else if (DesOATemp > SetPointTemp) { // Cooling Mode
                             OutAirUnit(OAUnitNum).OperatingMode = CoolingMode;
                             AirOutletTemp = SetPointTemp;
                             OutAirUnit(OAUnitNum).CompOutSetTemp = AirOutletTemp;
-                            SimZoneOutAirUnitComps(OAUnitNum, FirstHVACIteration);
+                            SimZoneOutAirUnitComps(state, OAUnitNum, FirstHVACIteration);
                         }
                     }
                     // SetPoint Temperature Condition
@@ -1901,18 +1902,18 @@ namespace OutdoorAirUnit {
                         OutAirUnit(OAUnitNum).OperatingMode = NeutralMode;
                         AirOutletTemp = DesOATemp;
                         OutAirUnit(OAUnitNum).CompOutSetTemp = DesOATemp;
-                        SimZoneOutAirUnitComps(OAUnitNum, FirstHVACIteration);
+                        SimZoneOutAirUnitComps(state, OAUnitNum, FirstHVACIteration);
                     } else {
                         if (SetPointTemp < LoCtrlTemp) {
                             OutAirUnit(OAUnitNum).OperatingMode = HeatingMode;
                             AirOutletTemp = LoCtrlTemp;
                             OutAirUnit(OAUnitNum).CompOutSetTemp = AirOutletTemp;
-                            SimZoneOutAirUnitComps(OAUnitNum, FirstHVACIteration);
+                            SimZoneOutAirUnitComps(state, OAUnitNum, FirstHVACIteration);
                         } else if (SetPointTemp > HiCtrlTemp) {
                             OutAirUnit(OAUnitNum).OperatingMode = CoolingMode;
                             AirOutletTemp = HiCtrlTemp;
                             OutAirUnit(OAUnitNum).CompOutSetTemp = AirOutletTemp;
-                            SimZoneOutAirUnitComps(OAUnitNum, FirstHVACIteration);
+                            SimZoneOutAirUnitComps(state, OAUnitNum, FirstHVACIteration);
                         }
                     }
                 }
@@ -1933,7 +1934,7 @@ namespace OutdoorAirUnit {
 
                 OutAirUnit(OAUnitNum).FanEffect = true; // RE-Simulation to take over the supply fan effect
                 OutAirUnit(OAUnitNum).FanCorTemp = (Node(OutletNode).Temp - OutAirUnit(OAUnitNum).CompOutSetTemp);
-                SimZoneOutAirUnitComps(OAUnitNum, FirstHVACIteration);
+                SimZoneOutAirUnitComps(state, OAUnitNum, FirstHVACIteration);
                 if (OutAirUnit(OAUnitNum).SFanType != DataHVACGlobals::FanType_SystemModelObject) {
                     Fans::SimulateFanComponents(state, OutAirUnit(OAUnitNum).SFanName,
                                                 FirstHVACIteration,
@@ -2023,7 +2024,7 @@ namespace OutdoorAirUnit {
         LatOutputProvided = LatentOutput;
     }
 
-    void SimZoneOutAirUnitComps(int const OAUnitNum, bool const FirstHVACIteration)
+    void SimZoneOutAirUnitComps(AllGlobals &state, int const OAUnitNum, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2050,7 +2051,7 @@ namespace OutdoorAirUnit {
         for (EquipNum = 1; EquipNum <= OutAirUnit(OAUnitNum).NumComponents; ++EquipNum) {
             EquipType = OutAirUnit(OAUnitNum).OAEquip(EquipNum).ComponentType;
             EquipName = OutAirUnit(OAUnitNum).OAEquip(EquipNum).ComponentName;
-            SimOutdoorAirEquipComps(OAUnitNum,
+            SimOutdoorAirEquipComps(state, OAUnitNum,
                                     EquipType,
                                     EquipName,
                                     EquipNum,
@@ -2229,19 +2230,19 @@ namespace OutdoorAirUnit {
 
             } else if (SELECT_CASE_var == SteamCoil_AirHeat) { // 'Coil:Heating:Steam'
                 if (Sim) {
-                    CalcOAUnitCoilComps(UnitNum, FirstHVACIteration, SimCompNum, QUnitOut);
+                    CalcOAUnitCoilComps(state, UnitNum, FirstHVACIteration, SimCompNum, QUnitOut);
                 }
 
             } else if (SELECT_CASE_var == Coil_ElectricHeat) { // 'Coil:Heating:Electric'
                 if (Sim) {
                     //     stand-alone coils are temperature controlled (do not pass QCoilReq in argument list, QCoilReq overrides temp SP)
-                    CalcOAUnitCoilComps(UnitNum, FirstHVACIteration, SimCompNum, QUnitOut);
+                    CalcOAUnitCoilComps(state, UnitNum, FirstHVACIteration, SimCompNum, QUnitOut);
                 }
 
             } else if (SELECT_CASE_var == Coil_GasHeat) { // 'Coil:Heating:Fuel'
                 if (Sim) {
                     //     stand-alone coils are temperature controlled (do not pass QCoilReq in argument list, QCoilReq overrides temp SP)
-                    CalcOAUnitCoilComps(UnitNum, FirstHVACIteration, SimCompNum, QUnitOut);
+                    CalcOAUnitCoilComps(state, UnitNum, FirstHVACIteration, SimCompNum, QUnitOut);
                 }
 
                 // water cooling coil Types
@@ -2393,7 +2394,7 @@ namespace OutdoorAirUnit {
                     } else {
                         Dxsystemouttemp = CompAirOutTemp - FanEffect;
                     }
-                    SimDXCoolingSystem(EquipName, FirstHVACIteration, -1, DXSystemIndex, UnitNum, Dxsystemouttemp);
+                    SimDXCoolingSystem(state, EquipName, FirstHVACIteration, -1, DXSystemIndex, UnitNum, Dxsystemouttemp);
                 }
 
             } else if (SELECT_CASE_var == DXHeatPumpSystem) {
@@ -2421,7 +2422,7 @@ namespace OutdoorAirUnit {
                     Real64 latOut = 0.0;
                     OutAirUnit(OAUnitNum)
                         .OAEquip(SimCompNum)
-                        .compPointer->simulate(EquipName,
+                        .compPointer->simulate(state, EquipName,
                                                FirstHVACIteration,
                                                -1,
                                                DXSystemIndex,
@@ -2440,7 +2441,7 @@ namespace OutdoorAirUnit {
         }
     }
 
-    void CalcOAUnitCoilComps(int const CompNum, // actual outdoor air unit num
+    void CalcOAUnitCoilComps(AllGlobals &state, int const CompNum, // actual outdoor air unit num
                              bool const FirstHVACIteration,
                              int const EquipIndex, // Component Type -- Integerized for this module
                              Real64 &LoadMet)

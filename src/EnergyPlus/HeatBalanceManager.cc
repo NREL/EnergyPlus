@@ -402,7 +402,7 @@ namespace HeatBalanceManager {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetHeatBalanceInput()
+    void GetHeatBalanceInput(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -481,7 +481,7 @@ namespace HeatBalanceManager {
 
         // following is done to "get internal heat gains" input so that lights are gotten before
         // daylighting input
-        ManageInternalHeatGains(true);
+        ManageInternalHeatGains(state, true);
     }
 
     void CheckUsedConstructions(bool &ErrorsFound)

@@ -3656,7 +3656,7 @@ namespace ZoneEquipmentManager {
                                (SELECT_CASE_var == PkgTermHPWaterToAir_Num)) { // 'ZoneHVAC:PackagedTerminalHeatPump'
                         // 'ZoneHVAC:PackagedTerminalAirConditioner'
                         // 'ZoneHVAC:WaterToAirHeatPump'
-                        SimPackagedTerminalUnit(PrioritySimOrder(EquipTypeNum).EquipName,
+                        SimPackagedTerminalUnit(state, PrioritySimOrder(EquipTypeNum).EquipName,
                                                 ActualZoneNum,
                                                 FirstHVACIteration,
                                                 SysOutputProvided,
@@ -3673,7 +3673,7 @@ namespace ZoneEquipmentManager {
                         bool ZoneEquipFlag = true;
                         ZoneEquipList(CurZoneEqNum)
                             .compPointer[EquipPtr]
-                            ->simulate(PrioritySimOrder(EquipTypeNum).EquipName,
+                            ->simulate(state, PrioritySimOrder(EquipTypeNum).EquipName,
                                        FirstHVACIteration,
                                        AirLoopNum,
                                        ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr),
@@ -3709,7 +3709,7 @@ namespace ZoneEquipmentManager {
                                        ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
 
                     } else if (SELECT_CASE_var == UnitVentilator_Num) { // 'ZoneHVAC:UnitVentilator'
-                        SimUnitVentilator(PrioritySimOrder(EquipTypeNum).EquipName,
+                        SimUnitVentilator(state, PrioritySimOrder(EquipTypeNum).EquipName,
                                           ActualZoneNum,
                                           FirstHVACIteration,
                                           SysOutputProvided,
@@ -3717,7 +3717,7 @@ namespace ZoneEquipmentManager {
                                           ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
 
                     } else if (SELECT_CASE_var == UnitHeater_Num) { // 'ZoneHVAC:UnitHeater'
-                        SimUnitHeater(PrioritySimOrder(EquipTypeNum).EquipName,
+                        SimUnitHeater(state, PrioritySimOrder(EquipTypeNum).EquipName,
                                       ActualZoneNum,
                                       FirstHVACIteration,
                                       SysOutputProvided,
@@ -3850,7 +3850,7 @@ namespace ZoneEquipmentManager {
 //                            LatOutputProvided = dynamic_cast<WaterThermalTanks::HeatPumpWaterHeaterData*> (HPWH)->HPWaterHeaterLatentCapacity;
 //                        }
 
-                        SimHeatPumpWaterHeater(PrioritySimOrder(EquipTypeNum).EquipName,
+                        SimHeatPumpWaterHeater(state, PrioritySimOrder(EquipTypeNum).EquipName,
                                                FirstHVACIteration,
                                                SysOutputProvided,
                                                LatOutputProvided,
@@ -3863,7 +3863,7 @@ namespace ZoneEquipmentManager {
                                           LatOutputProvided,
                                           ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
                     } else if (SELECT_CASE_var == OutdoorAirUnit_Num) { // 'ZoneHVAC:OutdoorAirUnit'
-                        SimOutdoorAirUnit(PrioritySimOrder(EquipTypeNum).EquipName,
+                        SimOutdoorAirUnit(state, PrioritySimOrder(EquipTypeNum).EquipName,
                                           ActualZoneNum,
                                           FirstHVACIteration,
                                           SysOutputProvided,

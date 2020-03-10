@@ -71,6 +71,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
@@ -222,7 +223,7 @@ namespace VentilatedSlab {
         VentSlabNumericFields.deallocate();
     }
 
-    void SimVentilatedSlab(std::string const &CompName,   // name of the fan coil unit
+    void SimVentilatedSlab(AllGlobals &state, std::string const &CompName,   // name of the fan coil unit
                            int const ZoneNum,             // number of zone being served
                            bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                            Real64 &PowerMet,              // Sensible power supplied (W)
@@ -283,7 +284,7 @@ namespace VentilatedSlab {
 
         InitVentilatedSlab(Item, ZoneNum, FirstHVACIteration);
 
-        CalcVentilatedSlab(Item, ZoneNum, FirstHVACIteration, PowerMet, LatOutputProvided);
+        CalcVentilatedSlab(state, Item, ZoneNum, FirstHVACIteration, PowerMet, LatOutputProvided);
 
         UpdateVentilatedSlab(Item, FirstHVACIteration);
 
@@ -2416,7 +2417,7 @@ namespace VentilatedSlab {
         }
     }
 
-    void CalcVentilatedSlab(int &Item,                     // number of the current ventilated slab being simulated
+    void CalcVentilatedSlab(AllGlobals &state, int &Item,                     // number of the current ventilated slab being simulated
                             int const ZoneNum,             // number of zone being served
                             bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                             Real64 &PowerMet,              // power supplied (W)
@@ -3271,7 +3272,7 @@ namespace VentilatedSlab {
         CalcVentilatedSlabCoilOutput(Item, PowerMet, LatOutputProvided);
     }
 
-    void CalcVentilatedSlabComps(int const Item,                // system index in ventilated slab array
+    void CalcVentilatedSlabComps(AllGlobals &state, int const Item,                // system index in ventilated slab array
                                  bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
                                  Real64 &LoadMet                // load met by the system (watts)
     )

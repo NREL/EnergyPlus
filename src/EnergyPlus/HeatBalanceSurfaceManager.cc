@@ -279,7 +279,7 @@ namespace HeatBalanceSurfaceManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitSurfaceHeatBalance()
+    void InitSurfaceHeatBalance(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -730,7 +730,7 @@ namespace HeatBalanceSurfaceManager {
         }
 
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Internal Heat Gains");
-        ManageInternalHeatGains(false);
+        ManageInternalHeatGains(state, false);
         if (InitSurfaceHeatBalancefirstTime) DisplayString("Initializing Interior Solar Distribution");
         InitIntSolarDistribution();
 

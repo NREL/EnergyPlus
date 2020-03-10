@@ -75,6 +75,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
@@ -90,6 +91,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SimAirServingZones.hh>
 #include <EnergyPlus/StandardRatings.hh>
+#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterManager.hh>
 
@@ -6577,7 +6579,7 @@ namespace DXCoils {
             // store fan info for coil
             if (DXCoil(DXCoilNum).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
                 if (DXCoil(DXCoilNum).SupplyFanIndex > -1) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(DXCoil(DXCoilNum).Name,
+                    coilSelectionReportObj->setCoilSupplyFanInfo(state, DXCoil(DXCoilNum).Name,
                                                                  DXCoil(DXCoilNum).DXCoilType,
                                                                  DXCoil(DXCoilNum).SupplyFanName,
                                                                  DataAirSystems::objectVectorOOFanSystemModel,
@@ -6586,7 +6588,7 @@ namespace DXCoils {
 
             } else {
                 if (DXCoil(DXCoilNum).SupplyFanIndex > 0) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(DXCoil(DXCoilNum).Name,
+                    coilSelectionReportObj->setCoilSupplyFanInfo(state, DXCoil(DXCoilNum).Name,
                                                                  DXCoil(DXCoilNum).DXCoilType,
                                                                  DXCoil(DXCoilNum).SupplyFanName,
                                                                  DataAirSystems::structArrayLegacyFanModels,
@@ -13427,6 +13429,7 @@ namespace DXCoils {
         using DataEnvironment::OutBaroPress;
         using General::RoundSigDigits;
         using General::SolveRoot;
+        using TempSolveRoot::SolveRoot;
         using namespace OutputReportPredefined;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
@@ -13666,7 +13669,7 @@ namespace DXCoils {
 
             LowerBoundMassFlowRate = 0.01 * DXCoil(DXCoilNum).RatedAirMassFlowRate(1);
 
-            SolveRoot(AccuracyTolerance,
+            SolveRoot(state, AccuracyTolerance,
                       MaximumIterations,
                       SolverFlag,
                       PartLoadAirMassFlowRate,
@@ -13962,8 +13965,7 @@ namespace DXCoils {
         }
     }
 
-    Real64 CalcTwoSpeedDXCoilIEERResidual(Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-    //Real64 CalcTwoSpeedDXCoilIEERResidual(AllGlobals &state, Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 CalcTwoSpeedDXCoilIEERResidual(AllGlobals &state, Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                           Array1<Real64> const &Par           // par(1) = DX coil number
     )
     {
@@ -14921,7 +14923,7 @@ namespace DXCoils {
         return CapFTCurveIndex;
     }
 
-    void SetDXCoolingCoilData(int const DXCoilNum,                    // Number of DX Cooling Coil
+    void SetDXCoolingCoilData(AllGlobals &state, int const DXCoilNum,                    // Number of DX Cooling Coil
                               bool &ErrorsFound,                      // Set to true if certain errors found
                               Optional_int HeatingCoilPLFCurvePTR,    // Parameter equivalent of heating coil PLR curve index
                               Optional_int CondenserType,             // Parameter equivalent of condenser type parameter
@@ -15060,13 +15062,13 @@ namespace DXCoils {
             DXCoil(DXCoilNum).SupplyFan_TypeNum = SupplyFan_TypeNum;
             if (DXCoil(DXCoilNum).SupplyFanIndex > -1) {
                 if (SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(DXCoil(DXCoilNum).Name,
+                    coilSelectionReportObj->setCoilSupplyFanInfo(state, DXCoil(DXCoilNum).Name,
                                                                  DXCoil(DXCoilNum).DXCoilType,
                                                                  HVACFan::fanObjs[DXCoil(DXCoilNum).SupplyFanIndex]->name,
                                                                  DataAirSystems::objectVectorOOFanSystemModel,
                                                                  DXCoil(DXCoilNum).SupplyFanIndex);
                 } else {
-                    coilSelectionReportObj->setCoilSupplyFanInfo(DXCoil(DXCoilNum).Name,
+                    coilSelectionReportObj->setCoilSupplyFanInfo(state, DXCoil(DXCoilNum).Name,
                                                                  DXCoil(DXCoilNum).DXCoilType,
                                                                  Fans::Fan(DXCoil(DXCoilNum).SupplyFanIndex).FanName,
                                                                  DataAirSystems::structArrayLegacyFanModels,

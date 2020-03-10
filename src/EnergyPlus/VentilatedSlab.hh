@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 
 namespace EnergyPlus {
 
@@ -358,7 +359,7 @@ namespace VentilatedSlab {
 
     void SizeVentilatedSlab(int const Item);
 
-    void CalcVentilatedSlab(int &Item,                     // number of the current ventilated slab being simulated
+    void CalcVentilatedSlab(AllGlobals &state, int &Item,                     // number of the current ventilated slab being simulated
                             int const ZoneNum,             // number of zone being served
                             bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                             Real64 &PowerMet,              // power supplied (W)

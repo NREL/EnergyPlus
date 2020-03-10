@@ -5692,7 +5692,7 @@ namespace OutputReportTabular {
             WriteLoadComponentSummaryTables();
             WriteHeatEmissionTable();
 
-            coilSelectionReportObj->finishCoilSummaryReportTable(); // call to write out the coil selection summary table data
+            coilSelectionReportObj->finishCoilSummaryReportTable(state); // call to write out the coil selection summary table data
             WritePredefinedTables();                                // moved to come after zone load components is finished
 
             if (DoWeathSim) {

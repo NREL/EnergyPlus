@@ -565,7 +565,7 @@ void ControlCompOutput(AllGlobals &state, std::string const &CompName,          
 
         case OutdoorAirUnitNum: //'ZONEHVAC:OUTDOORAIRUNIT'
             // Simulate outdoor air unit components
-            CalcOAUnitCoilComps(CompNum, FirstHVACIteration, EquipIndex, LoadMet); // Autodesk:OPTIONAL EquipIndex used without PRESENT check
+            CalcOAUnitCoilComps(state, CompNum, FirstHVACIteration, EquipIndex, LoadMet); // Autodesk:OPTIONAL EquipIndex used without PRESENT check
             // Calculate the control signal (the variable we are forcing to zero)
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
             break;
@@ -579,7 +579,7 @@ void ControlCompOutput(AllGlobals &state, std::string const &CompName,          
 
         case UnitVentilatorNum: // 'ZONEHVAC:UNITVENTILATOR'
             // Simulate unit ventilator components
-            CalcUnitVentilatorComponents(CompNum, FirstHVACIteration, LoadMet);
+            CalcUnitVentilatorComponents(state, CompNum, FirstHVACIteration, LoadMet);
             // Calculate the control signal (the variable we are forcing to zero)
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
             break;

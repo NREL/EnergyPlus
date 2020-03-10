@@ -67,6 +67,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -475,7 +476,7 @@ namespace SteamCoils {
 
     // Beginning Initialization Section of the Module
 
-    void InitSteamCoil(int const CoilNum, bool const FirstHVACIteration)
+    void InitSteamCoil(AllGlobals &state, int const CoilNum, bool const FirstHVACIteration)
     {
         // SUBROUTINE INFORMATION:
         //   AUTHOR         Rahul Chillar
@@ -555,7 +556,7 @@ namespace SteamCoils {
 
         if (!SysSizingCalc && MySizeFlag(CoilNum)) {
             // for each coil, do the sizing once.
-            SizeSteamCoil(CoilNum);
+            SizeSteamCoil(state, CoilNum);
             MySizeFlag(CoilNum) = false;
         }
 
@@ -670,7 +671,7 @@ namespace SteamCoils {
         //                                                   SteamCoil(CoilNum)%MaxSteamMassFlowRate)
     }
 
-    void SizeSteamCoil(int const CoilNum)
+    void SizeSteamCoil(AllGlobals &state, int const CoilNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rahul Chillar
@@ -869,7 +870,7 @@ namespace SteamCoils {
                 case DataAirSystems::structArrayLegacyFanModels: {
                     int SupFanNum = DataAirSystems::PrimaryAirSystem(CurSysNum).SupFanNum;
                     if (SupFanNum > 0) {
-                        coilSelectionReportObj->setCoilSupplyFanInfo(SteamCoil(CoilNum).Name,
+                        coilSelectionReportObj->setCoilSupplyFanInfo(state, SteamCoil(CoilNum).Name,
                                                                      "Coil:Heating:Steam",
                                                                      Fans::Fan(DataAirSystems::PrimaryAirSystem(CurSysNum).SupFanNum).FanName,
                                                                      DataAirSystems::structArrayLegacyFanModels,
@@ -880,7 +881,7 @@ namespace SteamCoils {
                 }
                 case DataAirSystems::objectVectorOOFanSystemModel: {
                     if (DataAirSystems::PrimaryAirSystem(CurSysNum).supFanVecIndex >= 0) {
-                        coilSelectionReportObj->setCoilSupplyFanInfo(
+                        coilSelectionReportObj->setCoilSupplyFanInfo(state,
                             SteamCoil(CoilNum).Name,
                             "Coil:Heating:Steam",
                             HVACFan::fanObjs[DataAirSystems::PrimaryAirSystem(CurSysNum).supFanVecIndex]->name,

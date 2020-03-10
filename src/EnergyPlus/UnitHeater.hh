@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 
 namespace EnergyPlus {
 
@@ -175,14 +176,14 @@ namespace UnitHeater {
 
     void clear_state();
 
-    void SimUnitHeater(std::string const &CompName,   // name of the fan coil unit
+    void SimUnitHeater(AllGlobals &state, std::string const &CompName,   // name of the fan coil unit
                        int const ZoneNum,             // number of zone being served
                        bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                        Real64 &PowerMet,              // Sensible power supplied (W)
                        Real64 &LatOutputProvided,     // Latent add/removal supplied by window AC (kg/s), dehumid = negative
                        int &CompIndex);
 
-    void GetUnitHeaterInput();
+    void GetUnitHeaterInput(AllGlobals &state);
 
     void InitUnitHeater(int const UnitHeatNum,        // index for the current unit heater
                         int const ZoneNum,            // number of zone being served
@@ -191,7 +192,7 @@ namespace UnitHeater {
 
     void SizeUnitHeater(int const UnitHeatNum);
 
-    void CalcUnitHeater(int &UnitHeatNum,              // number of the current fan coil unit being simulated
+    void CalcUnitHeater(AllGlobals &state, int &UnitHeatNum,              // number of the current fan coil unit being simulated
                         int const ZoneNum,             // number of zone being served
                         bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                         Real64 &PowerMet,              // Sensible power supplied (W)

@@ -741,7 +741,7 @@ namespace MixedAir {
                 OACoolingCoil = true;
             } else if (SELECT_CASE_var == DXSystem) { // CoilSystem:Cooling:DX  old 'AirLoopHVAC:UnitaryCoolOnly'
                 if (Sim) {
-                    SimDXCoolingSystem(CompName, FirstHVACIteration, AirLoopNum, CompIndex);
+                    SimDXCoolingSystem(state, CompName, FirstHVACIteration, AirLoopNum, CompIndex);
                 }
                 OACoolingCoil = true;
             } else if (SELECT_CASE_var == UnitarySystemModel) { // AirLoopHVAC:UnitarySystem
@@ -752,7 +752,7 @@ namespace MixedAir {
                     bool ZoneEquipFlag = false;
                     Real64 sensOut = 0.0;
                     Real64 latOut = 0.0;
-                    OutsideAirSys(OASysNum).compPointer[CompIndex]->simulate(CompName,
+                    OutsideAirSys(OASysNum).compPointer[CompIndex]->simulate(state, CompName,
                                                                              FirstHVACIteration,
                                                                              AirLoopNum,
                                                                              CompIndex,
@@ -764,10 +764,10 @@ namespace MixedAir {
                                                                              sensOut,
                                                                              latOut);
                 }
-                if (AirLoopInputsFilled) UnitarySystems::UnitarySys::getUnitarySysHeatCoolCoil(CompName, OACoolingCoil, OAHeatingCoil, 0);
+                if (AirLoopInputsFilled) UnitarySystems::UnitarySys::getUnitarySysHeatCoolCoil(state, CompName, OACoolingCoil, OAHeatingCoil, 0);
                 if (MyOneTimeCheckUnitarySysFlag(OASysNum)) {
                     if (AirLoopInputsFilled) {
-                        UnitarySystems::UnitarySys::checkUnitarySysCoilInOASysExists(CompName, 0);
+                        UnitarySystems::UnitarySys::checkUnitarySysCoilInOASysExists(state, CompName, 0);
                         MyOneTimeCheckUnitarySysFlag(OASysNum) = false;
                     }
                 }
@@ -970,7 +970,7 @@ namespace MixedAir {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetOutsideAirSysInputs()
+    void GetOutsideAirSysInputs(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1265,7 +1265,7 @@ namespace MixedAir {
                         OutsideAirSys(OASysNum).ComponentIndex(CompNum) = CompNum;
                         UnitarySystems::UnitarySys thisSys;
                         OutsideAirSys(OASysNum).compPointer[CompNum] =
-                            thisSys.factory(DataHVACGlobals::UnitarySys_AnyCoilType, OutsideAirSys(OASysNum).ComponentName(CompNum), false, 0);
+                            thisSys.factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, OutsideAirSys(OASysNum).ComponentName(CompNum), false, 0);
                     } else if (SELECT_CASE_var == "COIL:USERDEFINED") {
                         OutsideAirSys(OASysNum).ComponentType_Num(CompNum) = Coil_UserDefined;
                         // Heat recovery

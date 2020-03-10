@@ -575,7 +575,7 @@ namespace ZoneAirLoopEquipmentManager {
         AirDistUnit(AirDistUnitNum).CoolGain = 0.0;
     }
 
-    void SimZoneAirLoopEquipment(int const AirDistUnitNum,
+    void SimZoneAirLoopEquipment(AllGlobals &state, int const AirDistUnitNum,
                                  Real64 &SysOutputProvided,
                                  Real64 &NonAirSysOutput,
                                  Real64 &LatOutputProvided, // Latent add/removal provided by this unit (kg/s), dehumidify = negative
@@ -674,42 +674,42 @@ namespace ZoneAirLoopEquipmentManager {
                                      AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
 
                 } else if (SELECT_CASE_var == SingleDuctVAVReheat) {
-                    SimulateSingleDuct(AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
+                    SimulateSingleDuct(state, AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                        FirstHVACIteration,
                                        ActualZoneNum,
                                        ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                                        AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
 
                 } else if (SELECT_CASE_var == SingleDuctCBVAVReheat) {
-                    SimulateSingleDuct(AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
+                    SimulateSingleDuct(state, AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                        FirstHVACIteration,
                                        ActualZoneNum,
                                        ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                                        AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
 
                 } else if (SELECT_CASE_var == SingleDuctVAVNoReheat) {
-                    SimulateSingleDuct(AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
+                    SimulateSingleDuct(state, AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                        FirstHVACIteration,
                                        ActualZoneNum,
                                        ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                                        AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
 
                 } else if (SELECT_CASE_var == SingleDuctCBVAVNoReheat) {
-                    SimulateSingleDuct(AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
+                    SimulateSingleDuct(state, AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                        FirstHVACIteration,
                                        ActualZoneNum,
                                        ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                                        AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
 
                 } else if (SELECT_CASE_var == SingleDuctConstVolReheat) {
-                    SimulateSingleDuct(AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
+                    SimulateSingleDuct(state, AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                        FirstHVACIteration,
                                        ActualZoneNum,
                                        ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                                        AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
 
                 } else if (SELECT_CASE_var == SingleDuctConstVolNoReheat) {
-                    SimulateSingleDuct(AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
+                    SimulateSingleDuct(state, AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                        FirstHVACIteration,
                                        ActualZoneNum,
                                        ZoneEquipConfig(ControlledZoneNum).ZoneNode,
@@ -737,7 +737,7 @@ namespace ZoneAirLoopEquipmentManager {
                                AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
 
                 } else if (SELECT_CASE_var == SingleDuctVAVReheatVSFan) {
-                    SimulateSingleDuct(AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
+                    SimulateSingleDuct(state, AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                        FirstHVACIteration,
                                        ActualZoneNum,
                                        ZoneEquipConfig(ControlledZoneNum).ZoneNode,

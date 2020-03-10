@@ -258,7 +258,7 @@ namespace DataZoneEquipment {
         GetZoneEquipmentData1();
     }
 
-    void GetZoneEquipmentData1()
+    void GetZoneEquipmentData1(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -670,7 +670,7 @@ namespace DataZoneEquipment {
                         } else if (SELECT_CASE_var == "AIRLOOPHVAC:UNITARYSYSTEM") { // Unitary System
                             thisZoneEquipList.EquipType_Num(ZoneEquipTypeNum) = ZoneUnitarySys_Num;
                             UnitarySystems::UnitarySys thisSys;
-                            thisZoneEquipList.compPointer[ZoneEquipTypeNum] = thisSys.factory(
+                            thisZoneEquipList.compPointer[ZoneEquipTypeNum] = thisSys.factory(state, 
                                 DataHVACGlobals::UnitarySys_AnyCoilType, thisZoneEquipList.EquipName(ZoneEquipTypeNum), true, 0);
 
                         } else if (SELECT_CASE_var == "ZONEHVAC:DEHUMIDIFIER:DX") { // Zone dehumidifier

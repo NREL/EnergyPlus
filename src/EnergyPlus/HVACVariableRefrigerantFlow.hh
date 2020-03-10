@@ -451,7 +451,7 @@ namespace HVACVariableRefrigerantFlow {
 
         void SizeVRFCondenser();
 
-        void CalcVRFCondenser_FluidTCtrl();
+        void CalcVRFCondenser_FluidTCtrl(AllGlobals &state);
 
         void CalcVRFIUTeTc_FluidTCtrl();
 
@@ -806,7 +806,7 @@ namespace HVACVariableRefrigerantFlow {
                                 Optional<Real64> LatOutputProvided = _ // delivered latent capacity (W)
         );
 
-        Real64 CalVRFTUAirFlowRate_FluidTCtrl(int VRFTUNum,     // Index to VRF terminal unit
+        Real64 CalVRFTUAirFlowRate_FluidTCtrl(AllGlobals &state, int VRFTUNum,     // Index to VRF terminal unit
                                               Real64 PartLoadRatio,   // part load ratio of the coil
                                               bool FirstHVACIteration // FirstHVACIteration flag
         );
@@ -840,13 +840,13 @@ namespace HVACVariableRefrigerantFlow {
 
         // Methods for curve based and refrigerant flow control based models
         //******************************************************************************
-        void CalcVRFSuppHeatingCoil(int VRFTUNum,            // index of vrf terminal unit
+        void CalcVRFSuppHeatingCoil(AllGlobals &state, int VRFTUNum,            // index of vrf terminal unit
                                     bool FirstHVACIteration, // True when first HVAC iteration
                                     Real64 PartLoadRatio,    // coil operating part-load ratio
                                     Real64 &SuppCoilLoad           // adjusted supp coil load when outlet temp exceeds max (W)
         );
 
-        static Real64 HotWaterHeatingCoilResidual(Real64 PartLoadFrac,     // water heating coil part-load ratio
+        static Real64 HotWaterHeatingCoilResidual(AllGlobals &state, Real64 PartLoadFrac,     // water heating coil part-load ratio
                                                   std::vector<Real64> const &Par // par(1) = VRF TU Numberindex to current VRF terminal unit
         );
 
@@ -929,7 +929,7 @@ namespace HVACVariableRefrigerantFlow {
 
     void isVRFCoilPresent(AllGlobals &state, std::string const VRFTUName, bool &CoolCoilPresent, bool & HeatCoilPresent);
 
-    Real64 PLRResidual(Real64 PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 PLRResidual(AllGlobals &state, Real64 PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                        Array1<Real64> const &Par   // par(1) = VRFTUNum
     );
 
@@ -962,8 +962,7 @@ namespace HVACVariableRefrigerantFlow {
 
     void clear_state();
 
-    //Real64 VRFTUAirFlowResidual_FluidTCtrl(AllGlobals &state, Real64 FanSpdRatio, // fan speed ratio of VRF VAV TU
-    Real64 VRFTUAirFlowResidual_FluidTCtrl( Real64 FanSpdRatio, // fan speed ratio of VRF VAV TU
+    Real64 VRFTUAirFlowResidual_FluidTCtrl(AllGlobals &state, Real64 FanSpdRatio, // fan speed ratio of VRF VAV TU
                                            Array1<Real64> const &Par // par(1) = VRFTUNum
     );
 

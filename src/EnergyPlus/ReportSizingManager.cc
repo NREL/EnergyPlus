@@ -195,7 +195,7 @@ namespace ReportSizingManager {
         }
     }
 
-    void RequestSizing(std::string const &CompType,      // type of component
+    void RequestSizing(AllGlobals &state, std::string const &CompType,      // type of component
                        std::string const &CompName,      // name of component
                        int const SizingType,             // integerized type of sizing requested (see DataHVACGlobals, e.g. CoolingCapacitySizing)
                        std::string const &SizingString,  // string containing info for eio report
@@ -3233,7 +3233,7 @@ namespace ReportSizingManager {
                             case DataAirSystems::structArrayLegacyFanModels: {
                                 FanCoolLoad = FanDesHeatGain(state, PrimaryAirSystem(CurSysNum).SupFanNum, DesVolFlow);
                                 if (coilSelectionReportObj->isCompTypeCoil(CompType) && (SupFanNum > 0)) {
-                                    coilSelectionReportObj->setCoilSupplyFanInfo(CompName,
+                                    coilSelectionReportObj->setCoilSupplyFanInfo(state, CompName,
                                                                                  CompType,
                                                                                  Fans::Fan(PrimaryAirSystem(CurSysNum).SupFanNum).FanName,
                                                                                  DataAirSystems::structArrayLegacyFanModels,
@@ -3245,7 +3245,7 @@ namespace ReportSizingManager {
                             case DataAirSystems::objectVectorOOFanSystemModel: {
                                 FanCoolLoad = HVACFan::fanObjs[PrimaryAirSystem(CurSysNum).supFanVecIndex]->getFanDesignHeatGain(DesVolFlow);
                                 if (coilSelectionReportObj->isCompTypeCoil(CompType) && (PrimaryAirSystem(CurSysNum).supFanVecIndex >= 0)) {
-                                    coilSelectionReportObj->setCoilSupplyFanInfo(CompName,
+                                    coilSelectionReportObj->setCoilSupplyFanInfo(state, CompName,
                                                                                  CompType,
                                                                                  HVACFan::fanObjs[PrimaryAirSystem(CurSysNum).supFanVecIndex]->name,
                                                                                  DataAirSystems::objectVectorOOFanSystemModel,
@@ -3492,7 +3492,7 @@ namespace ReportSizingManager {
                         switch (PrimaryAirSystem(CurSysNum).supFanModelTypeEnum) {
                         case DataAirSystems::structArrayLegacyFanModels: {
                             if (coilSelectionReportObj->isCompTypeCoil(CompType) && (PrimaryAirSystem(CurSysNum).SupFanNum > 0)) {
-                                coilSelectionReportObj->setCoilSupplyFanInfo(CompName,
+                                coilSelectionReportObj->setCoilSupplyFanInfo(state, CompName,
                                                                              CompType,
                                                                              Fans::Fan(PrimaryAirSystem(CurSysNum).SupFanNum).FanName,
                                                                              DataAirSystems::structArrayLegacyFanModels,
@@ -3502,7 +3502,7 @@ namespace ReportSizingManager {
                         }
                         case DataAirSystems::objectVectorOOFanSystemModel: {
                             if (coilSelectionReportObj->isCompTypeCoil(CompType) && (PrimaryAirSystem(CurSysNum).supFanVecIndex >= 0)) {
-                                coilSelectionReportObj->setCoilSupplyFanInfo(CompName,
+                                coilSelectionReportObj->setCoilSupplyFanInfo(state, CompName,
                                                                              CompType,
                                                                              HVACFan::fanObjs[PrimaryAirSystem(CurSysNum).supFanVecIndex]->name,
                                                                              DataAirSystems::objectVectorOOFanSystemModel,

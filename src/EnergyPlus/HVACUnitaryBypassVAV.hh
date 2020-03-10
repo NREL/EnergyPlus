@@ -54,6 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 
 namespace EnergyPlus {
 
@@ -318,9 +319,9 @@ namespace HVACUnitaryBypassVAV {
                   bool &HXUnitOn                 // flag to enable heat exchanger
     );
 
-    void GetCBVAV();
+    void GetCBVAV(AllGlobals &state);
 
-    void InitCBVAV(int const CBVAVNum,            // Index of the current CBVAV unit being simulated
+    void InitCBVAV(AllGlobals &state, int const CBVAVNum,            // Index of the current CBVAV unit being simulated
                    bool const FirstHVACIteration, // TRUE if first HVAC iteration
                    int const AirLoopNum,          // air loop index
                    Real64 &OnOffAirFlowRatio,     // Ratio of compressor ON airflow to average airflow over timestep
@@ -329,14 +330,14 @@ namespace HVACUnitaryBypassVAV {
 
     void SizeCBVAV(int const CBVAVNum); // Index to CBVAV system
 
-    void ControlCBVAVOutput(int const CBVAVNum,            // Index to CBVAV system
+    void ControlCBVAVOutput(AllGlobals &state, int const CBVAVNum,            // Index to CBVAV system
                             bool const FirstHVACIteration, // Flag for 1st HVAC iteration
                             Real64 &PartLoadFrac,          // Unit part load fraction
                             Real64 &OnOffAirFlowRatio,     // Ratio of compressor ON airflow to AVERAGE airflow over timestep
                             bool &HXUnitOn                 // flag to enable heat exchanger
     );
 
-    void CalcCBVAV(int const CBVAVNum,            // Unit index in fan coil array
+    void CalcCBVAV(AllGlobals &state, int const CBVAVNum,            // Unit index in fan coil array
                    bool const FirstHVACIteration, // Flag for 1st HVAC iteration
                    Real64 &PartLoadFrac,          // Compressor part load fraction
                    Real64 &LoadMet,               // Load met by unit (W)
@@ -361,7 +362,7 @@ namespace HVACUnitaryBypassVAV {
                                  Array1<Real64> const &Par  // Par(1) = DX coil number
     );
 
-    Real64 MultiModeDXCoilResidual(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 MultiModeDXCoilResidual(AllGlobals &state, Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                    Array1<Real64> const &Par   // Par(1) = DX coil number
     );
 
@@ -371,14 +372,14 @@ namespace HVACUnitaryBypassVAV {
 
     void ReportCBVAV(int const CBVAVNum); // Index of the current CBVAV unit being simulated
 
-    void CalcNonDXHeatingCoils(int const CBVAVNum,            // Changeover bypass VAV unit index
+    void CalcNonDXHeatingCoils(AllGlobals &state, int const CBVAVNum,            // Changeover bypass VAV unit index
                                bool const FirstHVACIteration, // flag for first HVAC iteration in the time step
                                Real64 &HeatCoilLoad,          // heating coil load to be met (Watts)
                                int const FanMode,             // fan operation mode
                                Real64 &HeatCoilLoadmet        // coil heating load met
     );
 
-    Real64 HotWaterCoilResidual(Real64 const HWFlow,      // hot water flow rate in kg/s
+    Real64 HotWaterCoilResidual(AllGlobals &state, Real64 const HWFlow,      // hot water flow rate in kg/s
                                 Array1<Real64> const &Par // Par(5) is the requested coil load
     );
 

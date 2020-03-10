@@ -141,9 +141,9 @@ CoilSelectionData::CoilSelectionData( // constructor
     fanTypeName = "unknown";
 }
 
-void ReportCoilSelection::finishCoilSummaryReportTable()
+void ReportCoilSelection::finishCoilSummaryReportTable(AllGlobals &state)
 {
-    doFinalProcessingOfCoilData();
+    doFinalProcessingOfCoilData(state);
     writeCoilSelectionOutput();
     writeCoilSelectionOutput2();
 }
@@ -495,7 +495,7 @@ void ReportCoilSelection::doAirLoopSetup(int const coilVecIndex)
     }
 }
 
-void ReportCoilSelection::doZoneEqSetup(int const coilVecIndex)
+void ReportCoilSelection::doZoneEqSetup(AllGlobals &state, int const coilVecIndex)
 {
     auto &c(coilSelectionDataObjs[coilVecIndex]);
     c->coilLocation = "Zone";
@@ -526,7 +526,7 @@ void ReportCoilSelection::doZoneEqSetup(int const coilVecIndex)
         switch (DataAirSystems::PrimaryAirSystem(c->airloopNum).supFanModelTypeEnum) {
         case DataAirSystems::structArrayLegacyFanModels: {
 
-            coilSelectionReportObj->setCoilSupplyFanInfo(c->coilName_,
+            coilSelectionReportObj->setCoilSupplyFanInfo(state, c->coilName_,
                                                          c->coilObjName,
                                                          Fans::Fan(DataAirSystems::PrimaryAirSystem(c->airloopNum).SupFanNum).FanName,
                                                          DataAirSystems::structArrayLegacyFanModels,
@@ -535,7 +535,7 @@ void ReportCoilSelection::doZoneEqSetup(int const coilVecIndex)
         }
         case DataAirSystems::objectVectorOOFanSystemModel: {
 
-            coilSelectionReportObj->setCoilSupplyFanInfo(c->coilName_,
+            coilSelectionReportObj->setCoilSupplyFanInfo(state, c->coilName_,
                                                          c->coilObjName,
                                                          HVACFan::fanObjs[DataAirSystems::PrimaryAirSystem(c->airloopNum).supFanVecIndex]->name,
                                                          DataAirSystems::objectVectorOOFanSystemModel,
@@ -599,7 +599,7 @@ void ReportCoilSelection::doZoneEqSetup(int const coilVecIndex)
     }
 }
 
-void ReportCoilSelection::doFinalProcessingOfCoilData()
+void ReportCoilSelection::doFinalProcessingOfCoilData(AllGlobals &state)
 {
     // this routine does some final processing in preparation for writing out results
     for (auto &c : coilSelectionDataObjs) {
@@ -1808,7 +1808,7 @@ void ReportCoilSelection::setCoilReheatMultiplier(std::string const &coilName, /
     c->reheatLoadMult = multiplierReheatLoad;
 }
 
-void ReportCoilSelection::setCoilSupplyFanInfo(std::string const &coilName, // user-defined name of the coil
+void ReportCoilSelection::setCoilSupplyFanInfo(AllGlobals &state, std::string const &coilName, // user-defined name of the coil
                                                std::string const &coilType, // idf input object class name of coil
                                                std::string const &fanName,
                                                DataAirSystems::fanModelTypeEnum const &fanEnumType,

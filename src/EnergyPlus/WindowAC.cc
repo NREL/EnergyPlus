@@ -291,7 +291,7 @@ namespace WindowAC {
         ZoneCoolingOnlyFan = false;
     }
 
-    void GetWindowAC()
+    void GetWindowAC(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -795,13 +795,13 @@ namespace WindowAC {
         }
         for (WindACNum = 1; WindACNum <= NumWindAC; ++WindACNum) {
             if (WindAC(WindACNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                coilSelectionReportObj->setCoilSupplyFanInfo(WindAC(WindACNum).DXCoilName,
+                coilSelectionReportObj->setCoilSupplyFanInfo(state, WindAC(WindACNum).DXCoilName,
                                                              WindAC(WindACNum).DXCoilType,
                                                              WindAC(WindACNum).FanName,
                                                              DataAirSystems::objectVectorOOFanSystemModel,
                                                              WindAC(WindACNum).FanIndex);
             } else {
-                coilSelectionReportObj->setCoilSupplyFanInfo(WindAC(WindACNum).DXCoilName,
+                coilSelectionReportObj->setCoilSupplyFanInfo(state, WindAC(WindACNum).DXCoilName,
                                                              WindAC(WindACNum).DXCoilType,
                                                              WindAC(WindACNum).FanName,
                                                              DataAirSystems::structArrayLegacyFanModels,
@@ -810,7 +810,7 @@ namespace WindowAC {
         }
     }
 
-    void InitWindowAC(int const WindACNum,          // number of the current window AC unit being simulated
+    void InitWindowAC(AllGlobals &state, int const WindACNum,          // number of the current window AC unit being simulated
                       Real64 &QZnReq,               // zone load (modified as needed) (W)
                       int const ZoneNum,            // index to zone
                       bool const FirstHVACIteration // TRUE when first HVAC iteration
@@ -1185,7 +1185,7 @@ namespace WindowAC {
         DataScalableCapSizingON = false;
     }
 
-    void SimCyclingWindowAC(int const WindACNum,           // number of the current window AC unit being simulated
+    void SimCyclingWindowAC(AllGlobals &state, int const WindACNum,           // number of the current window AC unit being simulated
                             int const EP_UNUSED(ZoneNum),  // number of zone being served !unused1208
                             bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                             Real64 &PowerMet,              // Sensible power supplied (W)
@@ -1478,7 +1478,7 @@ namespace WindowAC {
             Real64 FanDelayTime(0.0);          // Fan delay time, time delay for the HP's fan to
             Real64 OnOffAirFlowRatio(1.0);     // ratio of compressor on flow to average flow over time step
 
-            VariableSpeedCoils::SimVariableSpeedCoils(WindAC(WindACNum).DXCoilName,
+            VariableSpeedCoils::SimVariableSpeedCoils(state, WindAC(WindACNum).DXCoilName,
                                                       WindAC(WindACNum).DXCoilIndex,
                                                       WindAC(WindACNum).OpMode,
                                                       MaxONOFFCyclesperHour,
@@ -1509,7 +1509,7 @@ namespace WindowAC {
         LoadMet = AirMassFlow * (PsyHFnTdbW(Node(OutletNode).Temp, MinHumRat) - PsyHFnTdbW(Node(InletNode).Temp, MinHumRat));
     }
 
-    void ControlCycWindACOutput(int const WindACNum,           // Unit index in fan coil array
+    void ControlCycWindACOutput(AllGlobals &state, int const WindACNum,           // Unit index in fan coil array
                                 bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
                                 int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
                                 Real64 const QZnReq,           // cooling output needed by zone [W]

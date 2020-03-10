@@ -80,6 +80,7 @@
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/FuelCellElectricGenerator.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/HybridModel.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -164,7 +165,7 @@ namespace InternalHeatGains {
         ErrorsFound = false;
     }
 
-    void ManageInternalHeatGains(Optional_bool_const InitOnly) // when true, just calls the get input, if appropriate and returns.
+    void ManageInternalHeatGains(AllGlobals &state, Optional_bool_const InitOnly) // when true, just calls the get input, if appropriate and returns.
     {
 
         // SUBROUTINE INFORMATION:
@@ -210,7 +211,7 @@ namespace InternalHeatGains {
             if (InitOnly) return;
         }
 
-        InitInternalHeatGains();
+        InitInternalHeatGains(state);
 
         ReportInternalHeatGains();
 
@@ -5121,7 +5122,7 @@ namespace InternalHeatGains {
         }
     }
 
-    void InitInternalHeatGains()
+    void InitInternalHeatGains(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5525,7 +5526,7 @@ namespace InternalHeatGains {
 
         if (NumZoneITEqStatements > 0) CalcZoneITEq();
 
-        CalcWaterThermalTankZoneGains();
+        CalcWaterThermalTankZoneGains(state);
         PipeHeatTransfer::PipeHTData::CalcZonePipesHeatGain();
         CalcWaterUseZoneGains();
         FigureFuelCellZoneGains();
