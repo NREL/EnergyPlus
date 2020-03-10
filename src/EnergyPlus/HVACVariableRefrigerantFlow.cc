@@ -577,17 +577,10 @@ namespace HVACVariableRefrigerantFlow {
                 OutdoorWetBulb = OutWetBulbTemp;
             }
         } else {
-            if (VRF(VRFCond).CondenserType == DataHVACGlobals::WaterCooled) {
-                OutdoorDryBulb = DataLoopNode::Node(VRF(VRFCond).CondenserNodeNum).Temp;
-                OutdoorHumRat = DataLoopNode::Node(VRF(VRFCond).CondenserNodeNum).HumRat;
-                OutdoorPressure = OutBaroPress;
-                OutdoorWetBulb = OutdoorDryBulb;
-            } else {
                 OutdoorDryBulb = OutDryBulbTemp;
                 OutdoorHumRat = OutHumRat;
                 OutdoorPressure = OutBaroPress;
                 OutdoorWetBulb = OutWetBulbTemp;
-            }
         }
 
         if (VRF(VRFCond).CondenserType == DataHVACGlobals::AirCooled) {
