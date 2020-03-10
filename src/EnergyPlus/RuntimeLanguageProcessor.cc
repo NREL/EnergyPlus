@@ -442,15 +442,15 @@ namespace RuntimeLanguageProcessor {
             EMSActuatorVariableNum = EMSActuatorUsed(ActuatorUsedLoop).ActuatorVariableNum;
             ErlVariableNum = EMSActuatorUsed(ActuatorUsedLoop).ErlVariableNum;
             ErlVariable(ErlVariableNum).Value.Type = ValueNull;
-            EMSActuatorAvailable(EMSActuatorVariableNum).Actuated = false;
+            *EMSActuatorAvailable(EMSActuatorVariableNum).Actuated = false;
             {
                 auto const SELECT_CASE_var(EMSActuatorAvailable(EMSActuatorVariableNum).PntrVarTypeUsed);
                 if (SELECT_CASE_var == PntrReal) {
-                    EMSActuatorAvailable(EMSActuatorVariableNum).RealValue = 0.0;
+                    *EMSActuatorAvailable(EMSActuatorVariableNum).RealValue = 0.0;
                 } else if (SELECT_CASE_var == PntrInteger) {
-                    EMSActuatorAvailable(EMSActuatorVariableNum).IntValue = 0;
+                    *EMSActuatorAvailable(EMSActuatorVariableNum).IntValue = 0;
                 } else if (SELECT_CASE_var == PntrLogical) {
-                    EMSActuatorAvailable(EMSActuatorVariableNum).LogValue = false;
+                    *EMSActuatorAvailable(EMSActuatorVariableNum).LogValue = false;
                 }
             }
         }
@@ -1755,7 +1755,7 @@ namespace RuntimeLanguageProcessor {
         ExpressionNum = ProcessTokens(Token, NumTokens, StackNum, String);
     }
 
-    int ProcessTokens(Array1S<TokenType> const TokenIN, int const NumTokensIN, int const StackNum, std::string const &ParsingString)
+    int ProcessTokens(const Array1D<TokenType> &TokenIN, int const NumTokensIN, int const StackNum, std::string const &ParsingString)
     {
 
         // SUBROUTINE INFORMATION:
