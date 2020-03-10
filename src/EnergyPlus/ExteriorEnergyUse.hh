@@ -92,7 +92,7 @@ namespace ExteriorEnergyUse {
 
     // Clears the global data in ExteriorEnergyUse.
     // Needed for unit tests, should not be normally called.
-    void clear_state();
+    void clear_state(AllGlobals &state);
 
     // Name Public routines, optionally name Private routines within this module
 
@@ -146,9 +146,9 @@ namespace ExteriorEnergyUse {
 
     // Functions
 
-    void ManageExteriorEnergyUse();
+    void ManageExteriorEnergyUse(AllGlobals &state);
 
-    void GetExteriorEnergyUseInput();
+    void GetExteriorEnergyUseInput(AllGlobals &state);
 
     void ValidateFuelType(int &FuelTypeNumber,                    // Fuel Type to be set in structure.
                           std::string const &FuelTypeAlpha,       // Fuel Type String
@@ -158,7 +158,7 @@ namespace ExteriorEnergyUse {
                           std::string const &CurrentName          // current object name being parsed
     );
 
-    void ReportExteriorEnergyUse();
+    void ReportExteriorEnergyUse(AllGlobals &state);
 
 } // namespace ExteriorEnergyUse
 

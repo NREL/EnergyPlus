@@ -234,9 +234,9 @@ public: // methods
                   Real64 const controlSOCMaxFracLimit,
                   Real64 const controlSOCMinFracLimit);
 
-    void calcAndReportSimpleBucketModel();
+    //void calcAndReportSimpleBucketModel();
 
-    void calcAndReportKineticBatteryModel();
+    //void calcAndReportKineticBatteryModel();
 
     void reinitAtBeginEnvironment();
 
@@ -544,7 +544,7 @@ public: // Methods
     // Constructor
     ElectPowerLoadCenter(int const objectNum);
 
-    void manageElecLoadCenter(bool const firstHVACIteration, Real64 &remainingPowerDemand);
+    void manageElecLoadCenter(AllGlobals &state, bool const firstHVACIteration, Real64 &remainingPowerDemand);
 
     void setupLoadCenterMeterIndices();
 
@@ -559,7 +559,7 @@ public: // Methods
     void updateLoadCenterGeneratorRecords();
 
 private: // Methods
-    void dispatchGenerators(bool const firstHVACIteration, Real64 &remainingPowerDemand);
+    void dispatchGenerators(AllGlobals &state, bool const firstHVACIteration, Real64 &remainingPowerDemand);
 
     void dispatchStorage(Real64 const remainingPowerDemand);
 
@@ -690,7 +690,7 @@ public: // Methods
     {
     }
 
-    void manageElectricPowerService(bool const FirstHVACIteration,
+    void manageElectricPowerService(AllGlobals &state, bool const FirstHVACIteration,
                                     bool &SimElecCircuits,      // simulation convergence flag
                                     bool const UpdateMetersOnly // if true then don't resimulate generators, just update meters.
     );

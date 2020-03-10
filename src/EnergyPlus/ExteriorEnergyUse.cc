@@ -135,7 +135,7 @@ namespace ExteriorEnergyUse {
 
     // Clears the global data in ExteriorEnergyUse.
     // Needed for unit tests, should not be normally called.
-    void clear_state()
+    void clear_state(AllGlobals &state)
     {
         state.exteriorEnergyUse.NumExteriorLights = 0;
         state.exteriorEnergyUse.NumExteriorEqs = 0;
@@ -145,7 +145,7 @@ namespace ExteriorEnergyUse {
         GetExteriorEnergyInputFlag = true;
     }
 
-    void ManageExteriorEnergyUse()
+    void ManageExteriorEnergyUse(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -158,14 +158,14 @@ namespace ExteriorEnergyUse {
         // This subroutine provides the usual call for the Simulation Manager.
 
         if (GetExteriorEnergyInputFlag) {
-            GetExteriorEnergyUseInput();
+            GetExteriorEnergyUseInput(state);
             GetExteriorEnergyInputFlag = false;
         }
 
-        ReportExteriorEnergyUse();
+        ReportExteriorEnergyUse(state);
     }
 
-    void GetExteriorEnergyUseInput()
+    void GetExteriorEnergyUseInput(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -589,7 +589,7 @@ namespace ExteriorEnergyUse {
         }
     }
 
-    void ReportExteriorEnergyUse()
+    void ReportExteriorEnergyUse(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:

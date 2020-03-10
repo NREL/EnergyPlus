@@ -249,7 +249,6 @@ SET( SRC
   GeneratorFuelSupply.hh
   GlobalNames.cc
   GlobalNames.hh
-  Globals/Globals.cc
   Globals/Globals.hh
   GroundHeatExchangers.cc
   GroundHeatExchangers.hh

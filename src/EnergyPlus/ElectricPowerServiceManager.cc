@@ -108,7 +108,7 @@ void initializeElectricPowerServiceZoneGains() // namespace routine for handling
     }
 }
 
-void ElectricPowerServiceManager::manageElectricPowerService(
+void ElectricPowerServiceManager::manageElectricPowerService(AllGlobals &state, 
     bool const firstHVACIteration,
     bool &SimElecCircuits,      // simulation convergence flag
     bool const UpdateMetersOnly // if true then don't resimulate generators, just update meters.
@@ -153,7 +153,7 @@ void ElectricPowerServiceManager::manageElectricPowerService(
     }
 
     for (auto &e : elecLoadCenterObjs) {
-        e->manageElecLoadCenter(firstHVACIteration, wholeBldgRemainingLoad_);
+        e->manageElecLoadCenter(state, firstHVACIteration, wholeBldgRemainingLoad_);
     }
 
     updateWholeBuildingRecords();
@@ -1008,13 +1008,13 @@ ElectPowerLoadCenter::ElectPowerLoadCenter( // constructor
     }
 }
 
-void ElectPowerLoadCenter::manageElecLoadCenter(bool const firstHVACIteration, Real64 &remainingWholePowerDemand)
+void ElectPowerLoadCenter::manageElecLoadCenter(AllGlobals &state, bool const firstHVACIteration, Real64 &remainingWholePowerDemand)
 {
     //
     subpanelFeedInRequest = remainingWholePowerDemand;
 
     if (generatorsPresent_) {
-        dispatchGenerators(firstHVACIteration, remainingWholePowerDemand);
+        dispatchGenerators(state, firstHVACIteration, remainingWholePowerDemand);
 
     } // if generators present
     updateLoadCenterGeneratorRecords();
@@ -1047,7 +1047,7 @@ void ElectPowerLoadCenter::manageElecLoadCenter(bool const firstHVACIteration, R
     updateLoadCenterGeneratorRecords();
 }
 
-void ElectPowerLoadCenter::dispatchGenerators(bool const firstHVACIteration,
+void ElectPowerLoadCenter::dispatchGenerators(AllGlobals &state, bool const firstHVACIteration,
                                               Real64 &remainingWholePowerDemand // power request in, remaining unmet request out
 )
 {
