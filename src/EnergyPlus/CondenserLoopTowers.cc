@@ -5291,6 +5291,7 @@ namespace CondenserLoopTowers {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int SolFla;             // Flag of solver
         Array1D<Real64> Par(4); // Parameter array for regula falsi solver
+        Real64 const VSTowerMaxRangeTemp(22.2222); // set VS cooling tower range maximum value used for solver 
 
         //   determine tower outlet water temperature
         Par(1) = this->thisTowerNum; // Index to cooling tower
@@ -5299,7 +5300,7 @@ namespace CondenserLoopTowers {
         Par(4) = Twb;                // inlet air wet-bulb temperature [C]
         Real64 Tr;                   // range temperature which results in an energy balance
         auto f = std::bind(&CoolingTower::residualTr, this, std::placeholders::_1, std::placeholders::_2);
-        General::SolveRoot(Acc, MaxIte, SolFla, Tr, f, 0.001, towers(this->VSTower).MaxRangeTemp, Par);
+        General::SolveRoot(Acc, MaxIte, SolFla, Tr, f, 0.001, VSTowerMaxRangeTemp, Par);
 
         Real64 _OutletWaterTemp = this->WaterTemp - Tr;
 
