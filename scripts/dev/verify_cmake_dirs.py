@@ -18,7 +18,7 @@ def custom_check_output_line(relative_file_path: str, line_num: int, message: st
     return json.dumps({
         'tool': 'verify_cmake_dirs',
         'file': relative_file_path,
-        'line_num': line_num,
+        'line': line_num,
         'messagetype': 'error',
         'message': message
     })
