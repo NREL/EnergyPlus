@@ -720,4 +720,196 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_EMSOverrideAirFlow)
     EXPECT_EQ(sd_airterminal(SysNum).EMSMassFlowRateValue, sd_airterminalInlet(SysNum).AirMassFlowRate);
     EXPECT_EQ(sd_airterminal(SysNum).EMSMassFlowRateValue, sd_airterminalOutlet(SysNum).AirMassFlowRate);
 }
+
+TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimSensibleOutPutTest)
+{
+
+    bool ErrorsFound(false);
+    bool FirstHVACIteration(false);
+
+    std::string const idf_objects = delimited_string({
+        "  AirTerminal:SingleDuct:ConstantVolume:NoReheat,",
+        "    CVNoReheatATU,           !- Name",
+        "    AvailSchedule,           !- Availability Schedule Name",
+        "    NoReheatAirInletNode,    !- Air Inlet Node Name",
+        "    NoReheatAirOutletNode,   !- Air Outlet Node Name",
+        "    1.0;                     !- Maximum Air Flow Rate {m3/s}",
+
+        "  Schedule:Compact,",
+        "    AvailSchedule,           !- Name",
+        "    Fraction,                !- Schedule Type Limits Name",
+        "    Through: 12/31,          !- Field 1",
+        "    For: AllDays,            !- Field 2",
+        "    Until: 24:00,1.0;        !- Field 3",
+
+        "  ZoneHVAC:EquipmentList,",
+        "    ZoneEquipment,           !- Name",
+        "    SequentialLoad,          !- Load Distribution Scheme",
+        "    ZoneHVAC:AirDistributionUnit,  !- Zone Equipment 1 Object Type",
+        "    NoReheatADU,             !- Zone Equipment 1 Name",
+        "    1,                       !- Zone Equipment 1 Cooling Sequence",
+        "    1;                       !- Zone Equipment 1 Heating or No-Load Sequence",
+
+        "  ZoneHVAC:AirDistributionUnit,",
+        "    NoReheatADU,             !- Name",
+        "    NoReheatAirOutletNode,   !- Air Distribution Unit Outlet Node Name",
+        "    AirTerminal:SingleDuct:ConstantVolume:NoReheat,  !- Air Terminal Object Type",
+        "    CVNoReheatATU;           !- Air Terminal Name",
+
+        "  Zone,",
+        "    Zone One,                !- Name",
+        "    0,                       !- Direction of Relative North {deg}",
+        "    0,                       !- X Origin {m}",
+        "    0,                       !- Y Origin {m}",
+        "    0,                       !- Z Origin {m}",
+        "    1,                       !- Type",
+        "    1,                       !- Multiplier",
+        "    2.40,                    !- Ceiling Height {m}",
+        "    240.0;                   !- Volume {m3}",
+
+        "  ZoneHVAC:EquipmentConnections,",
+        "    Zone One,                !- Zone Name",
+        "    ZoneEquipment,           !- Zone Conditioning Equipment List Name",
+        "    ZoneInlets,              !- Zone Air Inlet Node or NodeList Name",
+        "    ,                        !- Zone Air Exhaust Node or NodeList Name",
+        "    Zone Air Node,           !- Zone Air Node Name",
+        "    Zone Return Air Node;    !- Zone Return Air Node Name",
+
+        "  NodeList,",
+        "    ZoneInlets,              !- Name",
+        "    NoReheatAirOutletNode;   !- Node 1 Name",
+
+        });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
+    MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
+    ProcessScheduleInput(OutputFiles::getSingleton());  // read schedules
+
+    GetZoneData(ErrorsFound);
+    ASSERT_FALSE(ErrorsFound);
+
+    GetZoneEquipmentData1();
+    GetZoneAirLoopEquipment();
+    GetSysInput();
+
+    DataGlobals::SysSizingCalc = true;
+    DataGlobals::BeginEnvrnFlag = true;
+    DataEnvironment::StdRhoAir = 1.0;
+    DataEnvironment::OutBaroPress = 101325.0;
+
+    int const AirDistUnitNum(1);
+    int const AirTerminalNum(1);
+
+    auto &thisAirDistUnit(DataDefineEquip::AirDistUnit(AirDistUnitNum));
+    auto &thisAirTerminal(SingleDuct::sd_airterminal(AirTerminalNum));
+    auto &thisAirTerminalInlet(SingleDuct::sd_airterminalInlet(AirTerminalNum));
+    auto &thisAirTerminalOutlet(SingleDuct::sd_airterminalOutlet(AirTerminalNum));
+
+    int const InletNode = thisAirTerminal.InletNodeNum;
+    int const OutletNode = thisAirTerminal.OutletNodeNum;
+    int const ZonePtr = thisAirTerminal.ActualZoneNum;
+    int const ZoneAirNodeNum = ZoneEquipConfig(ZonePtr).ZoneNode;
+
+    Schedule(thisAirTerminal.SchedPtr).CurrentValue = 1.0; // unit is always available
+
+    // design maximum air mass flow rate
+    Real64 MassFlowRateMaxAvail = thisAirTerminal.MaxAirVolFlowRate * DataEnvironment::StdRhoAir;
+    EXPECT_EQ(1.0, thisAirTerminal.MaxAirVolFlowRate);
+    EXPECT_EQ(1.0, MassFlowRateMaxAvail);
+
+    // test 1: heating mode test
+    // set air inlet node properties
+    Node(InletNode).Temp = 35.0;
+    Node(InletNode).HumRat = 0.0075;
+    Node(InletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(InletNode).Temp, Node(InletNode).HumRat);
+    Node(OutletNode).Temp = Node(InletNode).Temp;
+    Node(OutletNode).HumRat = Node(InletNode).HumRat;
+    Node(OutletNode).Enthalpy = Node(InletNode).Enthalpy;
+    // set zone air node properties
+    Node(ZoneAirNodeNum).Temp = 20.0;
+    Node(ZoneAirNodeNum).HumRat = 0.005;
+    Node(ZoneAirNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(ZoneAirNodeNum).Temp, Node(ZoneAirNodeNum).HumRat);
+    // set inlet mass flow rate to zero
+    Node(InletNode).MassFlowRate = 0.0;
+    Node(InletNode).MassFlowRateMaxAvail = 0.0;
+    FirstHVACIteration = true;
+    SingleDuct::GetInputFlag = false;
+    Real64 SysOutputProvided = 0.0;
+    Real64 NonAirSysOutput = 0.0;
+    Real64 LatOutputProvided = 0.0;
+    // run single duct simulation
+    SimZoneAirLoopEquipment(AirDistUnitNum, SysOutputProvided, NonAirSysOutput, LatOutputProvided, FirstHVACIteration, ZonePtr, ZonePtr);
+    // check AT air mass flow rates
+    EXPECT_EQ(MassFlowRateMaxAvail, thisAirTerminal.AirMassFlowRateMax); // design maximum mass flow rate
+    EXPECT_EQ(0.0, thisAirTerminalInlet.AirMassFlowRateMaxAvail);        // maximum available mass flow rate
+    EXPECT_EQ(0.0, thisAirTerminalInlet.AirMassFlowRate);                // inlet mass flow rate is zero
+    EXPECT_EQ(0.0, thisAirTerminalOutlet.AirMassFlowRate);               // outlet mass flow rate is zero
+    EXPECT_EQ(0.0, SysOutputProvided);                                   // delivered sensible heating is zero
+    // reset mass flow rate to the maximum available
+    Node(InletNode).MassFlowRateMaxAvail = MassFlowRateMaxAvail;
+    EXPECT_EQ(1.0, MassFlowRateMaxAvail);
+    // calculate sensible output provided by the air terminal unit
+    Real64 CpAir = PsyCpAirFnW(Node(OutletNode).HumRat);
+    Real64 SensHeatRateProvided = MassFlowRateMaxAvail * CpAir * (Node(OutletNode).Temp - Node(ZoneAirNodeNum).Temp);
+    // run SimulateSingleDuct() function
+    SimZoneAirLoopEquipment(AirDistUnitNum, SysOutputProvided, NonAirSysOutput, LatOutputProvided, FirstHVACIteration, ZonePtr, ZonePtr);
+    // check air terminal unit air mass flow rates and delivered sensible heating rate
+    EXPECT_EQ(MassFlowRateMaxAvail, thisAirTerminalInlet.AirMassFlowRate);
+    EXPECT_EQ(MassFlowRateMaxAvail, thisAirTerminalOutlet.AirMassFlowRate);
+    EXPECT_NEAR(SensHeatRateProvided, SysOutputProvided, 0.001);
+    // outlet and inlet nodes air conditions must match exactly
+    EXPECT_EQ(thisAirTerminalOutlet.AirTemp, thisAirTerminalInlet.AirTemp);
+    EXPECT_EQ(thisAirTerminalOutlet.AirHumRat, thisAirTerminalInlet.AirHumRat);
+    EXPECT_EQ(thisAirTerminalOutlet.AirEnthalpy, thisAirTerminalInlet.AirEnthalpy);
+    EXPECT_EQ(thisAirTerminalOutlet.AirMassFlowRate, thisAirTerminalInlet.AirMassFlowRate);
+    ;
+    // test 2: cooling mode test
+    // set air inlet node properties
+    Node(InletNode).Temp = 15.0;
+    Node(InletNode).HumRat = 0.0085;
+    Node(InletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(InletNode).Temp, Node(InletNode).HumRat);
+    Node(OutletNode).Temp = Node(InletNode).Temp;
+    Node(OutletNode).HumRat = Node(InletNode).HumRat;
+    Node(OutletNode).Enthalpy = Node(InletNode).Enthalpy;
+    // set zone air node properties
+    Node(ZoneAirNodeNum).Temp = 24.0;
+    Node(ZoneAirNodeNum).HumRat = 0.00975;
+    Node(ZoneAirNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(Node(ZoneAirNodeNum).Temp, Node(ZoneAirNodeNum).HumRat);
+    // set inlet mass flow rate to zero
+    Node(InletNode).MassFlowRate = 0.0;
+    Node(InletNode).MassFlowRateMaxAvail = 0.0;
+    FirstHVACIteration = true;
+    SysOutputProvided = 0.0;
+    NonAirSysOutput = 0.0;
+    LatOutputProvided = 0.0;
+    // run single duct simulation
+    SimZoneAirLoopEquipment(AirDistUnitNum, SysOutputProvided, NonAirSysOutput, LatOutputProvided, FirstHVACIteration, ZonePtr, ZonePtr);
+    // check AT air mass flow rates
+    EXPECT_EQ(MassFlowRateMaxAvail, thisAirTerminal.AirMassFlowRateMax); // design maximum mass flow rate
+    EXPECT_EQ(0.0, thisAirTerminalInlet.AirMassFlowRateMaxAvail);        // maximum available mass flow rate
+    EXPECT_EQ(0.0, thisAirTerminalInlet.AirMassFlowRate);                // inlet mass flow rate is zero
+    EXPECT_EQ(0.0, thisAirTerminalOutlet.AirMassFlowRate);               // outlet mass flow rate is zero
+    EXPECT_EQ(0.0, SysOutputProvided);                                   // delivered sensible cooling is zero
+    ;
+    // reset mass flow rate to the maximum available
+    Node(InletNode).MassFlowRateMaxAvail = MassFlowRateMaxAvail;
+    EXPECT_EQ(1.0, MassFlowRateMaxAvail);
+    // calculate sensible output provided by the air terminal unit
+    CpAir = PsyCpAirFnW(Node(OutletNode).HumRat);
+    Real64 SensCoolRateProvided = MassFlowRateMaxAvail * CpAir * (Node(OutletNode).Temp - Node(ZoneAirNodeNum).Temp);
+    // run SimulateSingleDuct() function
+    SimZoneAirLoopEquipment(AirDistUnitNum, SysOutputProvided, NonAirSysOutput, LatOutputProvided, FirstHVACIteration, ZonePtr, ZonePtr);
+    // check air terminal unit air mass flow rates and delivered sensible cooling rate
+    EXPECT_EQ(MassFlowRateMaxAvail, thisAirTerminalInlet.AirMassFlowRate);
+    EXPECT_EQ(MassFlowRateMaxAvail, thisAirTerminalOutlet.AirMassFlowRate);
+    EXPECT_NEAR(SensCoolRateProvided, SysOutputProvided, 0.001);
+    // outlet and inlet nodes air conditions must match exactly
+    EXPECT_EQ(thisAirTerminalOutlet.AirTemp, thisAirTerminalInlet.AirTemp);
+    EXPECT_EQ(thisAirTerminalOutlet.AirHumRat, thisAirTerminalInlet.AirHumRat);
+    EXPECT_EQ(thisAirTerminalOutlet.AirEnthalpy, thisAirTerminalInlet.AirEnthalpy);
+    EXPECT_EQ(thisAirTerminalOutlet.AirMassFlowRate, thisAirTerminalInlet.AirMassFlowRate);
+}
+
 } // namespace EnergyPlus
