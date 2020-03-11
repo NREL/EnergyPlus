@@ -4095,12 +4095,12 @@ namespace SystemAvailabilityManager {
         for (SysAvailNum = 1; SysAvailNum <= NumHybridVentSysAvailMgrs; ++SysAvailNum) {
             if (HybridVentSysAvailMgrData(SysAvailNum).HybridVentMgrConnectedToAirLoop) {
                 for (PriAirSysNum = 1; PriAirSysNum <= NumPrimaryAirSys; ++PriAirSysNum) {
-                    if (HybridVentSysAvailMgrData(SysAvailNum).AirLoopNum == PriAirSysNum) CalcHybridVentSysAvailMgr(SysAvailNum, PriAirSysNum);
+                    if (HybridVentSysAvailMgrData(SysAvailNum).AirLoopNum == PriAirSysNum) CalcHybridVentSysAvailMgr(state, SysAvailNum, PriAirSysNum);
                 }
             } else {
                 // Hybrid ventilation manager is applied to zone component
                 if (HybridVentSysAvailMgrData(SysAvailNum).SimHybridVentSysAvailMgr) {
-                    CalcHybridVentSysAvailMgr(SysAvailNum);
+                    CalcHybridVentSysAvailMgr(state, SysAvailNum);
                 }
             }
         }
@@ -4852,7 +4852,8 @@ namespace SystemAvailabilityManager {
         CurrentEndTimeLast = CurrentEndTime;
     }
 
-    void CalcHybridVentSysAvailMgr(int const SysAvailNum,          // number of the current scheduled system availability manager
+    void CalcHybridVentSysAvailMgr(AllGlobals &state,
+                                   int const SysAvailNum,          // number of the current scheduled system availability manager
                                    Optional_int_const PriAirSysNum // number of the primary air system affected by this Avail. Manager
     )
     {
@@ -5017,7 +5018,7 @@ namespace SystemAvailabilityManager {
                     }
 
                     if (HybridVentSysAvailMgrData(SysAvailNum).ANControlTypeSchedPtr > 0 && HybridVentModeOA) {
-                        ManageAirflowNetworkBalance(true);
+                        ManageAirflowNetworkBalance(state, true);
                         ACH = GetZoneInfilAirChangeRate(ZoneNum);
                     }
                     if (ACH > OASetPoint) {

@@ -559,7 +559,8 @@ namespace SystemAvailabilityManager {
 
     void InitHybridVentSysAvailMgr();
 
-    void CalcHybridVentSysAvailMgr(int const SysAvailNum,              // number of the current scheduled system availability manager
+    void CalcHybridVentSysAvailMgr(AllGlobals &state,
+                                   int const SysAvailNum,              // number of the current scheduled system availability manager
                                    Optional_int_const PriAirSysNum = _ // number of the primary air system affected by this Avail. Manager
     );
 

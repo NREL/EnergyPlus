@@ -6109,7 +6109,7 @@ namespace DXCoils {
              DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_HeatPumpWaterHeaterWrapped) &&
             MyEnvrnFlag(DXCoilNum)) {
 
-            SizeDXCoil(DXCoilNum);
+            SizeDXCoil(state, DXCoilNum);
 
             RatedVolFlowPerRatedTotCap = DXCoil(DXCoilNum).RatedAirVolFlowRate(1) / DXCoil(DXCoilNum).RatedTotCap2;
             if (((MinRatedVolFlowPerRatedTotCap(DXCT) - RatedVolFlowPerRatedTotCap) > SmallDifferenceTest) ||
@@ -6132,7 +6132,7 @@ namespace DXCoils {
             //   call CalcHPWHDXCoil to determine DXCoil%RatedTotCap(1) for rated CBF calculation below
             CalcHPWHDXCoil(DXCoilNum, 1.0);
             if (MySizeFlag(DXCoilNum)) {
-                SizeDXCoil(DXCoilNum);
+                SizeDXCoil(state, DXCoilNum);
                 MySizeFlag(DXCoilNum) = false;
             }
 
@@ -6216,7 +6216,7 @@ namespace DXCoils {
 
         if (!SysSizingCalc && MySizeFlag(DXCoilNum)) {
             // for each coil, do the sizing once.
-            SizeDXCoil(DXCoilNum);
+            SizeDXCoil(state, DXCoilNum);
             MySizeFlag(DXCoilNum) = false;
 
             if (DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_CoolingSingleSpeed || DXCoil(DXCoilNum).DXCoilType_Num == CoilDX_CoolingTwoSpeed ||
@@ -7336,7 +7336,7 @@ namespace DXCoils {
                         RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
                         MSRatedAirVolFlowRateDes = TempSize;
                         bPRINT = true;
-                    } 
+                    }
                     if ( IsAutoSize) {
                         MSRatedAirVolFlowRateDes = TempSize;;
                     }
@@ -7350,7 +7350,7 @@ namespace DXCoils {
                         DataConstantUsedForSizing = DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( DXCoil( DXCoilNum ).NumOfSpeeds );
                         if ( !IsAutoSize && !HardSizeNoDesRun ) DataConstantUsedForSizing = MSRatedAirVolFlowRateDes;
                         DataFractionUsedForSizing = (float)Mode / DXCoil( DXCoilNum ).NumOfSpeeds;
-                    }   
+                    }
                     TempSize = DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode );
                     DataEMSOverrideON = DXCoil(DXCoilNum).RatedAirVolFlowRateEMSOverrideON(Mode);
                     DataEMSOverride = DXCoil(DXCoilNum).RatedAirVolFlowRateEMSOverrideValue(Mode);
@@ -7677,7 +7677,7 @@ namespace DXCoils {
                         RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
                         MSRatedAirVolFlowRateDes = TempSize;
                         bPRINT = true;
-                    } 
+                    }
                 } else {
                     FieldNum = 12 + (Mode - 1) * 5;
                     SizingString = DXCoilNumericFields(DXCoilNum).PerfMode(1).FieldNames(FieldNum) + " [m3/s]";
@@ -7687,7 +7687,7 @@ namespace DXCoils {
                         // Auto size low speed flow to fraction of the highest speed capacity
                         DataConstantUsedForSizing = DXCoil(DXCoilNum).MSRatedAirVolFlowRate(DXCoil(DXCoilNum).NumOfSpeeds);
                         if (!IsAutoSize && !HardSizeNoDesRun ) DataConstantUsedForSizing = MSRatedAirVolFlowRateDes;
-                        DataFractionUsedForSizing = (float)Mode / DXCoil(DXCoilNum).NumOfSpeeds;                        
+                        DataFractionUsedForSizing = (float)Mode / DXCoil(DXCoilNum).NumOfSpeeds;
                     }
                     TempSize = DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode );
                     RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
@@ -13517,7 +13517,7 @@ namespace DXCoils {
 
         // Get fan index and name if not already available
         if (DXCoil(DXCoilNum).SupplyFanIndex == -1)
-            GetFanIndexForTwoSpeedCoil(state, 
+            GetFanIndexForTwoSpeedCoil(state,
                 DXCoilNum, DXCoil(DXCoilNum).SupplyFanIndex, DXCoil(DXCoilNum).SupplyFanName, DXCoil(DXCoilNum).SupplyFan_TypeNum);
         if (DXCoil(DXCoilNum).SupplyFanIndex == -1) { // didn't find VAV fan, do not rate this coil
             DXCoil(DXCoilNum).RateWithInternalStaticAndFanObject = false;

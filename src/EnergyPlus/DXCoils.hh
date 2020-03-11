@@ -638,7 +638,7 @@ namespace DXCoils {
 
     void InitDXCoil(AllGlobals &state, int const DXCoilNum); // number of the current DX coil unit being simulated
 
-    void SizeDXCoil(int const DXCoilNum);
+    void SizeDXCoil(AllGlobals &state, int const DXCoilNum);
 
     void CalcHPWHDXCoil(int const DXCoilNum,       // the number of the DX coil to be simulated
                         Real64 const PartLoadRatio // sensible water heating load / full load sensible water heating capacity

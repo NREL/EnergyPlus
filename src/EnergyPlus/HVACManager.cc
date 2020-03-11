@@ -344,7 +344,7 @@ namespace HVACManager {
         if (TriggerGetAFN) {
             TriggerGetAFN = false;
             DisplayString("Initializing HVAC");
-            ManageAirflowNetworkBalance(); // first call only gets input and returns.
+            ManageAirflowNetworkBalance(state); // first call only gets input and returns.
         }
 
         ZT = MAT;
@@ -403,7 +403,7 @@ namespace HVACManager {
         CalcAirFlowSimple(state);
         if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
             AirflowNetwork::RollBackFlag = false;
-            ManageAirflowNetworkBalance(false);
+            ManageAirflowNetworkBalance(state, false);
         }
 
         SetHeatToReturnAirFlag();
@@ -461,7 +461,7 @@ namespace HVACManager {
                 CalcAirFlowSimple(state, SysTimestepLoop);
                 if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                     AirflowNetwork::RollBackFlag = false;
-                    ManageAirflowNetworkBalance(false);
+                    ManageAirflowNetworkBalance(state, false);
                 }
 
                 UpdateInternalGainValues(true, true);
@@ -1817,7 +1817,7 @@ namespace HVACManager {
             RepIterAir = 0;
             // Call AirflowNetwork simulation to calculate air flows and pressures
             if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-                ManageAirflowNetworkBalance(FirstHVACIteration);
+                ManageAirflowNetworkBalance(state, FirstHVACIteration);
             }
             ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);
             AirLoopInputsFilled = true; // all air loop inputs have been read in
@@ -1841,7 +1841,7 @@ namespace HVACManager {
                 // Call AirflowNetwork simulation to calculate air flows and pressures
                 ResimulateAirZone = false;
                 if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
-                    ManageAirflowNetworkBalance(FirstHVACIteration, IterAir, ResimulateAirZone);
+                    ManageAirflowNetworkBalance(state, FirstHVACIteration, IterAir, ResimulateAirZone);
                 }
                 if (SimAirLoops) {
                     ManageAirLoops(state, FirstHVACIteration, SimAirLoops, SimZoneEquipment);

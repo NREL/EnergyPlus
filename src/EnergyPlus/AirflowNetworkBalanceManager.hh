@@ -166,7 +166,8 @@ namespace AirflowNetworkBalanceManager {
 
     void clear_state();
 
-    void ManageAirflowNetworkBalance(Optional_bool_const FirstHVACIteration = _, // True when solution technique on first iteration
+    void ManageAirflowNetworkBalance(AllGlobals &state,
+                                     Optional_bool_const FirstHVACIteration = _, // True when solution technique on first iteration
                                      Optional_int_const Iter = _,                // Iteration number
                                      Optional_bool ResimulateAirZone = _         // True when solution technique on third iteration
     );
