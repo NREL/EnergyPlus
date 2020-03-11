@@ -4800,8 +4800,7 @@ namespace SingleDuct {
         MassFlow = sd_airterminalInlet(SysNum).AirMassFlowRate; // system air mass flow rate
 
         if (GetCurrentScheduleValue(this->SchedPtr) > 0.0 && MassFlow > SmallMassFlow) {
-            Real64 CpAir = PsyCpAirFnW(0.5 * (Node(this->OutletNodeNum).HumRat + Node(ZoneNodeNum).HumRat));
-            SensOutputProvided = MassFlow * CpAir * (Node(this->OutletNodeNum).Temp - Node(ZoneNodeNum).Temp);
+            SensOutputProvided = MassFlow * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(Node(this->OutletNodeNum).Temp, Node(this->OutletNodeNum).HumRat, Node(ZoneNodeNum).Temp, Node(ZoneNodeNum).HumRat);
         } else {
             SensOutputProvided = 0.0;
         }
