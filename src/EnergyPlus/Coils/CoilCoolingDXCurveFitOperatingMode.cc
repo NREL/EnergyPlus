@@ -257,7 +257,8 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(const DataLoopNode::N
                                                            Real64 &speedRatio,
                                                            int  const fanOpMode,
                                                            DataLoopNode::NodeData &condInletNode,
-                                                           DataLoopNode::NodeData &EP_UNUSED(condOutletNode))
+                                                           DataLoopNode::NodeData &EP_UNUSED(condOutletNode),
+                                                           bool const singleMode)
 {
 
     // Currently speedNum is 1-based, while this->speeds are zero-based
@@ -328,7 +329,7 @@ void CoilCoolingDXCurveFitOperatingMode::CalcOperatingMode(const DataLoopNode::N
     OpModePower = thisspeed.fullLoadPower * thisspeed.RTF;
     OpModeWasteHeat = thisspeed.fullLoadWasteHeat * thisspeed.RTF;
 
-    if ((speedNum > 1) && (speedRatio < 1.0)) {
+    if ((speedNum > 1) && (speedRatio < 1.0) && !singleMode) {
 
         // If multispeed, evaluate next lower speed using PLR, then combine with high speed for final outlet conditions
         auto &lowerspeed(this->speeds[max(speedNum - 2, 0)]);

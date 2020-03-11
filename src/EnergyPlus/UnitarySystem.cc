@@ -6670,9 +6670,11 @@ namespace UnitarySystems {
                 }
 
                 if ((thisSys.m_HeatingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedHeating &&
-                     thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) ||
+                     (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
+                      thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling)) ||
                     (thisSys.m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingGasOrOtherFuel &&
-                     thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling)) {
+                     (thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling ||
+                      thisSys.m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling))) {
                     if (thisSys.m_DesignSpecMSHPIndex > -1) {
                         if (thisSys.m_CompPointerMSHP->m_SingleModeFlag) {
                             thisSys.m_SingleMode = 1;
@@ -6682,9 +6684,8 @@ namespace UnitarySystems {
                     if (thisSys.m_DesignSpecMSHPIndex > -1) {
                         if (thisSys.m_CompPointerMSHP->m_SingleModeFlag) {
                             ShowSevereError(cCurrentModuleObject + ": " + thisObjectName);
-                            ShowContinueError(
-                                "In order to perform Single Mode Operation, the valid cooling coil type is Coil:Cooling:DX:MultiSpeed and "
-                                "the valid heating is Coil:Heating:DX:MultiSpeed or Coil:Heating:Fuel.");
+                            ShowContinueError("In order to perform Single Mode Operation, the valid cooling coil type is Coil:Cooling:DX:MultiSpeed "
+                                              "or Coil:Cooling:DX and the valid heating is Coil:Heating:DX:MultiSpeed or Coil:Heating:Fuel.");
                             ShowContinueError("The input cooling coil type = " + loc_coolingCoilType +
                                               " and the input heating coil type = " + loc_heatingCoilType);
                         }
@@ -10102,6 +10103,7 @@ namespace UnitarySystems {
 
             } else if (SELECT_CASE_var == DataHVACGlobals::CoilDX_Cooling) { // CoilCoolingDX
 
+                bool const singleMode = (this->m_SingleMode == 1);
                 if (this->m_ControlType == ControlType::Setpoint) {
                     if (this->m_CoolingSpeedNum > 1) {
                         CoilPLR = 1.0 * double(CompOn);
@@ -10111,8 +10113,12 @@ namespace UnitarySystems {
                 } else {
                     if (CoolingLoad) {
                         if (this->m_CoolingSpeedNum > 1) {
-                            CoilPLR = 1.0 * double(CompOn);
-                            this->m_CoolingSpeedRatio = PartLoadRatio * double(CompOn);
+                            if (singleMode) {
+                                CoilPLR = 1.0 * double(CompOn);
+                                this->m_CoolingSpeedRatio = PartLoadRatio * double(CompOn);
+                            } else {
+                                CoilPLR = PartLoadRatio * double(CompOn);
+                            }
                         } else {
                             CoilPLR = PartLoadRatio * double(CompOn);
                         }
@@ -10121,11 +10127,19 @@ namespace UnitarySystems {
                     }
                 }
                 coilCoolingDXs[this->m_CoolingCoilIndex].simulate(
-                    HXUnitOn, CoilPLR, this->m_CoolingSpeedNum, this->m_CoolingSpeedRatio, this->m_FanOpMode);
+                    HXUnitOn, CoilPLR, this->m_CoolingSpeedNum, this->m_CoolingSpeedRatio, this->m_FanOpMode, singleMode);
                 if (this->m_CoolingSpeedNum > 1) {
-                    this->m_CoolCompPartLoadRatio = 1.0;
+                    if (this->m_SingleMode == 0) {
+                        this->m_CoolCompPartLoadRatio = double(CompOn);
+                    } else {
+                        this->m_CoolCompPartLoadRatio = PartLoadRatio * double(CompOn);
+                        this->m_CoolingCycRatio = this->m_CoolingSpeedRatio;
+                        this->m_CoolingSpeedRatio = 1.0;
+                    }
                 } else {
-                    this->m_CoolCompPartLoadRatio = PartLoadRatio * double(CompOn);
+                    this->m_CoolCompPartLoadRatio = this->m_CoolingCycRatio * double(CompOn);
+                    this->m_CoolingCycRatio = this->m_CoolingSpeedRatio;
+                    this->m_CoolingSpeedRatio = 0.0;
                 }
 
             } else if ((SELECT_CASE_var == DataHVACGlobals::CoilDX_CoolingHXAssisted) ||
@@ -10776,8 +10790,9 @@ namespace UnitarySystems {
                     DataHVACGlobals::MSHPMassFlowRateLow = this->m_DesignMassFlowRate;
                     DataHVACGlobals::MSHPMassFlowRateHigh = this->m_DesignMassFlowRate;
                     bool useDehumMode = (this->m_DehumidificationMode == 1);
+                    bool const singleMode = (this->m_SingleMode == 1);
                     coilCoolingDXs[this->m_CoolingCoilIndex].simulate(
-                        useDehumMode, PartLoadFrac, this->m_CoolingSpeedNum, this->m_CoolingSpeedRatio, this->m_FanOpMode);
+                        useDehumMode, PartLoadFrac, this->m_CoolingSpeedNum, this->m_CoolingSpeedRatio, this->m_FanOpMode, singleMode);
                         this->m_CoolCompPartLoadRatio = PartLoadFrac;
                 } else if ((CoilType_Num == DataHVACGlobals::Coil_CoolingWater) ||
                            (CoilType_Num == DataHVACGlobals::Coil_CoolingWaterDetailed)) { // COIL:COOLING:WATER
@@ -10927,10 +10942,11 @@ namespace UnitarySystems {
                     } else if (CoilType_Num == DataHVACGlobals::CoilDX_Cooling) { // CoilCoolingDX
                         bool useDehumMode = (this->m_DehumidificationMode == 1);
                         this->m_CoolingSpeedRatio = 1.0;
+                        bool const singleMode = (this->m_SingleMode == 1);
                         for (int speedNum = 1; speedNum <= this->m_NumOfSpeedCooling; speedNum++) {
                             this->m_CoolingSpeedNum = speedNum;
                             coilCoolingDXs[this->m_CoolingCoilIndex].simulate(
-                                useDehumMode, PartLoadFrac, this->m_CoolingSpeedNum, this->m_CoolingSpeedRatio, this->m_FanOpMode);
+                                useDehumMode, PartLoadFrac, this->m_CoolingSpeedNum, this->m_CoolingSpeedRatio, this->m_FanOpMode, singleMode);
                             if ((DataLoopNode::Node(OutletNode).Temp - DesOutTemp) < Acc) break;
                         }
                         if (this->m_CoolingSpeedNum == 1) {
@@ -11263,6 +11279,8 @@ namespace UnitarySystems {
                             Par[5] = this->m_CoolingSpeedNum;
                             Par[6] = this->m_CoolingSpeedRatio;
                             Par[7] = 0.0;
+                            Par[8] = 0.0;
+                            if (this->m_SingleMode == 1) Par[8] = 1.0;
                             General::SolveRoot(Acc, MaxIte, SolFla, PartLoadFrac, &this->genericDXCoilResidual, 0.0, 1.0, Par);
                             if (this->m_CoolingSpeedNum == 1) {
                                 this->m_CompPartLoadRatio = PartLoadFrac;
@@ -11433,10 +11451,11 @@ namespace UnitarySystems {
                         bool useDehumMode = true; // this->m_DehumidificationMode
                         DehumidMode = 1; // int representation of dehumidification mode
                         if (this->m_CoolingSpeedNum == 0) this->m_CoolingSpeedNum = 1;
+                        bool const singleMode = (this->m_SingleMode == 1);
                         for (int speedNum = this->m_CoolingSpeedNum; speedNum <= this->m_NumOfSpeedCooling; speedNum++) {
                             this->m_CoolingSpeedNum = speedNum;
                             coilCoolingDXs[this->m_CoolingCoilIndex].simulate(
-                                useDehumMode, PartLoadFrac, this->m_CoolingSpeedNum, this->m_CoolingSpeedRatio, this->m_FanOpMode);
+                                useDehumMode, PartLoadFrac, this->m_CoolingSpeedNum, this->m_CoolingSpeedRatio, this->m_FanOpMode, singleMode);
                             if ((DataLoopNode::Node(OutletNode).Temp - DesOutTemp) < Acc ) break;
                         }
 
@@ -11772,11 +11791,12 @@ namespace UnitarySystems {
                         } else if (CoilType_Num == DataHVACGlobals::CoilDX_Cooling) { // CoilCoolingDX
                             bool useDehumMode = false;                                // this->m_DehumidificationMode
                             if (this->m_CoolingSpeedNum == 0) this->m_CoolingSpeedNum = 1;
+                            bool const singleMode = (this->m_SingleMode == 1);
                             PartLoadFrac = 1.0;
                             for (int speedNum = this->m_CoolingSpeedNum; speedNum <= this->m_NumOfSpeedCooling; speedNum++) {
                                 this->m_CoolingSpeedNum = speedNum;
                                 coilCoolingDXs[this->m_CoolingCoilIndex].simulate(
-                                    useDehumMode, PartLoadFrac, this->m_CoolingSpeedNum, this->m_CoolingSpeedRatio, this->m_FanOpMode);
+                                    useDehumMode, PartLoadFrac, this->m_CoolingSpeedNum, this->m_CoolingSpeedRatio, this->m_FanOpMode, singleMode);
                                 if ((DataLoopNode::Node(OutletNode).HumRat - DesOutHumRat) < Acc) break;
                             }
 
@@ -13058,7 +13078,8 @@ namespace UnitarySystems {
                 }
             }
             bool useDehumMode = (this->m_DehumidificationMode == 1);
-            coilCoolingDXs[this->m_CoolingCoilIndex].simulate(useDehumMode, CycRatio, this->m_CoolingSpeedNum, SpeedRatio, this->m_FanOpMode);
+            bool const singleMode = (this->m_SingleMode == 1);
+            coilCoolingDXs[this->m_CoolingCoilIndex].simulate(useDehumMode, CycRatio, this->m_CoolingSpeedNum, SpeedRatio, this->m_FanOpMode, singleMode);
 
         } else if (CoilTypeNum == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed) {
 
@@ -13705,10 +13726,11 @@ namespace UnitarySystems {
         int CoolingSpeedNum = int(Par[5]);
         Real64 CoolingSpeedRatio = Par[6];
         bool RunOnSensible = (Par[7] == 0.0);
+        bool const singleMode = (Par[8] == 1.0);
         if (CoolingSpeedNum == 1) {
-            coilCoolingDXs[CoilIndex].simulate(useDehumMode, PartLoadRatio, CoolingSpeedNum, CoolingSpeedRatio, FanOpMode);
+            coilCoolingDXs[CoilIndex].simulate(useDehumMode, PartLoadRatio, CoolingSpeedNum, CoolingSpeedRatio, FanOpMode, singleMode);
         } else {
-            coilCoolingDXs[CoilIndex].simulate(useDehumMode, CoolingSpeedRatio, CoolingSpeedNum, PartLoadRatio, FanOpMode);
+            coilCoolingDXs[CoilIndex].simulate(useDehumMode, CoolingSpeedRatio, CoolingSpeedNum, PartLoadRatio, FanOpMode, singleMode);
         }
         Real64 outletCondition = 0.0;
         if (RunOnSensible) {

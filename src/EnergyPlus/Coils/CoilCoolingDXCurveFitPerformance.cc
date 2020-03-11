@@ -162,12 +162,13 @@ void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &in
                                                 Real64 &speedRatio,
                                                 int const fanOpMode,
                                                 DataLoopNode::NodeData &condInletNode,
-                                                DataLoopNode::NodeData &condOutletNode)
+                                                DataLoopNode::NodeData &condOutletNode,
+                                                bool const singleMode)
 {
     if (useAlternateMode) {
-        this->calculate(this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
+        this->calculate(this->alternateMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
     } else {
-        this->calculate(this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
+        this->calculate(this->normalMode, inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
     }
 }
 
@@ -192,11 +193,12 @@ void CoilCoolingDXCurveFitPerformance::calculate(CoilCoolingDXCurveFitOperatingM
                                                  Real64 &speedRatio,
                                                  int const fanOpMode,
                                                  DataLoopNode::NodeData &condInletNode,
-                                                 DataLoopNode::NodeData &condOutletNode)
+                                                 DataLoopNode::NodeData &condOutletNode,
+                                                 bool const singleMode)
 {
 
     // calculate the performance at this mode/speed
-    currentMode.CalcOperatingMode(inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
+    currentMode.CalcOperatingMode(inletNode, outletNode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
 
     // scaling term to get rate into consumptions
     Real64 reportingConstant = DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;

@@ -636,7 +636,7 @@ void CoilCoolingDX::size() {
     this->performance.size();
 }
 
-void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int const fanOpMode)
+void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int const fanOpMode, bool const singleMode)
 {
     if (this->myOneTimeInitFlag) {
         this->oneTimeInit();
@@ -661,7 +661,8 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
     // call the simulation, which returns useful data
     // TODO: check the avail schedule and reset data/pass through data as needed
     // TODO: check the minOATcompressor and reset data/pass through data as needed
-    this->performance.simulate(evapInletNode, evapOutletNode, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode);
+    this->performance.simulate(
+        evapInletNode, evapOutletNode, useAlternateMode, PLR, speedNum, speedRatio, fanOpMode, condInletNode, condOutletNode, singleMode);
     EnergyPlus::CoilCoolingDX::passThroughNodeData(evapInletNode, evapOutletNode);
 
     // calculate energy conversion factor
@@ -795,6 +796,7 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
             int dummySpeedNum = 1;
             Real64 dummySpeedRatio = 1.0;
             int dummyFanOpMode = 1.0;
+            bool dummySingleMode = false;
 
             Real64 const RatedInletAirTemp(26.6667);        // 26.6667C or 80F
             Real64 const RatedInletWetBulbTemp(19.44);      // 19.44 or 67F
@@ -824,7 +826,16 @@ void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Re
             DataEnvironment::OutBaroPress = DataEnvironment::StdPressureSeaLevel; // assume rating is for sea level.
             DataEnvironment::OutHumRat = Psychrometrics::PsyWFnTdbTwbPb(RatedOutdoorAirTemp, ratedOutdoorAirWetBulb, DataEnvironment::StdPressureSeaLevel, "Coil:Cooling:DX::simulate");
 
-            this->performance.simulate(dummyEvapInlet, dummyEvapOutlet, false, dummyPLR, dummySpeedNum, dummySpeedRatio, dummyFanOpMode, dummyCondInlet, dummyCondOutlet);
+            this->performance.simulate(dummyEvapInlet,
+                                       dummyEvapOutlet,
+                                       false,
+                                       dummyPLR,
+                                       dummySpeedNum,
+                                       dummySpeedRatio,
+                                       dummyFanOpMode,
+                                       dummyCondInlet,
+                                       dummyCondOutlet,
+                                       dummySingleMode);
 
             // reset outdoor conditions back to previous state
             DataEnvironment::OutDryBulbTemp = holdOutDryBulbTemp;
