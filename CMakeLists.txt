@@ -15,44 +15,9 @@ endif()
 
 set( CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH} )
 
-set( CMAKE_VERSION_MAJOR 9 )
-set( CMAKE_VERSION_MINOR 3 )
-set( CMAKE_VERSION_PATCH 0 )
-
 set( CMAKE_POSITION_INDEPENDENT_CODE ON )
 
-set( PREV_RELEASE_SHA "921312f" )
-
-set( ENERGYPLUS_VERSION "${CMAKE_VERSION_MAJOR}.${CMAKE_VERSION_MINOR}.${CMAKE_VERSION_PATCH}" )
-
-string( TIMESTAMP CMAKE_YEAR "%Y")
-
-set( CMAKE_VERSION_BUILD "Unknown" CACHE STRING "Build number" )
-find_package(Git)
-
-if(NOT GIT_FOUND)
-  find_program(GIT_EXECUTABLE git HINTS "$ENV{LOCALAPPDATA}/Programs/git/bin")
-  if (NOT GIT_EXECUTABLE_NOTFOUND)
-    set(GIT_FOUND TRUE)
-  endif()
-endif()
-
-if(GIT_FOUND)
-  execute_process(COMMAND "${GIT_EXECUTABLE}" "rev-parse" "--short=10" "HEAD"
-                  WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
-                  TIMEOUT 10
-                  RESULT_VARIABLE RESULT
-                  OUTPUT_VARIABLE GIT_VERSION
-                  ERROR_QUIET
-                  OUTPUT_STRIP_TRAILING_WHITESPACE)
-  if(${RESULT} EQUAL 0 AND NOT "${GIT_VERSION}" EQUAL "${CMAKE_VERSION_BUILD}")
-    set(CMAKE_VERSION_BUILD ${GIT_VERSION} CACHE STRING "Build number" FORCE) # git sha
-  endif()
-
-  get_filename_component(GIT_DIR "${GIT_EXECUTABLE}" PATH)
-else()
-  set(GIT_DIR "")
-endif()
+include(cmake/Version.cmake)
 
 set( OPENGL_REQUIRED OFF CACHE BOOL "Require OpenGL in order to build" )
 if(OPENGL_REQUIRED)
@@ -63,15 +28,6 @@ if(OPENGL_REQUIRED)
   endif()
 else()
   set( OPENGL_FOUND FALSE )
-endif()
-
-# Set a default build type if none was specified
-if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-  message(STATUS "Setting build type to 'Release' as none was specified.")
-  set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
-  # Set the possible values of build type for cmake-gui
-  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release"
-    "MinSizeRel" "RelWithDebInfo")
 endif()
 
 option( BUILD_PACKAGE "Build package" OFF )
@@ -86,6 +42,15 @@ option( ENABLE_GTEST_SHUFFLE "Enable shuffle to eliminate order dependency" ON )
 option( ENABLE_INSTALL_REMOTE "Enable install_remote and install_remote_plist commands to install files from remote resources on the internet" ON )
 
 mark_as_advanced( ENABLE_INSTALL_REMOTE )
+
+# Set a default build type if none was specified
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  message(STATUS "Setting build type to 'Release' as none was specified.")
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+  # Set the possible values of build type for cmake-gui
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release"
+    "MinSizeRel" "RelWithDebInfo")
+endif()
 
 # we are making *a Python 3 Interpreter* a required dependency, so find it here
 find_package(PythonInterp 3 REQUIRED)
@@ -283,22 +248,7 @@ if( BUILD_PACKAGE )
 endif()
 
 if (BUILD_DOCS)
-  # this _should_ find the xelatex compiler, but for some reason it isn't populating for me
-  find_package(LATEX)
-  # so we'll create a cache variable which will be available to the add_subdirectory call below
-  set(XELATEX "XeLaTeX Compiler" CACHE INTERNAL "")
-  # and we'll simply take the found pdflatex compiler path and replace pdflatex with xelatex
-  string(REPLACE pdflatex xelatex XELATEX ${PDFLATEX_COMPILER})
-  # and then verify it actually exists at that location...which it should pretty much every time...
-  if( EXISTS ${XELATEX} )
-    # and if it does, just add the doc/CMakeLists commands
-    add_subdirectory(doc)
-  else()
-    # and if it doesn't, clearly state why it fails
-    message( FATAL_ERROR "Expected to find xelatex at: ${XELATEX} ; check your LaTeX installation")
-  endif()
-  set(TEX_INTERACTION "batchmode" CACHE STRING "Choose the interaction mode for TeX.")
-  set_property(CACHE TEX_INTERACTION PROPERTY STRINGS "nonstopmode" "batchmode")
+  add_subdirectory(doc)
 endif()
 
 # some parameters are simply not needed for everyday building
@@ -314,6 +264,9 @@ mark_as_advanced(KIVA_EXE_BUILD)
 mark_as_advanced(KIVA_GROUND_PLOT)
 mark_as_advanced(KIVA_STATIC_LIB)
 mark_as_advanced(KIVA_TESTING)
+mark_as_advanced(BTWXT_COVERAGE)
+mark_as_advanced(BUILD_BTWXT_TESTING)
+mark_as_advanced(BTWXT_STATIC_LIB)
 mark_as_advanced(RE2_BUILD_TESTING)
 mark_as_advanced(USEPCRE)
 mark_as_advanced(CCACHE_PROGRAM)
