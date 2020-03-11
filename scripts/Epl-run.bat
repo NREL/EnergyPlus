@@ -224,7 +224,6 @@ IF EXIST eplusout.dfs  DEL eplusout.dfs
 IF EXIST slab.int DEL slab.int
 IF EXIST BasementGHTIn.idf DEL BasementGHTIn.idf
 IF EXIST eplusshading.csv DEL eplusshading.csv
-IF EXIST eplusout_perflog.csv DEL eplusout_perflog.csv
 :if %pausing%==Y pause
 
 :  2. Copy input data file to working directory
