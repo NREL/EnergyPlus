@@ -5367,13 +5367,24 @@ namespace UnitarySystems {
                                           "LatentWithSensibleLoadControl.");
                     }
                 }
-                if ((thisSys.m_DehumidControlType_Num == DehumCtrlType::CoolReheat || thisSys.m_DehumidControlType_Num == DehumCtrlType::Multimode) &&
-                    !thisSys.m_RunOnLatentLoad && !thisSys.m_RunOnLatentOnlyWithSensible) {
-                    ShowWarningError(cCurrentModuleObject + " = " + thisObjectName);
-                    ShowContinueError("Inconsistent moisture control inputs.");
-                    ShowContinueError("Dehumidification Control Type = " + loc_dehumm_ControlType);
-                    ShowContinueError("Latent Load Control = " + loc_latentControlFlag);
-                    ShowContinueError("Humidity/Moisture will not be controlled with these settings.");
+                if (thisSys.m_DehumidControlType_Num == DehumCtrlType::CoolReheat || thisSys.m_DehumidControlType_Num == DehumCtrlType::Multimode) {
+                    if (!thisSys.m_RunOnLatentLoad && !thisSys.m_RunOnLatentOnlyWithSensible && thisSys.m_ControlType == ControlType::Load) {
+                        ShowWarningError(cCurrentModuleObject + " = " + thisObjectName);
+                        ShowContinueError("Inconsistent moisture control inputs.");
+                        ShowContinueError("Dehumidification Control Type = " + loc_dehumm_ControlType);
+                        ShowContinueError("Latent Load Control = " + loc_latentControlFlag);
+                        ShowContinueError("Humidity/Moisture may not be controlled with these settings.");
+                    }
+                } else {
+                    if (thisSys.m_RunOnLatentLoad || thisSys.m_RunOnLatentOnlyWithSensible && thisSys.m_ControlType == ControlType::Load) {
+                        ShowWarningError(cCurrentModuleObject + " = " + thisObjectName);
+                        ShowContinueError("Inconsistent moisture control inputs.");
+                        ShowContinueError("Dehumidification Control Type = " + loc_dehumm_ControlType);
+                        ShowContinueError("Latent Load Control = " + loc_latentControlFlag);
+                        ShowContinueError("Humidity/Moisture will not be controlled with these settings.");
+                        thisSys.m_RunOnLatentLoad = false;
+                        thisSys.m_RunOnLatentOnlyWithSensible = false;
+                    }
                 }
                 // Get reheat coil data if humidistat is used
                 thisSys.m_SuppHeatCoilName = loc_m_SuppHeatCoilName;
@@ -8003,6 +8014,7 @@ namespace UnitarySystems {
                     if (DataGlobals::DoCoilDirectSolutions && this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
                         this->FullOutput[SpeedNum] = SensOutputOn;
                     }
+                    // over specified logic? it has to be a water coil? what about other VS coil models?
                     if ((this->m_CoolingCoilType_Num != DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) &&
                         ((this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWater ||
                           this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterDetailed) &&
@@ -8479,6 +8491,7 @@ namespace UnitarySystems {
         // FullSensibleOutput is used to set supplemental heater PLR in calling routine
         // OnOffAirFlowRatio is used to average air flow between ON and OFF state
         FullSensibleOutput = TempSensOutput;
+        LatOutputOn = TempLatOutput;
 
         // RETURN if the moisture load is met
         if (MoistureLoad >= 0.0 || MoistureLoad >= TempLatOutput) return;
@@ -8557,6 +8570,9 @@ namespace UnitarySystems {
 
             if (this->m_DehumidControlType_Num == DehumCtrlType::Multimode && MoistureLoad < LatOutputOn) {
                 HXUnitOn = true;
+                CoolingLoad = true;
+                CoolPLR = 1.0;
+                this->m_CoolingPartLoadFrac = 1.0;
                 this->calcUnitarySystemToLoad(AirLoopNum,
                                               FirstHVACIteration,
                                               CoolPLR,
@@ -8569,6 +8585,80 @@ namespace UnitarySystems {
                                               SupHeaterLoad,
                                               CompressorONFlag);
                 FullSensibleOutput = TempSensOutput;
+            }
+
+            if (MoistureLoad < LatOutputOn && this->m_DehumidControlType_Num == DehumCtrlType::CoolReheat) {
+                if (this->m_NumOfSpeedCooling > 0) {
+                    for (SpeedNum = this->m_CoolingSpeedNum; SpeedNum <= this->m_NumOfSpeedCooling; ++SpeedNum) {
+                        CoolPLR = 1.0;
+                        this->m_CoolingPartLoadFrac = CoolPLR;
+                        this->m_CoolingSpeedRatio = 1.0;
+                        this->m_CoolingCycRatio = 1.0;
+                        this->m_CoolingSpeedNum = SpeedNum;
+                        this->calcUnitarySystemToLoad(AirLoopNum,
+                                                      FirstHVACIteration,
+                                                      CoolPLR,
+                                                      HeatPLR,
+                                                      OnOffAirFlowRatio,
+                                                      SensOutputOn,
+                                                      LatOutputOn,
+                                                      HXUnitOn,
+                                                      HeatCoilLoad,
+                                                      SupHeaterLoad,
+                                                      CompressorONFlag);
+                        if (DataGlobals::DoCoilDirectSolutions && this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_MultiSpeedCooling) {
+                            this->FullOutput[SpeedNum] = SensOutputOn;
+                        }
+                        // over specified logic? it has to be a water coil? what about other VS coil models?
+                        if ((this->m_CoolingCoilType_Num != DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit) &&
+                            ((this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWater ||
+                              this->m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterDetailed) &&
+                             !this->m_DiscreteSpeedCoolingCoil)) {
+                            this->m_CoolingSpeedRatio = 0.0;
+                            this->m_CoolingSpeedNum = SpeedNum - 1;
+                            if (this->m_CoolingSpeedNum == 0) {
+                                this->m_CoolingCycRatio = 0.0;
+                                CoolPLR = 0.0;
+                            } else {
+                                this->m_CoolingCycRatio = 1.0;
+                                this->m_CoolingSpeedRatio = 0.0;
+                                if (this->m_SingleMode == 1) {
+                                    CoolPLR = 1.0;
+                                }
+                            }
+
+                            this->calcUnitarySystemToLoad(AirLoopNum,
+                                                          FirstHVACIteration,
+                                                          CoolPLR,
+                                                          HeatPLR,
+                                                          OnOffAirFlowRatio,
+                                                          SensOutputOn,
+                                                          LatOutputOn,
+                                                          HXUnitOn,
+                                                          HeatCoilLoad,
+                                                          SupHeaterLoad,
+                                                          CompressorONFlag);
+                            this->m_CoolingSpeedNum = SpeedNum;
+                        }
+                        if (MoistureLoad >= LatOutputOn) {
+                            break;
+                        }
+                    }
+                } else {
+                    CoolPLR = 1.0;
+                    this->calcUnitarySystemToLoad(AirLoopNum,
+                                                  FirstHVACIteration,
+                                                  CoolPLR,
+                                                  HeatPLR,
+                                                  OnOffAirFlowRatio,
+                                                  SensOutputOn,
+                                                  LatOutputOn,
+                                                  HXUnitOn,
+                                                  HeatCoilLoad,
+                                                  SupHeaterLoad,
+                                                  CompressorONFlag);
+                    this->m_CoolingPartLoadFrac = CoolPLR;
+                }
             }
 
             //    IF ((HeatingLoad .AND. MoistureLoad < TempLatOutput) .OR. &
@@ -8602,11 +8692,7 @@ namespace UnitarySystems {
                 Par[11] = double(AirLoopNum);
                 // Tolerance is fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
                 General::SolveRoot(0.001, MaxIter, SolFlagLat, PartLoadRatio, this->calcUnitarySystemLoadResidual, 0.0, 1.0, Par);
-                //      IF (HeatingLoad) THEN
-                //        UnitarySystem(UnitarySysNum)%HeatingPartLoadFrac = PartLoadRatio
-                //      ELSE
                 this->m_CoolingPartLoadFrac = PartLoadRatio;
-                //      END IF
                 this->m_HeatingPartLoadFrac = HeatPLR;
             } else if (MoistureLoad < LatOutputOn && CoolingLoad) {
                 //     Logic below needs further look...what to do if the bounds check for RegulaFalsi fail?
@@ -10631,7 +10717,7 @@ namespace UnitarySystems {
 
         // Check the dehumidification control type. IF it's multimode, turn off the HX to find the sensible PLR. Then check to
         // see if the humidity load is met without the use of the HX. Always run the HX for the other modes.
-        if (this->m_DehumidControlType_Num != DehumCtrlType::Multimode) {
+        if (this->m_DehumidControlType_Num != DehumCtrlType::Multimode && this->m_CoolingCoilType_Num != DataHVACGlobals::CoilDX_Cooling) {
             HXUnitOn = true;
         } else {
             HXUnitOn = false;
