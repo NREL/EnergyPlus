@@ -229,6 +229,8 @@ namespace EMSManager {
             AnyEnergyManagementSystemInModel = false;
         }
 
+        AnyEnergyManagementSystemInModel = AnyEnergyManagementSystemInModel || DataGlobals::externalHVACManager;
+
         if (AnyEnergyManagementSystemInModel) {
 
             ScanForReports("EnergyManagementSystem", OutputEDDFile);
