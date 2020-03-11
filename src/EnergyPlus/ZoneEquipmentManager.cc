@@ -3610,7 +3610,7 @@ namespace ZoneEquipmentManager {
                             TurnFansOff = true;
                         }
 
-                        ManageZoneAirLoopEquipment(PrioritySimOrder(EquipTypeNum).EquipName,
+                        ManageZoneAirLoopEquipment(state, PrioritySimOrder(EquipTypeNum).EquipName,
                                                    FirstHVACIteration,
                                                    AirSysOutput,
                                                    NonAirSysOutput,
@@ -3767,7 +3767,7 @@ namespace ZoneEquipmentManager {
                         LatOutputProvided = 0.0; // This baseboard does not add/remove any latent heat
 
                     } else if (SELECT_CASE_var == BBElectricConvective_Num) { // 'ZoneHVAC:Baseboard:Convective:Electric'
-                        SimElectricBaseboard(PrioritySimOrder(EquipTypeNum).EquipName,
+                        SimElectricBaseboard(state, PrioritySimOrder(EquipTypeNum).EquipName,
                                              ActualZoneNum,
                                              ControlledZoneNum,
                                              SysOutputProvided,
@@ -3777,7 +3777,7 @@ namespace ZoneEquipmentManager {
                         LatOutputProvided = 0.0; // This baseboard does not add/remove any latent heat
 
                     } else if (SELECT_CASE_var == CoolingPanel_Num) { // 'ZoneHVAC:CoolingPanel:RadiantConvective:Water'
-                        SimCoolingPanel(PrioritySimOrder(EquipTypeNum).EquipName,
+                        SimCoolingPanel(state, PrioritySimOrder(EquipTypeNum).EquipName,
                                         ActualZoneNum,
                                         ControlledZoneNum,
                                         FirstHVACIteration,
@@ -3871,7 +3871,7 @@ namespace ZoneEquipmentManager {
                                           ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
 
                     } else if (SELECT_CASE_var == BBElectric_Num) { // 'ZoneHVAC:Baseboard:RadiantConvective:Electric'
-                        SimElecBaseboard(PrioritySimOrder(EquipTypeNum).EquipName,
+                        SimElecBaseboard(state, PrioritySimOrder(EquipTypeNum).EquipName,
                                          ActualZoneNum,
                                          ControlledZoneNum,
                                          FirstHVACIteration,

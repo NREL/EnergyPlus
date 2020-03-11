@@ -217,7 +217,7 @@ namespace BaseboardRadiator {
             }
         }
 
-        InitBaseboard(BaseboardNum, ControlledZoneNum);
+        InitBaseboard(state, BaseboardNum, ControlledZoneNum);
 
         QZnReq = ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToHeatSP;
 
@@ -556,7 +556,7 @@ namespace BaseboardRadiator {
         }
     }
 
-    void InitBaseboard(int const BaseboardNum, int const ControlledZoneNumSub)
+    void InitBaseboard(AllGlobals &state, int const BaseboardNum, int const ControlledZoneNumSub)
     {
 
         // SUBROUTINE INFORMATION:
@@ -650,7 +650,7 @@ namespace BaseboardRadiator {
 
         if (!SysSizingCalc && MySizeFlag(BaseboardNum) && !SetLoopIndexFlag(BaseboardNum)) {
             // for each coil, do the sizing once.
-            SizeBaseboard(BaseboardNum);
+            SizeBaseboard(state, BaseboardNum);
 
             MySizeFlag(BaseboardNum) = false;
         }

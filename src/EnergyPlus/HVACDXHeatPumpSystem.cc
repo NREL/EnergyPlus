@@ -191,7 +191,7 @@ namespace HVACDXHeatPumpSystem {
         // Obtains and Allocates DX Cooling System related parameters from input file
         if (GetInputFlag) { // First time subroutine has been entered
             // Get the DXCoolingSystem input
-            GetDXHeatPumpSystemInput();
+            GetDXHeatPumpSystemInput(state);
             GetInputFlag = false;
         }
 
@@ -283,7 +283,7 @@ namespace HVACDXHeatPumpSystem {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetDXHeatPumpSystemInput()
+    void GetDXHeatPumpSystemInput(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -402,10 +402,10 @@ namespace HVACDXHeatPumpSystem {
                     DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType, DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilName, ErrorsFound);
             } else {
                 DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilInletNodeNum =
-                    GetCoilInletNode(DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType, DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilName, ErrorsFound);
+                    GetCoilInletNode(state, DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType, DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilName, ErrorsFound);
 
                 DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilOutletNodeNum =
-                    GetCoilOutletNode(DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType, DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilName, ErrorsFound);
+                    GetCoilOutletNode(state, DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilType, DXHeatPumpSystem(DXHeatSysNum).HeatPumpCoilName, ErrorsFound);
             }
 
             // Coil air-side outlet node is the control node
@@ -1300,7 +1300,7 @@ namespace HVACDXHeatPumpSystem {
         return Residuum;
     }
 
-    int GetHeatingCoilInletNodeNum(
+    int GetHeatingCoilInletNodeNum(AllGlobals &state,
         std::string const &DXHeatCoilSysName)
     {
         // SUBROUTINE INFORMATION:
@@ -1316,7 +1316,7 @@ namespace HVACDXHeatPumpSystem {
         int DXHeatSysNum;
 
         if (GetInputFlag) { // First time subroutine has been entered
-            GetDXHeatPumpSystemInput();
+            GetDXHeatPumpSystemInput(state);
             GetInputFlag = false;
         }
 
@@ -1331,7 +1331,7 @@ namespace HVACDXHeatPumpSystem {
         return NodeNum;
     }
 
-    int GetHeatingCoilOutletNodeNum(
+    int GetHeatingCoilOutletNodeNum(AllGlobals &state,
         std::string const &DXHeatCoilSysName)
     {
         // SUBROUTINE INFORMATION:
@@ -1347,7 +1347,7 @@ namespace HVACDXHeatPumpSystem {
         int DXHeatSysNum;
 
         if (GetInputFlag) { // First time subroutine has been entered
-            GetDXHeatPumpSystemInput();
+            GetDXHeatPumpSystemInput(state);
             GetInputFlag = false;
         }
 

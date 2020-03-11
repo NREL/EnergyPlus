@@ -1122,7 +1122,7 @@ TEST_F(EnergyPlusFixture, AutosizeLowTempRadiantVariableFlowTest)
     EXPECT_FALSE(ErrorsFound);
 
     GetPlantSizingInput();
-    GetPlantLoopData();
+    GetPlantLoopData(state);
     GetPlantInput(state);
     SetupInitialPlantCallingOrder();
     SetupBranchControlTypes();

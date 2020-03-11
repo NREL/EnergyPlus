@@ -972,7 +972,7 @@ namespace FaultsManager {
                     }
                     // Read in controller input if not done yet
                     if (HVACControllers::GetControllerInputFlag) {
-                        HVACControllers::GetControllerInput();
+                        HVACControllers::GetControllerInput(state);
                         HVACControllers::GetControllerInputFlag = false;
                     }
                     // Check the controller name
@@ -1016,7 +1016,7 @@ namespace FaultsManager {
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "CoilSystem:Heating:DX")) {
                     // Read in DXCoolingSystem input if not done yet
                     if (HVACDXHeatPumpSystem::GetInputFlag) {
-                        HVACDXHeatPumpSystem::GetDXHeatPumpSystemInput();
+                        HVACDXHeatPumpSystem::GetDXHeatPumpSystemInput(state);
                         HVACDXHeatPumpSystem::GetInputFlag = false;
                     }
 

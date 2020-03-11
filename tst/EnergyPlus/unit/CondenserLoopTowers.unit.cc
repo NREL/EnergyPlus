@@ -3040,7 +3040,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_Sizing
 
     BranchInputManager::ManageBranchInput(); // just gets input and returns.
     // Get plant loop data
-    PlantManager::GetPlantLoopData();
+    PlantManager::GetPlantLoopData(state);
     PlantManager::GetPlantInput(state);
     SizingManager::GetPlantSizingInput();
     PlantManager::InitOneTimePlantSizingInfo(1);
@@ -3434,7 +3434,7 @@ TEST_F(EnergyPlusFixture, CondenserLoopTowers_SingleSpeedUser_SizingError_UserSp
 
     BranchInputManager::ManageBranchInput(); // just gets input and returns.
     // Get plant loop data
-    PlantManager::GetPlantLoopData();
+    PlantManager::GetPlantLoopData(state);
     PlantManager::GetPlantInput(state);
     SizingManager::GetPlantSizingInput();
     PlantManager::InitOneTimePlantSizingInfo(1);

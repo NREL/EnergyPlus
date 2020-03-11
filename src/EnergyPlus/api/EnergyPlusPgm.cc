@@ -307,10 +307,10 @@ int initializeEnergyPlus(AllGlobals &state, std::string const & filepath) {
         }
         ResultsFramework::OutputSchema->setupOutputOptions();
     } catch (const FatalError &e) {
-        return AbortEnergyPlus();
+        return AbortEnergyPlus(state);
     } catch (const std::exception &e) {
         ShowSevereError(e.what());
-        return AbortEnergyPlus();
+        return AbortEnergyPlus(state);
     }
     return 0;
 }
@@ -367,15 +367,15 @@ int initializeAsLibrary(AllGlobals &state) {
         EnergyPlus::inputProcessor->processInput();
         ResultsFramework::OutputSchema->setupOutputOptions();
     } catch (const FatalError &e) {
-        return AbortEnergyPlus();
+        return AbortEnergyPlus(state);
     } catch (const std::exception &e) {
         ShowSevereError(e.what());
-        return AbortEnergyPlus();
+        return AbortEnergyPlus(state);
     }
     return 0;
 }
 
-int wrapUpEnergyPlus() {
+int wrapUpEnergyPlus(AllGlobals &state) {
     using namespace EnergyPlus;
 
     try {
@@ -396,10 +396,10 @@ int wrapUpEnergyPlus() {
             }
         }
     } catch (const FatalError &e) {
-        return AbortEnergyPlus();
+        return AbortEnergyPlus(state);
     } catch (const std::exception &e) {
         ShowSevereError(e.what());
-        return AbortEnergyPlus();
+        return AbortEnergyPlus(state);
     }
 
     return EndEnergyPlus();
@@ -428,12 +428,12 @@ int RunEnergyPlus(AllGlobals &state, std::string const & filepath)
     try {
         EnergyPlus::SimulationManager::ManageSimulation(state,EnergyPlus::OutputFiles::getSingleton());
     } catch (const EnergyPlus::FatalError &e) {
-        return EnergyPlus::AbortEnergyPlus();
+        return EnergyPlus::AbortEnergyPlus(state);
     } catch (const std::exception &e) {
         EnergyPlus::ShowSevereError(e.what());
-        return EnergyPlus::AbortEnergyPlus();
+        return EnergyPlus::AbortEnergyPlus(state);
     }
-    return wrapUpEnergyPlus();
+    return wrapUpEnergyPlus(state);
 }
 
 int runEnergyPlusAsLibrary(AllGlobals &state, int argc, const char *argv[])
@@ -468,12 +468,12 @@ int runEnergyPlusAsLibrary(AllGlobals &state, int argc, const char *argv[])
     try {
         EnergyPlus::SimulationManager::ManageSimulation(state, EnergyPlus::OutputFiles::getSingleton());
     } catch (const EnergyPlus::FatalError &e) {
-        return EnergyPlus::AbortEnergyPlus();
+        return EnergyPlus::AbortEnergyPlus(state);
     } catch (const std::exception &e) {
         EnergyPlus::ShowSevereError(e.what());
-        return EnergyPlus::AbortEnergyPlus();
+        return EnergyPlus::AbortEnergyPlus(state);
     }
-    return wrapUpEnergyPlus();
+    return wrapUpEnergyPlus(state);
 }
 
 void StoreProgressCallback(void (*f)(int const))

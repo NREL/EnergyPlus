@@ -134,12 +134,12 @@ TEST_F(EnergyPlusFixture, HVACControllers_ResetHumidityRatioCtrlVarType)
     // check specified control variable type is "HumidityRatio"
     ASSERT_EQ(iCtrlVarType_HumRat, AllSetPtMgr(1).CtrlTypeMode);
 
-    GetControllerInput();
+    GetControllerInput(state);
     // check control variable type in AllSetPtMgr is reset to "MaximumHumidityRatio"
     ASSERT_EQ(iCtrlVarType_MaxHumRat, AllSetPtMgr(1).CtrlTypeMode);
 
     // ControllerProps always expects the control variable type to be "HumididtyRatio"
-    ControllerProps(1).HumRatCntrlType = GetHumidityRatioVariableType(ControllerProps(1).SensedNode);
+    ControllerProps(1).HumRatCntrlType = GetHumidityRatioVariableType(state, ControllerProps(1).SensedNode);
     ASSERT_EQ(iCtrlVarType_HumRat, ControllerProps(1).HumRatCntrlType);
 }
 
@@ -202,12 +202,12 @@ TEST_F(EnergyPlusFixture, HVACControllers_TestTempAndHumidityRatioCtrlVarType)
     // check specified control variable type is "HumidityRatio"
     ASSERT_EQ(iCtrlVarType_MaxHumRat, AllSetPtMgr(1).CtrlTypeMode);
 
-    GetControllerInput();
+    GetControllerInput(state);
     // check control variable type in AllSetPtMgr is reset to "MaximumHumidityRatio"
     ASSERT_EQ(iCtrlVarType_MaxHumRat, AllSetPtMgr(1).CtrlTypeMode);
 
     // ControllerProps expects the control variable type to be "MaximumHumididtyRatio"
-    ControllerProps(1).HumRatCntrlType = GetHumidityRatioVariableType(ControllerProps(1).SensedNode);
+    ControllerProps(1).HumRatCntrlType = GetHumidityRatioVariableType(state, ControllerProps(1).SensedNode);
     ASSERT_EQ(iCtrlVarType_MaxHumRat, ControllerProps(1).HumRatCntrlType);
 
     // test index for air loop controllers
@@ -350,9 +350,9 @@ TEST_F(EnergyPlusFixture, HVACControllers_SchSetPointMgrsOrderTest)
     ASSERT_EQ(iTemperature, AllSetPtMgr(1).CtrlTypeMode);           // is "Temperature"
     ASSERT_EQ(iCtrlVarType_MaxHumRat, AllSetPtMgr(2).CtrlTypeMode); // is "MaximumHumidityRatio"
 
-    GetControllerInput();
+    GetControllerInput(state);
     // check ControllerProps control variable is set to "MaximumHumidityRatio"
-    ControllerProps(1).HumRatCntrlType = GetHumidityRatioVariableType(ControllerProps(1).SensedNode);
+    ControllerProps(1).HumRatCntrlType = GetHumidityRatioVariableType(state, ControllerProps(1).SensedNode);
     ASSERT_EQ(iCtrlVarType_MaxHumRat, ControllerProps(1).HumRatCntrlType); // MaximumHumidityRatio
 }
 
@@ -397,7 +397,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnPrimaryLoopCheckTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetControllerInput();
+    GetControllerInput(state);
 
     ASSERT_EQ(WaterCoil(1).Name, "CHILLED WATER COIL");
     ASSERT_EQ(WaterCoil(1).WaterCoilType_Num, WaterCoils::WaterCoil_Cooling);
@@ -433,7 +433,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnPrimaryLoopCheckTest)
     EXPECT_TRUE(WaterCoilOnAirLoop);
 
     WaterCoilOnAirLoop = true;
-    WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnOASystem(CoilTypeNum, CompName);
+    WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnOASystem(state, CoilTypeNum, CompName);
     EXPECT_FALSE(WaterCoilOnAirLoop);
 
     WaterCoilOnAirLoop = true;
@@ -490,7 +490,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnOutsideAirSystemCheckTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetControllerInput();
+    GetControllerInput(state);
 
     ASSERT_EQ(WaterCoil(1).Name, "OA PREHEAT HW COIL");
     ASSERT_EQ(WaterCoil(1).WaterCoilType_Num, WaterCoils::WaterCoil_SimpleHeating);
@@ -538,7 +538,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnOutsideAirSystemCheckTest)
     EXPECT_FALSE(WaterCoilOnAirLoop);
 
     WaterCoilOnAirLoop = false;
-    WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnOASystem(CoilTypeNum, CompName);
+    WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnOASystem(state, CoilTypeNum, CompName);
     EXPECT_TRUE(WaterCoilOnAirLoop);
 
     WaterCoilOnAirLoop = false;
@@ -548,7 +548,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_WaterCoilOnOutsideAirSystemCheckTest)
     // test a different water coil type
     CoilTypeNum = SimAirServingZones::WaterCoil_DetailedCool;
     WaterCoilOnAirLoop = true;
-    WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnOASystem(CoilTypeNum, CompName);
+    WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnOASystem(state, CoilTypeNum, CompName);
     EXPECT_FALSE(WaterCoilOnAirLoop);
 }
 TEST_F(EnergyPlusFixture, HVACControllers_CoilSystemCoolingWaterOnOutsideAirSystemCheckTest)
@@ -622,7 +622,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_CoilSystemCoolingWaterOnOutsideAirSyst
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetControllerInput();
+    GetControllerInput(state);
 
     ASSERT_EQ(WaterCoil(1).Name, "DETAILED PRE COOLING COIL");
     ASSERT_EQ(WaterCoil(1).WaterCoilType_Num, WaterCoils::WaterCoil_DetFlatFinCooling);
@@ -670,7 +670,7 @@ TEST_F(EnergyPlusFixture, HVACControllers_CoilSystemCoolingWaterOnOutsideAirSyst
     EXPECT_FALSE(WaterCoilOnAirLoop);
 
     WaterCoilOnAirLoop = true;
-    WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnOASystem(CoilTypeNum, CompName);
+    WaterCoilOnAirLoop = SimAirServingZones::CheckWaterCoilOnOASystem(state, CoilTypeNum, CompName);
     EXPECT_FALSE(WaterCoilOnAirLoop);
 
     WaterCoilOnAirLoop = false;

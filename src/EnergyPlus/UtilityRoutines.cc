@@ -81,6 +81,7 @@ extern "C" {
 #include <EnergyPlus/ExternalInterface.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
@@ -484,7 +485,7 @@ namespace UtilityRoutines {
 
 } // namespace UtilityRoutines
 
-int AbortEnergyPlus()
+int AbortEnergyPlus(AllGlobals &state)
 {
 
     // SUBROUTINE INFORMATION:
@@ -566,7 +567,7 @@ int AbortEnergyPlus()
         TerminalError = false;
         TestBranchIntegrity(ErrFound);
         if (ErrFound) TerminalError = true;
-        TestAirPathIntegrity(ErrFound);
+        TestAirPathIntegrity(state, ErrFound);
         if (ErrFound) TerminalError = true;
         CheckMarkedNodes(ErrFound);
         if (ErrFound) TerminalError = true;

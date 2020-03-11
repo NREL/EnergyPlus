@@ -309,7 +309,7 @@ namespace MixedAir {
         void CalcOAEconomizer(AllGlobals &state, 
             int const AirLoopNum, Real64 const OutAirMinFrac, Real64 &OASignal, bool &HighHumidityOperationFlag, bool const FirstHVACIteration);
 
-        void SizeOAController();
+        void SizeOAController(AllGlobals &state);
 
         void UpdateOAController();
 
@@ -467,7 +467,7 @@ namespace MixedAir {
 
     void GetOAMixerInputs();
 
-    void ProcessOAControllerInputs(std::string const &CurrentModuleObject,
+    void ProcessOAControllerInputs(AllGlobals &state, std::string const &CurrentModuleObject,
                                    int const OutAirNum,
                                    Array1_string const &AlphArray,
                                    int &NumAlphas,
@@ -488,7 +488,7 @@ namespace MixedAir {
 
     void InitOutsideAirSys(AllGlobals &state, int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum);
 
-    void InitOAController(int const OAControllerNum, bool const FirstHVACIteration, int const AirLoopNum);
+    void InitOAController(AllGlobals &state, int const OAControllerNum, bool const FirstHVACIteration, int const AirLoopNum);
 
     void InitOAMixer(int const OAMixerNum, bool const FirstHVACIteration);
 

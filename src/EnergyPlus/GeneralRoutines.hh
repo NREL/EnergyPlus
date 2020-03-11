@@ -145,11 +145,11 @@ void CalcBasinHeaterPower(Real64 const Capacity,     // Basin heater capacity pe
                           Real64 &Power              // Basin heater power (W)
 );
 
-void TestAirPathIntegrity(bool &ErrFound);
+void TestAirPathIntegrity(AllGlobals &state, bool &ErrFound);
 
-void TestSupplyAirPathIntegrity(bool &ErrFound);
+void TestSupplyAirPathIntegrity(AllGlobals &state, bool &ErrFound);
 
-void TestReturnAirPathIntegrity(bool &ErrFound, Array2S_int ValRetAPaths);
+void TestReturnAirPathIntegrity(AllGlobals &state, bool &ErrFound, Array2S_int ValRetAPaths);
 
 } // namespace EnergyPlus
 

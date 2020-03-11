@@ -1183,7 +1183,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcGFunction_Check)
     ASSERT_TRUE(process_idf(idf_objects));
     ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
-    GetPlantLoopData();
+    GetPlantLoopData(state);
     GetPlantInput(state);
     SetupInitialPlantCallingOrder();
     SetupBranchControlTypes();
@@ -1665,7 +1665,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_convection_re
     ASSERT_TRUE(process_idf(idf_objects));
     ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
-    GetPlantLoopData();
+    GetPlantLoopData(state);
     GetPlantInput(state);
     SetupInitialPlantCallingOrder();
     SetupBranchControlTypes();
@@ -1969,7 +1969,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calc_pipe_resistance)
     ASSERT_TRUE(process_idf(idf_objects));
     ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
-    GetPlantLoopData();
+    GetPlantLoopData(state);
     GetPlantInput(state);
     SetupInitialPlantCallingOrder();
     SetupBranchControlTypes();
@@ -2265,7 +2265,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_1
     ASSERT_TRUE(process_idf(idf_objects));
     ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
-    GetPlantLoopData();
+    GetPlantLoopData(state);
     GetPlantInput(state);
     SetupInitialPlantCallingOrder();
     SetupBranchControlTypes();
@@ -2563,7 +2563,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_2
     ASSERT_TRUE(process_idf(idf_objects));
     ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
-    GetPlantLoopData();
+    GetPlantLoopData(state);
     GetPlantInput(state);
     SetupInitialPlantCallingOrder();
     SetupBranchControlTypes();
@@ -2861,7 +2861,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHGroutResistance_3
     ASSERT_TRUE(process_idf(idf_objects));
     ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
-    GetPlantLoopData();
+    GetPlantLoopData(state);
     GetPlantInput(state);
     SetupInitialPlantCallingOrder();
     SetupBranchControlTypes();
@@ -3159,7 +3159,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
     ASSERT_TRUE(process_idf(idf_objects));
     ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
-    GetPlantLoopData();
+    GetPlantLoopData(state);
     GetPlantInput(state);
     SetupInitialPlantCallingOrder();
     SetupBranchControlTypes();
@@ -3457,7 +3457,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
     ASSERT_TRUE(process_idf(idf_objects));
     ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
-    GetPlantLoopData();
+    GetPlantLoopData(state);
     GetPlantInput(state);
     SetupInitialPlantCallingOrder();
     SetupBranchControlTypes();
@@ -3755,7 +3755,7 @@ TEST_F(EnergyPlusFixture, GroundHeatExchangerTest_System_calcBHTotalInternalResi
     ASSERT_TRUE(process_idf(idf_objects));
     ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleInputProcessed = true;
-    GetPlantLoopData();
+    GetPlantLoopData(state);
     GetPlantInput(state);
     SetupInitialPlantCallingOrder();
     SetupBranchControlTypes();

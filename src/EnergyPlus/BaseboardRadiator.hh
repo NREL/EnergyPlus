@@ -159,9 +159,9 @@ namespace BaseboardRadiator {
 
     void GetBaseboardInput();
 
-    void InitBaseboard(int const BaseboardNum, int const ControlledZoneNumSub);
+    void InitBaseboard(AllGlobals &state, int const BaseboardNum, int const ControlledZoneNumSub);
 
-    void SizeBaseboard(int const BaseboardNum);
+    void SizeBaseboard(AllGlobals &state, int const BaseboardNum);
 
     void SimHWConvective(int &BaseboardNum, Real64 &LoadMet);
 

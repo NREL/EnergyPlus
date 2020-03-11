@@ -13440,7 +13440,7 @@ TEST_F(EnergyPlusFixture, BasicAdvancedSingleSidedAvoidCrashTest)
     AirflowNetworkBalanceManager::GetAirflowNetworkInput(state, OutputFiles::getSingleton());
     AirflowNetworkGetInputFlag = false;
     AirflowNetwork::AirflowNetworkExchangeData.allocate(1);
-    ManageAirflowNetworkBalance(First, iter, resimu);
+    ManageAirflowNetworkBalance(state, First, iter, resimu);
     EXPECT_FALSE(resimu);
 }
 

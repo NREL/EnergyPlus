@@ -706,7 +706,7 @@ namespace Furnaces {
                         SimulateFanComponents(state, BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
                     }
 
-                    SimWatertoAirHPSimple(BlankString,
+                    SimWatertoAirHPSimple(state, BlankString,
                                           Furnace(FurnaceNum).CoolingCoilIndex,
                                           Furnace(FurnaceNum).CoolingCoilSensDemand,
                                           Furnace(FurnaceNum).CoolingCoilLatentDemand,
@@ -718,7 +718,7 @@ namespace Furnaces {
                                           CompOp,
                                           Furnace(FurnaceNum).CoolPartLoadRatio,
                                           FirstHVACIteration);
-                    SimWatertoAirHPSimple(BlankString,
+                    SimWatertoAirHPSimple(state, BlankString,
                                           Furnace(FurnaceNum).HeatingCoilIndex,
                                           Furnace(FurnaceNum).HeatingCoilSensDemand,
                                           Dummy,
@@ -1338,7 +1338,7 @@ namespace Furnaces {
 
                     // Get the Heating Coil Inlet Node
                     errFlag = false;
-                    HeatingCoilInletNode = GetWaterCoilInletNode("Coil:Heating:Water", HeatingCoilName, errFlag);
+                    HeatingCoilInletNode = GetWaterCoilInletNode(state, "Coil:Heating:Water", HeatingCoilName, errFlag);
                     Furnace(FurnaceNum).HWCoilAirInletNode = HeatingCoilInletNode;
                     if (errFlag) {
                         ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Furnace(FurnaceNum).Name);
@@ -1347,7 +1347,7 @@ namespace Furnaces {
 
                     // Get the Heating Coil Outlet Node
                     errFlag = false;
-                    HeatingCoilOutletNode = GetWaterCoilOutletNode("Coil:Heating:Water", HeatingCoilName, errFlag);
+                    HeatingCoilOutletNode = GetWaterCoilOutletNode(state, "Coil:Heating:Water", HeatingCoilName, errFlag);
                     Furnace(FurnaceNum).HWCoilAirOutletNode = HeatingCoilOutletNode;
                     if (errFlag) {
                         ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Furnace(FurnaceNum).Name);
@@ -1356,7 +1356,7 @@ namespace Furnaces {
 
                     // check if user has also used a water coil controller, which they should not do
                     errFlag = false;
-                    CheckCoilWaterInletNode(Furnace(FurnaceNum).CoilControlNode, errFlag);
+                    CheckCoilWaterInletNode(state, Furnace(FurnaceNum).CoilControlNode, errFlag);
                     if (!errFlag) { // then did find a controller so that is bad
                         ShowSevereError(CurrentModuleObject + " = " + Furnace(FurnaceNum).Name + " has a conflicting Controller:WaterCoil object");
                         ShowContinueError("Hot water coils are controlled directly by unitary and furnace systems.");
@@ -1883,7 +1883,7 @@ namespace Furnaces {
 
                     // Get the Heating Coil Inlet Node
                     errFlag = false;
-                    HeatingCoilInletNode = GetWaterCoilInletNode("Coil:Heating:Water", HeatingCoilName, errFlag);
+                    HeatingCoilInletNode = GetWaterCoilInletNode(state, "Coil:Heating:Water", HeatingCoilName, errFlag);
                     Furnace(FurnaceNum).HWCoilAirInletNode = HeatingCoilInletNode;
                     if (errFlag) {
                         ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Furnace(FurnaceNum).Name);
@@ -1892,7 +1892,7 @@ namespace Furnaces {
 
                     // Get the Heating Coil Outlet Node
                     errFlag = false;
-                    HeatingCoilOutletNode = GetWaterCoilOutletNode("Coil:Heating:Water", HeatingCoilName, errFlag);
+                    HeatingCoilOutletNode = GetWaterCoilOutletNode(state, "Coil:Heating:Water", HeatingCoilName, errFlag);
                     Furnace(FurnaceNum).HWCoilAirOutletNode = HeatingCoilOutletNode;
                     if (errFlag) {
                         ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Furnace(FurnaceNum).Name);
@@ -1901,7 +1901,7 @@ namespace Furnaces {
 
                     // check if user has also used a water coil controller, which they should not do
                     errFlag = false;
-                    CheckCoilWaterInletNode(Furnace(FurnaceNum).CoilControlNode, errFlag);
+                    CheckCoilWaterInletNode(state, Furnace(FurnaceNum).CoilControlNode, errFlag);
                     if (!errFlag) { // then did find a controller so that is bad
                         ShowSevereError(CurrentModuleObject + " = " + Furnace(FurnaceNum).Name + " has a conflicting Controller:WaterCoil object");
                         ShowContinueError("Hot water coils are controlled directly by unitary and furnace systems.");
@@ -1985,7 +1985,7 @@ namespace Furnaces {
             // If coil type not found, check to see if a HX assisted cooling coil is used.
             if (Furnace(FurnaceNum).CoolingCoilType_Num == 0) {
                 errFlag = false;
-                Furnace(FurnaceNum).CoolingCoilType_Num = GetHXAssistedCoilTypeNum(CoolingCoilType, CoolingCoilName, errFlag, PrintMessage);
+                Furnace(FurnaceNum).CoolingCoilType_Num = GetHXAssistedCoilTypeNum(state, CoolingCoilType, CoolingCoilName, errFlag, PrintMessage);
             }
 
             if (Furnace(FurnaceNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
@@ -2005,7 +2005,7 @@ namespace Furnaces {
 
                     // Get DX cooling coil capacity
                     errFlag = false;
-                    Furnace(FurnaceNum).DesignCoolingCapacity = GetDXCoilCapacity(CoolingCoilType, CoolingCoilName, errFlag);
+                    Furnace(FurnaceNum).DesignCoolingCapacity = GetDXCoilCapacity(state, CoolingCoilType, CoolingCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -2013,8 +2013,8 @@ namespace Furnaces {
 
                     // Get the Cooling Coil Nodes
                     errFlag = false;
-                    CoolingCoilInletNode = GetDXCoilInletNode(CoolingCoilType, CoolingCoilName, errFlag);
-                    CoolingCoilOutletNode = GetDXCoilOutletNode(CoolingCoilType, CoolingCoilName, errFlag);
+                    CoolingCoilInletNode = GetDXCoilInletNode(state, CoolingCoilType, CoolingCoilName, errFlag);
+                    CoolingCoilOutletNode = GetDXCoilOutletNode(state, CoolingCoilType, CoolingCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -2054,14 +2054,14 @@ namespace Furnaces {
                 } else { // mine data from heat exchanger assisted cooling coil
 
                     // Get DX heat exchanger assisted cooling coil index
-                    GetHXDXCoilIndex(CoolingCoilName, Furnace(FurnaceNum).CoolingCoilIndex, IsNotOK);
+                    GetHXDXCoilIndex(state, CoolingCoilName, Furnace(FurnaceNum).CoolingCoilIndex, IsNotOK);
                     if (IsNotOK) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
                     }
 
                     // Get DX cooling coil capacity
-                    Furnace(FurnaceNum).DesignCoolingCapacity = GetDXHXAsstdCoilCapacity(CoolingCoilType, CoolingCoilName, errFlag);
+                    Furnace(FurnaceNum).DesignCoolingCapacity = GetDXHXAsstdCoilCapacity(state, CoolingCoilType, CoolingCoilName, errFlag);
                     errFlag = false;
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
@@ -2070,8 +2070,8 @@ namespace Furnaces {
 
                     // Get the Cooling Coil Nodes
                     errFlag = false;
-                    CoolingCoilInletNode = GetDXHXAsstdCoilInletNode(CoolingCoilType, CoolingCoilName, errFlag);
-                    CoolingCoilOutletNode = GetDXHXAsstdCoilOutletNode(CoolingCoilType, CoolingCoilName, errFlag);
+                    CoolingCoilInletNode = GetDXHXAsstdCoilInletNode(state, CoolingCoilType, CoolingCoilName, errFlag);
+                    CoolingCoilOutletNode = GetDXHXAsstdCoilOutletNode(state, CoolingCoilType, CoolingCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -2089,7 +2089,7 @@ namespace Furnaces {
                         }
                     } else {
                         Furnace(FurnaceNum).CondenserNodeNum = GetDXCoilCondenserInletNode(
-                            "COIL:COOLING:DX:SINGLESPEED", GetHXDXCoilName(CoolingCoilType, CoolingCoilName, errFlag), errFlag);
+                            "COIL:COOLING:DX:SINGLESPEED", GetHXDXCoilName(state, CoolingCoilType, CoolingCoilName, errFlag), errFlag);
                     }
 
                     if (errFlag) {
@@ -2100,9 +2100,9 @@ namespace Furnaces {
                     // Push heating coil PLF curve index to DX coil
                     if (HeatingCoilPLFCurveIndex > 0) {
                         // get the actual index to the DX cooling coil object
-                        DXCoilIndex = GetActualDXCoilIndex(CoolingCoilType, CoolingCoilName, ErrorsFound);
+                        DXCoilIndex = GetActualDXCoilIndex(state, CoolingCoilType, CoolingCoilName, ErrorsFound);
                         Furnace(FurnaceNum).ActualDXCoilIndexForHXAssisted = DXCoilIndex;
-                        int ActualCoolCoilType = HVACHXAssistedCoolingCoil::GetCoilObjectTypeNum(CoolingCoilType, CoolingCoilName, errFlag, true);
+                        int ActualCoolCoilType = HVACHXAssistedCoolingCoil::GetCoilObjectTypeNum(state, CoolingCoilType, CoolingCoilName, errFlag, true);
                         if (ActualCoolCoilType == DataHVACGlobals::CoilDX_CoolingSingleSpeed) {
                             SetDXCoolingCoilData(state, DXCoilIndex, ErrorsFound, HeatingCoilPLFCurveIndex);
                         }
@@ -2306,7 +2306,7 @@ namespace Furnaces {
 
                         // Get the ReHeat Coil Inlet Node
                         errFlag = false;
-                        ReheatCoilInletNode = GetWaterCoilInletNode("Coil:Heating:Water", ReheatingCoilName, errFlag);
+                        ReheatCoilInletNode = GetWaterCoilInletNode(state, "Coil:Heating:Water", ReheatingCoilName, errFlag);
                         Furnace(FurnaceNum).SuppCoilAirInletNode = ReheatCoilInletNode;
                         if (errFlag) {
                             ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Furnace(FurnaceNum).Name);
@@ -2315,7 +2315,7 @@ namespace Furnaces {
 
                         // Get the ReHeat Coil Outlet Node
                         errFlag = false;
-                        ReheatCoilOutletNode = GetWaterCoilOutletNode("Coil:Heating:Water", ReheatingCoilName, errFlag);
+                        ReheatCoilOutletNode = GetWaterCoilOutletNode(state, "Coil:Heating:Water", ReheatingCoilName, errFlag);
                         Furnace(FurnaceNum).SuppCoilAirOutletNode = ReheatCoilOutletNode;
                         if (errFlag) {
                             ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Furnace(FurnaceNum).Name);
@@ -2324,7 +2324,7 @@ namespace Furnaces {
 
                         // check if user has also used a water coil controller, which they should not do
                         errFlag = false;
-                        CheckCoilWaterInletNode(Furnace(FurnaceNum).CoilControlNode, errFlag);
+                        CheckCoilWaterInletNode(state, Furnace(FurnaceNum).CoilControlNode, errFlag);
                         if (!errFlag) { // then did find a controller so that is bad
                             ShowSevereError(CurrentModuleObject + " = " + Furnace(FurnaceNum).Name +
                                             " has a conflicting Controller:WaterCoil object");
@@ -2982,8 +2982,8 @@ namespace Furnaces {
 
                     // Get the Heating Coil Node Names
                     errFlag = false;
-                    HeatingCoilInletNode = GetDXCoilInletNode(HeatingCoilType, HeatingCoilName, errFlag);
-                    HeatingCoilOutletNode = GetDXCoilOutletNode(HeatingCoilType, HeatingCoilName, errFlag);
+                    HeatingCoilInletNode = GetDXCoilInletNode(state, HeatingCoilType, HeatingCoilName, errFlag);
+                    HeatingCoilOutletNode = GetDXCoilOutletNode(state, HeatingCoilType, HeatingCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -2991,7 +2991,7 @@ namespace Furnaces {
 
                     // Get the design heating capacity
                     errFlag = false;
-                    Furnace(FurnaceNum).DesignHeatingCapacity = GetDXCoilCapacity(HeatingCoilType, HeatingCoilName, errFlag);
+                    Furnace(FurnaceNum).DesignHeatingCapacity = GetDXCoilCapacity(state, HeatingCoilType, HeatingCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " =" + Alphas(1));
                         ErrorsFound = true;
@@ -3051,7 +3051,7 @@ namespace Furnaces {
                 if (Furnace(FurnaceNum).CoolingCoilType_Num == 0) {
                     errFlag = false;
                     PrintMessage = false;
-                    Furnace(FurnaceNum).CoolingCoilType_Num = GetHXAssistedCoilTypeNum(CoolingCoilType, CoolingCoilName, errFlag, PrintMessage);
+                    Furnace(FurnaceNum).CoolingCoilType_Num = GetHXAssistedCoilTypeNum(state, CoolingCoilType, CoolingCoilName, errFlag, PrintMessage);
                 }
 
                 if (Furnace(FurnaceNum).CoolingCoilType_Num == CoilDX_CoolingSingleSpeed) {
@@ -3059,8 +3059,8 @@ namespace Furnaces {
                     // Get the cooling coil node numbers
                     errFlag = false;
                     GetDXCoilIndex(CoolingCoilName, Furnace(FurnaceNum).CoolingCoilIndex, errFlag);
-                    CoolingCoilInletNode = GetDXCoilInletNode(CoolingCoilType, CoolingCoilName, errFlag);
-                    CoolingCoilOutletNode = GetDXCoilOutletNode(CoolingCoilType, CoolingCoilName, errFlag);
+                    CoolingCoilInletNode = GetDXCoilInletNode(state, CoolingCoilType, CoolingCoilName, errFlag);
+                    CoolingCoilOutletNode = GetDXCoilOutletNode(state, CoolingCoilType, CoolingCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -3068,7 +3068,7 @@ namespace Furnaces {
 
                     // Get the DX cooling coil design capacity
                     errFlag = false;
-                    Furnace(FurnaceNum).DesignCoolingCapacity = GetDXCoilCapacity(CoolingCoilType, CoolingCoilName, errFlag);
+                    Furnace(FurnaceNum).DesignCoolingCapacity = GetDXCoilCapacity(state, CoolingCoilType, CoolingCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -3078,9 +3078,9 @@ namespace Furnaces {
 
                     // Get the cooling coil node numbers
                     errFlag = false;
-                    GetHXDXCoilIndex(CoolingCoilName, Furnace(FurnaceNum).CoolingCoilIndex, errFlag);
-                    CoolingCoilInletNode = GetDXHXAsstdCoilInletNode(CoolingCoilType, CoolingCoilName, errFlag);
-                    CoolingCoilOutletNode = GetDXHXAsstdCoilOutletNode(CoolingCoilType, CoolingCoilName, errFlag);
+                    GetHXDXCoilIndex(state, CoolingCoilName, Furnace(FurnaceNum).CoolingCoilIndex, errFlag);
+                    CoolingCoilInletNode = GetDXHXAsstdCoilInletNode(state, CoolingCoilType, CoolingCoilName, errFlag);
+                    CoolingCoilOutletNode = GetDXHXAsstdCoilOutletNode(state, CoolingCoilType, CoolingCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
@@ -3088,14 +3088,14 @@ namespace Furnaces {
 
                     // Get the heat exchanger assisted cooling coil design capacity
                     errFlag = false;
-                    Furnace(FurnaceNum).DesignCoolingCapacity = GetDXHXAsstdCoilCapacity(CoolingCoilType, CoolingCoilName, errFlag);
+                    Furnace(FurnaceNum).DesignCoolingCapacity = GetDXHXAsstdCoilCapacity(state, CoolingCoilType, CoolingCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                         ErrorsFound = true;
                     }
 
                     // get the actual index to the DX cooling coil object
-                    DXCoilIndex = GetActualDXCoilIndex(CoolingCoilType, CoolingCoilName, ErrorsFound);
+                    DXCoilIndex = GetActualDXCoilIndex(state, CoolingCoilType, CoolingCoilName, ErrorsFound);
                     Furnace(FurnaceNum).ActualDXCoilIndexForHXAssisted = DXCoilIndex;
 
                 } else if (Furnace(FurnaceNum).CoolingCoilType_Num == Coil_CoolingAirToAirVariableSpeed) {
@@ -3237,7 +3237,7 @@ namespace Furnaces {
 
                     // Get the ReHeat Coil Inlet Node
                     errFlag = false;
-                    SupHeatCoilInletNode = GetWaterCoilInletNode("Coil:Heating:Water", SuppHeatCoilName, errFlag);
+                    SupHeatCoilInletNode = GetWaterCoilInletNode(state, "Coil:Heating:Water", SuppHeatCoilName, errFlag);
                     Furnace(FurnaceNum).SuppCoilAirInletNode = SupHeatCoilInletNode;
                     if (errFlag) {
                         ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Furnace(FurnaceNum).Name);
@@ -3246,14 +3246,14 @@ namespace Furnaces {
 
                     // Get the ReHeat Coil Outlet Node
                     errFlag = false;
-                    SupHeatCoilOutletNode = GetWaterCoilOutletNode("Coil:Heating:Water", SuppHeatCoilName, errFlag);
+                    SupHeatCoilOutletNode = GetWaterCoilOutletNode(state, "Coil:Heating:Water", SuppHeatCoilName, errFlag);
                     Furnace(FurnaceNum).SuppCoilAirOutletNode = SupHeatCoilOutletNode;
                     if (errFlag) {
                         ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Furnace(FurnaceNum).Name);
                         ErrorsFound = true;
                     }
                     errFlag = false;
-                    CheckCoilWaterInletNode(Furnace(FurnaceNum).CoilControlNode, errFlag);
+                    CheckCoilWaterInletNode(state, Furnace(FurnaceNum).CoilControlNode, errFlag);
                     if (!errFlag) { // then did find a controller so that is bad
                         ShowSevereError(CurrentModuleObject + " = " + Furnace(FurnaceNum).Name + " has a conflicting Controller:WaterCoil object");
                         ShowContinueError("Hot water coils are controlled directly by unitary and furnace systems.");
@@ -3610,7 +3610,7 @@ namespace Furnaces {
                 }
             } else {
                 Furnace(FurnaceNum).CondenserNodeNum =
-                    GetDXCoilCondenserInletNode("Coil:Cooling:DX:SingleSpeed", GetHXDXCoilName(CoolingCoilType, CoolingCoilName, errFlag), errFlag);
+                    GetDXCoilCondenserInletNode("Coil:Cooling:DX:SingleSpeed", GetHXDXCoilName(state, CoolingCoilType, CoolingCoilName, errFlag), errFlag);
             }
             if (errFlag) {
                 ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
@@ -3836,8 +3836,8 @@ namespace Furnaces {
                     ErrorsFound = true;
                 } else {
                     Furnace(FurnaceNum).HeatingCoilIndex = GetWtoAHPCoilIndex(HeatingCoilType, HeatingCoilName, errFlag);
-                    HeatingCoilInletNode = GetWtoAHPCoilInletNode(HeatingCoilType, HeatingCoilName, errFlag);
-                    HeatingCoilOutletNode = GetWtoAHPCoilOutletNode(HeatingCoilType, HeatingCoilName, errFlag);
+                    HeatingCoilInletNode = GetWtoAHPCoilInletNode(state, HeatingCoilType, HeatingCoilName, errFlag);
+                    HeatingCoilOutletNode = GetWtoAHPCoilOutletNode(state, HeatingCoilType, HeatingCoilName, errFlag);
                 }
             } else if (Alphas(8) == "COIL:HEATING:WATERTOAIRHEATPUMP:EQUATIONFIT") {
                 HeatingCoilType = Alphas(8);
@@ -3849,8 +3849,8 @@ namespace Furnaces {
                     ErrorsFound = true;
                 } else {
                     Furnace(FurnaceNum).HeatingCoilIndex = GetWtoAHPSimpleCoilIndex(HeatingCoilType, HeatingCoilName, errFlag);
-                    HeatingCoilInletNode = GetWtoAHPSimpleCoilInletNode(HeatingCoilType, HeatingCoilName, errFlag);
-                    HeatingCoilOutletNode = GetWtoAHPSimpleCoilOutletNode(HeatingCoilType, HeatingCoilName, errFlag);
+                    HeatingCoilInletNode = GetWtoAHPSimpleCoilInletNode(state, HeatingCoilType, HeatingCoilName, errFlag);
+                    HeatingCoilOutletNode = GetWtoAHPSimpleCoilOutletNode(state, HeatingCoilType, HeatingCoilName, errFlag);
                 }
             } else if (Alphas(8) == "COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT") {
                 HeatingCoilType = Alphas(8);
@@ -3882,8 +3882,8 @@ namespace Furnaces {
                     ErrorsFound = true;
                 } else {
                     Furnace(FurnaceNum).CoolingCoilIndex = GetWtoAHPCoilIndex(CoolingCoilType, CoolingCoilName, errFlag);
-                    CoolingCoilInletNode = GetWtoAHPCoilInletNode(CoolingCoilType, CoolingCoilName, errFlag);
-                    CoolingCoilOutletNode = GetWtoAHPCoilOutletNode(CoolingCoilType, CoolingCoilName, errFlag);
+                    CoolingCoilInletNode = GetWtoAHPCoilInletNode(state, CoolingCoilType, CoolingCoilName, errFlag);
+                    CoolingCoilOutletNode = GetWtoAHPCoilOutletNode(state, CoolingCoilType, CoolingCoilName, errFlag);
                 }
             } else if (Alphas(10) == "COIL:COOLING:WATERTOAIRHEATPUMP:EQUATIONFIT") {
                 CoolingCoilType = Alphas(10);
@@ -3895,8 +3895,8 @@ namespace Furnaces {
                     ErrorsFound = true;
                 } else {
                     Furnace(FurnaceNum).CoolingCoilIndex = GetWtoAHPSimpleCoilIndex(CoolingCoilType, CoolingCoilName, errFlag);
-                    CoolingCoilInletNode = GetWtoAHPSimpleCoilInletNode(CoolingCoilType, CoolingCoilName, errFlag);
-                    CoolingCoilOutletNode = GetWtoAHPSimpleCoilOutletNode(CoolingCoilType, CoolingCoilName, errFlag);
+                    CoolingCoilInletNode = GetWtoAHPSimpleCoilInletNode(state, CoolingCoilType, CoolingCoilName, errFlag);
+                    CoolingCoilOutletNode = GetWtoAHPSimpleCoilOutletNode(state, CoolingCoilType, CoolingCoilName, errFlag);
                 }
             } else if (Alphas(10) == "COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT") {
                 CoolingCoilType = Alphas(10);
@@ -4032,7 +4032,7 @@ namespace Furnaces {
 
                     // Get the ReHeat Coil Inlet Node
                     errFlag = false;
-                    SupHeatCoilInletNode = GetWaterCoilInletNode("Coil:Heating:Water", SuppHeatCoilName, errFlag);
+                    SupHeatCoilInletNode = GetWaterCoilInletNode(state, "Coil:Heating:Water", SuppHeatCoilName, errFlag);
                     Furnace(FurnaceNum).SuppCoilAirInletNode = SupHeatCoilInletNode;
                     if (errFlag) {
                         ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Furnace(FurnaceNum).Name);
@@ -4041,7 +4041,7 @@ namespace Furnaces {
 
                     // Get the ReHeat Coil Outlet Node
                     errFlag = false;
-                    SupHeatCoilOutletNode = GetWaterCoilOutletNode("Coil:Heating:Water", SuppHeatCoilName, errFlag);
+                    SupHeatCoilOutletNode = GetWaterCoilOutletNode(state, "Coil:Heating:Water", SuppHeatCoilName, errFlag);
                     Furnace(FurnaceNum).SuppCoilAirOutletNode = SupHeatCoilOutletNode;
                     if (errFlag) {
                         ShowContinueError("Occurs in " + CurrentModuleObject + " = " + Furnace(FurnaceNum).Name);
@@ -4049,7 +4049,7 @@ namespace Furnaces {
                     }
 
                     errFlag = false;
-                    CheckCoilWaterInletNode(Furnace(FurnaceNum).CoilControlNode, errFlag);
+                    CheckCoilWaterInletNode(state, Furnace(FurnaceNum).CoilControlNode, errFlag);
                     if (!errFlag) { // then did find a controller so that is bad
                         ShowSevereError(CurrentModuleObject + " = " + Furnace(FurnaceNum).Name + " has a conflicting Controller:WaterCoil object");
                         ShowContinueError("Hot water coils are controlled directly by unitary and furnace systems.");
@@ -4372,14 +4372,14 @@ namespace Furnaces {
             //  Get from coil module.
             if (Furnace(FurnaceNum).HeatingCoilType_Num == Coil_HeatingWaterToAirHP) {
                 errFlag = false;
-                Furnace(FurnaceNum).DesignHeatingCapacity = GetWtoAHPCoilCapacity(HeatingCoilType, HeatingCoilName, errFlag);
+                Furnace(FurnaceNum).DesignHeatingCapacity = GetWtoAHPCoilCapacity(state, HeatingCoilType, HeatingCoilName, errFlag);
                 if (errFlag) {
                     ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                     ErrorsFound = true;
                 }
             } else if (Furnace(FurnaceNum).HeatingCoilType_Num == Coil_HeatingWaterToAirHPSimple) {
                 errFlag = false;
-                Furnace(FurnaceNum).DesignHeatingCapacity = GetWtoAHPSimpleCoilCapacity(HeatingCoilType, HeatingCoilName, errFlag);
+                Furnace(FurnaceNum).DesignHeatingCapacity = GetWtoAHPSimpleCoilCapacity(state, HeatingCoilType, HeatingCoilName, errFlag);
                 if (errFlag) {
                     ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                     ErrorsFound = true;
@@ -4398,14 +4398,14 @@ namespace Furnaces {
             //  Get from coil module.
             if (Furnace(FurnaceNum).CoolingCoilType_Num == Coil_CoolingWaterToAirHP) {
                 errFlag = false;
-                Furnace(FurnaceNum).DesignCoolingCapacity = GetWtoAHPCoilCapacity(CoolingCoilType, CoolingCoilName, errFlag);
+                Furnace(FurnaceNum).DesignCoolingCapacity = GetWtoAHPCoilCapacity(state, CoolingCoilType, CoolingCoilName, errFlag);
                 if (errFlag) {
                     ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                     ErrorsFound = true;
                 }
             } else if (Furnace(FurnaceNum).CoolingCoilType_Num == Coil_CoolingWaterToAirHPSimple) {
                 errFlag = false;
-                Furnace(FurnaceNum).DesignCoolingCapacity = GetWtoAHPSimpleCoilCapacity(CoolingCoilType, CoolingCoilName, errFlag);
+                Furnace(FurnaceNum).DesignCoolingCapacity = GetWtoAHPSimpleCoilCapacity(state, CoolingCoilType, CoolingCoilName, errFlag);
                 if (errFlag) {
                     ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                     ErrorsFound = true;
@@ -5087,7 +5087,7 @@ namespace Furnaces {
                     }
                     // If steam coil max steam flow rate is autosized, simulate once in order to mine max flow rate
                     if (Furnace(FurnaceNum).HeatingCoilType_Num == Coil_HeatingSteam) {
-                        SimulateSteamCoilComponents(Furnace(FurnaceNum).HeatingCoilName,
+                        SimulateSteamCoilComponents(state, Furnace(FurnaceNum).HeatingCoilName,
                                                     FirstHVACIteration,
                                                     Furnace(FurnaceNum).HeatingCoilIndex,
                                                     1.0,
@@ -5125,7 +5125,7 @@ namespace Furnaces {
                         }
                     }
                     if (Furnace(FurnaceNum).SuppHeatCoilType_Num == Coil_HeatingSteam) {
-                        SimulateSteamCoilComponents(Furnace(FurnaceNum).SuppHeatCoilName,
+                        SimulateSteamCoilComponents(state, Furnace(FurnaceNum).SuppHeatCoilName,
                                                     FirstHVACIteration,
                                                     Furnace(FurnaceNum).SuppHeatCoilIndex,
                                                     1.0,
@@ -5382,13 +5382,13 @@ namespace Furnaces {
                                      Furnace(FurnaceNum).CompNum);
 
                 //     simulate steam coil to find operating capacity
-                SimulateSteamCoilComponents(Furnace(FurnaceNum).HeatingCoilName,
+                SimulateSteamCoilComponents(state, Furnace(FurnaceNum).HeatingCoilName,
                                             FirstHVACIteration,
                                             Furnace(FurnaceNum).HeatingCoilIndex,
                                             1.0,
                                             QActual); // QCoilReq, simulate any load > 0 to get max capacity of steam coil
                 Furnace(FurnaceNum).DesignHeatingCapacity =
-                    GetSteamCoilCapacity(Furnace(FurnaceNum).HeatingCoilType, Furnace(FurnaceNum).HeatingCoilName, ErrorsFound);
+                    GetSteamCoilCapacity(state, Furnace(FurnaceNum).HeatingCoilType, Furnace(FurnaceNum).HeatingCoilName, ErrorsFound);
 
             } // from IF(Furnace(FurnaceNum)%HeatingCoilType_Num == Coil_HeatingSteam) THEN
 
@@ -5423,13 +5423,13 @@ namespace Furnaces {
                                      Furnace(FurnaceNum).CompNumSupp);
 
                 //     simulate steam coil to find operating capacity
-                SimulateSteamCoilComponents(Furnace(FurnaceNum).SuppHeatCoilName,
+                SimulateSteamCoilComponents(state, Furnace(FurnaceNum).SuppHeatCoilName,
                                             FirstHVACIteration,
                                             Furnace(FurnaceNum).SuppHeatCoilIndex,
                                             1.0,
                                             QActual); // QCoilReq, simulate any load > 0 to get max capacity of steam coil
                 Furnace(FurnaceNum).DesignSuppHeatingCapacity =
-                    GetSteamCoilCapacity(Furnace(FurnaceNum).SuppHeatCoilType, Furnace(FurnaceNum).SuppHeatCoilName, ErrorsFound);
+                    GetSteamCoilCapacity(state, Furnace(FurnaceNum).SuppHeatCoilType, Furnace(FurnaceNum).SuppHeatCoilName, ErrorsFound);
 
             } // from IF(Furnace(FurnaceNum)%SuppHeatCoilType_Num == Coil_HeatingSteam) THEN
         }     // from IF( FirstHVACIteration ) THEN
@@ -6040,7 +6040,7 @@ namespace Furnaces {
         } else if (Furnace(FurnaceNum).CoolingCoilType_Num == CoilDX_CoolingHXAssisted) {
             SimHXAssistedCoolingCoil(state, BlankString, true, On, 0.0, Furnace(FurnaceNum).CoolingCoilIndex, 1, false, 1.0, false);
         } else if (Furnace(FurnaceNum).CoolingCoilType_Num == Coil_CoolingWaterToAirHPSimple) {
-            SimWatertoAirHPSimple(BlankString,
+            SimWatertoAirHPSimple(state, BlankString,
                                   Furnace(FurnaceNum).CoolingCoilIndex,
                                   Furnace(FurnaceNum).CoolingCoilSensDemand,
                                   Furnace(FurnaceNum).CoolingCoilLatentDemand,
@@ -8664,7 +8664,7 @@ namespace Furnaces {
             if (Furnace(FurnaceNum).FanPlace == BlowThru) {
                 SimulateFanComponents(state, BlankString, FirstHVACIteration, Furnace(FurnaceNum).FanIndex, FanSpeedRatio);
                 // COIL:WATERTOAIRHPSIMPLE:COOLING
-                SimWatertoAirHPSimple(BlankString,
+                SimWatertoAirHPSimple(state, BlankString,
                                       Furnace(FurnaceNum).CoolingCoilIndex,
                                       Furnace(FurnaceNum).CoolingCoilSensDemand,
                                       Furnace(FurnaceNum).CoolingCoilLatentDemand,
@@ -8678,7 +8678,7 @@ namespace Furnaces {
                                       FirstHVACIteration); // CoolPartLoadRatio
                 Dummy = 0.0;
                 // COIL:WATERTOAIRHPSIMPLE:HEATING
-                SimWatertoAirHPSimple(BlankString,
+                SimWatertoAirHPSimple(state, BlankString,
                                       Furnace(FurnaceNum).HeatingCoilIndex,
                                       Furnace(FurnaceNum).HeatingCoilSensDemand,
                                       Dummy,
@@ -8695,7 +8695,7 @@ namespace Furnaces {
             }
             //    Simulate the cooling and heating coils
             // COIL:WATERTOAIRHPSIMPLE:COOLING
-            SimWatertoAirHPSimple(BlankString,
+            SimWatertoAirHPSimple(state, BlankString,
                                   Furnace(FurnaceNum).CoolingCoilIndex,
                                   Furnace(FurnaceNum).CoolingCoilSensDemand,
                                   Furnace(FurnaceNum).CoolingCoilLatentDemand,
@@ -8709,7 +8709,7 @@ namespace Furnaces {
                                   FirstHVACIteration); // CoolPartLoadRatio
             Dummy = 0.0;
             // COIL:WATERTOAIRHPSIMPLE:HEATING
-            SimWatertoAirHPSimple(BlankString,
+            SimWatertoAirHPSimple(state, BlankString,
                                   Furnace(FurnaceNum).HeatingCoilIndex,
                                   Furnace(FurnaceNum).HeatingCoilSensDemand,
                                   Dummy,
@@ -9647,12 +9647,12 @@ namespace Furnaces {
                 if (QCoilLoad > SmallLoad) {
                     SetComponentFlowRate(MaxHotWaterFlow, CoilControlNode, CoilOutletNode, LoopNum, LoopSideNum, BranchNum, CompNum);
                     // simulate the steam heating coil
-                    SimulateSteamCoilComponents(HeatingCoilName, FirstHVACIteration, HeatingCoilIndex, QCoilLoad, QActual, FanMode);
+                    SimulateSteamCoilComponents(state, HeatingCoilName, FirstHVACIteration, HeatingCoilIndex, QCoilLoad, QActual, FanMode);
                 } else {
                     mdot = 0.0;
                     SetComponentFlowRate(mdot, CoilControlNode, CoilOutletNode, LoopNum, LoopSideNum, BranchNum, CompNum);
                     // simulate the steam heating coil
-                    SimulateSteamCoilComponents(HeatingCoilName, FirstHVACIteration, HeatingCoilIndex, QCoilLoad, QActual, FanMode);
+                    SimulateSteamCoilComponents(state, HeatingCoilName, FirstHVACIteration, HeatingCoilIndex, QCoilLoad, QActual, FanMode);
                 }
             }
         }

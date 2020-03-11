@@ -5565,7 +5565,7 @@ TEST_F(HVACVRFFixture, VRFTest_SysCurve_WaterCooled)
 
     BranchInputManager::ManageBranchInput();
     // Get plant loop data
-    PlantManager::GetPlantLoopData();
+    PlantManager::GetPlantLoopData(state);
     PlantManager::GetPlantInput(state);
 
     HVACVariableRefrigerantFlow::MyEnvrnFlag = true;

@@ -1170,7 +1170,7 @@ namespace SimAirServingZones {
                         PrimaryAirSystem(AirSysNum).ControllerType(OASysControllerNum) = ControllerType;
                         PrimaryAirSystem(AirSysNum).ControlConverged(OASysControllerNum) = false;
                         PrimaryAirSystem(AirSysNum).CanBeLockedOutByEcono(OASysControllerNum) = true;
-                        GetControllerActuatorNodeNum(ControllerName, ActuatorNodeNum, errFlag);
+                        GetControllerActuatorNodeNum(state, ControllerName, ActuatorNodeNum, errFlag);
 
                         bool nonLockoutCoilFound = false;
                         WaterCoilNodeNum = -1;
@@ -1410,7 +1410,7 @@ namespace SimAirServingZones {
                         WaterCoilNodeNum = GetCoilWaterInletNode(PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).TypeOf,
                                                                  PrimaryAirSystem(AirSysNum).Branch(BranchNum).Comp(CompNum).Name,
                                                                  ErrorsFound);
-                        CheckCoilWaterInletNode(WaterCoilNodeNum, NodeNotFound);
+                        CheckCoilWaterInletNode(state, WaterCoilNodeNum, NodeNotFound);
                         if (NodeNotFound) {
                             ErrorsFound = true;
                             ShowSevereError(RoutineName + CurrentModuleObject + "=\"" +
@@ -1430,7 +1430,7 @@ namespace SimAirServingZones {
                 CompType_Num = GetOACompTypeNum(state, OASysNum, OACompNum);
                 if (CompType_Num == WaterCoil_DetailedCool || CompType_Num == WaterCoil_SimpleHeat || CompType_Num == WaterCoil_Cooling) {
                     WaterCoilNodeNum = GetCoilWaterInletNode(GetOACompType(state, OASysNum, OACompNum), GetOACompName(state, OASysNum, OACompNum), ErrorsFound);
-                    CheckCoilWaterInletNode(WaterCoilNodeNum, NodeNotFound);
+                    CheckCoilWaterInletNode(state, WaterCoilNodeNum, NodeNotFound);
                     if (NodeNotFound) {
                         ErrorsFound = true;
                         ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + GetOACompName(state, OASysNum, OACompNum) + "\", invalid actuator.");
@@ -2185,7 +2185,7 @@ namespace SimAirServingZones {
             for (AirLoopNum = 1; AirLoopNum <= NumPrimaryAirSys; ++AirLoopNum) {
 
                 for (BranchNum = 1; BranchNum <= PrimaryAirSystem(AirLoopNum).NumBranches; ++BranchNum) {
-                    SizeAirLoopBranches(AirLoopNum, BranchNum);
+                    SizeAirLoopBranches(state, AirLoopNum, BranchNum);
                 }
             }
 
@@ -2949,7 +2949,7 @@ namespace SimAirServingZones {
             // Need to actaully simulate controller to get controller index.
             for (int AirLoopControlNum = 1; AirLoopControlNum <= PrimaryAirSystem(AirLoopNum).NumControllers; ++AirLoopControlNum) {
                 PrimaryAirSystem(AirLoopNum).ControllerIndex(AirLoopControlNum) =
-                    HVACControllers::GetControllerIndex(PrimaryAirSystem(AirLoopNum).ControllerName(AirLoopControlNum));
+                    HVACControllers::GetControllerIndex(state, PrimaryAirSystem(AirLoopNum).ControllerName(AirLoopControlNum));
                 HVACControllers::ControllerProps(PrimaryAirSystem(AirLoopNum).ControllerIndex(AirLoopControlNum)).AirLoopControllerIndex =
                     AirLoopControlNum;
             }
@@ -2964,7 +2964,7 @@ namespace SimAirServingZones {
 
             // BypassOAController is true here since we do not want to simulate the controller if it has already been simulated in the OA system
             // ControllerConvergedFlag is returned true here for water coils in OA system
-            ManageControllers(PrimaryAirSystem(AirLoopNum).ControllerName(AirLoopControlNum),
+            ManageControllers(state, PrimaryAirSystem(AirLoopNum).ControllerName(AirLoopControlNum),
                               PrimaryAirSystem(AirLoopNum).ControllerIndex(AirLoopControlNum),
                               FirstHVACIteration,
                               AirLoopNum,
@@ -3002,7 +3002,7 @@ namespace SimAirServingZones {
 
                 ++Iter;
 
-                ManageControllers(PrimaryAirSystem(AirLoopNum).ControllerName(AirLoopControlNum),
+                ManageControllers(state, PrimaryAirSystem(AirLoopNum).ControllerName(AirLoopControlNum),
                                   PrimaryAirSystem(AirLoopNum).ControllerIndex(AirLoopControlNum),
                                   FirstHVACIteration,
                                   AirLoopNum,
@@ -3083,7 +3083,7 @@ namespace SimAirServingZones {
 
             ControllerConvergedFlag = false;
 
-            ManageControllers(PrimaryAirSystem(AirLoopNum).ControllerName(AirLoopControlNum),
+            ManageControllers(state, PrimaryAirSystem(AirLoopNum).ControllerName(AirLoopControlNum),
                               PrimaryAirSystem(AirLoopNum).ControllerIndex(AirLoopControlNum),
                               FirstHVACIteration,
                               AirLoopNum,
@@ -3189,7 +3189,7 @@ namespace SimAirServingZones {
         // This call to ManageControllers reinitializes the controllers actuated variables to zero
 
         // BypassOAController is false here since we want to simulate the controller
-        ManageControllers(ControllerName,
+        ManageControllers(state, ControllerName,
                           ControllerIndex,
                           FirstHVACIteration,
                           AirLoopNum,
@@ -3229,7 +3229,7 @@ namespace SimAirServingZones {
 
             ++Iter;
 
-            ManageControllers(ControllerName,
+            ManageControllers(state, ControllerName,
                               ControllerIndex,
                               FirstHVACIteration,
                               AirLoopNum,
@@ -3291,7 +3291,7 @@ namespace SimAirServingZones {
 
         ControllerConvergedFlag = false;
 
-        ManageControllers(ControllerName,
+        ManageControllers(state, ControllerName,
                           ControllerIndex,
                           FirstHVACIteration,
                           AirLoopNum,
@@ -3381,7 +3381,7 @@ namespace SimAirServingZones {
         for (AirLoopControlNum = 1; AirLoopControlNum <= PrimaryAirSystem(AirLoopNum).NumControllers; ++AirLoopControlNum) {
 
             // BypassOAController is false here since we want to simulate the controller during ReSolveAirLoopControllers calls ?
-            ManageControllers(PrimaryAirSystem(AirLoopNum).ControllerName(AirLoopControlNum),
+            ManageControllers(state, PrimaryAirSystem(AirLoopNum).ControllerName(AirLoopControlNum),
                               PrimaryAirSystem(AirLoopNum).ControllerIndex(AirLoopControlNum),
                               FirstHVACIteration,
                               AirLoopNum,
@@ -3402,7 +3402,7 @@ namespace SimAirServingZones {
 
             ControllerConvergedFlag = false;
 
-            ManageControllers(PrimaryAirSystem(AirLoopNum).ControllerName(AirLoopControlNum),
+            ManageControllers(state, PrimaryAirSystem(AirLoopNum).ControllerName(AirLoopControlNum),
                               PrimaryAirSystem(AirLoopNum).ControllerIndex(AirLoopControlNum),
                               FirstHVACIteration,
                               AirLoopNum,
@@ -3599,7 +3599,7 @@ namespace SimAirServingZones {
                 if (QActual > 0.0) HeatingActive = true; // determine if coil is ON
 
             } else if (SELECT_CASE_var == SteamCoil_AirHeat) { // 'Coil:Heating:Steam'
-                SimulateSteamCoilComponents(CompName, FirstHVACIteration, CompIndex, constant_zero, QActual);
+                SimulateSteamCoilComponents(state, CompName, FirstHVACIteration, CompIndex, constant_zero, QActual);
                 if (QActual > 0.0) HeatingActive = true; // determine if coil is ON
 
             } else if (SELECT_CASE_var == WaterCoil_DetailedCool) { // 'Coil:Cooling:Water:DetailedGeometry'
@@ -4082,7 +4082,7 @@ namespace SimAirServingZones {
         }
     }
 
-    void SizeAirLoopBranches(int const AirLoopNum, int const BranchNum)
+    void SizeAirLoopBranches(AllGlobals &state, int const AirLoopNum, int const BranchNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4186,8 +4186,8 @@ namespace SimAirServingZones {
             CompType_Num = PrimaryAirSystem(AirLoopNum).Branch(BranchNum).Comp(CompNum).CompType_Num;
             if (CompType_Num == WaterCoil_DetailedCool || CompType_Num == WaterCoil_SimpleHeat || CompType_Num == WaterCoil_CoolingHXAsst) {
                 if (CompType_Num == WaterCoil_CoolingHXAsst) {
-                    CoilName = GetHXDXCoilName(CompType, CompName, ErrorsFound);
-                    CoilType = GetHXCoilType(CompType, CompName, ErrorsFound);
+                    CoilName = GetHXDXCoilName(state, CompType, CompName, ErrorsFound);
+                    CoilType = GetHXCoilType(state, CompType, CompName, ErrorsFound);
                 } else {
                     CoilName = CompName;
                     CoilType = CompType;
@@ -7636,7 +7636,7 @@ namespace SimAirServingZones {
 
         CheckWaterCoilIsOnAirLoop = CheckWaterCoilOnPrimaryAirLoopBranch(state, CompTypeNum, CompName);
         if (!CheckWaterCoilIsOnAirLoop) {
-            CheckWaterCoilIsOnAirLoop = CheckWaterCoilOnOASystem(CompTypeNum, CompName);
+            CheckWaterCoilIsOnAirLoop = CheckWaterCoilOnOASystem(state, CompTypeNum, CompName);
         }
 
         if (!CheckWaterCoilIsOnAirLoop) {
@@ -7725,7 +7725,7 @@ namespace SimAirServingZones {
 
         if (GetCoilsInputFlag) {
             // Get the HXAssistedCoolingCoil input
-            GetHXAssistedCoolingCoilInput();
+            GetHXAssistedCoolingCoilInput(state);
             GetCoilsInputFlag = false;
         }
 
@@ -7752,7 +7752,7 @@ namespace SimAirServingZones {
         if (WaterCoilIsOnWaterCoilSystem) {
             CheckWaterCoilSystemIsOnAirLoopOASystem = CheckWaterCoilOnPrimaryAirLoopBranch(state, CoilSystemTypeNum, CoilSystemName);
             if (!CheckWaterCoilSystemIsOnAirLoopOASystem) {
-                CheckWaterCoilSystemIsOnAirLoopOASystem = CheckWaterCoilOnOASystem(CoilSystemTypeNum, CoilSystemName);
+                CheckWaterCoilSystemIsOnAirLoopOASystem = CheckWaterCoilOnOASystem(state, CoilSystemTypeNum, CoilSystemName);
             }
         }
         return CheckWaterCoilSystemIsOnAirLoopOASystem;

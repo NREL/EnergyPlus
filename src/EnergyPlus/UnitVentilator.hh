@@ -264,7 +264,7 @@ namespace UnitVentilator {
 
     void GetUnitVentilatorInput(AllGlobals &state);
 
-    void InitUnitVentilator(int const UnitVentNum,         // index for the current unit ventilator
+    void InitUnitVentilator(AllGlobals &state, int const UnitVentNum,         // index for the current unit ventilator
                             bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                             int const ZoneNum              // number of zone being served
     );

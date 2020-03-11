@@ -295,7 +295,7 @@ namespace EnergyPlus {
             LogPlantConvergencePoints(FirstHVACIteration);
         }
 
-        void GetPlantLoopData() {
+        void GetPlantLoopData(AllGlobals &state) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Sankaranarayanan K P
@@ -489,10 +489,10 @@ namespace EnergyPlus {
                         Alpha(11), ErrorsFound, CurrentModuleObject, Alpha(1), this_loop.FluidType,
                         NodeConnectionType_Outlet, 1, ObjectIsParent);
 
-                this_demand_side.InletNodeSetPt = IsNodeOnSetPtManager(this_demand_side.NodeNumIn, localTempSetPt);
-                this_demand_side.OutletNodeSetPt = IsNodeOnSetPtManager(this_demand_side.NodeNumOut, localTempSetPt);
-                this_supply_side.InletNodeSetPt = IsNodeOnSetPtManager(this_supply_side.NodeNumIn, localTempSetPt);
-                this_supply_side.OutletNodeSetPt = IsNodeOnSetPtManager(this_supply_side.NodeNumOut, localTempSetPt);
+                this_demand_side.InletNodeSetPt = IsNodeOnSetPtManager(state, this_demand_side.NodeNumIn, localTempSetPt);
+                this_demand_side.OutletNodeSetPt = IsNodeOnSetPtManager(state, this_demand_side.NodeNumOut, localTempSetPt);
+                this_supply_side.InletNodeSetPt = IsNodeOnSetPtManager(state, this_supply_side.NodeNumIn, localTempSetPt);
+                this_supply_side.OutletNodeSetPt = IsNodeOnSetPtManager(state, this_supply_side.NodeNumOut, localTempSetPt);
                 this_loop.TempSetPointNodeNum = GetOnlySingleNode(
                         Alpha(5), ErrorsFound, CurrentModuleObject, Alpha(1), this_loop.FluidType,
                         NodeConnectionType_Sensor, 1, ObjectIsParent);

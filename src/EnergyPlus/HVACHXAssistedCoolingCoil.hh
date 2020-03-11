@@ -158,7 +158,7 @@ namespace HVACHXAssistedCoolingCoil {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetHXAssistedCoolingCoilInput();
+    void GetHXAssistedCoolingCoilInput(AllGlobals &state);
 
     // End of Get Input subroutines for this Module
     //******************************************************************************
@@ -184,83 +184,83 @@ namespace HVACHXAssistedCoolingCoil {
     //        End of Reporting subroutines for the HXAssistedCoil Module
     // *****************************************************************************
 
-    void GetHXDXCoilIndex(std::string const &HXDXCoilName, int &HXDXCoilIndex, bool &ErrorsFound, Optional_string_const CurrentModuleObject = _);
+    void GetHXDXCoilIndex(AllGlobals &state, std::string const &HXDXCoilName, int &HXDXCoilIndex, bool &ErrorsFound, Optional_string_const CurrentModuleObject = _);
 
-    void CheckHXAssistedCoolingCoilSchedule(std::string const &CompType, // unused1208
+    void CheckHXAssistedCoolingCoilSchedule(AllGlobals &state, std::string const &CompType, // unused1208
                                             std::string const &CompName,
                                             Real64 &Value,
                                             int &CompIndex);
 
-    Real64 GetCoilCapacity(std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilCapacity(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
                            std::string const &CoilName, // must match coil names for the coil type
                            bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilGroupTypeNum(std::string const &CoilType,         // must match coil types in this module
+    int GetCoilGroupTypeNum(AllGlobals &state, std::string const &CoilType,         // must match coil types in this module
                             std::string const &CoilName,         // must match coil names for the coil type
                             bool &ErrorsFound,                   // set to true if problem
                             Optional_bool_const PrintWarning = _ // prints warning message if true
     );
 
-    int GetCoilObjectTypeNum(std::string const &CoilType,         // must match coil types in this module
+    int GetCoilObjectTypeNum(AllGlobals &state, std::string const &CoilType,         // must match coil types in this module
                              std::string const &CoilName,         // must match coil names for the coil type
                              bool &ErrorsFound,                   // set to true if problem
                              Optional_bool_const PrintWarning = _ // prints warning message if true
     );
 
-    int GetCoilInletNode(std::string const &CoilType, // must match coil types in this module
+    int GetCoilInletNode(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
                          std::string const &CoilName, // must match coil names for the coil type
                          bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilWaterInletNode(std::string const &CoilType, // must match coil types in this module
+    int GetCoilWaterInletNode(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
                               std::string const &CoilName, // must match coil names for the coil type
                               bool &ErrorsFound            // set to true if problem
     );
 
-    int GetCoilOutletNode(std::string const &CoilType, // must match coil types in this module
+    int GetCoilOutletNode(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     );
 
-    std::string GetHXDXCoilType(std::string const &CoilType, // must match coil types in this module
+    std::string GetHXDXCoilType(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
                                 std::string const &CoilName, // must match coil names for the coil type
                                 bool &ErrorsFound            // set to true if problem
     );
 
-    std::string GetHXDXCoilName(std::string const &CoilType, // must match coil types in this module
+    std::string GetHXDXCoilName(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
                                 std::string const &CoilName, // must match coil names for the coil type
                                 bool &ErrorsFound            // set to true if problem
     );
 
-    int GetActualDXCoilIndex(std::string const &CoilType, // must match coil types in this module
+    int GetActualDXCoilIndex(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
                              std::string const &CoilName, // must match coil names for the coil type
                              bool &ErrorsFound            // set to true if problem
     );
 
-    std::string GetHXCoilType(std::string const &CoilType, // must match coil types in this module
+    std::string GetHXCoilType(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
                               std::string const &CoilName, // must match coil names for the coil type
                               bool &ErrorsFound            // set to true if problem
     );
 
-    void GetHXCoilTypeAndName(std::string const &CoilType,  // must match coil types in this module
+    void GetHXCoilTypeAndName(AllGlobals &state, std::string const &CoilType,  // must match coil types in this module
                               std::string const &CoilName,  // must match coil names for the coil type
                               bool &ErrorsFound,            // set to true if problem
                               std::string &CoolingCoilType, // returned type of cooling coil
                               std::string &CoolingCoilName  // returned name of cooling coil
     );
 
-    Real64 GetCoilMaxWaterFlowRate(std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilMaxWaterFlowRate(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
                                    std::string const &CoilName, // must match coil names for the coil type
                                    bool &ErrorsFound            // set to true if problem
     );
 
-    Real64 GetHXCoilAirFlowRate(std::string const &CoilType, // must match coil types in this module
+    Real64 GetHXCoilAirFlowRate(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
                                 std::string const &CoilName, // must match coil names for the coil type
                                 bool &ErrorsFound            // set to true if problem
     );
 
-    bool VerifyHeatExchangerParent(std::string const &HXType, // must match coil types in this module
+    bool VerifyHeatExchangerParent(AllGlobals &state, std::string const &HXType, // must match coil types in this module
                                    std::string const &HXName  // must match coil names for the coil type
     );
 

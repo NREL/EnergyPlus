@@ -57,10 +57,11 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 
 namespace EnergyPlus {
 
-int AbortEnergyPlus();
+int AbortEnergyPlus(AllGlobals &state);
 
 void CloseMiscOpenFiles();
 

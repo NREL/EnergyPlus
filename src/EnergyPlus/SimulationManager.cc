@@ -433,7 +433,7 @@ namespace SimulationManager {
             InitDemandManagers();
             TestBranchIntegrity(ErrFound);
             if (ErrFound) TerminalError = true;
-            TestAirPathIntegrity(ErrFound);
+            TestAirPathIntegrity(state, ErrFound);
             if (ErrFound) TerminalError = true;
             CheckMarkedNodes(ErrFound);
             if (ErrFound) TerminalError = true;

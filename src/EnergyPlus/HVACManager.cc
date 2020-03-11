@@ -398,7 +398,7 @@ namespace HVACManager {
         if (Contaminant.SimulateContaminants)
             ManageZoneContaminanUpdates(iGetZoneSetPoints, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
-        ManageHybridVentilation();
+        ManageHybridVentilation(state);
 
         CalcAirFlowSimple(state);
         if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
@@ -457,7 +457,7 @@ namespace HVACManager {
 
             if (TimeStepSys < TimeStepZone) {
 
-                ManageHybridVentilation();
+                ManageHybridVentilation(state);
                 CalcAirFlowSimple(state, SysTimestepLoop);
                 if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlSimple) {
                     AirflowNetwork::RollBackFlag = false;
@@ -796,8 +796,8 @@ namespace HVACManager {
         if (!SimHVACIterSetup) {
             SetupOutputVariable("HVAC System Solver Iteration Count", OutputProcessor::Unit::None, HVACManageIteration, "HVAC", "Sum", "SimHVAC");
             SetupOutputVariable("Air System Solver Iteration Count", OutputProcessor::Unit::None, RepIterAir, "HVAC", "Sum", "SimHVAC");
-            ManageSetPoints(); // need to call this before getting plant loop data so setpoint checks can complete okay
-            GetPlantLoopData();
+            ManageSetPoints(state); // need to call this before getting plant loop data so setpoint checks can complete okay
+            GetPlantLoopData(state);
             GetPlantInput(state);
             SetupInitialPlantCallingOrder();
             SetupBranchControlTypes(); // new routine to do away with input for branch control type
@@ -839,7 +839,7 @@ namespace HVACManager {
         bool anyEMSRan = false;
         ManageEMS(emsCallFromBeforeHVACManagers, anyEMSRan); // calling point
 
-        ManageSetPoints();
+        ManageSetPoints(state);
 
         // re-initialize plant loop and nodes.
         ReInitPlantLoopsAtFirstHVACIteration();

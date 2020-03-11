@@ -185,7 +185,7 @@ namespace UnitHeater {
 
     void GetUnitHeaterInput(AllGlobals &state);
 
-    void InitUnitHeater(int const UnitHeatNum,        // index for the current unit heater
+    void InitUnitHeater(AllGlobals &state, int const UnitHeatNum,        // index for the current unit heater
                         int const ZoneNum,            // number of zone being served
                         bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     );

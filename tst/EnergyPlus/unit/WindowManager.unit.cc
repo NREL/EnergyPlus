@@ -437,7 +437,7 @@ TEST_F(EnergyPlusFixture, WindowManager_RefAirTempTest)
     HeatBalanceManager::GetFrameAndDividerData(ErrorsFound);
     HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
-    HeatBalanceManager::GetBuildingData(ErrorsFound);
+    HeatBalanceManager::GetBuildingData(state, ErrorsFound);
 
     Psychrometrics::InitializePsychRoutines();
 
@@ -2659,7 +2659,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     HeatBalanceManager::GetFrameAndDividerData(ErrorsFound);
     HeatBalanceManager::GetMaterialData(OutputFiles::getSingleton(), ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
-    HeatBalanceManager::GetBuildingData(ErrorsFound);
+    HeatBalanceManager::GetBuildingData(state, ErrorsFound);
 
     EXPECT_TRUE(DataGlobals::AnyLocalEnvironmentsInModel);
 

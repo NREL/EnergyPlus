@@ -264,7 +264,7 @@ namespace PurchasedAirManager {
 
         CalcPurchAirLoads(PurchAirNum, SysOutputProvided, MoistOutputProvided, ControlledZoneNum, ActualZoneNum);
 
-        UpdatePurchasedAir(PurchAirNum, FirstHVACIteration);
+        UpdatePurchasedAir(state, PurchAirNum, FirstHVACIteration);
 
         ReportPurchasedAir(PurchAirNum);
     }

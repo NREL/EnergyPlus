@@ -184,7 +184,7 @@ namespace SteamCoils {
 
     // Functions
 
-    void SimulateSteamCoilComponents(std::string const &CompName,
+    void SimulateSteamCoilComponents(AllGlobals &state, std::string const &CompName,
                                      bool const FirstHVACIteration,
                                      int &CompIndex,
                                      Optional<Real64 const> QCoilReq = _, // coil load to be met
@@ -280,7 +280,7 @@ namespace SteamCoils {
                                bool &ErrorsFound            // set to true if problem
     );
 
-    Real64 GetCoilCapacity(std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilCapacity(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
                            std::string const &CoilName, // must match coil names for the coil type
                            bool &ErrorsFound            // set to true if problem
     );

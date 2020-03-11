@@ -71,6 +71,19 @@ int energyplus(int argc, const char *argv[]) {
     return runEnergyPlusAsLibrary(state, argc, argv);
 }
 
+int energyplusWithStates(AllGlobals &state, int argc, const char *argv[]) {
+    //    argv[0] = "energyplus";
+    //    argv[1] = "-d";
+    //    argv[2] = workingPath.string().c_str();
+    //    argv[3] = "-w";
+    //    argv[4] = epcomp->weatherFilePath.c_str();
+    //    argv[5] = "-i";
+    //    argv[6] = epcomp->iddPath.c_str();
+    //    argv[7] = epcomp->idfInputPath.c_str();
+
+    return runEnergyPlusAsLibrary(state, argc, argv);
+}
+
 void issueWarning(const char * message) {
     EnergyPlus::ShowWarningError(message);
 }

@@ -254,7 +254,7 @@ namespace VentilatedSlab {
 
         // FLOW:
         if (GetInputFlag) {
-            GetVentilatedSlabInput();
+            GetVentilatedSlabInput(state);
             GetInputFlag = false;
         }
 
@@ -282,7 +282,7 @@ namespace VentilatedSlab {
 
         ZoneEqVentedSlab = true;
 
-        InitVentilatedSlab(Item, ZoneNum, FirstHVACIteration);
+        InitVentilatedSlab(state, Item, ZoneNum, FirstHVACIteration);
 
         CalcVentilatedSlab(state, Item, ZoneNum, FirstHVACIteration, PowerMet, LatOutputProvided);
 
@@ -293,7 +293,7 @@ namespace VentilatedSlab {
         ZoneEqVentedSlab = false;
     }
 
-    void GetVentilatedSlabInput()
+    void GetVentilatedSlabInput(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1069,7 +1069,7 @@ namespace VentilatedSlab {
                             VentSlab(Item).CCoilPlantName = cAlphaArgs(31);
                         } else if (SELECT_CASE_var == "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED") {
                             VentSlab(Item).CCoilType = Cooling_CoilHXAssisted;
-                            GetHXCoilTypeAndName(
+                            GetHXCoilTypeAndName(state,
                                 cAlphaArgs(30), cAlphaArgs(31), ErrorsFound, VentSlab(Item).CCoilPlantType, VentSlab(Item).CCoilPlantName);
                             if (UtilityRoutines::SameString(VentSlab(Item).CCoilPlantType, "Coil:Cooling:Water")) {
                                 VentSlab(Item).CCoil_PlantTypeNum = TypeOf_CoilWaterCooling;
@@ -1127,7 +1127,7 @@ namespace VentilatedSlab {
                             GetWaterCoilMaxFlowRate("Coil:Cooling:Water:DetailedGeometry", VentSlab(Item).CCoilName, ErrorsFound);
                     } else if (VentSlab(Item).CCoilType == Cooling_CoilHXAssisted) {
                         VentSlab(Item).MaxVolColdWaterFlow =
-                            GetHXAssistedCoilFlowRate("CoilSystem:Cooling:Water:HeatExchangerAssisted", VentSlab(Item).CCoilName, ErrorsFound);
+                            GetHXAssistedCoilFlowRate(state, "CoilSystem:Cooling:Water:HeatExchangerAssisted", VentSlab(Item).CCoilName, ErrorsFound);
                     }
 
                 } else { // No Cooling Coil
@@ -2290,8 +2290,8 @@ namespace VentilatedSlab {
             } else {
                 CheckZoneSizing(cMO_VentilatedSlab, VentSlab(Item).Name);
                 if (VentSlab(Item).CCoilType == Cooling_CoilHXAssisted) {
-                    CoolingCoilName = GetHXDXCoilName(VentSlab(Item).CCoilTypeCh, VentSlab(Item).CCoilName, ErrorsFound);
-                    CoolingCoilType = GetHXCoilType(VentSlab(Item).CCoilTypeCh, VentSlab(Item).CCoilName, ErrorsFound);
+                    CoolingCoilName = GetHXDXCoilName(state, VentSlab(Item).CCoilTypeCh, VentSlab(Item).CCoilName, ErrorsFound);
+                    CoolingCoilType = GetHXCoilType(state, VentSlab(Item).CCoilTypeCh, VentSlab(Item).CCoilName, ErrorsFound);
                 } else {
                     CoolingCoilName = VentSlab(Item).CCoilName;
                     CoolingCoilType = VentSlab(Item).CCoilTypeCh;
@@ -2398,8 +2398,8 @@ namespace VentilatedSlab {
         }
 
         if (VentSlab(Item).CCoilType == Cooling_CoilHXAssisted) {
-            CoolingCoilName = GetHXDXCoilName(VentSlab(Item).CCoilTypeCh, VentSlab(Item).CCoilName, ErrorsFound);
-            CoolingCoilType = GetHXCoilType(VentSlab(Item).CCoilTypeCh, VentSlab(Item).CCoilName, ErrorsFound);
+            CoolingCoilName = GetHXDXCoilName(state, VentSlab(Item).CCoilTypeCh, VentSlab(Item).CCoilName, ErrorsFound);
+            CoolingCoilType = GetHXCoilType(state, VentSlab(Item).CCoilTypeCh, VentSlab(Item).CCoilName, ErrorsFound);
         } else {
             CoolingCoilName = VentSlab(Item).CCoilName;
             CoolingCoilType = VentSlab(Item).CCoilTypeCh;
@@ -2585,7 +2585,7 @@ namespace VentilatedSlab {
                                                VentSlab(Item).CCoilSchedValue,
                                                VentSlab(Item).CCoil_Index);
                     } else if (SELECT_CASE_var1 == Cooling_CoilHXAssisted) {
-                        CheckHXAssistedCoolingCoilSchedule("CoilSystem:Cooling:Water:HeatExchangerAssisted",
+                        CheckHXAssistedCoolingCoilSchedule(state, "CoilSystem:Cooling:Water:HeatExchangerAssisted",
                                                            VentSlab(Item).CCoilName,
                                                            VentSlab(Item).CCoilSchedValue,
                                                            VentSlab(Item).CCoil_Index);
@@ -2628,7 +2628,7 @@ namespace VentilatedSlab {
                                                VentSlab(Item).CCoilSchedValue,
                                                VentSlab(Item).CCoil_Index);
                     } else if (SELECT_CASE_var1 == Cooling_CoilHXAssisted) {
-                        CheckHXAssistedCoolingCoilSchedule("CoilSystem:Cooling:Water:HeatExchangerAssisted",
+                        CheckHXAssistedCoolingCoilSchedule(state, "CoilSystem:Cooling:Water:HeatExchangerAssisted",
                                                            VentSlab(Item).CCoilName,
                                                            VentSlab(Item).CCoilSchedValue,
                                                            VentSlab(Item).CCoil_Index);
@@ -3369,7 +3369,7 @@ namespace VentilatedSlab {
 
                     if (QCoilReq < 0.0) QCoilReq = 0.0; // a heating coil can only heat, not cool
 
-                    SimulateSteamCoilComponents(VentSlab(Item).HCoilName, FirstHVACIteration, VentSlab(Item).HCoil_Index, QCoilReq);
+                    SimulateSteamCoilComponents(state, VentSlab(Item).HCoilName, FirstHVACIteration, VentSlab(Item).HCoil_Index, QCoilReq);
 
                 } else if ((SELECT_CASE_var == Heating_ElectricCoilType) || (SELECT_CASE_var == Heating_GasCoilType)) {
 

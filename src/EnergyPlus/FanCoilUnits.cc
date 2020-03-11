@@ -544,7 +544,7 @@ namespace FanCoilUnits {
                 }
                 if (UtilityRoutines::SameString(Alphas(11), "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
                     FanCoil(FanCoilNum).CCoilType_Num = CCoil_HXAssist;
-                    GetHXCoilTypeAndName(FanCoil(FanCoilNum).CCoilType,
+                    GetHXCoilTypeAndName(state, FanCoil(FanCoilNum).CCoilType,
                                          FanCoil(FanCoilNum).CCoilName,
                                          ErrorsFound,
                                          FanCoil(FanCoilNum).CCoilPlantType,
@@ -572,16 +572,16 @@ namespace FanCoilUnits {
                         FanCoil(FanCoilNum).CoolCoilFluidInletNode =
                             GetCoilWaterInletNode(FanCoil(FanCoilNum).CCoilType, FanCoil(FanCoilNum).CCoilName, IsNotOK);
                         FanCoil(FanCoilNum).CoolCoilInletNodeNum =
-                            WaterCoils::GetCoilInletNode(FanCoil(FanCoilNum).CCoilType, FanCoil(FanCoilNum).CCoilName, IsNotOK);
+                            WaterCoils::GetCoilInletNode(state, FanCoil(FanCoilNum).CCoilType, FanCoil(FanCoilNum).CCoilName, IsNotOK);
                         FanCoil(FanCoilNum).CoolCoilOutletNodeNum =
-                            WaterCoils::GetCoilOutletNode(FanCoil(FanCoilNum).CCoilType, FanCoil(FanCoilNum).CCoilName, IsNotOK);
+                            WaterCoils::GetCoilOutletNode(state, FanCoil(FanCoilNum).CCoilType, FanCoil(FanCoilNum).CCoilName, IsNotOK);
                     } else {
                         FanCoil(FanCoilNum).CoolCoilFluidInletNode =
-                            GetHXCoilWaterInletNode(FanCoil(FanCoilNum).CCoilType, FanCoil(FanCoilNum).CCoilName, IsNotOK);
+                            GetHXCoilWaterInletNode(state, FanCoil(FanCoilNum).CCoilType, FanCoil(FanCoilNum).CCoilName, IsNotOK);
                         FanCoil(FanCoilNum).CoolCoilInletNodeNum =
-                            HVACHXAssistedCoolingCoil::GetCoilInletNode(FanCoil(FanCoilNum).CCoilType, FanCoil(FanCoilNum).CCoilName, IsNotOK);
+                            HVACHXAssistedCoolingCoil::GetCoilInletNode(state, FanCoil(FanCoilNum).CCoilType, FanCoil(FanCoilNum).CCoilName, IsNotOK);
                         FanCoil(FanCoilNum).CoolCoilOutletNodeNum =
-                            HVACHXAssistedCoolingCoil::GetCoilOutletNode(FanCoil(FanCoilNum).CCoilType, FanCoil(FanCoilNum).CCoilName, IsNotOK);
+                            HVACHXAssistedCoolingCoil::GetCoilOutletNode(state, FanCoil(FanCoilNum).CCoilType, FanCoil(FanCoilNum).CCoilName, IsNotOK);
                     }
                     // Other error checks should trap before it gets to this point in the code, but including just in case.
                     if (IsNotOK) {
@@ -608,9 +608,9 @@ namespace FanCoilUnits {
                     FanCoil(FanCoilNum).HeatCoilFluidInletNode =
                         GetCoilWaterInletNode(FanCoil(FanCoilNum).HCoilType, FanCoil(FanCoilNum).HCoilName, IsNotOK);
                     FanCoil(FanCoilNum).HeatCoilInletNodeNum =
-                        WaterCoils::GetCoilInletNode(FanCoil(FanCoilNum).HCoilType, FanCoil(FanCoilNum).HCoilName, IsNotOK);
+                        WaterCoils::GetCoilInletNode(state, FanCoil(FanCoilNum).HCoilType, FanCoil(FanCoilNum).HCoilName, IsNotOK);
                     FanCoil(FanCoilNum).HeatCoilOutletNodeNum =
-                        WaterCoils::GetCoilOutletNode(FanCoil(FanCoilNum).HCoilType, FanCoil(FanCoilNum).HCoilName, IsNotOK);
+                        WaterCoils::GetCoilOutletNode(state, FanCoil(FanCoilNum).HCoilType, FanCoil(FanCoilNum).HCoilName, IsNotOK);
                     if (IsNotOK) {
                         ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + FanCoil(FanCoilNum).Name + "\".");
                         ErrorsFound = true;
@@ -1898,8 +1898,8 @@ namespace FanCoilUnits {
                 }
             } else {
                 if (UtilityRoutines::SameString(FanCoil(FanCoilNum).CCoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
-                    CoolingCoilName = GetHXDXCoilName(FanCoil(FanCoilNum).CCoilType, FanCoil(FanCoilNum).CCoilName, ErrorsFound);
-                    CoolingCoilType = GetHXCoilType(FanCoil(FanCoilNum).CCoilType, FanCoil(FanCoilNum).CCoilName, ErrorsFound);
+                    CoolingCoilName = GetHXDXCoilName(state, FanCoil(FanCoilNum).CCoilType, FanCoil(FanCoilNum).CCoilName, ErrorsFound);
+                    CoolingCoilType = GetHXCoilType(state, FanCoil(FanCoilNum).CCoilType, FanCoil(FanCoilNum).CCoilName, ErrorsFound);
                 } else {
                     CoolingCoilName = FanCoil(FanCoilNum).CCoilName;
                     CoolingCoilType = FanCoil(FanCoilNum).CCoilType;
@@ -2099,8 +2099,8 @@ namespace FanCoilUnits {
 
         // set the design air flow rates for the heating and cooling coils
         if (UtilityRoutines::SameString(FanCoil(FanCoilNum).CCoilType, "CoilSystem:Cooling:Water:HeatExchangerAssisted")) {
-            CoolingCoilName = GetHXDXCoilName(FanCoil(FanCoilNum).CCoilType, FanCoil(FanCoilNum).CCoilName, ErrorsFound);
-            CoolingCoilType = GetHXCoilType(FanCoil(FanCoilNum).CCoilType, FanCoil(FanCoilNum).CCoilName, ErrorsFound);
+            CoolingCoilName = GetHXDXCoilName(state, FanCoil(FanCoilNum).CCoilType, FanCoil(FanCoilNum).CCoilName, ErrorsFound);
+            CoolingCoilType = GetHXCoilType(state, FanCoil(FanCoilNum).CCoilType, FanCoil(FanCoilNum).CCoilName, ErrorsFound);
         } else {
             CoolingCoilName = FanCoil(FanCoilNum).CCoilName;
             CoolingCoilType = FanCoil(FanCoilNum).CCoilType;

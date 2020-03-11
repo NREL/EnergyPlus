@@ -151,7 +151,7 @@ namespace HVACDXHeatPumpSystem {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetDXHeatPumpSystemInput();
+    void GetDXHeatPumpSystemInput(AllGlobals &state);
 
     // End of Get Input subroutines for the Module
     //******************************************************************************
@@ -191,9 +191,9 @@ namespace HVACDXHeatPumpSystem {
                                Array1<Real64> const &Par // par(1) = DX coil number
     );
 
-    int GetHeatingCoilInletNodeNum(std::string const &DXCoilSysName);
+    int GetHeatingCoilInletNodeNum(AllGlobals &state, std::string const &DXCoilSysName);
 
-    int GetHeatingCoilOutletNodeNum(std::string const &DXCoilSysName);
+    int GetHeatingCoilOutletNodeNum(AllGlobals &state, std::string const &DXCoilSysName);
 
 
 } // namespace HVACDXHeatPumpSystem

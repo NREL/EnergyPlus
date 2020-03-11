@@ -457,7 +457,7 @@ namespace HeatBalanceManager {
 
         GetConstructData(ErrorsFound); // Read constructs from input file/transfer from legacy data structure
 
-        GetBuildingData(ErrorsFound); // Read building data from input file
+        GetBuildingData(state, ErrorsFound); // Read building data from input file
 
         // Added SV 6/26/2013 to load scheduled surface gains
         GetScheduledSurfaceGains(ErrorsFound);

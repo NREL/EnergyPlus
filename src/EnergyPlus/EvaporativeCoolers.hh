@@ -436,7 +436,7 @@ namespace EvaporativeCoolers {
 
     void GetInputZoneEvaporativeCoolerUnit(AllGlobals &state);
 
-    void InitZoneEvaporativeCoolerUnit(int const UnitNum, // unit number
+    void InitZoneEvaporativeCoolerUnit(AllGlobals &state, int const UnitNum, // unit number
                                        int const ZoneNum  // number of zone being served
     );
 
@@ -454,7 +454,7 @@ namespace EvaporativeCoolers {
                                 Real64 &LatentOutputProvided    // Latent add/removal  (kg/s), dehumid = negative
     );
 
-    void ControlZoneEvapUnitOutput(int const UnitNum,           // unit number
+    void ControlZoneEvapUnitOutput(AllGlobals &state, int const UnitNum,           // unit number
                                    Real64 const ZoneCoolingLoad // target cooling load
     );
 

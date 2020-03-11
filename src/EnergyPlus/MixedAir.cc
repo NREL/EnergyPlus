@@ -694,7 +694,7 @@ namespace MixedAir {
                 OAHeatingCoil = true;
             } else if (SELECT_CASE_var == SteamCoil_AirHeat) { // 'Coil:Heating:Steam'
                 if (Sim) {
-                    SimulateSteamCoilComponents(CompName, FirstHVACIteration, CompIndex, 0.0);
+                    SimulateSteamCoilComponents(state, CompName, FirstHVACIteration, CompIndex, 0.0);
                 }
                 OAHeatingCoil = true;
             } else if (SELECT_CASE_var == WaterCoil_DetailedCool) { // 'Coil:Cooling:Water:DetailedGeometry'
@@ -963,7 +963,7 @@ namespace MixedAir {
             OAControllerNum = CtrlIndex;
         }
 
-        InitOAController(OAControllerNum, FirstHVACIteration, AirLoopNum);
+        InitOAController(state, OAControllerNum, FirstHVACIteration, AirLoopNum);
 
         OAController(OAControllerNum).CalcOAController(state, AirLoopNum, FirstHVACIteration);
         OAController(OAControllerNum).UpdateOAController();
@@ -1466,7 +1466,7 @@ namespace MixedAir {
                                               cNumericFields);
                 GlobalNames::VerifyUniqueInterObjectName(OAControllerUniqueNames, AlphArray(1), CurrentModuleObject, cAlphaFields(1), ErrorsFound);
 
-                ProcessOAControllerInputs(CurrentModuleObject,
+                ProcessOAControllerInputs(state, CurrentModuleObject,
                                           OutAirNum,
                                           AlphArray,
                                           NumAlphas,
@@ -2223,7 +2223,7 @@ namespace MixedAir {
         GetOAMixerInputFlag = false;
     }
 
-    void ProcessOAControllerInputs(std::string const &CurrentModuleObject,
+    void ProcessOAControllerInputs(AllGlobals &state, std::string const &CurrentModuleObject,
                                    int const OutAirNum,
                                    Array1_string const &AlphArray,
                                    int &NumAlphas,
@@ -2588,7 +2588,7 @@ namespace MixedAir {
             ShowContinueError("...The high humidity control option will be disabled and the simulation continues.");
         }
 
-        OAController(OutAirNum).MixedAirSPMNum = GetMixedAirNumWithCoilFreezingCheck(OAController(OutAirNum).MixNode);
+        OAController(OutAirNum).MixedAirSPMNum = GetMixedAirNumWithCoilFreezingCheck(state, OAController(OutAirNum).MixNode);
     }
 
     // End of Get Input subroutines for the Module
@@ -2649,7 +2649,7 @@ namespace MixedAir {
         // Each iteration
     }
 
-    void InitOAController(int const OAControllerNum, bool const FirstHVACIteration, int const AirLoopNum)
+    void InitOAController(AllGlobals &state, int const OAControllerNum, bool const FirstHVACIteration, int const AirLoopNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2821,7 +2821,7 @@ namespace MixedAir {
         }
 
         if (!SysSizingCalc && OAControllerMySizeFlag(OAControllerNum)) {
-            thisOAController.SizeOAController();
+            thisOAController.SizeOAController(state);
             if (AirLoopNum > 0) {
                 AirLoopControlInfo(AirLoopNum).OACtrlNum = OAControllerNum;
                 AirLoopControlInfo(AirLoopNum).OACtrlName = thisOAController.Name;
@@ -4479,7 +4479,7 @@ namespace MixedAir {
 
         // Define an outside air signal
         if (this->MixedAirSPMNum > 0) {
-            this->CoolCoilFreezeCheck = GetCoilFreezingCheckFlag(this->MixedAirSPMNum);
+            this->CoolCoilFreezeCheck = GetCoilFreezingCheckFlag(state, this->MixedAirSPMNum);
         } else {
             this->CoolCoilFreezeCheck = false;
         }
@@ -4861,7 +4861,7 @@ namespace MixedAir {
     // Beginning Sizing Section of the Module
     //******************************************************************************
 
-    void OAControllerProps::SizeOAController()
+    void OAControllerProps::SizeOAController(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4993,8 +4993,8 @@ namespace MixedAir {
                     UtilityRoutines::SameString(CompType, "COIL:HEATING:WATER") ||
                     UtilityRoutines::SameString(CompType, "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED")) {
                     if (UtilityRoutines::SameString(CompType, "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED")) {
-                        CoilName = GetHXDXCoilName(CompType, CompName, ErrorsFound);
-                        CoilType = GetHXCoilType(CompType, CompName, ErrorsFound);
+                        CoilName = GetHXDXCoilName(state, CompType, CompName, ErrorsFound);
+                        CoilType = GetHXCoilType(state, CompType, CompName, ErrorsFound);
                     } else {
                         CoilName = CompName;
                         CoilType = CompType;

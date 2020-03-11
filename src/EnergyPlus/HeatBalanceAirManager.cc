@@ -197,7 +197,7 @@ namespace HeatBalanceAirManager {
 
         // Obtains and Allocates heat balance related parameters from input file
         if (ManageAirHeatBalanceGetInputFlag) {
-            GetAirHeatBalanceInput();
+            GetAirHeatBalanceInput(state);
             ManageAirHeatBalanceGetInputFlag = false;
         }
 
@@ -213,7 +213,7 @@ namespace HeatBalanceAirManager {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetAirHeatBalanceInput()
+    void GetAirHeatBalanceInput(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -254,7 +254,7 @@ namespace HeatBalanceAirManager {
 
         auto &outputFiles = OutputFiles::getSingleton();
 
-        GetAirFlowFlag(outputFiles, ErrorsFound);
+        GetAirFlowFlag(state, outputFiles, ErrorsFound);
 
         SetZoneMassConservationFlag();
 
@@ -266,7 +266,7 @@ namespace HeatBalanceAirManager {
         }
     }
 
-    void GetAirFlowFlag(OutputFiles &outputFiles, bool &ErrorsFound) // Set to true if errors found
+    void GetAirFlowFlag(AllGlobals &state, OutputFiles &outputFiles, bool &ErrorsFound) // Set to true if errors found
     {
 
         // SUBROUTINE INFORMATION:
@@ -291,7 +291,7 @@ namespace HeatBalanceAirManager {
 
         AirFlowFlag = UseSimpleAirFlow;
 
-        GetSimpleAirModelInputs(outputFiles, ErrorsFound);
+        GetSimpleAirModelInputs(state, outputFiles, ErrorsFound);
         if (TotInfiltration + TotVentilation + TotMixing + TotCrossMixing + TotRefDoorMixing > 0) {
             static constexpr auto Format_720("! <AirFlow Model>, Simple\n AirFlow Model, {}\n");
             print(outputFiles.eio, Format_720, "Simple");
@@ -331,7 +331,7 @@ namespace HeatBalanceAirManager {
         }
     }
 
-    void GetSimpleAirModelInputs(OutputFiles &outputFiles, bool &ErrorsFound) // IF errors found in input
+    void GetSimpleAirModelInputs(AllGlobals &state, OutputFiles &outputFiles, bool &ErrorsFound) // IF errors found in input
     {
 
         // SUBROUTINE INFORMATION:
@@ -680,7 +680,7 @@ namespace HeatBalanceAirManager {
             }
 
             // Check whether this zone is also controleld by hybrid ventilation object with ventilation control option or not
-            ControlFlag = GetHybridVentilationControlStatus(ZoneAirBalance(Loop).ZonePtr);
+            ControlFlag = GetHybridVentilationControlStatus(state, ZoneAirBalance(Loop).ZonePtr);
             if (ControlFlag && ZoneAirBalance(Loop).BalanceMethod == AirBalanceQuadrature) {
                 ZoneAirBalance(Loop).BalanceMethod = AirBalanceNone;
                 ShowWarningError(cCurrentModuleObject + " = " + ZoneAirBalance(Loop).Name + ": This Zone (" + cAlphaArgs(2) +

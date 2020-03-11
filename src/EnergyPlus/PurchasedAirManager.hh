@@ -343,7 +343,7 @@ namespace PurchasedAirManager {
                               int const OperatingMode          // current operating mode, Off, Heating, Cooling, or DeadBand
     );
 
-    void UpdatePurchasedAir(int const PurchAirNum, bool const FirstHVACIteration);
+    void UpdatePurchasedAir(AllGlobals &state, int const PurchAirNum, bool const FirstHVACIteration);
 
     void ReportPurchasedAir(int const PurchAirNum);
 

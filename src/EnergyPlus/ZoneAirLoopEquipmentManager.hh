@@ -62,7 +62,7 @@ namespace ZoneAirLoopEquipmentManager {
     // Functions
     void clear_state();
 
-    void ManageZoneAirLoopEquipment(std::string const &ZoneAirLoopEquipName,
+    void ManageZoneAirLoopEquipment(AllGlobals &state, std::string const &ZoneAirLoopEquipName,
                                     bool const FirstHVACIteration,
                                     Real64 &SysOutputProvided,
                                     Real64 &NonAirSysOutput,

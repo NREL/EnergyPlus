@@ -3417,8 +3417,8 @@ namespace HVACVariableRefrigerantFlow {
                                     GetDXCoilAvailSchPtr(DXCoolingCoilType, cAlphaArgs(12), errFlag);
                             }
                             GetDXCoilIndex(cAlphaArgs(12), VRFTU(VRFTUNum).CoolCoilIndex, errFlag, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_FluidTCtrl_Cooling));
-                            CCoilInletNodeNum = GetDXCoilInletNode(DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_FluidTCtrl_Cooling), cAlphaArgs(12), errFlag);
-                            CCoilOutletNodeNum = GetDXCoilOutletNode(DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_FluidTCtrl_Cooling), cAlphaArgs(12), errFlag);
+                            CCoilInletNodeNum = GetDXCoilInletNode(state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_FluidTCtrl_Cooling), cAlphaArgs(12), errFlag);
+                            CCoilOutletNodeNum = GetDXCoilOutletNode(state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_FluidTCtrl_Cooling), cAlphaArgs(12), errFlag);
                             VRFTU(VRFTUNum).coolCoilAirInNode = CCoilInletNodeNum;
                             VRFTU(VRFTUNum).coolCoilAirOutNode = CCoilOutletNodeNum;
 
@@ -3482,8 +3482,8 @@ namespace HVACVariableRefrigerantFlow {
                             }
                             errFlag = false;
                             GetDXCoilIndex(cAlphaArgs(12), VRFTU(VRFTUNum).CoolCoilIndex, errFlag, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Cooling));
-                            CCoilInletNodeNum = GetDXCoilInletNode(DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Cooling), cAlphaArgs(12), errFlag);
-                            CCoilOutletNodeNum = GetDXCoilOutletNode(DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Cooling), cAlphaArgs(12), errFlag);
+                            CCoilInletNodeNum = GetDXCoilInletNode(state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Cooling), cAlphaArgs(12), errFlag);
+                            CCoilOutletNodeNum = GetDXCoilOutletNode(state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Cooling), cAlphaArgs(12), errFlag);
                             VRFTU(VRFTUNum).coolCoilAirInNode = CCoilInletNodeNum;
                             VRFTU(VRFTUNum).coolCoilAirOutNode = CCoilOutletNodeNum;
 
@@ -3542,8 +3542,8 @@ namespace HVACVariableRefrigerantFlow {
                                     GetDXCoilAvailSchPtr(DXHeatingCoilType, cAlphaArgs(14), errFlag);
                             }
                             GetDXCoilIndex(cAlphaArgs(14), VRFTU(VRFTUNum).HeatCoilIndex, errFlag, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_FluidTCtrl_Heating));
-                            HCoilInletNodeNum = GetDXCoilInletNode(DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_FluidTCtrl_Heating), cAlphaArgs(14), errFlag);
-                            HCoilOutletNodeNum = GetDXCoilOutletNode(DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_FluidTCtrl_Heating), cAlphaArgs(14), errFlag);
+                            HCoilInletNodeNum = GetDXCoilInletNode(state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_FluidTCtrl_Heating), cAlphaArgs(14), errFlag);
+                            HCoilOutletNodeNum = GetDXCoilOutletNode(state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_FluidTCtrl_Heating), cAlphaArgs(14), errFlag);
                             VRFTU(VRFTUNum).heatCoilAirInNode = HCoilInletNodeNum;
                             VRFTU(VRFTUNum).heatCoilAirOutNode = HCoilOutletNodeNum;
 
@@ -3753,8 +3753,8 @@ namespace HVACVariableRefrigerantFlow {
                             }
                             errFlag = false;
                             GetDXCoilIndex(cAlphaArgs(14), VRFTU(VRFTUNum).HeatCoilIndex, errFlag, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Heating));
-                            HCoilInletNodeNum = GetDXCoilInletNode(DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Heating), cAlphaArgs(14), errFlag);
-                            HCoilOutletNodeNum = GetDXCoilOutletNode(DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Heating), cAlphaArgs(14), errFlag);
+                            HCoilInletNodeNum = GetDXCoilInletNode(state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Heating), cAlphaArgs(14), errFlag);
+                            HCoilOutletNodeNum = GetDXCoilOutletNode(state, DataHVACGlobals::cAllCoilTypes(DataHVACGlobals::CoilVRF_Heating), cAlphaArgs(14), errFlag);
                             VRFTU(VRFTUNum).heatCoilAirInNode = HCoilInletNodeNum;
                             VRFTU(VRFTUNum).heatCoilAirOutNode = HCoilOutletNodeNum;
 
@@ -4075,7 +4075,7 @@ namespace HVACVariableRefrigerantFlow {
                         }
                         // Get the supplemental heating Coil air inlet node
                         errFlag = false;
-                        SuppHeatCoilAirInletNode = WaterCoils::GetCoilInletNode("Coil:Heating:Water", SuppHeatingCoilName, errFlag);
+                        SuppHeatCoilAirInletNode = WaterCoils::GetCoilInletNode(state, "Coil:Heating:Water", SuppHeatingCoilName, errFlag);
                         VRFTU(VRFTUNum).SuppHeatCoilAirInletNode = SuppHeatCoilAirInletNode;
                         if (errFlag) {
                             ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
@@ -4083,7 +4083,7 @@ namespace HVACVariableRefrigerantFlow {
                         }
                         // Get the supplemental heating coil air outlet node
                         errFlag = false;
-                        SuppHeatCoilAirOutletNode = WaterCoils::GetCoilOutletNode("Coil:Heating:Water", SuppHeatingCoilName, errFlag);
+                        SuppHeatCoilAirOutletNode = WaterCoils::GetCoilOutletNode(state, "Coil:Heating:Water", SuppHeatingCoilName, errFlag);
                         VRFTU(VRFTUNum).SuppHeatCoilAirOutletNode = SuppHeatCoilAirOutletNode;
                         if (errFlag) {
                             ShowContinueError("Occurs in " + cCurrentModuleObject + " = " + VRFTU(VRFTUNum).Name);
@@ -5776,7 +5776,7 @@ namespace HVACVariableRefrigerantFlow {
 
                 if (VRFTU(VRFTUNum).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingSteam) {
                     if (VRFTU(VRFTUNum).SuppHeatCoilFluidMaxFlow == DataSizing::AutoSize) {
-                        SteamCoils::SimulateSteamCoilComponents(
+                        SteamCoils::SimulateSteamCoilComponents(state, 
                             VRFTU(VRFTUNum).SuppHeatCoilName, FirstHVACIteration, VRFTU(VRFTUNum).SuppHeatCoilIndex, 1.0);
                         // design steam volume flow rate
                         Real64 CoilMaxVolFlowRate = SteamCoils::GetCoilMaxSteamFlowRate(VRFTU(VRFTUNum).SuppHeatCoilIndex, ErrorsFound);
@@ -5871,12 +5871,12 @@ namespace HVACVariableRefrigerantFlow {
                                                          VRFTU(VRFTUNum).SuppHeatCoilCompNum);
 
                     //     simulate steam coil to find operating capacity
-                    SteamCoils::SimulateSteamCoilComponents(VRFTU(VRFTUNum).SuppHeatCoilName,
+                    SteamCoils::SimulateSteamCoilComponents(state, VRFTU(VRFTUNum).SuppHeatCoilName,
                                                             FirstHVACIteration,
                                                             VRFTU(VRFTUNum).SuppHeatCoilIndex,
                                                             1.0,
                                                             ErrorsFound); // QCoilReq, simulate any load > 0 to get max capacity of steam coil
-                    SuppHeatCoilCapacity = SteamCoils::GetCoilCapacity("Coil:Heating:Steam", VRFTU(VRFTUNum).SuppHeatCoilName, ErrorsFound);
+                    SuppHeatCoilCapacity = SteamCoils::GetCoilCapacity(state, "Coil:Heating:Steam", VRFTU(VRFTUNum).SuppHeatCoilName, ErrorsFound);
 
                     VRFTU(VRFTUNum).DesignSuppHeatingCapacity = SuppHeatCoilCapacity;
                 } // from if VRFTU( VRFTUNum ).SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingSteam
@@ -14113,7 +14113,7 @@ namespace HVACVariableRefrigerantFlow {
                 //     simulate steam heating coil
                 Real64 mdot = this->SuppHeatCoilFluidMaxFlow * PartLoadRatio;
                 DataLoopNode::Node(this->SuppHeatCoilFluidInletNode).MassFlowRate = mdot;
-                SteamCoils::SimulateSteamCoilComponents(
+                SteamCoils::SimulateSteamCoilComponents(state, 
                     this->SuppHeatCoilName, FirstHVACIteration, this->SuppHeatCoilIndex, SuppHeatCoilLoad, QActual, this->OpMode, PartLoadRatio);
                 SuppHeatCoilLoad = QActual;
             }

@@ -287,7 +287,7 @@ namespace HVACControllers {
         CheckEquipName.deallocate();
     }
 
-    void ManageControllers(std::string const &ControllerName,
+    void ManageControllers(AllGlobals &state, std::string const &ControllerName,
                            int &ControllerIndex,
                            bool const FirstHVACIteration,
                            int const AirLoopNum,
@@ -336,7 +336,7 @@ namespace HVACControllers {
 
         // Obtains and Allocates Controller related parameters from input file
         if (GetControllerInputFlag) { // First time subroutine has been entered
-            GetControllerInput();
+            GetControllerInput(state);
             GetControllerInputFlag = false;
         }
 
@@ -402,7 +402,7 @@ namespace HVACControllers {
         if (ControllerProps(ControlNum).InitFirstPass) {
             // Coil must first be sized to:
             // Initialize ControllerProps(ControlNum)%MinActuated and ControllerProps(ControlNum)%MaxActuated
-            InitController(ControlNum, IsConvergedFlag);
+            InitController(state, ControlNum, IsConvergedFlag);
             ControllerProps(ControlNum).InitFirstPass = false;
         }
 
@@ -439,7 +439,7 @@ namespace HVACControllers {
 
             } else if (SELECT_CASE_var == iControllerOpIterate) {
                 // With the correct ControlNum Initialize all Controller related parameters
-                InitController(ControlNum, IsConvergedFlag);
+                InitController(state, ControlNum, IsConvergedFlag);
 
                 // No initialization needed: should have been done before
                 // Simulate the correct Controller with the current ControlNum
@@ -462,7 +462,7 @@ namespace HVACControllers {
 
             } else if (SELECT_CASE_var == iControllerOpEnd) {
                 // With the correct ControlNum Initialize all Controller related parameters
-                InitController(ControlNum, IsConvergedFlag);
+                InitController(state, ControlNum, IsConvergedFlag);
 
                 // No initialization needed: should have been done before
                 // Check convergence for the correct Controller with the current ControlNum
@@ -703,9 +703,9 @@ namespace HVACControllers {
                 if (ControllerProps(Num).SensedNode > 0) {
 
                     if (ControllerProps(Num).ControlVar == iHumidityRatio || ControllerProps(Num).ControlVar == iTemperatureAndHumidityRatio) {
-                        ResetHumidityRatioCtrlVarType(ControllerProps(Num).SensedNode);
+                        ResetHumidityRatioCtrlVarType(state, ControllerProps(Num).SensedNode);
                     }
-                    CheckForSensorAndSetPointNode(ControllerProps(Num).SensedNode, ControllerProps(Num).ControlVar, NodeNotFound);
+                    CheckForSensorAndSetPointNode(state, ControllerProps(Num).SensedNode, ControllerProps(Num).ControlVar, NodeNotFound);
 
                     if (NodeNotFound) {
                         // the sensor node is not on the water coil air outlet node
@@ -720,7 +720,7 @@ namespace HVACControllers {
                             if (SELECT_CASE_var == iTemperature) {
                                 CheckIfNodeSetPointManagedByEMS(ControllerProps(Num).SensedNode, iTemperatureSetPoint, EMSSetPointErrorFlag);
                                 if (EMSSetPointErrorFlag) {
-                                    if (!NodeHasSPMCtrlVarType(ControllerProps(Num).SensedNode, iCtrlVarType_Temp)) {
+                                    if (!NodeHasSPMCtrlVarType(state, ControllerProps(Num).SensedNode, iCtrlVarType_Temp)) {
                                         ShowContinueError(" ..Temperature setpoint not found on coil air outlet node.");
                                         ShowContinueError(
                                             " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node.");
@@ -730,7 +730,7 @@ namespace HVACControllers {
                             } else if (SELECT_CASE_var == iHumidityRatio) {
                                 CheckIfNodeSetPointManagedByEMS(ControllerProps(Num).SensedNode, iHumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
                                 if (EMSSetPointErrorFlag) {
-                                    if (!NodeHasSPMCtrlVarType(ControllerProps(Num).SensedNode, iCtrlVarType_MaxHumRat)) {
+                                    if (!NodeHasSPMCtrlVarType(state, ControllerProps(Num).SensedNode, iCtrlVarType_MaxHumRat)) {
                                         ShowContinueError(" ..Humidity ratio setpoint not found on coil air outlet node.");
                                         ShowContinueError(
                                             " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node.");
@@ -740,7 +740,7 @@ namespace HVACControllers {
                             } else if (SELECT_CASE_var == iTemperatureAndHumidityRatio) {
                                 CheckIfNodeSetPointManagedByEMS(ControllerProps(Num).SensedNode, iTemperatureSetPoint, EMSSetPointErrorFlag);
                                 if (EMSSetPointErrorFlag) {
-                                    if (!NodeHasSPMCtrlVarType(ControllerProps(Num).SensedNode, iCtrlVarType_Temp)) {
+                                    if (!NodeHasSPMCtrlVarType(state, ControllerProps(Num).SensedNode, iCtrlVarType_Temp)) {
                                         ShowContinueError(" ..Temperature setpoint not found on coil air outlet node.");
                                         ShowContinueError(
                                             " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node.");
@@ -750,7 +750,7 @@ namespace HVACControllers {
                                 EMSSetPointErrorFlag = false;
                                 CheckIfNodeSetPointManagedByEMS(ControllerProps(Num).SensedNode, iHumidityRatioMaxSetPoint, EMSSetPointErrorFlag);
                                 if (EMSSetPointErrorFlag) {
-                                    if (!NodeHasSPMCtrlVarType(ControllerProps(Num).SensedNode, iCtrlVarType_MaxHumRat)) {
+                                    if (!NodeHasSPMCtrlVarType(state, ControllerProps(Num).SensedNode, iCtrlVarType_MaxHumRat)) {
                                         ShowContinueError(" ..Humidity ratio setpoint not found on coil air outlet node.");
                                         ShowContinueError(
                                             " ..The setpoint may have been placed on a node downstream of the coil or on an airloop outlet node.");
@@ -926,7 +926,7 @@ namespace HVACControllers {
         RootFinders(ControlNum).UpperPoint.DefinedFlag = false;
     }
 
-    void InitController(int const ControlNum,
+    void InitController(AllGlobals &state, int const ControlNum,
                         bool &IsConvergedFlag)
     {
 
@@ -1027,7 +1027,7 @@ namespace HVACControllers {
                             }
                         }
                     } else if (SELECT_CASE_var == iHumidityRatio) { // 'HumidityRatio'
-                        ControllerProps(ControllerIndex).HumRatCntrlType = GetHumidityRatioVariableType(SensedNode);
+                        ControllerProps(ControllerIndex).HumRatCntrlType = GetHumidityRatioVariableType(state, SensedNode);
                         if ((ControllerProps(ControlNum).HumRatCntrlType == iCtrlVarType_HumRat &&
                              Node(SensedNode).HumRatSetPoint == SensedNodeFlagValue) ||
                             (ControllerProps(ControlNum).HumRatCntrlType == iCtrlVarType_MaxHumRat &&
@@ -3486,7 +3486,7 @@ namespace HVACControllers {
         }
     }
 
-    void CheckCoilWaterInletNode(int const WaterInletNodeNum, // input actuator node number
+    void CheckCoilWaterInletNode(AllGlobals &state, int const WaterInletNodeNum, // input actuator node number
                                  bool &NodeNotFound           // true if matching actuator node not found
     )
     {
@@ -3525,7 +3525,7 @@ namespace HVACControllers {
         int ControlNum;
 
         if (GetControllerInputFlag) {
-            GetControllerInput();
+            GetControllerInput(state);
             GetControllerInputFlag = false;
         }
 
@@ -3537,7 +3537,7 @@ namespace HVACControllers {
         }
     }
 
-    void GetControllerNameAndIndex(int const WaterInletNodeNum, // input actuator node number
+    void GetControllerNameAndIndex(AllGlobals &state, int const WaterInletNodeNum, // input actuator node number
                                    std::string &ControllerName, // controller name used by water coil
                                    int &ControllerIndex,        // controller index used by water coil
                                    bool &ErrorsFound            // true if matching actuator node not found
@@ -3556,7 +3556,7 @@ namespace HVACControllers {
         int ControlNum;
 
         if (GetControllerInputFlag) {
-            GetControllerInput();
+            GetControllerInput(state);
             GetControllerInputFlag = false;
         }
 
@@ -3575,7 +3575,7 @@ namespace HVACControllers {
         }
     }
 
-    void GetControllerActuatorNodeNum(std::string const &ControllerName, // name of coil controller
+    void GetControllerActuatorNodeNum(AllGlobals &state, std::string const &ControllerName, // name of coil controller
                                       int &WaterInletNodeNum,            // input actuator node number
                                       bool &NodeNotFound                 // true if matching actuator node not found
     )
@@ -3594,7 +3594,7 @@ namespace HVACControllers {
         int ControlNum;
 
         if (GetControllerInputFlag) {
-            GetControllerInput();
+            GetControllerInput(state);
             GetControllerInputFlag = false;
         }
 
@@ -3606,7 +3606,7 @@ namespace HVACControllers {
         }
     }
 
-    int GetControllerIndex(std::string const &ControllerName // name of coil controller
+    int GetControllerIndex(AllGlobals &state, std::string const &ControllerName // name of coil controller
     )
     {
 
@@ -3617,7 +3617,7 @@ namespace HVACControllers {
         // This subroutine finds the controllers actuator node number
 
         if (GetControllerInputFlag) {
-            GetControllerInput();
+            GetControllerInput(state);
             GetControllerInputFlag = false;
         }
 

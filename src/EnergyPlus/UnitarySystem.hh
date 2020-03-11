@@ -546,19 +546,19 @@ namespace UnitarySystems {
                                                  std::vector<Real64> const &Par // par(1) = DX coil number
         );
 
-        static Real64 steamHeatingCoilResidual(Real64 const PartLoadFrac,     // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
+        static Real64 steamHeatingCoilResidual(AllGlobals &state, Real64 const PartLoadFrac,     // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                                std::vector<Real64> const &Par // par(1) = DX coil number
         );
 
-        static Real64 heatWatertoAirHPTempResidual(Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+        static Real64 heatWatertoAirHPTempResidual(AllGlobals &state, Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                                    std::vector<Real64> const &Par // par(1) = HeatWatertoAirHP coil number
         );
 
-        static Real64 coolWatertoAirHPHumRatResidual(Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+        static Real64 coolWatertoAirHPHumRatResidual(AllGlobals &state, Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                                      std::vector<Real64> const &Par // par(1) = CoolWatertoAirHP coil number
         );
 
-        static Real64 coolWatertoAirHPTempResidual(Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+        static Real64 coolWatertoAirHPTempResidual(AllGlobals &state, Real64 const PartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                                    std::vector<Real64> const &Par // par(1) = CoolWatertoAirHP coil number
         );
 

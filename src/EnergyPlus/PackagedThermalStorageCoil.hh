@@ -450,7 +450,7 @@ namespace PackagedThermalStorageCoil {
 
     void CalcTESIceStorageTank(int const TESCoilNum);
 
-    void ControlTESIceStorageTankCoil(std::string const &CoilName,
+    void ControlTESIceStorageTankCoil(AllGlobals &state, std::string const &CoilName,
                                       int CoilIndex,
                                       std::string SystemType,
                                       int const FanOpMode,

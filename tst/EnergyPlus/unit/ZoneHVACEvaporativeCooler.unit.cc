@@ -245,7 +245,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectCelDekPad_CyclingUnit_Sim)
     Real64 HalfOfFullLoad = 0.50 * FullSensibleOutput;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = HalfOfFullLoad;
     // calculate part load ratio for cycling fan
-    EvaporativeCoolers::ControlZoneEvapUnitOutput(UnitNum, HalfOfFullLoad);
+    EvaporativeCoolers::ControlZoneEvapUnitOutput(state, UnitNum, HalfOfFullLoad);
     EXPECT_NEAR(0.4746755, thisZoneEvapCooler.UnitPartLoadRatio, 0.000001);
     EvaporativeCoolers::CalcZoneEvapUnitOutput(state, UnitNum, thisZoneEvapCooler.UnitPartLoadRatio, SensOutputProvided, LatOutputProvided);
     EXPECT_NEAR(HalfOfFullLoad, SensOutputProvided, 0.01);
@@ -262,7 +262,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectCelDekPad_CyclingUnit_Sim)
     HalfOfFullLoad = 0.50 * FullSensibleOutput;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = HalfOfFullLoad;
     // calculate part load ratio for cycling fan
-    EvaporativeCoolers::ControlZoneEvapUnitOutput(UnitNum, HalfOfFullLoad);
+    EvaporativeCoolers::ControlZoneEvapUnitOutput(state, UnitNum, HalfOfFullLoad);
     EXPECT_NEAR(0.4746755, thisZoneEvapCooler.UnitPartLoadRatio, 0.000001);
     EvaporativeCoolers::CalcZoneEvapUnitOutput(state, UnitNum, thisZoneEvapCooler.UnitPartLoadRatio, SensOutputProvided, LatOutputProvided);
     EXPECT_NEAR(HalfOfFullLoad, SensOutputProvided, 0.01);
@@ -368,7 +368,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectResearchSpecial_CyclingUnit_Sim)
     Real64 HalfOfFullLoad = 0.50 * FullSensibleOutput;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = HalfOfFullLoad;
     // calculate part load ratio for cycling fan
-    EvaporativeCoolers::ControlZoneEvapUnitOutput(UnitNum, HalfOfFullLoad);
+    EvaporativeCoolers::ControlZoneEvapUnitOutput(state, UnitNum, HalfOfFullLoad);
     EXPECT_NEAR(0.500000, thisZoneEvapCooler.UnitPartLoadRatio, 0.000001);
     EvaporativeCoolers::CalcZoneEvapUnitOutput(state, UnitNum, thisZoneEvapCooler.UnitPartLoadRatio, SensOutputProvided, LatOutputProvided);
     EXPECT_NEAR(HalfOfFullLoad, SensOutputProvided, 0.01);
@@ -385,7 +385,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectResearchSpecial_CyclingUnit_Sim)
     HalfOfFullLoad = 0.50 * FullSensibleOutput;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = HalfOfFullLoad;
     // calculate part load ratio for cycling fan
-    EvaporativeCoolers::ControlZoneEvapUnitOutput(UnitNum, HalfOfFullLoad);
+    EvaporativeCoolers::ControlZoneEvapUnitOutput(state, UnitNum, HalfOfFullLoad);
     EXPECT_NEAR(0.500000, thisZoneEvapCooler.UnitPartLoadRatio, 0.000001);
     EvaporativeCoolers::CalcZoneEvapUnitOutput(state, UnitNum, thisZoneEvapCooler.UnitPartLoadRatio, SensOutputProvided, LatOutputProvided);
     EXPECT_NEAR(HalfOfFullLoad, SensOutputProvided, 0.01);
@@ -505,7 +505,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, IndirectWetCoil_CyclingUnit_Sim)
     Real64 HalfOfFullLoad = 0.50 * FullSensibleOutput;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = HalfOfFullLoad;
     // calculate part load ratio for cycling fan
-    EvaporativeCoolers::ControlZoneEvapUnitOutput(UnitNum, HalfOfFullLoad);
+    EvaporativeCoolers::ControlZoneEvapUnitOutput(state, UnitNum, HalfOfFullLoad);
     EXPECT_NEAR(0.500000, thisZoneEvapCooler.UnitPartLoadRatio, 0.000001);
     EvaporativeCoolers::CalcZoneEvapUnitOutput(state, UnitNum, thisZoneEvapCooler.UnitPartLoadRatio, SensOutputProvided, LatOutputProvided);
     EXPECT_NEAR(HalfOfFullLoad, SensOutputProvided, 0.01);
@@ -522,7 +522,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, IndirectWetCoil_CyclingUnit_Sim)
     HalfOfFullLoad = 0.50 * FullSensibleOutput;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = HalfOfFullLoad;
     // calculate part load ratio for cycling fan
-    EvaporativeCoolers::ControlZoneEvapUnitOutput(UnitNum, HalfOfFullLoad);
+    EvaporativeCoolers::ControlZoneEvapUnitOutput(state, UnitNum, HalfOfFullLoad);
     EXPECT_NEAR(0.500000, thisZoneEvapCooler.UnitPartLoadRatio, 0.000001);
     EvaporativeCoolers::CalcZoneEvapUnitOutput(state, UnitNum, thisZoneEvapCooler.UnitPartLoadRatio, SensOutputProvided, LatOutputProvided);
     EXPECT_NEAR(HalfOfFullLoad, SensOutputProvided, 0.01);

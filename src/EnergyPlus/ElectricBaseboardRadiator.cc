@@ -128,7 +128,7 @@ namespace ElectricBaseboardRadiator {
 
     // Functions
 
-    void SimElecBaseboard(std::string const &EquipName,
+    void SimElecBaseboard(AllGlobals &state, std::string const &EquipName,
                           int const EP_UNUSED(ActualZoneNum),
                           int const ControlledZoneNum,
                           bool const FirstHVACIteration,
@@ -181,7 +181,7 @@ namespace ElectricBaseboardRadiator {
             }
         }
 
-        InitElectricBaseboard(BaseboardNum, ControlledZoneNum, FirstHVACIteration);
+        InitElectricBaseboard(state, BaseboardNum, ControlledZoneNum, FirstHVACIteration);
 
         {
             auto const SELECT_CASE_var(ElecBaseboard(BaseboardNum).EquipType);
@@ -552,7 +552,7 @@ namespace ElectricBaseboardRadiator {
         }
     }
 
-    void InitElectricBaseboard(int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration)
+    void InitElectricBaseboard(AllGlobals &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -598,7 +598,7 @@ namespace ElectricBaseboardRadiator {
 
         if (!SysSizingCalc && MySizeFlag(BaseboardNum)) {
             // for each coil, do the sizing once.
-            SizeElectricBaseboard(BaseboardNum);
+            SizeElectricBaseboard(state, BaseboardNum);
             MySizeFlag(BaseboardNum) = false;
         }
 

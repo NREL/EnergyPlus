@@ -1555,7 +1555,7 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrSetPtTest)
     zoneNode.Temp = 20.0;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 0.0;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 0.0;
-    SetPointManager::ManageSetPoints();
+    SetPointManager::ManageSetPoints(state);
     EXPECT_NEAR(coolSPNode.TempSetPoint, zoneNode.Temp, 0.001);
     EXPECT_NEAR(heatSPNode.TempSetPoint, zoneNode.Temp, 0.001);
 
@@ -1564,7 +1564,7 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrSetPtTest)
     zoneNode.Temp = 20.0;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 100.0;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 50.0;
-    SetPointManager::ManageSetPoints();
+    SetPointManager::ManageSetPoints(state);
     EXPECT_NEAR(coolSPNode.TempSetPoint, 20.994, 0.01);
     EXPECT_NEAR(heatSPNode.TempSetPoint, 20.497, 0.01);
 
@@ -1573,7 +1573,7 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrSetPtTest)
     zoneNode.Temp = 20.0;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = 10000.0;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = 5000.0;
-    SetPointManager::ManageSetPoints();
+    SetPointManager::ManageSetPoints(state);
     EXPECT_NEAR(coolSPNode.TempSetPoint, 99.0, 0.01);
     EXPECT_NEAR(heatSPNode.TempSetPoint, 45.0, 0.01);
 
@@ -1582,7 +1582,7 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrSetPtTest)
     zoneNode.Temp = 20.0;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = -50.0;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -100.0;
-    SetPointManager::ManageSetPoints();
+    SetPointManager::ManageSetPoints(state);
     EXPECT_NEAR(coolSPNode.TempSetPoint, 19.50, 0.01);
     EXPECT_NEAR(heatSPNode.TempSetPoint, 19.01, 0.01);
 
@@ -1591,7 +1591,7 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrSetPtTest)
     zoneNode.Temp = 20.0;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToCoolingSP = -5000.0;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).OutputRequiredToHeatingSP = -20000.0;
-    SetPointManager::ManageSetPoints();
+    SetPointManager::ManageSetPoints(state);
     EXPECT_NEAR(coolSPNode.TempSetPoint, 14.0, 0.01);
     EXPECT_NEAR(heatSPNode.TempSetPoint, -99.0, 0.01);
 }

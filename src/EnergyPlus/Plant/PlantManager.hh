@@ -88,7 +88,7 @@ namespace PlantManager {
                           bool &SimElecCircuits      // True when electic circuits need to be (re)simulated
     );
 
-    void GetPlantLoopData();
+    void GetPlantLoopData(AllGlobals &state);
 
     void GetPlantInput(AllGlobals &state);
 

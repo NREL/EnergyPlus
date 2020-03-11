@@ -1433,7 +1433,7 @@ void CalcBasinHeaterPower(Real64 const Capacity,     // Basin heater capacity pe
     }
 }
 
-void TestAirPathIntegrity(bool &ErrFound)
+void TestAirPathIntegrity(AllGlobals &state, bool &ErrFound)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1491,9 +1491,9 @@ void TestAirPathIntegrity(bool &ErrFound)
     ValRetAPaths = 0;
     ValSupAPaths = 0;
 
-    TestSupplyAirPathIntegrity(errFlag);
+    TestSupplyAirPathIntegrity(state, errFlag);
     if (errFlag) ErrFound = true;
-    TestReturnAirPathIntegrity(errFlag, ValRetAPaths);
+    TestReturnAirPathIntegrity(state, errFlag, ValRetAPaths);
     if (errFlag) ErrFound = true;
 
     // Final tests, look for duplicate nodes

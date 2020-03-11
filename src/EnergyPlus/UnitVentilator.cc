@@ -252,7 +252,7 @@ namespace UnitVentilator {
 
         ZoneEqUnitVent = true;
 
-        InitUnitVentilator(UnitVentNum, FirstHVACIteration, ZoneNum);
+        InitUnitVentilator(state, UnitVentNum, FirstHVACIteration, ZoneNum);
 
         CalcUnitVentilator(state, UnitVentNum, ZoneNum, FirstHVACIteration, PowerMet, LatOutputProvided);
 
@@ -871,7 +871,7 @@ namespace UnitVentilator {
                             UnitVent(UnitVentNum).CCoilPlantName = Alphas(18);
                         } else if (SELECT_CASE_var == "COILSYSTEM:COOLING:WATER:HEATEXCHANGERASSISTED") {
                             UnitVent(UnitVentNum).CCoilType = Cooling_CoilHXAssisted;
-                            GetHXCoilTypeAndName(cCoolingCoilType,
+                            GetHXCoilTypeAndName(state, cCoolingCoilType,
                                                  Alphas(18),
                                                  ErrorsFound,
                                                  UnitVent(UnitVentNum).CCoilPlantType,
@@ -909,7 +909,7 @@ namespace UnitVentilator {
                                     GetCoilWaterInletNode(UnitVent(UnitVentNum).CCoilTypeCh, UnitVent(UnitVentNum).CCoilName, errFlag);
                             } else {
                                 UnitVent(UnitVentNum).ColdControlNode =
-                                    GetHXCoilWaterInletNode(UnitVent(UnitVentNum).CCoilTypeCh, UnitVent(UnitVentNum).CCoilName, errFlag);
+                                    GetHXCoilWaterInletNode(state, UnitVent(UnitVentNum).CCoilTypeCh, UnitVent(UnitVentNum).CCoilName, errFlag);
                             }
                             // Other error checks should trap before it gets to this point in the code, but including just in case.
                             if (errFlag) {
@@ -935,7 +935,7 @@ namespace UnitVentilator {
                             UnitVent(UnitVentNum).MaxVolColdWaterFlow =
                                 GetWaterCoilMaxFlowRate("Coil:Cooling:Water:DetailedGeometry", UnitVent(UnitVentNum).CCoilName, ErrorsFound);
                         } else if (SELECT_CASE_var == Cooling_CoilHXAssisted) {
-                            UnitVent(UnitVentNum).MaxVolColdWaterFlow = GetHXAssistedCoilFlowRate(
+                            UnitVent(UnitVentNum).MaxVolColdWaterFlow = GetHXAssistedCoilFlowRate(state,
                                 "CoilSystem:Cooling:Water:HeatExchangerAssisted", UnitVent(UnitVentNum).CCoilName, ErrorsFound);
                         } else {
                         }
@@ -2334,8 +2334,8 @@ namespace UnitVentilator {
                     CheckZoneSizing(cMO_UnitVentilator, UnitVent(UnitVentNum).Name);
 
                     if (UnitVent(UnitVentNum).CCoilType == Cooling_CoilHXAssisted) {
-                        CoolingCoilName = GetHXDXCoilName(UnitVent(UnitVentNum).CCoilTypeCh, UnitVent(UnitVentNum).CCoilName, ErrorsFound);
-                        CoolingCoilType = GetHXCoilType(UnitVent(UnitVentNum).CCoilTypeCh, UnitVent(UnitVentNum).CCoilName, ErrorsFound);
+                        CoolingCoilName = GetHXDXCoilName(state, UnitVent(UnitVentNum).CCoilTypeCh, UnitVent(UnitVentNum).CCoilName, ErrorsFound);
+                        CoolingCoilType = GetHXCoilType(state, UnitVent(UnitVentNum).CCoilTypeCh, UnitVent(UnitVentNum).CCoilName, ErrorsFound);
                     } else {
                         CoolingCoilName = UnitVent(UnitVentNum).CCoilName;
                         CoolingCoilType = UnitVent(UnitVentNum).CCoilTypeCh;
@@ -2462,8 +2462,8 @@ namespace UnitVentilator {
 
         // set the design air flow rates for the heating and cooling coils
         if (UnitVent(UnitVentNum).CCoilType == Cooling_CoilHXAssisted) {
-            CoolingCoilName = GetHXDXCoilName(UnitVent(UnitVentNum).CCoilTypeCh, UnitVent(UnitVentNum).CCoilName, ErrorsFound);
-            CoolingCoilType = GetHXCoilType(UnitVent(UnitVentNum).CCoilTypeCh, UnitVent(UnitVentNum).CCoilName, ErrorsFound);
+            CoolingCoilName = GetHXDXCoilName(state, UnitVent(UnitVentNum).CCoilTypeCh, UnitVent(UnitVentNum).CCoilName, ErrorsFound);
+            CoolingCoilType = GetHXCoilType(state, UnitVent(UnitVentNum).CCoilTypeCh, UnitVent(UnitVentNum).CCoilName, ErrorsFound);
         } else {
             CoolingCoilName = UnitVent(UnitVentNum).CCoilName;
             CoolingCoilType = UnitVent(UnitVentNum).CCoilTypeCh;
@@ -2639,7 +2639,7 @@ namespace UnitVentilator {
                                                UnitVent(UnitVentNum).CCoilSchedValue,
                                                UnitVent(UnitVentNum).CCoil_Index);
                     } else if (SELECT_CASE_var1 == Cooling_CoilHXAssisted) {
-                        CheckHXAssistedCoolingCoilSchedule("CoilSystem:Cooling:Water:HeatExchangerAssisted",
+                        CheckHXAssistedCoolingCoilSchedule(state, "CoilSystem:Cooling:Water:HeatExchangerAssisted",
                                                            UnitVent(UnitVentNum).CCoilName,
                                                            UnitVent(UnitVentNum).CCoilSchedValue,
                                                            UnitVent(UnitVentNum).CCoil_Index);
@@ -2694,7 +2694,7 @@ namespace UnitVentilator {
                                                UnitVent(UnitVentNum).CCoilSchedValue,
                                                UnitVent(UnitVentNum).CCoil_Index);
                     } else if (SELECT_CASE_var1 == Cooling_CoilHXAssisted) {
-                        CheckHXAssistedCoolingCoilSchedule("CoilSystem:Cooling:Water:HeatExchangerAssisted",
+                        CheckHXAssistedCoolingCoilSchedule(state, "CoilSystem:Cooling:Water:HeatExchangerAssisted",
                                                            UnitVent(UnitVentNum).CCoilName,
                                                            UnitVent(UnitVentNum).CCoilSchedValue,
                                                            UnitVent(UnitVentNum).CCoil_Index);
@@ -3391,7 +3391,7 @@ namespace UnitVentilator {
 
                         if (QCoilReq < 0.0) QCoilReq = 0.0; // a heating coil can only heat, not cool
 
-                        SimulateSteamCoilComponents(UnitVent(UnitVentNum).HCoilName, FirstHVACIteration, UnitVent(UnitVentNum).HCoil_Index, QCoilReq);
+                        SimulateSteamCoilComponents(state, UnitVent(UnitVentNum).HCoilName, FirstHVACIteration, UnitVent(UnitVentNum).HCoil_Index, QCoilReq);
 
                     } else if ((SELECT_CASE_var == Heating_ElectricCoilType) || (SELECT_CASE_var == Heating_GasCoilType)) {
 
@@ -3513,7 +3513,7 @@ namespace UnitVentilator {
                                              UnitVent(UnitVentNum).HWLoopSide,
                                              UnitVent(UnitVentNum).HWBranchNum,
                                              UnitVent(UnitVentNum).HWCompNum);
-                        SimulateSteamCoilComponents(UnitVent(UnitVentNum).HCoilName,
+                        SimulateSteamCoilComponents(state, UnitVent(UnitVentNum).HCoilName,
                                                     FirstHVACIteration,
                                                     UnitVent(UnitVentNum).HCoil_Index,
                                                     QCoilReq,

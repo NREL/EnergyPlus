@@ -240,7 +240,7 @@ namespace UnitHeater {
 
         ZoneEqUnitHeater = true;
 
-        InitUnitHeater(UnitHeatNum, ZoneNum, FirstHVACIteration);
+        InitUnitHeater(state, UnitHeatNum, ZoneNum, FirstHVACIteration);
 
         ZoneHeatingOnlyFan = true;
 
@@ -1770,7 +1770,7 @@ namespace UnitHeater {
                                                 (Node(HCoilInAirNode).Temp - Node(UnitHeat(UnitHeatNum).AirInNode).Temp);
                     }
                     if (QCoilReq < 0.0) QCoilReq = 0.0; // a heating coil can only heat, not cool
-                    SimulateSteamCoilComponents(UnitHeat(UnitHeatNum).HCoilName, FirstHVACIteration, UnitHeat(UnitHeatNum).HCoil_Index, QCoilReq);
+                    SimulateSteamCoilComponents(state, UnitHeat(UnitHeatNum).HCoilName, FirstHVACIteration, UnitHeat(UnitHeatNum).HCoil_Index, QCoilReq);
 
                 } else if ((SELECT_CASE_var == ElectricCoil) || (SELECT_CASE_var == GasCoil)) {
 
@@ -1849,7 +1849,7 @@ namespace UnitHeater {
                                          UnitHeat(UnitHeatNum).HWLoopSide,
                                          UnitHeat(UnitHeatNum).HWBranchNum,
                                          UnitHeat(UnitHeatNum).HWCompNum);
-                    SimulateSteamCoilComponents(
+                    SimulateSteamCoilComponents(state, 
                         UnitHeat(UnitHeatNum).HCoilName, FirstHVACIteration, UnitHeat(UnitHeatNum).HCoil_Index, QCoilReq, _, FanOpMode, PartLoadFrac);
                 } else if ((SELECT_CASE_var == ElectricCoil) || (SELECT_CASE_var == GasCoil)) {
 

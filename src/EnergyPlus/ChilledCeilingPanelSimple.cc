@@ -69,6 +69,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -163,7 +164,7 @@ namespace CoolingPanelSimple {
         MySizeFlagCoolPanel.deallocate();
     }
 
-    void SimCoolingPanel(std::string const &EquipName,
+    void SimCoolingPanel(AllGlobals &state, std::string const &EquipName,
                          int const ActualZoneNum,
                          int const ControlledZoneNum,
                          bool const FirstHVACIteration,
@@ -225,7 +226,7 @@ namespace CoolingPanelSimple {
 
             auto &ThisCP(CoolingPanel(CoolingPanelNum));
 
-            InitCoolingPanel(CoolingPanelNum, ControlledZoneNum, FirstHVACIteration);
+            InitCoolingPanel(state, CoolingPanelNum, ControlledZoneNum, FirstHVACIteration);
 
             QZnReq = ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToCoolSP;
 
@@ -748,7 +749,7 @@ namespace CoolingPanelSimple {
         }
     }
 
-    void InitCoolingPanel(int const CoolingPanelNum, int const ControlledZoneNumSub, bool const FirstHVACIteration)
+    void InitCoolingPanel(AllGlobals &state, int const CoolingPanelNum, int const ControlledZoneNumSub, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -844,7 +845,7 @@ namespace CoolingPanelSimple {
         if (!SysSizingCalc) {
             if (MySizeFlagCoolPanel(CoolingPanelNum) && !SetLoopIndexFlag(CoolingPanelNum)) {
                 // for each cooling panel do the sizing once.
-                SizeCoolingPanel(CoolingPanelNum);
+                SizeCoolingPanel(state, CoolingPanelNum);
                 MySizeFlagCoolPanel(CoolingPanelNum) = false;
 
                 // set design mass flow rates

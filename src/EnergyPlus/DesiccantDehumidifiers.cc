@@ -518,7 +518,7 @@ namespace DesiccantDehumidifiers {
 
                     // Get the Regeneration Heating Coil Inlet Node
                     errFlag = false;
-                    RegenCoilAirInletNode = GetWaterCoilInletNode("Coil:Heating:Water", RegenCoilName, errFlag);
+                    RegenCoilAirInletNode = GetWaterCoilInletNode(state, "Coil:Heating:Water", RegenCoilName, errFlag);
                     DesicDehum(DesicDehumNum).RegenCoilInletNode = RegenCoilAirInletNode;
                     if (errFlag) {
                         ShowContinueError("Occurs in " + CurrentModuleObject + " = " + DesicDehum(DesicDehumNum).Name);
@@ -527,7 +527,7 @@ namespace DesiccantDehumidifiers {
 
                     // Get the Regeneration Heating Coil Outlet Node
                     errFlag = false;
-                    RegenCoilAirOutletNode = GetWaterCoilOutletNode("Coil:Heating:Water", RegenCoilName, errFlag);
+                    RegenCoilAirOutletNode = GetWaterCoilOutletNode(state, "Coil:Heating:Water", RegenCoilName, errFlag);
                     DesicDehum(DesicDehumNum).RegenCoilOutletNode = RegenCoilAirOutletNode;
                     if (errFlag) {
                         ShowContinueError("Occurs in " + CurrentModuleObject + " = " + DesicDehum(DesicDehumNum).Name);
@@ -1051,7 +1051,7 @@ namespace DesiccantDehumidifiers {
 
                         // Get the Regeneration Heating Coil Inlet Node
                         errFlag = false;
-                        RegenCoilAirInletNode = GetWaterCoilInletNode("Coil:Heating:Water", RegenCoilName, errFlag);
+                        RegenCoilAirInletNode = GetWaterCoilInletNode(state, "Coil:Heating:Water", RegenCoilName, errFlag);
                         DesicDehum(DesicDehumNum).RegenCoilInletNode = RegenCoilAirInletNode;
                         if (errFlag) {
                             ShowContinueError("Occurs in " + CurrentModuleObject + " = " + DesicDehum(DesicDehumNum).Name);
@@ -1060,7 +1060,7 @@ namespace DesiccantDehumidifiers {
 
                         // Get the Regeneration Heating Coil Outlet Node
                         errFlag = false;
-                        RegenCoilAirOutletNode = GetWaterCoilOutletNode("Coil:Heating:Water", RegenCoilName, errFlag);
+                        RegenCoilAirOutletNode = GetWaterCoilOutletNode(state, "Coil:Heating:Water", RegenCoilName, errFlag);
                         DesicDehum(DesicDehumNum).RegenCoilOutletNode = RegenCoilAirOutletNode;
                         if (errFlag) {
                             ShowContinueError("Occurs in " + CurrentModuleObject + " = " + DesicDehum(DesicDehumNum).Name);
@@ -1323,9 +1323,9 @@ namespace DesiccantDehumidifiers {
                     (DesicDehum(DesicDehumNum).coolingCoil_TypeNum == DataHVACGlobals::CoilDX_CoolingTwoStageWHumControl)) {
                     ErrorsFound2 = false;
                     DesicDehum(DesicDehumNum).CoolingCoilOutletNode =
-                        GetDXCoilOutletNode(DesicDehum(DesicDehumNum).CoolingCoilType, DesicDehum(DesicDehumNum).CoolingCoilName, ErrorsFound2);
+                        GetDXCoilOutletNode(state, DesicDehum(DesicDehumNum).CoolingCoilType, DesicDehum(DesicDehumNum).CoolingCoilName, ErrorsFound2);
                     DesicDehum(DesicDehumNum).CompanionCoilCapacity =
-                        GetDXCoilCapacity(DesicDehum(DesicDehumNum).CoolingCoilType, DesicDehum(DesicDehumNum).CoolingCoilName, ErrorsFound2);
+                        GetDXCoilCapacity(state, DesicDehum(DesicDehumNum).CoolingCoilType, DesicDehum(DesicDehumNum).CoolingCoilName, ErrorsFound2);
                     if (ErrorsFound2)
                         ShowContinueError("...occurs in " + DesicDehum(DesicDehumNum).DehumType + " \"" + DesicDehum(DesicDehumNum).CoolingCoilName +
                                           "\"");
@@ -1914,7 +1914,7 @@ namespace DesiccantDehumidifiers {
                                 }
                             }
                             if (DesicDehum(DesicDehumNum).RegenCoilType_Num == Coil_HeatingSteam) {
-                                SimulateSteamCoilComponents(DesicDehum(DesicDehumNum).RegenCoilName,
+                                SimulateSteamCoilComponents(state, DesicDehum(DesicDehumNum).RegenCoilName,
                                                             FirstHVACIteration,
                                                             DesicDehum(DesicDehumNum).RegenCoilIndex,
                                                             1.0,
@@ -3344,7 +3344,7 @@ namespace DesiccantDehumidifiers {
                                          DesicDehum(DesicDehumNum).BranchNum,
                                          DesicDehum(DesicDehumNum).CompNum);
                     // simulate the regenerator steam heating coil
-                    SimulateSteamCoilComponents(DesicDehum(DesicDehumNum).RegenCoilName,
+                    SimulateSteamCoilComponents(state, DesicDehum(DesicDehumNum).RegenCoilName,
                                                 FirstHVACIteration,
                                                 DesicDehum(DesicDehumNum).RegenCoilIndex,
                                                 RegenCoilLoad,
@@ -3383,7 +3383,7 @@ namespace DesiccantDehumidifiers {
                                          DesicDehum(DesicDehumNum).BranchNum,
                                          DesicDehum(DesicDehumNum).CompNum);
                     // simulate the regenerator steam heating coil
-                    SimulateSteamCoilComponents(DesicDehum(DesicDehumNum).RegenCoilName,
+                    SimulateSteamCoilComponents(state, DesicDehum(DesicDehumNum).RegenCoilName,
                                                 FirstHVACIteration,
                                                 DesicDehum(DesicDehumNum).RegenCoilIndex,
                                                 RegenCoilLoad,

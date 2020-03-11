@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 
 namespace EnergyPlus {
 
@@ -553,7 +554,7 @@ namespace SystemAvailabilityManager {
 
     int ValidateAndSetSysAvailabilityManagerType(std::string const &AvailMgrName); // name to validate
 
-    void ManageHybridVentilation();
+    void ManageHybridVentilation(AllGlobals &state);
 
     void GetHybridVentilationInputs();
 
@@ -564,7 +565,7 @@ namespace SystemAvailabilityManager {
                                    Optional_int_const PriAirSysNum = _ // number of the primary air system affected by this Avail. Manager
     );
 
-    bool GetHybridVentilationControlStatus(int const ZoneNum); // Index of zone
+    bool GetHybridVentilationControlStatus(AllGlobals &state, int const ZoneNum); // Index of zone
 
 } // namespace SystemAvailabilityManager
 

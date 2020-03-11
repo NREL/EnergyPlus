@@ -170,7 +170,7 @@ namespace HeatBalanceManager {
 
     void GetConstructData(bool &ErrorsFound); // If errors found in input
 
-    void GetBuildingData(bool &ErrorsFound); // If errors found in input
+    void GetBuildingData(AllGlobals &state, bool &ErrorsFound); // If errors found in input
 
     void GetZoneData(bool &ErrorsFound); // If errors found in input
 

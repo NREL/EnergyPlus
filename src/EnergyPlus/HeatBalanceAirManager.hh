@@ -74,18 +74,18 @@ namespace HeatBalanceAirManager {
     // Functions
     void clear_state();
 
-    void ManageAirHeatBalance();
+    void ManageAirHeatBalance(AllGlobals &state);
 
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetAirHeatBalanceInput();
+    void GetAirHeatBalanceInput(AllGlobals &state);
 
-    void GetAirFlowFlag(OutputFiles &outputFiles, bool &ErrorsFound); // Set to true if errors found
+    void GetAirFlowFlag(AllGlobals &state, OutputFiles &outputFiles, bool &ErrorsFound); // Set to true if errors found
 
     void SetZoneMassConservationFlag(); // sets the zone air mass flow variables
 
-    void GetSimpleAirModelInputs(OutputFiles &outputFiles, bool &ErrorsFound); // IF errors found in input
+    void GetSimpleAirModelInputs(AllGlobals &state, OutputFiles &outputFiles, bool &ErrorsFound); // IF errors found in input
 
     //*****************************************************************************************
     // This subroutine was moved from 'RoomAirManager' Module

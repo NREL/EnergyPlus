@@ -1037,7 +1037,7 @@ namespace SetPointManager {
 
     void clear_state();
 
-    void ManageSetPoints();
+    void ManageSetPoints(AllGlobals &state);
 
     void GetSetPointManagerInputs(AllGlobals &state); // wrapper for GetInput to accomodate unit testing
 
@@ -1055,24 +1055,24 @@ namespace SetPointManager {
 
     void UpdateOAPretreatSetPoints();
 
-    int getSPMBasedOnNode(int const NodeNum, int const SetPtType, int const SMPType, CtrlNodeType ctrlOrRefNode);
+    int getSPMBasedOnNode(AllGlobals &state, int const NodeNum, int const SetPtType, int const SMPType, CtrlNodeType ctrlOrRefNode);
 
-    bool IsNodeOnSetPtManager(int const NodeNum, int const SetPtType);
+    bool IsNodeOnSetPtManager(AllGlobals &state, int const NodeNum, int const SetPtType);
 
-    bool NodeHasSPMCtrlVarType(int const NodeNum, int const iCtrlVarType);
+    bool NodeHasSPMCtrlVarType(AllGlobals &state, int const NodeNum, int const iCtrlVarType);
 
-    void ResetHumidityRatioCtrlVarType(int const NodeNum);
+    void ResetHumidityRatioCtrlVarType(AllGlobals &state, int const NodeNum);
 
     void CheckIfAnyIdealCondEntSetPoint();
 
-    int GetHumidityRatioVariableType(int const CntrlNodeNum);
+    int GetHumidityRatioVariableType(AllGlobals &state, int const CntrlNodeNum);
 
     void SetUpNewScheduledTESSetPtMgr(
         int const SchedPtr, int const SchedPtrCharge, Real64 NonChargeCHWTemp, Real64 ChargeCHWTemp, int const CompOpType, int const ControlNodeNum);
 
-    bool GetCoilFreezingCheckFlag(int const MixedAirSPMNum);
+    bool GetCoilFreezingCheckFlag(AllGlobals &state, int const MixedAirSPMNum);
 
-    int GetMixedAirNumWithCoilFreezingCheck(int const MixedAirNode);
+    int GetMixedAirNumWithCoilFreezingCheck(AllGlobals &state, int const MixedAirNode);
 
 } // namespace SetPointManager
 

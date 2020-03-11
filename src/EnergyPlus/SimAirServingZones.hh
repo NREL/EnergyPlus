@@ -185,7 +185,7 @@ namespace SimAirServingZones {
 
     void SizeAirLoops();
 
-    void SizeAirLoopBranches(int const AirLoopNum, int const BranchNum);
+    void SizeAirLoopBranches(AllGlobals &state, int const AirLoopNum, int const BranchNum);
 
     void SetUpSysSizingArrays();
 
@@ -223,7 +223,7 @@ namespace SimAirServingZones {
 
     bool CheckWaterCoilOnPrimaryAirLoopBranch(AllGlobals &state, int const CoilTypeNum, std::string const CompName);
 
-    bool CheckWaterCoilOnOASystem(int const CoilTypeNum, std::string const CompName);
+    bool CheckWaterCoilOnOASystem(AllGlobals &state, int const CoilTypeNum, std::string const CompName);
 
     bool CheckWaterCoilSystemOnAirLoopOrOASystem(AllGlobals &state, int const CoilTypeNum, std::string const CompName);
 

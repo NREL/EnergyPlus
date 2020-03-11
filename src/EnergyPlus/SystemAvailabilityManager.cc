@@ -4043,9 +4043,8 @@ namespace SystemAvailabilityManager {
         return ValidType;
     }
 
-    void ManageHybridVentilation()
+    void ManageHybridVentilation(AllGlobals &state)
     {
-
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
         //       DATE WRITTEN   March 2007
@@ -5306,7 +5305,7 @@ namespace SystemAvailabilityManager {
         }
     }
 
-    bool GetHybridVentilationControlStatus(int const ZoneNum) // Index of zone
+    bool GetHybridVentilationControlStatus(AllGlobals &state, int const ZoneNum) // Index of zone
     {
 
         // SUBROUTINE INFORMATION:

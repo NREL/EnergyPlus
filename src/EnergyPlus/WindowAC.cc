@@ -537,11 +537,11 @@ namespace WindowAC {
                 if (UtilityRoutines::SameString(Alphas(9), "Coil:Cooling:DX:SingleSpeed")) {
                     WindAC(WindACNum).DXCoilType_Num = CoilDX_CoolingSingleSpeed;
                     WindAC(WindACNum).CoilOutletNodeNum =
-                        GetDXCoilOutletNode(WindAC(WindACNum).DXCoilType, WindAC(WindACNum).DXCoilName, CoilNodeErrFlag);
+                        GetDXCoilOutletNode(state, WindAC(WindACNum).DXCoilType, WindAC(WindACNum).DXCoilName, CoilNodeErrFlag);
                 } else if (UtilityRoutines::SameString(Alphas(9), "CoilSystem:Cooling:DX:HeatExchangerAssisted")) {
                     WindAC(WindACNum).DXCoilType_Num = CoilDX_CoolingHXAssisted;
                     WindAC(WindACNum).CoilOutletNodeNum =
-                        GetDXHXAsstdCoilOutletNode(WindAC(WindACNum).DXCoilType, WindAC(WindACNum).DXCoilName, CoilNodeErrFlag);
+                        GetDXHXAsstdCoilOutletNode(state, WindAC(WindACNum).DXCoilType, WindAC(WindACNum).DXCoilName, CoilNodeErrFlag);
                 } else if (UtilityRoutines::SameString(Alphas(9), "Coil:Cooling:DX:VariableSpeed")) {
                     WindAC(WindACNum).DXCoilType_Num = DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed;
                     WindAC(WindACNum).CoilOutletNodeNum = VariableSpeedCoils::GetCoilOutletNodeVariableSpeed(

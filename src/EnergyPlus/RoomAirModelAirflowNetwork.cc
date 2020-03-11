@@ -1340,7 +1340,7 @@ namespace RoomAirModelAirflowNetwork {
 
             if (ThisRAFNNode.HVAC(I).TypeOfNum == ZoneEquipTypeOf_BaseboardConvectiveElectric) {
                 // CASE(BBElectricConvective_Num)  !'ZoneHVAC:Baseboard:Convective:Electric' 15
-                SimElectricBaseboard(ThisRAFNNode.HVAC(I).Name,
+                SimElectricBaseboard(state, ThisRAFNNode.HVAC(I).Name,
                                      ZoneNum,
                                      RoomAirflowNetworkZoneInfo(ZoneNum).ActualZoneID,
                                      SysOutputProvided,
@@ -1357,7 +1357,7 @@ namespace RoomAirModelAirflowNetwork {
 
             if (ThisRAFNNode.HVAC(I).TypeOfNum == ZoneEquipTypeOf_BaseboardRadiantConvectiveElectric) {
                 // CASE(BBElectric_Num)  !'ZoneHVAC:Baseboard:RadiantConvective:Electric' 12
-                SimElecBaseboard(ThisRAFNNode.HVAC(I).Name,
+                SimElecBaseboard(state, ThisRAFNNode.HVAC(I).Name,
                                  ZoneNum,
                                  RoomAirflowNetworkZoneInfo(ZoneNum).ActualZoneID,
                                  false,

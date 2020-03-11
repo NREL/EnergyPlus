@@ -244,7 +244,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_TemperatureSensorOffset_CoilSAT)
 
     // Readin inputs
     SetPointManager::GetSetPointManagerInputs(state);
-    HVACControllers::GetControllerInput();
+    HVACControllers::GetControllerInput(state);
 
     // Run
     CheckAndReadFaults(state);

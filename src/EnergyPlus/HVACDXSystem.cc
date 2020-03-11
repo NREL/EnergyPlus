@@ -513,7 +513,7 @@ namespace HVACDXSystem {
                     }
                 } else if (UtilityRoutines::SameString(Alphas(6), "CoilSystem:Cooling:DX:HeatExchangerAssisted")) {
                     DXCoolingSystem(DXCoolSysNum).CoolingCoilType_Num = CoilDX_CoolingHXAssisted;
-                    GetHXDXCoilIndex(
+                    GetHXDXCoilIndex(state, 
                         DXCoolingSystem(DXCoolSysNum).CoolingCoilName, DXCoolingSystem(DXCoolSysNum).CoolingCoilIndex, ErrFound, CurrentModuleObject);
                     if (ErrFound) {
                         ShowContinueError("...occurs in " + CurrentModuleObject + " = " + DXCoolingSystem(DXCoolSysNum).Name);
@@ -521,7 +521,7 @@ namespace HVACDXSystem {
                     }
 
                     DXErrorsFound = false;
-                    HXDXCoolCoilName = GetHXDXCoilName(Alphas(6), Alphas(7), DXErrorsFound);
+                    HXDXCoolCoilName = GetHXDXCoilName(state, Alphas(6), Alphas(7), DXErrorsFound);
                     if (DXErrorsFound) {
                         ShowWarningError(CurrentModuleObject + " = \"" + DXCoolingSystem(DXCoolSysNum).Name + "\"");
                         ShowContinueError("CoilSystem:Cooling:DX:HeatExchangerAssisted \"" + Alphas(7) + "\" not found.");
@@ -2635,7 +2635,7 @@ namespace HVACDXSystem {
 
                     } else if (SELECT_CASE_var == CoilDX_PackagedThermalStorageCooling) {
 
-                        ControlTESIceStorageTankCoil(CompName,
+                        ControlTESIceStorageTankCoil(state, CompName,
                                                      DXCoolingSystem(DXSystemNum).CoolingCoilIndex,
                                                      DXCoolingSystem(DXSystemNum).DXCoolingSystemType,
                                                      DXCoolingSystem(DXSystemNum).FanOpMode,

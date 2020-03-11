@@ -60,7 +60,7 @@ void CreateCurrentDateTimeString(std::string &CurrentDateTimeString);
 
 int initializeEnergyPlus(AllGlobals &state, std::string const & filepath);
 
-int wrapUpEnergyPlus();
+int wrapUpEnergyPlus(AllGlobals &state);
 
 void ENERGYPLUSLIB_API EnergyPlusPgm(AllGlobals &state, std::string const &filepath = std::string());
 

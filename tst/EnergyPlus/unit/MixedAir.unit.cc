@@ -170,7 +170,7 @@ TEST_F(EnergyPlusFixture, MixedAir_ProcessOAControllerTest)
                                   cAlphaFields,
                                   cNumericFields);
 
-    ProcessOAControllerInputs(CurrentModuleObject,
+    ProcessOAControllerInputs(state, CurrentModuleObject,
                               ControllerNum,
                               AlphArray,
                               NumAlphas,
@@ -200,7 +200,7 @@ TEST_F(EnergyPlusFixture, MixedAir_ProcessOAControllerTest)
                                   cNumericFields);
 
     ErrorsFound = false;
-    ProcessOAControllerInputs(CurrentModuleObject,
+    ProcessOAControllerInputs(state, CurrentModuleObject,
                               ControllerNum,
                               AlphArray,
                               NumAlphas,
@@ -831,7 +831,7 @@ TEST_F(EnergyPlusFixture, CO2ControlDesignOccupancyTest)
     AirLoopZoneInfo(1).ActualZoneNumber.allocate(1);
     AirLoopZoneInfo(1).ActualZoneNumber(1) = 1;
 
-    InitOAController(1, true, 1);
+    InitOAController(state, 1, true, 1);
     EXPECT_EQ("ProportionalControlBasedOnDesignOccupancy", DataSizing::cOAFlowMethodTypes(VentilationMechanical(1).ZoneOAFlowMethod(1)));
 
     OutsideAirSys.deallocate();
@@ -1500,7 +1500,7 @@ TEST_F(EnergyPlusFixture, MixedAir_MissingHIghRHControlInputTest)
                                   cAlphaFields,
                                   cNumericFields);
 
-    ProcessOAControllerInputs(CurrentModuleObject,
+    ProcessOAControllerInputs(state, CurrentModuleObject,
                               ControllerNum,
                               AlphArray,
                               NumAlphas,
@@ -1632,7 +1632,7 @@ TEST_F(EnergyPlusFixture, MixedAir_HIghRHControlTest)
         cAlphaFields,
         cNumericFields);
 
-    ProcessOAControllerInputs(CurrentModuleObject,
+    ProcessOAControllerInputs(state, CurrentModuleObject,
         ControllerNum,
         AlphArray,
         NumAlphas,
@@ -1772,17 +1772,17 @@ TEST_F(EnergyPlusFixture, OAControllerMixedAirSPTest)
     PrimaryAirSystem(1).Branch(1).Comp(1).TypeOf = "AirLoopHVAC:OutdoorAirSystem";
 
     // mixed node temperature set point has not yet been set, expect OA controller mixed temp SP to be equal to low temp limit
-    InitOAController(1, true, 1);
+    InitOAController(state, 1, true, 1);
     EXPECT_EQ(OAController(1).MixSetTemp, OAController(1).TempLowLim);
 
     // expect OA controller mixed node temp SP to be equal to 0.5 C.
     Node(1).TempSetPoint = 0.5;
-    InitOAController(1, true, 1);
+    InitOAController(state, 1, true, 1);
     EXPECT_EQ(OAController(1).MixSetTemp, 0.5);
 
     // expect OA controller mixed node temp SP to be less than 0 and equal to -5.0 C.
     Node(1).TempSetPoint = -5.0;
-    InitOAController(1, true, 1);
+    InitOAController(state, 1, true, 1);
     EXPECT_EQ(OAController(1).MixSetTemp, -5.0);
 }
 

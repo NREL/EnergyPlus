@@ -211,7 +211,7 @@ namespace PlantManager {
         // get input and checks if there are two setpointmanagers
         // for a TwoWayCommonPipe and one of them setpoints can be
         // a SetpointManager:OutdoorAirReset type.
-        GetPlantLoopData();
+        GetPlantLoopData(state);
         ASSERT_FALSE(ErrorsFound);
         // there two setpoint amanegrs in the loop
         EXPECT_EQ(1, NumSchSetPtMgrs);    // SetpointManager:Scheduled
