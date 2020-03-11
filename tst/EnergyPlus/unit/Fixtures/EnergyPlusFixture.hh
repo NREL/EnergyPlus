@@ -109,7 +109,7 @@ protected:
     // This is run every unit test for this fixture.
     // It sets up the various stream redirections.
     // It also calls show_message every unit test to output a begin message to the error file.
-    virtual void SetUp();
+    virtual void SetUp(AllGlobals &state);
 
     // This is run every unit test and makes sure to clear all state in global variables this fixture touches.
     virtual void TearDown(AllGlobals &state);

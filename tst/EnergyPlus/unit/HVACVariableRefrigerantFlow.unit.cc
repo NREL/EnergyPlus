@@ -138,7 +138,7 @@ public:
 protected:
     virtual void SetUp()
     {
-        EnergyPlusFixture::SetUp(); // Sets up the base fixture first.
+        EnergyPlusFixture::SetUp(state); // Sets up the base fixture first.
 
         DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0); // initialize StdRhoAir
         DataEnvironment::OutBaroPress = 101325.0;

@@ -66,7 +66,9 @@ int energyplus(int argc, const char *argv[]) {
 //    argv[5] = "-i";
 //    argv[6] = epcomp->iddPath.c_str();
 //    argv[7] = epcomp->idfInputPath.c_str();
-    return runEnergyPlusAsLibrary(argc, argv);
+
+    AllGlobals state;
+    return runEnergyPlusAsLibrary(state, argc, argv);
 }
 
 void issueWarning(const char * message) {

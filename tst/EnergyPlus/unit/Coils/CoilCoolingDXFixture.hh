@@ -55,8 +55,8 @@
 class CoilCoolingDXTest : public EnergyPlus::EnergyPlusFixture {
 public:
 protected:
-  void SetUp() override {
-    EnergyPlus::EnergyPlusFixture::SetUp(); // Sets up the base fixture first.
+  void SetUp(AllGlobals &state) override {
+    EnergyPlus::EnergyPlusFixture::SetUp(state); // Sets up the base fixture first.
   }
 
   std::string getSpeedObjectString(const std::string &speedObjectName) {

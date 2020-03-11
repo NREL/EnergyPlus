@@ -93,7 +93,7 @@ public:
 protected:
     virtual void SetUp()
     {
-        EnergyPlusFixture::SetUp(); // Sets up the base fixture first.
+        EnergyPlusFixture::SetUp(state); // Sets up the base fixture first.
 
         DataGlobals::DayOfSim = 1;
         DataGlobals::HourOfDay = 1;

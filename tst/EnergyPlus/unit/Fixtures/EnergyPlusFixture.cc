@@ -79,9 +79,9 @@ void EnergyPlusFixture::SetUpTestCase()
     EnergyPlus::inputProcessor = InputProcessor::factory();
 }
 
-void EnergyPlusFixture::SetUp()
+void EnergyPlusFixture::SetUp(AllGlobals &state)
 {
-    AllGlobals state;
+    //AllGlobals state;
     EnergyPlus::clearAllStates(state);
 
     show_message();

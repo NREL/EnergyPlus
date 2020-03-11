@@ -111,9 +111,9 @@ public:
     Real64 const RhoWater = 1000.0; // For estimating the expected result
 
 protected:
-    virtual void SetUp()
+    virtual void SetUp(AllGlobals &state)
     {
-        EnergyPlusFixture::SetUp(); // Sets up the base fixture first.
+        EnergyPlusFixture::SetUp(state); // Sets up the base fixture first.
 
         ElecRadSys.allocate(1);
         HydrRadSys.allocate(1);

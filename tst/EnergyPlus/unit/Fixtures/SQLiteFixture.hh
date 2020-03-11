@@ -72,9 +72,9 @@ protected:
 
     std::shared_ptr<std::ostringstream> ss;
 
-    virtual void SetUp()
+    virtual void SetUp(AllGlobals &state)
     {
-        EnergyPlusFixture::SetUp(); // Sets up the base fixture first.
+        EnergyPlusFixture::SetUp(state); // Sets up the base fixture first.
         ss = std::make_shared<std::ostringstream>();
         // Make sure CreateSQLiteDatabase() is not called anywhere during the test in EP code
         // By default, set the SQLite location to memory

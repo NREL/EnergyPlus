@@ -66,7 +66,7 @@ void ENERGYPLUSLIB_API EnergyPlusPgm(AllGlobals &state, std::string const &filep
 
 int ENERGYPLUSLIB_API RunEnergyPlus(AllGlobals &state, std::string const & filepath = std::string());
 
-int runEnergyPlusAsLibrary(int argc, const char *argv[]);
+int runEnergyPlusAsLibrary(AllGlobals &state, int argc, const char *argv[]);
 
 void ENERGYPLUSLIB_API StoreProgressCallback(void (*f)(int const));
 

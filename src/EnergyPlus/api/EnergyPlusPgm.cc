@@ -436,7 +436,7 @@ int RunEnergyPlus(AllGlobals &state, std::string const & filepath)
     return wrapUpEnergyPlus();
 }
 
-int runEnergyPlusAsLibrary(int argc, const char *argv[])
+int runEnergyPlusAsLibrary(AllGlobals &state, int argc, const char *argv[])
 {
     // PROGRAM INFORMATION:
     //       AUTHOR         Linda K. Lawrie, et al
@@ -452,7 +452,7 @@ int runEnergyPlusAsLibrary(int argc, const char *argv[])
     // The method used in EnergyPlus is to simplify the main program as much
     // as possible and contain all "simulation" code in other modules and files.
 
-    AllGlobals state;
+    //AllGlobals state;
 
     EnergyPlus::DataGlobals::eplusRunningViaAPI = true;
 
