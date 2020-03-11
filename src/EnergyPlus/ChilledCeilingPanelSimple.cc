@@ -928,7 +928,7 @@ namespace CoolingPanelSimple {
         ThisCP.RadEnergy = 0.0;
     }
 
-    void SizeCoolingPanel(int const CoolingPanelNum)
+    void SizeCoolingPanel(AllGlobals &state, int const CoolingPanelNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rick Strand
@@ -1013,12 +1013,12 @@ namespace CoolingPanelSimple {
             if (!IsAutoSize && !ZoneSizingRunDone) { // simulation continue
                 if (CapSizingMethod == CoolingDesignCapacity && ThisCP.ScaledCoolingCapacity > 0.0) {
                     TempSize = ThisCP.ScaledCoolingCapacity;
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     DesCoilLoad = TempSize;
                 } else if (CapSizingMethod == CapacityPerFloorArea) {
                     DataScalableCapSizingON = true;
                     TempSize = ThisCP.ScaledCoolingCapacity * Zone(ThisCP.ZonePtr).FloorArea;
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     DesCoilLoad = TempSize;
                     DataScalableCapSizingON = false;
                 } else if (CapSizingMethod == FractionOfAutosizedCoolingCapacity) {
@@ -1062,7 +1062,7 @@ namespace CoolingPanelSimple {
                     } else {
                         TempSize = ThisCP.ScaledCoolingCapacity;
                     }
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     DesCoilLoad = TempSize;
                     DataConstantUsedForSizing = 0.0;
                     DataFractionUsedForSizing = 0.0;

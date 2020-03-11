@@ -904,7 +904,7 @@ namespace FaultsManager {
                     UtilityRoutines::SameString(SELECT_CASE_VAR, "Coil:Heating:Desuperheater")) {
                     // Read in coil input if not done yet
                     if (HeatingCoils::GetCoilsInputFlag) {
-                        HeatingCoils::GetHeatingCoilInput();
+                        HeatingCoils::GetHeatingCoilInput(state);
                         HeatingCoils::GetCoilsInputFlag = false;
                     }
                     // Check the coil name and coil type
@@ -998,7 +998,7 @@ namespace FaultsManager {
                 } else if (UtilityRoutines::SameString(SELECT_CASE_VAR, "CoilSystem:Cooling:DX")) {
                     // Read in DXCoolingSystem input if not done yet
                     if (HVACDXSystem::GetInputFlag) {
-                        HVACDXSystem::GetDXCoolingSystemInput();
+                        HVACDXSystem::GetDXCoolingSystemInput(state);
                         HVACDXSystem::GetInputFlag = false;
                     }
 

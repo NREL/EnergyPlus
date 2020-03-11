@@ -522,7 +522,7 @@ namespace BaseboardElectric {
         Baseboard(BaseboardNum).AirInletHumRat = Node(ZoneNode).HumRat;
     }
 
-    void SizeElectricBaseboard(int const BaseboardNum)
+    void SizeElectricBaseboard(AllGlobals &state, int const BaseboardNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -620,7 +620,7 @@ namespace BaseboardElectric {
                 } else {
                     TempSize = Baseboard(BaseboardNum).ScaledHeatingCapacity;
                 }
-                RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                 Baseboard(BaseboardNum).NominalCapacity = TempSize;
                 DataScalableCapSizingON = false;
             }

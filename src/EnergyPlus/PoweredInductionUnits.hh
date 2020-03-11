@@ -171,7 +171,7 @@ namespace PoweredInductionUnits {
 
     void clear_state();
 
-    void SimPIU(std::string const &CompName,   // name of the PIU
+    void SimPIU(AllGlobals &state, std::string const &CompName,   // name of the PIU
                 bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
                 int const ZoneNum,             // index of zone served by PIU
                 int const ZoneNodeNum,         // zone node number of zone served by PIU
@@ -202,9 +202,9 @@ namespace PoweredInductionUnits {
 
     // ===================== Utilities =====================================
 
-    bool PIUnitHasMixer(std::string const &CompName); // component (mixer) name
+    bool PIUnitHasMixer(AllGlobals &state, std::string const &CompName); // component (mixer) name
 
-    void PIUInducesPlenumAir(int const NodeNum); // induced air node number
+    void PIUInducesPlenumAir(AllGlobals &state, int const NodeNum); // induced air node number
 
 } // namespace PoweredInductionUnits
 

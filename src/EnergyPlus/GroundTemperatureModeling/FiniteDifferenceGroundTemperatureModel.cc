@@ -242,7 +242,7 @@ void FiniteDiffGroundTempsModel::getWeatherData(AllGlobals &state)
     WeatherManager::Envrn = originalNumOfEnvn;
     Available = true;
     ErrorsFound = false;
-    GetNextEnvironment(OutputFiles::getSingleton(), Available, ErrorsFound);
+    GetNextEnvironment(state, OutputFiles::getSingleton(), Available, ErrorsFound);
     if (ErrorsFound) {
         ShowFatalError("Site:GroundTemperature:Undisturbed:FiniteDifference: error in reading weather file data");
     }

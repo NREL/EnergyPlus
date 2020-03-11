@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACSystems.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 
 namespace EnergyPlus {
@@ -486,9 +487,9 @@ namespace DataZoneEquipment {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void GetZoneEquipmentData();
+    void GetZoneEquipmentData(AllGlobals &state);
 
-    void GetZoneEquipmentData1();
+    void GetZoneEquipmentData1(AllGlobals &state);
 
     void SetupZoneEquipmentForConvectionFlowRegime();
 
@@ -496,18 +497,18 @@ namespace DataZoneEquipment {
                                 std::string const &ComponentName, // Name of component
                                 Optional_int CtrlZoneNum = _);
 
-    int GetControlledZoneIndex(std::string const &ZoneName); // Zone name to match into Controlled Zone structure
+    int GetControlledZoneIndex(AllGlobals &state, std::string const &ZoneName); // Zone name to match into Controlled Zone structure
 
-    int FindControlledZoneIndexFromSystemNodeNumberForZone(int const TrialZoneNodeNum); // Node number to match into Controlled Zone structure
+    int FindControlledZoneIndexFromSystemNodeNumberForZone(AllGlobals &state, int const TrialZoneNodeNum); // Node number to match into Controlled Zone structure
 
-    int GetSystemNodeNumberForZone(std::string const &ZoneName); // Zone name to match into Controlled Zone structure
+    int GetSystemNodeNumberForZone(AllGlobals &state, std::string const &ZoneName); // Zone name to match into Controlled Zone structure
 
-    int GetReturnAirNodeForZone(std::string const &ZoneName,             // Zone name to match into Controlled Zone structure
+    int GetReturnAirNodeForZone(AllGlobals &state, std::string const &ZoneName,             // Zone name to match into Controlled Zone structure
                                 std::string const &NodeName,             // Return air node name to match (may be blank)
                                 std::string const &calledFromDescription // String identifying the calling function and object
     );
 
-    int GetReturnNumForZone(std::string const &ZoneName, // Zone name to match into Controlled Zone structure
+    int GetReturnNumForZone(AllGlobals &state, std::string const &ZoneName, // Zone name to match into Controlled Zone structure
                             std::string const &NodeName  // Return air node name to match (may be blank)
     );
 

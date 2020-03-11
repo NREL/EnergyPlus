@@ -68,6 +68,7 @@
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixedAir.hh>
@@ -493,7 +494,7 @@ namespace HVACControllers {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetControllerInput()
+    void GetControllerInput(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -694,7 +695,7 @@ namespace HVACControllers {
                 ControllerProps(Num).MaxVolFlowActuated = NumArray(2);
                 ControllerProps(Num).MinVolFlowActuated = NumArray(3);
 
-                if (!CheckForControllerWaterCoil(CurrentModuleObject, AlphArray(1))) {
+                if (!CheckForControllerWaterCoil(state, CurrentModuleObject, AlphArray(1))) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + AlphArray(1) + "\" not found on any AirLoopHVAC:ControllerList.");
                     ErrorsFound = true;
                 }

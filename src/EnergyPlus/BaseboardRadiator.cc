@@ -702,7 +702,7 @@ namespace BaseboardRadiator {
         Baseboard(BaseboardNum).AirInletHumRat = Node(ZoneNode).HumRat;
     }
 
-    void SizeBaseboard(int const BaseboardNum)
+    void SizeBaseboard(AllGlobals &state, int const BaseboardNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -834,7 +834,7 @@ namespace BaseboardRadiator {
                         } else {
                             TempSize = Baseboard(BaseboardNum).ScaledHeatingCapacity;
                         }
-                        RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                         DesCoilLoad = TempSize;
                         DataScalableCapSizingON = false;
                     } else {
@@ -952,7 +952,7 @@ namespace BaseboardRadiator {
                         } else {
                             TempSize = Baseboard(BaseboardNum).ScaledHeatingCapacity;
                         }
-                        RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                         DesCoilLoad = TempSize;
                         DataScalableCapSizingON = false;
                     } else {

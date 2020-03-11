@@ -116,7 +116,7 @@ namespace ZoneAirLoopEquipmentManager {
         numADUInitialized = 0;
     }
 
-    void ManageZoneAirLoopEquipment(std::string const &ZoneAirLoopEquipName,
+    void ManageZoneAirLoopEquipment(AllGlobals &state, std::string const &ZoneAirLoopEquipName,
                                     bool const FirstHVACIteration,
                                     Real64 &SysOutputProvided,
                                     Real64 &NonAirSysOutput,
@@ -165,7 +165,7 @@ namespace ZoneAirLoopEquipmentManager {
         InitZoneAirLoopEquipment(AirDistUnitNum, ControlledZoneNum, ActualZoneNum);
         InitZoneAirLoopEquipmentTimeStep(AirDistUnitNum);
 
-        SimZoneAirLoopEquipment(
+        SimZoneAirLoopEquipment(state,
             AirDistUnitNum, SysOutputProvided, NonAirSysOutput, LatOutputProvided, FirstHVACIteration, ControlledZoneNum, ActualZoneNum);
 
         // Call one-time init to fill termunit sizing and other data for the ADU - can't do this until the actual terminal unit nodes have been
@@ -716,21 +716,21 @@ namespace ZoneAirLoopEquipmentManager {
                                        AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
 
                 } else if (SELECT_CASE_var == SingleDuct_SeriesPIU_Reheat) {
-                    SimPIU(AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
+                    SimPIU(state, AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                            FirstHVACIteration,
                            ActualZoneNum,
                            ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                            AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
 
                 } else if (SELECT_CASE_var == SingleDuct_ParallelPIU_Reheat) {
-                    SimPIU(AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
+                    SimPIU(state, AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                            FirstHVACIteration,
                            ActualZoneNum,
                            ZoneEquipConfig(ControlledZoneNum).ZoneNode,
                            AirDistUnit(AirDistUnitNum).EquipIndex(AirDistCompNum));
 
                 } else if (SELECT_CASE_var == SingleDuct_ConstVol_4PipeInduc) {
-                    SimIndUnit(AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
+                    SimIndUnit(state, AirDistUnit(AirDistUnitNum).EquipName(AirDistCompNum),
                                FirstHVACIteration,
                                ActualZoneNum,
                                ZoneEquipConfig(ControlledZoneNum).ZoneNode,

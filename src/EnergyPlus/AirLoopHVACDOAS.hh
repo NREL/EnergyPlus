@@ -191,7 +191,7 @@ namespace AirLoopHVACDOAS {
 
         void initAirLoopDOAS(AllGlobals &state, bool const FirstHVACIteration);
 
-        void CalcAirLoopDOAS(bool const FirstHVACIteration);
+        void CalcAirLoopDOAS(AllGlobals &state, bool const FirstHVACIteration);
 
         void SizingAirLoopDOAS(AllGlobals &state);
 

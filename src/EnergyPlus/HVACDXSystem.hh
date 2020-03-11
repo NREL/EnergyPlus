@@ -231,7 +231,7 @@ namespace HVACDXSystem {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetDXCoolingSystemInput();
+    void GetDXCoolingSystemInput(AllGlobals &state);
 
     // End of Get Input subroutines for the Module
     //******************************************************************************
@@ -288,11 +288,11 @@ namespace HVACDXSystem {
                                          Array1<Real64> const &Par   // par(1) = DX coil number
     );
 
-    Real64 HXAssistedCoolCoilTempResidual(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 HXAssistedCoolCoilTempResidual(AllGlobals &state, Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                           Array1<Real64> const &Par   // par(1) = DX coil number
     );
 
-    Real64 HXAssistedCoolCoilHRResidual(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 HXAssistedCoolCoilHRResidual(AllGlobals &state, Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                         Array1<Real64> const &Par   // par(1) = DX coil number
     );
 
@@ -312,9 +312,9 @@ namespace HVACDXSystem {
                                    int const ControlMode       // temperature or humidity control mode
     );
 
-    void CheckDXCoolingCoilInOASysExists(std::string const &DXCoilSysName);
+    void CheckDXCoolingCoilInOASysExists(AllGlobals &state, std::string const &DXCoilSysName);
 
-    void GetCoolingCoilTypeNameAndIndex(
+    void GetCoolingCoilTypeNameAndIndex(AllGlobals &state, 
         std::string const &DXCoilSysName, int &CoolCoilType, int &CoolCoilIndex, std::string &CoolCoilName, bool &ErrFound);
 
     //******************************************************************************
@@ -339,9 +339,9 @@ namespace HVACDXSystem {
                                   Array1<Real64> const &Par // par(1) = DX coil number
     );
 
-    int GetCoolingCoilInletNodeNum(std::string const &DXCoilSysName);
+    int GetCoolingCoilInletNodeNum(AllGlobals &state, std::string const &DXCoilSysName);
 
-    int GetCoolingCoilOutletNodeNum(std::string const &DXCoilSysName);
+    int GetCoolingCoilOutletNodeNum(AllGlobals &state, std::string const &DXCoilSysName);
 
     //        End of Calculation subroutines for the DXCoolingSystem Module
     // *****************************************************************************

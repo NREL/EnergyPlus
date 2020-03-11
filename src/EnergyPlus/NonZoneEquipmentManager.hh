@@ -50,6 +50,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 
 namespace EnergyPlus {
 
@@ -63,7 +64,7 @@ namespace NonZoneEquipmentManager {
 
     // Functions
 
-    void ManageNonZoneEquipment(bool FirstHVACIteration,
+    void ManageNonZoneEquipment(AllGlobals &state, bool FirstHVACIteration,
                                 bool &SimNonZoneEquipment // Simulation convergence flag
     );
 

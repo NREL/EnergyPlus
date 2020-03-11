@@ -264,7 +264,7 @@ void ManageHVACSizingSimulation(AllGlobals &state, OutputFiles &outputFiles, boo
         Available = true;
         for (int i = 1; i <= NumOfEnvrn; ++i) { // loop over environments
 
-            GetNextEnvironment(OutputFiles::getSingleton(), Available, ErrorsFound);
+            GetNextEnvironment(state, OutputFiles::getSingleton(), Available, ErrorsFound);
             if (ErrorsFound) break;
             if (!Available) continue;
 

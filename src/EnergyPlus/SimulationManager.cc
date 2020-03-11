@@ -392,7 +392,7 @@ namespace SimulationManager {
         }
 
         DisplayString("Adjusting Air System Sizing");
-        SizingManager::ManageSystemSizingAdjustments();
+        SizingManager::ManageSystemSizingAdjustments(state);
 
         DisplayString("Adjusting Standard 62.1 Ventilation Sizing");
         SizingManager::ManageSystemVentilationAdjustments();
@@ -441,7 +441,7 @@ namespace SimulationManager {
             if (ErrFound) TerminalError = true;
             TestCompSetInletOutletNodes(ErrFound);
             if (ErrFound) TerminalError = true;
-            CheckControllerLists(ErrFound);
+            CheckControllerLists(state, ErrFound);
             if (ErrFound) TerminalError = true;
 
             if (DoDesDaySim || DoWeathSim) {
@@ -492,7 +492,7 @@ namespace SimulationManager {
 
         while (Available) {
 
-            GetNextEnvironment(outputFiles, Available, ErrorsFound);
+            GetNextEnvironment(state, outputFiles, Available, ErrorsFound);
 
             if (!Available) break;
             if (ErrorsFound) break;
@@ -2095,7 +2095,7 @@ namespace SimulationManager {
 
         while (Available) { // do for each environment
 
-            GetNextEnvironment(outputFiles, Available, ErrorsFound);
+            GetNextEnvironment(state, outputFiles, Available, ErrorsFound);
 
             if (!Available) break;
             if (ErrorsFound) break;
@@ -3187,13 +3187,13 @@ void Resimulate(AllGlobals &state, bool &ResimExt, // Flag to resimulate the ext
 
     if (ResimHB) {
         // Surface simulation
-        InitSurfaceHeatBalance();
+        InitSurfaceHeatBalance(state);
         HeatBalanceSurfaceManager::CalcHeatBalanceOutsideSurf();
         HeatBalanceSurfaceManager::CalcHeatBalanceInsideSurf();
 
         // Air simulation
         InitAirHeatBalance();
-        ManageRefrigeratedCaseRacks();
+        ManageRefrigeratedCaseRacks(state);
 
         ++DemandManagerHBIterations;
         ResimHVAC = true; // Make sure HVAC is resimulated too
@@ -3201,10 +3201,10 @@ void Resimulate(AllGlobals &state, bool &ResimExt, // Flag to resimulate the ext
 
     if (ResimHVAC) {
         // HVAC simulation
-        ManageZoneAirUpdates(iGetZoneSetPoints, ZoneTempChange, false, UseZoneTimeStepHistory, 0.0);
+        ManageZoneAirUpdates(state, iGetZoneSetPoints, ZoneTempChange, false, UseZoneTimeStepHistory, 0.0);
         if (Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(iGetZoneSetPoints, false, UseZoneTimeStepHistory, 0.0);
-        CalcAirFlowSimple(0, ZoneAirMassFlow.EnforceZoneMassBalance);
-        ManageZoneAirUpdates(iPredictStep, ZoneTempChange, false, UseZoneTimeStepHistory, 0.0);
+        CalcAirFlowSimple(state, 0, ZoneAirMassFlow.EnforceZoneMassBalance);
+        ManageZoneAirUpdates(state, iPredictStep, ZoneTempChange, false, UseZoneTimeStepHistory, 0.0);
         if (Contaminant.SimulateContaminants) ManageZoneContaminanUpdates(iPredictStep, false, UseZoneTimeStepHistory, 0.0);
         SimHVAC(state);
 

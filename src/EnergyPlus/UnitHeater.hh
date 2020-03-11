@@ -190,7 +190,7 @@ namespace UnitHeater {
                         bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     );
 
-    void SizeUnitHeater(int const UnitHeatNum);
+    void SizeUnitHeater(AllGlobals &state, int const UnitHeatNum);
 
     void CalcUnitHeater(AllGlobals &state, int &UnitHeatNum,              // number of the current fan coil unit being simulated
                         int const ZoneNum,             // number of zone being served
@@ -199,7 +199,7 @@ namespace UnitHeater {
                         Real64 &LatOutputProvided      // Latent power supplied (kg/s), negative = dehumidification
     );
 
-    void CalcUnitHeaterComponents(int const UnitHeatNum,                   // Unit index in unit heater array
+    void CalcUnitHeaterComponents(AllGlobals &state, int const UnitHeatNum,                   // Unit index in unit heater array
                                   bool const FirstHVACIteration,           // flag for 1st HVAV iteration in the time step
                                   Real64 &LoadMet,                         // load met by unit (watts)
                                   Optional_int_const OpMode = _,           // fan operating mode
@@ -215,7 +215,7 @@ namespace UnitHeater {
 
     void ReportUnitHeater(int const UnitHeatNum); // Unit index in unit heater array
 
-    Real64 CalcUnitHeaterResidual(Real64 const PartLoadRatio, // heating coil part load ratio
+    Real64 CalcUnitHeaterResidual(AllGlobals &state, Real64 const PartLoadRatio, // heating coil part load ratio
                                   Array1<Real64> const &Par   // Function parameters
     );
 

@@ -306,13 +306,13 @@ namespace HVACUnitaryBypassVAV {
 
     void clear_state();
 
-    void SimUnitaryBypassVAV(std::string const &CompName,   // Name of the CBVAV system
+    void SimUnitaryBypassVAV(AllGlobals &state, std::string const &CompName,   // Name of the CBVAV system
                              bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system time step
                              int const AirLoopNum,          // air loop index
                              int &CompIndex                 // Index to changeover-bypass VAV system
     );
 
-    void SimCBVAV(int const CBVAVNum,            // Index of the current CBVAV system being simulated
+    void SimCBVAV(AllGlobals &state, int const CBVAVNum,            // Index of the current CBVAV system being simulated
                   bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                   Real64 &QSensUnitOut,          // Sensible delivered capacity [W]
                   Real64 &OnOffAirFlowRatio,     // Ratio of compressor ON airflow to AVERAGE airflow over timestep
@@ -354,7 +354,7 @@ namespace HVACUnitaryBypassVAV {
                               Array1<Real64> const &Par  // Par(1) = DX coil number
     );
 
-    Real64 HXAssistDXCoilResidual(Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 HXAssistDXCoilResidual(AllGlobals &state, Real64 const PartLoadFrac, // Compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                   Array1<Real64> const &Par  // Par(1) = DX coil number
     );
 

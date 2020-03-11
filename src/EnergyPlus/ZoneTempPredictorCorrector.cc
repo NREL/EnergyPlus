@@ -75,6 +75,7 @@
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HybridModel.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -329,7 +330,7 @@ namespace ZoneTempPredictorCorrector {
         NumOnOffCtrZone = 0;
     }
 
-    void ManageZoneAirUpdates(int const UpdateType,   // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
+    void ManageZoneAirUpdates(AllGlobals &state, int const UpdateType,   // Can be iGetZoneSetPoints, iPredictStep, iCorrectStep
                               Real64 &ZoneTempChange, // Temp change in zone air btw previous and current timestep
                               bool const ShortenTimeStepSys,
                               bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step
@@ -368,10 +369,10 @@ namespace ZoneTempPredictorCorrector {
                 CalcZoneAirTempSetPoints();
 
             } else if (SELECT_CASE_var == iPredictStep) {
-                PredictSystemLoads(ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+                PredictSystemLoads(state, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
             } else if (SELECT_CASE_var == iCorrectStep) {
-                CorrectZoneAirTemp(ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
+                CorrectZoneAirTemp(state, ZoneTempChange, ShortenTimeStepSys, UseZoneTimeStepHistory, PriorTimeStep);
 
             } else if (SELECT_CASE_var == iRevertZoneTimestepHistories) {
                 RevertZoneTimestepHistories();
@@ -4789,7 +4790,7 @@ namespace ZoneTempPredictorCorrector {
     }
 
 
-    void CorrectZoneAirTemp(Real64 &ZoneTempChange, // Temperature change in zone air between previous and current timestep
+    void CorrectZoneAirTemp(AllGlobals &state, Real64 &ZoneTempChange, // Temperature change in zone air between previous and current timestep
                             bool const ShortenTimeStepSys,
                             bool const UseZoneTimeStepHistory, // if true then use zone timestep history, if false use system time step history
                             Real64 const PriorTimeStep         // the old value for timestep length is passed for possible use in interpolating
@@ -5011,7 +5012,7 @@ namespace ZoneTempPredictorCorrector {
 
             AirCap = AIRRAT(ZoneNum);
 
-            ManageAirModel(ZoneNum);
+            ManageAirModel(state, ZoneNum);
 
             // Calculate the various heat balance sums
             CalcZoneSums(ZoneNum, SumIntGain, SumHA, SumHATsurf, SumHATref, SumMCp, SumMCpT, SumSysMCp, SumSysMCpT);

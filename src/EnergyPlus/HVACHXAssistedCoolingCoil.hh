@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 
 namespace EnergyPlus {
 
@@ -142,7 +143,7 @@ namespace HVACHXAssistedCoolingCoil {
 
     void clear_state();
 
-    void SimHXAssistedCoolingCoil(std::string const &HXAssistedCoilName, // Name of HXAssistedCoolingCoil
+    void SimHXAssistedCoolingCoil(AllGlobals &state, std::string const &HXAssistedCoilName, // Name of HXAssistedCoolingCoil
                                   bool const FirstHVACIteration,         // FirstHVACIteration flag
                                   int const CompOp,                      // compressor operation; 1=on, 0=off
                                   Real64 const PartLoadRatio,            // Part load ratio of Coil:DX:CoolingBypassFactorEmpirical
@@ -170,7 +171,7 @@ namespace HVACHXAssistedCoolingCoil {
     // End Initialization Section of the Module
     //******************************************************************************
 
-    void CalcHXAssistedCoolingCoil(int const HXAssistedCoilNum,             // Index number for HXAssistedCoolingCoil
+    void CalcHXAssistedCoolingCoil(AllGlobals &state, int const HXAssistedCoilNum,             // Index number for HXAssistedCoolingCoil
                                    bool const FirstHVACIteration,           // FirstHVACIteration flag
                                    int const CompOp,                        // compressor operation; 1=on, 0=off
                                    Real64 const PartLoadRatio,              // Cooling coil part load ratio

@@ -1004,10 +1004,10 @@ namespace PackagedTerminalHeatPump {
                         ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\".");
                         ErrorsFound = true;
                     } else {
-                        GetHeatingCoilIndex(SuppHeatCoilName, PTUnit(PTUnitNum).SuppHeatCoilIndex, errFlag);
+                        GetHeatingCoilIndex(state, SuppHeatCoilName, PTUnit(PTUnitNum).SuppHeatCoilIndex, errFlag);
                         // Get the Supplemental Heating Coil Node Numbers
-                        SuppHeatInletNodeNum = GetHeatingCoilInletNode(SuppHeatCoilType, SuppHeatCoilName, errFlag);
-                        SuppHeatOutletNodeNum = GetHeatingCoilOutletNode(SuppHeatCoilType, SuppHeatCoilName, errFlag);
+                        SuppHeatInletNodeNum = GetHeatingCoilInletNode(state, SuppHeatCoilType, SuppHeatCoilName, errFlag);
+                        SuppHeatOutletNodeNum = GetHeatingCoilOutletNode(state, SuppHeatCoilType, SuppHeatCoilName, errFlag);
                         if (errFlag) {
                             ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\".");
                             ErrorsFound = true;
@@ -1766,10 +1766,10 @@ namespace PackagedTerminalHeatPump {
                     if (UtilityRoutines::SameString(Alphas(9), "Coil:Heating:Fuel"))
                         PTUnit(PTUnitNum).ACHeatCoilType_Num = Coil_HeatingGasOrOtherFuel;
                     if (UtilityRoutines::SameString(Alphas(9), "Coil:Heating:Electric")) PTUnit(PTUnitNum).ACHeatCoilType_Num = Coil_HeatingElectric;
-                    PTUnit(PTUnitNum).ACHeatCoilCap = GetHeatingCoilCapacity(PTUnit(PTUnitNum).ACHeatCoilType, ACHeatCoilName, ErrorsFound);
+                    PTUnit(PTUnitNum).ACHeatCoilCap = GetHeatingCoilCapacity(state, PTUnit(PTUnitNum).ACHeatCoilType, ACHeatCoilName, ErrorsFound);
                     errFlag = false;
-                    HeatCoilInletNodeNum = GetHeatingCoilInletNode(PTUnit(PTUnitNum).ACHeatCoilType, ACHeatCoilName, errFlag);
-                    HeatCoilOutletNodeNum = GetHeatingCoilOutletNode(PTUnit(PTUnitNum).ACHeatCoilType, ACHeatCoilName, errFlag);
+                    HeatCoilInletNodeNum = GetHeatingCoilInletNode(state, PTUnit(PTUnitNum).ACHeatCoilType, ACHeatCoilName, errFlag);
+                    HeatCoilOutletNodeNum = GetHeatingCoilOutletNode(state, PTUnit(PTUnitNum).ACHeatCoilType, ACHeatCoilName, errFlag);
                     if (errFlag) {
                         ShowContinueError("...occurs in " + PTUnit(PTUnitNum).UnitType + " \"" + PTUnit(PTUnitNum).Name + "\"");
                         ErrorsFound = true;
@@ -2657,10 +2657,10 @@ namespace PackagedTerminalHeatPump {
                         ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\".");
                         ErrorsFound = true;
                     } else {
-                        GetHeatingCoilIndex(SuppHeatCoilName, PTUnit(PTUnitNum).SuppHeatCoilIndex, errFlag);
+                        GetHeatingCoilIndex(state, SuppHeatCoilName, PTUnit(PTUnitNum).SuppHeatCoilIndex, errFlag);
                         // Get the Supplemental Heating Coil Node Numbers
-                        SuppHeatInletNodeNum = GetHeatingCoilInletNode(SuppHeatCoilType, SuppHeatCoilName, errFlag);
-                        SuppHeatOutletNodeNum = GetHeatingCoilOutletNode(SuppHeatCoilType, SuppHeatCoilName, errFlag);
+                        SuppHeatInletNodeNum = GetHeatingCoilInletNode(state, SuppHeatCoilType, SuppHeatCoilName, errFlag);
+                        SuppHeatOutletNodeNum = GetHeatingCoilOutletNode(state, SuppHeatCoilType, SuppHeatCoilName, errFlag);
                         if (errFlag) {
                             ShowContinueError("...specified in " + CurrentModuleObject + "=\"" + PTUnit(PTUnitNum).Name + "\".");
                             ErrorsFound = true;
@@ -3258,7 +3258,7 @@ namespace PackagedTerminalHeatPump {
             if (PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingGasOrOtherFuel ||
                 PTUnit(PTUnitNum).SuppHeatCoilType_Num == Coil_HeatingElectric) {
                 errFlag = false;
-                PTUnit(PTUnitNum).DesignSuppHeatingCapacity = GetHeatingCoilCapacity(SuppHeatCoilType, SuppHeatCoilName, errFlag);
+                PTUnit(PTUnitNum).DesignSuppHeatingCapacity = GetHeatingCoilCapacity(state, SuppHeatCoilType, SuppHeatCoilName, errFlag);
                 if (errFlag) {
                     ShowContinueError("...occurs in " + CurrentModuleObject + " = " + Alphas(1));
                     ErrorsFound = true;
@@ -4321,10 +4321,10 @@ namespace PackagedTerminalHeatPump {
         if (PTUnit(PTUnitNum).ACHeatCoilCap == AutoSize) {
             if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingGasOrOtherFuel) {
                 PTUnit(PTUnitNum).ACHeatCoilCap =
-                    GetHeatingCoilCapacity(PTUnit(PTUnitNum).ACHeatCoilType, PTUnit(PTUnitNum).ACHeatCoilName, ErrorsFound);
+                    GetHeatingCoilCapacity(state, PTUnit(PTUnitNum).ACHeatCoilType, PTUnit(PTUnitNum).ACHeatCoilName, ErrorsFound);
             } else if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingElectric) {
                 PTUnit(PTUnitNum).ACHeatCoilCap =
-                    GetHeatingCoilCapacity(PTUnit(PTUnitNum).ACHeatCoilType, PTUnit(PTUnitNum).ACHeatCoilName, ErrorsFound);
+                    GetHeatingCoilCapacity(state, PTUnit(PTUnitNum).ACHeatCoilType, PTUnit(PTUnitNum).ACHeatCoilName, ErrorsFound);
             }
         }
 
@@ -4875,7 +4875,7 @@ namespace PackagedTerminalHeatPump {
                     } else {
                         TempSize = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                     }
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     PTUnit(PTUnitNum).MaxCoolAirVolFlow = TempSize;
                 } else if (SAFMethod == FlowPerCoolingCapacity) {
                     SizingMethod = CoolingCapacitySizing;
@@ -4886,13 +4886,13 @@ namespace PackagedTerminalHeatPump {
                     if (ZoneHVACSizing(zoneHVACIndex).CoolingCapMethod == FractionOfAutosizedCoolingCapacity) {
                         DataFracOfAutosizedCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledCoolingCapacity;
                     }
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     DataAutosizedCoolingCapacity = TempSize;
                     DataFlowPerCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                     SizingMethod = CoolingAirflowSizing;
                     PrintFlag = true;
                     TempSize = AutoSize;
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     PTUnit(PTUnitNum).MaxCoolAirVolFlow = TempSize;
                 }
 
@@ -4922,7 +4922,7 @@ namespace PackagedTerminalHeatPump {
                     } else {
                         TempSize = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
                     }
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     PTUnit(PTUnitNum).MaxHeatAirVolFlow = TempSize;
                 } else if (SAFMethod == FlowPerHeatingCapacity) {
                     SizingMethod = HeatingCapacitySizing;
@@ -4930,7 +4930,7 @@ namespace PackagedTerminalHeatPump {
                     PrintFlag = false;
                     DataScalableSizingON = true;
                     DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow;
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     if (ZoneHVACSizing(zoneHVACIndex).HeatingCapMethod == FractionOfAutosizedHeatingCapacity) {
                         DataFracOfAutosizedHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).ScaledHeatingCapacity;
                     }
@@ -4939,7 +4939,7 @@ namespace PackagedTerminalHeatPump {
                     SizingMethod = HeatingAirflowSizing;
                     PrintFlag = true;
                     TempSize = AutoSize;
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     PTUnit(PTUnitNum).MaxHeatAirVolFlow = TempSize;
                 }
 
@@ -4974,7 +4974,7 @@ namespace PackagedTerminalHeatPump {
                     } else {
                         TempSize = ZoneHVACSizing(zoneHVACIndex).MaxNoCoolHeatAirVolFlow;
                     }
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow = TempSize;
                 }
 
@@ -5060,7 +5060,7 @@ namespace PackagedTerminalHeatPump {
                     TempSize = PTUnit(PTUnitNum).MaxCoolAirVolFlow;
                 }
                 PrintFlag = true;
-                RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                 PTUnit(PTUnitNum).MaxCoolAirVolFlow = TempSize;
                 ZoneEqSizing(CurZoneEqNum).CoolingAirFlow = false;
 
@@ -5092,7 +5092,7 @@ namespace PackagedTerminalHeatPump {
                     TempSize = PTUnit(PTUnitNum).MaxHeatAirVolFlow;
                 }
                 PrintFlag = true;
-                RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                 PTUnit(PTUnitNum).MaxHeatAirVolFlow = TempSize;
                 ZoneEqSizing(CurZoneEqNum).HeatingAirFlow = false;
 
@@ -5114,7 +5114,7 @@ namespace PackagedTerminalHeatPump {
                 FieldNum = 3; // N3, \field Supply Air Flow Rate When No Cooling or Heating is Needed
                 SizingString = PTUnitUNumericFields(PTUnitNum).FieldNames(FieldNum) + " [m3/s]";
                 TempSize = PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow;
-                RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                 PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow = TempSize;
                 DataConstantUsedForSizing = 0.0;
                 DataFractionUsedForSizing = 0.0;
@@ -5373,7 +5373,7 @@ namespace PackagedTerminalHeatPump {
                 FieldNum = 7; // Minimum Supply Air Temperature in Cooling Mode
             }
             SizingString = PTUnitUNumericFields(PTUnitNum).FieldNames(FieldNum) + " [C]";
-            RequestSizing(CompType, CompName, SizingMethod, SizingString, PTUnit(PTUnitNum).DesignMinOutletTemp, PrintFlag, RoutineName);
+            RequestSizing(state, CompType, CompName, SizingMethod, SizingString, PTUnit(PTUnitNum).DesignMinOutletTemp, PrintFlag, RoutineName);
 
             SizingMethod = ASHRAEMaxSATHeatingSizing;
             if (PTUnit(PTUnitNum).ZoneEquipType == PkgTermHPAirToAir_Num) {
@@ -5389,7 +5389,7 @@ namespace PackagedTerminalHeatPump {
             }
             DataCapacityUsedForSizing /= PTUnit(PTUnitNum).ControlZoneMassFlowFrac;
             DataFlowUsedForSizing = PTUnit(PTUnitNum).MaxNoCoolHeatAirVolFlow;
-            RequestSizing(CompType, CompName, SizingMethod, SizingString, PTUnit(PTUnitNum).DesignMaxOutletTemp, PrintFlag, RoutineName);
+            RequestSizing(state, CompType, CompName, SizingMethod, SizingString, PTUnit(PTUnitNum).DesignMaxOutletTemp, PrintFlag, RoutineName);
 
             DataCapacityUsedForSizing = 0.0; // reset so other routines don't use this inadvertently
             DataFlowUsedForSizing = 0.0;
@@ -5676,7 +5676,7 @@ namespace PackagedTerminalHeatPump {
                 {
                     auto const SELECT_CASE_var(PTUnit(PTUnitNum).SuppHeatCoilType_Num);
                     if ((SELECT_CASE_var == Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == Coil_HeatingElectric)) {
-                        SimulateHeatingCoilComponents(
+                        SimulateHeatingCoilComponents(state,
                             PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, SupHeaterLoad, PTUnit(PTUnitNum).SuppHeatCoilIndex);
                     } else if (SELECT_CASE_var == Coil_HeatingWater) {
                         mdot = 0.0;
@@ -5841,7 +5841,7 @@ namespace PackagedTerminalHeatPump {
         // if blow through, simulate fan then coils
         if (PTUnit(PTUnitNum).FanPlace == BlowThru) {
             if (PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             } else {
                 Fans::SimulateFanComponents(state, PTUnit(PTUnitNum).FanName,
                                             FirstHVACIteration,
@@ -5857,7 +5857,7 @@ namespace PackagedTerminalHeatPump {
                 auto const SELECT_CASE_var(PTUnit(PTUnitNum).UnitType_Num);
                 if ((SELECT_CASE_var == PTACUnit) || (SELECT_CASE_var == PTHPUnit)) {
                     if (PTUnit(PTUnitNum).DXCoolCoilType_Num == CoilDX_CoolingHXAssisted) {
-                        SimHXAssistedCoolingCoil(PTUnit(PTUnitNum).DXCoolCoilName,
+                        SimHXAssistedCoolingCoil(state, PTUnit(PTUnitNum).DXCoolCoilName,
                                                  FirstHVACIteration,
                                                  On,
                                                  PartLoadFrac,
@@ -5898,7 +5898,7 @@ namespace PackagedTerminalHeatPump {
                 auto const SELECT_CASE_var(PTUnit(PTUnitNum).UnitType_Num);
                 if ((SELECT_CASE_var == PTACUnit) || (SELECT_CASE_var == PTHPUnit)) {
                     if (PTUnit(PTUnitNum).DXCoolCoilType_Num == CoilDX_CoolingHXAssisted) {
-                        SimHXAssistedCoolingCoil(PTUnit(PTUnitNum).DXCoolCoilName,
+                        SimHXAssistedCoolingCoil(state, PTUnit(PTUnitNum).DXCoolCoilName,
                                                  FirstHVACIteration,
                                                  Off,
                                                  dZero,
@@ -5936,7 +5936,7 @@ namespace PackagedTerminalHeatPump {
                 QCoilReq = PTUnit(PTUnitNum).ACHeatCoilCap * PartLoadFrac;
                 if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingGasOrOtherFuel ||
                     PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingElectric) {
-                    SimulateHeatingCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName,
+                    SimulateHeatingCoilComponents(state, PTUnit(PTUnitNum).ACHeatCoilName,
                                                   FirstHVACIteration,
                                                   QCoilReq,
                                                   PTUnit(PTUnitNum).ACHeatCoilIndex,
@@ -6023,7 +6023,7 @@ namespace PackagedTerminalHeatPump {
                 QCoilReq = 0.0;
                 if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingGasOrOtherFuel ||
                     PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingElectric) {
-                    SimulateHeatingCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName, FirstHVACIteration, QCoilReq, PTUnit(PTUnitNum).ACHeatCoilIndex);
+                    SimulateHeatingCoilComponents(state, PTUnit(PTUnitNum).ACHeatCoilName, FirstHVACIteration, QCoilReq, PTUnit(PTUnitNum).ACHeatCoilIndex);
                 } else if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingWater) {
                     mdot = 0.0;
                     SetComponentFlowRate(mdot,
@@ -6087,7 +6087,7 @@ namespace PackagedTerminalHeatPump {
         // if draw through, simulate coils then fan
         if (PTUnit(PTUnitNum).FanPlace == DrawThru) {
             if (PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             } else {
                 Fans::SimulateFanComponents(state, PTUnit(PTUnitNum).FanName,
                                             FirstHVACIteration,
@@ -6102,7 +6102,7 @@ namespace PackagedTerminalHeatPump {
                 {
                     auto const SELECT_CASE_var(PTUnit(PTUnitNum).SuppHeatCoilType_Num);
                     if ((SELECT_CASE_var == Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == Coil_HeatingElectric)) {
-                        SimulateHeatingCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName,
+                        SimulateHeatingCoilComponents(state, PTUnit(PTUnitNum).SuppHeatCoilName,
                                                       FirstHVACIteration,
                                                       SupHeaterLoad,
                                                       PTUnit(PTUnitNum).SuppHeatCoilIndex,
@@ -6144,7 +6144,7 @@ namespace PackagedTerminalHeatPump {
                 {
                     auto const SELECT_CASE_var(PTUnit(PTUnitNum).SuppHeatCoilType_Num);
                     if ((SELECT_CASE_var == Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == Coil_HeatingElectric)) {
-                        SimulateHeatingCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName,
+                        SimulateHeatingCoilComponents(state, PTUnit(PTUnitNum).SuppHeatCoilName,
                                                       FirstHVACIteration,
                                                       SupHeaterLoad,
                                                       PTUnit(PTUnitNum).SuppHeatCoilIndex,
@@ -6464,7 +6464,7 @@ namespace PackagedTerminalHeatPump {
         return Residuum;
     }
 
-    Real64 SupSATResidual(Real64 &TempSupHeater,    // supplemental heater load at maximum SAT
+    Real64 SupSATResidual(AllGlobals &state, Real64 &TempSupHeater,    // supplemental heater load at maximum SAT
                           Array1<Real64> const &Par // par(1) = PTUnitNum
     )
     {
@@ -6512,7 +6512,7 @@ namespace PackagedTerminalHeatPump {
         PTUnitNum = int(Par(1));
         // FirstHVACIteration is a logical, Par is real, so make 1.0=TRUE and 0.0=FALSE
         FirstHVACIteration = (Par(2) == 1.0);
-        SimulateHeatingCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, TempSupHeater, PTUnit(PTUnitNum).SuppHeatCoilIndex);
+        SimulateHeatingCoilComponents(state, PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, TempSupHeater, PTUnit(PTUnitNum).SuppHeatCoilIndex);
         SupSATResidual = Node(PTUnit(PTUnitNum).AirOutNode).Temp - PTUnit(PTUnitNum).MaxSATSupHeat;
 
         return SupSATResidual;
@@ -7619,7 +7619,7 @@ namespace PackagedTerminalHeatPump {
                 {
                     auto const SELECT_CASE_var(PTUnit(PTUnitNum).SuppHeatCoilType_Num);
                     if ((SELECT_CASE_var == Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == Coil_HeatingElectric)) {
-                        SimulateHeatingCoilComponents(
+                        SimulateHeatingCoilComponents(state, 
                             PTUnit(PTUnitNum).SuppHeatCoilName, FirstHVACIteration, SupHeaterLoad, PTUnit(PTUnitNum).SuppHeatCoilIndex);
                     } else if (SELECT_CASE_var == Coil_HeatingWater) {
                         mdot = 0.0;
@@ -8020,7 +8020,7 @@ namespace PackagedTerminalHeatPump {
         // if blow through, simulate fan then coils
         if (PTUnit(PTUnitNum).FanPlace == BlowThru) {
             if (PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             } else {
                 Fans::SimulateFanComponents (state, PTUnit(PTUnitNum).FanName,
                                             FirstHVACIteration,
@@ -8102,7 +8102,7 @@ namespace PackagedTerminalHeatPump {
                     QCoilReq = PTUnit(PTUnitNum).ACHeatCoilCap * PartLoadFrac;
                     if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingGasOrOtherFuel ||
                         PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingElectric) {
-                        SimulateHeatingCoilComponents(PTUnit(PTUnitNum).ACHeatCoilName,
+                        SimulateHeatingCoilComponents(state, PTUnit(PTUnitNum).ACHeatCoilName,
                                                       FirstHVACIteration,
                                                       QCoilReq,
                                                       PTUnit(PTUnitNum).ACHeatCoilIndex,
@@ -8154,7 +8154,7 @@ namespace PackagedTerminalHeatPump {
                     QCoilReq = 0.0;
                     if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingGasOrOtherFuel ||
                         PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingElectric) {
-                        SimulateHeatingCoilComponents(
+                        SimulateHeatingCoilComponents(state,
                             PTUnit(PTUnitNum).ACHeatCoilName, FirstHVACIteration, QCoilReq, PTUnit(PTUnitNum).ACHeatCoilIndex);
                     } else if (PTUnit(PTUnitNum).ACHeatCoilType_Num == Coil_HeatingWater) {
                         mdot = 0.0;
@@ -8192,7 +8192,7 @@ namespace PackagedTerminalHeatPump {
         // if draw through, simulate coils then fan
         if (PTUnit(PTUnitNum).FanPlace == DrawThru) {
             if (PTUnit(PTUnitNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                HVACFan::fanObjs[PTUnit(PTUnitNum).FanIndex]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             } else {
                 Fans::SimulateFanComponents(state, PTUnit(PTUnitNum).FanName,
                                             FirstHVACIteration,
@@ -8208,7 +8208,7 @@ namespace PackagedTerminalHeatPump {
                 {
                     auto const SELECT_CASE_var(PTUnit(PTUnitNum).SuppHeatCoilType_Num);
                     if ((SELECT_CASE_var == Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == Coil_HeatingElectric)) {
-                        SimulateHeatingCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName,
+                        SimulateHeatingCoilComponents(state, PTUnit(PTUnitNum).SuppHeatCoilName,
                                                       FirstHVACIteration,
                                                       SupHeaterLoad,
                                                       PTUnit(PTUnitNum).SuppHeatCoilIndex,
@@ -8250,7 +8250,7 @@ namespace PackagedTerminalHeatPump {
                 {
                     auto const SELECT_CASE_var(PTUnit(PTUnitNum).SuppHeatCoilType_Num);
                     if ((SELECT_CASE_var == Coil_HeatingGasOrOtherFuel) || (SELECT_CASE_var == Coil_HeatingElectric)) {
-                        SimulateHeatingCoilComponents(PTUnit(PTUnitNum).SuppHeatCoilName,
+                        SimulateHeatingCoilComponents(state, PTUnit(PTUnitNum).SuppHeatCoilName,
                                                       FirstHVACIteration,
                                                       SupHeaterLoad,
                                                       PTUnit(PTUnitNum).SuppHeatCoilIndex,

@@ -93,6 +93,7 @@
 #include <EnergyPlus/ElectricBaseboardRadiator.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HWBaseboardRadiator.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
@@ -210,7 +211,7 @@ namespace HeatBalanceSurfaceManager {
         calcHeatBalanceInsideSurfFirstTime = true;
     }
 
-    void ManageSurfaceHeatBalance()
+    void ManageSurfaceHeatBalance(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -234,7 +235,7 @@ namespace HeatBalanceSurfaceManager {
         int ConstrNum;
 
         if (ManageSurfaceHeatBalancefirstTime) DisplayString("Initializing Surfaces");
-        InitSurfaceHeatBalance(); // Initialize all heat balance related parameters
+        InitSurfaceHeatBalance(state); // Initialize all heat balance related parameters
 
         // Solve the zone heat balance 'Detailed' solution
         // Call the outside and inside surface heat balances

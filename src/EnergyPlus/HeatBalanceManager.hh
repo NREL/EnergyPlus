@@ -147,7 +147,7 @@ namespace HeatBalanceManager {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetHeatBalanceInput();
+    void GetHeatBalanceInput(AllGlobals &state);
 
     void CheckUsedConstructions(bool &ErrorsFound);
 

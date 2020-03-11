@@ -52,6 +52,7 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -178,12 +179,12 @@ void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &in
     }
 }
 
-void CoilCoolingDXCurveFitPerformance::size()
+void CoilCoolingDXCurveFitPerformance::size(AllGlobals &state)
 {
     if (!DataGlobals::SysSizingCalc && this->mySizeFlag) {
-        this->normalMode.size();
+        this->normalMode.size(state);
         if (this->hasAlternateMode) {
-            this->alternateMode.size();
+            this->alternateMode.size(state);
         }
         this->mySizeFlag = false;
     }
@@ -330,7 +331,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(AllGlobals &state, in
                     Psychrometrics::PsyWFnTdbTwbPb(CoolingCoilInletAirDryBulbTempRated, CoolingCoilInletAirWetBulbTempRated, DataEnvironment::OutBaroPress, RoutineName);
             DataLoopNode::Node(fanInletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(CoolingCoilInletAirDryBulbTempRated, DataLoopNode::Node(fanInletNode).HumRat);
             if (supplyFanType == DataHVACGlobals::FanType_SystemModelObject) {
-                HVACFan::fanObjs[supplyFanIndex]->simulate(_, true, false, FanStaticPressureRise);
+                HVACFan::fanObjs[supplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
                 fanPowerCorrection = HVACFan::fanObjs[supplyFanIndex]->fanPower();
             } else {
                 Fans::SimulateFanComponents(state, supplyFanName, true, supplyFanIndex, _, true, false, FanStaticPressureRise);
@@ -480,7 +481,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(AllGlobals &state, in
                 DataLoopNode::Node(fanInletNode).Enthalpy = Psychrometrics::PsyHFnTdbW(CoolingCoilInletAirDryBulbTempRated, SupplyAirHumRat);
 
                 if (supplyFanType == DataHVACGlobals::FanType_SystemModelObject) {
-                    HVACFan::fanObjs[supplyFanIndex]->simulate(_, true, false, FanStaticPressureRise);
+                    HVACFan::fanObjs[supplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
                     fanPowerCorrection = HVACFan::fanObjs[supplyFanIndex]->fanPower();
                 } else {
                     Fans::SimulateFanComponents(state, supplyFanName, true, supplyFanIndex, _, true, false, FanStaticPressureRise);
@@ -717,7 +718,7 @@ Real64 CoilCoolingDXCurveFitPerformance::calcIEERResidual(AllGlobals &state,
         DataLoopNode::Node(FanInletNodeNum).HumRat = Psychrometrics::PsyWFnTdbTwbPb(IndoorUnitInletDryBulb, IndoorUnitInletWetBulb, DataEnvironment::OutBaroPress, RoutineName);
         DataLoopNode::Node(FanInletNodeNum).Enthalpy = Psychrometrics::PsyHFnTdbW(IndoorUnitInletDryBulb, DataLoopNode::Node(FanInletNodeNum).HumRat);
         if (supplyFanTypeNum == DataHVACGlobals::FanType_SystemModelObject) {
-            HVACFan::fanObjs[supplyFanIndex]->simulate(_, true, false, FanStaticPressureRise);
+            HVACFan::fanObjs[supplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
         } else {
             // TODO: I am hoping we can just pass in the supply fan name
             Fans::SimulateFanComponents(state, "", true, supplyFanIndex, _, true, false, FanStaticPressureRise);

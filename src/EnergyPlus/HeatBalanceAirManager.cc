@@ -152,7 +152,7 @@ namespace HeatBalanceAirManager {
         UniqueInfiltrationNames.clear();
     }
 
-    void ManageAirHeatBalance()
+    void ManageAirHeatBalance(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -205,7 +205,7 @@ namespace HeatBalanceAirManager {
 
         // Solve the zone heat balance 'Detailed' solution
         // Call the air surface heat balances
-        CalcHeatBalanceAir();
+        CalcHeatBalanceAir(state);
 
         ReportZoneMeanAirTemp();
     }

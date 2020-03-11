@@ -304,9 +304,9 @@ namespace MixedAir {
         {
         }
 
-        void CalcOAController(int const AirLoopNum, bool const FirstHVACIteration);
+        void CalcOAController(AllGlobals &state, int const AirLoopNum, bool const FirstHVACIteration);
 
-        void CalcOAEconomizer(
+        void CalcOAEconomizer(AllGlobals &state, 
             int const AirLoopNum, Real64 const OutAirMinFrac, Real64 &OASignal, bool &HighHumidityOperationFlag, bool const FirstHVACIteration);
 
         void SizeOAController();
@@ -433,13 +433,13 @@ namespace MixedAir {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void ManageOutsideAirSystem(std::string const &OASysName, bool const FirstHVACIteration, int const AirLoopNum, int &OASysNum);
+    void ManageOutsideAirSystem(AllGlobals &state, std::string const &OASysName, bool const FirstHVACIteration, int const AirLoopNum, int &OASysNum);
 
-    void SimOutsideAirSys(int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum);
+    void SimOutsideAirSys(AllGlobals &state, int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum);
 
-    void SimOASysComponents(int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum);
+    void SimOASysComponents(AllGlobals &state, int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum);
 
-    void SimOAComponent(std::string const &CompType, // the component type
+    void SimOAComponent(AllGlobals &state, std::string const &CompType, // the component type
                         std::string const &CompName, // the component Name
                         int const CompTypeNum,       // Component Type -- Integerized for this module
                         bool const FirstHVACIteration,
@@ -459,7 +459,7 @@ namespace MixedAir {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetOutsideAirSysInputs();
+    void GetOutsideAirSysInputs(AllGlobals &state);
 
     void GetOAControllerInputs(AllGlobals &state, OutputFiles &outputFiles);
 
@@ -526,7 +526,7 @@ namespace MixedAir {
                                        Array1<Real64> const &Par // par(1) = mixed node number
     );
 
-    Real64 MultiCompControlTempResidual(Real64 const OASignal,    // Relative outside air flow rate (0 to 1)
+    Real64 MultiCompControlTempResidual(AllGlobals &state, Real64 const OASignal,    // Relative outside air flow rate (0 to 1)
                                         Array1<Real64> const &Par // par(1) = mixed node number
     );
 
@@ -540,17 +540,17 @@ namespace MixedAir {
 
     int GetOAMixerReliefNodeNumber(int const OAMixerNum); // Which Mixer
 
-    int GetOASysControllerListIndex(int const OASysNumber); // OA Sys Number
+    int GetOASysControllerListIndex(AllGlobals &state, int const OASysNumber); // OA Sys Number
 
-    int GetOASysNumSimpControllers(int const OASysNumber); // OA Sys Number
+    int GetOASysNumSimpControllers(AllGlobals &state, int const OASysNumber); // OA Sys Number
 
-    int GetOASysNumHeatingCoils(int const OASysNumber); // OA Sys Number
+    int GetOASysNumHeatingCoils(AllGlobals &state, int const OASysNumber); // OA Sys Number
 
-    int GetOASysNumHXs(int const OASysNumber); // OA Sys Number
+    int GetOASysNumHXs(AllGlobals &state, int const OASysNumber); // OA Sys Number
 
-    int GetOASysNumCoolingCoils(int const OASysNumber); // OA Sys Number
+    int GetOASysNumCoolingCoils(AllGlobals &state, int const OASysNumber); // OA Sys Number
 
-    int GetOASystemNumber(std::string const &OASysName); // OA Sys Name
+    int GetOASystemNumber(AllGlobals &state, std::string const &OASysName); // OA Sys Name
 
     int FindOAMixerMatchForOASystem(int const OASysNumber); // Which OA System
 
@@ -562,27 +562,27 @@ namespace MixedAir {
 
     int GetOAMixerMixedNodeNumber(int const OAMixerNumber); // Which Mixer
 
-    bool CheckForControllerWaterCoil(std::string const &ControllerType, // should be passed in as UPPERCASE
+    bool CheckForControllerWaterCoil(AllGlobals &state, std::string const &ControllerType, // should be passed in as UPPERCASE
                                      std::string const &ControllerName  // should be passed in as UPPERCASE
     );
 
-    void CheckControllerLists(bool &ErrFound);
+    void CheckControllerLists(AllGlobals &state, bool &ErrFound);
 
     void CheckOAControllerName(std::string &OAControllerName, std::string const &ObjectType, std::string const &FieldName, bool &ErrorsFound);
 
-    int GetNumOASystems();
+    int GetNumOASystems(AllGlobals &state);
 
-    int GetOACompListNumber(int const OASysNum); // OA Sys Number
+    int GetOACompListNumber(AllGlobals &state, int const OASysNum); // OA Sys Number
 
-    std::string GetOACompName(int const OASysNum, // OA Sys Number
+    std::string GetOACompName(AllGlobals &state, int const OASysNum, // OA Sys Number
                               int const InListNum // In-list Number
     );
 
-    std::string GetOACompType(int const OASysNum, // OA Sys Number
+    std::string GetOACompType(AllGlobals &state, int const OASysNum, // OA Sys Number
                               int const InListNum // In-list Number
     );
 
-    int GetOACompTypeNum(int const OASysNum, // OA Sys Number
+    int GetOACompTypeNum(AllGlobals &state, int const OASysNum, // OA Sys Number
                          int const InListNum // In-list Number
     );
 

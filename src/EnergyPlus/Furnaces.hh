@@ -509,14 +509,14 @@ namespace Furnaces {
                              Array1<Real64> const &Par // par(1) = MSHPNum
     );
 
-    void SetVSHPAirFlow(int const FurnaceNum,                 // Unit index
+    void SetVSHPAirFlow(AllGlobals &state, int const FurnaceNum,                 // Unit index
                         Real64 const PartLoadRatio,           // unit part load ratio
                         Real64 &OnOffAirFlowRatio,            // ratio of compressor ON airflow to average airflow over timestep
                         Optional_int_const SpeedNum = _,      // Speed number
                         Optional<Real64 const> SpeedRatio = _ // Speed ratio
     );
 
-    void SetOnOffMassFlowRateVSCoil(int const FurnaceNum,          // index to furnace
+    void SetOnOffMassFlowRateVSCoil(AllGlobals &state, int const FurnaceNum,          // index to furnace
                                     int const ZoneNum,             // index to zone
                                     bool const FirstHVACIteration, // Flag for 1st HVAC iteration
                                     int const AirLoopNum,          // index to air loop !unused1208

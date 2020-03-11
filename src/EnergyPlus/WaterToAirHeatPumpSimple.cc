@@ -195,7 +195,7 @@ namespace WaterToAirHeatPumpSimple {
         SimpleWatertoAirHP.deallocate();
     }
 
-    void SimWatertoAirHPSimple(std::string const &CompName,   // Coil Name
+    void SimWatertoAirHPSimple(AllGlobals &state, std::string const &CompName,   // Coil Name
                                int &CompIndex,                // Index for Component name
                                Real64 const SensLoad,         // Sensible demand load [W]
                                Real64 const LatentLoad,       // Latent demand load [W]
@@ -275,7 +275,7 @@ namespace WaterToAirHeatPumpSimple {
 
         if (SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum == TypeOf_CoilWAHPCoolingEquationFit) {
             // Cooling mode
-            InitSimpleWatertoAirHP(HPNum,
+            InitSimpleWatertoAirHP(state, HPNum,
                                    MaxONOFFCyclesperHour,
                                    HPTimeConstant,
                                    FanDelayTime,
@@ -288,7 +288,7 @@ namespace WaterToAirHeatPumpSimple {
             UpdateSimpleWatertoAirHP(HPNum);
         } else if (SimpleWatertoAirHP(HPNum).WAHPPlantTypeOfNum == TypeOf_CoilWAHPHeatingEquationFit) {
             // Heating mode
-            InitSimpleWatertoAirHP(HPNum,
+            InitSimpleWatertoAirHP(state, HPNum,
                                    MaxONOFFCyclesperHour,
                                    HPTimeConstant,
                                    FanDelayTime,
@@ -811,7 +811,7 @@ namespace WaterToAirHeatPumpSimple {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitSimpleWatertoAirHP(int const HPNum,                           // Current HPNum under simulation
+    void InitSimpleWatertoAirHP(AllGlobals &state, int const HPNum,                           // Current HPNum under simulation
                                 Real64 const MaxONOFFCyclesperHour,        // Maximum cycling rate of heat pump [cycles/hr]
                                 Real64 const HPTimeConstant,               // Heat pump time constant [s]
                                 Real64 const FanDelayTime,                 // Fan delay time, time delay for the HP's fan to
@@ -905,7 +905,7 @@ namespace WaterToAirHeatPumpSimple {
 
         if (!SysSizingCalc && MySizeFlag(HPNum) && !MyPlantScanFlag(HPNum)) {
             // for each furnace, do the sizing once.
-            SizeHVACWaterToAir(HPNum);
+            SizeHVACWaterToAir(state, HPNum);
 
             MySizeFlag(HPNum) = false;
         }
@@ -1400,7 +1400,7 @@ namespace WaterToAirHeatPumpSimple {
                                 break;
                             }
                             case DataAirSystems::objectVectorOOFanSystemModel: {
-                                FanCoolLoad = HVACFan::fanObjs[DataFanIndex]->getFanDesignHeatGain(VolFlowRate);
+                                FanCoolLoad = HVACFan::fanObjs[DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
                                 break;
                             }
                             case DataAirSystems::fanModelTypeNotYetSet: {
@@ -1489,7 +1489,7 @@ namespace WaterToAirHeatPumpSimple {
                                 break;
                             }
                             case DataAirSystems::objectVectorOOFanSystemModel: {
-                                FanCoolLoad = HVACFan::fanObjs[DataFanIndex]->getFanDesignHeatGain(VolFlowRate);
+                                FanCoolLoad = HVACFan::fanObjs[DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
                                 break;
                             }
                             case DataAirSystems::fanModelTypeNotYetSet: {
@@ -1593,7 +1593,7 @@ namespace WaterToAirHeatPumpSimple {
                                 break;
                             }
                             case DataAirSystems::objectVectorOOFanSystemModel: {
-                                FanCoolLoad = HVACFan::fanObjs[DataFanIndex]->getFanDesignHeatGain(VolFlowRate);
+                                FanCoolLoad = HVACFan::fanObjs[DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
                                 break;
                             }
                             case DataAirSystems::fanModelTypeNotYetSet: {
@@ -1680,7 +1680,7 @@ namespace WaterToAirHeatPumpSimple {
                                 break;
                             }
                             case DataAirSystems::objectVectorOOFanSystemModel: {
-                                FanCoolLoad = HVACFan::fanObjs[DataFanIndex]->getFanDesignHeatGain(VolFlowRate);
+                                FanCoolLoad = HVACFan::fanObjs[DataFanIndex]->getFanDesignHeatGain(state, VolFlowRate);
                                 break;
                             }
                             case DataAirSystems::fanModelTypeNotYetSet: {

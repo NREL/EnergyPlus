@@ -258,7 +258,7 @@ namespace ZoneEquipmentManager {
         // na
 
         if (GetZoneEquipmentInputFlag) {
-            GetZoneEquipment();
+            GetZoneEquipment(state);
             GetZoneEquipmentInputFlag = false;
             ZoneEquipInputsFilled = true;
         }
@@ -279,7 +279,7 @@ namespace ZoneEquipmentManager {
         SimZone = false;
     }
 
-    void GetZoneEquipment()
+    void GetZoneEquipment(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -319,7 +319,7 @@ namespace ZoneEquipmentManager {
         int MaxNumOfEquipTypes;
 
         if (!ZoneEquipInputsFilled) {
-            GetZoneEquipmentData();
+            GetZoneEquipmentData(state);
         }
 
         NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
@@ -3483,7 +3483,7 @@ namespace ZoneEquipmentManager {
 
                     } else if (SELECT_CASE_var == ZoneSupplyPlenum_Type) { // 'AirLoopHVAC:SupplyPlenum'
 
-                        SimAirZonePlenum(SupplyAirPath(SupplyAirPathNum).ComponentName(CompNum),
+                        SimAirZonePlenum(state, SupplyAirPath(SupplyAirPathNum).ComponentName(CompNum),
                                          ZoneSupplyPlenum_Type,
                                          SupplyAirPath(SupplyAirPathNum).ComponentIndex(CompNum),
                                          FirstHVACIteration,
@@ -3509,7 +3509,7 @@ namespace ZoneEquipmentManager {
         // and controllers
 
         if (ZoneAirMassFlow.EnforceZoneMassBalance) {
-            CalcAirFlowSimple(0, AdjustZoneMassFlowFlag);
+            CalcAirFlowSimple(state, 0, AdjustZoneMassFlowFlag);
         }
 
         for (ControlledZoneNum = 1; ControlledZoneNum <= NumOfZones; ++ControlledZoneNum) {
@@ -3645,7 +3645,7 @@ namespace ZoneEquipmentManager {
                                     LatOutputProvided);
 
                     } else if (SELECT_CASE_var == WindowAC_Num) { // 'ZoneHVAC:WindowAirConditioner'
-                        SimWindowAC(PrioritySimOrder(EquipTypeNum).EquipName,
+                        SimWindowAC(state, PrioritySimOrder(EquipTypeNum).EquipName,
                                     ActualZoneNum,
                                     FirstHVACIteration,
                                     SysOutputProvided,
@@ -3725,7 +3725,7 @@ namespace ZoneEquipmentManager {
                                       ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
 
                     } else if (SELECT_CASE_var == PurchasedAir_Num) { // 'ZoneHVAC:IdealLoadsAirSystem'
-                        SimPurchasedAir(PrioritySimOrder(EquipTypeNum).EquipName,
+                        SimPurchasedAir(state, PrioritySimOrder(EquipTypeNum).EquipName,
                                         SysOutputProvided,
                                         LatOutputProvided,
                                         FirstHVACIteration,
@@ -3734,7 +3734,7 @@ namespace ZoneEquipmentManager {
                                         ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
 
                     } else if (SELECT_CASE_var == BBWater_Num) { // 'ZoneHVAC:Baseboard:RadiantConvective:Water'
-                        SimHWBaseboard(PrioritySimOrder(EquipTypeNum).EquipName,
+                        SimHWBaseboard(state, PrioritySimOrder(EquipTypeNum).EquipName,
                                        ActualZoneNum,
                                        ControlledZoneNum,
                                        FirstHVACIteration,
@@ -3756,7 +3756,7 @@ namespace ZoneEquipmentManager {
                         LatOutputProvided = 0.0; // This baseboard does not add/remove any latent heat
 
                     } else if (SELECT_CASE_var == BBWaterConvective_Num) { // 'ZoneHVAC:Baseboard:Convective:Water'
-                        SimBaseboard(PrioritySimOrder(EquipTypeNum).EquipName,
+                        SimBaseboard(state, PrioritySimOrder(EquipTypeNum).EquipName,
                                      ActualZoneNum,
                                      ControlledZoneNum,
                                      FirstHVACIteration,
@@ -3788,7 +3788,7 @@ namespace ZoneEquipmentManager {
                         LatOutputProvided = 0.0; // This cooling panel does not add/remove any latent heat
 
                     } else if (SELECT_CASE_var == HiTempRadiant_Num) { // 'ZoneHVAC:HighTemperatureRadiant'
-                        SimHighTempRadiantSystem(PrioritySimOrder(EquipTypeNum).EquipName,
+                        SimHighTempRadiantSystem(state, PrioritySimOrder(EquipTypeNum).EquipName,
                                                  FirstHVACIteration,
                                                  SysOutputProvided,
                                                  ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
@@ -3798,7 +3798,7 @@ namespace ZoneEquipmentManager {
                     } else if (SELECT_CASE_var ==
                                LoTempRadiant_Num) { // 'ZoneHVAC:LowTemperatureRadiant:VariableFlow', 'ZoneHVAC:LowTemperatureRadiant:ConstantFlow'
                         // 'ZoneHVAC:LowTemperatureRadiant:Electric'
-                        SimLowTempRadiantSystem(PrioritySimOrder(EquipTypeNum).EquipName,
+                        SimLowTempRadiantSystem(state, PrioritySimOrder(EquipTypeNum).EquipName,
                                                 FirstHVACIteration,
                                                 SysOutputProvided,
                                                 ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
@@ -3824,13 +3824,13 @@ namespace ZoneEquipmentManager {
                         TurnFansOff = false;
 
                     } else if (SELECT_CASE_var == HeatXchngr_Num) { // 'HeatExchanger:AirToAir:FlatPlate'
-                        SimHeatRecovery(PrioritySimOrder(EquipTypeNum).EquipName,
+                        SimHeatRecovery(state, PrioritySimOrder(EquipTypeNum).EquipName,
                                         FirstHVACIteration,
                                         ZoneEquipList(ControlledZoneNum).EquipIndex(EquipPtr),
                                         ContFanCycCoil);
 
                     } else if (SELECT_CASE_var == ERVStandAlone_Num) { // 'ZoneHVAC:EnergyRecoveryVentilator'
-                        SimStandAloneERV(PrioritySimOrder(EquipTypeNum).EquipName,
+                        SimStandAloneERV(state, PrioritySimOrder(EquipTypeNum).EquipName,
                                          ActualZoneNum,
                                          FirstHVACIteration,
                                          SysOutputProvided,
@@ -3856,7 +3856,7 @@ namespace ZoneEquipmentManager {
                                                LatOutputProvided,
                                                ZoneEquipList(ControlledZoneNum).EquipIndex(EquipPtr));
                     } else if (SELECT_CASE_var == VentilatedSlab_Num) { // 'ZoneHVAC:VentilatedSlab'
-                        SimVentilatedSlab(PrioritySimOrder(EquipTypeNum).EquipName,
+                        SimVentilatedSlab(state, PrioritySimOrder(EquipTypeNum).EquipName,
                                           ActualZoneNum,
                                           FirstHVACIteration,
                                           SysOutputProvided,
@@ -3882,7 +3882,7 @@ namespace ZoneEquipmentManager {
                         LatOutputProvided = 0.0; // This baseboard does not add/remove any latent heat
 
                     } else if (SELECT_CASE_var == RefrigerationAirChillerSet_Num) { // 'ZoneHVAC:RefrigerationChillerSet'
-                        SimAirChillerSet(PrioritySimOrder(EquipTypeNum).EquipName,
+                        SimAirChillerSet(state, PrioritySimOrder(EquipTypeNum).EquipName,
                                          ActualZoneNum,
                                          FirstHVACIteration,
                                          SysOutputProvided,
@@ -3899,7 +3899,7 @@ namespace ZoneEquipmentManager {
                                               ZoneEquipList(CurZoneEqNum).EquipIndex(EquipPtr));
 
                     } else if (SELECT_CASE_var == ZoneEvaporativeCoolerUnit_Num) {
-                        SimZoneEvaporativeCoolerUnit(PrioritySimOrder(EquipTypeNum).EquipName,
+                        SimZoneEvaporativeCoolerUnit(state, PrioritySimOrder(EquipTypeNum).EquipName,
                                                      ActualZoneNum,
                                                      SysOutputProvided,
                                                      LatOutputProvided,
@@ -3962,7 +3962,7 @@ namespace ZoneEquipmentManager {
 
                     } else if (SELECT_CASE_var == ZoneSupplyPlenum_Type) { // 'AirLoopHVAC:SupplyPlenum'
 
-                        SimAirZonePlenum(SupplyAirPath(SupplyAirPathNum).ComponentName(CompNum),
+                        SimAirZonePlenum(state, SupplyAirPath(SupplyAirPathNum).ComponentName(CompNum),
                                          ZoneSupplyPlenum_Type,
                                          SupplyAirPath(SupplyAirPathNum).ComponentIndex(CompNum),
                                          FirstHVACIteration,
@@ -3988,7 +3988,7 @@ namespace ZoneEquipmentManager {
 
         CalcZoneLeavingConditions(FirstHVACIteration);
 
-        SimReturnAirPath();
+        SimReturnAirPath(state);
     }
 
     void SetZoneEquipSimOrder(int const ControlledZoneNum, int const ActualZoneNum)
@@ -5467,7 +5467,7 @@ namespace ZoneEquipmentManager {
         // na
     }
 
-    void CalcAirFlowSimple(int const SysTimestepLoop,        // System time step index
+    void CalcAirFlowSimple(AllGlobals &state, int const SysTimestepLoop,        // System time step index
                            bool const AdjustZoneMassFlowFlag // flags to adjust zone mxing and infiltration mass flow rates
     )
     {
@@ -6436,7 +6436,7 @@ namespace ZoneEquipmentManager {
         // Calculate combined outdoor air flows
         for (j = 1; j <= TotZoneAirBalance; ++j) {
             if (ZoneAirBalance(j).BalanceMethod == AirBalanceQuadrature) {
-                if (!ZoneAirBalance(j).OneTimeFlag) GetStandAloneERVNodes(j);
+                if (!ZoneAirBalance(j).OneTimeFlag) GetStandAloneERVNodes(state, j);
                 if (ZoneAirBalance(j).NumOfERVs > 0) {
                     for (I = 1; I <= ZoneAirBalance(j).NumOfERVs; ++I) {
                         MassFlowDiff = Node(ZoneAirBalance(j).ERVExhaustNode(I)).MassFlowRate - Node(ZoneAirBalance(j).ERVInletNode(I)).MassFlowRate;
@@ -6460,7 +6460,7 @@ namespace ZoneEquipmentManager {
         }
     }
 
-    void GetStandAloneERVNodes(int const OutdoorNum) // Zone Air Balance Outdoor index
+    void GetStandAloneERVNodes(AllGlobals &state, int const OutdoorNum) // Zone Air Balance Outdoor index
     {
 
         // SUBROUTINE INFORMATION:
@@ -6519,8 +6519,8 @@ namespace ZoneEquipmentManager {
                     j = 1;
                     for (I = 1; I <= ZoneEquipList(ZoneNum).NumOfEquipTypes; ++I) {
                         if (ZoneEquipList(ZoneNum).EquipType_Num(I) == ERVStandAlone_Num) {
-                            ZoneAirBalance(OutdoorNum).ERVInletNode(j) = GetStandAloneERVOutAirNode(ZoneEquipList(ZoneNum).EquipIndex(I));
-                            ZoneAirBalance(OutdoorNum).ERVExhaustNode(j) = GetStandAloneERVReturnAirNode(ZoneEquipList(ZoneNum).EquipIndex(I));
+                            ZoneAirBalance(OutdoorNum).ERVInletNode(j) = GetStandAloneERVOutAirNode(state, ZoneEquipList(ZoneNum).EquipIndex(I));
+                            ZoneAirBalance(OutdoorNum).ERVExhaustNode(j) = GetStandAloneERVReturnAirNode(state, ZoneEquipList(ZoneNum).EquipIndex(I));
                             ++j;
                         }
                     }

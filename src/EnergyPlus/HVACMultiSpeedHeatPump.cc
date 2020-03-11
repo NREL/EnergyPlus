@@ -889,9 +889,9 @@ namespace HVACMultiSpeedHeatPump {
                 MSHeatPump(MSHPNum).HeatCoilName = Alphas(11);
                 LocalError = false;
                 if (UtilityRoutines::SameString(Alphas(10), "Coil:Heating:Electric:MultiStage")) {
-                    GetCoilIndex(MSHeatPump(MSHPNum).HeatCoilName, MSHeatPump(MSHPNum).HeatCoilIndex, LocalError);
+                    GetCoilIndex(state, MSHeatPump(MSHPNum).HeatCoilName, MSHeatPump(MSHPNum).HeatCoilIndex, LocalError);
                 } else {
-                    GetCoilIndex(MSHeatPump(MSHPNum).HeatCoilName, MSHeatPump(MSHPNum).HeatCoilIndex, LocalError);
+                    GetCoilIndex(state, MSHeatPump(MSHPNum).HeatCoilName, MSHeatPump(MSHPNum).HeatCoilIndex, LocalError);
                 }
                 if (LocalError) {
                     ShowSevereError("The index of " + cAlphaFields(11) + " is not found \"" + Alphas(11) + "\"");
@@ -899,14 +899,14 @@ namespace HVACMultiSpeedHeatPump {
                     ErrorsFound = true;
                     LocalError = false;
                 }
-                HeatingCoilInletNode = GetCoilInletNode(Alphas(10), Alphas(11), LocalError);
+                HeatingCoilInletNode = GetCoilInletNode(state, Alphas(10), Alphas(11), LocalError);
                 if (LocalError) {
                     ShowSevereError("The inlet node number of " + cAlphaFields(11) + " is not found \"" + Alphas(11) + "\"");
                     ShowContinueError("...occurs in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
                     ErrorsFound = true;
                     LocalError = false;
                 }
-                HeatingCoilOutletNode = GetCoilOutletNode(Alphas(10), Alphas(11), LocalError);
+                HeatingCoilOutletNode = GetCoilOutletNode(state, Alphas(10), Alphas(11), LocalError);
                 if (LocalError) {
                     ShowSevereError("The outlet node number of " + cAlphaFields(11) + " is not found \"" + Alphas(11) + "\"");
                     ShowContinueError("...occurs in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
@@ -1099,7 +1099,7 @@ namespace HVACMultiSpeedHeatPump {
             if (UtilityRoutines::SameString(Alphas(14), "Coil:Heating:Fuel")) {
                 MSHeatPump(MSHPNum).SuppHeatCoilType = SuppHeatingCoilGas;
                 errFlag = false;
-                MSHeatPump(MSHPNum).SuppHeatCoilNum = GetHeatingCoilIndex("Coil:Heating:Fuel", Alphas(15), errFlag);
+                MSHeatPump(MSHPNum).SuppHeatCoilNum = GetHeatingCoilIndex(state, "Coil:Heating:Fuel", Alphas(15), errFlag);
                 if (MSHeatPump(MSHPNum).SuppHeatCoilNum <= 0 || errFlag) {
                     ShowContinueError("Configuration error in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
                     ShowContinueError(cAlphaFields(15) + " of type Coil:Heating:Fuel \"" + Alphas(15) + "\" not found.");
@@ -1108,14 +1108,14 @@ namespace HVACMultiSpeedHeatPump {
 
                 // Get the Supplemental Heating Coil Node Numbers
                 LocalError = false;
-                SuppHeatCoilInletNode = GetHeatingCoilInletNode(Alphas(14), Alphas(15), LocalError);
+                SuppHeatCoilInletNode = GetHeatingCoilInletNode(state, Alphas(14), Alphas(15), LocalError);
                 if (LocalError) {
                     ShowSevereError("The inlet node number of " + cAlphaFields(15) + " is not found \"" + Alphas(15) + "\"");
                     ShowContinueError("...occurs in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
                     ErrorsFound = true;
                     LocalError = false;
                 }
-                SuppHeatCoilOutletNode = GetHeatingCoilOutletNode(Alphas(14), Alphas(15), LocalError);
+                SuppHeatCoilOutletNode = GetHeatingCoilOutletNode(state, Alphas(14), Alphas(15), LocalError);
                 if (LocalError) {
                     ShowSevereError("The outlet node number of " + cAlphaFields(15) + " is not found \"" + Alphas(15) + "\"");
                     ShowContinueError("...occurs in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
@@ -1124,7 +1124,7 @@ namespace HVACMultiSpeedHeatPump {
                 }
 
                 // Get supplemental heating coil capacity to see if it is autosize
-                MSHeatPump(MSHPNum).DesignSuppHeatingCapacity = GetHeatingCoilCapacity(Alphas(14), Alphas(15), LocalError);
+                MSHeatPump(MSHPNum).DesignSuppHeatingCapacity = GetHeatingCoilCapacity(state, Alphas(14), Alphas(15), LocalError);
                 if (LocalError) {
                     ShowSevereError("The capacity " + cAlphaFields(15) + " is not found \"" + Alphas(15) + "\"");
                     ShowContinueError("...occurs in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
@@ -1141,7 +1141,7 @@ namespace HVACMultiSpeedHeatPump {
             if (UtilityRoutines::SameString(Alphas(14), "Coil:Heating:Electric")) {
                 MSHeatPump(MSHPNum).SuppHeatCoilType = SuppHeatingCoilElec;
                 errFlag = false;
-                MSHeatPump(MSHPNum).SuppHeatCoilNum = GetHeatingCoilIndex("Coil:Heating:Electric", Alphas(15), errFlag);
+                MSHeatPump(MSHPNum).SuppHeatCoilNum = GetHeatingCoilIndex(state, "Coil:Heating:Electric", Alphas(15), errFlag);
                 if (MSHeatPump(MSHPNum).SuppHeatCoilNum <= 0 || errFlag) {
                     ShowContinueError("Configuration error in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
                     ShowContinueError(cAlphaFields(15) + " of type Coil:Heating:Electric \"" + Alphas(15) + "\" not found.");
@@ -1150,14 +1150,14 @@ namespace HVACMultiSpeedHeatPump {
 
                 // Get the Supplemental Heating Coil Node Numbers
                 LocalError = false;
-                SuppHeatCoilInletNode = GetHeatingCoilInletNode(Alphas(14), Alphas(15), LocalError);
+                SuppHeatCoilInletNode = GetHeatingCoilInletNode(state, Alphas(14), Alphas(15), LocalError);
                 if (LocalError) {
                     ShowSevereError("The inlet node number of " + cAlphaFields(15) + " is not found \"" + Alphas(15) + "\"");
                     ShowContinueError("...occurs in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
                     ErrorsFound = true;
                     LocalError = false;
                 }
-                SuppHeatCoilOutletNode = GetHeatingCoilOutletNode(Alphas(14), Alphas(15), LocalError);
+                SuppHeatCoilOutletNode = GetHeatingCoilOutletNode(state, Alphas(14), Alphas(15), LocalError);
                 if (LocalError) {
                     ShowSevereError("The outlet node number of " + cAlphaFields(15) + " is not found \"" + Alphas(15) + "\"");
                     ShowContinueError("...occurs in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
@@ -1166,7 +1166,7 @@ namespace HVACMultiSpeedHeatPump {
                 }
 
                 // Get supplemental heating coil capacity to see if it is autosize
-                MSHeatPump(MSHPNum).DesignSuppHeatingCapacity = GetHeatingCoilCapacity(Alphas(14), Alphas(15), LocalError);
+                MSHeatPump(MSHPNum).DesignSuppHeatingCapacity = GetHeatingCoilCapacity(state, Alphas(14), Alphas(15), LocalError);
                 if (LocalError) {
                     ShowSevereError("The capacity " + cAlphaFields(15) + " is not found \"" + Alphas(15) + "\"");
                     ShowContinueError("...occurs in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
@@ -1562,7 +1562,7 @@ namespace HVACMultiSpeedHeatPump {
                 }
             } else if (MSHeatPump(MSHPNum).HeatCoilType == Coil_HeatingElectric_MultiStage ||
                        MSHeatPump(MSHPNum).HeatCoilType == Coil_HeatingGas_MultiStage) {
-                i = GetHeatingCoilNumberOfStages(Alphas(10), Alphas(11), ErrorsFound);
+                i = GetHeatingCoilNumberOfStages(state, Alphas(10), Alphas(11), ErrorsFound);
                 if (MSHeatPump(MSHPNum).NumOfSpeedHeating != i) {
                     ShowSevereError("For " + CurrentModuleObject + " \"" + MSHeatPump(MSHPNum).Name + "\"");
                     ShowContinueError("The " + cNumericFields(9) + " is not equal to the number defined in " + cAlphaFields(11) + " = " + Alphas(11));
@@ -3478,7 +3478,7 @@ namespace HVACMultiSpeedHeatPump {
             } else if (MSHeatPump(MSHeatPumpNum).HeatCoilType == Coil_HeatingElectric_MultiStage ||
                        MSHeatPump(MSHeatPumpNum).HeatCoilType == Coil_HeatingGas_MultiStage) {
                 if (QZnReq > SmallLoad) {
-                    SimulateHeatingCoilComponents(MSHeatPump(MSHeatPumpNum).HeatCoilName,
+                    SimulateHeatingCoilComponents(state, MSHeatPump(MSHeatPumpNum).HeatCoilName,
                                                   FirstHVACIteration,
                                                   _,
                                                   0,
@@ -3489,7 +3489,7 @@ namespace HVACMultiSpeedHeatPump {
                                                   SpeedNum,
                                                   SpeedRatio);
                 } else {
-                    SimulateHeatingCoilComponents(
+                    SimulateHeatingCoilComponents(state,
                         MSHeatPump(MSHeatPumpNum).HeatCoilName, FirstHVACIteration, _, 0, _, _, MSHeatPump(MSHeatPumpNum).OpMode, 0.0, SpeedNum, 0.0);
                 }
             } else {
@@ -3561,7 +3561,7 @@ namespace HVACMultiSpeedHeatPump {
             } else if (MSHeatPump(MSHeatPumpNum).HeatCoilType == Coil_HeatingElectric_MultiStage ||
                        MSHeatPump(MSHeatPumpNum).HeatCoilType == Coil_HeatingGas_MultiStage) {
                 if (QZnReq > SmallLoad) {
-                    SimulateHeatingCoilComponents(MSHeatPump(MSHeatPumpNum).HeatCoilName,
+                    SimulateHeatingCoilComponents(state, MSHeatPump(MSHeatPumpNum).HeatCoilName,
                                                   FirstHVACIteration,
                                                   _,
                                                   0,
@@ -3572,7 +3572,7 @@ namespace HVACMultiSpeedHeatPump {
                                                   SpeedNum,
                                                   SpeedRatio);
                 } else {
-                    SimulateHeatingCoilComponents(
+                    SimulateHeatingCoilComponents(state,
                         MSHeatPump(MSHeatPumpNum).HeatCoilName, FirstHVACIteration, _, 0, _, _, MSHeatPump(MSHeatPumpNum).OpMode, 0.0, SpeedNum, 0.0);
                 }
             } else {
@@ -3647,7 +3647,7 @@ namespace HVACMultiSpeedHeatPump {
             } else if (MSHeatPump(MSHeatPumpNum).HeatCoilType == Coil_HeatingElectric_MultiStage ||
                        MSHeatPump(MSHeatPumpNum).HeatCoilType == Coil_HeatingGas_MultiStage) {
                 if (QZnReq > SmallLoad) {
-                    SimulateHeatingCoilComponents(MSHeatPump(MSHeatPumpNum).HeatCoilName,
+                    SimulateHeatingCoilComponents(state, MSHeatPump(MSHeatPumpNum).HeatCoilName,
                                                   FirstHVACIteration,
                                                   _,
                                                   0,
@@ -3658,7 +3658,7 @@ namespace HVACMultiSpeedHeatPump {
                                                   SpeedNum,
                                                   SpeedRatio);
                 } else {
-                    SimulateHeatingCoilComponents(
+                    SimulateHeatingCoilComponents(state,
                         MSHeatPump(MSHeatPumpNum).HeatCoilName, FirstHVACIteration, _, 0, _, _, MSHeatPump(MSHeatPumpNum).OpMode, 0.0, SpeedNum, 0.0);
                 }
             } else {
@@ -4268,7 +4268,7 @@ namespace HVACMultiSpeedHeatPump {
             {
                 auto const SELECT_CASE_var(HeatCoilType);
                 if ((SELECT_CASE_var == SuppHeatingCoilGas) || (SELECT_CASE_var == SuppHeatingCoilElec)) {
-                    SimulateHeatingCoilComponents(HeatCoilName, FirstHVACIteration, HeatingLoad, HeatCoilNum, QCoilActual, true, FanMode);
+                    SimulateHeatingCoilComponents(state, HeatCoilName, FirstHVACIteration, HeatingLoad, HeatCoilNum, QCoilActual, true, FanMode);
                 } else if (SELECT_CASE_var == Coil_HeatingWater) {
                     if (present(PartLoadFrac)) {
                         MaxHotWaterFlow = MaxCoilFluidFlow * PartLoadFrac;
@@ -4343,7 +4343,7 @@ namespace HVACMultiSpeedHeatPump {
             {
                 auto const SELECT_CASE_var(HeatCoilType);
                 if ((SELECT_CASE_var == SuppHeatingCoilGas) || (SELECT_CASE_var == SuppHeatingCoilElec)) {
-                    SimulateHeatingCoilComponents(HeatCoilName, FirstHVACIteration, HeatingLoad, HeatCoilNum, QCoilActual, true, FanMode);
+                    SimulateHeatingCoilComponents(state, HeatCoilName, FirstHVACIteration, HeatingLoad, HeatCoilNum, QCoilActual, true, FanMode);
                 } else if (SELECT_CASE_var == Coil_HeatingWater) {
                     mdot = 0.0;
                     SetComponentFlowRate(mdot, CoilControlNode, CoilOutletNode, LoopNum, LoopSide, BranchNum, CompNum);

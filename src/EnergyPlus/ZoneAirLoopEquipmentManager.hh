@@ -53,6 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 
 namespace EnergyPlus {
 
@@ -76,7 +77,7 @@ namespace ZoneAirLoopEquipmentManager {
 
     void InitZoneAirLoopEquipmentTimeStep(int const AirDistUnitNum);
 
-    void SimZoneAirLoopEquipment(int const AirDistUnitNum,
+    void SimZoneAirLoopEquipment(AllGlobals &state, int const AirDistUnitNum,
                                  Real64 &SysOutputProvided,
                                  Real64 &NonAirSysOutput,
                                  Real64 &LatOutputProvided, // Latent add/removal provided by this unit (kg/s), dehumidify = negative

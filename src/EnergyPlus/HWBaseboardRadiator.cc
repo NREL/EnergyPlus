@@ -220,7 +220,7 @@ namespace HWBaseboardRadiator {
 
         if (CompIndex > 0) {
 
-            InitHWBaseboard(BaseboardNum, ControlledZoneNum, FirstHVACIteration);
+            InitHWBaseboard(state, BaseboardNum, ControlledZoneNum, FirstHVACIteration);
 
             QZnReq = ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToHeatSP;
 
@@ -721,7 +721,7 @@ namespace HWBaseboardRadiator {
         }
     }
 
-    void InitHWBaseboard(int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration)
+    void InitHWBaseboard(AllGlobals &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -843,7 +843,7 @@ namespace HWBaseboardRadiator {
 
         if (!SysSizingCalc && MySizeFlag(BaseboardNum) && !SetLoopIndexFlag(BaseboardNum)) {
             // For each coil, do the sizing once
-            SizeHWBaseboard(BaseboardNum);
+            SizeHWBaseboard(state, BaseboardNum);
             MySizeFlag(BaseboardNum) = false;
         }
 
@@ -923,7 +923,7 @@ namespace HWBaseboardRadiator {
         HWBaseboard(BaseboardNum).RadEnergy = 0.0;
     }
 
-    void SizeHWBaseboard(int const BaseboardNum)
+    void SizeHWBaseboard(AllGlobals &state, int const BaseboardNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1050,7 +1050,7 @@ namespace HWBaseboardRadiator {
                 } else {
                     TempSize = HWBaseboard(BaseboardNum).ScaledHeatingCapacity;
                 }
-                RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                 if (HWBaseboard(BaseboardNum).ScaledHeatingCapacity == AutoSize) {
                     HWBaseboard(BaseboardNum).RatedCapacity = AutoSize;
                 } else {

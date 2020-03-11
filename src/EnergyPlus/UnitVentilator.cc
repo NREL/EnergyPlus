@@ -84,6 +84,7 @@
 #include <EnergyPlus/ScheduleManager.hh>
 #include <EnergyPlus/SingleDuct.hh>
 #include <EnergyPlus/SteamCoils.hh>
+#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UnitVentilator.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
@@ -1234,7 +1235,7 @@ namespace UnitVentilator {
         }
     }
 
-    void InitUnitVentilator(int const UnitVentNum,         // index for the current unit ventilator
+    void InitUnitVentilator(AllGlobals &state, int const UnitVentNum,         // index for the current unit ventilator
                             bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                             int const ZoneNum              // number of zone being served
     )
@@ -1406,7 +1407,7 @@ namespace UnitVentilator {
 
         if (!SysSizingCalc && MySizeFlag(UnitVentNum) && !MyPlantScanFlag(UnitVentNum)) {
 
-            SizeUnitVentilator(UnitVentNum);
+            SizeUnitVentilator(state, UnitVentNum);
 
             MySizeFlag(UnitVentNum) = false;
         }
@@ -1587,7 +1588,7 @@ namespace UnitVentilator {
         }
     }
 
-    void SizeUnitVentilator(int const UnitVentNum)
+    void SizeUnitVentilator(AllGlobals &state, int const UnitVentNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1777,7 +1778,7 @@ namespace UnitVentilator {
                         } else {
                             TempSize = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                         }
-                        RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                         CoolingAirVolFlowScalable = TempSize;
 
                     } else if (SAFMethod == FlowPerCoolingCapacity) {
@@ -1786,13 +1787,13 @@ namespace UnitVentilator {
                         PrintFlag = false;
                         DataScalableSizingON = true;
                         DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;
-                        RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                         DataAutosizedCoolingCapacity = TempSize;
                         DataFlowPerCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                         SizingMethod = CoolingAirflowSizing;
                         PrintFlag = true;
                         TempSize = AutoSize;
-                        RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                         CoolingAirVolFlowScalable = TempSize;
                     }
                     // DataScalableSizingON = false;
@@ -1821,7 +1822,7 @@ namespace UnitVentilator {
                         } else {
                             TempSize = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
                         }
-                        RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                         HeatingAirVolFlowScalable = TempSize;
 
                     } else if (SAFMethod == FlowPerHeatingCapacity) {
@@ -1830,13 +1831,13 @@ namespace UnitVentilator {
                         PrintFlag = false;
                         DataScalableSizingON = true;
                         DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow;
-                        RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                         DataAutosizedHeatingCapacity = TempSize;
                         DataFlowPerHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
                         SizingMethod = HeatingAirflowSizing;
                         PrintFlag = true;
                         TempSize = AutoSize;
-                        RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                         HeatingAirVolFlowScalable = TempSize;
                     }
                     // DataScalableSizingON = false;
@@ -1868,7 +1869,7 @@ namespace UnitVentilator {
                                 } else {
                                     TempSize = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                                 }
-                                RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                                 CoolingAirVolFlowScalable = TempSize;
 
                             } else if (SAFMethod == FlowPerCoolingCapacity) {
@@ -1877,13 +1878,13 @@ namespace UnitVentilator {
                                 PrintFlag = false;
                                 DataScalableSizingON = true;
                                 DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;
-                                RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                                 DataAutosizedCoolingCapacity = TempSize;
                                 DataFlowPerCoolingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxCoolAirVolFlow;
                                 SizingMethod = CoolingAirflowSizing;
                                 PrintFlag = true;
                                 TempSize = AutoSize;
-                                RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                                 CoolingAirVolFlowScalable = TempSize;
                             }
                         } else if (ZoneHVACSizing(zoneHVACIndex).HeatingSAFMethod > 0) {
@@ -1912,7 +1913,7 @@ namespace UnitVentilator {
                                 } else {
                                     TempSize = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
                                 }
-                                RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                                 HeatingAirVolFlowScalable = TempSize;
 
                             } else if (SAFMethod == FlowPerHeatingCapacity) {
@@ -1921,13 +1922,13 @@ namespace UnitVentilator {
                                 PrintFlag = false;
                                 DataScalableSizingON = true;
                                 DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow;
-                                RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                                 DataAutosizedHeatingCapacity = TempSize;
                                 DataFlowPerHeatingCapacity = ZoneHVACSizing(zoneHVACIndex).MaxHeatAirVolFlow;
                                 SizingMethod = HeatingAirflowSizing;
                                 PrintFlag = true;
                                 TempSize = AutoSize;
-                                RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                                 HeatingAirVolFlowScalable = TempSize;
                             }
                         }
@@ -1943,7 +1944,7 @@ namespace UnitVentilator {
                         } else {
                             TempSize = UnitVent(UnitVentNum).MaxAirVolFlow;
                         }
-                        RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                         HeatingAirVolFlowScalable = TempSize;
                     }
                 }
@@ -1969,7 +1970,7 @@ namespace UnitVentilator {
                 } else {
                     TempSize = UnitVent(UnitVentNum).MaxAirVolFlow;
                 }
-                RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                 UnitVent(UnitVentNum).MaxAirVolFlow = TempSize;
             }
         }
@@ -2143,7 +2144,7 @@ namespace UnitVentilator {
                                     }
                                     SizingString = "";
                                     PrintFlag = false;
-                                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                                     DesHeatingLoad = TempSize;
                                     DataScalableCapSizingON = false;
                                 } else {
@@ -2151,7 +2152,7 @@ namespace UnitVentilator {
                                     PrintFlag = false;
                                     TempSize = AutoSize;
                                     DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow;
-                                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                                     DesHeatingLoad = TempSize;
                                 }
                                 rho = GetDensityGlycol(PlantLoop(UnitVent(UnitVentNum).HWLoopNum).FluidName,
@@ -2254,7 +2255,7 @@ namespace UnitVentilator {
                                     }
                                     SizingString = "";
                                     PrintFlag = false;
-                                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                                     DesHeatingLoad = TempSize;
                                     DataScalableCapSizingON = false;
                                 } else {
@@ -2262,7 +2263,7 @@ namespace UnitVentilator {
                                     PrintFlag = false;
                                     TempSize = AutoSize;
                                     DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesHeatVolFlow;
-                                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                                     DesHeatingLoad = TempSize;
                                 }
                                 TempSteamIn = 100.00;
@@ -2390,7 +2391,7 @@ namespace UnitVentilator {
                                     }
                                     SizingString = "";
                                     PrintFlag = false;
-                                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                                     DesCoolingLoad = TempSize;
                                     DataScalableCapSizingON = false;
                                 } else {
@@ -2398,7 +2399,7 @@ namespace UnitVentilator {
                                     PrintFlag = false;
                                     TempSize = AutoSize;
                                     DataFlowUsedForSizing = FinalZoneSizing(CurZoneEqNum).DesCoolVolFlow;
-                                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                                     DesCoolingLoad = TempSize;
                                 }
                                 rho = GetDensityGlycol(PlantLoop(UnitVent(UnitVentNum).CWLoopNum).FluidName,
@@ -2540,6 +2541,7 @@ namespace UnitVentilator {
         using DataHVACGlobals::ZoneCompTurnFansOn;
         using DataZoneEquipment::UnitVentilator_Num;
         using General::SolveRoot;
+        using TempSolveRoot::SolveRoot;
         using HeatingCoils::CheckHeatingCoilSchedule;
         using HVACHXAssistedCoolingCoil::CheckHXAssistedCoolingCoilSchedule;
         using PlantUtilities::SetComponentFlowRate;
@@ -2609,12 +2611,12 @@ namespace UnitVentilator {
                                                UnitVent(UnitVentNum).HCoilSchedValue,
                                                UnitVent(UnitVentNum).HCoil_Index);
                     } else if (SELECT_CASE_var1 == Heating_ElectricCoilType) {
-                        CheckHeatingCoilSchedule("Coil:Heating:Electric",
+                        CheckHeatingCoilSchedule(state, "Coil:Heating:Electric",
                                                  UnitVent(UnitVentNum).HCoilName,
                                                  UnitVent(UnitVentNum).HCoilSchedValue,
                                                  UnitVent(UnitVentNum).HCoil_Index);
                     } else if (SELECT_CASE_var1 == Heating_GasCoilType) {
-                        CheckHeatingCoilSchedule("Coil:Heating:Fuel",
+                        CheckHeatingCoilSchedule(state, "Coil:Heating:Fuel",
                                                  UnitVent(UnitVentNum).HCoilName,
                                                  UnitVent(UnitVentNum).HCoilSchedValue,
                                                  UnitVent(UnitVentNum).HCoil_Index);
@@ -2662,12 +2664,12 @@ namespace UnitVentilator {
                                                UnitVent(UnitVentNum).HCoilSchedValue,
                                                UnitVent(UnitVentNum).HCoil_Index);
                     } else if (SELECT_CASE_var1 == Heating_ElectricCoilType) {
-                        CheckHeatingCoilSchedule("Coil:Heating:Electric",
+                        CheckHeatingCoilSchedule(state, "Coil:Heating:Electric",
                                                  UnitVent(UnitVentNum).HCoilName,
                                                  UnitVent(UnitVentNum).HCoilSchedValue,
                                                  UnitVent(UnitVentNum).HCoil_Index);
                     } else if (SELECT_CASE_var1 == Heating_GasCoilType) {
-                        CheckHeatingCoilSchedule("Coil:Heating:Fuel",
+                        CheckHeatingCoilSchedule(state, "Coil:Heating:Fuel",
                                                  UnitVent(UnitVentNum).HCoilName,
                                                  UnitVent(UnitVentNum).HCoilSchedValue,
                                                  UnitVent(UnitVentNum).HCoil_Index);
@@ -2965,7 +2967,7 @@ namespace UnitVentilator {
                                 if (FirstHVACIteration) Par(2) = 1.0;
                                 Par(3) = double(OpMode);
                                 // Tolerance is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-                                SolveRoot(0.001, MaxIter, SolFlag, PartLoadFrac, CalcUnitVentilatorResidual, 0.0, 1.0, Par);
+                                SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadFrac, CalcUnitVentilatorResidual, 0.0, 1.0, Par);
                             }
                         }
 
@@ -3187,7 +3189,7 @@ namespace UnitVentilator {
                                 if (FirstHVACIteration) Par(2) = 1.0;
                                 Par(3) = double(OpMode);
                                 // Tolerance is in fraction of load, MaxIter = 30, SolFalg = # of iterations or error as appropriate
-                                SolveRoot(0.001, MaxIter, SolFlag, PartLoadFrac, CalcUnitVentilatorResidual, 0.0, 1.0, Par);
+                                SolveRoot(state, 0.001, MaxIter, SolFlag, PartLoadFrac, CalcUnitVentilatorResidual, 0.0, 1.0, Par);
                             }
                         }
                         CalcUnitVentilatorComponents(state, UnitVentNum, FirstHVACIteration, QUnitOut, OpMode, PartLoadFrac);
@@ -3355,12 +3357,12 @@ namespace UnitVentilator {
                     UnitVent(UnitVentNum).FanName, FirstHVACIteration, UnitVent(UnitVentNum).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
             } else {
                 DataHVACGlobals::OnOffFanPartLoadFraction = 1.0; // used for cycling fan, set to 1.0 to be sure
-                HVACFan::fanObjs[UnitVent(UnitVentNum).Fan_Index]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                HVACFan::fanObjs[UnitVent(UnitVentNum).Fan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             }
 
             if (UnitVent(UnitVentNum).CCoilPresent) {
                 if (UnitVent(UnitVentNum).CCoilType == Cooling_CoilHXAssisted) {
-                    SimHXAssistedCoolingCoil(
+                    SimHXAssistedCoolingCoil(state, 
                         UnitVent(UnitVentNum).CCoilName, FirstHVACIteration, On, 0.0, UnitVent(UnitVentNum).CCoil_Index, ContFanCycCoil);
                 } else {
                     SimulateWaterCoilComponents(state, UnitVent(UnitVentNum).CCoilName, FirstHVACIteration, UnitVent(UnitVentNum).CCoil_Index);
@@ -3404,7 +3406,7 @@ namespace UnitVentilator {
 
                         if (QCoilReq < 0.0) QCoilReq = 0.0; // a heating coil can only heat, not cool
 
-                        SimulateHeatingCoilComponents(
+                        SimulateHeatingCoilComponents(state,
                             UnitVent(UnitVentNum).HCoilName, FirstHVACIteration, QCoilReq, UnitVent(UnitVentNum).HCoil_Index);
                     }
                 }
@@ -3435,7 +3437,7 @@ namespace UnitVentilator {
                 Fans::SimulateFanComponents(state,
                     UnitVent(UnitVentNum).FanName, FirstHVACIteration, UnitVent(UnitVentNum).Fan_Index, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff);
             } else {
-                HVACFan::fanObjs[UnitVent(UnitVentNum).Fan_Index]->simulate(_, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
+                HVACFan::fanObjs[UnitVent(UnitVentNum).Fan_Index]->simulate(state, _, ZoneCompTurnFansOn, ZoneCompTurnFansOff, _);
             }
 
             if (UnitVent(UnitVentNum).CCoilPresent) {
@@ -3450,7 +3452,7 @@ namespace UnitVentilator {
                                      UnitVent(UnitVentNum).CWCompNum);
 
                 if (UnitVent(UnitVentNum).CCoilType == Cooling_CoilHXAssisted) {
-                    SimHXAssistedCoolingCoil(
+                    SimHXAssistedCoolingCoil(state, 
                         UnitVent(UnitVentNum).CCoilName, FirstHVACIteration, On, PartLoadRatio, UnitVent(UnitVentNum).CCoil_Index, FanOpMode);
                 } else {
                     SimulateWaterCoilComponents(state, 
@@ -3530,7 +3532,7 @@ namespace UnitVentilator {
                                                     (Node(HCoilInAirNode).Temp - Node(UnitVent(UnitVentNum).AirInNode).Temp);
                         }
                         if (QCoilReq < 0.0) QCoilReq = 0.0;
-                        SimulateHeatingCoilComponents(UnitVent(UnitVentNum).HCoilName,
+                        SimulateHeatingCoilComponents(state, UnitVent(UnitVentNum).HCoilName,
                                                       FirstHVACIteration,
                                                       QCoilReq,
                                                       UnitVent(UnitVentNum).HCoil_Index,

@@ -94,7 +94,7 @@ namespace SizingManager {
 
     void ManageSizing(AllGlobals &state, OutputFiles &outputFiles);
 
-    void ManageSystemSizingAdjustments();
+    void ManageSystemSizingAdjustments(AllGlobals &state);
 
     void ManageSystemVentilationAdjustments();
 

@@ -203,7 +203,7 @@ namespace InternalHeatGains {
 
         // FLOW:
         if (GetInternalHeatGainsInputFlag) {
-            GetInternalHeatGainsInput(OutputFiles::getSingleton());
+            GetInternalHeatGainsInput(state, OutputFiles::getSingleton());
             GetInternalHeatGainsInputFlag = false;
         }
 
@@ -221,7 +221,7 @@ namespace InternalHeatGains {
         if (ZoneSizingCalc) GatherComponentLoadsIntGain();
     }
 
-    void GetInternalHeatGainsInput(OutputFiles &outputFiles)
+    void GetInternalHeatGainsInput(AllGlobals &state, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1423,7 +1423,7 @@ namespace InternalHeatGains {
                         }
                     }
                     if (Lights(Loop).ZonePtr > 0) {
-                        Lights(Loop).ZoneReturnNum = DataZoneEquipment::GetReturnNumForZone(Zone(Lights(Loop).ZonePtr).Name, retNodeName);
+                        Lights(Loop).ZoneReturnNum = DataZoneEquipment::GetReturnNumForZone(state, Zone(Lights(Loop).ZonePtr).Name, retNodeName);
                     }
 
                     if ((Lights(Loop).ZoneReturnNum == 0) && (Lights(Loop).FractionReturnAir > 0.0) && (!lAlphaFieldBlanks(7))) {
@@ -5533,7 +5533,7 @@ namespace InternalHeatGains {
         FigureMicroCHPZoneGains();
         initializeElectricPowerServiceZoneGains();
         FigureTDDZoneGains();
-        FigureRefrigerationZoneGains();
+        FigureRefrigerationZoneGains(state);
 
         // store pointer values to hold generic internal gain values constant for entire timestep
         UpdateInternalGainValues();

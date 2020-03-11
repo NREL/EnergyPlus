@@ -67,6 +67,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -77,6 +78,7 @@
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
 
@@ -169,7 +171,7 @@ namespace HVACSingleDuctInduc {
 
     // Functions
 
-    void SimIndUnit(std::string const &CompName,   // name of the terminal unit
+    void SimIndUnit(AllGlobals &state, std::string const &CompName,   // name of the terminal unit
                     bool const FirstHVACIteration, // TRUE if first HVAC iteration in time step
                     int const ZoneNum,             // index of zone served by the terminal unit
                     int const ZoneNodeNum,         // zone node number of zone served by the terminal unit
@@ -234,7 +236,7 @@ namespace HVACSingleDuctInduc {
 
             if (SELECT_CASE_var == SingleDuct_CV_FourPipeInduc) {
 
-                SimFourPipeIndUnit(IUNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
+                SimFourPipeIndUnit(state, IUNum, ZoneNum, ZoneNodeNum, FirstHVACIteration);
 
             } else {
                 ShowSevereError("Illegal Induction Unit Type used=" + IndUnit(IUNum).UnitType);
@@ -1068,7 +1070,7 @@ namespace HVACSingleDuctInduc {
         }
     }
 
-    void SimFourPipeIndUnit(int const IUNum,              // number of the current unit being simulated
+    void SimFourPipeIndUnit(AllGlobals &state, int const IUNum,              // number of the current unit being simulated
                             int const ZoneNum,            // number of zone being served
                             int const ZoneNodeNum,        // zone node number
                             bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
@@ -1101,6 +1103,7 @@ namespace HVACSingleDuctInduc {
         using DataPlant::PlantLoop;
         using General::RoundSigDigits;
         using General::SolveRoot;
+        using TempSolveRoot::SolveRoot;
         using PlantUtilities::SetComponentFlowRate;
 
         // Locals
@@ -1212,7 +1215,7 @@ namespace HVACSingleDuctInduc {
         Node(SecNode).MassFlowRate = SecAirMassFlow;
         // initialize the water inlet nodes to minimum
         // fire the unit at min water flow
-        CalcFourPipeIndUnit(IUNum, FirstHVACIteration, ZoneNodeNum, MinHotWaterFlow, MinColdWaterFlow, QPriOnly);
+        CalcFourPipeIndUnit(state, IUNum, FirstHVACIteration, ZoneNodeNum, MinHotWaterFlow, MinColdWaterFlow, QPriOnly);
         // the load to be met by the secondary air stream coils is QZnReq-PowerMet
 
         if (UnitOn) {
@@ -1220,7 +1223,7 @@ namespace HVACSingleDuctInduc {
             if (QToHeatSetPt - QPriOnly > SmallLoad) {
                 // heating coil
                 // check that it can meet the load
-                CalcFourPipeIndUnit(IUNum, FirstHVACIteration, ZoneNodeNum, MaxHotWaterFlow, MinColdWaterFlow, PowerMet);
+                CalcFourPipeIndUnit(state, IUNum, FirstHVACIteration, ZoneNodeNum, MaxHotWaterFlow, MinColdWaterFlow, PowerMet);
                 if (PowerMet > QToHeatSetPt + SmallLoad) {
                     Par(1) = double(IUNum);
                     if (FirstHVACIteration) {
@@ -1234,7 +1237,7 @@ namespace HVACSingleDuctInduc {
                     Par(6) = QPriOnly;
                     Par(7) = PowerMet;
                     ErrTolerance = IndUnit(IUNum).HotControlOffset;
-                    SolveRoot(ErrTolerance, SolveMaxIter, SolFlag, HWFlow, FourPipeIUHeatingResidual, MinHotWaterFlow, MaxHotWaterFlow, Par);
+                    SolveRoot(state, ErrTolerance, SolveMaxIter, SolFlag, HWFlow, FourPipeIUHeatingResidual, MinHotWaterFlow, MaxHotWaterFlow, Par);
                     if (SolFlag == -1) {
                         if (IndUnit(IUNum).HWCoilFailNum1 == 0) {
                             ShowWarningMessage("SimFourPipeIndUnit: Hot water coil control failed for " + IndUnit(IUNum).UnitType + "=\"" +
@@ -1269,7 +1272,7 @@ namespace HVACSingleDuctInduc {
             } else if (QToCoolSetPt - QPriOnly < -SmallLoad) {
                 // cooling coil
                 // check that it can meet the load
-                CalcFourPipeIndUnit(IUNum, FirstHVACIteration, ZoneNodeNum, MinHotWaterFlow, MaxColdWaterFlow, PowerMet);
+                CalcFourPipeIndUnit(state, IUNum, FirstHVACIteration, ZoneNodeNum, MinHotWaterFlow, MaxColdWaterFlow, PowerMet);
                 if (PowerMet < QToCoolSetPt - SmallLoad) {
                     Par(1) = double(IUNum);
                     if (FirstHVACIteration) {
@@ -1283,7 +1286,7 @@ namespace HVACSingleDuctInduc {
                     Par(6) = QPriOnly;
                     Par(7) = PowerMet;
                     ErrTolerance = IndUnit(IUNum).ColdControlOffset;
-                    SolveRoot(ErrTolerance, SolveMaxIter, SolFlag, CWFlow, FourPipeIUCoolingResidual, MinColdWaterFlow, MaxColdWaterFlow, Par);
+                    SolveRoot(state, ErrTolerance, SolveMaxIter, SolFlag, CWFlow, FourPipeIUCoolingResidual, MinColdWaterFlow, MaxColdWaterFlow, Par);
                     if (SolFlag == -1) {
                         if (IndUnit(IUNum).CWCoilFailNum1 == 0) {
                             ShowWarningMessage("SimFourPipeIndUnit: Cold water coil control failed for " + IndUnit(IUNum).UnitType + "=\"" +
@@ -1316,12 +1319,12 @@ namespace HVACSingleDuctInduc {
                     }
                 }
             } else {
-                CalcFourPipeIndUnit(IUNum, FirstHVACIteration, ZoneNodeNum, MinHotWaterFlow, MinColdWaterFlow, PowerMet);
+                CalcFourPipeIndUnit(state, IUNum, FirstHVACIteration, ZoneNodeNum, MinHotWaterFlow, MinColdWaterFlow, PowerMet);
             }
 
         } else {
             // unit off
-            CalcFourPipeIndUnit(IUNum, FirstHVACIteration, ZoneNodeNum, MinHotWaterFlow, MinColdWaterFlow, PowerMet);
+            CalcFourPipeIndUnit(state, IUNum, FirstHVACIteration, ZoneNodeNum, MinHotWaterFlow, MinColdWaterFlow, PowerMet);
         }
         Node(OutletNode).MassFlowRateMax = IndUnit(IUNum).MaxTotAirMassFlow;
 
@@ -1437,7 +1440,7 @@ namespace HVACSingleDuctInduc {
         LoadMet = TotAirMassFlow * CpAirZn * (Node(OutletNode).Temp - Node(ZoneNode).Temp);
     }
 
-    Real64 FourPipeIUHeatingResidual(Real64 const HWFlow,      // hot water flow rate in kg/s
+    Real64 FourPipeIUHeatingResidual(AllGlobals &state, Real64 const HWFlow,      // hot water flow rate in kg/s
                                      Array1<Real64> const &Par // Par(5) is the requested zone load
     )
     {
@@ -1489,13 +1492,13 @@ namespace HVACSingleDuctInduc {
         FirstHVACSoln = (Par(2) > 0.0);
         ZoneNodeIndex = int(Par(3));
         MinCWFlow = Par(4);
-        CalcFourPipeIndUnit(IUIndex, FirstHVACSoln, ZoneNodeIndex, HWFlow, MinCWFlow, UnitOutput);
+        CalcFourPipeIndUnit(state, IUIndex, FirstHVACSoln, ZoneNodeIndex, HWFlow, MinCWFlow, UnitOutput);
         Residuum = (Par(5) - UnitOutput) / (Par(7) - Par(6));
 
         return Residuum;
     }
 
-    Real64 FourPipeIUCoolingResidual(Real64 const CWFlow,      // cold water flow rate in kg/s
+    Real64 FourPipeIUCoolingResidual(AllGlobals &state, Real64 const CWFlow,      // cold water flow rate in kg/s
                                      Array1<Real64> const &Par // Par(5) is the requested zone load
     )
     {
@@ -1547,7 +1550,7 @@ namespace HVACSingleDuctInduc {
         FirstHVACSoln = (Par(2) > 0.0);
         ZoneNodeIndex = int(Par(3));
         MinHWFlow = Par(4);
-        CalcFourPipeIndUnit(IUIndex, FirstHVACSoln, ZoneNodeIndex, MinHWFlow, CWFlow, UnitOutput);
+        CalcFourPipeIndUnit(state, IUIndex, FirstHVACSoln, ZoneNodeIndex, MinHWFlow, CWFlow, UnitOutput);
         Residuum = (Par(5) - UnitOutput) / (Par(7) - Par(6));
 
         return Residuum;

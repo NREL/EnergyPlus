@@ -292,7 +292,7 @@ namespace SingleDuct {
         DataSizing::CurTermUnitSizingNum = DataDefineEquip::AirDistUnit(thisATU.ADUNum).TermUnitSizingNum;
 
         // With the correct SysNum Initialize the system
-        thisATU.InitSys(SysNum, FirstHVACIteration); // Initialize all Sys related parameters
+        thisATU.InitSys(state, SysNum, FirstHVACIteration); // Initialize all Sys related parameters
 
         // Calculate the Correct Sys Model with the current SysNum
         {
@@ -1715,13 +1715,13 @@ namespace SingleDuct {
             IsNotOK = false;
             if (UtilityRoutines::SameString(sd_airterminal(SysNum).ReheatComp, "Coil:Heating:Fuel")) {
                 sd_airterminal(SysNum).ReheatComp_Num = HCoilType_Gas;
-                sd_airterminal(SysNum).ReheatAirOutletNode = GetHeatingCoilOutletNode(sd_airterminal(SysNum).ReheatComp, sd_airterminal(SysNum).ReheatName, IsNotOK);
-                sd_airterminal(SysNum).ReheatCoilMaxCapacity = GetHeatingCoilCapacity(sd_airterminal(SysNum).ReheatComp, sd_airterminal(SysNum).ReheatName, IsNotOK);
+                sd_airterminal(SysNum).ReheatAirOutletNode = GetHeatingCoilOutletNode(state, sd_airterminal(SysNum).ReheatComp, sd_airterminal(SysNum).ReheatName, IsNotOK);
+                sd_airterminal(SysNum).ReheatCoilMaxCapacity = GetHeatingCoilCapacity(state, sd_airterminal(SysNum).ReheatComp, sd_airterminal(SysNum).ReheatName, IsNotOK);
                 if (IsNotOK) ShowContinueError("Occurs for terminal unit " + sd_airterminal(SysNum).SysType + " = " + sd_airterminal(SysNum).SysName);
             } else if (UtilityRoutines::SameString(sd_airterminal(SysNum).ReheatComp, "Coil:Heating:Electric")) {
                 sd_airterminal(SysNum).ReheatComp_Num = HCoilType_Electric;
-                sd_airterminal(SysNum).ReheatAirOutletNode = GetHeatingCoilOutletNode(sd_airterminal(SysNum).ReheatComp, sd_airterminal(SysNum).ReheatName, IsNotOK);
-                sd_airterminal(SysNum).ReheatCoilMaxCapacity = GetHeatingCoilCapacity(sd_airterminal(SysNum).ReheatComp, sd_airterminal(SysNum).ReheatName, IsNotOK);
+                sd_airterminal(SysNum).ReheatAirOutletNode = GetHeatingCoilOutletNode(state, sd_airterminal(SysNum).ReheatComp, sd_airterminal(SysNum).ReheatName, IsNotOK);
+                sd_airterminal(SysNum).ReheatCoilMaxCapacity = GetHeatingCoilCapacity(state, sd_airterminal(SysNum).ReheatComp, sd_airterminal(SysNum).ReheatName, IsNotOK);
                 if (IsNotOK) ShowContinueError("Occurs for terminal unit " + sd_airterminal(SysNum).SysType + " = " + sd_airterminal(SysNum).SysName);
             } else if (UtilityRoutines::SameString(sd_airterminal(SysNum).ReheatComp, "Coil:Heating:Water")) {
                 sd_airterminal(SysNum).ReheatComp_Num = HCoilType_SimpleHeating;
@@ -2017,7 +2017,7 @@ namespace SingleDuct {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void SingleDuctAirTerminal::InitSys(int const SysNum, bool const FirstHVACIteration)
+    void SingleDuctAirTerminal::InitSys(AllGlobals &state, int const SysNum, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2147,7 +2147,7 @@ namespace SingleDuct {
             if (sd_airterminal(SysNum).ReheatComp_Num == HCoilType_Electric || sd_airterminal(SysNum).ReheatComp_Num == HCoilType_Gas) {
                 if (sd_airterminal(SysNum).ReheatCoilMaxCapacity == AutoSize) {
                     errFlag = false;
-                    sd_airterminal(SysNum).ReheatCoilMaxCapacity = GetHeatingCoilCapacity(sd_airterminal(SysNum).ReheatComp, sd_airterminal(SysNum).ReheatName, errFlag);
+                    sd_airterminal(SysNum).ReheatCoilMaxCapacity = GetHeatingCoilCapacity(state, sd_airterminal(SysNum).ReheatComp, sd_airterminal(SysNum).ReheatName, errFlag);
                     if (errFlag) ShowContinueError("Occurs for terminal unit " + sd_airterminal(SysNum).SysType + " = " + sd_airterminal(SysNum).SysName);
                 }
                 if (sd_airterminal(SysNum).ReheatCoilMaxCapacity != AutoSize) {
@@ -3651,14 +3651,14 @@ namespace SingleDuct {
                     QZnReq = QZoneMax2 - MassFlow * CpAirAvg * (sd_airterminalInlet(SysNum).AirTemp - ZoneTemp);
 
                     // Simulate reheat coil for the VAV system
-                    SimulateHeatingCoilComponents(sd_airterminal(SysNum).ReheatName, FirstHVACIteration, QZnReq, sd_airterminal(SysNum).ReheatComp_Index);
+                    SimulateHeatingCoilComponents(state, sd_airterminal(SysNum).ReheatName, FirstHVACIteration, QZnReq, sd_airterminal(SysNum).ReheatComp_Index);
 
                 } else if (SELECT_CASE_var == HCoilType_Gas) { // COIL:GAS:HEATING
                     // Determine the load required to pass to the Component controller
                     QZnReq = QZoneMax2 - MassFlow * CpAirAvg * (sd_airterminalInlet(SysNum).AirTemp - ZoneTemp);
 
                     // Simulate reheat coil for the VAV system
-                    SimulateHeatingCoilComponents(
+                    SimulateHeatingCoilComponents(state, 
                         sd_airterminal(SysNum).ReheatName, FirstHVACIteration, QZnReq, sd_airterminal(SysNum).ReheatComp_Index, QHeatingDelivered);
 
                 } else if (SELECT_CASE_var == HCoilType_None) { // blank
@@ -3690,11 +3690,11 @@ namespace SingleDuct {
 
                 } else if (SELECT_CASE_var == HCoilType_Electric) { // COIL:ELECTRIC:HEATING
                     // Simulate reheat coil for the VAV system
-                    SimulateHeatingCoilComponents(sd_airterminal(SysNum).ReheatName, FirstHVACIteration, 0.0, sd_airterminal(SysNum).ReheatComp_Index);
+                    SimulateHeatingCoilComponents(state, sd_airterminal(SysNum).ReheatName, FirstHVACIteration, 0.0, sd_airterminal(SysNum).ReheatComp_Index);
 
                 } else if (SELECT_CASE_var == HCoilType_Gas) { // COIL:GAS:HEATING
                     // Simulate reheat coil for the VAV system
-                    SimulateHeatingCoilComponents(sd_airterminal(SysNum).ReheatName, FirstHVACIteration, 0.0, sd_airterminal(SysNum).ReheatComp_Index);
+                    SimulateHeatingCoilComponents(state, sd_airterminal(SysNum).ReheatName, FirstHVACIteration, 0.0, sd_airterminal(SysNum).ReheatComp_Index);
                 } else if (SELECT_CASE_var == HCoilType_None) { // blank
                                                                 // If no reheat is defined then assume that the damper is the only component.
                     // If something else is that is not a reheat coil or a blank then give the error message
@@ -4097,7 +4097,7 @@ namespace SingleDuct {
                     if (QZnReq < SmallLoad) QZnReq = 0.0;
 
                     // Simulate reheat coil for the VAV system
-                    SimulateHeatingCoilComponents(sd_airterminal(SysNum).ReheatName, FirstHVACIteration, QZnReq, sd_airterminal(SysNum).ReheatComp_Index);
+                    SimulateHeatingCoilComponents(state, sd_airterminal(SysNum).ReheatName, FirstHVACIteration, QZnReq, sd_airterminal(SysNum).ReheatComp_Index);
 
                 } else if (SELECT_CASE_var == HCoilType_Gas) { // COIL:GAS:HEATING
                     // Determine the load required to pass to the Component controller
@@ -4105,7 +4105,7 @@ namespace SingleDuct {
                     if (QZnReq < SmallLoad) QZnReq = 0.0;
 
                     // Simulate reheat coil for the VAV system
-                    SimulateHeatingCoilComponents(sd_airterminal(SysNum).ReheatName, FirstHVACIteration, QZnReq, sd_airterminal(SysNum).ReheatComp_Index);
+                    SimulateHeatingCoilComponents(state, sd_airterminal(SysNum).ReheatName, FirstHVACIteration, QZnReq, sd_airterminal(SysNum).ReheatComp_Index);
                 } else if (SELECT_CASE_var == HCoilType_None) { // blank
                                                                 // If no reheat is defined then assume that the damper is the only component.
                     // If something else is there that is not a reheat coil then give the error message below.
@@ -4137,11 +4137,11 @@ namespace SingleDuct {
 
                 } else if (SELECT_CASE_var == HCoilType_Electric) { // COIL:ELECTRIC:HEATING
                     // Simulate reheat coil for the VAV system
-                    SimulateHeatingCoilComponents(sd_airterminal(SysNum).ReheatName, FirstHVACIteration, 0.0, sd_airterminal(SysNum).ReheatComp_Index);
+                    SimulateHeatingCoilComponents(state, sd_airterminal(SysNum).ReheatName, FirstHVACIteration, 0.0, sd_airterminal(SysNum).ReheatComp_Index);
 
                 } else if (SELECT_CASE_var == HCoilType_Gas) { // COIL:GAS:HEATING
                     // Simulate reheat coil for the VAV system
-                    SimulateHeatingCoilComponents(sd_airterminal(SysNum).ReheatName, FirstHVACIteration, 0.0, sd_airterminal(SysNum).ReheatComp_Index);
+                    SimulateHeatingCoilComponents(state, sd_airterminal(SysNum).ReheatName, FirstHVACIteration, 0.0, sd_airterminal(SysNum).ReheatComp_Index);
                 } else if (SELECT_CASE_var == HCoilType_None) { // blank
                                                                 // If no reheat is defined then assume that the damper is the only component.
                                                                 // If something else is there that is not a reheat coil then give the error message
@@ -4739,14 +4739,14 @@ namespace SingleDuct {
                     QZnReq = QMax2 - MassFlow * CpAir * (sd_airterminalInlet(SysNum).AirTemp - ZoneTemp);
 
                     // Simulate reheat coil for the VAV system
-                    SimulateHeatingCoilComponents(sd_airterminal(SysNum).ReheatName, FirstHVACIteration, QZnReq, sd_airterminal(SysNum).ReheatComp_Index);
+                    SimulateHeatingCoilComponents(state, sd_airterminal(SysNum).ReheatName, FirstHVACIteration, QZnReq, sd_airterminal(SysNum).ReheatComp_Index);
 
                 } else if (SELECT_CASE_var == HCoilType_Gas) { // COIL:GAS:HEATING
                     // Determine the load required to pass to the Component controller
                     QZnReq = QMax2 - MassFlow * CpAir * (sd_airterminalInlet(SysNum).AirTemp - ZoneTemp);
 
                     // Simulate reheat coil for the VAV system
-                    SimulateHeatingCoilComponents(sd_airterminal(SysNum).ReheatName, FirstHVACIteration, QZnReq, sd_airterminal(SysNum).ReheatComp_Index);
+                    SimulateHeatingCoilComponents(state, sd_airterminal(SysNum).ReheatName, FirstHVACIteration, QZnReq, sd_airterminal(SysNum).ReheatComp_Index);
                 } else {
                     ShowFatalError("Invalid Reheat Component=" + sd_airterminal(SysNum).ReheatComp);
                 }
@@ -4774,11 +4774,11 @@ namespace SingleDuct {
 
                 } else if (SELECT_CASE_var == HCoilType_Electric) { // COIL:ELECTRIC:HEATING
                     // Simulate reheat coil for the Const Volume system
-                    SimulateHeatingCoilComponents(sd_airterminal(SysNum).ReheatName, FirstHVACIteration, 0.0, sd_airterminal(SysNum).ReheatComp_Index);
+                    SimulateHeatingCoilComponents(state, sd_airterminal(SysNum).ReheatName, FirstHVACIteration, 0.0, sd_airterminal(SysNum).ReheatComp_Index);
 
                 } else if (SELECT_CASE_var == HCoilType_Gas) { // COIL:GAS:HEATING
                     // Simulate reheat coil for the Const Volume system
-                    SimulateHeatingCoilComponents(sd_airterminal(SysNum).ReheatName, FirstHVACIteration, 0.0, sd_airterminal(SysNum).ReheatComp_Index);
+                    SimulateHeatingCoilComponents(state, sd_airterminal(SysNum).ReheatName, FirstHVACIteration, 0.0, sd_airterminal(SysNum).ReheatComp_Index);
                 } else {
                     ShowFatalError("Invalid Reheat Component=" + sd_airterminal(SysNum).ReheatComp);
                 }
@@ -4895,14 +4895,14 @@ namespace SingleDuct {
         if (FanType == DataHVACGlobals::FanType_SimpleVAV && FanOn == 1) {
             Fans::SimulateFanComponents(state, sd_airterminal(SysNum).FanName, FirstHVACIteration, sd_airterminal(SysNum).Fan_Index);
         } else if (FanType == DataHVACGlobals::FanType_SystemModelObject && FanOn == 1) {
-            HVACFan::fanObjs[sd_airterminal(SysNum).Fan_Index]->simulate(_, _, _, _);
+            HVACFan::fanObjs[sd_airterminal(SysNum).Fan_Index]->simulate(state, _, _, _, _);
 
         } else { // pass through conditions
             TurnFansOff = true;
             if (FanType == DataHVACGlobals::FanType_SimpleVAV) {
                 Fans::SimulateFanComponents(state, sd_airterminal(SysNum).FanName, FirstHVACIteration, sd_airterminal(SysNum).Fan_Index);
             } else if (FanType == DataHVACGlobals::FanType_SystemModelObject) {
-                HVACFan::fanObjs[sd_airterminal(SysNum).Fan_Index]->simulate(_, _, TurnFansOff, _);
+                HVACFan::fanObjs[sd_airterminal(SysNum).Fan_Index]->simulate(state, _, _, TurnFansOff, _);
             }
             TurnFansOff = TurnFansOffSav;
             Node(FanOutNode).MassFlowRate = Node(FanInNode).MassFlowRate;
@@ -4937,9 +4937,9 @@ namespace SingleDuct {
                 }
                 SimulateSteamCoilComponents(sd_airterminal(SysNum).ReheatName, FirstHVACIteration, sd_airterminal(SysNum).ReheatComp_Index, HCoilReq);
             } else if (SELECT_CASE_var == HCoilType_Electric) { // COIL:ELECTRIC:HEATING
-                SimulateHeatingCoilComponents(sd_airterminal(SysNum).ReheatName, FirstHVACIteration, HCoilReq, sd_airterminal(SysNum).ReheatComp_Index);
+                SimulateHeatingCoilComponents(state, sd_airterminal(SysNum).ReheatName, FirstHVACIteration, HCoilReq, sd_airterminal(SysNum).ReheatComp_Index);
             } else if (SELECT_CASE_var == HCoilType_Gas) { // COIL:GAS:HEATING
-                SimulateHeatingCoilComponents(sd_airterminal(SysNum).ReheatName, FirstHVACIteration, HCoilReq, sd_airterminal(SysNum).ReheatComp_Index);
+                SimulateHeatingCoilComponents(state, sd_airterminal(SysNum).ReheatName, FirstHVACIteration, HCoilReq, sd_airterminal(SysNum).ReheatComp_Index);
             } else {
                 ShowFatalError("Invalid Reheat Component=" + sd_airterminal(SysNum).ReheatComp);
             }

@@ -200,7 +200,7 @@ namespace SteamCoils {
 
     // Beginning Initialization Section of the Module
 
-    void InitSteamCoil(int const CoilNum, bool const FirstHVACIteration);
+    void InitSteamCoil(AllGlobals &state, int const CoilNum, bool const FirstHVACIteration);
 
     void SizeSteamCoil(AllGlobals &state, int const CoilNum);
 

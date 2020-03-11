@@ -75,6 +75,7 @@
 #include <EnergyPlus/DisplacementVentMgr.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/MundtSimMgr.hh>
@@ -181,7 +182,7 @@ namespace RoomAirModelManager {
 
         // FLOW:
         if (GetAirModelData) {
-            GetAirModelDatas();
+            GetAirModelDatas(state);
             GetAirModelData = false;
         }
 
@@ -231,7 +232,7 @@ namespace RoomAirModelManager {
 
     //*****************************************************************************************
 
-    void GetAirModelDatas()
+    void GetAirModelDatas(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -277,7 +278,7 @@ namespace RoomAirModelManager {
         GetMundtData(ErrorsFound);
 
         // get airflow network model info for all zones
-        GetRoomAirflowNetworkData(ErrorsFound);
+        GetRoomAirflowNetworkData(state, ErrorsFound);
 
         // get UCSDDV model controls for all zones
         GetDisplacementVentData(ErrorsFound);
@@ -1370,7 +1371,7 @@ namespace RoomAirModelManager {
         }
     }
 
-    void GetRoomAirflowNetworkData(bool &ErrorsFound) // True if errors found during this get input routine
+    void GetRoomAirflowNetworkData(AllGlobals &state, bool &ErrorsFound) // True if errors found during this get input routine
     {
 
         // SUBROUTINE INFORMATION:
@@ -1751,7 +1752,7 @@ namespace RoomAirModelManager {
                             RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).HVAC(EquipLoop).ReturnFraction =
                                 rNumericArgs(2 + (EquipLoop - 1) * 2);
 
-                            IntEquipError = CheckEquipName(RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).HVAC(EquipLoop).ObjectTypeName,
+                            IntEquipError = CheckEquipName(state, RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).HVAC(EquipLoop).ObjectTypeName,
                                                            RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).HVAC(EquipLoop).Name,
                                                            RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).HVAC(EquipLoop).SupplyNodeName,
                                                            RoomAirflowNetworkZoneInfo(ZoneNum).Node(RAFNNodeNum).HVAC(EquipLoop).ReturnNodeName,
@@ -2735,7 +2736,7 @@ namespace RoomAirModelManager {
         }
     }
 
-    void GetRAFNNodeNum(std::string const &RAFNNodeName, // Name of RoomAir:Node:AirflowNetwork
+    void GetRAFNNodeNum(AllGlobals &state, std::string const &RAFNNodeName, // Name of RoomAir:Node:AirflowNetwork
                         int &ZoneNum,                    // The zone number associate with the node name
                         int &RAFNNodeNum,                // RoomAir:Node:AirflowNetwork Number
                         bool &Errorfound                 // true if an error is found (TODO: Useless, RAFNodeNum is 0 when Errorfound is true)
@@ -2758,7 +2759,7 @@ namespace RoomAirModelManager {
 
         // Obtains and Allocates RoomAirSettings : AirflowNetwork
         if (GetAirModelData) {
-            GetAirModelDatas();
+            GetAirModelDatas(state);
             GetAirModelData = false;
         }
 

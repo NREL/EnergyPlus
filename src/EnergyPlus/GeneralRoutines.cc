@@ -572,7 +572,7 @@ void ControlCompOutput(AllGlobals &state, std::string const &CompName,          
 
         case UnitHeaterNum: // 'ZONEHVAC:UNITHEATER'
             // Simulate unit heater components
-            CalcUnitHeaterComponents(CompNum, FirstHVACIteration, LoadMet);
+            CalcUnitHeaterComponents(state, CompNum, FirstHVACIteration, LoadMet);
             // Calculate the control signal (the variable we are forcing to zero)
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
             break;
@@ -586,7 +586,7 @@ void ControlCompOutput(AllGlobals &state, std::string const &CompName,          
 
         case VentilatedSlabNum: // 'ZONEHVAC:VENTILATEDSLAB'
             // Simulate unit ventilator components
-            CalcVentilatedSlabComps(CompNum, FirstHVACIteration, LoadMet);
+            CalcVentilatedSlabComps(state, CompNum, FirstHVACIteration, LoadMet);
             // Calculate the control signal (the variable we are forcing to zero)
             ZoneController.SensedValue = (LoadMet - QZnReq) / Denom;
             break;
@@ -1529,7 +1529,7 @@ void TestAirPathIntegrity(bool &ErrFound)
     ValSupAPaths.deallocate();
 }
 
-void TestSupplyAirPathIntegrity(bool &ErrFound)
+void TestSupplyAirPathIntegrity(AllGlobals &state, bool &ErrFound)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1720,7 +1720,7 @@ void TestSupplyAirPathIntegrity(bool &ErrFound)
     }
     if (NumZoneSupplyPlenums == 0 && NumZoneReturnPlenums == 0) {
         if (inputProcessor->getNumObjectsFound("AirLoopHVAC:SupplyPlenum") > 0) {
-            GetZonePlenumInput();
+            GetZonePlenumInput(state);
         }
     }
 
@@ -1794,7 +1794,7 @@ void TestSupplyAirPathIntegrity(bool &ErrFound)
     }
 }
 
-void TestReturnAirPathIntegrity(bool &ErrFound, Array2S_int ValRetAPaths)
+void TestReturnAirPathIntegrity(AllGlobals &state, bool &ErrFound, Array2S_int ValRetAPaths)
 {
 
     // SUBROUTINE INFORMATION:
@@ -2093,7 +2093,7 @@ void TestReturnAirPathIntegrity(bool &ErrFound, Array2S_int ValRetAPaths)
     }
     if (NumZoneSupplyPlenums == 0 && NumZoneReturnPlenums == 0) {
         if (inputProcessor->getNumObjectsFound("AirLoopHVAC:ReturnPlenum") > 0) {
-            GetZonePlenumInput();
+            GetZonePlenumInput(state);
         }
     }
 
@@ -2141,7 +2141,7 @@ void TestReturnAirPathIntegrity(bool &ErrFound, Array2S_int ValRetAPaths)
         }
         if (!FoundZoneMixer(Count1)) { // could be as child on other items
             // PIU Units
-            if (PIUnitHasMixer(MixerCond(Count1).MixerName)) FoundZoneMixer(Count1) = true;
+            if (PIUnitHasMixer(state, MixerCond(Count1).MixerName)) FoundZoneMixer(Count1) = true;
         }
         if (!FoundZoneMixer(Count1)) { // could be as child on other items
             // fourPipeInduction units

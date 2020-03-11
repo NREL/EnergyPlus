@@ -59,6 +59,7 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataWater.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -412,8 +413,8 @@ void CoilCoolingDX::getDataAfterSizing(Real64 &_normalModeRatedEvapAirFlowRate,
     _normalModeRatedCapacity = this->performance.normalMode.ratedGrossTotalCap;
 }
 
-void CoilCoolingDX::size() {
-    this->performance.size();
+void CoilCoolingDX::size(AllGlobals &state) {
+    this->performance.size(state);
 }
 
 void CoilCoolingDX::simulate(bool useAlternateMode, Real64 PLR, int speedNum, Real64 speedRatio, int fanOpMode)

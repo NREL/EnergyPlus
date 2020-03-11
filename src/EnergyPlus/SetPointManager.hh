@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 
 namespace EnergyPlus {
 
@@ -1038,9 +1039,9 @@ namespace SetPointManager {
 
     void ManageSetPoints();
 
-    void GetSetPointManagerInputs(); // wrapper for GetInput to accomodate unit testing
+    void GetSetPointManagerInputs(AllGlobals &state); // wrapper for GetInput to accomodate unit testing
 
-    void GetSetPointManagerInputData(bool &ErrorsFound);
+    void GetSetPointManagerInputData(AllGlobals &state, bool &ErrorsFound);
 
     void VerifySetPointManagers(bool &ErrorsFound); // flag to denote node conflicts in input. !unused1208
 

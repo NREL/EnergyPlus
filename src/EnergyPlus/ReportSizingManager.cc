@@ -69,6 +69,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
@@ -3243,7 +3244,7 @@ namespace ReportSizingManager {
                                 break;
                             }
                             case DataAirSystems::objectVectorOOFanSystemModel: {
-                                FanCoolLoad = HVACFan::fanObjs[PrimaryAirSystem(CurSysNum).supFanVecIndex]->getFanDesignHeatGain(DesVolFlow);
+                                FanCoolLoad = HVACFan::fanObjs[PrimaryAirSystem(CurSysNum).supFanVecIndex]->getFanDesignHeatGain(state, DesVolFlow);
                                 if (coilSelectionReportObj->isCompTypeCoil(CompType) && (PrimaryAirSystem(CurSysNum).supFanVecIndex >= 0)) {
                                     coilSelectionReportObj->setCoilSupplyFanInfo(state, CompName,
                                                                                  CompType,
@@ -3266,7 +3267,7 @@ namespace ReportSizingManager {
                             }
                             case DataAirSystems::objectVectorOOFanSystemModel: {
                                 FanCoolLoad += (1.0 - OutAirFrac) *
-                                               HVACFan::fanObjs[PrimaryAirSystem(CurSysNum).retFanVecIndex]->getFanDesignHeatGain(DesVolFlow);
+                                               HVACFan::fanObjs[PrimaryAirSystem(CurSysNum).retFanVecIndex]->getFanDesignHeatGain(state, DesVolFlow);
                                 break;
                             }
                             case DataAirSystems::fanModelTypeNotYetSet: {

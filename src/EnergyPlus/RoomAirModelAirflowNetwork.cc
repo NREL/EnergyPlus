@@ -1302,7 +1302,7 @@ namespace RoomAirModelAirflowNetwork {
 
             if (ThisRAFNNode.HVAC(I).TypeOfNum == ZoneEquipTypeOf_BaseboardRadiantConvectiveWater) {
                 //'ZoneHVAC:Baseboard:RadiantConvective:Water' 13
-                SimHWBaseboard(ThisRAFNNode.HVAC(I).Name,
+                SimHWBaseboard(state, ThisRAFNNode.HVAC(I).Name,
                                ZoneNum,
                                RoomAirflowNetworkZoneInfo(ZoneNum).ActualZoneID,
                                false,
@@ -1327,7 +1327,7 @@ namespace RoomAirModelAirflowNetwork {
 
             if (ThisRAFNNode.HVAC(I).TypeOfNum == ZoneEquipTypeOf_BaseboardConvectiveWater) {
                 // CASE(BBWaterConvective_Num)  !'ZoneHVAC:Baseboard:Convective:Water' 16
-                SimBaseboard(ThisRAFNNode.HVAC(I).Name,
+                SimBaseboard(state, ThisRAFNNode.HVAC(I).Name,
                              ZoneNum,
                              RoomAirflowNetworkZoneInfo(ZoneNum).ActualZoneID,
                              false,
@@ -1350,7 +1350,7 @@ namespace RoomAirModelAirflowNetwork {
 
             if (ThisRAFNNode.HVAC(I).TypeOfNum == ZoneEquipTypeOf_RefrigerationChillerSet) {
                 // CASE(RefrigerationAirChillerSet_Num)  !'ZoneHVAC:RefrigerationChillerSet' 20
-                SimAirChillerSet(ThisRAFNNode.HVAC(I).Name, ZoneNum, false, SysOutputProvided, LatOutputProvided, ThisRAFNNode.HVAC(I).CompIndex);
+                SimAirChillerSet(state, ThisRAFNNode.HVAC(I).Name, ZoneNum, false, SysOutputProvided, LatOutputProvided, ThisRAFNNode.HVAC(I).CompIndex);
                 ThisRAFNNode.NonAirSystemResponse += ThisRAFNNode.HVAC(I).SupplyFraction * SysOutputProvided;
             }
 
@@ -1368,7 +1368,7 @@ namespace RoomAirModelAirflowNetwork {
 
             if (ThisRAFNNode.HVAC(I).TypeOfNum == ZoneEquipTypeOf_HighTemperatureRadiant) {
                 // CASE(BBElectric_Num)  !'ZoneHVAC:HighTemperatureRadiant' 17
-                SimHighTempRadiantSystem(ThisRAFNNode.HVAC(I).Name, false, SysOutputProvided, ThisRAFNNode.HVAC(I).CompIndex);
+                SimHighTempRadiantSystem(state, ThisRAFNNode.HVAC(I).Name, false, SysOutputProvided, ThisRAFNNode.HVAC(I).CompIndex);
                 ThisRAFNNode.NonAirSystemResponse += ThisRAFNNode.HVAC(I).SupplyFraction * SysOutputProvided;
                 // LatOutputProvided = 0.0d0 !This baseboard does not add / remove any latent heat
             }

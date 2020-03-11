@@ -239,7 +239,7 @@ namespace ChillerElectricEIR {
         this->initialize(runFlag, myLoad);
 
         if (calledFromLocation.loopNum == this->CWLoopNum) {
-            this->size();
+            this->size(state);
         }
     }
 
@@ -1240,7 +1240,7 @@ namespace ChillerElectricEIR {
         }
     }
 
-    void ElectricEIRChillerSpecs::size()
+    void ElectricEIRChillerSpecs::size(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1472,7 +1472,7 @@ namespace ChillerElectricEIR {
                     DataSizing::DataFractionUsedForSizing = 0.000114;
                     Real64 TempSize = this->CondVolFlowRate;
                     bool bPRINT = true; // TRUE if sizing is reported to output (eio)
-                    ReportSizingManager::RequestSizing(CompType, this->Name, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
+                    ReportSizingManager::RequestSizing(state, CompType, this->Name, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
                     this->CondVolFlowRate = TempSize;
                     DataSizing::DataConstantUsedForSizing = 0.0;
                     DataSizing::DataFractionUsedForSizing = 0.0;

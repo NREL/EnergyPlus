@@ -72,6 +72,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -184,7 +185,7 @@ namespace HeatingCoils {
 
     // Functions
 
-    void SimulateHeatingCoilComponents(std::string const &CompName,
+    void SimulateHeatingCoilComponents(AllGlobals &state, std::string const &CompName,
                                        bool const FirstHVACIteration,
                                        Optional<Real64 const> QCoilReq, // coil load to be met
                                        Optional_int CompIndex,
@@ -223,7 +224,7 @@ namespace HeatingCoils {
         // FLOW:
         // Obtains and Allocates HeatingCoil related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetHeatingCoilInput();
+            GetHeatingCoilInput(state);
             GetCoilsInputFlag = false;
         }
 
@@ -280,7 +281,7 @@ namespace HeatingCoils {
         }
 
         // With the correct CoilNum Initialize
-        InitHeatingCoil(CoilNum, FirstHVACIteration, QCoilRequired); // Initialize all HeatingCoil related parameters
+        InitHeatingCoil(state, CoilNum, FirstHVACIteration, QCoilRequired); // Initialize all HeatingCoil related parameters
 
         // Calculate the Correct HeatingCoil Model with the current CoilNum
         if (HeatingCoil(CoilNum).HCoilType_Num == Coil_HeatingElectric) {
@@ -319,7 +320,7 @@ namespace HeatingCoils {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetHeatingCoilInput()
+    void GetHeatingCoilInput(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -989,14 +990,14 @@ namespace HeatingCoils {
             // (when zone equipment heating coils are included in the input, the air loop DX equipment has not yet been read in)
             if (UtilityRoutines::SameString(Alphas(5), "Refrigeration:CompressorRack")) {
                 HeatingCoil(CoilNum).ReclaimHeatingSource = COMPRESSORRACK_REFRIGERATEDCASE;
-                GetRefrigeratedRackIndex(
+                GetRefrigeratedRackIndex(state,
                     Alphas(6), HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum, RefrigSystemTypeRack, DXCoilErrFlag, Alphas(5));
                 if (HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum > 0) ValidSourceType(CoilNum) = true;
             } else if ((UtilityRoutines::SameString(Alphas(5), "Refrigeration:Condenser:AirCooled")) ||
                        (UtilityRoutines::SameString(Alphas(5), "Refrigeration:Condenser:EvaporativeCooled")) ||
                        (UtilityRoutines::SameString(Alphas(5), "Refrigeration:Condenser:WaterCooled"))) {
                 HeatingCoil(CoilNum).ReclaimHeatingSource = CONDENSER_REFRIGERATION;
-                GetRefrigeratedRackIndex(
+                GetRefrigeratedRackIndex(state,
                     Alphas(6), HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum, RefrigSystemTypeDetailed, DXCoilErrFlag, Alphas(5));
                 if (HeatingCoil(CoilNum).ReclaimHeatingSourceIndexNum > 0) ValidSourceType(CoilNum) = true;
             } else if (UtilityRoutines::SameString(Alphas(5), "Coil:Cooling:DX:SingleSpeed")) {
@@ -1155,7 +1156,7 @@ namespace HeatingCoils {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitHeatingCoil(int const CoilNum, bool const FirstHVACIteration, Real64 const QCoilRequired)
+    void InitHeatingCoil(AllGlobals &state, int const CoilNum, bool const FirstHVACIteration, Real64 const QCoilRequired)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1203,7 +1204,7 @@ namespace HeatingCoils {
 
         if (!SysSizingCalc && MySizeFlag(CoilNum)) {
             // for each coil, do the sizing once.
-            SizeHeatingCoil(CoilNum);
+            SizeHeatingCoil(state, CoilNum);
 
             MySizeFlag(CoilNum) = false;
         }
@@ -1345,7 +1346,7 @@ namespace HeatingCoils {
         }
     }
 
-    void SizeHeatingCoil(int const CoilNum)
+    void SizeHeatingCoil(AllGlobals &state, int const CoilNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1428,10 +1429,10 @@ namespace HeatingCoils {
                 bPRINT = false;
                 DataDesicDehumNum = HeatingCoil(CoilNum).DesiccantDehumNum;
                 TempSize = AutoSize;
-                RequestSizing(CompType, CompName, HeatingCoilDesAirInletTempSizing, SizingString, TempSize, bPRINT, RoutineName);
+                RequestSizing(state, CompType, CompName, HeatingCoilDesAirInletTempSizing, SizingString, TempSize, bPRINT, RoutineName);
                 DataDesInletAirTemp = TempSize;
                 TempSize = AutoSize;
-                RequestSizing(CompType, CompName, HeatingCoilDesAirOutletTempSizing, SizingString, TempSize, bPRINT, RoutineName);
+                RequestSizing(state, CompType, CompName, HeatingCoilDesAirOutletTempSizing, SizingString, TempSize, bPRINT, RoutineName);
                 DataDesOutletAirTemp = TempSize;
                 if (CurOASysNum > 0) {
                     OASysEqSizing(CurOASysNum).AirFlow = true;
@@ -1441,7 +1442,7 @@ namespace HeatingCoils {
                 bPRINT = true;
             }
         }
-        RequestSizing(CompType, CompName, HeatingCapacitySizing, SizingString, TempCap, bPRINT, RoutineName);
+        RequestSizing(state, CompType, CompName, HeatingCapacitySizing, SizingString, TempCap, bPRINT, RoutineName);
         DataCoilIsSuppHeater = false; // reset global to false so other heating coils are not affected
         DataDesicRegCoil = false;     // reset global to false so other heating coils are not affected
         DataDesInletAirTemp = 0.0;    // reset global data to zero so other heating coils are not
@@ -2778,7 +2779,7 @@ namespace HeatingCoils {
 
     //        End of Reporting subroutines for the HeatingCoil Module
 
-    void GetCoilIndex(std::string const &HeatingCoilName, int &HeatingCoilIndex, bool &ErrorsFound)
+    void GetCoilIndex(AllGlobals &state, std::string const &HeatingCoilName, int &HeatingCoilIndex, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2793,7 +2794,7 @@ namespace HeatingCoils {
 
         // Obtains and Allocates HeatingCoil related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetHeatingCoilInput();
+            GetHeatingCoilInput(state);
             GetCoilsInputFlag = false;
         }
 
@@ -2804,7 +2805,7 @@ namespace HeatingCoils {
         }
     }
 
-    void CheckHeatingCoilSchedule(std::string const &CompType, // unused1208
+    void CheckHeatingCoilSchedule(AllGlobals &state, std::string const &CompType, // unused1208
                                   std::string const &CompName,
                                   Real64 &Value,
                                   int &CompIndex)
@@ -2828,7 +2829,7 @@ namespace HeatingCoils {
 
         // Obtains and Allocates HeatingCoil related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetHeatingCoilInput();
+            GetHeatingCoilInput(state);
             GetCoilsInputFlag = false;
         }
 
@@ -2863,7 +2864,7 @@ namespace HeatingCoils {
         }
     }
 
-    Real64 GetCoilCapacity(std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilCapacity(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
                            std::string const &CoilName, // must match coil names for the coil type
                            bool &ErrorsFound            // set to true if problem
     )
@@ -2889,7 +2890,7 @@ namespace HeatingCoils {
 
         // Obtains and Allocates HeatingCoil related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetHeatingCoilInput();
+            GetHeatingCoilInput(state);
             GetCoilsInputFlag = false;
         }
 
@@ -2924,7 +2925,7 @@ namespace HeatingCoils {
         return CoilCapacity;
     }
 
-    int GetCoilAvailScheduleIndex(std::string const &CoilType, // must match coil types in this module
+    int GetCoilAvailScheduleIndex(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
                                   std::string const &CoilName, // must match coil names for the coil type
                                   bool &ErrorsFound            // set to true if problem
     )
@@ -2950,7 +2951,7 @@ namespace HeatingCoils {
 
         // Obtains and Allocates HeatingCoil related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetHeatingCoilInput();
+            GetHeatingCoilInput(state);
             GetCoilsInputFlag = false;
         }
 
@@ -2976,7 +2977,7 @@ namespace HeatingCoils {
         return AvailSchIndex;
     }
 
-    int GetCoilInletNode(std::string const &CoilType, // must match coil types in this module
+    int GetCoilInletNode(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
                          std::string const &CoilName, // must match coil names for the coil type
                          bool &ErrorsFound            // set to true if problem
     )
@@ -3002,7 +3003,7 @@ namespace HeatingCoils {
 
         // Obtains and Allocates HeatingCoil related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetHeatingCoilInput();
+            GetHeatingCoilInput(state);
             GetCoilsInputFlag = false;
         }
 
@@ -3028,7 +3029,7 @@ namespace HeatingCoils {
         return NodeNumber;
     }
 
-    int GetCoilOutletNode(std::string const &CoilType, // must match coil types in this module
+    int GetCoilOutletNode(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     )
@@ -3054,7 +3055,7 @@ namespace HeatingCoils {
 
         // Obtains and Allocates HeatingCoil related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetHeatingCoilInput();
+            GetHeatingCoilInput(state);
             GetCoilsInputFlag = false;
         }
 
@@ -3080,7 +3081,7 @@ namespace HeatingCoils {
         return NodeNumber;
     }
 
-    int GetHeatReclaimSourceIndex(std::string const &CoilType, // must match coil types in this module
+    int GetHeatReclaimSourceIndex(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
                                   std::string const &CoilName, // must match coil names for the coil type
                                   bool &ErrorsFound            // set to true if problem
     )
@@ -3108,7 +3109,7 @@ namespace HeatingCoils {
 
         // Obtains and Allocates HeatingCoil related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetHeatingCoilInput();
+            GetHeatingCoilInput(state);
             GetCoilsInputFlag = false;
         }
 
@@ -3144,7 +3145,7 @@ namespace HeatingCoils {
         return CoilFound;
     }
 
-    int GetCoilControlNodeNum(std::string const &CoilType, // must match coil types in this module
+    int GetCoilControlNodeNum(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
                               std::string const &CoilName, // must match coil names for the coil type
                               bool &ErrorsFound            // set to true if problem
     )
@@ -3170,7 +3171,7 @@ namespace HeatingCoils {
 
         // Obtains and Allocates HeatingCoil related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetHeatingCoilInput();
+            GetHeatingCoilInput(state);
             GetCoilsInputFlag = false;
         }
 
@@ -3196,7 +3197,7 @@ namespace HeatingCoils {
         return NodeNumber;
     }
 
-    int GetHeatingCoilTypeNum(std::string const &CoilType, // must match coil types in this module
+    int GetHeatingCoilTypeNum(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
                               std::string const &CoilName, // must match coil names for the coil type
                               bool &ErrorsFound            // set to true if problem
     )
@@ -3222,7 +3223,7 @@ namespace HeatingCoils {
 
         // Obtains and Allocates HeatingCoil related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetHeatingCoilInput();
+            GetHeatingCoilInput(state);
             GetCoilsInputFlag = false;
         }
 
@@ -3248,7 +3249,7 @@ namespace HeatingCoils {
         return TypeNum;
     }
 
-    int GetHeatingCoilIndex(std::string const &CoilType, // must match coil types in this module
+    int GetHeatingCoilIndex(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
                             std::string const &CoilName, // must match coil names for the coil type
                             bool &ErrorsFound            // set to true if problem
     )
@@ -3273,7 +3274,7 @@ namespace HeatingCoils {
 
         // Obtains and Allocates HeatingCoil related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetHeatingCoilInput();
+            GetHeatingCoilInput(state);
             GetCoilsInputFlag = false;
         }
 
@@ -3294,7 +3295,7 @@ namespace HeatingCoils {
         return WhichCoil;
     }
 
-    int GetHeatingCoilPLFCurveIndex(std::string const &CoilType, // must match coil types in this module
+    int GetHeatingCoilPLFCurveIndex(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
                                     std::string const &CoilName, // must match coil names for the coil type
                                     bool &ErrorsFound            // set to true if problem
     )
@@ -3321,7 +3322,7 @@ namespace HeatingCoils {
 
         // Obtains and Allocates HeatingCoil related parameters from input file
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetHeatingCoilInput();
+            GetHeatingCoilInput(state);
             GetCoilsInputFlag = false;
         }
 
@@ -3343,7 +3344,7 @@ namespace HeatingCoils {
         return IndexNum;
     }
 
-    int GetHeatingCoilNumberOfStages(std::string const &CoilType, // must match coil types in this module
+    int GetHeatingCoilNumberOfStages(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
                                      std::string const &CoilName, // must match coil names for the coil type
                                      bool &ErrorsFound            // set to true if problem
     )
@@ -3367,7 +3368,7 @@ namespace HeatingCoils {
 
         // Obtains and Allocates HeatingCoils
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetHeatingCoilInput();
+            GetHeatingCoilInput(state);
             GetCoilsInputFlag = false;
         }
 
@@ -3401,7 +3402,7 @@ namespace HeatingCoils {
         HeatingCoilNumericFields.deallocate();
     }
 
-    void SetHeatingCoilData(int const CoilNum,                       // Number of electric or gas heating Coil
+    void SetHeatingCoilData(AllGlobals &state, int const CoilNum,                       // Number of electric or gas heating Coil
                             bool &ErrorsFound,                       // Set to true if certain errors found
                             Optional_bool DesiccantRegenerationCoil, // Flag that this coil is used as regeneration air heating coil
                             Optional_int DesiccantDehumIndex         // Index for the desiccant dehum system where this coil is used
@@ -3421,7 +3422,7 @@ namespace HeatingCoils {
         using General::TrimSigDigits;
 
         if (GetCoilsInputFlag) {
-            GetHeatingCoilInput();
+            GetHeatingCoilInput(state);
             GetCoilsInputFlag = false;
         }
 
@@ -3441,7 +3442,7 @@ namespace HeatingCoils {
         }
     }
 
-    void SetHeatingCoilAirLoopNumber(std::string const &HeatingCoilName, int AirLoopNum, bool &ErrorsFound)
+    void SetHeatingCoilAirLoopNumber(AllGlobals &state, std::string const &HeatingCoilName, int AirLoopNum, bool &ErrorsFound)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         L.Gu
@@ -3453,7 +3454,7 @@ namespace HeatingCoils {
         int HeatingCoilIndex;
 
         if (GetCoilsInputFlag) { // First time subroutine has been entered
-            GetHeatingCoilInput();
+            GetHeatingCoilInput(state);
             GetCoilsInputFlag = false;
         }
 

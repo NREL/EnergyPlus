@@ -77,6 +77,7 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -217,7 +218,7 @@ namespace SurfaceGeometry {
         UniqueSurfaceNames.clear();
     }
 
-    void SetupZoneGeometry(OutputFiles &outputFiles, bool &ErrorsFound)
+    void SetupZoneGeometry(AllGlobals &state, OutputFiles &outputFiles, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -301,7 +302,7 @@ namespace SurfaceGeometry {
             return;
         }
 
-        GetWindowGapAirflowControlData(ErrorsFound);
+        GetWindowGapAirflowControlData(state, ErrorsFound);
 
         GetStormWindowData(ErrorsFound);
 
@@ -8557,7 +8558,7 @@ namespace SurfaceGeometry {
         }
     }
 
-    void GetWindowGapAirflowControlData(bool &ErrorsFound) // If errors found in input
+    void GetWindowGapAirflowControlData(AllGlobals &state, bool &ErrorsFound) // If errors found in input
     {
 
         // SUBROUTINE INFORMATION:
@@ -8695,7 +8696,7 @@ namespace SurfaceGeometry {
                     SurfaceWindow(SurfNum).AirflowDestination = AirFlowWindow_Destination_OutdoorAir;
                 } else if (UtilityRoutines::SameString(cAlphaArgs(3), "ReturnAir")) {
                     SurfaceWindow(SurfNum).AirflowDestination = AirFlowWindow_Destination_ReturnAir;
-                    int controlledZoneNum = DataZoneEquipment::GetControlledZoneIndex(Surface(SurfNum).ZoneName);
+                    int controlledZoneNum = DataZoneEquipment::GetControlledZoneIndex(state, Surface(SurfNum).ZoneName);
                     if (controlledZoneNum > 0) {
                         DataZoneEquipment::ZoneEquipConfig(controlledZoneNum).ZoneHasAirFlowWindowReturn = true;
                         DataHeatBalance::Zone(Surface(SurfNum).Zone).HasAirFlowWindowReturn = true;
@@ -8709,7 +8710,7 @@ namespace SurfaceGeometry {
                     }
                     std::string callDescription = cCurrentModuleObject + "=" + Surface(SurfNum).Name;
                     SurfaceWindow(SurfNum).AirflowReturnNodePtr =
-                        DataZoneEquipment::GetReturnAirNodeForZone(Surface(SurfNum).ZoneName, retNodeName, callDescription);
+                        DataZoneEquipment::GetReturnAirNodeForZone(state, Surface(SurfNum).ZoneName, retNodeName, callDescription);
                     if (SurfaceWindow(SurfNum).AirflowReturnNodePtr == 0) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + "=\"" + Surface(SurfNum).Name +
                                         "\", airflow window return air node not found for " + cAlphaFieldNames(3) + " = " + cAlphaArgs(3));

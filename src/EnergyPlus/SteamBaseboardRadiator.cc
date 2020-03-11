@@ -226,7 +226,7 @@ namespace SteamBaseboardRadiator {
 
         if (CompIndex > 0) {
 
-            InitSteamBaseboard(BaseboardNum, ControlledZoneNum, FirstHVACIteration);
+            InitSteamBaseboard(state, BaseboardNum, ControlledZoneNum, FirstHVACIteration);
 
             QZnReq = ZoneSysEnergyDemand(ActualZoneNum).RemainingOutputReqToHeatSP;
 
@@ -715,7 +715,7 @@ namespace SteamBaseboardRadiator {
         }
     }
 
-    void InitSteamBaseboard(int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration)
+    void InitSteamBaseboard(AllGlobals &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -822,7 +822,7 @@ namespace SteamBaseboardRadiator {
 
         if (!SysSizingCalc && MySizeFlag(BaseboardNum) && (!SetLoopIndexFlag(BaseboardNum))) {
             // For each coil, do the sizing once
-            SizeSteamBaseboard(BaseboardNum);
+            SizeSteamBaseboard(state, BaseboardNum);
             MySizeFlag(BaseboardNum) = false;
         }
 
@@ -890,7 +890,7 @@ namespace SteamBaseboardRadiator {
         SteamBaseboard(BaseboardNum).RadEnergy = 0.0;
     }
 
-    void SizeSteamBaseboard(int const BaseboardNum)
+    void SizeSteamBaseboard(AllGlobals &state, int const BaseboardNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1017,7 +1017,7 @@ namespace SteamBaseboardRadiator {
                         } else {
                             TempSize = SteamBaseboard(BaseboardNum).ScaledHeatingCapacity;
                         }
-                        RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                         DesCoilLoad = TempSize;
                         DataScalableCapSizingON = false;
                     } else {

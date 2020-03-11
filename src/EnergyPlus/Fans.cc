@@ -1246,7 +1246,7 @@ namespace Fans {
         CompName = Fan(FanNum).FanName;
         DataEMSOverrideON = Fan(FanNum).MaxAirFlowRateEMSOverrideOn;
         DataEMSOverride = Fan(FanNum).MaxAirFlowRateEMSOverrideValue;
-        RequestSizing(CompType, CompName, SystemAirflowSizing, SizingString, TempFlow, bPRINT, RoutineName);
+        RequestSizing(state, CompType, CompName, SystemAirflowSizing, SizingString, TempFlow, bPRINT, RoutineName);
         Fan(FanNum).MaxAirFlowRate = TempFlow;
         DataAutosizable = true;
         DataEMSOverrideON = false;

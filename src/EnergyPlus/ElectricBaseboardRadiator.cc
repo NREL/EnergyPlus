@@ -655,7 +655,7 @@ namespace ElectricBaseboardRadiator {
         ElecBaseboard(BaseboardNum).ElecUseRate = 0.0;
     }
 
-    void SizeElectricBaseboard(int const BaseboardNum)
+    void SizeElectricBaseboard(AllGlobals &state, int const BaseboardNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -734,14 +734,14 @@ namespace ElectricBaseboardRadiator {
                     DataFracOfAutosizedHeatingCapacity = ElecBaseboard(BaseboardNum).ScaledHeatingCapacity;
                     ZoneEqSizing(CurZoneEqNum).DesHeatingLoad = FinalZoneSizing(CurZoneEqNum).NonAirSysDesHeatLoad;
                     FracOfAutoSzCap = AutoSize;
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, FracOfAutoSzCap, false, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, FracOfAutoSzCap, false, RoutineName);
                     TempSize = FracOfAutoSzCap;
                     DataFracOfAutosizedHeatingCapacity = 1.0;
                     DataScalableCapSizingON = true;
                 } else {
                     TempSize = ElecBaseboard(BaseboardNum).ScaledHeatingCapacity;
                 }
-                RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                 ElecBaseboard(BaseboardNum).NominalCapacity = TempSize;
                 DataScalableCapSizingON = false;
             }

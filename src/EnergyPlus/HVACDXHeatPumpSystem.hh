@@ -55,6 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 
 namespace EnergyPlus {
 
@@ -138,7 +139,7 @@ namespace HVACDXHeatPumpSystem {
 
     void clear_state();
 
-    void SimDXHeatPumpSystem(std::string const &DXHeatPumpSystemName,   // Name of DXSystem:Airloop object
+    void SimDXHeatPumpSystem(AllGlobals &state, std::string const &DXHeatPumpSystemName,   // Name of DXSystem:Airloop object
                              bool const FirstHVACIteration,             // True when first HVAC iteration
                              int const AirLoopNum,                      // Primary air loop number
                              int &CompIndex,                            // Index to CoilSystem:Heating:DX object
@@ -170,7 +171,7 @@ namespace HVACDXHeatPumpSystem {
     // Beginning of Calculation subroutines for the DXCoolingSystem Module
     // *****************************************************************************
 
-    void ControlDXHeatingSystem(int const DXSystemNum,        // index to DXSystem
+    void ControlDXHeatingSystem(AllGlobals &state, int const DXSystemNum,        // index to DXSystem
                                 bool const FirstHVACIteration // First HVAC iteration flag
     );
 
@@ -180,13 +181,13 @@ namespace HVACDXHeatPumpSystem {
 
     //******************************************************************************
 
-    Real64 VSCoilCyclingResidual(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 VSCoilCyclingResidual(AllGlobals &state, Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                  Array1<Real64> const &Par   // par(1) = DX coil number
     );
 
     //******************************************************************************
 
-    Real64 VSCoilSpeedResidual(Real64 const SpeedRatio,  // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 VSCoilSpeedResidual(AllGlobals &state, Real64 const SpeedRatio,  // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                Array1<Real64> const &Par // par(1) = DX coil number
     );
 

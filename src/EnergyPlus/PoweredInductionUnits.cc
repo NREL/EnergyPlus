@@ -1624,7 +1624,7 @@ namespace PoweredInductionUnits {
                 Node(SecNode).MassFlowRate = PIU(PIUNum).MaxTotAirMassFlow;
                 SimAirMixer(PIU(PIUNum).MixerName, PIU(PIUNum).Mixer_Num); // fire the mixer
                 if (PIU(PIUNum).Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                    HVACFan::fanObjs[PIU(PIUNum).Fan_Index]->simulate(_, PIUTurnFansOn, PIUTurnFansOff, _);
+                    HVACFan::fanObjs[PIU(PIUNum).Fan_Index]->simulate(state, _, PIUTurnFansOn, PIUTurnFansOff, _);
                 } else if (PIU(PIUNum).Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
                     Fans::SimulateFanComponents(state, PIU(PIUNum).FanName,
                                                 FirstHVACIteration,
@@ -1664,7 +1664,7 @@ namespace PoweredInductionUnits {
         SimAirMixer(PIU(PIUNum).MixerName, PIU(PIUNum).Mixer_Num);
         // fire the fan
         if (PIU(PIUNum).Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            HVACFan::fanObjs[PIU(PIUNum).Fan_Index]->simulate(_, PIUTurnFansOn, PIUTurnFansOff, _);
+            HVACFan::fanObjs[PIU(PIUNum).Fan_Index]->simulate(state, _, PIUTurnFansOn, PIUTurnFansOff, _);
         } else if (PIU(PIUNum).Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
             Fans::SimulateFanComponents(state, PIU(PIUNum).FanName,
                                         FirstHVACIteration,
@@ -1733,7 +1733,7 @@ namespace PoweredInductionUnits {
                 } else {
                     QCoilReq = QToHeatSetPt - Node(HCoilInAirNode).MassFlowRate * CpAirZn * (Node(HCoilInAirNode).Temp - Node(ZoneNode).Temp);
                 }
-                SimulateHeatingCoilComponents(PIU(PIUNum).HCoil, FirstHVACIteration, QCoilReq, PIU(PIUNum).HCoil_Index);
+                SimulateHeatingCoilComponents(state, PIU(PIUNum).HCoil, FirstHVACIteration, QCoilReq, PIU(PIUNum).HCoil_Index);
 
             } else if (SELECT_CASE_var == HCoilType_Gas) { // COIL:GAS:HEATING
                 if (!HCoilOn) {
@@ -1741,7 +1741,7 @@ namespace PoweredInductionUnits {
                 } else {
                     QCoilReq = QToHeatSetPt - Node(HCoilInAirNode).MassFlowRate * CpAirZn * (Node(HCoilInAirNode).Temp - Node(ZoneNode).Temp);
                 }
-                SimulateHeatingCoilComponents(PIU(PIUNum).HCoil, FirstHVACIteration, QCoilReq, PIU(PIUNum).HCoil_Index);
+                SimulateHeatingCoilComponents(state, PIU(PIUNum).HCoil, FirstHVACIteration, QCoilReq, PIU(PIUNum).HCoil_Index);
             }
         }
 
@@ -1904,7 +1904,7 @@ namespace PoweredInductionUnits {
                 Node(PriNode).MassFlowRate = 0.0;
 
                 if (PIU(PIUNum).Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                    HVACFan::fanObjs[PIU(PIUNum).Fan_Index]->simulate(_, PIUTurnFansOn, PIUTurnFansOff, _);
+                    HVACFan::fanObjs[PIU(PIUNum).Fan_Index]->simulate(state, _, PIUTurnFansOn, PIUTurnFansOff, _);
                 } else if (PIU(PIUNum).Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
                     Fans::SimulateFanComponents(state, PIU(PIUNum).FanName,
                                                 FirstHVACIteration,
@@ -1946,7 +1946,7 @@ namespace PoweredInductionUnits {
         // fire the fan
 
         if (PIU(PIUNum).Fan_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            HVACFan::fanObjs[PIU(PIUNum).Fan_Index]->simulate(_, PIUTurnFansOn, PIUTurnFansOff, _);
+            HVACFan::fanObjs[PIU(PIUNum).Fan_Index]->simulate(state, _, PIUTurnFansOn, PIUTurnFansOff, _);
         } else if (PIU(PIUNum).Fan_Num == DataHVACGlobals::FanType_SimpleConstVolume) {
             Fans::SimulateFanComponents(state, PIU(PIUNum).FanName,
                                         FirstHVACIteration,
@@ -2014,7 +2014,7 @@ namespace PoweredInductionUnits {
                 } else {
                     QCoilReq = QToHeatSetPt - Node(HCoilInAirNode).MassFlowRate * CpAirZn * (Node(HCoilInAirNode).Temp - Node(ZoneNode).Temp);
                 }
-                SimulateHeatingCoilComponents(PIU(PIUNum).HCoil, FirstHVACIteration, QCoilReq, PIU(PIUNum).HCoil_Index);
+                SimulateHeatingCoilComponents(state, PIU(PIUNum).HCoil, FirstHVACIteration, QCoilReq, PIU(PIUNum).HCoil_Index);
 
             } else if (SELECT_CASE_var == HCoilType_Gas) { // COIL:GAS:HEATING
                 if (!HCoilOn) {
@@ -2022,7 +2022,7 @@ namespace PoweredInductionUnits {
                 } else {
                     QCoilReq = QToHeatSetPt - Node(HCoilInAirNode).MassFlowRate * CpAirZn * (Node(HCoilInAirNode).Temp - Node(ZoneNode).Temp);
                 }
-                SimulateHeatingCoilComponents(PIU(PIUNum).HCoil, FirstHVACIteration, QCoilReq, PIU(PIUNum).HCoil_Index);
+                SimulateHeatingCoilComponents(state, PIU(PIUNum).HCoil, FirstHVACIteration, QCoilReq, PIU(PIUNum).HCoil_Index);
             }
         }
         PowerMet = Node(OutletNode).MassFlowRate *

@@ -150,7 +150,7 @@ namespace BaseboardRadiator {
 
     void clear_state();
 
-    void SimBaseboard(std::string const &EquipName,
+    void SimBaseboard(AllGlobals &state, std::string const &EquipName,
                       int const ActualZoneNum,
                       int const ControlledZoneNum,
                       bool const FirstHVACIteration,

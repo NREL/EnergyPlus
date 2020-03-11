@@ -418,7 +418,7 @@ namespace PackagedTerminalHeatPump {
                                 Array1<Real64> const &Par // Par(5) is the requested coil load
     );
 
-    Real64 SupSATResidual(Real64 &TempSupHeater,    // supplemental heater load at maximum SAT
+    Real64 SupSATResidual(AllGlobals &state, Real64 &TempSupHeater,    // supplemental heater load at maximum SAT
                           Array1<Real64> const &Par // par(1) = PTUnitNum
     );
 

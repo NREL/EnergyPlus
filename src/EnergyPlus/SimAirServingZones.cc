@@ -855,13 +855,13 @@ namespace SimAirServingZones {
                         AirToOANodeInfo(AirSysNum).OASysExists = true;
                         AirToOANodeInfo(AirSysNum).OASysInletNodeNum = InletNodeNumbers(CompNum);
                         AirToOANodeInfo(AirSysNum).OASysOutletNodeNum = OutletNodeNumbers(CompNum);
-                        OANum = GetOASystemNumber(CompNames(CompNum));
+                        OANum = GetOASystemNumber(state, CompNames(CompNum));
                         if (OANum > 0) {
-                            NumOASysSimpControllers = GetOASysNumSimpControllers(OANum);
-                            PrimaryAirSystem(AirSysNum).NumOAHeatCoils = GetOASysNumHeatingCoils(OANum);
-                            PrimaryAirSystem(AirSysNum).NumOACoolCoils = GetOASysNumCoolingCoils(OANum);
-                            PrimaryAirSystem(AirSysNum).NumOAHXs = GetOASysNumHXs(OANum);
-                            OASysContListNum = GetOASysControllerListIndex(OANum);
+                            NumOASysSimpControllers = GetOASysNumSimpControllers(state, OANum);
+                            PrimaryAirSystem(AirSysNum).NumOAHeatCoils = GetOASysNumHeatingCoils(state, OANum);
+                            PrimaryAirSystem(AirSysNum).NumOACoolCoils = GetOASysNumCoolingCoils(state, OANum);
+                            PrimaryAirSystem(AirSysNum).NumOAHXs = GetOASysNumHXs(state, OANum);
+                            OASysContListNum = GetOASysControllerListIndex(state, OANum);
                             OAMixNum = FindOAMixerMatchForOASystem(OANum);
                             if (OAMixNum > 0) {
                                 PrimaryAirSystem(AirSysNum).OAMixOAInNodeNum = GetOAMixerInletNodeNumber(OAMixNum);
@@ -1423,17 +1423,17 @@ namespace SimAirServingZones {
             }
         }
 
-        OANum = GetNumOASystems();
+        OANum = GetNumOASystems(state);
         for (int OASysNum = 1; OASysNum <= OANum; ++OASysNum) {
-            NumInList = GetOACompListNumber(OASysNum);
+            NumInList = GetOACompListNumber(state, OASysNum);
             for (int OACompNum = 1; OACompNum <= NumInList; ++OACompNum) {
-                CompType_Num = GetOACompTypeNum(OASysNum, OACompNum);
+                CompType_Num = GetOACompTypeNum(state, OASysNum, OACompNum);
                 if (CompType_Num == WaterCoil_DetailedCool || CompType_Num == WaterCoil_SimpleHeat || CompType_Num == WaterCoil_Cooling) {
-                    WaterCoilNodeNum = GetCoilWaterInletNode(GetOACompType(OASysNum, OACompNum), GetOACompName(OASysNum, OACompNum), ErrorsFound);
+                    WaterCoilNodeNum = GetCoilWaterInletNode(GetOACompType(state, OASysNum, OACompNum), GetOACompName(state, OASysNum, OACompNum), ErrorsFound);
                     CheckCoilWaterInletNode(WaterCoilNodeNum, NodeNotFound);
                     if (NodeNotFound) {
                         ErrorsFound = true;
-                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + GetOACompName(OASysNum, OACompNum) + "\", invalid actuator.");
+                        ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + GetOACompName(state, OASysNum, OACompNum) + "\", invalid actuator.");
                         ShowContinueError("...this coil requires a water coil controller and the inlet node of a water coil must also be an actuator "
                                           "node of a water coil controller.");
                     }
@@ -3206,7 +3206,7 @@ namespace SimAirServingZones {
 
         // Evaluate water coils with new actuated variables
         if (HXAssistedWaterCoil) {
-            SimHXAssistedCoolingCoil(CompName, FirstHVACIteration, CoilOn, 0.0, CompIndex, ContFanCycCoil);
+            SimHXAssistedCoolingCoil(state, CompName, FirstHVACIteration, CoilOn, 0.0, CompIndex, ContFanCycCoil);
         } else {
             SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
         }
@@ -3276,7 +3276,7 @@ namespace SimAirServingZones {
 
                 // Re-evaluate air loop components with new actuated variables
                 if (HXAssistedWaterCoil) {
-                    SimHXAssistedCoolingCoil(CompName, FirstHVACIteration, CoilOn, 0.0, CompIndex, ContFanCycCoil);
+                    SimHXAssistedCoolingCoil(state, CompName, FirstHVACIteration, CoilOn, 0.0, CompIndex, ContFanCycCoil);
                 } else {
                     SimulateWaterCoilComponents(state, CompName, FirstHVACIteration, CompIndex);
                 }
@@ -3564,7 +3564,7 @@ namespace SimAirServingZones {
             auto const SELECT_CASE_var(CompType_Num);
 
             if (SELECT_CASE_var == OAMixer_Num) { // 'OUTSIDE AIR SYSTEM'
-                ManageOutsideAirSystem(CompName, FirstHVACIteration, AirLoopNum, CompIndex);
+                ManageOutsideAirSystem(state, CompName, FirstHVACIteration, AirLoopNum, CompIndex);
 
                 // Fan Types for the air sys simulation
             } else if (SELECT_CASE_var == Fan_Simple_CV) { // 'Fan:ConstantVolume'
@@ -3580,7 +3580,7 @@ namespace SimAirServingZones {
                 // if the fan is here, it can't (yet) really be cycling fan operation, set this ugly global in the event that there are dx coils
                 // involved but the fan should really run like constant volume and not cycle with compressor
                 DataHVACGlobals::OnOffFanPartLoadFraction = 1.0;
-                HVACFan::fanObjs[CompIndex - 1]->simulate(_, _, _, _); // vector is 0 based, but CompIndex is 1 based so shift
+                HVACFan::fanObjs[CompIndex - 1]->simulate(state, _, _, _, _); // vector is 0 based, but CompIndex is 1 based so shift
 
                 // cpw22Aug2010 Add Fan:ComponentModel (new)
             } else if (SELECT_CASE_var == Fan_ComponentModel) { // 'Fan:ComponentModel'
@@ -3591,7 +3591,7 @@ namespace SimAirServingZones {
                 //  CASE(DXCoil_CoolingHXAsst)  ! 'CoilSystem:Cooling:DX:HeatExchangerAssisted'
                 //    CALL SimHXAssistedCoolingCoil(CompName,FirstHVACIteration,CoilOn,0.0,CompIndex,ContFanCycCoil)
             } else if (SELECT_CASE_var == WaterCoil_CoolingHXAsst) { // 'CoilSystem:Cooling:Water:HeatExchangerAssisted'
-                SimHXAssistedCoolingCoil(CompName, FirstHVACIteration, CoilOn, constant_zero, CompIndex, ContFanCycCoil, _, _, _, QActual);
+                SimHXAssistedCoolingCoil(state, CompName, FirstHVACIteration, CoilOn, constant_zero, CompIndex, ContFanCycCoil, _, _, _, QActual);
                 if (QActual > 0.0) CoolingActive = true; // determine if coil is ON
 
             } else if (SELECT_CASE_var == WaterCoil_SimpleHeat) { // 'Coil:Heating:Water'
@@ -3612,16 +3612,16 @@ namespace SimAirServingZones {
 
                 // stand-alone coils are temperature controlled (do not pass QCoilReq in argument list, QCoilReq overrides temp SP)
             } else if (SELECT_CASE_var == Coil_ElectricHeat) { // 'Coil:Heating:Electric'
-                SimulateHeatingCoilComponents(CompName, FirstHVACIteration, _, CompIndex, QActual);
+                SimulateHeatingCoilComponents(state, CompName, FirstHVACIteration, _, CompIndex, QActual);
                 if (QActual > 0.0) HeatingActive = true; // determine if coil is ON
 
                 // stand-alone coils are temperature controlled (do not pass QCoilReq in argument list, QCoilReq overrides temp SP)
             } else if (SELECT_CASE_var == Coil_GasHeat) { // 'Coil:Heating:Fuel'
-                SimulateHeatingCoilComponents(CompName, FirstHVACIteration, _, CompIndex, QActual);
+                SimulateHeatingCoilComponents(state, CompName, FirstHVACIteration, _, CompIndex, QActual);
                 if (QActual > 0.0) HeatingActive = true; // determine if coil is ON
                 // stand-alone coils are temperature controlled (do not pass QCoilReq in argument list, QCoilReq overrides temp SP)
             } else if (SELECT_CASE_var == Coil_DeSuperHeat) { // 'Coil:Heating:Desuperheater' - heat reclaim
-                SimulateHeatingCoilComponents(CompName, FirstHVACIteration, _, CompIndex, QActual);
+                SimulateHeatingCoilComponents(state, CompName, FirstHVACIteration, _, CompIndex, QActual);
                 if (QActual > 0.0) HeatingActive = true; // determine if coil is ON
 
             } else if (SELECT_CASE_var == DXSystem) { // CoilSystem:Cooling:DX  old 'AirLoopHVAC:UnitaryCoolOnly'
@@ -3629,7 +3629,7 @@ namespace SimAirServingZones {
                 if (QActual > 0.0) CoolingActive = true; // determine if coil is ON
 
             } else if (SELECT_CASE_var == DXHeatPumpSystem) { // 'CoilSystem:Heating:DX'
-                SimDXHeatPumpSystem(CompName, FirstHVACIteration, AirLoopNum, CompIndex, _, _, QActual);
+                SimDXHeatPumpSystem(state, CompName, FirstHVACIteration, AirLoopNum, CompIndex, _, _, QActual);
                 if (QActual > 0.0) HeatingActive = true; // determine if coil is ON
 
             } else if (SELECT_CASE_var == CoilUserDefined) { // Coil:UserDefined
@@ -3657,7 +3657,7 @@ namespace SimAirServingZones {
                 SimFurnace(state, CompName, FirstHVACIteration, AirLoopNum, CompIndex);
 
             } else if (SELECT_CASE_var == UnitarySystem_BypassVAVSys) { // 'AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass'
-                SimUnitaryBypassVAV(CompName, FirstHVACIteration, AirLoopNum, CompIndex);
+                SimUnitaryBypassVAV(state, CompName, FirstHVACIteration, AirLoopNum, CompIndex);
 
             } else if (SELECT_CASE_var == UnitarySystem_MSHeatPump) { // 'AirLoopHVAC:UnitaryHeatPump:AirToAir:Multispeed'
                 SimMSHeatPump(state, CompName, FirstHVACIteration, AirLoopNum, CompIndex);
@@ -3678,7 +3678,7 @@ namespace SimAirServingZones {
                 // Heat recovery
             } else if (SELECT_CASE_var == HeatXchngr) { // 'HeatExchanger:AirToAir:FlatPlate', 'HeatExchanger:AirToAir:SensibleAndLatent'
                 // 'HeatExchanger:Desiccant:BalancedFlow'
-                SimHeatRecovery(CompName,
+                SimHeatRecovery(state, CompName,
                                 FirstHVACIteration,
                                 CompIndex,
                                 AirLoopControlInfo(AirLoopNum).FanOpMode,
@@ -7677,7 +7677,7 @@ namespace SimAirServingZones {
         return false;
     }
 
-    bool CheckWaterCoilOnOASystem(int const CompTypeNum, std::string const CompName)
+    bool CheckWaterCoilOnOASystem(AllGlobals &state, int const CompTypeNum, std::string const CompName)
     {
         // PURPOSE OF THIS FUNCTION:
         // This function returns true if a water coil that has water controller is on
@@ -7690,10 +7690,10 @@ namespace SimAirServingZones {
         using MixedAir::GetOutsideAirSysInputs;
 
         if (GetOASysInputFlag) {
-            GetOutsideAirSysInputs();
+            GetOutsideAirSysInputs(state);
             GetOASysInputFlag = false;
         }
-        int NumOASys = GetNumOASystems();
+        int NumOASys = GetNumOASystems(state);
         if (NumOASys > 0) {
             for (int OASysNum = 1; OASysNum <= NumOASys; ++OASysNum) {
                 for (int OACompNum = 1; OACompNum <= OutsideAirSys(OASysNum).NumComponents; ++OACompNum) {

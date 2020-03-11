@@ -249,7 +249,7 @@ namespace ChillerElectricEIR {
 
         void initialize(bool RunFlag, Real64 MyLoad);
 
-        void size();
+        void size(AllGlobals &state);
 
         void calculate(Real64 &MyLoad, bool RunFlag);
 

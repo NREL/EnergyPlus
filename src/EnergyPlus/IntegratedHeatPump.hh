@@ -270,7 +270,7 @@ namespace IntegratedHeatPump {
                         Real64 const LatentLoad // Latent demand load [W]
     );
 
-    IHPOperationMode GetCurWorkMode(int const DXCoilNum);
+    IHPOperationMode GetCurWorkMode(AllGlobals &state, int const DXCoilNum);
 
     int GetLowSpeedNumIHP(int const DXCoilNum);
 

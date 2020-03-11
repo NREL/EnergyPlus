@@ -233,7 +233,7 @@ namespace SingleDuct {
         {
         }
 
-        void InitSys(int const SysNum, bool const FirstHVACIteration);
+        void InitSys(AllGlobals &state, int const SysNum, bool const FirstHVACIteration);
 
         void SizeSys(int const SysNum);
 

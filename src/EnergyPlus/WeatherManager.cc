@@ -787,7 +787,7 @@ namespace WeatherManager {
         }
     }
 
-    bool GetNextEnvironment(OutputFiles &outputFiles,
+    bool GetNextEnvironment(AllGlobals &state, OutputFiles &outputFiles,
                             bool &Available,  // true if there is another environment, false if the end
                             bool &ErrorsFound // will be set to true if severe errors are found in inputs
     )
@@ -950,7 +950,7 @@ namespace WeatherManager {
             rhoAirSTP = Psychrometrics::PsyRhoAirFnPbTdbW(StdPressureSeaLevel, constant_twenty, constant_zero);
             OpenWeatherFile(ErrorsFound); // moved here because of possibility of special days on EPW file
             CloseWeatherFile();
-            ReadUserWeatherInput(outputFiles);
+            ReadUserWeatherInput(state, outputFiles);
             AllocateWeatherData();
             if (NumIntervalsPerHour != 1) {
                 if (NumIntervalsPerHour != NumOfTimeStepInHour) {

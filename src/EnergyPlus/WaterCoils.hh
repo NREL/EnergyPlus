@@ -342,7 +342,7 @@ namespace WaterCoils {
     void                                   // refactor for coil report
     CalcAdjustedCoilUA(int const CoilNum); // refactor for coil report
 
-    void SizeWaterCoil(int const CoilNum);
+    void SizeWaterCoil(AllGlobals &state, int const CoilNum);
 
     // End Initialization Section of the Module
     //******************************************************************************

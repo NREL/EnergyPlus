@@ -104,7 +104,7 @@ struct CoilCoolingDXCurveFitPerformance
     CoilCoolingDXCurveFitPerformanceInputSpecification original_input_specs;
     CoilCoolingDXCurveFitPerformance() = default;
     explicit CoilCoolingDXCurveFitPerformance(const std::string &name);
-    void size();
+    void size(AllGlobals &state);
 
     std::string name;
     Real64 crankcaseHeaterCap = 0.0;

@@ -367,7 +367,7 @@ namespace RefrigeratedCase {
 
         void ReportRackSystem(int RackNum);
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(AllGlobals &state, std::string const &objectName);
 
         void onInitLoopEquip(AllGlobals &state, const PlantLocation &calledFromLocation) override;
 
@@ -861,7 +861,7 @@ namespace RefrigeratedCase {
 
         void UpdateCondenser();
 
-        static PlantComponent *factory(std::string const &objectName);
+        static PlantComponent *factory(AllGlobals &state, std::string const &objectName);
 
         void onInitLoopEquip(AllGlobals &state, const PlantLocation &calledFromLocation) override;
 
@@ -1518,9 +1518,9 @@ namespace RefrigeratedCase {
 
     // Functions
 
-    void ManageRefrigeratedCaseRacks();
+    void ManageRefrigeratedCaseRacks(AllGlobals &state);
 
-    void GetRefrigerationInput();
+    void GetRefrigerationInput(AllGlobals &state);
 
     void SetupReportInput();
 
@@ -1532,7 +1532,7 @@ namespace RefrigeratedCase {
 
     void SimulateDetailedTransRefrigSystems();
 
-    void GetRefrigeratedRackIndex(std::string const &Name,
+    void GetRefrigeratedRackIndex(AllGlobals &state, std::string const &Name,
                                   int &IndexPtr,
                                   int SysType,
                                   bool &ErrorsFound,
@@ -1543,9 +1543,9 @@ namespace RefrigeratedCase {
 
     void SumZoneImpacts();
 
-    void CheckRefrigerationInput();
+    void CheckRefrigerationInput(AllGlobals &state);
 
-    void SimAirChillerSet(std::string const &AirChillerSetName,
+    void SimAirChillerSet(AllGlobals &state, std::string const &AirChillerSetName,
                           int ZoneNum,
                           bool FirstHVACIteration,
                           Real64 &SysOutputProvided,
@@ -1560,7 +1560,7 @@ namespace RefrigeratedCase {
                         Real64 AvailableTotalLoad // Load that system or secondary loop is able to serve [W]
     );
 
-    void FigureRefrigerationZoneGains();
+    void FigureRefrigerationZoneGains(AllGlobals &state);
 
     void ZeroHVACValues();
 

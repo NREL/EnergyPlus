@@ -373,7 +373,7 @@ namespace AirflowNetworkBalanceManager {
         UniqueAirflowNetworkSurfaceName.clear();
     }
 
-    void ManageAirflowNetworkBalance(Optional_bool_const FirstHVACIteration, // True when solution technique on first iteration
+    void ManageAirflowNetworkBalance(AllGlobals &state, Optional_bool_const FirstHVACIteration, // True when solution technique on first iteration
                                      Optional_int_const Iter,                // Iteration number
                                      Optional_bool ResimulateAirZone         // True when solution technique on third iteration
     )
@@ -405,7 +405,7 @@ namespace AirflowNetworkBalanceManager {
         int AFNSupplyFanType = 0;
 
         if (AirflowNetworkGetInputFlag) {
-            GetAirflowNetworkInput(OutputFiles::getSingleton());
+            GetAirflowNetworkInput(state, OutputFiles::getSingleton());
             AirflowNetworkGetInputFlag = false;
             return;
         }
@@ -498,7 +498,7 @@ namespace AirflowNetworkBalanceManager {
 
         if (AirflowNetworkFanActivated && SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
             if (ValidateDistributionSystemFlag) {
-                ValidateDistributionSystem();
+                ValidateDistributionSystem(state);
                 ValidateFanFlowRate();
                 ValidateDistributionSystemFlag = false;
             }
@@ -3306,7 +3306,7 @@ namespace AirflowNetworkBalanceManager {
                 IntraZoneNodeData(i).RAFNNodeName = Alphas(2); // Name of RoomAir node
                 IntraZoneNodeData(i).Height = Numbers(1);      // Nodal height
                 // verify RoomAir model node names(May be too early to check and move to another subroutine)
-                GetRAFNNodeNum(IntraZoneNodeData(i).RAFNNodeName, IntraZoneNodeData(i).ZoneNum, IntraZoneNodeData(i).RAFNNodeNum, Errorfound1);
+                GetRAFNNodeNum(state, IntraZoneNodeData(i).RAFNNodeName, IntraZoneNodeData(i).ZoneNum, IntraZoneNodeData(i).RAFNNodeNum, Errorfound1);
                 if (Errorfound1) ErrorsFound = true;
                 if (IntraZoneNodeData(i).RAFNNodeNum == 0) {
                     ShowSevereError(RoutineName + CurrentModuleObject + "='" + Alphas(1) + "' invalid name " + cAlphaFields(2) + "='" + Alphas(2));
@@ -3315,7 +3315,7 @@ namespace AirflowNetworkBalanceManager {
                 IntraZoneNodeData(i).AFNZoneNum =
                     UtilityRoutines::FindItemInList(Alphas(3), MultizoneZoneData, &MultizoneZoneProp::ZoneName, AirflowNetworkNumOfZones);
                 if (MultizoneZoneData(IntraZoneNodeData(i).AFNZoneNum).RAFNNodeNum == 0) {
-                    GetRAFNNodeNum(MultizoneZoneData(IntraZoneNodeData(i).AFNZoneNum).ZoneName,
+                    GetRAFNNodeNum(state, MultizoneZoneData(IntraZoneNodeData(i).AFNZoneNum).ZoneName,
                                    IntraZoneNodeData(i).ZoneNum,
                                    MultizoneZoneData(IntraZoneNodeData(i).AFNZoneNum).RAFNNodeNum,
                                    Errorfound1);
@@ -9629,7 +9629,7 @@ namespace AirflowNetworkBalanceManager {
             LocalError = false;
             for (j = 1; j <= NumOfNodes; ++j) { // NodeID
                 if (DisSysNodeData(i).EPlusName == NodeID(j)) {
-                    DisSysNodeData(i).AirLoopNum = GetAirLoopNumber(j);
+                    DisSysNodeData(i).AirLoopNum = GetAirLoopNumber(state, j);
                     if (DisSysNodeData(i).AirLoopNum == 0) {
                         ShowSevereError(RoutineName + "The Node or Component Name defined in " + DisSysNodeData(i).Name +
                                         " is not found in the AirLoopHVAC.");
@@ -9921,7 +9921,7 @@ namespace AirflowNetworkBalanceManager {
                     if (IsNotOK) {
                         ErrorsFound = true;
                     } else {
-                        SetHeatingCoilAirLoopNumber(DisSysCompCoilData(i).Name, DisSysCompCoilData(i).AirLoopNum, ErrorsFound);
+                        SetHeatingCoilAirLoopNumber(state, DisSysCompCoilData(i).Name, DisSysCompCoilData(i).AirLoopNum, ErrorsFound);
                     }
 
                 } else if (SELECT_CASE_var == "COIL:HEATING:ELECTRIC") {
@@ -9929,7 +9929,7 @@ namespace AirflowNetworkBalanceManager {
                     if (IsNotOK) {
                         ErrorsFound = true;
                     } else {
-                        SetHeatingCoilAirLoopNumber(DisSysCompCoilData(i).Name, DisSysCompCoilData(i).AirLoopNum, ErrorsFound);
+                        SetHeatingCoilAirLoopNumber(state, DisSysCompCoilData(i).Name, DisSysCompCoilData(i).AirLoopNum, ErrorsFound);
                     }
 
                 } else if (SELECT_CASE_var == "COIL:COOLING:WATER") {

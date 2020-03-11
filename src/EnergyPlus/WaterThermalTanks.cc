@@ -457,7 +457,7 @@ namespace WaterThermalTanks {
             IntegratedHeatPump::IntegratedHeatPumps(this->DXCoilNum).WHtankType = this->TypeNum;
             IntegratedHeatPump::IntegratedHeatPumps(this->DXCoilNum).WHtankName = this->Name;
             IntegratedHeatPump::IntegratedHeatPumps(this->DXCoilNum).WHtankID = this->WaterHeaterTankNum;
-            IntegratedHeatPump::IHPOperationMode IHPMode = IntegratedHeatPump::GetCurWorkMode(this->DXCoilNum);
+            IntegratedHeatPump::IHPOperationMode IHPMode = IntegratedHeatPump::GetCurWorkMode(state, this->DXCoilNum);
 
             if ((IntegratedHeatPump::IHPOperationMode::DWHMode == IHPMode) || (IntegratedHeatPump::IHPOperationMode::SCDWHMode == IHPMode) ||
                 (IntegratedHeatPump::IHPOperationMode::SHDWHElecHeatOffMode == IHPMode) ||
@@ -1848,7 +1848,7 @@ namespace WaterThermalTanks {
             if ((HPWH.InletAirConfiguration == AmbientTempEnum::TempZone || HPWH.InletAirConfiguration == AmbientTempEnum::ZoneAndOA) &&
                 HPWH.AmbientTempZone > 0) {
                 if (!DataZoneEquipment::ZoneEquipInputsFilled) {
-                    DataZoneEquipment::GetZoneEquipmentData();
+                    DataZoneEquipment::GetZoneEquipmentData(state);
                     DataZoneEquipment::ZoneEquipInputsFilled = true;
                 }
                 if (allocated(DataZoneEquipment::ZoneEquipConfig)) {
@@ -3990,7 +3990,7 @@ namespace WaterThermalTanks {
         static std::string const RoutineNameNoColon("GetWaterThermalTankInput");
 
         // Make sure refrigeration input is gotten before this input
-        RefrigeratedCase::CheckRefrigerationInput();
+        RefrigeratedCase::CheckRefrigerationInput(state);
 
         if (getWaterThermalTankInputFlag) {
             numWaterHeaterMixed = inputProcessor->getNumObjectsFound(cMixedWHModuleObj);
@@ -8473,7 +8473,7 @@ namespace WaterThermalTanks {
                 int SpeedNum = 1;
                 if (HeatPump.FanPlacement == DataHVACGlobals::BlowThru) {
                     if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                     } else {
                         Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                     }
@@ -8515,7 +8515,7 @@ namespace WaterThermalTanks {
                                                                   0.0,
                                                                   1.0);
                     if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                     } else {
                         Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                     }
@@ -8529,7 +8529,7 @@ namespace WaterThermalTanks {
                     {
                         if (HeatPump.FanPlacement == DataHVACGlobals::BlowThru) {
                             if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                                HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                                HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                             } else {
                                 Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                             }
@@ -8563,7 +8563,7 @@ namespace WaterThermalTanks {
                                                                       0.0,
                                                                       1.0);
                             if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                                HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                                HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                             } else {
                                 Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                             }
@@ -8574,7 +8574,7 @@ namespace WaterThermalTanks {
             } else {
                 if (HeatPump.FanPlacement == DataHVACGlobals::BlowThru) {
                     if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                     } else {
                         Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                     }
@@ -8584,7 +8584,7 @@ namespace WaterThermalTanks {
                     DXCoils::SimDXCoil(state,
                         HeatPump.DXCoilName, CompOp, FirstHVACIteration, HeatPump.DXCoilNum, DataHVACGlobals::CycFanCycCoil, hpPartLoadRatio);
                     if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                     } else {
                         Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                     }
@@ -8826,7 +8826,7 @@ namespace WaterThermalTanks {
 
                 if (HeatPump.bIsIHP) {
                     bIterSpeed = false; // don't iterate speed unless match conditions below
-                    IHPMode = IntegratedHeatPump::GetCurWorkMode(HeatPump.DXCoilNum);
+                    IHPMode = IntegratedHeatPump::GetCurWorkMode(state, HeatPump.DXCoilNum);
 
                     if (IntegratedHeatPump::IntegratedHeatPumps(HeatPump.DXCoilNum).CheckWHCall) {
                         int VSCoilNum;
@@ -9278,7 +9278,7 @@ namespace WaterThermalTanks {
                 if (HeatPump.FanPlacement == DataHVACGlobals::BlowThru) {
                     //   simulate fan and DX coil twice to pass PLF (OnOffFanPartLoadFraction) to fan
                     if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                     } else {
                         Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                     }
@@ -9298,7 +9298,7 @@ namespace WaterThermalTanks {
                                                false,
                                                1.0);
                     if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                     } else {
                         Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                     }
@@ -9335,7 +9335,7 @@ namespace WaterThermalTanks {
                                                false,
                                                1.0);
                     if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                     } else {
                         Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                     }
@@ -9355,7 +9355,7 @@ namespace WaterThermalTanks {
                                                false,
                                                1.0);
                     if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                     } else {
                         Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                     }
@@ -9365,7 +9365,7 @@ namespace WaterThermalTanks {
                 if (HeatPump.FanPlacement == DataHVACGlobals::BlowThru) {
                     //   simulate fan and DX coil twice to pass PLF (OnOffFanPartLoadFraction) to fan
                     if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                     } else {
                         Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                     }
@@ -9383,7 +9383,7 @@ namespace WaterThermalTanks {
                                                               0.0,
                                                               1.0);
                     if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                     } else {
                         Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                     }
@@ -9416,7 +9416,7 @@ namespace WaterThermalTanks {
                                                               0.0,
                                                               1.0);
                     if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                     } else {
                         Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                     }
@@ -9434,7 +9434,7 @@ namespace WaterThermalTanks {
                                                               0.0,
                                                               1.0);
                     if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                        HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                     } else {
                         Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                     }
@@ -9446,14 +9446,14 @@ namespace WaterThermalTanks {
             if (HeatPump.FanPlacement == DataHVACGlobals::BlowThru) {
                 //   simulate fan and DX coil twice to pass PLF (OnOffFanPartLoadFraction) to fan
                 if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                    HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                    HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                 } else {
                     Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                 }
                 DXCoils::SimDXCoil(state,
                     HeatPump.DXCoilName, CompOp, FirstHVACIteration, HeatPump.DXCoilNum, DataHVACGlobals::CycFanCycCoil, hpPartLoadRatio);
                 if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                    HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                    HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                 } else {
                     Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                 }
@@ -9464,14 +9464,14 @@ namespace WaterThermalTanks {
                 DXCoils::SimDXCoil(state,
                     HeatPump.DXCoilName, CompOp, FirstHVACIteration, HeatPump.DXCoilNum, DataHVACGlobals::CycFanCycCoil, hpPartLoadRatio);
                 if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                    HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                    HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                 } else {
                     Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                 }
                 DXCoils::SimDXCoil(state,
                     HeatPump.DXCoilName, CompOp, FirstHVACIteration, HeatPump.DXCoilNum, DataHVACGlobals::CycFanCycCoil, hpPartLoadRatio);
                 if (HeatPump.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                    HVACFan::fanObjs[HeatPump.FanNum]->simulate(_, _, _, _);
+                    HVACFan::fanObjs[HeatPump.FanNum]->simulate(state, _, _, _, _);
                 } else {
                     Fans::SimulateFanComponents(state, HeatPump.FanName, FirstHVACIteration, HeatPump.FanNum);
                 }
@@ -9661,7 +9661,7 @@ namespace WaterThermalTanks {
         } // system fan will use the inlet node max avail.
 
         if (HPWH.FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-            HVACFan::fanObjs[HPWH.FanNum]->simulate(_, _, _, _);
+            HVACFan::fanObjs[HPWH.FanNum]->simulate(state, _, _, _, _);
         } else {
             Fans::SimulateFanComponents(state, HPWH.FanName, FirstHVACIteration, HPWH.FanNum);
         }
@@ -11495,7 +11495,7 @@ namespace WaterThermalTanks {
                         if (HPWaterHeater(HPNum).FanPlacement == DataHVACGlobals::BlowThru) {
                             //   simulate fan and DX coil twice
                             if (HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                                HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(_, _, _, _);
+                                HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(state, _, _, _, _);
                             } else {
                                 Fans::SimulateFanComponents(state, HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
                             }
@@ -11513,7 +11513,7 @@ namespace WaterThermalTanks {
                                                                       0.0,
                                                                       1.0);
                             if (HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                                HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(_, _, _, _);
+                                HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(state, _, _, _, _);
                             } else {
                                 Fans::SimulateFanComponents(state, HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
                             }
@@ -11546,7 +11546,7 @@ namespace WaterThermalTanks {
                                                                       0.0,
                                                                       1.0);
                             if (HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                                HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(_, _, _, _);
+                                HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(state, _, _, _, _);
                             } else {
                                 Fans::SimulateFanComponents(state, HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
                             }
@@ -11564,7 +11564,7 @@ namespace WaterThermalTanks {
                                                                       0.0,
                                                                       1.0);
                             if (HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                                HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(_, _, _, _);
+                                HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(state, _, _, _, _);
                             } else {
                                 Fans::SimulateFanComponents(state, HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
                             }
@@ -11580,7 +11580,7 @@ namespace WaterThermalTanks {
                             if (FirstTimeFlag) { // first time DXCoils::DXCoil is called, it's sized at the RatedCondenserWaterInlet temp, size and
                                                  // reset water inlet temp. If already sized, no harm.
                                 if (HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                                    HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(_, _, _, _);
+                                    HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(state, _, _, _, _);
                                 } else {
                                     Fans::SimulateFanComponents(state, HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
                                 }
@@ -11591,14 +11591,14 @@ namespace WaterThermalTanks {
                             // ?? should only need to call twice if PLR<1 since this might affect OnOffFanPartLoadFraction which impacts fan energy.
                             // PLR=1 here.
                             if (HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                                HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(_, _, _, _);
+                                HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(state, _, _, _, _);
                             } else {
                                 Fans::SimulateFanComponents(state, HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
                             }
                             DXCoils::SimDXCoil(state,
                                 HPWaterHeater(HPNum).DXCoilName, 1, true, HPWaterHeater(HPNum).DXCoilNum, DataHVACGlobals::CycFanCycCoil, 1.0);
                             if (HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                                HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(_, _, _, _);
+                                HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(state, _, _, _, _);
                             } else {
                                 Fans::SimulateFanComponents(state, HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
                             }
@@ -11616,14 +11616,14 @@ namespace WaterThermalTanks {
                             DXCoils::SimDXCoil(state,
                                 HPWaterHeater(HPNum).DXCoilName, 1, true, HPWaterHeater(HPNum).DXCoilNum, DataHVACGlobals::CycFanCycCoil, 1.0);
                             if (HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                                HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(_, _, _, _);
+                                HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(state, _, _, _, _);
                             } else {
                                 Fans::SimulateFanComponents(state, HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
                             }
                             DXCoils::SimDXCoil(state,
                                 HPWaterHeater(HPNum).DXCoilName, 1, true, HPWaterHeater(HPNum).DXCoilNum, DataHVACGlobals::CycFanCycCoil, 1.0);
                             if (HPWaterHeater(HPNum).FanType_Num == DataHVACGlobals::FanType_SystemModelObject) {
-                                HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(_, _, _, _);
+                                HVACFan::fanObjs[HPWaterHeater(HPNum).FanNum]->simulate(state, _, _, _, _);
                             } else {
                                 Fans::SimulateFanComponents(state, HPWaterHeater(HPNum).FanName, true, HPWaterHeater(HPNum).FanNum);
                             }

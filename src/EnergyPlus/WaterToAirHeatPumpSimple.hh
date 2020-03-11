@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 
 namespace EnergyPlus {
 
@@ -258,7 +259,7 @@ namespace WaterToAirHeatPumpSimple {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitSimpleWatertoAirHP(int const HPNum,                    // Current HPNum under simulation
+    void InitSimpleWatertoAirHP(AllGlobals &state, int const HPNum,                    // Current HPNum under simulation
                                 Real64 const MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
                                 Real64 const HPTimeConstant,        // Heat pump time constant [s]
                                 Real64 const FanDelayTime,          // Fan delay time, time delay for the HP's fan to
@@ -269,7 +270,7 @@ namespace WaterToAirHeatPumpSimple {
                                 bool const FirstHVACIteration       // Iteration flag
     );
 
-    void SizeHVACWaterToAir(int const HPNum);
+    void SizeHVACWaterToAir(AllGlobals &state, int const HPNum);
 
     void CalcHPCoolingSimple(int const HPNum,               // Heat Pump Number
                              int const CyclingScheme,       // Fan/Compressor cycling scheme indicator

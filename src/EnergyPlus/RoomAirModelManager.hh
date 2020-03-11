@@ -50,6 +50,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 
 namespace EnergyPlus {
 
@@ -73,11 +74,11 @@ namespace RoomAirModelManager {
 
     void clear_state();
 
-    void ManageAirModel(int &ZoneNum);
+    void ManageAirModel(AllGlobals &state, int &ZoneNum);
 
     //*****************************************************************************************
 
-    void GetAirModelDatas();
+    void GetAirModelDatas(AllGlobals &state);
 
     void GetUserDefinedPatternData(bool &ErrorsFound); // True if errors found during this get input routine
 
@@ -95,14 +96,14 @@ namespace RoomAirModelManager {
 
     void SharedDVCVUFDataInit(int &ZoneNum);
 
-    void GetRoomAirflowNetworkData(bool &ErrorsFound); // True if errors found during this get input routine
+    void GetRoomAirflowNetworkData(AllGlobals &state, bool &ErrorsFound); // True if errors found during this get input routine
 
-    void GetRAFNNodeNum(std::string const &RAFNNodeName,
+    void GetRAFNNodeNum(AllGlobals &state, std::string const &RAFNNodeName,
                         int &ZoneNum,
                         int &RAFNNodeNum,
                         bool &Errorfound); // find zone number and node number based on the node name
 
-    bool CheckEquipName(std::string const &EquipType, // Equipment type
+    bool CheckEquipName(AllGlobals &state, std::string const &EquipType, // Equipment type
                         std::string const &EquipName, // Equipment Name
                         std::string &SupplyNodeName,  // Supply node name
                         std::string &ReturnNodeName,  // Return node name

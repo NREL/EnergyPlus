@@ -173,7 +173,7 @@ namespace SteamCoils {
         CheckEquipName.deallocate();
     }
 
-    void SimulateSteamCoilComponents(std::string const &CompName,
+    void SimulateSteamCoilComponents(AllGlobals &state, std::string const &CompName,
                                      bool const FirstHVACIteration,
                                      int &CompIndex,
                                      Optional<Real64 const> QCoilReq, // coil load to be met
@@ -230,7 +230,7 @@ namespace SteamCoils {
         }
 
         // With the correct CoilNum Initialize
-        InitSteamCoil(CoilNum, FirstHVACIteration); // Initialize all SteamCoil related parameters
+        InitSteamCoil(state, CoilNum, FirstHVACIteration); // Initialize all SteamCoil related parameters
 
         if (present(FanOpMode)) {
             OpMode = FanOpMode;
@@ -780,10 +780,10 @@ namespace SteamCoils {
                         SizingString = "";
                         bPRINT = false;
                         TempSize = AutoSize;
-                        RequestSizing(CompType, CompName, HeatingCoilDesAirInletTempSizing, SizingString, TempSize, bPRINT, RoutineName);
+                        RequestSizing(state, CompType, CompName, HeatingCoilDesAirInletTempSizing, SizingString, TempSize, bPRINT, RoutineName);
                         DataDesInletAirTemp = TempSize;
                         TempSize = AutoSize;
-                        RequestSizing(CompType, CompName, HeatingCoilDesAirOutletTempSizing, SizingString, TempSize, bPRINT, RoutineName);
+                        RequestSizing(state, CompType, CompName, HeatingCoilDesAirOutletTempSizing, SizingString, TempSize, bPRINT, RoutineName);
                         DataDesOutletAirTemp = TempSize;
                         if (CurOASysNum > 0) {
                             OASysEqSizing(CurOASysNum).AirFlow = true;
@@ -810,7 +810,7 @@ namespace SteamCoils {
                     if (DataDesicRegCoil) {
                         bPRINT = false;
                         TempSize = AutoSize;
-                        RequestSizing(CompType, CompName, HeatingAirflowSizing, SizingString, TempSize, bPRINT, RoutineName);
+                        RequestSizing(state, CompType, CompName, HeatingAirflowSizing, SizingString, TempSize, bPRINT, RoutineName);
                         DesVolFlow = TempSize;
                     }
                     DesMassFlow = RhoAirStd * DesVolFlow;

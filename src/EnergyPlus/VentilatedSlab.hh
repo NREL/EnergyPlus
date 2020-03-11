@@ -343,7 +343,7 @@ namespace VentilatedSlab {
 
     void clear_state();
 
-    void SimVentilatedSlab(std::string const &CompName,   // name of the fan coil unit
+    void SimVentilatedSlab(AllGlobals &state, std::string const &CompName,   // name of the fan coil unit
                            int const ZoneNum,             // number of zone being served
                            bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                            Real64 &PowerMet,              // Sensible power supplied (W)
@@ -357,7 +357,7 @@ namespace VentilatedSlab {
                             bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     );
 
-    void SizeVentilatedSlab(int const Item);
+    void SizeVentilatedSlab(AllGlobals &state, int const Item);
 
     void CalcVentilatedSlab(AllGlobals &state, int &Item,                     // number of the current ventilated slab being simulated
                             int const ZoneNum,             // number of zone being served
@@ -366,7 +366,7 @@ namespace VentilatedSlab {
                             Real64 &LatOutputProvided      // latent capacity supplied (kg/s)
     );
 
-    void CalcVentilatedSlabComps(int const Item,                // system index in ventilated slab array
+    void CalcVentilatedSlabComps(AllGlobals &state, int const Item,                // system index in ventilated slab array
                                  bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
                                  Real64 &LoadMet                // load met by the system (watts)
     );

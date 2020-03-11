@@ -264,7 +264,7 @@ int initializeEnergyPlus(AllGlobals &state, std::string const & filepath) {
 
     DataStringGlobals::VerString += "," + DataStringGlobals::CurrentDateTime;
 
-    DataSystemVariables::processEnvironmentVariables();
+    DataSystemVariables::processEnvironmentVariables(state);
 
     if (!filepath.empty()) {
         // if filepath is not empty, then we are using E+ as a library API call
@@ -315,7 +315,7 @@ int initializeEnergyPlus(AllGlobals &state, std::string const & filepath) {
     return 0;
 }
 
-int initializeAsLibrary() {
+int initializeAsLibrary(AllGlobals &state) {
     using namespace EnergyPlus;
 
     // Disable C++ i/o synching with C methods for speed
@@ -350,7 +350,7 @@ int initializeAsLibrary() {
 
     DataStringGlobals::VerString += "," + DataStringGlobals::CurrentDateTime;
 
-    DataSystemVariables::processEnvironmentVariables();
+    DataSystemVariables::processEnvironmentVariables(state);
 
     int errStatus = initErrorFile();
     if (errStatus) {
@@ -463,7 +463,7 @@ int runEnergyPlusAsLibrary(int argc, const char *argv[])
 
     EnergyPlus::CommandLineInterface::ProcessArgs(state, argc, argv );
 
-    int status = initializeAsLibrary();
+    int status = initializeAsLibrary(state);
     if (status) return status;
     try {
         EnergyPlus::SimulationManager::ManageSimulation(state, EnergyPlus::OutputFiles::getSingleton());

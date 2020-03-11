@@ -152,7 +152,7 @@ namespace SimAirServingZones {
     void SolveAirLoopControllers(AllGlobals &state, 
         bool const FirstHVACIteration, int const AirLoopNum, bool &AirLoopConvergedFlag, int &IterMax, int &IterTot, int &NumCalls);
 
-    void SolveWaterCoilController(bool const FirstHVACIteration,
+    void SolveWaterCoilController(AllGlobals &state, bool const FirstHVACIteration,
                                   int const AirLoopNum,
                                   std::string const &CompName,
                                   int &CompIndex,

@@ -336,7 +336,7 @@ namespace HeatBalanceManager {
 
         // Get the heat balance input at the beginning of the simulation only
         if (ManageHeatBalanceGetInputFlag) {
-            GetHeatBalanceInput(); // Obtains heat balance related parameters from input file
+            GetHeatBalanceInput(state); // Obtains heat balance related parameters from input file
             HeatBalanceIntRadExchange::InitSolarViewFactors(outputFiles);
 
             // Surface octree setup
@@ -368,7 +368,7 @@ namespace HeatBalanceManager {
         // may be a radiant system in the building which will require iteration between
         // the HVAC system (called from the Air Heat Balance) and the zone (simulated
         // in the Surface Heat Balance Manager).  In the future, this may be improved.
-        ManageSurfaceHeatBalance();
+        ManageSurfaceHeatBalance(state);
         ManageEMS(emsCallFromEndZoneTimestepBeforeZoneReporting, anyRan); // EMS calling point
         RecKeepHeatBalance(outputFiles);                                             // Do any heat balance related record keeping
 
@@ -4598,7 +4598,7 @@ namespace HeatBalanceManager {
         } // End of ConstrNum DO loop
     }
 
-    void GetBuildingData(bool &ErrorsFound) // If errors found in input
+    void GetBuildingData(AllGlobals &state, bool &ErrorsFound) // If errors found in input
     {
 
         // SUBROUTINE INFORMATION:
@@ -4636,7 +4636,7 @@ namespace HeatBalanceManager {
 
         GetZoneData(ErrorsFound); // Read Zone data from input file
 
-        SetupZoneGeometry(OutputFiles::getSingleton(), ErrorsFound);
+        SetupZoneGeometry(state, OutputFiles::getSingleton(), ErrorsFound);
     }
 
     void GetZoneData(bool &ErrorsFound) // If errors found in input

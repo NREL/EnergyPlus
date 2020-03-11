@@ -6642,7 +6642,7 @@ namespace DXCoils {
         }
     }
 
-    void SizeDXCoil(int const DXCoilNum)
+    void SizeDXCoil(AllGlobals &state, int const DXCoilNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -6824,7 +6824,7 @@ namespace DXCoils {
                         DataConstantUsedForSizing = DXCoil(DXCoilNum).RatedTotCap2;
                         DataFractionUsedForSizing = 0.00005035;
                         TempSize = AutoSize;
-                        RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                         DXCoil(DXCoilNum).RatedAirVolFlowRate(1) = TempSize;
                         PrintFlag = false;
                         DataConstantUsedForSizing = 0.0;
@@ -6843,7 +6843,7 @@ namespace DXCoils {
                         DataConstantUsedForSizing = DXCoil(DXCoilNum).RatedTotCap2;
                         DataFractionUsedForSizing = 0.00000004487;
                         TempSize = AutoSize;
-                        RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                         DXCoil(DXCoilNum).RatedHPWHCondWaterFlow = TempSize;
                         PrintFlag = false;
                         DataConstantUsedForSizing = 0.0;
@@ -6907,7 +6907,7 @@ namespace DXCoils {
                     DataIsDXCoil = true;
                     DataEMSOverrideON = DXCoil(DXCoilNum).RatedAirVolFlowRateEMSOverrideON(Mode);
                     DataEMSOverride = DXCoil(DXCoilNum).RatedAirVolFlowRateEMSOverrideValue(Mode);
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     DXCoil(DXCoilNum).RatedAirVolFlowRate(Mode) = TempSize;
                     DataIsDXCoil = false;
                     DataEMSOverrideON = false;
@@ -7019,7 +7019,7 @@ namespace DXCoils {
                 DataIsDXCoil = true;
                 DataEMSOverrideON = DXCoil(DXCoilNum).RatedTotCapEMSOverrideOn(Mode);
                 DataEMSOverride = DXCoil(DXCoilNum).RatedTotCapEMSOverrideValue(Mode);
-                RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                 DXCoil(DXCoilNum).RatedTotCap(Mode) = TempSize;
                 DataIsDXCoil = false;
                 DataFlowUsedForSizing = 0.0;
@@ -7057,7 +7057,7 @@ namespace DXCoils {
                     DataCapacityUsedForSizing = DXCoil(DXCoilNum).RatedTotCap(Mode);
                     DataEMSOverrideON = DXCoil(DXCoilNum).RatedSHREMSOverrideOn(Mode);
                     DataEMSOverride = DXCoil(DXCoilNum).RatedSHREMSOverrideValue(Mode);
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
                     DXCoil(DXCoilNum).RatedSHR(Mode) = TempSize;
                     DataFlowUsedForSizing = 0.0;
                     DataCapacityUsedForSizing = 0.0;
@@ -7086,7 +7086,7 @@ namespace DXCoils {
                     DataConstantUsedForSizing = DXCoil(DXCoilNum).RatedTotCap(Mode);
                     DataFractionUsedForSizing = 0.000114;
                     TempSize = DXCoil(DXCoilNum).EvapCondAirFlow(Mode);
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
                     DXCoil(DXCoilNum).EvapCondAirFlow(Mode) = TempSize;
                     DataConstantUsedForSizing = 0.0;
                     DataFractionUsedForSizing = 0.0;
@@ -7143,7 +7143,7 @@ namespace DXCoils {
                     DataConstantUsedForSizing = DXCoil(DXCoilNum).RatedTotCap(Mode);
                     DataFractionUsedForSizing = 0.000114 * 0.3333;
                     TempSize = DXCoil(DXCoilNum).EvapCondAirFlow2;
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     DXCoil(DXCoilNum).EvapCondAirFlow2 = TempSize;
                     DataConstantUsedForSizing = 0.0;
                     DataFractionUsedForSizing = 0.0;
@@ -7169,7 +7169,7 @@ namespace DXCoils {
                     DataConstantUsedForSizing = DXCoil(DXCoilNum).RatedTotCap(Mode);
                     DataFractionUsedForSizing = 0.004266;
                     TempSize = DXCoil(DXCoilNum).EvapCondPumpElecNomPower(Mode);
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     DXCoil(DXCoilNum).EvapCondPumpElecNomPower(Mode) = TempSize;
                     DataConstantUsedForSizing = 0.0;
                     DataFractionUsedForSizing = 0.0;
@@ -7187,7 +7187,7 @@ namespace DXCoils {
                     DataConstantUsedForSizing = DXCoil(DXCoilNum).RatedTotCap(Mode);
                     DataFractionUsedForSizing = 0.004266 * 0.3333;
                     TempSize = DXCoil(DXCoilNum).EvapCondPumpElecNomPower2;
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     DXCoil(DXCoilNum).EvapCondPumpElecNomPower2 = TempSize;
                     DataConstantUsedForSizing = 0.0;
                     DataFractionUsedForSizing = 0.0;
@@ -7204,7 +7204,7 @@ namespace DXCoils {
                     DataConstantUsedForSizing = DXCoil(DXCoilNum).RatedAirVolFlowRate(Mode);
                     DataFractionUsedForSizing = 0.3333;
                     TempSize = DXCoil(DXCoilNum).RatedAirVolFlowRate2;
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     DXCoil(DXCoilNum).RatedAirVolFlowRate2 = TempSize;
                     DataConstantUsedForSizing = 0.0;
                     DataFractionUsedForSizing = 0.0;
@@ -7221,7 +7221,7 @@ namespace DXCoils {
                     DataConstantUsedForSizing = DXCoil(DXCoilNum).RatedTotCap(Mode);
                     DataFractionUsedForSizing = 0.3333;
                     TempSize = DXCoil(DXCoilNum).RatedTotCap2;
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     DXCoil(DXCoilNum).RatedTotCap2 = TempSize;
                     DataConstantUsedForSizing = 0.0;
                     DataFractionUsedForSizing = 0.0;
@@ -7274,7 +7274,7 @@ namespace DXCoils {
                     DataConstantUsedForSizing = DXCoil(DXCoilNum).RatedSHR(Mode);
                     DataFractionUsedForSizing = 1.0;
                     TempSize = DXCoil(DXCoilNum).RatedSHR2;
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     DXCoil(DXCoilNum).RatedSHR2 = TempSize;
                     DataConstantUsedForSizing = 0.0;
                     DataFractionUsedForSizing = 0.0;
@@ -7295,7 +7295,7 @@ namespace DXCoils {
                         DataConstantUsedForSizing = DXCoolCap;
                         DataFractionUsedForSizing = 1.0;
                         TempSize = DXCoil(DXCoilNum).DefrostCapacity;
-                        RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                         DXCoil(DXCoilNum).DefrostCapacity = TempSize;
                         DataConstantUsedForSizing = 0.0;
                         DataFractionUsedForSizing = 0.0;
@@ -7326,14 +7326,14 @@ namespace DXCoils {
                     TempSize = DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode);
                     DataEMSOverrideON = DXCoil(DXCoilNum).RatedAirVolFlowRateEMSOverrideON(Mode);
                     DataEMSOverride = DXCoil(DXCoilNum).RatedAirVolFlowRateEMSOverrideValue(Mode);
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) = TempSize;
                     DataEMSOverrideON = false;
                     DataEMSOverride = 0.0;
                     if ( !IsAutoSize && !HardSizeNoDesRun) {
                         TempSize = AutoSize;
                         bPRINT = false;
-                        RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
+                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
                         MSRatedAirVolFlowRateDes = TempSize;
                         bPRINT = true;
                     } 
@@ -7354,7 +7354,7 @@ namespace DXCoils {
                     TempSize = DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode );
                     DataEMSOverrideON = DXCoil(DXCoilNum).RatedAirVolFlowRateEMSOverrideON(Mode);
                     DataEMSOverride = DXCoil(DXCoilNum).RatedAirVolFlowRateEMSOverrideValue(Mode);
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
                     DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) = TempSize;
                 }
                 DataEMSOverride = 0.0;
@@ -7399,7 +7399,7 @@ namespace DXCoils {
                         PrintFlag = false;
                         TempSize = DataSizing::AutoSize;
                         // Auto size capacity at the highest speed
-                        RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
                         SizingMethod = AutoCalculateSizing;
                         DataConstantUsedForSizing = TempSize;
                         DataFractionUsedForSizing = 1.0;
@@ -7408,7 +7408,7 @@ namespace DXCoils {
                         PrintFlag = true;
                     }
                     TempSize = DXCoil( DXCoilNum ).MSRatedTotCap( Mode );
-                    RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
                     DXCoil( DXCoilNum ).MSRatedTotCap( Mode ) = TempSize;
                     if (IsAutoSize) {
                         MSRatedTotCapDesAtMaxSpeed = TempSize;
@@ -7434,7 +7434,7 @@ namespace DXCoils {
                     TempSize = DXCoil(DXCoilNum).MSRatedTotCap(Mode);
                     DataEMSOverrideON = DXCoil(DXCoilNum).RatedTotCapEMSOverrideOn(Mode);
                     DataEMSOverride = DXCoil(DXCoilNum).RatedTotCapEMSOverrideValue(Mode);
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     DXCoil(DXCoilNum).MSRatedTotCap(Mode) = TempSize;
                 }
                 DataEMSOverride = 0.0;
@@ -7474,7 +7474,7 @@ namespace DXCoils {
                     DataCapacityUsedForSizing = MSRatedTotCapDesAtMaxSpeed;
                     DataEMSOverrideON = DXCoil(DXCoilNum).RatedSHREMSOverrideOn(Mode);
                     DataEMSOverride = DXCoil(DXCoilNum).RatedSHREMSOverrideValue(Mode);
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
                     DXCoil(DXCoilNum).MSRatedSHR(Mode) = TempSize;
                     // added for rated sensible cooling capacity estimate for html reporting, issue #7381
                     DXCoil(DXCoilNum).RatedSHR(1) = DXCoil(DXCoilNum).MSRatedSHR(Mode);
@@ -7669,12 +7669,12 @@ namespace DXCoils {
                     TempSize = DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode);
                     DataEMSOverrideON = DXCoil(DXCoilNum).RatedAirVolFlowRateEMSOverrideON(Mode);
                     DataEMSOverride = DXCoil(DXCoilNum).RatedAirVolFlowRateEMSOverrideValue(Mode);
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) = TempSize;
                     if ( !IsAutoSize && !HardSizeNoDesRun ) {
                         TempSize = AutoSize;
                         bPRINT = false;
-                        RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
+                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
                         MSRatedAirVolFlowRateDes = TempSize;
                         bPRINT = true;
                     } 
@@ -7690,7 +7690,7 @@ namespace DXCoils {
                         DataFractionUsedForSizing = (float)Mode / DXCoil(DXCoilNum).NumOfSpeeds;                        
                     }
                     TempSize = DXCoil( DXCoilNum ).MSRatedAirVolFlowRate( Mode );
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, bPRINT, RoutineName);
                     DXCoil(DXCoilNum).MSRatedAirVolFlowRate(Mode) = TempSize;
                 }
                 DataEMSOverride = 0.0;
@@ -7781,7 +7781,7 @@ namespace DXCoils {
                         TempSize = DataSizing::AutoSize;
                         DataEMSOverrideON = DXCoil(DXCoilNum).RatedTotCapEMSOverrideOn(Mode);
                         DataEMSOverride = DXCoil(DXCoilNum).RatedTotCapEMSOverrideValue(Mode);
-                        RequestSizing( CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
+                        RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName );
                         MSRatedTotCapDesAtMaxSpeed = TempSize;
                         SizingMethod = AutoCalculateSizing;
                         DataConstantUsedForSizing = TempSize;
@@ -7791,7 +7791,7 @@ namespace DXCoils {
                     TempSize = DXCoil(DXCoilNum).MSRatedTotCap(Mode);
                     DataEMSOverrideON = DXCoil(DXCoilNum).RatedTotCapEMSOverrideOn(Mode);
                     DataEMSOverride = DXCoil(DXCoilNum).RatedTotCapEMSOverrideValue(Mode);
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     DXCoil(DXCoilNum).MSRatedTotCap(Mode) = TempSize;
                     if (IsAutoSize) {
                         MSRatedTotCapDesAtMaxSpeed = TempSize;
@@ -7814,7 +7814,7 @@ namespace DXCoils {
                     TempSize = DXCoil(DXCoilNum).MSRatedTotCap(Mode);
                     DataEMSOverrideON = DXCoil(DXCoilNum).RatedTotCapEMSOverrideOn(Mode);
                     DataEMSOverride = DXCoil(DXCoilNum).RatedTotCapEMSOverrideValue(Mode);
-                    RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                    RequestSizing(state, CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                     DXCoil(DXCoilNum).MSRatedTotCap(Mode) = TempSize;
                 }
                 PrintFlag = false;
@@ -13572,7 +13572,7 @@ namespace DXCoils {
                     PsyWFnTdbTwbPb(CoolingCoilInletAirDryBulbTempRated, CoolingCoilInletAirWetBulbTempRated, OutBaroPress, RoutineName);
                 Node(FanInletNode).Enthalpy = PsyHFnTdbW(CoolingCoilInletAirDryBulbTempRated, Node(FanInletNode).HumRat);
                 if (DXCoil(DXCoilNum).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
-                    HVACFan::fanObjs[DXCoil(DXCoilNum).SupplyFanIndex]->simulate(_, true, false, FanStaticPressureRise);
+                    HVACFan::fanObjs[DXCoil(DXCoilNum).SupplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
                     FanPowerCorrection = HVACFan::fanObjs[DXCoil(DXCoilNum).SupplyFanIndex]->fanPower();
                 } else {
                     Fans::SimulateFanComponents(state,
@@ -13712,7 +13712,7 @@ namespace DXCoils {
                     Node(FanInletNode).Enthalpy = PsyHFnTdbW(CoolingCoilInletAirDryBulbTempRated, SupplyAirHumRat);
 
                     if (DXCoil(DXCoilNum).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
-                        HVACFan::fanObjs[DXCoil(DXCoilNum).SupplyFanIndex]->simulate(_, true, false, FanStaticPressureRise);
+                        HVACFan::fanObjs[DXCoil(DXCoilNum).SupplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
                         FanPowerCorrection = HVACFan::fanObjs[DXCoil(DXCoilNum).SupplyFanIndex]->fanPower();
                     } else {
                         Fans::SimulateFanComponents(state,
@@ -14057,7 +14057,7 @@ namespace DXCoils {
             Node(FanInletNodeNum).HumRat = PsyWFnTdbTwbPb(IndoorUnitInletDryBulb, IndoorUnitInletWetBulb, OutBaroPress, RoutineName);
             Node(FanInletNodeNum).Enthalpy = PsyHFnTdbW(IndoorUnitInletDryBulb, Node(FanInletNodeNum).HumRat);
             if (DXCoil(DXCoilNum).SupplyFan_TypeNum == DataHVACGlobals::FanType_SystemModelObject) {
-                HVACFan::fanObjs[DXCoil(DXCoilNum).SupplyFanIndex]->simulate(_, true, false, FanStaticPressureRise);
+                HVACFan::fanObjs[DXCoil(DXCoilNum).SupplyFanIndex]->simulate(state, _, true, false, FanStaticPressureRise);
             } else {
                 Fans::SimulateFanComponents(state,
                     DXCoil(DXCoilNum).SupplyFanName, true, DXCoil(DXCoilNum).SupplyFanIndex, _, true, false, FanStaticPressureRise);

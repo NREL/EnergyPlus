@@ -75,6 +75,7 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/OutdoorAirUnit.hh>
@@ -4496,16 +4497,16 @@ namespace SystemReports {
                     // case statement to cover all possible zone forced air units that could have outside air
 
                     if (SELECT_CASE_var == WindowAC_Num) { // Window Air Conditioner
-                        OutAirNode = GetWindowACOutAirNode(ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                        OutAirNode = GetWindowACOutAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
 
                         ZoneInletAirNode =
-                            GetWindowACZoneInletAirNode(ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetWindowACZoneInletAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
                         MixedAirNode =
-                            GetWindowACMixedAirNode(ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetWindowACMixedAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         ReturnAirNode =
-                            GetWindowACReturnAirNode(ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetWindowACReturnAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if ((MixedAirNode > 0) && (ReturnAirNode > 0)) {
                             ZFAUEnthMixedAir = PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
                             ZFAUEnthReturnAir = PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
@@ -4559,16 +4560,16 @@ namespace SystemReports {
                         }
 
                     } else if (SELECT_CASE_var == FanCoil4Pipe_Num) {
-                        OutAirNode = GetFanCoilOutAirNode(ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                        OutAirNode = GetFanCoilOutAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
 
                         ZoneInletAirNode =
                             GetFanCoilZoneInletAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
                         MixedAirNode =
-                            GetFanCoilMixedAirNode(ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetFanCoilMixedAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         ReturnAirNode =
-                            GetFanCoilReturnAirNode(ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetFanCoilReturnAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if ((MixedAirNode > 0) && (ReturnAirNode > 0)) {
                             ZFAUEnthMixedAir = PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
                             ZFAUEnthReturnAir = PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);
@@ -4622,15 +4623,15 @@ namespace SystemReports {
 
                     } else if (SELECT_CASE_var == ERVStandAlone_Num) {
                         OutAirNode =
-                            GetStandAloneERVOutAirNode(ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetStandAloneERVOutAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if (OutAirNode > 0) ZFAUOutAirFlow += Node(OutAirNode).MassFlowRate;
 
                         ZoneInletAirNode =
-                            GetStandAloneERVZoneInletAirNode(ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetStandAloneERVZoneInletAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if (ZoneInletAirNode > 0) ZFAUFlowRate = max(Node(ZoneInletAirNode).MassFlowRate, 0.0);
                         MixedAirNode = ZoneInletAirNode;
                         ReturnAirNode =
-                            GetStandAloneERVReturnAirNode(ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
+                            GetStandAloneERVReturnAirNode(state, ZoneEquipList(ZoneEquipConfig(CtrlZoneNum).EquipListIndex).EquipIndex(thisZoneEquipNum));
                         if ((MixedAirNode > 0) && (ReturnAirNode > 0)) {
                             ZFAUEnthMixedAir = PsyHFnTdbW(Node(MixedAirNode).Temp, Node(MixedAirNode).HumRat);
                             ZFAUEnthReturnAir = PsyHFnTdbW(Node(ReturnAirNode).Temp, Node(ReturnAirNode).HumRat);

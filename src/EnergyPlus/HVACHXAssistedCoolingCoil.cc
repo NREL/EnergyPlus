@@ -60,6 +60,7 @@
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HeatRecovery.hh>
@@ -164,7 +165,7 @@ namespace HVACHXAssistedCoolingCoil {
         CheckEquipName.deallocate();
     }
 
-    void SimHXAssistedCoolingCoil(std::string const &HXAssistedCoilName, // Name of HXAssistedCoolingCoil
+    void SimHXAssistedCoolingCoil(AllGlobals &state, std::string const &HXAssistedCoilName, // Name of HXAssistedCoolingCoil
                                   bool const FirstHVACIteration,         // FirstHVACIteration flag
                                   int const CompOp,                      // compressor operation; 1=on, 0=off
                                   Real64 const PartLoadRatio,            // Part load ratio of Coil:DX:CoolingBypassFactorEmpirical
@@ -251,7 +252,7 @@ namespace HVACHXAssistedCoolingCoil {
         } else {
             AirFlowRatio = 1.0;
         }
-        CalcHXAssistedCoolingCoil(HXAssistedCoilNum, FirstHVACIteration, CompOp, PartLoadRatio, HXUnitOn, FanOpMode, AirFlowRatio, EconomizerFlag);
+        CalcHXAssistedCoolingCoil(state, HXAssistedCoilNum, FirstHVACIteration, CompOp, PartLoadRatio, HXUnitOn, FanOpMode, AirFlowRatio, EconomizerFlag);
 
         // Update the current HXAssistedCoil output
         //  Call UpdateHXAssistedCoolingCoil(HXAssistedCoilNum), not required. Updates done by the HX and cooling coil components.
@@ -940,7 +941,7 @@ namespace HVACHXAssistedCoolingCoil {
         // Force at least 2 iterations to pass outlet node information
         while ((std::abs(Error) > 0.0005 && Iter <= MaxIter) || Iter < 2) {
 
-            SimHeatRecovery(HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName,
+            SimHeatRecovery(state, HXAssistedCoil(HXAssistedCoilNum).HeatExchangerName,
                             FirstHVACIteration,
                             HXAssistedCoil(HXAssistedCoilNum).HeatExchangerIndex,
                             FanOpMode,

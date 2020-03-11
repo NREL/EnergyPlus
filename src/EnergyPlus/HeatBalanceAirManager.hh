@@ -50,6 +50,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 
 namespace EnergyPlus {
     class OutputFiles;
@@ -107,7 +108,7 @@ namespace HeatBalanceAirManager {
     // Begin Algorithm Section of the Module
     //******************************************************************************
 
-    void CalcHeatBalanceAir();
+    void CalcHeatBalanceAir(AllGlobals &state);
 
     // END Algorithm Section of the Module
 

@@ -181,9 +181,9 @@ namespace SteamBaseboardRadiator {
 
     void GetSteamBaseboardInput();
 
-    void InitSteamBaseboard(int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration);
+    void InitSteamBaseboard(AllGlobals &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration);
 
-    void SizeSteamBaseboard(int const BaseboardNum);
+    void SizeSteamBaseboard(AllGlobals &state, int const BaseboardNum);
 
     void CalcSteamBaseboard(int &BaseboardNum, Real64 &LoadMet);
 

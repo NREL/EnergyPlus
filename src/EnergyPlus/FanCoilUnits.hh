@@ -352,13 +352,13 @@ namespace FanCoilUnits {
                           Optional<Real64> PLR = _       // Part Load Ratio, fraction of time step fancoil is on
     );
 
-    void SimMultiStage4PipeFanCoil(int &FanCoilNum,               // number of the current fan coil unit being simulated
+    void SimMultiStage4PipeFanCoil(AllGlobals &state, int &FanCoilNum,               // number of the current fan coil unit being simulated
                                    int const ControlledZoneNum,   // index into ZoneEqupConfig
                                    bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                    Real64 &PowerMet               // Sensible power supplied (W)
     );
 
-    void CalcMultiStage4PipeFanCoil(int &FanCoilNum,               // number of the current fan coil unit being simulated
+    void CalcMultiStage4PipeFanCoil(AllGlobals &state, int &FanCoilNum,               // number of the current fan coil unit being simulated
                                     int const ZoneNum,             // number of zone being served
                                     bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                     Real64 const QZnReq,           // current zone cooling or heating load
@@ -371,56 +371,56 @@ namespace FanCoilUnits {
 
     int GetFanCoilZoneInletAirNode(AllGlobals &state, int const FanCoilNum);
 
-    int GetFanCoilOutAirNode(int const FanCoilNum);
+    int GetFanCoilOutAirNode(AllGlobals &state, int const FanCoilNum);
 
-    int GetFanCoilReturnAirNode(int const FanCoilNum);
+    int GetFanCoilReturnAirNode(AllGlobals &state, int const FanCoilNum);
 
-    int GetFanCoilMixedAirNode(int const FanCoilNum);
+    int GetFanCoilMixedAirNode(AllGlobals &state, int const FanCoilNum);
 
-    int GetFanCoilInletAirNode(int const FanCoilNum);
+    int GetFanCoilInletAirNode(AllGlobals &state, int const FanCoilNum);
 
-    void GetFanCoilIndex(std::string const &FanCoilName, int &FanCoilIndex);
+    void GetFanCoilIndex(AllGlobals &state, std::string const &FanCoilName, int &FanCoilIndex);
 
-    Real64 CalcFanCoilLoadResidual(Real64 const PartLoadRatio, // DX cooling coil part load ratio
+    Real64 CalcFanCoilLoadResidual(AllGlobals &state, Real64 const PartLoadRatio, // DX cooling coil part load ratio
                                    Array1<Real64> const &Par   // Function parameters
     );
 
-    Real64 CalcFanCoilPLRResidual(Real64 const PLR,         // part-load ratio of air and water mass flow rate
+    Real64 CalcFanCoilPLRResidual(AllGlobals &state, Real64 const PLR,         // part-load ratio of air and water mass flow rate
                                   Array1<Real64> const &Par // Function parameters
     );
 
-    Real64 CalcFanCoilHWLoadResidual(Real64 const HWFlow,      // water mass flow rate [kg/s]
+    Real64 CalcFanCoilHWLoadResidual(AllGlobals &state, Real64 const HWFlow,      // water mass flow rate [kg/s]
                                      Array1<Real64> const &Par // Function parameters
     );
 
-    Real64 CalcFanCoilCWLoadResidual(Real64 const CWFlow,      // water mass flow rate [kg/s]
+    Real64 CalcFanCoilCWLoadResidual(AllGlobals &state, Real64 const CWFlow,      // water mass flow rate [kg/s]
                                      Array1<Real64> const &Par // Function parameters
     );
-    Real64 CalcFanCoilWaterFlowTempResidual(Real64 const WaterFlow,   // water mass flow rate [kg/s]
+    Real64 CalcFanCoilWaterFlowTempResidual(AllGlobals &state, Real64 const WaterFlow,   // water mass flow rate [kg/s]
                                             Array1<Real64> const &Par // Function parameters
     );
 
-    Real64 CalcFanCoilWaterFlowResidual(Real64 const WaterFlow,   // water mass flow rate [kg/s]
+    Real64 CalcFanCoilWaterFlowResidual(AllGlobals &state, Real64 const WaterFlow,   // water mass flow rate [kg/s]
                                         Array1<Real64> const &Par // Function parameters
     );
 
-    Real64 CalcFanCoilAirAndWaterFlowResidual(Real64 const WaterFlow,   // water mass flow rate [kg/s]
+    Real64 CalcFanCoilAirAndWaterFlowResidual(AllGlobals &state, Real64 const WaterFlow,   // water mass flow rate [kg/s]
                                               Array1<Real64> const &Par // Function parameters
     );
 
-    Real64 CalcFanCoilAirAndWaterInStepResidual(Real64 const PLR,         // air and water mass flow rate ratio
+    Real64 CalcFanCoilAirAndWaterInStepResidual(AllGlobals &state, Real64 const PLR,         // air and water mass flow rate ratio
                                                 Array1<Real64> const &Par // Function parameters
     );
 
-    Real64 CalcFanCoilBothFlowResidual(Real64 const PLR,         // air and water mass flow rate ratio
+    Real64 CalcFanCoilBothFlowResidual(AllGlobals &state, Real64 const PLR,         // air and water mass flow rate ratio
                                        Array1<Real64> const &Par // Function parameters
     );
 
-    Real64 CalcFanCoilElecHeatResidual(Real64 const PLR,         // electric heating coil part load ratio
+    Real64 CalcFanCoilElecHeatResidual(AllGlobals &state, Real64 const PLR,         // electric heating coil part load ratio
                                        Array1<Real64> const &Par // Function parameters
     );
 
-    Real64 CalcFanCoilElecHeatTempResidual(Real64 const PLR,         // electric heating coil part load ratio
+    Real64 CalcFanCoilElecHeatTempResidual(AllGlobals &state, Real64 const PLR,         // electric heating coil part load ratio
                                            Array1<Real64> const &Par // Function parameters
     );
 } // namespace FanCoilUnits

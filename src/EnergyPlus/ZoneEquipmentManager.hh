@@ -106,7 +106,7 @@ namespace ZoneEquipmentManager {
                              bool &SimAir                       // Eventually set to true via SimZoneEquipment if AirLoop must be resimulated
     );
 
-    void GetZoneEquipment();
+    void GetZoneEquipment(AllGlobals &state);
 
     void InitZoneEquipment(bool const FirstHVACIteration); // unused 1208
 
@@ -139,11 +139,11 @@ namespace ZoneEquipmentManager {
                              Real64 &FinalTotalReturnMassFlow // Final total return air mass flow rate
     );
 
-    void CalcAirFlowSimple(int const SysTimestepLoop = 0,              // System time step index
+    void CalcAirFlowSimple(AllGlobals &state, int const SysTimestepLoop = 0,              // System time step index
                            bool const AdjustZoneMixingFlowFlag = false // flags to adjust zone mxing mass flow rate
     );
 
-    void GetStandAloneERVNodes(int const OutdoorNum); // Zone Air Balance Outdoor index
+    void GetStandAloneERVNodes(AllGlobals &state, int const OutdoorNum); // Zone Air Balance Outdoor index
 
     void CalcZoneMixingFlowRateOfReceivingZone(int const ZoneNum, Real64 &ZoneMixingAirMassFlowRate);
 

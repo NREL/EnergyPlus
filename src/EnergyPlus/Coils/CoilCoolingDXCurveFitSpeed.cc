@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
@@ -315,7 +316,7 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(const std::string& name_t
     }
 }
 
-void CoilCoolingDXCurveFitSpeed::size()
+void CoilCoolingDXCurveFitSpeed::size(AllGlobals &state)
 {
 
     std::string RoutineName = "sizeSpeed";
@@ -337,11 +338,11 @@ void CoilCoolingDXCurveFitSpeed::size()
 
     int SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
     std::string SizingString = "Rated Air Flow Rate [m3/s]";
-    ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, this->evap_air_flow_rate, PrintFlag, RoutineName);
+    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, this->evap_air_flow_rate, PrintFlag, RoutineName);
 
     SizingMethod = DataHVACGlobals::CoolingCapacitySizing;
     SizingString = "Gross Cooling Capacity [W]";
-    ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, this->rated_total_capacity, PrintFlag, RoutineName);
+    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, this->rated_total_capacity, PrintFlag, RoutineName);
 
      //  DataSizing::DataEMSOverrideON = DXCoil( DXCoilNum ).RatedSHREMSOverrideOn( Mode );
     //  DataSizing::DataEMSOverride = DXCoil( DXCoilNum ).RatedSHREMSOverrideValue( Mode );
@@ -349,7 +350,7 @@ void CoilCoolingDXCurveFitSpeed::size()
     SizingString = "Gross Sensible Heat Ratio";
     DataSizing::DataFlowUsedForSizing = this->evap_air_flow_rate;
     DataSizing::DataCapacityUsedForSizing = this->rated_total_capacity;
-    ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, this->grossRatedSHR, PrintFlag, RoutineName);
+    ReportSizingManager::RequestSizing(state, CompType, CompName, SizingMethod, SizingString, this->grossRatedSHR, PrintFlag, RoutineName);
     DataSizing::DataFlowUsedForSizing = 0.0;
     DataSizing::DataCapacityUsedForSizing = 0.0;
     //  DataSizing::DataEMSOverrideON = false;

@@ -269,7 +269,7 @@ namespace UnitVentilator {
                             int const ZoneNum              // number of zone being served
     );
 
-    void SizeUnitVentilator(int const UnitVentNum);
+    void SizeUnitVentilator(AllGlobals &state, int const UnitVentNum);
 
     void CalcUnitVentilator(AllGlobals &state, int &UnitVentNum,              // number of the current fan coil unit being simulated
                             int const ZoneNum,             // number of zone being served
@@ -306,7 +306,7 @@ namespace UnitVentilator {
 
     int GetUnitVentilatorReturnAirNode(AllGlobals &state, int const UnitVentNum);
 
-    Real64 CalcUnitVentilatorResidual(Real64 const PartLoadRatio, // Coil Part Load Ratio
+    Real64 CalcUnitVentilatorResidual(AllGlobals &state, Real64 const PartLoadRatio, // Coil Part Load Ratio
                                       Array1<Real64> const &Par   // Function parameters
     );
     

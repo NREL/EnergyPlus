@@ -81,7 +81,7 @@ namespace InternalHeatGains {
 
     void ManageInternalHeatGains(AllGlobals &state, Optional_bool_const InitOnly = _); // when true, just calls the get input, if appropriate and returns.
 
-    void GetInternalHeatGainsInput(OutputFiles &outputFiles);
+    void GetInternalHeatGainsInput(AllGlobals &state, OutputFiles &outputFiles);
 
     void InitInternalHeatGains(AllGlobals &state);
 

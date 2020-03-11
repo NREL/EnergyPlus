@@ -62,6 +62,7 @@
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -69,6 +70,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
 
@@ -223,7 +225,7 @@ namespace HVACDXHeatPumpSystem {
 
         // Call the series of components that simulate a DX Heating System
         // Control the DX Heating System
-        ControlDXHeatingSystem(DXSystemNum, FirstHVACIteration);
+        ControlDXHeatingSystem(state, DXSystemNum, FirstHVACIteration);
 
         // simulate DX Heating System
         CompName = DXHeatPumpSystem(DXSystemNum).HeatPumpCoilName;
@@ -602,6 +604,7 @@ namespace HVACDXHeatPumpSystem {
         using FaultsManager::FaultsCoilSATSensor;
         using General::RoundSigDigits;
         using General::SolveRoot;
+        using TempSolveRoot::SolveRoot;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyTdpFnWPb;
         using VariableSpeedCoils::SimVariableSpeedCoils;
@@ -941,7 +944,7 @@ namespace HVACDXHeatPumpSystem {
                                         Par(2) = DesOutTemp;
                                         Par(5) = double(FanOpMode);
                                         Par(3) = double(SpeedNum);
-                                        SolveRoot(Acc, MaxIte, SolFla, SpeedRatio, VSCoilSpeedResidual, 1.0e-10, 1.0, Par);
+                                        SolveRoot(state, Acc, MaxIte, SolFla, SpeedRatio, VSCoilSpeedResidual, 1.0e-10, 1.0, Par);
 
                                         if (SolFla == -1) {
                                             if (!WarmupFlag) {
@@ -1009,7 +1012,7 @@ namespace HVACDXHeatPumpSystem {
                                         Par(1) = double(VSCoilIndex);
                                         Par(2) = DesOutTemp;
                                         Par(5) = double(FanOpMode);
-                                        SolveRoot(Acc, MaxIte, SolFla, PartLoadFrac, VSCoilCyclingResidual, 1.0e-10, 1.0, Par);
+                                        SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, VSCoilCyclingResidual, 1.0e-10, 1.0, Par);
                                         if (SolFla == -1) {
                                             if (!WarmupFlag) {
                                                 if (DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIter < 1) {

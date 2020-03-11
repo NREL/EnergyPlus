@@ -54,6 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 
 namespace EnergyPlus {
     class OutputFiles;
@@ -170,7 +171,7 @@ namespace AirflowNetworkBalanceManager {
                                      Optional_bool ResimulateAirZone = _         // True when solution technique on third iteration
     );
 
-    void GetAirflowNetworkInput(EnergyPlus::OutputFiles &outputFiles);
+    void GetAirflowNetworkInput(AllGlobals &state, EnergyPlus::OutputFiles &outputFiles);
 
     void InitAirflowNetwork();
 
@@ -223,7 +224,7 @@ namespace AirflowNetworkBalanceManager {
                                       Real64 &OpenFactor // Window or door opening factor (used to calculate airflow)
     );
 
-    void ValidateDistributionSystem();
+    void ValidateDistributionSystem(AllGlobals &state);
 
     void ValidateFanFlowRate(); // Catch a fan flow rate from EPlus input file and add a flag for VAV terminal damper
 
@@ -235,7 +236,7 @@ namespace AirflowNetworkBalanceManager {
 
     Real64 GetZoneInfilAirChangeRate(int const ZoneNum); // hybrid ventilation system controlled zone number
 
-    int GetAirLoopNumber(int const NodeNumber); // Get air loop number for each distribution node and linkage
+    int GetAirLoopNumber(AllGlobals &state, int const NodeNumber); // Get air loop number for each distribution node and linkage
 
     Real64 AFNPressureResidual(Real64 const ExFanMassFlowRate,
                                Array1<Real64> const &Par); // Residual function using Regula Falsi

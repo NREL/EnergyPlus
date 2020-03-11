@@ -1364,11 +1364,11 @@ namespace EnergyPlus {
                                                                    "Refrigeration:Condenser:WaterCooled")) {
                                 this_comp.TypeOf_Num = TypeOf_RefrigSystemWaterCondenser;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
-                                this_comp.compPtr = RefrigeratedCase::RefrigCondenserData::factory(CompNames(CompNum));
+                                this_comp.compPtr = RefrigeratedCase::RefrigCondenserData::factory(state, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "Refrigeration:CompressorRack")) {
                                 this_comp.TypeOf_Num = TypeOf_RefrigerationWaterCoolRack;
                                 this_comp.CurOpSchemeType = DemandOpSchemeType;
-                                this_comp.compPtr = RefrigeratedCase::RefrigRackData::factory(CompNames(CompNum));
+                                this_comp.compPtr = RefrigeratedCase::RefrigRackData::factory(state, CompNames(CompNum));
                             } else if (UtilityRoutines::SameString(this_comp_type, "PlantComponent:UserDefined")) {
                                 this_comp.TypeOf_Num = TypeOf_PlantComponentUserDefined;
                                 this_comp.CurOpSchemeType = UnknownStatusOpSchemeType;
