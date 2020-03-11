@@ -8012,7 +8012,7 @@ namespace WindowEquivalentLayer {
         Real64 Specular_F;
 
         // Argument array dimensioning
-        EP_SIZE_CHECK(P, hipDIM);
+        //EP_SIZE_CHECK(P, hipDIM);
 
         // Locals
         // FUNCTION ARGUMENT DEFINITIONS:
