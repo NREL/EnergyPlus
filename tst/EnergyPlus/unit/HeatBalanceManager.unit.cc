@@ -65,6 +65,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputFiles.hh>
@@ -1576,9 +1577,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     DataGlobals::HourOfDay = 11;
     DataGlobals::CurrentTime = 11.0;
     WeatherManager::SetCurrentWeather();
-    HeatBalanceManager::ManageHeatBalance(OutputFiles::getSingleton());
+    HeatBalanceManager::ManageHeatBalance(state, OutputFiles::getSingleton());
     // For now, must call this twice in order to hit the BeginTimeStepBeforePredictor EMS calling point
-    HeatBalanceManager::ManageHeatBalance(OutputFiles::getSingleton());
+    HeatBalanceManager::ManageHeatBalance(state, OutputFiles::getSingleton());
     // Find the fenestration surface
     int winSurfNum = UtilityRoutines::FindItemInList("FENESTRATIONSURFACE", DataSurfaces::Surface);
     int win1ConstNum = UtilityRoutines::FindItemInList("WINDOWCONSTRUCTION1", DataHeatBalance::Construct);
@@ -1593,9 +1594,9 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_EMSConstructionTest)
     DataGlobals::HourOfDay = 14;
     DataGlobals::CurrentTime = 14.0;
     WeatherManager::SetCurrentWeather();
-    HeatBalanceManager::ManageHeatBalance(OutputFiles::getSingleton());
+    HeatBalanceManager::ManageHeatBalance(state, OutputFiles::getSingleton());
     // For now, must call this twice in order to hit the BeginTimeStepBeforePredictor EMS calling point
-    HeatBalanceManager::ManageHeatBalance(OutputFiles::getSingleton());
+    HeatBalanceManager::ManageHeatBalance(state, OutputFiles::getSingleton());
     int win2ConstNum = UtilityRoutines::FindItemInList("WINDOWCONSTRUCTION2", DataHeatBalance::Construct);
     EXPECT_EQ(DataSurfaces::Surface(winSurfNum).Construction, win2ConstNum);
     transSol = DataSurfaces::WinSysSolTransmittance(winSurfNum);

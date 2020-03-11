@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
@@ -136,7 +137,7 @@ protected:
 
     virtual void TearDown()
     {
-        EnergyPlusFixture::TearDown(); // Remember to tear down the base fixture after cleaning up derived fixture!
+        EnergyPlusFixture::TearDown(state); // Remember to tear down the base fixture after cleaning up derived fixture!
     }
 };
 

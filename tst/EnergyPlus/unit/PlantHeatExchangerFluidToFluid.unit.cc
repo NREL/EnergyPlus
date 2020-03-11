@@ -1080,7 +1080,7 @@ TEST_F(PlantHXFixture, PlantHXModulatedDualDeadDefectFileHi)
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(OutputFiles::getSingleton(), ErrorsFound);
+    SimulationManager::SetupSimulation(state, OutputFiles::getSingleton(), ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
     int EnvCount = 0;
@@ -1089,7 +1089,7 @@ TEST_F(PlantHXFixture, PlantHXModulatedDualDeadDefectFileHi)
 
     while (Available) {
 
-        WeatherManager::GetNextEnvironment(OutputFiles::getSingleton(), Available, ErrorsFound);
+        WeatherManager::GetNextEnvironment(state, OutputFiles::getSingleton(), Available, ErrorsFound);
 
         if (!Available) break;
         if (ErrorsFound) break;
@@ -1141,7 +1141,7 @@ TEST_F(PlantHXFixture, PlantHXModulatedDualDeadDefectFileHi)
 
                     WeatherManager::ManageWeather();
 
-                    HeatBalanceManager::ManageHeatBalance(OutputFiles::getSingleton());
+                    HeatBalanceManager::ManageHeatBalance(state, OutputFiles::getSingleton());
 
                     //  After the first iteration of HeatBalance, all the 'input' has been gotten
 
@@ -2171,7 +2171,7 @@ TEST_F(PlantHXFixture, PlantHXModulatedDualDeadDefectFileLo)
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(OutputFiles::getSingleton(), ErrorsFound);
+    SimulationManager::SetupSimulation(state, OutputFiles::getSingleton(), ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
     int EnvCount = 0;
@@ -2180,7 +2180,7 @@ TEST_F(PlantHXFixture, PlantHXModulatedDualDeadDefectFileLo)
 
     while (Available) {
 
-        WeatherManager::GetNextEnvironment(OutputFiles::getSingleton(), Available, ErrorsFound);
+        WeatherManager::GetNextEnvironment(state, OutputFiles::getSingleton(), Available, ErrorsFound);
 
         if (!Available) break;
         if (ErrorsFound) break;
@@ -2232,7 +2232,7 @@ TEST_F(PlantHXFixture, PlantHXModulatedDualDeadDefectFileLo)
 
                     WeatherManager::ManageWeather();
 
-                    HeatBalanceManager::ManageHeatBalance(OutputFiles::getSingleton());
+                    HeatBalanceManager::ManageHeatBalance(state, OutputFiles::getSingleton());
 
                     //  After the first iteration of HeatBalance, all the 'input' has been gotten
 

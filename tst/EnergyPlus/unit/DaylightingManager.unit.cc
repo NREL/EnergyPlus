@@ -60,6 +60,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DaylightingManager.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -825,7 +826,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     SurfaceGeometry::GetSurfaceData(OutputFiles::getSingleton(), foundErrors); // setup zone geometry and get zone data
     EXPECT_FALSE(foundErrors);                    // expect no errors
 
-    SurfaceGeometry::SetupZoneGeometry(OutputFiles::getSingleton(), foundErrors); // this calls GetSurfaceData()
+    SurfaceGeometry::SetupZoneGeometry(state, OutputFiles::getSingleton(), foundErrors); // this calls GetSurfaceData()
     EXPECT_FALSE(foundErrors);                       // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors(OutputFiles::getSingleton());
 
@@ -844,7 +845,7 @@ TEST_F(EnergyPlusFixture, DaylightingManager_GetDaylParamInGeoTrans_Test)
     DataEnvironment::HolidayIndex = 0;
     DataEnvironment::DayOfYear_Schedule = General::OrdinalDay(DataEnvironment::Month, DataEnvironment::DayOfMonth, 1);
     ScheduleManager::UpdateScheduleValues();
-    InternalHeatGains::GetInternalHeatGainsInput(OutputFiles::getSingleton());
+    InternalHeatGains::GetInternalHeatGainsInput(state, OutputFiles::getSingleton());
     InternalHeatGains::GetInternalHeatGainsInputFlag = false;
 
     GetDaylightingParametersInput();
@@ -1325,12 +1326,12 @@ TEST_F(EnergyPlusFixture, DaylightingManager_DayltgInteriorIllum_Test)
     HeatBalanceManager::GetZoneData(foundErrors); // read zone data
     EXPECT_FALSE(foundErrors);                    // expect no errors
 
-    SurfaceGeometry::SetupZoneGeometry(OutputFiles::getSingleton(), foundErrors); // this calls GetSurfaceData()
+    SurfaceGeometry::SetupZoneGeometry(state, OutputFiles::getSingleton(), foundErrors); // this calls GetSurfaceData()
     EXPECT_FALSE(foundErrors);                       // expect no errors
     HeatBalanceIntRadExchange::InitSolarViewFactors(OutputFiles::getSingleton());
 
     int ZoneNum = UtilityRoutines::FindItemInList("EAST ZONE", DataHeatBalance::Zone);
-    InternalHeatGains::GetInternalHeatGainsInput(OutputFiles::getSingleton());
+    InternalHeatGains::GetInternalHeatGainsInput(state, OutputFiles::getSingleton());
     InternalHeatGains::GetInternalHeatGainsInputFlag = false;
     DaylightingManager::GetInputDayliteRefPt(foundErrors);
     DaylightingManager::GetDaylightingParametersInput();

@@ -65,6 +65,7 @@
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FluidProperties.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/OutputFiles.hh>
@@ -1124,7 +1125,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     BeginEnvrnFlag = true;
     ZoneSizingCalc = true;
     createFacilityElectricPowerServiceObject();
-    SizingManager::ManageSizing(OutputFiles::getSingleton());
+    SizingManager::ManageSizing(state, OutputFiles::getSingleton());
 
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(1, NumOfUnitHeats);
@@ -1135,7 +1136,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_HWHeatingCoilUAAutoSizingTest)
     DataSizing::CurZoneEqNum = 1;
 
     InitUnitHeater(UnitHeatNum, ZoneNum, FirstHVACIteration);
-    InitWaterCoil(OutputFiles::getSingleton(), CoilNum, FirstHVACIteration); // init hot water heating coil
+    InitWaterCoil(state, OutputFiles::getSingleton(), CoilNum, FirstHVACIteration); // init hot water heating coil
 
     PltSizHeatNum = PlantUtilities::MyPlantSizingIndex("Coil:Heating:Water",
                                                        UnitHeat(UnitHeatNum).HCoilName,
@@ -1288,7 +1289,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
-    GetZoneEquipmentData();
+    GetZoneEquipmentData(state);
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
@@ -1297,11 +1298,11 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     GetWaterCoilsInputFlag = false;
 
     ErrorsFound = false;
-    GetFanInput();
+    GetFanInput(state);
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
-    GetUnitHeaterInput(); // get unit heaters data
+    GetUnitHeaterInput(state); // get unit heaters data
     EXPECT_FALSE(ErrorsFound);
     EXPECT_EQ(1, NumOfUnitHeats);
     EXPECT_EQ("ZONE2UNITHEAT", UnitHeat(1).Name);
@@ -1363,10 +1364,10 @@ TEST_F(EnergyPlusFixture, UnitHeater_SimUnitHeaterTest)
     UHAirInletNode = UnitHeat(UnitHeatNum).AirInNode;
     UHAirOutletNode = UnitHeat(UnitHeatNum).AirOutNode;
 
-    SimUnitHeater(UnitHeat(UnitHeatNum).Name, ZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, CurZoneEqNum);
+    SimUnitHeater(state, UnitHeat(UnitHeatNum).Name, ZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, CurZoneEqNum);
     // SimUnitHeater does not converge on the first call: the unit heater deliveres more than required heating load. But it meets
     // on the second call (iteration). I suspect it may be an initialization issue related to ControlCompOutput routine
-    SimUnitHeater(UnitHeat(UnitHeatNum).Name, ZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, CurZoneEqNum);
+    SimUnitHeater(state, UnitHeat(UnitHeatNum).Name, ZoneNum, FirstHVACIteration, SysOutputProvided, LatOutputProvided, CurZoneEqNum);
     // verify the total heat rate deleivered by the unit heater
     UHAirMassFlowRate = Node(UHAirInletNode).MassFlowRate;
     UHEnteringAirEnthalpy = PsyHFnTdbW(Node(UHAirInletNode).Temp, Node(UHAirInletNode).HumRat);
@@ -2463,7 +2464,7 @@ TEST_F(EnergyPlusFixture, UnitHeater_SecondPriorityZoneEquipment)
     bool SimAirLoops = true;
     bool FirstHVACIteration = false;
     // re-simulate the zone HVAC equipment per the priority order
-    ZoneEquipmentManager::ManageZoneEquipment(FirstHVACIteration, SimZoneEquipment, SimAirLoops);
+    ZoneEquipmentManager::ManageZoneEquipment(state, FirstHVACIteration, SimZoneEquipment, SimAirLoops);
     // check the reheat coil nominal capacity
     EXPECT_NEAR(HeatingCoils::HeatingCoil(1).NominalCapacity, 17542.3, 1.0);
     // check the reheat coil outputis the full capacity

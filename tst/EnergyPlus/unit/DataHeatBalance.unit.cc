@@ -57,6 +57,7 @@
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/EMSManager.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -830,7 +831,7 @@ TEST_F(EnergyPlusFixture, DataHeatBalance_CheckConstructLayers)
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
-    SurfaceGeometry::SetupZoneGeometry(OutputFiles::getSingleton(),
+    SurfaceGeometry::SetupZoneGeometry(state, OutputFiles::getSingleton(),
                                        ErrorsFound); // this calls GetSurfaceData() and SetFlagForWindowConstructionWithShadeOrBlindLayer()
     EXPECT_FALSE(ErrorsFound);
 

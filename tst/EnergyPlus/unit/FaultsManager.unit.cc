@@ -65,6 +65,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FaultsManager.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/OutputFiles.hh>
@@ -136,11 +137,11 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     // Run and Check
     // (1)The rated operational point of Fan_1 falls on the fan curve
     FanNum = 1;
-    TestRestult = FaultsFouledAirFilters(FanNum).CheckFaultyAirFilterFanCurve();
+    TestRestult = FaultsFouledAirFilters(FanNum).CheckFaultyAirFilterFanCurve(state);
     EXPECT_TRUE(TestRestult);
     // (2)The rated operational point of Fan_2 does not fall on the fan curve
     FanNum = 2;
-    TestRestult = FaultsFouledAirFilters(FanNum).CheckFaultyAirFilterFanCurve();
+    TestRestult = FaultsFouledAirFilters(FanNum).CheckFaultyAirFilterFanCurve(state);
     EXPECT_FALSE(TestRestult);
 
     // Clean up
@@ -242,11 +243,11 @@ TEST_F(EnergyPlusFixture, FaultsManager_TemperatureSensorOffset_CoilSAT)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // Readin inputs
-    SetPointManager::GetSetPointManagerInputs();
+    SetPointManager::GetSetPointManagerInputs(state);
     HVACControllers::GetControllerInput();
 
     // Run
-    CheckAndReadFaults();
+    CheckAndReadFaults(state);
 
     // Check
     EXPECT_EQ(2.0, FaultsCoilSATSensor(1).Offset);
@@ -432,7 +433,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_EconomizerFaultGetInput)
 
     ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton()); // read schedules
 
-    MixedAir::GetOAControllerInputs(OutputFiles::getSingleton());
+    MixedAir::GetOAControllerInputs(state, OutputFiles::getSingleton());
 
     // there are two OA controller objects
     EXPECT_EQ(MixedAir::NumOAControllers, 2);

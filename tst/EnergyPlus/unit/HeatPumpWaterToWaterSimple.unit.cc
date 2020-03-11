@@ -727,7 +727,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(OutputFiles::getSingleton(), ErrorsFound);
+    SimulationManager::SetupSimulation(state, OutputFiles::getSingleton(), ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
     int EnvCount = 0;
@@ -736,7 +736,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
 
     while (Available) {
 
-        WeatherManager::GetNextEnvironment(OutputFiles::getSingleton(), Available, ErrorsFound);
+        WeatherManager::GetNextEnvironment(state, OutputFiles::getSingleton(), Available, ErrorsFound);
 
         if (!Available) break;
         if (ErrorsFound) break;
@@ -788,7 +788,7 @@ TEST_F(EnergyPlusFixture, PlantLoopSourceSideTest)
 
                     WeatherManager::ManageWeather();
 
-                    HeatBalanceManager::ManageHeatBalance(OutputFiles::getSingleton());
+                    HeatBalanceManager::ManageHeatBalance(state, OutputFiles::getSingleton());
 
                     //  After the first iteration of HeatBalance, all the 'input' has been gotten
 
@@ -1472,12 +1472,12 @@ TEST_F(EnergyPlusFixture, WWHP_AutosizeTest1)
     PlantManager::CheckIfAnyPlant();
 
     BranchInputManager::ManageBranchInput(); // just gets input and
-    SizingManager::ManageSizing(OutputFiles::getSingleton());
+    SizingManager::ManageSizing(state, OutputFiles::getSingleton());
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(OutputFiles::getSingleton(), ErrorsFound);
+    SimulationManager::SetupSimulation(state, OutputFiles::getSingleton(), ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
     // should be sized now

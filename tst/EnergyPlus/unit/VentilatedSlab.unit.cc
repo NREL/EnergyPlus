@@ -55,6 +55,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataSurfaceLists.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -2317,7 +2318,7 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;
-    SetupZoneGeometry(OutputFiles::getSingleton(), ErrorsFound); // read zone geometry data
+    SetupZoneGeometry(state, OutputFiles::getSingleton(), ErrorsFound); // read zone geometry data
     EXPECT_FALSE(ErrorsFound);
 
     ErrorsFound = false;

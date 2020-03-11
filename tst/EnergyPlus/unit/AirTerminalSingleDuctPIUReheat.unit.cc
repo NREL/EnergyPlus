@@ -58,6 +58,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/PoweredInductionUnits.hh>
@@ -188,10 +189,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIUReheat_GetInputtest)
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1();
+    GetZoneEquipmentData1(state);
     GetZoneAirLoopEquipment();
 
-    GetPIUs();
+    GetPIUs(state);
 
     ASSERT_EQ(1, NumSeriesPIUs);
     EXPECT_EQ("SPACE1-1 ZONE COIL", PIU(1).HCoil);     // heating coil name
@@ -297,10 +298,10 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctSeriesPIU_SetADUInletNodeTest)
     GetZoneData(ErrorsFound);
     ASSERT_FALSE(ErrorsFound);
 
-    GetZoneEquipmentData1();
+    GetZoneEquipmentData1(state);
     GetZoneAirLoopEquipment();
 
-    GetPIUs();
+    GetPIUs(state);
 
     int const PIUNum = 1;
     int const ADUNum = 1;

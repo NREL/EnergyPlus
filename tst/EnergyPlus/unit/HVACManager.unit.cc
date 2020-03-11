@@ -116,7 +116,7 @@ TEST_F(EnergyPlusFixture, CrossMixingReportTest)
     DataZoneEquipment::ZoneEquipConfig(2).NumReturnNodes = 0;
 
     // Call HVACManager
-    ReportAirHeatBalance();
+    ReportAirHeatBalance(state);
 
     EXPECT_NEAR(DataHeatBalance::ZnAirRpt(1).MixVolume, DataHeatBalance::ZnAirRpt(2).MixVolume, 0.0001);
     EXPECT_NEAR(DataHeatBalance::ZnAirRpt(1).MixVdotCurDensity, DataHeatBalance::ZnAirRpt(2).MixVdotCurDensity, 0.0001);
@@ -179,7 +179,7 @@ TEST_F(EnergyPlusFixture, InfiltrationReportTest)
     DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 0;
     DataZoneEquipment::ZoneEquipConfig(2).NumReturnNodes = 0;
     // Call HVACManager
-    ReportAirHeatBalance();
+    ReportAirHeatBalance(state);
 
     EXPECT_NEAR(2.9971591, DataHeatBalance::ZnAirRpt(1).InfilVolumeCurDensity, 0.0001);
     EXPECT_NEAR(5.9943183, DataHeatBalance::ZnAirRpt(1).VentilVolumeCurDensity, 0.0001);
@@ -242,7 +242,7 @@ TEST_F(EnergyPlusFixture, ExfilAndExhaustReportTest)
     DataLoopNode::Node(1).MassFlowRate = 0.0;
 
     // Call HVACManager
-    ReportAirHeatBalance();
+    ReportAirHeatBalance(state);
 
     EXPECT_NEAR(9.7853391, DataHeatBalance::ZnAirRpt(1).ExfilTotalLoss, 0.0001);
     EXPECT_NEAR(26.056543, DataHeatBalance::ZnAirRpt(2).ExfilTotalLoss, 0.0001);

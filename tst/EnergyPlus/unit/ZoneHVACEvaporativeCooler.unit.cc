@@ -60,6 +60,7 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/OutputFiles.hh>
@@ -141,7 +142,7 @@ protected:
 
     virtual void TearDown()
     {
-        EnergyPlusFixture::TearDown();
+        EnergyPlusFixture::TearDown(state);
     }
 };
 
@@ -198,11 +199,11 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectCelDekPad_CyclingUnit_Sim)
     ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleManager::ScheduleInputProcessed = true;
 
-    Fans::GetFanInput();
+    Fans::GetFanInput(state);
     ASSERT_FALSE(ErrorsFound);
     EvaporativeCoolers::GetEvapInput();
     ASSERT_FALSE(ErrorsFound);
-    EvaporativeCoolers::GetInputZoneEvaporativeCoolerUnit();
+    EvaporativeCoolers::GetInputZoneEvaporativeCoolerUnit(state);
     ASSERT_FALSE(ErrorsFound);
 
     DataGlobals::BeginEnvrnFlag = true;
@@ -233,11 +234,11 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectCelDekPad_CyclingUnit_Sim)
     // Evap Cooler Unit Control Method = Zone Temperature Dead Band OnOff Cycling
     EXPECT_EQ(thisZoneEvapCooler.OpMode, DataHVACGlobals::CycFanCycCoil);
     EXPECT_EQ(thisZoneEvapCooler.ControlSchemeType, ZoneTemperatureDeadBandOnOffCycling);
-    EvaporativeCoolers::SimZoneEvaporativeCoolerUnit(thisZoneEvapCooler.Name, ActualZoneNum, SensOutputProvided, LatOutputProvided, ZoneEquipIndex);
+    EvaporativeCoolers::SimZoneEvaporativeCoolerUnit(state, thisZoneEvapCooler.Name, ActualZoneNum, SensOutputProvided, LatOutputProvided, ZoneEquipIndex);
     Real64 FullSensibleOutput = 0.0;
     Real64 FullLatentOutput = 0.0;
     Real64 PartLoadRatio = 1.0;
-    EvaporativeCoolers::CalcZoneEvapUnitOutput(UnitNum, PartLoadRatio, FullSensibleOutput, FullLatentOutput);
+    EvaporativeCoolers::CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, FullSensibleOutput, FullLatentOutput);
     EXPECT_NEAR(FullSensibleOutput, SensOutputProvided, 0.01);
     EXPECT_NEAR(FullSensibleOutput, -thisZoneEvapCooler.UnitSensibleCoolingRate, 0.01);
     // test the unit at half of the full flow capacity
@@ -246,15 +247,15 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectCelDekPad_CyclingUnit_Sim)
     // calculate part load ratio for cycling fan
     EvaporativeCoolers::ControlZoneEvapUnitOutput(UnitNum, HalfOfFullLoad);
     EXPECT_NEAR(0.4746755, thisZoneEvapCooler.UnitPartLoadRatio, 0.000001);
-    EvaporativeCoolers::CalcZoneEvapUnitOutput(UnitNum, thisZoneEvapCooler.UnitPartLoadRatio, SensOutputProvided, LatOutputProvided);
+    EvaporativeCoolers::CalcZoneEvapUnitOutput(state, UnitNum, thisZoneEvapCooler.UnitPartLoadRatio, SensOutputProvided, LatOutputProvided);
     EXPECT_NEAR(HalfOfFullLoad, SensOutputProvided, 0.01);
 
     // Evap Cooler Unit Control Method = Zone Cooling Load OnOff Cycling
     thisZoneEvapCooler.ControlSchemeType = ZoneCoolingLoadOnOffCycling;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -15000.0;
-    EvaporativeCoolers::SimZoneEvaporativeCoolerUnit(thisZoneEvapCooler.Name, ActualZoneNum, SensOutputProvided, LatOutputProvided, ZoneEquipIndex);
+    EvaporativeCoolers::SimZoneEvaporativeCoolerUnit(state, thisZoneEvapCooler.Name, ActualZoneNum, SensOutputProvided, LatOutputProvided, ZoneEquipIndex);
     PartLoadRatio = 1.0;
-    EvaporativeCoolers::CalcZoneEvapUnitOutput(UnitNum, PartLoadRatio, FullSensibleOutput, FullLatentOutput);
+    EvaporativeCoolers::CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, FullSensibleOutput, FullLatentOutput);
     EXPECT_NEAR(FullSensibleOutput, SensOutputProvided, 0.01);
     EXPECT_NEAR(FullSensibleOutput, -thisZoneEvapCooler.UnitSensibleCoolingRate, 0.01);
     // test the unit at half of the full flow capacity
@@ -263,7 +264,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectCelDekPad_CyclingUnit_Sim)
     // calculate part load ratio for cycling fan
     EvaporativeCoolers::ControlZoneEvapUnitOutput(UnitNum, HalfOfFullLoad);
     EXPECT_NEAR(0.4746755, thisZoneEvapCooler.UnitPartLoadRatio, 0.000001);
-    EvaporativeCoolers::CalcZoneEvapUnitOutput(UnitNum, thisZoneEvapCooler.UnitPartLoadRatio, SensOutputProvided, LatOutputProvided);
+    EvaporativeCoolers::CalcZoneEvapUnitOutput(state, UnitNum, thisZoneEvapCooler.UnitPartLoadRatio, SensOutputProvided, LatOutputProvided);
     EXPECT_NEAR(HalfOfFullLoad, SensOutputProvided, 0.01);
 }
 
@@ -322,11 +323,11 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectResearchSpecial_CyclingUnit_Sim)
     ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleManager::ScheduleInputProcessed = true;
 
-    Fans::GetFanInput();
+    Fans::GetFanInput(state);
     ASSERT_FALSE(ErrorsFound);
     EvaporativeCoolers::GetEvapInput();
     ASSERT_FALSE(ErrorsFound);
-    EvaporativeCoolers::GetInputZoneEvaporativeCoolerUnit();
+    EvaporativeCoolers::GetInputZoneEvaporativeCoolerUnit(state);
     ASSERT_FALSE(ErrorsFound);
 
     DataGlobals::BeginEnvrnFlag = true;
@@ -356,11 +357,11 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectResearchSpecial_CyclingUnit_Sim)
     // Evap Cooler Unit Control Method = Zone Temperature Dead Band OnOff Cycling
     EXPECT_EQ(thisZoneEvapCooler.OpMode, DataHVACGlobals::CycFanCycCoil);
     EXPECT_EQ(thisZoneEvapCooler.ControlSchemeType, ZoneTemperatureDeadBandOnOffCycling);
-    EvaporativeCoolers::SimZoneEvaporativeCoolerUnit(thisZoneEvapCooler.Name, ActualZoneNum, SensOutputProvided, LatOutputProvided, ZoneEquipIndex);
+    EvaporativeCoolers::SimZoneEvaporativeCoolerUnit(state, thisZoneEvapCooler.Name, ActualZoneNum, SensOutputProvided, LatOutputProvided, ZoneEquipIndex);
     Real64 FullSensibleOutput = 0.0;
     Real64 FullLatentOutput = 0.0;
     Real64 PartLoadRatio = 1.0;
-    EvaporativeCoolers::CalcZoneEvapUnitOutput(UnitNum, PartLoadRatio, FullSensibleOutput, FullLatentOutput);
+    EvaporativeCoolers::CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, FullSensibleOutput, FullLatentOutput);
     EXPECT_NEAR(FullSensibleOutput, SensOutputProvided, 0.01);
     EXPECT_NEAR(FullSensibleOutput, -thisZoneEvapCooler.UnitSensibleCoolingRate, 0.01);
     // test the unit at half of the full flow capacity
@@ -369,15 +370,15 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectResearchSpecial_CyclingUnit_Sim)
     // calculate part load ratio for cycling fan
     EvaporativeCoolers::ControlZoneEvapUnitOutput(UnitNum, HalfOfFullLoad);
     EXPECT_NEAR(0.500000, thisZoneEvapCooler.UnitPartLoadRatio, 0.000001);
-    EvaporativeCoolers::CalcZoneEvapUnitOutput(UnitNum, thisZoneEvapCooler.UnitPartLoadRatio, SensOutputProvided, LatOutputProvided);
+    EvaporativeCoolers::CalcZoneEvapUnitOutput(state, UnitNum, thisZoneEvapCooler.UnitPartLoadRatio, SensOutputProvided, LatOutputProvided);
     EXPECT_NEAR(HalfOfFullLoad, SensOutputProvided, 0.01);
 
     // Evap Cooler Unit Control Method = Zone Cooling Load OnOff Cycling
     thisZoneEvapCooler.ControlSchemeType = ZoneCoolingLoadOnOffCycling;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -15000.0;
-    EvaporativeCoolers::SimZoneEvaporativeCoolerUnit(thisZoneEvapCooler.Name, ActualZoneNum, SensOutputProvided, LatOutputProvided, ZoneEquipIndex);
+    EvaporativeCoolers::SimZoneEvaporativeCoolerUnit(state, thisZoneEvapCooler.Name, ActualZoneNum, SensOutputProvided, LatOutputProvided, ZoneEquipIndex);
     PartLoadRatio = 1.0;
-    EvaporativeCoolers::CalcZoneEvapUnitOutput(UnitNum, PartLoadRatio, FullSensibleOutput, FullLatentOutput);
+    EvaporativeCoolers::CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, FullSensibleOutput, FullLatentOutput);
     EXPECT_NEAR(FullSensibleOutput, SensOutputProvided, 0.01);
     EXPECT_NEAR(FullSensibleOutput, -thisZoneEvapCooler.UnitSensibleCoolingRate, 0.01);
     // test the unit at half of the full flow capacity
@@ -386,7 +387,7 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, DirectResearchSpecial_CyclingUnit_Sim)
     // calculate part load ratio for cycling fan
     EvaporativeCoolers::ControlZoneEvapUnitOutput(UnitNum, HalfOfFullLoad);
     EXPECT_NEAR(0.500000, thisZoneEvapCooler.UnitPartLoadRatio, 0.000001);
-    EvaporativeCoolers::CalcZoneEvapUnitOutput(UnitNum, thisZoneEvapCooler.UnitPartLoadRatio, SensOutputProvided, LatOutputProvided);
+    EvaporativeCoolers::CalcZoneEvapUnitOutput(state, UnitNum, thisZoneEvapCooler.UnitPartLoadRatio, SensOutputProvided, LatOutputProvided);
     EXPECT_NEAR(HalfOfFullLoad, SensOutputProvided, 0.01);
 }
 
@@ -451,11 +452,11 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, IndirectWetCoil_CyclingUnit_Sim)
     ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
     ScheduleManager::ScheduleInputProcessed = true;
 
-    Fans::GetFanInput();
+    Fans::GetFanInput(state);
     ASSERT_FALSE(ErrorsFound);
     EvaporativeCoolers::GetEvapInput();
     ASSERT_FALSE(ErrorsFound);
-    EvaporativeCoolers::GetInputZoneEvaporativeCoolerUnit();
+    EvaporativeCoolers::GetInputZoneEvaporativeCoolerUnit(state);
     ASSERT_FALSE(ErrorsFound);
 
     OutAirNodeManager::SetOutAirNodes();
@@ -493,11 +494,11 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, IndirectWetCoil_CyclingUnit_Sim)
     // Evap Cooler Unit Control Method = Zone Temperature Dead Band OnOff Cycling
     EXPECT_EQ(thisZoneEvapCooler.OpMode, DataHVACGlobals::CycFanCycCoil);
     EXPECT_EQ(thisZoneEvapCooler.ControlSchemeType, ZoneTemperatureDeadBandOnOffCycling);
-    EvaporativeCoolers::SimZoneEvaporativeCoolerUnit(thisZoneEvapCooler.Name, ActualZoneNum, SensOutputProvided, LatOutputProvided, ZoneEquipIndex);
+    EvaporativeCoolers::SimZoneEvaporativeCoolerUnit(state, thisZoneEvapCooler.Name, ActualZoneNum, SensOutputProvided, LatOutputProvided, ZoneEquipIndex);
     Real64 FullSensibleOutput = 0.0;
     Real64 FullLatentOutput = 0.0;
     Real64 PartLoadRatio = 1.0;
-    EvaporativeCoolers::CalcZoneEvapUnitOutput(UnitNum, PartLoadRatio, FullSensibleOutput, FullLatentOutput);
+    EvaporativeCoolers::CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, FullSensibleOutput, FullLatentOutput);
     EXPECT_NEAR(FullSensibleOutput, SensOutputProvided, 0.01);
     EXPECT_NEAR(FullSensibleOutput, -thisZoneEvapCooler.UnitSensibleCoolingRate, 0.01);
     // test the unit at half of the full flow capacity
@@ -506,15 +507,15 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, IndirectWetCoil_CyclingUnit_Sim)
     // calculate part load ratio for cycling fan
     EvaporativeCoolers::ControlZoneEvapUnitOutput(UnitNum, HalfOfFullLoad);
     EXPECT_NEAR(0.500000, thisZoneEvapCooler.UnitPartLoadRatio, 0.000001);
-    EvaporativeCoolers::CalcZoneEvapUnitOutput(UnitNum, thisZoneEvapCooler.UnitPartLoadRatio, SensOutputProvided, LatOutputProvided);
+    EvaporativeCoolers::CalcZoneEvapUnitOutput(state, UnitNum, thisZoneEvapCooler.UnitPartLoadRatio, SensOutputProvided, LatOutputProvided);
     EXPECT_NEAR(HalfOfFullLoad, SensOutputProvided, 0.01);
 
     // Evap Cooler Unit Control Method = Zone Cooling Load OnOff Cycling
     thisZoneEvapCooler.ControlSchemeType = ZoneCoolingLoadOnOffCycling;
     DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -15000.0;
-    EvaporativeCoolers::SimZoneEvaporativeCoolerUnit(thisZoneEvapCooler.Name, ActualZoneNum, SensOutputProvided, LatOutputProvided, ZoneEquipIndex);
+    EvaporativeCoolers::SimZoneEvaporativeCoolerUnit(state, thisZoneEvapCooler.Name, ActualZoneNum, SensOutputProvided, LatOutputProvided, ZoneEquipIndex);
     PartLoadRatio = 1.0;
-    EvaporativeCoolers::CalcZoneEvapUnitOutput(UnitNum, PartLoadRatio, FullSensibleOutput, FullLatentOutput);
+    EvaporativeCoolers::CalcZoneEvapUnitOutput(state, UnitNum, PartLoadRatio, FullSensibleOutput, FullLatentOutput);
     EXPECT_NEAR(FullSensibleOutput, SensOutputProvided, 0.01);
     EXPECT_NEAR(FullSensibleOutput, -thisZoneEvapCooler.UnitSensibleCoolingRate, 0.01);
     // test the unit at half of the full flow capacity
@@ -523,6 +524,6 @@ TEST_F(ZoneHVACEvapCoolerUnitTest, IndirectWetCoil_CyclingUnit_Sim)
     // calculate part load ratio for cycling fan
     EvaporativeCoolers::ControlZoneEvapUnitOutput(UnitNum, HalfOfFullLoad);
     EXPECT_NEAR(0.500000, thisZoneEvapCooler.UnitPartLoadRatio, 0.000001);
-    EvaporativeCoolers::CalcZoneEvapUnitOutput(UnitNum, thisZoneEvapCooler.UnitPartLoadRatio, SensOutputProvided, LatOutputProvided);
+    EvaporativeCoolers::CalcZoneEvapUnitOutput(state, UnitNum, thisZoneEvapCooler.UnitPartLoadRatio, SensOutputProvided, LatOutputProvided);
     EXPECT_NEAR(HalfOfFullLoad, SensOutputProvided, 0.01);
 }

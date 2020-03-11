@@ -52,6 +52,7 @@
 
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSurfaces.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
@@ -132,7 +133,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_CorrectInputs) {
     GetMaterialData(OutputFiles::getSingleton(), errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadZoneCoupledDomainInputs(1, 1, errorsFound);
+    ReadZoneCoupledDomainInputs(state, 1, 1, errorsFound);
 
     EXPECT_FALSE(errorsFound);
 }
@@ -201,7 +202,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadOSCMName) {
     GetMaterialData(OutputFiles::getSingleton(), errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadZoneCoupledDomainInputs(1, 1, errorsFound);
+    ReadZoneCoupledDomainInputs(state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -270,7 +271,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadSlabLocation) {
     GetMaterialData(OutputFiles::getSingleton(), errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadZoneCoupledDomainInputs(1, 1, errorsFound);
+    ReadZoneCoupledDomainInputs(state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -339,7 +340,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadSlabMaterialName) 
     GetMaterialData(OutputFiles::getSingleton(), errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadZoneCoupledDomainInputs(1, 1, errorsFound);
+    ReadZoneCoupledDomainInputs(state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -408,7 +409,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadHorizInsSelection)
     GetMaterialData(OutputFiles::getSingleton(), errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadZoneCoupledDomainInputs(1, 1, errorsFound);
+    ReadZoneCoupledDomainInputs(state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -477,7 +478,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadHorizInsMaterialNa
     GetMaterialData(OutputFiles::getSingleton(), errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadZoneCoupledDomainInputs(1, 1, errorsFound);
+    ReadZoneCoupledDomainInputs(state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -546,7 +547,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadHorizInsExtentsSel
     GetMaterialData(OutputFiles::getSingleton(), errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadZoneCoupledDomainInputs(1, 1, errorsFound);
+    ReadZoneCoupledDomainInputs(state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -615,7 +616,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_PerimeterInsulationWi
     GetMaterialData(OutputFiles::getSingleton(), errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadZoneCoupledDomainInputs(1, 1, errorsFound);
+    ReadZoneCoupledDomainInputs(state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -684,7 +685,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadVertInsSelection) 
     GetMaterialData(OutputFiles::getSingleton(), errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadZoneCoupledDomainInputs(1, 1, errorsFound);
+    ReadZoneCoupledDomainInputs(state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -753,7 +754,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadVertInsMaterialNam
     GetMaterialData(OutputFiles::getSingleton(), errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadZoneCoupledDomainInputs(1, 1, errorsFound);
+    ReadZoneCoupledDomainInputs(state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -822,7 +823,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadVertInsDepth) {
     GetMaterialData(OutputFiles::getSingleton(), errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadZoneCoupledDomainInputs(1, 1, errorsFound);
+    ReadZoneCoupledDomainInputs(state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -891,7 +892,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainSlab_CheckInputs_BadTimeStepSelection)
     GetMaterialData(OutputFiles::getSingleton(), errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadZoneCoupledDomainInputs(1, 1, errorsFound);
+    ReadZoneCoupledDomainInputs(state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -960,7 +961,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_CorrectInputs) {
     GetMaterialData(OutputFiles::getSingleton(), errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadBasementInputs(1, 1, errorsFound);
+    ReadBasementInputs(state, 1, 1, errorsFound);
 
     EXPECT_FALSE(errorsFound);
 }
@@ -1029,7 +1030,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadOSCMName) {
     GetMaterialData(OutputFiles::getSingleton(), errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadBasementInputs(1, 1, errorsFound);
+    ReadBasementInputs(state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -1098,7 +1099,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadHorizInsSelect
     GetMaterialData(OutputFiles::getSingleton(), errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadBasementInputs(1, 1, errorsFound);
+    ReadBasementInputs(state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -1167,7 +1168,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadHorizInsMateri
     GetMaterialData(OutputFiles::getSingleton(), errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadBasementInputs(1, 1, errorsFound);
+    ReadBasementInputs(state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -1236,7 +1237,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadHorizInsExtent
     GetMaterialData(OutputFiles::getSingleton(), errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadBasementInputs(1, 1, errorsFound);
+    ReadBasementInputs(state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -1305,7 +1306,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadBasementDepth)
     GetMaterialData(OutputFiles::getSingleton(), errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadBasementInputs(1, 1, errorsFound);
+    ReadBasementInputs(state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -1374,7 +1375,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadFloorOSCMName)
     GetMaterialData(OutputFiles::getSingleton(), errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadBasementInputs(1, 1, errorsFound);
+    ReadBasementInputs(state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -1443,7 +1444,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadVertInsSelecti
     GetMaterialData(OutputFiles::getSingleton(), errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadBasementInputs(1, 1, errorsFound);
+    ReadBasementInputs(state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -1512,7 +1513,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadVertInsName) {
     GetMaterialData(OutputFiles::getSingleton(), errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadBasementInputs(1, 1, errorsFound);
+    ReadBasementInputs(state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -1581,7 +1582,7 @@ TEST_F(EnergyPlusFixture, SiteGroundDomainBasement_CheckInputs_BadTimestepSelect
     GetMaterialData(OutputFiles::getSingleton(), errorsFound);
 
     PlantPipingSystemsManager::domains.resize(1);
-    ReadBasementInputs(1, 1, errorsFound);
+    ReadBasementInputs(state, 1, 1, errorsFound);
 
     EXPECT_TRUE(errorsFound);
 }
@@ -1730,7 +1731,7 @@ TEST_F(EnergyPlusFixture, PipingSystemFullSimulation) {
 
     // first call the factory, it will call GetInput
     bool initLoopEquip = true;
-    PlantComponent *thisCircuit = PlantPipingSystemsManager::Circuit::factory(DataPlant::TypeOf_PipingSystemPipeCircuit,
+    PlantComponent *thisCircuit = PlantPipingSystemsManager::Circuit::factory(state, DataPlant::TypeOf_PipingSystemPipeCircuit,
                                                                               "MY PIPE CIRCUIT");
 
     EXPECT_EQ(2u, PlantPipingSystemsManager::domains.size());
@@ -1749,12 +1750,12 @@ TEST_F(EnergyPlusFixture, PipingSystemFullSimulation) {
     initLoopEquip = false;
     EnergyPlus::PlantLocation myLocation = EnergyPlus::PlantLocation(1, 2, 1, 1);
     Real64 curLoad = 0.0;
-    thisCircuit->simulate(myLocation, true, curLoad, true);
+    thisCircuit->simulate(state, myLocation, true, curLoad, true);
 
     // we can also try to call from the Domain side
     DataGlobals::BeginSimFlag = true;
     DataGlobals::BeginEnvrnFlag = true;
-    PlantPipingSystemsManager::SimulateGroundDomains(OutputFiles::getSingleton(), false);
+    PlantPipingSystemsManager::SimulateGroundDomains(state, OutputFiles::getSingleton(), false);
 }
 
 /*

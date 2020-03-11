@@ -69,6 +69,7 @@
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -700,7 +701,7 @@ TEST_F(EnergyPlusFixture, SZRHOAFractionImpact)
     DataZoneEquipment::ZoneEquipConfig(1).InletNode(1) = zoneInletNode;
     DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
 
-    SetPointManager::GetSetPointManagerInputs();
+    SetPointManager::GetSetPointManagerInputs(state);
     EXPECT_EQ(SetPointManager::SingZoneRhSetPtMgr(1).ControlZoneNum, 1);
     SetPointManager::SingZoneRhSetPtMgr(1).AirLoopNum = 1;
 
@@ -880,7 +881,7 @@ TEST_F(EnergyPlusFixture, MixedAirSetPointManager_SameRefAndSPNodeName)
 
     // GetInput should fail since reference and set point node names are the same
     bool ErrorsFound = false;
-    SetPointManager::GetSetPointManagerInputData(ErrorsFound);
+    SetPointManager::GetSetPointManagerInputData(state, ErrorsFound);
     EXPECT_TRUE(ErrorsFound);
 
     std::string const error_string = delimited_string({
@@ -1198,23 +1199,23 @@ TEST_F(EnergyPlusFixture, ColdestSetPointMgrInSingleDuct)
 
     HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                    // zones are specified in the idf snippet
-    DataZoneEquipment::GetZoneEquipmentData();
+    DataZoneEquipment::GetZoneEquipmentData(state);
     ZoneAirLoopEquipmentManager::GetZoneAirLoopEquipment();
-    SingleDuct::GetSysInput();
+    SingleDuct::GetSysInput(state);
 
-    MixedAir::GetOutsideAirSysInputs();
+    MixedAir::GetOutsideAirSysInputs(state);
     SplitterComponent::GetSplitterInput();
     BranchInputManager::GetMixerInput();
     BranchInputManager::ManageBranchInput();
 
     DataGlobals::SysSizingCalc = true;
-    SimAirServingZones::GetAirPathData();
-    SimAirServingZones::InitAirLoops(true);
+    SimAirServingZones::GetAirPathData(state);
+    SimAirServingZones::InitAirLoops(state, true);
     // check the number of zones served by single duct or dual duct system
     EXPECT_EQ(1, DataAirLoop::AirToZoneNodeInfo(1).NumZonesCooled); // cooled and heated zone (served by single-duct)
     EXPECT_EQ(0, DataAirLoop::AirToZoneNodeInfo(1).NumZonesHeated); // no heated only zone (served by dual-duct)
 
-    SetPointManager::GetSetPointManagerInputs();
+    SetPointManager::GetSetPointManagerInputs(state);
     SetPointManager::WarmestSetPtMgr(1).AirLoopNum = 1;
     SetPointManager::ColdestSetPtMgr(1).AirLoopNum = 1;
 
@@ -1269,7 +1270,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMaxTempTest)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(ErrorsFound); // zones are specified in the idf snippet
 
-    SetPointManager::GetSetPointManagerInputs();
+    SetPointManager::GetSetPointManagerInputs(state);
     // check Set Point Manager get inputs
     EXPECT_EQ(SetPointManager::OutAirSetPtMgr(1).CtrlVarType, "MAXIMUMTEMPERATURE");
     EXPECT_EQ(SetPointManager::OutAirSetPtMgr(1).CtrlTypeMode, SetPointManager::iCtrlVarType_MaxTemp);
@@ -1327,7 +1328,7 @@ TEST_F(EnergyPlusFixture, SetPointManager_OutdoorAirResetMinTempTest)
     ASSERT_TRUE(process_idf(idf_objects));
     EXPECT_FALSE(ErrorsFound); // zones are specified in the idf snippet
 
-    SetPointManager::GetSetPointManagerInputs();
+    SetPointManager::GetSetPointManagerInputs(state);
     // check Set Point Manager get inputs
     EXPECT_EQ(SetPointManager::OutAirSetPtMgr(1).CtrlVarType, "MINIMUMTEMPERATURE");
     EXPECT_EQ(SetPointManager::OutAirSetPtMgr(1).CtrlTypeMode, SetPointManager::iCtrlVarType_MinTemp);
@@ -1398,7 +1399,7 @@ TEST_F(EnergyPlusFixture, SingZoneRhSetPtMgrZoneInletNodeTest)
     DataZoneEquipment::ZoneEquipConfig(1).InletNode(1) = 4;
     DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
 
-    SetPointManager::GetSetPointManagerInputs();
+    SetPointManager::GetSetPointManagerInputs(state);
 
     DataZoneEquipment::ZoneEquipInputsFilled = true;
     DataAirLoop::AirLoopInputsFilled = true;
@@ -1465,7 +1466,7 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrZoneInletNodeTest)
     DataZoneEquipment::ZoneEquipConfig(1).InletNode(1) = 4;
     DataZoneEquipment::ZoneEquipConfig(1).InletNodeAirLoopNum(1) = 1;
 
-    SetPointManager::GetSetPointManagerInputs();
+    SetPointManager::GetSetPointManagerInputs(state);
 
     DataZoneEquipment::ZoneEquipInputsFilled = true;
     DataAirLoop::AirLoopInputsFilled = true;
@@ -1518,7 +1519,7 @@ TEST_F(EnergyPlusFixture, SingZoneCoolHeatSetPtMgrSetPtTest)
 
     DataHeatBalance::Zone.allocate(DataGlobals::NumOfZones);
     DataHeatBalance::Zone(1).Name = "ZSF1";
-    SetPointManager::GetSetPointManagerInputs();
+    SetPointManager::GetSetPointManagerInputs(state);
 
     DataZoneEquipment::ZoneEquipConfig.allocate(1);
     DataZoneEquipment::ZoneEquipConfig(1).NumInletNodes = 1;

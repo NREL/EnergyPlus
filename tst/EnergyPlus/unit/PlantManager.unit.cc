@@ -56,6 +56,7 @@
 #include <ObjexxFCL/string.functions.hh>
 // EnergyPlus Headers
 #include "Fixtures/EnergyPlusFixture.hh"
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
@@ -81,7 +82,7 @@ namespace PlantManager {
         PlantLoop(1).CirculationTime = 2;
         PlantLoop(1).FluidType = NodeType_Water;
         PlantLoop(1).FluidIndex = 1;
-        SizePlantLoop(1, true);
+        SizePlantLoop(state, 1, true);
         int TestVolume = 600;
         EXPECT_EQ(TestVolume, PlantLoop(1).Volume);
     }

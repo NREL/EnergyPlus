@@ -70,6 +70,7 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -219,7 +220,7 @@ TEST_F(EnergyPlusFixture, TestZoneVentingSch)
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    GetAirflowNetworkInput(OutputFiles::getSingleton());
+    GetAirflowNetworkInput(state, OutputFiles::getSingleton());
 
     // MultizoneZoneData has only 1 element so may be hardcoded
     auto GetIndex = UtilityRoutines::FindItemInList(AirflowNetwork::MultizoneZoneData(1).VentingSchName, Schedule({1, NumSchedules}));
@@ -342,7 +343,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_TestTriangularWindowWarni
     });
 
     ASSERT_TRUE(process_idf(idf_objects));
-    GetAirflowNetworkInput(OutputFiles::getSingleton());
+    GetAirflowNetworkInput(state, OutputFiles::getSingleton());
     std::string const error_string = delimited_string({
         "   ** Warning ** GetAirflowNetworkInput: AirflowNetwork:MultiZone:Surface=\"WINDOW1\".",
         "   **   ~~~   ** The opening is a Triangular subsurface. A rectangular subsurface will be used with equivalent width and height.",
@@ -2253,7 +2254,7 @@ TEST_F(EnergyPlusFixture, TestAFNPressureStat)
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
-    GetAirflowNetworkInput(OutputFiles::getSingleton());
+    GetAirflowNetworkInput(state, OutputFiles::getSingleton());
 
     Real64 PressureSet = 0.5;
 
@@ -2466,7 +2467,7 @@ TEST_F(EnergyPlusFixture, TestZoneVentingSchWithAdaptiveCtrl)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetAirflowNetworkInput(OutputFiles::getSingleton());
+    GetAirflowNetworkInput(state, OutputFiles::getSingleton());
 
     // The original value before fix is zero. After the fix, the correct schedule number is assigned.
 
@@ -3008,7 +3009,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManagerTest_PolygonalWindows)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    GetAirflowNetworkInput(OutputFiles::getSingleton());
+    GetAirflowNetworkInput(state, OutputFiles::getSingleton());
 
     // Choice: Height; Base Surface: Vertical Rectangular
     EXPECT_NEAR(1.0, AirflowNetwork::MultizoneSurfaceData(1).Width, 0.0001);
@@ -4410,7 +4411,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AFNUserDefinedDuctViewFac
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetHeatBalanceInput();
+    HeatBalanceManager::GetHeatBalanceInput(state);
     HeatBalanceManager::AllocateHeatBalArrays();
     DataEnvironment::OutBaroPress = 101000;
     DataHVACGlobals::TimeStepSys = DataGlobals::TimeStepZone;
@@ -4423,7 +4424,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_AFNUserDefinedDuctViewFac
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
-    GetAirflowNetworkInput(OutputFiles::getSingleton());
+    GetAirflowNetworkInput(state, OutputFiles::getSingleton());
     InitAirflowNetwork();
 
     // Check inputs
@@ -5633,7 +5634,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodes)
     CurveManager::GetCurveInput();
     EXPECT_EQ(CurveManager::NumCurves, 2);
 
-    AirflowNetworkBalanceManager::GetAirflowNetworkInput(OutputFiles::getSingleton());
+    AirflowNetworkBalanceManager::GetAirflowNetworkInput(state, OutputFiles::getSingleton());
 
     // Check the airflow elements
     EXPECT_EQ(2u, AirflowNetwork::MultizoneExternalNodeData.size());
@@ -6275,7 +6276,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithTables)
     CurveManager::GetCurveInput();
     EXPECT_EQ(CurveManager::NumCurves, 2);
 
-    AirflowNetworkBalanceManager::GetAirflowNetworkInput(OutputFiles::getSingleton());
+    AirflowNetworkBalanceManager::GetAirflowNetworkInput(state, OutputFiles::getSingleton());
 
     // Check the airflow elements
     EXPECT_EQ(2u, AirflowNetwork::MultizoneExternalNodeData.size());
@@ -6898,7 +6899,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithNoInput)
     CurveManager::GetCurveInput();
     EXPECT_EQ(CurveManager::NumCurves, 1);
 
-    AirflowNetworkBalanceManager::GetAirflowNetworkInput(OutputFiles::getSingleton());
+    AirflowNetworkBalanceManager::GetAirflowNetworkInput(state, OutputFiles::getSingleton());
 
     EXPECT_EQ(CurveManager::NumCurves, 6);
 
@@ -7525,7 +7526,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithSymmetricTable)
     CurveManager::GetCurveInput();
     EXPECT_EQ(CurveManager::NumCurves, 1);
 
-    AirflowNetworkBalanceManager::GetAirflowNetworkInput(OutputFiles::getSingleton());
+    AirflowNetworkBalanceManager::GetAirflowNetworkInput(state, OutputFiles::getSingleton());
 
     // Check the airflow elements
     EXPECT_EQ(2u, AirflowNetwork::MultizoneExternalNodeData.size());
@@ -8159,7 +8160,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithSymmetricCurve)
     CurveManager::GetCurveInput();
     EXPECT_EQ(CurveManager::NumCurves, 1);
 
-    AirflowNetworkBalanceManager::GetAirflowNetworkInput(OutputFiles::getSingleton());
+    AirflowNetworkBalanceManager::GetAirflowNetworkInput(state, OutputFiles::getSingleton());
 
     // Check the airflow elements
     EXPECT_EQ(2u, AirflowNetwork::MultizoneExternalNodeData.size());
@@ -8875,7 +8876,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithLocalAirNode)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetHeatBalanceInput();
+    HeatBalanceManager::GetHeatBalanceInput(state);
     HeatBalanceManager::AllocateHeatBalArrays();
     DataHVACGlobals::TimeStepSys = DataGlobals::TimeStepZone;
     SurfaceGeometry::GetGeometryParameters(OutputFiles::getSingleton(), ErrorsFound);
@@ -8893,7 +8894,7 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithLocalAirNode)
 
     DataGlobals::AnyLocalEnvironmentsInModel = true;
     OutAirNodeManager::SetOutAirNodes();
-    GetAirflowNetworkInput(OutputFiles::getSingleton());
+    GetAirflowNetworkInput(state, OutputFiles::getSingleton());
     InitAirflowNetwork();
 
     // Check the airflow elements
@@ -9360,7 +9361,7 @@ TEST_F(EnergyPlusFixture, BasicAdvancedSingleSided)
     CurveManager::GetCurveInput();
     EXPECT_EQ(0, CurveManager::NumCurves);
 
-    AirflowNetworkBalanceManager::GetAirflowNetworkInput(OutputFiles::getSingleton());
+    AirflowNetworkBalanceManager::GetAirflowNetworkInput(state, OutputFiles::getSingleton());
 
     // Check that the correct number of curves has been generated (5 facade directions + 2 windows)
     EXPECT_EQ(7, CurveManager::NumCurves);
@@ -12906,7 +12907,7 @@ TEST_F(EnergyPlusFixture, MultiAirLoopTest)
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
-    GetAirflowNetworkInput(OutputFiles::getSingleton());
+    GetAirflowNetworkInput(state, OutputFiles::getSingleton());
 
     Real64 PresssureSet = 0.5;
     // Assign values
@@ -12989,7 +12990,7 @@ TEST_F(EnergyPlusFixture, AFN_CheckNumOfFansInAirLoopTest)
     DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(1).Name = "CVF";
     DataAirSystems::PrimaryAirSystem(1).Branch(1).Comp(2).Name = "VAV";
 
-    ASSERT_THROW(ValidateDistributionSystem(), std::runtime_error);
+    ASSERT_THROW(ValidateDistributionSystem(state), std::runtime_error);
 
     std::string const error_string = delimited_string({
         "   ** Severe  ** ValidateDistributionSystem: An AirLoop branch, , has two or more fans: CVF,VAV",
@@ -13436,7 +13437,7 @@ TEST_F(EnergyPlusFixture, BasicAdvancedSingleSidedAvoidCrashTest)
     bool resimu = false;
 
     Zone(1).OutDryBulbTemp = DataEnvironment::OutDryBulbTemp;
-    AirflowNetworkBalanceManager::GetAirflowNetworkInput(OutputFiles::getSingleton());
+    AirflowNetworkBalanceManager::GetAirflowNetworkInput(state, OutputFiles::getSingleton());
     AirflowNetworkGetInputFlag = false;
     AirflowNetwork::AirflowNetworkExchangeData.allocate(1);
     ManageAirflowNetworkBalance(First, iter, resimu);
@@ -15365,7 +15366,7 @@ TEST_F(EnergyPlusFixture, TestAFNFanModel)
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
-    GetAirflowNetworkInput(OutputFiles::getSingleton());
+    GetAirflowNetworkInput(state, OutputFiles::getSingleton());
 
     Schedule(1).CurrentValue = 1.0;
     Schedule(2).CurrentValue = 100.0;
@@ -15482,7 +15483,7 @@ TEST_F(EnergyPlusFixture, AFN_CheckMultiZoneNodes_NoZoneNode)
     DataZoneEquipment::ZoneEquipConfig(1).NumReturnNodes = 0;
     DataZoneEquipment::ZoneEquipConfig(1).IsControlled = true;
 
-    ASSERT_THROW(ValidateDistributionSystem(), std::runtime_error);
+    ASSERT_THROW(ValidateDistributionSystem(state), std::runtime_error);
 
     std::string const error_string = delimited_string({
         "   ** Severe  ** ValidateDistributionSystem: 'ATTIC ZONE AIR NODE' is not defined as an AirflowNetwork:Distribution:Node object.",
@@ -15569,7 +15570,7 @@ TEST_F(EnergyPlusFixture, AFN_CheckMultiZoneNodes_NoInletNode)
 
 
     // MixedAir::NumOAMixers.allocate(1);
-    ValidateDistributionSystem();
+    ValidateDistributionSystem(state);
 
     EXPECT_TRUE(compare_err_stream("", true));
 }

@@ -66,6 +66,7 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -3976,8 +3977,8 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
     SurfaceGeometry::GetSurfaceData(OutputFiles::getSingleton(), ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
-    ZoneEquipmentManager::GetZoneEquipment();
-    SimAirServingZones::GetAirPathData();
+    ZoneEquipmentManager::GetZoneEquipment(state);
+    SimAirServingZones::GetAirPathData(state);
     // OA inlet node
     DataLoopNode::Node(2).MassFlowRate = 0.1;
     DataLoopNode::Node(3).MassFlowRate = 0.1;
@@ -4009,7 +4010,7 @@ TEST_F(EnergyPlusFixture, AirLoopHVACDOASTest)
     DataLoopNode::Node(11).HumRat = 0.0008;
     DataLoopNode::Node(70).TempSetPoint = 4.5;
     Schedule(1).CurrentValue = 1.0; // set availability and fan schedule to 1
-    thisAirLoopDOASObjec.SimAirLoopHVACDOAS(true, index);
+    thisAirLoopDOASObjec.SimAirLoopHVACDOAS(state, true, index);
 
     // Mixer outlet
     EXPECT_NEAR(23.0, DataLoopNode::Node(68).Temp, 0.0001);

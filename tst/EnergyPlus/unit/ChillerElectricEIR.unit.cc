@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 
 #include "Fixtures/EnergyPlusFixture.hh"
@@ -129,7 +130,7 @@ TEST_F(ChillerElecEIRFixture, ElectricEIRChiller_HeatRecoveryAutosizeTest)
     DataPlant::PlantFirstSizesOkayToFinalize = true;
 
     // now call sizing routine
-    thisEIR.size();
+    thisEIR.size(state);
     // see if heat recovery flow rate is as expected
     EXPECT_NEAR(thisEIR.DesignHeatRecVolFlowRate, 0.5, 0.00001);
 
@@ -232,7 +233,7 @@ TEST_F(ChillerElecEIRFixture, ChillerElectricEIR_AirCooledChiller)
     DataPlant::PlantFinalSizesOkayToReport = true;
 
     thisEIR.initialize(RunFlag, MyLoad);
-    thisEIR.size();
+    thisEIR.size(state);
 
     // run through init again after sizing is complete to set mass flow rate
     DataGlobals::BeginEnvrnFlag = true;

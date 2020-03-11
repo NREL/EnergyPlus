@@ -56,6 +56,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -160,7 +161,7 @@ namespace OutputProcessor {
         int StartMinute = 0;
         bool PrintESOTimeStamp = true;
 
-        ReportTSMeters(StartMinute, EndMinute, PrintESOTimeStamp, true);
+        ReportTSMeters(state, StartMinute, EndMinute, PrintESOTimeStamp, true);
 
         auto result = queryResult("SELECT * FROM Time;", "Time");
 
@@ -226,7 +227,7 @@ namespace OutputProcessor {
         int StartMinute = 0;
         bool PrintESOTimeStamp = false;
 
-        ReportTSMeters(StartMinute, EndMinute, PrintESOTimeStamp, true);
+        ReportTSMeters(state, StartMinute, EndMinute, PrintESOTimeStamp, true);
 
         auto result = queryResult("SELECT * FROM Time;", "Time");
 
@@ -287,7 +288,7 @@ namespace OutputProcessor {
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 3;
 
-        ReportHRMeters(true);
+        ReportHRMeters(state, true);
 
         auto result = queryResult("SELECT * FROM Time;", "Time");
 
@@ -355,7 +356,7 @@ namespace OutputProcessor {
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 3;
 
-        ReportDYMeters(true);
+        ReportDYMeters(state, true);
 
         auto result = queryResult("SELECT * FROM Time;", "Time");
 
@@ -427,7 +428,7 @@ namespace OutputProcessor {
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 3;
 
-        ReportMNMeters(true);
+        ReportMNMeters(state, true);
 
         auto result = queryResult("SELECT * FROM Time;", "Time");
 
@@ -499,7 +500,7 @@ namespace OutputProcessor {
         DataEnvironment::DayOfWeek = 2;
         DataEnvironment::HolidayIndex = 3;
 
-        ReportSMMeters(true);
+        ReportSMMeters(state, true);
 
         auto result = queryResult("SELECT * FROM Time;", "Time");
 
@@ -4194,7 +4195,7 @@ namespace OutputProcessor {
 
         UpdateMeterReporting(OutputFiles::getSingleton());
 
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
+        UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
 
         auto timeResults = queryResult("SELECT * FROM Time;", "Time");
 
@@ -4442,7 +4443,7 @@ namespace OutputProcessor {
 
         UpdateMeterReporting(OutputFiles::getSingleton());
 
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
+        UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
 
         auto timeResults = queryResult("SELECT * FROM Time;", "Time");
 
@@ -4699,7 +4700,7 @@ namespace OutputProcessor {
 
         UpdateMeterReporting(OutputFiles::getSingleton());
 
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
 
         auto timeResults = queryResult("SELECT * FROM Time;", "Time");
 
@@ -4835,33 +4836,33 @@ namespace OutputProcessor {
 
         PurchAir(1).TotHeatEnergy = 1.1;
         UpdateMeterReporting(OutputFiles::getSingleton());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
 
         PurchAir(1).TotHeatEnergy = 1.3;
         UpdateMeterReporting(OutputFiles::getSingleton());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
 
         PurchAir(1).TotHeatEnergy = 1.5;
         UpdateMeterReporting(OutputFiles::getSingleton());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
 
         PurchAir(1).TotHeatEnergy = 1.7;
         UpdateMeterReporting(OutputFiles::getSingleton());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
 
         PurchAir(1).TotHeatEnergy = 1.9;
         UpdateMeterReporting(OutputFiles::getSingleton());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
 
         PurchAir(1).TotHeatEnergy = 2.2;
         UpdateMeterReporting(OutputFiles::getSingleton());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
 
         DataGlobals::WarmupFlag = false;
 
         PurchAir(1).TotHeatEnergy = 2.4;
         UpdateMeterReporting(OutputFiles::getSingleton());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone); // zone timestep
+        UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone); // zone timestep
 
         compare_eso_stream(delimited_string({
             "7,1,,Zone Ideal Loads Supply Air Total Heating Energy [J] !Each Call",
@@ -4886,15 +4887,15 @@ namespace OutputProcessor {
 
         PurchAir(1).TotHeatEnergy = 100.0;
         UpdateMeterReporting(OutputFiles::getSingleton());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
 
         PurchAir(1).TotHeatEnergy = 200.0;
         UpdateMeterReporting(OutputFiles::getSingleton());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepSystem);
+        UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepSystem);
 
         PurchAir(1).TotHeatEnergy = 300.0;
         UpdateMeterReporting(OutputFiles::getSingleton());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone); // zone timestep
+        UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone); // zone timestep
 
         compare_eso_stream(delimited_string({
             "2,365,12,31, 0,24, 0.00,10.00,Tuesday",
@@ -4970,7 +4971,7 @@ namespace OutputProcessor {
                             1,
                             1);
         UpdateMeterReporting(OutputFiles::getSingleton());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
+        UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
 
         GenOutputVariablesAuditReport();
 
@@ -5051,7 +5052,7 @@ namespace OutputProcessor {
                             1,
                             1);
         UpdateMeterReporting(OutputFiles::getSingleton());
-        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
+        UpdateDataandReport(state, OutputProcessor::TimeStepType::TimeStepZone);
 
         NumExtraVars = 0;
         BuildKeyVarList("Air Loop 1|AirSupply InletNode", "SYSTEM NODE SETPOINT TEMPERATURE", 1, 2);

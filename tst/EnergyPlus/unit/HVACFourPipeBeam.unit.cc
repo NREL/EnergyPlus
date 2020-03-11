@@ -61,6 +61,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HVACFourPipeBeam.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -1731,13 +1732,13 @@ TEST_F(EnergyPlusFixture, Beam_sizeandSimulateOneZone)
     createFacilityElectricPowerServiceObject();
     BranchInputManager::ManageBranchInput(); // just gets input and returns.
     DataGlobals::DoingSizing = true;
-    SizingManager::ManageSizing(OutputFiles::getSingleton());
+    SizingManager::ManageSizing(state, OutputFiles::getSingleton());
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
     TestAirPathIntegrity(ErrorsFound); // Needed to initialize return node connections to airloops and inlet nodes
-    SimulationManager::SetupSimulation(OutputFiles::getSingleton(), ErrorsFound);
+    SimulationManager::SetupSimulation(state, OutputFiles::getSingleton(), ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
     DataHVACGlobals::SimZoneEquipmentFlag = true;
@@ -3305,13 +3306,13 @@ TEST_F(EnergyPlusFixture, Beam_fatalWhenSysSizingOff)
     createFacilityElectricPowerServiceObject();
     BranchInputManager::ManageBranchInput(); // just gets input and returns.
     DataGlobals::DoingSizing = true;
-    SizingManager::ManageSizing(OutputFiles::getSingleton());
+    SizingManager::ManageSizing(state, OutputFiles::getSingleton());
     DataGlobals::DoingSizing = false;
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
 
-    ASSERT_ANY_THROW(SimulationManager::SetupSimulation(OutputFiles::getSingleton(), ErrorsFound));
+    ASSERT_ANY_THROW(SimulationManager::SetupSimulation(state, OutputFiles::getSingleton(), ErrorsFound));
 }
 
 } // namespace EnergyPlus

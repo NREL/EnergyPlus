@@ -69,6 +69,7 @@
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
@@ -202,7 +203,7 @@ TEST_F(EnergyPlusFixture, WindowFrameTest)
     DataGlobals::BeginEnvrnFlag = true;
     DataEnvironment::OutBaroPress = 100000;
 
-    HeatBalanceManager::ManageHeatBalance(OutputFiles::getSingleton());
+    HeatBalanceManager::ManageHeatBalance(state, OutputFiles::getSingleton());
 
     // This test will emulate NFRC 100 U-factor test
     int winNum;

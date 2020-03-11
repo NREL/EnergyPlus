@@ -64,6 +64,7 @@
 #include <EnergyPlus/DataRoomAirModel.hh>
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/OutputFiles.hh>
@@ -425,12 +426,12 @@ TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_DynamicIntConvSurfaceClassi
     HeatBalanceManager::GetZoneData(errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    SurfaceGeometry::SetupZoneGeometry(OutputFiles::getSingleton(), errorsFound);
+    SurfaceGeometry::SetupZoneGeometry(state, OutputFiles::getSingleton(), errorsFound);
     ASSERT_FALSE(errorsFound);
     HeatBalanceManager::AllocateHeatBalArrays();
     HeatBalanceSurfaceManager::AllocateSurfaceHeatBalArrays();
 
-    DataZoneEquipment::GetZoneEquipmentData1();
+    DataZoneEquipment::GetZoneEquipmentData1(state);
 
     BaseboardElectric::GetBaseboardInput();
 

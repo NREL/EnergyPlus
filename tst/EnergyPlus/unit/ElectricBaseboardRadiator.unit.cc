@@ -55,6 +55,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/ElectricBaseboardRadiator.hh>
+#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -293,7 +294,7 @@ TEST_F(EnergyPlusFixture, RadConvElecBaseboard_Test1)
     SurfaceGeometry::GetSurfaceData(OutputFiles::getSingleton(), errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    DataZoneEquipment::GetZoneEquipmentData1();
+    DataZoneEquipment::GetZoneEquipmentData1(state);
 
     ElectricBaseboardRadiator::GetElectricBaseboardInput();
     EXPECT_EQ(ElectricBaseboardRadiator::ElecBaseboard(1).ZonePtr, 1);
@@ -589,7 +590,7 @@ TEST_F(EnergyPlusFixture, ElectricBaseboardRadConv_SizingTest)
     SurfaceGeometry::GetSurfaceData(OutputFiles::getSingleton(), errorsFound);
     ASSERT_FALSE(errorsFound);
 
-    DataZoneEquipment::GetZoneEquipmentData1();
+    DataZoneEquipment::GetZoneEquipmentData1(state);
     // get electric baseboard inputs
     ElectricBaseboardRadiator::GetElectricBaseboardInput();
 
