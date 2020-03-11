@@ -6956,7 +6956,6 @@ namespace ZoneTempPredictorCorrector {
 
         // first time run allocate arrays and setup output variable
         if (SetupOscillationOutputFlag) {
-            if (!DataGlobals::DoWeathSim) return;
             ZoneTempHist.allocate(4, NumOfZones);
             ZoneTempHist = 0.0;
             ZoneTempOscillate.dimension(NumOfZones, 0.0);
