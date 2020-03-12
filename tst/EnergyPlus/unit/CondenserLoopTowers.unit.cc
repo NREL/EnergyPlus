@@ -3910,11 +3910,11 @@ TEST_F(EnergyPlusFixture, VSCoolingTowers_WaterOutletTempTest)
     BranchInputManager::ManageBranchInput();
 
     // Get plant loop data
-    PlantManager::GetPlantLoopData();
-    PlantManager::GetPlantInput();
+    PlantManager::GetPlantLoopData(state);
+    PlantManager::GetPlantInput(state);
     SizingManager::GetPlantSizingInput();
     PlantManager::InitOneTimePlantSizingInfo(1);
-    PlantManager::SizePlantLoop(1, true);
+    PlantManager::SizePlantLoop(state, 1, true);
     PlantManager::InitLoopEquip = true;
 
     DataGlobals::DoingSizing = false;

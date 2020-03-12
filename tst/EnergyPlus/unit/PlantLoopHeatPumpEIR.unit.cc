@@ -2772,7 +2772,7 @@ TEST_F(EIRPLHPFixture, CoolingMetering)
     // call for all initialization
     DataGlobals::BeginEnvrnFlag = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
-    thisCoolingPLHP->onInitLoopEquip(myLoadLocation);
+    thisCoolingPLHP->onInitLoopEquip(state, myLoadLocation);
 
     int NumFound;
 
@@ -2868,7 +2868,7 @@ TEST_F(EIRPLHPFixture, HeatingMetering)
     // call for all initialization
     DataGlobals::BeginEnvrnFlag = true;
     DataPlant::PlantFirstSizesOkayToFinalize = true;
-    thisHeatingPLHP->onInitLoopEquip(myLoadLocation);
+    thisHeatingPLHP->onInitLoopEquip(state, myLoadLocation);
 
     int NumFound;
 

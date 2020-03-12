@@ -16942,7 +16942,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_DuplicatedNodeNameTest)
     EXPECT_FALSE(ErrorsFound);
     HeatBalanceManager::GetConstructData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
-    HeatBalanceManager::GetHeatBalanceInput();
+    HeatBalanceManager::GetHeatBalanceInput(state);
     HeatBalanceManager::AllocateHeatBalArrays();
     DataEnvironment::OutBaroPress = 101000;
     DataHVACGlobals::TimeStepSys = DataGlobals::TimeStepZone;
@@ -16955,7 +16955,7 @@ TEST_F(EnergyPlusFixture, AirflowNetworkBalanceManager_DuplicatedNodeNameTest)
     EXPECT_FALSE(ErrorsFound);
 
     // Read AirflowNetwork inputs
-    ASSERT_THROW(GetAirflowNetworkInput(OutputFiles::getSingleton()), std::runtime_error);
+    ASSERT_THROW(GetAirflowNetworkInput(state, OutputFiles::getSingleton()), std::runtime_error);
 
     std::string const error_string = delimited_string({
         "   ** Warning ** GetHTSurfaceData: Surfaces with interface to Ground found but no \"Ground Temperatures\" were input.",

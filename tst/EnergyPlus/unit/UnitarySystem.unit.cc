@@ -11895,7 +11895,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_AllFlowFieldsBlankInputTest)
     bool ErrorsFound(false);
     HeatBalanceManager::GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);                 
-    DataZoneEquipment::GetZoneEquipmentData1();
+    DataZoneEquipment::GetZoneEquipmentData1(state);
     DataSizing::ZoneEqSizing.allocate(1);
     DataZoneEquipment::ZoneEquipList(1).EquipIndex.allocate(1);
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 1;
@@ -11904,10 +11904,10 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_AllFlowFieldsBlankInputTest)
     std::string compName = "UNITARY SYSTEM MODEL";
     int compTypeOfNum = DataHVACGlobals::UnitarySys_AnyCoilType;
     bool zoneEquipment(true);
-    UnitarySystems::UnitarySys::factory(DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
+    UnitarySystems::UnitarySys::factory(state, DataHVACGlobals::UnitarySys_AnyCoilType, compName, zoneEquipment, 0);
     UnitarySystems::UnitarySys *thisSys = &UnitarySystems::unitarySys[0];
     DataZoneEquipment::ZoneEquipInputsFilled = true;
-    thisSys->getUnitarySystemInputData(compName, zoneEquipment, 0, ErrorsFound);
+    thisSys->getUnitarySystemInputData(state, compName, zoneEquipment, 0, ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
 
     ASSERT_EQ(1, UnitarySystems::numUnitarySystems);
@@ -11958,7 +11958,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_AllFlowFieldsBlankInputTest)
     int AirLoopNum(0);
     bool FirstHVACIteration(true);
 
-    thisSys->sizeSystem(FirstHVACIteration, AirLoopNum);
+    thisSys->sizeSystem(state, FirstHVACIteration, AirLoopNum);
     // check autosized flows and capacity
     EXPECT_EQ(thisSys->m_MaxCoolAirVolFlow, 1.005);
     EXPECT_EQ(thisSys->m_MaxHeatAirVolFlow, 1.005);

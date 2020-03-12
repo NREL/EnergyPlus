@@ -13624,8 +13624,8 @@ TEST_F(HVACVRFFixture, VRF_BlowthroughFanPlacement_InputTest)
     GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     // get zone input and connections
-    GetZoneEquipmentData();
-    GetVRFInput();
+    GetZoneEquipmentData(state);
+    GetVRFInput(state);
     // set pointer to components
     auto &thisVRFTU(VRFTU(1));
     auto &thisDXCoolingCoil(DXCoil(1));
