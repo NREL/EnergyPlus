@@ -141,7 +141,7 @@ namespace ExteriorEnergyUse {
     };
 
     // Object Data
-    extern Array1D<ExteriorLightUsage> ExteriorLights;        // Structure for Exterior Light reporting
+    //!$extern Array1D<ExteriorLightUsage> ExteriorLights;        // Structure for Exterior Light reporting
     extern Array1D<ExteriorEquipmentUsage> ExteriorEquipment; // Structure for Exterior Equipment Reporting
 
     // Functions

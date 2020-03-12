@@ -724,7 +724,7 @@ namespace OutputReportTabular {
         TOCEntries.deallocate();
         UnitConv.deallocate();
 
-        OutputReportTabular::ResetTabularReports(state);
+        OutputReportTabular::ResetTabularReports();
     }
 
     void UpdateTabularReports(OutputProcessor::TimeStepType t_timeStepType) // What kind of data to update (Zone, HVAC)
@@ -6468,7 +6468,7 @@ namespace OutputReportTabular {
         using DataOutputs::iTotalAutoCalculatableFields;
         using DataOutputs::iTotalAutoSizableFields;
         using DataOutputs::iTotalFieldsWithDefaults;
-        using ExteriorEnergyUse::ExteriorLights;
+        //!$using ExteriorEnergyUse::ExteriorLights;
 		//!$using ExteriorEnergyUse::NumExteriorLights;
         using General::RoundSigDigits;
         using ScheduleManager::GetScheduleName;
@@ -6551,22 +6551,22 @@ namespace OutputReportTabular {
             consumptionTotal += Lights(iLight).SumConsumption / 1000000000.0;
         }
         PreDefTableEntry(pdchInLtConsump, "Interior Lighting Total", consumptionTotal);
-
+        
         // Exterior Lighting
         consumptionTotal = 0.0;
         for (iLight = 1; iLight <= state.exteriorEnergyUse.NumExteriorLights; ++iLight) {
-            if (ExteriorLights(iLight).ControlMode == 1) { // photocell/schedule
+            if (state.exteriorEnergyUse.ExteriorLights(iLight).ControlMode == 1) { // photocell/schedule
                 PreDefTableEntry(pdchExLtAvgHrSchd,
-                                 ExteriorLights(iLight).Name,
+                                 state.exteriorEnergyUse.ExteriorLights(iLight).Name,
                                  ScheduleAverageHoursPerWeek(ExteriorLights(iLight).SchedPtr, StartOfWeek, CurrentYearIsLeapYear));
             }
             // average operating hours per week
             if (gatherElapsedTimeBEPS > 0) {
-                HrsPerWeek = 24 * 7 * ExteriorLights(iLight).SumTimeNotZeroCons / gatherElapsedTimeBEPS;
+                HrsPerWeek = 24 * 7 * state.exteriorEnergyUse.ExteriorLights(iLight).SumTimeNotZeroCons / gatherElapsedTimeBEPS;
                 PreDefTableEntry(pdchExLtAvgHrOper, ExteriorLights(iLight).Name, HrsPerWeek);
             }
             // full load hours per week
-            if ((ExteriorLights(iLight).DesignLevel * gatherElapsedTimeBEPS) > 0) {
+            if ((state.exteriorEnergyUse.ExteriorLights(iLight).DesignLevel * gatherElapsedTimeBEPS) > 0) {
                 HrsPerWeek =
                     24 * 7 * ExteriorLights(iLight).SumConsumption / (ExteriorLights(iLight).DesignLevel * gatherElapsedTimeBEPS * SecInHour);
                 PreDefTableEntry(pdchExLtFullLoadHrs, ExteriorLights(iLight).Name, HrsPerWeek);
@@ -15142,7 +15142,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void ResetTabularReports(AllGlobals &state)
+    void ResetTabularReports()
     {
         // Jason Glazer - October 2015
         // Reset all gathering arrays to zero for multi-year simulations
@@ -15159,7 +15159,7 @@ namespace OutputReportTabular {
         ResetSourceEnergyEndUseGathering();
         ResetPeakDemandGathering();
         ResetHeatGainGathering();
-        ResetRemainingPredefinedEntries(state);
+        ResetRemainingPredefinedEntries();
         ResetThermalComfortSimpleASH55();
         ResetSetPointMet();
         ResetAdaptiveComfort();
@@ -15392,7 +15392,7 @@ namespace OutputReportTabular {
         BuildingPreDefRep.SHGSClOtherRem = 0.0;
     }
 
-    void ResetRemainingPredefinedEntries(AllGlobals &state)
+    void ResetRemainingPredefinedEntries()
     {
         // Jason Glazer - October 2015
         // Reset all entries that are added to the predefined reports in the FillRemainingPredefinedEntries() function to zero for multi-year
@@ -15401,7 +15401,7 @@ namespace OutputReportTabular {
         using DataHeatBalance::TotLights;
         using DataHeatBalance::Zone;
         using DataHeatBalance::ZonePreDefRep;
-        using ExteriorEnergyUse::ExteriorLights;
+        //!$using ExteriorEnergyUse::ExteriorLights;
         //using ExteriorEnergyUse::NumExteriorLights;
 
         Real64 const bigVal(0.0); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
@@ -15412,10 +15412,11 @@ namespace OutputReportTabular {
             Lights(iLight).SumTimeNotZeroCons = 0.;
             Lights(iLight).SumConsumption = 0.;
         }
-        for (iLight = 1; iLight <= state.exteriorEnergyUse.NumExteriorLights; ++iLight) {
-            ExteriorLights(iLight).SumTimeNotZeroCons = 0.;
-            ExteriorLights(iLight).SumConsumption = 0.;
-        }
+//!$  TRY AND MOVE THIS TO GLOBALS.OutputReportTabular.clear_state.ResetTabularReportsThis.ResetRemainingPredefinedEntriesThis
+//!$        for (iLight = 1; iLight <= state.exteriorEnergyUse.NumExteriorLights; ++iLight) {
+//!$            ExteriorLights(iLight).SumTimeNotZeroCons = 0.;
+//!$            ExteriorLights(iLight).SumConsumption = 0.;
+//!$        }
         for (iZone = 1; iZone <= NumOfZones; ++iZone) {
             if (Zone(iZone).SystemZoneNodeNumber >= 0) { // conditioned zones only
                 if (Zone(iZone).isNominalOccupied) {

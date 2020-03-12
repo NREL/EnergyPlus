@@ -81,7 +81,8 @@ void EnergyPlusFixture::SetUpTestCase()
 
 void EnergyPlusFixture::SetUp()
 {
-    EnergyPlus::clearThisState(AllGlobals &state);
+    AllGlobals state;   //DOES THIS NEED TO BE HIGHER?
+    EnergyPlus::clearThisState(state);
     EnergyPlus::clearAllStates();
 
     show_message();

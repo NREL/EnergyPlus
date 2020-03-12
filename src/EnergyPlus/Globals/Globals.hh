@@ -50,12 +50,33 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/ExteriorEnergyUse.hh>
 
 #include <string>
 
 struct BaseGlobalStruct
 {
     virtual void clear_state() = 0;
+};
+
+struct OutputReportTabular : BaseGlobalStruct
+{
+    //int NumExteriorLights = 0; // Number of Exterior Light Inputs
+
+    void clear_state() override {
+        ResetTabularReportsThis();
+    }
+
+    void ResetTabularReportsThis() {
+        ResetRemainingPredefinedEntriesThis();
+    }
+
+    void ResetRemainingPredefinedEntriesThis() {
+        for (iLight = 1; iLight <= state.exteriorEnergyUse.NumExteriorLights; ++iLight) {
+        ExteriorLights(iLight).SumTimeNotZeroCons = 0.;
+        ExteriorLights(iLight).SumConsumption = 0.;
+        }
+    }
 };
 
 struct DataGlobal : BaseGlobalStruct
@@ -77,8 +98,12 @@ struct DataGlobal : BaseGlobalStruct
 
 struct ExteriorEnergyUseGlobals : BaseGlobalStruct
 {
+    using EnergyPlus::ExteriorEnergyUse;
     int NumExteriorLights = 0; // Number of Exterior Light Inputs
     int NumExteriorEqs = 0;    // Number of Exterior Equipment Inputs
+
+    // Object Data
+    Array1D<ExteriorLightUsage> ExteriorLights;        // Structure for Exterior Light reporting
 
     void clear_state() override {
         NumExteriorLights = 0;
@@ -132,6 +157,7 @@ struct AllGlobals : BaseGlobalStruct
     ExteriorEnergyUseGlobals exteriorEnergyUse;
     FansGlobals fans;
     PipesGlobals pipes;
+    OutputReportTabular outputReportTabular;
 
     // all clear states
     void clear_state() override
@@ -139,6 +165,7 @@ struct AllGlobals : BaseGlobalStruct
         dataGlobals.clear_state();
         exteriorEnergyUse.clear_state();
         fans.clear_state();
+        outputReportTabular.clear_state();
         pipes.clear_state();
     };
 };

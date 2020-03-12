@@ -903,7 +903,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void ResetTabularReports(AllGlobals &state);
+    void ResetTabularReports();
 
     void ResetMonthlyGathering();
 
@@ -917,7 +917,7 @@ namespace OutputReportTabular {
 
     void ResetHeatGainGathering();
 
-    void ResetRemainingPredefinedEntries(AllGlobals &state);
+    void ResetRemainingPredefinedEntries();
 
     void ResetAdaptiveComfort();
 
