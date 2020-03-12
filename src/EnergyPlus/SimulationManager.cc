@@ -686,7 +686,7 @@ namespace SimulationManager {
 
         OpenOutputTabularFile();
 
-        WriteTabularReports(); //     Create the tabular reports at completion of each
+        WriteTabularReports(outputFiles); //     Create the tabular reports at completion of each
 
         WriteTabularTariffReports();
 
@@ -1782,36 +1782,18 @@ namespace SimulationManager {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int write_stat;
 
+
         // FLOW:
-        OutputFileStandard = GetNewUnitNumber();
         StdOutputRecordCount = 0;
-        {
-            IOFlags flags;
-            flags.ACTION("write");
-            flags.STATUS("UNKNOWN");
-            ObjexxFCL::gio::open(OutputFileStandard, DataStringGlobals::outputEsoFileName, flags);
-            write_stat = flags.ios();
-        }
-        if (write_stat != 0) {
-           ShowFatalError("OpenOutputFiles: Could not open file " + DataStringGlobals::outputEsoFileName + " for output (write).");
-        }
-        eso_stream = ObjexxFCL::gio::out_stream(OutputFileStandard);
-        ObjexxFCL::gio::write(OutputFileStandard, fmtA) << "Program Version," + VerString;
+        OutputFiles::getSingleton().eso.ensure_open();
+        print(OutputFiles::getSingleton().eso, "Program Version,{}\n", VerString);
 
         // Open the Initialization Output File
-        OutputFiles::getSingleton().eio.open();
-        if (!OutputFiles::getSingleton().eio.good()) {
-            ShowFatalError("OpenOutputFiles: Could not open file " + OutputFiles::getSingleton().eio.fileName + " for output (write).");
-        }
-
+        OutputFiles::getSingleton().eio.ensure_open();
         print(OutputFiles::getSingleton().eio, "Program Version,{}\n", VerString);
 
         // Open the Meters Output File
-        OutputFiles::getSingleton().mtr.open();
-        StdMeterRecordCount = 0;
-        if (!OutputFiles::getSingleton().mtr.good()) {
-            ShowFatalError("OpenOutputFiles: Could not open file " + OutputFiles::getSingleton().mtr.fileName + " for output (write).");
-        }
+        OutputFiles::getSingleton().mtr.ensure_open();
         print(OutputFiles::getSingleton().mtr, "Program Version,{}\n", VerString);
 
         // Open the Branch-Node Details Output File
@@ -1886,7 +1868,6 @@ namespace SimulationManager {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static constexpr auto EndOfDataString("End of Data"); // Signifies the end of the data block in the output file
-        static ObjexxFCL::gio::Fmt EndOfDataFormat("(\"End of Data\")");
 
         // INTERFACE BLOCK SPECIFICATIONS:
         // na
@@ -1895,85 +1876,80 @@ namespace SimulationManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        int EchoInputFile; // found unit number for 'eplusout.audit'
         std::string cEnvSetThreads;
         std::string cepEnvSetThreads;
         std::string cIDFSetThreads;
 
-        EchoInputFile = FindUnitNumber(DataStringGlobals::outputAuditFileName);
+        OutputFiles::getSingleton().audit.ensure_open();
+        constexpr static auto variable_fmt{" {}={:12}\n"};
         // Record some items on the audit file
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfRVariable=" << NumOfRVariable_Setup;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfRVariable(Total)=" << NumTotalRVariable;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfRVariable(Actual)=" << NumOfRVariable;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfRVariable(Summed)=" << NumOfRVariable_Sum;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfRVariable(Meter)=" << NumOfRVariable_Meter;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfIVariable=" << NumOfIVariable_Setup;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfIVariable(Total)=" << NumTotalIVariable;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfIVariable(Actual)=" << NumOfIVariable;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfIVariable(Summed)=" << NumOfIVariable_Sum;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MaxRVariable=" << MaxRVariable;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MaxIVariable=" << MaxIVariable;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumEnergyMeters=" << NumEnergyMeters;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumVarMeterArrays=" << NumVarMeterArrays;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "maxUniqueKeyCount=" << maxUniqueKeyCount;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "maxNumberOfFigures=" << maxNumberOfFigures;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MAXHCArrayBounds=" << MAXHCArrayBounds;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MaxVerticesPerSurface=" << MaxVerticesPerSurface;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumReportList=" << NumReportList;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "InstMeterCacheSize=" << InstMeterCacheSize;
+        print(outputFiles.audit, variable_fmt, "NumOfRVariable", NumOfRVariable_Setup);
+        print(outputFiles.audit, variable_fmt, "NumOfRVariable(Total)", NumTotalRVariable);
+        print(outputFiles.audit, variable_fmt, "NumOfRVariable(Actual)", NumOfRVariable);
+        print(outputFiles.audit, variable_fmt, "NumOfRVariable(Summed)", NumOfRVariable_Sum);
+        print(outputFiles.audit, variable_fmt, "NumOfRVariable(Meter)", NumOfRVariable_Meter);
+        print(outputFiles.audit, variable_fmt, "NumOfIVariable", NumOfIVariable_Setup);
+        print(outputFiles.audit, variable_fmt, "NumOfIVariable(Total)", NumTotalIVariable);
+        print(outputFiles.audit, variable_fmt, "NumOfIVariable(Actual)", NumOfIVariable);
+        print(outputFiles.audit, variable_fmt, "NumOfIVariable(Summed)", NumOfIVariable_Sum);
+        print(outputFiles.audit, variable_fmt, "MaxRVariable", MaxRVariable);
+        print(outputFiles.audit, variable_fmt, "MaxIVariable", MaxIVariable);
+        print(outputFiles.audit, variable_fmt, "NumEnergyMeters", NumEnergyMeters);
+        print(outputFiles.audit, variable_fmt, "NumVarMeterArrays", NumVarMeterArrays);
+        print(outputFiles.audit, variable_fmt, "maxUniqueKeyCount", maxUniqueKeyCount);
+        print(outputFiles.audit, variable_fmt, "maxNumberOfFigures", maxNumberOfFigures);
+        print(outputFiles.audit, variable_fmt, "MAXHCArrayBounds", MAXHCArrayBounds);
+        print(outputFiles.audit, variable_fmt, "MaxVerticesPerSurface", MaxVerticesPerSurface);
+        print(outputFiles.audit, variable_fmt, "NumReportList", NumReportList);
+        print(outputFiles.audit, variable_fmt, "InstMeterCacheSize", InstMeterCacheSize);
         if (SutherlandHodgman) {
             if (SlaterBarsky) {
-                ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "ClippingAlgorithm=SlaterBarskyandSutherlandHodgman";
+                print(outputFiles.audit, " {}\n", "ClippingAlgorithm=SlaterBarskyandSutherlandHodgman");
             } else {
-                ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "ClippingAlgorithm=SutherlandHodgman";
+                print(outputFiles.audit, " {}\n", "ClippingAlgorithm=SutherlandHodgman");
             }
         } else {
-            ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "ClippingAlgorithm=ConvexWeilerAtherton";
+            print(outputFiles.audit, "{}\n", "ClippingAlgorithm=ConvexWeilerAtherton");
         }
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MonthlyFieldSetInputCount=" << MonthlyFieldSetInputCount;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumConsideredOutputVariables=" << NumConsideredOutputVariables;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MaxConsideredOutputVariables=" << MaxConsideredOutputVariables;
+        print(outputFiles.audit, variable_fmt, "MonthlyFieldSetInputCount", MonthlyFieldSetInputCount);
+        print(outputFiles.audit, variable_fmt, "NumConsideredOutputVariables", NumConsideredOutputVariables);
+        print(outputFiles.audit, variable_fmt, "MaxConsideredOutputVariables", MaxConsideredOutputVariables);
 
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "numActuatorsUsed=" << numActuatorsUsed;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "numEMSActuatorsAvailable=" << numEMSActuatorsAvailable;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "maxEMSActuatorsAvailable=" << maxEMSActuatorsAvailable;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "numInternalVariablesUsed=" << NumInternalVariablesUsed;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "numEMSInternalVarsAvailable=" << numEMSInternalVarsAvailable;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "maxEMSInternalVarsAvailable=" << maxEMSInternalVarsAvailable;
+        print(outputFiles.audit, variable_fmt, "numActuatorsUsed", numActuatorsUsed);
+        print(outputFiles.audit, variable_fmt, "numEMSActuatorsAvailable", numEMSActuatorsAvailable);
+        print(outputFiles.audit, variable_fmt, "maxEMSActuatorsAvailable", maxEMSActuatorsAvailable);
+        print(outputFiles.audit, variable_fmt, "numInternalVariablesUsed", NumInternalVariablesUsed);
+        print(outputFiles.audit, variable_fmt, "numEMSInternalVarsAvailable", numEMSInternalVarsAvailable);
+        print(outputFiles.audit, variable_fmt, "maxEMSInternalVarsAvailable", maxEMSInternalVarsAvailable);
 
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumOfNodeConnections=" << NumOfNodeConnections;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "MaxNumOfNodeConnections=" << MaxNumOfNodeConnections;
+        print(outputFiles.audit, variable_fmt, "NumOfNodeConnections", NumOfNodeConnections);
+        print(outputFiles.audit, variable_fmt, "MaxNumOfNodeConnections", MaxNumOfNodeConnections);
 #ifdef EP_Count_Calls
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumShadow_Calls=" << NumShadow_Calls;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumShadowAtTS_Calls=" << NumShadowAtTS_Calls;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumClipPoly_Calls=" << NumClipPoly_Calls;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumInitSolar_Calls=" << NumInitSolar_Calls;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumAnisoSky_Calls=" << NumAnisoSky_Calls;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumDetPolyOverlap_Calls=" << NumDetPolyOverlap_Calls;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumCalcPerSolBeam_Calls=" << NumCalcPerSolBeam_Calls;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumDetShadowCombs_Calls=" << NumDetShadowCombs_Calls;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumIntSolarDist_Calls=" << NumIntSolarDist_Calls;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumIntRadExchange_Calls=" << NumIntRadExchange_Calls;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumIntRadExchangeZ_Calls=" << NumIntRadExchangeZ_Calls;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumIntRadExchangeMain_Calls=" << NumIntRadExchangeMain_Calls;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumIntRadExchangeOSurf_Calls=" << NumIntRadExchangeOSurf_Calls;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumIntRadExchangeISurf_Calls=" << NumIntRadExchangeISurf_Calls;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumMaxInsideSurfIterations=" << NumMaxInsideSurfIterations;
-        ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "NumCalcScriptF_Calls=" << NumCalcScriptF_Calls;
+        print(outputFiles.audit, variable_fmt, "NumShadow_Calls", NumShadow_Calls);
+        print(outputFiles.audit, variable_fmt, "NumShadowAtTS_Calls", NumShadowAtTS_Calls);
+        print(outputFiles.audit, variable_fmt, "NumClipPoly_Calls", NumClipPoly_Calls);
+        print(outputFiles.audit, variable_fmt, "NumInitSolar_Calls", NumInitSolar_Calls);
+        print(outputFiles.audit, variable_fmt, "NumAnisoSky_Calls", NumAnisoSky_Calls);
+        print(outputFiles.audit, variable_fmt, "NumDetPolyOverlap_Calls", NumDetPolyOverlap_Calls);
+        print(outputFiles.audit, variable_fmt, "NumCalcPerSolBeam_Calls", NumCalcPerSolBeam_Calls);
+        print(outputFiles.audit, variable_fmt, "NumDetShadowCombs_Calls", NumDetShadowCombs_Calls);
+        print(outputFiles.audit, variable_fmt, "NumIntSolarDist_Calls", NumIntSolarDist_Calls);
+        print(outputFiles.audit, variable_fmt, "NumIntRadExchange_Calls", NumIntRadExchange_Calls);
+        print(outputFiles.audit, variable_fmt, "NumIntRadExchangeZ_Calls", NumIntRadExchangeZ_Calls);
+        print(outputFiles.audit, variable_fmt, "NumIntRadExchangeMain_Calls", NumIntRadExchangeMain_Calls);
+        print(outputFiles.audit, variable_fmt, "NumIntRadExchangeOSurf_Calls", NumIntRadExchangeOSurf_Calls);
+        print(outputFiles.audit, variable_fmt, "NumIntRadExchangeISurf_Calls", NumIntRadExchangeISurf_Calls);
+        print(outputFiles.audit, variable_fmt, "NumMaxInsideSurfIterations", NumMaxInsideSurfIterations);
+        print(outputFiles.audit, variable_fmt, "NumCalcScriptF_Calls", NumCalcScriptF_Calls);
 #endif
 
-        ObjexxFCL::gio::write(OutputFileStandard, EndOfDataFormat);
-        ObjexxFCL::gio::write(OutputFileStandard, fmtLD) << "Number of Records Written=" << StdOutputRecordCount;
+        print(outputFiles.eso, "{}\n", EndOfDataString);
         if (StdOutputRecordCount > 0) {
-            ObjexxFCL::gio::close(OutputFileStandard);
+            print(outputFiles.eso, variable_fmt, "Number of Records Written", StdOutputRecordCount);
+            outputFiles.eso.close();
         } else {
-            {
-                IOFlags flags;
-                flags.DISPOSE("DELETE");
-                ObjexxFCL::gio::close(OutputFileStandard, flags);
-            }
+            outputFiles.eso.del();
         }
-        eso_stream = nullptr;
 
         if (DataHeatBalance::AnyCondFD) { // echo out relaxation factor, it may have been changed by the program
             print(
@@ -2052,6 +2028,8 @@ namespace SimulationManager {
         if (OutputFileShadingFrac > 0) {
             ObjexxFCL::gio::close(OutputFileShadingFrac);
         }
+
+
     }
 
     void SetupSimulation(OutputFiles &outputFiles, bool &ErrorsFound)

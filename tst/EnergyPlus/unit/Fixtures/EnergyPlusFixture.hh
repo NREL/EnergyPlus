@@ -268,8 +268,6 @@ private:
     static bool process_idd(std::string const &idd, bool &errors_found);
 
     std::unique_ptr<std::ostringstream> json_stream;
-    std::unique_ptr<std::ostringstream> eso_stream;
-    std::unique_ptr<std::ostringstream> mtr_stream;
     std::unique_ptr<std::ostringstream> err_stream;
     std::unique_ptr<std::ostringstream> m_cout_buffer;
     std::unique_ptr<std::ostringstream> m_cerr_buffer;

@@ -762,7 +762,7 @@ TEST_F(SQLiteFixture, DesignDay_EnthalphyAtMaxDB)
 
     SimulationManager::OpenOutputFiles();
     // reset eio stream
-    compare_eio_stream("", true);
+    has_eio_output(true);
 
     bool ErrorsFound(false);
     DataEnvironment::TotDesDays = 1;

@@ -335,7 +335,7 @@ namespace SurfaceGeometry {
             if (Surface(SurfNum).Class == SurfaceClass_Detached_F) ++FixedShadingCount;
             if (Surface(SurfNum).Class == SurfaceClass_Detached_B) ++BuildingShadingCount;
 
-            if (Surface(SurfNum).Class != SurfaceClass_IntMass) ProcessSurfaceVertices(SurfNum, ErrorsFound);
+            if (Surface(SurfNum).Class != SurfaceClass_IntMass) ProcessSurfaceVertices(outputFiles, SurfNum, ErrorsFound);
         }
 
         for (auto &e : Zone) {
@@ -7074,7 +7074,7 @@ namespace SurfaceGeometry {
 
         // Setup Kiva instances
         if (DataHeatBalance::AnyKiva) {
-            if (!ErrorsFound) ErrorsFound = kivaManager.setupKivaInstances(OutputFiles::getSingleton());
+            if (!ErrorsFound) ErrorsFound = kivaManager.setupKivaInstances(outputFiles);
         }
 
         // test for missing materials for algorithms selected
@@ -10628,8 +10628,7 @@ namespace SurfaceGeometry {
         return (std::abs((distance(start, end) - (distance(start, test) + distance(test, end)))) < tol);
     }
 
-    void ProcessSurfaceVertices(int const ThisSurf, // Surface Number
-                                bool &ErrorsFound)
+    void ProcessSurfaceVertices(OutputFiles &outputFiles, int const ThisSurf, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -11111,7 +11110,7 @@ namespace SurfaceGeometry {
 
                 } else {
                     // Error Condition
-                    ShowSevereError(RoutineName + "Incorrect surface shape number.", OutputFileStandard);
+                    ShowSevereError(RoutineName + "Incorrect surface shape number.", OptionalOutputFileRef{outputFiles.eso});
                     ShowContinueError("Please notify EnergyPlus support of this error and send input file.");
                     ErrorInSurface = true;
                 }
@@ -11251,7 +11250,7 @@ namespace SurfaceGeometry {
                 ObjexxFCL::gio::write(ErrLineOut, ErrFmt) << point.x << point.y << point.z;
                 ShowContinueError(ErrLineOut);
             }
-            ShowFatalError("CalcCoordinateTransformation: Program terminates due to preceding condition.", OutputFileStandard);
+            ShowFatalError("CalcCoordinateTransformation: Program terminates due to preceding condition.", OptionalOutputFileRef{OutputFiles::getSingleton().eso});
             return;
         }
 

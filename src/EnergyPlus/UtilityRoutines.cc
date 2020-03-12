@@ -65,6 +65,7 @@ extern "C" {
 #include <ObjexxFCL/string.functions.hh>
 
 // EnergyPlus Headers
+#include "OutputFiles.hh"
 #include <EnergyPlus/BranchInputManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
 #include <EnergyPlus/CommandLineInterface.hh>
@@ -85,10 +86,10 @@ extern "C" {
 #include <EnergyPlus/OutputReports.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/ResultsSchema.hh>
+#include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/SimulationManager.hh>
 #include <EnergyPlus/SolarShading.hh>
 #include <EnergyPlus/SystemReports.hh>
-#include <EnergyPlus/SQLiteProcedures.hh>
 #include <EnergyPlus/Timer.h>
 #include <EnergyPlus/UtilityRoutines.hh>
 
@@ -1283,7 +1284,7 @@ bool env_var_on(std::string const &env_var_str)
     return ((!env_var_str.empty()) && is_any_of(env_var_str[0], "YyTt"));
 }
 
-void ShowFatalError(std::string const &ErrorMessage, Optional_int OutUnit1, Optional_int OutUnit2)
+void ShowFatalError(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1335,7 +1336,7 @@ void ShowFatalError(std::string const &ErrorMessage, Optional_int OutUnit1, Opti
     throw FatalError(ErrorMessage);
 }
 
-void ShowSevereError(std::string const &ErrorMessage, Optional_int OutUnit1, Optional_int OutUnit2)
+void ShowSevereError(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1392,7 +1393,7 @@ void ShowSevereError(std::string const &ErrorMessage, Optional_int OutUnit1, Opt
     }
 }
 
-void ShowSevereMessage(std::string const &ErrorMessage, Optional_int OutUnit1, Optional_int OutUnit2)
+void ShowSevereMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1445,7 +1446,7 @@ void ShowSevereMessage(std::string const &ErrorMessage, Optional_int OutUnit1, O
     }
 }
 
-void ShowContinueError(std::string const &Message, Optional_int OutUnit1, Optional_int OutUnit2)
+void ShowContinueError(std::string const &Message, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1485,7 +1486,7 @@ void ShowContinueError(std::string const &Message, Optional_int OutUnit1, Option
     }
 }
 
-void ShowContinueErrorTimeStamp(std::string const &Message, Optional_int OutUnit1, Optional_int OutUnit2)
+void ShowContinueErrorTimeStamp(std::string const &Message, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1559,7 +1560,7 @@ void ShowContinueErrorTimeStamp(std::string const &Message, Optional_int OutUnit
     }
 }
 
-void ShowMessage(std::string const &Message, Optional_int OutUnit1, Optional_int OutUnit2)
+void ShowMessage(std::string const &Message, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1603,7 +1604,7 @@ void ShowMessage(std::string const &Message, Optional_int OutUnit1, Optional_int
     }
 }
 
-void ShowWarningError(std::string const &ErrorMessage, Optional_int OutUnit1, Optional_int OutUnit2)
+void ShowWarningError(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1657,7 +1658,7 @@ void ShowWarningError(std::string const &ErrorMessage, Optional_int OutUnit1, Op
     }
 }
 
-void ShowWarningMessage(std::string const &ErrorMessage, Optional_int OutUnit1, Optional_int OutUnit2)
+void ShowWarningMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1935,7 +1936,7 @@ void StoreRecurringErrorMessage(std::string const &ErrorMessage,         // Mess
     }
 }
 
-void ShowErrorMessage(std::string const &ErrorMessage, Optional_int OutUnit1, Optional_int OutUnit2)
+void ShowErrorMessage(std::string const &ErrorMessage, OptionalOutputFileRef OutUnit1, OptionalOutputFileRef OutUnit2)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1967,7 +1968,6 @@ void ShowErrorMessage(std::string const &ErrorMessage, Optional_int OutUnit1, Op
     // SUBROUTINE ARGUMENT DEFINITIONS:
 
     // SUBROUTINE PARAMETER DEFINITIONS:
-    static ObjexxFCL::gio::Fmt ErrorFormat("(2X,A)");
     static ObjexxFCL::gio::Fmt fmtA("(A)");
 
     // INTERFACE BLOCK SPECIFICATIONS
@@ -1989,10 +1989,10 @@ void ShowErrorMessage(std::string const &ErrorMessage, Optional_int OutUnit1, Op
         ObjexxFCL::gio::write(CacheIPErrorFile, fmtA) << ErrorMessage;
     }
     if (present(OutUnit1)) {
-        ObjexxFCL::gio::write(OutUnit1, ErrorFormat) << ErrorMessage;
+        print(OutUnit1(), "  {}", ErrorMessage);
     }
     if (present(OutUnit2)) {
-        ObjexxFCL::gio::write(OutUnit2, ErrorFormat) << ErrorMessage;
+        print(OutUnit2(), "  {}", ErrorMessage);
     }
     std::string tmp = "  " + ErrorMessage + DataStringGlobals::NL;
     if (DataGlobals::errorCallback) DataGlobals::errorCallback(tmp.c_str());

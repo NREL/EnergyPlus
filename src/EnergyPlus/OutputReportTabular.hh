@@ -753,7 +753,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void WriteTabularReports();
+    void WriteTabularReports(OutputFiles &outputFiles);
 
     void FillWeatherPredefinedEntries();
 
@@ -951,8 +951,6 @@ namespace OutputReportTabular {
     //======================================================================================================================
 
     std::string RealToStr(Real64 const RealIn, int const numDigits);
-
-    std::string IntToStr(int const intIn);
 
     Real64 StrToReal(std::string const &stringIn);
 
