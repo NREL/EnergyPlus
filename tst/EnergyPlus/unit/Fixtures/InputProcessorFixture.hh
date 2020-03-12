@@ -71,9 +71,9 @@ protected:
     {
     }
 
-    virtual void SetUp(AllGlobals &state)
+    virtual void SetUp()
     {
-        EnergyPlusFixture::SetUp(state); // Sets up individual test cases.
+        EnergyPlusFixture::SetUp(); // Sets up individual test cases.
     }
 
     virtual void TearDown(AllGlobals &state)

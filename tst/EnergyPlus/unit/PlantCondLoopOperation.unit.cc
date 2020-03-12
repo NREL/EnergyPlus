@@ -74,9 +74,9 @@ public:
     {
     }
 
-    virtual void SetUp(AllGlobals &state)
+    virtual void SetUp()
     {
-        EnergyPlusFixture::SetUp(state); // Sets up individual test cases.
+        EnergyPlusFixture::SetUp(); // Sets up individual test cases.
 
                                     // unit test for plant equipment list load distribution
                                     // set up one plantloop side with 1 branches, 12 components

@@ -102,9 +102,9 @@ public:
     Real64 const RhoWater = 1000.0; // For estimating the expected result
 
 protected:
-    virtual void SetUp(AllGlobals &state)
+    virtual void SetUp()
     {
-        EnergyPlusFixture::SetUp(state); // Sets up the base fixture first.
+        EnergyPlusFixture::SetUp(); // Sets up the base fixture first.
 
         DataEnvironment::StdRhoAir = Psychrometrics::PsyRhoAirFnPbTdbW(101325.0, 20.0, 0.0); // initialize StdRhoAir
         DataEnvironment::OutBaroPress = 101325.0;

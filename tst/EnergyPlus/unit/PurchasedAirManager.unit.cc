@@ -94,9 +94,9 @@ public:
     bool ErrorsFound = false;
 
 protected:
-    virtual void SetUp(AllGlobals &state)
+    virtual void SetUp()
     {
-        EnergyPlusFixture::SetUp(state); // Sets up the base fixture first.
+        EnergyPlusFixture::SetUp(); // Sets up the base fixture first.
 
         DataHeatBalFanSys::ZoneThermostatSetPointHi.allocate(1);
         DataHeatBalFanSys::ZoneThermostatSetPointHi(1) = 23.9; // 75F

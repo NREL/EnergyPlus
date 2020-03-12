@@ -79,7 +79,7 @@ class HVACSizingSimulationManagerTest : public EnergyPlusFixture
 protected:
     virtual void SetUp()
     {
-        EnergyPlusFixture::SetUp(state); // Sets up the base fixture first.
+        EnergyPlusFixture::SetUp(); // Sets up the base fixture first.
 
         // setup weather manager state needed
         NumOfEnvrn = 2;

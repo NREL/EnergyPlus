@@ -98,9 +98,9 @@ using DataZoneEquipment::ZoneEquipList;
 class RoomAirflowNetworkTest : public EnergyPlusFixture
 {
 protected:
-    virtual void SetUp(AllGlobals &state)
+    virtual void SetUp()
     {
-        EnergyPlusFixture::SetUp(state); // Sets up the base fixture first.
+        EnergyPlusFixture::SetUp(); // Sets up the base fixture first.
 
         CurZoneEqNum = 0;
         CurSysNum = 0;
