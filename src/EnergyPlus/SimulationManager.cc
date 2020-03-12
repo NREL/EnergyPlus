@@ -430,7 +430,7 @@ namespace SimulationManager {
             CheckPollutionMeterReporting();
             facilityElectricServiceObj->verifyCustomMetersElecPowerMgr();
             SetupPollutionCalculations();
-            InitDemandManagers();
+            InitDemandManagers(state);
             TestBranchIntegrity(ErrFound);
             if (ErrFound) TerminalError = true;
             TestAirPathIntegrity(state, ErrFound);
@@ -584,7 +584,7 @@ namespace SimulationManager {
                 // for simulations that last longer than a week, identify when the last year of the simulation is started
                 if ((DayOfSim > 365) && ((NumOfDayInEnvrn - DayOfSim) == 364) && !WarmupFlag) {
                     DisplayString("Starting last  year of environment at:  " + state.dataGlobals.DayOfSimChr);
-                    ResetTabularReports(state);
+                    ResetTabularReports();
                 }
 
                 for (HourOfDay = 1; HourOfDay <= 24; ++HourOfDay) { // Begin hour loop ...

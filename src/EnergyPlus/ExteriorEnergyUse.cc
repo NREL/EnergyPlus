@@ -127,7 +127,7 @@ namespace ExteriorEnergyUse {
     // Name Public routines, optionally name Private routines within this module
 
     // Object Data
-    Array1D<ExteriorLightUsage> ExteriorLights;        // Structure for Exterior Light reporting
+    //!$Array1D<ExteriorLightUsage> ExteriorLights;        // Structure for Exterior Light reporting
     Array1D<ExteriorEquipmentUsage> ExteriorEquipment; // Structure for Exterior Equipment Reporting
     std::unordered_map<std::string, std::string> UniqueExteriorEquipNames;
 
@@ -137,7 +137,7 @@ namespace ExteriorEnergyUse {
     // Needed for unit tests, should not be normally called.
     void clear_state()
     {
-        ExteriorLights.deallocate();
+        //!$ExteriorLights.deallocate();
         ExteriorEquipment.deallocate();
         UniqueExteriorEquipNames.clear();
         GetExteriorEnergyInputFlag = true;
@@ -203,7 +203,7 @@ namespace ExteriorEnergyUse {
         static Real64 sumDesignLevel(0.0); // for predefined report of design level total
 
 		state.exteriorEnergyUse.NumExteriorLights = inputProcessor->getNumObjectsFound("Exterior:Lights");
-        ExteriorLights.allocate(state.exteriorEnergyUse.NumExteriorLights);
+        state.exteriorEnergyUse.ExteriorLights.allocate(state.exteriorEnergyUse.NumExteriorLights);
 
         NumFuelEq = inputProcessor->getNumObjectsFound("Exterior:FuelEquipment");
         NumWtrEq = inputProcessor->getNumObjectsFound("Exterior:WaterEquipment");
@@ -230,9 +230,9 @@ namespace ExteriorEnergyUse {
                                           cNumericFieldNames);
             if (UtilityRoutines::IsNameEmpty(cAlphaArgs(1), cCurrentModuleObject, ErrorsFound)) continue;
 
-            ExteriorLights(Item).Name = cAlphaArgs(1);
-            ExteriorLights(Item).SchedPtr = GetScheduleIndex(cAlphaArgs(2));
-            if (ExteriorLights(Item).SchedPtr == 0) {
+            state.exteriorEnergyUse.ExteriorLights(Item).Name = cAlphaArgs(1);
+            state.exteriorEnergyUse.ExteriorLights(Item).SchedPtr = GetScheduleIndex(cAlphaArgs(2));
+            if (state.exteriorEnergyUse.ExteriorLights(Item).SchedPtr == 0) {
                 if (lAlphaFieldBlanks(2)) {
                     ShowSevereError(RoutineName + cCurrentModuleObject + ": " + cAlphaFieldNames(2) + " is required, missing for " +
                                     cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
@@ -242,8 +242,8 @@ namespace ExteriorEnergyUse {
                 }
                 ErrorsFound = true;
             } else { // check min/max on schedule
-                SchMin = GetScheduleMinValue(ExteriorLights(Item).SchedPtr);
-                SchMax = GetScheduleMaxValue(ExteriorLights(Item).SchedPtr);
+                SchMin = GetScheduleMinValue(state.exteriorEnergyUse.ExteriorLights(Item).SchedPtr);
+                SchMax = GetScheduleMaxValue(state.exteriorEnergyUse.ExteriorLights(Item).SchedPtr);
                 if (SchMin < 0.0 || SchMax < 0.0) {
                     if (SchMin < 0.0) {
                         ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(2) + " minimum, is < 0.0 for " +
@@ -260,11 +260,11 @@ namespace ExteriorEnergyUse {
                 }
             }
             if (lAlphaFieldBlanks(3)) {
-                ExteriorLights(Item).ControlMode = ScheduleOnly;
+                state.exteriorEnergyUse.ExteriorLights(Item).ControlMode = ScheduleOnly;
             } else if (UtilityRoutines::SameString(cAlphaArgs(3), "ScheduleNameOnly")) {
-                ExteriorLights(Item).ControlMode = ScheduleOnly;
+                state.exteriorEnergyUse.ExteriorLights(Item).ControlMode = ScheduleOnly;
             } else if (UtilityRoutines::SameString(cAlphaArgs(3), "AstronomicalClock")) {
-                ExteriorLights(Item).ControlMode = AstroClockOverride;
+                state.exteriorEnergyUse.ExteriorLights(Item).ControlMode = AstroClockOverride;
             } else {
                 ShowSevereError(RoutineName + cCurrentModuleObject + ": invalid " + cAlphaFieldNames(3) + '=' + cAlphaArgs(3) + " for " +
                                 cAlphaFieldNames(1) + '=' + cAlphaArgs(1));
@@ -276,39 +276,39 @@ namespace ExteriorEnergyUse {
                 EndUseSubcategoryName = "General";
             }
 
-            ExteriorLights(Item).DesignLevel = rNumericArgs(1);
+            state.exteriorEnergyUse.ExteriorLights(Item).DesignLevel = rNumericArgs(1);
             if (AnyEnergyManagementSystemInModel) {
                 SetupEMSActuator("ExteriorLights",
-                                 ExteriorLights(Item).Name,
+                                 state.exteriorEnergyUse.ExteriorLights(Item).Name,
                                  "Electric Power",
                                  "W",
-                                 ExteriorLights(Item).PowerActuatorOn,
-                                 ExteriorLights(Item).PowerActuatorValue);
+                                 state.exteriorEnergyUse.ExteriorLights(Item).PowerActuatorOn,
+                                 state.exteriorEnergyUse.ExteriorLights(Item).PowerActuatorValue);
             }
 
             SetupOutputVariable(
-                "Exterior Lights Electric Power", OutputProcessor::Unit::W, ExteriorLights(Item).Power, "Zone", "Average", ExteriorLights(Item).Name);
+                "Exterior Lights Electric Power", OutputProcessor::Unit::W, state.exteriorEnergyUse.ExteriorLights(Item).Power, "Zone", "Average", state.exteriorEnergyUse.ExteriorLights(Item).Name);
 
             SetupOutputVariable("Exterior Lights Electric Energy",
                                 OutputProcessor::Unit::J,
-                                ExteriorLights(Item).CurrentUse,
+                                state.exteriorEnergyUse.ExteriorLights(Item).CurrentUse,
                                 "Zone",
                                 "Sum",
-                                ExteriorLights(Item).Name,
+                                state.exteriorEnergyUse.ExteriorLights(Item).Name,
                                 _,
                                 "Electricity",
                                 "Exterior Lights",
                                 EndUseSubcategoryName);
 
             // entries for predefined tables
-            PreDefTableEntry(pdchExLtPower, ExteriorLights(Item).Name, ExteriorLights(Item).DesignLevel);
-            sumDesignLevel += ExteriorLights(Item).DesignLevel;
-            if (ExteriorLights(Item).ControlMode == AstroClockOverride) { // photocell/schedule
-                PreDefTableEntry(pdchExLtClock, ExteriorLights(Item).Name, "AstronomicalClock");
-                PreDefTableEntry(pdchExLtSchd, ExteriorLights(Item).Name, "-");
+            PreDefTableEntry(pdchExLtPower, state.exteriorEnergyUse.ExteriorLights(Item).Name, state.exteriorEnergyUse.ExteriorLights(Item).DesignLevel);
+            sumDesignLevel += state.exteriorEnergyUse.ExteriorLights(Item).DesignLevel;
+            if (state.exteriorEnergyUse.ExteriorLights(Item).ControlMode == AstroClockOverride) { // photocell/schedule
+                PreDefTableEntry(pdchExLtClock, state.exteriorEnergyUse.ExteriorLights(Item).Name, "AstronomicalClock");
+                PreDefTableEntry(pdchExLtSchd, state.exteriorEnergyUse.ExteriorLights(Item).Name, "-");
             } else {
-                PreDefTableEntry(pdchExLtClock, ExteriorLights(Item).Name, "Schedule");
-                PreDefTableEntry(pdchExLtSchd, ExteriorLights(Item).Name, GetScheduleName(ExteriorLights(Item).SchedPtr));
+                PreDefTableEntry(pdchExLtClock, state.exteriorEnergyUse.ExteriorLights(Item).Name, "Schedule");
+                PreDefTableEntry(pdchExLtSchd, state.exteriorEnergyUse.ExteriorLights(Item).Name, GetScheduleName(state.exteriorEnergyUse.ExteriorLights(Item).SchedPtr));
             }
         }
         PreDefTableEntry(pdchExLtPower, "Exterior Lighting Total", sumDesignLevel);
@@ -632,20 +632,20 @@ namespace ExteriorEnergyUse {
 
         for (Item = 1; Item <= state.exteriorEnergyUse.NumExteriorLights; ++Item) {
             {
-                auto const SELECT_CASE_var(ExteriorLights(Item).ControlMode);
+                auto const SELECT_CASE_var(state.exteriorEnergyUse.ExteriorLights(Item).ControlMode);
 
                 if (SELECT_CASE_var == ScheduleOnly) {
-                    ExteriorLights(Item).Power = ExteriorLights(Item).DesignLevel * GetCurrentScheduleValue(ExteriorLights(Item).SchedPtr);
-                    ExteriorLights(Item).CurrentUse = ExteriorLights(Item).Power * TimeStepZoneSec;
+                    state.exteriorEnergyUse.ExteriorLights(Item).Power = state.exteriorEnergyUse.ExteriorLights(Item).DesignLevel * GetCurrentScheduleValue(state.exteriorEnergyUse.ExteriorLights(Item).SchedPtr);
+                    state.exteriorEnergyUse.ExteriorLights(Item).CurrentUse = state.exteriorEnergyUse.ExteriorLights(Item).Power * TimeStepZoneSec;
 
                 } else if (SELECT_CASE_var == AstroClockOverride) {
 
                     if (SunIsUp) {
-                        ExteriorLights(Item).Power = 0.0;
-                        ExteriorLights(Item).CurrentUse = 0.0;
+                        state.exteriorEnergyUse.ExteriorLights(Item).Power = 0.0;
+                        state.exteriorEnergyUse.ExteriorLights(Item).CurrentUse = 0.0;
                     } else {
-                        ExteriorLights(Item).Power = ExteriorLights(Item).DesignLevel * GetCurrentScheduleValue(ExteriorLights(Item).SchedPtr);
-                        ExteriorLights(Item).CurrentUse = ExteriorLights(Item).Power * TimeStepZoneSec;
+                        state.exteriorEnergyUse.ExteriorLights(Item).Power = state.exteriorEnergyUse.ExteriorLights(Item).DesignLevel * GetCurrentScheduleValue(state.exteriorEnergyUse.ExteriorLights(Item).SchedPtr);
+                        state.exteriorEnergyUse.ExteriorLights(Item).CurrentUse = state.exteriorEnergyUse.ExteriorLights(Item).Power * TimeStepZoneSec;
                     }
 
                 } else {
@@ -654,25 +654,25 @@ namespace ExteriorEnergyUse {
             }
 
             // Reduce lighting power due to demand limiting
-            if (ExteriorLights(Item).ManageDemand && (ExteriorLights(Item).Power > ExteriorLights(Item).DemandLimit)) {
-                ExteriorLights(Item).Power = ExteriorLights(Item).DemandLimit;
-                ExteriorLights(Item).CurrentUse = ExteriorLights(Item).Power * TimeStepZoneSec;
+            if (state.exteriorEnergyUse.ExteriorLights(Item).ManageDemand && (state.exteriorEnergyUse.ExteriorLights(Item).Power > state.exteriorEnergyUse.ExteriorLights(Item).DemandLimit)) {
+                state.exteriorEnergyUse.ExteriorLights(Item).Power = state.exteriorEnergyUse.ExteriorLights(Item).DemandLimit;
+                state.exteriorEnergyUse.ExteriorLights(Item).CurrentUse = state.exteriorEnergyUse.ExteriorLights(Item).Power * TimeStepZoneSec;
             }
             // EMS controls
-            if (ExteriorLights(Item).PowerActuatorOn) ExteriorLights(Item).Power = ExteriorLights(Item).PowerActuatorValue;
+            if (state.exteriorEnergyUse.ExteriorLights(Item).PowerActuatorOn) state.exteriorEnergyUse.ExteriorLights(Item).Power = state.exteriorEnergyUse.ExteriorLights(Item).PowerActuatorValue;
 
-            ExteriorLights(Item).CurrentUse = ExteriorLights(Item).Power * TimeStepZoneSec;
+            state.exteriorEnergyUse.ExteriorLights(Item).CurrentUse = state.exteriorEnergyUse.ExteriorLights(Item).Power * TimeStepZoneSec;
 
             // gather for tabular reports
             if (!WarmupFlag) {
                 //      IF (DoOutputReporting .AND.  WriteTabularFiles .and. (KindOfSim == ksRunPeriodWeather)) THEN !for weather simulations only
                 if (DoOutputReporting && (KindOfSim == ksRunPeriodWeather)) { // for weather simulations only
                     // for tabular report, accumlate the total electricity used for each ExteriorLights object
-                    ExteriorLights(Item).SumConsumption += ExteriorLights(Item).CurrentUse;
+                    state.exteriorEnergyUse.ExteriorLights(Item).SumConsumption += state.exteriorEnergyUse.ExteriorLights(Item).CurrentUse;
                     // for tabular report, accumulate the time when each ExteriorLights has consumption
                     //(using a very small threshold instead of zero)
-                    if (ExteriorLights(Item).CurrentUse > 0.01) {
-                        ExteriorLights(Item).SumTimeNotZeroCons += TimeStepZone;
+                    if (state.exteriorEnergyUse.ExteriorLights(Item).CurrentUse > 0.01) {
+                        state.exteriorEnergyUse.ExteriorLights(Item).SumTimeNotZeroCons += TimeStepZone;
                     }
                 }
             }

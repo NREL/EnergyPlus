@@ -621,7 +621,7 @@ namespace HVACManager {
 
         NumOfSysTimeStepsLastZoneTimeStep = NumOfSysTimeSteps;
 
-        UpdateDemandManagers();
+        UpdateDemandManagers(state);
 
         // DO FINAL UPDATE OF RECORD KEEPING VARIABLES
         // Report the Node Data to Aid in Debugging

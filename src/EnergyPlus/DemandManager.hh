@@ -192,19 +192,19 @@ namespace DemandManager {
 
     void GetDemandManagerListInput();
 
-    void GetDemandManagerInput();
+    void GetDemandManagerInput(AllGlobals &state);
 
-    void SurveyDemandManagers();
+    void SurveyDemandManagers(AllGlobals &state);
 
-    void ActivateDemandManagers();
+    void ActivateDemandManagers(AllGlobals &state);
 
-    void UpdateDemandManagers();
+    void UpdateDemandManagers(AllGlobals &state);
 
     void ReportDemandManagerList(int const ListNum);
 
-    void LoadInterface(int const Action, int const MgrNum, int const LoadPtr, bool &CanReduceDemand);
+    void LoadInterface(AllGlobals &state, int const Action, int const MgrNum, int const LoadPtr, bool &CanReduceDemand);
 
-    void InitDemandManagers();
+    void InitDemandManagers(AllGlobals &state);
 
 } // namespace DemandManager
 

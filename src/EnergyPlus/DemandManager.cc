@@ -190,7 +190,7 @@ namespace DemandManager {
 
         // FLOW:
         if (GetInput && !DoingSizing) {
-            GetDemandManagerInput();
+            GetDemandManagerInput(state);
             GetDemandManagerListInput();
             GetInput = false;
         }
@@ -248,13 +248,13 @@ namespace DemandManager {
                     ResimHB = false;
                     ResimHVAC = false;
 
-                    SurveyDemandManagers(); // Determines which Demand Managers can reduce demand
+                    SurveyDemandManagers(state); // Determines which Demand Managers can reduce demand
 
                     for (ListNum = 1; ListNum <= NumDemandManagerList; ++ListNum) {
                         SimulateDemandManagerList(ListNum, ResimExt, ResimHB, ResimHVAC);
                     } // ListNum
 
-                    ActivateDemandManagers(); // Sets limits on loads
+                    ActivateDemandManagers(state); // Sets limits on loads
 
                     if (DemandManagerExtIterations + DemandManagerHBIterations + DemandManagerHVACIterations > 500) {
                         // This error can only happen if there is a bug in the code
@@ -544,7 +544,7 @@ namespace DemandManager {
                         // Validate DEMAND MANAGER Type
                         {
                             auto const SELECT_CASE_var(AlphArray(MgrNum * 2 + 5));
-                            if ((SELECT_CASE_var == "DEMANDMANAGER:LIGHTS") || (SELECT_CASE_var == "DEMANDMANAGER:EXTERIORLIGHTS") ||
+                            if ((SELECT_CASE_var == "DEMANDMANAGER:LIGHTS") || (SELECT_CASE_var == "DEMANDMANAGER:state.exteriorEnergyUse.ExteriorLights") ||
                                 (SELECT_CASE_var == "DEMANDMANAGER:ELECTRICEQUIPMENT") || (SELECT_CASE_var == "DEMANDMANAGER:THERMOSTATS") ||
                                 (SELECT_CASE_var == "DEMANDMANAGER:VENTILATION")) {
 
@@ -643,7 +643,7 @@ namespace DemandManager {
         }
     }
 
-    void GetDemandManagerInput()
+    void GetDemandManagerInput(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -667,7 +667,7 @@ namespace DemandManager {
         using DataHeatBalance::ZoneElectricObjects;
         using DataZoneControls::TempControlledZone;
         using DataZoneControls::TStatObjects;
-        using ExteriorEnergyUse::ExteriorLights;
+        //!$using ExteriorEnergyUse::state.exteriorEnergyUse.ExteriorLights;
         using General::RoundSigDigits;
         using MixedAir::GetOAController;
         using ScheduleManager::GetScheduleIndex;
@@ -699,7 +699,7 @@ namespace DemandManager {
         // FLOW:
         MaxAlphas = 0;
         MaxNums = 0;
-        CurrentModuleObject = "DemandManager:ExteriorLights";
+        CurrentModuleObject = "DemandManager:state.exteriorEnergyUse.ExteriorLights";
         NumDemandMgrExtLights = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (NumDemandMgrExtLights > 0) {
             inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNums);
@@ -744,11 +744,11 @@ namespace DemandManager {
             DemandMgr.allocate(NumDemandMgr);
             UniqueDemandMgrNames.reserve(NumDemandMgr);
 
-            // Get input for DemandManager:ExteriorLights
+            // Get input for DemandManager:state.exteriorEnergyUse.ExteriorLights
             StartIndex = 1;
             EndIndex = NumDemandMgrExtLights;
 
-            CurrentModuleObject = "DemandManager:ExteriorLights";
+            CurrentModuleObject = "DemandManager:state.exteriorEnergyUse.ExteriorLights";
 
             for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
 
@@ -838,7 +838,7 @@ namespace DemandManager {
                     DemandMgr(MgrNum).Load.allocate(DemandMgr(MgrNum).NumOfLoads);
 
                     for (LoadNum = 1; LoadNum <= DemandMgr(MgrNum).NumOfLoads; ++LoadNum) {
-                        LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), ExteriorLights);
+                        LoadPtr = UtilityRoutines::FindItemInList(AlphArray(LoadNum + 4), state.exteriorEnergyUse.ExteriorLights);
 
                         if (LoadPtr > 0) {
                             DemandMgr(MgrNum).Load(LoadNum) = LoadPtr;
@@ -1400,7 +1400,7 @@ namespace DemandManager {
         }
     }
 
-    void SurveyDemandManagers()
+    void SurveyDemandManagers(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1439,7 +1439,7 @@ namespace DemandManager {
 
                 // Check if this load can reduce demand
                 // Assume FIXED control action for now, needs more sophisticated check for VARIABLE control
-                LoadInterface(CheckCanReduce, MgrNum, LoadPtr, CanReduceDemand);
+                LoadInterface(state, CheckCanReduce, MgrNum, LoadPtr, CanReduceDemand);
 
                 if (CanReduceDemand) {
                     DemandMgr(MgrNum).CanReduceDemand = true;
@@ -1451,7 +1451,7 @@ namespace DemandManager {
         } // MgrNum
     }
 
-    void ActivateDemandManagers()
+    void ActivateDemandManagers(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1488,7 +1488,7 @@ namespace DemandManager {
                         // Turn ON limiting on all loads
                         for (LoadNum = 1; LoadNum <= DemandMgr(MgrNum).NumOfLoads; ++LoadNum) {
                             LoadPtr = DemandMgr(MgrNum).Load(LoadNum);
-                            LoadInterface(SetLimit, MgrNum, LoadPtr, CanReduceDemand);
+                            LoadInterface(state, SetLimit, MgrNum, LoadPtr, CanReduceDemand);
                         } // LoadNum
 
                     } else if (SELECT_CASE_var == ManagerSelectionMany) { // All loads are limited except for one
@@ -1497,7 +1497,7 @@ namespace DemandManager {
                             // Turn ON limiting on all loads
                             for (LoadNum = 1; LoadNum <= DemandMgr(MgrNum).NumOfLoads; ++LoadNum) {
                                 LoadPtr = DemandMgr(MgrNum).Load(LoadNum);
-                                LoadInterface(SetLimit, MgrNum, LoadPtr, CanReduceDemand);
+                                LoadInterface(state, SetLimit, MgrNum, LoadPtr, CanReduceDemand);
                             } // LoadNum
 
                             // Set next rotated load (from last time it was active)
@@ -1508,11 +1508,11 @@ namespace DemandManager {
 
                             // Turn OFF limiting for the new rotated load
                             LoadPtr = DemandMgr(MgrNum).Load(RotatedLoadNum);
-                            LoadInterface(ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
+                            LoadInterface(state, ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
                         } else {
                             // Turn ON limiting for the one and only load
                             LoadPtr = DemandMgr(MgrNum).Load(1);
-                            LoadInterface(SetLimit, MgrNum, LoadPtr, CanReduceDemand);
+                            LoadInterface(state, SetLimit, MgrNum, LoadPtr, CanReduceDemand);
                         }
 
                     } else if (SELECT_CASE_var == ManagerSelectionOne) { // Only one load is limited
@@ -1520,7 +1520,7 @@ namespace DemandManager {
                             // Turn OFF limiting on all loads
                             for (LoadNum = 1; LoadNum <= DemandMgr(MgrNum).NumOfLoads; ++LoadNum) {
                                 LoadPtr = DemandMgr(MgrNum).Load(LoadNum);
-                                LoadInterface(ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
+                                LoadInterface(state, ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
                             } // LoadNum
 
                             // Set next rotated load (from last time it was active)
@@ -1531,11 +1531,11 @@ namespace DemandManager {
 
                             // Turn ON limiting for the new rotated load
                             LoadPtr = DemandMgr(MgrNum).Load(RotatedLoadNum);
-                            LoadInterface(SetLimit, MgrNum, LoadPtr, CanReduceDemand);
+                            LoadInterface(state, SetLimit, MgrNum, LoadPtr, CanReduceDemand);
                         } else {
                             // Turn ON limiting for the one and only load
                             LoadPtr = DemandMgr(MgrNum).Load(1);
-                            LoadInterface(SetLimit, MgrNum, LoadPtr, CanReduceDemand);
+                            LoadInterface(state, SetLimit, MgrNum, LoadPtr, CanReduceDemand);
                         }
                     }
                 }
@@ -1544,7 +1544,7 @@ namespace DemandManager {
         } // MgrNum
     }
 
-    void UpdateDemandManagers()
+    void UpdateDemandManagers(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1564,7 +1564,7 @@ namespace DemandManager {
         using DataHeatBalance::Lights;
         using DataHeatBalance::ZoneElectric;
         using DataZoneControls::TempControlledZone;
-        using ExteriorEnergyUse::ExteriorLights;
+        //!$using ExteriorEnergyUse::ExteriorLights;
         using ScheduleManager::GetCurrentScheduleValue;
 
         // Locals
@@ -1608,7 +1608,7 @@ namespace DemandManager {
                         // Demand Manager is not available, remove demand limits from all loads
                         for (LoadNum = 1; LoadNum <= DemandMgr(MgrNum).NumOfLoads; ++LoadNum) {
                             LoadPtr = DemandMgr(MgrNum).Load(LoadNum);
-                            LoadInterface(ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
+                            LoadInterface(state, ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
                         } // LoadNum
 
                     } else {
@@ -1628,7 +1628,7 @@ namespace DemandManager {
                                         // Turn ON limiting for the old rotated load
                                         RotatedLoadNum = DemandMgr(MgrNum).RotatedLoadNum;
                                         LoadPtr = DemandMgr(MgrNum).Load(RotatedLoadNum);
-                                        LoadInterface(SetLimit, MgrNum, LoadPtr, CanReduceDemand);
+                                        LoadInterface(state, SetLimit, MgrNum, LoadPtr, CanReduceDemand);
 
                                         // Set next rotated load
                                         ++RotatedLoadNum;
@@ -1637,7 +1637,7 @@ namespace DemandManager {
 
                                         // Turn OFF limiting for the new rotated load
                                         LoadPtr = DemandMgr(MgrNum).Load(RotatedLoadNum);
-                                        LoadInterface(ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
+                                        LoadInterface(state, ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
                                     }
                                 }
 
@@ -1651,7 +1651,7 @@ namespace DemandManager {
                                         // Turn OFF limiting for the old rotated load
                                         RotatedLoadNum = DemandMgr(MgrNum).RotatedLoadNum;
                                         LoadPtr = DemandMgr(MgrNum).Load(RotatedLoadNum);
-                                        LoadInterface(ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
+                                        LoadInterface(state, ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
 
                                         // Set next rotated load
                                         ++RotatedLoadNum;
@@ -1660,7 +1660,7 @@ namespace DemandManager {
 
                                         // Turn ON limiting for the new rotated load
                                         LoadPtr = DemandMgr(MgrNum).Load(RotatedLoadNum);
-                                        LoadInterface(SetLimit, MgrNum, LoadPtr, CanReduceDemand);
+                                        LoadInterface(state, SetLimit, MgrNum, LoadPtr, CanReduceDemand);
                                     }
                                 }
                             }
@@ -1674,7 +1674,7 @@ namespace DemandManager {
                 // Demand Manager is not available, remove demand limits from all loads
                 for (LoadNum = 1; LoadNum <= DemandMgr(MgrNum).NumOfLoads; ++LoadNum) {
                     LoadPtr = DemandMgr(MgrNum).Load(LoadNum);
-                    LoadInterface(ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
+                    LoadInterface(state, ClearLimit, MgrNum, LoadPtr, CanReduceDemand);
                 } // LoadNum
             }
 
@@ -1765,7 +1765,7 @@ namespace DemandManager {
         }
     }
 
-    void LoadInterface(int const Action, int const MgrNum, int const LoadPtr, bool &CanReduceDemand)
+    void LoadInterface(AllGlobals &state, int const Action, int const MgrNum, int const LoadPtr, bool &CanReduceDemand)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1790,7 +1790,7 @@ namespace DemandManager {
         using DataZoneControls::ComfortControlledZone;
         using DataZoneControls::NumComfortControlledZones;
         using DataZoneControls::TempControlledZone;
-        using ExteriorEnergyUse::ExteriorLights;
+        //!$using ExteriorEnergyUse::ExteriorLights;
         using MixedAir::OAGetFlowRate;
         using MixedAir::OAGetMinFlowRate;
         using MixedAir::OASetDemandManagerVentilationFlow;
@@ -1809,14 +1809,14 @@ namespace DemandManager {
             auto const SELECT_CASE_var(DemandMgr(MgrNum).Type);
 
             if (SELECT_CASE_var == ManagerTypeExtLights) {
-                LowestPower = ExteriorLights(LoadPtr).DesignLevel * DemandMgr(MgrNum).LowerLimit;
+                LowestPower = state.exteriorEnergyUse.ExteriorLights(LoadPtr).DesignLevel * DemandMgr(MgrNum).LowerLimit;
                 if (Action == CheckCanReduce) {
-                    if (ExteriorLights(LoadPtr).Power > LowestPower) CanReduceDemand = true;
+                    if (state.exteriorEnergyUse.ExteriorLights(LoadPtr).Power > LowestPower) CanReduceDemand = true;
                 } else if (Action == SetLimit) {
-                    ExteriorLights(LoadPtr).ManageDemand = true;
-                    ExteriorLights(LoadPtr).DemandLimit = LowestPower;
+                    state.exteriorEnergyUse.ExteriorLights(LoadPtr).ManageDemand = true;
+                    state.exteriorEnergyUse.ExteriorLights(LoadPtr).DemandLimit = LowestPower;
                 } else if (Action == ClearLimit) {
-                    ExteriorLights(LoadPtr).ManageDemand = false;
+                    state.exteriorEnergyUse.ExteriorLights(LoadPtr).ManageDemand = false;
                 }
 
             } else if (SELECT_CASE_var == ManagerTypeLights) {
@@ -1890,7 +1890,7 @@ namespace DemandManager {
         }
     }
 
-    void InitDemandManagers()
+    void InitDemandManagers(AllGlobals &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1928,7 +1928,7 @@ namespace DemandManager {
         // na
 
         if (GetInput) {
-            GetDemandManagerInput();
+            GetDemandManagerInput(state);
             GetDemandManagerListInput();
             GetInput = false;
         }

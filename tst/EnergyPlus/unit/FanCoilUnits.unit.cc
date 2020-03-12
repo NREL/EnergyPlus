@@ -75,6 +75,7 @@
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <EnergyPlus/TempSolveRoot.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/WaterCoils.hh>
 #include <EnergyPlus/General.hh>
@@ -2182,7 +2183,7 @@ TEST_F(EnergyPlusFixture, FanCoil_ASHRAE90VariableFan)
     CoilNames.clear();
 }
 
-Real64 ResidualFancoil(Real64 const mdot,
+Real64 ResidualFancoil(AllGlobals &state, Real64 const mdot,
                        Array1<Real64> const &Par // Function parameters
 )
 {
@@ -2206,6 +2207,7 @@ TEST_F(EnergyPlusFixture, Test_TightenWaterFlowLimits)
 {
 
     using General::SolveRoot;
+    using TempSolveRoot::SolveRoot;
 
     int FanCoilNum(1);
     bool FirstHVACIteration(false);
@@ -2472,13 +2474,13 @@ TEST_F(EnergyPlusFixture, Test_TightenWaterFlowLimits)
     Par(1) = -1000.0;
     Par(2) = 0.0;
 
-    General::SolveRoot(ErrorToler, MaxIte, SolFla, mdot, ResidualFancoil, MinWaterFlow, MaxWaterFlow, Par, 2, minFlow, maxFlow);
+    TempSolveRoot::SolveRoot(state, ErrorToler, MaxIte, SolFla, mdot, ResidualFancoil, MinWaterFlow, MaxWaterFlow, Par, 2, minFlow, maxFlow);
     EXPECT_EQ(-1, SolFla);
     EXPECT_NEAR(minFlow, 0.0, 0.0000001);
     EXPECT_NEAR(maxFlow, 0.09375, 0.0000001);
     MaxIte = 20;
     HVACSystemRootFinding.HVACSystemRootSolver = DataHVACGlobals::HVACSystemRootSolverAlgorithm::RegulaFalsi;
-    General::SolveRoot(ErrorToler, MaxIte, SolFla, mdot, ResidualFancoil, minFlow, maxFlow, Par);
+    TempSolveRoot::SolveRoot(state, ErrorToler, MaxIte, SolFla, mdot, ResidualFancoil, minFlow, maxFlow, Par);
     EXPECT_EQ(3, SolFla);
 }
 
