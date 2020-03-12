@@ -1,6 +1,6 @@
 compilers:
   - name: "gcc"
-    version: "7.4"
+    version: "7.5"
     build_package_generator:
      - "STGZ"
      - "TGZ"
@@ -29,7 +29,7 @@ compilers:
       - ./scripts/dev/verify_cmake_dirs.py
 
   - name: "gcc"
-    version: "7.4"
+    version: "7.5"
     build_type: Debug
     build_package_generator: "STGZ"
     cmake_extra_flags: -DLINK_WITH_PYTHON=ON -DBUILD_FORTRAN=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=OFF -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_COVERAGE:BOOL=ON -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF
@@ -44,7 +44,7 @@ compilers:
     skip_packaging: true
 
   - name: "gcc"
-    version: "7.4"
+    version: "7.5"
     build_type: Debug
     build_package_generator: "STGZ"
     cmake_extra_flags: -DLINK_WITH_PYTHON=ON -DBUILD_FORTRAN=ON -DBUILD_TESTING:BOOL=ON -DENABLE_REGRESSION_TESTING:BOOL=OFF -DCOMMIT_SHA=$COMMIT_SHA -DENABLE_COVERAGE:BOOL=ON -DENABLE_GTEST_DEBUG_MODE:BOOL=OFF

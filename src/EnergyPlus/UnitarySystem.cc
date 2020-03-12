@@ -6086,6 +6086,46 @@ namespace UnitarySystems {
                     errorsFound = true;
                 }
 
+                // check supply air flow calculation method
+                if (thisSys.m_FanExists) {
+                    if (thisSys.m_CoolCoilExists) {
+                        if (loc_m_CoolingSAFMethod == "") {
+                            ShowWarningError(cCurrentModuleObject + " = " + thisObjectName);
+                            ShowContinueError(
+                                "Method used to determine the cooling supply air flow rate is not specified when cooling coil is present.");
+                            // check if all cooling flow calc method fields are blank
+                            if (((loc_m_CoolingSAFMethod_SAFlow == -999.0) && (loc_m_CoolingSAFMethod_SAFlowPerFloorArea == -999.0) &&
+                                 (loc_m_CoolingSAFMethod_FracOfAutosizedCoolingSAFlow == -999.0) &&
+                                 (loc_m_CoolingSAFMethod_FlowPerCoolingCapacity == -999.0))) {
+                                ShowContinueError("Cooling Supply Air Flow Rate field is blank.");
+                                ShowContinueError("Cooling Supply Air Flow Rate Per Floor Area field is blank.");
+                                ShowContinueError("Cooling Fraction of Autosized Cooling Supply Air Flow Rate field is blank.");
+                                ShowContinueError("Cooling Supply Air Flow Rate Per Unit of Capacity field is blank.");
+                                ShowContinueError("Blank field not allowed for all four cooling supply air flow rate calculation methods when "
+                                                  "cooling coil is present.");
+                            }
+                        }
+                    }
+                    if (thisSys.m_HeatCoilExists) {
+                        if (loc_m_HeatingSAFMethod == "") {
+                            ShowWarningError(cCurrentModuleObject + " = " + thisObjectName);
+                            ShowContinueError(
+                                "Method used to determine the heating supply air flow rate is not specified when heating coil is present.");
+                            // check if all heating flow calc method fields are blank
+                            if (((loc_m_HeatingSAFMethod_SAFlow == -999.0) && (loc_m_HeatingSAFMethod_SAFlowPerFloorArea == -999.0) &&
+                                 (loc_m_HeatingSAFMethod_FracOfAutosizedHeatingSAFlow == -999.0) &&
+                                 (loc_m_HeatingSAFMethod_FlowPerHeatingCapacity == -999.0))) {
+                                ShowContinueError("Heating Supply Air Flow Rate field is blank.");
+                                ShowContinueError("Heating Supply Air Flow Rate Per Floor Area field is blank.");
+                                ShowContinueError("Heating Fraction of Autosized Heating Supply Air Flow Rate field is blank.");
+                                ShowContinueError("Heating Supply Air Flow Rate Per Unit of Capacity field is blank.");
+                                ShowContinueError("Blank field not allowed for all four heating supply air flow rate calculation methods when heating "
+                                                  "coil is present.");
+                            }
+                        }
+                    }
+                }
+
                 //       Fan operating mode (cycling or constant) schedule. IF constant fan, then set AirFlowControl
                 if (thisSys.m_FanOpModeSchedPtr > 0) {
                     if (!ScheduleManager::CheckScheduleValueMinMax(thisSys.m_FanOpModeSchedPtr, ">=", 0.0, "<=", 0.0)) {
