@@ -5376,7 +5376,7 @@ namespace UnitarySystems {
                         ShowContinueError("Humidity/Moisture may not be controlled with these settings.");
                     }
                 } else {
-                    if (thisSys.m_RunOnLatentLoad || thisSys.m_RunOnLatentOnlyWithSensible && thisSys.m_ControlType == ControlType::Load) {
+                    if ((thisSys.m_RunOnLatentLoad || thisSys.m_RunOnLatentOnlyWithSensible) && thisSys.m_ControlType == ControlType::Load) {
                         ShowWarningError(cCurrentModuleObject + " = " + thisObjectName);
                         ShowContinueError("Inconsistent moisture control inputs.");
                         ShowContinueError("Dehumidification Control Type = " + loc_dehumm_ControlType);
