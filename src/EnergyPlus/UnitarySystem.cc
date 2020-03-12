@@ -7775,7 +7775,7 @@ namespace UnitarySystems {
 
         if (!HeatingLoad && !CoolingLoad) {
             // no load
-            if (MoistureLoad >= 0.0 || MoistureLoad > LatOutputOff) return;
+            if (MoistureLoad > LatOutputOff) return;
             // Dehumcontrol_Multimode only controls RH if there is a sensible load
             if (this->m_DehumidControlType_Num == DehumCtrlType::Multimode) return;
         }
@@ -7835,11 +7835,13 @@ namespace UnitarySystems {
                     if (HeatingLoad && SensOutputOff > ZoneLoad && (MoistureLoad >= 0.0 || MoistureLoad > LatOutputOff)) return;
                     if (!HeatingLoad && (MoistureLoad >= 0.0 || MoistureLoad > LatOutputOff)) return;
                 } else if (SELECT_CASE_var == DataHVACGlobals::SingleCoolingSetPoint) {
+                    if (CoolingLoad && SensOutputOff < ZoneLoad && this->m_DehumidControlType_Num != DehumCtrlType::CoolReheat) return;
                     if (CoolingLoad && SensOutputOff < ZoneLoad && (MoistureLoad >= 0.0 || MoistureLoad > LatOutputOff)) return;
                     if (!CoolingLoad && (MoistureLoad >= 0.0 || MoistureLoad > LatOutputOff)) return;
                 } else if ((SELECT_CASE_var == DataHVACGlobals::SingleHeatCoolSetPoint) ||
                            (SELECT_CASE_var == DataHVACGlobals::DualSetPointWithDeadBand)) {
                     if (HeatingLoad && SensOutputOff > ZoneLoad && (MoistureLoad >= 0.0 || MoistureLoad > LatOutputOff)) return;
+                    if (CoolingLoad && SensOutputOff < ZoneLoad && this->m_DehumidControlType_Num != DehumCtrlType::CoolReheat) return;
                     if (CoolingLoad && SensOutputOff < ZoneLoad && (MoistureLoad >= 0.0 || MoistureLoad > LatOutputOff)) return;
                     if (!HeatingLoad && !CoolingLoad && (MoistureLoad >= 0.0 || MoistureLoad > LatOutputOff)) return;
                 } else {
@@ -8633,7 +8635,6 @@ namespace UnitarySystems {
 
             if (this->m_DehumidControlType_Num == DehumCtrlType::Multimode && MoistureLoad < LatOutputOn) {
                 HXUnitOn = true;
-                CoolingLoad = true;
                 CoolPLR = 1.0;
                 this->m_CoolingPartLoadFrac = 1.0;
                 this->calcUnitarySystemToLoad(AirLoopNum,
