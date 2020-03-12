@@ -61,6 +61,7 @@ struct BaseGlobalStruct
 
 struct OutputReportTabular : BaseGlobalStruct
 {
+    using AllGlobals:exteriorEnergyUse;
     //int NumExteriorLights = 0; // Number of Exterior Light Inputs
 
     void clear_state() override {
@@ -72,7 +73,7 @@ struct OutputReportTabular : BaseGlobalStruct
     }
 
     void ResetRemainingPredefinedEntriesThis() {
-        for (iLight = 1; iLight <= state.exteriorEnergyUse.NumExteriorLights; ++iLight) {
+        for (iLight = 1; iLight <= exteriorEnergyUse.NumExteriorLights; ++iLight) {
         ExteriorLights(iLight).SumTimeNotZeroCons = 0.;
         ExteriorLights(iLight).SumConsumption = 0.;
         }
