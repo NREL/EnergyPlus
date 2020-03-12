@@ -50,7 +50,6 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/ExteriorEnergyUse.hh>
 
 #include <string>
 
@@ -59,26 +58,13 @@ struct BaseGlobalStruct
     virtual void clear_state() = 0;
 };
 
-struct OutputReportTabular : BaseGlobalStruct
-{
-    using AllGlobals:exteriorEnergyUse;
-    //int NumExteriorLights = 0; // Number of Exterior Light Inputs
-
-    void clear_state() override {
-        ResetTabularReportsThis();
-    }
-
-    void ResetTabularReportsThis() {
-        ResetRemainingPredefinedEntriesThis();
-    }
-
-    void ResetRemainingPredefinedEntriesThis() {
-        for (iLight = 1; iLight <= exteriorEnergyUse.NumExteriorLights; ++iLight) {
-        ExteriorLights(iLight).SumTimeNotZeroCons = 0.;
-        ExteriorLights(iLight).SumConsumption = 0.;
-        }
-    }
-};
+//struct OutputReportTabular : BaseGlobalStruct
+//{
+//    //int MaxHeaderLength;
+//
+//    void clear_state() override {
+//    }
+//};
 
 struct DataGlobal : BaseGlobalStruct
 {
@@ -99,7 +85,30 @@ struct DataGlobal : BaseGlobalStruct
 
 struct ExteriorEnergyUseGlobals : BaseGlobalStruct
 {
-    using EnergyPlus::ExteriorEnergyUse;
+    struct ExteriorLightUsage
+    {
+        // Members
+        std::string Name;          // Descriptive name -- will show on reporting
+        int SchedPtr;              // Can be scheduled
+        Real64 DesignLevel;        // Consumption in Watts
+        Real64 Power;              // Power = DesignLevel * ScheduleValue
+        Real64 CurrentUse;         // Use for this time step
+        int ControlMode;           // Control mode Schedule Only or Astronomical Clock plus schedule
+        bool ManageDemand;         // Flag to indicate whether to use demand limiting
+        Real64 DemandLimit;        // Demand limit set by demand manager [W]
+        bool PowerActuatorOn;      // EMS flag
+        Real64 PowerActuatorValue; // EMS value
+        Real64 SumConsumption;     // sum of electric consumption [J] for reporting
+        Real64 SumTimeNotZeroCons; // sum of time of positive electric consumption [hr]
+
+                                   // Default Constructor
+        ExteriorLightUsage()
+            : SchedPtr(0), DesignLevel(0.0), Power(0.0), CurrentUse(0.0), ControlMode(1), ManageDemand(false), DemandLimit(0.0),
+            PowerActuatorOn(false), SumConsumption(0.0), SumTimeNotZeroCons(0.0)
+        {
+        }
+    };
+
     int NumExteriorLights = 0; // Number of Exterior Light Inputs
     int NumExteriorEqs = 0;    // Number of Exterior Equipment Inputs
 
@@ -109,6 +118,14 @@ struct ExteriorEnergyUseGlobals : BaseGlobalStruct
     void clear_state() override {
         NumExteriorLights = 0;
         NumExteriorEqs = 0;
+
+        //OutputReportTabular.clear_state().ResetTabularReports().ResetRemainingPredefinedEntries()
+        //for (iLight = 1; iLight <= state.exteriorEnergyUse.NumExteriorLights; ++iLight) {
+        int iLight;
+        for (iLight = 1; iLight <= ExteriorLights.size(); ++iLight) {
+            ExteriorLights(iLight).SumTimeNotZeroCons = 0.;
+            ExteriorLights(iLight).SumConsumption = 0.;
+        }
     }
 };
 
@@ -158,7 +175,7 @@ struct AllGlobals : BaseGlobalStruct
     ExteriorEnergyUseGlobals exteriorEnergyUse;
     FansGlobals fans;
     PipesGlobals pipes;
-    OutputReportTabular outputReportTabular;
+    //OutputReportTabular outputReportTabular;
 
     // all clear states
     void clear_state() override
@@ -166,7 +183,7 @@ struct AllGlobals : BaseGlobalStruct
         dataGlobals.clear_state();
         exteriorEnergyUse.clear_state();
         fans.clear_state();
-        outputReportTabular.clear_state();
+        //outputReportTabular.clear_state();
         pipes.clear_state();
     };
 };

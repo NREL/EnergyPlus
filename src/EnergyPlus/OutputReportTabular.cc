@@ -15412,7 +15412,7 @@ namespace OutputReportTabular {
             Lights(iLight).SumTimeNotZeroCons = 0.;
             Lights(iLight).SumConsumption = 0.;
         }
-//!$  TRY AND MOVE THIS TO GLOBALS.OutputReportTabular.clear_state.ResetTabularReportsThis.ResetRemainingPredefinedEntriesThis
+//!$  TRY AND MOVE THIS TO ExteriorEnergyUseGlobals
 //!$        for (iLight = 1; iLight <= state.exteriorEnergyUse.NumExteriorLights; ++iLight) {
 //!$            ExteriorLights(iLight).SumTimeNotZeroCons = 0.;
 //!$            ExteriorLights(iLight).SumConsumption = 0.;
