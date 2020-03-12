@@ -221,8 +221,8 @@ protected:
     return fullObject;
   }
 
-  void TearDown(AllGlobals &state) override {
-    EnergyPlus::EnergyPlusFixture::TearDown(state); // Remember to tear down the base
+  void TearDown() override {
+    EnergyPlus::EnergyPlusFixture::TearDown(); // Remember to tear down the base
                                                // fixture after cleaning up
                                                // derived fixture!
   }

@@ -49,5 +49,6 @@
 #include <EnergyPlus/Globals/Globals.hh>
 
 namespace EnergyPlus {
-    void clearAllStates(AllGlobals &state);
+    void clearThisState(AllGlobals &state);
+    void clearAllStates();
 }

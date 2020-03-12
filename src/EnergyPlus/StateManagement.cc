@@ -236,7 +236,11 @@
 #include <EnergyPlus/ZonePlenum.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
-void EnergyPlus::clearAllStates(AllGlobals &state)
+void EnergyPlus::clearThisState(AllGlobals &state)
+{
+    state.clear_state();
+}
+void EnergyPlus::clearAllStates()
 {
     using namespace EnergyPlus;
     // A to Z order
@@ -270,7 +274,7 @@ void EnergyPlus::clearAllStates(AllGlobals &state)
     DataEnvironment::clear_state();
     DataErrorTracking::clear_state();
     DataGenerators::clear_state();
-    DataGlobals::clear_state(state);
+    DataGlobals::clear_state();
     DataHeatBalance::clear_state();
     DataHeatBalFanSys::clear_state();
     DataHeatBalSurface::clear_state();
@@ -306,7 +310,7 @@ void EnergyPlus::clearAllStates(AllGlobals &state)
     EMSManager::clear_state();
     EvaporativeCoolers::clear_state();
     EvaporativeFluidCoolers::clear_state();
-    ExteriorEnergyUse::clear_state(state);
+    ExteriorEnergyUse::clear_state();
     FanCoilUnits::clear_state();
     Fans::clear_state();
     FaultsManager::clear_state();
@@ -314,7 +318,6 @@ void EnergyPlus::clearAllStates(AllGlobals &state)
     FluidProperties::clear_state();
     Furnaces::clear_state();
     GlobalNames::clear_state();
-    state.clear_state();
     GroundHeatExchangers::clear_state();
     GroundTemperatureManager::clear_state();
     HeatBalanceAirManager::clear_state();
@@ -354,12 +357,12 @@ void EnergyPlus::clearAllStates(AllGlobals &state)
     OutdoorAirUnit::clear_state();
     OutputProcessor::clear_state();
     OutputReportPredefined::clear_state();
-    OutputReportTabular::clear_state(state);
+    OutputReportTabular::clear_state();
     OutputReportTabularAnnual::clear_state();
     OutsideEnergySources::clear_state();
     PackagedTerminalHeatPump::clear_state();
     PhotovoltaicThermalCollectors::clear_state();
-    Pipes::clear_state(state);
+    Pipes::clear_state();
     PipeHeatTransfer::clear_state();
     PlantCentralGSHP::clear_state();
     PlantChillers::clear_state();

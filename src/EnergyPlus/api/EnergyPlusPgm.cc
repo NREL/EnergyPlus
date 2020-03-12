@@ -452,8 +452,6 @@ int runEnergyPlusAsLibrary(AllGlobals &state, int argc, const char *argv[])
     // The method used in EnergyPlus is to simplify the main program as much
     // as possible and contain all "simulation" code in other modules and files.
 
-    //AllGlobals state;
-
     EnergyPlus::DataGlobals::eplusRunningViaAPI = true;
 
     // clean out any stdin, stderr, stdout flags from a prior call

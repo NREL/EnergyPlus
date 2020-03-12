@@ -272,11 +272,10 @@ namespace DataGlobals {
 
     // Clears the global data in DataGlobals.
     // Needed for unit tests, should not be normally called.
-    void clear_state(AllGlobals &state)
+    void clear_state()
     {
         runReadVars = false;
         DDOnlySimulation = false;
-        state.dataGlobals.AnnualSimulation = false;
         outputEpJSONConversion = false;
         outputEpJSONConversionOnly = false;
         isEpJSON = false;
@@ -290,7 +289,6 @@ namespace DataGlobals {
         BeginFullSimFlag = false;
         BeginTimeStepFlag = false;
         DayOfSim = 0;
-        state.dataGlobals.DayOfSimChr = "0";
         CalendarYear = 0;
         CalendarYearChr = "0";
         EndEnvrnFlag = false;

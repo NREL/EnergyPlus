@@ -92,7 +92,7 @@ namespace ExteriorEnergyUse {
 
     // Clears the global data in ExteriorEnergyUse.
     // Needed for unit tests, should not be normally called.
-    void clear_state(AllGlobals &state);
+    void clear_state();
 
     // Name Public routines, optionally name Private routines within this module
 

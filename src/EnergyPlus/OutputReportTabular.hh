@@ -668,7 +668,7 @@ namespace OutputReportTabular {
     extern Array1D<UnitConvType> UnitConv;
 
     // Functions
-    void clear_state(AllGlobals &state);
+    void clear_state();
 
     void UpdateTabularReports(OutputProcessor::TimeStepType t_timeStepType); // What kind of data to update (Zone, HVAC)
 

@@ -549,7 +549,7 @@ namespace OutputReportTabular {
     } // namespace
 
     // Functions
-    void clear_state(AllGlobals &state)
+    void clear_state()
     {
         GatherMonthlyResultsForTimestepRunOnce = true;
         UpdateTabularReportsGetInput = true;

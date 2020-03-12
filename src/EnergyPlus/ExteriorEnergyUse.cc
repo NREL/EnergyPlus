@@ -135,10 +135,8 @@ namespace ExteriorEnergyUse {
 
     // Clears the global data in ExteriorEnergyUse.
     // Needed for unit tests, should not be normally called.
-    void clear_state(AllGlobals &state)
+    void clear_state()
     {
-        state.exteriorEnergyUse.NumExteriorLights = 0;
-        state.exteriorEnergyUse.NumExteriorEqs = 0;
         ExteriorLights.deallocate();
         ExteriorEquipment.deallocate();
         UniqueExteriorEquipNames.clear();

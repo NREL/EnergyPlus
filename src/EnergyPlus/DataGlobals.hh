@@ -307,7 +307,7 @@ namespace DataGlobals {
 
     // Clears the global data in DataGlobals.
     // Needed for unit tests, should not be normally called.
-    void clear_state(AllGlobals &state);
+    void clear_state();
 
 } // namespace DataGlobals
 

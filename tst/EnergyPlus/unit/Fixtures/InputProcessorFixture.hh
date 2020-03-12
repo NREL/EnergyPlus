@@ -76,9 +76,9 @@ protected:
         EnergyPlusFixture::SetUp(); // Sets up individual test cases.
     }
 
-    virtual void TearDown(AllGlobals &state)
+    virtual void TearDown()
     {
-        EnergyPlusFixture::TearDown(state); // Remember to tear down the base fixture after cleaning up derived fixture!
+        EnergyPlusFixture::TearDown(); // Remember to tear down the base fixture after cleaning up derived fixture!
     }
 
     bool process_idd(std::string const &idd, bool &errors_found)

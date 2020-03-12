@@ -89,9 +89,9 @@ protected:
         ss->str(std::string());
     }
 
-    virtual void TearDown(AllGlobals &state)
+    virtual void TearDown()
     {
-        EnergyPlusFixture::TearDown(state); // Remember to tear down the base fixture after cleaning up derived fixture!
+        EnergyPlusFixture::TearDown(); // Remember to tear down the base fixture after cleaning up derived fixture!
     }
 
     void resetDatabase()

@@ -118,10 +118,8 @@ namespace Pipes {
     std::unordered_map<std::string, std::string> LocalPipeUniqueNames;
 
     // Functions
-    void clear_state(AllGlobals &state)
+    void clear_state()
     {
-        state.pipes.NumLocalPipes = 0;
-        state.pipes.GetPipeInputFlag = true;
         LocalPipe.deallocate();
         LocalPipeUniqueNames.clear();
     }

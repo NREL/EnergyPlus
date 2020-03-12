@@ -112,7 +112,7 @@ protected:
     virtual void SetUp();
 
     // This is run every unit test and makes sure to clear all state in global variables this fixture touches.
-    virtual void TearDown(AllGlobals &state);
+    virtual void TearDown();
 
     // This will output the "Begin Test" ShowMessage for every unit test that uses or inherits from this fixture.
     // Now this does not need to be manually entered for every unit test as well as it will automatically be updated as the
@@ -256,6 +256,10 @@ protected:
                      std::vector<bool> const &alphas_blank,
                      std::vector<Real64> const &numbers,
                      std::vector<bool> const &numbers_blank);
+
+public:
+    AllGlobals state;
+    EnergyPlusFixture();
 
 private:
     friend class InputProcessorFixture;

@@ -142,7 +142,7 @@ protected:
 
     virtual void TearDown()
     {
-        EnergyPlusFixture::TearDown(state);
+        EnergyPlusFixture::TearDown();
     }
 };
 
