@@ -6589,13 +6589,13 @@ namespace RefrigeratedCase {
                                               "Refrigeration:Case",
                                               RefrigCase(caseNum).Name,
                                               DataHeatBalance::IntGainTypeOf_RefrigerationCase,
-                                              RefrigCase(caseNum).SensZoneCreditRate,
-                                              RefrigCase(caseNum).SensHVACCreditRate,
-                                              _,
-                                              RefrigCase(caseNum).LatZoneCreditRate,
-                                              RefrigCase(caseNum).LatHVACCreditRate,
-                                              _,
-                                              _,
+                                              &RefrigCase(caseNum).SensZoneCreditRate,
+                                              &RefrigCase(caseNum).SensHVACCreditRate,
+                                              nullptr,
+                                              &RefrigCase(caseNum).LatZoneCreditRate,
+                                              &RefrigCase(caseNum).LatHVACCreditRate,
+                                              nullptr,
+                                              nullptr,
                                               RefrigCase(caseNum).ZoneRANode);
                     }
                 } // END IF (.NOT. RefrigCase(CaseNum)%unusedCase)
@@ -6778,10 +6778,10 @@ namespace RefrigeratedCase {
                                                   "Refrigeration:WalkIn",
                                                   Walkin_and_zone_name,
                                                   DataHeatBalance::IntGainTypeOf_RefrigerationWalkIn,
-                                                  WalkIn(walkInNum).SensZoneCreditRate(zoneId),
-                                                  _,
-                                                  _,
-                                                  WalkIn(walkInNum).LatZoneCreditRate(zoneId));
+                                                  &WalkIn(walkInNum).SensZoneCreditRate(zoneId),
+                                                  nullptr,
+                                                  nullptr,
+                                                  &WalkIn(walkInNum).LatZoneCreditRate(zoneId));
 
                     } // ZoneID
                 }     //(.NOT.  WalkIn( WalkInNum)%unusedWalkIn)
@@ -7274,14 +7274,14 @@ namespace RefrigeratedCase {
                                               "Refrigeration:SecondarySystem:Receiver",
                                               Secondary(secondNum).Name,
                                               DataHeatBalance::IntGainTypeOf_RefrigerationSecondaryReceiver,
-                                              Secondary(secondNum).ReceiverZoneHeatGain);
+                                              &Secondary(secondNum).ReceiverZoneHeatGain);
                     }
                     if (Secondary(secondNum).DistPipeZoneNum > 0) {
                         SetupZoneInternalGain(Secondary(secondNum).DistPipeZoneNum,
                                               "Refrigeration:SecondarySystem:Pipe",
                                               Secondary(secondNum).Name,
                                               DataHeatBalance::IntGainTypeOf_RefrigerationSecondaryPipe,
-                                              Secondary(secondNum).DistPipeZoneHeatGain);
+                                              &Secondary(secondNum).DistPipeZoneHeatGain);
                     }
                 } // not an unused
             }     // NumSimulationSecondarySystems
@@ -7435,8 +7435,8 @@ namespace RefrigeratedCase {
                                               "Refrigeration:CompressorRack",
                                               RefrigRack(rackNum).Name,
                                               DataHeatBalance::IntGainTypeOf_RefrigerationCompressorRack,
-                                              RefrigRack(rackNum).SensZoneCreditHeatRate,
-                                              RefrigRack(rackNum).SensHVACCreditHeatRate);
+                                              &RefrigRack(rackNum).SensZoneCreditHeatRate,
+                                              &RefrigRack(rackNum).SensHVACCreditHeatRate);
 
                     } // LocationZone
 
@@ -7584,8 +7584,8 @@ namespace RefrigeratedCase {
                                               "Refrigeration:CompressorRack",
                                               RefrigRack(rackNum).Name,
                                               DataHeatBalance::IntGainTypeOf_RefrigerationCompressorRack,
-                                              RefrigRack(rackNum).SensZoneCreditHeatRate,
-                                              RefrigRack(rackNum).SensHVACCreditHeatRate);
+                                              &RefrigRack(rackNum).SensZoneCreditHeatRate,
+                                              &RefrigRack(rackNum).SensHVACCreditHeatRate);
 
                     } // location zone
                 }     // Serves coils or case/walkin loads
@@ -8064,14 +8064,14 @@ namespace RefrigeratedCase {
                                               "Refrigeration:System:Condenser:AirCooled",
                                               System(refrigSysNum).Name,
                                               DataHeatBalance::IntGainTypeOf_RefrigerationSystemAirCooledCondenser,
-                                              System(refrigSysNum).NetHeatRejectLoad);
+                                              &System(refrigSysNum).NetHeatRejectLoad);
 
                     if (System(refrigSysNum).SuctionPipeActualZoneNum > 0)
                         SetupZoneInternalGain(System(refrigSysNum).SuctionPipeActualZoneNum,
                                               "Refrigeration:System:SuctionPipe",
                                               System(refrigSysNum).Name,
                                               DataHeatBalance::IntGainTypeOf_RefrigerationSystemSuctionPipe,
-                                              System(refrigSysNum).PipeHeatLoad);
+                                              &System(refrigSysNum).PipeHeatLoad);
                 }
             } // numrefrigsystems
 
@@ -8683,21 +8683,21 @@ namespace RefrigeratedCase {
                                               "Refrigeration:TranscriticalSystem:GasCooler:AirCooled",
                                               TransSystem(refrigSysNum).Name,
                                               DataHeatBalance::IntGainTypeOf_RefrigerationTransSysAirCooledGasCooler,
-                                              TransSystem(refrigSysNum).NetHeatRejectLoad);
+                                              &TransSystem(refrigSysNum).NetHeatRejectLoad);
                 } // (TransSystem(RefrigSysNum)%SystemRejectHeatToZone)
                 if (TransSystem(refrigSysNum).SuctionPipeActualZoneNumMT > 0) {
                     SetupZoneInternalGain(TransSystem(refrigSysNum).SuctionPipeActualZoneNumMT,
                                           "Refrigeration:TranscriticalSystem:SuctionPipeMT",
                                           TransSystem(refrigSysNum).Name,
                                           DataHeatBalance::IntGainTypeOf_RefrigerationTransSysSuctionPipeMT,
-                                          TransSystem(refrigSysNum).PipeHeatLoadMT);
+                                          &TransSystem(refrigSysNum).PipeHeatLoadMT);
                 } // TransSystem(RefrigSysNum)%SuctionPipeActualZoneNumMT > 0
                 if (TransSystem(refrigSysNum).SuctionPipeActualZoneNumLT > 0) {
                     SetupZoneInternalGain(TransSystem(refrigSysNum).SuctionPipeActualZoneNumLT,
                                           "Refrigeration:TranscriticalSystem:SuctionPipeLT",
                                           TransSystem(refrigSysNum).Name,
                                           DataHeatBalance::IntGainTypeOf_RefrigerationTransSysSuctionPipeLT,
-                                          TransSystem(refrigSysNum).PipeHeatLoadLT);
+                                          &TransSystem(refrigSysNum).PipeHeatLoadLT);
                 } // TransSystem(RefrigSysNum)%SuctionPipeActualZoneNumLT > 0
 
                 // Report Compressor ENERGY here, not on system level for meters.

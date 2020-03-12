@@ -1118,9 +1118,9 @@ namespace FuelCellElectricGenerator {
                                   "Generator:FuelCell",
                                   this->Name,
                                   DataHeatBalance::IntGainTypeOf_GeneratorFuelCell,
-                                  this->Report.SkinLossConvect,
-                                  _,
-                                  this->Report.SkinLossRadiat);
+                                  &this->Report.SkinLossConvect,
+                                  nullptr,
+                                  &this->Report.SkinLossRadiat);
         }
 
         if (DataGlobals::DisplayAdvancedReportVariables) { // show extra data originally needed for detailed comparative testing

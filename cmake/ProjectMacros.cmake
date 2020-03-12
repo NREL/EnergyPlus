@@ -135,8 +135,8 @@ function( ADD_SIMULATION_TEST )
   endif()
 
   add_test(NAME "${TEST_CATEGORY}.${IDF_NAME}" COMMAND ${CMAKE_COMMAND}
-    -DSOURCE_DIR=${CMAKE_SOURCE_DIR}
-    -DBINARY_DIR=${CMAKE_BINARY_DIR}
+    -DSOURCE_DIR=${PROJECT_SOURCE_DIR}
+    -DBINARY_DIR=${PROJECT_BINARY_DIR}
     -DENERGYPLUS_EXE=$<TARGET_FILE:energyplus>
     -DIDF_FILE=${ADD_SIM_TEST_IDF_FILE}
     -DEPW_FILE=${ADD_SIM_TEST_EPW_FILE}
@@ -145,7 +145,7 @@ function( ADD_SIMULATION_TEST )
     -DTEST_FILE_FOLDER=${TEST_FILE_FOLDER}
     -DRUN_CALLGRIND:BOOL=${RUN_CALLGRIND}
     -DVALGRIND=${VALGRIND}
-    -P ${CMAKE_SOURCE_DIR}/cmake/RunSimulation.cmake
+    -P ${PROJECT_SOURCE_DIR}/cmake/RunSimulation.cmake
   )
 
   if (ADD_SIM_TEST_COST AND NOT ADD_SIM_TEST_COST STREQUAL "" )
@@ -163,7 +163,7 @@ function( ADD_SIMULATION_TEST )
 
   if( DO_REGRESSION_TESTING AND (NOT ADD_SIM_TEST_EXPECT_FATAL) )
     add_test(NAME "regression.${IDF_NAME}" COMMAND ${CMAKE_COMMAND}
-      -DBINARY_DIR=${CMAKE_BINARY_DIR}
+      -DBINARY_DIR=${PROJECT_BINARY_DIR}
       -DPYTHON_EXECUTABLE=${PYTHON_EXECUTABLE}
       -DIDF_FILE=${ADD_SIM_TEST_IDF_FILE}
       -DREGRESSION_SCRIPT_PATH=${REGRESSION_SCRIPT_PATH}
@@ -171,7 +171,7 @@ function( ADD_SIMULATION_TEST )
       -DREGRESSION_BASELINE_SHA=${REGRESSION_BASELINE_SHA}
       -DCOMMIT_SHA=${COMMIT_SHA}
       -DDEVICE_ID=${DEVICE_ID}
-      -P ${CMAKE_SOURCE_DIR}/cmake/RunRegression.cmake
+      -P ${PROJECT_SOURCE_DIR}/cmake/RunRegression.cmake
       )
     # Note, CMake / CTest doesn't seem to validate if this dependent name actually exists,
     # but it does seem to honor the requirement

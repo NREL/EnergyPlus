@@ -1116,12 +1116,12 @@ namespace InternalHeatGains {
                                               "People",
                                               People(Loop).Name,
                                               IntGainTypeOf_People,
-                                              People(Loop).ConGainRate,
-                                              _,
-                                              People(Loop).RadGainRate,
-                                              People(Loop).LatGainRate,
-                                              _,
-                                              People(Loop).CO2GainRate);
+                                              &People(Loop).ConGainRate,
+                                              nullptr,
+                                              &People(Loop).RadGainRate,
+                                              &People(Loop).LatGainRate,
+                                              nullptr,
+                                              &People(Loop).CO2GainRate);
 
                 } // Item1 - number of zones
             }     // Item - number of people statements
@@ -1582,13 +1582,13 @@ namespace InternalHeatGains {
                                               "Lights",
                                               Lights(Loop).Name,
                                               IntGainTypeOf_Lights,
-                                              Lights(Loop).ConGainRate,
-                                              Lights(Loop).RetAirGainRate,
-                                              Lights(Loop).RadGainRate,
-                                              _,
-                                              _,
-                                              _,
-                                              _,
+                                              &Lights(Loop).ConGainRate,
+                                              &Lights(Loop).RetAirGainRate,
+                                              &Lights(Loop).RadGainRate,
+                                              nullptr,
+                                              nullptr,
+                                              nullptr,
+                                              nullptr,
                                               returnNodeNum);
 
                     if (Lights(Loop).FractionReturnAir > 0) Zone(Lights(Loop).ZonePtr).HasLtsRetAirGain = true;
@@ -2005,10 +2005,10 @@ namespace InternalHeatGains {
                                               "ElectricEquipment",
                                               ZoneElectric(Loop).Name,
                                               IntGainTypeOf_ElectricEquipment,
-                                              ZoneElectric(Loop).ConGainRate,
-                                              _,
-                                              ZoneElectric(Loop).RadGainRate,
-                                              ZoneElectric(Loop).LatGainRate);
+                                              &ZoneElectric(Loop).ConGainRate,
+                                              nullptr,
+                                              &ZoneElectric(Loop).RadGainRate,
+                                              &ZoneElectric(Loop).LatGainRate);
 
                 } // Item1
             }     // Item - Number of ZoneElectric objects
@@ -2400,12 +2400,12 @@ namespace InternalHeatGains {
                                               "GasEquipment",
                                               ZoneGas(Loop).Name,
                                               IntGainTypeOf_GasEquipment,
-                                              ZoneGas(Loop).ConGainRate,
-                                              _,
-                                              ZoneGas(Loop).RadGainRate,
-                                              ZoneGas(Loop).LatGainRate,
-                                              _,
-                                              ZoneGas(Loop).CO2GainRate);
+                                              &ZoneGas(Loop).ConGainRate,
+                                              nullptr,
+                                              &ZoneGas(Loop).RadGainRate,
+                                              &ZoneGas(Loop).LatGainRate,
+                                              nullptr,
+                                              &ZoneGas(Loop).CO2GainRate);
 
                 } // Item1
             }     // Item - number of gas statements
@@ -2794,10 +2794,10 @@ namespace InternalHeatGains {
                                               "HotWaterEquipment",
                                               ZoneHWEq(Loop).Name,
                                               IntGainTypeOf_HotWaterEquipment,
-                                              ZoneHWEq(Loop).ConGainRate,
-                                              _,
-                                              ZoneHWEq(Loop).RadGainRate,
-                                              ZoneHWEq(Loop).LatGainRate);
+                                              &ZoneHWEq(Loop).ConGainRate,
+                                              nullptr,
+                                              &ZoneHWEq(Loop).RadGainRate,
+                                              &ZoneHWEq(Loop).LatGainRate);
 
                 } // Item1
             }     // Item - number of hot water statements
@@ -3187,10 +3187,10 @@ namespace InternalHeatGains {
                                               "SteamEquipment",
                                               ZoneSteamEq(Loop).Name,
                                               IntGainTypeOf_SteamEquipment,
-                                              ZoneSteamEq(Loop).ConGainRate,
-                                              _,
-                                              ZoneSteamEq(Loop).RadGainRate,
-                                              ZoneSteamEq(Loop).LatGainRate);
+                                              &ZoneSteamEq(Loop).ConGainRate,
+                                              nullptr,
+                                              &ZoneSteamEq(Loop).RadGainRate,
+                                              &ZoneSteamEq(Loop).LatGainRate);
 
                 } // Item1
             }     // Item - number of hot water statements
@@ -3606,10 +3606,10 @@ namespace InternalHeatGains {
                                               "OtherEquipment",
                                               ZoneOtherEq(Loop).Name,
                                               IntGainTypeOf_OtherEquipment,
-                                              ZoneOtherEq(Loop).ConGainRate,
-                                              _,
-                                              ZoneOtherEq(Loop).RadGainRate,
-                                              ZoneOtherEq(Loop).LatGainRate);
+                                              &ZoneOtherEq(Loop).ConGainRate,
+                                              nullptr,
+                                              &ZoneOtherEq(Loop).RadGainRate,
+                                              &ZoneOtherEq(Loop).LatGainRate);
 
                 } // Item1
             }     // Item - number of other equipment statements
@@ -4328,7 +4328,7 @@ namespace InternalHeatGains {
                                           "ElectricEquipment:ITE:AirCooled",
                                           ZoneITEq(Loop).Name,
                                           IntGainTypeOf_ElectricEquipmentITEAirCooled,
-                                          ZoneITEq(Loop).ConGainRateToZone);
+                                          &ZoneITEq(Loop).ConGainRateToZone);
 
             } // Item - Number of ZoneITEq objects
             for (Loop = 1; Loop <= NumZoneITEqStatements; ++Loop) {
@@ -4530,9 +4530,9 @@ namespace InternalHeatGains {
                                   "ZoneBaseboard:OutdoorTemperatureControlled",
                                   ZoneBBHeat(Loop).Name,
                                   IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled,
-                                  ZoneBBHeat(Loop).ConGainRate,
-                                  _,
-                                  ZoneBBHeat(Loop).RadGainRate);
+                                  &ZoneBBHeat(Loop).ConGainRate,
+                                  nullptr,
+                                  &ZoneBBHeat(Loop).RadGainRate);
         }
 
         RepVarSet = true;
@@ -4623,12 +4623,12 @@ namespace InternalHeatGains {
                                   "ZoneContaminantSourceAndSink:CarbonDioxide",
                                   ZoneCO2Gen(Loop).Name,
                                   IntGainTypeOf_ZoneContaminantSourceAndSinkCarbonDioxide,
-                                  _,
-                                  _,
-                                  _,
-                                  _,
-                                  _,
-                                  ZoneCO2Gen(Loop).CO2GainRate);
+                                  nullptr,
+                                  nullptr,
+                                  nullptr,
+                                  nullptr,
+                                  nullptr,
+                                  &ZoneCO2Gen(Loop).CO2GainRate);
         }
 
         RepVarSet.deallocate();
@@ -6501,13 +6501,13 @@ namespace InternalHeatGains {
         // store pointer values to hold generic internal gain values constant for entire timestep
         for (NZ = 1; NZ <= NumOfZones; ++NZ) {
             for (Loop = 1; Loop <= ZoneIntGain(NZ).NumberOfDevices; ++Loop) {
-                ZoneIntGain(NZ).Device(Loop).ConvectGainRate = ZoneIntGain(NZ).Device(Loop).PtrConvectGainRate;
-                ZoneIntGain(NZ).Device(Loop).ReturnAirConvGainRate = ZoneIntGain(NZ).Device(Loop).PtrReturnAirConvGainRate;
-                if (DoRadiationUpdate) ZoneIntGain(NZ).Device(Loop).RadiantGainRate = ZoneIntGain(NZ).Device(Loop).PtrRadiantGainRate;
-                ZoneIntGain(NZ).Device(Loop).LatentGainRate = ZoneIntGain(NZ).Device(Loop).PtrLatentGainRate;
-                ZoneIntGain(NZ).Device(Loop).ReturnAirLatentGainRate = ZoneIntGain(NZ).Device(Loop).PtrReturnAirLatentGainRate;
-                ZoneIntGain(NZ).Device(Loop).CarbonDioxideGainRate = ZoneIntGain(NZ).Device(Loop).PtrCarbonDioxideGainRate;
-                ZoneIntGain(NZ).Device(Loop).GenericContamGainRate = ZoneIntGain(NZ).Device(Loop).PtrGenericContamGainRate;
+                ZoneIntGain(NZ).Device(Loop).ConvectGainRate = *ZoneIntGain(NZ).Device(Loop).PtrConvectGainRate;
+                ZoneIntGain(NZ).Device(Loop).ReturnAirConvGainRate = *ZoneIntGain(NZ).Device(Loop).PtrReturnAirConvGainRate;
+                if (DoRadiationUpdate) ZoneIntGain(NZ).Device(Loop).RadiantGainRate = *ZoneIntGain(NZ).Device(Loop).PtrRadiantGainRate;
+                ZoneIntGain(NZ).Device(Loop).LatentGainRate = *ZoneIntGain(NZ).Device(Loop).PtrLatentGainRate;
+                ZoneIntGain(NZ).Device(Loop).ReturnAirLatentGainRate = *ZoneIntGain(NZ).Device(Loop).PtrReturnAirLatentGainRate;
+                ZoneIntGain(NZ).Device(Loop).CarbonDioxideGainRate = *ZoneIntGain(NZ).Device(Loop).PtrCarbonDioxideGainRate;
+                ZoneIntGain(NZ).Device(Loop).GenericContamGainRate = *ZoneIntGain(NZ).Device(Loop).PtrGenericContamGainRate;
             }
             if (ReSumLatentGains) {
                 SumAllInternalLatentGains(NZ, ZoneLatentGain(NZ));
