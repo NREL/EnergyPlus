@@ -399,16 +399,16 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     pZoneHybridUnitaryAirConditioner->InitializeModelParams();
     pZoneHybridUnitaryAirConditioner->InletTemp = Tra;
     pZoneHybridUnitaryAirConditioner->SecInletTemp = Tosa;
+    pZoneHybridUnitaryAirConditioner->SecInletMassFlowRate = DesignMinVR;
     pZoneHybridUnitaryAirConditioner->doStep(RequestedCooling, Requestedheating, Requested_Humidification, Requested_Dehumidification, DesignMinVR);
     ReportZoneHybridUnitaryAirConditioners(1);
 
     SystemReports::ReportMaxVentilationLoads();
     // output results
-    Real64 ovr_htg_vent_load = MaxOverheatingByVent(1);
-    Real64 ovr_clg_vent_load = MaxOvercoolingByVent(1);
+    Real64 zone_oa_mass_flow = ZoneOAMassFlow(1); // OA flow reported to the zone from the unitary hybrid system
+
     // checks
-    EXPECT_GT(ovr_htg_vent_load, 0); // add heating ventilation load from outside air
-    EXPECT_EQ(ovr_clg_vent_load, 0);
+    EXPECT_EQ(zone_oa_mass_flow, DesignMinVR); // reported zone OA flow matches unitary hybrid OA flow
 
     // Scenario 8: Check output meters and report
     int NumFound;
