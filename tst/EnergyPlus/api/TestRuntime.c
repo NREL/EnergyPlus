@@ -49,7 +49,6 @@
 #include <string.h>
 #include <EnergyPlus/api/func.h>
 #include <EnergyPlus/api/runtime.h>
-#include <EnergyPlus/Globals/Globals.hh>
 
 int numWarnings = 0;
 int oneTimeHalfway = 0;
@@ -75,14 +74,13 @@ void errorHandler(const char * message) {
 int main(int argc, const char * argv[]) {
     registerProgressCallback(progressHandler);
     registerErrorCallback(errorHandler);
-    AllGlobals state;
-    energyplusWithStates(state, argc, argv);
+    energyplus(argc, argv);
     if (numWarnings > 0) {
         printf("There were %d warnings!\n", numWarnings);
         numWarnings = 0;
     }
     oneTimeHalfway = 0;
-    cClearAllStates(state); // note previous callbacks are cleared here
+    cClearAllStates(); // note previous callbacks are cleared here
     callbackAfterNewEnvironmentWarmupComplete(newEnvrnHandler);
     energyplus(argc, argv);
     if (numWarnings > 0) {
