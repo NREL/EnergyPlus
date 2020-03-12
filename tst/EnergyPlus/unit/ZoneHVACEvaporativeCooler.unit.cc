@@ -81,9 +81,9 @@ public:
     bool FirstHVACIteration = true;
 
 protected:
-    virtual void SetUp(AllGlobals &state)
+    virtual void SetUp()
     {
-        EnergyPlusFixture::SetUp(state); // Sets up the base fixture first.
+        EnergyPlusFixture::SetUp(); // Sets up the base fixture first.
 
         DataSizing::ZoneEqSizing.allocate(1);
         DataEnvironment::OutBaroPress = 101325.0;

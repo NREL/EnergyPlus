@@ -104,9 +104,9 @@ public:
     {
     }
 
-    virtual void SetUp(AllGlobals &state)
+    virtual void SetUp()
     {
-        EnergyPlusFixture::SetUp(state); // Sets up individual test cases.
+        EnergyPlusFixture::SetUp(); // Sets up individual test cases.
 
         CurZoneEqNum = 0;
         CurSysNum = 0;
