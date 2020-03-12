@@ -4894,6 +4894,12 @@ namespace OutputProcessor {
         UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone); // zone timestep
 
         compare_eso_stream(delimited_string({
+            "1,5,Environment Title[],Latitude[deg],Longitude[deg],Time Zone[],Elevation[m]",
+            "2,8,Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],Hour[],StartMinute[],EndMinute[],DayType",
+            "3,5,Cumulative Day of Simulation[],Month[],Day of Month[],DST Indicator[1=yes 0=no],DayType  ! When Daily Report Variables Requested",
+            "4,2,Cumulative Days of Simulation[],Month[]  ! When Monthly Report Variables Requested",
+            "5,1,Cumulative Days of Simulation[] ! When Run Period Report Variables Requested",
+            "6,1,Calendar Year of Simulation[] ! When Annual Report Variables Requested",
             "7,1,,Zone Ideal Loads Supply Air Total Heating Energy [J] !Each Call",
             "56,11,,Zone Ideal Loads Supply Air Total Heating Energy [J] !RunPeriod [Value,Min,Month,Day,Hour,Minute,Max,Month,Day,Hour,Minute]",
             "2,365,12,31, 0,24,10.00,20.00,Tuesday",
