@@ -49,7 +49,7 @@
 #define EnergyPlusAPIRuntime_h_INCLUDED
 
 #include <EnergyPlus/api/EnergyPlusAPI.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+//#include <EnergyPlus/Globals/Globals.hh>
 #include <EnergyPlus/TypeDefs.h>
 
 #ifdef __cplusplus
