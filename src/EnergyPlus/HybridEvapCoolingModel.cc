@@ -462,7 +462,7 @@ namespace HybridEvapCoolingModel {
         CMode newMode;
         bool error = newMode.ParseMode(ModeCounter,
                                        &OperatingModes,
-                                       ScaledSystemMaximumSupplyAirMassFlowRate,
+                                       ScalingFactor,
                                        Alphas,
                                        cAlphaFields,
                                        Numbers,
@@ -475,7 +475,7 @@ namespace HybridEvapCoolingModel {
 
     bool CMode::ParseMode(int ModeCounter,
                           std::vector<CMode> *OperatingModes,
-                          Real64 scaledCorrection,
+                          Real64 ScalingFactor,
                           Array1D_string Alphas,
                           Array1D_string cAlphaFields,
                           Array1D<Real64> Numbers,
@@ -502,7 +502,7 @@ namespace HybridEvapCoolingModel {
 
         // Using/Aliasing
         ModeID = ModeCounter;
-        Correction = scaledCorrection;
+        Correction = ScalingFactor;
 
         if (!ValidateArrays(Alphas, cAlphaFields, Numbers, cNumericFields, cCurrentModuleObject)) {
             ShowSevereError(
