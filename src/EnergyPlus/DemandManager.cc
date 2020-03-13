@@ -544,7 +544,7 @@ namespace DemandManager {
                         // Validate DEMAND MANAGER Type
                         {
                             auto const SELECT_CASE_var(AlphArray(MgrNum * 2 + 5));
-                            if ((SELECT_CASE_var == "DEMANDMANAGER:LIGHTS") || (SELECT_CASE_var == "DEMANDMANAGER:state.exteriorEnergyUse.ExteriorLights") ||
+                            if ((SELECT_CASE_var == "DEMANDMANAGER:LIGHTS") || (SELECT_CASE_var == "DEMANDMANAGER:EXTERIORLIGHTS") ||
                                 (SELECT_CASE_var == "DEMANDMANAGER:ELECTRICEQUIPMENT") || (SELECT_CASE_var == "DEMANDMANAGER:THERMOSTATS") ||
                                 (SELECT_CASE_var == "DEMANDMANAGER:VENTILATION")) {
 
@@ -699,7 +699,7 @@ namespace DemandManager {
         // FLOW:
         MaxAlphas = 0;
         MaxNums = 0;
-        CurrentModuleObject = "DemandManager:state.exteriorEnergyUse.ExteriorLights";
+        CurrentModuleObject = "DemandManager:ExteriorLights";
         NumDemandMgrExtLights = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (NumDemandMgrExtLights > 0) {
             inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNums);
@@ -748,7 +748,7 @@ namespace DemandManager {
             StartIndex = 1;
             EndIndex = NumDemandMgrExtLights;
 
-            CurrentModuleObject = "DemandManager:state.exteriorEnergyUse.ExteriorLights";
+            CurrentModuleObject = "DemandManager:ExteriorLights";
 
             for (MgrNum = StartIndex; MgrNum <= EndIndex; ++MgrNum) {
 
