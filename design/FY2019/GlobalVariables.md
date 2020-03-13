@@ -1,7 +1,7 @@
 NFP: Refactor Global Variables
 ================
 
-**Brian Ball, Edwin Lee, Kyle Bene NREL**
+**Brian Ball, Edwin Lee, Matt Mitchell, Kyle Bene NREL**
 
  - 1 Aug 2019 
 
