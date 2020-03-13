@@ -1398,13 +1398,11 @@ namespace HybridEvapCoolingModel {
         Real64 ScaledMsa = 0;
         Real64 Mvent = 0;
         Real64 OptimalSetting_RunFractionTotalFuel = IMPLAUSIBLE_POWER;
-        Real64 EIR;
         Real64 ElectricalPower;
         Real64 Tma;
         Real64 Wma;
         Real64 Hsa;
         Real64 Hma;
-        Real64 TotalSystem;
         Real64 PreviousMaxiumConditioningOutput = 0;
         Real64 PreviousMaxiumHumidOrDehumidOutput = 0;
         std::string ObjectID = Name.c_str();
@@ -1585,7 +1583,7 @@ namespace HybridEvapCoolingModel {
             Real64 LambdaSa = Psychrometrics::PsyHfgAirFnWTdb(0, Tsa);
             Real64 LatentSystem = LambdaSa * MsaDry * (Wma - Wsa); // W
                                                                    // Total system cooling
-            TotalSystem = (Hma - Hsa) * ScaledMsa;
+            thisSetting.TotalSystem = (Hma - Hsa) * ScaledMsa;
             // Perform latent check
             // Real64 latentCheck = TotalSystem - SensibleSystem;
 
@@ -1599,7 +1597,6 @@ namespace HybridEvapCoolingModel {
                                                                                                                     // Perform latent check
             // Real64 latentRoomORZoneCheck = TotalRoomORZone - SensibleRoomORZone;
 
-            thisSetting.TotalSystem = TotalSystem;
             thisSetting.SensibleSystem = SensibleSystem;
             thisSetting.LatentSystem = LatentSystem;
             thisSetting.TotalZone = TotalRoomORZone;
@@ -1647,9 +1644,6 @@ namespace HybridEvapCoolingModel {
                 thisSetting.oMode.CalculateCurveVal(StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, THIRD_FUEL_USE);
             thisSetting.WaterConsumptionRate =
                 thisSetting.oMode.CalculateCurveVal(StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, WATER_USE);
-
-            // Calculate EIR
-            EIR = ElectricalPower / TotalSystem;
 
             // Calculate partload fraction required to meet all requirements
             Real64 PartRuntimeFraction = 0;
