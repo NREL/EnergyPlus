@@ -599,6 +599,8 @@ namespace DataHeatBalance {
     Array1D<Real64> SNLoadPredictedHSPRate; // Predicted load to heating setpoint (unmultiplied)
     Array1D<Real64> SNLoadPredictedCSPRate; // Predicted load to cooling setpoint (unmultiplied)
     Array1D<Real64> MoisturePredictedRate;
+    Array1D<Real64> MoisturePredictedHumSPRate;   // Predicted latent load to humidification setpoint (unmultiplied)
+    Array1D<Real64> MoisturePredictedDehumSPRate; // Predicted latent load to dehumidification setpoint (unmultiplied)
 
     Array1D<Real64> ListSNLoadHeatEnergy;
     Array1D<Real64> ListSNLoadCoolEnergy;
@@ -779,7 +781,7 @@ namespace DataHeatBalance {
     Array1D<Real64> const
         GasSpecificHeatRatio(10, {1.4, 1.67, 1.68, 1.66, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}); // Gas specific heat ratios.  Used for gasses in low pressure
 
-    Real64 ZeroPointerVal(0.0);
+    Real64 zeroPointerVal(0.0);
 
     int NumAirBoundaryMixing(0);                   // Number of air boundary simple mixing objects needed
     std::vector<int> AirBoundaryMixingZone1(0);    // Air boundary simple mixing zone 1
@@ -960,6 +962,8 @@ namespace DataHeatBalance {
         SNLoadPredictedHSPRate.deallocate();
         SNLoadPredictedCSPRate.deallocate();
         MoisturePredictedRate.deallocate();
+        MoisturePredictedHumSPRate.deallocate();
+        MoisturePredictedDehumSPRate.deallocate();
         ListSNLoadHeatEnergy.deallocate();
         ListSNLoadCoolEnergy.deallocate();
         ListSNLoadHeatRate.deallocate();
@@ -1060,7 +1064,6 @@ namespace DataHeatBalance {
         CosIncAng.deallocate();
         BackSurfaces.deallocate();
         OverlapAreas.deallocate();
-        ZeroPointerVal = 0.0;
         ZonePreDefRep.deallocate();
         BuildingPreDefRep = ZonePreDefRepType();
         ZoneIntGain.deallocate();
@@ -1115,6 +1118,7 @@ namespace DataHeatBalance {
         MassConservation.deallocate();
         ZoneLocalEnvironment.deallocate();
         ZoneAirMassFlow = ZoneAirMassFlowConservation();
+        zeroPointerVal = 0;
     }
 
     void ZoneData::SetOutBulbTempAt()

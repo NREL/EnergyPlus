@@ -81,74 +81,144 @@ void issueText(const char * message) {
 void registerProgressCallback(void (*f)(int const)) {
     EnergyPlus::DataGlobals::progressCallback = f;
 }
+
 void registerStdOutCallback(void (*f)(const char * message)) {
     EnergyPlus::DataGlobals::messageCallback = f;
 }
 
-void callbackBeginNewEnvironment(void (*f)()) {
+void callbackBeginNewEnvironment(std::function<void ()> f) {
     EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromBeginNewEvironment, f);
 }
 
-void callbackAfterNewEnvironmentWarmupComplete(void (*f)()) {
+void callbackBeginNewEnvironment(void (*f)()) {
+    callbackBeginNewEnvironment(std::function<void ()>(f));
+}
+
+void callbackAfterNewEnvironmentWarmupComplete(std::function<void ()> f) {
     EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromBeginNewEvironmentAfterWarmUp, f);
 }
 
-void callbackBeginZoneTimeStepBeforeInitHeatBalance(void (*f)()) {
+void callbackAfterNewEnvironmentWarmupComplete(void (*f)()) {
+  callbackAfterNewEnvironmentWarmupComplete(std::function<void ()>(f));
+}
+
+void callbackBeginZoneTimeStepBeforeInitHeatBalance(std::function<void ()> f) {
     EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromBeginZoneTimestepBeforeInitHeatBalance, f);
 }
 
-void callbackBeginZoneTimeStepAfterInitHeatBalance(void (*f)()) {
+void callbackBeginZoneTimeStepBeforeInitHeatBalance(void (*f)()) {
+    callbackBeginZoneTimeStepBeforeInitHeatBalance(std::function<void ()>(f));
+}
+
+void callbackBeginZoneTimeStepAfterInitHeatBalance(std::function<void ()> f) {
     EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromBeginZoneTimestepAfterInitHeatBalance, f);
 }
 
-void callbackBeginTimeStepBeforePredictor(void (*f)()) {
+void callbackBeginZoneTimeStepAfterInitHeatBalance(void (*f)()) {
+    callbackBeginZoneTimeStepAfterInitHeatBalance(std::function<void ()>(f));
+}
+
+void callbackBeginTimeStepBeforePredictor(std::function<void ()> f) {
     EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromBeginTimestepBeforePredictor, f);
 }
 
-void callbackAfterPredictorBeforeHVACManagers(void (*f)()) {
+void callbackBeginTimeStepBeforePredictor(void (*f)()) {
+    callbackBeginTimeStepBeforePredictor(std::function<void ()>(f));
+}
+
+void callbackAfterPredictorBeforeHVACManagers(std::function<void ()> f) {
     EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromBeforeHVACManagers, f);
 }
 
-void callbackAfterPredictorAfterHVACManagers(void (*f)()) {
+void callbackAfterPredictorBeforeHVACManagers(void (*f)()) {
+    callbackAfterPredictorBeforeHVACManagers(std::function<void ()>(f));
+}
+
+void callbackAfterPredictorAfterHVACManagers(std::function<void ()> f) {
     EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromAfterHVACManagers, f);
 }
 
-void callbackInsideSystemIterationLoop(void (*f)()) {
+void callbackAfterPredictorAfterHVACManagers(void (*f)()) {
+    callbackAfterPredictorAfterHVACManagers(std::function<void ()>(f));
+}
+
+void callbackInsideSystemIterationLoop(std::function<void ()> f) {
     EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromHVACIterationLoop, f);
 }
 
-void callbackEndOfZoneTimeStepBeforeZoneReporting(void (*f)()) {
+void callbackInsideSystemIterationLoop(void (*f)()) {
+    callbackInsideSystemIterationLoop(std::function<void ()>(f));
+}
+
+void callbackEndOfZoneTimeStepBeforeZoneReporting(std::function<void ()> f) {
     EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromEndZoneTimestepBeforeZoneReporting, f);
 }
 
-void callbackEndOfZoneTimeStepAfterZoneReporting(void (*f)()) {
+void callbackEndOfZoneTimeStepBeforeZoneReporting(void (*f)()) {
+    callbackEndOfZoneTimeStepBeforeZoneReporting(std::function<void ()>(f));
+}
+
+void callbackEndOfZoneTimeStepAfterZoneReporting(std::function<void ()> f) {
     EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromEndZoneTimestepAfterZoneReporting, f);
 }
 
-void callbackEndOfSystemTimeStepBeforeHVACReporting(void (*f)()) {
+void callbackEndOfZoneTimeStepAfterZoneReporting(void (*f)()) {
+    callbackEndOfZoneTimeStepAfterZoneReporting(std::function<void ()>(f));
+}
+
+void callbackEndOfSystemTimeStepBeforeHVACReporting(std::function<void ()> f) {
     EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromEndSystemTimestepBeforeHVACReporting, f);
 }
 
-void callbackEndOfSystemTimeStepAfterHVACReporting(void (*f)()) {
+void callbackEndOfSystemTimeStepBeforeHVACReporting(void (*f)()) {
+    callbackEndOfSystemTimeStepBeforeHVACReporting(std::function<void ()>(f));
+}
+
+void callbackEndOfSystemTimeStepAfterHVACReporting(std::function<void ()> f) {
     EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromEndSystemTimestepAfterHVACReporting, f);
 }
 
-void callbackEndOfZoneSizing(void (*f)()) {
+void callbackEndOfSystemTimeStepAfterHVACReporting(void (*f)()) {
+    callbackEndOfSystemTimeStepAfterHVACReporting(std::function<void ()>(f));
+}
+
+void callbackEndOfZoneSizing(std::function<void ()> f) {
     EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromZoneSizing, f);
 }
 
-void callbackEndOfSystemSizing(void (*f)()) {
+void callbackEndOfZoneSizing(void (*f)()) {
+    callbackEndOfZoneSizing(std::function<void ()>(f));
+}
+
+void callbackEndOfSystemSizing(std::function<void ()> f) {
     EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromSystemSizing, f);
 }
 
-void callbackEndOfAfterComponentGetInput(void (*f)()) {
+void callbackEndOfSystemSizing(void (*f)()) {
+    callbackEndOfSystemSizing(std::function<void ()>(f));
+}
+
+void callbackEndOfAfterComponentGetInput(std::function<void ()> f) {
     EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromComponentGetInput, f);
 }
 
-void callbackUserDefinedComponentModel(void (*f)()) {
+void callbackEndOfAfterComponentGetInput(void (*f)()) {
+    callbackEndOfAfterComponentGetInput(std::function<void ()>(f));
+}
+
+void callbackUserDefinedComponentModel(std::function<void ()> f) {
     EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromUserDefinedComponentModel, f);
 }
 
-void callbackUnitarySystemSizing(void (*f)()) {
+void callbackUserDefinedComponentModel(void (*f)()) {
+    callbackUserDefinedComponentModel(std::function<void ()>(f));
+}
+
+void callbackUnitarySystemSizing(std::function<void ()> f) {
     EnergyPlus::PluginManagement::registerNewCallback(EnergyPlus::DataGlobals::emsCallFromUnitarySystemSizing, f);
 }
+
+void callbackUnitarySystemSizing(void (*f)()) {
+    callbackUnitarySystemSizing(std::function<void ()>(f));
+}
+
