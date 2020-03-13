@@ -430,14 +430,11 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ValidateFieldsParsing
     bool ErrorsFound = false;
     GetInputZoneHybridUnitaryAirConditioners(ErrorsFound);
     InitZoneHybridUnitaryAirConditioners(1, 1);
-
-    std::unique_ptr<Model> pZoneHybridUnitaryAirConditioner;
-    pZoneHybridUnitaryAirConditioner.reset(&HybridUnitaryAirConditioners::ZoneHybridUnitaryAirConditioner(1));
+    Model *pZoneHybridUnitaryAirConditioner = &HybridUnitaryAirConditioners::ZoneHybridUnitaryAirConditioner(1);
     pZoneHybridUnitaryAirConditioner->Initialize(1);
     pZoneHybridUnitaryAirConditioner->InitializeModelParams();
-
-    EXPECT_EQ(pZoneHybridUnitaryAirConditioner->OperatingModes.size(), 2);
-
+    unsigned long expectedOperatingModesSize = 2;
+    EXPECT_EQ(pZoneHybridUnitaryAirConditioner->OperatingModes.size(), expectedOperatingModesSize);
 }
 
 
@@ -474,19 +471,16 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ValidateMinimumIdfInp
     ASSERT_TRUE(process_idf(idf_objects));
     bool ErrorsFound = false;
     GetInputZoneHybridUnitaryAirConditioners(ErrorsFound);
-
     InitZoneHybridUnitaryAirConditioners(1, 1);
-
-    std::unique_ptr<Model> pZoneHybridUnitaryAirConditioner;
-    pZoneHybridUnitaryAirConditioner.reset(&HybridUnitaryAirConditioners::ZoneHybridUnitaryAirConditioner(1));
+    Model *pZoneHybridUnitaryAirConditioner = &HybridUnitaryAirConditioners::ZoneHybridUnitaryAirConditioner(1);
     pZoneHybridUnitaryAirConditioner->Initialize(1);
     pZoneHybridUnitaryAirConditioner->InitializeModelParams();
-    EXPECT_EQ(pZoneHybridUnitaryAirConditioner->OperatingModes.size(), 1);
+    constexpr unsigned long expectedOperatingModesSize = 1;
+    EXPECT_EQ(pZoneHybridUnitaryAirConditioner->OperatingModes.size(), expectedOperatingModesSize);
 }
 
 TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_CalculateCurveVal)
 {
-
     std::string const idf_objects = delimited_string({
                                                          "ZoneHVAC:HybridUnitaryHVAC,",
                                                          "MUNTERSEPX5000,          !- Name",
@@ -674,7 +668,6 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_CalculateCurveVal)
 
     CurveManager::GetCurveInput();
     CurveManager::GetCurvesInputFlag = false;
-    int numCurves = CurveManager::NumCurves;
     EXPECT_EQ(4, CurveManager::NumCurves);
 
     bool ErrorsFound(false);
@@ -682,10 +675,8 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_CalculateCurveVal)
     GetOARequirements();
     EXPECT_FALSE(ErrorsFound);
 
-
     InitZoneHybridUnitaryAirConditioners(1, 1);
-    std::unique_ptr<Model> pZoneHybridUnitaryAirConditioner;
-    pZoneHybridUnitaryAirConditioner.reset(&HybridUnitaryAirConditioners::ZoneHybridUnitaryAirConditioner(1));
+    Model *pZoneHybridUnitaryAirConditioner = &HybridUnitaryAirConditioners::ZoneHybridUnitaryAirConditioner(1);
     pZoneHybridUnitaryAirConditioner->Initialize(1);
     pZoneHybridUnitaryAirConditioner->InitializeModelParams();
 
@@ -700,30 +691,21 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_CalculateCurveVal)
     Real64 ExpectedPowerOutput = 1000.0*2.0/3.0176;
     Real64 ExpectedFanPowerOutput = 3.25*2.0/3.0176;
 
-    std::vector<Real64> ExpectedResults{ExpectedTsa,ExpectedWsa };
-
-    int TEMP_CURVE = 0;
-    int W_CURVE = 1;
-    int POWER_CURVE = 2;
-    int SUPPLY_FAN_POWER = 3;
-
-    Real64 testCurveVal;
+    std::vector<Real64> ExpectedResults{ExpectedTsa,ExpectedWsa,ExpectedPowerOutput,ExpectedFanPowerOutput };
     CMode mode0 = pZoneHybridUnitaryAirConditioner->OperatingModes[0];
 
-    testCurveVal = mode0.CalculateCurveVal(Toa, Woa, Tra, Wra, Ma, OAF, TEMP_CURVE);
-    EXPECT_EQ(testCurveVal, ExpectedTsa);
-    testCurveVal = mode0.CalculateCurveVal(Toa, Woa, Tra, Wra, Ma, OAF, W_CURVE);
-    EXPECT_EQ(testCurveVal, ExpectedWsa);
-    testCurveVal = mode0.CalculateCurveVal(Toa, Woa, Tra, Wra, Ma, OAF, POWER_CURVE);
-    EXPECT_EQ(testCurveVal, ExpectedPowerOutput);
-    testCurveVal = mode0.CalculateCurveVal(Toa, Woa, Tra, Wra, Ma, OAF, SUPPLY_FAN_POWER);
-    EXPECT_EQ(testCurveVal, ExpectedFanPowerOutput);
+    // The following loop is intended to loop through the valid curves in each operating mode, where i corresponds to the correct curve index in this operating mode, as well as the correct expected
+    // return value in the ExpectedResults array. The values of the curves are as follow:
+    //
+    // TEMP_CURVE = 0;
+    // W_CURVE = 1;
+    // POWER_CURVE = 2;
+    // SUPPLY_FAN_POWER = 3;
 
-    for (int i =0; i<4; i++){
-        testCurveVal = mode0.CalculateCurveVal(Toa, Woa, Tra, Wra, Ma, OAF, SUPPLY_FAN_POWER);
-        EXPECT_EQ(testCurveVal, ExpectedFanPowerOutput);
+    for (int i=0; i<ExpectedResults.size(); i++){
+        Real64 testCurveVal = mode0.CalculateCurveVal(Toa, Woa, Tra, Wra, Ma, OAF, i);
+        EXPECT_EQ(testCurveVal, ExpectedResults[i]);
     }
-
 }
 
 } // namespace EnergyPlus
