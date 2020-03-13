@@ -45,8 +45,8 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef Globals_hh_INCLUDED
-#define Globals_hh_INCLUDED
+#ifndef EnergyPlusData_hh_INCLUDED
+#define EnergyPlusData_hh_INCLUDED
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
