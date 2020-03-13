@@ -93,6 +93,14 @@ namespace SizingManager {
 
     void ManageSizing(OutputFiles &outputFiles);
 
+    bool CalcdoLoadComponentPulseNow(bool const isPulseZoneSizing,
+                                     bool const WarmupFlag,
+                                     int const HourOfDay,
+                                     int const TimeStep,
+                                     int const KindOfSim,
+                                     int const DayOfSim
+                                     );
+
     void ManageSystemSizingAdjustments();
 
     void ManageSystemVentilationAdjustments();
