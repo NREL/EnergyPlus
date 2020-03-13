@@ -83,7 +83,7 @@ struct DataGlobal : BaseGlobalStruct
     }
 };
 
-struct ExteriorEnergyUseGlobals : BaseGlobalStruct
+struct ExteriorEnergyUseData : BaseGlobalStruct
 {
     struct ExteriorLightUsage
     {
@@ -122,7 +122,7 @@ struct ExteriorEnergyUseGlobals : BaseGlobalStruct
     }
 };
 
-struct FansGlobals : BaseGlobalStruct
+struct FansData : BaseGlobalStruct
 {
     // constants
     static constexpr int ExhaustFanCoupledToAvailManagers = 150;
@@ -135,7 +135,7 @@ struct FansGlobals : BaseGlobalStruct
     bool LocalTurnFansOn;      // If True, overrides fan schedule and cycles ZoneHVAC component fans on
     bool LocalTurnFansOff;     // If True, overrides fan schedule and LocalTurnFansOn and cycles ZoneHVAC component fans off
 
-    FansGlobals() : NumFans(0), NumNightVentPerf(0), GetFanInputFlag(true), LocalTurnFansOn(false), LocalTurnFansOff(false)
+    FansData() : NumFans(0), NumNightVentPerf(0), GetFanInputFlag(true), LocalTurnFansOn(false), LocalTurnFansOff(false)
     {
     }
 
@@ -149,7 +149,7 @@ struct FansGlobals : BaseGlobalStruct
     }
 };
 
-struct PipesGlobals : BaseGlobalStruct
+struct PipesData : BaseGlobalStruct
 {
     // MODULE VARIABLE DECLARATIONS
     int NumLocalPipes = 0;
@@ -165,9 +165,9 @@ struct EnergyPlusData : BaseGlobalStruct
 {
     // module globals
     DataGlobal dataGlobals;
-    ExteriorEnergyUseGlobals exteriorEnergyUse;
-    FansGlobals fans;
-    PipesGlobals pipes;
+    ExteriorEnergyUseData exteriorEnergyUse;
+    FansData fans;
+    PipesData pipes;
     //OutputReportTabular outputReportTabular;
 
     // all clear states
