@@ -52,6 +52,9 @@ namespace EnergyPlus {
 
 namespace AirflowNetwork {
 
+    int lowerLimitErrIdx(0);
+    int upperLimitErrIdx(0);
+
     Real64 airThermConductivity(Real64 T // Temperature in Celsius
     )
     {
@@ -65,9 +68,6 @@ namespace AirflowNetwork {
         Real64 const a = 0.02364;
         Real64 const b = 0.0000754772569209165;
         Real64 const c = -2.40977632412045e-8;
-
-        static int lowerLimitErrIdx(0);
-        static int upperLimitErrIdx(0);
 
         if (T < LowerLimit) {
             if (lowerLimitErrIdx == 0) {
