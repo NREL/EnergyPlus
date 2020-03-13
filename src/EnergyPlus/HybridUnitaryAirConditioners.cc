@@ -413,8 +413,6 @@ namespace HybridUnitaryAirConditioners {
         Array1D_bool lNumericBlanks;      // Logical array, numeric field input BLANK = .TRUE.
         int NumAlphas;                    // Number of Alphas for each GetObjectItem call
         int NumNumbers;                   // Number of Numbers for each GetObjectItem call
-        int MaxAlphas;                    // Maximum number of alpha fields in all objects
-        int MaxNumbers;                   // Maximum number of numeric fields in all objects
         int NumFields;                    // Total number of fields in object
         int IOStatus;                     // Used in GetObjectItem
         static bool ErrorsFound(false);   // Set to true if errors in input, fatal at end of routine
@@ -424,13 +422,12 @@ namespace HybridUnitaryAirConditioners {
 
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const RoutineName("GetInputZoneEvaporativeCoolerUnit: ");
-        MaxNumbers = 0;
-        MaxAlphas = 0;
+
         CurrentModuleObject = "ZoneHVAC:HybridUnitaryHVAC";
         NumZoneHybridEvap = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumFields, NumAlphas, NumNumbers);
-        MaxNumbers = max(MaxNumbers, NumNumbers);
-        MaxAlphas = max(MaxAlphas, NumAlphas);
+        int MaxNumbers = max(0, NumNumbers);    // Maximum number of numeric fields in all objects
+        int MaxAlphas = max(0, NumAlphas);      // Maximum number of alpha fields in all objects
         Alphas.allocate(MaxAlphas);
         Numbers.dimension(MaxNumbers, 0.0);
         cAlphaFields.allocate(MaxAlphas);

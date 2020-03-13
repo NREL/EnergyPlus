@@ -1317,7 +1317,6 @@ namespace HybridEvapCoolingModel {
         bool DidWePartlyMeetLoad = false;
         int modenumber = 0;
         Real64 OptimalSetting_RunFractionTotalFuel = IMPLAUSIBLE_POWER;
-        Real64 ElectricalPower;
         Real64 Tma;
         Real64 Wma;
         Real64 Hsa;
@@ -1535,10 +1534,7 @@ namespace HybridEvapCoolingModel {
                 Humidification_load_met = true;
             }
 
-            Real64 Y_val =
-                thisSetting.oMode.CalculateCurveVal(StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, POWER_CURVE); // fix modenumber not set
-            ElectricalPower = Y_val; // [Kw] calculations for fuel in Kw
-            thisSetting.ElectricalPower = ElectricalPower;
+            thisSetting.ElectricalPower = thisSetting.oMode.CalculateCurveVal(StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, POWER_CURVE); // [Kw] calculations for fuel in Kw
 
             thisSetting.SupplyFanElectricPower =
                 thisSetting.oMode.CalculateCurveVal(StepIns.Tosa, Wosa, StepIns.Tra, Wra, UnscaledMsa, OSAF, SUPPLY_FAN_POWER);
@@ -1563,7 +1559,7 @@ namespace HybridEvapCoolingModel {
                                                                latentRoomORZone); //
 
             Real64 RunFractionTotalFuel =
-                ElectricalPower * PartRuntimeFraction; // fraction can be above 1 meaning its not able to do it completely in a time step.
+                thisSetting.ElectricalPower * PartRuntimeFraction; // fraction can be above 1 meaning its not able to do it completely in a time step.
             thisSetting.Runtime_Fraction = PartRuntimeFraction;
 
             if (Conditioning_load_met && Humidification_load_met) {
