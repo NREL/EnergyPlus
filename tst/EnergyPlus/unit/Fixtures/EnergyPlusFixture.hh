@@ -259,7 +259,6 @@ protected:
 
 public:
     AllGlobals state;
-    //EnergyPlusFixture();
 
 private:
     friend class InputProcessorFixture;
