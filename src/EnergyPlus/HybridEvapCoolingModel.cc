@@ -225,10 +225,9 @@ namespace HybridEvapCoolingModel {
         // METHODOLOGY EMPLOYED:
         // Makes a call to the curve manager, then multiplies the result by either the NormalizationReference for intensive variables or by the
         // scaling Correction for extensive variables. The Normalization reference is specified as a model input, the Correction is equal to the
-        // ScaledSystemMaximumSupplyAirMassFlowRate, which is calculated as  Correction=ScaledSystemMaximumSupplyAirMassFlowRate=
-        // SystemMaximumSupplyAirFlowRate*ScalingFactor*AirDensity, where SystemMaximumSupplyAirFlowRate, and ScalingFactor are model inputs. The
-        // following tables are for intensive variables : Supply Air Temperature, Supply Air Humidity, External Static Pressure, The following tables
-        // are for extensive variables : Electric Power, Fan Electric Power, Second Fuel Consumption, Third Fuel Consumption, Water Use Lookup Table
+        // Scaling Factor, which is input by the user in the idf for this unit, and passed to this CMode from the parent Model. The following
+        // tables are for intensive variables : Supply Air Temperature, Supply Air Humidity, External Static Pressure, The following tables are
+        // for extensive variables : Electric Power, Fan Electric Power, Second Fuel Consumption, Third Fuel Consumption, Water Use Lookup Table
         //
         // Tosa is the outside air temperature
         // Wosa is the outside humidity ratio
@@ -261,18 +260,18 @@ namespace HybridEvapCoolingModel {
             }
             break;
 
+        // The Correction factor for the Power, Fan Power, Static Pressure, Water, and Fuel Use curves is equal to the Parent Model's Scaling Factor
         case POWER_CURVE:
             if (ValidPointer(Psa_curve_pointer)) {
-                // Correction= scaling factor *System Maximum Supply Air Flow Rate*StdRhoAir
                 Y_val = Correction * CurveValue(Psa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
             } else {
                 Y_val = 0;
             }
             break;
 
+
         case SUPPLY_FAN_POWER:
             if (ValidPointer(SFPsa_curve_pointer)) {
-                // Correction= scaling factor *System Maximum Supply Air Flow Rate*StdRhoAir
                 Y_val = Correction * CurveValue(SFPsa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
             } else {
                 Y_val = 0;
@@ -281,7 +280,6 @@ namespace HybridEvapCoolingModel {
 
         case EXTERNAL_STATIC_PRESSURE:
             if (ValidPointer(ESPsa_curve_pointer)) {
-                // Correction= scaling factor *System Maximum Supply Air Flow Rate*StdRhoAir
                 Y_val = CurveValue(ESPsa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
             } else {
                 Y_val = 0; // or set a more reasonable default
@@ -290,7 +288,6 @@ namespace HybridEvapCoolingModel {
 
         case SECOND_FUEL_USE:
             if (ValidPointer(SFUsa_curve_pointer)) {
-                // Correction= scaling factor *System Maximum Supply Air Flow Rate*StdRhoAir
                 Y_val = Correction * CurveValue(SFUsa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
             } else {
                 Y_val = 0; // or set a more reasonable default
@@ -299,7 +296,6 @@ namespace HybridEvapCoolingModel {
 
         case THIRD_FUEL_USE:
             if (ValidPointer(TFUsa_curve_pointer)) {
-                // Correction= scaling factor *System Maximum Supply Air Flow Rate*StdRhoAir
                 Y_val = Correction * CurveValue(TFUsa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
             } else {
                 Y_val = 0; // or set a more reasonable default
@@ -308,7 +304,6 @@ namespace HybridEvapCoolingModel {
 
         case WATER_USE:
             if (ValidPointer(WUsa_curve_pointer)) {
-                // Correction= scaling factor *System Maximum Supply Air Flow Rate*StdRhoAir
                 Y_val = Correction * CurveValue(WUsa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
             } else {
                 Y_val = 0; // or set a more reasonable default

@@ -523,6 +523,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_CalculateCurveVal)
                                                          "0,                       !- Mode0 Outside Air Fraction",
                                                          "0;                       !- Mode0 Supply Air Mass Flow Rate Ratio",
 
+
                                                          "Table:IndependentVariableList,",
                                                          "Mode0_IndependentVariableList,  !- Name",
                                                          "Mode0_Toa,                      !- Independent Variable 1 Name",
@@ -531,6 +532,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_CalculateCurveVal)
                                                          "Mode0_Wra,                      !- Extended Field",
                                                          "Mode0_Ma,                       !- Extended Field",
                                                          "Mode0_OAF;                      !- Extended Field",
+
 
                                                          "Table:IndependentVariable,",
                                                          "Mode0_Toa,               !- Name",
@@ -558,6 +560,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_CalculateCurveVal)
                                                          ",                        !- External File Column Number",
                                                          ",                        !- External File Starting Row Number",
                                                          "0.005;                   !- Value 1",
+
 
                                                          "Table:IndependentVariable,",
                                                          "Mode0_Tra,               !- Name",
@@ -599,7 +602,6 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_CalculateCurveVal)
                                                          ",                        !- External File Column Number",
                                                          ",                        !- External File Starting Row Number",
                                                          "0.5;                     !- Value 1",
-
 
                                                          "Table:IndependentVariable,",
                                                          "Mode0_OAF,               !- Name",
