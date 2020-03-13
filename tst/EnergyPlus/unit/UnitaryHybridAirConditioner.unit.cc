@@ -360,4 +360,368 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     EXPECT_GT(Tsa, Tra);
 }
 
+
+TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ValidateFieldsParsing)
+{
+    std::string idf_objects = delimited_string({
+                                                         "ZoneHVAC:HybridUnitaryHVAC,",
+                                                         "MUNTERSEPX5000,          !- Name",
+                                                         "ALWAYS_ON,               !- Availability Schedule Name",
+                                                         ",                        !- Availability Manager List Name",
+                                                         ",                        !- Minimum Supply Air Temperature Schedule Name",
+                                                         ",                        !- Maximum Supply Air Temperature Schedule Name",
+                                                         ",                        !- Minimum Supply Air Humidity Ratio Schedule Name",
+                                                         ",                        !- Maximum Supply Air Humidity Ratio Schedule Name",
+                                                         "AUTOMATIC,               !- Method to Choose Controlled Inputs and Part Runtime Fraction",
+                                                         "Main Return Air Node Name,  !- Return Air Node Name",
+                                                         "Outside Air Inlet Node,  !- Outside Air Node Name",
+                                                         "Main Zone Inlet Node,    !- Supply Air Node Name",
+                                                         "Main Relief Node,        !- Relief Node Name",
+                                                         "2.51,                    !- System Maximum Supply AirFlow Rate {m3/s}",
+                                                         ",                        !- External Static Pressure at System Maximum Supply Air Flow Rate {Pa}",
+                                                         "1,                       !- Scaling Factor",
+                                                         "2,                       !- Number of Operating Modes",
+                                                         "10,                      !- Minimum Time Between Mode Change {minutes}",
+                                                         "Electricity,             !- First fuel type",
+                                                         "NaturalGas,              !- Second fuel type",
+                                                         "DistrictCooling,         !- Third fuel type",
+                                                         ",                        !- Objective Function Minimizes",
+                                                         "SZ DSOA SPACE2-1,        !- Design Specification Outdoor Air Object Name",
+                                                         "Mode0 Standby,           !- Mode0 Name",
+                                                         ",                        !- Mode0 Supply Air Temperature Lookup Table Name",
+                                                         ",                        !- Mode0 Supply Air Humidity Ratio Lookup Table Name",
+                                                         ",                        !- Mode0 System Electric Power Lookup Table Name",
+                                                         ",                        !- Mode0 Supply Fan Electric Power Lookup Table Name",
+                                                         ",                        !- Mode0 External Static Pressure Lookup Table Name",
+                                                         ",                        !- Mode0 System Second Fuel Consumption Lookup Table Name",
+                                                         ",                        !- Mode0 System Third Fuel Consumption Lookup Table Name",
+                                                         ",                        !- Mode0 System Water Use Lookup Table Name",
+                                                         "0,                       !- Mode0 Outside Air Fraction",
+                                                         "0,                       !- Mode0 Supply Air Mass Flow Rate Ratio",
+                                                         "Mode1_IEC,               !- Mode1 Name",
+                                                         ",                        !- Mode1 Supply Air Temperature Lookup Table Name",
+                                                         ",                        !- Mode1 Supply Air Humidity Ratio Lookup Table Name",
+                                                         ",                        !- Mode1 System Electric Power Lookup Table Name",
+                                                         ",                        !- Mode1 Supply Fan Electric Power Lookup Table Name",
+                                                         ",                        !- Mode1 External Static Pressure Lookup Table Name",
+                                                         ",                        !- Mode1 System Second Fuel Consumption Lookup Table Name",
+                                                         ",                        !- Mode1 System Third Fuel Consumption Lookup Table Name",
+                                                         ",                        !- Mode1 System Water Use Lookup Table Name",
+                                                         "-20,                     !- Mode1 Minimum Outside Air Temperature {C}",
+                                                         "100,                     !- Mode1 Maximum Outside Air Temperature {C}",
+                                                         "0,                       !- Mode1 Minimum Outside Air Humidity Ratio {kgWater/kgDryAir}",
+                                                         "0.03,                    !- Mode1 Maximum Outside Air Humidity Ratio {kgWater/kgDryAir}",
+                                                         "0,                       !- Mode1 Minimum Outside Air Relative Humidity {percent}",
+                                                         "100,                     !- Mode1 Maximum Outside Air Relative Humidity {percent}",
+                                                         "-20,                     !- Mode1 Minimum Return Air Temperature {C}",
+                                                         "100,                     !- Mode1 Maximum Return Air Temperature {C}",
+                                                         "0,                       !- Mode1 Minimum Return Air Humidity Ratio {kgWater/kgDryAir}",
+                                                         "0.03,                    !- Mode1 Maximum Return Air Humidity Ratio {kgWater/kgDryAir}",
+                                                         "0,                       !- Mode1 Minimum Return Air Relative Humidity {percent}",
+                                                         "100,                     !- Mode1 Maximum Return Air Relative Humidity {percent}",
+                                                         "1,                       !- Mode1 Minimum Outside Air Fraction",
+                                                         "1,                       !- Mode1 Maximum Outside Air Fraction",
+                                                         "0.715,                   !- Mode1 Minimum Supply Air Mass Flow Rate Ratio",
+                                                         "0.964;                   !- Mode1 Maximum Supply Air Mass Flow Rate Ratio",
+
+                                                     });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool ErrorsFound = false;
+    GetInputZoneHybridUnitaryAirConditioners(ErrorsFound);
+    InitZoneHybridUnitaryAirConditioners(1, 1);
+
+    std::unique_ptr<Model> pZoneHybridUnitaryAirConditioner;
+    pZoneHybridUnitaryAirConditioner.reset(&HybridUnitaryAirConditioners::ZoneHybridUnitaryAirConditioner(1));
+    pZoneHybridUnitaryAirConditioner->Initialize(1);
+    pZoneHybridUnitaryAirConditioner->InitializeModelParams();
+
+    EXPECT_EQ(pZoneHybridUnitaryAirConditioner->OperatingModes.size(), 2);
+
+}
+
+
+TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_ValidateMinimumIdfInput)
+{
+    std::string idf_objects = delimited_string({
+                                       "ZoneHVAC:HybridUnitaryHVAC,",
+                                       "MUNTERSEPX5000,          !- Name",
+                                       "ALWAYS_ON,               !- Availability Schedule Name",
+                                       ",                        !- Availability Manager List Name",
+                                       ",                        !- Minimum Supply Air Temperature Schedule Name",
+                                       ",                        !- Maximum Supply Air Temperature Schedule Name",
+                                       ",                        !- Minimum Supply Air Humidity Ratio Schedule Name",
+                                       ",                        !- Maximum Supply Air Humidity Ratio Schedule Name",
+                                       "AUTOMATIC,               !- Method to Choose Controlled Inputs and Part Runtime Fraction",
+                                       "Main Return Air Node Name,  !- Return Air Node Name",
+                                       "Outside Air Inlet Node,  !- Outside Air Node Name",
+                                       "Main Zone Inlet Node,    !- Supply Air Node Name",
+                                       "Main Relief Node,        !- Relief Node Name",
+                                       "2.51,                    !- System Maximum Supply AirFlow Rate {m3/s}",
+                                       ",                        !- External Static Pressure at System Maximum Supply Air Flow Rate {Pa}",
+                                       "1,                       !- Scaling Factor",
+                                       "1,                       !- Number of Operating Modes",
+                                       "10,                      !- Minimum Time Between Mode Change {minutes}",
+                                       "Electricity,             !- First fuel type",
+                                       "NaturalGas,              !- Second fuel type",
+                                       "DistrictCooling,         !- Third fuel type",
+                                       ",                        !- Objective Function Minimizes",
+                                       "SZ DSOA SPACE2-1,        !- Design Specification Outdoor Air Object Name",
+                                       "Mode0 Standby;           !- Mode0 Name",
+
+                                   });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+    bool ErrorsFound = false;
+    GetInputZoneHybridUnitaryAirConditioners(ErrorsFound);
+
+    InitZoneHybridUnitaryAirConditioners(1, 1);
+
+    std::unique_ptr<Model> pZoneHybridUnitaryAirConditioner;
+    pZoneHybridUnitaryAirConditioner.reset(&HybridUnitaryAirConditioners::ZoneHybridUnitaryAirConditioner(1));
+    pZoneHybridUnitaryAirConditioner->Initialize(1);
+    pZoneHybridUnitaryAirConditioner->InitializeModelParams();
+    EXPECT_EQ(pZoneHybridUnitaryAirConditioner->OperatingModes.size(), 1);
+}
+
+TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_CalculateCurveVal)
+{
+
+    std::string const idf_objects = delimited_string({
+                                                         "ZoneHVAC:HybridUnitaryHVAC,",
+                                                         "MUNTERSEPX5000,          !- Name",
+                                                         "ALWAYS_ON,               !- Availability Schedule Name",
+                                                         ",                        !- Availability Manager List Name",
+                                                         ",                        !- Minimum Supply Air Temperature Schedule Name",
+                                                         ",                        !- Maximum Supply Air Temperature Schedule Name",
+                                                         ",                        !- Minimum Supply Air Humidity Ratio Schedule Name",
+                                                         ",                        !- Maximum Supply Air Humidity Ratio Schedule Name",
+                                                         "AUTOMATIC,               !- Method to Choose Controlled Inputs and Part Runtime Fraction",
+                                                         "Main Return Air Node Name,  !- Return Air Node Name",
+                                                         "Outside Air Inlet Node,  !- Outside Air Node Name",
+                                                         "Main Zone Inlet Node,    !- Supply Air Node Name",
+                                                         "Main Relief Node,        !- Relief Node Name",
+                                                         "2.51,                    !- System Maximum Supply AirFlow Rate {m3/s}",
+                                                         ",                        !- External Static Pressure at System Maximum Supply Air Flow Rate {Pa}",
+                                                         "2.0,                     !- Scaling Factor",
+                                                         "1,                       !- Number of Operating Modes",
+                                                         "10,                      !- Minimum Time Between Mode Change {minutes}",
+                                                         "Electricity,             !- First fuel type",
+                                                         "NaturalGas,              !- Second fuel type",
+                                                         "DistrictCooling,         !- Third fuel type",
+                                                         ",                        !- Objective Function Minimizes",
+                                                         "SZ DSOA SPACE2-1,        !- Design Specification Outdoor Air Object Name",
+                                                         "Mode0 Standby,           !- Mode0 Name",
+                                                         "Mode0_Tsa_lookup,        !- Mode0 Supply Air Temperature Lookup Table Name",
+                                                         "Mode0_Wsa_lookup,        !- Mode0 Supply Air Humidity Ratio Lookup Table Name",
+                                                         "Mode0_Power_lookup,      !- Mode0 System Electric Power Lookup Table Name",
+                                                         "Mode0_FanPower_lookup,   !- Mode0 Supply Fan Electric Power Lookup Table Name",
+                                                         ",                        !- Mode0 External Static Pressure Lookup Table Name",
+                                                         ",                        !- Mode0 System Second Fuel Consumption Lookup Table Name",
+                                                         ",                        !- Mode0 System Third Fuel Consumption Lookup Table Name",
+                                                         ",                        !- Mode0 System Water Use Lookup Table Name",
+                                                         "0,                       !- Mode0 Outside Air Fraction",
+                                                         "0;                       !- Mode0 Supply Air Mass Flow Rate Ratio",
+
+                                                         "Table:IndependentVariableList,",
+                                                         "Mode0_IndependentVariableList,  !- Name",
+                                                         "Mode0_Toa,                      !- Independent Variable 1 Name",
+                                                         "Mode0_Woa,                      !- Independent Variable 2 Name",
+                                                         "Mode0_Tra,                      !- Extended Field",
+                                                         "Mode0_Wra,                      !- Extended Field",
+                                                         "Mode0_Ma,                       !- Extended Field",
+                                                         "Mode0_OAF;                      !- Extended Field",
+
+                                                         "Table:IndependentVariable,",
+                                                         "Mode0_Toa,               !- Name",
+                                                         "Linear,                  !- Interpolation Method",
+                                                         "Constant,                !- Extrapolation Method",
+                                                         "-20,                     !- Minimum Value",
+                                                         "100,                     !- Maximum Value",
+                                                         ",                        !- Normalization Reference Value",
+                                                         "Dimensionless,           !- Unit Type",
+                                                         ",                        !- External File Name",
+                                                         ",                        !- External File Column Number",
+                                                         ",                        !- External File Starting Row Number",
+                                                         "10.0;                    !- Value 1",
+
+
+                                                         "Table:IndependentVariable,",
+                                                         "Mode0_Woa,               !- Name",
+                                                         "Linear,                  !- Interpolation Method",
+                                                         "Constant,                !- Extrapolation Method",
+                                                         "0,                       !- Minimum Value",
+                                                         "0.03,                    !- Maximum Value",
+                                                         ",                        !- Normalization Reference Value",
+                                                         "Dimensionless,           !- Unit Type",
+                                                         ",                        !- External File Name",
+                                                         ",                        !- External File Column Number",
+                                                         ",                        !- External File Starting Row Number",
+                                                         "0.005;                   !- Value 1",
+
+                                                         "Table:IndependentVariable,",
+                                                         "Mode0_Tra,               !- Name",
+                                                         "Linear,                  !- Interpolation Method",
+                                                         "Constant,                !- Extrapolation Method",
+                                                         "-20,                     !- Minimum Value",
+                                                         "100,                     !- Maximum Value",
+                                                         ",                        !- Normalization Reference Value",
+                                                         "Dimensionless,           !- Unit Type",
+                                                         ",                        !- External File Name",
+                                                         ",                        !- External File Column Number",
+                                                         ",                        !- External File Starting Row Number",
+                                                         "20.0;                    !- Value 1",
+
+
+                                                         "Table:IndependentVariable,",
+                                                         "Mode0_Wra,               !- Name",
+                                                         "Linear,                  !- Interpolation Method",
+                                                         "Constant,                !- Extrapolation Method",
+                                                         "0,                       !- Minimum Value",
+                                                         "0.03,                    !- Maximum Value",
+                                                         ",                        !- Normalization Reference Value",
+                                                         "Dimensionless,           !- Unit Type",
+                                                         ",                        !- External File Name",
+                                                         ",                        !- External File Column Number",
+                                                         ",                        !- External File Starting Row Number",
+                                                         "0.01;                    !- Value 1",
+
+
+                                                         "Table:IndependentVariable,",
+                                                         "Mode0_Ma,                !- Name",
+                                                         "Linear,                  !- Interpolation Method",
+                                                         "Constant,                !- Extrapolation Method",
+                                                         "0,                       !- Minimum Value",
+                                                         "1,                       !- Maximum Value",
+                                                         ",                        !- Normalization Reference Value",
+                                                         "Dimensionless,           !- Unit Type",
+                                                         ",                        !- External File Name",
+                                                         ",                        !- External File Column Number",
+                                                         ",                        !- External File Starting Row Number",
+                                                         "0.5;                     !- Value 1",
+
+
+                                                         "Table:IndependentVariable,",
+                                                         "Mode0_OAF,               !- Name",
+                                                         "Linear,                  !- Interpolation Method",
+                                                         "Constant,                !- Extrapolation Method",
+                                                         "0,                       !- Minimum Value",
+                                                         "1,                       !- Maximum Value",
+                                                         ",                        !- Normalization Reference Value",
+                                                         "Dimensionless,           !- Unit Type",
+                                                         ",                        !- External File Name",
+                                                         ",                        !- External File Column Number",
+                                                         ",                        !- External File Starting Row Number",
+                                                         "1;                       !- Value 1",
+
+                                                         "Table:Lookup,",
+                                                         "Mode0_Tsa_lookup,        !- Name",
+                                                         "Mode0_IndependentVariableList,  !- Independent Variable List Name",
+                                                         "DivisorOnly,             !- Normalization Method",
+                                                         ",                        !- Normalization Divisor",
+                                                         "-9999,                   !- Minimum Output",
+                                                         "9999,                    !- Maximum Output",
+                                                         "Dimensionless,           !- Output Unit Type",
+                                                         ",                        !- External File Name",
+                                                         ",                        !- External File Column Number",
+                                                         ",                        !- External File Starting Row Number",
+                                                         "5.0;                     !- Output Value 1",
+
+                                                         "Table:Lookup,",
+                                                         "Mode0_Wsa_lookup,        !- Name",
+                                                         "Mode0_IndependentVariableList,  !- Independent Variable List Name",
+                                                         "DivisorOnly,             !- Normalization Method",
+                                                         "3.0,                     !- Normalization Divisor",
+                                                         "-9999,                   !- Minimum Output",
+                                                         "9999,                    !- Maximum Output",
+                                                         "Dimensionless,           !- Output Unit Type",
+                                                         ",                        !- External File Name",
+                                                         ",                        !- External File Column Number",
+                                                         ",                        !- External File Starting Row Number",
+                                                         "0.005;                     !- Output Value 1",
+
+                                                         "Table:Lookup,",
+                                                         "Mode0_Power_lookup,      !- Name",
+                                                         "Mode0_IndependentVariableList,  !- Independent Variable List Name",
+                                                         "DivisorOnly,             !- Normalization Method",
+                                                         "3.0176,                  !- Normalization Divisor",
+                                                         "-9999,                   !- Minimum Output",
+                                                         "9999,                    !- Maximum Output",
+                                                         "Dimensionless,           !- Output Unit Type",
+                                                         ",                        !- External File Name",
+                                                         ",                        !- External File Column Number",
+                                                         ",                        !- External File Starting Row Number",
+                                                         "1000.0;                  !- Output Value 1",
+
+                                                         "Table:Lookup,",
+                                                         "Mode0_FanPower_lookup,   !- Name",
+                                                         "Mode0_IndependentVariableList,  !- Independent Variable List Name",
+                                                         "DivisorOnly,             !- Normalization Method",
+                                                         "3.0176,                  !- Normalization Divisor",
+                                                         "-9999,                   !- Minimum Output",
+                                                         "9999,                    !- Maximum Output",
+                                                         "Dimensionless,           !- Output Unit Type",
+                                                         ",                        !- External File Name",
+                                                         ",                        !- External File Column Number",
+                                                         ",                        !- External File Starting Row Number",
+                                                         "3.25;                    !- Output Value 1",
+
+                                                     });
+
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    CurveManager::GetCurveInput();
+    CurveManager::GetCurvesInputFlag = false;
+    int numCurves = CurveManager::NumCurves;
+    EXPECT_EQ(4, CurveManager::NumCurves);
+
+    bool ErrorsFound(false);
+    GetInputZoneHybridUnitaryAirConditioners(ErrorsFound);
+    GetOARequirements();
+    EXPECT_FALSE(ErrorsFound);
+
+
+    InitZoneHybridUnitaryAirConditioners(1, 1);
+    std::unique_ptr<Model> pZoneHybridUnitaryAirConditioner;
+    pZoneHybridUnitaryAirConditioner.reset(&HybridUnitaryAirConditioners::ZoneHybridUnitaryAirConditioner(1));
+    pZoneHybridUnitaryAirConditioner->Initialize(1);
+    pZoneHybridUnitaryAirConditioner->InitializeModelParams();
+
+    Real64 Toa = 10.0;
+    Real64 Woa = 0.005;
+    Real64 Tra = 20.0;
+    Real64 Wra = 0.01;
+    Real64 Ma = 0.5;
+    Real64 OAF = 1.0;
+    Real64 ExpectedTsa = 5.0;
+    Real64 ExpectedWsa = 0.005/3.0;
+    Real64 ExpectedPowerOutput = 1000.0*2.0/3.0176;
+    Real64 ExpectedFanPowerOutput = 3.25*2.0/3.0176;
+
+    std::vector<Real64> ExpectedResults{ExpectedTsa,ExpectedWsa };
+
+    int TEMP_CURVE = 0;
+    int W_CURVE = 1;
+    int POWER_CURVE = 2;
+    int SUPPLY_FAN_POWER = 3;
+
+    Real64 testCurveVal;
+    CMode mode0 = pZoneHybridUnitaryAirConditioner->OperatingModes[0];
+
+    testCurveVal = mode0.CalculateCurveVal(Toa, Woa, Tra, Wra, Ma, OAF, TEMP_CURVE);
+    EXPECT_EQ(testCurveVal, ExpectedTsa);
+    testCurveVal = mode0.CalculateCurveVal(Toa, Woa, Tra, Wra, Ma, OAF, W_CURVE);
+    EXPECT_EQ(testCurveVal, ExpectedWsa);
+    testCurveVal = mode0.CalculateCurveVal(Toa, Woa, Tra, Wra, Ma, OAF, POWER_CURVE);
+    EXPECT_EQ(testCurveVal, ExpectedPowerOutput);
+    testCurveVal = mode0.CalculateCurveVal(Toa, Woa, Tra, Wra, Ma, OAF, SUPPLY_FAN_POWER);
+    EXPECT_EQ(testCurveVal, ExpectedFanPowerOutput);
+
+    for (int i =0; i<4; i++){
+        testCurveVal = mode0.CalculateCurveVal(Toa, Woa, Tra, Wra, Ma, OAF, SUPPLY_FAN_POWER);
+        EXPECT_EQ(testCurveVal, ExpectedFanPowerOutput);
+    }
+
+}
+
 } // namespace EnergyPlus
