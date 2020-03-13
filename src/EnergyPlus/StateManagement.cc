@@ -48,6 +48,7 @@
 #include <EnergyPlus/StateManagement.hh>
 
 #include <AirflowNetwork/Elements.hpp>
+#include <AirflowNetwork/Properties.hpp>
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/BaseboardElectric.hh>
 #include <EnergyPlus/BaseboardRadiator.hh>
