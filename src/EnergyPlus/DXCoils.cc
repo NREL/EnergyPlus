@@ -786,17 +786,7 @@ namespace DXCoils {
                     DXCoil(DXCoilNum).CoolingCoilRuntimeFraction = S1RuntimeFraction;
 
                     AirMassFlow = DXCoil(DXCoilNum).InletAirMassFlowRate;
-                    DXCoil(DXCoilNum).TotalCoolingEnergyRate =
-                        AirMassFlow * (DXCoil(DXCoilNum).InletAirEnthalpy - DXCoil(DXCoilNum).OutletAirEnthalpy);
-                    MinAirHumRat = min(DXCoil(DXCoilNum).InletAirHumRat, DXCoil(DXCoilNum).OutletAirHumRat);
-                    DXCoil(DXCoilNum).SensCoolingEnergyRate = AirMassFlow * (PsyHFnTdbW(DXCoil(DXCoilNum).InletAirTemp, MinAirHumRat) -
-                                                                             PsyHFnTdbW(DXCoil(DXCoilNum).OutletAirTemp, MinAirHumRat));
-                    //  Don't let sensible capacity be greater than total capacity
-                    if (DXCoil(DXCoilNum).SensCoolingEnergyRate > DXCoil(DXCoilNum).TotalCoolingEnergyRate) {
-                        DXCoil(DXCoilNum).SensCoolingEnergyRate = DXCoil(DXCoilNum).TotalCoolingEnergyRate;
-                    }
-
-                    DXCoil(DXCoilNum).LatCoolingEnergyRate = DXCoil(DXCoilNum).TotalCoolingEnergyRate - DXCoil(DXCoilNum).SensCoolingEnergyRate;
+                    CalcTotalSensibleLatentOutput(AirMassFlow, DXCoil(DXCoilNum).InletAirTemp, DXCoil(DXCoilNum).InletAirHumRat, DXCoil(DXCoilNum).OutletAirTemp, DXCoil(DXCoilNum).OutletAirHumRat, DXCoil(DXCoilNum).TotalCoolingEnergyRate, DXCoil(DXCoilNum).SensCoolingEnergyRate, DXCoil(DXCoilNum).LatCoolingEnergyRate);
 
                     DXCoil(DXCoilNum).EvapWaterConsumpRate =
                         (1.0 - S12RuntimeFraction) * S1EvapWaterConsumpRate + S12RuntimeFraction * S12EvapWaterConsumpRate;
@@ -9226,19 +9216,10 @@ namespace DXCoils {
             //     IF (FanOpMode .EQ. CycFanCycCoil) AirMassFlow = AirMassFlow / PartLoadRatio
             // For multimode coil, this should be full flow including bypassed fraction
             AirMassFlow = DXCoil(DXCoilNum).InletAirMassFlowRate;
-            //DXCoil(DXCoilNum).TotalCoolingEnergyRate = AirMassFlow * (InletAirEnthalpy - OutletAirEnthalpy);
-
             CalcTotalSensibleLatentOutput(AirMassFlow, InletAirDryBulbTemp, InletAirHumRat, OutletAirTemp, OutletAirHumRat, DXCoil(DXCoilNum).TotalCoolingEnergyRate, DXCoil(DXCoilNum).SensCoolingEnergyRate, DXCoil(DXCoilNum).LatCoolingEnergyRate);
             // Set DataHeatGlobal heat reclaim variable for use by heat reclaim coil (part load ratio is accounted for)
             // Calculation for heat reclaim needs to be corrected to use compressor power (not including condenser fan power)
             HeatReclaimDXCoil(DXCoilNum).AvailCapacity = DXCoil(DXCoilNum).TotalCoolingEnergyRate + DXCoil(DXCoilNum).ElecCoolingPower;
-
-            //DXCoil(DXCoilNum).SensCoolingEnergyRate = AirMassFlow * PsyDeltaHSenFnTdb2W2Tdb1W1(InletAirDryBulbTemp, InletAirHumRat, OutletAirTemp, OutletAirHumRat);
-            //  Don't let sensible capacity be greater than total capacity
-            //if (DXCoil(DXCoilNum).SensCoolingEnergyRate > DXCoil(DXCoilNum).TotalCoolingEnergyRate) {
-            //    DXCoil(DXCoilNum).SensCoolingEnergyRate = DXCoil(DXCoilNum).TotalCoolingEnergyRate;
-            //}
-            //DXCoil(DXCoilNum).LatCoolingEnergyRate = DXCoil(DXCoilNum).TotalCoolingEnergyRate - DXCoil(DXCoilNum).SensCoolingEnergyRate;
 
             // Calculate crankcase heater power using the runtime fraction for this DX cooling coil only if there is no companion DX coil.
             // Else use the largest runtime fraction of this DX cooling coil and the companion DX heating coil.
@@ -9945,20 +9926,9 @@ namespace DXCoils {
             //     IF (FanOpMode .EQ. CycFanCycCoil) AirMassFlow = AirMassFlow / PartLoadRatio
             // For multimode coil, this should be full flow including bypassed fraction
             AirMassFlow = DXCoil(DXCoilNum).InletAirMassFlowRate;
-            DXCoil(DXCoilNum).TotalCoolingEnergyRate = AirMassFlow * (InletAirEnthalpy - OutletAirEnthalpy);
+            // Coil total/sensible/latent cooling rates
+            CalcTotalSensibleLatentOutput(AirMassFlow, InletAirDryBulbTemp, InletAirHumRat, OutletAirTemp, OutletAirHumRat, DXCoil(DXCoilNum).TotalCoolingEnergyRate, DXCoil(DXCoilNum).SensCoolingEnergyRate, DXCoil(DXCoilNum).LatCoolingEnergyRate);
 
-            //! Set DataHeatGlobal heat reclaim variable for use by heat reclaim coil (part load ratio is accounted for)
-            //! Calculation for heat reclaim needs to be corrected to use compressor power (not including condenser fan power)
-            //  HeatReclaimDXCoil(DXCoilNum)%AvailCapacity = DXCoil(DXCoilNum)%TotalCoolingEnergyRate + DXCoil(DXCoilNum)%ElecCoolingPower
-
-            DXCoil(DXCoilNum).SensCoolingEnergyRate =
-                AirMassFlow * PsyDeltaHSenFnTdb2W2Tdb1W1(InletAirDryBulbTemp, InletAirHumRat, OutletAirTemp, OutletAirHumRat); // sensible {W};
-
-            //  Don't let sensible capacity be greater than total capacity
-            if (DXCoil(DXCoilNum).SensCoolingEnergyRate > DXCoil(DXCoilNum).TotalCoolingEnergyRate) {
-                DXCoil(DXCoilNum).SensCoolingEnergyRate = DXCoil(DXCoilNum).TotalCoolingEnergyRate;
-            }
-            DXCoil(DXCoilNum).LatCoolingEnergyRate = DXCoil(DXCoilNum).TotalCoolingEnergyRate - DXCoil(DXCoilNum).SensCoolingEnergyRate;
             DXCoil(DXCoilNum).OutletAirTemp = OutletAirTemp;
             DXCoil(DXCoilNum).OutletAirHumRat = OutletAirHumRat;
             DXCoil(DXCoilNum).OutletAirEnthalpy = OutletAirEnthalpy;
@@ -10786,16 +10756,8 @@ namespace DXCoils {
                         OutletAirHumRat = PsyWFnTdbH(OutletAirDryBulbTemp, OutletAirEnthalpy);
                     }
                 }
-                // calculate cooling rate and electrical power
-                DXCoil(DXCoilNum).TotalCoolingEnergyRate = AirMassFlow * (InletAirEnthalpy - OutletAirEnthalpy);
-                MinAirHumRat = min(InletAirHumRat, OutletAirHumRat);
-                DXCoil(DXCoilNum).SensCoolingEnergyRate =
-                    AirMassFlow * (PsyHFnTdbW(InletAirDryBulbTemp, MinAirHumRat) - PsyHFnTdbW(OutletAirDryBulbTemp, MinAirHumRat));
-                // Don't let sensible capacity be greater than total capacity
-                if (DXCoil(DXCoilNum).SensCoolingEnergyRate > DXCoil(DXCoilNum).TotalCoolingEnergyRate) {
-                    DXCoil(DXCoilNum).SensCoolingEnergyRate = DXCoil(DXCoilNum).TotalCoolingEnergyRate;
-                }
-                DXCoil(DXCoilNum).LatCoolingEnergyRate = DXCoil(DXCoilNum).TotalCoolingEnergyRate - DXCoil(DXCoilNum).SensCoolingEnergyRate;
+                // Coil total/sensible/latent cooling rates and electrical power
+                CalcTotalSensibleLatentOutput(AirMassFlow, InletAirDryBulbTemp, InletAirHumRat, OutletAirDryBulbTemp, OutletAirHumRat, DXCoil(DXCoilNum).TotalCoolingEnergyRate, DXCoil(DXCoilNum).SensCoolingEnergyRate, DXCoil(DXCoilNum).LatCoolingEnergyRate);
                 DXCoil(DXCoilNum).ElecCoolingPower = TotCap * EIR;
                 //   Calculation for heat reclaim needs to be corrected to use compressor power (not including condenser fan power)
                 HeatReclaimDXCoil(DXCoilNum).AvailCapacity = DXCoil(DXCoilNum).TotalCoolingEnergyRate + DXCoil(DXCoilNum).ElecCoolingPower;
@@ -10914,18 +10876,10 @@ namespace DXCoils {
                 }
                 // get the eletrical power consumption
                 DXCoil(DXCoilNum).ElecCoolingPower = TotCapLS * EIRLS * DXCoil(DXCoilNum).CoolingCoilRuntimeFraction;
-                // calculate cooling output power
-                DXCoil(DXCoilNum).TotalCoolingEnergyRate = AirMassFlow * (InletAirEnthalpy - OutletAirEnthalpy);
-                //   Calculation for heat reclaim needs to be corrected to use compressor power (not including condenser fan power)
+
+                // Coil total/sensible/latent cooling rates and electrical power
+                CalcTotalSensibleLatentOutput(AirMassFlow, InletAirDryBulbTemp, InletAirHumRat, OutletAirDryBulbTemp, OutletAirHumRat, DXCoil(DXCoilNum).TotalCoolingEnergyRate, DXCoil(DXCoilNum).SensCoolingEnergyRate, DXCoil(DXCoilNum).LatCoolingEnergyRate);
                 HeatReclaimDXCoil(DXCoilNum).AvailCapacity = DXCoil(DXCoilNum).TotalCoolingEnergyRate + DXCoil(DXCoilNum).ElecCoolingPower;
-                MinAirHumRat = min(InletAirHumRat, OutletAirHumRat);
-                DXCoil(DXCoilNum).SensCoolingEnergyRate =
-                    AirMassFlow * (PsyHFnTdbW(InletAirDryBulbTemp, MinAirHumRat) - PsyHFnTdbW(OutletAirDryBulbTemp, MinAirHumRat));
-                // Don't let sensible capacity be greater than total capacity
-                if (DXCoil(DXCoilNum).SensCoolingEnergyRate > DXCoil(DXCoilNum).TotalCoolingEnergyRate) {
-                    DXCoil(DXCoilNum).SensCoolingEnergyRate = DXCoil(DXCoilNum).TotalCoolingEnergyRate;
-                }
-                DXCoil(DXCoilNum).LatCoolingEnergyRate = DXCoil(DXCoilNum).TotalCoolingEnergyRate - DXCoil(DXCoilNum).SensCoolingEnergyRate;
                 DXCoil(DXCoilNum).OutletAirEnthalpy = OutletAirEnthalpy;
                 DXCoil(DXCoilNum).OutletAirHumRat = OutletAirHumRat;
                 DXCoil(DXCoilNum).OutletAirTemp = OutletAirDryBulbTemp;
@@ -12119,21 +12073,22 @@ namespace DXCoils {
                     EvapCondPumpElecPower = SpeedRatio * DXCoil(DXCoilNum).MSEvapCondPumpElecNomPower(SpeedNumHS) +
                                             (1.0 - SpeedRatio) * DXCoil(DXCoilNum).MSEvapCondPumpElecNomPower(SpeedNumLS);
                 }
-                // Outlet calculation
-                DXCoil(DXCoilNum).TotalCoolingEnergyRate = MSHPMassFlowRateHigh * (InletAirEnthalpy - HSOutletAirEnthalpy) * SpeedRatio +
-                                                           MSHPMassFlowRateLow * (InletAirEnthalpy - LSOutletAirEnthalpy) * (1.0 - SpeedRatio);
+                MinAirHumRat = min(InletAirHumRat, SpeedRatio * HSOutletAirHumRat + (1.0 - SpeedRatio) * LSOutletAirHumRat);
+
+                //// Outlet calculation
+                Real64 SensibleOutputLS(0.0);  // low speed sensible output rate
+                Real64 LatentOutputLS(0.0);    // low speed latent output rate
+                Real64 TotalOutputLS(0.0);     // low speed total output rate 
+                Real64 SensibleOutputHS(0.0);  // high speed sensible output rate
+                Real64 LatentOutputHS(0.0);    // high speed latent output rate
+                Real64 TotalOutputHS(0.0);     // high speed total output rate 
+                CalcTotalSensibleLatentOutput(MSHPMassFlowRateLow, InletAirDryBulbTemp, InletAirHumRat, LSOutletAirDryBulbTemp, LSOutletAirHumRat, TotalOutputLS, SensibleOutputLS, LatentOutputLS);
+                CalcTotalSensibleLatentOutput(MSHPMassFlowRateHigh, InletAirDryBulbTemp, InletAirHumRat, HSOutletAirDryBulbTemp, HSOutletAirHumRat, TotalOutputHS, SensibleOutputHS, LatentOutputHS);
+                DXCoil(DXCoilNum).TotalCoolingEnergyRate = TotalOutputHS * SpeedRatio + TotalOutputLS * (1.0 - SpeedRatio);
+                DXCoil(DXCoilNum).SensCoolingEnergyRate = SensibleOutputHS * SpeedRatio + SensibleOutputLS * (1.0 - SpeedRatio);
+                DXCoil(DXCoilNum).LatCoolingEnergyRate = LatentOutputHS * SpeedRatio + LatentOutputLS * (1.0 - SpeedRatio);
                 // Average outlet enthalpy
                 OutletAirEnthalpy = InletAirEnthalpy - DXCoil(DXCoilNum).TotalCoolingEnergyRate / DXCoil(DXCoilNum).InletAirMassFlowRate;
-                MinAirHumRat = min(InletAirHumRat, SpeedRatio * HSOutletAirHumRat + (1.0 - SpeedRatio) * LSOutletAirHumRat);
-                DXCoil(DXCoilNum).SensCoolingEnergyRate =
-                    MSHPMassFlowRateHigh * (PsyHFnTdbW(InletAirDryBulbTemp, MinAirHumRat) - PsyHFnTdbW(HSOutletAirDryBulbTemp, MinAirHumRat)) *
-                        SpeedRatio +
-                    MSHPMassFlowRateLow * (PsyHFnTdbW(InletAirDryBulbTemp, MinAirHumRat) - PsyHFnTdbW(LSOutletAirDryBulbTemp, MinAirHumRat)) *
-                        (1.0 - SpeedRatio);
-                if (DXCoil(DXCoilNum).SensCoolingEnergyRate > DXCoil(DXCoilNum).TotalCoolingEnergyRate) {
-                    DXCoil(DXCoilNum).SensCoolingEnergyRate = DXCoil(DXCoilNum).TotalCoolingEnergyRate;
-                }
-                DXCoil(DXCoilNum).LatCoolingEnergyRate = DXCoil(DXCoilNum).TotalCoolingEnergyRate - DXCoil(DXCoilNum).SensCoolingEnergyRate;
 
                 if (FanOpMode == CycFanCycCoil) OnOffFanPartLoadFraction = 1.0;
                 // Update outlet conditions
@@ -12147,7 +12102,8 @@ namespace DXCoils {
                     OutletAirDryBulbTemp = HSOutletAirDryBulbTemp;
                 } else {
                     if (FanOpMode == ContFanCycCoil) {
-                        Hfg = PsyHfgAirFnWTdb(MinAirHumRat, HSOutletAirDryBulbTemp * SpeedRatio + (1.0 - SpeedRatio) * LSOutletAirDryBulbTemp);
+                        // average latent heat of vaporization, {J/kg} that maintains correct sensible/latent split;
+                        Hfg = Psychrometrics::PsyHfgAvgFnTdb2Tdb1(HSOutletAirDryBulbTemp * SpeedRatio + (1.0 - SpeedRatio) * LSOutletAirDryBulbTemp, InletAirDryBulbTemp); 
                         // Average outlet HR
                         OutletAirHumRat = InletAirHumRat - DXCoil(DXCoilNum).LatCoolingEnergyRate / Hfg / DXCoil(DXCoilNum).InletAirMassFlowRate;
                     } else {
@@ -12157,13 +12113,7 @@ namespace DXCoils {
                     if (OutletAirDryBulbTemp < OutletAirDryBulbTempSat) { // Limit to saturated conditions at OutletAirEnthalpy
                         OutletAirDryBulbTemp = OutletAirDryBulbTempSat;
                         OutletAirHumRat = PsyWFnTdbH(OutletAirDryBulbTemp, OutletAirEnthalpy, RoutineName);
-                        MinAirHumRat = min(InletAirHumRat, OutletAirHumRat);
-                        DXCoil(DXCoilNum).SensCoolingEnergyRate =
-                            AirMassFlow * (PsyHFnTdbW(InletAirDryBulbTemp, MinAirHumRat) - PsyHFnTdbW(OutletAirDryBulbTemp, MinAirHumRat));
-                        if (DXCoil(DXCoilNum).SensCoolingEnergyRate > DXCoil(DXCoilNum).TotalCoolingEnergyRate) {
-                            DXCoil(DXCoilNum).SensCoolingEnergyRate = DXCoil(DXCoilNum).TotalCoolingEnergyRate;
-                        }
-                        DXCoil(DXCoilNum).LatCoolingEnergyRate = DXCoil(DXCoilNum).TotalCoolingEnergyRate - DXCoil(DXCoilNum).SensCoolingEnergyRate;
+                        CalcTotalSensibleLatentOutput(AirMassFlow, InletAirDryBulbTemp, InletAirHumRat, OutletAirDryBulbTemp, OutletAirHumRat, DXCoil(DXCoilNum).TotalCoolingEnergyRate, DXCoil(DXCoilNum).SensCoolingEnergyRate, DXCoil(DXCoilNum).LatCoolingEnergyRate);
                     }
                 }
 
@@ -12370,41 +12320,20 @@ namespace DXCoils {
                 DXCoil(DXCoilNum).ElecCoolingPower = TotCapLS * EIRLS * DXCoil(DXCoilNum).CoolingCoilRuntimeFraction;
                 // calculate cooling output power
                 //    AirMassFlow = DXCoil(DXCoilNum)%InletAirMassFlowRate
-                DXCoil(DXCoilNum).TotalCoolingEnergyRate = AirMassFlow * (InletAirEnthalpy - LSOutletAirEnthalpy) * CycRatio;
+                CalcTotalSensibleLatentOutput(AirMassFlow, InletAirDryBulbTemp, InletAirHumRat, LSOutletAirDryBulbTemp, LSOutletAirHumRat, DXCoil(DXCoilNum).TotalCoolingEnergyRate, DXCoil(DXCoilNum).SensCoolingEnergyRate, DXCoil(DXCoilNum).LatCoolingEnergyRate);
+                DXCoil(DXCoilNum).TotalCoolingEnergyRate = DXCoil(DXCoilNum).TotalCoolingEnergyRate * CycRatio;
+                DXCoil(DXCoilNum).SensCoolingEnergyRate = DXCoil(DXCoilNum).SensCoolingEnergyRate * CycRatio;
+                DXCoil(DXCoilNum).LatCoolingEnergyRate = DXCoil(DXCoilNum).LatCoolingEnergyRate * CycRatio;
                 if (FanOpMode == ContFanCycCoil) {
                     OutletAirEnthalpy = InletAirEnthalpy - DXCoil(DXCoilNum).TotalCoolingEnergyRate / DXCoil(DXCoilNum).InletAirMassFlowRate;
-                    MinAirHumRat = min(InletAirHumRat, LSOutletAirHumRat);
-                    DXCoil(DXCoilNum).SensCoolingEnergyRate =
-                        AirMassFlow * (PsyHFnTdbW(InletAirDryBulbTemp, MinAirHumRat) - PsyHFnTdbW(LSOutletAirDryBulbTemp, MinAirHumRat)) * CycRatio;
-                    if (DXCoil(DXCoilNum).SensCoolingEnergyRate > DXCoil(DXCoilNum).TotalCoolingEnergyRate) {
-                        DXCoil(DXCoilNum).SensCoolingEnergyRate = DXCoil(DXCoilNum).TotalCoolingEnergyRate;
-                    }
-                    DXCoil(DXCoilNum).LatCoolingEnergyRate = DXCoil(DXCoilNum).TotalCoolingEnergyRate - DXCoil(DXCoilNum).SensCoolingEnergyRate;
-                    // Calculate avarage outlet conditions
-                    Hfg = PsyHfgAirFnWTdb(MinAirHumRat, OutletAirDryBulbTemp * CycRatio + (1.0 - CycRatio) * InletAirDryBulbTemp);
+                    Hfg = Psychrometrics::PsyHfgAvgFnTdb2Tdb1(OutletAirDryBulbTemp * CycRatio + (1.0 - CycRatio) * InletAirDryBulbTemp, InletAirDryBulbTemp); 
                     OutletAirHumRat = InletAirHumRat - DXCoil(DXCoilNum).LatCoolingEnergyRate / Hfg / DXCoil(DXCoilNum).InletAirMassFlowRate;
                     OutletAirDryBulbTemp = PsyTdbFnHW(OutletAirEnthalpy, OutletAirHumRat);
                     if (OutletAirDryBulbTemp < OutletAirDryBulbTempSat) { // Limit to saturated conditions at OutletAirEnthalpy
                         OutletAirDryBulbTemp = OutletAirDryBulbTempSat;
                         OutletAirHumRat = PsyWFnTdbH(OutletAirDryBulbTemp, OutletAirEnthalpy, RoutineName);
-                        MinAirHumRat = min(InletAirHumRat, OutletAirHumRat);
-                        DXCoil(DXCoilNum).SensCoolingEnergyRate =
-                            DXCoil(DXCoilNum).InletAirMassFlowRate *
-                            (PsyHFnTdbW(InletAirDryBulbTemp, MinAirHumRat) - PsyHFnTdbW(OutletAirDryBulbTemp, MinAirHumRat));
-                        if (DXCoil(DXCoilNum).SensCoolingEnergyRate > DXCoil(DXCoilNum).TotalCoolingEnergyRate) {
-                            DXCoil(DXCoilNum).SensCoolingEnergyRate = DXCoil(DXCoilNum).TotalCoolingEnergyRate;
-                        }
-                        DXCoil(DXCoilNum).LatCoolingEnergyRate = DXCoil(DXCoilNum).TotalCoolingEnergyRate - DXCoil(DXCoilNum).SensCoolingEnergyRate;
+                        CalcTotalSensibleLatentOutput(DXCoil(DXCoilNum).InletAirMassFlowRate, InletAirDryBulbTemp, InletAirHumRat, OutletAirDryBulbTemp, OutletAirHumRat, DXCoil(DXCoilNum).TotalCoolingEnergyRate, DXCoil(DXCoilNum).SensCoolingEnergyRate, DXCoil(DXCoilNum).LatCoolingEnergyRate);
                     }
-                } else {
-                    MinAirHumRat = min(InletAirHumRat, OutletAirHumRat);
-                    DXCoil(DXCoilNum).SensCoolingEnergyRate =
-                        AirMassFlow * (PsyHFnTdbW(InletAirDryBulbTemp, MinAirHumRat) - PsyHFnTdbW(LSOutletAirDryBulbTemp, MinAirHumRat)) * CycRatio;
-                    // Don't let sensible capacity be greater than total capacity
-                    if (DXCoil(DXCoilNum).SensCoolingEnergyRate > DXCoil(DXCoilNum).TotalCoolingEnergyRate) {
-                        DXCoil(DXCoilNum).SensCoolingEnergyRate = DXCoil(DXCoilNum).TotalCoolingEnergyRate;
-                    }
-                    DXCoil(DXCoilNum).LatCoolingEnergyRate = DXCoil(DXCoilNum).TotalCoolingEnergyRate - DXCoil(DXCoilNum).SensCoolingEnergyRate;
                 }
                 //   Calculation for heat reclaim needs to be corrected to use compressor power (not including condenser fan power)
                 HeatReclaimDXCoil(DXCoilNum).AvailCapacity = DXCoil(DXCoilNum).TotalCoolingEnergyRate + DXCoil(DXCoilNum).ElecCoolingPower;
@@ -15996,19 +15925,8 @@ namespace DXCoils {
 
             // Coil total cooling
             Real64 AirMassFlowRate = DXCoil(DXCoilNum).InletAirMassFlowRate;
-            DXCoil(DXCoilNum).TotalCoolingEnergyRate = AirMassFlowRate * (InletAirEnthalpy - OutletAirEnthalpy);
-
-            // Coil sensible cooling
-            DXCoil(DXCoilNum).SensCoolingEnergyRate =
-                AirMassFlowRate * PsyDeltaHSenFnTdb2W2Tdb1W1(InletAirDryBulbTemp, InletAirHumRat, OutletAirTemp, OutletAirHumRat); // sensible {W};
-
-            //  Don't let sensible capacity be greater than total capacity
-            if (DXCoil(DXCoilNum).SensCoolingEnergyRate > DXCoil(DXCoilNum).TotalCoolingEnergyRate) {
-                DXCoil(DXCoilNum).SensCoolingEnergyRate = DXCoil(DXCoilNum).TotalCoolingEnergyRate;
-            }
-
-            // Coil latent cooling
-            DXCoil(DXCoilNum).LatCoolingEnergyRate = DXCoil(DXCoilNum).TotalCoolingEnergyRate - DXCoil(DXCoilNum).SensCoolingEnergyRate;
+            // Coil total/sensible/latent cooling rates
+            CalcTotalSensibleLatentOutput(AirMassFlowRate, InletAirDryBulbTemp, InletAirHumRat, OutletAirTemp, OutletAirHumRat, DXCoil(DXCoilNum).TotalCoolingEnergyRate, DXCoil(DXCoilNum).SensCoolingEnergyRate, DXCoil(DXCoilNum).LatCoolingEnergyRate);
 
             // Coil outlet conditions
             DXCoil(DXCoilNum).OutletAirTemp = OutletAirTemp;
@@ -16960,7 +16878,7 @@ namespace DXCoils {
         if (MassFlow > 0.0) {
             TotalOutput = MassFlow * (Psychrometrics::PsyHFnTdbW(TDB2, dW2) - Psychrometrics::PsyHFnTdbW(TDB1, dW1));  // total addition/removal rate, {W};
             SensibleOutput = MassFlow * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(TDB2, dW2, TDB1, dW1); // sensible addition/removal rate, {W};
-            Real64 const h_fg_avg = Psychrometrics::PsyHfgAvgFnTdb2Tdb1(TDB2, TDB1); // average latent heat of vaporization, {J/kg};
+            //Real64 const h_fg_avg = Psychrometrics::PsyHfgAvgFnTdb2Tdb1(TDB2, TDB1); // average latent heat of vaporization, {J/kg};
             if (SensibleOutput > TotalOutput) {SensibleOutput = TotalOutput;}; //  reset if sensible is higher than total, 
             LatentOutput = TotalOutput - SensibleOutput; // latent addition/removal rate, {W}
         }
