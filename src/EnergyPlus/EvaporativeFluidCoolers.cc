@@ -68,7 +68,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -988,7 +988,7 @@ namespace EvaporativeFluidCoolers {
         }
     }
 
-    void EvapFluidCoolerSpecs::simulate(AllGlobals &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void EvapFluidCoolerSpecs::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                         bool EP_UNUSED(FirstHVACIteration),
                                         Real64 &EP_UNUSED(CurLoad),
                                         bool RunFlag)

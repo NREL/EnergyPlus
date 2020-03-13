@@ -64,7 +64,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/PackagedTerminalHeatPump.hh>

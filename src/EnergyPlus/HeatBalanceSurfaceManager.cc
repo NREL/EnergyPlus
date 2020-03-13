@@ -93,7 +93,7 @@
 #include <EnergyPlus/ElectricBaseboardRadiator.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HWBaseboardRadiator.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
@@ -211,7 +211,7 @@ namespace HeatBalanceSurfaceManager {
         calcHeatBalanceInsideSurfFirstTime = true;
     }
 
-    void ManageSurfaceHeatBalance(AllGlobals &state)
+    void ManageSurfaceHeatBalance(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -280,7 +280,7 @@ namespace HeatBalanceSurfaceManager {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitSurfaceHeatBalance(AllGlobals &state)
+    void InitSurfaceHeatBalance(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:

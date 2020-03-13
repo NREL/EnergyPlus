@@ -45,7 +45,7 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Plant/Component.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 
@@ -67,7 +67,7 @@ namespace DataPlant {
         return false;
     }
 
-    void CompData::simulate(AllGlobals &state, bool const FirstHVACIteration, bool &InitLoopEquip, bool const GetCompSizFac) {
+    void CompData::simulate(EnergyPlusData &state, bool const FirstHVACIteration, bool &InitLoopEquip, bool const GetCompSizFac) {
 
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher

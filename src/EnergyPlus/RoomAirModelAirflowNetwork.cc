@@ -72,7 +72,7 @@
 #include <EnergyPlus/ElectricBaseboardRadiator.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HWBaseboardRadiator.hh>
 #include <EnergyPlus/HeatBalFiniteDiffManager.hh>
 #include <EnergyPlus/HeatBalanceHAMTManager.hh>
@@ -156,7 +156,7 @@ namespace RoomAirModelAirflowNetwork {
         RAFN.deallocate();
     }
 
-    void SimRoomAirModelAirflowNetwork(AllGlobals &state, int const ZoneNum) // index number for the specified zone
+    void SimRoomAirModelAirflowNetwork(EnergyPlusData &state, int const ZoneNum) // index number for the specified zone
     {
 
         // SUBROUTINE INFORMATION:
@@ -207,7 +207,7 @@ namespace RoomAirModelAirflowNetwork {
 
     //****************************************************
 
-    void LoadPredictionRoomAirModelAirflowNetwork(AllGlobals &state, int const ZoneNum, int const RoomAirNode) // index number for the specified zone and node
+    void LoadPredictionRoomAirModelAirflowNetwork(EnergyPlusData &state, int const ZoneNum, int const RoomAirNode) // index number for the specified zone and node
     {
 
         // SUBROUTINE INFORMATION:
@@ -255,7 +255,7 @@ namespace RoomAirModelAirflowNetwork {
 
     //****************************************************
 
-    void RAFNData::InitRoomAirModelAirflowNetwork(AllGlobals &state, int const RoomAirNode) // index number for the specified zone
+    void RAFNData::InitRoomAirModelAirflowNetwork(EnergyPlusData &state, int const RoomAirNode) // index number for the specified zone
     {
 
         // SUBROUTINE INFORMATION:
@@ -1252,7 +1252,7 @@ namespace RoomAirModelAirflowNetwork {
 
     } // CalcSurfaceMoistureSums
 
-    void RAFNData::SumNonAirSystemResponseForNode(AllGlobals &state, int const RAFNNodeNum)
+    void RAFNData::SumNonAirSystemResponseForNode(EnergyPlusData &state, int const RAFNNodeNum)
     {
 
         // SUBROUTINE INFORMATION:

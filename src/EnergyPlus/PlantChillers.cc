@@ -70,7 +70,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -182,7 +182,7 @@ namespace PlantChillers {
         _SizFac = this->SizFac;
     }
 
-    void BaseChillerSpecs::onInitLoopEquip(AllGlobals &state, const PlantLocation &calledFromLocation)
+    void BaseChillerSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
     {
         this->initialize(false, 0.0);
         if (calledFromLocation.loopNum == this->CWLoopNum) {
@@ -686,7 +686,7 @@ namespace PlantChillers {
         }
     }
 
-    void ElectricChillerSpecs::simulate(AllGlobals &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+    void ElectricChillerSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
         if (calledFromLocation.loopNum == this->CWLoopNum) { // chilled water loop
             this->initialize(RunFlag, CurLoad);
@@ -2101,7 +2101,7 @@ namespace PlantChillers {
         return nullptr;
     }
 
-    void EngineDrivenChillerSpecs::simulate(AllGlobals &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+    void EngineDrivenChillerSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
         if (calledFromLocation.loopNum == this->CWLoopNum) { // chilled water loop
             this->initialize(RunFlag, CurLoad);
@@ -4079,7 +4079,7 @@ namespace PlantChillers {
         return nullptr;
     }
 
-    void GTChillerSpecs::simulate(AllGlobals &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+    void GTChillerSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
         if (calledFromLocation.loopNum == this->CWLoopNum) { // chilled water loop
             this->initialize(RunFlag, CurLoad);
@@ -6071,7 +6071,7 @@ namespace PlantChillers {
         return nullptr;
     }
 
-    void ConstCOPChillerSpecs::simulate(AllGlobals &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+    void ConstCOPChillerSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
         if (calledFromLocation.loopNum == this->CWLoopNum) {
             this->initialize(RunFlag, CurLoad);

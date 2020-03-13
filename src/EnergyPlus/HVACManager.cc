@@ -83,7 +83,7 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/IceThermalStorage.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
@@ -219,7 +219,7 @@ namespace HVACManager {
         ReportAirHeatBalanceFirstTimeFlag = true;
     }
 
-    void ManageHVAC(AllGlobals &state, OutputFiles &outputFiles)
+    void ManageHVAC(EnergyPlusData &state, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -657,7 +657,7 @@ namespace HVACManager {
         }
     }
 
-    void SimHVAC(AllGlobals &state)
+    void SimHVAC(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1729,7 +1729,7 @@ namespace HVACManager {
         }
     }
 
-    void SimSelectedEquipment(AllGlobals &state, bool &SimAirLoops,         // True when the air loops need to be (re)simulated
+    void SimSelectedEquipment(EnergyPlusData &state, bool &SimAirLoops,         // True when the air loops need to be (re)simulated
                               bool &SimZoneEquipment,    // True when zone equipment components need to be (re)simulated
                               bool &SimNonZoneEquipment, // True when non-zone equipment components need to be (re)simulated
                               bool &SimPlantLoops,       // True when the main plant loops need to be (re)simulated
@@ -2330,7 +2330,7 @@ namespace HVACManager {
         } // GroupNum
     }
 
-    void ReportAirHeatBalance(AllGlobals &state)
+    void ReportAirHeatBalance(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:

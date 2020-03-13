@@ -58,7 +58,7 @@
 #include <EnergyPlus/EvaporativeCoolers.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FaultsManager.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
@@ -246,7 +246,7 @@ namespace FaultsManager {
 
     // Functions
 
-    void CheckAndReadFaults(AllGlobals &state)
+    void CheckAndReadFaults(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2025,7 +2025,7 @@ namespace FaultsManager {
         QEvaporator = QEvaporator_f;
     }
 
-    bool FaultPropertiesAirFilter::CheckFaultyAirFilterFanCurve(AllGlobals &state)
+    bool FaultPropertiesAirFilter::CheckFaultyAirFilterFanCurve(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:

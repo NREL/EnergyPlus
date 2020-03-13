@@ -55,7 +55,7 @@
 #include "Fixtures/EnergyPlusFixture.hh"
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/OutputFiles.hh>

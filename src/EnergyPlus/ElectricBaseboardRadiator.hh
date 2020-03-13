@@ -54,7 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -144,7 +144,7 @@ namespace ElectricBaseboardRadiator {
 
     // Functions
 
-    void SimElecBaseboard(AllGlobals &state, std::string const &EquipName,
+    void SimElecBaseboard(EnergyPlusData &state, std::string const &EquipName,
                           int const ActualZoneNum,
                           int const ControlledZoneNum,
                           bool const FirstHVACIteration,
@@ -153,9 +153,9 @@ namespace ElectricBaseboardRadiator {
 
     void GetElectricBaseboardInput();
 
-    void InitElectricBaseboard(AllGlobals &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration);
+    void InitElectricBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration);
 
-    void SizeElectricBaseboard(AllGlobals &state, int const BaseboardNum);
+    void SizeElectricBaseboard(EnergyPlusData &state, int const BaseboardNum);
 
     void CalcElectricBaseboard(int const BaseboardNum, int const ControlledZoneNum);
 

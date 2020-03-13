@@ -64,7 +64,7 @@
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/OutputFiles.hh>
@@ -189,7 +189,7 @@ void HVACSizingSimulationManager::ProcessCoincidentPlantSizeAdjustments(int cons
     // as more sizing adjustments are added this will need to change to consider all not just plant coincident
     FinalSizingHVACSizingSimIteration = plantCoinAnalyRequestsAnotherIteration;
 }
-void HVACSizingSimulationManager::RedoKickOffAndResize(AllGlobals &state)
+void HVACSizingSimulationManager::RedoKickOffAndResize(EnergyPlusData &state)
 {
     using DataGlobals::KickOffSimulation;
     using DataGlobals::RedoSizesHVACSimulation;
@@ -218,7 +218,7 @@ void HVACSizingSimulationManager::UpdateSizingLogsSystemStep()
 
 std::unique_ptr<HVACSizingSimulationManager> hvacSizingSimulationManager;
 
-void ManageHVACSizingSimulation(AllGlobals &state, OutputFiles &outputFiles, bool &ErrorsFound)
+void ManageHVACSizingSimulation(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrorsFound)
 {
     using DataEnvironment::CurMnDy;
     using DataEnvironment::CurrentOverallSimDay;

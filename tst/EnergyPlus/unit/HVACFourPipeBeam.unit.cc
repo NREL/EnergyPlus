@@ -61,7 +61,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACFourPipeBeam.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/NodeInputManager.hh>

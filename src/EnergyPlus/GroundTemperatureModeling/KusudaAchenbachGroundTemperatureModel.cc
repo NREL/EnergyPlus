@@ -52,7 +52,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -64,7 +64,7 @@ namespace EnergyPlus {
 //******************************************************************************
 
 // Kusuda model factory
-std::shared_ptr<KusudaGroundTempsModel> KusudaGroundTempsModel::KusudaGTMFactory(AllGlobals &state, int objectType, std::string objectName)
+std::shared_ptr<KusudaGroundTempsModel> KusudaGroundTempsModel::KusudaGTMFactory(EnergyPlusData &state, int objectType, std::string objectName)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell

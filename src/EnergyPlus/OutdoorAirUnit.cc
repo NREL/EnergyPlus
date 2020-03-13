@@ -73,7 +73,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HVACFan.hh>
@@ -221,7 +221,7 @@ namespace OutdoorAirUnit {
         ZoneEquipmentListChecked = false;
     }
 
-    void SimOutdoorAirUnit(AllGlobals &state, std::string const &CompName,   // name of the outdoor air unit
+    void SimOutdoorAirUnit(EnergyPlusData &state, std::string const &CompName,   // name of the outdoor air unit
                            int const ZoneNum,             // number of zone being served
                            bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                            Real64 &PowerMet,              // Sensible power supplied (W)
@@ -292,7 +292,7 @@ namespace OutdoorAirUnit {
         ZoneEqOutdoorAirUnit = false;
     }
 
-    void GetOutdoorAirUnitInputs(AllGlobals &state)
+    void GetOutdoorAirUnitInputs(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1069,7 +1069,7 @@ namespace OutdoorAirUnit {
         }
     }
 
-    void InitOutdoorAirUnit(AllGlobals &state, int const OAUnitNum,          // index for the current outdoor air unit
+    void InitOutdoorAirUnit(EnergyPlusData &state, int const OAUnitNum,          // index for the current outdoor air unit
                             int const ZoneNum,            // number of zone being served
                             bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     )
@@ -1413,7 +1413,7 @@ namespace OutdoorAirUnit {
         }
     }
 
-    void SizeOutdoorAirUnit(AllGlobals &state, int const OAUnitNum)
+    void SizeOutdoorAirUnit(EnergyPlusData &state, int const OAUnitNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1646,7 +1646,7 @@ namespace OutdoorAirUnit {
         }
     }
 
-    void CalcOutdoorAirUnit(AllGlobals &state, int &OAUnitNum,                // number of the current unit being simulated
+    void CalcOutdoorAirUnit(EnergyPlusData &state, int &OAUnitNum,                // number of the current unit being simulated
                             int const ZoneNum,             // number of zone being served
                             bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                             Real64 &PowerMet,              // power supplied
@@ -2024,7 +2024,7 @@ namespace OutdoorAirUnit {
         LatOutputProvided = LatentOutput;
     }
 
-    void SimZoneOutAirUnitComps(AllGlobals &state, int const OAUnitNum, bool const FirstHVACIteration)
+    void SimZoneOutAirUnitComps(EnergyPlusData &state, int const OAUnitNum, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2064,7 +2064,7 @@ namespace OutdoorAirUnit {
         CurOAUnitNum = 0;
     }
 
-    void SimOutdoorAirEquipComps(AllGlobals &state, int const OAUnitNum,          // actual outdoor air unit num
+    void SimOutdoorAirEquipComps(EnergyPlusData &state, int const OAUnitNum,          // actual outdoor air unit num
                                  std::string const &EquipType, // the component type
                                  std::string const &EquipName, // the component Name
                                  int const EquipNum,
@@ -2441,7 +2441,7 @@ namespace OutdoorAirUnit {
         }
     }
 
-    void CalcOAUnitCoilComps(AllGlobals &state, int const CompNum, // actual outdoor air unit num
+    void CalcOAUnitCoilComps(EnergyPlusData &state, int const CompNum, // actual outdoor air unit num
                              bool const FirstHVACIteration,
                              int const EquipIndex, // Component Type -- Integerized for this module
                              Real64 &LoadMet)
@@ -2668,7 +2668,7 @@ namespace OutdoorAirUnit {
         }
     }
 
-    int GetOutdoorAirUnitOutAirNode(AllGlobals &state, int const OAUnitNum)
+    int GetOutdoorAirUnitOutAirNode(EnergyPlusData &state, int const OAUnitNum)
     {
 
         // FUNCTION INFORMATION:
@@ -2719,7 +2719,7 @@ namespace OutdoorAirUnit {
         return GetOutdoorAirUnitOutAirNode;
     }
 
-    int GetOutdoorAirUnitZoneInletNode(AllGlobals &state, int const OAUnitNum)
+    int GetOutdoorAirUnitZoneInletNode(EnergyPlusData &state, int const OAUnitNum)
     {
 
         // FUNCTION INFORMATION:
@@ -2770,7 +2770,7 @@ namespace OutdoorAirUnit {
         return GetOutdoorAirUnitZoneInletNode;
     }
 
-    int GetOutdoorAirUnitReturnAirNode(AllGlobals &state, int const OAUnitNum)
+    int GetOutdoorAirUnitReturnAirNode(EnergyPlusData &state, int const OAUnitNum)
     {
 
         // FUNCTION INFORMATION:

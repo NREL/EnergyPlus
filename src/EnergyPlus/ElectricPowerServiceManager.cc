@@ -66,7 +66,7 @@
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/FuelCellElectricGenerator.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/ICEngineElectricGenerator.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -108,7 +108,7 @@ void initializeElectricPowerServiceZoneGains() // namespace routine for handling
     }
 }
 
-void ElectricPowerServiceManager::manageElectricPowerService(AllGlobals &state, 
+void ElectricPowerServiceManager::manageElectricPowerService(EnergyPlusData &state, 
     bool const firstHVACIteration,
     bool &SimElecCircuits,      // simulation convergence flag
     bool const UpdateMetersOnly // if true then don't resimulate generators, just update meters.
@@ -1008,7 +1008,7 @@ ElectPowerLoadCenter::ElectPowerLoadCenter( // constructor
     }
 }
 
-void ElectPowerLoadCenter::manageElecLoadCenter(AllGlobals &state, bool const firstHVACIteration, Real64 &remainingWholePowerDemand)
+void ElectPowerLoadCenter::manageElecLoadCenter(EnergyPlusData &state, bool const firstHVACIteration, Real64 &remainingWholePowerDemand)
 {
     //
     subpanelFeedInRequest = remainingWholePowerDemand;
@@ -1047,7 +1047,7 @@ void ElectPowerLoadCenter::manageElecLoadCenter(AllGlobals &state, bool const fi
     updateLoadCenterGeneratorRecords();
 }
 
-void ElectPowerLoadCenter::dispatchGenerators(AllGlobals &state, bool const firstHVACIteration,
+void ElectPowerLoadCenter::dispatchGenerators(EnergyPlusData &state, bool const firstHVACIteration,
                                               Real64 &remainingWholePowerDemand // power request in, remaining unmet request out
 )
 {
@@ -2087,7 +2087,7 @@ void GeneratorController::reinitAtBeginEnvironment()
     thermProdRate = 0.0;
 }
 
-void GeneratorController::simGeneratorGetPowerOutput(AllGlobals &state, bool const runFlag,
+void GeneratorController::simGeneratorGetPowerOutput(EnergyPlusData &state, bool const runFlag,
                                                      Real64 const myElecLoadRequest,
                                                      bool const FirstHVACIteration, // Unused 2010 JANUARY
                                                      Real64 &electricPowerOutput,   // Actual generator electric power output

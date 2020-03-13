@@ -67,7 +67,7 @@
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/OutputFiles.hh>
@@ -2183,7 +2183,7 @@ TEST_F(EnergyPlusFixture, FanCoil_ASHRAE90VariableFan)
     CoilNames.clear();
 }
 
-Real64 ResidualFancoil(AllGlobals &state, Real64 const mdot,
+Real64 ResidualFancoil(EnergyPlusData &state, Real64 const mdot,
                        Array1<Real64> const &Par // Function parameters
 )
 {

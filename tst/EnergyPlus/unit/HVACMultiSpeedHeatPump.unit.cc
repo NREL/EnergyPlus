@@ -67,7 +67,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Fans.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACMultiSpeedHeatPump.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/OutputFiles.hh>

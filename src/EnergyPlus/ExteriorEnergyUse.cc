@@ -53,7 +53,7 @@
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
@@ -143,7 +143,7 @@ namespace ExteriorEnergyUse {
         GetExteriorEnergyInputFlag = true;
     }
 
-    void ManageExteriorEnergyUse(AllGlobals &state)
+    void ManageExteriorEnergyUse(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -163,7 +163,7 @@ namespace ExteriorEnergyUse {
         ReportExteriorEnergyUse(state);
     }
 
-    void GetExteriorEnergyUseInput(AllGlobals &state)
+    void GetExteriorEnergyUseInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -587,7 +587,7 @@ namespace ExteriorEnergyUse {
         }
     }
 
-    void ReportExteriorEnergyUse(AllGlobals &state)
+    void ReportExteriorEnergyUse(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:

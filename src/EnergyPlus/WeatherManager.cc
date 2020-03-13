@@ -75,7 +75,7 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -787,7 +787,7 @@ namespace WeatherManager {
         }
     }
 
-    bool GetNextEnvironment(AllGlobals &state, OutputFiles &outputFiles,
+    bool GetNextEnvironment(EnergyPlusData &state, OutputFiles &outputFiles,
                             bool &Available,  // true if there is another environment, false if the end
                             bool &ErrorsFound // will be set to true if severe errors are found in inputs
     )
@@ -5882,7 +5882,7 @@ namespace WeatherManager {
         } // ... end of .NOT.WarmupFlag IF-THEN block.
     }
 
-    void ReadUserWeatherInput(AllGlobals &state, OutputFiles &outputFiles)
+    void ReadUserWeatherInput(EnergyPlusData &state, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8078,7 +8078,7 @@ namespace WeatherManager {
         }
     }
 
-    void GetGroundTemps(AllGlobals &state, bool &ErrorsFound)
+    void GetGroundTemps(EnergyPlusData &state, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:

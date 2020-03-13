@@ -69,7 +69,7 @@
 #include <EnergyPlus/FuelCellElectricGenerator.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneratorFuelSupply.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -3104,7 +3104,7 @@ namespace FuelCellElectricGenerator {
         OptLoad = 0.0;
     }
 
-    void FCDataStruct::simulate(AllGlobals &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void FCDataStruct::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                 bool FirstHVACIteration,
                                 Real64 &EP_UNUSED(CurLoad),
                                 bool EP_UNUSED(RunFlag))

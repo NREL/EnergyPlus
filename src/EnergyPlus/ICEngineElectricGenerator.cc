@@ -61,7 +61,7 @@
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/ICEngineElectricGenerator.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -442,7 +442,7 @@ namespace ICEngineElectricGenerator {
         OptLoad = 0.0;
     }
 
-    void ICEngineGeneratorSpecs::simulate(AllGlobals &state, const EnergyPlus::PlantLocation &EP_UNUSED(calledFromLocation),
+    void ICEngineGeneratorSpecs::simulate(EnergyPlusData &state, const EnergyPlus::PlantLocation &EP_UNUSED(calledFromLocation),
                                           bool FirstHVACIteration,
                                           Real64 &EP_UNUSED(CurLoad),
                                           bool EP_UNUSED(RunFlag))

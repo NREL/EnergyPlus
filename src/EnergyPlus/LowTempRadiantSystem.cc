@@ -76,7 +76,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
@@ -262,7 +262,7 @@ namespace LowTempRadiantSystem {
         GetInputFlag = true;
     }
 
-    void SimLowTempRadiantSystem(AllGlobals &state, std::string const &CompName,   // name of the low temperature radiant system
+    void SimLowTempRadiantSystem(EnergyPlusData &state, std::string const &CompName,   // name of the low temperature radiant system
                                  bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                  Real64 &LoadMet,               // load met by the radiant system, in Watts
                                  int &CompIndex)
@@ -1646,7 +1646,7 @@ namespace LowTempRadiantSystem {
         }
     }
 
-    void InitLowTempRadiantSystem(AllGlobals &state, bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
+    void InitLowTempRadiantSystem(EnergyPlusData &state, bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                   int const RadSysNum,  // Index for the low temperature radiant system under consideration within the derived types
                                   int const SystemType, // Type of radiant system: hydronic, constant flow, or electric
                                   bool &InitErrorsFound)
@@ -2250,7 +2250,7 @@ namespace LowTempRadiantSystem {
         OperatingMode = NotOperating; // System is not operating or can't operate; will be reset elsewhere, if necessary
     }
 
-    void SizeLowTempRadiantSystem(AllGlobals &state, int const RadSysNum, // Index for the low temperature radiant system under consideration within the derived types
+    void SizeLowTempRadiantSystem(EnergyPlusData &state, int const RadSysNum, // Index for the low temperature radiant system under consideration within the derived types
                                   int const SystemType // Type of radiant system: hydronic, constant flow, or electric
     )
     {

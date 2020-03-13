@@ -62,7 +62,7 @@
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -147,7 +147,7 @@ namespace HVACDXHeatPumpSystem {
         DXHeatPumpSystem.deallocate();
     }
 
-    void SimDXHeatPumpSystem(AllGlobals &state, std::string const &DXHeatPumpSystemName, // Name of DXSystem:Airloop object
+    void SimDXHeatPumpSystem(EnergyPlusData &state, std::string const &DXHeatPumpSystemName, // Name of DXSystem:Airloop object
                              bool const FirstHVACIteration,           // True when first HVAC iteration
                              int const AirLoopNum,                    // Primary air loop number
                              int &CompIndex,                          // Index to CoilSystem:Heating:DX object
@@ -283,7 +283,7 @@ namespace HVACDXHeatPumpSystem {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetDXHeatPumpSystemInput(AllGlobals &state)
+    void GetDXHeatPumpSystemInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -573,7 +573,7 @@ namespace HVACDXHeatPumpSystem {
     // Beginning of Calculation subroutines for the DXCoolingSystem Module
     // *****************************************************************************
 
-    void ControlDXHeatingSystem(AllGlobals &state, int const DXSystemNum,        // index to DXSystem
+    void ControlDXHeatingSystem(EnergyPlusData &state, int const DXSystemNum,        // index to DXSystem
                                 bool const FirstHVACIteration // First HVAC iteration flag
     )
     {
@@ -1143,7 +1143,7 @@ namespace HVACDXHeatPumpSystem {
 
     //******************************************************************************
 
-    Real64 VSCoilCyclingResidual(AllGlobals &state, Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 VSCoilCyclingResidual(EnergyPlusData &state, Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                  Array1<Real64> const &Par   // Par(1) = DX coil number
     )
     {
@@ -1222,7 +1222,7 @@ namespace HVACDXHeatPumpSystem {
 
     //******************************************************************************
 
-    Real64 VSCoilSpeedResidual(AllGlobals &state, Real64 const SpeedRatio,  // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 VSCoilSpeedResidual(EnergyPlusData &state, Real64 const SpeedRatio,  // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                Array1<Real64> const &Par // Par(1) = DX coil number
     )
     {
@@ -1300,7 +1300,7 @@ namespace HVACDXHeatPumpSystem {
         return Residuum;
     }
 
-    int GetHeatingCoilInletNodeNum(AllGlobals &state,
+    int GetHeatingCoilInletNodeNum(EnergyPlusData &state,
         std::string const &DXHeatCoilSysName)
     {
         // SUBROUTINE INFORMATION:
@@ -1331,7 +1331,7 @@ namespace HVACDXHeatPumpSystem {
         return NodeNum;
     }
 
-    int GetHeatingCoilOutletNodeNum(AllGlobals &state,
+    int GetHeatingCoilOutletNodeNum(EnergyPlusData &state,
         std::string const &DXHeatCoilSysName)
     {
         // SUBROUTINE INFORMATION:

@@ -61,7 +61,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
 #include <EnergyPlus/HVACFan.hh>
@@ -132,7 +132,7 @@ namespace AirLoopHVACDOAS {
         numAirLoopDOAS = 0;
     }
 
-    void AirLoopDOAS::SimAirLoopHVACDOAS(AllGlobals &state, bool const FirstHVACIteration, int &CompIndex)
+    void AirLoopDOAS::SimAirLoopHVACDOAS(EnergyPlusData &state, bool const FirstHVACIteration, int &CompIndex)
     {
 
         // Obtains and Allocates unitary system related parameters from input file
@@ -400,7 +400,7 @@ namespace AirLoopHVACDOAS {
         }
     } // namespace AirLoopSplitter
 
-    void AirLoopDOAS::getAirLoopDOASInput(AllGlobals &state)
+    void AirLoopDOAS::getAirLoopDOASInput(EnergyPlusData &state)
     {
 
         using DataAirLoop::OutsideAirSys;
@@ -914,7 +914,7 @@ namespace AirLoopHVACDOAS {
         }
     }
 
-    void AirLoopDOAS::initAirLoopDOAS(AllGlobals &state, bool const FirstHVACIteration)
+    void AirLoopDOAS::initAirLoopDOAS(EnergyPlusData &state, bool const FirstHVACIteration)
     {
         int LoopOA;
         int NodeNum;
@@ -1023,7 +1023,7 @@ namespace AirLoopHVACDOAS {
         }
     }
 
-    void AirLoopDOAS::CalcAirLoopDOAS(AllGlobals &state, bool const FirstHVACIteration)
+    void AirLoopDOAS::CalcAirLoopDOAS(EnergyPlusData &state, bool const FirstHVACIteration)
     {
         using DataAirLoop::OutsideAirSys;
         using MixedAir::ManageOutsideAirSystem;
@@ -1045,7 +1045,7 @@ namespace AirLoopHVACDOAS {
         this->m_CompPointerAirLoopSplitter->CalcAirLoopSplitter(Temp, HumRat);
     }
 
-    void AirLoopDOAS::SizingAirLoopDOAS(AllGlobals &state)
+    void AirLoopDOAS::SizingAirLoopDOAS(EnergyPlusData &state)
     {
         Real64 SizingMassFlow = 0;
         int AirLoopNum;
@@ -1082,7 +1082,7 @@ namespace AirLoopHVACDOAS {
         DataSizing::CurOASysNum = this->m_OASystemNum;
     }
 
-    void getAirLoopHVACDOASInput(AllGlobals &state)
+    void getAirLoopHVACDOASInput(EnergyPlusData &state)
     {
         if (GetInputOnceFlag) {
             AirLoopDOAS::getAirLoopDOASInput(state);

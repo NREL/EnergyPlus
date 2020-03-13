@@ -62,7 +62,7 @@
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatPumpWaterToWaterCOOLING.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -138,7 +138,7 @@ namespace HeatPumpWaterToWaterCOOLING {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void GshpPeCoolingSpecs::simulate(AllGlobals &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
+    void GshpPeCoolingSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad,
                   bool EP_UNUSED(RunFlag)) {
         // Simulate the model for the Demand "MyLoad"
         if (calledFromLocation.loopNum == this->LoadLoopNum) { // chilled water loop
@@ -170,7 +170,7 @@ namespace HeatPumpWaterToWaterCOOLING {
         OptLoad = this->NomCap * this->OptPartLoadRat;
     }
 
-    void GshpPeCoolingSpecs::onInitLoopEquip(AllGlobals &state, const PlantLocation &EP_UNUSED(calledFromLocation)) {
+    void GshpPeCoolingSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation)) {
         if (this->plantScanFlag) {
             // Locate the heating on the plant loops for later usage
             bool errFlag = false;

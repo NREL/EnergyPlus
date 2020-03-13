@@ -59,7 +59,7 @@
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/FileSystem.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
@@ -82,7 +82,7 @@ namespace CommandLineInterface {
     using namespace SolarShading;
     using namespace ez;
 
-    int ProcessArgs(AllGlobals &state, int argc, const char *argv[])
+    int ProcessArgs(EnergyPlusData &state, int argc, const char *argv[])
     {
         typedef std::string::size_type size_type;
 

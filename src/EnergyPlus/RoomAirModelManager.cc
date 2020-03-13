@@ -75,7 +75,7 @@
 #include <EnergyPlus/DisplacementVentMgr.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/MundtSimMgr.hh>
@@ -138,7 +138,7 @@ namespace RoomAirModelManager {
         GetAirModelData = true;
     }
 
-    void ManageAirModel(AllGlobals &state, int &ZoneNum)
+    void ManageAirModel(EnergyPlusData &state, int &ZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -232,7 +232,7 @@ namespace RoomAirModelManager {
 
     //*****************************************************************************************
 
-    void GetAirModelDatas(AllGlobals &state)
+    void GetAirModelDatas(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1371,7 +1371,7 @@ namespace RoomAirModelManager {
         }
     }
 
-    void GetRoomAirflowNetworkData(AllGlobals &state, bool &ErrorsFound) // True if errors found during this get input routine
+    void GetRoomAirflowNetworkData(EnergyPlusData &state, bool &ErrorsFound) // True if errors found during this get input routine
     {
 
         // SUBROUTINE INFORMATION:
@@ -2736,7 +2736,7 @@ namespace RoomAirModelManager {
         }
     }
 
-    void GetRAFNNodeNum(AllGlobals &state, std::string const &RAFNNodeName, // Name of RoomAir:Node:AirflowNetwork
+    void GetRAFNNodeNum(EnergyPlusData &state, std::string const &RAFNNodeName, // Name of RoomAir:Node:AirflowNetwork
                         int &ZoneNum,                    // The zone number associate with the node name
                         int &RAFNNodeNum,                // RoomAir:Node:AirflowNetwork Number
                         bool &Errorfound                 // true if an error is found (TODO: Useless, RAFNodeNum is 0 when Errorfound is true)
@@ -2782,7 +2782,7 @@ namespace RoomAirModelManager {
         }
     }
 
-    bool CheckEquipName(AllGlobals &state, std::string const &EquipType, // Equipment type
+    bool CheckEquipName(EnergyPlusData &state, std::string const &EquipType, // Equipment type
                         std::string const &EquipName, // Equipment Name
                         std::string &SupplyNodeName,  // Supply node name
                         std::string &ReturnNodeName,  // Return node name

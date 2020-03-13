@@ -75,7 +75,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
@@ -268,7 +268,7 @@ namespace DXCoils {
     } // namespace
     // Functions
 
-    void SimDXCoil(AllGlobals &state, std::string const &CompName,   // name of the fan coil unit
+    void SimDXCoil(EnergyPlusData &state, std::string const &CompName,   // name of the fan coil unit
                    int const CompOp,              // compressor operation; 1=on, 0=off
                    bool const FirstHVACIteration, // True when first HVAC iteration
                    int &CompIndex,
@@ -395,7 +395,7 @@ namespace DXCoils {
         ReportDXCoil(DXCoilNum);
     }
 
-    void SimDXCoilMultiSpeed(AllGlobals &state, std::string const &CompName, // name of the fan coil unit
+    void SimDXCoilMultiSpeed(EnergyPlusData &state, std::string const &CompName, // name of the fan coil unit
                              Real64 const SpeedRatio,     // = (CompressorSpeed - CompressorSpeedMin) /
                              Real64 const CycRatio,       // cycling part load ratio for variable speed
                              int &CompIndex,
@@ -510,7 +510,7 @@ namespace DXCoils {
         ReportDXCoil(DXCoilNum);
     }
 
-    void SimDXCoilMultiMode(AllGlobals &state, std::string const &CompName,   // name of the fan coil unit
+    void SimDXCoilMultiMode(EnergyPlusData &state, std::string const &CompName,   // name of the fan coil unit
                             int const EP_UNUSED(CompOp),   // compressor operation; 1=on, 0=off !unused1208
                             bool const FirstHVACIteration, // true if first hvac iteration
                             Real64 const PartLoadRatio,    // part load ratio
@@ -6047,7 +6047,7 @@ namespace DXCoils {
         ManageEMS(emsCallFromComponentGetInput, anyEMSRan);
     }
 
-    void InitDXCoil(AllGlobals &state, int const DXCoilNum) // number of the current DX coil unit being simulated
+    void InitDXCoil(EnergyPlusData &state, int const DXCoilNum) // number of the current DX coil unit being simulated
     {
 
         // SUBROUTINE INFORMATION:
@@ -6642,7 +6642,7 @@ namespace DXCoils {
         }
     }
 
-    void SizeDXCoil(AllGlobals &state, int const DXCoilNum)
+    void SizeDXCoil(EnergyPlusData &state, int const DXCoilNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -13408,7 +13408,7 @@ namespace DXCoils {
         }
     }
 
-    void CalcTwoSpeedDXCoilStandardRating(AllGlobals &state, OutputFiles &outputFiles, int const DXCoilNum)
+    void CalcTwoSpeedDXCoilStandardRating(EnergyPlusData &state, OutputFiles &outputFiles, int const DXCoilNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         B. Griffith, (Derived from CalcDXCoilStandardRating by Bereket Nigusse & Chandan Sharma)
@@ -13888,7 +13888,7 @@ namespace DXCoils {
         OutDryBulbTemp = heldOutDryBulb; // reset the outdoor dry bulb when done with it
     }
 
-    void GetFanIndexForTwoSpeedCoil(AllGlobals &state, int const CoolingCoilIndex, int &SupplyFanIndex, std::string &SupplyFanName, int &SupplyFan_TypeNum)
+    void GetFanIndexForTwoSpeedCoil(EnergyPlusData &state, int const CoolingCoilIndex, int &SupplyFanIndex, std::string &SupplyFanName, int &SupplyFan_TypeNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -13965,7 +13965,7 @@ namespace DXCoils {
         }
     }
 
-    Real64 CalcTwoSpeedDXCoilIEERResidual(AllGlobals &state, Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 CalcTwoSpeedDXCoilIEERResidual(EnergyPlusData &state, Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                           Array1<Real64> const &Par           // par(1) = DX coil number
     )
     {
@@ -14164,7 +14164,7 @@ namespace DXCoils {
         }
     }
 
-    Real64 GetCoilCapacity(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilCapacity(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                            std::string const &CoilName, // must match coil names for the coil type
                            bool &ErrorsFound            // set to true if problem
     )
@@ -14423,7 +14423,7 @@ namespace DXCoils {
 
         return MinOAT;
     }
-    int GetCoilInletNode(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
+    int GetCoilInletNode(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                          std::string const &CoilName, // must match coil names for the coil type
                          bool &ErrorsFound            // set to true if problem
     )
@@ -14485,7 +14485,7 @@ namespace DXCoils {
         return NodeNumber;
     }
 
-    int GetCoilOutletNode(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
+    int GetCoilOutletNode(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     )
@@ -14923,7 +14923,7 @@ namespace DXCoils {
         return CapFTCurveIndex;
     }
 
-    void SetDXCoolingCoilData(AllGlobals &state, int const DXCoilNum,                    // Number of DX Cooling Coil
+    void SetDXCoolingCoilData(EnergyPlusData &state, int const DXCoilNum,                    // Number of DX Cooling Coil
                               bool &ErrorsFound,                      // Set to true if certain errors found
                               Optional_int HeatingCoilPLFCurvePTR,    // Parameter equivalent of heating coil PLR curve index
                               Optional_int CondenserType,             // Parameter equivalent of condenser type parameter

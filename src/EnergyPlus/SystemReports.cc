@@ -75,7 +75,7 @@
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
 #include <EnergyPlus/OutdoorAirUnit.hh>
@@ -4351,7 +4351,7 @@ namespace SystemReports {
         } // switch
     }
 
-    void ReportMaxVentilationLoads(AllGlobals &state)
+    void ReportMaxVentilationLoads(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Dan Fisher (with minor assistance from RKS)

@@ -76,7 +76,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HeatingCoils.hh>
@@ -291,7 +291,7 @@ namespace Furnaces {
         UniqueFurnaceNames.clear();
     }
 
-    void SimFurnace(AllGlobals &state, std::string const &FurnaceName,
+    void SimFurnace(EnergyPlusData &state, std::string const &FurnaceName,
                     bool const FirstHVACIteration,
                     int const AirLoopNum, // Primary air loop number
                     int &CompIndex        // Pointer to which furnace
@@ -798,7 +798,7 @@ namespace Furnaces {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetFurnaceInput(AllGlobals &state)
+    void GetFurnaceInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4696,7 +4696,7 @@ namespace Furnaces {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitFurnace(AllGlobals &state, int const FurnaceNum,         // index to Furnace
+    void InitFurnace(EnergyPlusData &state, int const FurnaceNum,         // index to Furnace
                      int const AirLoopNum,         // index to air loop
                      Real64 &OnOffAirFlowRatio,    // ratio of on to off air mass flow rate
                      int &OpMode,                  // fan operating mode
@@ -5954,7 +5954,7 @@ namespace Furnaces {
         SetAverageAirFlow(FurnaceNum, PartLoadRatio, OnOffAirFlowRatio);
     }
 
-    void SizeFurnace(AllGlobals &state, int const FurnaceNum, bool const FirstHVACIteration)
+    void SizeFurnace(EnergyPlusData &state, int const FurnaceNum, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -6337,7 +6337,7 @@ namespace Furnaces {
     // Beginning of Update subroutines for the Furnace Module
     // *****************************************************************************
 
-    void CalcNewZoneHeatOnlyFlowRates(AllGlobals &state, int const FurnaceNum,          // Index to furnace
+    void CalcNewZoneHeatOnlyFlowRates(EnergyPlusData &state, int const FurnaceNum,          // Index to furnace
                                       bool const FirstHVACIteration, // Iteration flag
                                       Real64 const ZoneLoad,         // load to be met by furnace (W)
                                       Real64 &HeatCoilLoad,          // actual load passed to heating coil (W)
@@ -6578,7 +6578,7 @@ namespace Furnaces {
         Node(FurnaceInletNode).MassFlowRate = Furnace(FurnaceNum).MdotFurnace;
     }
 
-    void CalcNewZoneHeatCoolFlowRates(AllGlobals &state, int const FurnaceNum,
+    void CalcNewZoneHeatCoolFlowRates(EnergyPlusData &state, int const FurnaceNum,
                                       bool const FirstHVACIteration,
                                       int const CompOp,          // compressor operation flag (1=On, 0=Off)
                                       Real64 const ZoneLoad,     // the control zone load (watts)
@@ -7920,7 +7920,7 @@ namespace Furnaces {
         Node(FurnaceInletNode).MassFlowRate = Furnace(FurnaceNum).MdotFurnace;
     }
 
-    void CalcWaterToAirHeatPump(AllGlobals &state, int const AirLoopNum,          // index to air loop
+    void CalcWaterToAirHeatPump(EnergyPlusData &state, int const AirLoopNum,          // index to air loop
                                 int const FurnaceNum,          // index to Furnace
                                 bool const FirstHVACIteration, // TRUE on first HVAC iteration
                                 int const CompOp,              // compressor operation flag (1=On, 0=Off)
@@ -8485,7 +8485,7 @@ namespace Furnaces {
         Node(FurnaceInletNode).MassFlowRate = Furnace(FurnaceNum).MdotFurnace;
     }
 
-    void CalcFurnaceOutput(AllGlobals &state, int const FurnaceNum,
+    void CalcFurnaceOutput(EnergyPlusData &state, int const FurnaceNum,
                            bool const FirstHVACIteration,
                            int const FanOpMode,            // Cycling fan or constant fan
                            int const CompOp,               // Compressor on/off; 1=on, 0=off
@@ -8909,7 +8909,7 @@ namespace Furnaces {
     //        End of Update subroutines for the Furnace Module
     // *****************************************************************************
 
-    Real64 CalcFurnaceResidual(AllGlobals &state, Real64 const PartLoadRatio, // DX cooling coil part load ratio
+    Real64 CalcFurnaceResidual(EnergyPlusData &state, Real64 const PartLoadRatio, // DX cooling coil part load ratio
                                Array1<Real64> const &Par   // Function parameters
     )
     {
@@ -9063,7 +9063,7 @@ namespace Furnaces {
         return Residuum;
     }
 
-    Real64 CalcWaterToAirResidual(AllGlobals &state, Real64 const PartLoadRatio, // DX cooling coil part load ratio
+    Real64 CalcWaterToAirResidual(EnergyPlusData &state, Real64 const PartLoadRatio, // DX cooling coil part load ratio
                                   Array1<Real64> const &Par   // Function parameters
     )
     {
@@ -9495,7 +9495,7 @@ namespace Furnaces {
             1.0; // reset to 1 in case blow through fan configuration (fan resets to 1, but for blow thru fans coil sets back down < 1)
     }
 
-    void CalcNonDXHeatingCoils(AllGlobals &state, int const FurnaceNum,           // Furnace Index
+    void CalcNonDXHeatingCoils(EnergyPlusData &state, int const FurnaceNum,           // Furnace Index
                                bool const SuppHeatingCoilFlag, // .TRUE. if supplemental heating coil
                                bool const FirstHVACIteration,  // flag for first HVAC iteration in the time step
                                Real64 const QCoilLoad,         // load met by unit (watts)
@@ -9660,7 +9660,7 @@ namespace Furnaces {
         HeatCoilLoadmet = QActual;
     }
 
-    Real64 HotWaterCoilResidual(AllGlobals &state, Real64 const HWFlow,      // hot water flow rate in kg/s
+    Real64 HotWaterCoilResidual(EnergyPlusData &state, Real64 const HWFlow,      // hot water flow rate in kg/s
                                 Array1<Real64> const &Par // Par(5) is the requested coil load
     )
     {
@@ -9741,7 +9741,7 @@ namespace Furnaces {
 
     //******************************************************************************
 
-    void SimVariableSpeedHP(AllGlobals &state, int const FurnaceNum,          // number of the current engine driven Heat Pump being simulated
+    void SimVariableSpeedHP(EnergyPlusData &state, int const FurnaceNum,          // number of the current engine driven Heat Pump being simulated
                             bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                             int const AirLoopNum,          // index to air loop
                             Real64 const QZnReq,           // required zone load
@@ -10072,7 +10072,7 @@ namespace Furnaces {
 
     //******************************************************************************
 
-    void ControlVSHPOutput(AllGlobals &state, int const FurnaceNum,          // Unit index of engine driven heat pump
+    void ControlVSHPOutput(EnergyPlusData &state, int const FurnaceNum,          // Unit index of engine driven heat pump
                            bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
                            int const CompOp,              // compressor operation; 1=on, 0=off
                            int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
@@ -10481,7 +10481,7 @@ namespace Furnaces {
 
     //******************************************************************************
 
-    void CalcVarSpeedHeatPump(AllGlobals &state, int const FurnaceNum,          // Variable speed heat pump number
+    void CalcVarSpeedHeatPump(EnergyPlusData &state, int const FurnaceNum,          // Variable speed heat pump number
                               bool const FirstHVACIteration, // Flag for 1st HVAC iteration
                               int const CompOp,              // Compressor on/off; 1=on, 0=off
                               int const SpeedNum,            // Speed number
@@ -11061,7 +11061,7 @@ namespace Furnaces {
 
     //******************************************************************************
 
-    Real64 VSHPCyclingResidual(AllGlobals &state, Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 VSHPCyclingResidual(EnergyPlusData &state, Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                Array1<Real64> const &Par  // par(1) = FurnaceNum
     )
     {
@@ -11177,7 +11177,7 @@ namespace Furnaces {
 
     //******************************************************************************
 
-    Real64 VSHPSpeedResidual(AllGlobals &state, Real64 const SpeedRatio,  // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 VSHPSpeedResidual(EnergyPlusData &state, Real64 const SpeedRatio,  // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                              Array1<Real64> const &Par // par(1) = MSHPNum
     )
     {
@@ -11293,7 +11293,7 @@ namespace Furnaces {
         return VSHPSpeedResidual;
     }
 
-    void SetVSHPAirFlow(AllGlobals &state, int const FurnaceNum,             // Unit index
+    void SetVSHPAirFlow(EnergyPlusData &state, int const FurnaceNum,             // Unit index
                         Real64 const PartLoadRatio,       // unit part load ratio
                         Real64 &OnOffAirFlowRatio,        // ratio of compressor ON airflow to average airflow over timestep
                         Optional_int_const SpeedNum,      // Speed number
@@ -11525,7 +11525,7 @@ namespace Furnaces {
         //  END IF
     }
 
-    void SetOnOffMassFlowRateVSCoil(AllGlobals &state, int const FurnaceNum,                 // index to furnace
+    void SetOnOffMassFlowRateVSCoil(EnergyPlusData &state, int const FurnaceNum,                 // index to furnace
                                     int const ZoneNum,                    // index to zone
                                     bool const FirstHVACIteration,        // Flag for 1st HVAC iteration
                                     int const EP_UNUSED(AirLoopNum),      // index to air loop !unused1208

@@ -54,7 +54,7 @@
 
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -144,7 +144,7 @@ struct CoilCoolingDXCurveFitSpeed
 
     void CalcSpeedOutput(
         const DataLoopNode::NodeData &inletNode, DataLoopNode::NodeData &outletNode, Real64 &PLR, int &fanOpMode, Real64 condInletTemp);
-    void size(AllGlobals &state);
+    void size(EnergyPlusData &state);
     Real64 CalcBypassFactor(Real64 tdb, Real64 w, Real64 h, Real64 p);
 
 private:

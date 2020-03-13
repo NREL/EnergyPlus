@@ -125,7 +125,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/Furnaces.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/HeatPumpWaterToWaterCOOLING.hh>
@@ -236,7 +236,7 @@
 #include <EnergyPlus/ZonePlenum.hh>
 #include <EnergyPlus/ZoneTempPredictorCorrector.hh>
 
-void EnergyPlus::clearThisState(AllGlobals &state)
+void EnergyPlus::clearThisState(EnergyPlusData &state)
 {
     state.clear_state();
 }

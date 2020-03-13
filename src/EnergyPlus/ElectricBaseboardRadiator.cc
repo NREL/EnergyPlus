@@ -67,7 +67,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -128,7 +128,7 @@ namespace ElectricBaseboardRadiator {
 
     // Functions
 
-    void SimElecBaseboard(AllGlobals &state, std::string const &EquipName,
+    void SimElecBaseboard(EnergyPlusData &state, std::string const &EquipName,
                           int const EP_UNUSED(ActualZoneNum),
                           int const ControlledZoneNum,
                           bool const FirstHVACIteration,
@@ -552,7 +552,7 @@ namespace ElectricBaseboardRadiator {
         }
     }
 
-    void InitElectricBaseboard(AllGlobals &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration)
+    void InitElectricBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -656,7 +656,7 @@ namespace ElectricBaseboardRadiator {
         ElecBaseboard(BaseboardNum).ElecUseRate = 0.0;
     }
 
-    void SizeElectricBaseboard(AllGlobals &state, int const BaseboardNum)
+    void SizeElectricBaseboard(EnergyPlusData &state, int const BaseboardNum)
     {
 
         // SUBROUTINE INFORMATION:

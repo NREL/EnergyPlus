@@ -73,7 +73,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -169,7 +169,7 @@ namespace CondenserLoopTowers {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void CoolingTower::simulate(AllGlobals &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void CoolingTower::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                 bool const EP_UNUSED(FirstHVACIteration),
                                 Real64 &CurLoad,
                                 bool const RunFlag)
@@ -201,7 +201,7 @@ namespace CondenserLoopTowers {
         SizFactor = this->SizFac;
     }
 
-    void CoolingTower::onInitLoopEquip(AllGlobals &state, const PlantLocation &EP_UNUSED(calledFromLocation))
+    void CoolingTower::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
         this->initialize();
         if (this->TowerType_Num == DataPlant::TypeOf_CoolingTower_VarSpdMerkel) {

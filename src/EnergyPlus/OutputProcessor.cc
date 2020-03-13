@@ -77,7 +77,7 @@
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
@@ -3051,7 +3051,7 @@ namespace OutputProcessor {
         }
     }
 
-    void ReportTSMeters(AllGlobals &state, Real64 const StartMinute, // Start Minute for TimeStep
+    void ReportTSMeters(EnergyPlusData &state, Real64 const StartMinute, // Start Minute for TimeStep
                         Real64 const EndMinute,   // End Minute for TimeStep
                         bool &PrintESOTimeStamp,  // True if the ESO Time Stamp also needs to be printed
                         bool PrintTimeStampToSQL  // Print Time Stamp to SQL file
@@ -3181,7 +3181,7 @@ namespace OutputProcessor {
         }
     }
 
-    void ReportHRMeters(AllGlobals &state, bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+    void ReportHRMeters(EnergyPlusData &state, bool PrintTimeStampToSQL // Print Time Stamp to SQL file
     )
     {
 
@@ -3284,7 +3284,7 @@ namespace OutputProcessor {
         }
     }
 
-    void ReportDYMeters(AllGlobals &state, bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+    void ReportDYMeters(EnergyPlusData &state, bool PrintTimeStampToSQL // Print Time Stamp to SQL file
     )
     {
 
@@ -3382,7 +3382,7 @@ namespace OutputProcessor {
         }
     }
 
-    void ReportMNMeters(AllGlobals &state, bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+    void ReportMNMeters(EnergyPlusData &state, bool PrintTimeStampToSQL // Print Time Stamp to SQL file
     )
     {
 
@@ -3542,7 +3542,7 @@ namespace OutputProcessor {
         }
     }
 
-    void ReportSMMeters(AllGlobals &state, bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+    void ReportSMMeters(EnergyPlusData &state, bool PrintTimeStampToSQL // Print Time Stamp to SQL file
     )
     {
 
@@ -6268,7 +6268,7 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
                         indexGroupKey);
 }
 
-void UpdateDataandReport(AllGlobals &state, OutputProcessor::TimeStepType const t_TimeStepTypeKey) // What kind of data to update (Zone, HVAC)
+void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType const t_TimeStepTypeKey) // What kind of data to update (Zone, HVAC)
 {
 
     // SUBROUTINE INFORMATION:

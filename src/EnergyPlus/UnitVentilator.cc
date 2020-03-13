@@ -69,7 +69,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HeatingCoils.hh>
@@ -195,7 +195,7 @@ namespace UnitVentilator {
         UnitVentNumericFields.deallocate();
     }
 
-    void SimUnitVentilator(AllGlobals &state, std::string const &CompName,   // name of the fan coil unit
+    void SimUnitVentilator(EnergyPlusData &state, std::string const &CompName,   // name of the fan coil unit
                            int const ZoneNum,             // number of zone being served
                            bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                            Real64 &PowerMet,              // Sensible power supplied (W)
@@ -263,7 +263,7 @@ namespace UnitVentilator {
         ZoneEqUnitVent = false;
     }
 
-    void GetUnitVentilatorInput(AllGlobals &state)
+    void GetUnitVentilatorInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1235,7 +1235,7 @@ namespace UnitVentilator {
         }
     }
 
-    void InitUnitVentilator(AllGlobals &state, int const UnitVentNum,         // index for the current unit ventilator
+    void InitUnitVentilator(EnergyPlusData &state, int const UnitVentNum,         // index for the current unit ventilator
                             bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                             int const ZoneNum              // number of zone being served
     )
@@ -1588,7 +1588,7 @@ namespace UnitVentilator {
         }
     }
 
-    void SizeUnitVentilator(AllGlobals &state, int const UnitVentNum)
+    void SizeUnitVentilator(EnergyPlusData &state, int const UnitVentNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2481,7 +2481,7 @@ namespace UnitVentilator {
         }
     }
 
-    void CalcUnitVentilator(AllGlobals &state, int &UnitVentNum,              // number of the current fan coil unit being simulated
+    void CalcUnitVentilator(EnergyPlusData &state, int &UnitVentNum,              // number of the current fan coil unit being simulated
                             int const ZoneNum,             // number of zone being served
                             bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                             Real64 &PowerMet,              // Sensible power supplied (W)
@@ -3251,7 +3251,7 @@ namespace UnitVentilator {
         LatOutputProvided = LatentOutput;
     }
 
-    void CalcUnitVentilatorComponents(AllGlobals &state, int const UnitVentNum,              // Unit index in unit ventilator array
+    void CalcUnitVentilatorComponents(EnergyPlusData &state, int const UnitVentNum,              // Unit index in unit ventilator array
                                       bool const FirstHVACIteration,      // flag for 1st HVAV iteration in the time step
                                       Real64 &LoadMet,                    // load met by unit (watts)
                                       Optional_int_const OpMode,          // Fan Type
@@ -3733,7 +3733,7 @@ namespace UnitVentilator {
         }
     }
 
-    int GetUnitVentilatorOutAirNode(AllGlobals &state, int const UnitVentNum)
+    int GetUnitVentilatorOutAirNode(EnergyPlusData &state, int const UnitVentNum)
     {
 
         // FUNCTION INFORMATION:
@@ -3784,7 +3784,7 @@ namespace UnitVentilator {
         return GetUnitVentilatorOutAirNode;
     }
 
-    int GetUnitVentilatorZoneInletAirNode(AllGlobals &state, int const UnitVentNum)
+    int GetUnitVentilatorZoneInletAirNode(EnergyPlusData &state, int const UnitVentNum)
     {
 
         // FUNCTION INFORMATION:
@@ -3835,7 +3835,7 @@ namespace UnitVentilator {
         return GetUnitVentilatorZoneInletAirNode;
     }
 
-    int GetUnitVentilatorMixedAirNode(AllGlobals &state, int const UnitVentNum)
+    int GetUnitVentilatorMixedAirNode(EnergyPlusData &state, int const UnitVentNum)
     {
 
         // FUNCTION INFORMATION:
@@ -3886,7 +3886,7 @@ namespace UnitVentilator {
         return GetUnitVentilatorMixedAirNode;
     }
 
-    int GetUnitVentilatorReturnAirNode(AllGlobals &state, int const UnitVentNum)
+    int GetUnitVentilatorReturnAirNode(EnergyPlusData &state, int const UnitVentNum)
     {
 
         // FUNCTION INFORMATION:
@@ -3937,7 +3937,7 @@ namespace UnitVentilator {
         return GetUnitVentilatorReturnAirNode;
     }
 
-    Real64 CalcUnitVentilatorResidual(AllGlobals &state, Real64 const PartLoadRatio, // Coil Part Load Ratio
+    Real64 CalcUnitVentilatorResidual(EnergyPlusData &state, Real64 const PartLoadRatio, // Coil Part Load Ratio
                                       Array1<Real64> const &Par   // Function parameters
     )
     {

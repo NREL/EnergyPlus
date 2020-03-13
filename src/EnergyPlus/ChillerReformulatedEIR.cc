@@ -70,7 +70,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputFiles.hh>
@@ -192,7 +192,7 @@ namespace ChillerReformulatedEIR {
         sizFac = this->SizFac;
     }
 
-    void ReformulatedEIRChillerSpecs::onInitLoopEquip(AllGlobals &state, const PlantLocation &calledFromLocation)
+    void ReformulatedEIRChillerSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
     {
         bool runFlag = true;
         Real64 myLoad = 0.0;
@@ -203,7 +203,7 @@ namespace ChillerReformulatedEIR {
         }
     }
 
-    void ReformulatedEIRChillerSpecs::simulate(AllGlobals &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+    void ReformulatedEIRChillerSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu

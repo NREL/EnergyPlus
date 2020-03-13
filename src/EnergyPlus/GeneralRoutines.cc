@@ -76,7 +76,7 @@
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
 #include <EnergyPlus/HWBaseboardRadiator.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -117,7 +117,7 @@ enum GeneralRoutinesEquipNums
     VentilatedSlabNum = 11
 };
 
-void ControlCompOutput(AllGlobals &state, std::string const &CompName,           // the component Name
+void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,           // the component Name
                        std::string const &CompType,           // Type of component
                        int &CompNum,                          // Index of component in component array
                        bool const FirstHVACIteration,         // flag for 1st HVAV iteration in the time step
@@ -1433,7 +1433,7 @@ void CalcBasinHeaterPower(Real64 const Capacity,     // Basin heater capacity pe
     }
 }
 
-void TestAirPathIntegrity(AllGlobals &state, bool &ErrFound)
+void TestAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1529,7 +1529,7 @@ void TestAirPathIntegrity(AllGlobals &state, bool &ErrFound)
     ValSupAPaths.deallocate();
 }
 
-void TestSupplyAirPathIntegrity(AllGlobals &state, bool &ErrFound)
+void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound)
 {
 
     // SUBROUTINE INFORMATION:
@@ -1794,7 +1794,7 @@ void TestSupplyAirPathIntegrity(AllGlobals &state, bool &ErrFound)
     }
 }
 
-void TestReturnAirPathIntegrity(AllGlobals &state, bool &ErrFound, Array2S_int ValRetAPaths)
+void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_int ValRetAPaths)
 {
 
     // SUBROUTINE INFORMATION:

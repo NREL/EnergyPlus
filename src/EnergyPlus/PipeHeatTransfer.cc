@@ -69,7 +69,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -169,7 +169,7 @@ namespace PipeHeatTransfer {
 
     // Functions
 
-    PlantComponent *PipeHTData::factory(AllGlobals &state, int objectType, std::string objectName)
+    PlantComponent *PipeHTData::factory(EnergyPlusData &state, int objectType, std::string objectName)
     {
         // Process the input data for pipes if it hasn't been done already
         if (GetPipeInputFlag) {
@@ -193,7 +193,7 @@ namespace PipeHeatTransfer {
         PipeHTUniqueNames.clear();
     }
 
-    void PipeHTData::simulate(AllGlobals &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void PipeHTData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                               bool const FirstHVACIteration,
                               Real64 &EP_UNUSED(CurLoad),
                               bool const EP_UNUSED(RunFlag))
@@ -236,7 +236,7 @@ namespace PipeHeatTransfer {
         this->PreviousPipeTemp = this->PipeTemp;
     }
 
-    void GetPipesHeatTransfer(AllGlobals &state)
+    void GetPipesHeatTransfer(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:

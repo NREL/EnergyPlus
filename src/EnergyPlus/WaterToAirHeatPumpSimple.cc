@@ -195,7 +195,7 @@ namespace WaterToAirHeatPumpSimple {
         SimpleWatertoAirHP.deallocate();
     }
 
-    void SimWatertoAirHPSimple(AllGlobals &state, std::string const &CompName,   // Coil Name
+    void SimWatertoAirHPSimple(EnergyPlusData &state, std::string const &CompName,   // Coil Name
                                int &CompIndex,                // Index for Component name
                                Real64 const SensLoad,         // Sensible demand load [W]
                                Real64 const LatentLoad,       // Latent demand load [W]
@@ -811,7 +811,7 @@ namespace WaterToAirHeatPumpSimple {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitSimpleWatertoAirHP(AllGlobals &state, int const HPNum,                           // Current HPNum under simulation
+    void InitSimpleWatertoAirHP(EnergyPlusData &state, int const HPNum,                           // Current HPNum under simulation
                                 Real64 const MaxONOFFCyclesperHour,        // Maximum cycling rate of heat pump [cycles/hr]
                                 Real64 const HPTimeConstant,               // Heat pump time constant [s]
                                 Real64 const FanDelayTime,                 // Fan delay time, time delay for the HP's fan to
@@ -1125,7 +1125,7 @@ namespace WaterToAirHeatPumpSimple {
         DataHeatBalance::HeatReclaimSimple_WAHPCoil(HPNum).AvailCapacity = 0.0;
     }
 
-    void SizeHVACWaterToAir(AllGlobals &state, int const HPNum)
+    void SizeHVACWaterToAir(EnergyPlusData &state, int const HPNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3029,7 +3029,7 @@ namespace WaterToAirHeatPumpSimple {
         return IndexNum;
     }
 
-    Real64 GetCoilCapacity(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilCapacity(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                            std::string const &CoilName, // must match coil names for the coil type
                            bool &ErrorsFound            // set to true if problem
     )
@@ -3133,7 +3133,7 @@ namespace WaterToAirHeatPumpSimple {
         return CoilAirFlowRate;
     }
 
-    int GetCoilInletNode(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
+    int GetCoilInletNode(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                          std::string const &CoilName, // must match coil names for the coil type
                          bool &ErrorsFound            // set to true if problem
     )
@@ -3197,7 +3197,7 @@ namespace WaterToAirHeatPumpSimple {
         return NodeNumber;
     }
 
-    int GetCoilOutletNode(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
+    int GetCoilOutletNode(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     )

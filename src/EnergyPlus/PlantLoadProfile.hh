@@ -54,7 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
@@ -121,9 +121,9 @@ namespace PlantLoadProfile {
         // Functions
         static PlantComponent *factory(std::string objectName);
 
-        void simulate(AllGlobals &state, const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
+        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
 
-        void onInitLoopEquip(AllGlobals &state, const PlantLocation &calledFromLocation) override;
+        void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation) override;
 
         void InitPlantProfile();
 

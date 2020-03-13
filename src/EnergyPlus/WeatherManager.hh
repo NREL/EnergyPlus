@@ -60,7 +60,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
     class OutputFiles;
@@ -688,7 +688,7 @@ namespace WeatherManager {
 
     void ResetEnvironmentCounter();
 
-    bool GetNextEnvironment(AllGlobals &state, OutputFiles &outputFiles,
+    bool GetNextEnvironment(EnergyPlusData &state, OutputFiles &outputFiles,
                             bool &Available,  // true if there is another environment, false if the end
                             bool &ErrorsFound // will be set to true if severe errors are found in inputs
     );
@@ -847,7 +847,7 @@ namespace WeatherManager {
     void ReportWeatherAndTimeInformation(OutputFiles &outputFiles,
                                          bool &PrintEnvrnStamp); // Set to true when the environment header should be printed
 
-    void ReadUserWeatherInput(AllGlobals &state, OutputFiles &outputFiles);
+    void ReadUserWeatherInput(EnergyPlusData &state, OutputFiles &outputFiles);
 
     void GetRunPeriodData(int &TotRunPers, // Total number of Run Periods requested
                           bool &ErrorsFound);
@@ -867,7 +867,7 @@ namespace WeatherManager {
 
     void GetWeatherProperties(bool &ErrorsFound);
 
-    void GetGroundTemps(AllGlobals &state, bool &ErrorsFound);
+    void GetGroundTemps(EnergyPlusData &state, bool &ErrorsFound);
 
     void GetGroundReflectances(OutputFiles &outputFiles, bool &ErrorsFound);
 

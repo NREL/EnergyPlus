@@ -54,7 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
 namespace EnergyPlus {
@@ -108,10 +108,10 @@ namespace Pipes {
         }
 
     public:
-        static PlantComponent *factory(AllGlobals &state, int objectType, std::string objectName);
+        static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string objectName);
 
     public:
-        void simulate(AllGlobals &state, const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
+        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
     };
 
     // Object Data
@@ -120,7 +120,7 @@ namespace Pipes {
     // Functions
     void clear_state();
 
-    void GetPipeInput(AllGlobals &state);
+    void GetPipeInput(EnergyPlusData &state);
 
 } // namespace Pipes
 

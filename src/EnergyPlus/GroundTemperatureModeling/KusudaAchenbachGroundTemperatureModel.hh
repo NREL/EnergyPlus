@@ -54,7 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundTemperatureModeling/BaseGroundTemperatureModel.hh>
 
 namespace EnergyPlus {
@@ -71,7 +71,7 @@ public:
     Real64 aveGroundTempAmplitude;
     Real64 phaseShiftInSecs;
 
-    static std::shared_ptr<KusudaGroundTempsModel> KusudaGTMFactory(AllGlobals &state, int objectType, std::string objectName);
+    static std::shared_ptr<KusudaGroundTempsModel> KusudaGTMFactory(EnergyPlusData &state, int objectType, std::string objectName);
 
     Real64 getGroundTemp() override;
 

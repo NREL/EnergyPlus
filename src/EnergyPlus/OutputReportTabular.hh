@@ -62,7 +62,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 
@@ -754,7 +754,7 @@ namespace OutputReportTabular {
     //======================================================================================================================
     //======================================================================================================================
 
-    void WriteTabularReports(AllGlobals &state);
+    void WriteTabularReports(EnergyPlusData &state);
 
     void FillWeatherPredefinedEntries();
 
@@ -762,7 +762,7 @@ namespace OutputReportTabular {
                                    int const colNum             // Column number
     );
 
-    void FillRemainingPredefinedEntries(AllGlobals &state);
+    void FillRemainingPredefinedEntries(EnergyPlusData &state);
 
     void WriteMonthlyTables();
 

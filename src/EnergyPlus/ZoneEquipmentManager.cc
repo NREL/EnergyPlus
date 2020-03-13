@@ -86,7 +86,7 @@
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACInterfaceManager.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
 #include <EnergyPlus/HVACVariableRefrigerantFlow.hh>
@@ -216,7 +216,7 @@ namespace ZoneEquipmentManager {
         reportDOASZoneSizingHeader = true;
     }
 
-    void ManageZoneEquipment(AllGlobals &state, bool const FirstHVACIteration,
+    void ManageZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration,
                              bool &SimZone, // Set to false at the end of the routine
                              bool &SimAir   // Eventually set to true via SimZoneEquipment if AirLoop must be resimulated
     )
@@ -279,7 +279,7 @@ namespace ZoneEquipmentManager {
         SimZone = false;
     }
 
-    void GetZoneEquipment(AllGlobals &state)
+    void GetZoneEquipment(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2165,7 +2165,7 @@ namespace ZoneEquipmentManager {
         }
     }
 
-    void UpdateZoneSizing(AllGlobals &state, OutputFiles &outputFiles, int const CallIndicator)
+    void UpdateZoneSizing(EnergyPlusData &state, OutputFiles &outputFiles, int const CallIndicator)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3354,7 +3354,7 @@ namespace ZoneEquipmentManager {
         }
     }
 
-    void SimZoneEquipment(AllGlobals &state, bool const FirstHVACIteration, bool &SimAir)
+    void SimZoneEquipment(EnergyPlusData &state, bool const FirstHVACIteration, bool &SimAir)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5467,7 +5467,7 @@ namespace ZoneEquipmentManager {
         // na
     }
 
-    void CalcAirFlowSimple(AllGlobals &state, int const SysTimestepLoop,        // System time step index
+    void CalcAirFlowSimple(EnergyPlusData &state, int const SysTimestepLoop,        // System time step index
                            bool const AdjustZoneMassFlowFlag // flags to adjust zone mxing and infiltration mass flow rates
     )
     {
@@ -6460,7 +6460,7 @@ namespace ZoneEquipmentManager {
         }
     }
 
-    void GetStandAloneERVNodes(AllGlobals &state, int const OutdoorNum) // Zone Air Balance Outdoor index
+    void GetStandAloneERVNodes(EnergyPlusData &state, int const OutdoorNum) // Zone Air Balance Outdoor index
     {
 
         // SUBROUTINE INFORMATION:

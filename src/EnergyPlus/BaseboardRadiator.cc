@@ -152,7 +152,7 @@ namespace BaseboardRadiator {
         BaseboardParamsNumericFields.deallocate();
     }
 
-    void SimBaseboard(AllGlobals &state, std::string const &EquipName,
+    void SimBaseboard(EnergyPlusData &state, std::string const &EquipName,
                       int const ActualZoneNum,
                       int const ControlledZoneNum,
                       bool const FirstHVACIteration,
@@ -556,7 +556,7 @@ namespace BaseboardRadiator {
         }
     }
 
-    void InitBaseboard(AllGlobals &state, int const BaseboardNum, int const ControlledZoneNumSub)
+    void InitBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNumSub)
     {
 
         // SUBROUTINE INFORMATION:
@@ -702,7 +702,7 @@ namespace BaseboardRadiator {
         Baseboard(BaseboardNum).AirInletHumRat = Node(ZoneNode).HumRat;
     }
 
-    void SizeBaseboard(AllGlobals &state, int const BaseboardNum)
+    void SizeBaseboard(EnergyPlusData &state, int const BaseboardNum)
     {
 
         // SUBROUTINE INFORMATION:

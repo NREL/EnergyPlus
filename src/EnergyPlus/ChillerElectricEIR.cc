@@ -72,7 +72,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -163,7 +163,7 @@ namespace ChillerElectricEIR {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void ElectricEIRChillerSpecs::simulate(AllGlobals &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
+    void ElectricEIRChillerSpecs::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Richard Raustad
@@ -231,7 +231,7 @@ namespace ChillerElectricEIR {
         sizFac = this->SizFac;
     }
 
-    void ElectricEIRChillerSpecs::onInitLoopEquip(AllGlobals &state, const PlantLocation &calledFromLocation)
+    void ElectricEIRChillerSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
     {
         bool runFlag = true;
         Real64 myLoad = 0.0;
@@ -1240,7 +1240,7 @@ namespace ChillerElectricEIR {
         }
     }
 
-    void ElectricEIRChillerSpecs::size(AllGlobals &state)
+    void ElectricEIRChillerSpecs::size(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:

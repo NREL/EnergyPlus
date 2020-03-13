@@ -71,7 +71,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -165,7 +165,7 @@ namespace SteamBaseboardRadiator {
 
     // Functions
 
-    void SimSteamBaseboard(AllGlobals &state, std::string const &EquipName,
+    void SimSteamBaseboard(EnergyPlusData &state, std::string const &EquipName,
                            int const ActualZoneNum,
                            int const ControlledZoneNum,
                            bool const FirstHVACIteration,
@@ -715,7 +715,7 @@ namespace SteamBaseboardRadiator {
         }
     }
 
-    void InitSteamBaseboard(AllGlobals &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration)
+    void InitSteamBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -890,7 +890,7 @@ namespace SteamBaseboardRadiator {
         SteamBaseboard(BaseboardNum).RadEnergy = 0.0;
     }
 
-    void SizeSteamBaseboard(AllGlobals &state, int const BaseboardNum)
+    void SizeSteamBaseboard(EnergyPlusData &state, int const BaseboardNum)
     {
 
         // SUBROUTINE INFORMATION:

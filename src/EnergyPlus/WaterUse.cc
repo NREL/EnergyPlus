@@ -62,7 +62,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataWater.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -222,7 +222,7 @@ namespace WaterUse {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void WaterConnectionsType::simulate(AllGlobals &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void WaterConnectionsType::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                         bool FirstHVACIteration,
                                         Real64 &EP_UNUSED(CurLoad),
                                         bool EP_UNUSED(RunFlag))

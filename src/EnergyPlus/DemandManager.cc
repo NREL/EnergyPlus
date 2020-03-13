@@ -60,7 +60,7 @@
 #include <EnergyPlus/ExteriorEnergyUse.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -160,7 +160,7 @@ namespace DemandManager {
         UniqueDemandMgrNames.clear();
     }
 
-    void ManageDemand(AllGlobals &state)
+    void ManageDemand(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -643,7 +643,7 @@ namespace DemandManager {
         }
     }
 
-    void GetDemandManagerInput(AllGlobals &state)
+    void GetDemandManagerInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1400,7 +1400,7 @@ namespace DemandManager {
         }
     }
 
-    void SurveyDemandManagers(AllGlobals &state)
+    void SurveyDemandManagers(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1451,7 +1451,7 @@ namespace DemandManager {
         } // MgrNum
     }
 
-    void ActivateDemandManagers(AllGlobals &state)
+    void ActivateDemandManagers(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1544,7 +1544,7 @@ namespace DemandManager {
         } // MgrNum
     }
 
-    void UpdateDemandManagers(AllGlobals &state)
+    void UpdateDemandManagers(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1765,7 +1765,7 @@ namespace DemandManager {
         }
     }
 
-    void LoadInterface(AllGlobals &state, int const Action, int const MgrNum, int const LoadPtr, bool &CanReduceDemand)
+    void LoadInterface(EnergyPlusData &state, int const Action, int const MgrNum, int const LoadPtr, bool &CanReduceDemand)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1890,7 +1890,7 @@ namespace DemandManager {
         }
     }
 
-    void InitDemandManagers(AllGlobals &state)
+    void InitDemandManagers(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:

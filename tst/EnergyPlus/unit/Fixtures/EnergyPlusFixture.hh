@@ -54,7 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataStringGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 
 #include <memory>
@@ -62,7 +62,7 @@
 
 namespace EnergyPlus {
 
-//AllGlobals state;
+//EnergyPlusData state;
 
 // This is a helper struct to redirect std::cout. This makes sure std::cout is redirected back and
 // everything is cleaned up properly
@@ -258,7 +258,7 @@ protected:
                      std::vector<bool> const &numbers_blank);
 
 public:
-    AllGlobals state;
+    EnergyPlusData state;
 
 private:
     friend class InputProcessorFixture;

@@ -4043,7 +4043,7 @@ namespace SystemAvailabilityManager {
         return ValidType;
     }
 
-    void ManageHybridVentilation(AllGlobals &state)
+    void ManageHybridVentilation(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu
@@ -4851,7 +4851,7 @@ namespace SystemAvailabilityManager {
         CurrentEndTimeLast = CurrentEndTime;
     }
 
-    void CalcHybridVentSysAvailMgr(AllGlobals &state,
+    void CalcHybridVentSysAvailMgr(EnergyPlusData &state,
                                    int const SysAvailNum,          // number of the current scheduled system availability manager
                                    Optional_int_const PriAirSysNum // number of the primary air system affected by this Avail. Manager
     )
@@ -5305,7 +5305,7 @@ namespace SystemAvailabilityManager {
         }
     }
 
-    bool GetHybridVentilationControlStatus(AllGlobals &state, int const ZoneNum) // Index of zone
+    bool GetHybridVentilationControlStatus(EnergyPlusData &state, int const ZoneNum) // Index of zone
     {
 
         // SUBROUTINE INFORMATION:

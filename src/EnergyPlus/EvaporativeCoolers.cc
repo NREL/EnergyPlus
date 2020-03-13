@@ -76,7 +76,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -3573,7 +3573,7 @@ namespace EvaporativeCoolers {
     //_______________________________________________________________________________________________________________________
     //***************
 
-    void SimZoneEvaporativeCoolerUnit(AllGlobals &state, std::string const &CompName,    // name of the packaged terminal heat pump
+    void SimZoneEvaporativeCoolerUnit(EnergyPlusData &state, std::string const &CompName,    // name of the packaged terminal heat pump
                                       int const ZoneNum,              // number of zone being served
                                       Real64 &SensibleOutputProvided, // sensible capacity delivered to zone
                                       Real64 &LatentOutputProvided,   // Latent add/removal  (kg/s), dehumid = negative
@@ -3630,7 +3630,7 @@ namespace EvaporativeCoolers {
         ReportZoneEvaporativeCoolerUnit(CompNum);
     }
 
-    void GetInputZoneEvaporativeCoolerUnit(AllGlobals &state)
+    void GetInputZoneEvaporativeCoolerUnit(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4061,7 +4061,7 @@ namespace EvaporativeCoolers {
         }
     }
 
-    void InitZoneEvaporativeCoolerUnit(AllGlobals &state, int const UnitNum, // unit number
+    void InitZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum, // unit number
                                        int const ZoneNum  // number of zone being served
     )
     {
@@ -4257,7 +4257,7 @@ namespace EvaporativeCoolers {
         }
     }
 
-    void SizeZoneEvaporativeCoolerUnit(AllGlobals &state, int const UnitNum) // unit number
+    void SizeZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum) // unit number
     {
 
         // SUBROUTINE INFORMATION:
@@ -4395,7 +4395,7 @@ namespace EvaporativeCoolers {
         }
     }
 
-    void CalcZoneEvaporativeCoolerUnit(AllGlobals &state, int const UnitNum,              // unit number
+    void CalcZoneEvaporativeCoolerUnit(EnergyPlusData &state, int const UnitNum,              // unit number
                                        int const ZoneNum,              // number of zone being served
                                        Real64 &SensibleOutputProvided, // sensible capacity delivered to zone
                                        Real64 &LatentOutputProvided    // Latent add/removal  (kg/s), dehumid = negative
@@ -4528,7 +4528,7 @@ namespace EvaporativeCoolers {
         }
     }
 
-    void CalcZoneEvapUnitOutput(AllGlobals &state, int const UnitNum,              // unit number
+    void CalcZoneEvapUnitOutput(EnergyPlusData &state, int const UnitNum,              // unit number
                                 Real64 const PartLoadRatio,     // zone evap unit part load ratiod
                                 Real64 &SensibleOutputProvided, // target cooling load
                                 Real64 &LatentOutputProvided    // target cooling load
@@ -4623,7 +4623,7 @@ namespace EvaporativeCoolers {
         LatentOutputProvided = Node(OutletNodeNum).MassFlowRate * (Node(OutletNodeNum).HumRat - Node(ZoneNodeNum).HumRat);
     }
 
-    void ControlZoneEvapUnitOutput(AllGlobals &state, int const UnitNum,           // unit number
+    void ControlZoneEvapUnitOutput(EnergyPlusData &state, int const UnitNum,           // unit number
                                    Real64 const ZoneCoolingLoad // target cooling load
     )
     {
@@ -4681,7 +4681,7 @@ namespace EvaporativeCoolers {
         ZoneEvapUnit(UnitNum).UnitPartLoadRatio = PartLoadRatio;
     }
 
-    Real64 ZoneEvapUnitLoadResidual(AllGlobals &state, Real64 const PartLoadRatio,
+    Real64 ZoneEvapUnitLoadResidual(EnergyPlusData &state, Real64 const PartLoadRatio,
                                     Array1<Real64> const &Par // parameters
     )
     {
@@ -4704,7 +4704,7 @@ namespace EvaporativeCoolers {
         return Residual;
     }
 
-    void ControlVSEvapUnitToMeetLoad(AllGlobals &state, int const UnitNum,           // unit number
+    void ControlVSEvapUnitToMeetLoad(EnergyPlusData &state, int const UnitNum,           // unit number
                                      int const ZoneNum,           // number of zone being served
                                      Real64 const ZoneCoolingLoad // target cooling load
     )
@@ -4836,7 +4836,7 @@ namespace EvaporativeCoolers {
         }
     }
 
-    Real64 VSEvapUnitLoadResidual(AllGlobals &state, Real64 const FanSpeedRatio,
+    Real64 VSEvapUnitLoadResidual(EnergyPlusData &state, Real64 const FanSpeedRatio,
                                   Array1<Real64> const &Par // parameters
     )
     {

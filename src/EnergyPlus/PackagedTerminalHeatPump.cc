@@ -75,7 +75,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HeatingCoils.hh>
@@ -222,7 +222,7 @@ namespace PackagedTerminalHeatPump {
         PTUnit.deallocate();
     }
 
-    void SimPackagedTerminalUnit(AllGlobals &state, std::string const &CompName,   // name of the packaged terminal heat pump
+    void SimPackagedTerminalUnit(EnergyPlusData &state, std::string const &CompName,   // name of the packaged terminal heat pump
                                  int const ZoneNum,             // number of zone being served
                                  bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                  Real64 &QUnitOut,              // sensible capacity delivered to zone
@@ -324,7 +324,7 @@ namespace PackagedTerminalHeatPump {
         ZoneEqDXCoil = false;
     }
 
-    void SimPTUnit(AllGlobals &state, int const PTUnitNum,           // number of the current Packaged Terminal Heat Pump being simulated
+    void SimPTUnit(EnergyPlusData &state, int const PTUnitNum,           // number of the current Packaged Terminal Heat Pump being simulated
                    int const ZoneNum,             // number of zone being served
                    bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                    Real64 &QSensUnitOut,          // sensible delivered capacity [W]
@@ -515,7 +515,7 @@ namespace PackagedTerminalHeatPump {
         }
     }
 
-    void GetPTUnit(AllGlobals &state)
+    void GetPTUnit(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3674,7 +3674,7 @@ namespace PackagedTerminalHeatPump {
         }
     }
 
-    void InitPTUnit(AllGlobals &state, int const PTUnitNum,           // number of the current PTHP unit being simulated
+    void InitPTUnit(EnergyPlusData &state, int const PTUnitNum,           // number of the current PTHP unit being simulated
                     int const ZoneNum,             // zone number where the current PTHP unit is located
                     bool const FirstHVACIteration, // TRUE on first HVAC iteration
                     Real64 &OnOffAirFlowRatio,     // ratio of compressor ON airflow to average airflow over timestep
@@ -4704,7 +4704,7 @@ namespace PackagedTerminalHeatPump {
         SetAverageAirFlow(PTUnitNum, PartLoadFrac, OnOffAirFlowRatio);
     }
 
-    void SizePTUnit(AllGlobals &state, int const PTUnitNum)
+    void SizePTUnit(EnergyPlusData &state, int const PTUnitNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5414,7 +5414,7 @@ namespace PackagedTerminalHeatPump {
         DataScalableCapSizingON = false;
     }
 
-    void ControlPTUnitOutput(AllGlobals &state, int const PTUnitNum,           // Unit index in fan coil array
+    void ControlPTUnitOutput(EnergyPlusData &state, int const PTUnitNum,           // Unit index in fan coil array
                              bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
                              int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
                              Real64 const QZnReq,           // cooling or heating output needed by zone [W]
@@ -5723,7 +5723,7 @@ namespace PackagedTerminalHeatPump {
         }
     }
 
-    void CalcPTUnit(AllGlobals &state, int const PTUnitNum,           // Unit index in fan coil array
+    void CalcPTUnit(EnergyPlusData &state, int const PTUnitNum,           // Unit index in fan coil array
                     bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
                     Real64 const PartLoadFrac,     // compressor part load fraction
                     Real64 &LoadMet,               // load met by unit (W)
@@ -6389,7 +6389,7 @@ namespace PackagedTerminalHeatPump {
         }
     }
 
-    Real64 HotWaterCoilResidual(AllGlobals &state, Real64 const HWFlow,      // hot water flow rate in kg/s
+    Real64 HotWaterCoilResidual(EnergyPlusData &state, Real64 const HWFlow,      // hot water flow rate in kg/s
                                 Array1<Real64> const &Par // Par(5) is the requested coil load
     )
     {
@@ -6464,7 +6464,7 @@ namespace PackagedTerminalHeatPump {
         return Residuum;
     }
 
-    Real64 SupSATResidual(AllGlobals &state, Real64 &TempSupHeater,    // supplemental heater load at maximum SAT
+    Real64 SupSATResidual(EnergyPlusData &state, Real64 &TempSupHeater,    // supplemental heater load at maximum SAT
                           Array1<Real64> const &Par // par(1) = PTUnitNum
     )
     {
@@ -6518,7 +6518,7 @@ namespace PackagedTerminalHeatPump {
         return SupSATResidual;
     }
 
-    Real64 PLRResidual(AllGlobals &state, Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 PLRResidual(EnergyPlusData &state, Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                        Array1<Real64> const &Par  // par(1) = PTUnitNum
     )
     {
@@ -6746,7 +6746,7 @@ namespace PackagedTerminalHeatPump {
             1.0; // reset to 1 in case blow through fan configuration (fan resets to 1, but for blow thru fans coil sets back down < 1)
     }
 
-    int GetPTUnitZoneInletAirNode(AllGlobals &state, int const PTUnitCompIndex, int const PTUnitType)
+    int GetPTUnitZoneInletAirNode(EnergyPlusData &state, int const PTUnitCompIndex, int const PTUnitType)
     {
 
         // FUNCTION INFORMATION:
@@ -6821,7 +6821,7 @@ namespace PackagedTerminalHeatPump {
         return GetPTUnitZoneInletAirNode;
     }
 
-    int GetPTUnitOutAirNode(AllGlobals &state, int const PTUnitCompIndex, int const PTUnitType)
+    int GetPTUnitOutAirNode(EnergyPlusData &state, int const PTUnitCompIndex, int const PTUnitType)
     {
 
         // FUNCTION INFORMATION:
@@ -6897,7 +6897,7 @@ namespace PackagedTerminalHeatPump {
         return GetPTUnitOutAirNode;
     }
 
-    int GetPTUnitReturnAirNode(AllGlobals &state, int const PTUnitCompIndex, int const PTUnitType)
+    int GetPTUnitReturnAirNode(EnergyPlusData &state, int const PTUnitCompIndex, int const PTUnitType)
     {
 
         // FUNCTION INFORMATION:
@@ -6977,7 +6977,7 @@ namespace PackagedTerminalHeatPump {
         return GetPTUnitReturnAirNode;
     }
 
-    int GetPTUnitMixedAirNode(AllGlobals &state, int const PTUnitCompIndex, int const PTUnitType)
+    int GetPTUnitMixedAirNode(EnergyPlusData &state, int const PTUnitCompIndex, int const PTUnitType)
     {
 
         // FUNCTION INFORMATION:
@@ -7059,7 +7059,7 @@ namespace PackagedTerminalHeatPump {
 
     //******************************************************************************
 
-    void SimVariableSpeedHP(AllGlobals &state, int const PTUnitNum,           // number of the current engine driven Heat Pump being simulated
+    void SimVariableSpeedHP(EnergyPlusData &state, int const PTUnitNum,           // number of the current engine driven Heat Pump being simulated
                             int const ZoneNum,             // Controlled zone number
                             bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                             Real64 const QZnReq,           // required zone load
@@ -7242,7 +7242,7 @@ namespace PackagedTerminalHeatPump {
     //******************************************************************************
     //******************************************************************************
 
-    void ControlVSHPOutput(AllGlobals &state, int const PTUnitNum,           // Unit index in fan coil array
+    void ControlVSHPOutput(EnergyPlusData &state, int const PTUnitNum,           // Unit index in fan coil array
                            bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
                            int const CompOp,              // compressor operation; 1=on, 0=off
                            int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
@@ -7674,7 +7674,7 @@ namespace PackagedTerminalHeatPump {
 
     //******************************************************************************
 
-    Real64 VSHPCyclingResidual(AllGlobals &state, Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 VSHPCyclingResidual(EnergyPlusData &state, Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                Array1<Real64> const &Par  // par(1) = FurnaceNum
     )
     {
@@ -7794,7 +7794,7 @@ namespace PackagedTerminalHeatPump {
 
     //******************************************************************************
 
-    Real64 VSHPSpeedResidual(AllGlobals &state, Real64 const SpeedRatio,  // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 VSHPSpeedResidual(EnergyPlusData &state, Real64 const SpeedRatio,  // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                              Array1<Real64> const &Par // par(1) = MSHPNum
     )
     {
@@ -7916,7 +7916,7 @@ namespace PackagedTerminalHeatPump {
 
     //******************************************************************************
 
-    void CalcVarSpeedHeatPump(AllGlobals &state, int const PTUnitNum,           // Unit index in fan coil array
+    void CalcVarSpeedHeatPump(EnergyPlusData &state, int const PTUnitNum,           // Unit index in fan coil array
                               int const ZoneNum,             // Zone index
                               bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
                               int const CompOp,              // Compressor on/off; 1=on, 0=off
@@ -8713,7 +8713,7 @@ namespace PackagedTerminalHeatPump {
         }
     }
 
-    Real64 CalcPTUnitWaterFlowResidual(AllGlobals &state, Real64 const PartLoadRatio, // coil part load ratio
+    Real64 CalcPTUnitWaterFlowResidual(EnergyPlusData &state, Real64 const PartLoadRatio, // coil part load ratio
                                        Array1<Real64> const &Par   // Function parameters
     )
     {
@@ -8877,7 +8877,7 @@ namespace PackagedTerminalHeatPump {
         return Residuum;
     }
 
-    Real64 CalcPTUnitAirAndWaterFlowResidual(AllGlobals &state, Real64 const PartLoadRatio, // water and air part load ratio
+    Real64 CalcPTUnitAirAndWaterFlowResidual(EnergyPlusData &state, Real64 const PartLoadRatio, // water and air part load ratio
                                              Array1<Real64> const &Par   // Function parameters
     )
     {

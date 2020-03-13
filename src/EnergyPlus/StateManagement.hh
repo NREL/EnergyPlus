@@ -46,9 +46,9 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
-    void clearThisState(AllGlobals &state);
+    void clearThisState(EnergyPlusData &state);
     void clearAllStates();
 }

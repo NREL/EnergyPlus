@@ -66,7 +66,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -135,13 +135,13 @@ namespace OutsideEnergySources {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void OutsideEnergySourceSpecs::simulate(AllGlobals &state, const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration),
+    void OutsideEnergySourceSpecs::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation), bool EP_UNUSED(FirstHVACIteration),
                                             Real64 &CurLoad, bool RunFlag) {
         this->initialize(CurLoad);
         this->calculate(RunFlag, CurLoad);
     }
 
-    void OutsideEnergySourceSpecs::onInitLoopEquip(AllGlobals &state, const PlantLocation &) {
+    void OutsideEnergySourceSpecs::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &) {
         this->initialize(0.0);
         this->size();
     }

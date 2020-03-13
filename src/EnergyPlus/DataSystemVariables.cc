@@ -59,7 +59,7 @@
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -416,7 +416,7 @@ namespace DataSystemVariables {
         Threading = false;
     }
 
-    void processEnvironmentVariables(AllGlobals &state) {
+    void processEnvironmentVariables(EnergyPlusData &state) {
 
         static std::string cEnvValue;
 

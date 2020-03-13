@@ -81,7 +81,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/FuelCellElectricGenerator.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/HVACInterfaceManager.hh>
 #include <EnergyPlus/HeatPumpWaterToWaterSimple.hh>
@@ -171,7 +171,7 @@ namespace EnergyPlus {
             DemandSideInletNode.deallocate();
         }
 
-        void ManagePlantLoops(AllGlobals &state, bool const FirstHVACIteration,
+        void ManagePlantLoops(EnergyPlusData &state, bool const FirstHVACIteration,
                               bool &SimAirLoops,                    // True when the air loops need to be (re)simulated
                               bool &SimZoneEquipment,               // True when zone equipment components need to be (re)simulated
                               bool &EP_UNUSED(
@@ -295,7 +295,7 @@ namespace EnergyPlus {
             LogPlantConvergencePoints(FirstHVACIteration);
         }
 
-        void GetPlantLoopData(AllGlobals &state) {
+        void GetPlantLoopData(EnergyPlusData &state) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Sankaranarayanan K P
@@ -737,7 +737,7 @@ namespace EnergyPlus {
             }
         }
 
-        void GetPlantInput(AllGlobals &state) {
+        void GetPlantInput(EnergyPlusData &state) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Sankaranarayanan K P
@@ -2071,7 +2071,7 @@ namespace EnergyPlus {
             } // plant loops
         }
 
-        void InitializeLoops(AllGlobals &state, bool const FirstHVACIteration) // true if first iteration of the simulation
+        void InitializeLoops(EnergyPlusData &state, bool const FirstHVACIteration) // true if first iteration of the simulation
         {
 
             // SUBROUTINE INFORMATION:
@@ -2982,7 +2982,7 @@ namespace EnergyPlus {
             }
         }
 
-        void SizePlantLoop(AllGlobals &state, int const LoopNum, // Supply side loop being simulated
+        void SizePlantLoop(EnergyPlusData &state, int const LoopNum, // Supply side loop being simulated
                            bool const OkayToFinish) {
 
             // SUBROUTINE INFORMATION:

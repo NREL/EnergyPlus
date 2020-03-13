@@ -68,7 +68,7 @@
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixedAir.hh>
@@ -287,7 +287,7 @@ namespace HVACControllers {
         CheckEquipName.deallocate();
     }
 
-    void ManageControllers(AllGlobals &state, std::string const &ControllerName,
+    void ManageControllers(EnergyPlusData &state, std::string const &ControllerName,
                            int &ControllerIndex,
                            bool const FirstHVACIteration,
                            int const AirLoopNum,
@@ -494,7 +494,7 @@ namespace HVACControllers {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetControllerInput(AllGlobals &state)
+    void GetControllerInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -926,7 +926,7 @@ namespace HVACControllers {
         RootFinders(ControlNum).UpperPoint.DefinedFlag = false;
     }
 
-    void InitController(AllGlobals &state, int const ControlNum,
+    void InitController(EnergyPlusData &state, int const ControlNum,
                         bool &IsConvergedFlag)
     {
 
@@ -3486,7 +3486,7 @@ namespace HVACControllers {
         }
     }
 
-    void CheckCoilWaterInletNode(AllGlobals &state, int const WaterInletNodeNum, // input actuator node number
+    void CheckCoilWaterInletNode(EnergyPlusData &state, int const WaterInletNodeNum, // input actuator node number
                                  bool &NodeNotFound           // true if matching actuator node not found
     )
     {
@@ -3537,7 +3537,7 @@ namespace HVACControllers {
         }
     }
 
-    void GetControllerNameAndIndex(AllGlobals &state, int const WaterInletNodeNum, // input actuator node number
+    void GetControllerNameAndIndex(EnergyPlusData &state, int const WaterInletNodeNum, // input actuator node number
                                    std::string &ControllerName, // controller name used by water coil
                                    int &ControllerIndex,        // controller index used by water coil
                                    bool &ErrorsFound            // true if matching actuator node not found
@@ -3575,7 +3575,7 @@ namespace HVACControllers {
         }
     }
 
-    void GetControllerActuatorNodeNum(AllGlobals &state, std::string const &ControllerName, // name of coil controller
+    void GetControllerActuatorNodeNum(EnergyPlusData &state, std::string const &ControllerName, // name of coil controller
                                       int &WaterInletNodeNum,            // input actuator node number
                                       bool &NodeNotFound                 // true if matching actuator node not found
     )
@@ -3606,7 +3606,7 @@ namespace HVACControllers {
         }
     }
 
-    int GetControllerIndex(AllGlobals &state, std::string const &ControllerName // name of coil controller
+    int GetControllerIndex(EnergyPlusData &state, std::string const &ControllerName // name of coil controller
     )
     {
 

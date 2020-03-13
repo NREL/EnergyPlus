@@ -68,7 +68,7 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -204,7 +204,7 @@ namespace PurchasedAirManager {
 
     } // namespace
 
-    void SimPurchasedAir(AllGlobals &state, std::string const &PurchAirName,
+    void SimPurchasedAir(EnergyPlusData &state, std::string const &PurchAirName,
                          Real64 &SysOutputProvided,
                          Real64 &MoistOutputProvided, // Moisture output provided (kg/s), dehumidification = negative
                          bool const FirstHVACIteration,
@@ -1087,7 +1087,7 @@ namespace PurchasedAirManager {
         }
     }
 
-    void InitPurchasedAir(AllGlobals &state, int const PurchAirNum,
+    void InitPurchasedAir(EnergyPlusData &state, int const PurchAirNum,
                           bool const EP_UNUSED(FirstHVACIteration), // unused1208
                           int const ControlledZoneNum,
                           int const ActualZoneNum)
@@ -1361,7 +1361,7 @@ namespace PurchasedAirManager {
         //      ENDIF
     }
 
-    void SizePurchasedAir(AllGlobals &state, int const PurchAirNum)
+    void SizePurchasedAir(EnergyPlusData &state, int const PurchAirNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2939,7 +2939,7 @@ namespace PurchasedAirManager {
         }
     }
 
-    void UpdatePurchasedAir(AllGlobals &state, int const PurchAirNum, bool const FirstHVACIteration)
+    void UpdatePurchasedAir(EnergyPlusData &state, int const PurchAirNum, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:

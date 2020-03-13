@@ -55,7 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -243,13 +243,13 @@ namespace DesiccantDehumidifiers {
 
     // Functions
 
-    void SimDesiccantDehumidifier(AllGlobals &state, std::string const &CompName,   // name of the dehumidifier unit
+    void SimDesiccantDehumidifier(EnergyPlusData &state, std::string const &CompName,   // name of the dehumidifier unit
                                   bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                   int &CompIndex);
 
-    void GetDesiccantDehumidifierInput(AllGlobals &state);
+    void GetDesiccantDehumidifierInput(EnergyPlusData &state);
 
-    void InitDesiccantDehumidifier(AllGlobals &state, int const DesicDehumNum,      // number of the current dehumidifier being simulated
+    void InitDesiccantDehumidifier(EnergyPlusData &state, int const DesicDehumNum,      // number of the current dehumidifier being simulated
                                    bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     );
 
@@ -258,12 +258,12 @@ namespace DesiccantDehumidifiers {
                                       bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep !unused1208
     );
 
-    void CalcSolidDesiccantDehumidifier(AllGlobals &state, int const DesicDehumNum,      // number of the current dehumidifier being simulated
+    void CalcSolidDesiccantDehumidifier(EnergyPlusData &state, int const DesicDehumNum,      // number of the current dehumidifier being simulated
                                         Real64 const HumRatNeeded,    // process air leaving humidity ratio set by controller [kgWater/kgDryAir]
                                         bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     );
 
-    void CalcGenericDesiccantDehumidifier(AllGlobals &state, int const DesicDehumNum,      // number of the current dehumidifier being simulated
+    void CalcGenericDesiccantDehumidifier(EnergyPlusData &state, int const DesicDehumNum,      // number of the current dehumidifier being simulated
                                           Real64 const HumRatNeeded,    // process air leaving humidity ratio set by controller [kg water/kg air]
                                           bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     );
@@ -272,29 +272,29 @@ namespace DesiccantDehumidifiers {
 
     void ReportDesiccantDehumidifier(int const DesicDehumNum); // number of the current dehumidifier being simulated
 
-    void CalcNonDXHeatingCoils(AllGlobals &state, int const DesicDehumNum,              // Desiccant dehumidifier unit index
+    void CalcNonDXHeatingCoils(EnergyPlusData &state, int const DesicDehumNum,              // Desiccant dehumidifier unit index
                                bool const FirstHVACIteration,        // flag for first HVAC iteration in the time step
                                Real64 const RegenCoilLoad,           // heating coil load to be met (Watts)
                                Optional<Real64> RegenCoilLoadmet = _ // heating load met
     );
 
-    Real64 HotWaterCoilResidual(AllGlobals &state, Real64 const HWFlow,      // hot water flow rate in kg/s
+    Real64 HotWaterCoilResidual(EnergyPlusData &state, Real64 const HWFlow,      // hot water flow rate in kg/s
                                 Array1<Real64> const &Par // Par(5) is the requested coil load
     );
 
-    int GetProcAirInletNodeNum(AllGlobals &state, std::string const &DesicDehumName,
+    int GetProcAirInletNodeNum(EnergyPlusData &state, std::string const &DesicDehumName,
         bool &ErrorsFound
     );
 
-    int GetProcAirOutletNodeNum(AllGlobals &state, std::string const &DesicDehumName,
+    int GetProcAirOutletNodeNum(EnergyPlusData &state, std::string const &DesicDehumName,
         bool &ErrorsFound
     );
 
-    int GetRegAirInletNodeNum(AllGlobals &state, std::string const &DesicDehumName,
+    int GetRegAirInletNodeNum(EnergyPlusData &state, std::string const &DesicDehumName,
         bool &ErrorsFound
     );
 
-    int GetRegAirOutletNodeNum(AllGlobals &state, std::string const &DesicDehumName,
+    int GetRegAirOutletNodeNum(EnergyPlusData &state, std::string const &DesicDehumName,
         bool &ErrorsFound
     );
 

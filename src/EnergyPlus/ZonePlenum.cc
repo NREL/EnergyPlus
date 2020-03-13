@@ -63,7 +63,7 @@
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/PoweredInductionUnits.hh>
@@ -145,7 +145,7 @@ namespace ZonePlenum {
         ZoneSupPlenCond.deallocate();
     }
 
-    void SimAirZonePlenum(AllGlobals &state, std::string const &CompName,
+    void SimAirZonePlenum(EnergyPlusData &state, std::string const &CompName,
                           int const iCompType,
                           int &CompIndex,
                           Optional_bool_const FirstHVACIteration, // Autodesk:OPTIONAL Used without PRESENT check
@@ -278,7 +278,7 @@ namespace ZonePlenum {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetZonePlenumInput(AllGlobals &state)
+    void GetZonePlenumInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1485,7 +1485,7 @@ namespace ZonePlenum {
     //        End of Reporting subroutines for the ZonePlenum Module
     // *****************************************************************************
 
-    int GetReturnPlenumIndex(AllGlobals &state, int const &ExNodeNum)
+    int GetReturnPlenumIndex(EnergyPlusData &state, int const &ExNodeNum)
     {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -1521,7 +1521,7 @@ namespace ZonePlenum {
         return WhichPlenum;
     }
 
-    void GetReturnPlenumName(AllGlobals &state, int const &ReturnPlenumIndex, std::string &ReturnPlenumName)
+    void GetReturnPlenumName(EnergyPlusData &state, int const &ReturnPlenumIndex, std::string &ReturnPlenumName)
     {
 
         // Obtains and Allocates ZonePlenum related parameters from input file
@@ -1536,7 +1536,7 @@ namespace ZonePlenum {
         }
     }
 
-    int getReturnPlenumIndexFromInletNode(AllGlobals &state, int const &InNodeNum)
+    int getReturnPlenumIndexFromInletNode(EnergyPlusData &state, int const &InNodeNum)
     {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:

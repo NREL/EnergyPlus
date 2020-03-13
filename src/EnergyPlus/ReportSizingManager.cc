@@ -69,7 +69,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
@@ -196,7 +196,7 @@ namespace ReportSizingManager {
         }
     }
 
-    void RequestSizing(AllGlobals &state, std::string const &CompType,      // type of component
+    void RequestSizing(EnergyPlusData &state, std::string const &CompType,      // type of component
                        std::string const &CompName,      // name of component
                        int const SizingType,             // integerized type of sizing requested (see DataHVACGlobals, e.g. CoolingCapacitySizing)
                        std::string const &SizingString,  // string containing info for eio report

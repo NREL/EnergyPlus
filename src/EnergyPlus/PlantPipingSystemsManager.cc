@@ -76,7 +76,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -150,7 +150,7 @@ namespace EnergyPlus {
             DataGlobals::AnySlabsInModel = (numSlabsCheck > 0);
         }
 
-        void CheckIfAnyBasements(AllGlobals &state) {
+        void CheckIfAnyBasements(EnergyPlusData &state) {
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Matt Mitchell
             //       DATE WRITTEN   May 2014
@@ -160,7 +160,7 @@ namespace EnergyPlus {
             DataGlobals::AnyBasementsInModel = (numBasementsCheck > 0);
         }
 
-        PlantComponent *Circuit::factory(AllGlobals &state, int EP_UNUSED(objectType), std::string objectName) {
+        PlantComponent *Circuit::factory(EnergyPlusData &state, int EP_UNUSED(objectType), std::string objectName) {
             // Process the input data for circuits if it hasn't been done already
             if (GetInputFlag) {
                 GetPipingSystemsAndGroundDomainsInput(state);
@@ -179,7 +179,7 @@ namespace EnergyPlus {
             return nullptr; // LCOV_EXCL_LINE
         }
 
-        void Circuit::simulate(AllGlobals &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+        void Circuit::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                bool const EP_UNUSED(FirstHVACIteration),
                                Real64 &EP_UNUSED(CurLoad),
                                bool const EP_UNUSED(RunFlag)) {
@@ -196,7 +196,7 @@ namespace EnergyPlus {
             thisDomain.UpdatePipingSystems(this);
         }
 
-        void SimulateGroundDomains(AllGlobals &state, OutputFiles &outputFiles, bool initOnly)
+        void SimulateGroundDomains(EnergyPlusData &state, OutputFiles &outputFiles, bool initOnly)
         {
 
             // SUBROUTINE INFORMATION:
@@ -411,7 +411,7 @@ namespace EnergyPlus {
             }
         }
 
-        void GetPipingSystemsAndGroundDomainsInput(AllGlobals &state) {
+        void GetPipingSystemsAndGroundDomainsInput(EnergyPlusData &state) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -506,7 +506,7 @@ namespace EnergyPlus {
             }
         }
 
-        void ReadGeneralDomainInputs(AllGlobals &state, int const IndexStart, int const NumGeneralizedDomains, bool &ErrorsFound) {
+        void ReadGeneralDomainInputs(EnergyPlusData &state, int const IndexStart, int const NumGeneralizedDomains, bool &ErrorsFound) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -822,7 +822,7 @@ namespace EnergyPlus {
             }
         }
 
-        void ReadZoneCoupledDomainInputs(AllGlobals &state, int const StartingDomainNumForZone, int const NumZoneCoupledDomains,
+        void ReadZoneCoupledDomainInputs(EnergyPlusData &state, int const StartingDomainNumForZone, int const NumZoneCoupledDomains,
                                          bool &ErrorsFound) {
 
             // SUBROUTINE INFORMATION:
@@ -1137,7 +1137,7 @@ namespace EnergyPlus {
             }
         }
 
-        void ReadBasementInputs(AllGlobals &state, int const StartingDomainNumForBasement, int const NumBasements, bool &ErrorsFound) {
+        void ReadBasementInputs(EnergyPlusData &state, int const StartingDomainNumForBasement, int const NumBasements, bool &ErrorsFound) {
 
             // SUBROUTINE INFORMATION:
             //       AUTHOR         Edwin Lee
@@ -1833,7 +1833,7 @@ namespace EnergyPlus {
             }
         }
 
-        void ReadHorizontalTrenchInputs(AllGlobals &state, int const StartingDomainNumForHorizontal,
+        void ReadHorizontalTrenchInputs(EnergyPlusData &state, int const StartingDomainNumForHorizontal,
                                         int const StartingCircuitNumForHorizontal,
                                         bool &ErrorsFound) {
 

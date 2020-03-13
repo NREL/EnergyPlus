@@ -62,7 +62,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 #include <EnergyPlus/DisplayRoutines.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
     class OutputFile;
@@ -721,22 +721,22 @@ namespace OutputProcessor {
                    int &CurMinValDate      // Current Minimum Value Date Stamp
     );
 
-    void ReportTSMeters(AllGlobals &state, Real64 const StartMinute, // Start Minute for TimeStep
+    void ReportTSMeters(EnergyPlusData &state, Real64 const StartMinute, // Start Minute for TimeStep
                         Real64 const EndMinute,   // End Minute for TimeStep
                         bool &PrintESOTimeStamp,  // True if the ESO Time Stamp also needs to be printed
                         bool PrintTimeStampToSQL  // Print Time Stamp to SQL file
     );
 
-    void ReportHRMeters(AllGlobals &state, bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+    void ReportHRMeters(EnergyPlusData &state, bool PrintTimeStampToSQL // Print Time Stamp to SQL file
     );
 
-    void ReportDYMeters(AllGlobals &state, bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+    void ReportDYMeters(EnergyPlusData &state, bool PrintTimeStampToSQL // Print Time Stamp to SQL file
     );
 
-    void ReportMNMeters(AllGlobals &state, bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+    void ReportMNMeters(EnergyPlusData &state, bool PrintTimeStampToSQL // Print Time Stamp to SQL file
     );
 
-    void ReportSMMeters(AllGlobals &state, bool PrintTimeStampToSQL // Print Time Stamp to SQL file
+    void ReportSMMeters(EnergyPlusData &state, bool PrintTimeStampToSQL // Print Time Stamp to SQL file
     );
 
     void ReportYRMeters(bool PrintTimeStampToSQL // Print Time Stamp to SQL file
@@ -969,7 +969,7 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
                          Optional_int_const indexGroupKey = _       // Group identifier for SQL output
 );
 
-void UpdateDataandReport(AllGlobals &state, OutputProcessor::TimeStepType const TimeStepTypeKey); // What kind of data to update (Zone, HVAC)
+void UpdateDataandReport(EnergyPlusData &state, OutputProcessor::TimeStepType const TimeStepTypeKey); // What kind of data to update (Zone, HVAC)
 
 void AssignReportNumber(int &ReportNumber);
 

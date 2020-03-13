@@ -72,7 +72,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HeatRecovery.hh>
 #include <EnergyPlus/HeatingCoils.hh>
@@ -202,7 +202,7 @@ namespace DesiccantDehumidifiers {
 
     // Functions
 
-    void SimDesiccantDehumidifier(AllGlobals &state, std::string const &CompName,   // name of the dehumidifier unit
+    void SimDesiccantDehumidifier(EnergyPlusData &state, std::string const &CompName,   // name of the dehumidifier unit
                                   bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                                   int &CompIndex)
     {
@@ -271,7 +271,7 @@ namespace DesiccantDehumidifiers {
         ReportDesiccantDehumidifier(DesicDehumNum);
     }
 
-    void GetDesiccantDehumidifierInput(AllGlobals &state)
+    void GetDesiccantDehumidifierInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1679,7 +1679,7 @@ namespace DesiccantDehumidifiers {
         lNumericBlanks.deallocate();
     }
 
-    void InitDesiccantDehumidifier(AllGlobals &state, int const DesicDehumNum,      // number of the current dehumidifier being simulated
+    void InitDesiccantDehumidifier(EnergyPlusData &state, int const DesicDehumNum,      // number of the current dehumidifier being simulated
                                    bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     )
     {
@@ -2124,7 +2124,7 @@ namespace DesiccantDehumidifiers {
         }
     }
 
-    void CalcSolidDesiccantDehumidifier(AllGlobals &state, int const DesicDehumNum,      // number of the current dehumidifier being simulated
+    void CalcSolidDesiccantDehumidifier(EnergyPlusData &state, int const DesicDehumNum,      // number of the current dehumidifier being simulated
                                         Real64 const HumRatNeeded,    // process air leaving humidity ratio set by controller [kgWater/kgDryAir]
                                         bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     )
@@ -2547,7 +2547,7 @@ namespace DesiccantDehumidifiers {
         //  DesicDehum(DesicDehumNum)%RegenAirOutEnthalpy    = -999.
     }
 
-    void CalcGenericDesiccantDehumidifier(AllGlobals &state, int const DesicDehumNum,      // number of the current dehumidifier being simulated
+    void CalcGenericDesiccantDehumidifier(EnergyPlusData &state, int const DesicDehumNum,      // number of the current dehumidifier being simulated
                                           Real64 const HumRatNeeded,    // process air leaving humidity ratio set by controller [kg water/kg air]
                                           bool const FirstHVACIteration // TRUE if 1st HVAC simulation of system timestep
     )
@@ -3204,7 +3204,7 @@ namespace DesiccantDehumidifiers {
         }
     }
 
-    void CalcNonDXHeatingCoils(AllGlobals &state, int const DesicDehumNum,          // Desiccant dehumidifier unit index
+    void CalcNonDXHeatingCoils(EnergyPlusData &state, int const DesicDehumNum,          // Desiccant dehumidifier unit index
                                bool const FirstHVACIteration,    // flag for first HVAC iteration in the time step
                                Real64 const RegenCoilLoad,       // heating coil load to be met (Watts)
                                Optional<Real64> RegenCoilLoadmet // heating load met
@@ -3394,7 +3394,7 @@ namespace DesiccantDehumidifiers {
         if (present(RegenCoilLoadmet)) RegenCoilLoadmet = RegenCoilActual;
     }
 
-    Real64 HotWaterCoilResidual(AllGlobals &state, Real64 const HWFlow,      // hot water flow rate in kg/s
+    Real64 HotWaterCoilResidual(EnergyPlusData &state, Real64 const HWFlow,      // hot water flow rate in kg/s
                                 Array1<Real64> const &Par // Par(5) is the requested coil load                            
     )
     {
@@ -3479,7 +3479,7 @@ namespace DesiccantDehumidifiers {
         UniqueDesicDehumNames.clear();
     }
 
-    int GetProcAirInletNodeNum(AllGlobals &state, std::string const &DesicDehumName, bool &ErrorsFound)
+    int GetProcAirInletNodeNum(EnergyPlusData &state, std::string const &DesicDehumName, bool &ErrorsFound)
     {
 
         // FUNCTION INFORMATION:
@@ -3516,7 +3516,7 @@ namespace DesiccantDehumidifiers {
         return NodeNum;
     }
 
-    int GetProcAirOutletNodeNum(AllGlobals &state, std::string const &DesicDehumName, bool &ErrorsFound)
+    int GetProcAirOutletNodeNum(EnergyPlusData &state, std::string const &DesicDehumName, bool &ErrorsFound)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
@@ -3552,7 +3552,7 @@ namespace DesiccantDehumidifiers {
         return NodeNum;
     }
 
-    int GetRegAirInletNodeNum(AllGlobals &state, std::string const &DesicDehumName, bool &ErrorsFound)
+    int GetRegAirInletNodeNum(EnergyPlusData &state, std::string const &DesicDehumName, bool &ErrorsFound)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
@@ -3588,7 +3588,7 @@ namespace DesiccantDehumidifiers {
         return NodeNum;
     }
 
-    int GetRegAirOutletNodeNum(AllGlobals &state, std::string const &DesicDehumName, bool &ErrorsFound)
+    int GetRegAirOutletNodeNum(EnergyPlusData &state, std::string const &DesicDehumName, bool &ErrorsFound)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu

@@ -69,7 +69,7 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -451,7 +451,7 @@ namespace SetPointManager {
         SchTESSetPtMgr.deallocate();              // TES Scheduled setpoint Managers
     }
 
-    void ManageSetPoints(AllGlobals &state)
+    void ManageSetPoints(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Russ Taylor, Rick Strand
@@ -508,7 +508,7 @@ namespace SetPointManager {
         }
     }
 
-    void GetSetPointManagerInputs(AllGlobals &state)
+    void GetSetPointManagerInputs(EnergyPlusData &state)
     {
         // wrapper for GetInput to allow unit testing when fatal inputs are detected
         static bool ErrorsFound(false);
@@ -521,7 +521,7 @@ namespace SetPointManager {
         }
     }
 
-    void GetSetPointManagerInputData(AllGlobals &state, bool &ErrorsFound)
+    void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8464,7 +8464,7 @@ namespace SetPointManager {
         }
     }
 
-    int getSPMBasedOnNode(AllGlobals &state, int const NodeNum, int const SetPtType, int const SPMType, CtrlNodeType ctrlOrRefNode)
+    int getSPMBasedOnNode(EnergyPlusData &state, int const NodeNum, int const SetPtType, int const SPMType, CtrlNodeType ctrlOrRefNode)
     {
 
         if (GetInputFlag) {
@@ -8502,7 +8502,7 @@ namespace SetPointManager {
         return getSPMBasedOnNode;
     }
 
-    bool IsNodeOnSetPtManager(AllGlobals &state, int const NodeNum, int const SetPtType)
+    bool IsNodeOnSetPtManager(EnergyPlusData &state, int const NodeNum, int const SetPtType)
     {
 
         // FUNCTION INFORMATION:
@@ -8552,7 +8552,7 @@ namespace SetPointManager {
         return IsNodeOnSetPtManager;
     }
 
-    bool NodeHasSPMCtrlVarType(AllGlobals &state, int const NodeNum, int const iCtrlVarType)
+    bool NodeHasSPMCtrlVarType(EnergyPlusData &state, int const NodeNum, int const iCtrlVarType)
     {
 
         // FUNCTION INFORMATION:
@@ -8619,7 +8619,7 @@ namespace SetPointManager {
         return NodeHasSPMCtrlVarType;
     }
 
-    void ResetHumidityRatioCtrlVarType(AllGlobals &state, int const NodeNum)
+    void ResetHumidityRatioCtrlVarType(EnergyPlusData &state, int const NodeNum)
     {
 
         // FUNCTION INFORMATION:
@@ -8723,7 +8723,7 @@ namespace SetPointManager {
         }
     }
 
-    int GetHumidityRatioVariableType(AllGlobals &state, int const CntrlNodeNum)
+    int GetHumidityRatioVariableType(EnergyPlusData &state, int const CntrlNodeNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8925,7 +8925,7 @@ namespace SetPointManager {
 
     } // end of SetUpNewScheduledTESSetPtMgr
 
-    bool GetCoilFreezingCheckFlag(AllGlobals &state, int const MixedAirSPMNum)
+    bool GetCoilFreezingCheckFlag(EnergyPlusData &state, int const MixedAirSPMNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8976,7 +8976,7 @@ namespace SetPointManager {
         return FeezigCheckFlag;
     } // End of GetCoilFreezingCheckFlag
 
-    int GetMixedAirNumWithCoilFreezingCheck(AllGlobals &state, int const MixedAirNode)
+    int GetMixedAirNumWithCoilFreezingCheck(EnergyPlusData &state, int const MixedAirNode)
     {
 
         // SUBROUTINE INFORMATION:

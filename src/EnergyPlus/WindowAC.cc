@@ -69,7 +69,7 @@
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -193,7 +193,7 @@ namespace WindowAC {
         WindACNumericFields.deallocate();
     }
 
-    void SimWindowAC(AllGlobals &state, std::string const &CompName,   // name of the window AC unit
+    void SimWindowAC(EnergyPlusData &state, std::string const &CompName,   // name of the window AC unit
                      int const ZoneNum,             // number of zone being served
                      bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                      Real64 &PowerMet,              // Sensible power supplied by window AC (W)
@@ -292,7 +292,7 @@ namespace WindowAC {
         ZoneCoolingOnlyFan = false;
     }
 
-    void GetWindowAC(AllGlobals &state)
+    void GetWindowAC(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -811,7 +811,7 @@ namespace WindowAC {
         }
     }
 
-    void InitWindowAC(AllGlobals &state, int const WindACNum,          // number of the current window AC unit being simulated
+    void InitWindowAC(EnergyPlusData &state, int const WindACNum,          // number of the current window AC unit being simulated
                       Real64 &QZnReq,               // zone load (modified as needed) (W)
                       int const ZoneNum,            // index to zone
                       bool const FirstHVACIteration // TRUE when first HVAC iteration
@@ -997,7 +997,7 @@ namespace WindowAC {
         }
     }
 
-    void SizeWindowAC(AllGlobals &state, int const WindACNum)
+    void SizeWindowAC(EnergyPlusData &state, int const WindACNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1186,7 +1186,7 @@ namespace WindowAC {
         DataScalableCapSizingON = false;
     }
 
-    void SimCyclingWindowAC(AllGlobals &state, int const WindACNum,           // number of the current window AC unit being simulated
+    void SimCyclingWindowAC(EnergyPlusData &state, int const WindACNum,           // number of the current window AC unit being simulated
                             int const EP_UNUSED(ZoneNum),  // number of zone being served !unused1208
                             bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                             Real64 &PowerMet,              // Sensible power supplied (W)
@@ -1386,7 +1386,7 @@ namespace WindowAC {
         }
     }
 
-    void CalcWindowACOutput(AllGlobals &state, int const WindACNum,           // Unit index in fan coil array
+    void CalcWindowACOutput(EnergyPlusData &state, int const WindACNum,           // Unit index in fan coil array
                             bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
                             int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
                             Real64 const PartLoadFrac,     // unit part load fraction
@@ -1510,7 +1510,7 @@ namespace WindowAC {
         LoadMet = AirMassFlow * (PsyHFnTdbW(Node(OutletNode).Temp, MinHumRat) - PsyHFnTdbW(Node(InletNode).Temp, MinHumRat));
     }
 
-    void ControlCycWindACOutput(AllGlobals &state, int const WindACNum,           // Unit index in fan coil array
+    void ControlCycWindACOutput(EnergyPlusData &state, int const WindACNum,           // Unit index in fan coil array
                                 bool const FirstHVACIteration, // flag for 1st HVAV iteration in the time step
                                 int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
                                 Real64 const QZnReq,           // cooling output needed by zone [W]
@@ -1693,7 +1693,7 @@ namespace WindowAC {
         } // WindAC(WindACNum)%DXCoilType_Num == CoilDX_CoolingHXAssisted && *
     }
 
-    int GetWindowACZoneInletAirNode(AllGlobals &state, int const WindACNum)
+    int GetWindowACZoneInletAirNode(EnergyPlusData &state, int const WindACNum)
     {
 
         // FUNCTION INFORMATION:
@@ -1741,7 +1741,7 @@ namespace WindowAC {
         return GetWindowACZoneInletAirNode;
     }
 
-    int GetWindowACOutAirNode(AllGlobals &state, int const WindACNum)
+    int GetWindowACOutAirNode(EnergyPlusData &state, int const WindACNum)
     {
 
         // FUNCTION INFORMATION:
@@ -1789,7 +1789,7 @@ namespace WindowAC {
         return GetWindowACOutAirNode;
     }
 
-    int GetWindowACReturnAirNode(AllGlobals &state, int const WindACNum)
+    int GetWindowACReturnAirNode(EnergyPlusData &state, int const WindACNum)
     {
 
         // FUNCTION INFORMATION:
@@ -1845,7 +1845,7 @@ namespace WindowAC {
         return GetWindowACReturnAirNode;
     }
 
-    int GetWindowACMixedAirNode(AllGlobals &state, int const WindACNum)
+    int GetWindowACMixedAirNode(EnergyPlusData &state, int const WindACNum)
     {
 
         // FUNCTION INFORMATION:

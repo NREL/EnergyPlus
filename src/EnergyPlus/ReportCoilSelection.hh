@@ -59,7 +59,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -237,7 +237,7 @@ public:
     }
 
 public: // methods
-    void finishCoilSummaryReportTable(AllGlobals &state);
+    void finishCoilSummaryReportTable(EnergyPlusData &state);
 
     void setCoilFinalSizes(std::string const &coilName,    // user-defined name of the coil
                            std::string const &coilObjName, //  coil object name, e.g., Coil:Cooling:Water
@@ -389,7 +389,7 @@ public: // methods
                                  std::string const &coilType, // idf input object class name of coil
                                  Real64 const multiplierReheatLoad);
 
-    void setCoilSupplyFanInfo(AllGlobals &state, std::string const &coilName, // user-defined name of the coil
+    void setCoilSupplyFanInfo(EnergyPlusData &state, std::string const &coilName, // user-defined name of the coil
                               std::string const &coilType, // idf input object class name of coil
                               std::string const &fanName,
                               DataAirSystems::fanModelTypeEnum const &fanEnumType,
@@ -410,9 +410,9 @@ public: // methods
 private: // methods
     void doAirLoopSetup(int const coilVecIndex);
 
-    void doZoneEqSetup(AllGlobals &state, int const coilVecIndex);
+    void doZoneEqSetup(EnergyPlusData &state, int const coilVecIndex);
 
-    void doFinalProcessingOfCoilData(AllGlobals &state);
+    void doFinalProcessingOfCoilData(EnergyPlusData &state);
 
     void writeCoilSelectionOutput();
 

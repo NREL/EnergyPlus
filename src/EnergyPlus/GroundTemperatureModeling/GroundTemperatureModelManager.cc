@@ -87,7 +87,7 @@ namespace GroundTemperatureManager {
 
     //******************************************************************************
 
-    std::shared_ptr<BaseGroundTempsModel> GetGroundTempModelAndInit(AllGlobals &state, std::string const &objectType_str, std::string const &objectName)
+    std::shared_ptr<BaseGroundTempsModel> GetGroundTempModelAndInit(EnergyPlusData &state, std::string const &objectType_str, std::string const &objectName)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Matt Mitchell

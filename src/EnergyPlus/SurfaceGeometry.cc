@@ -77,7 +77,7 @@
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
@@ -218,7 +218,7 @@ namespace SurfaceGeometry {
         UniqueSurfaceNames.clear();
     }
 
-    void SetupZoneGeometry(AllGlobals &state, OutputFiles &outputFiles, bool &ErrorsFound)
+    void SetupZoneGeometry(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8558,7 +8558,7 @@ namespace SurfaceGeometry {
         }
     }
 
-    void GetWindowGapAirflowControlData(AllGlobals &state, bool &ErrorsFound) // If errors found in input
+    void GetWindowGapAirflowControlData(EnergyPlusData &state, bool &ErrorsFound) // If errors found in input
     {
 
         // SUBROUTINE INFORMATION:

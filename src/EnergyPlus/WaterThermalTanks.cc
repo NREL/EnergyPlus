@@ -71,7 +71,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -195,7 +195,7 @@ namespace WaterThermalTanks {
         calcWaterThermalTankZoneGainsMyEnvrnFlag = true;
     }
 
-    PlantComponent *WaterThermalTankData::factory(AllGlobals &state, std::string const &objectName)
+    PlantComponent *WaterThermalTankData::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data
         if (getWaterThermalTankInputFlag) {
@@ -215,7 +215,7 @@ namespace WaterThermalTanks {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void WaterThermalTankData::onInitLoopEquip(AllGlobals &state, const PlantLocation &calledFromLocation)
+    void WaterThermalTankData::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
     {
         this->initialize(state, true);
         this->MinePlantStructForInfo();
@@ -252,7 +252,7 @@ namespace WaterThermalTanks {
         OptLoad = this->MaxCapacity;
     }
 
-    int getTankIDX(AllGlobals &state, std::string const &CompName, int &CompIndex)
+    int getTankIDX(EnergyPlusData &state, std::string const &CompName, int &CompIndex)
     {
         if (getWaterThermalTankInputFlag) {
             GetWaterThermalTankInput(state, OutputFiles::getSingleton());
@@ -285,7 +285,7 @@ namespace WaterThermalTanks {
         return CompNum;
     }
 
-    int getHPTankIDX(AllGlobals &state, std::string const &CompName, int &CompIndex)
+    int getHPTankIDX(EnergyPlusData &state, std::string const &CompName, int &CompIndex)
     {
         if (getWaterThermalTankInputFlag) {
             GetWaterThermalTankInput(state, OutputFiles::getSingleton());
@@ -318,7 +318,7 @@ namespace WaterThermalTanks {
         return CompNum;
     }
 
-    void WaterThermalTankData::simulate(AllGlobals &state, const PlantLocation &calledFromLocation,
+    void WaterThermalTankData::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation,
                                         bool FirstHVACIteration,
                                         Real64 &CurLoad,
                                         bool EP_UNUSED(RunFlag))
@@ -368,7 +368,7 @@ namespace WaterThermalTanks {
         this->callerLoopNum = 0;
     }
 
-    PlantComponent *HeatPumpWaterHeaterData::factory(AllGlobals &state, std::string const &objectName)
+    PlantComponent *HeatPumpWaterHeaterData::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data
         if (getWaterThermalTankInputFlag) {
@@ -388,7 +388,7 @@ namespace WaterThermalTanks {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void HeatPumpWaterHeaterData::onInitLoopEquip(AllGlobals &state, const PlantLocation &calledFromLocation)
+    void HeatPumpWaterHeaterData::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
     {
         auto &Tank = WaterThermalTank(this->WaterHeaterTankNum);
         Tank.onInitLoopEquip(state, calledFromLocation);
@@ -404,7 +404,7 @@ namespace WaterThermalTanks {
         OptLoad = this->Capacity;
     }
 
-    void HeatPumpWaterHeaterData::simulate(AllGlobals &state, const PlantLocation &calledFromLocation,
+    void HeatPumpWaterHeaterData::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation,
                                            bool FirstHVACIteration,
                                            Real64 &CurLoad,
                                            bool EP_UNUSED(RunFlag))
@@ -494,7 +494,7 @@ namespace WaterThermalTanks {
         Tank.callerLoopNum = 0;
     }
 
-    void SimulateWaterHeaterStandAlone(AllGlobals &state, int const WaterHeaterNum, bool const FirstHVACIteration)
+    void SimulateWaterHeaterStandAlone(EnergyPlusData &state, int const WaterHeaterNum, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -554,7 +554,7 @@ namespace WaterThermalTanks {
         }
     }
 
-    void SimHeatPumpWaterHeater(AllGlobals &state, std::string const &CompName,
+    void SimHeatPumpWaterHeater(EnergyPlusData &state, std::string const &CompName,
                                 bool const FirstHVACIteration,
                                 Real64 &SensLoadMet, // sensible load met by this equipment and sent to zone, W
                                 Real64 &LatLoadMet,  // net latent load met and sent to zone (kg/s), dehumid = negative
@@ -619,7 +619,7 @@ namespace WaterThermalTanks {
         }
     }
 
-    void CalcWaterThermalTankZoneGains(AllGlobals &state)
+    void CalcWaterThermalTankZoneGains(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1026,7 +1026,7 @@ namespace WaterThermalTanks {
         return ErrorsFound;
     }
 
-    bool getHPWaterHeaterInput(AllGlobals &state)
+    bool getHPWaterHeaterInput(EnergyPlusData &state)
     {
         bool ErrorsFound = false;
 
@@ -3969,7 +3969,7 @@ namespace WaterThermalTanks {
         return ErrorsFound;
     }
 
-    bool GetWaterThermalTankInput(AllGlobals &state, OutputFiles &outputFiles)
+    bool GetWaterThermalTankInput(EnergyPlusData &state, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5493,7 +5493,7 @@ namespace WaterThermalTanks {
         } // NodeNum
     }
 
-    void WaterThermalTankData::initialize(AllGlobals &state, bool const FirstHVACIteration)
+    void WaterThermalTankData::initialize(EnergyPlusData &state, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -8380,7 +8380,7 @@ namespace WaterThermalTanks {
         }
     }
 
-    void WaterThermalTankData::CalcHeatPumpWaterHeater(AllGlobals &state, bool const FirstHVACIteration)
+    void WaterThermalTankData::CalcHeatPumpWaterHeater(EnergyPlusData &state, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -9590,7 +9590,7 @@ namespace WaterThermalTanks {
         }
     }
 
-    void WaterThermalTankData::SetVSHPWHFlowRates(AllGlobals &state, HeatPumpWaterHeaterData &HPWH, // heat pump coil
+    void WaterThermalTankData::SetVSHPWHFlowRates(EnergyPlusData &state, HeatPumpWaterHeaterData &HPWH, // heat pump coil
                                                   int const SpeedNum,            // upper speed number
                                                   Real64 const SpeedRatio,       // interpolation ration between upper and lower speed
                                                   Real64 const WaterDens,        // tank water density
@@ -9667,7 +9667,7 @@ namespace WaterThermalTanks {
         }
     }
 
-    Real64 WaterThermalTankData::PLRResidualIterSpeed(AllGlobals &state, Real64 const SpeedRatio, // speed ratio between two speed levels
+    Real64 WaterThermalTankData::PLRResidualIterSpeed(EnergyPlusData &state, Real64 const SpeedRatio, // speed ratio between two speed levels
                                                       Array1<Real64> const &Par)
     {
         // FUNCTION INFORMATION:
@@ -11336,7 +11336,7 @@ namespace WaterThermalTanks {
         this->VolumeConsumed = this->VolFlowRate * SecInTimeStep;
     }
 
-    void WaterThermalTankData::CalcStandardRatings(AllGlobals &state, OutputFiles &outputFiles)
+    void WaterThermalTankData::CalcStandardRatings(EnergyPlusData &state, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:

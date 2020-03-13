@@ -71,7 +71,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HWBaseboardRadiator.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
@@ -161,7 +161,7 @@ namespace HWBaseboardRadiator {
 
     // Functions
 
-    void SimHWBaseboard(AllGlobals &state, std::string const &EquipName,
+    void SimHWBaseboard(EnergyPlusData &state, std::string const &EquipName,
                         int const ActualZoneNum,
                         int const ControlledZoneNum,
                         bool const FirstHVACIteration,
@@ -721,7 +721,7 @@ namespace HWBaseboardRadiator {
         }
     }
 
-    void InitHWBaseboard(AllGlobals &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration)
+    void InitHWBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNumSub, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -923,7 +923,7 @@ namespace HWBaseboardRadiator {
         HWBaseboard(BaseboardNum).RadEnergy = 0.0;
     }
 
-    void SizeHWBaseboard(AllGlobals &state, int const BaseboardNum)
+    void SizeHWBaseboard(EnergyPlusData &state, int const BaseboardNum)
     {
 
         // SUBROUTINE INFORMATION:

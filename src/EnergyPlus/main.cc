@@ -47,7 +47,7 @@
 
 #include <EnergyPlus/CommandLineInterface.hh>
 #include <EnergyPlus/api/EnergyPlusPgm.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 using EnergyPlus::CommandLineInterface::ProcessArgs;
 
@@ -59,7 +59,7 @@ int main(int argc, const char *argv[])
     unsigned int fp_control_state = _controlfp(_EM_INEXACT, _MCW_EM);
 #endif
 
-    AllGlobals state;
+    EnergyPlusData state;
 
     ProcessArgs(state, argc, argv);
     EnergyPlusPgm(state);

@@ -64,7 +64,7 @@
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -211,7 +211,7 @@ namespace SurfaceGroundHeatExchanger {
         return nullptr;
     }
 
-    void SurfaceGroundHeatExchangerData::simulate(AllGlobals &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void SurfaceGroundHeatExchangerData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                                   bool const FirstHVACIteration,
                                                   Real64 &EP_UNUSED(CurLoad),
                                                   bool const EP_UNUSED(RunFlag))

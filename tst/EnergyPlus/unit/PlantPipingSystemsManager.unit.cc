@@ -52,7 +52,7 @@
 
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSurfaces.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
 #include <EnergyPlus/SurfaceGeometry.hh>

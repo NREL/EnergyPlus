@@ -53,7 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
@@ -146,9 +146,9 @@ namespace ExteriorEnergyUse {
 
     // Functions
 
-    void ManageExteriorEnergyUse(AllGlobals &state);
+    void ManageExteriorEnergyUse(EnergyPlusData &state);
 
-    void GetExteriorEnergyUseInput(AllGlobals &state);
+    void GetExteriorEnergyUseInput(EnergyPlusData &state);
 
     void ValidateFuelType(int &FuelTypeNumber,                    // Fuel Type to be set in structure.
                           std::string const &FuelTypeAlpha,       // Fuel Type String
@@ -158,7 +158,7 @@ namespace ExteriorEnergyUse {
                           std::string const &CurrentName          // current object name being parsed
     );
 
-    void ReportExteriorEnergyUse(AllGlobals &state);
+    void ReportExteriorEnergyUse(EnergyPlusData &state);
 
 } // namespace ExteriorEnergyUse
 

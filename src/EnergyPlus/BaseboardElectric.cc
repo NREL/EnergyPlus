@@ -124,7 +124,7 @@ namespace BaseboardElectric {
         BaseboardNumericFields.deallocate();
     }
 
-    void SimElectricBaseboard(AllGlobals &state, std::string const &EquipName, int const ActualZoneNum, int const ControlledZoneNum, Real64 &PowerMet, int &CompIndex)
+    void SimElectricBaseboard(EnergyPlusData &state, std::string const &EquipName, int const ActualZoneNum, int const ControlledZoneNum, Real64 &PowerMet, int &CompIndex)
     {
 
         // SUBROUTINE INFORMATION:
@@ -439,7 +439,7 @@ namespace BaseboardElectric {
         }
     }
 
-    void InitBaseboard(AllGlobals &state, int const BaseboardNum, int const ControlledZoneNum)
+    void InitBaseboard(EnergyPlusData &state, int const BaseboardNum, int const ControlledZoneNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -522,7 +522,7 @@ namespace BaseboardElectric {
         Baseboard(BaseboardNum).AirInletHumRat = Node(ZoneNode).HumRat;
     }
 
-    void SizeElectricBaseboard(AllGlobals &state, int const BaseboardNum)
+    void SizeElectricBaseboard(EnergyPlusData &state, int const BaseboardNum)
     {
 
         // SUBROUTINE INFORMATION:

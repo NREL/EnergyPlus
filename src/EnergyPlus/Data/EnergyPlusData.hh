@@ -170,7 +170,7 @@ struct PipesGlobals : BaseGlobalStruct
     }
 };
 
-struct AllGlobals : BaseGlobalStruct
+struct EnergyPlusData : BaseGlobalStruct
 {
     // module globals
     DataGlobal dataGlobals;
@@ -190,6 +190,6 @@ struct AllGlobals : BaseGlobalStruct
     };
 };
 
-//extern AllGlobals state;
+//extern EnergyPlusData state;
 
 #endif

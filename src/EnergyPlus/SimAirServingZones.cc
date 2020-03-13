@@ -87,7 +87,7 @@
 #include <EnergyPlus/Furnaces.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
@@ -248,7 +248,7 @@ namespace SimAirServingZones {
         TestUniqueNodesNum = 0;
     }
 
-    void ManageAirLoops(AllGlobals &state, bool const FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
+    void ManageAirLoops(EnergyPlusData &state, bool const FirstHVACIteration, // TRUE if first full HVAC iteration in an HVAC timestep
                         bool &SimAir,                  // TRUE means air loops must be (re)simulated
                         bool &SimZoneEquipment         // TRUE means zone equipment must be (re) simulated
     )
@@ -313,7 +313,7 @@ namespace SimAirServingZones {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetAirPathData(AllGlobals &state)
+    void GetAirPathData(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION
@@ -1469,7 +1469,7 @@ namespace SimAirServingZones {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitAirLoops(AllGlobals &state, bool const FirstHVACIteration) // TRUE if first full HVAC iteration in an HVAC timestep
+    void InitAirLoops(EnergyPlusData &state, bool const FirstHVACIteration) // TRUE if first full HVAC iteration in an HVAC timestep
     {
 
         // SUBROUTINE INFORMATION:
@@ -2467,7 +2467,7 @@ namespace SimAirServingZones {
         }
     }
 
-    void SimAirLoops(AllGlobals &state, bool const FirstHVACIteration, bool &SimZoneEquipment)
+    void SimAirLoops(EnergyPlusData &state, bool const FirstHVACIteration, bool &SimZoneEquipment)
     {
 
         // SUBROUTINE INFORMATION
@@ -2717,7 +2717,7 @@ namespace SimAirServingZones {
         CurSysNum = 0;
     }
 
-    void SimAirLoop(AllGlobals &state, 
+    void SimAirLoop(EnergyPlusData &state, 
         bool const FirstHVACIteration, int const AirLoopNum, int const AirLoopPass, int &AirLoopIterMax, int &AirLoopIterTot, int &AirLoopNumCalls)
     {
 
@@ -2861,7 +2861,7 @@ namespace SimAirServingZones {
         AirLoopControlInfo(AirLoopNum).ConvergedFlag = AirLoopConvergedFlag;
     }
 
-    void SolveAirLoopControllers(AllGlobals &state, 
+    void SolveAirLoopControllers(EnergyPlusData &state, 
         bool const FirstHVACIteration, int const AirLoopNum, bool &AirLoopConvergedFlag, int &IterMax, int &IterTot, int &NumCalls)
     {
 
@@ -3098,7 +3098,7 @@ namespace SimAirServingZones {
         }
     }
 
-    void SolveWaterCoilController(AllGlobals &state, bool const FirstHVACIteration,
+    void SolveWaterCoilController(EnergyPlusData &state, bool const FirstHVACIteration,
                                   int const AirLoopNum,
                                   std::string const &CompName,
                                   int &CompIndex,
@@ -3308,7 +3308,7 @@ namespace SimAirServingZones {
         }
     }
 
-    void ReSolveAirLoopControllers(AllGlobals &state, 
+    void ReSolveAirLoopControllers(EnergyPlusData &state, 
         bool const FirstHVACIteration, int const AirLoopNum, bool &AirLoopConvergedFlag, int &IterMax, int &IterTot, int &NumCalls)
     {
 
@@ -3423,7 +3423,7 @@ namespace SimAirServingZones {
         } // end of controller loop
     }
 
-    void SimAirLoopComponents(AllGlobals &state, int const AirLoopNum,         // Index of the air loop being currently simulated
+    void SimAirLoopComponents(EnergyPlusData &state, int const AirLoopNum,         // Index of the air loop being currently simulated
                               bool const FirstHVACIteration // TRUE if first full HVAC iteration in an HVAC timestep
     )
     {
@@ -3498,7 +3498,7 @@ namespace SimAirServingZones {
         CurDuctType = 0;
     }
 
-    void SimAirLoopComponent(AllGlobals &state, std::string const &CompName,            // the component Name
+    void SimAirLoopComponent(EnergyPlusData &state, std::string const &CompName,            // the component Name
                              int const CompType_Num,                 // numeric equivalent for component type
                              bool const FirstHVACIteration,          // TRUE if first full HVAC iteration in an HVAC timestep
                              int const AirLoopNum,                   // Primary air loop number
@@ -4082,7 +4082,7 @@ namespace SimAirServingZones {
         }
     }
 
-    void SizeAirLoopBranches(AllGlobals &state, int const AirLoopNum, int const BranchNum)
+    void SizeAirLoopBranches(EnergyPlusData &state, int const AirLoopNum, int const BranchNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -7624,7 +7624,7 @@ namespace SimAirServingZones {
         return ReheatCoilInHumRatForSizing;
     }
 
-    void CheckWaterCoilIsOnAirLoop(AllGlobals &state, int const CompTypeNum, std::string const CompType, std::string const CompName, bool &WaterCoilOnAirLoop)
+    void CheckWaterCoilIsOnAirLoop(EnergyPlusData &state, int const CompTypeNum, std::string const CompType, std::string const CompName, bool &WaterCoilOnAirLoop)
     {
         // PURPOSE OF THIS FUNCTION:
         // This function returns true if a water coil that has water controller is either on
@@ -7650,7 +7650,7 @@ namespace SimAirServingZones {
         WaterCoilOnAirLoop = CheckWaterCoilIsOnAirLoop;
     }
 
-    bool CheckWaterCoilOnPrimaryAirLoopBranch(AllGlobals &state, int const CompTypeNum, std::string const CompName)
+    bool CheckWaterCoilOnPrimaryAirLoopBranch(EnergyPlusData &state, int const CompTypeNum, std::string const CompName)
     {
         // PURPOSE OF THIS FUNCTION:
         // This function returns true if a water coil that has water controller is on
@@ -7677,7 +7677,7 @@ namespace SimAirServingZones {
         return false;
     }
 
-    bool CheckWaterCoilOnOASystem(AllGlobals &state, int const CompTypeNum, std::string const CompName)
+    bool CheckWaterCoilOnOASystem(EnergyPlusData &state, int const CompTypeNum, std::string const CompName)
     {
         // PURPOSE OF THIS FUNCTION:
         // This function returns true if a water coil that has water controller is on
@@ -7707,7 +7707,7 @@ namespace SimAirServingZones {
         return false;
     }
 
-    bool CheckWaterCoilSystemOnAirLoopOrOASystem(AllGlobals &state, int const CompTypeNum, std::string const CompName)
+    bool CheckWaterCoilSystemOnAirLoopOrOASystem(EnergyPlusData &state, int const CompTypeNum, std::string const CompName)
     {
         // PURPOSE OF THIS FUNCTION:
         // This function returns true if a water coil whcih is part of CoilSystem:Cooling:Water:HeatExchangerAssisted

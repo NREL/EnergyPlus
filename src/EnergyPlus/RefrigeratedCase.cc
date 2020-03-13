@@ -71,7 +71,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -508,7 +508,7 @@ namespace RefrigeratedCase {
         CaseWIZoneReport.deallocate();
     }
 
-    void ManageRefrigeratedCaseRacks(AllGlobals &state)
+    void ManageRefrigeratedCaseRacks(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -571,7 +571,7 @@ namespace RefrigeratedCase {
         if (HaveDetailedTransRefrig) SimulateDetailedTransRefrigSystems();
     }
 
-    void GetRefrigerationInput(AllGlobals &state)
+    void GetRefrigerationInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -10115,7 +10115,7 @@ namespace RefrigeratedCase {
         }
     }
 
-    PlantComponent *RefrigCondenserData::factory(AllGlobals &state, std::string const &objectName)
+    PlantComponent *RefrigCondenserData::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data for boilers if it hasn't been done already
         if (GetRefrigerationInputFlag) {
@@ -10134,13 +10134,13 @@ namespace RefrigeratedCase {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void RefrigCondenserData::onInitLoopEquip(AllGlobals &state, const PlantLocation &EP_UNUSED(calledFromLocation))
+    void RefrigCondenserData::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
         InitRefrigeration();
         InitRefrigerationPlantConnections();
     }
 
-    void RefrigCondenserData::simulate(AllGlobals &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void RefrigCondenserData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                        bool const FirstHVACIteration,
                                        Real64 &EP_UNUSED(CurLoad),
                                        bool const EP_UNUSED(RunFlag))
@@ -10272,7 +10272,7 @@ namespace RefrigeratedCase {
         this->UpdateCondenser();
     }
 
-    PlantComponent *RefrigRackData::factory(AllGlobals &state, std::string const &objectName)
+    PlantComponent *RefrigRackData::factory(EnergyPlusData &state, std::string const &objectName)
     {
         // Process the input data for boilers if it hasn't been done already
         if (GetRefrigerationInputFlag) {
@@ -10291,13 +10291,13 @@ namespace RefrigeratedCase {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void RefrigRackData::onInitLoopEquip(AllGlobals &state, const PlantLocation &EP_UNUSED(calledFromLocation))
+    void RefrigRackData::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
         InitRefrigeration();
         InitRefrigerationPlantConnections();
     }
 
-    void RefrigRackData::simulate(AllGlobals &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void RefrigRackData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                   bool const FirstHVACIteration,
                                   Real64 &EP_UNUSED(CurLoad),
                                   bool const EP_UNUSED(RunFlag))
@@ -12670,7 +12670,7 @@ namespace RefrigeratedCase {
         }
     }
 
-    void GetRefrigeratedRackIndex(AllGlobals &state, std::string const &Name,
+    void GetRefrigeratedRackIndex(EnergyPlusData &state, std::string const &Name,
                                   int &IndexPtr,
                                   int const SysType,
                                   bool &ErrorsFound,
@@ -14172,7 +14172,7 @@ namespace RefrigeratedCase {
         }
     }
 
-    void CheckRefrigerationInput(AllGlobals &state)
+    void CheckRefrigerationInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -14202,7 +14202,7 @@ namespace RefrigeratedCase {
         } // GetRefrigerationInputFlag
     }
 
-    void SimAirChillerSet(AllGlobals &state, std::string const &AirChillerSetName,
+    void SimAirChillerSet(EnergyPlusData &state, std::string const &AirChillerSetName,
                           int const ZoneNum,
                           bool const FirstHVACIteration,
                           Real64 &SysOutputProvided,
@@ -14822,7 +14822,7 @@ namespace RefrigeratedCase {
         }
     }
 
-    void FigureRefrigerationZoneGains(AllGlobals &state)
+    void FigureRefrigerationZoneGains(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:

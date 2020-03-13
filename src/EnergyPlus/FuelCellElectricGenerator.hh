@@ -548,7 +548,7 @@ namespace FuelCellElectricGenerator {
 
         void setupOutputVars();
 
-        void simulate(AllGlobals &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void FigureAirHeatCap(Real64 FluidTemp, Real64 &Cp);
 

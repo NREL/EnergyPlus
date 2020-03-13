@@ -57,7 +57,7 @@
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -124,7 +124,7 @@ namespace Pipes {
         LocalPipeUniqueNames.clear();
     }
 
-    PlantComponent *LocalPipeData::factory(AllGlobals &state, int objectType, std::string objectName)
+    PlantComponent *LocalPipeData::factory(EnergyPlusData &state, int objectType, std::string objectName)
     {
         // Process the input data for pipes if it hasn't been done already
         if (state.pipes.GetPipeInputFlag) {
@@ -143,7 +143,7 @@ namespace Pipes {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void LocalPipeData::simulate(AllGlobals &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void LocalPipeData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                  bool const EP_UNUSED(FirstHVACIteration),
                                  Real64 &EP_UNUSED(CurLoad),
                                  bool const EP_UNUSED(RunFlag))
@@ -179,7 +179,7 @@ namespace Pipes {
         PlantUtilities::SafeCopyPlantNode(this->InletNodeNum, this->OutletNodeNum, this->LoopNum);
     }
 
-    void GetPipeInput(AllGlobals &state)
+    void GetPipeInput(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher

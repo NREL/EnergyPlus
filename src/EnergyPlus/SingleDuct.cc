@@ -76,7 +76,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -236,7 +236,7 @@ namespace SingleDuct {
         InitATMixerFlag = true;
     }
 
-    void SimulateSingleDuct(AllGlobals &state, std::string const &CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex)
+    void SimulateSingleDuct(EnergyPlusData &state, std::string const &CompName, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum, int &CompIndex)
     {
 
         // SUBROUTINE INFORMATION:
@@ -329,7 +329,7 @@ namespace SingleDuct {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetSysInput(AllGlobals &state)
+    void GetSysInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2017,7 +2017,7 @@ namespace SingleDuct {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void SingleDuctAirTerminal::InitSys(AllGlobals &state, int const SysNum, bool const FirstHVACIteration)
+    void SingleDuctAirTerminal::InitSys(EnergyPlusData &state, int const SysNum, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3214,7 +3214,7 @@ namespace SingleDuct {
     // Begin Algorithm Section of the Module
     //******************************************************************************
 
-    void SingleDuctAirTerminal::SimVAV(AllGlobals &state, int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum)
+    void SingleDuctAirTerminal::SimVAV(EnergyPlusData &state, int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3783,7 +3783,7 @@ namespace SingleDuct {
         }
     }
 
-    void SingleDuctAirTerminal::SimCBVAV(AllGlobals &state, int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum)
+    void SingleDuctAirTerminal::SimCBVAV(EnergyPlusData &state, int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4157,7 +4157,7 @@ namespace SingleDuct {
         MassFlow1(SysNum) = MassFlow;
     }
 
-    void SingleDuctAirTerminal::SimVAVVS(AllGlobals &state, int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum)
+    void SingleDuctAirTerminal::SimVAVVS(EnergyPlusData &state, int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4593,7 +4593,7 @@ namespace SingleDuct {
 
     }
 
-    void SingleDuctAirTerminal::SimConstVol(AllGlobals &state, int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum)
+    void SingleDuctAirTerminal::SimConstVol(EnergyPlusData &state, int const SysNum, bool const FirstHVACIteration, int const ZoneNum, int const ZoneNodeNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4827,7 +4827,7 @@ namespace SingleDuct {
         sd_airterminal(SysNum).UpdateSys(SysNum);
     }
 
-    void SingleDuctAirTerminal::CalcVAVVS(AllGlobals &state, int const SysNum,               // Unit index
+    void SingleDuctAirTerminal::CalcVAVVS(EnergyPlusData &state, int const SysNum,               // Unit index
                    bool const FirstHVACIteration,  // flag for 1st HVAV iteration in the time step
                    int const ZoneNode,             // zone node number
                    int const EP_UNUSED(HCoilType), // type of hot water coil !unused1208
@@ -4948,7 +4948,7 @@ namespace SingleDuct {
         LoadMet = AirMassFlow * CpAirZn * (Node(HCOutNode).Temp - Node(ZoneNode).Temp);
     }
 
-    Real64 SingleDuctAirTerminal::VAVVSCoolingResidual(AllGlobals &state, Real64 const SupplyAirMassFlow, // supply air mass flow rate [kg/s]
+    Real64 SingleDuctAirTerminal::VAVVSCoolingResidual(EnergyPlusData &state, Real64 const SupplyAirMassFlow, // supply air mass flow rate [kg/s]
                                 Array1<Real64> const &Par       // Par(1) = REAL(SysNum)
     )
     {
@@ -5020,7 +5020,7 @@ namespace SingleDuct {
         return Residuum;
     }
 
-    Real64 SingleDuctAirTerminal::VAVVSHWNoFanResidual(AllGlobals &state, Real64 const HWMassFlow,  // hot water mass flow rate [kg/s]
+    Real64 SingleDuctAirTerminal::VAVVSHWNoFanResidual(EnergyPlusData &state, Real64 const HWMassFlow,  // hot water mass flow rate [kg/s]
                                 Array1<Real64> const &Par // Par(1) = REAL(SysNum)
     )
     {
@@ -5111,7 +5111,7 @@ namespace SingleDuct {
         return Residuum;
     }
 
-    Real64 SingleDuctAirTerminal::VAVVSHWFanOnResidual(AllGlobals &state, Real64 const SupplyAirMassFlow, // supply air mass flow rate [kg/s]
+    Real64 SingleDuctAirTerminal::VAVVSHWFanOnResidual(EnergyPlusData &state, Real64 const SupplyAirMassFlow, // supply air mass flow rate [kg/s]
                                 Array1<Real64> const &Par       // Par(1) = REAL(SysNum)
     )
     {
@@ -5183,7 +5183,7 @@ namespace SingleDuct {
         return Residuum;
     }
 
-    Real64 SingleDuctAirTerminal::VAVVSHCFanOnResidual(AllGlobals &state, Real64 const HeatingFrac, // fraction of maximum heating output
+    Real64 SingleDuctAirTerminal::VAVVSHCFanOnResidual(EnergyPlusData &state, Real64 const HeatingFrac, // fraction of maximum heating output
                                 Array1<Real64> const &Par // Par(1) = REAL(SysNum)
     )
     {
@@ -5379,7 +5379,7 @@ namespace SingleDuct {
         // Still needs to report the Sys power from this component
     }
 
-    void GetHVACSingleDuctSysIndex(AllGlobals &state, std::string const &SDSName,
+    void GetHVACSingleDuctSysIndex(EnergyPlusData &state, std::string const &SDSName,
                                    int &SDSIndex,
                                    bool &ErrorsFound,
                                    Optional_string_const ThisObjectType,

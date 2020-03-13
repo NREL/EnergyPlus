@@ -54,7 +54,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
     class OutputFiles;
@@ -92,9 +92,9 @@ namespace SizingManager {
     // Functions
     void clear_state();
 
-    void ManageSizing(AllGlobals &state, OutputFiles &outputFiles);
+    void ManageSizing(EnergyPlusData &state, OutputFiles &outputFiles);
 
-    void ManageSystemSizingAdjustments(AllGlobals &state);
+    void ManageSystemSizingAdjustments(EnergyPlusData &state);
 
     void ManageSystemVentilationAdjustments();
 
@@ -132,7 +132,7 @@ namespace SizingManager {
 
     void GetPlantSizingInput();
 
-    void SetupZoneSizing(AllGlobals &state, OutputFiles &outputFiles, bool &ErrorsFound);
+    void SetupZoneSizing(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrorsFound);
 
     void ReportZoneSizing(OutputFiles &outputFiles,
                           std::string const &ZoneName,   // the name of the zone
@@ -165,7 +165,7 @@ namespace SizingManager {
 
     std::string TimeIndexToHrMinString(int timeIndex);
 
-    void UpdateFacilitySizing(AllGlobals &state, int const CallIndicator);
+    void UpdateFacilitySizing(EnergyPlusData &state, int const CallIndicator);
 
     void UpdateTermUnitFinalZoneSizing();
 

@@ -58,7 +58,7 @@
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/MixerComponent.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -124,7 +124,7 @@ namespace ReturnAirPathManager {
         ErrorsFound = false;
     }
 
-    void SimReturnAirPath(AllGlobals &state)
+    void SimReturnAirPath(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -264,7 +264,7 @@ namespace ReturnAirPathManager {
         // USE STATEMENTS:
     }
 
-    void CalcReturnAirPath(AllGlobals &state, int &ReturnAirPathNum)
+    void CalcReturnAirPath(EnergyPlusData &state, int &ReturnAirPathNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Russ Taylor

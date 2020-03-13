@@ -54,7 +54,7 @@
 #include <vector>
 
 // EnergyPlus headers
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/WaterToWaterHeatPumps.hh>
@@ -141,9 +141,9 @@ namespace EIRPlantLoopHeatPumps {
 
         EIRPlantLoopHeatPump() = default;
 
-        void simulate(AllGlobals &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void onInitLoopEquip(AllGlobals &state, const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+        void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
         void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
                                  Real64 &EP_UNUSED(MaxLoad),

@@ -59,7 +59,7 @@
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh>
@@ -80,7 +80,7 @@ Real64 iterationTempConvergenceCriteria = 0.00001;
 //******************************************************************************
 
 // Finite difference model factory
-std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(AllGlobals &state, int objectType, std::string objectName)
+std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDiffGTMFactory(EnergyPlusData &state, int objectType, std::string objectName)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -147,7 +147,7 @@ std::shared_ptr<FiniteDiffGroundTempsModel> FiniteDiffGroundTempsModel::FiniteDi
 
 //******************************************************************************
 
-void FiniteDiffGroundTempsModel::initAndSim(AllGlobals &state)
+void FiniteDiffGroundTempsModel::initAndSim(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell
@@ -167,7 +167,7 @@ void FiniteDiffGroundTempsModel::initAndSim(AllGlobals &state)
 
 //******************************************************************************
 
-void FiniteDiffGroundTempsModel::getWeatherData(AllGlobals &state)
+void FiniteDiffGroundTempsModel::getWeatherData(EnergyPlusData &state)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Matt Mitchell

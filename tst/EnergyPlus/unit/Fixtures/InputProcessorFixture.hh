@@ -53,7 +53,7 @@
 
 // EnergyPlus Headers
 #include "EnergyPlusFixture.hh"
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/IdfParser.hh>
 
 namespace EnergyPlus {

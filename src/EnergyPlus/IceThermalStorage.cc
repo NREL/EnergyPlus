@@ -63,7 +63,7 @@
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/IceThermalStorage.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -180,7 +180,7 @@ namespace IceThermalStorage {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void SimpleIceStorageData::simulate(AllGlobals &state, const PlantLocation &calledFromLocation,
+    void SimpleIceStorageData::simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation,
                                         bool EP_UNUSED(FirstHVACIteration),
                                         Real64 &EP_UNUSED(CurLoad),
                                         bool RunFlag)
@@ -288,7 +288,7 @@ namespace IceThermalStorage {
         this->RecordOutput(MyLoad2, RunFlag);
     }
 
-    void DetailedIceStorageData::simulate(AllGlobals &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void DetailedIceStorageData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                           bool EP_UNUSED(FirstHVACIteration),
                                           Real64 &EP_UNUSED(CurLoad),
                                           bool EP_UNUSED(RunFlag))

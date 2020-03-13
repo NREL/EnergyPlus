@@ -107,7 +107,7 @@ extern "C" {
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
@@ -218,7 +218,7 @@ namespace SimulationManager {
         PreP_Fatal = false;
     }
 
-    void ManageSimulation(AllGlobals &state, OutputFiles &outputFiles)
+    void ManageSimulation(EnergyPlusData &state, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2055,7 +2055,7 @@ namespace SimulationManager {
         }
     }
 
-    void SetupSimulation(AllGlobals &state, OutputFiles &outputFiles, bool &ErrorsFound)
+    void SetupSimulation(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3096,7 +3096,7 @@ namespace SimulationManager {
 
 // EXTERNAL SUBROUTINES:
 
-void Resimulate(AllGlobals &state, bool &ResimExt, // Flag to resimulate the exterior energy use simulation
+void Resimulate(EnergyPlusData &state, bool &ResimExt, // Flag to resimulate the exterior energy use simulation
                 bool &ResimHB,  // Flag to resimulate the heat balance simulation (including HVAC)
                 bool &ResimHVAC // Flag to resimulate the HVAC simulation
 )

@@ -62,7 +62,7 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -87,7 +87,7 @@ namespace EIRPlantLoopHeatPumps {
         heatPumps.clear();
     }
 
-    void EIRPlantLoopHeatPump::simulate(AllGlobals &state, const EnergyPlus::PlantLocation &calledFromLocation,
+    void EIRPlantLoopHeatPump::simulate(EnergyPlusData &state, const EnergyPlus::PlantLocation &calledFromLocation,
                                         bool const FirstHVACIteration,
                                         Real64 &CurLoad,
                                         bool const RunFlag)
@@ -351,7 +351,7 @@ namespace EIRPlantLoopHeatPumps {
         this->sourceSideOutletTemp = this->calcSourceOutletTemp(this->sourceSideInletTemp, this->sourceSideHeatTransfer / sourceMCp);
     }
 
-    void EIRPlantLoopHeatPump::onInitLoopEquip(AllGlobals &state, const PlantLocation &EP_UNUSED(calledFromLocation))
+    void EIRPlantLoopHeatPump::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
         // This function does all one-time and begin-environment initialization
         std::string const routineName = EIRPlantLoopHeatPumps::__EQUIP__ + ':' + __FUNCTION__;

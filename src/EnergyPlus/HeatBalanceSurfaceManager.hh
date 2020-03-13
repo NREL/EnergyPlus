@@ -53,7 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -92,12 +92,12 @@ namespace HeatBalanceSurfaceManager {
     // Functions
     void clear_state();
 
-    void ManageSurfaceHeatBalance(AllGlobals &state);
+    void ManageSurfaceHeatBalance(EnergyPlusData &state);
 
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitSurfaceHeatBalance(AllGlobals &state);
+    void InitSurfaceHeatBalance(EnergyPlusData &state);
 
     void GatherForPredefinedReport();
 

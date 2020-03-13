@@ -195,7 +195,7 @@ namespace MicroturbineElectricGenerator {
         {
         }
 
-        void simulate(AllGlobals &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation),
                                  Real64 &EP_UNUSED(MaxLoad),

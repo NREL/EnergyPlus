@@ -71,7 +71,7 @@
 #include <EnergyPlus/DisplayRoutines.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundHeatExchangers.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -408,14 +408,14 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GLHEBase::onInitLoopEquip(AllGlobals &state, const PlantLocation &EP_UNUSED(calledFromLocation))
+    void GLHEBase::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation))
     {
         this->initGLHESimVars();
     }
 
     //******************************************************************************
 
-    void GLHEBase::simulate(AllGlobals &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void GLHEBase::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                             bool const EP_UNUSED(FirstHVACIteration),
                             Real64 &EP_UNUSED(CurLoad),
                             bool const EP_UNUSED(RunFlag))
@@ -432,7 +432,7 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    PlantComponent *GLHEBase::factory(AllGlobals &state, int const objectType, std::string objectName)
+    PlantComponent *GLHEBase::factory(EnergyPlusData &state, int const objectType, std::string objectName)
     {
         if (GetInput) {
             GetGroundHeatExchangerInput(state);
@@ -2137,7 +2137,7 @@ namespace GroundHeatExchangers {
 
     //******************************************************************************
 
-    void GetGroundHeatExchangerInput(AllGlobals &state)
+    void GetGroundHeatExchangerInput(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Dan Fisher

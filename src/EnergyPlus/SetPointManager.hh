@@ -56,7 +56,7 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -1037,11 +1037,11 @@ namespace SetPointManager {
 
     void clear_state();
 
-    void ManageSetPoints(AllGlobals &state);
+    void ManageSetPoints(EnergyPlusData &state);
 
-    void GetSetPointManagerInputs(AllGlobals &state); // wrapper for GetInput to accomodate unit testing
+    void GetSetPointManagerInputs(EnergyPlusData &state); // wrapper for GetInput to accomodate unit testing
 
-    void GetSetPointManagerInputData(AllGlobals &state, bool &ErrorsFound);
+    void GetSetPointManagerInputData(EnergyPlusData &state, bool &ErrorsFound);
 
     void VerifySetPointManagers(bool &ErrorsFound); // flag to denote node conflicts in input. !unused1208
 
@@ -1055,24 +1055,24 @@ namespace SetPointManager {
 
     void UpdateOAPretreatSetPoints();
 
-    int getSPMBasedOnNode(AllGlobals &state, int const NodeNum, int const SetPtType, int const SMPType, CtrlNodeType ctrlOrRefNode);
+    int getSPMBasedOnNode(EnergyPlusData &state, int const NodeNum, int const SetPtType, int const SMPType, CtrlNodeType ctrlOrRefNode);
 
-    bool IsNodeOnSetPtManager(AllGlobals &state, int const NodeNum, int const SetPtType);
+    bool IsNodeOnSetPtManager(EnergyPlusData &state, int const NodeNum, int const SetPtType);
 
-    bool NodeHasSPMCtrlVarType(AllGlobals &state, int const NodeNum, int const iCtrlVarType);
+    bool NodeHasSPMCtrlVarType(EnergyPlusData &state, int const NodeNum, int const iCtrlVarType);
 
-    void ResetHumidityRatioCtrlVarType(AllGlobals &state, int const NodeNum);
+    void ResetHumidityRatioCtrlVarType(EnergyPlusData &state, int const NodeNum);
 
     void CheckIfAnyIdealCondEntSetPoint();
 
-    int GetHumidityRatioVariableType(AllGlobals &state, int const CntrlNodeNum);
+    int GetHumidityRatioVariableType(EnergyPlusData &state, int const CntrlNodeNum);
 
     void SetUpNewScheduledTESSetPtMgr(
         int const SchedPtr, int const SchedPtrCharge, Real64 NonChargeCHWTemp, Real64 ChargeCHWTemp, int const CompOpType, int const ControlNodeNum);
 
-    bool GetCoilFreezingCheckFlag(AllGlobals &state, int const MixedAirSPMNum);
+    bool GetCoilFreezingCheckFlag(EnergyPlusData &state, int const MixedAirSPMNum);
 
-    int GetMixedAirNumWithCoilFreezingCheck(AllGlobals &state, int const MixedAirNode);
+    int GetMixedAirNumWithCoilFreezingCheck(EnergyPlusData &state, int const MixedAirNode);
 
 } // namespace SetPointManager
 

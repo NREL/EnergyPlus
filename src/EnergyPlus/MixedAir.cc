@@ -79,7 +79,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACDXHeatPumpSystem.hh>
 #include <EnergyPlus/HVACDXSystem.hh>
@@ -388,7 +388,7 @@ namespace MixedAir {
         OAControllerUniqueNames.clear();
     }
 
-    void ManageOutsideAirSystem(AllGlobals &state, std::string const &OASysName, bool const FirstHVACIteration, int const AirLoopNum, int &OASysNum)
+    void ManageOutsideAirSystem(EnergyPlusData &state, std::string const &OASysName, bool const FirstHVACIteration, int const AirLoopNum, int &OASysNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -417,7 +417,7 @@ namespace MixedAir {
         SimOutsideAirSys(state, OASysNum, FirstHVACIteration, AirLoopNum);
     }
 
-    void SimOASysComponents(AllGlobals &state, int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum)
+    void SimOASysComponents(EnergyPlusData &state, int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum)
     {
         int CompNum;
         static std::string CompType; // Tuned Made static
@@ -483,7 +483,7 @@ namespace MixedAir {
         }
     }
 
-    void SimOutsideAirSys(AllGlobals &state, int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum)
+    void SimOutsideAirSys(EnergyPlusData &state, int const OASysNum, bool const FirstHVACIteration, int const AirLoopNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -562,7 +562,7 @@ namespace MixedAir {
         }
     }
 
-    void SimOAComponent(AllGlobals &state, std::string const &CompType, // the component type
+    void SimOAComponent(EnergyPlusData &state, std::string const &CompType, // the component type
                         std::string const &CompName, // the component Name
                         int const CompTypeNum,       // Component Type -- Integerized for this module
                         bool const FirstHVACIteration,
@@ -929,7 +929,7 @@ namespace MixedAir {
         ReportOAMixer(OAMixerNum);
     }
 
-    void SimOAController(AllGlobals &state, std::string const &CtrlName, int &CtrlIndex, bool const FirstHVACIteration, int const AirLoopNum)
+    void SimOAController(EnergyPlusData &state, std::string const &CtrlName, int &CtrlIndex, bool const FirstHVACIteration, int const AirLoopNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -972,7 +972,7 @@ namespace MixedAir {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetOutsideAirSysInputs(AllGlobals &state)
+    void GetOutsideAirSysInputs(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1340,7 +1340,7 @@ namespace MixedAir {
         GetOASysInputFlag = false;
     }
 
-    void GetOAControllerInputs(AllGlobals &state, OutputFiles &outputFiles)
+    void GetOAControllerInputs(EnergyPlusData &state, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2223,7 +2223,7 @@ namespace MixedAir {
         GetOAMixerInputFlag = false;
     }
 
-    void ProcessOAControllerInputs(AllGlobals &state, std::string const &CurrentModuleObject,
+    void ProcessOAControllerInputs(EnergyPlusData &state, std::string const &CurrentModuleObject,
                                    int const OutAirNum,
                                    Array1_string const &AlphArray,
                                    int &NumAlphas,
@@ -2597,7 +2597,7 @@ namespace MixedAir {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitOutsideAirSys(AllGlobals &state, int const(OASysNum), bool const FirstHVACIteration, int const AirLoopNum)
+    void InitOutsideAirSys(EnergyPlusData &state, int const(OASysNum), bool const FirstHVACIteration, int const AirLoopNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -2649,7 +2649,7 @@ namespace MixedAir {
         // Each iteration
     }
 
-    void InitOAController(AllGlobals &state, int const OAControllerNum, bool const FirstHVACIteration, int const AirLoopNum)
+    void InitOAController(EnergyPlusData &state, int const OAControllerNum, bool const FirstHVACIteration, int const AirLoopNum)
     {
 
         // SUBROUTINE INFORMATION:
@@ -3527,7 +3527,7 @@ namespace MixedAir {
     // Beginning Calculation Section of the Module
     //******************************************************************************
 
-    void OAControllerProps::CalcOAController(AllGlobals &state, int const AirLoopNum, bool const FirstHVACIteration)
+    void OAControllerProps::CalcOAController(EnergyPlusData &state, int const AirLoopNum, bool const FirstHVACIteration)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4417,7 +4417,7 @@ namespace MixedAir {
         }
     }
 
-    void OAControllerProps::CalcOAEconomizer(AllGlobals &state, 
+    void OAControllerProps::CalcOAEconomizer(EnergyPlusData &state, 
         int const AirLoopNum, Real64 const OutAirMinFrac, Real64 &OASignal, bool &HighHumidityOperationFlag, bool const FirstHVACIteration)
     {
         using DataAirLoop::OutsideAirSys;
@@ -4861,7 +4861,7 @@ namespace MixedAir {
     // Beginning Sizing Section of the Module
     //******************************************************************************
 
-    void OAControllerProps::SizeOAController(AllGlobals &state)
+    void OAControllerProps::SizeOAController(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5248,7 +5248,7 @@ namespace MixedAir {
         return Residuum;
     }
 
-    Real64 MultiCompControlTempResidual(AllGlobals &state, Real64 const OASignal,    // Relative outside air flow rate (0 to 1)
+    Real64 MultiCompControlTempResidual(EnergyPlusData &state, Real64 const OASignal,    // Relative outside air flow rate (0 to 1)
                                         Array1<Real64> const &Par // par(1) = mixed node number
     )
     {
@@ -5524,7 +5524,7 @@ namespace MixedAir {
         return ReliefNodeNumber;
     }
 
-    int GetOASysControllerListIndex(AllGlobals &state, int const OASysNumber) // OA Sys Number
+    int GetOASysControllerListIndex(EnergyPlusData &state, int const OASysNumber) // OA Sys Number
     {
 
         // FUNCTION INFORMATION:
@@ -5573,7 +5573,7 @@ namespace MixedAir {
         return OASysControllerListNum;
     }
 
-    int GetOASysNumSimpControllers(AllGlobals &state, int const OASysNumber) // OA Sys Number
+    int GetOASysNumSimpControllers(EnergyPlusData &state, int const OASysNumber) // OA Sys Number
     {
 
         // FUNCTION INFORMATION:
@@ -5622,7 +5622,7 @@ namespace MixedAir {
         return OASysNumSimpControllers;
     }
 
-    int GetOASysNumHeatingCoils(AllGlobals &state, int const OASysNumber) // OA Sys Number
+    int GetOASysNumHeatingCoils(EnergyPlusData &state, int const OASysNumber) // OA Sys Number
     {
 
         // FUNCTION INFORMATION:
@@ -5697,7 +5697,7 @@ namespace MixedAir {
         return NumHeatingCoils;
     }
 
-    int GetOASysNumHXs(AllGlobals &state, int const OASysNumber)
+    int GetOASysNumHXs(EnergyPlusData &state, int const OASysNumber)
     {
 
         // FUNCTION INFORMATION:
@@ -5755,7 +5755,7 @@ namespace MixedAir {
         return NumHX;
     }
 
-    int GetOASysNumCoolingCoils(AllGlobals &state, int const OASysNumber) // OA Sys Number
+    int GetOASysNumCoolingCoils(EnergyPlusData &state, int const OASysNumber) // OA Sys Number
     {
 
         // FUNCTION INFORMATION:
@@ -5830,7 +5830,7 @@ namespace MixedAir {
         return NumCoolingCoils;
     }
 
-    int GetOASystemNumber(AllGlobals &state, std::string const &OASysName) // OA Sys Name
+    int GetOASystemNumber(EnergyPlusData &state, std::string const &OASysName) // OA Sys Name
     {
 
         // FUNCTION INFORMATION:
@@ -6082,7 +6082,7 @@ namespace MixedAir {
         return OAMixerMixedNodeNumber;
     }
 
-    bool CheckForControllerWaterCoil(AllGlobals &state, std::string const &ControllerType, // should be passed in as UPPERCASE
+    bool CheckForControllerWaterCoil(EnergyPlusData &state, std::string const &ControllerType, // should be passed in as UPPERCASE
                                      std::string const &ControllerName  // should be passed in as UPPERCASE
     )
     {
@@ -6124,7 +6124,7 @@ namespace MixedAir {
         return OnControllerList;
     }
 
-    void CheckControllerLists(AllGlobals &state, bool &ErrFound)
+    void CheckControllerLists(EnergyPlusData &state, bool &ErrFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -6294,7 +6294,7 @@ namespace MixedAir {
         }
     }
 
-    int GetNumOASystems(AllGlobals &state)
+    int GetNumOASystems(EnergyPlusData &state)
     {
 
         // FUNCTION INFORMATION:
@@ -6343,7 +6343,7 @@ namespace MixedAir {
         return NumberOfOASystems;
     }
 
-    int GetOACompListNumber(AllGlobals &state, int const OASysNum) // OA Sys Number
+    int GetOACompListNumber(EnergyPlusData &state, int const OASysNum) // OA Sys Number
     {
 
         // FUNCTION INFORMATION:
@@ -6369,7 +6369,7 @@ namespace MixedAir {
         return NumOACompList;
     }
 
-    std::string GetOACompName(AllGlobals &state, int const OASysNum, // OA Sys Number
+    std::string GetOACompName(EnergyPlusData &state, int const OASysNum, // OA Sys Number
                               int const InListNum // In-list Number
     )
     {
@@ -6418,7 +6418,7 @@ namespace MixedAir {
         return OACompName;
     }
 
-    std::string GetOACompType(AllGlobals &state, int const OASysNum, // OA Sys Number
+    std::string GetOACompType(EnergyPlusData &state, int const OASysNum, // OA Sys Number
                               int const InListNum // In-list Number
     )
     {
@@ -6467,7 +6467,7 @@ namespace MixedAir {
         return OACompType;
     }
 
-    int GetOACompTypeNum(AllGlobals &state, int const OASysNum, // OA Sys Number
+    int GetOACompTypeNum(EnergyPlusData &state, int const OASysNum, // OA Sys Number
                          int const InListNum // In-list Number
     )
     {

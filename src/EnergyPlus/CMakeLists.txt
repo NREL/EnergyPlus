@@ -84,6 +84,7 @@ SET( SRC
   DXCoils.hh
   DXFEarClipping.cc
   DXFEarClipping.hh
+  Data/EnergyPlusData.hh
   DataAirLoop.cc
   DataAirLoop.hh
   DataAirSystems.cc
@@ -249,7 +250,6 @@ SET( SRC
   GeneratorFuelSupply.hh
   GlobalNames.cc
   GlobalNames.hh
-  Globals/Globals.hh
   GroundHeatExchangers.cc
   GroundHeatExchangers.hh
   GroundTemperatureModeling/BaseGroundTemperatureModel.hh

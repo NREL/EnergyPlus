@@ -53,7 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -66,7 +66,7 @@ namespace EnergyPlus {
         HVACSystemData() {
         }
 
-        virtual void simulate(AllGlobals &state, std::string const &Name,
+        virtual void simulate(EnergyPlusData &state, std::string const &Name,
             bool const firstHVACIteration,
             int const &AirLoopNum,
             int &CompIndex,
@@ -79,9 +79,9 @@ namespace EnergyPlus {
             Real64 &latOutputProvided    // latent output at supply air node
         ) = 0;
 
-        virtual void sizeSystem(AllGlobals &state, bool const FirstHVACIteration, int const AirLoopNum) = 0;
-        virtual int getAirInNode(AllGlobals &state, std::string const &UnitarySysName, int const ZoneOAUnitNum) = 0;
-        virtual int getAirOutNode(AllGlobals &state, std::string const &UnitarySysName, int const ZoneOAUnitNum) = 0;
+        virtual void sizeSystem(EnergyPlusData &state, bool const FirstHVACIteration, int const AirLoopNum) = 0;
+        virtual int getAirInNode(EnergyPlusData &state, std::string const &UnitarySysName, int const ZoneOAUnitNum) = 0;
+        virtual int getAirOutNode(EnergyPlusData &state, std::string const &UnitarySysName, int const ZoneOAUnitNum) = 0;
 
     };
 

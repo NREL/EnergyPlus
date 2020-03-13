@@ -71,7 +71,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -171,7 +171,7 @@ namespace PackagedThermalStorageCoil {
 
     // Functions
 
-    void SimTESCoil(AllGlobals &state, std::string const &CompName, // name of the fan coil unit
+    void SimTESCoil(EnergyPlusData &state, std::string const &CompName, // name of the fan coil unit
                     int &CompIndex,
                     int const FanOpMode, // allows parent object to control fan mode
                     int &TESOpMode,
@@ -243,7 +243,7 @@ namespace PackagedThermalStorageCoil {
         }
     }
 
-    void GetTESCoilInput(AllGlobals &state)
+    void GetTESCoilInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4076,7 +4076,7 @@ namespace PackagedThermalStorageCoil {
         }
     }
 
-    void ControlTESIceStorageTankCoil(AllGlobals &state, std::string const &CoilName,      // child object coil name
+    void ControlTESIceStorageTankCoil(EnergyPlusData &state, std::string const &CoilName,      // child object coil name
                                       int CoilIndex,                    // child object coil index
                                       std::string SystemType,           // parent object system type
                                       int const FanOpMode,              // parent object fan operating mode
@@ -4899,7 +4899,7 @@ namespace PackagedThermalStorageCoil {
         TESCoil(TESCoilNum).EvapCondPumpElecConsumption = TESCoil(TESCoilNum).EvapCondPumpElecPower * TimeStepSys * SecInHour;
     }
 
-    void GetTESCoilIndex(AllGlobals &state, std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, Optional_string_const CurrentModuleObject)
+    void GetTESCoilIndex(EnergyPlusData &state, std::string const &CoilName, int &CoilIndex, bool &ErrorsFound, Optional_string_const CurrentModuleObject)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4934,7 +4934,7 @@ namespace PackagedThermalStorageCoil {
         }
     }
 
-    void GetTESCoilAirInletNode(AllGlobals &state, std::string const &CoilName, int &CoilAirInletNode, bool &ErrorsFound, std::string const &CurrentModuleObject)
+    void GetTESCoilAirInletNode(EnergyPlusData &state, std::string const &CoilName, int &CoilAirInletNode, bool &ErrorsFound, std::string const &CurrentModuleObject)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4971,7 +4971,7 @@ namespace PackagedThermalStorageCoil {
         }
     }
 
-    void GetTESCoilAirOutletNode(AllGlobals &state, std::string const &CoilName, int &CoilAirOutletNode, bool &ErrorsFound, std::string const &CurrentModuleObject)
+    void GetTESCoilAirOutletNode(EnergyPlusData &state, std::string const &CoilName, int &CoilAirOutletNode, bool &ErrorsFound, std::string const &CurrentModuleObject)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5008,7 +5008,7 @@ namespace PackagedThermalStorageCoil {
         }
     }
 
-    void GetTESCoilCoolingCapacity(AllGlobals &state, std::string const &CoilName, Real64 &CoilCoolCapacity, bool &ErrorsFound, std::string const &CurrentModuleObject)
+    void GetTESCoilCoolingCapacity(EnergyPlusData &state, std::string const &CoilName, Real64 &CoilCoolCapacity, bool &ErrorsFound, std::string const &CurrentModuleObject)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5053,7 +5053,7 @@ namespace PackagedThermalStorageCoil {
         }
     }
 
-    void GetTESCoilCoolingAirFlowRate(AllGlobals &state, std::string const &CoilName, Real64 &CoilCoolAirFlow, bool &ErrorsFound, std::string const &CurrentModuleObject)
+    void GetTESCoilCoolingAirFlowRate(EnergyPlusData &state, std::string const &CoilName, Real64 &CoilCoolAirFlow, bool &ErrorsFound, std::string const &CurrentModuleObject)
     {
 
         // SUBROUTINE INFORMATION:

@@ -55,7 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -219,7 +219,7 @@ namespace HVACDXSystem {
 
     void clear_state();
 
-    void SimDXCoolingSystem(AllGlobals &state, std::string const &DXCoolingSystemName,    // Name of DXSystem:Airloop object
+    void SimDXCoolingSystem(EnergyPlusData &state, std::string const &DXCoolingSystemName,    // Name of DXSystem:Airloop object
                             bool const FirstHVACIteration,             // True when first HVAC iteration
                             int const AirLoopNum,                      // Primary air loop number
                             int &CompIndex,                            // Index to DXSystem:Airloop object
@@ -231,7 +231,7 @@ namespace HVACDXSystem {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetDXCoolingSystemInput(AllGlobals &state);
+    void GetDXCoolingSystemInput(EnergyPlusData &state);
 
     // End of Get Input subroutines for the Module
     //******************************************************************************
@@ -239,7 +239,7 @@ namespace HVACDXSystem {
     // Beginning of Initialization subroutines for the Module
     // *****************************************************************************
 
-    void InitDXCoolingSystem(AllGlobals &state, int const DXSystemNum,                    // number of the current DX Sys being simulated
+    void InitDXCoolingSystem(EnergyPlusData &state, int const DXSystemNum,                    // number of the current DX Sys being simulated
                              int const AirLoopNum,                     // number of the current air loop being simulated
                              Optional_int_const OAUnitNum = _,         // number of the current outdoor air unit being simulated
                              Optional<Real64 const> OAUCoilOutTemp = _ // the coil inlet temperature of OutdoorAirUnit
@@ -251,7 +251,7 @@ namespace HVACDXSystem {
     // Beginning of Calculation subroutines for the DXCoolingSystem Module
     // *****************************************************************************
 
-    void ControlDXSystem(AllGlobals &state, int const DXSystemNum,         // index to DXSystem
+    void ControlDXSystem(EnergyPlusData &state, int const DXSystemNum,         // index to DXSystem
                          bool const FirstHVACIteration, // First HVAC iteration flag
                          bool &HXUnitOn                 // flag to enable heat exchanger heat recovery
     );
@@ -280,19 +280,19 @@ namespace HVACDXSystem {
                                     Array1<Real64> const &Par   // par(1) = DX coil number
     );
 
-    Real64 MultiModeDXCoilResidual(AllGlobals &state, Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 MultiModeDXCoilResidual(EnergyPlusData &state, Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                    Array1<Real64> const &Par   // par(1) = DX coil number
     );
 
-    Real64 MultiModeDXCoilHumRatResidual(AllGlobals &state, Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 MultiModeDXCoilHumRatResidual(EnergyPlusData &state, Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                          Array1<Real64> const &Par   // par(1) = DX coil number
     );
 
-    Real64 HXAssistedCoolCoilTempResidual(AllGlobals &state, Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 HXAssistedCoolCoilTempResidual(EnergyPlusData &state, Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                           Array1<Real64> const &Par   // par(1) = DX coil number
     );
 
-    Real64 HXAssistedCoolCoilHRResidual(AllGlobals &state, Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 HXAssistedCoolCoilHRResidual(EnergyPlusData &state, Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                         Array1<Real64> const &Par   // par(1) = DX coil number
     );
 
@@ -312,36 +312,36 @@ namespace HVACDXSystem {
                                    int const ControlMode       // temperature or humidity control mode
     );
 
-    void CheckDXCoolingCoilInOASysExists(AllGlobals &state, std::string const &DXCoilSysName);
+    void CheckDXCoolingCoilInOASysExists(EnergyPlusData &state, std::string const &DXCoilSysName);
 
-    void GetCoolingCoilTypeNameAndIndex(AllGlobals &state, 
+    void GetCoolingCoilTypeNameAndIndex(EnergyPlusData &state, 
         std::string const &DXCoilSysName, int &CoolCoilType, int &CoolCoilIndex, std::string &CoolCoilName, bool &ErrFound);
 
     //******************************************************************************
 
-    Real64 VSCoilCyclingResidual(AllGlobals &state, Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 VSCoilCyclingResidual(EnergyPlusData &state, Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                  Array1<Real64> const &Par   // par(1) = DX coil number
     );
 
     //******************************************************************************
 
-    Real64 VSCoilSpeedResidual(AllGlobals &state, Real64 const SpeedRatio,  // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 VSCoilSpeedResidual(EnergyPlusData &state, Real64 const SpeedRatio,  // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                Array1<Real64> const &Par // par(1) = DX coil number
     );
 
-    Real64 VSCoilCyclingHumResidual(AllGlobals &state, Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 VSCoilCyclingHumResidual(EnergyPlusData &state, Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                     Array1<Real64> const &Par   // par(1) = DX coil number
     );
 
     //******************************************************************************
 
-    Real64 VSCoilSpeedHumResidual(AllGlobals &state, Real64 const SpeedRatio,  // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 VSCoilSpeedHumResidual(EnergyPlusData &state, Real64 const SpeedRatio,  // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                   Array1<Real64> const &Par // par(1) = DX coil number
     );
 
-    int GetCoolingCoilInletNodeNum(AllGlobals &state, std::string const &DXCoilSysName);
+    int GetCoolingCoilInletNodeNum(EnergyPlusData &state, std::string const &DXCoilSysName);
 
-    int GetCoolingCoilOutletNodeNum(AllGlobals &state, std::string const &DXCoilSysName);
+    int GetCoolingCoilOutletNodeNum(EnergyPlusData &state, std::string const &DXCoilSysName);
 
     //        End of Calculation subroutines for the DXCoolingSystem Module
     // *****************************************************************************

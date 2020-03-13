@@ -54,11 +54,11 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
-void ControlCompOutput(AllGlobals &state, std::string const &CompName,               // the component Name
+void ControlCompOutput(EnergyPlusData &state, std::string const &CompName,               // the component Name
                        std::string const &CompType,               // Type of component
                        int &CompNum,                              // Index of component in component array
                        bool const FirstHVACIteration,             // flag for 1st HVAV iteration in the time step
@@ -145,11 +145,11 @@ void CalcBasinHeaterPower(Real64 const Capacity,     // Basin heater capacity pe
                           Real64 &Power              // Basin heater power (W)
 );
 
-void TestAirPathIntegrity(AllGlobals &state, bool &ErrFound);
+void TestAirPathIntegrity(EnergyPlusData &state, bool &ErrFound);
 
-void TestSupplyAirPathIntegrity(AllGlobals &state, bool &ErrFound);
+void TestSupplyAirPathIntegrity(EnergyPlusData &state, bool &ErrFound);
 
-void TestReturnAirPathIntegrity(AllGlobals &state, bool &ErrFound, Array2S_int ValRetAPaths);
+void TestReturnAirPathIntegrity(EnergyPlusData &state, bool &ErrFound, Array2S_int ValRetAPaths);
 
 } // namespace EnergyPlus
 

@@ -75,7 +75,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceSurfaceManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -129,7 +129,7 @@ namespace SwimmingPool {
         Pool.deallocate();
     }
 
-    void SimSwimmingPool(AllGlobals &state, bool FirstHVACIteration)
+    void SimSwimmingPool(EnergyPlusData &state, bool FirstHVACIteration)
     {
         // Process the input data if it hasn't been done already
         if (getSwimmingPoolInput) {
@@ -154,7 +154,7 @@ namespace SwimmingPool {
         ReportSwimmingPool();
     }
 
-    void SwimmingPoolData::simulate(AllGlobals &state, const PlantLocation &EP_UNUSED(calledFromLocation),
+    void SwimmingPoolData::simulate(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation),
                                     bool FirstHVACIteration,
                                     Real64 &EP_UNUSED(CurLoad),
                                     bool EP_UNUSED(RunFlag))

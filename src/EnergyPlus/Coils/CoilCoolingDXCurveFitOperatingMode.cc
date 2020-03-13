@@ -52,7 +52,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataSizing.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
@@ -149,7 +149,7 @@ CoilCoolingDXCurveFitOperatingMode::CoilCoolingDXCurveFitOperatingMode(const std
     }
 }
 
-void CoilCoolingDXCurveFitOperatingMode::size(AllGlobals &state)
+void CoilCoolingDXCurveFitOperatingMode::size(EnergyPlusData &state)
 {
 
     std::string RoutineName = "sizeOperatingMode";

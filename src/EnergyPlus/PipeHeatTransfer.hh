@@ -59,7 +59,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GroundTemperatureModeling/GroundTemperatureModelManager.hh>
 #include <EnergyPlus/PlantComponent.hh>
 
@@ -238,11 +238,11 @@ namespace PipeHeatTransfer {
         {
         }
 
-        static PlantComponent *factory(AllGlobals &state, int objectType, std::string objectName);
+        static PlantComponent *factory(EnergyPlusData &state, int objectType, std::string objectName);
 
         void clear_state();
 
-        void simulate(AllGlobals &state, const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
+        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool const FirstHVACIteration, Real64 &CurLoad, bool const RunFlag) override;
 
         void PushInnerTimeStepArrays();
 
@@ -281,7 +281,7 @@ namespace PipeHeatTransfer {
     // Object Data
     extern Array1D<PipeHTData> PipeHT;
 
-    void GetPipesHeatTransfer(AllGlobals &state);
+    void GetPipesHeatTransfer(EnergyPlusData &state);
 
 } // namespace PipeHeatTransfer
 

@@ -57,7 +57,7 @@
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
@@ -316,7 +316,7 @@ CoilCoolingDXCurveFitSpeed::CoilCoolingDXCurveFitSpeed(const std::string& name_t
     }
 }
 
-void CoilCoolingDXCurveFitSpeed::size(AllGlobals &state)
+void CoilCoolingDXCurveFitSpeed::size(EnergyPlusData &state)
 {
 
     std::string RoutineName = "sizeSpeed";

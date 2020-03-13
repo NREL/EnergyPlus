@@ -56,7 +56,7 @@
 #include <EnergyPlus/DataSurfaces.hh>
 #include <EnergyPlus/DataVectorTypes.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceKivaManager.hh>
 
 // C++ Headers
@@ -115,7 +115,7 @@ namespace SurfaceGeometry {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void SetupZoneGeometry(AllGlobals &state, OutputFiles &outputFiles, bool &ErrorsFound);
+    void SetupZoneGeometry(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrorsFound);
 
     void AllocateModuleArrays();
 
@@ -287,7 +287,7 @@ namespace SurfaceGeometry {
 
     void GetStormWindowData(bool &ErrorsFound); // If errors found in input
 
-    void GetWindowGapAirflowControlData(AllGlobals &state, bool &ErrorsFound); // If errors found in input
+    void GetWindowGapAirflowControlData(EnergyPlusData &state, bool &ErrorsFound); // If errors found in input
 
     void GetOSCData(OutputFiles &outputFiles, bool &ErrorsFound);
 

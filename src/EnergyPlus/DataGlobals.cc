@@ -53,7 +53,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 

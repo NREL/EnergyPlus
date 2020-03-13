@@ -66,7 +66,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HeatBalanceAirManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -152,7 +152,7 @@ namespace HeatBalanceAirManager {
         UniqueInfiltrationNames.clear();
     }
 
-    void ManageAirHeatBalance(AllGlobals &state)
+    void ManageAirHeatBalance(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -213,7 +213,7 @@ namespace HeatBalanceAirManager {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetAirHeatBalanceInput(AllGlobals &state)
+    void GetAirHeatBalanceInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -266,7 +266,7 @@ namespace HeatBalanceAirManager {
         }
     }
 
-    void GetAirFlowFlag(AllGlobals &state, OutputFiles &outputFiles, bool &ErrorsFound) // Set to true if errors found
+    void GetAirFlowFlag(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrorsFound) // Set to true if errors found
     {
 
         // SUBROUTINE INFORMATION:
@@ -331,7 +331,7 @@ namespace HeatBalanceAirManager {
         }
     }
 
-    void GetSimpleAirModelInputs(AllGlobals &state, OutputFiles &outputFiles, bool &ErrorsFound) // IF errors found in input
+    void GetSimpleAirModelInputs(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrorsFound) // IF errors found in input
     {
 
         // SUBROUTINE INFORMATION:
@@ -4183,7 +4183,7 @@ namespace HeatBalanceAirManager {
     // Begin Algorithm Section of the Module
     //******************************************************************************
 
-    void CalcHeatBalanceAir(AllGlobals &state)
+    void CalcHeatBalanceAir(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:

@@ -73,7 +73,7 @@
 #include <EnergyPlus/DualDuct.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACCooledBeam.hh>
 #include <EnergyPlus/HVACFourPipeBeam.hh>
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
@@ -147,7 +147,7 @@ namespace SizingManager {
         NumAirLoops = 0;
     }
 
-    void ManageSizing(AllGlobals &state, OutputFiles &outputFiles)
+    void ManageSizing(EnergyPlusData &state, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -845,7 +845,7 @@ namespace SizingManager {
         }
     }
 
-    void ManageSystemSizingAdjustments(AllGlobals &state)
+    void ManageSystemSizingAdjustments(EnergyPlusData &state)
     {
         // This routine adjusts system sizing outcomes based on how the zone air terminals finish out their sizing.
         // The zone models are executed to trigger their sizing routines
@@ -3864,7 +3864,7 @@ namespace SizingManager {
         }
     }
 
-    void SetupZoneSizing(AllGlobals &state, OutputFiles &outputFiles, bool &ErrorsFound)
+    void SetupZoneSizing(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrorsFound)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4774,7 +4774,7 @@ namespace SizingManager {
     }
 
     // Update the sizing for the entire facilty to gather values for reporting - Glazer January 2017
-    void UpdateFacilitySizing(AllGlobals &state, int const CallIndicator)
+    void UpdateFacilitySizing(EnergyPlusData &state, int const CallIndicator)
     {
         int NumOfTimeStepInDay = NumOfTimeStepInHour * 24;
 

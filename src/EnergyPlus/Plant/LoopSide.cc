@@ -54,7 +54,7 @@
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACInterfaceManager.hh>
 #include <EnergyPlus/Plant/LoopSide.hh>
 #include <EnergyPlus/PlantCondLoopOperation.hh>
@@ -68,7 +68,7 @@ namespace DataPlant {
 
     static std::string const fluidNameSteam("STEAM");
 
-    void HalfLoopData::solve(AllGlobals &state, bool const FirstHVACIteration, bool &ReSimOtherSideNeeded) {
+    void HalfLoopData::solve(EnergyPlusData &state, bool const FirstHVACIteration, bool &ReSimOtherSideNeeded) {
 
         // SUBROUTINE INFORMATION:
         //       AUTHORS:         Dan Fisher, Sankaranarayanan K P, Edwin Lee
@@ -541,7 +541,7 @@ namespace DataPlant {
         }
     }
 
-    void HalfLoopData::SimulateAllLoopSideBranches(AllGlobals &state, Real64 const ThisLoopSideFlow, bool const FirstHVACIteration, bool &LoopShutDownFlag)
+    void HalfLoopData::SimulateAllLoopSideBranches(EnergyPlusData &state, Real64 const ThisLoopSideFlow, bool const FirstHVACIteration, bool &LoopShutDownFlag)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1214,7 +1214,7 @@ namespace DataPlant {
     }
 
 
-    void HalfLoopData::DoFlowAndLoadSolutionPass(AllGlobals &state, int OtherSide, int ThisSideInletNode, bool FirstHVACIteration) {
+    void HalfLoopData::DoFlowAndLoadSolutionPass(EnergyPlusData &state, int OtherSide, int ThisSideInletNode, bool FirstHVACIteration) {
     
         // This is passed in-out deep down into the depths where the load op manager calls EMS and EMS can shut down pumps
         bool LoopShutDownFlag = false;
@@ -1689,7 +1689,7 @@ namespace DataPlant {
         } // Splitter/Mixer exists
     }
 
-    void HalfLoopData::SimulateLoopSideBranchGroup(AllGlobals &state, 
+    void HalfLoopData::SimulateLoopSideBranchGroup(EnergyPlusData &state, 
         int const FirstBranchNum, int const LastBranchNum, Real64 FlowRequest, bool const FirstHVACIteration, bool &LoopShutDownFlag)
     {
 

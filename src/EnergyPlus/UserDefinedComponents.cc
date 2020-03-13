@@ -67,7 +67,7 @@
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -149,7 +149,7 @@ namespace UserDefinedComponents {
         return nullptr; // LCOV_EXCL_LINE
     }
 
-    void UserPlantComponentStruct::onInitLoopEquip(AllGlobals &state, const PlantLocation &calledFromLocation)
+    void UserPlantComponentStruct::onInitLoopEquip(EnergyPlusData &state, const PlantLocation &calledFromLocation)
     {
         bool anyEMSRan;
         Real64 myLoad = 0.0;
@@ -201,7 +201,7 @@ namespace UserDefinedComponents {
         OptLoad = this->Loop(thisLoop).OptLoad;
     }
 
-    void UserPlantComponentStruct::UserPlantComponentStruct::simulate(AllGlobals &state, const EnergyPlus::PlantLocation &calledFromLocation,
+    void UserPlantComponentStruct::UserPlantComponentStruct::simulate(EnergyPlusData &state, const EnergyPlus::PlantLocation &calledFromLocation,
                                                                       bool EP_UNUSED(FirstHVACIteration),
                                                                       Real64 &CurLoad,
                                                                       bool EP_UNUSED(RunFlag))

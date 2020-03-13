@@ -55,7 +55,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -520,7 +520,7 @@ namespace HeatRecovery {
 
     void clear_state();
 
-    void SimHeatRecovery(AllGlobals &state, std::string const &CompName,                 // name of the heat exchanger unit
+    void SimHeatRecovery(EnergyPlusData &state, std::string const &CompName,                 // name of the heat exchanger unit
                          bool const FirstHVACIteration,               // TRUE if 1st HVAC simulation of system timestep
                          int &CompIndex,                              // Pointer to Component
                          int const FanOpMode,                         // Supply air fan operating mode
@@ -535,11 +535,11 @@ namespace HeatRecovery {
 
     void GetHeatRecoveryInput();
 
-    void InitHeatRecovery(AllGlobals &state, int const ExchNum, // number of the current heat exchanger being simulated
+    void InitHeatRecovery(EnergyPlusData &state, int const ExchNum, // number of the current heat exchanger being simulated
                           int const CompanionCoilIndex,
                           int const CompanionCoilType_Num);
 
-    void SizeHeatRecovery(AllGlobals &state, int const ExchNum);
+    void SizeHeatRecovery(EnergyPlusData &state, int const ExchNum);
 
     void CalcAirToAirPlateHeatExch(int const ExNum,                        // number of the current heat exchanger being simulated
                                    bool const HXUnitOn,                    // flag to simulate heat exchager heat recovery

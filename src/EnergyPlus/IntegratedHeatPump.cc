@@ -59,7 +59,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -93,7 +93,7 @@ namespace IntegratedHeatPump {
         IntegratedHeatPumps.deallocate();
     }
 
-    void SimIHP(AllGlobals &state, std::string const &CompName,              // Coil Name
+    void SimIHP(EnergyPlusData &state, std::string const &CompName,              // Coil Name
                 int &CompIndex,                           // Index for Component name
                 int const CyclingScheme,                  // Continuous fan OR cycling compressor
                 Real64 &MaxONOFFCyclesperHour,            // Maximum cycling rate of heat pump [cycles/hr]
@@ -1922,7 +1922,7 @@ namespace IntegratedHeatPump {
         }
     }
 
-    void SizeIHP(AllGlobals &state, int const DXCoilNum)
+    void SizeIHP(EnergyPlusData &state, int const DXCoilNum)
     {
         using DataSizing::AutoSize;
         using General::TrimSigDigits;
@@ -2184,7 +2184,7 @@ namespace IntegratedHeatPump {
         }
     }
 
-    void DecideWorkMode(AllGlobals &state, int const DXCoilNum,
+    void DecideWorkMode(EnergyPlusData &state, int const DXCoilNum,
                         Real64 const SensLoad,  // Sensible demand load [W]
                         Real64 const LatentLoad // Latent demand load [W]
                         )                       // shall be called from a air loop parent
@@ -2331,7 +2331,7 @@ namespace IntegratedHeatPump {
         ClearCoils(state, DXCoilNum);
     }
 
-    void ClearCoils(AllGlobals &state, int const DXCoilNum)
+    void ClearCoils(EnergyPlusData &state, int const DXCoilNum)
     {
         using General::TrimSigDigits;
         using VariableSpeedCoils::SimVariableSpeedCoils;
@@ -2372,7 +2372,7 @@ namespace IntegratedHeatPump {
         return;
     }
 
-    IHPOperationMode GetCurWorkMode(AllGlobals &state, int const DXCoilNum)
+    IHPOperationMode GetCurWorkMode(EnergyPlusData &state, int const DXCoilNum)
     {
         using General::TrimSigDigits;
 
@@ -2618,7 +2618,7 @@ namespace IntegratedHeatPump {
         return PLRNumber;
     }
 
-    Real64 GetDWHCoilCapacityIHP(AllGlobals &state, std::string const &CoilType,            // must match coil types in this module
+    Real64 GetDWHCoilCapacityIHP(EnergyPlusData &state, std::string const &CoilType,            // must match coil types in this module
                                  std::string const &CoilName,            // must match coil names for the coil type
                                  IHPOperationMode const EP_UNUSED(Mode), // mode coil type
                                  bool &ErrorsFound                       // set to true if problem
@@ -2775,7 +2775,7 @@ namespace IntegratedHeatPump {
         return (SpeedNum);
     }
 
-    Real64 GetAirVolFlowRateIHP(AllGlobals &state, int const DXCoilNum,
+    Real64 GetAirVolFlowRateIHP(EnergyPlusData &state, int const DXCoilNum,
                                 int const SpeedNum,
                                 Real64 const SpeedRatio,
                                 bool const IsCallbyWH // whether the call from the water heating loop or air loop, true = from water heating loop
@@ -2882,7 +2882,7 @@ namespace IntegratedHeatPump {
         return (AirVolFlowRate);
     }
 
-    Real64 GetWaterVolFlowRateIHP(AllGlobals &state, 
+    Real64 GetWaterVolFlowRateIHP(EnergyPlusData &state, 
         int const DXCoilNum,
         int const SpeedNum,
         Real64 const SpeedRatio,
@@ -2960,7 +2960,7 @@ namespace IntegratedHeatPump {
         return (WaterVolFlowRate);
     }
 
-    Real64 GetAirMassFlowRateIHP(AllGlobals &state, int const DXCoilNum,
+    Real64 GetAirMassFlowRateIHP(EnergyPlusData &state, int const DXCoilNum,
                                  int const SpeedNum,
                                  Real64 const SpeedRatio,
                                  bool const IsCallbyWH // whether the call from the water heating loop or air loop, true = from water heating loop

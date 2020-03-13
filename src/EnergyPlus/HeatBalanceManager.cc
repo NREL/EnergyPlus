@@ -87,7 +87,7 @@
 #include <EnergyPlus/EconomicTariff.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
 #include <EnergyPlus/HeatBalanceIntRadExchange.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
@@ -284,7 +284,7 @@ namespace HeatBalanceManager {
         UniqueConstructNames.clear();
     }
 
-    void ManageHeatBalance(AllGlobals &state, OutputFiles &outputFiles)
+    void ManageHeatBalance(EnergyPlusData &state, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -402,7 +402,7 @@ namespace HeatBalanceManager {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetHeatBalanceInput(AllGlobals &state)
+    void GetHeatBalanceInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -4598,7 +4598,7 @@ namespace HeatBalanceManager {
         } // End of ConstrNum DO loop
     }
 
-    void GetBuildingData(AllGlobals &state, bool &ErrorsFound) // If errors found in input
+    void GetBuildingData(EnergyPlusData &state, bool &ErrorsFound) // If errors found in input
     {
 
         // SUBROUTINE INFORMATION:
@@ -5906,7 +5906,7 @@ namespace HeatBalanceManager {
     // Beginning of Reporting subroutines for the HB Module
     // *****************************************************************************
 
-    void ReportHeatBalance(AllGlobals &state, OutputFiles &outputFiles)
+    void ReportHeatBalance(EnergyPlusData &state, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:

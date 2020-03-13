@@ -52,7 +52,7 @@
 #include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -179,7 +179,7 @@ void CoilCoolingDXCurveFitPerformance::simulate(const DataLoopNode::NodeData &in
     }
 }
 
-void CoilCoolingDXCurveFitPerformance::size(AllGlobals &state)
+void CoilCoolingDXCurveFitPerformance::size(EnergyPlusData &state)
 {
     if (!DataGlobals::SysSizingCalc && this->mySizeFlag) {
         this->normalMode.size(state);
@@ -239,7 +239,7 @@ void CoilCoolingDXCurveFitPerformance::calculate(CoilCoolingDXCurveFitOperatingM
 }
 
 
-void CoilCoolingDXCurveFitPerformance::calcStandardRatings(AllGlobals &state, int supplyFanIndex, int const supplyFanType, std::string const &supplyFanName, int condInletNodeIndex, OutputFiles &outputFiles) {
+void CoilCoolingDXCurveFitPerformance::calcStandardRatings(EnergyPlusData &state, int supplyFanIndex, int const supplyFanType, std::string const &supplyFanName, int condInletNodeIndex, OutputFiles &outputFiles) {
 
     using General::SolveRoot;
     using TempSolveRoot::SolveRoot;
@@ -647,7 +647,7 @@ void CoilCoolingDXCurveFitPerformance::calcStandardRatings(AllGlobals &state, in
     OutputReportPredefined::PreDefTableEntry(OutputReportPredefined::pdchVAVDXCoolCoilMdotD, this->name, SupAirMdot_TestPoint[3], 4);
 }
 
-Real64 CoilCoolingDXCurveFitPerformance::calcIEERResidual(AllGlobals &state, 
+Real64 CoilCoolingDXCurveFitPerformance::calcIEERResidual(EnergyPlusData &state, 
         Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
         std::vector<Real64> const &Par
 )

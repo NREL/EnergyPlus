@@ -60,7 +60,7 @@
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HeatRecovery.hh>
@@ -165,7 +165,7 @@ namespace HVACHXAssistedCoolingCoil {
         CheckEquipName.deallocate();
     }
 
-    void SimHXAssistedCoolingCoil(AllGlobals &state, std::string const &HXAssistedCoilName, // Name of HXAssistedCoolingCoil
+    void SimHXAssistedCoolingCoil(EnergyPlusData &state, std::string const &HXAssistedCoilName, // Name of HXAssistedCoolingCoil
                                   bool const FirstHVACIteration,         // FirstHVACIteration flag
                                   int const CompOp,                      // compressor operation; 1=on, 0=off
                                   Real64 const PartLoadRatio,            // Part load ratio of Coil:DX:CoolingBypassFactorEmpirical
@@ -271,7 +271,7 @@ namespace HVACHXAssistedCoolingCoil {
     // Get Input Section of the Module
     //******************************************************************************
 
-    void GetHXAssistedCoolingCoilInput(AllGlobals &state)
+    void GetHXAssistedCoolingCoilInput(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -850,7 +850,7 @@ namespace HVACHXAssistedCoolingCoil {
     // End Initialization Section of the Module
     //******************************************************************************
 
-    void CalcHXAssistedCoolingCoil(AllGlobals &state, int const HXAssistedCoilNum,         // Index number for HXAssistedCoolingCoil
+    void CalcHXAssistedCoolingCoil(EnergyPlusData &state, int const HXAssistedCoilNum,         // Index number for HXAssistedCoolingCoil
                                    bool const FirstHVACIteration,       // FirstHVACIteration flag
                                    int const CompOp,                    // compressor operation; 1=on, 0=off
                                    Real64 const PartLoadRatio,          // Cooling coil part load ratio
@@ -1016,7 +1016,7 @@ namespace HVACHXAssistedCoolingCoil {
     //        End of Reporting subroutines for the HXAssistedCoil Module
     // *****************************************************************************
 
-    void GetHXDXCoilIndex(AllGlobals &state, std::string const &HXDXCoilName, int &HXDXCoilIndex, bool &ErrorsFound, Optional_string_const CurrentModuleObject)
+    void GetHXDXCoilIndex(EnergyPlusData &state, std::string const &HXDXCoilName, int &HXDXCoilIndex, bool &ErrorsFound, Optional_string_const CurrentModuleObject)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1052,7 +1052,7 @@ namespace HVACHXAssistedCoolingCoil {
         }
     }
 
-    void CheckHXAssistedCoolingCoilSchedule(AllGlobals &state, std::string const &EP_UNUSED(CompType), // unused1208
+    void CheckHXAssistedCoolingCoilSchedule(EnergyPlusData &state, std::string const &EP_UNUSED(CompType), // unused1208
                                             std::string const &CompName,
                                             Real64 &Value,
                                             int &CompIndex)
@@ -1109,7 +1109,7 @@ namespace HVACHXAssistedCoolingCoil {
         }
     }
 
-    Real64 GetCoilCapacity(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilCapacity(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                            std::string const &CoilName, // must match coil names for the coil type
                            bool &ErrorsFound            // set to true if problem
     )
@@ -1191,7 +1191,7 @@ namespace HVACHXAssistedCoolingCoil {
         return CoilCapacity;
     }
 
-    int GetCoilGroupTypeNum(AllGlobals &state, std::string const &CoilType,     // must match coil types in this module
+    int GetCoilGroupTypeNum(EnergyPlusData &state, std::string const &CoilType,     // must match coil types in this module
                             std::string const &CoilName,     // must match coil names for the coil type
                             bool &ErrorsFound,               // set to true if problem
                             Optional_bool_const PrintWarning // prints warning message if true
@@ -1248,7 +1248,7 @@ namespace HVACHXAssistedCoolingCoil {
         return TypeNum;
     }
 
-    int GetCoilObjectTypeNum(AllGlobals &state, std::string const &CoilType,     // must match coil types in this module
+    int GetCoilObjectTypeNum(EnergyPlusData &state, std::string const &CoilType,     // must match coil types in this module
                              std::string const &CoilName,     // must match coil names for the coil type
                              bool &ErrorsFound,               // set to true if problem
                              Optional_bool_const PrintWarning // prints warning message if true
@@ -1305,7 +1305,7 @@ namespace HVACHXAssistedCoolingCoil {
         return TypeNum;
     }
 
-    int GetCoilInletNode(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
+    int GetCoilInletNode(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                          std::string const &CoilName, // must match coil names for the coil type
                          bool &ErrorsFound            // set to true if problem
     )
@@ -1352,7 +1352,7 @@ namespace HVACHXAssistedCoolingCoil {
         return NodeNumber;
     }
 
-    int GetCoilWaterInletNode(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
+    int GetCoilWaterInletNode(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                               std::string const &CoilName, // must match coil names for the coil type
                               bool &ErrorsFound            // set to true if problem
     )
@@ -1413,7 +1413,7 @@ namespace HVACHXAssistedCoolingCoil {
         return NodeNumber;
     }
 
-    int GetCoilOutletNode(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
+    int GetCoilOutletNode(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
     )
@@ -1460,7 +1460,7 @@ namespace HVACHXAssistedCoolingCoil {
         return NodeNumber;
     }
 
-    std::string GetHXDXCoilType(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
+    std::string GetHXDXCoilType(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                                 std::string const &CoilName, // must match coil names for the coil type
                                 bool &ErrorsFound            // set to true if problem
     )
@@ -1507,7 +1507,7 @@ namespace HVACHXAssistedCoolingCoil {
         return DXCoilType;
     }
 
-    std::string GetHXDXCoilName(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
+    std::string GetHXDXCoilName(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                                 std::string const &CoilName, // must match coil names for the coil type
                                 bool &ErrorsFound            // set to true if problem
     )
@@ -1555,7 +1555,7 @@ namespace HVACHXAssistedCoolingCoil {
         return DXCoilName;
     }
 
-    int GetActualDXCoilIndex(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
+    int GetActualDXCoilIndex(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                              std::string const &CoilName, // must match coil names for the coil type
                              bool &ErrorsFound            // set to true if problem
     )
@@ -1603,7 +1603,7 @@ namespace HVACHXAssistedCoolingCoil {
         return DXCoilIndex;
     }
 
-    std::string GetHXCoilType(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
+    std::string GetHXCoilType(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                               std::string const &CoilName, // must match coil names for the coil type
                               bool &ErrorsFound            // set to true if problem
     )
@@ -1650,7 +1650,7 @@ namespace HVACHXAssistedCoolingCoil {
         return CoolingCoilType;
     }
 
-    void GetHXCoilTypeAndName(AllGlobals &state, std::string const &CoilType,  // must match coil types in this module
+    void GetHXCoilTypeAndName(EnergyPlusData &state, std::string const &CoilType,  // must match coil types in this module
                               std::string const &CoilName,  // must match coil names for the coil type
                               bool &ErrorsFound,            // set to true if problem
                               std::string &CoolingCoilType, // returned type of cooling coil
@@ -1694,7 +1694,7 @@ namespace HVACHXAssistedCoolingCoil {
         }
     }
 
-    Real64 GetCoilMaxWaterFlowRate(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilMaxWaterFlowRate(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                                    std::string const &CoilName, // must match coil names for the coil type
                                    bool &ErrorsFound            // set to true if problem
     )
@@ -1762,7 +1762,7 @@ namespace HVACHXAssistedCoolingCoil {
         return MaxWaterFlowRate;
     }
 
-    Real64 GetHXCoilAirFlowRate(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
+    Real64 GetHXCoilAirFlowRate(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                                 std::string const &CoilName, // must match coil names for the coil type
                                 bool &ErrorsFound            // set to true if problem
     )
@@ -1822,7 +1822,7 @@ namespace HVACHXAssistedCoolingCoil {
         return MaxAirFlowRate;
     }
 
-    bool VerifyHeatExchangerParent(AllGlobals &state, std::string const &HXType, // must match coil types in this module
+    bool VerifyHeatExchangerParent(EnergyPlusData &state, std::string const &HXType, // must match coil types in this module
                                    std::string const &HXName  // must match coil names for the coil type
     )
     {

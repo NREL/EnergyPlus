@@ -86,7 +86,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/HeatingCoils.hh>
@@ -372,7 +372,7 @@ namespace AirflowNetworkBalanceManager {
         UniqueAirflowNetworkSurfaceName.clear();
     }
 
-    void ManageAirflowNetworkBalance(AllGlobals &state, Optional_bool_const FirstHVACIteration, // True when solution technique on first iteration
+    void ManageAirflowNetworkBalance(EnergyPlusData &state, Optional_bool_const FirstHVACIteration, // True when solution technique on first iteration
                                      Optional_int_const Iter,                // Iteration number
                                      Optional_bool ResimulateAirZone         // True when solution technique on third iteration
     )
@@ -524,7 +524,7 @@ namespace AirflowNetworkBalanceManager {
         UpdateAirflowNetwork(FirstHVACIteration);
     }
 
-    static bool getAirflowElementInput(AllGlobals &state)
+    static bool getAirflowElementInput(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Jason DeGraw
@@ -1551,7 +1551,7 @@ namespace AirflowNetworkBalanceManager {
         return success;
     }
 
-    void GetAirflowNetworkInput(AllGlobals &state, OutputFiles &outputFiles)
+    void GetAirflowNetworkInput(EnergyPlusData &state, OutputFiles &outputFiles)
     {
 
         // SUBROUTINE INFORMATION:
@@ -9569,7 +9569,7 @@ namespace AirflowNetworkBalanceManager {
         }
     }
 
-    void ValidateDistributionSystem(AllGlobals &state)
+    void ValidateDistributionSystem(EnergyPlusData &state)
     {
 
         // SUBROUTINE INFORMATION:
@@ -11055,7 +11055,7 @@ namespace AirflowNetworkBalanceManager {
         return ACH;
     }
 
-    int GetAirLoopNumber(AllGlobals &state, int const NodeNumber) // Get air loop number for each distribution node and linkage
+    int GetAirLoopNumber(EnergyPlusData &state, int const NodeNumber) // Get air loop number for each distribution node and linkage
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu

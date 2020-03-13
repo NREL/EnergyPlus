@@ -77,7 +77,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FluidProperties.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/HVACFan.hh>

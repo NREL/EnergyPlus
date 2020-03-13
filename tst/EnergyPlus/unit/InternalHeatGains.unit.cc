@@ -60,7 +60,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/DisplacementVentMgr.hh>
 #include <EnergyPlus/ExteriorEnergyUse.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACManager.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>

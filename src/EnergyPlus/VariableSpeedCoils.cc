@@ -68,7 +68,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -292,7 +292,7 @@ namespace VariableSpeedCoils {
     {
     }
 
-    void SimVariableSpeedCoils(AllGlobals &state, std::string const &CompName,   // Coil Name
+    void SimVariableSpeedCoils(EnergyPlusData &state, std::string const &CompName,   // Coil Name
                                int &CompIndex,                // Index for Component name
                                int const CyclingScheme,       // Continuous fan OR cycling compressor
                                Real64 &MaxONOFFCyclesperHour, // Maximum cycling rate of heat pump [cycles/hr]
@@ -3178,7 +3178,7 @@ namespace VariableSpeedCoils {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitVarSpeedCoil(AllGlobals &state, int const DXCoilNum,                       // Current DXCoilNum under simulation
+    void InitVarSpeedCoil(EnergyPlusData &state, int const DXCoilNum,                       // Current DXCoilNum under simulation
                           Real64 const MaxONOFFCyclesperHour,        // Maximum cycling rate of heat pump [cycles/hr]
                           Real64 const HPTimeConstant,               // Heat pump time constant [s]
                           Real64 const FanDelayTime,                 // Fan delay time, time delay for the HP's fan to
@@ -3780,7 +3780,7 @@ namespace VariableSpeedCoils {
         DataHeatBalance::HeatReclaimVS_DXCoil(DXCoilNum).AvailCapacity = 0.0;
     }
 
-    void SizeVarSpeedCoil(AllGlobals &state, int const DXCoilNum)
+    void SizeVarSpeedCoil(EnergyPlusData &state, int const DXCoilNum)
     {
 
         // SUBROUTINE INFORMATION:

@@ -50,7 +50,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
     class OutputFiles;
@@ -76,7 +76,7 @@ namespace SimulationManager {
     // Functions
     void clear_state();
 
-    void ManageSimulation(AllGlobals &state, OutputFiles &outputFiles);
+    void ManageSimulation(EnergyPlusData &state, OutputFiles &outputFiles);
 
     void GetProjectData(OutputFiles &outputFiles);
 
@@ -96,7 +96,7 @@ namespace SimulationManager {
 
     void CloseOutputFiles(OutputFiles &outputFiles);
 
-    void SetupSimulation(AllGlobals &state, OutputFiles &outputFiles, bool &ErrorsFound);
+    void SetupSimulation(EnergyPlusData &state, OutputFiles &outputFiles, bool &ErrorsFound);
 
     void ReportNodeConnections();
 
@@ -115,7 +115,7 @@ namespace SimulationManager {
 
 // EXTERNAL SUBROUTINES:
 
-void Resimulate(AllGlobals &state, bool &ResimExt, // Flag to resimulate the exterior energy use simulation
+void Resimulate(EnergyPlusData &state, bool &ResimExt, // Flag to resimulate the exterior energy use simulation
                 bool &ResimHB,  // Flag to resimulate the heat balance simulation (including HVAC)
                 bool &ResimHVAC // Flag to resimulate the HVAC simulation
 );

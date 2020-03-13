@@ -49,7 +49,7 @@
 #include <EnergyPlus/DataAirSystems.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/HVACFan.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 
 namespace EnergyPlus {
 
@@ -118,7 +118,7 @@ namespace DataAirSystems {
         AirSysSubSubCompToPlant.deallocate(); // Connections
     }
 
-    Real64 calcFanDesignHeatGain(AllGlobals &state, int const &dataFanEnumType, int const &dataFanIndex, Real64 const &desVolFlow)
+    Real64 calcFanDesignHeatGain(EnergyPlusData &state, int const &dataFanEnumType, int const &dataFanIndex, Real64 const &desVolFlow)
     {
         Real64 fanDesHeatLoad = 0.0; // design fan heat load (W)
 

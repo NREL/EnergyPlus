@@ -54,7 +54,7 @@
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/Plant/PlantLocation.hh>
 #include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/VariableSpeedCoils.hh>
@@ -399,11 +399,11 @@ namespace WaterThermalTanks {
         {
         }
 
-        static PlantComponent *factory(AllGlobals &state, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
-        void simulate(AllGlobals &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
-        void onInitLoopEquip(AllGlobals &state, const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+        void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
         void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
     };
@@ -647,7 +647,7 @@ namespace WaterThermalTanks {
         {
         }
 
-        static PlantComponent *factory(AllGlobals &state, std::string const &objectName);
+        static PlantComponent *factory(EnergyPlusData &state, std::string const &objectName);
 
         void setupOutputVars();
 
@@ -657,7 +657,7 @@ namespace WaterThermalTanks {
 
         void setupWaterHeaterOutputVars(OutputFiles &outputFiles);
 
-        void simulate(AllGlobals &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
+        void simulate(EnergyPlusData &state, const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
         Real64 PartLoadFactor(Real64 PartLoadRatio_loc);
 
@@ -665,7 +665,7 @@ namespace WaterThermalTanks {
 
         void SetupStratifiedNodes();
 
-        void initialize(AllGlobals &state, bool FirstHVACIteration);
+        void initialize(EnergyPlusData &state, bool FirstHVACIteration);
 
         bool SourceHeatNeed(Real64 OutletTemp, Real64 DeadBandTemp, Real64 SetPointTemp_loc);
 
@@ -691,7 +691,7 @@ namespace WaterThermalTanks {
 
         void CalcWaterThermalTankMixed(); // Water Heater being simulated
 
-        void CalcStandardRatings(AllGlobals &state, OutputFiles &outputFiles);
+        void CalcStandardRatings(EnergyPlusData &state, OutputFiles &outputFiles);
 
         void ReportCWTankInits(OutputFiles &outputFiles);
 
@@ -767,11 +767,11 @@ namespace WaterThermalTanks {
                                            Array1<Real64> const &Par // par(1) = HP set point temperature [C]
         );
 
-        void CalcHeatPumpWaterHeater(AllGlobals &state, bool FirstHVACIteration);
+        void CalcHeatPumpWaterHeater(EnergyPlusData &state, bool FirstHVACIteration);
 
         void ConvergeSingleSpeedHPWHCoilAndTank(Real64 partLoadRatio);
 
-        void SetVSHPWHFlowRates(AllGlobals &state, HeatPumpWaterHeaterData &HPWH,
+        void SetVSHPWHFlowRates(EnergyPlusData &state, HeatPumpWaterHeaterData &HPWH,
                                 int SpeedNum,
                                 Real64 SpeedRatio,
                                 Real64 WaterDens,
@@ -781,13 +781,13 @@ namespace WaterThermalTanks {
 
         Real64 PLRResidualHPWH(Real64 HPPartLoadRatio, Array1<Real64> const &Par);
 
-        Real64 PLRResidualIterSpeed(AllGlobals &state, Real64 SpeedRatio,        // speed ratio between two speed levels
+        Real64 PLRResidualIterSpeed(EnergyPlusData &state, Real64 SpeedRatio,        // speed ratio between two speed levels
                                     Array1<Real64> const &Par //
         );
 
         static void ValidatePLFCurve(int CurveIndex, bool &IsValid);
 
-        void onInitLoopEquip(AllGlobals &state, const PlantLocation &EP_UNUSED(calledFromLocation)) override;
+        void onInitLoopEquip(EnergyPlusData &state, const PlantLocation &EP_UNUSED(calledFromLocation)) override;
 
         void getDesignCapacities(const PlantLocation &EP_UNUSED(calledFromLocation), Real64 &MaxLoad, Real64 &MinLoad, Real64 &OptLoad) override;
     };
@@ -879,9 +879,9 @@ namespace WaterThermalTanks {
 
     // Functions
 
-    void SimulateWaterHeaterStandAlone(AllGlobals &state, int WaterHeaterNum, bool FirstHVACIteration);
+    void SimulateWaterHeaterStandAlone(EnergyPlusData &state, int WaterHeaterNum, bool FirstHVACIteration);
 
-    void SimHeatPumpWaterHeater(AllGlobals &state, std::string const &CompName,
+    void SimHeatPumpWaterHeater(EnergyPlusData &state, std::string const &CompName,
                                 bool FirstHVACIteration,
                                 Real64 &SensLoadMet, // sensible load met by this equipment and sent to zone, W
                                 Real64 &LatLoadMet,  // net latent load met and sent to zone (kg/s), dehumid = negative
@@ -889,7 +889,7 @@ namespace WaterThermalTanks {
 
     bool getDesuperHtrInput();
 
-    bool getHPWaterHeaterInput(AllGlobals &state);
+    bool getHPWaterHeaterInput(EnergyPlusData &state);
 
     bool getWaterHeaterMixedInputs();
 
@@ -899,13 +899,13 @@ namespace WaterThermalTanks {
 
     bool getWaterTankStratifiedInput();
 
-    bool GetWaterThermalTankInput(AllGlobals &state, OutputFiles &outputFiles);
+    bool GetWaterThermalTankInput(EnergyPlusData &state, OutputFiles &outputFiles);
 
-    void CalcWaterThermalTankZoneGains(AllGlobals &state);
+    void CalcWaterThermalTankZoneGains(EnergyPlusData &state);
 
-    int getTankIDX(AllGlobals &state, std::string const &CompName, int &CompIndex);
+    int getTankIDX(EnergyPlusData &state, std::string const &CompName, int &CompIndex);
 
-    int getHPTankIDX(AllGlobals &state, std::string const &CompName, int &CompIndex);
+    int getHPTankIDX(EnergyPlusData &state, std::string const &CompName, int &CompIndex);
 
     void clear_state();
 

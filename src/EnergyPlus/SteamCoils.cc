@@ -67,7 +67,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
@@ -173,7 +173,7 @@ namespace SteamCoils {
         CheckEquipName.deallocate();
     }
 
-    void SimulateSteamCoilComponents(AllGlobals &state, std::string const &CompName,
+    void SimulateSteamCoilComponents(EnergyPlusData &state, std::string const &CompName,
                                      bool const FirstHVACIteration,
                                      int &CompIndex,
                                      Optional<Real64 const> QCoilReq, // coil load to be met
@@ -476,7 +476,7 @@ namespace SteamCoils {
 
     // Beginning Initialization Section of the Module
 
-    void InitSteamCoil(AllGlobals &state, int const CoilNum, bool const FirstHVACIteration)
+    void InitSteamCoil(EnergyPlusData &state, int const CoilNum, bool const FirstHVACIteration)
     {
         // SUBROUTINE INFORMATION:
         //   AUTHOR         Rahul Chillar
@@ -671,7 +671,7 @@ namespace SteamCoils {
         //                                                   SteamCoil(CoilNum)%MaxSteamMassFlowRate)
     }
 
-    void SizeSteamCoil(AllGlobals &state, int const CoilNum)
+    void SizeSteamCoil(EnergyPlusData &state, int const CoilNum)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Rahul Chillar
@@ -2069,7 +2069,7 @@ namespace SteamCoils {
         return NodeNumber;
     }
 
-    Real64 GetCoilCapacity(AllGlobals &state, std::string const &CoilType, // must match coil types in this module
+    Real64 GetCoilCapacity(EnergyPlusData &state, std::string const &CoilType, // must match coil types in this module
                            std::string const &CoilName, // must match coil names for the coil type
                            bool &ErrorsFound            // set to true if problem
     )

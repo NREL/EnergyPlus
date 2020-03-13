@@ -62,7 +62,7 @@
 #include <EnergyPlus/Fans.hh> // used for fault model routine CalFaultyFanAirFlowReduction
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -121,7 +121,7 @@ namespace HVACFan {
         }
     }
 
-    void FanSystem::simulate(AllGlobals &state, 
+    void FanSystem::simulate(EnergyPlusData &state, 
         Optional<Real64 const> flowFraction, // when used, this directs the fan to set the flow at this flow fraction = current flow/ max design flow
                                              // rate.  It is not exactly the same as the legacy speed ratio that was used with SimulateFanComponents.
         Optional_bool_const zoneCompTurnFansOn,  // can be used as turn fans ON signal from ZoneHVAC component
@@ -181,7 +181,7 @@ namespace HVACFan {
         report();
     }
 
-    void FanSystem::init(AllGlobals &state)
+    void FanSystem::init(EnergyPlusData &state)
     {
         if (!DataGlobals::SysSizingCalc && m_objSizingFlag) {
             set_size(state);
@@ -229,7 +229,7 @@ namespace HVACFan {
         m_inletAirEnthalpy = DataLoopNode::Node(inletNodeNum).Enthalpy;
     }
 
-    void FanSystem::set_size(AllGlobals &state)
+    void FanSystem::set_size(EnergyPlusData &state)
     {
         std::string static const routineName = "FanSystem::set_size ";
 
@@ -1099,7 +1099,7 @@ namespace HVACFan {
         }
     }
 
-    Real64 FanSystem::getFanDesignHeatGain(AllGlobals &state, Real64 const FanVolFlow // fan volume flow rate [m3/s]
+    Real64 FanSystem::getFanDesignHeatGain(EnergyPlusData &state, Real64 const FanVolFlow // fan volume flow rate [m3/s]
     )
     {
         if (!m_objSizingFlag) {

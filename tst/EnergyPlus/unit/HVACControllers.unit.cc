@@ -57,7 +57,7 @@
 #include <EnergyPlus/DataAirLoop.hh>
 #include <EnergyPlus/DataConvergParams.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACControllers.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>

@@ -64,7 +64,7 @@
 #include <EnergyPlus/DualDuct.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACCooledBeam.hh>
 #include <EnergyPlus/HVACFourPipeBeam.hh>
 #include <EnergyPlus/HVACSingleDuctInduc.hh>
@@ -117,7 +117,7 @@ namespace ZoneAirLoopEquipmentManager {
         numADUInitialized = 0;
     }
 
-    void ManageZoneAirLoopEquipment(AllGlobals &state, std::string const &ZoneAirLoopEquipName,
+    void ManageZoneAirLoopEquipment(EnergyPlusData &state, std::string const &ZoneAirLoopEquipName,
                                     bool const FirstHVACIteration,
                                     Real64 &SysOutputProvided,
                                     Real64 &NonAirSysOutput,
@@ -576,7 +576,7 @@ namespace ZoneAirLoopEquipmentManager {
         AirDistUnit(AirDistUnitNum).CoolGain = 0.0;
     }
 
-    void SimZoneAirLoopEquipment(AllGlobals &state, int const AirDistUnitNum,
+    void SimZoneAirLoopEquipment(EnergyPlusData &state, int const AirDistUnitNum,
                                  Real64 &SysOutputProvided,
                                  Real64 &NonAirSysOutput,
                                  Real64 &LatOutputProvided, // Latent add/removal provided by this unit (kg/s), dehumidify = negative

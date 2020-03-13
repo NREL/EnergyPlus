@@ -60,7 +60,7 @@
 #include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/General.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/PlantUtilities.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/SZVAVModel.hh>
@@ -89,7 +89,7 @@ namespace SZVAVModel {
 
     // Functions
 
-    void calcSZVAVModel(AllGlobals &state, PackagedTerminalHeatPump::PTUnitData &SZVAVModel,
+    void calcSZVAVModel(EnergyPlusData &state, PackagedTerminalHeatPump::PTUnitData &SZVAVModel,
                         int const &SysIndex,
                         bool const &FirstHVACIteration,
                         bool const &CoolingLoad,
@@ -509,7 +509,7 @@ namespace SZVAVModel {
         }
     }
 
-    void calcSZVAVModel(AllGlobals &state, FanCoilUnits::FanCoilData &SZVAVModel,
+    void calcSZVAVModel(EnergyPlusData &state, FanCoilUnits::FanCoilData &SZVAVModel,
                         int const &SysIndex,
                         bool const &FirstHVACIteration,
                         bool const &CoolingLoad,
@@ -914,7 +914,7 @@ namespace SZVAVModel {
         }
     }
 
-    void calcSZVAVModel(AllGlobals &state, UnitarySystems::UnitarySys &SZVAVModel,
+    void calcSZVAVModel(EnergyPlusData &state, UnitarySystems::UnitarySys &SZVAVModel,
                         int const &SysIndex,
                         bool const &FirstHVACIteration,
                         bool const &CoolingLoad,

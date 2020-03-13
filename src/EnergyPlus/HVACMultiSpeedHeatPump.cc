@@ -76,7 +76,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
-#include <EnergyPlus/Globals/Globals.hh>
+#include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/HVACMultiSpeedHeatPump.hh>
 #include <EnergyPlus/HeatingCoils.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -220,7 +220,7 @@ namespace HVACMultiSpeedHeatPump {
 
     // Functions
 
-    void SimMSHeatPump(AllGlobals &state, std::string const &CompName,   // Name of the unitary engine driven heat pump system
+    void SimMSHeatPump(EnergyPlusData &state, std::string const &CompName,   // Name of the unitary engine driven heat pump system
                        bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system time step
                        int const AirLoopNum,          // air loop index
                        int &CompIndex                 // Index to changeover-bypass VAV system
@@ -290,7 +290,7 @@ namespace HVACMultiSpeedHeatPump {
 
     //******************************************************************************
 
-    void SimMSHP(AllGlobals &state, int const MSHeatPumpNum,       // number of the current engine driven Heat Pump being simulated
+    void SimMSHP(EnergyPlusData &state, int const MSHeatPumpNum,       // number of the current engine driven Heat Pump being simulated
                  bool const FirstHVACIteration, // TRUE if 1st HVAC simulation of system timestep
                  int const AirLoopNum,          // air loop index
                  Real64 &QSensUnitOut,          // cooling/heating deliveded to zones [W]
@@ -508,7 +508,7 @@ namespace HVACMultiSpeedHeatPump {
 
     //******************************************************************************
 
-    void GetMSHeatPumpInput(AllGlobals &state)
+    void GetMSHeatPumpInput(EnergyPlusData &state)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR:          Lixing Gu, FSEC
@@ -1727,7 +1727,7 @@ namespace HVACMultiSpeedHeatPump {
 
     //******************************************************************************
 
-    void InitMSHeatPump(AllGlobals &state, int const MSHeatPumpNum,       // Engine driven heat pump number
+    void InitMSHeatPump(EnergyPlusData &state, int const MSHeatPumpNum,       // Engine driven heat pump number
                         bool const FirstHVACIteration, // TRUE if first HVAC iteration
                         int const AirLoopNum,          // air loop index
                         Real64 &QZnReq,                // Heating/Cooling load for all served zones
@@ -2817,7 +2817,7 @@ namespace HVACMultiSpeedHeatPump {
 
     //******************************************************************************
 
-    void ControlMSHPOutput(AllGlobals &state, int const MSHeatPumpNum,       // Unit index of engine driven heat pump
+    void ControlMSHPOutput(EnergyPlusData &state, int const MSHeatPumpNum,       // Unit index of engine driven heat pump
                            bool const FirstHVACIteration, // flag for 1st HVAC iteration in the time step
                            int const CompOp,              // compressor operation; 1=on, 0=off
                            int const OpMode,              // operating mode: CycFanCycCoil | ContFanCycCoil
@@ -3320,7 +3320,7 @@ namespace HVACMultiSpeedHeatPump {
 
     //******************************************************************************
 
-    void CalcMSHeatPump(AllGlobals &state, int const MSHeatPumpNum,       // Engine driven heat pump number
+    void CalcMSHeatPump(EnergyPlusData &state, int const MSHeatPumpNum,       // Engine driven heat pump number
                         bool const FirstHVACIteration, // Flag for 1st HVAC iteration
                         int const CompOp,              // Compressor on/off; 1=on, 0=off
                         int const SpeedNum,            // Speed number
@@ -3683,7 +3683,7 @@ namespace HVACMultiSpeedHeatPump {
 
     //******************************************************************************
 
-    Real64 MSHPCyclingResidual(AllGlobals &state, Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 MSHPCyclingResidual(EnergyPlusData &state, Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                Array1<Real64> const &Par  // par(1) = MSHPNum
     )
     {
@@ -3760,7 +3760,7 @@ namespace HVACMultiSpeedHeatPump {
 
     //******************************************************************************
 
-    Real64 MSHPVarSpeedResidual(AllGlobals &state, Real64 const SpeedRatio,  // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+    Real64 MSHPVarSpeedResidual(EnergyPlusData &state, Real64 const SpeedRatio,  // compressor cycling ratio (1.0 is continuous, 0.0 is off)
                                 Array1<Real64> const &Par // par(1) = MSHPNum
     )
     {
@@ -4156,7 +4156,7 @@ namespace HVACMultiSpeedHeatPump {
         }
     }
 
-    void CalcNonDXHeatingCoils(AllGlobals &state, int const MSHeatPumpNum,       // multispeed heatpump index
+    void CalcNonDXHeatingCoils(EnergyPlusData &state, int const MSHeatPumpNum,       // multispeed heatpump index
                                bool const FirstHVACIteration, // flag for first HVAC iteration in the time step
                                Real64 const HeatingLoad,      // supplemental coil load to be met by unit (watts)
                                int const FanMode,             // fan operation mode
@@ -4359,7 +4359,7 @@ namespace HVACMultiSpeedHeatPump {
         HeatCoilLoadmet = QCoilActual;
     }
 
-    Real64 HotWaterCoilResidual(AllGlobals &state, Real64 const HWFlow,      // hot water flow rate in kg/s
+    Real64 HotWaterCoilResidual(EnergyPlusData &state, Real64 const HWFlow,      // hot water flow rate in kg/s
                                 Array1<Real64> const &Par // Par(5) is the requested coil load
     )
     {
