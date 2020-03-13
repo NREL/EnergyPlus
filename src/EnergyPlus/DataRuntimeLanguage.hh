@@ -262,8 +262,8 @@ namespace DataRuntimeLanguage {
         std::string UniqueIDName;    // unique id for internal var, All uppercase
         std::string Units;           // registered units, used for reporting and checks.
         int PntrVarTypeUsed;         // data type used: integer (PntrInteger) or real (PntrReal)
-        Reference<Real64> RealValue; // fortran POINTER to the REAL value that is being accessed
-        Reference_int IntValue;      // fortran POINTER to the Integer value that is being accessed
+        Real64 * RealValue; // POINTER to the REAL value that is being accessed
+        int * IntValue;      // POINTER to the Integer value that is being accessed
 
         // Default Constructor
         InternalVarsAvailableType() : PntrVarTypeUsed(0)
@@ -298,13 +298,13 @@ namespace DataRuntimeLanguage {
         std::string Units;             // control value units, used for reporting and checks.
         int PntrVarTypeUsed;           // data type used: integer (PntrInteger), real (PntrReal)
         // or logical (PntrLogical)
-        Reference_bool Actuated;     // fortran POINTER to the logical value that signals EMS is actuating
-        Reference<Real64> RealValue; // fortran POINTER to the REAL value that is being actuated
-        Reference_int IntValue;      // fortran POINTER to the Integer value that is being actuated
-        Reference_bool LogValue;     // fortran POINTER to the Logical value that is being actuated
+        bool * Actuated;     // POINTER to the logical value that signals EMS is actuating
+        Real64 * RealValue; // POINTER to the REAL value that is being actuated
+        int * IntValue;      // POINTER to the Integer value that is being actuated
+        bool * LogValue;     // POINTER to the Logical value that is being actuated
 
         // Default Constructor
-        EMSActuatorAvailableType() : PntrVarTypeUsed(0)
+        EMSActuatorAvailableType() : PntrVarTypeUsed(0), Actuated(nullptr), RealValue(nullptr), IntValue(nullptr), LogValue(nullptr)
         {
         }
     };

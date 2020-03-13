@@ -62,6 +62,7 @@
 #include <EnergyPlus/AirflowNetwork/include/AirflowNetwork/Solver.hpp>
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/BranchNodeConnections.hh>
+#include <EnergyPlus/Coils/CoilCoolingDX.hh>
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataAirLoop.hh>
@@ -102,7 +103,6 @@
 #include <EnergyPlus/ThermalComfort.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/ZoneDehumidifier.hh>
-
 
 namespace EnergyPlus {
 
@@ -1642,9 +1642,8 @@ namespace AirflowNetworkBalanceManager {
         Real64 baseratio;
 
         // Formats
-        static constexpr auto Format_110(
-            "! <AirflowNetwork Model:Control>, No Multizone or Distribution/Multizone with Distribution/Multizone "
-            "without Distribution/Multizone with Distribution only during Fan Operation\n");
+        static constexpr auto Format_110("! <AirflowNetwork Model:Control>, No Multizone or Distribution/Multizone with Distribution/Multizone "
+                                         "without Distribution/Multizone with Distribution only during Fan Operation\n");
         static constexpr auto Format_120("AirflowNetwork Model:Control,{}\n");
 
         // Set the maximum numbers of input fields
@@ -2842,9 +2841,10 @@ namespace AirflowNetworkBalanceManager {
         for (i = 1; i <= AirflowNetworkNumOfSurfaces; ++i) {
             if (MultizoneSurfaceData(i).NonRectangular) {
                 if (found) {
-                    print(outputFiles.eio,
-                          "! <AirflowNetwork Model:Equivalent Rectangle Surface>, Name, Equivalent Height {{m}}, Equivalent Width {{m}} AirflowNetwork "
-                          "Model:Equivalent Rectangle\n");
+                    print(
+                        outputFiles.eio,
+                        "! <AirflowNetwork Model:Equivalent Rectangle Surface>, Name, Equivalent Height {{m}}, Equivalent Width {{m}} AirflowNetwork "
+                        "Model:Equivalent Rectangle\n");
                     found = false;
                 }
                 print(outputFiles.eio,
@@ -3164,7 +3164,8 @@ namespace AirflowNetworkBalanceManager {
         if (AirflowNetworkNumOfSingleSideZones > 0) {
             for (i = 1; i <= AirflowNetworkNumOfZones; ++i) {
                 if (MultizoneZoneData(i).SingleSidedCpType == "ADVANCED") {
-                    print(outputFiles.eio, "AirflowNetwork: Advanced Single-Sided Model: Difference in Opening Wind Pressure Coefficients (DeltaCP), ");
+                    print(outputFiles.eio,
+                          "AirflowNetwork: Advanced Single-Sided Model: Difference in Opening Wind Pressure Coefficients (DeltaCP), ");
                     print(outputFiles.eio, "{}, ", MultizoneZoneData(i).ZoneName);
                     for (unsigned j = 1; j <= EPDeltaCP(i).WindDir.size() - 1; ++j) {
                         print(outputFiles.eio, "{:.2R},", EPDeltaCP(i).WindDir(j));
@@ -3592,13 +3593,22 @@ namespace AirflowNetworkBalanceManager {
                     UtilityRoutines::SameString(Alphas(3), "OAMixerOutdoorAirStreamNode") ||
                     UtilityRoutines::SameString(Alphas(3), "OutdoorAir:NodeList") || UtilityRoutines::SameString(Alphas(3), "OutdoorAir:Node") ||
                     UtilityRoutines::SameString(Alphas(3), "Other") || lAlphaBlanks(3)) {
-                    continue;
                 } else {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\" invalid " + cAlphaFields(3) + "=\"" + Alphas(3) +
                                     "\" illegal key.");
-                    ShowContinueError("Valid keys are: AirLoopHVAC:ZoneMixer, AirLoopHVAC:ZoneSplitter, AirLoopHVAC:OutdoorAirSystem, "
+                    ShowContinueError("Valid keys are: AirLoopHVAC:ZoneMixer, AirLoopHVAC:ZoneSplitter, AirLoopHVAC:OutdoorAirSystem, " 
                                       "OAMixerOutdoorAirStreamNode, OutdoorAir:NodeList, OutdoorAir:Node or Other.");
                     ErrorsFound = true;
+                }
+                // Avoid duplication of EPlusName
+                for (j = 1; j < i; ++j) {
+                    if (!UtilityRoutines::SameString(Alphas(2), "")) {
+                        if (UtilityRoutines::SameString(DisSysNodeData(j).EPlusName, Alphas(2))) {
+                            ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\" Duplicated " + cAlphaFields(2) + "=\"" +
+                                            Alphas(2) + "\". Please make a correction.");
+                            ErrorsFound = true;
+                        }
+                    }
                 }
             }
         } else {
@@ -9880,7 +9890,24 @@ namespace AirflowNetworkBalanceManager {
             {
                 auto const SELECT_CASE_var(UtilityRoutines::MakeUPPERCase(DisSysCompCoilData(i).EPlusType));
 
-                if (SELECT_CASE_var == "COIL:COOLING:DX:SINGLESPEED") {
+                if (SELECT_CASE_var == "COIL:COOLING:DX") {
+                    ValidateComponent("Coil:Cooling:DX", DisSysCompCoilData(i).Name, IsNotOK, RoutineName + CurrentModuleObject);
+                    if (IsNotOK) {
+                        ErrorsFound = true;
+                    } else {
+                        // Replace the convenience function with in-place code
+                        std::string mycoil = DisSysCompCoilData(i).Name;
+                        auto it = std::find_if(
+                            coilCoolingDXs.begin(), coilCoolingDXs.end(), [&mycoil](const CoilCoolingDX &coil) { return coil.name == mycoil; });
+                        if (it != coilCoolingDXs.end()) {
+                            // Set the airloop number on the CoilCoolingDX object, which is used to collect the runtime fraction
+                            it->airLoopNum = DisSysCompCoilData(i).AirLoopNum;
+                        } else {
+                            ShowSevereError("SetDXCoilAirLoopNumber: Could not find Coil \"Name=\"" + DisSysCompCoilData(i).Name + "\"");
+                        }
+                        // SetDXCoilAirLoopNumber(DisSysCompCoilData(i).Name, DisSysCompCoilData(i).AirLoopNum);
+                    }
+                } else if (SELECT_CASE_var == "COIL:COOLING:DX:SINGLESPEED") {
                     ValidateComponent("Coil:Cooling:DX:SingleSpeed", DisSysCompCoilData(i).Name, IsNotOK, RoutineName + CurrentModuleObject);
                     if (IsNotOK) {
                         ErrorsFound = true;
