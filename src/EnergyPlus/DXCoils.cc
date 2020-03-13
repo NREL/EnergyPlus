@@ -9226,20 +9226,19 @@ namespace DXCoils {
             //     IF (FanOpMode .EQ. CycFanCycCoil) AirMassFlow = AirMassFlow / PartLoadRatio
             // For multimode coil, this should be full flow including bypassed fraction
             AirMassFlow = DXCoil(DXCoilNum).InletAirMassFlowRate;
-            DXCoil(DXCoilNum).TotalCoolingEnergyRate = AirMassFlow * (InletAirEnthalpy - OutletAirEnthalpy);
+            //DXCoil(DXCoilNum).TotalCoolingEnergyRate = AirMassFlow * (InletAirEnthalpy - OutletAirEnthalpy);
 
+            CalcTotalSensibleLatentOutput(AirMassFlow, InletAirDryBulbTemp, InletAirHumRat, OutletAirTemp, OutletAirHumRat, DXCoil(DXCoilNum).TotalCoolingEnergyRate, DXCoil(DXCoilNum).SensCoolingEnergyRate, DXCoil(DXCoilNum).LatCoolingEnergyRate);
             // Set DataHeatGlobal heat reclaim variable for use by heat reclaim coil (part load ratio is accounted for)
             // Calculation for heat reclaim needs to be corrected to use compressor power (not including condenser fan power)
             HeatReclaimDXCoil(DXCoilNum).AvailCapacity = DXCoil(DXCoilNum).TotalCoolingEnergyRate + DXCoil(DXCoilNum).ElecCoolingPower;
 
-            MinAirHumRat = min(InletAirHumRat, OutletAirHumRat);
-            DXCoil(DXCoilNum).SensCoolingEnergyRate =
-                AirMassFlow * (PsyHFnTdbW(InletAirDryBulbTemp, MinAirHumRat) - PsyHFnTdbW(OutletAirTemp, MinAirHumRat));
+            //DXCoil(DXCoilNum).SensCoolingEnergyRate = AirMassFlow * PsyDeltaHSenFnTdb2W2Tdb1W1(InletAirDryBulbTemp, InletAirHumRat, OutletAirTemp, OutletAirHumRat);
             //  Don't let sensible capacity be greater than total capacity
-            if (DXCoil(DXCoilNum).SensCoolingEnergyRate > DXCoil(DXCoilNum).TotalCoolingEnergyRate) {
-                DXCoil(DXCoilNum).SensCoolingEnergyRate = DXCoil(DXCoilNum).TotalCoolingEnergyRate;
-            }
-            DXCoil(DXCoilNum).LatCoolingEnergyRate = DXCoil(DXCoilNum).TotalCoolingEnergyRate - DXCoil(DXCoilNum).SensCoolingEnergyRate;
+            //if (DXCoil(DXCoilNum).SensCoolingEnergyRate > DXCoil(DXCoilNum).TotalCoolingEnergyRate) {
+            //    DXCoil(DXCoilNum).SensCoolingEnergyRate = DXCoil(DXCoilNum).TotalCoolingEnergyRate;
+            //}
+            //DXCoil(DXCoilNum).LatCoolingEnergyRate = DXCoil(DXCoilNum).TotalCoolingEnergyRate - DXCoil(DXCoilNum).SensCoolingEnergyRate;
 
             // Calculate crankcase heater power using the runtime fraction for this DX cooling coil only if there is no companion DX coil.
             // Else use the largest runtime fraction of this DX cooling coil and the companion DX heating coil.
@@ -16942,6 +16941,29 @@ namespace DXCoils {
         // Disable latent degradation when direct solution is used.
 
         DXCoil(DXCoilNum).Twet_Rated(1) = 0.0;
+    }
+
+    void CalcTotalSensibleLatentOutput(Real64 const MassFlow,  // air mass flow rate, {kg/s}
+        Real64 const TDB2,      // dry-bulb temperature at state 2 {C}
+        Real64 const dW2,       // humidity ratio at  at state 2
+        Real64 const TDB1,      // dry-bulb temperature at  at state 1 {C}
+        Real64 const dW1,       // humidity ratio  at state 1
+        Real64 &TotalOutput,    // total = sensible + latent putput rate (state 2 -> State 1), {W}
+        Real64 &SensibleOutput, // sensible output rate (state 2 -> State 1), {W}
+        Real64 &LatentOutput    // latent output rate (state 2 -> State 1), {W}
+
+    )
+    {
+        TotalOutput = 0.0;
+        LatentOutput = 0.0;
+        SensibleOutput = 0.0;
+        if (MassFlow > 0.0) {
+            TotalOutput = MassFlow * (Psychrometrics::PsyHFnTdbW(TDB2, dW2) - Psychrometrics::PsyHFnTdbW(TDB1, dW1));  // total addition/removal rate, {W};
+            SensibleOutput = MassFlow * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(TDB2, dW2, TDB1, dW1); // sensible addition/removal rate, {W};
+            Real64 const h_fg_avg = Psychrometrics::PsyHfgAvgFnTdb2Tdb1(TDB2, TDB1); // average latent heat of vaporization, {J/kg};
+            if (SensibleOutput > TotalOutput) {SensibleOutput = TotalOutput;}; //  reset if sensible is higher than total, 
+            LatentOutput = TotalOutput - SensibleOutput; // latent addition/removal rate, {W}
+        }
     }
 
     // Clears the global data in DXCoils.
