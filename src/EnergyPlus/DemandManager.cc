@@ -667,7 +667,7 @@ namespace DemandManager {
         using DataHeatBalance::ZoneElectricObjects;
         using DataZoneControls::TempControlledZone;
         using DataZoneControls::TStatObjects;
-        //!$using ExteriorEnergyUse::state.exteriorEnergyUse.ExteriorLights;
+        //!$using ExteriorEnergyUse::ExteriorLights;
         using General::RoundSigDigits;
         using MixedAir::GetOAController;
         using ScheduleManager::GetScheduleIndex;
@@ -744,7 +744,7 @@ namespace DemandManager {
             DemandMgr.allocate(NumDemandMgr);
             UniqueDemandMgrNames.reserve(NumDemandMgr);
 
-            // Get input for DemandManager:state.exteriorEnergyUse.ExteriorLights
+            // Get input for DemandManager:ExteriorLights
             StartIndex = 1;
             EndIndex = NumDemandMgrExtLights;
 
