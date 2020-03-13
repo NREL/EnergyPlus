@@ -70,6 +70,7 @@ set( test_src
   ElectricPowerServiceManager.unit.cc
   EMSManager.unit.cc
   EvaporativeCoolers.unit.cc
+  EvaporativeFluidCoolers.unit.cc
   ExteriorEnergyUse.unit.cc
   FanCoilUnits.unit.cc
   Fans.unit.cc
