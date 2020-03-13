@@ -439,8 +439,10 @@ namespace HybridEvapCoolingModel {
         int numbers_len = Numbers.size();
         int OpperatingModes = Numbers(4);
         int parmsnumber = alphas_len + numbers_len;
-        int MinimumExpectedLength =
-            OpperatingModes * (MODE_BLOCK_OFFSET_Number + MODE_BLOCK_OFFSET_Alpha) + BLOCK_HEADER_OFFSET_Alpha + BLOCK_HEADER_OFFSET_Number;
+        int minHeaderFieldsLength = BLOCK_HEADER_OFFSET_Alpha + BLOCK_HEADER_OFFSET_Number;
+        int minimumOperatingFieldsLength = ((OpperatingModes-1) * (MODE_BLOCK_OFFSET_Number + MODE_BLOCK_OFFSET_Alpha)) + 1;
+
+        int MinimumExpectedLength = minimumOperatingFieldsLength + minHeaderFieldsLength;
         if (MinimumExpectedLength > parmsnumber) {
             return false;
         }
@@ -508,13 +510,14 @@ namespace HybridEvapCoolingModel {
                 cCurrentModuleObject);
             return false;
         }
+
         int inter_Number;
         bool ErrorsFound = false;
         int inter_Alpha = BLOCK_HEADER_OFFSET_Alpha + MODE_BLOCK_OFFSET_Alpha * ModeID;
-        if (ModeID == 1) {
-            inter_Number = BLOCK_HEADER_OFFSET_Number + MODE1_BLOCK_OFFSET_Number * ModeID;
-        } else {
+        if (ModeID > 0) {
             inter_Number = BLOCK_HEADER_OFFSET_Number + MODE1_BLOCK_OFFSET_Number + MODE_BLOCK_OFFSET_Number * (ModeID - 1);
+        } else {
+            inter_Number = BLOCK_HEADER_OFFSET_Number + MODE1_BLOCK_OFFSET_Number;
         }
         std::ostringstream strs;
         strs << ModeID;
