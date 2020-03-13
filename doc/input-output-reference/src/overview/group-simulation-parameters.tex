@@ -122,7 +122,7 @@ The figure below shows how the building north axis can be rotated to correspond 
 
 \begin{figure}[hbtp] % fig 1
 \centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image001.png}
+\includegraphics[width=0.4\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image001.png}
 \caption{Illustration of Building North Axis \protect \label{fig:illustration-of-building-north-axis}}
 \end{figure}
 
@@ -194,7 +194,7 @@ If you use \textbf{FullInteriorAndExterior} the program will also calculate how 
 
 \begin{figure}[hbtp] % fig 2
 \centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image002.png}
+\includegraphics[width=0.9\textwidth, height=0.5\textheight, keepaspectratio=true]{media/image002.png}
 \caption{Illustration of Convex and Non-convex Zones \protect \label{fig:illustration-of-convex-and-non-convex-zones}}
 \end{figure}
 
@@ -221,19 +221,19 @@ The building surfaces are assumed to be diffusely reflecting if they are opaque 
 
 \begin{figure}[hbtp] % fig 3
 \centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image003.png}
+\includegraphics[width=0.9\textwidth, height=0.7\textheight, keepaspectratio=true]{media/image003.png}
 \caption{  Solar reflection from shadowing surfaces. Solid arrows are beam solar radiation; dashed arrows are diffuse solar radiation. (a) Diffuse reflection of beam solar radiation from the top of an overhang. (b) Diffuse reflection of sky solar radiation from the top of an overhang. (c) Beam-to-beam (specular) reflection from the façade of an adjacent highly-glazed building represented by a vertical shadowing surface. \protect \label{fig:solar-reflection-from-shadowing-surfaces.}}
 \end{figure}
 
 \begin{figure}[hbtp] % fig 4
 \centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image004.png}
+\includegraphics[width=0.9\textwidth, height=0.7\textheight, keepaspectratio=true]{media/image004.png}
 \caption{  Solar reflection from building surfaces onto other building surfaces. In this example beam solar reflects from a vertical section of the building onto a roof section. The reflection from the window is specular. The reflection from the wall is diffuse. \protect \label{fig:solar-reflection-from-building-surfaces-onto}}
 \end{figure}
 
 \begin{figure}[hbtp] % fig 5
 \centering
-\includegraphics[width=0.9\textwidth, height=0.9\textheight, keepaspectratio=true]{media/image005.png}
+\includegraphics[width=0.9\textwidth, height=0.7\textheight, keepaspectratio=true]{media/image005.png}
 \caption{Shadowing from building affects beam solar reflection from the ground. Beam-to-diffuse reflection from the ground onto the building occurs only for sunlit areas, A and C, not from shaded area, B. \protect \label{fig:shadowing-from-building-affects-beam-solar}}
 \end{figure}
 
@@ -860,17 +860,17 @@ Run & Use Coil Direct Solution & Zone Radiant Exchange Algorithm & Override Mode
 
 This example uses 13 different simulations to arrive at the recommended values for the PerformancePrecisionTradeoffsobject, but fewer trials could have been made to reach a similar conclusion. The first run shows the results of no performance precision tradeoffs being applied and is the same as not having the PerformancePrecisionTradeoffs object present. It is a good idea to use this as a first step so that a baseline of the time, errors, and oscillations are available for reference.  Runs 2 through 6 are just stepping through the Override Modes. Run 7 employs the Use Coil Direct Solution option, but the time for the simulation went up, so it was not used anymore.  Runs 8 through 13 repeat the various override modes, but this time with the CarrollMRT radiant exchange algorithm. Mode02, Moded03, and Mode04 only save a few seconds compared to Mode01, which takes about one-third of the time of the baseline Run 1 time. Mode05 saves the most time with both ScriptF and CarrollMRT taking about one-fifth of the original time. Mode05 seems like the natural choice, but we need to look at other results in the \_perflog.csv file first before we come to that conclusion.
 
-These example simulations each took three minutes or less to try. If your building takes much longer than a few minutes, you might want to temporarily change your run period to just a  month or even a week to tune the PerformancePrecisionTradeoffs object inputs. If temporarily shortening the run period is necessary, it is best to pick a month or week that has some cooling and some heating. Just remember to set your run period back to a full year before coming to any conclusions about the building or energy eﬀiciency options being considered for the building.
+These example simulations each took three minutes or less to try. If your building takes much longer than a few minutes, you might want to temporarily change your run period to just a  month or even a week to tune the PerformancePrecisionTradeoffs object inputs. If temporarily shortening the run period is necessary, it is best to pick a month or week that has some cooling and some heating. Just remember to set your run period back to a full year before coming to any conclusions about the building or energy efficiency options being considered for the building.
 
 
 % table X
 {\scriptsize
-\begin{longtable}[c]{p{0.3in}p{0.75in}p{0.75in}p{0.75in}p{0.5in}p{0.5in}p{0.75in}p{0.75in}p{0.75in}}
+\begin{longtable}[c]{p{0.3in}p{0.4in}p{0.6in}p{0.75in}p{0.5in}p{0.5in}p{0.75in}p{0.75in}p{0.75in}}
 \caption{PerfLog Energy Columns\label{table:perflog_mode_columns}} \tabularnewline
 \toprule
 Run &
-  Use Coil Direct Solution &
-  Zone Radiant Exchange Algorithm &
+  UCDS &
+  ZREA &
   Override Mode &
   Electricity ABUPS Total {[}MJ{]} &
   Natural Gas ABUPS Total {[}MJ{]} &
@@ -879,19 +879,21 @@ Run &
 \midrule
 \endfirsthead
 
-1  & FALSE & ScriptF    & NORMAL & 3,103,200 & 756,352 & 213,489 & 158.1 \tabularnewline
-2  & FALSE & ScriptF    & MODE01 & 3,093,683 & 738,559 & 211,747 & 55.1  \tabularnewline
-3  & FALSE & ScriptF    & MODE02 & 3,097,292 & 746,356 & 212,704 & 52.4  \tabularnewline
-4  & FALSE & ScriptF    & MODE03 & 3,097,292 & 746,356 & 212,704 & 52.4  \tabularnewline
-5  & FALSE & ScriptF    & MODE04 & 3,097,292 & 746,356 & 212,704 & 51.7  \tabularnewline
-6  & FALSE & ScriptF    & MODE05 & 3,098,474 & 743,652 & 213,207 & 32.7  \tabularnewline
-7  & TRUE  & ScriptF    & NORMAL & 3,103,200 & 756,352 & 213,489 & 161.9 \tabularnewline
-8  & FALSE & CarrollMRT & NORMAL & 3,256,436 & 498,372 & 267,030 & 171.0 \tabularnewline
-9  & FALSE & CarrollMRT & MODE01 & 3,245,912 & 486,067 & 265,166 & 54.2  \tabularnewline
-10 & FALSE & CarrollMRT & MODE02 & 3,243,835 & 492,423 & 265,212 & 53.9  \tabularnewline
-11 & FALSE & CarrollMRT & MODE03 & 3,243,835 & 492,423 & 265,212 & 51.2  \tabularnewline
-12 & FALSE & CarrollMRT & MODE04 & 3,243,835 & 492,423 & 265,212 & 51.1  \tabularnewline
-13 & FALSE & CarrollMRT & MODE05 & 3,244,804 & 490,038 & 265,528 & 32.8  \tabularnewline
+1  & False & ScriptF  & NORMAL & 3,103,200 & 756,352 & 213,489 & 158.1 \tabularnewline
+2  & False & ScriptF  & MODE01 & 3,093,683 & 738,559 & 211,747 & 55.1  \tabularnewline
+3  & False & ScriptF  & MODE02 & 3,097,292 & 746,356 & 212,704 & 52.4  \tabularnewline
+4  & False & ScriptF  & MODE03 & 3,097,292 & 746,356 & 212,704 & 52.4  \tabularnewline
+5  & False & ScriptF  & MODE04 & 3,097,292 & 746,356 & 212,704 & 51.7  \tabularnewline
+6  & False & ScriptF  & MODE05 & 3,098,474 & 743,652 & 213,207 & 32.7  \tabularnewline
+7  & True  & ScriptF  & NORMAL & 3,103,200 & 756,352 & 213,489 & 161.9 \tabularnewline
+8  & False & CarrollMRT & NORMAL & 3,256,436 & 498,372 & 267,030 & 171.0 \tabularnewline
+9  & False & CarrollMRT & MODE01 & 3,245,912 & 486,067 & 265,166 & 54.2  \tabularnewline
+10 & False & CarrollMRT & MODE02 & 3,243,835 & 492,423 & 265,212 & 53.9  \tabularnewline
+11 & False & CarrollMRT & MODE03 & 3,243,835 & 492,423 & 265,212 & 51.2  \tabularnewline
+12 & False & CarrollMRT & MODE04 & 3,243,835 & 492,423 & 265,212 & 51.1  \tabularnewline
+13 & False & CarrollMRT & MODE05 & 3,244,804 & 490,038 & 265,528 & 32.8  \tabularnewline
+\multicolumn{8}{l}{UCDS: Use Coil Direct Solution} \tabularnewline
+\multicolumn{8}{l}{ZREA: Zone Radiant Exchange Algorithm} \tabularnewline
 \bottomrule
 \end{longtable}
 }
