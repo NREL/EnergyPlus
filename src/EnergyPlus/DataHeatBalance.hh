@@ -616,8 +616,7 @@ namespace DataHeatBalance {
 
     extern Array1D<Real64> const GasSpecificHeatRatio; // Gas specific heat ratios.  Used for gasses in low pressure
 
-    extern Real64 ZeroPointerVal;
-
+    extern Real64 zeroPointerVal;
     extern int NumAirBoundaryMixing;                 // Number of air boundary simple mixing objects needed
     extern std::vector<int> AirBoundaryMixingZone1;  // Air boundary simple mixing zone 1
     extern std::vector<int> AirBoundaryMixingZone2;  // Air boundary simple mixing zone 2
@@ -1862,27 +1861,28 @@ namespace DataHeatBalance {
         std::string CompObjectType;                   // device object class name
         std::string CompObjectName;                   // device user unique name
         int CompTypeOfNum;                            // type of internal gain device identifier
-        Reference<Real64> PtrConvectGainRate;         // fortan POINTER to value of convection heat gain rate for device, watts
+        Real64 * PtrConvectGainRate;         // POINTER to value of convection heat gain rate for device, watts
         Real64 ConvectGainRate;                       // current timestep value of convection heat gain rate for device, watts
-        Reference<Real64> PtrReturnAirConvGainRate;   // fortan POINTER to value of return air convection heat gain rate for device, W
+        Real64 * PtrReturnAirConvGainRate;   // POINTER to value of return air convection heat gain rate for device, W
         Real64 ReturnAirConvGainRate;                 // current timestep value of return air convection heat gain rate for device, W
-        Reference<Real64> PtrRadiantGainRate;         // fortan POINTER to value of thermal radiation heat gain rate for device, watts
+        Real64 * PtrRadiantGainRate;         // POINTER to value of thermal radiation heat gain rate for device, watts
         Real64 RadiantGainRate;                       // current timestep value of thermal radiation heat gain rate for device, watts
-        Reference<Real64> PtrLatentGainRate;          // fortan POINTER to value of moisture gain rate for device, Watts
+        Real64 * PtrLatentGainRate;          // POINTER to value of moisture gain rate for device, Watts
         Real64 LatentGainRate;                        // current timestep value of moisture gain rate for device, Watts
-        Reference<Real64> PtrReturnAirLatentGainRate; // fortan POINTER to value of return air moisture gain rate for device, Watts
+        Real64 * PtrReturnAirLatentGainRate; // POINTER to value of return air moisture gain rate for device, Watts
         Real64 ReturnAirLatentGainRate;               // current timestep value of return air moisture gain rate for device, Watts
-        Reference<Real64> PtrCarbonDioxideGainRate;   // fortan POINTER to value of carbon dioxide gain rate for device
+        Real64 * PtrCarbonDioxideGainRate;   // POINTER to value of carbon dioxide gain rate for device
         Real64 CarbonDioxideGainRate;                 // current timestep value of carbon dioxide gain rate for device
-        Reference<Real64> PtrGenericContamGainRate;   // fortan POINTER to value of generic contaminant gain rate for device
+        Real64 * PtrGenericContamGainRate;   // POINTER to value of generic contaminant gain rate for device
         Real64 GenericContamGainRate;                 // current timestep value of generic contaminant gain rate for device
         int ReturnAirNodeNum;                         // return air node number for retrun air convection heat gain
 
         // Default Constructor
         GenericComponentZoneIntGainStruct()
-            : CompTypeOfNum(0), ConvectGainRate(0.0), // Autodesk:Init Zero initializations for Real64 members added to fix use uninitialized: Such
-                                                      // use probably is a logic bug that still needs fixing
-              ReturnAirConvGainRate(0.0), RadiantGainRate(0.0), LatentGainRate(0.0), ReturnAirLatentGainRate(0.0), CarbonDioxideGainRate(0.0),
+            : CompTypeOfNum(0), PtrConvectGainRate(nullptr), ConvectGainRate(0.0), PtrReturnAirConvGainRate(nullptr),
+              ReturnAirConvGainRate(0.0), PtrRadiantGainRate(nullptr), RadiantGainRate(0.0), PtrLatentGainRate(nullptr),
+              LatentGainRate(0.0), PtrReturnAirLatentGainRate(nullptr), ReturnAirLatentGainRate(0.0),
+              PtrCarbonDioxideGainRate(nullptr), CarbonDioxideGainRate(0.0), PtrGenericContamGainRate(nullptr),
               GenericContamGainRate(0.0), ReturnAirNodeNum(0)
         {
         }

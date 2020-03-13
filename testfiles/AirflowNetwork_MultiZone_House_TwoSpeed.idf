@@ -1553,7 +1553,7 @@
 
   AirflowNetwork:Distribution:Node,
     MainInletNode,           !- Name
-    Air Loop Inlet Node,     !- Component Name or Node Name
+    ,                        !- Component Name or Node Name
     Other,                   !- Component Object Type or Node Type
     3.0;                     !- Node Height {m}
 
