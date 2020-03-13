@@ -128,7 +128,7 @@ namespace HybridEvapCoolingModel {
         Real64 Maximum_Return_Air_Humidity_Ratio;
         Real64 Minimum_Return_Air_Relative_Humidity;
         Real64 Maximum_Return_Air_Relative_Humidity;
-        Real64 Correction;
+        Real64 ModelScalingFactor;
         int MODE_BLOCK_OFFSET_Alpha;
         int BLOCK_HEADER_OFFSET_Alpha;
         int MODE1_BLOCK_OFFSET_Number;
@@ -142,7 +142,7 @@ namespace HybridEvapCoolingModel {
                             std::string cCurrentModuleObject);
         bool ParseMode(int ModeCounter,
                        std::vector<CMode> *OperatingModes,
-                       Real64 correction,
+                       Real64 ScalingFactor,
                        Array1D_string Alphas,
                        Array1D_string cAlphaFields,
                        Array1D<Real64> Numbers,

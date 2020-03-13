@@ -123,7 +123,7 @@ namespace HybridEvapCoolingModel {
 
     CMode::CMode()
         : ModeID(0.0), Max_Msa(0.0), Min_Msa(0.0), Min_OAF(0.0), Max_OAF(0.0), Minimum_Outdoor_Air_Temperature(0.0),
-          Maximum_Outdoor_Air_Temperature(0.0), Minimum_Outdoor_Air_Humidity_Ratio(0.0), Maximum_Outdoor_Air_Humidity_Ratio(0.0), Correction(0.0)
+          Maximum_Outdoor_Air_Temperature(0.0), Minimum_Outdoor_Air_Humidity_Ratio(0.0), Maximum_Outdoor_Air_Humidity_Ratio(0.0), ModelScalingFactor(0.0)
     {
         MODE_BLOCK_OFFSET_Alpha = 9;
         BLOCK_HEADER_OFFSET_Alpha = 19;
@@ -224,10 +224,10 @@ namespace HybridEvapCoolingModel {
 
         // METHODOLOGY EMPLOYED:
         // Makes a call to the curve manager, then multiplies the result by either the NormalizationReference for intensive variables or by the
-        // scaling Correction for extensive variables. The Normalization reference is specified as a model input, the Correction is equal to the
-        // Scaling Factor, which is input by the user in the idf for this unit, and passed to this CMode from the parent Model. The following
-        // tables are for intensive variables : Supply Air Temperature, Supply Air Humidity, External Static Pressure, The following tables are
-        // for extensive variables : Electric Power, Fan Electric Power, Second Fuel Consumption, Third Fuel Consumption, Water Use Lookup Table
+        // ModelScalingFactorn for extensive variables. The Normalization reference is specified as a model input, the ModelScalingFactor is the
+        // parent model's Scaling Factor, which is input by the user in the idf for this unit, and passed to this CMode from the parent Model. The
+        // following tables are for intensive variables : Supply Air Temperature, Supply Air Humidity, External Static Pressure, The following tables
+        // are for extensive variables : Electric Power, Fan Electric Power, Second Fuel Consumption, Third Fuel Consumption, Water Use Lookup Table
         //
         // Tosa is the outside air temperature
         // Wosa is the outside humidity ratio
@@ -260,10 +260,10 @@ namespace HybridEvapCoolingModel {
             }
             break;
 
-        // The Correction factor for the Power, Fan Power, Static Pressure, Water, and Fuel Use curves is equal to the Parent Model's Scaling Factor
+        // The ModelScalingFactor factor for the Power, Fan Power, Water, and Fuel Use curves is equal to the Parent Model's Scaling Factor
         case POWER_CURVE:
             if (ValidPointer(Psa_curve_pointer)) {
-                Y_val = Correction * CurveValue(Psa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
+                Y_val = ModelScalingFactor * CurveValue(Psa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
             } else {
                 Y_val = 0;
             }
@@ -272,7 +272,7 @@ namespace HybridEvapCoolingModel {
 
         case SUPPLY_FAN_POWER:
             if (ValidPointer(SFPsa_curve_pointer)) {
-                Y_val = Correction * CurveValue(SFPsa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
+                Y_val = ModelScalingFactor * CurveValue(SFPsa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
             } else {
                 Y_val = 0;
             }
@@ -288,7 +288,7 @@ namespace HybridEvapCoolingModel {
 
         case SECOND_FUEL_USE:
             if (ValidPointer(SFUsa_curve_pointer)) {
-                Y_val = Correction * CurveValue(SFUsa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
+                Y_val = ModelScalingFactor * CurveValue(SFUsa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
             } else {
                 Y_val = 0; // or set a more reasonable default
             }
@@ -296,7 +296,7 @@ namespace HybridEvapCoolingModel {
 
         case THIRD_FUEL_USE:
             if (ValidPointer(TFUsa_curve_pointer)) {
-                Y_val = Correction * CurveValue(TFUsa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
+                Y_val = ModelScalingFactor * CurveValue(TFUsa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
             } else {
                 Y_val = 0; // or set a more reasonable default
             }
@@ -304,7 +304,7 @@ namespace HybridEvapCoolingModel {
 
         case WATER_USE:
             if (ValidPointer(WUsa_curve_pointer)) {
-                Y_val = Correction * CurveValue(WUsa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
+                Y_val = ModelScalingFactor * CurveValue(WUsa_curve_pointer, Tosa, Wosa, Tra, Wra, Msa, OSAF);
             } else {
                 Y_val = 0; // or set a more reasonable default
             }
@@ -497,7 +497,7 @@ namespace HybridEvapCoolingModel {
 
         // Using/Aliasing
         ModeID = ModeCounter;
-        Correction = ScalingFactor;
+        ModelScalingFactor = ScalingFactor;
 
         if (!ValidateArrays(Alphas, cAlphaFields, Numbers, cNumericFields, cCurrentModuleObject)) {
             ShowSevereError(

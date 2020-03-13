@@ -695,7 +695,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_CalculateCurveVal)
     CMode mode0 = pZoneHybridUnitaryAirConditioner->OperatingModes[0];
 
     // The following loop is intended to loop through the valid curves in each operating mode, where i corresponds to the correct curve index in this operating mode, as well as the correct expected
-    // return value in the ExpectedResults array. The values of the curves are as follow:
+    // return value in the ExpectedResults array. The values of the curves currently being tested are as follow:
     //
     // TEMP_CURVE = 0;
     // W_CURVE = 1;
