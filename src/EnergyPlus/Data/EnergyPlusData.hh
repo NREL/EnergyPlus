@@ -119,15 +119,6 @@ struct ExteriorEnergyUseGlobals : BaseGlobalStruct
         NumExteriorLights = 0;
         NumExteriorEqs = 0;
         ExteriorLights.deallocate();
-        //BELOW IS THIS EVEN NEEDED NOW GIVEN THE ExteriorLights.deallocate(); ABOVE??
-        //FROM OutputReportTabular.clear_state().ResetTabularReports().ResetRemainingPredefinedEntries()
-        //for (iLight = 1; iLight <= state.exteriorEnergyUse.NumExteriorLights; ++iLight) {
-        //int iLight;
-        for (size_t iLight = 1; iLight <= ExteriorLights.size(); ++iLight) {
-            ExteriorLights(iLight).SumTimeNotZeroCons = 0.;
-            ExteriorLights(iLight).SumConsumption = 0.;
-        }
-
     }
 };
 
@@ -189,7 +180,5 @@ struct EnergyPlusData : BaseGlobalStruct
         pipes.clear_state();
     };
 };
-
-//extern EnergyPlusData state;
 
 #endif

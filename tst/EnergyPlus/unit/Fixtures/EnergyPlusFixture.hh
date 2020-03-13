@@ -62,8 +62,6 @@
 
 namespace EnergyPlus {
 
-//EnergyPlusData state;
-
 // This is a helper struct to redirect std::cout. This makes sure std::cout is redirected back and
 // everything is cleaned up properly
 struct RedirectCout
