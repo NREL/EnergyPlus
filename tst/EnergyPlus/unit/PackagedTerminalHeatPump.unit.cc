@@ -796,7 +796,7 @@ TEST_F(PTHPFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(OutputFiles::getSingleton()); // read schedules
+    ProcessScheduleInput(outputFiles()); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
@@ -1148,7 +1148,7 @@ TEST_F(PTHPFixture, SimPTAC_SZVAVTest)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(OutputFiles::getSingleton()); // read schedules
+    ProcessScheduleInput(outputFiles()); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 

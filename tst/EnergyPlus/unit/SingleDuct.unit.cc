@@ -126,7 +126,7 @@ TEST_F(EnergyPlusFixture, VAVNoReheatTerminalUnitSchedule)
 
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton()); // read schedules
+    ScheduleManager::ProcessScheduleInput(outputFiles()); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
@@ -297,7 +297,7 @@ TEST_F(EnergyPlusFixture, VAVReheatTerminalUnitSchedule)
 
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton()); // read schedules
+    ScheduleManager::ProcessScheduleInput(outputFiles()); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
@@ -1255,7 +1255,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_ZeroFloorAreaTest)
 
     // OutputProcessor::TimeValue.allocate(2);
 
-    ManageSimulation(OutputFiles::getSingleton()); // run the design day over the warmup period (24 hrs, 25 days)
+    ManageSimulation(outputFiles()); // run the design day over the warmup period (24 hrs, 25 days)
 
     // compare_err_stream( "" ); // just for debugging
 
@@ -2454,7 +2454,7 @@ TEST_F(EnergyPlusFixture, SingleDuct_VAVWaterCoilSizing)
 
     // OutputProcessor::TimeValue.allocate(2);
 
-    ManageSimulation(OutputFiles::getSingleton()); // run the design days
+    ManageSimulation(outputFiles()); // run the design days
 
     // size the reheat coil with no design zone heating load
     // DesZoneHeatLoad = 0 from simulating design days and forcing heating load = 0
