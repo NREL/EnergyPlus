@@ -2794,7 +2794,7 @@ TEST_F(EnergyPlusFixture, WindowManager_SrdLWRTest)
     WindowManager::CalcWindowHeatBalance(2, DataHeatBalance::HConvIn(2), inSurfTemp, outSurfTemp);
     // Test if LWR from surrounding surfaces correctly calculated
     EXPECT_DOUBLE_EQ(StefanBoltzmann * 0.84 * 0.6 * (pow_4(25.0 + KelvinConv) - pow_4(thetas(1))), DataHeatBalSurface::QRadLWOutSrdSurfs(2));
-    EXPECT_NEAR(-63.6456, DataHeatBalSurface::QHeatEmiReport(2),3);
+    EXPECT_NEAR(-24.9342, DataHeatBalSurface::QHeatEmiReport(2),3);
 }
 TEST_F(EnergyPlusFixture, WindowMaterialComplexShadeTest)
 {

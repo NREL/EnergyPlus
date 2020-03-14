@@ -3074,6 +3074,7 @@ namespace WindowManager {
 
         Real64 const Tsout_4(pow_4(Tsout)); // Tuned To reduce pow calls and redundancies
         Real64 const Tout_4(pow_4(tout));
+        Real64 const emiss_sigma_product(SurfOutsideEmiss * sigma);
         Real64 rad_out_lw_srd_per_area = 0;
 
         if (AnyLocalEnvironmentsInModel) {
@@ -3083,24 +3084,24 @@ namespace WindowManager {
                     SrdSurfViewFac = SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
                     SrdSurfTempAbs =
                         GetCurrentScheduleValue(SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) + KelvinConv;
-                    rad_out_lw_srd_per_area += SurfOutsideEmiss * sigma * SrdSurfViewFac * (pow_4(SrdSurfTempAbs) - Tsout_4);
+                    rad_out_lw_srd_per_area += - emiss_sigma_product * SrdSurfViewFac * (Tsout_4 - pow_4(SrdSurfTempAbs));
                 }
             }
         }
 
-        Real64 const rad_out_air_per_area = - SurfOutsideEmiss * sigma * (1.0 - AirSkyRadSplit(SurfNum)) * surface.ViewFactorSkyIR * (Tsout_4 - Tout_4);
-        Real64 const rad_out_ground_per_area = - SurfOutsideEmiss * sigma * surface.ViewFactorGroundIR * (Tsout_4 - Tout_4);
-        Real64 const rad_out_sky_per_area = - SurfOutsideEmiss * sigma * AirSkyRadSplit(SurfNum) * surface.ViewFactorSkyIR * (Tsout_4 - pow_4(SkyTempKelvin));
-        Real64 const rad_out_per_area = rad_out_air_per_area + rad_out_ground_per_area + rad_out_ground_per_area + rad_out_per_area;
+        Real64 const rad_out_air_per_area = - emiss_sigma_product * (1.0 - AirSkyRadSplit(SurfNum)) * surface.ViewFactorSkyIR * (Tsout_4 - Tout_4);
+        Real64 const rad_out_ground_per_area = - emiss_sigma_product * surface.ViewFactorGroundIR * (Tsout_4 - Tout_4);
+        Real64 const rad_out_sky_per_area = - emiss_sigma_product * AirSkyRadSplit(SurfNum) * surface.ViewFactorSkyIR * (Tsout_4 - pow_4(SkyTempKelvin));
+        Real64 const rad_out_per_area = rad_out_air_per_area + rad_out_sky_per_area + rad_out_ground_per_area + rad_out_lw_srd_per_area;
 
-        QRadLWOutSrdSurfs(SurfNum) = surface.Area * rad_out_lw_srd_per_area;
+        QRadLWOutSrdSurfs(SurfNum) = rad_out_lw_srd_per_area;
         QdotRadOutRep(SurfNum) = surface.Area * rad_out_per_area;
         QdotRadOutRepPerArea(SurfNum) = rad_out_per_area;
         QRadOutReport(SurfNum) = QdotRadOutRep(SurfNum) * TimeStepZoneSec;
 
         // Radiation emission to air rate
         DataHeatBalSurface::QAirExtReport(SurfNum) = surface.Area * rad_out_air_per_area;
-        DataHeatBalSurface::QHeatEmiReport(SurfNum) = DataHeatBalSurface::QAirExtReport(SurfNum) - QdotConvOutRep(SurfNum);
+        DataHeatBalSurface::QHeatEmiReport(SurfNum) = surface.Area * hcout * (Tsout - tout) + DataHeatBalSurface::QAirExtReport(SurfNum);;
 
     }
 
