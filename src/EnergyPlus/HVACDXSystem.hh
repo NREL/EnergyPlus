@@ -339,9 +339,9 @@ namespace HVACDXSystem {
                                   Array1<Real64> const &Par // par(1) = DX coil number
     );
 
-    int GetCoolingCoilInletNodeNum(EnergyPlusData &state, std::string const &DXCoilSysName);
+    int GetCoolingCoilInletNodeNum(EnergyPlusData &state, std::string const &DXCoilSysName, bool &InletNodeErrFlag);
 
-    int GetCoolingCoilOutletNodeNum(EnergyPlusData &state, std::string const &DXCoilSysName);
+    int GetCoolingCoilOutletNodeNum(EnergyPlusData &state, std::string const &DXCoilSysName, bool &OutletNodeErrFlag);
 
     //        End of Calculation subroutines for the DXCoolingSystem Module
     // *****************************************************************************

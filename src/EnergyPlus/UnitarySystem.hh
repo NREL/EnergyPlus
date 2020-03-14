@@ -765,8 +765,8 @@ namespace UnitarySystems {
         ) override;
 
         void sizeSystem(EnergyPlusData &state, bool const FirstHVACIteration, int const AirLoopNum) override;
-        int getAirInNode(EnergyPlusData &state, std::string const &UnitarySysName, int const ZoneOAUnitNum)override;
-        int getAirOutNode(EnergyPlusData &state, std::string const &UnitarySysName, int const ZoneOAUnitNum)override;
+        int getAirInNode(EnergyPlusData &state, std::string const &UnitarySysName, int const ZoneOAUnitNum, bool &errFlag) override;
+        int getAirOutNode(EnergyPlusData &state, std::string const &UnitarySysName, int const ZoneOAUnitNum, bool &errFlag) override;
     };
 
     extern std::vector<UnitarySys> unitarySys;

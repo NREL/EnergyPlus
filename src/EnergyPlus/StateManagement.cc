@@ -48,6 +48,7 @@
 #include <EnergyPlus/StateManagement.hh>
 
 #include <AirflowNetwork/Elements.hpp>
+#include <AirflowNetwork/Properties.hpp>
 #include <EnergyPlus/AirflowNetworkBalanceManager.hh>
 #include <EnergyPlus/BaseboardElectric.hh>
 #include <EnergyPlus/BaseboardRadiator.hh>
@@ -158,6 +159,7 @@
 #include <EnergyPlus/IntegratedHeatPump.hh>
 #include <EnergyPlus/InternalHeatGains.hh>
 #include <EnergyPlus/LowTempRadiantSystem.hh>
+#include <EnergyPlus/MicroCHPElectricGenerator.hh>
 #include <EnergyPlus/MixedAir.hh>
 #include <EnergyPlus/MixerComponent.hh>
 #include <EnergyPlus/MoistureBalanceEMPDManager.hh>
@@ -349,6 +351,7 @@ void EnergyPlus::clearAllStates()
     IntegratedHeatPump::clear_state();
     InternalHeatGains::clear_state();
     LowTempRadiantSystem::clear_state();
+    MicroCHPElectricGenerator::clear_state();
     MixedAir::clear_state();
     MixerComponent::clear_state();
     MoistureBalanceEMPDManager::clear_state();

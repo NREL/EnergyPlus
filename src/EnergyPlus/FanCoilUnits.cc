@@ -1310,7 +1310,7 @@ namespace FanCoilUnits {
             !DataHVACGlobals::ZoneCompTurnFansOff) {
             Node(InletNode).MassFlowRate = FanCoil(FanCoilNum).MaxAirMassFlow;
             Node(InletNode).MassFlowRateMaxAvail = Node(InletNode).MassFlowRate;
-            Node(InletNode).MassFlowRateMinAvail = Node(InletNode).MassFlowRate;
+            Node(InletNode).MassFlowRateMinAvail = 0.0;
 
             if (OutsideAirNode > 0) {
                 Node(OutsideAirNode).MassFlowRate = FanCoil(FanCoilNum).OutAirMassFlow;

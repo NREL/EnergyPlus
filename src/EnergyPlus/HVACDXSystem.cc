@@ -3832,15 +3832,13 @@ namespace HVACDXSystem {
         return Residuum;
     }
 
-    int GetCoolingCoilInletNodeNum(EnergyPlusData &state, std::string const &DXCoilSysName)
+    int GetCoolingCoilInletNodeNum(EnergyPlusData &state, std::string const &DXCoilSysName, bool &InletNodeErrFlag)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu, FSEC
         //       DATE WRITTEN   Apr. 2019
         // PURPOSE OF THIS SUBROUTINE:
         // Get inlet node number
-
-        // Using/Aliasing
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NodeNum;
@@ -3858,19 +3856,18 @@ namespace HVACDXSystem {
                 NodeNum = DXCoolingSystem(DXCoolSysNum).DXCoolingCoilInletNodeNum;
             }
         }
+        if (NodeNum == 0) InletNodeErrFlag = true;
 
         return NodeNum;
     }
 
-    int GetCoolingCoilOutletNodeNum(EnergyPlusData &state, std::string const &DXCoilSysName)
+    int GetCoolingCoilOutletNodeNum(EnergyPlusData &state, std::string const &DXCoilSysName, bool &OutletNodeErrFlag)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu, FSEC
         //       DATE WRITTEN   Apr. 2019
         // PURPOSE OF THIS SUBROUTINE:
         // Get Outlet node number
-
-        // Using/Aliasing
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NodeNum;
@@ -3888,6 +3885,7 @@ namespace HVACDXSystem {
                 NodeNum = DXCoolingSystem(DXCoolSysNum).DXCoolingCoilOutletNodeNum;
             }
         }
+        if (NodeNum == 0) OutletNodeErrFlag = true;
 
         return NodeNum;
     }
