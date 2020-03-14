@@ -702,7 +702,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_CalculateCurveVal)
     // POWER_CURVE = 2;
     // SUPPLY_FAN_POWER = 3;
 
-    for (int i=0; i<ExpectedResults.size(); i++){
+    for (std::size_t i=0; i<ExpectedResults.size(); i++){
         Real64 testCurveVal = mode0.CalculateCurveVal(Toa, Woa, Tra, Wra, Ma, OAF, i);
         EXPECT_EQ(testCurveVal, ExpectedResults[i]);
     }

@@ -52,10 +52,8 @@
 
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
-#include <EnergyPlus/DataGlobalConstants.hh>
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
-#include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -105,9 +103,7 @@ namespace HybridEvapCoolingModel {
     using CurveManager::CurveValue;
     using CurveManager::GetCurveIndex;
     using CurveManager::GetCurveMinMaxValues;
-    using EnergyPlus::CurveManager::GetNormalPoint;
     using ScheduleManager::GetCurrentScheduleValue;
-    typedef int *MyType;
 
 #define DEF_Tdb 0
 #define DEF_RH 1
@@ -223,11 +219,12 @@ namespace HybridEvapCoolingModel {
         // Returns the normalized or scaled output from the performance curve as specified by curveType.  6 independent variables are required.
 
         // METHODOLOGY EMPLOYED:
-        // Makes a call to the curve manager, then multiplies the result by either the NormalizationReference for intensive variables or by the
-        // ModelScalingFactorn for extensive variables. The Normalization reference is specified as a model input, the ModelScalingFactor is the
-        // parent model's Scaling Factor, which is input by the user in the idf for this unit, and passed to this CMode from the parent Model. The
-        // following tables are for intensive variables : Supply Air Temperature, Supply Air Humidity, External Static Pressure, The following tables
-        // are for extensive variables : Electric Power, Fan Electric Power, Second Fuel Consumption, Third Fuel Consumption, Water Use Lookup Table
+        // Makes a call to the curve manager, then multiplies the result by either the by the ModelScalingFactor for extensive variables.
+        // The ModelScalingFactor is the parent model's Scaling Factor, which is input by the user in the idf for this unit, and passed to
+        // this CMode from the parent Model.
+        // The following tables are for intensive variables : Supply Air Temperature, Supply Air Humidity, External Static Pressure
+        // The following tables are for extensive variables : Electric Power, Fan Electric Power, Second Fuel Consumption,
+        // Third Fuel Consumption, Water Use Lookup Table
         //
         // Tosa is the outside air temperature
         // Wosa is the outside humidity ratio
@@ -1800,9 +1797,9 @@ namespace HybridEvapCoolingModel {
         //   so we always know what values need to be set.
         // 2)Calculate W humidity ratios for outdoor air and return air.
         // 3)Sets boolean values for each potential conditioning requirement;
-        //  CoolingRequested, HeatingRequested, VentilationRequested, DehumidificationRequested, HumidificationRequested
-        // 4)Take the first operating mode which is always standby and calculate the NormalizationReference
-        //  and then use curves to determine performance metrics for the standby mode including energy use and other outputs
+        //   CoolingRequested, HeatingRequested, VentilationRequested, DehumidificationRequested, HumidificationRequested
+        // 4)Take the first operating mode which is always standby and calculate the use curves to determine performance metrics for
+        //   the standby mode including energy use and other outputs
         // 5)Test system availbility status and go into standby if unit is off or not needed (booleans listed in 3 are all false)
         // 6) Set the operating conditions and respective part load fractions.
         // 7) Set timestep average outlet condition, considering all operating conditions and runtimes.
@@ -1846,11 +1843,10 @@ namespace HybridEvapCoolingModel {
         // Sets boolean values for each potential conditioning requirement;  CoolingRequested, HeatingRequested, VentilationRequested,
         // DehumidificationRequested, HumidificationRequested
         DetermineCoolingVentilationOrHumidificationNeeds(StepIns);
-        // Take the first operating mode which is always standby and calculate the NormalizationReference
-        // and then use curves to determine performance metrics for the standby mode including energy use and other outputs
+        // Take the first operating mode which is always standby and calculate the curve values
+        // to determine performance metrics for the standby mode including energy use and other outputs
 
         CMode Mode = *(OperatingModes.begin());
-        //
         if (SetStandByMode(Mode, StepIns.Tosa, Wosa, StepIns.Tra, Wra)) {
             std::string ObjectID = Name.c_str();
             ShowSevereError("Standby mode not defined correctly, as the mode is defined there are zero combinations of acceptible outside air "
