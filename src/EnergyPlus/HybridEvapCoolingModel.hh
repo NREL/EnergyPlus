@@ -191,9 +191,9 @@ namespace HybridEvapCoolingModel {
         Real64 TotalSystem;
         Real64 SensibleSystem;
         Real64 LatentSystem;
-        Real64 TotalZone;    // kW
-        Real64 SensibleZone; // kW
-        Real64 LatentZone;   // kW
+        Real64 TotalZone;    // W
+        Real64 SensibleZone; // W
+        Real64 LatentZone;   // W
         Real64 ElectricalPower;
         Real64 SupplyFanElectricPower;
         Real64 SecondaryFuelConsumptionRate;
@@ -235,10 +235,17 @@ namespace HybridEvapCoolingModel {
         int ZoneNum;  // stores the current zone associated with the system, this is currently not used but is expected to be used in the next set of
                       // functionality additions.
         int SchedPtr; // Pointer to the correct schedule
+        int ZoneNodeNum;                  // index of zone air node in node structure
+        std::string AvailManagerListName; // Name of an availability manager list object
+        int AvailStatus;
 
         Real64 SystemMaximumSupplyAirFlowRate;           // taken from IDF N1, the system max supply flow rate in m3/s.
         Real64 ScalingFactor;                            // taken from IDF N3, linear scaling factor.
-        Real64 ScaledSystemMaximumSupplyAirMassFlowRate; // the actual scaling factor used to multiply the
+        Real64 ScaledSystemMaximumSupplyAirMassFlowRate; // the scaled system max supply mass flow rate in m3/s.
+        Real64 ScaledSystemMaximumSupplyAirVolumeFlowRate; // the scaled system max supply volume flow rate in m3/s.
+        std::string FirstFuelType;             // First fuel type, currently electricity is only option
+        std::string SecondFuelType;             // Second fuel type
+        std::string ThirdFuelType;             // Third fuel type
 
         int UnitOn;                          // feels like it should be a bool but its an output and I couldn't get it to work as a bool
         Real64 UnitTotalCoolingRate;         // unit output to zone, total cooling rate [W]
@@ -297,10 +304,11 @@ namespace HybridEvapCoolingModel {
         int InletNode;
         int OutletNode;
         int SecondaryInletNode;       // This is usually OA node feeding into the purge/secondary side
-        int SecondaryOutletNode;      // This outlet node of the secondary side and ilet to the secondary fan
+        int SecondaryOutletNode;      // This outlet node of the secondary side and inlet to the secondary fan
         Real64 FinalElectricalPower;  // Output fuel use in W
         Real64 FinalElectricalEnergy; // Output fuel energy use in J
-        Real64 InletMassFlowRate;     // Inlet is primary process air node at inlet to cooler
+        Real64 InletMassFlowRate; // Inlet is primary process air node at inlet to cooler
+        Real64 InletVolumetricFlowRate; // Inlet is primary process air node at inlet to cooler
         Real64 InletTemp;
         Real64 InletWetBulbTemp;
         Real64 InletHumRat;
@@ -322,6 +330,7 @@ namespace HybridEvapCoolingModel {
         Real64 SecInletEnthalpy;
         Real64 SecInletPressure;
         Real64 SecInletRH;
+        Real64 SecOutletVolumetricFlowRate;
         Real64 SecOutletMassFlowRate; // Inlet is primary process air node at inlet to cooler
         Real64 SecOutletTemp;
         Real64 SecOutletWetBulbTemp;
