@@ -647,10 +647,10 @@ SET( SRC
 CREATE_SRC_GROUPS( "${SRC}" )
 
 SET( INPUTPARSING_SRC
-  "${CMAKE_SOURCE_DIR}/third_party/milo/dtoa.h"
-  "${CMAKE_SOURCE_DIR}/third_party/milo/itoa.h"
-  "${CMAKE_SOURCE_DIR}/third_party/milo/diyfp.h"
-  "${CMAKE_SOURCE_DIR}/third_party/milo/ieee754.h"
+  "${PROJECT_SOURCE_DIR}/third_party/milo/dtoa.h"
+  "${PROJECT_SOURCE_DIR}/third_party/milo/itoa.h"
+  "${PROJECT_SOURCE_DIR}/third_party/milo/diyfp.h"
+  "${PROJECT_SOURCE_DIR}/third_party/milo/ieee754.h"
   "${CMAKE_CURRENT_BINARY_DIR}/DataStringGlobals.cc"
   DataStringGlobals.hh
   FileSystem.cc
@@ -685,7 +685,7 @@ if(LINK_WITH_PYTHON)
   # check the python bit version here...if we are building against Python it has to match up bitwise
   # if we aren't, then the identified interpreter can be whatever bit it wants
   if(MSVC)
-    execute_process(COMMAND "${PYTHON_EXECUTABLE}" "${CMAKE_SOURCE_DIR}/cmake/PythonGetBitSize.py" OUTPUT_VARIABLE PYTHON_BIT_SIZE)
+    execute_process(COMMAND "${PYTHON_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/cmake/PythonGetBitSize.py" OUTPUT_VARIABLE PYTHON_BIT_SIZE)
 #    if(("${PYTHON_BIT_SIZE}" STREQUAL "64") AND NOT ("${CMAKE_GENERATOR_PLATFORM}" STREQUAL "x64"))
 #      message(SEND_ERROR "Found 64-bit Python but attempting to generate non-64-bit EnergyPlus; this is invalid")
 #    endif()
@@ -776,7 +776,7 @@ add_custom_command(
         TARGET energyplus
         POST_BUILD
         COMMAND ${CMAKE_COMMAND}
-        -DREPO_ROOT=${CMAKE_SOURCE_DIR}
+        -DREPO_ROOT=${PROJECT_SOURCE_DIR}
         -DEXECUTABLE_PATH=$<TARGET_FILE:energyplus>
         -DCMAKE_VERSION_MAJOR="${CMAKE_VERSION_MAJOR}"
         -DCMAKE_VERSION_MINOR="${CMAKE_VERSION_MINOR}"
@@ -784,7 +784,7 @@ add_custom_command(
         -DCMAKE_VERSION_BUILD="${CMAKE_VERSION_BUILD}"
         -DPYTHON_API_VERSION_MAJOR="${PYTHON_API_VERSION_MAJOR}"
         -DPYTHON_API_VERSION_MINOR="${PYTHON_API_VERSION_MINOR}"
-        -P "${CMAKE_SOURCE_DIR}/cmake/PythonSetupAPIinBuild.cmake"
+        -P "${PROJECT_SOURCE_DIR}/cmake/PythonSetupAPIinBuild.cmake"
 )
 
 install( TARGETS energyplus energyplusapi DESTINATION ./ )
@@ -801,7 +801,7 @@ if(LINK_WITH_PYTHON)
         COMMAND ${CMAKE_COMMAND}
           -DRESOLVED_PYTHON_LIB=${RESOLVED_PYTHON_LIBRARY}
           -DEXECUTABLE_PATH=$<TARGET_FILE:energyplus>
-          -P ${CMAKE_SOURCE_DIR}/cmake/PythonGetLibAndLinkUp.cmake
+          -P ${PROJECT_SOURCE_DIR}/cmake/PythonGetLibAndLinkUp.cmake
     )
   endif()
   install(
@@ -810,7 +810,7 @@ if(LINK_WITH_PYTHON)
       COMMAND ${CMAKE_COMMAND}
       -DRESOLVED_PYTHON_LIB=${RESOLVED_PYTHON_LIBRARY}
       -DEXECUTABLE_PATH=\${CMAKE_INSTALL_PREFIX}/energyplus${CMAKE_EXECUTABLE_SUFFIX}
-      -P ${CMAKE_SOURCE_DIR}/cmake/PythonGetLibAndLinkUp.cmake
+      -P ${PROJECT_SOURCE_DIR}/cmake/PythonGetLibAndLinkUp.cmake
     )"
   )
   if (APPLE)
@@ -820,7 +820,7 @@ if(LINK_WITH_PYTHON)
         COMMAND ${CMAKE_COMMAND}
         -DRESOLVED_PYTHON_LIB=${RESOLVED_PYTHON_LIBRARY}
         -DEXECUTABLE_PATH=\${CMAKE_INSTALL_PREFIX}/energyplus${CMAKE_EXECUTABLE_SUFFIX}
-        -P ${CMAKE_SOURCE_DIR}/cmake/PythonFixUpOnMac.cmake
+        -P ${PROJECT_SOURCE_DIR}/cmake/PythonFixUpOnMac.cmake
       )"
     )
   endif()
@@ -828,7 +828,7 @@ if(LINK_WITH_PYTHON)
   add_custom_command(
           TARGET energyplus
           POST_BUILD
-          COMMAND ${PYTHON_EXECUTABLE} "${CMAKE_SOURCE_DIR}/cmake/PythonCopyStandardLib.py" "$<TARGET_FILE:energyplus>" "python_standard_lib"
+          COMMAND ${PYTHON_EXECUTABLE} "${PROJECT_SOURCE_DIR}/cmake/PythonCopyStandardLib.py" "$<TARGET_FILE:energyplus>" "python_standard_lib"
   )
 endif()
 
@@ -853,56 +853,56 @@ if( BUILD_TESTING )
            -DEPW_FILE=USA_CO_Golden-NREL.724666_TMY3.epw
            -P ${PROJECT_SOURCE_DIR}/cmake/RunCallbackTest.cmake)
 
-  set(EPW_FILE "${CMAKE_SOURCE_DIR}/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw")
-  set(IDF_FILE "${CMAKE_SOURCE_DIR}/testfiles/1ZoneUncontrolled.idf")
+  set(EPW_FILE "${PROJECT_SOURCE_DIR}/weather/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw")
+  set(IDF_FILE "${PROJECT_SOURCE_DIR}/testfiles/1ZoneUncontrolled.idf")
 
-  add_executable( TestAPI_Functional_C ${CMAKE_SOURCE_DIR}/tst/EnergyPlus/api/TestFunctional.c )
+  add_executable( TestAPI_Functional_C ${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestFunctional.c )
   target_link_libraries( TestAPI_Functional_C energyplusapi )
   add_test(NAME "API.TestFunctionalC" COMMAND TestAPI_Functional_C)
 
-  file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/tst/api/)
+  file(MAKE_DIRECTORY ${PROJECT_BINARY_DIR}/tst/api/)
 
-  set(TEST_DIR "${CMAKE_BINARY_DIR}/tst/api/runtime")
+  set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/runtime")
   file(MAKE_DIRECTORY ${TEST_DIR})
-  add_executable( TestAPI_Runtime_C ${CMAKE_SOURCE_DIR}/tst/EnergyPlus/api/TestRuntime.c )
+  add_executable( TestAPI_Runtime_C ${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestRuntime.c )
   target_link_libraries( TestAPI_Runtime_C energyplusapi )
   add_test(NAME "API.TestRuntimeC" COMMAND TestAPI_Runtime_C -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}")
 
-  set(TEST_DIR "${CMAKE_BINARY_DIR}/tst/api/exchange")
+  set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/exchange")
   file(MAKE_DIRECTORY ${TEST_DIR})
-  add_executable( TestAPI_DataTransfer_C ${CMAKE_SOURCE_DIR}/tst/EnergyPlus/api/TestDataTransfer.c )
+  add_executable( TestAPI_DataTransfer_C ${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestDataTransfer.c )
   target_link_libraries( TestAPI_DataTransfer_C energyplusapi )
   add_test(NAME "API.TestDataTransferC" COMMAND TestAPI_DataTransfer_C -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}")
 
   # This is tricky, the test scripts should be copied into the Products/<config> directory, but add_test has to be
   # called so early, it's hard to figure that out ahead of time.  I dunno.  Just skipping these on MSVC builds for now.
   if(NOT MSVC)
-    set(API_TEST_TARGET_DIR "${CMAKE_BINARY_DIR}/Products")
+    set(API_TEST_TARGET_DIR "${PROJECT_BINARY_DIR}/Products")
 
-    configure_file( "${CMAKE_SOURCE_DIR}/tst/EnergyPlus/api/TestFunctional.py" "${API_TEST_TARGET_DIR}/TestFunctional.py" )
+    configure_file( "${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestFunctional.py" "${API_TEST_TARGET_DIR}/TestFunctional.py" )
     add_test(NAME "API.TestFunctionalPython"
             COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestFunctional.py"
             WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
 
-    set(TEST_DIR "${CMAKE_BINARY_DIR}/tst/api/runtime_python")
+    set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/runtime_python")
     file(MAKE_DIRECTORY ${TEST_DIR})
-    configure_file( "${CMAKE_SOURCE_DIR}/tst/EnergyPlus/api/TestRuntime.py" "${API_TEST_TARGET_DIR}/TestRuntime.py" )
+    configure_file( "${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestRuntime.py" "${API_TEST_TARGET_DIR}/TestRuntime.py" )
     add_test(NAME "API.TestRuntimePython"
             COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestRuntime.py" -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}"
             WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
 
-    set(TEST_DIR "${CMAKE_BINARY_DIR}/tst/api/exchange_python")
+    set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/exchange_python")
     file(MAKE_DIRECTORY ${TEST_DIR})
-    configure_file( "${CMAKE_SOURCE_DIR}/tst/EnergyPlus/api/TestDataTransfer.py" "${API_TEST_TARGET_DIR}/TestDataTransfer.py" )
+    configure_file( "${PROJECT_SOURCE_DIR}/tst/EnergyPlus/api/TestDataTransfer.py" "${API_TEST_TARGET_DIR}/TestDataTransfer.py" )
     add_test(NAME "API.TestDataTransferPython"
             COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/TestDataTransfer.py" -d "${TEST_DIR}" -w "${EPW_FILE}" -D "${IDF_FILE}"
             WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
 
-    set(TEST_DIR "${CMAKE_BINARY_DIR}/tst/api/plugin_tester_tester")
+    set(TEST_DIR "${PROJECT_BINARY_DIR}/tst/api/plugin_tester_tester")
     file(MAKE_DIRECTORY ${TEST_DIR})
-    configure_file( "${CMAKE_SOURCE_DIR}/src/EnergyPlus/api/plugin_tester.py" "${API_TEST_TARGET_DIR}/plugin_tester.py" )
+    configure_file( "${PROJECT_SOURCE_DIR}/src/EnergyPlus/api/plugin_tester.py" "${API_TEST_TARGET_DIR}/plugin_tester.py" )
     add_test(NAME "API.PluginTesterTester"
-            COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/plugin_tester.py" "${CMAKE_SOURCE_DIR}/testfiles/PythonPluginCustomTrendVariable.py"
+            COMMAND "${PYTHON_EXECUTABLE}" "${API_TEST_TARGET_DIR}/plugin_tester.py" "${PROJECT_SOURCE_DIR}/testfiles/PythonPluginCustomTrendVariable.py"
             WORKING_DIRECTORY "${API_TEST_TARGET_DIR}")
   endif()
 endif()
