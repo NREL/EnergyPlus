@@ -3941,32 +3941,16 @@ namespace InternalHeatGains {
                 }
 
                 if (ZoneITEq(Loop).FlowControlWithApproachTemps) {
-                    Real64 TAirInDesign = ZoneITEq(Loop).DesignTAirIn;
+                    Real64 TAirInSizing;
+                    // Set the TAirInSizing to the maximun setpoint value to do sizing based on the maximum fan and cpu power of the ite object
                     SetPointManager::GetSetPointManagerInputData(ErrorsFound);
                     for (int SetPtMgrNum = 1; SetPtMgrNum <= SetPointManager::NumSZClSetPtMgrs; ++SetPtMgrNum) {
                         if (SetPointManager::SingZoneClSetPtMgr(SetPtMgrNum).ControlZoneNum == Loop) {
-                            TAirInDesign = SetPointManager::SingZoneClSetPtMgr(SetPtMgrNum).MaxSetTemp; // Set the maximun setpoint
+                            TAirInSizing = SetPointManager::SingZoneClSetPtMgr(SetPtMgrNum).MaxSetTemp;
                         }
                     }
-                    if (ZoneITEq(Loop).SupplyApproachTempSch != 0) {
-                        TAirInDesign = TAirInDesign + GetCurrentScheduleValue(ZoneITEq(Loop).SupplyApproachTempSch);
-                    } else {
-                        TAirInDesign = TAirInDesign + ZoneITEq(Loop).SupplyApproachTemp;
-                    }
-                    Real64 OperSchedFrac = GetCurrentScheduleValue(ZoneITEq(Loop).OperSchedPtr);
-                    Real64 CPULoadSchedFrac = GetCurrentScheduleValue(ZoneITEq(Loop).CPULoadSchedPtr);
 
-                    Real64 CPUPowerAtDesign =
-                            max(ZoneITEq(Loop).DesignCPUPower * OperSchedFrac * CurveManager::CurveValue(ZoneITEq(Loop).CPUPowerFLTCurve, CPULoadSchedFrac, TAirInDesign), 0.0);
-
-                    Real64 AirVolFlowFracDesignT = max(CurveManager::CurveValue(ZoneITEq(Loop).AirFlowFLTCurve, CPULoadSchedFrac, TAirInDesign), 0.0);
-
-                    Real64 FanPowerAtDesign =
-                            max(ZoneITEq(Loop).DesignFanPower * OperSchedFrac * CurveManager::CurveValue(ZoneITEq(Loop).FanPowerFFCurve, AirVolFlowFracDesignT), 0.0);
-
-                    if (FanPowerAtDesign + CPUPowerAtDesign > ZoneITEq(Loop).DesignTotalPower) {
-                        ZoneITEq(Loop).DesignTotalPower = FanPowerAtDesign + CPUPowerAtDesign;
-                    }
+                    ZoneITEq(Loop).SizingTAirIn = max(TAirInSizing, ZoneITEq(Loop).DesignTAirIn);
                 }
 
                 // Object report variables
@@ -5845,37 +5829,16 @@ namespace InternalHeatGains {
             // Calculate power input and airflow
             TAirInDesign = ZoneITEq(Loop).DesignTAirIn;
 
-            Real64 DesignTotalPower = ZoneITEq(Loop).DesignTotalPower;
-            Real64 AirVolFlowAtDesign = ZoneITEq(Loop).DesignAirVolFlowRate;
-
             if (DoingSizing && ZoneITEq(Loop).FlowControlWithApproachTemps) {
-                SetPointManager::GetSetPointManagerInputData(ErrorsFound);
-                for (int SetPtMgrNum = 1; SetPtMgrNum <= SetPointManager::NumSZClSetPtMgrs; ++SetPtMgrNum) {
-                    if (SetPointManager::SingZoneClSetPtMgr(SetPtMgrNum).ControlZoneNum == Loop) {
-                        TAirInDesign = SetPointManager::SingZoneClSetPtMgr(SetPtMgrNum).MaxSetTemp; // Set the maximun setpoint
-                    }
-                }
+
+                TAirInDesign = ZoneITEq(Loop).SizingTAirIn;
                 if (ZoneITEq(Loop).SupplyApproachTempSch != 0) {
                     TAirInDesign = TAirInDesign + GetCurrentScheduleValue(ZoneITEq(Loop).SupplyApproachTempSch);
                 } else {
                     TAirInDesign = TAirInDesign + ZoneITEq(Loop).SupplyApproachTemp;
                 }
-                Real64 OperSchedFrac = GetCurrentScheduleValue(ZoneITEq(Loop).OperSchedPtr);
-                Real64 CPULoadSchedFrac = GetCurrentScheduleValue(ZoneITEq(Loop).CPULoadSchedPtr);
-
-                Real64 CPUPowerAtDesign =
-                        max(ZoneITEq(Loop).DesignCPUPower * OperSchedFrac * CurveManager::CurveValue(ZoneITEq(Loop).CPUPowerFLTCurve, CPULoadSchedFrac, TAirInDesign), 0.0);
-
-                AirVolFlowFracDesignT = max(CurveManager::CurveValue(ZoneITEq(Loop).AirFlowFLTCurve, CPULoadSchedFrac, TAirInDesign), 0.0);
-                AirVolFlowAtDesign = ZoneITEq(Loop).DesignAirVolFlowRate * OperSchedFrac * AirVolFlowFracDesignT;
-
-                Real64 FanPowerAtDesign =
-                        max(ZoneITEq(Loop).DesignFanPower * OperSchedFrac * CurveManager::CurveValue(ZoneITEq(Loop).FanPowerFFCurve, AirVolFlowFracDesignT), 0.0);
-
-
-                if (FanPowerAtDesign + CPUPowerAtDesign > ZoneITEq(Loop).DesignTotalPower) {
-                    DesignTotalPower = FanPowerAtDesign + CPUPowerAtDesign;
-                }
+                OperSchedFrac = GetCurrentScheduleValue(ZoneITEq(Loop).OperSchedPtr);
+                CPULoadSchedFrac = GetCurrentScheduleValue(ZoneITEq(Loop).CPULoadSchedPtr);
 
             }
 
@@ -5940,7 +5903,9 @@ namespace InternalHeatGains {
                 ZoneITEMap[ZoneITEq(Loop).ZonePtr].push_back(Loop);
             }
             if (DoingSizing && ZoneITEq(Loop).FlowControlWithApproachTemps) {
-                ZoneITEq(Loop).ConGainRateToZone = DesignTotalPower;
+                if (ZoneITEq(Loop).FanPowerAtDesign + ZoneITEq(Loop).CPUPowerAtDesign > ZoneITEq(Loop).DesignTotalPower) {
+                    ZoneITEq(Loop).ConGainRateToZone = ZoneITEq(Loop).FanPowerAtDesign + ZoneITEq(Loop).CPUPowerAtDesign;
+                }
             }
             // Object report variables
             ZoneITEq(Loop).CPUPower = CPUPower;
