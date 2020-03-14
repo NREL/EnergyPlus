@@ -361,7 +361,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
 
     HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                    // expect no errors
-    DataZoneEquipment::GetZoneEquipmentData();    // read zone equipment    SystemReports::ReportMaxVentilationLoads();
+    DataZoneEquipment::GetZoneEquipmentData(state);    // read zone equipment    SystemReports::ReportMaxVentilationLoads();
     DataZoneEquipment::ZoneEquipInputsFilled = true;
     ZoneOAMassFlow.allocate(NumOfZones);
     ZoneOAMass.allocate(NumOfZones);
@@ -404,7 +404,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     pZoneHybridUnitaryAirConditioner->doStep(RequestedCooling, Requestedheating, Requested_Humidification, Requested_Dehumidification, DesignMinVR);
     ReportZoneHybridUnitaryAirConditioners(1);
 
-    SystemReports::ReportMaxVentilationLoads();
+    SystemReports::ReportMaxVentilationLoads(state);
     // output results
     Real64 zone_oa_mass_flow = ZoneOAMassFlow(1); // OA flow reported to the zone from the unitary hybrid system
 
