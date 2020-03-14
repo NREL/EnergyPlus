@@ -191,9 +191,9 @@ class DataExchange:
 
     def get_actuator_handle(
             self,
-            actuator_key: Union[str, bytes],
             component_type: Union[str, bytes],
-            control_type: Union[str, bytes]
+            control_type: Union[str, bytes],
+            actuator_key: Union[str, bytes]
     ) -> int:
         """
         Get a handle to an available actuator in a running simulation.
@@ -204,18 +204,18 @@ class DataExchange:
         Note also that the arguments passed in here can be either strings or bytes, as this wrapper handles conversion
         as needed.
 
-        :param actuator_key: The instance of the variable to retrieve, e.g. "Environment"
         :param component_type: The actuator category, e.g. "Weather Data"
         :param control_type: The name of the actuator to retrieve, e.g. "Outdoor Dew Point"
+        :param actuator_key: The instance of the variable to retrieve, e.g. "Environment"
         :return: An integer ID for this output variable, or -1 if one could not be found.
         """
-        if isinstance(actuator_key, str):
-            actuator_key = actuator_key.encode('utf-8')
         if isinstance(component_type, str):
             component_type = component_type.encode('utf-8')
         if isinstance(control_type, str):
             control_type = control_type.encode('utf-8')
-        return self.api.getActuatorHandle(actuator_key, component_type, control_type)
+        if isinstance(actuator_key, str):
+            actuator_key = actuator_key.encode('utf-8')
+        return self.api.getActuatorHandle(component_type, control_type, actuator_key)
 
     def get_variable_value(self, variable_handle: int) -> float:
         """

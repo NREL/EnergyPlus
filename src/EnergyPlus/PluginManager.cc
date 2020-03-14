@@ -578,6 +578,7 @@ namespace PluginManagement {
                 int variableIndex = EnergyPlus::PluginManagement::PluginManager::getGlobalVariableHandle(variableName);
                 int numValues = fields.at("number_of_timesteps_to_be_logged");
                 trends.emplace_back(thisObjectName, numValues, variableIndex);
+                this->maxTrendVariableIndex++;
             }
         }
 
@@ -935,6 +936,7 @@ namespace PluginManagement {
         std::string const varNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(name);
         PluginManagement::globalVariableNames.push_back(varNameUC);
         PluginManagement::globalVariableValues.push_back(Real64());
+        PluginManagement::pluginManager->maxGlobalVariableIndex++;
     }
 #else
     void PluginManager::addGlobalVariable(const std::string &EP_UNUSED(name)) {}

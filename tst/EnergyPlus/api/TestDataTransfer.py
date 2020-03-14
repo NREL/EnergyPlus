@@ -22,7 +22,7 @@ def time_step_handler():
                 u"SITE OUTDOOR AIR DEWPOINT TEMPERATURE", u"ENVIRONMENT"
             )
             outdoor_dew_point_actuator = api.exchange.get_actuator_handle(
-                "Environment", "Weather Data", "Outdoor Dew Point"
+                "Weather Data", "Outdoor Dew Point", "Environment"
             )
             if outdoor_temp_sensor == -1 or outdoor_dew_point_sensor == -1 or outdoor_dew_point_actuator == -1:
                 sys.exit(1)

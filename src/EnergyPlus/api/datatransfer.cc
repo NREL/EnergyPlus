@@ -66,8 +66,8 @@ const char * listAllAPIDataCSV() {
         }
         output.append("Actuator,");
         output.append(availActuator.ComponentTypeName).append(",");
-        output.append(availActuator.UniqueIDName).append(",");
-        output.append(availActuator.ControlTypeName).append(";\n");
+        output.append(availActuator.ControlTypeName).append(",");
+        output.append(availActuator.UniqueIDName).append(";\n");
     }
     output.append("**INTERNAL_VARIABLES**\n");
     for (auto const & availVariable : EnergyPlus::DataRuntimeLanguage::EMSInternalVarsAvailable) {
@@ -130,9 +130,9 @@ int getVariableHandle(const char* type, const char* key) {
     std::string const typeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(type);
     std::string const keyUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(key);
     int handle;
-    handle = 0;
+    handle = 0; // initialize to zero to get 1 based array
     if (!EnergyPlus::OutputProcessor::RVariableTypes.allocated()) {
-        return -2;
+        return -1; // return -1 if it isn't even allocated yet
     }
     for (auto const & availOutputVar : EnergyPlus::OutputProcessor::RVariableTypes) {
         handle++;
@@ -140,17 +140,15 @@ int getVariableHandle(const char* type, const char* key) {
             return handle;
         }
     }
-    return -1;
+    return -1; // return -1 if it wasn't found
 }
 
 Real64 getVariableValue(const int handle) {
-    // I'm not sure whether to validate the handle range here, even if I check for positive, they could still go
-    // out of range too high.  I'm inclined to just let it fail?  Maybe?
-    // If it is to be checked, just do
-    //    if (handle < 0) {
-    //        return -999;
-    //    }
-    return *EnergyPlus::OutputProcessor::RVariableTypes(handle).VarPtr.Which;
+    try {
+        return *EnergyPlus::OutputProcessor::RVariableTypes(handle).VarPtr.Which;
+    } catch (...) {
+        throw std::runtime_error("Variable handle out of range in getVariableValue");
+    }
 }
 
 
@@ -166,17 +164,15 @@ int getMeterHandle(const char* meterName) {
 }
 
 Real64 getMeterValue(int handle) {
-    // I'm not sure whether to validate the handle range here, even if I check for positive, they could still go
-    // out of range too high.  I'm inclined to just let it fail?  Maybe?
-    // If it is to be checked, just do
-    //    if (handle < 0) {
-    //        return -999;
-    //    }
-    return EnergyPlus::GetCurrentMeterValue(handle);
+    try {
+        return EnergyPlus::GetCurrentMeterValue(handle);
+    } catch (...) {
+        throw std::runtime_error("Meter handle out of range in getMeterValue");
+    }
 }
 
 
-int getActuatorHandle(const char* uniqueKey, const char* componentType, const char* controlType) {
+int getActuatorHandle(const char* componentType, const char* controlType, const char* uniqueKey) {
     int handle;
     handle = 0;
     std::string const typeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(componentType);
@@ -251,10 +247,16 @@ int getPluginGlobalVariableHandle(const char* name) {
 }
 
 Real64 getPluginGlobalVariableValue(int handle) {
+    if (handle < 0 || handle > EnergyPlus::PluginManagement::pluginManager->maxGlobalVariableIndex) {
+        throw std::runtime_error("Plugin Global Variable index out of range");
+    }
     return EnergyPlus::PluginManagement::pluginManager->getGlobalVariableValue(handle);
 }
 
 void setPluginGlobalVariableValue(int handle, Real64 value) {
+    if (handle < 0 || handle > EnergyPlus::PluginManagement::pluginManager->maxGlobalVariableIndex) {
+        throw std::runtime_error("Plugin Global Variable index out of range");
+    }
     EnergyPlus::PluginManagement::pluginManager->setGlobalVariableValue(handle, value);
 }
 
@@ -263,26 +265,62 @@ int getPluginTrendVariableHandle(const char* name) {
 }
 
 Real64 getPluginTrendVariableValue(int handle, int timeIndex) {
+    if (handle < 0 || handle > EnergyPlus::PluginManagement::pluginManager->maxTrendVariableIndex) {
+        throw std::runtime_error("Plugin Trend Variable index out of range");
+    }
+    if (timeIndex < 2 || timeIndex > ((int)EnergyPlus::PluginManagement::pluginManager->getTrendVariableHistorySize(handle) - 1)) {
+        throw std::runtime_error("Plugin Trend Variable history count out of range");
+    }
     return EnergyPlus::PluginManagement::pluginManager->getTrendVariableValue(handle, timeIndex);
 }
 
 Real64 getPluginTrendVariableAverage(int handle, int count) {
+    if (handle < 0 || handle > EnergyPlus::PluginManagement::pluginManager->maxTrendVariableIndex) {
+        throw std::runtime_error("Plugin Trend Variable index out of range");
+    }
+    if (count < 2 || count > ((int)EnergyPlus::PluginManagement::pluginManager->getTrendVariableHistorySize(handle) - 1)) {
+        throw std::runtime_error("Plugin Trend Variable history count out of range");
+    }
     return EnergyPlus::PluginManagement::pluginManager->getTrendVariableAverage(handle, count);
 }
 
 Real64 getPluginTrendVariableMin(int handle, int count) {
+    if (handle < 0 || handle > EnergyPlus::PluginManagement::pluginManager->maxTrendVariableIndex) {
+        throw std::runtime_error("Plugin Trend Variable index out of range");
+    }
+    if (count < 2 || count > ((int)EnergyPlus::PluginManagement::pluginManager->getTrendVariableHistorySize(handle) - 1)) {
+        throw std::runtime_error("Plugin Trend Variable history count out of range");
+    }
     return EnergyPlus::PluginManagement::pluginManager->getTrendVariableMin(handle, count);
 }
 
 Real64 getPluginTrendVariableMax(int handle, int count) {
+    if (handle < 0 || handle > EnergyPlus::PluginManagement::pluginManager->maxTrendVariableIndex) {
+        throw std::runtime_error("Plugin Trend Variable index out of range");
+    }
+    if (count < 2 || count > ((int)EnergyPlus::PluginManagement::pluginManager->getTrendVariableHistorySize(handle) - 1)) {
+        throw std::runtime_error("Plugin Trend Variable history count out of range");
+    }
     return EnergyPlus::PluginManagement::pluginManager->getTrendVariableMax(handle, count);
 }
 
 Real64 getPluginTrendVariableSum(int handle, int count) {
+    if (handle < 0 || handle > EnergyPlus::PluginManagement::pluginManager->maxTrendVariableIndex) {
+        throw std::runtime_error("Plugin Trend Variable index out of range");
+    }
+    if (count < 2 || count > ((int)EnergyPlus::PluginManagement::pluginManager->getTrendVariableHistorySize(handle) - 1)) {
+        throw std::runtime_error("Plugin Trend Variable history count out of range");
+    }
     return EnergyPlus::PluginManagement::pluginManager->getTrendVariableSum(handle, count);
 }
 
 Real64 getPluginTrendVariableDirection(int handle, int count) {
+    if (handle < 0 || handle > EnergyPlus::PluginManagement::pluginManager->maxTrendVariableIndex) {
+        throw std::runtime_error("Plugin Trend Variable index out of range");
+    }
+    if (count < 2 || count > ((int)EnergyPlus::PluginManagement::pluginManager->getTrendVariableHistorySize(handle) - 1)) {
+        throw std::runtime_error("Plugin Trend Variable history count out of range");
+    }
     return EnergyPlus::PluginManagement::pluginManager->getTrendVariableDirection(handle, count);
 }
 
@@ -317,7 +355,7 @@ int hour() {
 
 Real64 currentTime() {
     if (EnergyPlus::DataHVACGlobals::TimeStepSys < EnergyPlus::DataGlobals::TimeStepZone) {
-        // CurrentTime is for end of zone timestep, need to account for system timestep
+        // CurrentTime is for end of zone timestep, need to move back to beginning of current zone timestep, then add on system time elapsed already plus current system timestep
         return EnergyPlus::DataGlobals::CurrentTime - EnergyPlus::DataGlobals::TimeStepZone + EnergyPlus::DataHVACGlobals::SysTimeElapsed + EnergyPlus::DataHVACGlobals::TimeStepSys;
     } else {
         return EnergyPlus::DataGlobals::CurrentTime;
@@ -327,7 +365,10 @@ Real64 currentTime() {
 int minutes() {
     // the -1 is to push us to the right minute, but this should be handled cautiously because if we are inside the HVAC iteration loop,
     // currentTime() returns a floating point fractional hour, so truncation could put this a few seconds from the expected minute.
-    return ((int)std::round(currentTime()) - EnergyPlus::DataGlobals::HourOfDay - 1) * 60;
+    Real64 currentTimeVal = currentTime();
+    Real64 fractionalHoursIntoTheDay = currentTimeVal - double(EnergyPlus::DataGlobals::HourOfDay - 1);
+    Real64 fractionalMinutesIntoTheDay = fractionalHoursIntoTheDay * 60.0;
+    return (int)(fractionalMinutesIntoTheDay);
 }
 
 int holidayIndex() {
