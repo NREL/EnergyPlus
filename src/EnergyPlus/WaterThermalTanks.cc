@@ -4853,25 +4853,25 @@ namespace WaterThermalTanks {
                                           "WaterHeater:Mixed",
                                           this->Name,
                                           DataHeatBalance::IntGainTypeOf_WaterHeaterMixed,
-                                          this->AmbientZoneGain);
+                                          &this->AmbientZoneGain);
                 } else if (SELECT_CASE_var == DataPlant::TypeOf_WtrHeaterStratified) {
                     SetupZoneInternalGain(this->AmbientTempZone,
                                           "WaterHeater:Stratified",
                                           this->Name,
                                           DataHeatBalance::IntGainTypeOf_WaterHeaterStratified,
-                                          this->AmbientZoneGain);
+                                          &this->AmbientZoneGain);
                 } else if (SELECT_CASE_var == DataPlant::TypeOf_ChilledWaterTankMixed) {
                     SetupZoneInternalGain(this->AmbientTempZone,
                                           "ThermalStorage:ChilledWater:Mixed",
                                           this->Name,
                                           DataHeatBalance::IntGainTypeOf_ThermalStorageChilledWaterMixed,
-                                          this->AmbientZoneGain);
+                                          &this->AmbientZoneGain);
                 } else if (SELECT_CASE_var == DataPlant::TypeOf_ChilledWaterTankStratified) {
                     SetupZoneInternalGain(this->AmbientTempZone,
                                           "ThermalStorage:ChilledWater:Stratified",
                                           this->Name,
                                           DataHeatBalance::IntGainTypeOf_ThermalStorageChilledWaterStratified,
-                                          this->AmbientZoneGain);
+                                          &this->AmbientZoneGain);
                 }
             }
         }

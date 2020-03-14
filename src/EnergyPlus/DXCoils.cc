@@ -1469,7 +1469,7 @@ namespace DXCoils {
                                           "Coil:Cooling:DX:SingleSpeed",
                                           DXCoil(DXCoilNum).Name,
                                           IntGainTypeOf_SecCoolingDXCoilSingleSpeed,
-                                          DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate);
+                                          &DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate);
                     DXCoil(DXCoilNum).IsSecondaryDXCoilInZone = true;
                 } else {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
@@ -2372,10 +2372,10 @@ namespace DXCoils {
                                           "Coil:Heating:DX:SingleSpeed",
                                           DXCoil(DXCoilNum).Name,
                                           IntGainTypeOf_SecHeatingDXCoilSingleSpeed,
-                                          DXCoil(DXCoilNum).SecCoilSensibleHeatRemovalRate,
-                                          _,
-                                          _,
-                                          DXCoil(DXCoilNum).SecCoilLatentHeatRemovalRate);
+                                          &DXCoil(DXCoilNum).SecCoilSensibleHeatRemovalRate,
+                                          nullptr,
+                                          nullptr,
+                                          &DXCoil(DXCoilNum).SecCoilLatentHeatRemovalRate);
                     DXCoil(DXCoilNum).IsSecondaryDXCoilInZone = true;
                 } else {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
@@ -2942,7 +2942,7 @@ namespace DXCoils {
                                           "Coil:Cooling:DX:TwoSpeed",
                                           DXCoil(DXCoilNum).Name,
                                           IntGainTypeOf_SecCoolingDXCoilTwoSpeed,
-                                          DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate);
+                                          &DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate);
                     DXCoil(DXCoilNum).IsSecondaryDXCoilInZone = true;
                 } else {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
@@ -4258,7 +4258,7 @@ namespace DXCoils {
                                           "Coil:Cooling:DX:MultiSpeed",
                                           DXCoil(DXCoilNum).Name,
                                           IntGainTypeOf_SecCoolingDXCoilMultiSpeed,
-                                          DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate);
+                                          &DXCoil(DXCoilNum).SecCoilSensibleHeatGainRate);
                     DXCoil(DXCoilNum).IsSecondaryDXCoilInZone = true;
                 } else {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");
@@ -4706,10 +4706,10 @@ namespace DXCoils {
                                           "Coil:Heating:DX:MultiSpeed",
                                           DXCoil(DXCoilNum).Name,
                                           IntGainTypeOf_SecHeatingDXCoilMultiSpeed,
-                                          DXCoil(DXCoilNum).SecCoilSensibleHeatRemovalRate,
-                                          _,
-                                          _,
-                                          DXCoil(DXCoilNum).SecCoilLatentHeatRemovalRate);
+                                          &DXCoil(DXCoilNum).SecCoilSensibleHeatRemovalRate,
+                                          nullptr,
+                                          nullptr,
+                                          &DXCoil(DXCoilNum).SecCoilLatentHeatRemovalRate);
                     DXCoil(DXCoilNum).IsSecondaryDXCoilInZone = true;
                 } else {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + DXCoil(DXCoilNum).Name + "\", invalid");

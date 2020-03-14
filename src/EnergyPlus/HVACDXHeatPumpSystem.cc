@@ -1297,16 +1297,13 @@ namespace HVACDXHeatPumpSystem {
         return Residuum;
     }
 
-    int GetHeatingCoilInletNodeNum(
-        std::string const &DXHeatCoilSysName)
+    int GetHeatingCoilInletNodeNum(std::string const &DXHeatCoilSysName, bool &InletNodeErrFlag)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu, FSEC
         //       DATE WRITTEN   Apr. 2019
         // PURPOSE OF THIS SUBROUTINE:
         // Get inlet node number
-
-        // Using/Aliasing
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NodeNum;
@@ -1324,20 +1321,18 @@ namespace HVACDXHeatPumpSystem {
                 NodeNum = DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilInletNodeNum;
             }
         }
+        if (NodeNum == 0) InletNodeErrFlag = true;
 
         return NodeNum;
     }
 
-    int GetHeatingCoilOutletNodeNum(
-        std::string const &DXHeatCoilSysName)
+    int GetHeatingCoilOutletNodeNum(std::string const &DXHeatCoilSysName, bool &OutletNodeErrFlag)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Lixing Gu, FSEC
         //       DATE WRITTEN   Apr. 2019
         // PURPOSE OF THIS SUBROUTINE:
         // Get Outlet node number
-
-        // Using/Aliasing
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int NodeNum;
@@ -1355,6 +1350,7 @@ namespace HVACDXHeatPumpSystem {
                 NodeNum = DXHeatPumpSystem(DXHeatSysNum).DXHeatPumpCoilOutletNodeNum;
             }
         }
+        if (NodeNum == 0) OutletNodeErrFlag = true;
 
         return NodeNum;
     }

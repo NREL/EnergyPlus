@@ -419,7 +419,7 @@ namespace PackagedThermalStorageCoil {
                                       "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
                                       TESCoil(item).Name,
                                       IntGainTypeOf_PackagedTESCoilTank,
-                                      TESCoil(item).QdotAmbient);
+                                      &TESCoil(item).QdotAmbient);
             }
 
             TESCoil(item).StorageUA = rNumericArgs(4);

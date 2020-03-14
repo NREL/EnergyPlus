@@ -45,6 +45,8 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
+#include <cmath>
+
 #include <EnergyPlus/api/datatransfer.h>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
@@ -148,7 +150,7 @@ Real64 getVariableValue(const int handle) {
     //    if (handle < 0) {
     //        return -999;
     //    }
-    return EnergyPlus::OutputProcessor::RVariableTypes(handle).VarPtr().Which;
+    return *EnergyPlus::OutputProcessor::RVariableTypes(handle).VarPtr.Which;
 }
 
 
@@ -195,20 +197,22 @@ int getActuatorHandle(const char* uniqueKey, const char* componentType, const ch
 void resetActuator(int handle) {
     // resets the actuator so that E+ will use the internally calculated value again
     auto & theActuator(EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable(handle));
-    theActuator.Actuated = false;
+    *theActuator.Actuated = false;
 }
 
 void setActuatorValue(const int handle, const Real64 value) {
     // I could imagine returning a 0 or 1, but it would really only be validating the handle was in range
     // the handle is based on the available actuator list
     auto & theActuator(EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable(handle));
-    if (theActuator.RealValue.associated()) {
-        theActuator.RealValue = value;
+    if (theActuator.RealValue) {
+        *theActuator.RealValue = value;
+    } else if (theActuator.IntValue) {
+        *theActuator.IntValue = (int)std::lround(value);
     } else {
-        // try falling back to integer assignment; // TODO: Address this later
-        theActuator.IntValue = value;
+        // what should we do for logicals?
     }
-    theActuator.Actuated = true;
+
+    *theActuator.Actuated = true;
 }
 
 
@@ -234,9 +238,9 @@ Real64 getInternalVariableValue(int handle) {
     }
     auto thisVar = EnergyPlus::DataRuntimeLanguage::EMSInternalVarsAvailable(handle);
     if (thisVar.PntrVarTypeUsed == EnergyPlus::DataRuntimeLanguage::PntrReal) {
-        return thisVar.RealValue();
+        return *thisVar.RealValue;
     } else if (thisVar.PntrVarTypeUsed == EnergyPlus::DataRuntimeLanguage::PntrInteger) {
-        return (Real64)thisVar.IntValue();
+        return (Real64)(*thisVar.IntValue);
     } // Doesn't look like this struct actually has a logical member type, so skipping that
     return 1;
 }

@@ -350,7 +350,7 @@ namespace DaylightingDevices {
                                           "DaylightingDevice:Tubular",
                                           TDDPipe(PipeNum).Name,
                                           IntGainTypeOf_DaylightingDeviceTubular,
-                                          TDDPipe(PipeNum).TZoneHeatGain(TZoneNum));
+                                          &TDDPipe(PipeNum).TZoneHeatGain(TZoneNum));
 
                 } // TZoneNum
 
