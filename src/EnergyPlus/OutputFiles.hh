@@ -113,6 +113,7 @@ public:
     std::string outputSszTxtFileName{"eplusssz.txt"};
 
     OutputFile mtr{"eplusout.mtr"};
+    OutputFile bnd{"eplusout.bnd"};
 
     static OutputFiles makeOutputFiles();
     static OutputFiles &getSingleton();
