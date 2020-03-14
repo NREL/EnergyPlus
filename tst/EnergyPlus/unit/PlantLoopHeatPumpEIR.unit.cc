@@ -61,7 +61,10 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
+#include <EnergyPlus/OutputProcessor.hh>
+#include <EnergyPlus/PlantComponent.hh>
 #include <EnergyPlus/PlantLoopHeatPumpEIR.hh>
+#include <EnergyPlus/WeatherManager.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::EIRPlantLoopHeatPumps;
@@ -2699,5 +2702,198 @@ TEST_F(EIRPLHPFixture, Test_DoPhysics)
     EXPECT_NEAR(thisCoolingPLHP->sourceSideOutletTemp, 47.9, 0.1);
 }
 
+TEST_F(EIRPLHPFixture, CoolingMetering)
+{
+    std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
+                                                      "  hp cooling side,",
+                                                      "  node 1,",
+                                                      "  node 2,",
+                                                      "  WaterSource,",
+                                                      "  node 3,",
+                                                      "  node 4,",
+                                                      "  ,",
+                                                      "  0.0001,",
+                                                      "  0.0001,",
+                                                      "  1000,",
+                                                      "  3.14,",
+                                                      "  ,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "Curve:Linear,",
+                                                      "  dummyCurve,",
+                                                      "  0.95,",
+                                                      "  0,",
+                                                      "  1,",
+                                                      "  1;"});
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // set up the plant loops
+    // first the load side
+    DataPlant::TotNumLoops = 2;
+    DataPlant::PlantLoop.allocate(2);
+    DataPlant::PlantLoop(1).LoopSide.allocate(2);
+    DataPlant::PlantLoop(1).LoopDemandCalcScheme = DataPlant::SingleSetPoint;
+    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
+    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    auto &PLHPPlantLoadSideComp = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
+    PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
+    // then the source side
+    DataPlant::PlantLoop(2).LoopSide.allocate(2);
+    DataPlant::PlantLoop(2).LoopSide(1).TotalBranches = 1;
+    DataPlant::PlantLoop(2).LoopSide(1).Branch.allocate(1);
+    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
+    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
+    auto &PLHPPlantLoadSourceComp = DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
+    PLHPPlantLoadSourceComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRCooling;
+
+    // the init call expects a "from" calling point
+    PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
+
+    // call the factory with a valid name to trigger reading inputs
+    EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE");
+
+    // verify the size of the vector and the processed condition
+    EXPECT_EQ(1u, heatPumps.size());
+
+    // for now we know the order is maintained, so get each heat pump object
+    EIRPlantLoopHeatPump *thisCoolingPLHP = &heatPumps[0];
+
+    // do a bit of extra wiring up to the plant
+    PLHPPlantLoadSideComp.Name = thisCoolingPLHP->name;
+    PLHPPlantLoadSideComp.NodeNumIn = thisCoolingPLHP->loadSideNodes.inlet;
+    PLHPPlantLoadSourceComp.Name = thisCoolingPLHP->name;
+    PLHPPlantLoadSourceComp.NodeNumIn = thisCoolingPLHP->sourceSideNodes.inlet;
+
+    // call for all initialization
+    DataGlobals::BeginEnvrnFlag = true;
+    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    thisCoolingPLHP->onInitLoopEquip(myLoadLocation);
+
+    int NumFound;
+
+    std::string TypeOfComp = "HeatPump:PlantLoop:EIR:Cooling";
+    std::string NameOfComp = thisCoolingPLHP->name;
+    int NumVariables = GetNumMeteredVariables(TypeOfComp, NameOfComp);
+    Array1D_int VarIndexes(NumVariables);                     // Variable Numbers
+    Array1D_int VarTypes(NumVariables);                       // Variable Types (1=integer, 2=real, 3=meter)
+    Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables);                     // Variable Index Types (1=Zone,2=HVAC)
+    Array1D<OutputProcessor::Unit> unitsForVar(NumVariables); // units from enum for each variable
+    Array1D_int ResourceTypes(NumVariables);                  // ResourceTypes for each variable
+    Array1D_string EndUses(NumVariables);                     // EndUses for each variable
+    Array1D_string Groups(NumVariables);                      // Groups for each variable
+    Array1D_string Names(NumVariables);                       // Variable Names for each variable
+
+    GetMeteredVariables(TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
+
+    EXPECT_EQ(2, NumFound);
+    EXPECT_EQ(ResourceTypes(1), 1010); // ENERGYTRANSFER
+    EXPECT_EQ(EndUses(1), "");
+    EXPECT_EQ(Groups(1), "PLANT");
+    EXPECT_EQ(ResourceTypes(2), 1001); // Electric
+    EXPECT_EQ(EndUses(2), "COOLING");
+    EXPECT_EQ(Groups(2), "PLANT");
+}
+
+TEST_F(EIRPLHPFixture, HeatingMetering)
+{
+    std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Heating,",
+                                                      "  hp heating side,",
+                                                      "  node 1,",
+                                                      "  node 2,",
+                                                      "  WaterSource,",
+                                                      "  node 3,",
+                                                      "  node 4,",
+                                                      "  ,",
+                                                      "  0.0001,",
+                                                      "  0.0001,",
+                                                      "  1000,",
+                                                      "  3.14,",
+                                                      "  ,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve,",
+                                                      "  dummyCurve;",
+                                                      "Curve:Linear,",
+                                                      "  dummyCurve,",
+                                                      "  0.95,",
+                                                      "  0,",
+                                                      "  1,",
+                                                      "  1;"});
+    ASSERT_TRUE(process_idf(idf_objects));
+
+    // set up the plant loops
+    // first the load side
+    DataPlant::TotNumLoops = 2;
+    DataPlant::PlantLoop.allocate(2);
+    DataPlant::PlantLoop(1).LoopSide.allocate(2);
+    DataPlant::PlantLoop(1).LoopDemandCalcScheme = DataPlant::SingleSetPoint;
+    DataPlant::PlantLoop(1).LoopSide(2).TotalBranches = 1;
+    DataPlant::PlantLoop(1).LoopSide(2).Branch.allocate(1);
+    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).TotalComponents = 1;
+    DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp.allocate(1);
+    auto &PLHPPlantLoadSideComp = DataPlant::PlantLoop(1).LoopSide(2).Branch(1).Comp(1);
+    PLHPPlantLoadSideComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
+    PLHPPlantLoadSideComp.CurOpSchemeType = DataPlant::CompSetPtBasedSchemeType;
+    // then the source side
+    DataPlant::PlantLoop(2).LoopSide.allocate(2);
+    DataPlant::PlantLoop(2).LoopSide(1).TotalBranches = 1;
+    DataPlant::PlantLoop(2).LoopSide(1).Branch.allocate(1);
+    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).TotalComponents = 1;
+    DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp.allocate(1);
+    auto &PLHPPlantLoadSourceComp = DataPlant::PlantLoop(2).LoopSide(1).Branch(1).Comp(1);
+    PLHPPlantLoadSourceComp.TypeOf_Num = DataPlant::TypeOf_HeatPumpEIRHeating;
+
+    // the init call expects a "from" calling point
+    PlantLocation myLoadLocation = PlantLocation(1, 2, 1, 1);
+
+    // call the factory with a valid name to trigger reading inputs
+    EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP HEATING SIDE");
+
+    // verify the size of the vector and the processed condition
+    EXPECT_EQ(1u, heatPumps.size());
+
+    // for now we know the order is maintained, so get each heat pump object
+    EIRPlantLoopHeatPump *thisHeatingPLHP = &heatPumps[0];
+
+    // do a bit of extra wiring up to the plant
+    PLHPPlantLoadSideComp.Name = thisHeatingPLHP->name;
+    PLHPPlantLoadSideComp.NodeNumIn = thisHeatingPLHP->loadSideNodes.inlet;
+    PLHPPlantLoadSourceComp.Name = thisHeatingPLHP->name;
+    PLHPPlantLoadSourceComp.NodeNumIn = thisHeatingPLHP->sourceSideNodes.inlet;
+
+    // call for all initialization
+    DataGlobals::BeginEnvrnFlag = true;
+    DataPlant::PlantFirstSizesOkayToFinalize = true;
+    thisHeatingPLHP->onInitLoopEquip(myLoadLocation);
+
+    int NumFound;
+
+    std::string TypeOfComp = "HeatPump:PlantLoop:EIR:Heating";
+    std::string NameOfComp = thisHeatingPLHP->name;
+    int NumVariables = GetNumMeteredVariables(TypeOfComp, NameOfComp);
+    Array1D_int VarIndexes(NumVariables);                     // Variable Numbers
+    Array1D_int VarTypes(NumVariables);                       // Variable Types (1=integer, 2=real, 3=meter)
+    Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables);                     // Variable Index Types (1=Zone,2=HVAC)
+    Array1D<OutputProcessor::Unit> unitsForVar(NumVariables); // units from enum for each variable
+    Array1D_int ResourceTypes(NumVariables);                  // ResourceTypes for each variable
+    Array1D_string EndUses(NumVariables);                     // EndUses for each variable
+    Array1D_string Groups(NumVariables);                      // Groups for each variable
+    Array1D_string Names(NumVariables);                       // Variable Names for each variable
+
+    GetMeteredVariables(TypeOfComp, NameOfComp, VarIndexes, VarTypes, IndexTypes, unitsForVar, ResourceTypes, EndUses, Groups, Names, NumFound);
+
+    EXPECT_EQ(2, NumFound);
+    EXPECT_EQ(ResourceTypes(1), 1010); // ENERGYTRANSFER
+    EXPECT_EQ(EndUses(1), "");
+    EXPECT_EQ(Groups(1), "PLANT");
+    EXPECT_EQ(ResourceTypes(2), 1001); // Electric
+    EXPECT_EQ(EndUses(2), "HEATING");
+    EXPECT_EQ(Groups(2), "PLANT");
+}
+
 #pragma clang diagnostic pop
 #pragma clang diagnostic pop
+
