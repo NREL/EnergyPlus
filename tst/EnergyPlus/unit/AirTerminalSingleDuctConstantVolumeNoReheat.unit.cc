@@ -244,14 +244,14 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_SimConstVolNoReheat)
     DataEnvironment::StdRhoAir = 1.0;
     int const SysNum(1);
     Real64 MassFlowRateMaxAvail = sd_airterminal(SysNum).MaxAirVolFlowRate * DataEnvironment::StdRhoAir;
-    sd_airterminalInlet(SysNum).AirMassFlowRate = MassFlowRateMaxAvail;
+    sd_airterminal(SysNum).sd_airterminalInlet.AirMassFlowRate = MassFlowRateMaxAvail;
     Schedule(sd_airterminal(SysNum).SchedPtr).CurrentValue = 1.0; // unit is always available
     int const ZonePtr = sd_airterminal(SysNum).ActualZoneNum;
     int const ZoneAirNodeNum = ZoneEquipConfig(ZonePtr).ZoneNode;
     // run SimConstVolNoReheat() function
-    sd_airterminal(SysNum).SimConstVolNoReheat(SysNum, ZoneAirNodeNum);
+    sd_airterminal(SysNum).SimConstVolNoReheat(ZoneAirNodeNum);
     // check the TA outlet air mass flow rate
-    EXPECT_EQ(MassFlowRateMaxAvail, sd_airterminalOutlet(SysNum).AirMassFlowRate);
+    EXPECT_EQ(MassFlowRateMaxAvail, sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
 }
 
 TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_Sim)
@@ -365,9 +365,9 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_Sim)
     SimulateSingleDuct(AirDistUnit(1).EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, AirDistUnit(1).EquipIndex(1));
     // check AT air mass flow rates
     EXPECT_EQ(MassFlowRateMaxAvail, sd_airterminal(SysNum).AirMassFlowRateMax); // design maximum mass flow rate
-    EXPECT_EQ(0.0, sd_airterminalInlet(SysNum).AirMassFlowRateMaxAvail);        // maximum available mass flow rate
-    EXPECT_EQ(0.0, sd_airterminalInlet(SysNum).AirMassFlowRate);                // outlet mass flow rate is zero
-    EXPECT_EQ(0.0, sd_airterminalOutlet(SysNum).AirMassFlowRate);               // outlet mass flow rate is zero
+    EXPECT_EQ(0.0, sd_airterminal(SysNum).sd_airterminalInlet.AirMassFlowRateMaxAvail);        // maximum available mass flow rate
+    EXPECT_EQ(0.0, sd_airterminal(SysNum).sd_airterminalInlet.AirMassFlowRate);                // outlet mass flow rate is zero
+    EXPECT_EQ(0.0, sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);               // outlet mass flow rate is zero
     EXPECT_EQ(0.0, sd_airterminal(SysNum).HeatRate);                            // delivered heat rate is zero
 
     FirstHVACIteration = false;
@@ -376,15 +376,15 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_Sim)
     // run SimulateSingleDuct() function
     SimulateSingleDuct(AirDistUnit(1).EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, AirDistUnit(1).EquipIndex(1));
     // check AT air mass flow rates
-    EXPECT_EQ(MassFlowRateMaxAvail, sd_airterminalInlet(SysNum).AirMassFlowRate);
-    EXPECT_EQ(MassFlowRateMaxAvail, sd_airterminalOutlet(SysNum).AirMassFlowRate);
+    EXPECT_EQ(MassFlowRateMaxAvail, sd_airterminal(SysNum).sd_airterminalInlet.AirMassFlowRate);
+    EXPECT_EQ(MassFlowRateMaxAvail, sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
     // check heating rate delivered
     EXPECT_NEAR(SensHeatRateProvided, sd_airterminal(SysNum).HeatRate, 0.001);
     // outlet and inlet nodes air conditions must match exactly
-    EXPECT_EQ(sd_airterminalOutlet(SysNum).AirTemp, sd_airterminalInlet(SysNum).AirTemp);
-    EXPECT_EQ(sd_airterminalOutlet(SysNum).AirHumRat, sd_airterminalInlet(SysNum).AirHumRat);
-    EXPECT_EQ(sd_airterminalOutlet(SysNum).AirEnthalpy, sd_airterminalInlet(SysNum).AirEnthalpy);
-    EXPECT_EQ(sd_airterminalOutlet(SysNum).AirMassFlowRate, sd_airterminalInlet(SysNum).AirMassFlowRate);
+    EXPECT_EQ(sd_airterminal(SysNum).sd_airterminalOutlet.AirTemp, sd_airterminal(SysNum).sd_airterminalInlet.AirTemp);
+    EXPECT_EQ(sd_airterminal(SysNum).sd_airterminalOutlet.AirHumRat, sd_airterminal(SysNum).sd_airterminalInlet.AirHumRat);
+    EXPECT_EQ(sd_airterminal(SysNum).sd_airterminalOutlet.AirEnthalpy, sd_airterminal(SysNum).sd_airterminalInlet.AirEnthalpy);
+    EXPECT_EQ(sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate, sd_airterminal(SysNum).sd_airterminalInlet.AirMassFlowRate);
 }
 
 TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
@@ -543,9 +543,9 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
     SimulateSingleDuct(AirDistUnit(1).EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, AirDistUnit(1).EquipIndex(1));
     // check AT air mass flow rates
     EXPECT_EQ(MassFlowRateMaxAvail, sd_airterminal(SysNum).AirMassFlowRateMax); // design maximum mass flow rate
-    EXPECT_EQ(0.0, sd_airterminalInlet(SysNum).AirMassFlowRateMaxAvail);        // maximum available mass flow rate
-    EXPECT_EQ(0.0, sd_airterminalInlet(SysNum).AirMassFlowRate);                // outlet mass flow rate is zero
-    EXPECT_EQ(0.0, sd_airterminalOutlet(SysNum).AirMassFlowRate);               // outlet mass flow rate is zero
+    EXPECT_EQ(0.0, sd_airterminal(SysNum).sd_airterminalInlet.AirMassFlowRateMaxAvail);        // maximum available mass flow rate
+    EXPECT_EQ(0.0, sd_airterminal(SysNum).sd_airterminalInlet.AirMassFlowRate);                // outlet mass flow rate is zero
+    EXPECT_EQ(0.0, sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);               // outlet mass flow rate is zero
     EXPECT_EQ(0.0, sd_airterminal(SysNum).HeatRate);                            // delivered heat rate is zero
 
     DataGlobals::BeginEnvrnFlag = false;
@@ -573,8 +573,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
     // run SimulateSingleDuct() function
     SimulateSingleDuct(AirDistUnit(1).EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, AirDistUnit(1).EquipIndex(1));
     // check AT air mass flow rates
-    EXPECT_EQ(expectedMassFlow, sd_airterminalInlet(SysNum).AirMassFlowRate);
-    EXPECT_EQ(expectedMassFlow, sd_airterminalOutlet(SysNum).AirMassFlowRate);
+    EXPECT_EQ(expectedMassFlow, sd_airterminal(SysNum).sd_airterminalInlet.AirMassFlowRate);
+    EXPECT_EQ(expectedMassFlow, sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
 
     // 50% occupancy 1.5 people, OA/person = 0.1, OA/zone = 0.5, OA Sched = 1.0
     DataGlobals::HourOfDay = 12;
@@ -584,8 +584,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
     expectedMassFlow = 1.0 * ((1.5 * 0.1) + 0.5);
     SimulateSingleDuct(AirDistUnit(1).EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, AirDistUnit(1).EquipIndex(1));
     // check AT air mass flow rates
-    EXPECT_EQ(expectedMassFlow, sd_airterminalInlet(SysNum).AirMassFlowRate);
-    EXPECT_EQ(expectedMassFlow, sd_airterminalOutlet(SysNum).AirMassFlowRate);
+    EXPECT_EQ(expectedMassFlow, sd_airterminal(SysNum).sd_airterminalInlet.AirMassFlowRate);
+    EXPECT_EQ(expectedMassFlow, sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
 
     // Nighttime OA Sched = 0.0
     DataGlobals::HourOfDay = 24;
@@ -595,8 +595,8 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_OASpecification)
     expectedMassFlow = 0.0 * ((1.5 * 0.1) + 0.5);
     SimulateSingleDuct(AirDistUnit(1).EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, AirDistUnit(1).EquipIndex(1));
     // check AT air mass flow rates
-    EXPECT_EQ(expectedMassFlow, sd_airterminalInlet(SysNum).AirMassFlowRate);
-    EXPECT_EQ(expectedMassFlow, sd_airterminalOutlet(SysNum).AirMassFlowRate);
+    EXPECT_EQ(expectedMassFlow, sd_airterminal(SysNum).sd_airterminalInlet.AirMassFlowRate);
+    EXPECT_EQ(expectedMassFlow, sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
 }
 
 TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_EMSOverrideAirFlow)
@@ -704,20 +704,20 @@ TEST_F(EnergyPlusFixture, AirTerminalSingleDuctCVNoReheat_EMSOverrideAirFlow)
     // run SimulateSingleDuct() function
     SimulateSingleDuct(AirDistUnit(1).EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, AirDistUnit(1).EquipIndex(1));
     // check AT air mass flow rates
-    EXPECT_EQ(MassFlowRateMaxAvail, sd_airterminalInlet(SysNum).AirMassFlowRate);
-    EXPECT_EQ(MassFlowRateMaxAvail, sd_airterminalOutlet(SysNum).AirMassFlowRate);
+    EXPECT_EQ(MassFlowRateMaxAvail, sd_airterminal(SysNum).sd_airterminalInlet.AirMassFlowRate);
+    EXPECT_EQ(MassFlowRateMaxAvail, sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
     // outlet and inlet nodes air conditions must match exactly
-    EXPECT_EQ(sd_airterminalOutlet(SysNum).AirTemp, sd_airterminalInlet(SysNum).AirTemp);
-    EXPECT_EQ(sd_airterminalOutlet(SysNum).AirHumRat, sd_airterminalInlet(SysNum).AirHumRat);
-    EXPECT_EQ(sd_airterminalOutlet(SysNum).AirEnthalpy, sd_airterminalInlet(SysNum).AirEnthalpy);
-    EXPECT_EQ(sd_airterminalOutlet(SysNum).AirMassFlowRate, sd_airterminalInlet(SysNum).AirMassFlowRate);
+    EXPECT_EQ(sd_airterminal(SysNum).sd_airterminalOutlet.AirTemp, sd_airterminal(SysNum).sd_airterminalInlet.AirTemp);
+    EXPECT_EQ(sd_airterminal(SysNum).sd_airterminalOutlet.AirHumRat, sd_airterminal(SysNum).sd_airterminalInlet.AirHumRat);
+    EXPECT_EQ(sd_airterminal(SysNum).sd_airterminalOutlet.AirEnthalpy, sd_airterminal(SysNum).sd_airterminalInlet.AirEnthalpy);
+    EXPECT_EQ(sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate, sd_airterminal(SysNum).sd_airterminalInlet.AirMassFlowRate);
     // sets EMS actuators
     sd_airterminal(SysNum).EMSOverrideAirFlow = true;
     sd_airterminal(SysNum).EMSMassFlowRateValue = 0.5;
     // run SimulateSingleDuct() function
     SimulateSingleDuct(AirDistUnit(1).EquipName(1), FirstHVACIteration, ZonePtr, ZoneAirNodeNum, AirDistUnit(1).EquipIndex(1));
     // check AT air mass flow rates
-    EXPECT_EQ(sd_airterminal(SysNum).EMSMassFlowRateValue, sd_airterminalInlet(SysNum).AirMassFlowRate);
-    EXPECT_EQ(sd_airterminal(SysNum).EMSMassFlowRateValue, sd_airterminalOutlet(SysNum).AirMassFlowRate);
+    EXPECT_EQ(sd_airterminal(SysNum).EMSMassFlowRateValue, sd_airterminal(SysNum).sd_airterminalInlet.AirMassFlowRate);
+    EXPECT_EQ(sd_airterminal(SysNum).EMSMassFlowRateValue, sd_airterminal(SysNum).sd_airterminalOutlet.AirMassFlowRate);
 }
 } // namespace EnergyPlus

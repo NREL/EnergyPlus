@@ -22987,7 +22987,11 @@ DO iSys = 1, numCompactSysVRF
   CALL AddToObjFld('Heating Energy Input Ratio Boundary Curve Name', base + vrfsNameOff,' VRFHeatEIRFTBoundary')
   CALL AddToObjFld('Heating Energy Input Ratio Modifier Function of High Temperature Curve Name', base + vrfsNameOff, &
    ' VRFHeatEIRFTHi')
-  CALL AddToObjStr('Heating Performance Curve Outdoor Temperature Type','WetBulbTemperature')
+  IF (isCondWaterCooled) THEN
+    CALL AddToObjStr('Heating Performance Curve Outdoor Temperature Type','DryBulbTemperature')
+  ELSE
+    CALL AddToObjStr('Heating Performance Curve Outdoor Temperature Type','WetBulbTemperature')
+  ENDIF
   CALL AddToObjFld('Heating Energy Input Ratio Modifier Function of Low Part-Load Ratio Curve Name', base + vrfsNameOff, &
    ' HeatingEIRLowPLR')
   CALL AddToObjFld('Heating Energy Input Ratio Modifier Function of High Part-Load Ratio Curve Name', base + vrfsNameOff, &

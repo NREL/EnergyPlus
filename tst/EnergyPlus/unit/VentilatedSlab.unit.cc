@@ -143,9 +143,6 @@ TEST_F(EnergyPlusFixture, VentilatedSlab_CalcVentilatedSlabCoilOutputTest)
     EXPECT_TRUE(LatOutputProvided < 0.0);
     EXPECT_TRUE(PowerMet < 0.0);
 
-    // Deallocate everything
-    VentSlab.deallocate();
-    Node.deallocate();
 }
 
 TEST_F(EnergyPlusFixture, VentilatedSlab_InitVentilatedSlabTest)
