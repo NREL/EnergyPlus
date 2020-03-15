@@ -2915,6 +2915,9 @@ namespace RoomAirModelManager {
         } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_RefrigerationChillerSet) { // ZoneHVAC : RefrigerationChillerSet
             SupplyNodeName = Alphas(5);
             ReturnNodeName = Alphas(4);
+        } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_HybridUnitaryAirConditioners) { // ZoneHVAC : HybridUnitaryAirConditioners
+            SupplyNodeName = Alphas(11);
+            ReturnNodeName = Alphas(9);
         } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_FanZoneExhaust) { // Fan : ZoneExhaust
             SupplyNodeName = "";    // ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? ? May not use
         } else if (TypeNum == DataHVACGlobals::ZoneEquipTypeOf_WaterHeaterHeatPump) { // WaterHeater : HeatPump

@@ -404,18 +404,7 @@ namespace SizingManager {
                                 }
 
                                 // set flag for pulse used in load component reporting
-                                doLoadComponentPulseNow = false;
-                                if (isPulseZoneSizing) {
-                                    if (!WarmupFlag) {
-                                        if (DayOfSim == 1) {         // first day of sizing period
-                                            if (HourOfDay == 10) {   // at 10am
-                                                if (TimeStep == 1) { // first timestep in hour
-                                                    doLoadComponentPulseNow = true;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+                                doLoadComponentPulseNow = CalcdoLoadComponentPulseNow(isPulseZoneSizing,WarmupFlag,HourOfDay,TimeStep,KindOfSim,DayOfSim);
 
                                 ManageWeather();
 
@@ -842,6 +831,31 @@ namespace SizingManager {
         if (ErrorsFound) {
             ShowFatalError("Program terminates due to preceding conditions.");
         }
+    }
+
+    bool CalcdoLoadComponentPulseNow(bool const isPulseZoneSizing,
+                                     bool const WarmupFlag,
+                                     int const HourOfDay,
+                                     int const TimeStep,
+                                     int const KindOfSim,
+                                     int const DayOfSim
+                                     )
+    {
+        // This routine decides whether or not to do a Load Component Pulse.  True when yes it should, false when in shouldn't
+        // This check looks to do the pulse at the first time step of the 10th hour of the day while not in warmup mode.
+        // This needs to be done not just on the first day of a simulation because when the user picks a design day derived from
+        // an attached weather file the design day is not necessarily the first day of the simulation.
+
+        int const HourDayToPulse (10);
+        int const TimeStepToPulse (1);
+        
+        if ( (isPulseZoneSizing) && (!WarmupFlag) && (HourOfDay == HourDayToPulse) && (TimeStep == TimeStepToPulse) &&
+             ((KindOfSim == ksRunPeriodDesign) || (DayOfSim == 1)) ) {
+            return true;
+        } else {
+            return false;
+        }
+        
     }
 
     void ManageSystemSizingAdjustments()
