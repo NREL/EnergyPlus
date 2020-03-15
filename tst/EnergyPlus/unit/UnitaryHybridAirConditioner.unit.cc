@@ -227,7 +227,9 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     pZoneHybridUnitaryAirConditioner->doStep(RequestedCooling, Requestedheating, Requested_Humidification, Requested_Dehumidification, DesignMinVR);
 
     // output results
-    Real64 NormlizationDivisor = 3.0176;
+    Real64 NormalizationDivisor = 3.0176;
+    Real64 ScaledMaxMsa = pZoneHybridUnitaryAirConditioner->ScaledSystemMaximumSupplyAirMassFlowRate;
+    Real64 MinFlowFraction = DesignMinVR / ScaledMaxMsa;
     modenumber = pZoneHybridUnitaryAirConditioner->PrimaryMode;
     Real64 Tsa = pZoneHybridUnitaryAirConditioner->OutletTemp;
     Real64 Msa = pZoneHybridUnitaryAirConditioner->OutletMassFlowRate;
@@ -243,7 +245,8 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     EXPECT_NEAR(0.0, deliveredSH, 0.001);
     EXPECT_LT(Tsa, Tra);
     EXPECT_GT(Msa, DesignMinVR);
-    EXPECT_NEAR(Electricpower, 10188.37/NormlizationDivisor, 0.1);
+    EXPECT_GT(Electricpower, 10500 / NormalizationDivisor * MinFlowFraction);
+    EXPECT_LT(Electricpower, 12500 / NormalizationDivisor);
 
     // Scenario 2: high cooling larger system
 
@@ -270,11 +273,15 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     EXPECT_NEAR(0.0, deliveredSH, 0.001);
     EXPECT_LT(Tsa, Tra);
     EXPECT_GT(Msa, DesignMinVR);
-    EXPECT_NEAR(Electricpower, 4749.14/NormlizationDivisor, 0.1);
+    EXPECT_GT(Electricpower, 4000 / NormalizationDivisor * MinFlowFraction);
+    EXPECT_LT(Electricpower, 5000 / NormalizationDivisor);
 
     // Scenario 3: Outside of env conditions. should go to standby and have standby energy
     pZoneHybridUnitaryAirConditioner->Initialize(1);
     pZoneHybridUnitaryAirConditioner->InitializeModelParams();
+    pZoneHybridUnitaryAirConditioner->ScalingFactor = pZoneHybridUnitaryAirConditioner->ScalingFactor / 2; // reset back to original values
+    pZoneHybridUnitaryAirConditioner->ScaledSystemMaximumSupplyAirMassFlowRate =
+        pZoneHybridUnitaryAirConditioner->ScaledSystemMaximumSupplyAirMassFlowRate / 2; // reset back to original values
     pZoneHybridUnitaryAirConditioner->SecInletTemp = 150;
     pZoneHybridUnitaryAirConditioner->SecInletHumRat = 0;
     pZoneHybridUnitaryAirConditioner->doStep(RequestedCooling, Requestedheating, Requested_Humidification, Requested_Dehumidification, DesignMinVR);
@@ -285,7 +292,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
 
     // checks
     EXPECT_EQ(modenumber, 0); // Standby Mode
-    EXPECT_NEAR(Electricpower, 244/NormlizationDivisor, 10);
+    EXPECT_NEAR(Electricpower, 244 / NormalizationDivisor, 1);
 
     // Scenario 4: Low Cooling
     Requestedheating = -64358.68966; //-
@@ -310,7 +317,8 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     EXPECT_GT(deliveredSC, 0);
     EXPECT_NEAR(0.0, deliveredSH, 0.001);
     EXPECT_LT(Tsa, Tra);
-    EXPECT_NEAR(Electricpower, 1480.5/NormlizationDivisor, 0.1);
+    EXPECT_GT(Electricpower, 4000 / NormalizationDivisor * MinFlowFraction);
+    EXPECT_LT(Electricpower, 5000 / NormalizationDivisor);
 
     // Scenario 5: No Heating or Cooling, Minimum Ventilation
     Requestedheating = -55795.8058;
@@ -330,7 +338,8 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     EXPECT_EQ(modenumber, 4); // Ventilation Mode
     EXPECT_NEAR(Tsa, Tosa, 1.0);
     EXPECT_NEAR(Msa, DesignMinVR, 0.001);
-    EXPECT_NEAR(Electricpower, 3453.89/NormlizationDivisor, 0.1);
+    EXPECT_GT(Electricpower, 4000 / NormalizationDivisor * MinFlowFraction);
+    EXPECT_LT(Electricpower, 5000 / NormalizationDivisor);
 
     // Scenario 6: Availability Manager Off
     Requestedheating = -122396.255;  // Watts (Zone Predicted Sensible Load to Heating Setpoint Heat Transfer Rate
@@ -352,7 +361,7 @@ TEST_F(EnergyPlusFixture, Test_UnitaryHybridAirConditioner_Unittest)
     EXPECT_EQ(modenumber, 0); // Standby Mode
     EXPECT_EQ(Msa, 0);
     EXPECT_EQ(deliveredSC, 0);
-    EXPECT_NEAR(Electricpower, 244, 10);
+    EXPECT_NEAR(Electricpower, 244 / NormalizationDivisor, 1);
 
     // Scenario 7: Check ventilation load is being accounted for
     NumOfZones = 1;
