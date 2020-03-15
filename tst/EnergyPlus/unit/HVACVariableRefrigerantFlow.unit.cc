@@ -14214,8 +14214,8 @@ TEST_F(HVACVRFFixture, VRF_MinPLR_and_EIRfPLRCruveMinPLRInputsTest)
     GetZoneData(ErrorsFound);
     EXPECT_FALSE(ErrorsFound);
     // get zone input and connections
-    GetZoneEquipmentData();
-    GetVRFInputData(ErrorsFound);
+    GetZoneEquipmentData(state);
+    GetVRFInputData(state, ErrorsFound);
     // expect error due to min PLR value
     EXPECT_TRUE(ErrorsFound);
     // set pointer to components
