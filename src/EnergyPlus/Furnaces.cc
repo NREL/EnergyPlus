@@ -5271,7 +5271,7 @@ namespace Furnaces {
             Real64 LatentOutputDelta(0.0);    // delta latent output rate
             Real64 TotalOutputDelta(0.0);     // delta total output rate 
             DXCoils::CalcTotalSensibleLatentOutput(MassFlowRate, Node(OutNode).Temp, Node(OutNode).HumRat, Node(ZoneInNode).Temp, Node(ZoneInNode).HumRat, TotalOutput, SensibleOutput, LatentOutput);
-            DXCoils::CalcTotalSensibleLatentOutput(MassFlowRate, Node(OutNode).Temp, Node(OutNode).HumRat, Node(Furnace(FurnaceNum).NodeNumOfControlledZone).Temp, Node(Furnace(FurnaceNum).NodeNumOfControlledZone).HumRat, TotalOutputDelta, SensibleOutputDelta, LatentOutputDelta);
+            DXCoils::CalcTotalSensibleLatentOutput(DeltaMassRate, Node(OutNode).Temp, Node(OutNode).HumRat, Node(Furnace(FurnaceNum).NodeNumOfControlledZone).Temp, Node(Furnace(FurnaceNum).NodeNumOfControlledZone).HumRat, TotalOutputDelta, SensibleOutputDelta, LatentOutputDelta);
             Furnace(FurnaceNum).SenLoadLoss = SensibleOutput - SensibleOutputDelta;
             if (std::abs(Furnace(FurnaceNum).SensibleLoadMet) > 0.0) {
                 if (std::abs(Furnace(FurnaceNum).SenLoadLoss / Furnace(FurnaceNum).SensibleLoadMet) < 0.001) Furnace(FurnaceNum).SenLoadLoss = 0.0;
