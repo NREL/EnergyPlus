@@ -651,9 +651,8 @@ namespace DataPlant {
     }
 
     Real64 HalfLoopData::EvaluateLoopSetPointLoad(int const FirstBranchNum,
-                                                          int const LastBranchNum,
-                                                          Real64 ThisLoopSideFlow,
-                                                          Array1S_int LastComponentSimulated) {
+                                                  int const LastBranchNum,
+                                                  Real64 ThisLoopSideFlow) {
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Edwin Lee
@@ -695,7 +694,7 @@ namespace DataPlant {
 
             //~ Always start from the last component we did the last time around + 1 and
             //~  try to make it all the way to the end of the loop
-            int StartingComponent = LastComponentSimulated(BranchIndex) + 1;
+            int StartingComponent = this->Branch(BranchCounter).lastComponentSimulated + 1;
             int EnteringNodeNum = this->Branch(BranchCounter).Comp(StartingComponent).NodeNumIn;
 
             Real64 EnteringTemperature = DataLoopNode::Node(EnteringNodeNum).Temp;
@@ -847,8 +846,7 @@ namespace DataPlant {
         //  the very beginning of this loop side, so that it is basically for the entire loop side
     
         // FUNCTION PARAMETER DEFINITIONS:
-        static Array1D_int const InitCompArray(1, 0);
-        return this->EvaluateLoopSetPointLoad(1, 1, ThisLoopSideFlow, InitCompArray);
+        return this->EvaluateLoopSetPointLoad(1, 1, ThisLoopSideFlow);
     }
 
     Real64 HalfLoopData::SetupLoopFlowRequest(int const OtherSide) {
@@ -1226,7 +1224,11 @@ namespace DataPlant {
         // Now we know what the loop would "like" to run at, let's see the pump
         // operation range (min/max avail) to see whether it is possible this time around
         Real64 ThisLoopSideFlow = this->DetermineLoopSideFlowRate(ThisSideInletNode, ThisLoopSideFlowRequest);
-    
+
+        for (auto &branch : this->Branch) {
+            branch.lastComponentSimulated = 0;
+        }
+
         // We also need to establish a baseline "other-side-based" loop demand based on this possible flow rate
         this->InitialDemandToLoopSetPoint = this->CalcOtherSideDemand(ThisLoopSideFlow);
         this->UpdatedDemandToLoopSetPoint = this->InitialDemandToLoopSetPoint;

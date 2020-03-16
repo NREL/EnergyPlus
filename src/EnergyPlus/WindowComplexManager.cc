@@ -4019,7 +4019,7 @@ namespace WindowComplexManager {
     // This function check if gas with molecular weight has already been feed into coefficients and
     // feed arrays
 
-    void CheckGasCoefs(Real64 const currentWeight, int &indexNumber, Array1A<Real64> wght, bool &feedData)
+    void CheckGasCoefs(Real64 const currentWeight, int &indexNumber, Array1D<Real64> &wght, bool &feedData)
     {
 
         // Using/Aliasing
@@ -4027,7 +4027,7 @@ namespace WindowComplexManager {
         using TARCOGGassesParams::maxgas;
 
         // Argument array dimensioning
-        wght.dim(maxgas);
+        EP_SIZE_CHECK(wght, maxgas);
 
         // Locals
         // Local variables

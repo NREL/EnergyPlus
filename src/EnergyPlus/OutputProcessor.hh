@@ -266,7 +266,7 @@ namespace OutputProcessor {
     struct TimeSteps
     {
         // Members
-        Reference<Real64> TimeStep; // fortran POINTER Pointer to the Actual Time Step Variable (Zone or HVAC)
+        Real64 * TimeStep; // fortran POINTER Pointer to the Actual Time Step Variable (Zone or HVAC)
         Real64 CurMinute;           // Current minute (decoded from real Time Step Value)
 
         // Default Constructor
@@ -279,7 +279,7 @@ namespace OutputProcessor {
     struct RealVariables
     {
         // Members
-        Reference<Real64> Which; // The POINTER to the actual variable holding the value
+        Real64 * Which; // The POINTER to the actual variable holding the value
         Real64 Value;            // Current Value of the variable (to resolution of Zone Time Step)
         Real64 TSValue;          // Value of this variable at the Zone Time Step
         Real64 EITSValue;        // Value of this variable at the Zone Time Step for external interface
@@ -315,7 +315,7 @@ namespace OutputProcessor {
     struct IntegerVariables
     {
         // Members
-        Reference_int Which; // The POINTER to the actual variable holding the value
+        int * Which; // The POINTER to the actual variable holding the value
         Real64 Value;        // Current Value of the variable (to resolution of Zone Time Step)
         Real64 TSValue;      // Value of this variable at the Zone Time Step
         Real64 EITSValue;    // Value of this variable at the Zone Time Step for external interface
@@ -378,7 +378,7 @@ namespace OutputProcessor {
         std::string KeyNameOnlyUC;       // Name of key only witht out variable in uppercase
         OutputProcessor::Unit units;     // Units for Variable
         std::string unitNameCustomEMS;   // name of units when customEMS is used for EMS variables that are unusual
-        Reference<RealVariables> VarPtr; // Pointer used to real Variables structure
+        RealVariables VarPtr;            // Pointer used to real Variables structure
 
         // Default Constructor
         RealVariableType() : timeStepType(TimeStepType::TimeStepZone), storeType(StoreType::Averaged), ReportID(0), units(OutputProcessor::Unit::None)
@@ -396,7 +396,7 @@ namespace OutputProcessor {
         std::string VarNameUC;              // Name of Variable
         std::string VarNameOnly;            // Name of Variable
         OutputProcessor::Unit units;        // Units for Variable
-        Reference<IntegerVariables> VarPtr; // Pointer used to integer Variables structure
+        IntegerVariables VarPtr;            // Pointer used to integer Variables structure
 
         // Default Constructor
         IntegerVariableType() : timeStepType(TimeStepType::TimeStepZone), storeType(StoreType::Averaged), ReportID(0), units(OutputProcessor::Unit::None)
@@ -572,8 +572,6 @@ namespace OutputProcessor {
     extern Array1D<RealVariableType> RVariableTypes;         // Variable Types structure (use NumOfRVariables to traverse)
     extern Array1D<IntegerVariableType> IVariableTypes;      // Variable Types structure (use NumOfIVariables to traverse)
     extern Array1D<VariableTypeForDDOutput> DDVariableTypes; // Variable Types structure (use NumVariablesForOutput to traverse)
-    extern Reference<RealVariables> RVariable;
-    extern Reference<IntegerVariables> IVariable;
     extern Array1D<ReqReportVariables> ReqRepVars;
     extern Array1D<MeterArrayType> VarMeterArrays;
     extern Array1D<MeterType> EnergyMeters;
@@ -1009,25 +1007,25 @@ int GetNumMeteredVariables(std::string const &ComponentType, // Given Component 
                            std::string const &ComponentName  // Given Component Name (user defined)
 );
 
-void GetMeteredVariables(std::string const &ComponentType,                     // Given Component Type
-                         std::string const &ComponentName,                     // Given Component Name (user defined)
+void GetMeteredVariables(std::string const &ComponentType,                      // Given Component Type
+                         std::string const &ComponentName,                      // Given Component Name (user defined)
                          Array1D_int &VarIndexes,                               // Variable Numbers
                          Array1D_int &VarTypes,                                 // Variable Types (1=integer, 2=real, 3=meter)
-                         Array1A<OutputProcessor::TimeStepType> TimeStepTypes, // Variable Index Types (1=Zone,2=HVAC),
-                         Array1A<OutputProcessor::Unit> unitsForVar,           // units from enum for each variable
+                         Array1D<OutputProcessor::TimeStepType> &TimeStepTypes, // Variable Index Types (1=Zone,2=HVAC),
+                         Array1D<OutputProcessor::Unit> &unitsForVar,           // units from enum for each variable
                          Array1D_int &ResourceTypes,                            // ResourceTypes for each variable
                          Array1D_string &EndUses,                               // EndUses for each variable
                          Array1D_string &Groups,                                // Groups for each variable
                          Array1D_string &Names,                                 // Variable Names for each variable
-                         int &NumFound                                         // Number Found
+                         int &NumFound                                          // Number Found
 );
 
-void GetMeteredVariables(std::string const &ComponentType,                      // Given Component Type
-                         std::string const &ComponentName,                      // Given Component Name (user defined)
+void GetMeteredVariables(std::string const &ComponentType,                       // Given Component Type
+                         std::string const &ComponentName,                       // Given Component Name (user defined)
                          Array1D_int &VarIndexes,                                // Variable Numbers
                          Array1D_int &VarTypes,                                  // Variable Types (1=integer, 2=real, 3=meter)
-                         Array1A<OutputProcessor::TimeStepType> TimeStepTypes,  // Variable Index Types (1=Zone,2=HVAC),
-                         Array1A<OutputProcessor::Unit> unitsForVar,            // units from enum for each variable
+                         Array1D<OutputProcessor::TimeStepType> &TimeStepTypes,  // Variable Index Types (1=Zone,2=HVAC),
+                         Array1D<OutputProcessor::Unit> &unitsForVar,            // units from enum for each variable
                          Array1D_int &ResourceTypes,                             // ResourceTypes for each variable
                          Array1D_string &EndUses,                                // EndUses for each variable
                          Array1D_string &Groups,                                 // Groups for each variable

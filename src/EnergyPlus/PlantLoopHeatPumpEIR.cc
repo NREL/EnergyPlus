@@ -360,8 +360,17 @@ namespace EIRPlantLoopHeatPumps {
             // setup output variables
             SetupOutputVariable(
                 "Heat Pump Load Side Heat Transfer Rate", OutputProcessor::Unit::W, this->loadSideHeatTransfer, "System", "Average", this->name);
-            SetupOutputVariable(
-                "Heat Pump Load Side Heat Transfer Energy", OutputProcessor::Unit::J, this->loadSideEnergy, "System", "Sum", this->name);
+            SetupOutputVariable("Heat Pump Load Side Heat Transfer Energy",
+                                OutputProcessor::Unit::J,
+                                this->loadSideEnergy,
+                                "System",
+                                "Sum",
+                                this->name,
+                                _,
+                                "ENERGYTRANSFER",
+                                _,
+                                _,
+                                "Plant");
             SetupOutputVariable(
                 "Heat Pump Source Side Heat Transfer Rate", OutputProcessor::Unit::W, this->sourceSideHeatTransfer, "System", "Average", this->name);
             SetupOutputVariable(
@@ -375,7 +384,31 @@ namespace EIRPlantLoopHeatPumps {
             SetupOutputVariable(
                 "Heat Pump Source Side Outlet Temperature", OutputProcessor::Unit::C, this->sourceSideOutletTemp, "System", "Average", this->name);
             SetupOutputVariable("Heat Pump Electric Power", OutputProcessor::Unit::W, this->powerUsage, "System", "Average", this->name);
-            SetupOutputVariable("Heat Pump Electric Energy", OutputProcessor::Unit::J, this->powerEnergy, "System", "Sum", this->name);
+            if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRCooling) { // energy from HeatPump:PlantLoop:EIR:Cooling object
+                SetupOutputVariable("Heat Pump Electric Energy",
+                                    OutputProcessor::Unit::J,
+                                    this->powerEnergy,
+                                    "System",
+                                    "Sum",
+                                    this->name,
+                                    _,
+                                    "Electric",
+                                    "Cooling",
+                                    "Heat Pump",
+                                    "Plant");
+            } else if (this->plantTypeOfNum == DataPlant::TypeOf_HeatPumpEIRHeating) { // energy from HeatPump:PlantLoop:EIR:Heating object
+                SetupOutputVariable("Heat Pump Electric Energy",
+                                    OutputProcessor::Unit::J,
+                                    this->powerEnergy,
+                                    "System",
+                                    "Sum",
+                                    this->name,
+                                    _,
+                                    "Electric",
+                                    "Heating",
+                                    "Heat Pump",
+                                    "Plant");
+            }
             SetupOutputVariable(
                 "Heat Pump Load Side Mass Flow Rate", OutputProcessor::Unit::kg_s, this->loadSideMassFlowRate, "System", "Average", this->name);
             SetupOutputVariable(

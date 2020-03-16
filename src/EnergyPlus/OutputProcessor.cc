@@ -52,6 +52,7 @@
 #include <cstdio>
 #include <cstring>
 #include <fstream>
+#include <memory>
 #include <ostream>
 #include <string>
 #include <unordered_set>
@@ -300,8 +301,6 @@ namespace OutputProcessor {
     Array1D<RealVariableType> RVariableTypes;         // Variable Types structure (use NumOfRVariables to traverse)
     Array1D<IntegerVariableType> IVariableTypes;      // Variable Types structure (use NumOfIVariables to traverse)
     Array1D<VariableTypeForDDOutput> DDVariableTypes; // Variable Types structure (use NumVariablesForOutput to traverse)
-    Reference<RealVariables> RVariable;
-    Reference<IntegerVariables> IVariable;
     Array1D<ReqReportVariables> ReqRepVars;
     Array1D<MeterArrayType> VarMeterArrays;
     Array1D<MeterType> EnergyMeters;
@@ -397,8 +396,6 @@ namespace OutputProcessor {
         RVariableTypes.deallocate();
         IVariableTypes.deallocate();
         DDVariableTypes.deallocate();
-        RVariable.deallocate();
-        IVariable.deallocate();
         ReqRepVars.deallocate();
         VarMeterArrays.deallocate();
         EnergyMeters.deallocate();
@@ -533,7 +530,7 @@ namespace OutputProcessor {
         TimeStepType timeStepType = ValidateTimeStepType(TimeStepTypeKey, "SetupTimePointers");
 
         TimeSteps tPtr;
-        tPtr.TimeStep >>= TimeStep;
+        tPtr.TimeStep = &TimeStep;
         if (!TimeValue.insert(std::make_pair(timeStepType, tPtr)).second) {
             // The element was already present... shouldn't happen
             ShowFatalError("SetupTimePointers was already called for " + TimeStepTypeKey);
@@ -1668,8 +1665,8 @@ namespace OutputProcessor {
             }
             for (iKey = 1; iKey <= NumVarsOnCustomMeter; ++iKey) {
                 if (VarsOnCustomMeter(iKey) == 0) continue;
-                RVariable >>= RVariableTypes(VarsOnCustomMeter(iKey)).VarPtr;
-                AttachCustomMeters(VarsOnCustomMeter(iKey), RVariable().MeterArrayPtr, NumEnergyMeters);
+                auto & tmpVar = RVariableTypes(VarsOnCustomMeter(iKey)).VarPtr;
+                AttachCustomMeters(VarsOnCustomMeter(iKey), tmpVar.MeterArrayPtr, NumEnergyMeters);
             }
             if (NumVarsOnCustomMeter == 0) {
                 ShowWarningError(cCurrentModuleObject + "=\"" + cAlphaArgs(1) + "\", no items assigned ");
@@ -1878,8 +1875,8 @@ namespace OutputProcessor {
             }
             for (iKey = 1; iKey <= NumVarsOnCustomMeter; ++iKey) {
                 if (VarsOnCustomMeter(iKey) == 0) continue;
-                RVariable >>= RVariableTypes(VarsOnCustomMeter(iKey)).VarPtr;
-                AttachCustomMeters(VarsOnCustomMeter(iKey), RVariable().MeterArrayPtr, NumEnergyMeters);
+                auto & tmpVar = RVariableTypes(VarsOnCustomMeter(iKey)).VarPtr;
+                AttachCustomMeters(VarsOnCustomMeter(iKey), tmpVar.MeterArrayPtr, NumEnergyMeters);
             }
 
             errFlag = false;
@@ -2982,7 +2979,7 @@ namespace OutputProcessor {
         }
 
         for (Loop = 1; Loop <= NumOfRVariable; ++Loop) {
-            auto &rVar(RVariableTypes(Loop).VarPtr());
+            auto &rVar(RVariableTypes(Loop).VarPtr);
             if (rVar.frequency == ReportingFrequency::Monthly || rVar.frequency == ReportingFrequency::Yearly ||
                 rVar.frequency == ReportingFrequency::Simulation) {
                 rVar.StoreValue = 0.0;
@@ -2991,7 +2988,7 @@ namespace OutputProcessor {
         }
 
         for (Loop = 1; Loop <= NumOfIVariable; ++Loop) {
-            auto &iVar(IVariableTypes(Loop).VarPtr());
+            auto &iVar(IVariableTypes(Loop).VarPtr);
             if (iVar.frequency == ReportingFrequency::Monthly || iVar.frequency == ReportingFrequency::Yearly ||
                 iVar.frequency == ReportingFrequency::Simulation) {
                 iVar.StoreValue = 0;
@@ -3868,8 +3865,8 @@ namespace OutputProcessor {
             std::string mtrUnitString = unitEnumToStringBrackets(RVariableTypes(VarMeterArrays(VarMeter).RepVariable).units);
 
             Multipliers = "";
-            ZoneMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr().ZoneMult;
-            ZoneListMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr().ZoneListMult;
+            ZoneMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneMult;
+            ZoneListMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneListMult;
 
             if (ZoneMult > 1 || ZoneListMult > 1) {
                 ObjexxFCL::gio::write(String, fmtLD) << ZoneMult * ZoneListMult;
@@ -3881,7 +3878,7 @@ namespace OutputProcessor {
             }
 
             ObjexxFCL::gio::write(OutputFileMeterDetails, "(/,A)")
-                << " Meters for " + RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr().ReportIDChr + ',' +
+                << " Meters for " + RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr.ReportIDChr + ',' +
                        RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarName + mtrUnitString + Multipliers;
 
             for (I = 1; I <= VarMeterArrays(VarMeter).NumOnMeters; ++I) {
@@ -3928,8 +3925,8 @@ namespace OutputProcessor {
                             if (VarMeterArrays(VarMeter).OnMeters(VarMeter1) != Meter) continue;
 
                             Multipliers = "";
-                            ZoneMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr().ZoneMult;
-                            ZoneListMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr().ZoneListMult;
+                            ZoneMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneMult;
+                            ZoneListMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneListMult;
 
                             if (ZoneMult > 1 || ZoneListMult > 1) {
                                 ObjexxFCL::gio::write(String, fmtLD) << ZoneMult * ZoneListMult;
@@ -3958,8 +3955,8 @@ namespace OutputProcessor {
                                 if (VarMeterArrays(VarMeter).OnCustomMeters(VarMeter1) != Meter) continue;
 
                                 Multipliers = "";
-                                ZoneMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr().ZoneMult;
-                                ZoneListMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr().ZoneListMult;
+                                ZoneMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneMult;
+                                ZoneListMult = RVariableTypes(VarMeterArrays(VarMeter).RepVariable).VarPtr.ZoneListMult;
 
                                 if (ZoneMult > 1 || ZoneListMult > 1) {
                                     ObjexxFCL::gio::write(String, fmtLD) << ZoneMult * ZoneListMult;
@@ -5494,9 +5491,9 @@ namespace OutputProcessor {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         if (varType == 1) { // Integer
-            IVariableTypes(keyVarIndex).VarPtr().Which() = SetIntVal;
+            *IVariableTypes(keyVarIndex).VarPtr.Which = SetIntVal;
         } else if (varType == 2) { // real
-            RVariableTypes(keyVarIndex).VarPtr().Which() = SetRealVal;
+            *RVariableTypes(keyVarIndex).VarPtr.Which = SetRealVal;
         } else if (varType == 3) { // meter
             EnergyMeters(keyVarIndex).CurTSValue = SetRealVal;
         }
@@ -5831,20 +5828,18 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
     StoreType VariableType;    // 1=Average, 2=Sum, 3=Min/Max
     int Loop;
     ReportingFrequency RepFreq(ReportingFrequency::Hourly);
-    bool OnMeter;                   // True if this variable is on a meter
     std::string ResourceType;       // Will hold value of ResourceTypeKey
     std::string EndUse;             // Will hold value of EndUseKey
     std::string EndUseSub;          // Will hold value of EndUseSubKey
     std::string Group;              // Will hold value of GroupKey
     std::string ZoneName;           // Will hold value of ZoneKey
     static bool ErrorsFound(false); // True if Errors Found
-    bool ThisOneOnTheList;
     int localIndexGroupKey;
 
     if (!OutputInitialized) InitializeOutput();
 
     // Variable name without units
-    std::string VarName = VariableName;
+    const std::string& VarName = VariableName;
 
     // Determine whether to Report or not
     CheckReportVariable(KeyedValue, VarName);
@@ -5862,8 +5857,8 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
     }
 
     // DataOutputs::OutputVariablesForSimulation is case-insensitive
-    ThisOneOnTheList = DataOutputs::FindItemInVariableList(KeyedValue, VarName);
-    OnMeter = false; // just a safety initialization
+    bool const ThisOneOnTheList = DataOutputs::FindItemInVariableList(KeyedValue, VarName);
+    bool OnMeter = false; // True if this variable is on a meter
 
     for (Loop = 1; Loop <= NumExtraVars; ++Loop) {
 
@@ -5931,46 +5926,45 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
             ReallocateRVar();
         }
         CV = NumOfRVariable;
-        RVariableTypes(CV).timeStepType = TimeStepType;
-        RVariableTypes(CV).storeType = VariableType;
-        RVariableTypes(CV).VarName = KeyedValue + ':' + VarName;
-        RVariableTypes(CV).VarNameOnly = VarName;
-        RVariableTypes(CV).VarNameOnlyUC = UtilityRoutines::MakeUPPERCase(VarName);
-        RVariableTypes(CV).VarNameUC = UtilityRoutines::MakeUPPERCase(RVariableTypes(CV).VarName);
-        RVariableTypes(CV).KeyNameOnlyUC = UtilityRoutines::MakeUPPERCase(KeyedValue);
-        RVariableTypes(CV).units = VariableUnit;
+        auto &thisRvar = RVariableTypes(CV);
+        thisRvar.timeStepType = TimeStepType;
+        thisRvar.storeType = VariableType;
+        thisRvar.VarName = KeyedValue + ':' + VarName;
+        thisRvar.VarNameOnly = VarName;
+        thisRvar.VarNameOnlyUC = UtilityRoutines::MakeUPPERCase(VarName);
+        thisRvar.VarNameUC = UtilityRoutines::MakeUPPERCase(thisRvar.VarName);
+        thisRvar.KeyNameOnlyUC = UtilityRoutines::MakeUPPERCase(KeyedValue);
+        thisRvar.units = VariableUnit;
         if (VariableUnit == OutputProcessor::Unit::customEMS) {
-            RVariableTypes(CV).unitNameCustomEMS = customUnitName;
+            thisRvar.unitNameCustomEMS = customUnitName;
         }
         AssignReportNumber(CurrentReportNumber);
         ObjexxFCL::gio::write(IDOut, fmtLD) << CurrentReportNumber;
         strip(IDOut);
-        RVariable.allocate();
-        RVariable().Value = 0.0;
-        RVariable().TSValue = 0.0;
-        RVariable().StoreValue = 0.0;
-        RVariable().NumStored = 0.0;
-        RVariable().MaxValue = MaxSetValue;
-        RVariable().maxValueDate = 0;
-        RVariable().MinValue = MinSetValue;
-        RVariable().minValueDate = 0;
-
-        RVariableTypes(CV).VarPtr >>= RVariable;
-        RVariable().Which >>= ActualVariable;
-        RVariable().ReportID = CurrentReportNumber;
-        RVariableTypes(CV).ReportID = CurrentReportNumber;
-        RVariable().ReportIDChr = IDOut.substr(0, 15);
-        RVariable().storeType = VariableType;
-        RVariable().Stored = false;
-        RVariable().Report = false;
-        RVariable().frequency = ReportingFrequency::Hourly;
-        RVariable().SchedPtr = 0;
-        RVariable().MeterArrayPtr = 0;
-        RVariable().ZoneMult = 1;
-        RVariable().ZoneListMult = 1;
+        thisRvar.ReportID = CurrentReportNumber;
+        auto &thisVarPtr = thisRvar.VarPtr;
+        thisVarPtr.Value = 0.0;
+        thisVarPtr.TSValue = 0.0;
+        thisVarPtr.StoreValue = 0.0;
+        thisVarPtr.NumStored = 0.0;
+        thisVarPtr.MaxValue = MaxSetValue;
+        thisVarPtr.maxValueDate = 0;
+        thisVarPtr.MinValue = MinSetValue;
+        thisVarPtr.minValueDate = 0;
+        thisVarPtr.Which = &ActualVariable;
+        thisVarPtr.ReportID = CurrentReportNumber;
+        thisVarPtr.ReportIDChr = IDOut.substr(0, 15);
+        thisVarPtr.storeType = VariableType;
+        thisVarPtr.Stored = false;
+        thisVarPtr.Report = false;
+        thisVarPtr.frequency = ReportingFrequency::Hourly;
+        thisVarPtr.SchedPtr = 0;
+        thisVarPtr.MeterArrayPtr = 0;
+        thisVarPtr.ZoneMult = 1;
+        thisVarPtr.ZoneListMult = 1;
         if (present(ZoneMult) && present(ZoneListMult)) {
-            RVariable().ZoneMult = ZoneMult;
-            RVariable().ZoneListMult = ZoneListMult;
+            thisVarPtr.ZoneMult = ZoneMult;
+            thisVarPtr.ZoneListMult = ZoneListMult;
         }
 
         if (Loop == 1) {
@@ -5982,7 +5976,7 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
                 } else {
                     Unit mtrUnits = RVariableTypes(CV).units;
                     ErrorsFound = false;
-                    AttachMeters(mtrUnits, ResourceType, EndUse, EndUseSub, Group, ZoneName, CV, RVariable().MeterArrayPtr, ErrorsFound);
+                    AttachMeters(mtrUnits, ResourceType, EndUse, EndUseSub, Group, ZoneName, CV, thisVarPtr.MeterArrayPtr, ErrorsFound);
                     if (ErrorsFound) {
                         ShowContinueError("Invalid Meter spec for variable=" + KeyedValue + ':' + VariableName);
                         ErrorsLogged = true;
@@ -5993,48 +5987,48 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
 
         if (ReportList(Loop) == -1) continue;
 
-        RVariable().Report = true;
+        thisVarPtr.Report = true;
 
         if (ReportList(Loop) == 0) {
-            RVariable().frequency = RepFreq;
-            RVariable().SchedPtr = 0;
+            thisVarPtr.frequency = RepFreq;
+            thisVarPtr.SchedPtr = 0;
         } else {
-            RVariable().frequency = ReqRepVars(ReportList(Loop)).frequency;
-            RVariable().SchedPtr = ReqRepVars(ReportList(Loop)).SchedPtr;
+            thisVarPtr.frequency = ReqRepVars(ReportList(Loop)).frequency;
+            thisVarPtr.SchedPtr = ReqRepVars(ReportList(Loop)).SchedPtr;
         }
 
-        if (RVariable().Report) {
+        if (thisVarPtr.Report) {
             if (present(indexGroupKey)) {
                 localIndexGroupKey = indexGroupKey;
             } else {
                 localIndexGroupKey = -999; // Unknown Group
             }
 
-            if (RVariable().SchedPtr != 0) {
-                WriteReportVariableDictionaryItem(RVariable().frequency,
-                                                  RVariable().storeType,
-                                                  RVariable().ReportID,
+            if (thisVarPtr.SchedPtr != 0) {
+                WriteReportVariableDictionaryItem(thisVarPtr.frequency,
+                                                  thisVarPtr.storeType,
+                                                  thisVarPtr.ReportID,
                                                   localIndexGroupKey,
                                                   TimeStepTypeKey,
-                                                  RVariable().ReportIDChr,
+                                                  thisVarPtr.ReportIDChr,
                                                   KeyedValue,
                                                   VarName,
-                                                  RVariableTypes(CV).timeStepType,
-                                                  RVariableTypes(CV).units,
-                                                  RVariableTypes(CV).unitNameCustomEMS,
+                                                  thisRvar.timeStepType,
+                                                  thisRvar.units,
+                                                  thisRvar.unitNameCustomEMS,
                                                   ReqRepVars(ReportList(Loop)).SchedName);
             } else {
-                WriteReportVariableDictionaryItem(RVariable().frequency,
-                                                  RVariable().storeType,
-                                                  RVariable().ReportID,
+                WriteReportVariableDictionaryItem(thisVarPtr.frequency,
+                                                  thisVarPtr.storeType,
+                                                  thisVarPtr.ReportID,
                                                   localIndexGroupKey,
                                                   TimeStepTypeKey,
-                                                  RVariable().ReportIDChr,
+                                                  thisVarPtr.ReportIDChr,
                                                   KeyedValue,
                                                   VarName,
-                                                  RVariableTypes(CV).timeStepType,
-                                                  RVariableTypes(CV).units,
-                                                  RVariableTypes(CV).unitNameCustomEMS);
+                                                  thisRvar.timeStepType,
+                                                  thisRvar.units,
+                                                  thisRvar.unitNameCustomEMS);
             }
         }
     }
@@ -6072,18 +6066,16 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int CV;
     std::string IDOut;
-    //  CHARACTER(len=MaxNameLength) :: VariableNamewithUnits ! Variable name with units std format
     TimeStepType TimeStepType; // 1=TimeStepZone, 2=TimeStepSys
     StoreType VariableType;    // 1=Average, 2=Sum, 3=Min/Max
     int localIndexGroupKey;
-    bool ThisOneOnTheList;
     int Loop;
     ReportingFrequency RepFreq(ReportingFrequency::Hourly);
 
     if (!OutputInitialized) InitializeOutput();
 
     // Variable name without units
-    std::string VarName = VariableName;
+    const std::string& VarName = VariableName;
 
     // Determine whether to Report or not
     CheckReportVariable(KeyedValue, VarName);
@@ -6101,7 +6093,7 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
     }
 
     // DataOutputs::OutputVariablesForSimulation is case-insentitive
-    ThisOneOnTheList = DataOutputs::FindItemInVariableList(KeyedValue, VarName);
+    bool const ThisOneOnTheList = DataOutputs::FindItemInVariableList(KeyedValue, VarName);
 
     for (Loop = 1; Loop <= NumExtraVars; ++Loop) {
 
@@ -6124,80 +6116,78 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
         }
 
         CV = NumOfIVariable;
-        IVariableTypes(CV).timeStepType = TimeStepType;
-        IVariableTypes(CV).storeType = VariableType;
-        IVariableTypes(CV).VarName = KeyedValue + ':' + VarName;
-        IVariableTypes(CV).VarNameOnly = VarName;
-        IVariableTypes(CV).VarNameUC = UtilityRoutines::MakeUPPERCase(IVariableTypes(CV).VarName);
-        IVariableTypes(CV).units = VariableUnit;
+        auto &thisIVar = IVariableTypes(CV);
+        thisIVar.timeStepType = TimeStepType;
+        thisIVar.storeType = VariableType;
+        thisIVar.VarName = KeyedValue + ':' + VarName;
+        thisIVar.VarNameOnly = VarName;
+        thisIVar.VarNameUC = UtilityRoutines::MakeUPPERCase(thisIVar.VarName);
+        thisIVar.units = VariableUnit;
         AssignReportNumber(CurrentReportNumber);
         ObjexxFCL::gio::write(IDOut, fmtLD) << CurrentReportNumber;
         strip(IDOut);
-
-        IVariable.allocate();
-        IVariable().Value = 0.0;
-        IVariable().StoreValue = 0.0;
-        IVariable().TSValue = 0.0;
-        IVariable().NumStored = 0.0;
+        thisIVar.ReportID = CurrentReportNumber;
+        auto &thisVarPtr = thisIVar.VarPtr;
+        thisVarPtr.Value = 0.0;
+        thisVarPtr.StoreValue = 0.0;
+        thisVarPtr.TSValue = 0.0;
+        thisVarPtr.NumStored = 0.0;
         //    IVariable%LastTSValue=0
-        IVariable().MaxValue = IMaxSetValue;
-        IVariable().maxValueDate = 0;
-        IVariable().MinValue = IMinSetValue;
-        IVariable().minValueDate = 0;
-
-        IVariableTypes(CV).VarPtr >>= IVariable;
-        IVariable().Which >>= ActualVariable;
-        IVariable().ReportID = CurrentReportNumber;
-        IVariableTypes(CV).ReportID = CurrentReportNumber;
-        IVariable().ReportIDChr = IDOut.substr(0, 15);
-        IVariable().storeType = VariableType;
-        IVariable().Stored = false;
-        IVariable().Report = false;
-        IVariable().frequency = ReportingFrequency::Hourly;
-        IVariable().SchedPtr = 0;
+        thisVarPtr.MaxValue = IMaxSetValue;
+        thisVarPtr.maxValueDate = 0;
+        thisVarPtr.MinValue = IMinSetValue;
+        thisVarPtr.minValueDate = 0;
+        thisVarPtr.Which = &ActualVariable;
+        thisVarPtr.ReportID = CurrentReportNumber;
+        thisVarPtr.ReportIDChr = IDOut.substr(0, 15);
+        thisVarPtr.storeType = VariableType;
+        thisVarPtr.Stored = false;
+        thisVarPtr.Report = false;
+        thisVarPtr.frequency = ReportingFrequency::Hourly;
+        thisVarPtr.SchedPtr = 0;
 
         if (ReportList(Loop) == -1) continue;
 
-        IVariable().Report = true;
+        thisVarPtr.Report = true;
 
         if (ReportList(Loop) == 0) {
-            IVariable().frequency = RepFreq;
-            IVariable().SchedPtr = 0;
+            thisVarPtr.frequency = RepFreq;
+            thisVarPtr.SchedPtr = 0;
         } else {
-            IVariable().frequency = ReqRepVars(ReportList(Loop)).frequency;
-            IVariable().SchedPtr = ReqRepVars(ReportList(Loop)).SchedPtr;
+            thisVarPtr.frequency = ReqRepVars(ReportList(Loop)).frequency;
+            thisVarPtr.SchedPtr = ReqRepVars(ReportList(Loop)).SchedPtr;
         }
 
-        if (IVariable().Report) {
+        if (thisVarPtr.Report) {
             if (present(indexGroupKey)) {
                 localIndexGroupKey = indexGroupKey;
             } else {
                 localIndexGroupKey = -999; // Unknown Group
             }
 
-            if (IVariable().SchedPtr != 0) {
-                WriteReportVariableDictionaryItem(IVariable().frequency,
-                                                  IVariable().storeType,
-                                                  IVariable().ReportID,
+            if (thisVarPtr.SchedPtr != 0) {
+                WriteReportVariableDictionaryItem(thisVarPtr.frequency,
+                                                  thisVarPtr.storeType,
+                                                  thisVarPtr.ReportID,
                                                   localIndexGroupKey,
                                                   TimeStepTypeKey,
-                                                  IVariable().ReportIDChr,
+                                                  thisVarPtr.ReportIDChr,
                                                   KeyedValue,
                                                   VarName,
-                                                  IVariableTypes(CV).timeStepType,
-                                                  IVariableTypes(CV).units,
+                                                  thisIVar.timeStepType,
+                                                  thisIVar.units,
                                                   ReqRepVars(ReportList(Loop)).SchedName);
             } else {
-                WriteReportVariableDictionaryItem(IVariable().frequency,
-                                                  IVariable().storeType,
-                                                  IVariable().ReportID,
+                WriteReportVariableDictionaryItem(thisVarPtr.frequency,
+                                                  thisVarPtr.storeType,
+                                                  thisVarPtr.ReportID,
                                                   localIndexGroupKey,
                                                   TimeStepTypeKey,
-                                                  IVariable().ReportIDChr,
+                                                  thisVarPtr.ReportIDChr,
                                                   KeyedValue,
                                                   VarName,
-                                                  IVariableTypes(CV).timeStepType,
-                                                  IVariableTypes(CV).units);
+                                                  thisIVar.timeStepType,
+                                                  thisIVar.units);
             }
         }
     }
@@ -6347,7 +6337,7 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
 
     // Basic record keeping and report out if "detailed"
     StartMinute = TimeValue.at(t_TimeStepTypeKey).CurMinute;
-    TimeValue.at(t_TimeStepTypeKey).CurMinute += TimeValue.at(t_TimeStepTypeKey).TimeStep * 60.0;
+    TimeValue.at(t_TimeStepTypeKey).CurMinute += (*TimeValue.at(t_TimeStepTypeKey).TimeStep) * 60.0;
     if (t_TimeStepTypeKey == TimeStepType::TimeStepSystem &&
         (TimeValue.at(TimeStepType::TimeStepSystem).CurMinute == TimeValue.at(TimeStepType::TimeStepZone).CurMinute)) {
         EndTimeStepFlag = true;
@@ -6402,32 +6392,32 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
         if (RVariableTypes(Loop).timeStepType != t_TimeStepTypeKey) continue;
 
         // Act on the RVariables variable
-        auto &rVar(RVariableTypes(Loop).VarPtr());
+        auto &rVar(RVariableTypes(Loop).VarPtr);
         rVar.Stored = true;
         if (rVar.storeType == StoreType::Averaged) {
-            CurVal = rVar.Which * rxTime;
+            CurVal = (*rVar.Which) * rxTime;
             //        CALL SetMinMax(RVar%Which,MDHM,RVar%MaxValue,RVar%maxValueDate,RVar%MinValue,RVar%minValueDate)
-            if (rVar.Which > rVar.MaxValue) {
-                rVar.MaxValue = rVar.Which;
+            if ((*rVar.Which) > rVar.MaxValue) {
+                rVar.MaxValue = (*rVar.Which);
                 rVar.maxValueDate = MDHM;
             }
-            if (rVar.Which < rVar.MinValue) {
-                rVar.MinValue = rVar.Which;
+            if ((*rVar.Which) < rVar.MinValue) {
+                rVar.MinValue = (*rVar.Which);
                 rVar.minValueDate = MDHM;
             }
             rVar.TSValue += CurVal;
             rVar.EITSValue = rVar.TSValue; // CR - 8481 fix - 09/06/2011
         } else {
             //        CurVal=RVar%Which
-            if (rVar.Which > rVar.MaxValue) {
-                rVar.MaxValue = rVar.Which;
+            if ((*rVar.Which) > rVar.MaxValue) {
+                rVar.MaxValue = (*rVar.Which);
                 rVar.maxValueDate = MDHM;
             }
-            if (rVar.Which < rVar.MinValue) {
-                rVar.MinValue = rVar.Which;
+            if ((*rVar.Which) < rVar.MinValue) {
+                rVar.MinValue = (*rVar.Which);
                 rVar.minValueDate = MDHM;
             }
-            rVar.TSValue += rVar.Which;
+            rVar.TSValue += (*rVar.Which);
             rVar.EITSValue = rVar.TSValue; // CR - 8481 fix - 09/06/2011
         }
 
@@ -6470,15 +6460,15 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
                 }
                 TimePrint = false;
             }
-            WriteNumericData(rVar.ReportID, rVar.ReportIDChr, rVar.Which);
+            WriteNumericData(rVar.ReportID, rVar.ReportIDChr, *rVar.Which);
             ++StdOutputRecordCount;
 
             if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
                 if (t_TimeStepTypeKey == TimeStepType::TimeStepZone) {
-                    ResultsFramework::OutputSchema->RIDetailedZoneTSData.pushVariableValue(rVar.ReportID, rVar.Which);
+                    ResultsFramework::OutputSchema->RIDetailedZoneTSData.pushVariableValue(rVar.ReportID, *rVar.Which);
                 }
                 if (t_TimeStepTypeKey == TimeStepType::TimeStepSystem) {
-                    ResultsFramework::OutputSchema->RIDetailedHVACTSData.pushVariableValue(rVar.ReportID, rVar.Which);
+                    ResultsFramework::OutputSchema->RIDetailedHVACTSData.pushVariableValue(rVar.ReportID, *rVar.Which);
                 }
             }
         }
@@ -6488,11 +6478,11 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
         if (IVariableTypes(Loop).timeStepType != t_TimeStepTypeKey) continue;
 
         // Act on the IVariables variable
-        auto &iVar(IVariableTypes(Loop).VarPtr());
+        auto &iVar(IVariableTypes(Loop).VarPtr);
         iVar.Stored = true;
         //      ICurVal=IVar%Which
         if (iVar.storeType == StoreType::Averaged) {
-            ICurVal = iVar.Which * rxTime;
+            ICurVal = (*iVar.Which) * rxTime;
             iVar.TSValue += ICurVal;
             iVar.EITSValue = iVar.TSValue; // CR - 8481 fix - 09/06/2011
             if (nint(ICurVal) > iVar.MaxValue) {
@@ -6504,15 +6494,15 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
                 iVar.minValueDate = MDHM; //+ TimeValue.at(t_TimeStepTypeKey)%TimeStep
             }
         } else {
-            if (iVar.Which > iVar.MaxValue) {
-                iVar.MaxValue = iVar.Which; // Record keeping for date and time go here too
+            if ((*iVar.Which) > iVar.MaxValue) {
+                iVar.MaxValue = (*iVar.Which); // Record keeping for date and time go here too
                 iVar.maxValueDate = MDHM;   //+ TimeValue(TimeStepType)%TimeStep
             }
-            if (iVar.Which < iVar.MinValue) {
-                iVar.MinValue = iVar.Which;
+            if ((*iVar.Which) < iVar.MinValue) {
+                iVar.MinValue = (*iVar.Which);
                 iVar.minValueDate = MDHM; //+ TimeValue(TimeStepType)%TimeStep
             }
-            iVar.TSValue += iVar.Which;
+            iVar.TSValue += (*iVar.Which);
             iVar.EITSValue = iVar.TSValue; // CR - 8481 fix - 09/06/2011
         }
 
@@ -6555,15 +6545,15 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
                 TimePrint = false;
             }
             // only time integer vars actual report as integer only is "detailed"
-            WriteNumericData(iVar.ReportID, iVar.ReportIDChr, iVar.Which);
+            WriteNumericData(iVar.ReportID, iVar.ReportIDChr, *iVar.Which);
             ++StdOutputRecordCount;
 
             if (ResultsFramework::OutputSchema->timeSeriesEnabled()) {
                 if (t_TimeStepTypeKey == TimeStepType::TimeStepZone) {
-                    ResultsFramework::OutputSchema->RIDetailedZoneTSData.pushVariableValue(iVar.ReportID, iVar.Which);
+                    ResultsFramework::OutputSchema->RIDetailedZoneTSData.pushVariableValue(iVar.ReportID, *iVar.Which);
                 }
                 if (t_TimeStepTypeKey == TimeStepType::TimeStepSystem) {
-                    ResultsFramework::OutputSchema->RIDetailedHVACTSData.pushVariableValue(iVar.ReportID, iVar.Which);
+                    ResultsFramework::OutputSchema->RIDetailedHVACTSData.pushVariableValue(iVar.ReportID, *iVar.Which);
                 }
             }
         }
@@ -6587,7 +6577,7 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
         for (auto &thisTimeStepType : {TimeStepType::TimeStepZone, TimeStepType::TimeStepSystem}) { // Zone, HVAC
             for (Loop = 1; Loop <= NumOfRVariable; ++Loop) {
                 if (RVariableTypes(Loop).timeStepType != thisTimeStepType) continue;
-                auto &rVar(RVariableTypes(Loop).VarPtr());
+                auto &rVar(RVariableTypes(Loop).VarPtr);
                 // Update meters on the TimeStep  (Zone)
                 if (rVar.MeterArrayPtr != 0) {
                     if (VarMeterArrays(rVar.MeterArrayPtr).NumOnCustomMeters <= 0) {
@@ -6657,7 +6647,7 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
 
             for (Loop = 1; Loop <= NumOfIVariable; ++Loop) {
                 if (IVariableTypes(Loop).timeStepType != thisTimeStepType) continue;
-                auto &iVar(IVariableTypes(Loop).VarPtr());
+                auto &iVar(IVariableTypes(Loop).VarPtr);
                 ReportNow = true;
                 if (iVar.SchedPtr > 0) ReportNow = (GetCurrentScheduleValue(iVar.SchedPtr) != 0.0); // SetReportNow(IVar%SchedPtr)
                 if (!ReportNow) {
@@ -6756,7 +6746,7 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
             TimeValue.at(thisTimeStepType).CurMinute = 0.0;
             for (Loop = 1; Loop <= NumOfRVariable; ++Loop) {
                 if (RVariableTypes(Loop).timeStepType != thisTimeStepType) continue;
-                auto &rVar(RVariableTypes(Loop).VarPtr());
+                auto &rVar(RVariableTypes(Loop).VarPtr);
                 //        ReportNow=.TRUE.
                 //        IF (RVar%SchedPtr > 0) &
                 //          ReportNow=(GetCurrentScheduleValue(RVar%SchedPtr) /= 0.0)  !SetReportNow(RVar%SchedPtr)
@@ -6786,7 +6776,7 @@ void UpdateDataandReport(OutputProcessor::TimeStepType const t_TimeStepTypeKey) 
 
             for (Loop = 1; Loop <= NumOfIVariable; ++Loop) {
                 if (IVariableTypes(Loop).timeStepType != thisTimeStepType) continue;
-                auto &iVar(IVariableTypes(Loop).VarPtr());
+                auto &iVar(IVariableTypes(Loop).VarPtr);
                 //        ReportNow=.TRUE.
                 //        IF (IVar%SchedPtr > 0) &
                 //          ReportNow=(GetCurrentScheduleValue(IVar%SchedPtr) /= 0.0)  !SetReportNow(IVar%SchedPtr)
@@ -7976,9 +7966,9 @@ Real64 GetInstantMeterValue(int const MeterNumber,                             /
             auto &r_var_loop(RVariableTypes(InstMeterCache(Loop)));
             // Separate the Zone variables from the HVAC variables using TimeStepType
             if (r_var_loop.timeStepType == t_timeStepType) {
-                auto &rVar(r_var_loop.VarPtr());
+                auto &rVar(r_var_loop.VarPtr);
                 // Add to the total all of the appropriate variables
-                InstantMeterValue += rVar.Which * rVar.ZoneMult * rVar.ZoneListMult;
+                InstantMeterValue += (*rVar.Which) * rVar.ZoneMult * rVar.ZoneListMult;
             }
         }
     } else { // MeterType_CustomDec
@@ -7992,9 +7982,9 @@ Real64 GetInstantMeterValue(int const MeterNumber,                             /
                 if (var_meter_on(Meter) == energy_meter.SourceMeter) {
                     // Separate the Zone variables from the HVAC variables using TimeStepType
                     if (r_var_loop.timeStepType == t_timeStepType) {
-                        auto &rVar(r_var_loop.VarPtr());
+                        auto &rVar(r_var_loop.VarPtr);
                         // Add to the total all of the appropriate variables
-                        InstantMeterValue += rVar.Which * rVar.ZoneMult * rVar.ZoneListMult;
+                        InstantMeterValue += (*rVar.Which) * rVar.ZoneMult * rVar.ZoneListMult;
                         break;
                     }
                 }
@@ -8005,9 +7995,9 @@ Real64 GetInstantMeterValue(int const MeterNumber,                             /
                 if (var_meter_on_custom(Meter) == energy_meter.SourceMeter) {
                     // Separate the Zone variables from the HVAC variables using TimeStepType
                     if (r_var_loop.timeStepType == t_timeStepType) {
-                        auto &rVar(r_var_loop.VarPtr());
+                        auto &rVar(r_var_loop.VarPtr);
                         // Add to the total all of the appropriate variables
-                        InstantMeterValue += rVar.Which * rVar.ZoneMult * rVar.ZoneListMult;
+                        InstantMeterValue += (*rVar.Which) * rVar.ZoneMult * rVar.ZoneListMult;
                         break;
                     }
                 }
@@ -8022,9 +8012,9 @@ Real64 GetInstantMeterValue(int const MeterNumber,                             /
                 if (var_meter_on(Meter) == MeterNumber) {
                     // Separate the Zone variables from the HVAC variables using TimeStepType
                     if (r_var_loop.timeStepType == t_timeStepType) {
-                        auto &rVar(r_var_loop.VarPtr());
+                        auto &rVar(r_var_loop.VarPtr);
                         // Add to the total all of the appropriate variables
-                        InstantMeterValue -= rVar.Which * rVar.ZoneMult * rVar.ZoneListMult;
+                        InstantMeterValue -= (*rVar.Which) * rVar.ZoneMult * rVar.ZoneListMult;
                         break;
                     }
                 }
@@ -8035,9 +8025,9 @@ Real64 GetInstantMeterValue(int const MeterNumber,                             /
                 if (var_meter_on_custom(Meter) == MeterNumber) {
                     // Separate the Zone variables from the HVAC variables using TimeStepType
                     if (r_var_loop.timeStepType == t_timeStepType) {
-                        auto &rVar(r_var_loop.VarPtr());
+                        auto &rVar(r_var_loop.VarPtr);
                         // Add to the total all of the appropriate variables
-                        InstantMeterValue -= rVar.Which * rVar.ZoneMult * rVar.ZoneListMult;
+                        InstantMeterValue -= (*rVar.Which) * rVar.ZoneMult * rVar.ZoneListMult;
                         break;
                     }
                 }
@@ -8141,7 +8131,7 @@ Real64 GetInternalVariableValue(int const varType,    // 1=integer, 2=real, 3=me
         }
 
         // must use %Which, %Value is always zero if variable is not a requested report variable
-        resultVal = double(IVariableTypes(keyVarIndex).VarPtr().Which);
+        resultVal = double(*IVariableTypes(keyVarIndex).VarPtr.Which);
     } else if (varType == 2) { // real
         if (keyVarIndex > NumOfRVariable) {
             ShowFatalError("GetInternalVariableValue: Real variable passed index beyond range of array.");
@@ -8153,7 +8143,7 @@ Real64 GetInternalVariableValue(int const varType,    // 1=integer, 2=real, 3=me
         }
 
         // must use %Which, %Value is always zero if variable is not a requested report variable
-        resultVal = RVariableTypes(keyVarIndex).VarPtr().Which;
+        resultVal = *RVariableTypes(keyVarIndex).VarPtr.Which;
     } else if (varType == 3) { // Meter
         resultVal = GetCurrentMeterValue(keyVarIndex);
     } else if (varType == 4) { // Schedule
@@ -8223,7 +8213,7 @@ Real64 GetInternalVariableValueExternalInterface(int const varType,    // 1=inte
         }
 
         // must use %EITSValue, %This is the last-zonetimestep value
-        resultVal = double(IVariableTypes(keyVarIndex).VarPtr().EITSValue);
+        resultVal = double(IVariableTypes(keyVarIndex).VarPtr.EITSValue);
     } else if (varType == 2) { // REAL(r64)
         if (keyVarIndex > NumOfRVariable) {
             ShowFatalError("GetInternalVariableValueExternalInterface: passed index beyond range of array.");
@@ -8233,7 +8223,7 @@ Real64 GetInternalVariableValueExternalInterface(int const varType,    // 1=inte
         }
 
         // must use %EITSValue, %This is the last-zonetimestep value
-        resultVal = RVariableTypes(keyVarIndex).VarPtr().EITSValue;
+        resultVal = RVariableTypes(keyVarIndex).VarPtr.EITSValue;
     } else if (varType == 3) { // Meter
         resultVal = GetCurrentMeterValue(keyVarIndex);
     } else if (varType == 4) { // Schedule
@@ -8294,7 +8284,7 @@ int GetNumMeteredVariables(std::string const &EP_UNUSED(ComponentType), // Given
         //    Pos=INDEX(RVariableTypes(Loop)%VarName,':')
         //    IF (ComponentName /= RVariableTypes(Loop)%VarNameUC(1:Pos-1)) CYCLE
         if (ComponentName != RVariableTypes(Loop).KeyNameOnlyUC) continue;
-        auto &rVar(RVariableTypes(Loop).VarPtr());
+        auto &rVar(RVariableTypes(Loop).VarPtr);
         if (rVar.MeterArrayPtr == 0) {
             continue;
         }
@@ -8306,17 +8296,17 @@ int GetNumMeteredVariables(std::string const &EP_UNUSED(ComponentType), // Given
     return NumVariables;
 }
 
-void GetMeteredVariables(std::string const &ComponentType,                     // Given Component Type
-                         std::string const &ComponentName,                     // Given Component Name (user defined)
-                         Array1D_int &VarIndexes,                              // Variable Numbers
-                         Array1D_int &VarTypes,                                // Variable Types (1=integer, 2=real, 3=meter)
-                         Array1A<OutputProcessor::TimeStepType> TimeStepTypes, // Variable Index Types (1=Zone,2=HVAC)
-                         Array1A<OutputProcessor::Unit> unitsForVar,           // units from enum for each variable
-                         Array1D_int &ResourceTypes,                           // ResourceTypes for each variable
-                         Array1D_string &EndUses,                              // EndUses for each variable
-                         Array1D_string &Groups,                               // Groups for each variable
-                         Array1D_string &Names,                                // Variable Names for each variable
-                         int &NumFound                                         // Number Found
+void GetMeteredVariables(std::string const &ComponentType,                      // Given Component Type
+                         std::string const &ComponentName,                      // Given Component Name (user defined)
+                         Array1D_int &VarIndexes,                               // Variable Numbers
+                         Array1D_int &VarTypes,                                 // Variable Types (1=integer, 2=real, 3=meter)
+                         Array1D<OutputProcessor::TimeStepType> &TimeStepTypes, // Variable Index Types (1=Zone,2=HVAC)
+                         Array1D<OutputProcessor::Unit> &unitsForVar,           // units from enum for each variable
+                         Array1D_int &ResourceTypes,                            // ResourceTypes for each variable
+                         Array1D_string &EndUses,                               // EndUses for each variable
+                         Array1D_string &Groups,                                // Groups for each variable
+                         Array1D_string &Names,                                 // Variable Names for each variable
+                         int &NumFound                                          // Number Found
 )
 {
 
@@ -8348,7 +8338,7 @@ void GetMeteredVariables(std::string const &ComponentType,                     /
         //    Pos=INDEX(RVariableTypes(Loop)%VarName,':')
         //    IF (ComponentName /= RVariableTypes(Loop)%VarNameUC(1:Pos-1)) CYCLE
         if (ComponentName != RVariableTypes(Loop).KeyNameOnlyUC) continue;
-        auto &rVar(RVariableTypes(Loop).VarPtr());
+        auto &rVar(RVariableTypes(Loop).VarPtr);
         if (rVar.MeterArrayPtr == 0) continue;
         NumOnMeterPtr = VarMeterArrays(rVar.MeterArrayPtr).NumOnMeters;
         MeterPtr = VarMeterArrays(rVar.MeterArrayPtr).OnMeters(1);
@@ -8391,8 +8381,8 @@ void GetMeteredVariables(std::string const &ComponentType,                      
                          std::string const &ComponentName,                      // Given Component Name (user defined)
                          Array1D_int &VarIndexes,                               // Variable Numbers
                          Array1D_int &VarTypes,                                 // Variable Types (1=integer, 2=real, 3=meter)
-                         Array1A<OutputProcessor::TimeStepType> TimeStepTypes,  // Variable Index Types (1=Zone,2=HVAC)
-                         Array1A<OutputProcessor::Unit> unitsForVar,            // units from enum for each variable
+                         Array1D<OutputProcessor::TimeStepType> &TimeStepTypes, // Variable Index Types (1=Zone,2=HVAC)
+                         Array1D<OutputProcessor::Unit> &unitsForVar,           // units from enum for each variable
                          Array1D_int &ResourceTypes,                            // ResourceTypes for each variable
                          Array1D_string &EndUses,                               // EndUses for each variable
                          Array1D_string &Groups,                                // Groups for each variable
@@ -8429,7 +8419,7 @@ void GetMeteredVariables(std::string const &ComponentType,                      
         //    Pos=INDEX(RVariableTypes(Loop)%VarName,':')
         //    IF (ComponentName /= RVariableTypes(Loop)%VarNameUC(1:Pos-1)) CYCLE
         if (ComponentName != RVariableTypes(Loop).KeyNameOnlyUC) continue;
-        auto &rVar(RVariableTypes(Loop).VarPtr());
+        auto &rVar(RVariableTypes(Loop).VarPtr);
         if (rVar.MeterArrayPtr == 0) continue;
         NumOnMeterPtr = VarMeterArrays(rVar.MeterArrayPtr).NumOnMeters;
         MeterPtr = VarMeterArrays(rVar.MeterArrayPtr).OnMeters(1);
@@ -8468,14 +8458,12 @@ void GetMeteredVariables(std::string const &ComponentType,                      
 
 }
 
-
 void GetVariableKeyCountandType(std::string const &varName,                 // Standard variable name
                                 int &numKeys,                               // Number of keys found
                                 int &varType,                               // 0=not found, 1=integer, 2=real, 3=meter
                                 OutputProcessor::StoreType &varAvgSum,      // Variable  is Averaged=1 or Summed=2
                                 OutputProcessor::TimeStepType &varStepType, // Variable time step is Zone=1 or HVAC=2
                                 OutputProcessor::Unit &varUnits             // Units enumeration
-
 )
 {
 

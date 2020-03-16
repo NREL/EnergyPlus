@@ -3604,8 +3604,8 @@ TEST_F(EnergyPlusFixture, OutputReportTabular_ConfirmResetBEPSGathering)
     SetupTimePointers("Zone", timeStep);
     SetupTimePointers("HVAC", timeStep);
 
-    TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
-    TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
+    *TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
+    *TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
 
     GetInputOutputTableSummaryReports();
 
@@ -7778,8 +7778,8 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
     SetupTimePointers("Zone", timeStep);
     SetupTimePointers("HVAC", timeStep);
 
-    TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
-    TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
+    *TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
+    *TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
 
     GetInputOutputTableSummaryReports();
 
