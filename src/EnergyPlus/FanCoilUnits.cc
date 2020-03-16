@@ -66,6 +66,7 @@
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
+#include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/FanCoilUnits.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FluidProperties.hh>
@@ -3714,16 +3715,13 @@ namespace FanCoilUnits {
 
         if (FanCoil(FanCoilNum).ATMixerExists) {
             if (FanCoil(FanCoilNum).ATMixerType == ATMixer_SupplySide) {
-                LoadMet = Node(ATMixOutNode).MassFlowRate *
-                          (PsyHFnTdbW(Node(ATMixOutNode).Temp, Node(ZoneNode).HumRat) - PsyHFnTdbW(Node(ZoneNode).Temp, Node(ZoneNode).HumRat));
+                LoadMet = Node(ATMixOutNode).MassFlowRate * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(Node(ATMixOutNode).Temp, Node(ATMixOutNode).HumRat, Node(ZoneNode).Temp, Node(ZoneNode).HumRat);
             } else {
                 // ATM Mixer on inlet side
-                LoadMet =
-                    AirMassFlow * (PsyHFnTdbW(Node(OutletNode).Temp, Node(ZoneNode).HumRat) - PsyHFnTdbW(Node(ZoneNode).Temp, Node(ZoneNode).HumRat));
+                LoadMet = AirMassFlow * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(Node(OutletNode).Temp, Node(OutletNode).HumRat, Node(ZoneNode).Temp, Node(ZoneNode).HumRat);
             }
         } else {
-            LoadMet =
-                AirMassFlow * (PsyHFnTdbW(Node(OutletNode).Temp, Node(InletNode).HumRat) - PsyHFnTdbW(Node(InletNode).Temp, Node(InletNode).HumRat));
+            LoadMet = AirMassFlow * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(Node(OutletNode).Temp, Node(OutletNode).HumRat, Node(InletNode).Temp, Node(InletNode).HumRat);
         }
     }
 
