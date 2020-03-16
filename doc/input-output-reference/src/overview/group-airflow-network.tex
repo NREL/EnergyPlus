@@ -600,6 +600,8 @@ If Wind Pressure Coefficient Type = SurfaceAverageCalculation in the \hyperref[a
 object, this field is not used and a blank may be entered. If the surface is an
 interior (i.e., interzone) surface, leave this field blank.
 
+When there is an input object of either \hyperref[zonepropertylocalenvironment]{ZoneProperty:LocalEnvironment} or \hyperref[surfacepropertylocalenvironment]{SurfaceProperty:LocalEnvironment}, LocalEnvironment is enable, so that entered names of \hyperref[outdoorairnode]{OutdoorAir:Node} can be used as inputs for this field. More descrption of use can be found in  OutdoorAir:Node.
+
 \subsubsection{Field: Window/Door Opening Factor, or Crack Factor}\label{field-windowdoor-opening-factor-or-crack-factor}
 
 If this linkage is associated with an \hyperref[airflownetworkmultizonecomponentdetailedopening]{AirflowNetwork:MultiZone:Component:DetailedOpening} or \hyperref[airflownetworkmultizonecomponentsimpleopening]{AirflowNetwork:MultiZone:Component:SimpleOpening} object (which means it is an openable window or door), then this field is called ``Window/Door Opening Factor'' and represents the value of the Opening Factor that is in effect when the Vent Temperature Schedule (defined in the \hyperref[airflownetworkmultizonezone]{AirflowNetwork:MultiZone:Zone} object) indicates that this window or door is open.

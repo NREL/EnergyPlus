@@ -1164,7 +1164,9 @@ namespace FluidCoolers {
                 General::SolveRoot(Acc, MaxIte, SolFla, UA, SimpleFluidCoolerUAResidual, UA0, UA1, Par);
                 if (SolFla == -1) {
                     ShowWarningError("Iteration limit exceeded in calculating fluid cooler UA.");
-                    ShowContinueError("Autosizing of fluid cooler UA failed for fluid cooler = " + this->Name);
+                    if (PltSizCondNum > 0) {
+                        ShowContinueError("Autosizing of fluid cooler UA failed for fluid cooler = " + this->Name);
+                    }
                     ShowContinueError("The final UA value =" + General::RoundSigDigits(UA, 2) + " W/K, and the simulation continues...");
                 } else if (SolFla == -2) {
                     CalcFluidCoolerOutlet(int(Par(2)), Par(3), Par(4), UA0, OutWaterTempAtUA0);
@@ -1187,17 +1189,21 @@ namespace FluidCoolers {
                                       General::RoundSigDigits(this->DesignWaterFlowRate, 6));
                     ShowContinueError("Design Fluid Cooler Air Volume Flow Rate [m3/s]    = " + General::RoundSigDigits(Par(4), 2));
                     ShowContinueError("Design Fluid Cooler Air Inlet Dry-bulb Temp [C]    = " + General::RoundSigDigits(this->AirTemp, 2));
-                    ShowContinueError("Inputs to the plant sizing object:");
-                    ShowContinueError("Design Exit Water Temp [C]                         = " +
-                                      General::RoundSigDigits(DataSizing::PlantSizData(PltSizCondNum).ExitTemp, 2));
-                    ShowContinueError("Loop Design Temperature Difference [C]             = " +
-                                      General::RoundSigDigits(DataSizing::PlantSizData(PltSizCondNum).DeltaT, 2));
+                    if (PltSizCondNum > 0) {
+                        ShowContinueError("Inputs to the plant sizing object:");
+                        ShowContinueError("Design Exit Water Temp [C]                         = " +
+                                          General::RoundSigDigits(DataSizing::PlantSizData(PltSizCondNum).ExitTemp, 2));
+                        ShowContinueError("Loop Design Temperature Difference [C]             = " +
+                                          General::RoundSigDigits(DataSizing::PlantSizData(PltSizCondNum).DeltaT, 2));
+                    };
                     ShowContinueError("Design Fluid Cooler Water Inlet Temp [C]           = " + General::RoundSigDigits(this->WaterTemp, 2));
                     ShowContinueError("Calculated water outlet temp at low UA [C] (UA = " + General::RoundSigDigits(UA0, 2) +
                                       " W/K) = " + General::RoundSigDigits(OutWaterTempAtUA0, 2));
                     ShowContinueError("Calculated water outlet temp at high UA [C] (UA = " + General::RoundSigDigits(UA1, 2) +
                                       " W/K) = " + General::RoundSigDigits(OutWaterTempAtUA1, 2));
-                    ShowFatalError("Autosizing of Fluid Cooler UA failed for fluid cooler = " + this->Name);
+                    if (PltSizCondNum > 0) {
+                        ShowFatalError("Autosizing of Fluid Cooler UA failed for fluid cooler = " + this->Name);
+                    }
                 }
                 if (DataPlant::PlantFirstSizesOkayToFinalize) this->HighSpeedFluidCoolerUA = UA;
             } else {
@@ -1681,8 +1687,8 @@ namespace FluidCoolers {
         }
     }
 
-    Real64 SimpleFluidCoolerUAResidual(Real64 const UA,          // UA of fluid cooler
-                                       Array1<Real64> const &Par // par(1) = design fluid cooler load [W]
+    Real64 SimpleFluidCoolerUAResidual(Real64 const UA,           // UA of fluid cooler
+                                       Array1D<Real64> const &Par // par(1) = design fluid cooler load [W]
     )
     {
 

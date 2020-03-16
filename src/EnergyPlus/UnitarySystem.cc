@@ -205,14 +205,14 @@ namespace UnitarySystems {
           m_SensibleLoadMet(0.0), m_LatentLoadMet(0.0), m_MyStagedFlag(false), m_SensibleLoadPredicted(0.0), m_MoistureLoadPredicted(0.0),
           m_FaultyCoilSATFlag(false), m_FaultyCoilSATIndex(0), m_FaultyCoilSATOffset(0.0), m_TESOpMode(0), m_initLoadBasedControlAirLoopPass(false),
           m_airLoopPassCounter(0), m_airLoopReturnCounter(0), m_FanCompNotSetYet(true), m_CoolCompNotSetYet(true), m_HeatCompNotSetYet(true),
-          m_SuppCompNotSetYet(true), m_OKToPrintSizing(false), UnitarySystemType_Num(0), MaxIterIndex(0), RegulaFalsiFailedIndex(0),
-          NodeNumOfControlledZone(0), FanPartLoadRatio(0.0), CoolCoilWaterFlowRatio(0.0), HeatCoilWaterFlowRatio(0.0), ControlZoneNum(0),
-          AirInNode(0), AirOutNode(0), MaxCoolAirMassFlow(0.0), MaxHeatAirMassFlow(0.0), MaxNoCoolHeatAirMassFlow(0.0), DesignMinOutletTemp(0.0),
-          DesignMaxOutletTemp(0.0), LowSpeedCoolFanRatio(0.0), LowSpeedHeatFanRatio(0.0), MaxCoolCoilFluidFlow(0.0), MaxHeatCoilFluidFlow(0.0),
-          CoolCoilInletNodeNum(0), CoolCoilOutletNodeNum(0), CoolCoilFluidOutletNodeNum(0), CoolCoilLoopNum(0), CoolCoilLoopSide(0),
-          CoolCoilBranchNum(0), CoolCoilCompNum(0), CoolCoilFluidInletNode(0), HeatCoilLoopNum(0), HeatCoilLoopSide(0), HeatCoilBranchNum(0),
-          HeatCoilCompNum(0), HeatCoilFluidInletNode(0), HeatCoilFluidOutletNodeNum(0), HeatCoilInletNodeNum(0), HeatCoilOutletNodeNum(0),
-          ATMixerExists(false), ATMixerType(0), ATMixerOutNode(0), ControlZoneMassFlowFrac(0.0), m_CompPointerMSHP(nullptr)
+          m_SuppCompNotSetYet(true), m_OKToPrintSizing(false), m_SmallLoadTolerance(5.0), UnitarySystemType_Num(0), MaxIterIndex(0),
+          RegulaFalsiFailedIndex(0), NodeNumOfControlledZone(0), FanPartLoadRatio(0.0), CoolCoilWaterFlowRatio(0.0), HeatCoilWaterFlowRatio(0.0),
+          ControlZoneNum(0), AirInNode(0), AirOutNode(0), MaxCoolAirMassFlow(0.0), MaxHeatAirMassFlow(0.0), MaxNoCoolHeatAirMassFlow(0.0),
+          DesignMinOutletTemp(0.0), DesignMaxOutletTemp(0.0), LowSpeedCoolFanRatio(0.0), LowSpeedHeatFanRatio(0.0), MaxCoolCoilFluidFlow(0.0),
+          MaxHeatCoilFluidFlow(0.0), CoolCoilInletNodeNum(0), CoolCoilOutletNodeNum(0), CoolCoilFluidOutletNodeNum(0), CoolCoilLoopNum(0),
+          CoolCoilLoopSide(0), CoolCoilBranchNum(0), CoolCoilCompNum(0), CoolCoilFluidInletNode(0), HeatCoilLoopNum(0), HeatCoilLoopSide(0),
+          HeatCoilBranchNum(0), HeatCoilCompNum(0), HeatCoilFluidInletNode(0), HeatCoilFluidOutletNodeNum(0), HeatCoilInletNodeNum(0),
+          HeatCoilOutletNodeNum(0), ATMixerExists(false), ATMixerType(0), ATMixerOutNode(0), ControlZoneMassFlowFrac(0.0), m_CompPointerMSHP(nullptr)
     {
     }
 
@@ -2640,6 +2640,7 @@ namespace UnitarySystems {
                         ShowContinueError(" The Fraction of Supply Air Flow That Goes Through the Controlling Zone is set to 1.");
                         this->ControlZoneMassFlowFrac = 1.0;
                     }
+                    this->m_SmallLoadTolerance = 5.0 / this->ControlZoneMassFlowFrac; // adjust 5W load tolerance by control zone fraction
                     ReportSizingManager::ReportSizingOutput(this->UnitType,
                                                             this->Name,
                                                             "Fraction of Supply Air Flow That Goes Through the Controlling Zone",
@@ -2810,8 +2811,13 @@ namespace UnitarySystems {
                 }
 
                 Real64 loc_DesignMinOutletTemp(2.0);
-                if (fields.find("minimum_supply_air_temperature") != fields.end()) { // not required field, has default
-                    loc_DesignMinOutletTemp = fields.at("minimum_supply_air_temperature");
+                if (fields.find("minimum_supply_air_temperature") != fields.end()) { // not required field, has default (2C), and autosizable
+                    auto tempFieldVal = fields.at("minimum_supply_air_temperature");
+                    if (tempFieldVal == "Autosize") {
+                        loc_DesignMinOutletTemp = DataSizing::AutoSize;
+                    } else {
+                        loc_DesignMinOutletTemp = fields.at("minimum_supply_air_temperature");
+                    }
                 }
 
                 std::string loc_latentControlFlag("SensibleOnlyLoadControl");
@@ -3029,6 +3035,12 @@ namespace UnitarySystems {
                 if (fields.find("availability_schedule_name") != fields.end()) { // not required field
                     loc_sysAvailSched = UtilityRoutines::MakeUPPERCase(fields.at("availability_schedule_name"));
                     thisSys.m_SysAvailSchedPtr = ScheduleManager::GetScheduleIndex(loc_sysAvailSched);
+                    if (thisSys.m_SysAvailSchedPtr == 0) {
+                        ShowWarningError(getUnitarySystemInput + cCurrentModuleObject + "=\"" + thisSys.Name + "\", invalid Availability Schedule Name" +
+                                         " = " + loc_sysAvailSched);
+                        ShowContinueError("Set the default as Always On. Simulation continues.");
+                        thisSys.m_SysAvailSchedPtr = DataGlobals::ScheduleAlwaysOn;
+                    }
                 } else {
                     thisSys.m_SysAvailSchedPtr = DataGlobals::ScheduleAlwaysOn;
                 }
@@ -6074,6 +6086,46 @@ namespace UnitarySystems {
                     errorsFound = true;
                 }
 
+                // check supply air flow calculation method
+                if (thisSys.m_FanExists) {
+                    if (thisSys.m_CoolCoilExists) {
+                        if (loc_m_CoolingSAFMethod == "") {
+                            ShowWarningError(cCurrentModuleObject + " = " + thisObjectName);
+                            ShowContinueError(
+                                "Method used to determine the cooling supply air flow rate is not specified when cooling coil is present.");
+                            // check if all cooling flow calc method fields are blank
+                            if (((loc_m_CoolingSAFMethod_SAFlow == -999.0) && (loc_m_CoolingSAFMethod_SAFlowPerFloorArea == -999.0) &&
+                                 (loc_m_CoolingSAFMethod_FracOfAutosizedCoolingSAFlow == -999.0) &&
+                                 (loc_m_CoolingSAFMethod_FlowPerCoolingCapacity == -999.0))) {
+                                ShowContinueError("Cooling Supply Air Flow Rate field is blank.");
+                                ShowContinueError("Cooling Supply Air Flow Rate Per Floor Area field is blank.");
+                                ShowContinueError("Cooling Fraction of Autosized Cooling Supply Air Flow Rate field is blank.");
+                                ShowContinueError("Cooling Supply Air Flow Rate Per Unit of Capacity field is blank.");
+                                ShowContinueError("Blank field not allowed for all four cooling supply air flow rate calculation methods when "
+                                                  "cooling coil is present.");
+                            }
+                        }
+                    }
+                    if (thisSys.m_HeatCoilExists) {
+                        if (loc_m_HeatingSAFMethod == "") {
+                            ShowWarningError(cCurrentModuleObject + " = " + thisObjectName);
+                            ShowContinueError(
+                                "Method used to determine the heating supply air flow rate is not specified when heating coil is present.");
+                            // check if all heating flow calc method fields are blank
+                            if (((loc_m_HeatingSAFMethod_SAFlow == -999.0) && (loc_m_HeatingSAFMethod_SAFlowPerFloorArea == -999.0) &&
+                                 (loc_m_HeatingSAFMethod_FracOfAutosizedHeatingSAFlow == -999.0) &&
+                                 (loc_m_HeatingSAFMethod_FlowPerHeatingCapacity == -999.0))) {
+                                ShowContinueError("Heating Supply Air Flow Rate field is blank.");
+                                ShowContinueError("Heating Supply Air Flow Rate Per Floor Area field is blank.");
+                                ShowContinueError("Heating Fraction of Autosized Heating Supply Air Flow Rate field is blank.");
+                                ShowContinueError("Heating Supply Air Flow Rate Per Unit of Capacity field is blank.");
+                                ShowContinueError("Blank field not allowed for all four heating supply air flow rate calculation methods when heating "
+                                                  "coil is present.");
+                            }
+                        }
+                    }
+                }
+
                 //       Fan operating mode (cycling or constant) schedule. IF constant fan, then set AirFlowControl
                 if (thisSys.m_FanOpModeSchedPtr > 0) {
                     if (!ScheduleManager::CheckScheduleValueMinMax(thisSys.m_FanOpModeSchedPtr, ">=", 0.0, "<=", 0.0)) {
@@ -7175,6 +7227,17 @@ namespace UnitarySystems {
         } else {
             CompOn = 1;
             this->controlUnitarySystemOutput(AirLoopNum, FirstHVACIteration, OnOffAirFlowRatio, ZoneLoad, FullSensibleOutput, HXUnitOn, CompOn);
+        }
+        if (DataLoopNode::Node(this->AirOutNode).MassFlowRate < DataHVACGlobals::SmallMassFlow) {
+            CoolingLoad = false;
+            HeatingLoad = false;
+            MoistureLoad = 0.0;
+            this->m_CoolingPartLoadFrac = 0.0;
+            this->m_HeatingPartLoadFrac = 0.0;
+            if (this->CoolCoilFluidInletNode > 0) DataLoopNode::Node(this->CoolCoilFluidInletNode).MassFlowRate = 0.0;
+            if (this->HeatCoilFluidInletNode > 0) DataLoopNode::Node(this->HeatCoilFluidInletNode).MassFlowRate = 0.0;
+            this->setAverageAirFlow(this->m_CoolingPartLoadFrac, OnOffAirFlowRatio);
+            // anything else need to be reset here when system is shut down on low flow?
         }
         Real64 CoolPLR = this->m_CoolingPartLoadFrac;
         Real64 HeatPLR = this->m_HeatingPartLoadFrac;
@@ -8755,7 +8818,6 @@ namespace UnitarySystems {
         // Initialize mass flow rates and speed ratios. Calculate loads and adjust if necessary when using constant fan.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const Small5WLoad(5.0);
         static std::string const routineName("InitUnitarySystems");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -8886,10 +8948,6 @@ namespace UnitarySystems {
             this->m_MyEnvrnFlag2 = false;
         }
 
-        if (!DataGlobals::BeginEnvrnFlag) {
-            this->m_MyEnvrnFlag2 = true;
-        }
-
         if (allocated(DataZoneEquipment::ZoneEquipConfig) && this->m_MyCheckFlag) {
             if (this->m_AirLoopEquipment) {
                 int zoneNum = DataHeatBalance::Zone(this->ControlZoneNum).ZoneEqNum;
@@ -8938,6 +8996,7 @@ namespace UnitarySystems {
             m_initLoadBasedControlAirLoopPass = false;
         }
         if (!DataGlobals::BeginEnvrnFlag) {
+            this->m_MyEnvrnFlag2 = true; // this does not appear to be needed, only initializes autosized coil fluid flow rates
             m_initLoadBasedControlAirLoopPass = true;
         }
 
@@ -9017,11 +9076,11 @@ namespace UnitarySystems {
         CoolingLoad = false;
         HeatingLoad = false;
 
-        if (QZnReq > Small5WLoad / this->ControlZoneMassFlowFrac && !DataZoneEnergyDemands::CurDeadBandOrSetback(this->ControlZoneNum)) {
+        if (QZnReq > this->m_SmallLoadTolerance) { // no need to check deadband flag, QZnReq is correct.
             if (DataHeatBalFanSys::TempControlType(this->ControlZoneNum) != DataHVACGlobals::SingleCoolingSetPoint) {
                 HeatingLoad = true;
             }
-        } else if (QZnReq < -Small5WLoad / this->ControlZoneMassFlowFrac && !DataZoneEnergyDemands::CurDeadBandOrSetback(this->ControlZoneNum)) {
+        } else if (QZnReq < -this->m_SmallLoadTolerance) {
             if (DataHeatBalFanSys::TempControlType(this->ControlZoneNum) != DataHVACGlobals::SingleHeatingSetPoint) {
                 CoolingLoad = true;
             }
@@ -9138,7 +9197,7 @@ namespace UnitarySystems {
                 this->m_IterationMode[0] = NoCoolHeat;
             }
             // IF small loads to meet or not converging, just shut down unit
-            if (std::abs(ZoneLoad) < Small5WLoad) {
+            if (std::abs(ZoneLoad) < this->m_SmallLoadTolerance) {
                 ZoneLoad = 0.0;
                 CoolingLoad = false;
                 HeatingLoad = false;
@@ -9951,7 +10010,7 @@ namespace UnitarySystems {
                 int ATMixOutNode = this->ATMixerOutNode;
                 SensOutput =
                     DataLoopNode::Node(ATMixOutNode).MassFlowRate * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(ATMixOutNode).Temp, MinHumRatio) -
-                                                                     Psychrometrics::PsyHFnTdbW(RefTemp, MinHumRatio));
+                                                                     Psychrometrics::PsyHFnTdbW(RefTemp, MinHumRatio) - this->m_SenLoadLoss);
                 if (this->m_Humidistat) {
                     //   Calculate latent load met (at constant temperature)
                     LatOutput = DataLoopNode::Node(ATMixOutNode).MassFlowRate *
@@ -9964,7 +10023,7 @@ namespace UnitarySystems {
             } else {
                 // Air terminal inlet side mixer
                 SensOutput = AirMassFlow * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) -
-                                            Psychrometrics::PsyHFnTdbW(RefTemp, MinHumRatio));
+                                            Psychrometrics::PsyHFnTdbW(RefTemp, MinHumRatio)) - this->m_SenLoadLoss;
                 if (this->m_Humidistat) {
                     //   Calculate latent load met (at constant temperature)
                     LatOutput = AirMassFlow * (Psychrometrics::PsyHFnTdbW(RefTemp, DataLoopNode::Node(OutletNode).HumRat) -
@@ -15259,8 +15318,7 @@ namespace UnitarySystems {
         }
     }
 
-    int UnitarySys::getAirInNode(std::string const &UnitarySysName, int const ZoneOAUnitNum)
-    {
+    int UnitarySys::getAirInNode(std::string const &UnitarySysName, int const ZoneOAUnitNum, bool &errFlag) {
         if (UnitarySystems::getInputOnceFlag) {
             getUnitarySystemInput(UnitarySysName, false, ZoneOAUnitNum);
             UnitarySystems::getInputOnceFlag = false;
@@ -15272,11 +15330,11 @@ namespace UnitarySystems {
                 break;
             }
         }
+        if (airNode == 0) errFlag = true;
         return airNode;
     }
 
-    int UnitarySys::getAirOutNode(std::string const &UnitarySysName, int const ZoneOAUnitNum)
-    {
+    int UnitarySys::getAirOutNode(std::string const &UnitarySysName, int const ZoneOAUnitNum, bool &errFlag) {
         if (UnitarySystems::getInputOnceFlag) {
             getUnitarySystemInput(UnitarySysName, false, ZoneOAUnitNum);
             UnitarySystems::getInputOnceFlag = false;
@@ -15288,6 +15346,7 @@ namespace UnitarySystems {
                 break;
             }
         }
+        if (airNode == 0) errFlag = true;
         return airNode;
     }
 

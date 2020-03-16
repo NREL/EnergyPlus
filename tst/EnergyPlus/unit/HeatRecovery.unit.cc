@@ -3813,7 +3813,7 @@ TEST_F(EnergyPlusFixture, HeatRecoveryHXOnMainBranch_SimHeatRecoveryTest)
     ASSERT_TRUE(process_idf(idf_objects));
 
     // OutputProcessor::TimeValue.allocate(2); //
-    ManageSimulation();                     // run the design day
+    ManageSimulation(OutputFiles::getSingleton());                     // run the design day
 
     ASSERT_EQ("DOAS HEAT RECOVERY", ExchCond(1).Name);                       // Name of Heat Recovery Exchange On Main Air Loop
     ASSERT_EQ(ExchCond(1).Name, PrimaryAirSystem(1).Branch(1).Comp(2).Name); // Heat Recovery Exchange On Main Air Loop
