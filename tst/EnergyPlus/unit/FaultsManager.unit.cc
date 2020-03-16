@@ -744,7 +744,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
 
         // Check calculation
         // Expected FaultFrac * (1/UAfouled - 1 / UACoilTotal)
-        Real64 expectedFoulingFactor = 0.75 * ((1.0 / 3.32) - (1.0 / 6.64));
+        // Real64 expectedFoulingFactor = 0.75 * ((1.0 / 3.32) - (1.0 / 6.64));
         // EXPECT_NEAR(expectedFoulingFactor, FaultsManager::FouledCoils(FaultIndex).CalFaultyCoilFoulingFactor(), 0.0001);
     }
 
@@ -778,7 +778,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
         Real64 waterTerm = 0.0005 / (100.0*0.1); // Rf_water/A_water = Rfw / (Aout * Aratio)
         Real64 airTerm = 0.0001 / 100.0;         // Rf_air/A_air = Rfa / Aout
         // Expected FaultFrac * (waterTerm + airTerm)
-        Real64 expectedFoulingFactor = 0.75 * (waterTerm + airTerm);
+        // Real64 expectedFoulingFactor = 0.75 * (waterTerm + airTerm);
         // EXPECT_NEAR(expectedFoulingFactor, FaultsManager::FouledCoils(FaultIndex).CalFaultyCoilFoulingFactor(), 0.0001);
     }
 
