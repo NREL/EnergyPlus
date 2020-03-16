@@ -77,11 +77,7 @@
 using namespace EnergyPlus;
 using namespace OutputReportPredefined;
 
-class WaterThermalTanksFixture : public EnergyPlusFixture
-{
-};
-
-TEST_F(WaterThermalTanksFixture, HeatPumpWaterHeaterTests_TestQsourceCalcs)
+TEST_F(EnergyPlusFixture, HeatPumpWaterHeaterTests_TestQsourceCalcs)
 {
     Real64 DeltaT = 0.0;
     Real64 const SourceInletTemp = 62.0;
@@ -116,7 +112,7 @@ TEST_F(WaterThermalTanksFixture, HeatPumpWaterHeaterTests_TestQsourceCalcs)
     EXPECT_DOUBLE_EQ(SourceMassFlowRate, 0.0);
 }
 
-TEST_F(WaterThermalTanksFixture, WaterThermalTankData_GetDeadBandTemp)
+TEST_F(EnergyPlusFixture, WaterThermalTankData_GetDeadBandTemp)
 {
 
     WaterThermalTanks::WaterThermalTankData thisTank;
@@ -132,7 +128,7 @@ TEST_F(WaterThermalTanksFixture, WaterThermalTankData_GetDeadBandTemp)
     EXPECT_DOUBLE_EQ(11.0, thisTank.getDeadBandTemp());
 }
 
-TEST_F(WaterThermalTanksFixture, HPWHZoneEquipSeqenceNumberWarning)
+TEST_F(EnergyPlusFixture, HPWHZoneEquipSeqenceNumberWarning)
 {
     std::string const idf_objects = delimited_string({
         "  Schedule:Constant, DummySch, , 1.0;",
@@ -365,7 +361,7 @@ TEST_F(WaterThermalTanksFixture, HPWHZoneEquipSeqenceNumberWarning)
     EXPECT_FALSE(WaterThermalTanks::GetWaterThermalTankInput(OutputFiles::getSingleton()));
 }
 
-TEST_F(WaterThermalTanksFixture, HPWHWrappedDummyNodeConfig)
+TEST_F(EnergyPlusFixture, HPWHWrappedDummyNodeConfig)
 {
     // Unit test for #5127
 
@@ -544,7 +540,7 @@ TEST_F(WaterThermalTanksFixture, HPWHWrappedDummyNodeConfig)
     }
 }
 
-TEST_F(WaterThermalTanksFixture, HPWHEnergyBalance)
+TEST_F(EnergyPlusFixture, HPWHEnergyBalance)
 {
     using DataGlobals::HourOfDay;
     using DataGlobals::TimeStep;
@@ -803,7 +799,7 @@ TEST_F(WaterThermalTanksFixture, HPWHEnergyBalance)
     EXPECT_NEAR(HeatFromCoil, TankEnergySum, ErrorBound);
 }
 
-TEST_F(WaterThermalTanksFixture, HPWHSizing)
+TEST_F(EnergyPlusFixture, HPWHSizing)
 {
     std::string const idf_objects = delimited_string({
         "  Schedule:Constant, DummySch, , 1.0;",
@@ -1045,7 +1041,7 @@ TEST_F(WaterThermalTanksFixture, HPWHSizing)
     EXPECT_EQ(Fans::Fan(1).MaxAirFlowRate, DXCoils::DXCoil(1).RatedAirVolFlowRate(1));
 }
 
-TEST_F(WaterThermalTanksFixture, WaterThermalTank_CalcTempIntegral)
+TEST_F(EnergyPlusFixture, WaterThermalTank_CalcTempIntegral)
 {
 
     Real64 Ti = 57.22;   // Initial tank temperature (C)
@@ -1078,7 +1074,7 @@ TEST_F(WaterThermalTanksFixture, WaterThermalTank_CalcTempIntegral)
         14772.5, WaterThermalTanks::WaterThermalTankData::CalcTempIntegral(Ti, Tf, Ta, T1, T2, m, Cp, m1, m2, UA, 1000.0, t), 0.1); // Q = 1000W
 }
 
-TEST_F(WaterThermalTanksFixture, HPWHOutdoorAirMissingNodeNameWarning)
+TEST_F(EnergyPlusFixture, HPWHOutdoorAirMissingNodeNameWarning)
 {
     std::string const idf_objects = delimited_string({
         "  Schedule:Constant, DummySch, , 1.0;",
@@ -1242,7 +1238,7 @@ TEST_F(WaterThermalTanksFixture, HPWHOutdoorAirMissingNodeNameWarning)
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
 
-TEST_F(WaterThermalTanksFixture, HPWHTestSPControl)
+TEST_F(EnergyPlusFixture, HPWHTestSPControl)
 {
     std::string const idf_objects = delimited_string({
         "  Schedule:Constant, CompSetSch, , 60.0;",
@@ -1520,7 +1516,7 @@ TEST_F(WaterThermalTanksFixture, HPWHTestSPControl)
     EXPECT_NEAR(56.0, Tank.SourceOutletTemp, 0.0000001);    // source outlet = average tank temp
 }
 
-TEST_F(WaterThermalTanksFixture, StratifiedTankUseEnergy)
+TEST_F(EnergyPlusFixture, StratifiedTankUseEnergy)
 {
     using DataGlobals::HourOfDay;
     using DataGlobals::TimeStep;
@@ -1622,7 +1618,7 @@ TEST_F(WaterThermalTanksFixture, StratifiedTankUseEnergy)
     ASSERT_LT(Tank.UseRate, 0.0);
 }
 
-TEST_F(WaterThermalTanksFixture, StratifiedTankSourceTemperatures)
+TEST_F(EnergyPlusFixture, StratifiedTankSourceTemperatures)
 {
     using DataGlobals::HourOfDay;
     using DataGlobals::TimeStep;
@@ -1752,7 +1748,7 @@ TEST_F(WaterThermalTanksFixture, StratifiedTankSourceTemperatures)
     EXPECT_NEAR(Tank.SourceOutletTemp, 10.34, 0.01);
 }
 
-TEST_F(WaterThermalTanksFixture, MixedTankTimeNeededCalc)
+TEST_F(EnergyPlusFixture, MixedTankTimeNeededCalc)
 {
     using DataGlobals::HourOfDay;
     using DataGlobals::TimeStep;
@@ -1854,7 +1850,7 @@ TEST_F(WaterThermalTanksFixture, MixedTankTimeNeededCalc)
     EXPECT_NEAR(Tank.AmbientZoneGain, TankSkinHeatLossRate, 0.000001);
 }
 
-TEST_F(WaterThermalTanksFixture, StratifiedTankCalc)
+TEST_F(EnergyPlusFixture, StratifiedTankCalc)
 {
     using DataGlobals::HourOfDay;
     using DataGlobals::TimeStep;
@@ -2055,7 +2051,7 @@ TEST_F(WaterThermalTanksFixture, StratifiedTankCalc)
     EXPECT_NEAR(ExpectedVentedEnergy, -Tank.VentRate, fabs(ExpectedVentedEnergy) * 0.05);
 }
 
-TEST_F(WaterThermalTanksFixture, StratifiedTankSourceFlowRateCalc)
+TEST_F(EnergyPlusFixture, StratifiedTankSourceFlowRateCalc)
 {
     using DataGlobals::HourOfDay;
     using DataGlobals::SecInHour;
@@ -2185,7 +2181,7 @@ TEST_F(WaterThermalTanksFixture, StratifiedTankSourceFlowRateCalc)
     EXPECT_NEAR(Esource, EnergySum, EnergySum * 0.001);
 }
 
-TEST_F(WaterThermalTanksFixture, DesuperheaterTimeAdvanceCheck)
+TEST_F(EnergyPlusFixture, DesuperheaterTimeAdvanceCheck)
 {
     using DataGlobals::HourOfDay;
     using DataGlobals::TimeStep;
@@ -2471,7 +2467,7 @@ TEST_F(WaterThermalTanksFixture, DesuperheaterTimeAdvanceCheck)
     EXPECT_GT(Tank.TankTemp, 50);
 }
 
-TEST_F(WaterThermalTanksFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
+TEST_F(EnergyPlusFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
 {
     using DataGlobals::HourOfDay;
     using DataGlobals::TimeStep;
@@ -2741,7 +2737,7 @@ TEST_F(WaterThermalTanksFixture, StratifiedTank_GSHP_DesuperheaterSourceHeat)
     EXPECT_NEAR(Tank.SourceRate, Desuperheater.HeaterRate, Tank.SourceRate * 0.05);
 }
 
-TEST_F(WaterThermalTanksFixture, Desuperheater_Multispeed_Coil_Test)
+TEST_F(EnergyPlusFixture, Desuperheater_Multispeed_Coil_Test)
 {
     using DataGlobals::HourOfDay;
     using DataGlobals::TimeStep;
@@ -3122,7 +3118,7 @@ TEST_F(WaterThermalTanksFixture, Desuperheater_Multispeed_Coil_Test)
     EXPECT_EQ(Tank.SourceRate, 0.0);
 }
 
-TEST_F(WaterThermalTanksFixture, MixedTankAlternateSchedule)
+TEST_F(EnergyPlusFixture, MixedTankAlternateSchedule)
 {
     using DataGlobals::HourOfDay;
     using DataGlobals::SecInHour;
@@ -3244,7 +3240,7 @@ TEST_F(WaterThermalTanksFixture, MixedTankAlternateSchedule)
     EXPECT_EQ(Tank.SourceMassFlowRate, 0.0005 * rho);
 }
 
-TEST_F(WaterThermalTanksFixture, MixedTank_WarnPotentialFreeze)
+TEST_F(EnergyPlusFixture, MixedTank_WarnPotentialFreeze)
 {
     std::string const idf_objects = delimited_string({
         "  Schedule:Constant, Water Heater Setpoint Temperature, ,12;",
@@ -3330,7 +3326,7 @@ TEST_F(WaterThermalTanksFixture, MixedTank_WarnPotentialFreeze)
     EXPECT_TRUE(compare_err_stream(error_string, true));
 }
 
-TEST_F(WaterThermalTanksFixture, StratifiedTank_WarnPotentialFreeze)
+TEST_F(EnergyPlusFixture, StratifiedTank_WarnPotentialFreeze)
 {
     std::string const idf_objects = delimited_string({
         "  Schedule:Constant, Water Heater Setpoint Temperature, ,12;",
@@ -3441,7 +3437,7 @@ TEST_F(WaterThermalTanksFixture, StratifiedTank_WarnPotentialFreeze)
 }
 
 // Test for #7711: having the two types of HPWH makes InputProcessor crash in getJSONObjNum
-TEST_F(WaterThermalTanksFixture, HPWH_Both_Pumped_and_Wrapped_InputProcessing)
+TEST_F(EnergyPlusFixture, HPWH_Both_Pumped_and_Wrapped_InputProcessing)
 {
     std::string const idf_objects = delimited_string({
 
@@ -3917,7 +3913,7 @@ TEST_F(WaterThermalTanksFixture, HPWH_Both_Pumped_and_Wrapped_InputProcessing)
 }
 
 // Test for #7720: having a tank inside a HPWH, and a tank standalone making it crash
-TEST_F(WaterThermalTanksFixture, CrashCalcStandardRatings_HPWH_and_Standalone)
+TEST_F(EnergyPlusFixture, CrashCalcStandardRatings_HPWH_and_Standalone)
 {
     std::string const idf_objects = delimited_string({
         "  Schedule:Constant, CompSetSch, , 60.0;",
