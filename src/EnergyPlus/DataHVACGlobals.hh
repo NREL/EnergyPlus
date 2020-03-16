@@ -412,6 +412,7 @@ namespace DataHVACGlobals {
     extern int const ZoneEquipTypeOf_DehumidifierDX;
     extern int const ZoneEquipTypeOf_IdealLoadsAirSystem;
     extern int const ZoneEquipTypeOf_RefrigerationChillerSet;
+    extern int const ZoneEquipTypeOf_HybridUnitaryAirConditioners;
     extern int const ZoneEquipTypeOf_FanZoneExhaust;
     extern int const ZoneEquipTypeOf_WaterHeaterHeatPump;
     extern int const ZoneEquipTypeOf_AirTerminalDualDuctConstantVolume;
