@@ -4700,7 +4700,7 @@ namespace WindowManager {
 
     void LUdecomposition(Array2<Real64> &ajac, // As input: matrix to be decomposed;
                          int const n,          // Dimension of matrix
-                         Array1_int &indx,     // Vector of row permutations
+                         Array1D_int &indx,    // Vector of row permutations
                          Real64 &d             // +1 if even number of row interchange is even, -1
     )
     {
@@ -4803,8 +4803,8 @@ namespace WindowManager {
 
     void LUsolution(Array2<Real64> const &a, // Matrix and vector in a.x = b;
                     int const n,             // Dimension of a and b
-                    Array1_int const &indx,  // Vector of row permutations
-                    Array1<Real64> &b        // Matrix and vector in a.x = b;
+                    Array1D_int const &indx, // Vector of row permutations
+                    Array1D<Real64> &b       // Matrix and vector in a.x = b;
     )
     {
 
