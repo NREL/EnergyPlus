@@ -273,6 +273,12 @@ CHECKED_AND_OKED = {
     "OutputReportTabular.cc": {
         "ComputeTableBodyUsingMovingAvg": [
             "resCellsUsd"
+        ],
+        "parseStatLine": [
+            "isKoppen",
+            "heatingDesignlinepassed",
+            "coolingDesignlinepassed",
+            "desConditionlinepassed"
         ]
     },
     "PackagedTerminalHeatPump.cc": {
