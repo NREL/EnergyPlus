@@ -4925,7 +4925,7 @@ namespace SingleDuct {
     }
 
     Real64 SingleDuctAirTerminal::VAVVSCoolingResidual(Real64 const SupplyAirMassFlow, // supply air mass flow rate [kg/s]
-                                Array1<Real64> const &Par       // Par(1) = REAL(SysNum)
+                                Array1D<Real64> const &Par       // Par(1) = REAL(SysNum)
     )
     {
 
@@ -4997,7 +4997,7 @@ namespace SingleDuct {
     }
 
     Real64 SingleDuctAirTerminal::VAVVSHWNoFanResidual(Real64 const HWMassFlow,  // hot water mass flow rate [kg/s]
-                                Array1<Real64> const &Par // Par(1) = REAL(SysNum)
+                                Array1D<Real64> const &Par // Par(1) = REAL(SysNum)
     )
     {
 
@@ -5088,7 +5088,7 @@ namespace SingleDuct {
     }
 
     Real64 SingleDuctAirTerminal::VAVVSHWFanOnResidual(Real64 const SupplyAirMassFlow, // supply air mass flow rate [kg/s]
-                                Array1<Real64> const &Par       // Par(1) = REAL(SysNum)
+                                Array1D<Real64> const &Par       // Par(1) = REAL(SysNum)
     )
     {
 
@@ -5160,7 +5160,7 @@ namespace SingleDuct {
     }
 
     Real64 SingleDuctAirTerminal::VAVVSHCFanOnResidual(Real64 const HeatingFrac, // fraction of maximum heating output
-                                Array1<Real64> const &Par // Par(1) = REAL(SysNum)
+                                Array1D<Real64> const &Par // Par(1) = REAL(SysNum)
     )
     {
 
