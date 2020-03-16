@@ -759,7 +759,7 @@ namespace DXCoils {
     void GetFanIndexForTwoSpeedCoil(int const CoolingCoilIndex, int &SupplyFanIndex, std::string &SupplyFanName, int &SupplyFan_TypeNum);
 
     Real64 CalcTwoSpeedDXCoilIEERResidual(Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                          Array1<Real64> const &Par           // par(1) = DX coil number
+                                          Array1D<Real64> const &Par          // par(1) = DX coil number
     );
 
     // ======================  Utility routines ======================================
@@ -962,12 +962,12 @@ namespace DXCoils {
                               Real64 &CapModFac               // Coil capacity modification factor
     );
 
-    Real64 FanSpdResidualCool(Real64 const FanSpdRto,   // indoor unit fan speed ratio
-                              Array1<Real64> const &Par // array of parameters
+    Real64 FanSpdResidualCool(Real64 const FanSpdRto,    // indoor unit fan speed ratio
+                              Array1D<Real64> const &Par // array of parameters
     );
 
-    Real64 FanSpdResidualHeat(Real64 FanSpdRto,         // indoor unit fan speed ratio
-                              Array1<Real64> const &Par // array of parameters
+    Real64 FanSpdResidualHeat(Real64 FanSpdRto,          // indoor unit fan speed ratio
+                              Array1D<Real64> const &Par // array of parameters
     );
     // End of Methods for New VRF Model: Fluid Temperature Control
     // *****************************************************************************

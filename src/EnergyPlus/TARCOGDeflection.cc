@@ -96,14 +96,14 @@ namespace TARCOGDeflection {
                          Real64 const Pa,
                          Real64 const Pini,
                          Real64 const Tini,
-                         Array1A<Real64> const PaneThickness,
-                         Array1A<Real64> const NonDeflectedGapWidth,
-                         Array1A<Real64> DeflectedGapWidthMax,
-                         Array1A<Real64> DeflectedGapWidthMean,
-                         Array1A<Real64> const PanelTemps,
-                         Array1A<Real64> const YoungsMod,
-                         Array1A<Real64> const PoissonsRat,
-                         Array1A<Real64> LayerDeflection,
+                         const Array1D<Real64> &PaneThickness,
+                         const Array1D<Real64> &NonDeflectedGapWidth,
+                         Array1D<Real64> &DeflectedGapWidthMax,
+                         Array1D<Real64> &DeflectedGapWidthMean,
+                         const Array1D<Real64> &PanelTemps,
+                         const Array1D<Real64> &YoungsMod,
+                         const Array1D<Real64> &PoissonsRat,
+                         Array1D<Real64> &LayerDeflection,
                          int &nperr,
                          std::string &ErrorMessage)
     {
@@ -115,14 +115,14 @@ namespace TARCOGDeflection {
         // INPUT
 
         // Argument array dimensioning
-        PaneThickness.dim(maxlay);
-        NonDeflectedGapWidth.dim(MaxGap);
-        DeflectedGapWidthMax.dim(MaxGap);
-        DeflectedGapWidthMean.dim(MaxGap);
-        PanelTemps.dim(maxlay2);
-        YoungsMod.dim(maxlay);
-        PoissonsRat.dim(maxlay);
-        LayerDeflection.dim(maxlay);
+        EP_SIZE_CHECK(PaneThickness, maxlay);
+        EP_SIZE_CHECK(NonDeflectedGapWidth, MaxGap);
+        EP_SIZE_CHECK(DeflectedGapWidthMax, MaxGap);
+        EP_SIZE_CHECK(DeflectedGapWidthMean, MaxGap);
+        EP_SIZE_CHECK(PanelTemps, maxlay2);
+        EP_SIZE_CHECK(YoungsMod, maxlay);
+        EP_SIZE_CHECK(PoissonsRat, maxlay);
+        EP_SIZE_CHECK(LayerDeflection, maxlay);
 
         // Locals
         // OUTPUT
@@ -170,12 +170,12 @@ namespace TARCOGDeflection {
                                 Real64 const Pa,
                                 Real64 const Pini,
                                 Real64 const Tini,
-                                Array1A<Real64> const NonDeflectedGapWidth,
-                                Array1A<Real64> DeflectedGapWidthMax,
-                                Array1A<Real64> DeflectedGapWidthMean,
-                                Array1A<Real64> const PanelTemps,
-                                Array1A<Real64> DCoeff,
-                                Array1A<Real64> LayerDeflection,
+                                const Array1D<Real64> &NonDeflectedGapWidth,
+                                Array1D<Real64> &DeflectedGapWidthMax,
+                                Array1D<Real64> &DeflectedGapWidthMean,
+                                const Array1D<Real64> &PanelTemps,
+                                Array1D<Real64> &DCoeff,
+                                Array1D<Real64> &LayerDeflection,
                                 int &nperr,
                                 std::string &ErrorMessage)
     {
@@ -186,12 +186,12 @@ namespace TARCOGDeflection {
         // INPUT
 
         // Argument array dimensioning
-        NonDeflectedGapWidth.dim(MaxGap);
-        DeflectedGapWidthMax.dim(MaxGap);
-        DeflectedGapWidthMean.dim(MaxGap);
-        PanelTemps.dim(maxlay2);
-        DCoeff.dim(maxlay);
-        LayerDeflection.dim(maxlay);
+        EP_SIZE_CHECK(NonDeflectedGapWidth, MaxGap);
+        EP_SIZE_CHECK(DeflectedGapWidthMax, MaxGap);
+        EP_SIZE_CHECK(DeflectedGapWidthMean, MaxGap);
+        EP_SIZE_CHECK(PanelTemps, maxlay2);
+        EP_SIZE_CHECK(DCoeff, maxlay);
+        EP_SIZE_CHECK(LayerDeflection, maxlay);
 
         // Locals
         // OUTPUT
@@ -272,20 +272,20 @@ namespace TARCOGDeflection {
     void DeflectionWidths(int const nlayer,
                           Real64 const W,
                           Real64 const H,
-                          Array1A<Real64> DCoeff,
-                          Array1A<Real64> const NonDeflectedGapWidth,
-                          Array1A<Real64> const DeflectedGapWidthMax,
-                          Array1A<Real64> DeflectedGapWidthMean,
-                          Array1A<Real64> LayerDeflection)
+                          Array1D<Real64> &DCoeff,
+                          const Array1D<Real64> &NonDeflectedGapWidth,
+                          const Array1D<Real64> &DeflectedGapWidthMax,
+                          Array1D<Real64> &DeflectedGapWidthMean,
+                          Array1D<Real64> &LayerDeflection)
     {
         // INPUT
 
         // Argument array dimensioning
-        DCoeff.dim(maxlay);
-        NonDeflectedGapWidth.dim(MaxGap);
-        DeflectedGapWidthMax.dim(MaxGap);
-        DeflectedGapWidthMean.dim(MaxGap);
-        LayerDeflection.dim(maxlay);
+        EP_SIZE_CHECK(DCoeff, maxlay);
+        EP_SIZE_CHECK(NonDeflectedGapWidth, MaxGap);
+        EP_SIZE_CHECK(DeflectedGapWidthMax, MaxGap);
+        EP_SIZE_CHECK(DeflectedGapWidthMean, MaxGap);
+        EP_SIZE_CHECK(LayerDeflection, maxlay);
 
         // Locals
         // OUTPUT

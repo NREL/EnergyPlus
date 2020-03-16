@@ -13891,7 +13891,7 @@ namespace DXCoils {
     }
 
     Real64 CalcTwoSpeedDXCoilIEERResidual(Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                          Array1<Real64> const &Par           // par(1) = DX coil number
+                                          Array1D<Real64> const &Par          // par(1) = DX coil number
     )
     {
         // FUNCTION INFORMATION:
@@ -16730,8 +16730,8 @@ namespace DXCoils {
         }
     }
 
-    Real64 FanSpdResidualCool(Real64 const FanSpdRto,   // indoor unit fan speed ratio
-                              Array1<Real64> const &Par // parameters
+    Real64 FanSpdResidualCool(Real64 const FanSpdRto,    // indoor unit fan speed ratio
+                              Array1D<Real64> const &Par // parameters
     )
     {
         // FUNCTION INFORMATION:
@@ -16770,8 +16770,8 @@ namespace DXCoils {
         return FanSpdResidualCool;
     }
 
-    Real64 FanSpdResidualHeat(Real64 const FanSpdRto,   // indoor unit fan speed ratio
-                              Array1<Real64> const &Par // parameters
+    Real64 FanSpdResidualHeat(Real64 const FanSpdRto,    // indoor unit fan speed ratio
+                              Array1D<Real64> const &Par // parameters
     )
     {
         // FUNCTION INFORMATION:

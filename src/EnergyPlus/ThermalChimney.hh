@@ -49,7 +49,6 @@
 #define ThermalChimney_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2A.hh>
 
@@ -144,7 +143,7 @@ namespace ThermalChimney {
 
     void ReportThermalChimney();
 
-    void GaussElimination(Array2A<Real64> EquaCoef, Array1A<Real64> EquaConst, Array1A<Real64> ThermChimSubTemp, int const NTC);
+    void GaussElimination(Array2A<Real64> EquaCoef, Array1D<Real64> &EquaConst, Array1D<Real64> &ThermChimSubTemp, int const NTC);
 
     //        End of Module Subroutines for ThermalChimney
 

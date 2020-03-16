@@ -359,8 +359,8 @@ namespace DaylightingManager {
                      int &ZoneNum    // Zone number
     );
 
-    void DayltgGlareWithIntWins(Array1<Real64> &GLINDX, // Glare index
-                                int const ZoneNum       // Zone number
+    void DayltgGlareWithIntWins(Array1D<Real64> &GLINDX, // Glare index
+                                int const ZoneNum        // Zone number
     );
 
     void DayltgExtHorizIllum(Array1A<Real64> HISK, // Horizontal illuminance from sky for different sky types
@@ -407,9 +407,9 @@ namespace DaylightingManager {
                                        int const NBasis,
                                        int const IHR,
                                        int const iRefPoint,
-                                       Array2<Real64> &ElementLuminanceSky,     // sky related luminance at window element (exterior side)
-                                       Array1<Real64> &ElementLuminanceSun,     // sun related luminance at window element (exterior side),
-                                       Array1<Real64> &ElementLuminanceSunDisk, // sun related luminance at window element (exterior side),
+                                       Array2<Real64> &ElementLuminanceSky,      // sky related luminance at window element (exterior side)
+                                       Array1D<Real64> &ElementLuminanceSun,     // sun related luminance at window element (exterior side),
+                                       Array1D<Real64> &ElementLuminanceSunDisk, // sun related luminance at window element (exterior side),
                                        int const CalledFrom,
                                        Optional_int_const MapNum = _);
 

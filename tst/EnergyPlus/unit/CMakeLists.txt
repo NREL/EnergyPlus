@@ -117,6 +117,7 @@ set( test_src
   JsonOutput.unit.cc
   KusudaAchenbachGroundTemperatureModel.unit.cc
   LowTempRadiantSystem.unit.cc
+  MicroCHPElectricGenerator.unit.cc
   MoistureBalanceEMPD.unit.cc
   MixedAir.unit.cc
   MixerComponent.unit.cc
