@@ -67,6 +67,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/General.hh>
+#include <EnergyPlus/GeneralRoutines.hh>
 #include <EnergyPlus/GlobalNames.hh>
 #include <EnergyPlus/HVACFan.hh>
 #include <EnergyPlus/HVACStandAloneERV.hh>
@@ -1688,15 +1689,8 @@ namespace HVACStandAloneERV {
             StandAloneERV(StandAloneERVNum).ElecUseRate += HVACFan::fanObjs[StandAloneERV(StandAloneERVNum).ExhaustAirFanIndex]->fanPower();
         }
 
-        MinHumRatio = Node(ExhaustInletNode).HumRat;
-        if (Node(SupOutletNode).HumRat < Node(ExhaustInletNode).HumRat) MinHumRatio = Node(SupOutletNode).HumRat;
-
         AirMassFlow = Node(SupOutletNode).MassFlowRate;
-        SensLoadMet = AirMassFlow * (PsyHFnTdbW(Node(SupOutletNode).Temp, MinHumRatio) - PsyHFnTdbW(Node(ExhaustInletNode).Temp, MinHumRatio));
-        TotLoadMet = AirMassFlow * (PsyHFnTdbW(Node(SupOutletNode).Temp, Node(SupOutletNode).HumRat) -
-                                    PsyHFnTdbW(Node(ExhaustInletNode).Temp, Node(ExhaustInletNode).HumRat));
-        LatLoadMet = TotLoadMet - SensLoadMet; // watts
-
+        CalcTotalSensibleLatentOutput(AirMassFlow, Node(SupOutletNode).Temp, Node(SupOutletNode).HumRat, Node(ExhaustInletNode).Temp, Node(ExhaustInletNode).HumRat, TotLoadMet, SensLoadMet, LatLoadMet);
         LatentMassLoadMet = AirMassFlow * (Node(SupOutletNode).HumRat - Node(ExhaustInletNode).HumRat); // kg/s, dehumidification = negative
 
         if (SensLoadMet < 0.0) {
