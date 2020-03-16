@@ -106,38 +106,38 @@ ENERGYPLUSLIB_API typedef void * Glycol;
 ENERGYPLUSLIB_API Glycol glycolNew(const char* glycolName);
 /// \brief Deletes an instance of a Glycol class
 /// \details When an instance of a Glycol class is created using `glycolNew`, it should be cleaned up when totally done with it.
-/// \param[in] Glycol An instance of a Glycol class to be deleted.  The Glycol class is initially created by calling `glycolNew`.
+/// \param[in] glycol An instance of a Glycol class to be deleted.  The Glycol class is initially created by calling `glycolNew`.
 /// \see Glycol
 /// \see glycolNew
-ENERGYPLUSLIB_API void glycolDelete(Glycol);
+ENERGYPLUSLIB_API void glycolDelete(Glycol glycol);
 /// \brief Returns the fluid specific heat for the given Glycol instance at the specified temperature.
-/// \param[in] Glycol An instance of a Glycol class, which can be created by calling `glycolNew`.
+/// \param[in] glycol An instance of a Glycol class, which can be created by calling `glycolNew`.
 /// \param[in] temperature The fluid temperature for property evaluation, in degrees Celsius.
 /// \returns Fluid specific heat, in J/kgK
 /// \see Glycol
 /// \see glycolNew
-ENERGYPLUSLIB_API Real64 glycolSpecificHeat(Glycol, Real64 temperature);
+ENERGYPLUSLIB_API Real64 glycolSpecificHeat(Glycol glycol, Real64 temperature);
 /// \brief Returns the fluid density for the given Glycol instance at the specified temperature.
-/// \param[in] Glycol An instance of a Glycol class, which can be created by calling `glycolNew`.
+/// \param[in] glycol An instance of a Glycol class, which can be created by calling `glycolNew`.
 /// \param[in] temperature The fluid temperature for property evaluation, in degrees Celsius.
 /// \returns Fluid density, in kg/m3
 /// \see Glycol
 /// \see glycolNew
-ENERGYPLUSLIB_API Real64 glycolDensity(Glycol, Real64 temperature);
+ENERGYPLUSLIB_API Real64 glycolDensity(Glycol glycol, Real64 temperature);
 /// \brief Returns the fluid thermal conductivity for the given Glycol instance at the specified temperature.
-/// \param[in] Glycol An instance of a Glycol class, which can be created by calling `glycolNew`.
+/// \param[in] glycol An instance of a Glycol class, which can be created by calling `glycolNew`.
 /// \param[in] temperature The fluid temperature for property evaluation, in degrees Celsius.
 /// \returns Fluid thermal conductivity, in W/mK
 /// \see Glycol
 /// \see glycolNew
-ENERGYPLUSLIB_API Real64 glycolConductivity(Glycol, Real64 temperature);
+ENERGYPLUSLIB_API Real64 glycolConductivity(Glycol glycol, Real64 temperature);
 /// \brief Returns the fluid dynamic viscosity for the given Glycol instance at the specified temperature.
-/// \param[in] Glycol An instance of a Glycol class, which can be created by calling `glycolNew`.
+/// \param[in] glycol An instance of a Glycol class, which can be created by calling `glycolNew`.
 /// \param[in] temperature The fluid temperature for property evaluation, in degrees Celsius.
 /// \returns Fluid dynamic viscosity, in Pa-s (or kg/m-s)
 /// \see Glycol
 /// \see glycolNew
-ENERGYPLUSLIB_API Real64 glycolViscosity(Glycol, Real64 temperature);
+ENERGYPLUSLIB_API Real64 glycolViscosity(Glycol glycol, Real64 temperature);
 
 
 /// \brief This typedef is a convenient pointer to an internal refrigerant property class inside EnergyPlus.
@@ -158,48 +158,48 @@ ENERGYPLUSLIB_API typedef void * Refrigerant;
 ENERGYPLUSLIB_API Refrigerant refrigerantNew(const char* refrigerantName);
 /// \brief Deletes an instance of a Refrigerant class
 /// \details When an instance of a Refrigerant class is created using `refrigerantNew`, it should be cleaned up when totally done with it.
-/// \param[in] Refrigerant An instance of a Refrigerant class to be deleted.  The Refrigerant class is initially created by calling `refrigerantNew`.
+/// \param[in] refrigerant An instance of a Refrigerant class to be deleted.  The Refrigerant class is initially created by calling `refrigerantNew`.
 /// \see Refrigerant
 /// \see refrigerantNew
-ENERGYPLUSLIB_API void refrigerantDelete(Refrigerant);
+ENERGYPLUSLIB_API void refrigerantDelete(Refrigerant refrigerant);
 /// \brief Returns the refrigerant saturation pressure for the given Refrigerant instance at the specified temperature.
-/// \param[in] Refrigerant An instance of a Refrigerant class, which can be created by calling `refrigerantNew`.
+/// \param[in] refrigerant An instance of a Refrigerant class, which can be created by calling `refrigerantNew`.
 /// \param[in] temperature The refrigerant temperature for property evaluation, in degrees Celsius.
 /// \returns Refrigerant saturation pressure, in Pa
 /// \see Refrigerant
 /// \see refrigerantNew
-ENERGYPLUSLIB_API Real64 refrigerantSaturationPressure(Refrigerant, Real64 temperature);
+ENERGYPLUSLIB_API Real64 refrigerantSaturationPressure(Refrigerant refrigerant, Real64 temperature);
 /// \brief Returns the refrigerant saturation temperature for the given Refrigerant instance at the specified pressure.
-/// \param[in] Refrigerant An instance of a Refrigerant class, which can be created by calling `refrigerantNew`.
+/// \param[in] refrigerant An instance of a Refrigerant class, which can be created by calling `refrigerantNew`.
 /// \param[in] pressure The refrigerant pressure for property evaluation, in Pa.
 /// \returns Refrigerant saturation temperature, in C
 /// \see Refrigerant
 /// \see refrigerantNew
-ENERGYPLUSLIB_API Real64 refrigerantSaturationTemperature(Refrigerant, Real64 pressure);
+ENERGYPLUSLIB_API Real64 refrigerantSaturationTemperature(Refrigerant refrigerant, Real64 pressure);
 /// \brief Returns the refrigerant saturated enthalpy for the given Refrigerant instance at the specified temperature and quality.
-/// \param[in] Refrigerant An instance of a Refrigerant class, which can be created by calling `refrigerantNew`.
+/// \param[in] refrigerant An instance of a Refrigerant class, which can be created by calling `refrigerantNew`.
 /// \param[in] temperature The refrigerant temperature for property evaluation, in C.
 /// \param[in] quality The refrigerant quality for property evaluation, in fractional form from 0.0 to 1.0.
 /// \returns Refrigerant saturated enthalpy in J/kg
 /// \see Refrigerant
 /// \see refrigerantNew
-ENERGYPLUSLIB_API Real64 refrigerantSaturatedEnthalpy(Refrigerant, Real64 temperature, Real64 quality);
+ENERGYPLUSLIB_API Real64 refrigerantSaturatedEnthalpy(Refrigerant refrigerant, Real64 temperature, Real64 quality);
 /// \brief Returns the refrigerant saturated density for the given Refrigerant instance at the specified temperature and quality.
-/// \param[in] Refrigerant An instance of a Refrigerant class, which can be created by calling `refrigerantNew`.
+/// \param[in] refrigerant An instance of a Refrigerant class, which can be created by calling `refrigerantNew`.
 /// \param[in] temperature The refrigerant temperature for property evaluation, in C.
 /// \param[in] quality The refrigerant quality for property evaluation, in fractional form from 0.0 to 1.0.
 /// \returns Refrigerant saturated density in kg/m3
 /// \see Refrigerant
 /// \see refrigerantNew
-ENERGYPLUSLIB_API Real64 refrigerantSaturatedDensity(Refrigerant, Real64 temperature, Real64 quality);
+ENERGYPLUSLIB_API Real64 refrigerantSaturatedDensity(Refrigerant refrigerant, Real64 temperature, Real64 quality);
 /// \brief Returns the refrigerant saturated specific heat for the given Refrigerant instance at the specified temperature and quality.
-/// \param[in] Refrigerant An instance of a Refrigerant class, which can be created by calling `refrigerantNew`.
+/// \param[in] refrigerant An instance of a Refrigerant class, which can be created by calling `refrigerantNew`.
 /// \param[in] temperature The refrigerant temperature for property evaluation, in C.
 /// \param[in] quality The refrigerant quality for property evaluation, in fractional form from 0.0 to 1.0.
 /// \returns Refrigerant saturated enthalpy in J/kg-K
 /// \see Refrigerant
 /// \see refrigerantNew
-ENERGYPLUSLIB_API Real64 refrigerantSaturatedSpecificHeat(Refrigerant, Real64 temperature, Real64 quality);
+ENERGYPLUSLIB_API Real64 refrigerantSaturatedSpecificHeat(Refrigerant refrigerant, Real64 temperature, Real64 quality);
 //ENERGYPLUSLIB_API Real64 refrigerantSuperHeatedEnthalpy(Refrigerant, Real64 temperature, Real64 pressure);
 //ENERGYPLUSLIB_API Real64 refrigerantSuperHeatedPressure(Refrigerant, Real64 temperature, Real64 enthalpy);
 //ENERGYPLUSLIB_API Real64 refrigerantSuperHeatedDensity(Refrigerant, Real64 temperature, Real64 pressure);
@@ -246,13 +246,13 @@ ENERGYPLUSLIB_API Real64 psyRhovFnTdbWPb(Real64 Tdb, Real64 W, Real64 PB);
 /// \returns Psychrometric wet bulb temperature, in Celsius
 ENERGYPLUSLIB_API Real64 psyTwbFnTdbWPb(Real64 Tdb, Real64 W, Real64 PB);
 /// \brief Returns the psychrometric specific volume at given conditions.
-/// \param[in] Tdb Dry bulb temperature, in Celsius
+/// \param[in] TDB Dry bulb temperature, in Celsius
 /// \param[in] W Humidity ratio, in kgWater/kgDryAir
 /// \param[in] PB Barometric pressure, in Pascals
 /// \returns Psychrometric specific volume, in m3/kg
 ENERGYPLUSLIB_API Real64 psyVFnTdbWPb(Real64 TDB, Real64 W, Real64 PB);
 /// \brief Returns the psychrometric humidity ratio at given conditions.
-/// \param[in] Tdb Dry bulb temperature, in Celsius
+/// \param[in] TDB Dry bulb temperature, in Celsius
 /// \param[in] H Enthalpy, in J/kg
 /// \returns Psychrometric humidity ratio, in kgWater/kgDryAir
 ENERGYPLUSLIB_API Real64 psyWFnTdbH(Real64 TDB, Real64 H);

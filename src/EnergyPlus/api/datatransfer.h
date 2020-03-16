@@ -276,10 +276,10 @@ ENERGYPLUSLIB_API Real64 getPluginTrendVariableMax(int handle, int count);
 /// \see getPluginTrendVariableHandle
 ENERGYPLUSLIB_API Real64 getPluginTrendVariableSum(int handle, int count);
 /// \brief Gets the average trajectory of a Python Plugin "Trend" variable over a given number of history points
-/// \detail For many control applications, it is useful to know the average trajectory of a trend variable over time.
-///         To calculate this, the program will sample the history of the trend over the user-specified number of time history terms,
-///         perform a regression, and return the slope of this regression line.  If positive, the trend is, on average, increasing,
-///         and decreasing if negative.
+/// \details For many control applications, it is useful to know the average trajectory of a trend variable over time.
+///          To calculate this, the program will sample the history of the trend over the user-specified number of time history terms,
+///          perform a regression, and return the slope of this regression line.  If positive, the trend is, on average, increasing,
+///          and decreasing if negative.
 /// \param[in] handle The handle id to a Python Plugin "Trend" variable, which can be retrieved using the `getPluginTrendVariableHandle` function.
 /// \param[in] count The number of timesteps backward to traverse the trend when calculate this average direction.
 /// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
