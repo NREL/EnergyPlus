@@ -150,6 +150,16 @@ void TestSupplyAirPathIntegrity(bool &ErrFound);
 
 void TestReturnAirPathIntegrity(bool &ErrFound, Array2S_int ValRetAPaths);
 
+void CalcTotalSensibleLatentOutput(Real64 const MassFlow,  // air mass flow rate, {kg/s}
+                                   Real64 const TDB2,      // dry-bulb temperature at state 2 {C}
+                                   Real64 const dW2,       // humidity ratio at  at state 2
+                                   Real64 const TDB1,      // dry-bulb temperature at  at state 1 {C}
+                                   Real64 const dW1,       // humidity ratio  at state 1
+                                   Real64 &TotalOutput,    // total = sensible + latent putput rate (state 2 -> State 1), {W}
+                                   Real64 &SensibleOutput, // sensible output rate (state 2 -> State 1), {W}
+                                   Real64 &LatentOutput    // latent output rate (state 2 -> State 1), {W}
+);
+
 } // namespace EnergyPlus
 
 #endif

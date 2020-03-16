@@ -2346,8 +2346,8 @@ namespace HVACMultiSpeedHeatPump {
             Real64 LatentOutputDelta(0.0);    // delta latent output rate
             Real64 TotalOutputDelta(0.0);     // delta total output rate 
             MassFlowRate = Node(ZoneInNode).MassFlowRate / MSHeatPump(MSHeatPumpNum).FlowFraction;
-            DXCoils::CalcTotalSensibleLatentOutput(MassFlowRate, Node(OutNode).Temp, Node(OutNode).HumRat, Node(ZoneInNode).Temp, Node(ZoneInNode).HumRat, TotalOutput, SensibleOutput, LatentOutput);
-            DXCoils::CalcTotalSensibleLatentOutput(DeltaMassRate, Node(OutNode).Temp, Node(OutNode).HumRat, Node(MSHeatPump(MSHeatPumpNum).NodeNumOfControlledZone).Temp, Node(MSHeatPump(MSHeatPumpNum).NodeNumOfControlledZone).HumRat, TotalOutputDelta, SensibleOutputDelta, LatentOutputDelta);
+            CalcTotalSensibleLatentOutput(MassFlowRate, Node(OutNode).Temp, Node(OutNode).HumRat, Node(ZoneInNode).Temp, Node(ZoneInNode).HumRat, TotalOutput, SensibleOutput, LatentOutput);
+            CalcTotalSensibleLatentOutput(DeltaMassRate, Node(OutNode).Temp, Node(OutNode).HumRat, Node(MSHeatPump(MSHeatPumpNum).NodeNumOfControlledZone).Temp, Node(MSHeatPump(MSHeatPumpNum).NodeNumOfControlledZone).HumRat, TotalOutputDelta, SensibleOutputDelta, LatentOutputDelta);
             MSHeatPump(MSHeatPumpNum).LoadLoss = SensibleOutput - SensibleOutputDelta;
             if (std::abs(MSHeatPump(MSHeatPumpNum).LoadLoss) < 1.0e-6) MSHeatPump(MSHeatPumpNum).LoadLoss = 0.0;
         }
@@ -3674,9 +3674,7 @@ namespace HVACMultiSpeedHeatPump {
 
         // calculate sensible load met 
         Real64 SensibleOutput(0.0);  // sensible output rate
-        Real64 LatentOutput(0.0);    // latent output rate
-        Real64 TotalOutput(0.0);     // total output rate 
-        DXCoils::CalcTotalSensibleLatentOutput(AirMassFlow, Node(OutletNode).Temp, Node(OutletNode).HumRat, Node(MSHeatPump(MSHeatPumpNum).NodeNumOfControlledZone).Temp, Node(MSHeatPump(MSHeatPumpNum).NodeNumOfControlledZone).HumRat, TotalOutput, SensibleOutput, LatentOutput);
+        SensibleOutput = AirMassFlow * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(Node(OutletNode).Temp, Node(OutletNode).HumRat, Node(MSHeatPump(MSHeatPumpNum).NodeNumOfControlledZone).Temp, Node(MSHeatPump(MSHeatPumpNum).NodeNumOfControlledZone).HumRat);
         LoadMet = SensibleOutput - MSHeatPump(MSHeatPumpNum).LoadLoss;
 
         MSHeatPump(MSHeatPumpNum).LoadMet = LoadMet;

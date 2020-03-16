@@ -16861,29 +16861,6 @@ namespace DXCoils {
         DXCoil(DXCoilNum).Twet_Rated(1) = 0.0;
     }
 
-    void CalcTotalSensibleLatentOutput(Real64 const MassFlow,  // air mass flow rate, {kg/s}
-        Real64 const TDB2,      // dry-bulb temperature at state 2 {C}
-        Real64 const dW2,       // humidity ratio at  at state 2
-        Real64 const TDB1,      // dry-bulb temperature at  at state 1 {C}
-        Real64 const dW1,       // humidity ratio  at state 1
-        Real64 &TotalOutput,    // total = sensible + latent putput rate (state 2 -> State 1), {W}
-        Real64 &SensibleOutput, // sensible output rate (state 2 -> State 1), {W}
-        Real64 &LatentOutput    // latent output rate (state 2 -> State 1), {W}
-
-    )
-    {
-        TotalOutput = 0.0;
-        LatentOutput = 0.0;
-        SensibleOutput = 0.0;
-        if (MassFlow > 0.0) {
-            TotalOutput = MassFlow * (Psychrometrics::PsyHFnTdbW(TDB2, dW2) - Psychrometrics::PsyHFnTdbW(TDB1, dW1));  // total addition/removal rate, {W};
-            SensibleOutput = MassFlow * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(TDB2, dW2, TDB1, dW1); // sensible addition/removal rate, {W};
-            //Real64 const h_fg_avg = Psychrometrics::PsyHfgAvgFnTdb2Tdb1(TDB2, TDB1); // average latent heat of vaporization, {J/kg};
-            if (SensibleOutput > TotalOutput) {SensibleOutput = TotalOutput;}; //  reset if sensible is higher than total, 
-            LatentOutput = TotalOutput - SensibleOutput; // latent addition/removal rate, {W}
-        }
-    }
-
     // Clears the global data in DXCoils.
     // Needed for unit tests, should not be normally called.
     void clear_state()
