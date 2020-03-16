@@ -5000,14 +5000,14 @@ namespace HeatBalanceManager {
 
     void ProcessZoneData(std::string const &cCurrentModuleObject,
                          int const ZoneLoop,
-                         Array1_string const &cAlphaArgs,
+                         Array1D_string const &cAlphaArgs,
                          int &NumAlphas,
-                         Array1<Real64> const &rNumericArgs,
+                         Array1D<Real64> const &rNumericArgs,
                          int &NumNumbers,
-                         Array1_bool const &EP_UNUSED(lNumericFieldBlanks), // Unused
-                         Array1_bool const &lAlphaFieldBlanks,
-                         Array1_string const &cAlphaFieldNames,
-                         Array1_string const &EP_UNUSED(cNumericFieldNames), // Unused
+                         Array1D_bool const &EP_UNUSED(lNumericFieldBlanks), // Unused
+                         Array1D_bool const &lAlphaFieldBlanks,
+                         Array1D_string const &cAlphaFieldNames,
+                         Array1D_string const &EP_UNUSED(cNumericFieldNames), // Unused
                          bool &ErrorsFound                                   // If errors found in input
     )
     {
