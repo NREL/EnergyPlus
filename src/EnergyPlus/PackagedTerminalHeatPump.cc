@@ -65,7 +65,7 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -5447,7 +5447,7 @@ namespace PackagedTerminalHeatPump {
         using General::TrimSigDigits;
         using HeatingCoils::SimulateHeatingCoilComponents;
         using PlantUtilities::SetComponentFlowRate;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using SteamCoils::SimulateSteamCoilComponents;
         using WaterCoils::SimulateWaterCoilComponents;
 
@@ -5709,7 +5709,7 @@ namespace PackagedTerminalHeatPump {
                 //     use the outlet conditions when the supplemental heater was off (CALL above) as the inlet conditions for the calculation
                 //     of supplemental heater load to just meet the maximum supply air temperature from the supplemental heater.
                 if (Node(PTUnit(PTUnitNum).AirOutNode).Temp < PTUnit(PTUnitNum).MaxSATSupHeat) {
-                    CpAir = PsyCpAirFnWTdb(Node(PTUnit(PTUnitNum).AirOutNode).HumRat, Node(PTUnit(PTUnitNum).AirOutNode).Temp);
+                    CpAir = PsyCpAirFnW(Node(PTUnit(PTUnitNum).AirOutNode).HumRat);
                     SupHeaterLoad = Node(PTUnit(PTUnitNum).AirInNode).MassFlowRate * CpAir *
                                     (PTUnit(PTUnitNum).MaxSATSupHeat - Node(PTUnit(PTUnitNum).AirOutNode).Temp);
 
@@ -5754,7 +5754,7 @@ namespace PackagedTerminalHeatPump {
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using MixedAir::SimOAMixer;
         using PlantUtilities::SetComponentFlowRate;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
         using SingleDuct::SimATMixer;
         using SteamCoils::SimulateSteamCoilComponents;
@@ -6385,8 +6385,8 @@ namespace PackagedTerminalHeatPump {
         }
     }
 
-    Real64 HotWaterCoilResidual(Real64 const HWFlow,      // hot water flow rate in kg/s
-                                Array1<Real64> const &Par // Par(5) is the requested coil load
+    Real64 HotWaterCoilResidual(Real64 const HWFlow,       // hot water flow rate in kg/s
+                                Array1D<Real64> const &Par // Par(5) is the requested coil load
     )
     {
 
@@ -6460,8 +6460,8 @@ namespace PackagedTerminalHeatPump {
         return Residuum;
     }
 
-    Real64 SupSATResidual(Real64 &TempSupHeater,    // supplemental heater load at maximum SAT
-                          Array1<Real64> const &Par // par(1) = PTUnitNum
+    Real64 SupSATResidual(Real64 &TempSupHeater,   // supplemental heater load at maximum SAT
+                          Array1D<Real64> const &Par // par(1) = PTUnitNum
     )
     {
         // FUNCTION INFORMATION:
@@ -6515,7 +6515,7 @@ namespace PackagedTerminalHeatPump {
     }
 
     Real64 PLRResidual(Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                       Array1<Real64> const &Par  // par(1) = PTUnitNum
+                       Array1D<Real64> const &Par // par(1) = PTUnitNum
     )
     {
         // FUNCTION INFORMATION:
@@ -7278,7 +7278,7 @@ namespace PackagedTerminalHeatPump {
         using General::TrimSigDigits;
         using HeatingCoils::SimulateHeatingCoilComponents;
         using PlantUtilities::SetComponentFlowRate;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using SteamCoils::SimulateSteamCoilComponents;
         using WaterCoils::SimulateWaterCoilComponents;
 
@@ -7650,7 +7650,7 @@ namespace PackagedTerminalHeatPump {
                 //     use the outlet conditions when the supplemental heater was off (CALL above) as the inlet conditions for the calculation
                 //     of supplemental heater load to just meet the maximum supply air temperature from the supplemental heater.
                 if (Node(PTUnit(PTUnitNum).AirOutNode).Temp < PTUnit(PTUnitNum).MaxSATSupHeat) {
-                    CpAir = PsyCpAirFnWTdb(Node(PTUnit(PTUnitNum).AirOutNode).HumRat, Node(PTUnit(PTUnitNum).AirOutNode).Temp);
+                    CpAir = PsyCpAirFnW(Node(PTUnit(PTUnitNum).AirOutNode).HumRat);
                     SupHeaterLoad = Node(PTUnit(PTUnitNum).AirInNode).MassFlowRate * CpAir *
                                     (PTUnit(PTUnitNum).MaxSATSupHeat - Node(PTUnit(PTUnitNum).AirOutNode).Temp);
 
@@ -7670,7 +7670,7 @@ namespace PackagedTerminalHeatPump {
     //******************************************************************************
 
     Real64 VSHPCyclingResidual(Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                               Array1<Real64> const &Par  // par(1) = FurnaceNum
+                               Array1D<Real64> const &Par // par(1) = FurnaceNum
     )
     {
         // FUNCTION INFORMATION:
@@ -7789,8 +7789,8 @@ namespace PackagedTerminalHeatPump {
 
     //******************************************************************************
 
-    Real64 VSHPSpeedResidual(Real64 const SpeedRatio,  // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                             Array1<Real64> const &Par // par(1) = MSHPNum
+    Real64 VSHPSpeedResidual(Real64 const SpeedRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+                             Array1D<Real64> const &Par // par(1) = MSHPNum
     )
     {
         // FUNCTION INFORMATION:
@@ -7946,7 +7946,7 @@ namespace PackagedTerminalHeatPump {
         using HVACHXAssistedCoolingCoil::SimHXAssistedCoolingCoil;
         using MixedAir::SimOAMixer;
         using PlantUtilities::SetComponentFlowRate;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
         using SingleDuct::SimATMixer;
         using SteamCoils::SimulateSteamCoilComponents;
@@ -8708,7 +8708,7 @@ namespace PackagedTerminalHeatPump {
     }
 
     Real64 CalcPTUnitWaterFlowResidual(Real64 const PartLoadRatio, // coil part load ratio
-                                       Array1<Real64> const &Par   // Function parameters
+                                       Array1D<Real64> const &Par  // Function parameters
     )
     {
 
@@ -8872,7 +8872,7 @@ namespace PackagedTerminalHeatPump {
     }
 
     Real64 CalcPTUnitAirAndWaterFlowResidual(Real64 const PartLoadRatio, // water and air part load ratio
-                                             Array1<Real64> const &Par   // Function parameters
+                                             Array1D<Real64> const &Par  // Function parameters
     )
     {
 

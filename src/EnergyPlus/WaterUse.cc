@@ -60,7 +60,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataWater.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
@@ -723,10 +723,10 @@ namespace WaterUse {
                                   "WaterUse:Equipment",
                                   this->Name,
                                   DataHeatBalance::IntGainTypeOf_WaterUseEquipment,
-                                  this->SensibleRateNoMultiplier,
-                                  _,
-                                  _,
-                                  this->LatentRateNoMultiplier);
+                                  &this->SensibleRateNoMultiplier,
+                                  nullptr,
+                                  nullptr,
+                                  &this->LatentRateNoMultiplier);
         }
     }
 

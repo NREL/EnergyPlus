@@ -49,7 +49,6 @@
 #define WaterCoils_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array2A.hh>
 #include <ObjexxFCL/Optional.hh>
 
@@ -333,7 +332,8 @@ namespace WaterCoils {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitWaterCoil(int const CoilNum,
+    void InitWaterCoil(OutputFiles &outputFiles,
+                       int const CoilNum,
                        bool const FirstHVACIteration // unused1208
     );
 
@@ -472,20 +472,20 @@ namespace WaterCoils {
     // Beginning of Coil Utility subroutines for the Detailed Model
     // *****************************************************************************
 
-    void CalcDryFinEffCoef(Real64 const OutTubeEffFinDiamRatio, Array1<Real64> &PolynomCoef);
+    void CalcDryFinEffCoef(Real64 const OutTubeEffFinDiamRatio, Array1D<Real64> &PolynomCoef);
 
     void CalcIBesselFunc(Real64 const BessFuncArg, int const BessFuncOrd, Real64 &IBessFunc, int &ErrorCode);
 
     void CalcKBesselFunc(Real64 const BessFuncArg, int const BessFuncOrd, Real64 &KBessFunc, int &ErrorCode);
 
-    void CalcPolynomCoef(Array2<Real64> const &OrderedPair, Array1<Real64> &PolynomCoef);
+    void CalcPolynomCoef(Array2<Real64> const &OrderedPair, Array1D<Real64> &PolynomCoef);
 
-    Real64 SimpleHeatingCoilUAResidual(Real64 const UA,          // UA of coil
-                                       Array1<Real64> const &Par // par(1) = design coil load [W]
+    Real64 SimpleHeatingCoilUAResidual(Real64 const UA,           // UA of coil
+                                       Array1D<Real64> const &Par // par(1) = design coil load [W]
     );
 
-    Real64 SimpleCoolingCoilUAResidual(Real64 const UA,          // UA of coil
-                                       Array1<Real64> const &Par // par(1) = design coil load [W]
+    Real64 SimpleCoolingCoilUAResidual(Real64 const UA,           // UA of coil
+                                       Array1D<Real64> const &Par // par(1) = design coil load [W]
     );
 
     // Iterate Routine for Cooling Coil
@@ -557,8 +557,8 @@ namespace WaterCoils {
                       Real64 const PB  // barometric pressure {Pascals}
     );
 
-    Real64 EnthalpyResidual(Real64 const Tprov,       // test value of Tdb [C]
-                            Array1<Real64> const &Par // Par(1) = desired enthaply H [J/kg]
+    Real64 EnthalpyResidual(Real64 const Tprov,        // test value of Tdb [C]
+                            Array1D<Real64> const &Par // Par(1) = desired enthaply H [J/kg]
     );
 
     Real64 EstimateHEXSurfaceArea(int const CoilNum); // coil number, [-]

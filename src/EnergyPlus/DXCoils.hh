@@ -59,6 +59,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class OutputFiles;
 
 namespace DXCoils {
 
@@ -88,7 +89,7 @@ namespace DXCoils {
     extern Real64 const RatedOutdoorWetBulbTempHeat; // 6.11 C or 43F
     extern Real64 const RatedInletWetBulbTempHeat;   // 15.55 or 60F
 
-    extern Real64 const DryCoilOutletHumRatioMin; // dry coil outlet minimum hum ratio kgH2O/kgdry air
+    extern Real64 const DryCoilOutletHumRatioMin; // dry coil outlet minimum hum ratio kgWater/kgDryAir
 
     // Curve Types
     extern int const Linear;
@@ -753,12 +754,12 @@ namespace DXCoils {
 
     void ReportDXCoil(int const DXCoilNum); // number of the current fan coil unit being simulated
 
-    void CalcTwoSpeedDXCoilStandardRating(int const DXCoilNum);
+    void CalcTwoSpeedDXCoilStandardRating(OutputFiles &outputFiles, int const DXCoilNum);
 
     void GetFanIndexForTwoSpeedCoil(int const CoolingCoilIndex, int &SupplyFanIndex, std::string &SupplyFanName, int &SupplyFan_TypeNum);
 
     Real64 CalcTwoSpeedDXCoilIEERResidual(Real64 const SupplyAirMassFlowRate, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                          Array1<Real64> const &Par           // par(1) = DX coil number
+                                          Array1D<Real64> const &Par          // par(1) = DX coil number
     );
 
     // ======================  Utility routines ======================================
@@ -804,6 +805,14 @@ namespace DXCoils {
     int GetCoilOutletNode(std::string const &CoilType, // must match coil types in this module
                           std::string const &CoilName, // must match coil names for the coil type
                           bool &ErrorsFound            // set to true if problem
+    );
+
+    int getCoilInNodeIndex(int const &CoilIndex,       // coil index
+                           bool &ErrorsFound           // set to true if problem
+    );
+
+    int getCoilOutNodeIndex(int const &CoilIndex,      // coil index
+                            bool &ErrorsFound          // set to true if problem
     );
 
     int GetCoilCondenserInletNode(std::string const &CoilType, // must match coil types in this module
@@ -953,12 +962,12 @@ namespace DXCoils {
                               Real64 &CapModFac               // Coil capacity modification factor
     );
 
-    Real64 FanSpdResidualCool(Real64 const FanSpdRto,   // indoor unit fan speed ratio
-                              Array1<Real64> const &Par // array of parameters
+    Real64 FanSpdResidualCool(Real64 const FanSpdRto,    // indoor unit fan speed ratio
+                              Array1D<Real64> const &Par // array of parameters
     );
 
-    Real64 FanSpdResidualHeat(Real64 FanSpdRto,         // indoor unit fan speed ratio
-                              Array1<Real64> const &Par // array of parameters
+    Real64 FanSpdResidualHeat(Real64 FanSpdRto,          // indoor unit fan speed ratio
+                              Array1D<Real64> const &Par // array of parameters
     );
     // End of Methods for New VRF Model: Fluid Temperature Control
     // *****************************************************************************

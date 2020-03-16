@@ -28,6 +28,9 @@ kiva-ep/appveyor.yml
 kiva-ep/ChangeLog.md
 kiva-ep/README.md
 
+# submodules
+penumbra/.gitmodules
+
 # unused btwxt repo directories/files
 btwxt/vendor/googletest
 btwxt/.gitmodules

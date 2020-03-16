@@ -158,7 +158,7 @@ namespace NodeInputManager {
 
     void GetNodeNums(std::string const &Name,                  // Name for which to obtain information
                      int &NumNodes,                            // Number of nodes accompanying this Name
-                     Array1S_int NodeNumbers,                  // Node Numbers accompanying this Name
+                     Array1D_int &NodeNumbers,                 // Node Numbers accompanying this Name
                      bool &ErrorsFound,                        // True when errors are found...
                      int const NodeFluidType,                  // Fluidtype for checking/setting node FluidType
                      std::string const &NodeObjectType,        // Node Object Type (i.e. "Chiller:Electric")
@@ -335,7 +335,8 @@ namespace NodeInputManager {
         static ObjexxFCL::gio::Fmt Format_700("('! #Nodes,<Number of Unique Nodes>')");
         static ObjexxFCL::gio::Fmt Format_701("(A)");
         static ObjexxFCL::gio::Fmt Format_702("('! <Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>')");
-        static ObjexxFCL::gio::Fmt Format_703("('! <Suspicious Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>')");
+        static ObjexxFCL::gio::Fmt Format_703(
+            "('! <Suspicious Node>,<NodeNumber>,<Node Name>,<Node Fluid Type>,<# Times Node Referenced After Definition>')");
         static ObjexxFCL::gio::Fmt fmtLD("*");
 
         if (!NodeVarsSetup) {
@@ -547,7 +548,8 @@ namespace NodeInputManager {
             // Show suspicious node names on the Branch-Node Details file
             if (Count0 > 0) {
                 ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "! ===============================================================";
-                ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "! Suspicious nodes have 0 references.  It is normal for some nodes, however.";
+                ObjexxFCL::gio::write(OutputFileBNDetails, Format_701)
+                    << "! Suspicious nodes have 0 references.  It is normal for some nodes, however.";
                 ObjexxFCL::gio::write(OutputFileBNDetails, Format_701) << "! Listing nodes with 0 references (culled from previous list):";
                 ObjexxFCL::gio::write(OutputFileBNDetails, Format_703);
                 for (NumNode = 1; NumNode <= NumOfUniqueNodeNames; ++NumNode) {
@@ -564,7 +566,7 @@ namespace NodeInputManager {
         }
     }
 
-    void GetNodeListsInput(bool &ErrorsFound)       // Set to true when requested Node List not found, unchanged otherwise
+    void GetNodeListsInput(bool &ErrorsFound) // Set to true when requested Node List not found, unchanged otherwise
     {
 
         // SUBROUTINE INFORMATION:
@@ -1151,7 +1153,7 @@ namespace NodeInputManager {
         using OutputProcessor::ReqReportVariables;
         using OutputProcessor::ReqRepVars;
         using Psychrometrics::CPCW;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHFnTdbW;
         using Psychrometrics::PsyRhFnTdbWPb;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -1312,7 +1314,7 @@ namespace NodeInputManager {
                     MoreNodeInfo(iNode).RelHumidity = 0.0;
                 }
                 if (ReportSpecificHeat) { // only call psych routine if needed.
-                    MoreNodeInfo(iNode).SpecificHeat = PsyCpAirFnWTdb(Node(iNode).HumRat, Node(iNode).Temp);
+                    MoreNodeInfo(iNode).SpecificHeat = PsyCpAirFnW(Node(iNode).HumRat);
                 } else {
                     MoreNodeInfo(iNode).SpecificHeat = 0.0;
                 }
@@ -1366,7 +1368,7 @@ namespace NodeInputManager {
                         MoreNodeInfo(iNode).WetBulbTemp = 0.0;
                     }
                     if (ReportSpecificHeat) {
-                        MoreNodeInfo(iNode).SpecificHeat = PsyCpAirFnWTdb(Node(iNode).HumRat, Node(iNode).Temp);
+                        MoreNodeInfo(iNode).SpecificHeat = PsyCpAirFnW(Node(iNode).HumRat);
                     } else {
                         MoreNodeInfo(iNode).SpecificHeat = 0.0;
                     }

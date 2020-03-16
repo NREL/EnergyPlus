@@ -131,7 +131,7 @@ namespace Fans {
     using DataHVACGlobals::TurnFansOn; // cpw22Aug2010 Added FanType_ComponentModel
     using DataHVACGlobals::UnbalExhMassFlow;
     using EMSManager::ManageEMS;
-    using Psychrometrics::PsyCpAirFnWTdb;
+    using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
     using Psychrometrics::PsyTdbFnHW;
     using namespace ScheduleManager;
@@ -2057,7 +2057,7 @@ namespace Fans {
             // This fan does not change the moisture or Mass Flow across the component
             Fan(FanNum).OutletAirHumRat = Fan(FanNum).InletAirHumRat;
             Fan(FanNum).OutletAirMassFlowRate = MassFlow;
-            //   Fan(FanNum)%OutletAirTemp = Tin + PowerLossToAir/(MassFlow*PsyCpAirFnWTdb(Win,Tin))
+            //   Fan(FanNum)%OutletAirTemp = Tin + PowerLossToAir/(MassFlow*PsyCpAirFnW(Win,Tin))
             Fan(FanNum).OutletAirTemp = PsyTdbFnHW(Fan(FanNum).OutletAirEnthalpy, Fan(FanNum).OutletAirHumRat);
         } else {
             // Fan is off and not operating no power consumed and mass flow rate.
@@ -2874,6 +2874,29 @@ namespace Fans {
         return NodeNumber;
     }
 
+    int getFanInNodeIndex(int const &FanIndex, // fan index
+                          bool &ErrorsFound    // set to true if problem
+    )
+    {
+
+        int NodeNumber = 0; // returned outlet node of matched fan
+
+        // Obtains and Allocates fan related parameters from input file
+        if (GetFanInputFlag) { // First time subroutine has been entered
+            GetFanInput();
+            GetFanInputFlag = false;
+        }
+
+        if (FanIndex != 0) {
+            NodeNumber = Fan(FanIndex).InletNodeNum;
+        } else {
+            ShowSevereError("getFanInNodeIndex: Could not find Fan");
+            ErrorsFound = true;
+        }
+
+        return NodeNumber;
+    }
+
     int GetFanOutletNode(std::string const &FanType, // must match fan types in this module
                          std::string const &FanName, // must match fan names for the fan type
                          bool &ErrorsFound           // set to true if problem
@@ -3117,7 +3140,7 @@ namespace Fans {
             MotEff = Fan(FanNum).MotEff;
             MotInAirFrac = Fan(FanNum).MotInAirFrac;
             RhoAir = StdRhoAir;
-            CpAir = PsyCpAirFnWTdb(constant_zero, constant_twenty);
+            CpAir = PsyCpAirFnW(constant_zero);
             DesignDeltaT = (DeltaP / (RhoAir * CpAir * TotEff)) * (MotEff + MotInAirFrac * (1.0 - MotEff));
         } else {
             DesignDeltaT = 0.0;

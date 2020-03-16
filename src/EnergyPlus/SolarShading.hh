@@ -52,9 +52,13 @@
 #include <fstream>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Array3D.hh>
+
+// Penumbra Headers
+#ifndef EP_NO_OPENGL
+#include <penumbra/penumbra.h>
+#endif
 
 // EnergyPlus Headers
 #include <EnergyPlus/DataBSDFWindow.hh>
@@ -167,6 +171,11 @@ namespace SolarShading {
     extern int maxNumberOfFigures;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE SolarShading
+#ifdef EP_NO_OPENGL
+    extern bool penumbra;
+#else
+    extern std::unique_ptr<Pumbra::Penumbra> penumbra;
+#endif
 
     // Types
 
@@ -193,7 +202,7 @@ namespace SolarShading {
 
     void InitSolarCalculations();
 
-    void GetShadowingInput();
+    void GetShadowingInput(OutputFiles &outputFiles);
 
     void AllocateModuleArrays();
 
@@ -214,23 +223,23 @@ namespace SolarShading {
                 int const SBSNR  // Surface number of subsurface
     );
 
-    bool polygon_contains_point(int const nsides,           // number of sides (vertices)
-                                Array1A<Vector> polygon_3d, // points of polygon
-                                Vector const &point_3d,     // point to be tested
+    bool polygon_contains_point(int const nsides,            // number of sides (vertices)
+                                Array1D<Vector> &polygon_3d, // points of polygon
+                                Vector const &point_3d,      // point to be tested
                                 bool const ignorex,
                                 bool const ignorey,
                                 bool const ignorez);
 
     void ComputeIntSolarAbsorpFactors();
 
-    void CLIP(int const NVT, Array1<Real64> &XVT, Array1<Real64> &YVT, Array1<Real64> &ZVT);
+    void CLIP(int const NVT, Array1D<Real64> &XVT, Array1D<Real64> &YVT, Array1D<Real64> &ZVT);
 
-    void CTRANS(int const NS,        // Surface number whose vertex coordinates are being transformed
-                int const NGRS,      // Base surface number for surface NS
-                int &NVT,            // Number of vertices for surface NS
-                Array1<Real64> &XVT, // XYZ coordinates of vertices of NS in plane of NGRS
-                Array1<Real64> &YVT,
-                Array1<Real64> &ZVT);
+    void CTRANS(int const NS,         // Surface number whose vertex coordinates are being transformed
+                int const NGRS,       // Base surface number for surface NS
+                int &NVT,             // Number of vertices for surface NS
+                Array1D<Real64> &XVT, // XYZ coordinates of vertices of NS in plane of NGRS
+                Array1D<Real64> &YVT,
+                Array1D<Real64> &ZVT);
 
     void HTRANS(int const I,          // Mode selector: 0 - Compute H.C. of sides
                 int const NS,         // Figure Number

@@ -49,7 +49,6 @@
 #define SurfaceGeometry_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array1S.hh>
 
 // EnergyPlus Headers
@@ -114,18 +113,18 @@ namespace SurfaceGeometry {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void SetupZoneGeometry(bool &ErrorsFound);
+    void SetupZoneGeometry(OutputFiles &outputFiles, bool &ErrorsFound);
 
     void AllocateModuleArrays();
 
-    void GetSurfaceData(bool &ErrorsFound); // If errors found in input
+    void GetSurfaceData(OutputFiles &outputFiles, bool &ErrorsFound); // If errors found in input
 
     void checkSubSurfAzTiltNorm(SurfaceData &baseSurface, // Base surface data (in)
                                 SurfaceData &subSurface,  // Subsurface data (in)
                                 bool &surfaceError        // True if there is subsurface error that requires a fatal
     );
 
-    void GetGeometryParameters(bool &ErrorsFound); // set to true if errors found during input
+    void GetGeometryParameters(OutputFiles &outputFiles, bool &ErrorsFound); // set to true if errors found during input
 
     void GetDetShdSurfaceData(bool &ErrorsFound,          // Error flag indicator (true if errors found)
                               int &SurfNum,               // Count of Current SurfaceNumber
@@ -139,14 +138,15 @@ namespace SurfaceGeometry {
                                   int const TotRectDetachedBldg   // Number of Building Detached Shading Surfaces to obtain
     );
 
-    void GetHTSurfaceData(bool &ErrorsFound,                // Error flag indicator (true if errors found)
+    void GetHTSurfaceData(OutputFiles &outputFiles,
+                          bool &ErrorsFound,                // Error flag indicator (true if errors found)
                           int &SurfNum,                     // Count of Current SurfaceNumber
                           int const TotHTSurfs,             // Number of Heat Transfer Base Surfaces to obtain
                           int const TotDetailedWalls,       // Number of Wall:Detailed items to obtain
                           int const TotDetailedRoofs,       // Number of RoofCeiling:Detailed items to obtain
                           int const TotDetailedFloors,      // Number of Floor:Detailed items to obtain
-                          Array1S_string const BaseSurfCls, // Valid Classes for Base Surfaces
-                          Array1S_int const BaseSurfIDs,
+                          const Array1D_string &BaseSurfCls, // Valid Classes for Base Surfaces
+                          const Array1D_int &BaseSurfIDs,
                           int &NeedToAddSurfaces // Number of surfaces to add, based on unentered IZ surfaces
     );
 
@@ -162,7 +162,7 @@ namespace SurfaceGeometry {
                          int const TotRectGCFloors,     // Number of Floors with Ground Contact to obtain
                          int const TotRectIntFloors,    // Number of Adiabatic Walls to obtain
                          int const TotRectIZFloors,     // Number of Interzone Floors to obtain
-                         Array1S_int const BaseSurfIDs, // ID Assignments for valid surface classes
+                         const Array1D_int &BaseSurfIDs, // ID Assignments for valid surface classes
                          int &NeedToAddSurfaces         // Number of surfaces to add, based on unentered IZ surfaces
     );
 
@@ -177,8 +177,8 @@ namespace SurfaceGeometry {
     void GetHTSubSurfaceData(bool &ErrorsFound,               // Error flag indicator (true if errors found)
                              int &SurfNum,                    // Count of Current SurfaceNumber
                              int const TotHTSubs,             // Number of Heat Transfer SubSurfaces to obtain
-                             Array1S_string const SubSurfCls, // Valid Classes for Sub Surfaces
-                             Array1S_int const SubSurfIDs,    // ID Assignments for valid sub surface classes
+                             const Array1D_string &SubSurfCls, // Valid Classes for Sub Surfaces
+                             const Array1D_int &SubSurfIDs,    // ID Assignments for valid sub surface classes
                              int &AddedSubSurfaces,           // Subsurfaces added when windows reference Window5
                              int &NeedToAddSurfaces           // Number of surfaces to add, based on unentered IZ surfaces
     );
@@ -191,7 +191,7 @@ namespace SurfaceGeometry {
                             int const TotIZWindows,       // Number of Interzone Window SubSurfaces to obtain
                             int const TotIZDoors,         // Number of Interzone Door SubSurfaces to obtain
                             int const TotIZGlazedDoors,   // Number of Interzone Glass Door SubSurfaces to obtain
-                            Array1S_int const SubSurfIDs, // ID Assignments for valid sub surface classes
+                            const Array1D_int &SubSurfIDs, // ID Assignments for valid sub surface classes
                             int &AddedSubSurfaces,        // Subsurfaces added when windows reference Window5
                             int &NeedToAddSubSurfaces     // Number of surfaces to add, based on unentered IZ surfaces
     );
@@ -239,7 +239,7 @@ namespace SurfaceGeometry {
 
     int GetNumIntMassSurfaces(); // Number of Internal Mass Surfaces to obtain
 
-    void GetShadingSurfReflectanceData(bool &ErrorsFound); // If errors found in input
+    void GetShadingSurfReflectanceData(OutputFiles &outputFiles, bool &ErrorsFound); // If errors found in input
 
     void GetSurfaceSrdSurfsData(bool &ErrorsFound); // Error flag indicator (true if errors found)
 
@@ -247,7 +247,7 @@ namespace SurfaceGeometry {
 
     void GetHTSurfExtVentedCavityData(bool &ErrorsFound); // Error flag indicator (true if errors found)
 
-    void GetSurfaceHeatTransferAlgorithmOverrides(bool &ErrorsFound);
+    void GetSurfaceHeatTransferAlgorithmOverrides(OutputFiles &outputFiles, bool &ErrorsFound);
 
     class ExposedFoundationPerimeter
     {
@@ -287,15 +287,15 @@ namespace SurfaceGeometry {
 
     void GetWindowGapAirflowControlData(bool &ErrorsFound); // If errors found in input
 
-    void GetOSCData(bool &ErrorsFound);
+    void GetOSCData(OutputFiles &outputFiles, bool &ErrorsFound);
 
-    void GetOSCMData(bool &ErrorsFound);
+    void GetOSCMData(OutputFiles &outputFiles, bool &ErrorsFound);
 
     void GetFoundationData(bool &ErrorsFound);
 
     void GetMovableInsulationData(bool &ErrorsFound); // If errors found in input
 
-    void CalculateZoneVolume(Array1S_bool const CeilingHeightEntered);
+    void CalculateZoneVolume(const Array1D_bool &CeilingHeightEntered);
 
     struct EdgeOfSurf
     {

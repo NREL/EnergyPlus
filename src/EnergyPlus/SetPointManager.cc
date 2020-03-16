@@ -61,7 +61,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -151,7 +151,7 @@ namespace SetPointManager {
     using namespace CurveManager;
 
     // USE STATEMENTS
-    using Psychrometrics::PsyCpAirFnWTdb;
+    using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyHFnTdbW;
 
     // Data
@@ -3859,7 +3859,8 @@ namespace SetPointManager {
                             }
                         }
                         if (!found) {
-                            ShowSevereError(cSetPointManagerType + "=\"" + SingZoneHtSetPtMgr(SetPtMgrNum).Name + "\", The zone inlet node of " + NodeID(SingZoneHtSetPtMgr(SetPtMgrNum).ZoneInletNodeNum));
+                            ShowSevereError(cSetPointManagerType + "=\"" + SingZoneHtSetPtMgr(SetPtMgrNum).Name + "\", The zone inlet node of " +
+                                            NodeID(SingZoneHtSetPtMgr(SetPtMgrNum).ZoneInletNodeNum));
                             ShowContinueError("is not found in Zone = " + ZoneEquipConfig(ConZoneNum).ZoneName + ". Please check inputs.");
                             ErrorsFound = true;
                         }
@@ -3890,7 +3891,8 @@ namespace SetPointManager {
                             }
                         }
                         if (!found) {
-                            ShowSevereError(cSetPointManagerType + "=\"" + SingZoneClSetPtMgr(SetPtMgrNum).Name + "\", The zone inlet node of " + NodeID(SingZoneClSetPtMgr(SetPtMgrNum).ZoneInletNodeNum));
+                            ShowSevereError(cSetPointManagerType + "=\"" + SingZoneClSetPtMgr(SetPtMgrNum).Name + "\", The zone inlet node of " +
+                                            NodeID(SingZoneClSetPtMgr(SetPtMgrNum).ZoneInletNodeNum));
                             ShowContinueError("is not found in Zone = " + ZoneEquipConfig(ConZoneNum).ZoneName + ". Please check inputs.");
                             ErrorsFound = true;
                         }
@@ -4001,12 +4003,14 @@ namespace SetPointManager {
                             }
                         }
                         if (!found) {
-                            ShowSevereError(cSetPointManagerType + "=\"" + SingZoneRhSetPtMgr(SetPtMgrNum).Name + "\", The zone inlet node of "+NodeID(SingZoneRhSetPtMgr(SetPtMgrNum).ZoneInletNodeNum));
-                            ShowContinueError("is not found in Zone = " + ZoneEquipConfig(ConZoneNum).ZoneName +". Please check inputs.");
+                            ShowSevereError(cSetPointManagerType + "=\"" + SingZoneRhSetPtMgr(SetPtMgrNum).Name + "\", The zone inlet node of " +
+                                            NodeID(SingZoneRhSetPtMgr(SetPtMgrNum).ZoneInletNodeNum));
+                            ShowContinueError("is not found in Zone = " + ZoneEquipConfig(ConZoneNum).ZoneName + ". Please check inputs.");
                             ErrorsFound = true;
                         }
                         if (AirLoopNum == 0) {
-                            ShowSevereError(cSetPointManagerType + "=\"" + SingZoneRhSetPtMgr(SetPtMgrNum).Name + "\", The zone inlet node is not connected to an air loop.");
+                            ShowSevereError(cSetPointManagerType + "=\"" + SingZoneRhSetPtMgr(SetPtMgrNum).Name +
+                                            "\", The zone inlet node is not connected to an air loop.");
                             ErrorsFound = true;
                             continue;
                         }
@@ -5505,7 +5509,7 @@ namespace SetPointManager {
             FanDeltaT = 0.0;
         }
         TSupNoHC = TMixAtMinOA + FanDeltaT;
-        CpAir = PsyCpAirFnWTdb(Node(ZoneInletNode).HumRat, Node(ZoneInletNode).Temp);
+        CpAir = PsyCpAirFnW(Node(ZoneInletNode).HumRat);
         ExtrRateNoHC = CpAir * ZoneMassFlow * (TSupNoHC - ZoneTemp);
         if (ZoneMassFlow <= SmallMassFlow) {
             TSetPt = TSupNoHC;
@@ -5598,7 +5602,7 @@ namespace SetPointManager {
         if (ZoneMassFlow <= SmallMassFlow) {
             this->SetPt = this->MinSetTemp;
         } else {
-            CpAir = PsyCpAirFnWTdb(Node(ZoneInletNode).HumRat, Node(ZoneInletNode).Temp);
+            CpAir = PsyCpAirFnW(Node(ZoneInletNode).HumRat);
             this->SetPt = ZoneTemp + ZoneLoadtoHeatSP / (CpAir * ZoneMassFlow);
             this->SetPt = max(this->SetPt, this->MinSetTemp);
             this->SetPt = min(this->SetPt, this->MaxSetTemp);
@@ -5640,7 +5644,7 @@ namespace SetPointManager {
         if (ZoneMassFlow <= SmallMassFlow) {
             this->SetPt = this->MaxSetTemp;
         } else {
-            CpAir = PsyCpAirFnWTdb(Node(ZoneInletNode).HumRat, Node(ZoneInletNode).Temp);
+            CpAir = PsyCpAirFnW(Node(ZoneInletNode).HumRat);
             this->SetPt = ZoneTemp + ZoneLoadtoCoolSP / (CpAir * ZoneMassFlow);
             this->SetPt = max(this->SetPt, this->MinSetTemp);
             this->SetPt = min(this->SetPt, this->MaxSetTemp);
@@ -6161,7 +6165,7 @@ namespace SetPointManager {
             ZoneSetPointTemp = this->MaxSetTemp;
             if (ZoneLoad < 0.0) {
                 TotCoolLoad += std::abs(ZoneLoad);
-                CpAir = PsyCpAirFnWTdb(Node(ZoneInletNode).HumRat, Node(ZoneInletNode).Temp);
+                CpAir = PsyCpAirFnW(Node(ZoneInletNode).HumRat);
                 if (ZoneMassFlowMax > SmallMassFlow) {
                     ZoneSetPointTemp = ZoneTemp + ZoneLoad / (CpAir * ZoneMassFlowMax);
                 }
@@ -6244,7 +6248,7 @@ namespace SetPointManager {
                 ZoneSetPointTemp = this->MinSetTemp;
                 if (ZoneLoad > 0.0) {
                     TotHeatLoad += ZoneLoad;
-                    CpAir = PsyCpAirFnWTdb(Node(ZoneInletNode).HumRat, Node(ZoneInletNode).Temp);
+                    CpAir = PsyCpAirFnW(Node(ZoneInletNode).HumRat);
                     if (ZoneMassFlowMax > SmallMassFlow) {
                         ZoneSetPointTemp = ZoneTemp + ZoneLoad / (CpAir * ZoneMassFlowMax);
                     }
@@ -6264,7 +6268,7 @@ namespace SetPointManager {
                 ZoneSetPointTemp = this->MinSetTemp;
                 if (ZoneLoad > 0.0) {
                     TotHeatLoad += ZoneLoad;
-                    CpAir = PsyCpAirFnWTdb(Node(ZoneInletNode).HumRat, Node(ZoneInletNode).Temp);
+                    CpAir = PsyCpAirFnW(Node(ZoneInletNode).HumRat);
                     if (ZoneMassFlowMax > SmallMassFlow) {
                         ZoneSetPointTemp = ZoneTemp + ZoneLoad / (CpAir * ZoneMassFlowMax);
                     }
@@ -6365,7 +6369,7 @@ namespace SetPointManager {
             ZoneFracFlow = MinFracFlow;
             if (ZoneLoad < 0.0) {
                 TotCoolLoad += std::abs(ZoneLoad);
-                CpAir = PsyCpAirFnWTdb(Node(ZoneInletNode).HumRat, Node(ZoneInletNode).Temp);
+                CpAir = PsyCpAirFnW(Node(ZoneInletNode).HumRat);
                 if (ZoneMassFlowMax > SmallMassFlow) {
                     if (ControlStrategy == TempFirst) {
                         // First find supply air temperature required to meet the load at minimum flow. If this is
@@ -6565,11 +6569,11 @@ namespace SetPointManager {
             ZoneMassFlowRate = Node(ZoneInletNode).MassFlowRate;
             ZoneLoad = ZoneSysEnergyDemand(CtrlZoneNum).TotalOutputRequired;
             ZoneTemp = Node(ZoneNode).Temp;
-            CpAir = PsyCpAirFnWTdb(Node(ZoneNode).HumRat, ZoneTemp);
+            CpAir = PsyCpAirFnW(Node(ZoneNode).HumRat);
             SumProductMdotCpTot += ZoneMassFlowRate * CpAir;
             SumProductMdotCpTZoneTot += ZoneMassFlowRate * CpAir * ZoneTemp;
             if (ZoneLoad > 0.0) {
-                CpAir = PsyCpAirFnWTdb(Node(ZoneInletNode).HumRat, Node(ZoneInletNode).Temp);
+                CpAir = PsyCpAirFnW(Node(ZoneInletNode).HumRat);
                 SumHeatLoad += ZoneLoad;
                 SumProductMdotCp += ZoneMassFlowRate * CpAir;
             }
@@ -6655,11 +6659,11 @@ namespace SetPointManager {
             ZoneMassFlowRate = Node(ZoneInletNode).MassFlowRate;
             ZoneLoad = ZoneSysEnergyDemand(CtrlZoneNum).TotalOutputRequired;
             ZoneTemp = Node(ZoneNode).Temp;
-            CpAir = PsyCpAirFnWTdb(Node(ZoneNode).HumRat, ZoneTemp);
+            CpAir = PsyCpAirFnW(Node(ZoneNode).HumRat);
             SumProductMdotCpTot += ZoneMassFlowRate * CpAir;
             SumProductMdotCpTZoneTot += ZoneMassFlowRate * CpAir * ZoneTemp;
             if (ZoneLoad < 0.0) {
-                CpAir = PsyCpAirFnWTdb(Node(ZoneInletNode).HumRat, Node(ZoneInletNode).Temp);
+                CpAir = PsyCpAirFnW(Node(ZoneInletNode).HumRat);
                 SumCoolLoad += ZoneLoad;
                 SumProductMdotCp += ZoneMassFlowRate * CpAir;
             }
@@ -6712,14 +6716,14 @@ namespace SetPointManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 MoistureLoad;         // zone's moisture load predicted to the setpoint [kgH20/s]
+        Real64 MoistureLoad;         // zone's moisture load predicted to the setpoint [kgWater/s]
         Real64 ZoneMassFlowRate;     // zone inlet node actual mass flow rate lagged by system one time step[kg/s]
         int AirLoopNum;              // the index of the air loop served by this setpoint manager
         Real64 SumMoistureLoad;      // sum of the zone moisture loads for this air loop [W]
         Real64 SumMdot;              // sum of the actual mass flow rate for controlled zones in the air loop [kg/s]
         Real64 SumMdotTot;           // sum of the actual mass flow rate for this air loop [kg/s]
         Real64 SumProductMdotHumTot; // sum of product of actual mass flow rate at the zone inlet node,
-        // and humidity ratio at zones air node for all zones in the airloop [kgH20/s]
+        // and humidity ratio at zones air node for all zones in the airloop [kgWater/s]
         Real64 AverageZoneHum; // multizone average zone air node humidity ratio of all zones in the air loop [kg/kg]
         int ZonesCooledIndex;  // DO loop index for zones cooled by the air loop
         int CtrlZoneNum;       // the controlled zone index
@@ -6795,14 +6799,14 @@ namespace SetPointManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Real64 MoistureLoad;         // zone's moisture load predicted to the setpoint [kgH20/s]
+        Real64 MoistureLoad;         // zone's moisture load predicted to the setpoint [kgWater/s]
         Real64 ZoneMassFlowRate;     // zone inlet node actual mass flow rate lagged by system one time step[kg/s]
         int AirLoopNum;              // the index of the air loop served by this setpoint manager
         Real64 SumMoistureLoad;      // sum of the zone moisture loads for this air loop [W]
         Real64 SumMdot;              // sum of the actual mass flow rate for controlled zones in the air loop [kg/s]
         Real64 SumMdotTot;           // sum of the actual mass flow rate for this air loop [kg/s]
         Real64 SumProductMdotHumTot; // sum of product of actual mass flow rate at the zone inlet node,
-        // and humidity ratio at zones air node for all zones in the airloop [kgH20/s]
+        // and humidity ratio at zones air node for all zones in the airloop [kgWater/s]
         Real64 AverageZoneHum; // multizone average zone air node humidity ratio of all zones in the air loop [kg/kg]
         int ZonesCooledIndex;  // DO loop index for zones cooled by the air loop
         int CtrlZoneNum;       // the controlled zone index
@@ -6873,7 +6877,7 @@ namespace SetPointManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const SmallMoistureLoad(0.00001); // small moisture load [kgH2O/s]
+        Real64 const SmallMoistureLoad(0.00001); // small moisture load [kgWater/s]
 
         // INTERFACE BLOCK SPECIFICATIONS
 
@@ -6889,7 +6893,7 @@ namespace SetPointManager {
         Real64 ZoneHum;              // zone air node humidity ratio [kg/kg]
         Real64 SetPointHum;          // system setpoint humidity ratio [kg/kg]
         Real64 ZoneSetPointHum;      // Zone setpoint humidity ratio [kg/kg]
-        Real64 MoistureLoad;         // zone's moisture load predicted to the setpoint [kgH20/s]
+        Real64 MoistureLoad;         // zone's moisture load predicted to the setpoint [kgWater/s]
         Real64 ZoneMassFlowRate;     // zone inlet node actual supply air mass flow rate [kg/s]
         Real64 SumMoistureLoad(0.0); // sum of the zone moisture loads for this air loop [W]
 
@@ -6952,7 +6956,7 @@ namespace SetPointManager {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        Real64 const SmallMoistureLoad(0.00001); // small moisture load [kgH2O/s]
+        Real64 const SmallMoistureLoad(0.00001); // small moisture load [kgWater/s]
 
         // INTERFACE BLOCK SPECIFICATIONS
 
@@ -6968,7 +6972,7 @@ namespace SetPointManager {
         Real64 ZoneHum;              // zone air node humidity ratio [kg/kg]
         Real64 SetPointHum;          // system setpoint humidity ratio [kg/kg]
         Real64 ZoneSetPointHum;      // Zone setpoint humidity ratio [kg/kg]
-        Real64 MoistureLoad;         // zone's moisture load predicted to the setpoint [kgH20/s]
+        Real64 MoistureLoad;         // zone's moisture load predicted to the setpoint [kgWater/s]
         Real64 ZoneMassFlowRate;     // zone inlet node actual supply air mass flow rate [kg/s]
         Real64 SumMoistureLoad(0.0); // sum of the zone moisture loads for this air loop [W]
 
@@ -7300,7 +7304,7 @@ namespace SetPointManager {
                     PlantLoop(LoopIndexPlantSide).LoopSide(SupplySide).Branch(BranchIndexPlantSide).Comp(ChillerIndexPlantSide).TempDesEvapOut;
                 DCESPMDesignClgCapacity_Watts =
                     PlantLoop(LoopIndexPlantSide).LoopSide(SupplySide).Branch(BranchIndexPlantSide).Comp(ChillerIndexPlantSide).MaxLoad;
-                DCESPMCurrentLoad_Watts = PlantReport(LoopIndexPlantSide).CoolingDemand;
+                DCESPMCurrentLoad_Watts = PlantLoop(LoopIndexPlantSide).CoolingDemand;
             } else if (TypeNum == TypeOf_Chiller_Indirect_Absorption || TypeNum == TypeOf_Chiller_DFAbsorption) {
                 TempDesCondIn =
                     PlantLoop(LoopIndexPlantSide).LoopSide(SupplySide).Branch(BranchIndexPlantSide).Comp(ChillerIndexPlantSide).TempDesCondIn;
@@ -7788,14 +7792,14 @@ namespace SetPointManager {
         std::string TypeOfComp;
         std::string NameOfComp;
 
-        Array1D_int VarIndexes;                     // Variable Numbers
-        Array1D_int VarTypes;                       // Variable Types (1=integer, 2=real, 3=meter)
-        Array1D<OutputProcessor::TimeStepType> IndexTypes;                     // Variable Index Types (1=Zone,2=HVAC)
-        Array1D<OutputProcessor::Unit> unitsForVar; // units from enum for each variable
-        Array1D_int ResourceTypes;                  // ResourceTypes for each variable
-        Array1D_string EndUses;                     // EndUses for each variable
-        Array1D_string Groups;                      // Groups for each variable
-        Array1D_string Names;                       // Variable Names for each variable
+        Array1D_int VarIndexes;                            // Variable Numbers
+        Array1D_int VarTypes;                              // Variable Types (1=integer, 2=real, 3=meter)
+        Array1D<OutputProcessor::TimeStepType> IndexTypes; // Variable Index Types (1=Zone,2=HVAC)
+        Array1D<OutputProcessor::Unit> unitsForVar;        // units from enum for each variable
+        Array1D_int ResourceTypes;                         // ResourceTypes for each variable
+        Array1D_string EndUses;                            // EndUses for each variable
+        Array1D_string Groups;                             // Groups for each variable
+        Array1D_string Names;                              // Variable Names for each variable
         int NumVariables;
         int NumFound;
 
@@ -8459,7 +8463,8 @@ namespace SetPointManager {
         }
     }
 
-    int getSPMBasedOnNode(int const NodeNum, int const SetPtType, int const SPMType, CtrlNodeType ctrlOrRefNode) {
+    int getSPMBasedOnNode(int const NodeNum, int const SetPtType, int const SPMType, CtrlNodeType ctrlOrRefNode)
+    {
 
         if (GetInputFlag) {
             GetSetPointManagerInputs();
@@ -8472,21 +8477,21 @@ namespace SetPointManager {
             if (SetPtType == AllSetPtMgr(SetPtMgrNum).CtrlTypeMode) { // SetPtType is e.g., iCtrlVarType_Temp, iCtrlVarType_HumRat, etc.
                 switch (ctrlOrRefNode) { // ctrlOrRefNode is enum type of node to look for, either control node or reference node
                 case CtrlNodeType::control: {
-                        for (int NumNode = 1; NumNode <= AllSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++NumNode) {
-                            // SPMType is type of set point manager, e.g., iSPMType_Scheduled, iSPMType_MixedAir, etc.
-                            if (NodeNum == AllSetPtMgr(SetPtMgrNum).CtrlNodes(NumNode) && SPMType == AllSetPtMgr(SetPtMgrNum).SPMType) {
-                                getSPMBasedOnNode = AllSetPtMgr(SetPtMgrNum).SPMIndex; // SPMIndex is index to specific type of SPM
-                                break;
-                            }
+                    for (int NumNode = 1; NumNode <= AllSetPtMgr(SetPtMgrNum).NumCtrlNodes; ++NumNode) {
+                        // SPMType is type of set point manager, e.g., iSPMType_Scheduled, iSPMType_MixedAir, etc.
+                        if (NodeNum == AllSetPtMgr(SetPtMgrNum).CtrlNodes(NumNode) && SPMType == AllSetPtMgr(SetPtMgrNum).SPMType) {
+                            getSPMBasedOnNode = AllSetPtMgr(SetPtMgrNum).SPMIndex; // SPMIndex is index to specific type of SPM
+                            break;
                         }
-                        break;
+                    }
+                    break;
                 }
                 case CtrlNodeType::reference: {
-                        // SPMType is type of set point manager, e.g., iSPMType_Scheduled, iSPMType_MixedAir, etc.
-                        if (NodeNum == AllSetPtMgr(SetPtMgrNum).RefNode && SPMType == AllSetPtMgr(SetPtMgrNum).SPMType) {
-                            getSPMBasedOnNode = AllSetPtMgr(SetPtMgrNum).SPMIndex; // SPMIndex is index to specific type of SPM
-                        }
-                        break;
+                    // SPMType is type of set point manager, e.g., iSPMType_Scheduled, iSPMType_MixedAir, etc.
+                    if (NodeNum == AllSetPtMgr(SetPtMgrNum).RefNode && SPMType == AllSetPtMgr(SetPtMgrNum).SPMType) {
+                        getSPMBasedOnNode = AllSetPtMgr(SetPtMgrNum).SPMIndex; // SPMIndex is index to specific type of SPM
+                    }
+                    break;
                 }
                 }
             }

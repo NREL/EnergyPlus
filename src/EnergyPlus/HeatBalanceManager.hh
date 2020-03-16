@@ -56,6 +56,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class OutputFiles;
 
 namespace HeatBalanceManager {
 
@@ -140,7 +141,7 @@ namespace HeatBalanceManager {
     // Needed for unit tests, should not be normally called.
     void clear_state();
 
-    void ManageHeatBalance();
+    void ManageHeatBalance(OutputFiles &outputFiles);
 
     // Get Input Section of the Module
     //******************************************************************************
@@ -153,11 +154,11 @@ namespace HeatBalanceManager {
 
     void SetPreConstructionInputParameters();
 
-    void GetProjectControlData(bool &ErrorsFound); // Set to true if errors detected during getting data
+    void GetProjectControlData(OutputFiles &outputFiles, bool &ErrorsFound); // Set to true if errors detected during getting data
 
-    void GetSiteAtmosphereData(bool &ErrorsFound);
+    void GetSiteAtmosphereData(EnergyPlus::OutputFiles &outputFiles, bool &ErrorsFound);
 
-    void GetMaterialData(bool &ErrorsFound); // set to true if errors found in input
+    void GetMaterialData(OutputFiles &outputFiles, bool &ErrorsFound); // set to true if errors found in input
 
     void GetWindowGlassSpectralData(bool &ErrorsFound); // set to true if errors found in input
 
@@ -176,14 +177,14 @@ namespace HeatBalanceManager {
 
     void ProcessZoneData(std::string const &cCurrentModuleObject,
                          int const ZoneLoop,
-                         Array1_string const &cAlphaArgs,
+                         Array1D_string const &cAlphaArgs,
                          int &NumAlphas,
-                         Array1<Real64> const &rNumericArgs,
+                         Array1D<Real64> const &rNumericArgs,
                          int &NumNumbers,
-                         Array1_bool const &lNumericFieldBlanks, // Unused
-                         Array1_bool const &lAlphaFieldBlanks,
-                         Array1_string const &cAlphaFieldNames,
-                         Array1_string const &cNumericFieldNames, // Unused
+                         Array1D_bool const &lNumericFieldBlanks, // Unused
+                         Array1D_bool const &lAlphaFieldBlanks,
+                         Array1D_string const &cAlphaFieldNames,
+                         Array1D_string const &cNumericFieldNames, // Unused
                          bool &ErrorsFound                        // If errors found in input
     );
 
@@ -203,11 +204,11 @@ namespace HeatBalanceManager {
     // Beginning of Record Keeping subroutines for the HB Module
     // *****************************************************************************
 
-    void RecKeepHeatBalance();
+    void RecKeepHeatBalance(OutputFiles &outputFiles);
 
     void CheckWarmupConvergence();
 
-    void ReportWarmupConvergence();
+    void ReportWarmupConvergence(OutputFiles &outputFiles);
     
     void UpdateWindowFaceTempsNonBSDFWin();
 
@@ -217,7 +218,7 @@ namespace HeatBalanceManager {
     // Beginning of Reporting subroutines for the HB Module
     // *****************************************************************************
 
-    void ReportHeatBalance();
+    void ReportHeatBalance(OutputFiles &outputFiles);
 
     //        End of Reporting subroutines for the HB Module
 

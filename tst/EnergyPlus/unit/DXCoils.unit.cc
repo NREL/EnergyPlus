@@ -65,6 +65,7 @@
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ScheduleManager.hh>
@@ -217,10 +218,10 @@ TEST_F(EnergyPlusFixture, DXCoils_Test1)
     SizeDXCoil(2);
     EXPECT_DOUBLE_EQ(5000.0, DXCoil(2).DefrostCapacity);
 
-    EXPECT_TRUE(has_cerr_output());
+    EXPECT_TRUE(has_eio_output());
 
     // fails on windows due to endline issue... this outputs /r/n on Windows but it is outputting /n on Windows for some reason...
-    // EXPECT_TRUE( compare_cerr_stream( delimited_string( {
+    // EXPECT_TRUE( compare_eio_stream( delimited_string( {
     // 	"! <DX Heating Coil Standard Rating Information>, Component Type, Component Name, High Temperature Heating (net) Rating Capacity {W}, Low
     // Temperature Heating (net) Rating Capacity {W}, HSPF {Btu/W-h}, Region Number", 	" DX Heating Coil Standard Rating Information, , DX Heating
     // coil, 6414.3, 6414.3, 6.58, 4" } ) ) );
@@ -372,9 +373,9 @@ TEST_F(EnergyPlusFixture, DXCoils_Test2)
     SizeDXCoil(2);
     EXPECT_DOUBLE_EQ(0.0, DXCoil(2).RatedTotCap(1));
 
-    EXPECT_TRUE(has_cerr_output());
+    EXPECT_TRUE(has_eio_output());
 
-    // EXPECT_TRUE( compare_cerr_stream( delimited_string( {
+    // EXPECT_TRUE( compare_eio_stream( delimited_string( {
     // 	"! <Component Sizing Information>, Component Type, Component Name, Input Field Description, Value",
     // 	" Component Sizing Information, Coil:Heating:DX:SingleSpeed, DX Heating coil, Design Size  [W], 0.00000",
     // 	" Component Sizing Information, Coil:Heating:DX:SingleSpeed, DX Heating coil, User-Specified  [W], 5000.00000",
@@ -1076,7 +1077,7 @@ TEST_F(EnergyPlusFixture, DXCoilEvapCondPumpSizingTest)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     GetCurveInput();
     GetDXCoils();
 
@@ -1458,7 +1459,7 @@ TEST_F(EnergyPlusFixture, DXCoil_ValidateADPFunction)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     GetCurveInput();
     GetDXCoils();
     SetPredefinedTables();
@@ -1788,7 +1789,7 @@ TEST_F(EnergyPlusFixture, BlankDefrostEIRCurveInput)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     GetCurveInput();
     GetDXCoils();
 
@@ -1855,7 +1856,7 @@ TEST_F(EnergyPlusFixture, CurveOutputLimitWarning)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     GetCurveInput();
     GetDXCoils();
 
@@ -1962,7 +1963,7 @@ TEST_F(EnergyPlusFixture, CoilHeatingDXSingleSpeed_MinOADBTempCompOperLimit)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     GetDXCoils();
 
     ASSERT_EQ("HEATING COIL SINGLESPEED", DXCoil(1).Name); // Heating Coil Single Speed
@@ -2073,7 +2074,7 @@ TEST_F(EnergyPlusFixture, CoilCoolingDXTwoSpeed_MinOADBTempCompOperLimit)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
     GetDXCoils();
 
     ASSERT_EQ("MAIN COOLING COIL 1", DXCoil(1).Name); // Cooling Coil Two Speed
@@ -2196,7 +2197,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_TwoSpeed)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ScheduleManager::ProcessScheduleInput();
+    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
     DXCoils::GetDXCoils();
     EXPECT_EQ(1, DXCoils::NumDXCoils);
 
@@ -2418,7 +2419,7 @@ TEST_F(SQLiteFixture, DXCoils_TestComponentSizingOutput_SingleSpeed)
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ScheduleManager::ProcessScheduleInput();
+    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton());
     DXCoils::GetDXCoils();
     EXPECT_EQ(1, DXCoils::NumDXCoils);
 
@@ -3814,17 +3815,17 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
     EXPECT_EQ(31899.037804634620, DXCoil(1).MSRatedTotCap(2));
     EXPECT_EQ(31899.037804634620 * 0.5, DXCoil(1).MSRatedTotCap(1));
     // Design SHR at speed 2 and speed 1
-    EXPECT_EQ(0.76488154417788068, DXCoil(1).MSRatedSHR(2));
-    EXPECT_EQ(0.76488154417788068, DXCoil(1).MSRatedSHR(1));
+    EXPECT_NEAR(0.80088, DXCoil(1).MSRatedSHR(2), 0.00001);
+    EXPECT_NEAR(0.80088, DXCoil(1).MSRatedSHR(1), 0.00001);
 
     // test SHR design size when partial autosizing (capacity is hardsized)
-    DXCoil( 1 ).MSRatedTotCap( 1 ) = 17500.0; // DataSizing::AutoSize;
-    DXCoil( 1 ).MSRatedTotCap( 2 ) = 35000.0; // DataSizing::AutoSize;
+    DXCoil(1).MSRatedTotCap(1) = 17500.0; // DataSizing::AutoSize;
+    DXCoil(1).MSRatedTotCap(2) = 35000.0; // DataSizing::AutoSize;
 
     SizeDXCoil(1);
     // Design size SHR at speed 2 and speed 1
-    EXPECT_EQ(0.76488154417788068, DXCoil(1).MSRatedSHR(2));
-    EXPECT_EQ(0.76488154417788068, DXCoil(1).MSRatedSHR(1));
+    EXPECT_NEAR(0.80088, DXCoil(1).MSRatedSHR(2), 0.00001);
+    EXPECT_NEAR(0.80088, DXCoil(1).MSRatedSHR(1), 0.00001);
     // Design Capacity at speed 2 and speed 1
     EXPECT_EQ(31899.037804634620, DXCoil(1).MSRatedTotCapDes(2));
     EXPECT_EQ(35000.0, DXCoil(1).MSRatedTotCap(2));
@@ -3833,4 +3834,141 @@ TEST_F(EnergyPlusFixture, TestMultiSpeedCoolingCoilPartialAutoSizeOutput)
     EXPECT_EQ(1.75, DXCoil(1).MSRatedAirVolFlowRate(2));
     EXPECT_EQ(0.875, DXCoil(1).MSRatedAirVolFlowRate(1));
 }
+
+TEST_F(EnergyPlusFixture, DXCoils_GetDXCoilCapFTCurveIndexTest)
+{
+    using CurveManager::BiQuadratic;
+    using CurveManager::NumCurves;
+    using CurveManager::Quadratic;
+    int DXCoilNum;
+    int CurveNum;
+
+    NumDXCoils = 2;
+    DXCoil.allocate(NumDXCoils);
+    DXCoil(1).DXCoilType_Num = CoilDX_MultiSpeedCooling;
+    DXCoil(1).DXCoilType = "Coil:Cooling:DX:MultiSpeed";
+    DXCoil(2).DXCoilType_Num = CoilDX_MultiSpeedHeating;
+    DXCoil(2).DXCoilType = "Coil:Heating:DX:MultiSpeed";
+
+
+    for (DXCoilNum = 1; DXCoilNum <= 2; ++DXCoilNum) {
+        DXCoil(DXCoilNum).NumOfSpeeds = 2;
+        DXCoil(DXCoilNum).MSRatedTotCap.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
+        DXCoil(DXCoilNum).MSCCapFTemp.allocate(DXCoil(DXCoilNum).NumOfSpeeds);
+    }
+
+    NumCurves = 4;
+    PerfCurve.allocate(NumCurves);
+
+    CurveNum = 1;
+    PerfCurve(CurveNum).Name = "HP_Cool-Cap-fT-SP1";
+    PerfCurve(CurveNum).CurveType = BiQuadratic;
+    PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
+    PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+    PerfCurve(CurveNum).Coeff1 = 1.658788451;
+    PerfCurve(CurveNum).Coeff2 = -0.0834530076;
+    PerfCurve(CurveNum).Coeff3 = 0.00342409032;
+    PerfCurve(CurveNum).Coeff4 = 0.0024332436;
+    PerfCurve(CurveNum).Coeff5 = -4.5036e-005;
+    PerfCurve(CurveNum).Coeff6 = -0.00053367984;
+    PerfCurve(CurveNum).Var1Min = 13.88;
+    PerfCurve(CurveNum).Var1Max = 23.88;
+    PerfCurve(CurveNum).Var2Min = 18.33;
+    PerfCurve(CurveNum).Var2Max = 51.66;
+
+    CurveNum = 2;
+    PerfCurve(CurveNum).Name = "HP_Cool-Cap-fT-SP2";
+    PerfCurve(CurveNum).CurveType = BiQuadratic;
+    PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
+    PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+    PerfCurve(CurveNum).Coeff1 = 1.472738138;
+    PerfCurve(CurveNum).Coeff2 = -0.0672218352;
+    PerfCurve(CurveNum).Coeff3 = 0.0029199042;
+    PerfCurve(CurveNum).Coeff4 = 5.16005999999982e-005;
+    PerfCurve(CurveNum).Coeff5 = -2.97756e-005;
+    PerfCurve(CurveNum).Coeff6 = -0.00035908596;
+    PerfCurve(CurveNum).Var1Min = 13.88;
+    PerfCurve(CurveNum).Var1Max = 23.88;
+    PerfCurve(CurveNum).Var2Min = 18.33;
+    PerfCurve(CurveNum).Var2Max = 51.66;
+
+    CurveNum = 3;
+    PerfCurve(CurveNum).Name = "HP_Heat-Cap-fT-SP1";
+    PerfCurve(CurveNum).CurveType = BiQuadratic;
+    PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
+    PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+    PerfCurve(CurveNum).Coeff1 = 0.84077409;
+    PerfCurve(CurveNum).Coeff2 = -0.0014336586;
+    PerfCurve(CurveNum).Coeff3 = -0.000150336;
+    PerfCurve(CurveNum).Coeff4 = 0.029628603;
+    PerfCurve(CurveNum).Coeff5 = 0.000161676;
+    PerfCurve(CurveNum).Coeff6 = -2.349e-005;
+    PerfCurve(CurveNum).Var1Min = -100.0;
+    PerfCurve(CurveNum).Var1Max = 100.0;
+    PerfCurve(CurveNum).Var2Min = -100.0;
+    PerfCurve(CurveNum).Var2Max = 100.0;
+
+    CurveNum = 4;
+    PerfCurve(CurveNum).Name = "HP_Heat-Cap-fT-SP2";
+    PerfCurve(CurveNum).CurveType = BiQuadratic;
+    PerfCurve(CurveNum).ObjectType = "Curve:Biquadratic";
+    PerfCurve(CurveNum).InterpolationType = EvaluateCurveToLimits;
+    PerfCurve(CurveNum).Coeff1 = 0.831506971;
+    PerfCurve(CurveNum).Coeff2 = 0.0018392166;
+    PerfCurve(CurveNum).Coeff3 = -0.000187596;
+    PerfCurve(CurveNum).Coeff4 = 0.0266002056;
+    PerfCurve(CurveNum).Coeff5 = 0.000191484;
+    PerfCurve(CurveNum).Coeff6 = -6.5772e-005;
+    PerfCurve(CurveNum).Var1Min = -100.0;
+    PerfCurve(CurveNum).Var1Max = 100.0;
+    PerfCurve(CurveNum).Var2Min = -100.0;
+    PerfCurve(CurveNum).Var2Max = 100.0;
+
+    DXCoil(1).MSCCapFTemp(1) = 1;
+    DXCoil(1).MSCCapFTemp(2) = 2;
+
+    DXCoilNum = 2;
+    DXCoil(DXCoilNum).MSCCapFTemp(1) = 3;
+    DXCoil(DXCoilNum).MSCCapFTemp(2) = 4;
+
+    bool ErrorsFound;
+    int DataTotCapCurveIndex = 0;
+
+    DXCoils::GetCoilsInputFlag = false;
+
+    // dx cooling coil 
+    int CoilIndex = 1;
+    EXPECT_EQ(DXCoil(CoilIndex).DXCoilType, "Coil:Cooling:DX:MultiSpeed");
+    DataTotCapCurveIndex = DXCoils::GetDXCoilCapFTCurveIndex( CoilIndex, ErrorsFound );
+    EXPECT_EQ(2, DataTotCapCurveIndex);
+    // evaluate dx cooling coil curves to show impacts of incorrect curve index
+    Real64 TotCapTempModFac_lowestSpeed = CurveValue(1, 19.4, 30.0);
+    Real64 TotCapTempModFac_designSpeed = CurveValue(DataTotCapCurveIndex, 19.4, 30.0);
+    EXPECT_DOUBLE_EQ(1.0503539775151995, TotCapTempModFac_lowestSpeed);
+    EXPECT_DOUBLE_EQ(1.0333316291120003, TotCapTempModFac_designSpeed);
+    // apply dx cooling coil capacity curve correction
+    Real64 PeakCoilCoolingLoad = 10000.0;
+    Real64 NominalCoolingDesignCapacity_lowestSpeed = PeakCoilCoolingLoad / TotCapTempModFac_lowestSpeed;
+    Real64 NominalCoolingDesignCapacity_designSpeed = PeakCoilCoolingLoad / TotCapTempModFac_designSpeed;
+    EXPECT_DOUBLE_EQ(9520.5999254239905, NominalCoolingDesignCapacity_lowestSpeed);
+    EXPECT_DOUBLE_EQ(9677.4353153145621, NominalCoolingDesignCapacity_designSpeed);
+
+    // dx heating coil 
+    CoilIndex = 2;
+    EXPECT_EQ(DXCoil(CoilIndex).DXCoilType, "Coil:Heating:DX:MultiSpeed");
+    DataTotCapCurveIndex = DXCoils::GetDXCoilCapFTCurveIndex( CoilIndex, ErrorsFound );
+    EXPECT_EQ(4, DataTotCapCurveIndex);
+    // evaluate dx heating coil curves to show impacts of incorrect curve index
+    TotCapTempModFac_lowestSpeed = CurveValue(3, 5.0, 10.0);
+    TotCapTempModFac_designSpeed = CurveValue(DataTotCapCurveIndex, 5.0, 10.0);
+    EXPECT_DOUBLE_EQ(1.1411265269999999, TotCapTempModFac_lowestSpeed);
+    EXPECT_DOUBLE_EQ(1.1178750099999999, TotCapTempModFac_designSpeed);
+    // apply dx heating coil capacity curve correction
+    Real64 PeakCoilHeatingLoad = 10000.0;
+    Real64 NominalHeatingDesignCapacity_lowestSpeed = PeakCoilHeatingLoad / TotCapTempModFac_lowestSpeed;
+    Real64 NominalHeatingDesignCapacity_designSpeed = PeakCoilHeatingLoad / TotCapTempModFac_designSpeed;
+    EXPECT_DOUBLE_EQ(8763.2701224550547, NominalHeatingDesignCapacity_lowestSpeed);
+    EXPECT_DOUBLE_EQ(8945.5439208717980, NominalHeatingDesignCapacity_designSpeed);
+}
+
 } // namespace EnergyPlus

@@ -207,7 +207,7 @@ namespace DataHeatBalance {
 
     // Parameters for WarmupDays
     int const DefaultMaxNumberOfWarmupDays(25); // Default maximum number of warmup days allowed
-    int const DefaultMinNumberOfWarmupDays(6);  // Default minimum number of warmup days allowed
+    int const DefaultMinNumberOfWarmupDays(1);  // Default minimum number of warmup days allowed
 
     // Parameters for Sky Radiance Distribution
     int const Isotropic(0);
@@ -500,11 +500,12 @@ namespace DataHeatBalance {
     bool AnyAirBoundaryGroupedSolar(false); // Construction:AirBoundary with GroupedZones for solar used somewhere
 
     int MaxNumberOfWarmupDays(25);      // Maximum number of warmup days allowed
-    int MinNumberOfWarmupDays(6);       // Minimum number of warmup days allowed
+    int MinNumberOfWarmupDays(1);       // Minimum number of warmup days allowed
     Real64 CondFDRelaxFactor(1.0);      // Relaxation factor, for looping across all the surfaces.
     Real64 CondFDRelaxFactorInput(1.0); // Relaxation factor, for looping across all the surfaces, user input value
 
     int ZoneAirSolutionAlgo(Use3rdOrder);      // ThirdOrderBackwardDifference, AnalyticalSolution, and EulerMethod
+    bool OverrideZoneAirSolutionAlgo(false);   // Do not override the zone air solution algorithm in PerformancePrecisionTradeoffs
     Real64 BuildingRotationAppendixG(0.0);     // Building Rotation for Appendix G
     Real64 ZoneTotalExfiltrationHeatLoss(0.0); // Building total heat emission through zone exfiltration;
     Real64 ZoneTotalExhaustHeatLoss(0.0);      // Building total heat emission through zone air exhaust;
@@ -598,6 +599,8 @@ namespace DataHeatBalance {
     Array1D<Real64> SNLoadPredictedHSPRate; // Predicted load to heating setpoint (unmultiplied)
     Array1D<Real64> SNLoadPredictedCSPRate; // Predicted load to cooling setpoint (unmultiplied)
     Array1D<Real64> MoisturePredictedRate;
+    Array1D<Real64> MoisturePredictedHumSPRate;   // Predicted latent load to humidification setpoint (unmultiplied)
+    Array1D<Real64> MoisturePredictedDehumSPRate; // Predicted latent load to dehumidification setpoint (unmultiplied)
 
     Array1D<Real64> ListSNLoadHeatEnergy;
     Array1D<Real64> ListSNLoadCoolEnergy;
@@ -778,7 +781,7 @@ namespace DataHeatBalance {
     Array1D<Real64> const
         GasSpecificHeatRatio(10, {1.4, 1.67, 1.68, 1.66, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}); // Gas specific heat ratios.  Used for gasses in low pressure
 
-    Real64 ZeroPointerVal(0.0);
+    Real64 zeroPointerVal(0.0);
 
     int NumAirBoundaryMixing(0);                   // Number of air boundary simple mixing objects needed
     std::vector<int> AirBoundaryMixingZone1(0);    // Air boundary simple mixing zone 1
@@ -872,7 +875,7 @@ namespace DataHeatBalance {
         AnyAirBoundary = false;
         AnyAirBoundaryGroupedSolar = false;
         MaxNumberOfWarmupDays = 25;
-        MinNumberOfWarmupDays = 6;
+        MinNumberOfWarmupDays = 1;
         CondFDRelaxFactor = 1.0;
         CondFDRelaxFactorInput = 1.0;
         ZoneAirSolutionAlgo = Use3rdOrder;
@@ -959,6 +962,8 @@ namespace DataHeatBalance {
         SNLoadPredictedHSPRate.deallocate();
         SNLoadPredictedCSPRate.deallocate();
         MoisturePredictedRate.deallocate();
+        MoisturePredictedHumSPRate.deallocate();
+        MoisturePredictedDehumSPRate.deallocate();
         ListSNLoadHeatEnergy.deallocate();
         ListSNLoadCoolEnergy.deallocate();
         ListSNLoadHeatRate.deallocate();
@@ -1059,7 +1064,6 @@ namespace DataHeatBalance {
         CosIncAng.deallocate();
         BackSurfaces.deallocate();
         OverlapAreas.deallocate();
-        ZeroPointerVal = 0.0;
         ZonePreDefRep.deallocate();
         BuildingPreDefRep = ZonePreDefRepType();
         ZoneIntGain.deallocate();
@@ -1114,6 +1118,7 @@ namespace DataHeatBalance {
         MassConservation.deallocate();
         ZoneLocalEnvironment.deallocate();
         ZoneAirMassFlow = ZoneAirMassFlowConservation();
+        zeroPointerVal = 0;
     }
 
     void ZoneData::SetOutBulbTempAt()

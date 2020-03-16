@@ -693,7 +693,7 @@ namespace OutputReportTabular {
 
     bool warningAboutKeyNotFound(int foundIndex, int inObjIndex, std::string const &moduleName);
 
-    void GetInputTabularStyle();
+    void GetInputTabularStyle(OutputFiles &outputFiles);
 
     int SetUnitsStyleFromString(std::string const &unitStringIn);
 
@@ -791,7 +791,7 @@ namespace OutputReportTabular {
 
     void WriteSurfaceShadowing();
 
-    void WriteEioTables();
+    void WriteEioTables(OutputFiles &outputFiles);
 
     int unitsFromHeading(std::string &heading);
 
@@ -803,7 +803,7 @@ namespace OutputReportTabular {
 
     void DeallocateLoadComponentArrays();
 
-    void ComputeLoadComponentDecayCurve();
+    void ComputeLoadComponentDecayCurve(OutputFiles &outputFiles);
 
     void GatherComponentLoadsSurface();
 
@@ -870,9 +870,9 @@ namespace OutputReportTabular {
     void WriteTextLine(std::string const &lineOfText, Optional_bool_const isBold = _);
 
     void WriteTable(Array2S_string const body, // row,column
-                    Array1S_string const rowLabels,
-                    Array1S_string const columnLabels,
-                    Array1S_int widthColumn,
+                    const Array1D_string &rowLabels,
+                    const Array1D_string &columnLabels,
+                    Array1D_int &widthColumn,
                     Optional_bool_const transposeXML = _,
                     Optional_string_const footnoteText = _);
 
@@ -889,6 +889,10 @@ namespace OutputReportTabular {
     std::string ConvertToEscaped(std::string const &inString); // Input String
 
     void DetermineBuildingFloorArea();
+
+    /* Tables with Subcategories in particular have a blank for rowHead for display in the HTML output.
+     * This routine will fill up the blanks for output to Sql in particular */
+    void FillRowHead(Array1D_string & rowHead);
 
     //======================================================================================================================
     //======================================================================================================================

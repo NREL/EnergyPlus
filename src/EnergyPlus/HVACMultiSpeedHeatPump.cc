@@ -65,7 +65,7 @@
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneControls.hh>
@@ -848,7 +848,7 @@ namespace HVACMultiSpeedHeatPump {
                     LocalError = false;
                 }
                 MSHeatPump(MSHPNum).MinOATCompressorHeating = DXCoils::GetMinOATCompressorUsingIndex(MSHeatPump(MSHPNum).DXHeatCoilIndex, LocalError);
-                if ( LocalError ) {
+                if (LocalError) {
                     ShowContinueError("...for heating coil. Occurs in " + CurrentModuleObject + " \"" + Alphas(1) + "\"");
                     LocalError = false;
                 }
@@ -1039,7 +1039,7 @@ namespace HVACMultiSpeedHeatPump {
                 ErrorsFound = true;
             }
 
-            //MSHeatPump(MSHPNum).MinOATCompressor = Numbers(1); // deprecated, now uses coil MinOAT inputs
+            // MSHeatPump(MSHPNum).MinOATCompressor = Numbers(1); // deprecated, now uses coil MinOAT inputs
 
             if (UtilityRoutines::SameString(Alphas(12), "Coil:Cooling:DX:MultiSpeed")) {
                 MSHeatPump(MSHPNum).CoolCoilType = MultiSpeedCoolingCoil;
@@ -2850,7 +2850,7 @@ namespace HVACMultiSpeedHeatPump {
         using General::SolveRoot;
         using General::TrimSigDigits;
         using HeatingCoils::SimulateHeatingCoilComponents;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3301,8 +3301,7 @@ namespace HVACMultiSpeedHeatPump {
             //   use the outlet conditions when the supplemental heater was off (CALL above) as the inlet conditions for the calculation
             //   of supplemental heater load to just meet the maximum supply air temperature from the supplemental heater.
             if (Node(MSHeatPump(MSHeatPumpNum).AirOutletNodeNum).Temp < MSHeatPump(MSHeatPumpNum).SuppMaxAirTemp) {
-                CpAir =
-                    PsyCpAirFnWTdb(Node(MSHeatPump(MSHeatPumpNum).AirOutletNodeNum).HumRat, Node(MSHeatPump(MSHeatPumpNum).AirOutletNodeNum).Temp);
+                CpAir = PsyCpAirFnW(Node(MSHeatPump(MSHeatPumpNum).AirOutletNodeNum).HumRat);
                 SupHeaterLoad = Node(MSHeatPump(MSHeatPumpNum).AirInletNodeNum).MassFlowRate * CpAir *
                                 (MSHeatPump(MSHeatPumpNum).SuppMaxAirTemp - Node(MSHeatPump(MSHeatPumpNum).AirOutletNodeNum).Temp);
 
@@ -3682,7 +3681,7 @@ namespace HVACMultiSpeedHeatPump {
     //******************************************************************************
 
     Real64 MSHPCyclingResidual(Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                               Array1<Real64> const &Par  // par(1) = MSHPNum
+                               Array1D<Real64> const &Par // par(1) = MSHPNum
     )
     {
         // FUNCTION INFORMATION:
@@ -3758,8 +3757,8 @@ namespace HVACMultiSpeedHeatPump {
 
     //******************************************************************************
 
-    Real64 MSHPVarSpeedResidual(Real64 const SpeedRatio,  // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                Array1<Real64> const &Par // par(1) = MSHPNum
+    Real64 MSHPVarSpeedResidual(Real64 const SpeedRatio,   // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+                                Array1D<Real64> const &Par // par(1) = MSHPNum
     )
     {
         // FUNCTION INFORMATION:
@@ -4356,8 +4355,8 @@ namespace HVACMultiSpeedHeatPump {
         HeatCoilLoadmet = QCoilActual;
     }
 
-    Real64 HotWaterCoilResidual(Real64 const HWFlow,      // hot water flow rate in kg/s
-                                Array1<Real64> const &Par // Par(5) is the requested coil load
+    Real64 HotWaterCoilResidual(Real64 const HWFlow,       // hot water flow rate in kg/s
+                                Array1D<Real64> const &Par // Par(5) is the requested coil load
     )
     {
 

@@ -66,12 +66,12 @@
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
-#include <ObjexxFCL/Optional.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/ReportSizingManager.hh>
 #include <EnergyPlus/ScheduleManager.hh>
+#include <ObjexxFCL/Optional.hh>
 
 namespace EnergyPlus {
 
@@ -84,10 +84,9 @@ namespace HVACFan {
         fanObjs.clear();
     }
 
-    int getFanObjectVectorIndex(      // lookup vector index for fan object name in object array EnergyPlus::HVACFan::fanObjs
+    int getFanObjectVectorIndex(       // lookup vector index for fan object name in object array EnergyPlus::HVACFan::fanObjs
         std::string const &objectName, // IDF name in input
-        bool const ErrorCheck
-    )
+        bool const ErrorCheck)
     {
         int index = -1;
         bool found = false;
@@ -356,8 +355,8 @@ namespace HVACFan {
     FanSystem::FanSystem( // constructor
         std::string const &objectName)
         : availSchedIndex(0), inletNodeNum(0), outletNodeNum(0), designAirVolFlowRate(0.0), speedControl(SpeedControlMethod::NotSet), deltaPress(0.0),
-          designElecPower(0.0), powerModFuncFlowFractionCurveIndex(0), AirLoopNum(0), AirPathFlag(false), fanIsSecondaryDriver(false), m_fanType_Num(0),
-          m_designAirVolFlowRateWasAutosized(false), m_minPowerFlowFrac(0.0), m_motorEff(0.0), m_motorInAirFrac(0.0),
+          designElecPower(0.0), powerModFuncFlowFractionCurveIndex(0), AirLoopNum(0), AirPathFlag(false), fanIsSecondaryDriver(false),
+          m_fanType_Num(0), m_designAirVolFlowRateWasAutosized(false), m_minPowerFlowFrac(0.0), m_motorEff(0.0), m_motorInAirFrac(0.0),
           m_designElecPowerWasAutosized(false), m_powerSizingMethod(PowerSizingMethod::powerSizingMethodNotSet), m_elecPowerPerFlowRate(0.0),
           m_elecPowerPerFlowRatePerPressure(0.0), m_fanTotalEff(0.0), m_nightVentPressureDelta(0.0), m_nightVentFlowFraction(0.0), m_zoneNum(0),
           m_zoneRadFract(0.0), m_heatLossesDestination(ThermalLossDestination::heatLossNotDetermined), m_qdotConvZone(0.0), m_qdotRadZone(0.0),
@@ -368,7 +367,7 @@ namespace HVACFan {
           m_eMSFanEffOverrideOn(false), m_eMSFanEffValue(0.0), m_eMSMaxMassFlowOverrideOn(false), m_eMSAirMassFlowValue(0.0),
           m_faultyFilterFlag(false), m_faultyFilterIndex(0),
 
-          m_massFlowRateMaxAvail(0.0), m_massFlowRateMinAvail(0.0), m_rhoAirStdInit(0.0), m_designPointFEI(0.0) 
+          m_massFlowRateMaxAvail(0.0), m_massFlowRateMinAvail(0.0), m_rhoAirStdInit(0.0), m_designPointFEI(0.0)
     // oneTimePowerCurveCheck_( true )
     {
 
@@ -632,7 +631,7 @@ namespace HVACFan {
 
         if (m_heatLossesDestination == ThermalLossDestination::zoneGains) {
             SetupZoneInternalGain(
-                m_zoneNum, "Fan:SystemModel", name, DataHeatBalance::IntGainTypeOf_FanSystemModel, m_qdotConvZone, _, m_qdotRadZone);
+                m_zoneNum, "Fan:SystemModel", name, DataHeatBalance::IntGainTypeOf_FanSystemModel, &m_qdotConvZone, nullptr, &m_qdotRadZone);
         }
 
         alphaArgs.deallocate();
@@ -1063,7 +1062,6 @@ namespace HVACFan {
                 }
             }
         }
-
     }
 
     void FanSystem::report()
@@ -1090,7 +1088,7 @@ namespace HVACFan {
     Real64 FanSystem::getFanDesignTemperatureRise() const
     {
         if (!m_objSizingFlag) {
-            Real64 cpAir = Psychrometrics::PsyCpAirFnWTdb(DataPrecisionGlobals::constant_zero, DataPrecisionGlobals::constant_twenty);
+            Real64 cpAir = Psychrometrics::PsyCpAirFnW(DataPrecisionGlobals::constant_zero);
             Real64 designDeltaT = (deltaPress / (m_rhoAirStdInit * cpAir * m_fanTotalEff)) * (m_motorEff + m_motorInAirFrac * (1.0 - m_motorEff));
             return designDeltaT;
         } else {
