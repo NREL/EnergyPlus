@@ -825,11 +825,11 @@ namespace DataHeatBalance {
     Array1D<ScreenTransData> ScreenTrans;
     Array1D<ZoneCatEUseData> ZoneIntEEuse;
     Array1D<RefrigCaseCreditData> RefrigCaseCredit;
-    Array1D<HeatReclaimRefrigeratedRackData> HeatReclaimRefrigeratedRack;
+    Array1D<HeatReclaimDataBase> HeatReclaimRefrigeratedRack;
     Array1D<HeatReclaimRefrigCondenserData> HeatReclaimRefrigCondenser;
-    Array1D<HeatReclaimDXCoilData> HeatReclaimDXCoil;
-    Array1D<HeatReclaimDXCoilData> HeatReclaimVS_DXCoil;
-    Array1D<HeatReclaimHPCoilData> HeatReclaimSimple_WAHPCoil;
+    Array1D<HeatReclaimDataBase> HeatReclaimDXCoil;
+    Array1D<HeatReclaimDataBase> HeatReclaimVS_DXCoil;
+    Array1D<HeatReclaimDataBase> HeatReclaimSimple_WAHPCoil;
     Array1D<AirReportVars> ZnAirRpt;
     Array1D<TCGlazingsType> TCGlazings;
     Array1D<ZoneEquipData> ZoneCO2Gen;

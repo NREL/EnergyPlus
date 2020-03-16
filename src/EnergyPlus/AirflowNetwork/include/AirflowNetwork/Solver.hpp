@@ -49,7 +49,6 @@
 #define SOLVER_HPP
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array2D.hh>
 
 #include "AirflowNetwork/Properties.hpp"
@@ -175,10 +174,10 @@ namespace AirflowNetwork {
 
     void AIRMOV();
 
-    void SOLVZP(Array1A_int IK,     // pointer to the top of column/row "K"
-                Array1A<Real64> AD, // the main diagonal of [A] before and after factoring
-                Array1A<Real64> AU, // the upper triangle of [A] before and after factoring
-                int &ITER           // number of iterations
+    void SOLVZP(Array1D_int &IK,     // pointer to the top of column/row "K"
+                Array1D<Real64> &AD, // the main diagonal of [A] before and after factoring
+                Array1D<Real64> &AU, // the upper triangle of [A] before and after factoring
+                int &ITER            // number of iterations
     );
 
     void FILJAC(int const NNZE,  // number of nonzero entries in the "AU" array.
@@ -239,41 +238,41 @@ namespace AirflowNetwork {
                     std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
     );
 
-    void FACSKY(Array1A<Real64> AU,   // the upper triangle of [A] before and after factoring
-                Array1A<Real64> AD,   // the main diagonal of [A] before and after factoring
-                Array1A<Real64> AL,   // the lower triangle of [A] before and after factoring
-                Array1A_int const IK, // pointer to the top of column/row "K"
-                int const NEQ,        // number of equations
-                int const NSYM        // symmetry:  0 = symmetric matrix, 1 = non-symmetric
+    void FACSKY(Array1D<Real64> &AU,   // the upper triangle of [A] before and after factoring
+                Array1D<Real64> &AD,   // the main diagonal of [A] before and after factoring
+                Array1D<Real64> &AL,   // the lower triangle of [A] before and after factoring
+                const Array1D_int &IK, // pointer to the top of column/row "K"
+                int const NEQ,         // number of equations
+                int const NSYM         // symmetry:  0 = symmetric matrix, 1 = non-symmetric
     );
 
-    void SLVSKY(Array1A<Real64> const AU, // the upper triangle of [A] before and after factoring
-                Array1A<Real64> const AD, // the main diagonal of [A] before and after factoring
-                Array1A<Real64> const AL, // the lower triangle of [A] before and after factoring
-                Array1A<Real64> B,        // "B" vector (input); "X" vector (output).
-                Array1A_int const IK,     // pointer to the top of column/row "K"
-                int const NEQ,            // number of equations
-                int const NSYM            // symmetry:  0 = symmetric matrix, 1 = non-symmetric
+    void SLVSKY(const Array1D<Real64> &AU, // the upper triangle of [A] before and after factoring
+                const Array1D<Real64> &AD, // the main diagonal of [A] before and after factoring
+                const Array1D<Real64> &AL, // the lower triangle of [A] before and after factoring
+                Array1D<Real64> &B,        // "B" vector (input); "X" vector (output).
+                const Array1D_int &IK,     // pointer to the top of column/row "K"
+                int const NEQ,             // number of equations
+                int const NSYM             // symmetry:  0 = symmetric matrix, 1 = non-symmetric
     );
 
-    void FILSKY(Array1A<Real64> const X,     // element array (row-wise sequence)
+    void FILSKY(const Array1D<Real64> &X,    // element array (row-wise sequence)
                 std::array<int, 2> const LM, // location matrix
-                Array1A_int const IK,        // pointer to the top of column/row "K"
-                Array1A<Real64> AU,          // the upper triangle of [A] before and after factoring
-                Array1A<Real64> AD,          // the main diagonal of [A] before and after factoring
+                const Array1D_int &IK,       // pointer to the top of column/row "K"
+                Array1D<Real64> &AU,         // the upper triangle of [A] before and after factoring
+                Array1D<Real64> &AD,         // the main diagonal of [A] before and after factoring
                 int const FLAG               // mode of operation
     );
 
-    void DUMPVD(std::string const &S,    // Description
-                Array1A<Real64> const V, // Output values
-                int const n,             // Array size
-                int const UOUT           // Output file unit
+    void DUMPVD(std::string const &S,     // Description
+                const Array1D<Real64> &V, // Output values
+                int const n,              // Array size
+                int const UOUT            // Output file unit
     );
 
-    void DUMPVR(std::string const &S,    // Description
-                Array1A<Real64> const V, // Output values
-                int const n,             // Array size
-                int const UOUT           // Output file unit
+    void DUMPVR(std::string const &S,     // Description
+                const Array1D<Real64> &V, // Output values
+                int const n,              // Array size
+                int const UOUT            // Output file unit
     );
 
     int AFEDOP(int const j,                // Component number
@@ -286,19 +285,19 @@ namespace AirflowNetwork {
                std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
     );
 
-    void PresProfile(int const il,                 // Linkage number
-                     int const Pprof,              // Opening number
-                     Real64 const G,               // gravitation field strength [N/kg]
-                     Array1A<Real64> const DpF,    // Stack pressures at start heights of Layers
-                     Array1A<Real64> const DpT,    // Stack pressures at start heights of Layers
-                     Array1A<Real64> const BetaF,  // Density gradients in the FROM zone (starting at linkheight) [Kg/m3/m]
-                     Array1A<Real64> const BetaT,  // Density gradients in the TO zone (starting at linkheight) [Kg/m3/m]
-                     Array1A<Real64> const RhoStF, // Density at the start heights of Layers in the FROM zone
-                     Array1A<Real64> const RhoStT, // Density at the start heights of Layers in the TO zone
-                     int const From,               // Number of FROM zone
-                     int const To,                 // Number of To zone
-                     Real64 const ActLh,           // Actual height of opening [m]
-                     Real64 const OwnHeightFactor  // Cosine of deviation angle of the opening plane from the vertical direction
+    void PresProfile(int const il,                  // Linkage number
+                     int const Pprof,               // Opening number
+                     Real64 const G,                // gravitation field strength [N/kg]
+                     const Array1D<Real64> &DpF,    // Stack pressures at start heights of Layers
+                     const Array1D<Real64> &DpT,    // Stack pressures at start heights of Layers
+                     const Array1D<Real64> &BetaF,  // Density gradients in the FROM zone (starting at linkheight) [Kg/m3/m]
+                     const Array1D<Real64> &BetaT,  // Density gradients in the TO zone (starting at linkheight) [Kg/m3/m]
+                     const Array1D<Real64> &RhoStF, // Density at the start heights of Layers in the FROM zone
+                     const Array1D<Real64> &RhoStT, // Density at the start heights of Layers in the TO zone
+                     int const From,                // Number of FROM zone
+                     int const To,                  // Number of To zone
+                     Real64 const ActLh,            // Actual height of opening [m]
+                     Real64 const OwnHeightFactor   // Cosine of deviation angle of the opening plane from the vertical direction
     );
 
     void PStack();
