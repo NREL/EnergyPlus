@@ -5264,19 +5264,20 @@ namespace Furnaces {
                 MassFlowRate = Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).MassFlowRate;
                 DeltaMassRate = 0.0;
             }
-            Furnace(FurnaceNum).SenLoadLoss = MassFlowRate * (PsyHFnTdbW(Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).Temp, MinHumRat) -
-                                                              PsyHFnTdbW(Node(ZoneInNode).Temp, MinHumRat)) +
-                                              DeltaMassRate * (PsyHFnTdbW(Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).Temp, MinHumRat) -
-                                                               PsyHFnTdbW(Node(Furnace(FurnaceNum).NodeNumOfControlledZone).Temp, MinHumRat));
+            Real64 SensibleOutput(0.0);  // sensible output rate
+            Real64 LatentOutput(0.0);    // latent output rate
+            Real64 TotalOutput(0.0);     // total output rate 
+            Real64 SensibleOutputDelta(0.0);  // delta sensible output rate
+            Real64 LatentOutputDelta(0.0);    // delta latent output rate
+            Real64 TotalOutputDelta(0.0);     // delta total output rate 
+            DXCoils::CalcTotalSensibleLatentOutput(MassFlowRate, Node(OutNode).Temp, Node(OutNode).HumRat, Node(ZoneInNode).Temp, Node(ZoneInNode).HumRat, TotalOutput, SensibleOutput, LatentOutput);
+            DXCoils::CalcTotalSensibleLatentOutput(MassFlowRate, Node(OutNode).Temp, Node(OutNode).HumRat, Node(Furnace(FurnaceNum).NodeNumOfControlledZone).Temp, Node(Furnace(FurnaceNum).NodeNumOfControlledZone).HumRat, TotalOutputDelta, SensibleOutputDelta, LatentOutputDelta);
+            Furnace(FurnaceNum).SenLoadLoss = SensibleOutput - SensibleOutputDelta;
             if (std::abs(Furnace(FurnaceNum).SensibleLoadMet) > 0.0) {
                 if (std::abs(Furnace(FurnaceNum).SenLoadLoss / Furnace(FurnaceNum).SensibleLoadMet) < 0.001) Furnace(FurnaceNum).SenLoadLoss = 0.0;
             }
             if (Furnace(FurnaceNum).Humidistat) {
-                MaxTemp = Node(Furnace(FurnaceNum).NodeNumOfControlledZone).Temp;
-                Furnace(FurnaceNum).LatLoadLoss = MassFlowRate * (PsyHFnTdbW(MaxTemp, Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).HumRat) -
-                                                                  PsyHFnTdbW(MaxTemp, Node(ZoneInNode).HumRat)) +
-                                                  DeltaMassRate * (PsyHFnTdbW(MaxTemp, Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).HumRat) -
-                                                                   PsyHFnTdbW(MaxTemp, Node(Furnace(FurnaceNum).NodeNumOfControlledZone).HumRat));
+                Furnace(FurnaceNum).LatLoadLoss = LatentOutput - LatentOutputDelta;
                 if (std::abs(Furnace(FurnaceNum).LatentLoadMet) > 0.0) {
                     if (std::abs(Furnace(FurnaceNum).LatLoadLoss / Furnace(FurnaceNum).LatentLoadMet) < 0.001) Furnace(FurnaceNum).LatLoadLoss = 0.0;
                 }
@@ -8876,26 +8877,16 @@ namespace Furnaces {
 
         // Check delta T (outlet to space), if positive
         // use space HumRat (next line), else outlet humrat (IF) so psyc routine gives good result
-        MinHumRatio = Node(Furnace(FurnaceNum).NodeNumOfControlledZone).HumRat;
-        if (Node(FurnaceOutletNode).Temp < Node(Furnace(FurnaceNum).NodeNumOfControlledZone).Temp) MinHumRatio = Node(FurnaceOutletNode).HumRat;
 
-        // Calculate sensible load met (at constant humidity ratio)
-        SensibleLoadMet = AirMassFlow * (PsyHFnTdbW(Node(FurnaceOutletNode).Temp, MinHumRatio) -
-                                         PsyHFnTdbW(Node(Furnace(FurnaceNum).NodeNumOfControlledZone).Temp, MinHumRatio)) -
-                          Furnace(FurnaceNum).SenLoadLoss;
+        Real64 SensibleOutput(0.0);  // sensible output rate
+        Real64 LatentOutput(0.0);    // latent output rate
+        Real64 TotalOutput(0.0);     // total output rate 
+        DXCoils::CalcTotalSensibleLatentOutput(AirMassFlow, Node(FurnaceOutletNode).Temp, Node(FurnaceOutletNode).HumRat, Node(Furnace(FurnaceNum).NodeNumOfControlledZone).Temp, Node(Furnace(FurnaceNum).NodeNumOfControlledZone).HumRat, TotalOutput, SensibleOutput, LatentOutput);
+        SensibleLoadMet = SensibleOutput - Furnace(FurnaceNum).SenLoadLoss;
         Furnace(FurnaceNum).SensibleLoadMet = SensibleLoadMet;
 
         if (Furnace(FurnaceNum).Humidistat) {
-            MaxTemp = Node(Furnace(FurnaceNum).NodeNumOfControlledZone).Temp;
-            // modified, why does switching between furnace outlet and control zone temp
-            // cause latent load to change when latent capacity is 0 ?
-            //    IF(Node(FurnaceOutletNode)%Temp .GT. Node(Furnace(FurnaceNum)%NodeNumOfControlledZone)%Temp ) &
-            //       MaxTemp = Node(FurnaceOutletNode)%Temp
-
-            //   Calculate latent load met (at constant temperature)
-            LatentLoadMet = AirMassFlow * (PsyHFnTdbW(MaxTemp, Node(FurnaceOutletNode).HumRat) -
-                                           PsyHFnTdbW(MaxTemp, Node(Furnace(FurnaceNum).NodeNumOfControlledZone).HumRat)) -
-                            Furnace(FurnaceNum).LatLoadLoss;
+            LatentLoadMet = LatentOutput - Furnace(FurnaceNum).LatLoadLoss;
         } else {
             LatentLoadMet = 0.0;
         }
