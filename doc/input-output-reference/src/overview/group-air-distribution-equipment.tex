@@ -80,10 +80,9 @@ AirTerminal:SingleDuct:ConstantVolume:Reheat,
       0.001;  !- Convergence Tolerance
 \end{lstlisting}
 
-\subsubsection{Outputs}\label{outputs-1-000}
+\subsubsection{Outputs}
 
 There are no outputs for the constant volume reheat air terminal.
-
 
 \subsection{AirTerminal:SingleDuct:ConstantVolume:NoReheat}\label{airterminalsingleductconstantvolumenoreheat}
 The AirTerminal:SingleDuct:ConstantVolume:NoReheat object creates the capability of supplying central system air directly to a zone without any zone level thermostat control. The supply air temperature is controlled by the central system controller. It is typically used with a unitary system and furnaces which controls the system supply temperature and flow rate with continuous or cycling fan. When used without the Design Specification Outdoor Air Object Name, the terminal unit is passive and accepts any flow rate supplied by the central system, but will never exceed the maximum air flow rate.
@@ -120,6 +119,10 @@ This field is used to modulate the terminal unit flow rate based on the specifie
 
 This field specifies the occupancy level to use when calculating the ventilation rate per person when a Design Specification Outdoor Air Object Name has been specified. \textit{CurrentOccupancy} uses the current number of people in the zone which may vary. \textit{DesignOccupancy} uses the total Number of People specified for the zone which is constant.
 
+\subsubsection{Outputs}
+
+There are no outputs for the constant volume NoReheat air terminal.
+
 An IDF example:
 
 \begin{lstlisting}
@@ -133,38 +136,6 @@ AirTerminal:SingleDuct:ConstantVolume:NoReheat,
       ,                               !- Design Specification Outdoor Air Object Name
       ;                               !- Per Person Ventilation Rate Mode
 \end{lstlisting}
-
-\subsubsection{Outputs}\label{outputs-000}
-
-\begin{itemize}
-\item
-  HVAC,Sum,Zone Air Terminal Sensible Heating Energy {[}J{]}
-\item
-  HVAC,Sum,Zone Air Terminal Sensible Cooling Energy {[}J{]}
-\item
-  HVAC,Average,Zone Air Terminal Sensible Heating Rate {[}W{]}
-\item
-  HVAC,Average,Zone Air Terminal Sensible Cooling Rate {[}W{]}
-\item
-  HVAC,Average,Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}
-\end{itemize}
-
-\paragraph{Zone Air Terminal Sensible Heating Rate {[}W{]}}\label{zone-air-terminal-sensible-heating-rate-w}
-
-\paragraph{Zone Air Terminal Sensible Heating Energy~ {[}J{]}}\label{zone-air-terminal-sensible-heating-energy-j}
-
-These outputs are the sensible heating rate and energy provided to the zone by the single duct constant volume no reheat air terminal unit.
-
-\paragraph{Zone Air Terminal Sensible Cooling Rate {[}W{]}}\label{zone-air-terminal-sensible-cooling-rate-w}
-
-\paragraph{Zone Air Terminal Sensible Cooling Energy {[}J{]}}\label{zone-air-terminal-sensible-cooling-energy-j}
-
-These outputs are the sensible cooling rate and energy provided to the zone by the single duct constant volume no reheat air terminal unit.
-
-\paragraph{Zone Air Terminal Outdoor Air Volume Flow Rate {[}m3/s{]}}\label{zone-air-terminal-outdoor-air-volume-flow-rate-m3s}
-
-This output is the amount of outdoor air entering the zone. This is the average value over the frequency being reported. The amount of outdoor air is defined as the terminal unit air volume flow rate multiplied by the fraction of outdoor air entering the air loop's outside air system.
-
 
 \subsection{AirTerminal:SingleDuct:VAV:Reheat}\label{airterminalsingleductvavreheat}
 

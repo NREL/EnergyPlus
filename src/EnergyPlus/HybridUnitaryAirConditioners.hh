@@ -86,6 +86,12 @@ namespace HybridUnitaryAirConditioners {
 
     void ReportZoneHybridUnitaryAirConditioners(int const UnitNum);
 
+    int GetHybridUnitaryACOutAirNode(int const UnitNum);
+
+    int GetHybridUnitaryACZoneInletNode(int const UnitNum);
+
+    int GetHybridUnitaryACReturnAirNode(int const UnitNum);
+
 } // namespace HybridUnitaryAirConditioners
 } // namespace EnergyPlus
 #endif
