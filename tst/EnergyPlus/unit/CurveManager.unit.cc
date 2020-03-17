@@ -242,8 +242,7 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationNone)
      *  The curve of this data is therefore Linear, making interpolated data points easily calculated
      *  This idf will default to Cubic interpolation and Linear extrapolation
      */
-
-    double expected_divisor{1.0};
+    
     double expected_curve_min{2.0};
     double expected_curve_max{21.0};
 
@@ -320,8 +319,6 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationNone)
     CurveManager::GetCurveInput();
     CurveManager::GetCurvesInputFlag = false;
     ASSERT_EQ(1, CurveManager::NumCurves);
-
-    EXPECT_EQ(expected_divisor, CurveManager::PerfCurve(1).NormalizationValue);
 
     EXPECT_TRUE(CurveManager::PerfCurve(1).CurveMinPresent);
     EXPECT_EQ(expected_curve_min, CurveManager::PerfCurve(1).CurveMin);
@@ -423,8 +420,6 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationDivisorOnly)
     CurveManager::GetCurveInput();
     CurveManager::GetCurvesInputFlag = false;
     ASSERT_EQ(1, CurveManager::NumCurves);
-
-    EXPECT_EQ(expected_divisor, CurveManager::PerfCurve(1).NormalizationValue);
 
     EXPECT_TRUE(CurveManager::PerfCurve(1).CurveMinPresent);
     EXPECT_EQ(expected_curve_min, CurveManager::PerfCurve(1).CurveMin);
@@ -528,8 +523,6 @@ TEST_F(EnergyPlusFixture, DivisorNormalizationAutomaticWithDivisor)
     CurveManager::GetCurvesInputFlag = false;
     ASSERT_EQ(1, CurveManager::NumCurves);
 
-    EXPECT_EQ(expected_auto_divisor, CurveManager::PerfCurve(1).NormalizationValue);
-
     EXPECT_TRUE(CurveManager::PerfCurve(1).CurveMinPresent);
     EXPECT_EQ(expected_curve_min, CurveManager::PerfCurve(1).CurveMin);
 
@@ -632,8 +625,6 @@ TEST_F(EnergyPlusFixture, NormalizationAutomaticWithDivisorAndSpecifiedDivisor)
     CurveManager::GetCurveInput();
     CurveManager::GetCurvesInputFlag = false;
     ASSERT_EQ(1, CurveManager::NumCurves);
-
-    EXPECT_EQ(expected_auto_divisor*normalization_divisor, CurveManager::PerfCurve(1).NormalizationValue);
 
     EXPECT_TRUE(CurveManager::PerfCurve(1).CurveMinPresent);
     EXPECT_EQ(expected_curve_min, CurveManager::PerfCurve(1).CurveMin);
