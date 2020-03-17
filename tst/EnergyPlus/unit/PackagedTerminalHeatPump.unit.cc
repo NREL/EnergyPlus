@@ -57,13 +57,14 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalFanSys.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
 #include <EnergyPlus/HeatingCoils.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/PackagedTerminalHeatPump.hh>
@@ -109,9 +110,7 @@ using namespace ObjexxFCL;
 
 namespace EnergyPlus {
 
-class PTHPFixture : public EnergyPlusFixture {};
-
-TEST_F(PTHPFixture, PackagedTerminalHP_VSCoils_Sizing)
+TEST_F(EnergyPlusFixture, PackagedTerminalHP_VSCoils_Sizing)
 {
     std::string const idf_objects = delimited_string({
 
@@ -568,7 +567,7 @@ TEST_F(PTHPFixture, PackagedTerminalHP_VSCoils_Sizing)
     EXPECT_EQ(Fan(1).MaxAirFlowRate, max(ZoneEqSizing(1).CoolingAirVolFlow, ZoneEqSizing(1).HeatingAirVolFlow));
 }
 
-TEST_F(PTHPFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
+TEST_F(EnergyPlusFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
 {
 
     bool ErrorsFound(false);
@@ -652,7 +651,7 @@ TEST_F(PTHPFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
         "Coil:Heating:Fuel,",
         "    SPACE1-1 Heating Coil,   !- Name",
         "    FanAvailSched,           !- Availability Schedule Name",
-        "    Gas,                     !- Fuel Type",
+        "    NaturalGas,              !- Fuel Type",
         "    0.8,                     !- Gas Burner Efficiency",
         "    10000.0,                 !- Nominal Capacity {W}",
         "    SPACE1-1 CCoil Outlet Node,  !- Air Inlet Node Name",
@@ -795,7 +794,7 @@ TEST_F(PTHPFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(); // read schedules
+    ProcessScheduleInput(OutputFiles::getSingleton()); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 
@@ -918,7 +917,7 @@ TEST_F(PTHPFixture, AirTerminalSingleDuctMixer_SimPTAC_HeatingCoilTest)
     ASSERT_NEAR(HeatingCoils::HeatingCoil(1).HeatingCoilRate, 2217.0, 1.0);
 }
 
-TEST_F(PTHPFixture, SimPTAC_SZVAVTest)
+TEST_F(EnergyPlusFixture, SimPTAC_SZVAVTest)
 {
 
     bool ErrorsFound(false);
@@ -1004,7 +1003,7 @@ TEST_F(PTHPFixture, SimPTAC_SZVAVTest)
         "Coil:Heating:Fuel,",
         "    SPACE1-1 Heating Coil,   !- Name",
         "    FanAvailSched,           !- Availability Schedule Name",
-        "    Gas,                     !- Fuel Type",
+        "    NaturalGas,              !- Fuel Type",
         "    0.8,                     !- Gas Burner Efficiency",
         "    10000.0,                 !- Nominal Capacity {W}",
         "    SPACE1-1 CCoil Outlet Node,  !- Air Inlet Node Name",
@@ -1147,7 +1146,7 @@ TEST_F(PTHPFixture, SimPTAC_SZVAVTest)
     DataGlobals::NumOfTimeStepInHour = 1;
     DataGlobals::TimeStep = 1;
     DataGlobals::MinutesPerTimeStep = 60;
-    ProcessScheduleInput(); // read schedules
+    ProcessScheduleInput(OutputFiles::getSingleton()); // read schedules
     InitializePsychRoutines();
     OutputReportPredefined::SetPredefinedTables();
 

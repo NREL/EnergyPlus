@@ -58,7 +58,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/EMSManager.hh>
@@ -2275,7 +2275,7 @@ namespace PlantHeatExchangerFluidToFluid {
     }
 
     Real64 HeatExchangerStruct::demandSideFlowResidual(Real64 const DmdSideMassFlowRate,
-                                                       Array1<Real64> const &Par // Par(1) = HX index number
+                                                       Array1D<Real64> const &Par // Par(1) = HX index number
     )
     {
 

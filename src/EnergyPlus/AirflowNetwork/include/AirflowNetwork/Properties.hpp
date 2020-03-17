@@ -51,7 +51,7 @@
 #ifndef AIRDENSITY
 #include "../../../Psychrometrics.hh"
 #define AIRDENSITY(P, T, W) Psychrometrics::PsyRhoAirFnPbTdbW(P, T, W)
-#define AIRCP(W, T) Psychrometrics::PsyCpAirFnWTdb(W, T)
+#define AIRCP(W) Psychrometrics::PsyCpAirFnW(W)
 #else
 // Need a fallback
 #endif
@@ -64,7 +64,7 @@
 
 #ifndef TOKELVIN
 #include "../../../DataGlobals.hh"
-#define TOKELVIN(T) (T+DataGlobals::KelvinConv)
+#define TOKELVIN(T) (T + DataGlobals::KelvinConv)
 #else
 // Need a fallback
 #endif
@@ -72,6 +72,9 @@
 namespace EnergyPlus {
 
 namespace AirflowNetwork {
+
+    extern int lowerLimitErrIdx;
+    extern int upperLimitErrIdx;
 
     Real64 airThermConductivity(Real64 T // Temperature in Celsius
     );

@@ -61,7 +61,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataWater.hh>
@@ -419,7 +419,7 @@ namespace PackagedThermalStorageCoil {
                                       "Coil:Cooling:DX:SingleSpeed:ThermalStorage",
                                       TESCoil(item).Name,
                                       IntGainTypeOf_PackagedTESCoilTank,
-                                      TESCoil(item).QdotAmbient);
+                                      &TESCoil(item).QdotAmbient);
             }
 
             TESCoil(item).StorageUA = rNumericArgs(4);
@@ -4308,7 +4308,7 @@ namespace PackagedThermalStorageCoil {
     }
 
     Real64 TESCoilResidualFunction(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                   Array1<Real64> const &Par   // par(1) = DX coil number
+                                   Array1D<Real64> const &Par  // par(1) = DX coil number
     )
     {
         // FUNCTION INFORMATION:
@@ -4387,7 +4387,7 @@ namespace PackagedThermalStorageCoil {
     }
 
     Real64 TESCoilHumRatResidualFunction(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                         Array1<Real64> const &Par   // par(1) = DX coil number
+                                         Array1D<Real64> const &Par  // par(1) = DX coil number
     )
     {
         // FUNCTION INFORMATION:

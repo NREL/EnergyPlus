@@ -59,6 +59,7 @@
 #include <EnergyPlus/VariableSpeedCoils.hh>
 
 namespace EnergyPlus {
+    class OutputFiles;
 
 namespace WaterThermalTanks {
 
@@ -651,9 +652,9 @@ namespace WaterThermalTanks {
 
         void setupZoneInternalGains();
 
-        void setupChilledWaterTankOutputVars();
+        void setupChilledWaterTankOutputVars(OutputFiles &outputFiles);
 
-        void setupWaterHeaterOutputVars();
+        void setupWaterHeaterOutputVars(OutputFiles &outputFiles);
 
         void simulate(const PlantLocation &calledFromLocation, bool FirstHVACIteration, Real64 &CurLoad, bool RunFlag) override;
 
@@ -689,9 +690,9 @@ namespace WaterThermalTanks {
 
         void CalcWaterThermalTankMixed(); // Water Heater being simulated
 
-        void CalcStandardRatings();
+        void CalcStandardRatings(OutputFiles &outputFiles);
 
-        void ReportCWTankInits();
+        void ReportCWTankInits(OutputFiles &outputFiles);
 
         Real64 GetHPWHSensedTankTemp();
 
@@ -761,8 +762,8 @@ namespace WaterThermalTanks {
 
         void CalcDesuperheaterWaterHeater(bool FirstHVACIteration);
 
-        Real64 PLRResidualWaterThermalTank(Real64 HPPartLoadRatio,   // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                           Array1<Real64> const &Par // par(1) = HP set point temperature [C]
+        Real64 PLRResidualWaterThermalTank(Real64 HPPartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+                                           Array1D<Real64> const &Par // par(1) = HP set point temperature [C]
         );
 
         void CalcHeatPumpWaterHeater(bool FirstHVACIteration);
@@ -777,10 +778,10 @@ namespace WaterThermalTanks {
                                 bool FirstHVACIteration // TRUE if First iteration of simulation
         );
 
-        Real64 PLRResidualHPWH(Real64 HPPartLoadRatio, Array1<Real64> const &Par);
+        Real64 PLRResidualHPWH(Real64 HPPartLoadRatio, Array1D<Real64> const &Par);
 
         Real64 PLRResidualIterSpeed(Real64 SpeedRatio,        // speed ratio between two speed levels
-                                    Array1<Real64> const &Par //
+                                    Array1D<Real64> const &Par
         );
 
         static void ValidatePLFCurve(int CurveIndex, bool &IsValid);
@@ -897,7 +898,7 @@ namespace WaterThermalTanks {
 
     bool getWaterTankStratifiedInput();
 
-    bool GetWaterThermalTankInput();
+    bool GetWaterThermalTankInput(OutputFiles &outputFiles);
 
     void CalcWaterThermalTankZoneGains();
 

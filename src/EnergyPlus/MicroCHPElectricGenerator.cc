@@ -64,7 +64,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/General.hh>
@@ -525,9 +525,9 @@ namespace MicroCHPElectricGenerator {
                                   "Generator:MicroCHP",
                                   this->Name,
                                   DataHeatBalance::IntGainTypeOf_GeneratorMicroCHP,
-                                  this->A42Model.SkinLossConvect,
-                                  _,
-                                  this->A42Model.SkinLossRadiat);
+                                  &this->A42Model.SkinLossConvect,
+                                  nullptr,
+                                  &this->A42Model.SkinLossRadiat);
         }
     }
 

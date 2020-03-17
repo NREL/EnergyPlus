@@ -58,6 +58,7 @@
 #include <EnergyPlus/ElectricPowerServiceManager.hh>
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
@@ -68,11 +69,7 @@
 
 namespace EnergyPlus {
 
-class PlantHXFixture : public EnergyPlusFixture
-{
-};
-
-TEST_F(PlantHXFixture, PlantHXModulatedDualDeadDefectFileHi)
+TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileHi)
 {
     // this unit test was devised for issue #5258 which involves control logic related to plant HX not controlling well when the setpoint cannot be
     // met this test has complete IDF input to set up a system of four plant loops taken from the PlantLoopChain* integration tests.  This test checks
@@ -1064,7 +1061,7 @@ TEST_F(PlantHXFixture, PlantHXModulatedDualDeadDefectFileHi)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
 
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
@@ -1078,7 +1075,7 @@ TEST_F(PlantHXFixture, PlantHXModulatedDualDeadDefectFileHi)
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(ErrorsFound);
+    SimulationManager::SetupSimulation(OutputFiles::getSingleton(), ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
     int EnvCount = 0;
@@ -1087,7 +1084,7 @@ TEST_F(PlantHXFixture, PlantHXModulatedDualDeadDefectFileHi)
 
     while (Available) {
 
-        WeatherManager::GetNextEnvironment(Available, ErrorsFound);
+        WeatherManager::GetNextEnvironment(OutputFiles::getSingleton(), Available, ErrorsFound);
 
         if (!Available) break;
         if (ErrorsFound) break;
@@ -1139,7 +1136,7 @@ TEST_F(PlantHXFixture, PlantHXModulatedDualDeadDefectFileHi)
 
                     WeatherManager::ManageWeather();
 
-                    HeatBalanceManager::ManageHeatBalance();
+                    HeatBalanceManager::ManageHeatBalance(OutputFiles::getSingleton());
 
                     //  After the first iteration of HeatBalance, all the 'input' has been gotten
 
@@ -1162,7 +1159,7 @@ TEST_F(PlantHXFixture, PlantHXModulatedDualDeadDefectFileHi)
     EXPECT_NEAR(DataLoopNode::Node(4).Temp, 20.0, 0.01);
 }
 
-TEST_F(PlantHXFixture, PlantHXModulatedDualDeadDefectFileLo)
+TEST_F(EnergyPlusFixture, PlantHXModulatedDualDeadDefectFileLo)
 {
 
     // this unit test was devised for issue #5258 which involves control logic related to plant HX not controlling well when the setpoint cannot be
@@ -2155,7 +2152,7 @@ TEST_F(PlantHXFixture, PlantHXModulatedDualDeadDefectFileLo)
     bool ErrorsFound = false;
 
     DataGlobals::BeginSimFlag = true;
-    SimulationManager::GetProjectData();
+    SimulationManager::GetProjectData(OutputFiles::getSingleton());
 
     OutputReportPredefined::SetPredefinedTables();
     HeatBalanceManager::SetPreConstructionInputParameters(); // establish array bounds for constructions early
@@ -2169,7 +2166,7 @@ TEST_F(PlantHXFixture, PlantHXModulatedDualDeadDefectFileLo)
     DataGlobals::KickOffSimulation = true;
 
     WeatherManager::ResetEnvironmentCounter();
-    SimulationManager::SetupSimulation(ErrorsFound);
+    SimulationManager::SetupSimulation(OutputFiles::getSingleton(), ErrorsFound);
     DataGlobals::KickOffSimulation = false;
 
     int EnvCount = 0;
@@ -2178,7 +2175,7 @@ TEST_F(PlantHXFixture, PlantHXModulatedDualDeadDefectFileLo)
 
     while (Available) {
 
-        WeatherManager::GetNextEnvironment(Available, ErrorsFound);
+        WeatherManager::GetNextEnvironment(OutputFiles::getSingleton(), Available, ErrorsFound);
 
         if (!Available) break;
         if (ErrorsFound) break;
@@ -2230,7 +2227,7 @@ TEST_F(PlantHXFixture, PlantHXModulatedDualDeadDefectFileLo)
 
                     WeatherManager::ManageWeather();
 
-                    HeatBalanceManager::ManageHeatBalance();
+                    HeatBalanceManager::ManageHeatBalance(OutputFiles::getSingleton());
 
                     //  After the first iteration of HeatBalance, all the 'input' has been gotten
 
@@ -2256,7 +2253,7 @@ TEST_F(PlantHXFixture, PlantHXModulatedDualDeadDefectFileLo)
     EXPECT_NEAR(DataLoopNode::Node(4).Temp, 20.0, 0.01);
 }
 
-TEST_F(PlantHXFixture, PlantHXControlWithFirstHVACIteration)
+TEST_F(EnergyPlusFixture, PlantHXControlWithFirstHVACIteration)
 {
     // this unit test is for issue #4959.  Added FirstHVACIteration to simulate and control routines
     // unit test checks that the change to logic for #4959 does work to affect node mass flow rate.  The conditions are set up such that the demand
@@ -2269,7 +2266,7 @@ TEST_F(PlantHXFixture, PlantHXControlWithFirstHVACIteration)
     // get availability schedule to work
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(); // read schedules
+    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton()); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;
@@ -2358,7 +2355,7 @@ TEST_F(PlantHXFixture, PlantHXControlWithFirstHVACIteration)
     EXPECT_NEAR(DataLoopNode::Node(2).MassFlowRate, 0.0, 0.001);
 }
 
-TEST_F(PlantHXFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverride)
+TEST_F(EnergyPlusFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverride)
 {
     // this unit test is for issue #5626.  Fixed logic for CoolingSetpointOnOffWithComponentOverride.
     // unit test checks that the change for #5626 adjusts the temperature value used in central plant dispatch routines by the tolerance value.
@@ -2368,7 +2365,7 @@ TEST_F(PlantHXFixture, PlantHXControl_CoolingSetpointOnOffWithComponentOverride)
     // get availability schedule to work
     DataGlobals::NumOfTimeStepInHour = 1;    // must initialize this to get schedules initialized
     DataGlobals::MinutesPerTimeStep = 60;    // must initialize this to get schedules initialized
-    ScheduleManager::ProcessScheduleInput(); // read schedules
+    ScheduleManager::ProcessScheduleInput(OutputFiles::getSingleton()); // read schedules
     ScheduleManager::ScheduleInputProcessed = true;
     DataEnvironment::Month = 1;
     DataEnvironment::DayOfMonth = 21;

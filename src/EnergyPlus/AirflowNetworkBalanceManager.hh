@@ -53,10 +53,10 @@
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
-#include "OutputFiles.hh"
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class OutputFiles;
 
 namespace AirflowNetworkBalanceManager {
 
@@ -238,7 +238,7 @@ namespace AirflowNetworkBalanceManager {
     int GetAirLoopNumber(int const NodeNumber); // Get air loop number for each distribution node and linkage
 
     Real64 AFNPressureResidual(Real64 const ExFanMassFlowRate,
-                               Array1<Real64> const &Par); // Residual function using Regula Falsi
+                               Array1D<Real64> const &Par); // Residual function using Regula Falsi
 
     // derived class or struct
     struct OccupantVentilationControlProp

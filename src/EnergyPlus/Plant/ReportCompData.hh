@@ -58,7 +58,6 @@ namespace DataPlant {
     struct ReportCompData
     {
         // Members
-        bool Parent;             // TRUE = designated component is made up of sub-components
         std::string TypeOf;      // The 'keyWord' identifying  component type
         std::string Name;        // Component name
         int CompIndex;           // Component Index in whatever is using this component
@@ -79,7 +78,7 @@ namespace DataPlant {
 
         // Default Constructor
         ReportCompData()
-            : Parent(false), CompIndex(0), NodeNumIn(0), NodeNumOut(0), NumMeteredVars(0), NumSubComps(0), LoopLoadFrac(0.0), TotPlantSupplyElec(0.0),
+            : CompIndex(0), NodeNumIn(0), NodeNumOut(0), NumMeteredVars(0), NumSubComps(0), LoopLoadFrac(0.0), TotPlantSupplyElec(0.0),
               TotPlantSupplyGas(0.0), TotPlantSupplyPurch(0.0), TotPlantSupplyOther(0.0)
         {
         }

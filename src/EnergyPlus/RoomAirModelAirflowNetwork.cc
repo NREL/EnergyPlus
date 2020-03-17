@@ -281,7 +281,7 @@ namespace RoomAirModelAirflowNetwork {
         using DataZoneEquipment::ZoneEquipList;
         using General::RoundSigDigits;
         using InternalHeatGains::SumInternalLatentGainsByTypes;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
@@ -612,7 +612,7 @@ namespace RoomAirModelAirflowNetwork {
                 LinkInTemp = ThisRAFNNode.Link(linkNum).TempIn;
                 LinkInHumRat = ThisRAFNNode.Link(linkNum).HumRatIn;
                 LinkInMdot = ThisRAFNNode.Link(linkNum).MdotIn;
-                CpAir = PsyCpAirFnWTdb(LinkInHumRat, LinkInTemp);
+                CpAir = PsyCpAirFnW(LinkInHumRat);
                 SumLinkMCp = SumLinkMCp + CpAir * LinkInMdot;
                 SumLinkMCpT = SumLinkMCpT + CpAir * LinkInMdot * LinkInTemp;
                 SumLinkM = SumLinkM + LinkInMdot;
@@ -628,7 +628,7 @@ namespace RoomAirModelAirflowNetwork {
 
         ThisRAFNNode.RhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, ThisRAFNNode.AirTemp, ThisRAFNNode.HumRat, "InitRoomAirModelAirflowNetwork");
 
-        ThisRAFNNode.CpAir = PsyCpAirFnWTdb(ThisRAFNNode.HumRat, ThisRAFNNode.AirTemp);
+        ThisRAFNNode.CpAir = PsyCpAirFnW(ThisRAFNNode.HumRat);
 
     } // InitRoomAirModelAirflowNetwork
 
@@ -871,11 +871,11 @@ namespace RoomAirModelAirflowNetwork {
         using DataSurfaces::SurfaceWindow;
         using DataZoneEquipment::ZoneEquipConfig;
         using InternalHeatGains::SumInternalConvectionGainsByIndices;
-        using InternalHeatGains::SumInternalConvectionGainsByTypes;
+        //using InternalHeatGains::SumInternalConvectionGainsByTypes;
         using InternalHeatGains::SumInternalLatentGainsByIndices;
         using InternalHeatGains::SumReturnAirConvectionGainsByIndices;
         using InternalHeatGains::SumReturnAirConvectionGainsByTypes;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyRhoAirFnPbTdbW;
         using ZonePlenum::NumZoneReturnPlenums;
         using ZonePlenum::NumZoneSupplyPlenums;
@@ -990,7 +990,7 @@ namespace RoomAirModelAirflowNetwork {
                         NodeW = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).HumRat;
                         MassFlowRate = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate *
                                        RoomAirflowNetworkZoneInfo(ZoneNum).Node(RoomAirNodeNum).HVAC(EquipLoop).SupplyFraction;
-                        CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), NodeTemp);
+                        CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
                         SumSysMCp += MassFlowRate * CpAir;
                         SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                         SumSysM += MassFlowRate;
@@ -1003,7 +1003,7 @@ namespace RoomAirModelAirflowNetwork {
                 // Get node conditions
                 NodeTemp = Node(ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).Temp;
                 MassFlowRate = Node(ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate;
-                CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), NodeTemp);
+                CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
                 SumSysMCp += MassFlowRate * CpAir;
                 SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
             } // NodeNum
@@ -1014,7 +1014,7 @@ namespace RoomAirModelAirflowNetwork {
                     ADUInNode = AirDistUnit(ADUNum).InletNodeNum;
                     NodeTemp = Node(ADUInNode).Temp;
                     MassFlowRate = AirDistUnit(ADUNum).MassFlowRateUpStrLk;
-                    CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), NodeTemp);
+                    CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
                     SumSysMCp += MassFlowRate * CpAir;
                     SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                 }
@@ -1022,7 +1022,7 @@ namespace RoomAirModelAirflowNetwork {
                     ADUOutNode = AirDistUnit(ADUNum).OutletNodeNum;
                     NodeTemp = Node(ADUOutNode).Temp;
                     MassFlowRate = AirDistUnit(ADUNum).MassFlowRateDnStrLk;
-                    CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), NodeTemp);
+                    CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
                     SumSysMCp += MassFlowRate * CpAir;
                     SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
                 }
@@ -1031,7 +1031,7 @@ namespace RoomAirModelAirflowNetwork {
             // Get node conditions
             NodeTemp = Node(ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).Temp;
             MassFlowRate = Node(ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate;
-            CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), NodeTemp);
+            CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
             SumSysMCp += MassFlowRate * CpAir;
             SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
         }
@@ -1156,7 +1156,7 @@ namespace RoomAirModelAirflowNetwork {
     } // CalcNodeSums
 
     void RAFNData::CalcSurfaceMoistureSums(
-        int const RoomAirNode, Real64 &SumHmAW, Real64 &SumHmARa, Real64 &SumHmARaW, Array1<bool> const &EP_UNUSED(SurfMask))
+        int const RoomAirNode, Real64 &SumHmAW, Real64 &SumHmARa, Real64 &SumHmARaW, Array1D<bool> const &EP_UNUSED(SurfMask))
     {
 
         // SUBROUTINE INFORMATION:

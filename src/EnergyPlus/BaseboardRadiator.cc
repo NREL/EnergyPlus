@@ -60,7 +60,7 @@
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -118,7 +118,7 @@ namespace BaseboardRadiator {
     using namespace ScheduleManager;
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSpecificHeatGlycol;
-    using Psychrometrics::PsyCpAirFnWTdb;
+    using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
 
     // Data
@@ -1156,7 +1156,7 @@ namespace BaseboardRadiator {
 
         CpWater = GetSpecificHeatGlycol(
             PlantLoop(Baseboard(BaseboardNum).LoopNum).FluidName, WaterInletTemp, PlantLoop(Baseboard(BaseboardNum).LoopNum).FluidIndex, RoutineName);
-        CpAir = PsyCpAirFnWTdb(Baseboard(BaseboardNum).AirInletHumRat, AirInletTemp);
+        CpAir = PsyCpAirFnW(Baseboard(BaseboardNum).AirInletHumRat);
 
         if (Baseboard(BaseboardNum).DesAirMassFlowRate > 0.0) { // If UA is autosized, assign design condition
             AirMassFlowRate = Baseboard(BaseboardNum).DesAirMassFlowRate;
@@ -1321,8 +1321,8 @@ namespace BaseboardRadiator {
         Baseboard(BaseboardNum).Energy = Baseboard(BaseboardNum).Power * TimeStepSys * SecInHour;
     }
 
-    Real64 HWBaseboardUAResidual(Real64 const UA,          // UA of coil
-                                 Array1<Real64> const &Par // par(1) = design coil load [W]
+    Real64 HWBaseboardUAResidual(Real64 const UA,           // UA of coil
+                                 Array1D<Real64> const &Par // par(1) = design coil load [W]
     )
     {
 

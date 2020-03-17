@@ -55,7 +55,7 @@
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataErrorTracking.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataReportingFlags.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataSystemVariables.hh>
@@ -66,6 +66,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HVACSizingSimulationManager.hh>
 #include <EnergyPlus/HeatBalanceManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Plant/PlantManager.hh>
 #include <EnergyPlus/PlantPipingSystemsManager.hh>
 #include <EnergyPlus/SQLiteProcedures.hh>
@@ -130,7 +131,6 @@ void HVACSizingSimulationManager::CreateNewCoincidentPlantAnalysisObject(std::st
 void HVACSizingSimulationManager::SetupSizingAnalyses()
 {
     using DataLoopNode::Node;
-    using DataPlant::PlantReport;
     using DataSizing::CondenserLoop;
     using DataSizing::CoolingLoop;
     using DataSizing::HeatingLoop;
@@ -142,9 +142,9 @@ void HVACSizingSimulationManager::SetupSizingAnalyses()
         P.supplyInletNodeFlow_LogIndex = sizingLogger.SetupVariableSizingLog(Node(P.supplySideInletNodeNum).MassFlowRate, P.numTimeStepsInAvg);
         P.supplyInletNodeTemp_LogIndex = sizingLogger.SetupVariableSizingLog(Node(P.supplySideInletNodeNum).Temp, P.numTimeStepsInAvg);
         if (PlantSizData(P.plantSizingIndex).LoopType == HeatingLoop || PlantSizData(P.plantSizingIndex).LoopType == SteamLoop) {
-            P.loopDemand_LogIndex = sizingLogger.SetupVariableSizingLog(PlantReport(P.plantLoopIndex).HeatingDemand, P.numTimeStepsInAvg);
+            P.loopDemand_LogIndex = sizingLogger.SetupVariableSizingLog(DataPlant::PlantLoop(P.plantLoopIndex).HeatingDemand, P.numTimeStepsInAvg);
         } else if (PlantSizData(P.plantSizingIndex).LoopType == CoolingLoop || PlantSizData(P.plantSizingIndex).LoopType == CondenserLoop) {
-            P.loopDemand_LogIndex = sizingLogger.SetupVariableSizingLog(PlantReport(P.plantLoopIndex).CoolingDemand, P.numTimeStepsInAvg);
+            P.loopDemand_LogIndex = sizingLogger.SetupVariableSizingLog(DataPlant::PlantLoop(P.plantLoopIndex).CoolingDemand, P.numTimeStepsInAvg);
         }
     }
 }
@@ -179,7 +179,7 @@ void HVACSizingSimulationManager::ProcessCoincidentPlantSizeAdjustments(int cons
         P.peakDemandMassFlow = sizingLogger.logObjs[P.supplyInletNodeFlow_LogIndex].GetLogVariableDataAtTimestamp(P.NewFoundMaxDemandTimeStamp);
         P.peakDemandReturnTemp = sizingLogger.logObjs[P.supplyInletNodeTemp_LogIndex].GetLogVariableDataAtTimestamp(P.NewFoundMaxDemandTimeStamp);
 
-        P.ResolveDesignFlowRate(HVACSizingIterCount);
+        P.ResolveDesignFlowRate(OutputFiles::getSingleton(), HVACSizingIterCount);
         if (P.anotherIterationDesired) {
             plantCoinAnalyRequestsAnotherIteration = true;
         }
@@ -199,7 +199,7 @@ void HVACSizingSimulationManager::RedoKickOffAndResize()
     RedoSizesHVACSimulation = true;
 
     ResetEnvironmentCounter();
-    SetupSimulation(ErrorsFound);
+    SetupSimulation(OutputFiles::getSingleton(), ErrorsFound);
 
     KickOffSimulation = false;
     RedoSizesHVACSimulation = false;
@@ -217,7 +217,7 @@ void HVACSizingSimulationManager::UpdateSizingLogsSystemStep()
 
 std::unique_ptr<HVACSizingSimulationManager> hvacSizingSimulationManager;
 
-void ManageHVACSizingSimulation(bool &ErrorsFound)
+void ManageHVACSizingSimulation(OutputFiles &outputFiles, bool &ErrorsFound)
 {
     using DataEnvironment::CurMnDy;
     using DataEnvironment::CurrentOverallSimDay;
@@ -239,7 +239,7 @@ void ManageHVACSizingSimulation(bool &ErrorsFound)
 
     bool Available; // an environment is available to process
     int HVACSizingIterCount;
-    static ObjexxFCL::gio::Fmt Format_700("('Environment:WarmupDays,',I3)");
+
     static ObjexxFCL::gio::Fmt fmtLD("*");
 
     hvacSizingSimulationManager->DetermineSizingAnalysesNeeded();
@@ -263,7 +263,7 @@ void ManageHVACSizingSimulation(bool &ErrorsFound)
         Available = true;
         for (int i = 1; i <= NumOfEnvrn; ++i) { // loop over environments
 
-            GetNextEnvironment(Available, ErrorsFound);
+            GetNextEnvironment(OutputFiles::getSingleton(), Available, ErrorsFound);
             if (ErrorsFound) break;
             if (!Available) continue;
 
@@ -330,7 +330,8 @@ void ManageHVACSizingSimulation(bool &ErrorsFound)
                     DisplayString("Warming up {" + cWarmupDay + '}');
                 } else if (DayOfSim == 1) {
                     DisplayString("Starting HVAC Sizing Simulation at " + CurMnDy + " for " + EnvironmentName);
-                    ObjexxFCL::gio::write(OutputFileInits, Format_700) << NumOfWarmupDays;
+                    static constexpr auto Format_700("Environment:WarmupDays,{:3}\n");
+                    print(outputFiles.eio, Format_700, NumOfWarmupDays);
                 } else if (DisplayPerfSimulationFlag) {
                     DisplayString("Continuing Simulation at " + CurMnDy + " for " + EnvironmentName);
                     DisplayPerfSimulationFlag = false;
@@ -343,7 +344,7 @@ void ManageHVACSizingSimulation(bool &ErrorsFound)
 
                     for (TimeStep = 1; TimeStep <= NumOfTimeStepInHour; ++TimeStep) {
                         if (AnySlabsInModel || AnyBasementsInModel) {
-                            SimulateGroundDomains(false);
+                            SimulateGroundDomains(OutputFiles::getSingleton(), false);
                         }
 
                         BeginTimeStepFlag = true;
@@ -369,7 +370,7 @@ void ManageHVACSizingSimulation(bool &ErrorsFound)
 
                         ManageExteriorEnergyUse();
 
-                        ManageHeatBalance();
+                        ManageHeatBalance(outputFiles);
 
                         BeginHourFlag = false;
                         BeginDayFlag = false;
