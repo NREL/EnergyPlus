@@ -519,9 +519,9 @@ Limitations when using Foundation:Kiva objects include:
   Only floors and walls may use Foundation:Kiva objects as Outside
   Boundary Conditions.
 \item
-  Exactly one floor surface must reference each Foundation:Kiva object.
-  However, multiple floors may exist in the same thermal zone so long as
-  they reference separate Foundation:Kiva objects.
+  For a given zone, each floor surface must reference a different Foundation:Kiva object. In other words, multiple foundation floor surfaces may exist in the same thermal zone so long as they reference separate Foundation:Kiva objects. The same Foundation:Kiva object may be referenced by multiple floors so long as they are in different zones.
+\item
+  Any number of wall surfaces may reference a single Foundation:Kiva object so long as that object is referenced by exactly one floor surface in the same thermal zone.
 \item
   Foundation wall surfaces that are not triangular or quadrilateral may not
   translate well into the two-dimensional finite difference context.
@@ -791,7 +791,7 @@ Kiva's two-dimensional context and are illustrated in Figure
 \paragraph{Field: Exterior Horizontal Insulation
 Depth}
 
-Distance from the wall top to the top of exterior horizontal insulation,
+Distance from the exterior grade to the top of exterior horizontal insulation,
 in m. Required if Exterior Horizontal Insulation Material Name is
 defined.
 
@@ -831,7 +831,7 @@ Grade}
 Distance from the exterior grade to the wall top, in m. Default: 0.2 m
 
 Figures \ref{fig:2d-w} and \ref{fig:2d-w-slab} illustrate the definition of both the ``Wall
-Height Above Grade'' and the following field, ``Wall Depth Below Slab''.
+Height Above Grade'' and the following field, ``Wall Depth Below Slab''. If the top of foundation wall is flush with the ground then the ``Wall Height Above Grade'' is zero.
 
 \begin{figure}
 \centering
@@ -1129,7 +1129,7 @@ interior foundation wall using an Adiabatic Outside Boundary Condition.
 
 \paragraph{Field: Surface Name}\label{surfaceproperty-exposedfoundationperimeter-surface-name}
 
-Name of foundation floor surface.
+Name of foundation floor surface object.
 
 \paragraph{Field: Exposed Perimeter Calculation Method}\label{field-exposed-perimeter-calculation-method}
 
@@ -1138,10 +1138,10 @@ Required key/choice field that tells which method to use to calculate the expose
 \begin{itemize}
 \item TotalExposedPerimeter: Exposed perimeter is defined as an absolute distance in m. (The Total Exposed Perimeter field should be filled.)
 
-\item ExposedPerimeterFraction: Exposed perimeter is defined as a fraction of the total floor perimeter. (The Exposed Perimeter Fraction field should be filled.)
+\item ExposedPerimeterFraction: Exposed perimeter is defined as a fraction of the total floor perimeter. (The Exposed Perimeter Fraction field should be filled.) Note: This option works best when you are confident that the floor surface is completely exposed.
 
 \item BySegment: Each segment of the floor polygon (corresponding to distance between each set of vertices) is defined as exposed (``Yes'') or not exposed (``No'') in an extensible list corresponding to the number of vertices in the floor polygon. Exposed perimeter is defined as the sum of all exposed segment lengths. (The Surface Segment \textless{}x\textgreater{}
-Exposed fields should be filled.)
+Exposed fields should be filled.) Note: The number of segments identified in this object must match the number of vertices in the corresponding surface object.
 \end{itemize}
 
 \paragraph{Field: Total Exposed Perimeter}\label{surfaceproperty-exposedfoundationperimeter-total-exposed-perimeter}
