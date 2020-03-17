@@ -4794,7 +4794,6 @@ namespace Furnaces {
         Real64 DeltaMassRate; // Difference of mass flow rate between
         // inlet node and system outlet node
         Real64 MassFlowRate; // mass flow rate to calculate loss
-        Real64 MaxTemp;      // Maximum temperature used in latent loss calculation
         std::string FanType; // used in warning messages
         std::string FanName; // used in warning messages
 
@@ -8536,7 +8535,6 @@ namespace Furnaces {
         Real64 AirMassFlow;       // Furnace inlet node temperature
         Real64 WSHPRuntimeFrac;   // Compressor runtime fraction
         Real64 CompPartLoadRatio; // Compressor part load ratio
-        Real64 MaxTemp;           // Maximum temperature for calculating latent load at a constant temperature
         Real64 Dummy;             // dummy variable
         Real64 Tout;              // Temporary variable used when outlet temp > DesignMaxOutletTemp
         Real64 Wout;              // Temporary variable used when outlet temp > DesignMaxOutletTemp
