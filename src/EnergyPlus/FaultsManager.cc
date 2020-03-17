@@ -2083,40 +2083,6 @@ namespace FaultsManager {
         return FaultFrac;
     }
 
-    //Real64 FaultPropertiesFoulingCoil::CalFaultyCoilFoulingFactor()
-    //{
-        //// SUBROUTINE INFORMATION:
-        ////       AUTHOR         Julien Marrec, EffiBEM
-        ////       DATE WRITTEN   Feb. 2020
-
-        //// PURPOSE OF THIS SUBROUTINE:
-        //// Calculate the fouling thermal insulance factor (the reciprocal of a heat transfert coefficient) due to fouling in a coil
-
-        //// SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        //Real64 FoulingFactor(0.0); // Fouling Thermal Insulance Factor (K/W)
-
-        //Real64 FaultFrac = this->FaultFraction();
-        //// If severity is zero, there's no fouling
-        //if (FaultFrac > 0.0) {
-
-            //// If "FouledUARated", and coil is autosized, this requires sizing, so I cannot store the UA of the coil on this Fault object here
-            //// I have to use an index
-            //if (this->FoulingInputMethod == iFouledCoil_UARated) {
-                //if (this->FouledCoiledType == WaterCoils::WaterCoil_SimpleHeating) {
-                    //FoulingFactor = FaultFrac * (1.0 / this->UAFouled - 1.0 / WaterCoils::WaterCoil(this->FouledCoilNum).UACoil);
-                //} else { // WaterCoils::WaterCoil_Cooling
-                    //FoulingFactor = FaultFrac * (1.0 / this->UAFouled - 1.0 / WaterCoils::WaterCoil(this->FouledCoilNum).UACoilTotal);
-                //}
-            //} else {
-                //// This case is simpler, doesn't require knowledge of the Coil object
-                //FoulingFactor = FaultFrac * (this->Rfw / (this->Aratio * this->Aout) + this->Rfa / this->Aout);
-            //}
-        //}
-
-        //// Do not allow improving coil performance
-        //return max(FoulingFactor, 0.0);
-    //}
-
     void FaultPropertiesChillerSWT::CalFaultChillerSWT(bool FlagVariableFlow, // True if chiller is variable flow and false if it is constant flow
                                                        Real64 FaultyChillerSWTOffset, // Faulty chiller SWT sensor offset
                                                        Real64 Cp,                     // Local fluid specific heat

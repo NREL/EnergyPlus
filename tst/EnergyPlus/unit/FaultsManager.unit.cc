@@ -52,19 +52,16 @@
 #include <gtest/gtest.h>
 
 // C++ Headers
-#include <cassert>
 #include <cmath>
 #include <string>
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DataEnvironment.hh>
 #include <EnergyPlus/DataGlobals.hh>
-#include <EnergyPlus/DataLoopNode.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/HVACControllers.hh>
@@ -134,7 +131,6 @@ TEST_F(EnergyPlusFixture, FaultsManager_FaultFoulingAirFilters_CheckFaultyAirFil
     Fan(FanNum).DeltaPress = 1017.59 * 1.2;
     FaultsFouledAirFilters(FanNum).FaultyAirFilterFanName = "Fan_2";
     FaultsFouledAirFilters(FanNum).FaultyAirFilterFanCurvePtr = CurveNum;
-    ;
 
     // Run and Check
     // (1)The rated operational point of Fan_1 falls on the fan curve
@@ -775,8 +771,8 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
         EXPECT_NEAR(0.1, FaultsManager::FouledCoils(FaultIndex).Aratio, 0.0001);
 
         // Check calculation
-        Real64 waterTerm = 0.0005 / (100.0*0.1); // Rf_water/A_water = Rfw / (Aout * Aratio)
-        Real64 airTerm = 0.0001 / 100.0;         // Rf_air/A_air = Rfa / Aout
+        //Real64 waterTerm = 0.0005 / (100.0*0.1); // Rf_water/A_water = Rfw / (Aout * Aratio)
+        //Real64 airTerm = 0.0001 / 100.0;         // Rf_air/A_air = Rfa / Aout
         // Expected FaultFrac * (waterTerm + airTerm)
         // Real64 expectedFoulingFactor = 0.75 * (waterTerm + airTerm);
         // EXPECT_NEAR(expectedFoulingFactor, FaultsManager::FouledCoils(FaultIndex).CalFaultyCoilFoulingFactor(), 0.0001);
