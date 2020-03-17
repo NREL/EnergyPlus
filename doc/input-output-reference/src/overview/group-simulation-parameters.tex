@@ -564,6 +564,10 @@ Default: PolygonClipping
 
 If \textbf{PixelCounting} is selected and GPU hardware (or GPU emulation) is not available, a warning will be displayed and EnergyPlus will revert to PolygonClipping. Unlike PolygonClipping, PixelCounting has no limitations related to zone concavity when used with any ``FullInterior'' solar distribution options (i.e., it can accommodate both concave and convex zones equally).
 
+Use of the PixelCounting method requires some overhead in passing instructions between the CPU and the GPU. For low numbers of shading surfaces (less than about 200 for most hardware), PolygonClipping requires less runtime than PixelCounting. However, PixelCounting runtime scales significantly better at higher numbers of shading surfaces.
+
+Some computers have multiple GPUs. In this case, the highest performance GPU is not always used by default. You may want to select which GPU is used when running EnergyPlus by setting the graphics performance preferences on your computer.
+
 If \textbf{Scheduled} is chosen, the External Shading Fraction Schedule Name is required in \textbf{\hyperref[surfacePropertylocalEnvironment]{SurfaceProperty:LocalEnvironment}}. If some exterior surfaces do not have their \textbf{\hyperref[surfacePropertylocalEnvironment]{SurfaceProperty:LocalEnvironment}} objects, no shading is assigned on those exterior surfaces.
 
 If \textbf{Imported} is chosen, the \textbf{\hyperref[schedulefileshading]{Schedule:File:Shading}} object is required to define the external file that stores all shading calculation results. The results are imported altogether by reading the \textbf{\hyperref[schedulefileshading]{Schedule:File:Shading}} object during initialization. The file explicitly defines the mappings to the surfaces. If the data for a surface is not listed in the file, no shading is assigned on this surface.
