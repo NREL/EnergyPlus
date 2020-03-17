@@ -1195,7 +1195,7 @@ namespace HVACCooledBeam {
     }
 
     Real64 CoolBeamResidual(Real64 const CWFlow, // cold water flow rate in kg/s
-                            Array1<Real64> const &Par)
+                            Array1D<Real64> const &Par)
     {
 
         // FUNCTION INFORMATION:
