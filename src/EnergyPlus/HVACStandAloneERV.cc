@@ -1624,7 +1624,6 @@ namespace HVACStandAloneERV {
         int ExhaustInletNode; // unit exhaust air inlet node
         int SupInletNode;     // unit supply air inlet node
         Real64 AirMassFlow;   // total mass flow through supply side of the ERV (supply air outlet node)
-        Real64 MinHumRatio;   // minimum humidity ratio for calculating sensible load met
         // (so enthalpy routines work without error)
         Real64 TotLoadMet;    // total zone load met by unit (W)
         Real64 LatLoadMet;    // latent zone load met by unit (W)
