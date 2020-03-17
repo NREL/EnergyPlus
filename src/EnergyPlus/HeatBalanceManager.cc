@@ -7561,11 +7561,25 @@ namespace HeatBalanceManager {
                     thisConstruct.TypeIsAirBoundarySolar = true;
                 } else if (UtilityRoutines::SameString(solarMethod, "InteriorWindow")) {
                     thisConstruct.TypeIsAirBoundaryInteriorWindow = true;
+                    thisConstruct.TotGlassLayers = 0; // Yes, zero, so it doesn't calculate any glass absorbed solar
                     thisConstruct.TransDiff = 1.0;
                     thisConstruct.TransDiffVis = 1.0;
-                    thisConstruct.TotGlassLayers = 0; // Yes, zero, so it doesn't calculate any glass absorbed solar
-                    thisConstruct.TransSolBeamCoef = 1.0;
+                    thisConstruct.AbsDiffBackShade = 0.0;
+                    thisConstruct.ShadeAbsorpThermal = 0.0;
                     thisConstruct.ReflectSolDiffBack = 0.0;
+                    thisConstruct.ReflectSolDiffFront = 0.0;
+                    thisConstruct.ReflectVisDiffFront = 0.0;
+                    thisConstruct.AbsBeamShadeCoef = 0.0;
+                    thisConstruct.TransSolBeamCoef = 0.0;
+                    thisConstruct.TransSolBeamCoef(1) = 1.0;
+                    thisConstruct.ReflSolBeamFrontCoef = 0.0;
+                    thisConstruct.ReflSolBeamBackCoef = 0.0;
+                    thisConstruct.TransVisBeamCoef = 0.0;
+                    thisConstruct.TransVisBeamCoef(1) = 1.0;
+                    thisConstruct.AbsBeamCoef = 0.0;
+                    thisConstruct.AbsBeamBackCoef = 0.0;
+                    thisConstruct.AbsDiff = 0.0;
+                    thisConstruct.AbsDiffBack = 0.0;
                 }
 
                 // Radiant Exchange Method
