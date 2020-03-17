@@ -67,7 +67,7 @@ TEST(WindowRoutines, EffectiveOpennessHorizontalVenetianBlind_0_deg)
         int const nlayer = 1;
         Real64 const width = 1;
         Real64 const height = 1;
-        Array1A_int LayerType(nlayer);
+        Array1D_int LayerType(nlayer);
 
         Array1D<Real64> Atop_eff(nlayer, 0.0);
         Array1D<Real64> Abot_eff(nlayer, 0.0);
@@ -100,7 +100,7 @@ TEST(WindowRoutines, EffectiveOpennessVerticalVenetianBlind_0_deg)
         int const nlayer = 1;
         Real64 const width = 1;
         Real64 const height = 1;
-        Array1A_int LayerType(nlayer);
+        Array1D_int LayerType(nlayer);
 
         Array1D<Real64> Atop_eff(nlayer, 0.0);
         Array1D<Real64> Abot_eff(nlayer, 0.0);
@@ -133,7 +133,7 @@ TEST(WindowRoutines, EffectiveOpennessHorizontalVenetianBlind_45_deg)
         int const nlayer = 1;
         Real64 const width = 1;
         Real64 const height = 1;
-        Array1A_int LayerType(nlayer);
+        Array1D_int LayerType(nlayer);
 
         Array1D<Real64> Atop_eff(nlayer, 0.0);
         Array1D<Real64> Abot_eff(nlayer, 0.0);
@@ -166,7 +166,7 @@ TEST(WindowRoutines, EffectiveOpennessVerticalVenetianBlind_45_deg)
         int const nlayer = 1;
         Real64 const width = 1;
         Real64 const height = 1;
-        Array1A_int LayerType(nlayer);
+        Array1D_int LayerType(nlayer);
 
         Array1D<Real64> Atop_eff(nlayer, 0.0);
         Array1D<Real64> Abot_eff(nlayer, 0.0);
@@ -199,7 +199,7 @@ TEST(WindowRoutines, EffectiveOpennessOtherShades)
         int const nlayer = 1;
         Real64 const width = 1;
         Real64 const height = 1;
-        Array1A_int LayerType(nlayer);
+        Array1D_int LayerType(nlayer);
 
         Array1D<Real64> Atop_eff(nlayer, 0.0);
         Array1D<Real64> Abot_eff(nlayer, 0.0);
@@ -213,7 +213,7 @@ TEST(WindowRoutines, EffectiveOpennessOtherShades)
         Array1D<Real64> const Ar(nlayer, 0);
         Array1D<Real64> const Ah(nlayer, 0.2);
         LayerType(1) = DIFFSHADE;
-        Array1A<Real64> const SlatAngle(nlayer, 0);
+        Array1D<Real64> const SlatAngle(nlayer, 0);
 
         updateEffectiveMultipliers(nlayer, width, height, Atop, Abot, Al, Ar, Ah, Atop_eff, Abot_eff, Al_eff, Ar_eff, Ah_eff, LayerType, SlatAngle);
 
