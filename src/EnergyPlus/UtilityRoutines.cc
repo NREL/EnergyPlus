@@ -99,6 +99,14 @@ namespace UtilityRoutines {
     bool outputErrorHeader(true);
     ObjexxFCL::gio::Fmt fmtLD("*");
     ObjexxFCL::gio::Fmt fmtA("(A)");
+    std::string appendPerfLog_headerRow("");
+    std::string appendPerfLog_valuesRow("");
+
+    void clear_state()
+    {
+        appendPerfLog_headerRow = "";
+        appendPerfLog_valuesRow = "";
+    }
 
     Real64 ProcessNumber(std::string const &String, bool &ErrorFlag)
     {
@@ -444,32 +452,29 @@ namespace UtilityRoutines {
     // The finalColumn (an optional argument) being true triggers the actual file to be written or appended.
     // J.Glazer February 2020
     {
-        static std::string headerRow = "";
-        static std::string valuesRow = "";
-
         // the following was added for unit testing to clear the static strings
         if (colHeader == "RESET" && colValue == "RESET") {
-            headerRow = "";
-            valuesRow = "";
+            appendPerfLog_headerRow = "";
+            appendPerfLog_valuesRow = "";
             return;
         }
 
         //accumuate the row until ready to be written to the file.
-        headerRow = headerRow + colHeader + ",";
-        valuesRow = valuesRow + colValue + ",";
+        appendPerfLog_headerRow = appendPerfLog_headerRow + colHeader + ",";
+        appendPerfLog_valuesRow = appendPerfLog_valuesRow + colValue + ",";
 
         if (finalColumn) {
             std::fstream fsPerfLog;
             if (!exists(DataStringGlobals::outputPerfLogFileName)) {
                 fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::out); //open file normally
                 if (!fsPerfLog.fail()) {
-                    fsPerfLog << headerRow << std::endl;
-                    fsPerfLog << valuesRow << std::endl;
+                    fsPerfLog << appendPerfLog_headerRow << std::endl;
+                    fsPerfLog << appendPerfLog_valuesRow << std::endl;
                 }
             } else {
                 fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::app); //append to already existing file
                 if (!fsPerfLog.fail()) {
-                    fsPerfLog << valuesRow << std::endl;
+                    fsPerfLog << appendPerfLog_valuesRow << std::endl;
                 }
             }
             fsPerfLog.close();
