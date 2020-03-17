@@ -1803,7 +1803,6 @@ namespace HVACMultiSpeedHeatPump {
         int i;                 // Index to speed
         int NumOfSpeedCooling; // Number of speeds for cooling
         int NumOfSpeedHeating; // Number of speeds for heating
-        Real64 MinHumRat;      // Minimum humidity ratio for sensible capacity calculation (kg/kg)
         Real64 DeltaMassRate;  // Difference of mass flow rate between inlet node and system outlet node
 
         static int ZoneInSysIndex(0);                            // number of zone inlet nodes counter in an airloop
@@ -3372,7 +3371,6 @@ namespace HVACMultiSpeedHeatPump {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int OutletNode;            // MSHP air outlet node
         int InletNode;             // MSHP air inlet node
-        Real64 MinHumRat;          // Minimum humidity ratio for sensible capacity calculation (kg/kg)
         Real64 OutsideDryBulbTemp; // Outdoor dry bulb temperature [C]
         Real64 AirMassFlow;        // Air mass flow rate [kg/s]
         int FanInletNode;          // MSHP air outlet node

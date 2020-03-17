@@ -4790,7 +4790,6 @@ namespace Furnaces {
         Real64 QToCoolSetPt;                         // sensible load to cooling setpoint (W)
         Real64 QToHeatSetPt;                         // sensible load to heating setpoint (W)
         int ZoneInNode;                              // Zone inlet node number in the controlled zone
-        Real64 MinHumRat;                            // Minimum humidity ratio for sensible capacity
         // calculation (kg/kg)
         Real64 DeltaMassRate; // Difference of mass flow rate between
         // inlet node and system outlet node
@@ -5252,10 +5251,7 @@ namespace Furnaces {
         // Calcuate air distribution losses
         if (!FirstHVACIteration && AirLoopPass == 1) {
             ZoneInNode = Furnace(FurnaceNum).ZoneInletNode;
-            MinHumRat = Node(ZoneInNode).HumRat;
             MassFlowRate = Node(ZoneInNode).MassFlowRate / Furnace(FurnaceNum).ControlZoneMassFlowFrac;
-            if (Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).Temp < Node(Furnace(FurnaceNum).NodeNumOfControlledZone).Temp)
-                MinHumRat = Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).HumRat;
             if (AirflowNetwork::SimulateAirflowNetwork > AirflowNetwork::AirflowNetworkControlMultizone) {
                 DeltaMassRate = Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).MassFlowRate -
                                 Node(ZoneInNode).MassFlowRate / Furnace(FurnaceNum).ControlZoneMassFlowFrac;
@@ -5264,12 +5260,12 @@ namespace Furnaces {
                 MassFlowRate = Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).MassFlowRate;
                 DeltaMassRate = 0.0;
             }
-            Real64 SensibleOutput(0.0);  // sensible output rate
-            Real64 LatentOutput(0.0);    // latent output rate
-            Real64 TotalOutput(0.0);     // total output rate 
-            Real64 SensibleOutputDelta(0.0);  // delta sensible output rate
-            Real64 LatentOutputDelta(0.0);    // delta latent output rate
-            Real64 TotalOutputDelta(0.0);     // delta total output rate 
+            Real64 SensibleOutput(0.0);  // sensible output rate, {W}
+            Real64 LatentOutput(0.0);    // latent output rate, {W}
+            Real64 TotalOutput(0.0);     // total output rate, {W} 
+            Real64 SensibleOutputDelta(0.0);  // delta sensible output rate, {W}
+            Real64 LatentOutputDelta(0.0);    // delta latent output rate, {W}
+            Real64 TotalOutputDelta(0.0);     // delta total output rate, {W} 
             CalcTotalSensibleLatentOutput(MassFlowRate, Node(OutNode).Temp, Node(OutNode).HumRat, Node(ZoneInNode).Temp, Node(ZoneInNode).HumRat, TotalOutput, SensibleOutput, LatentOutput);
             CalcTotalSensibleLatentOutput(DeltaMassRate, Node(OutNode).Temp, Node(OutNode).HumRat, Node(Furnace(FurnaceNum).NodeNumOfControlledZone).Temp, Node(Furnace(FurnaceNum).NodeNumOfControlledZone).HumRat, TotalOutputDelta, SensibleOutputDelta, LatentOutputDelta);
             Furnace(FurnaceNum).SenLoadLoss = SensibleOutput - SensibleOutputDelta;
