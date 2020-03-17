@@ -233,6 +233,7 @@ namespace OutputProcessor {
         J_m2,
         clo,
         W_K,
+        K_W,
         kgWater_s,
         unknown,
         customEMS
