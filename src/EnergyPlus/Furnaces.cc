@@ -8540,7 +8540,6 @@ namespace Furnaces {
         Real64 AirMassFlow;       // Furnace inlet node temperature
         Real64 WSHPRuntimeFrac;   // Compressor runtime fraction
         Real64 CompPartLoadRatio; // Compressor part load ratio
-        Real64 MinHumRatio;       // Minimum humidity ratio for calculating sensible load at a constant humidity ratio
         Real64 MaxTemp;           // Maximum temperature for calculating latent load at a constant temperature
         Real64 Dummy;             // dummy variable
         Real64 Tout;              // Temporary variable used when outlet temp > DesignMaxOutletTemp
@@ -8875,12 +8874,9 @@ namespace Furnaces {
         // If the fan runs continually do not allow coils to set OnOffFanPartLoadRatio.
         if (FanOpMode == ContFanCycCoil) OnOffFanPartLoadFraction = 1.0;
 
-        // Check delta T (outlet to space), if positive
-        // use space HumRat (next line), else outlet humrat (IF) so psyc routine gives good result
-
-        Real64 SensibleOutput(0.0);  // sensible output rate
-        Real64 LatentOutput(0.0);    // latent output rate
-        Real64 TotalOutput(0.0);     // total output rate 
+        Real64 SensibleOutput(0.0);  // sensible output rate, {W}
+        Real64 LatentOutput(0.0);    // latent output rate, {W}
+        Real64 TotalOutput(0.0);     // total output rate, {W}
         CalcTotalSensibleLatentOutput(AirMassFlow, Node(FurnaceOutletNode).Temp, Node(FurnaceOutletNode).HumRat, Node(Furnace(FurnaceNum).NodeNumOfControlledZone).Temp, Node(Furnace(FurnaceNum).NodeNumOfControlledZone).HumRat, TotalOutput, SensibleOutput, LatentOutput);
         SensibleLoadMet = SensibleOutput - Furnace(FurnaceNum).SenLoadLoss;
         Furnace(FurnaceNum).SensibleLoadMet = SensibleLoadMet;
