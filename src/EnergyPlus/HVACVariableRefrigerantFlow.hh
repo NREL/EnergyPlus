@@ -929,7 +929,7 @@ namespace HVACVariableRefrigerantFlow {
     void isVRFCoilPresent(std::string const VRFTUName, bool &CoolCoilPresent, bool & HeatCoilPresent);
 
     Real64 PLRResidual(Real64 PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                       Array1<Real64> const &Par   // par(1) = VRFTUNum
+                       Array1D<Real64> const &Par   // par(1) = VRFTUNum
     );
 
     void SetAverageAirFlow(int VRFTUNum,         // Unit index
@@ -962,15 +962,15 @@ namespace HVACVariableRefrigerantFlow {
     void clear_state();
 
     Real64 VRFTUAirFlowResidual_FluidTCtrl(Real64 FanSpdRatio, // fan speed ratio of VRF VAV TU
-                                           Array1<Real64> const &Par // par(1) = VRFTUNum
+                                           Array1D<Real64> const &Par // par(1) = VRFTUNum
     );
 
     Real64 VRFOUTeResidual_FluidTCtrl(Real64 Te,          // outdoor unit evaporating temperature
-                                      Array1<Real64> const &Par // par(1) = VRFTUNum
+                                      Array1D<Real64> const &Par // par(1) = VRFTUNum
     );
 
     Real64 CompResidual_FluidTCtrl(Real64 T_suc,       // Compressor suction temperature Te' [C]
-                                   Array1<Real64> const &Par // parameters
+                                   Array1D<Real64> const &Par // parameters
     );
 
 } // namespace HVACVariableRefrigerantFlow

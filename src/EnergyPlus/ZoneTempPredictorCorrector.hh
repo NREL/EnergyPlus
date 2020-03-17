@@ -352,7 +352,7 @@ namespace ZoneTempPredictorCorrector {
     );
 
     Real64 PMVResidual(Real64 const Tset,
-                       Array1<Real64> const &Par // par(1) = PMV set point
+                       Array1D<Real64> const &Par // par(1) = PMV set point
     );
 
     void AdjustCoolingSetPointforTempAndHumidityControl(int const TempControlledZoneID,
