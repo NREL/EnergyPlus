@@ -3778,8 +3778,8 @@ TEST_F(EnergyPlusFixture, VRFTest_SysCurve)
     ASSERT_EQ(ZoneInletAirNode,
               ZoneEquipConfig(VRFTU(VRFTUNum).ZoneNum).InletNode(1)); // only 1 inlet node specified above in ZoneHVAC:EquipmentConnections
     ASSERT_EQ(1.0, VRF(VRFCond).CoolingCombinationRatio);
-    EXPECT_NEAR(11176.29, VRF(VRFCond).CoolingCapacity, 0.01);
-    EXPECT_NEAR(11176.29, VRF(VRFCond).HeatingCapacity, 0.01);
+    EXPECT_NEAR(11170.869, VRF(VRFCond).CoolingCapacity, 0.001);
+    EXPECT_NEAR(11170.869, VRF(VRFCond).HeatingCapacity, 0.001);
     EXPECT_EQ(0.0, VRF(VRFCond).DefrostPower);
 
     // test defrost operation Issue #4950 - Reverse cycle with timed defrost = 0
@@ -10559,11 +10559,11 @@ TEST_F(EnergyPlusFixture, VRFFluidControl_FanSysModel_OnOffModeTest)
     SimVRF(VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
     // check fan operation for cooling mode
     Real64 Result_AirMassFlowRateDesign = HVACFan::fanObjs[0]->maxAirMassFlowRate();
-    EXPECT_NEAR(Result_AirMassFlowRateDesign, 0.347040, 0.000001);
+    EXPECT_NEAR(Result_AirMassFlowRateDesign, 0.347052, 0.000001);
     Real64 Result_AirMassFlowRate = DataLoopNode::Node(HVACFan::fanObjs[0]->outletNodeNum).MassFlowRate;
     EXPECT_NEAR(Result_AirMassFlowRate, DXCoils::DXCoil(1).RatedAirMassFlowRate(1), 0.000001);
     Real64 Result_FanPower = HVACFan::fanObjs[0]->fanPower();
-    EXPECT_NEAR(Result_FanPower, 39.588, 0.001);
+    EXPECT_NEAR(Result_FanPower, 39.589, 0.001);
 
     // test no load mode fan operation
     ZoneSysEnergyDemand(1).RemainingOutputRequired = 0.0;
@@ -10577,7 +10577,7 @@ TEST_F(EnergyPlusFixture, VRFFluidControl_FanSysModel_OnOffModeTest)
     SimVRF(VRFTUNum, FirstHVACIteration, OnOffAirFlowRatio, SysOutputProvided, LatOutputProvided, QZnReq);
     // check no load fan operation
     Result_AirMassFlowRateDesign = HVACFan::fanObjs[0]->maxAirMassFlowRate();
-    EXPECT_NEAR(Result_AirMassFlowRateDesign, 0.347046, 0.00001);
+    EXPECT_NEAR(Result_AirMassFlowRateDesign, 0.34706, 0.00001);
     Result_AirMassFlowRate = DataLoopNode::Node(HVACFan::fanObjs[0]->outletNodeNum).MassFlowRate;
     EXPECT_EQ(Result_AirMassFlowRate, 0.0);
     Result_FanPower = HVACFan::fanObjs[0]->fanPower();
@@ -11227,9 +11227,9 @@ TEST_F(EnergyPlusFixture, VRFTU_SysCurve_ReportOutputVerificationTest)
     EXPECT_EQ(0.0, thisVRFTU.CoolOutAirMassFlow);
     EXPECT_EQ(0.0, thisVRFTU.HeatOutAirMassFlow);
     EXPECT_EQ(0.0, thisVRFTU.NoCoolHeatOutAirMassFlow);
-    EXPECT_NEAR(5367.5132, thisDXCoolingCoil.TotalCoolingEnergyRate, 0.0001);
-    EXPECT_NEAR(4999.3622, thisVRFTU.TotalCoolingRate, 0.0001);
-    EXPECT_NEAR(368.1510, thisFan.FanPower, 0.0001);
+    EXPECT_NEAR(5367.4015, thisDXCoolingCoil.TotalCoolingEnergyRate, 0.0001);
+    EXPECT_NEAR(4999.3782, thisVRFTU.TotalCoolingRate, 0.0001);
+    EXPECT_NEAR(368.0233, thisFan.FanPower, 0.0001);
     EXPECT_NEAR(thisDXCoolingCoil.TotalCoolingEnergyRate, (thisVRFTU.TotalCoolingRate + thisFan.FanPower), 0.0001);
 }
 

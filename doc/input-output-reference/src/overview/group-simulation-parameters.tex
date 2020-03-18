@@ -254,7 +254,7 @@ As noted in the message, there will be more information in the .eio file. (Refer
 
 You may be able to increase the Maximum Number of Warmup Days and get convergence, but some anomalous buildings may still not converge. Simulation proceeds for x warmup days until ``convergence'' is reached (see the discussion under the Temperature Convergence Tolerance Value field in this object, just above).
 
-The value in this field is an overall parameter for all types of environments in the simulation.  The maximum nmber of warmup days can also be controlled separately for individual designgdays using the input field Maximum Number Warmup Days in the \hyperref[sizingperioddesignday]{SizingPerod:DesignDay} object. 
+The value in this field is an overall parameter for all types of environments in the simulation.  The maximum nmber of warmup days can also be controlled separately for individual designgdays using the input field Maximum Number Warmup Days in the \hyperref[sizingperioddesignday]{SizingPerod:DesignDay} object.
 
 \paragraph{Field: Minimum Number of Warmup Days}\label{field-minimum-number-of-warmup-days}
 
@@ -562,7 +562,11 @@ Choices are:
 
 Default: PolygonClipping
 
-If \textbf{PixelCounting} is selected and GPU hardware (or GPU emulation) is not available, a warning will be displayed and EnergyPlus will revert to PolygonClipping.
+If \textbf{PixelCounting} is selected and GPU hardware (or GPU emulation) is not available, a warning will be displayed and EnergyPlus will revert to PolygonClipping. Unlike PolygonClipping, PixelCounting has no limitations related to zone concavity when used with any ``FullInterior'' solar distribution options (i.e., it can accommodate both concave and convex zones equally).
+
+Use of the PixelCounting method requires some overhead in passing instructions between the CPU and the GPU. For low numbers of shading surfaces (less than about 200 for most hardware), PolygonClipping requires less runtime than PixelCounting. However, PixelCounting runtime scales significantly better at higher numbers of shading surfaces.
+
+Some computers have multiple GPUs. In this case, the highest performance GPU is not always used by default. You may want to select which GPU is used when running EnergyPlus by setting the graphics performance preferences on your computer.
 
 If \textbf{Scheduled} is chosen, the External Shading Fraction Schedule Name is required in \textbf{\hyperref[surfacePropertylocalEnvironment]{SurfaceProperty:LocalEnvironment}}. If some exterior surfaces do not have their \textbf{\hyperref[surfacePropertylocalEnvironment]{SurfaceProperty:LocalEnvironment}} objects, no shading is assigned on those exterior surfaces.
 
@@ -576,7 +580,7 @@ This field is used to control how the solar, shading, and daylighting models are
 
 \paragraph{Field: Shading Calculation Update Frequency}\label{field-calculation-frequency}
 
-This numeric field will cause the shadowing calculations to be done periodically using the number in the field as the number of days in each period. This field is only used if the default method AverageOverDaysInFrequency is used in the previous field. Using this field will allow you to synchronize the shadowing calculations with changes in shading devices. Using the default of 20 days in each period is the average number of days between significant changes in solar position angles. For these shadowing calculations, an ``average'' (over the time period) of solar angles, position, equation of time are also used.
+This numeric field will cause the shadowing calculations to be done periodically using the number in the field as the number of days in each period. This field is only used if the default Periodic calculation frequency method is used in the previous field. Using this field will allow you to synchronize the shadowing calculations with changes in shading devices. Using the default of 20 days in each period is the average number of days between significant changes in solar position angles. For these shadowing calculations, an ``average'' (over the time period) of solar angles, position, equation of time are also used.
 
 \paragraph{Field: Maximum Figures in Shadow Overlap Calculations}\label{field-maximum-figures-in-shadow-overlap-calculations}
 
@@ -606,7 +610,7 @@ Two choices are available here: SimpleSkyDiffuseModeling and DetailedSkyDiffuseM
 
 In general (and you should also read the previous field description), if shadowing surfaces are used with the transmittance property, the user should be careful to synchronize this calculation with the scheduled occurrence of the transmittance (if any) (or use 1, which will be the most accurate but will cause more time in the calculations).
 
-This field applies to the method called ``AverageOverDaysInFrequency.'' When the method called ``DetailedTimestepIntegration'' is used the diffuse sky modeling always uses DetailedSkyDiffuseModeling.
+This field applies to the shading calculation update frequency method called ``Periodic.'' When the method called ``Timestep'' is used the diffuse sky modeling always uses DetailedSkyDiffuseModeling.
 
 \paragraph{Field: Output External Shading Calculation Results}\label{field-output-external-shading-calculation results}
 This fields indicates whether or not (\textbf{Yes} or \textbf{No})to save internal shading calculation results to an external file, which can be imported back as needed. This file saves external sunlit fractions for all surfaces. If \textbf{Yes} is chosen, hourly shading fraction of all surfaces will be exported as a CSV file, naming as "output file prefix + shading" (the default name is "eplusshading.csv" if no output file prefix is defined). Each column of the CSV file lists the annually calculated shading fraction of each surface with time-step interval. It only writes data for each simulation day that shadows are calculated, e.g. once every 20 days by default. If the results are intended to be reused to be imported  back using \textbf{ImportedShading} in \textbf{Field: External Shading Calculation Method}, the Calculation Frequency should be set as one to write year-round hourly results. Design days are not included. The default choice is \textbf{No}.
