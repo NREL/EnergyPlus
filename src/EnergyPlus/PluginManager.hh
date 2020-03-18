@@ -180,6 +180,7 @@ namespace PluginManagement {
 
         static int getLocationOfUserDefinedPlugin(std::string const &programName);
         static void runSingleUserDefinedPlugin(int index);
+        static bool anyUnexpectedPluginObjects();
     };
 
     struct PluginTrendVariable {

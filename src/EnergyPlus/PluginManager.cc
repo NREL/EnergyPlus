@@ -201,7 +201,7 @@ namespace PluginManagement {
                         EnergyPlus::ShowSevereError("Input error on PythonPlugin:OutputVariable = " + thisObjectName);
                         EnergyPlus::ShowContinueError("The variable was marked as metered, but did not define a resource type");
                         EnergyPlus::ShowContinueError("For metered variables, the resource type, group type, and end use category must be defined");
-                        EnergyPlus::ShowFatalError("Input error on PythonPlugin::OutputVariable causes program termination");
+                        EnergyPlus::ShowFatalError("Input error on PythonPlugin:OutputVariable causes program termination");
                     }
                     std::string const resourceType = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("resource_type"));
                     std::string sResourceType;
@@ -261,7 +261,7 @@ namespace PluginManagement {
                         EnergyPlus::ShowSevereError("Input error on PythonPlugin:OutputVariable = " + thisObjectName);
                         EnergyPlus::ShowContinueError("The variable was marked as metered, but did not define a group type");
                         EnergyPlus::ShowContinueError("For metered variables, the resource type, group type, and end use category must be defined");
-                        EnergyPlus::ShowFatalError("Input error on PythonPlugin::OutputVariable causes program termination");
+                        EnergyPlus::ShowFatalError("Input error on PythonPlugin:OutputVariable causes program termination");
                     }
                     std::string const groupType = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("group_type"));
                     std::string sGroupType;
@@ -283,7 +283,7 @@ namespace PluginManagement {
                         EnergyPlus::ShowSevereError("Input error on PythonPlugin:OutputVariable = " + thisObjectName);
                         EnergyPlus::ShowContinueError("The variable was marked as metered, but did not define an end-use category");
                         EnergyPlus::ShowContinueError("For metered variables, the resource type, group type, and end use category must be defined");
-                        EnergyPlus::ShowFatalError("Input error on PythonPlugin::OutputVariable causes program termination");
+                        EnergyPlus::ShowFatalError("Input error on PythonPlugin:OutputVariable causes program termination");
                     }
                     std::string const endUse = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("end_use_category"));
                     std::string sEndUse;
@@ -1084,7 +1084,7 @@ namespace PluginManagement {
 #if LINK_WITH_PYTHON == 1
     Real64 PluginManager::getGlobalVariableValue(int handle) {
         if (PluginManagement::globalVariableValues.empty()) {
-            EnergyPlus::ShowFatalError("Tried to access plugin global variable but it looks like there aren't any; use the PythonPlugin:GlobalVariables object to declare them.");
+            EnergyPlus::ShowFatalError("Tried to access plugin global variable but it looks like there aren't any; use the PythonPlugin:Variables object to declare them.");
         }
         try {
             return PluginManagement::globalVariableValues[handle];
@@ -1136,6 +1136,32 @@ namespace PluginManagement {
     }
 #else
     void PluginManager::runSingleUserDefinedPlugin(int EP_UNUSED(index)) {}
+#endif
+
+#if LINK_WITH_PYTHON == 1
+    bool PluginManager::anyUnexpectedPluginObjects() {
+        static std::vector<std::string> objectsToFind = {
+            "PythonPlugin:OutputVariable",
+            "PythonPlugin:SearchPaths",
+            "PythonPlugin:Instance",
+            "PythonPlugin:Variables",
+            "PythonPlugin:TrendVariable"
+        };
+        int numTotalThings = 0;
+        for (auto const &objToFind : objectsToFind) {
+            int instances = inputProcessor->getNumObjectsFound(objToFind);
+            numTotalThings += instances;
+            if (numTotalThings == 1) {
+                ShowSevereMessage("Found PythonPlugin objects in an IDF that is running in an API/Library workflow...this is invalid");
+            }
+            if (instances > 0) {
+                ShowContinueError("Invalid PythonPlugin object type: " + objToFind);
+            }
+        }
+        return numTotalThings > 0;
+    }
+#else
+    bool PluginManager::anyUnexpectedPluginObjects() {return false;}
 #endif
 
 } // namespace PluginManagement
