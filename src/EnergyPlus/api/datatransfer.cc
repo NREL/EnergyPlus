@@ -120,6 +120,7 @@ int apiDataFullyReady() {
 void requestVariable(const char* type, const char* key) {
     // allow specifying a request for an output variable, so that E+ does not have to keep all of them in memory
     // should be called before energyplus is run!
+    // note that the variable request array is cleared during clear_state, so if you run multiple E+ runs, these must be requested again each time.
     EnergyPlus::OutputProcessor::APIOutputVariableRequest request;
     request.varName = type;
     request.varKey = key;
@@ -197,17 +198,15 @@ void resetActuator(int handle) {
 }
 
 void setActuatorValue(const int handle, const Real64 value) {
-    // I could imagine returning a 0 or 1, but it would really only be validating the handle was in range
-    // the handle is based on the available actuator list
     auto & theActuator(EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable(handle));
     if (theActuator.RealValue) {
         *theActuator.RealValue = value;
     } else if (theActuator.IntValue) {
         *theActuator.IntValue = (int)std::lround(value);
     } else {
-        // what should we do for logicals?
+        // follow protocol from EMS manager, where 1.0 is true, 0.0 is false, and anything else is also false
+        *theActuator.LogValue = value < 0.99999 && value < 1.00001; // allow small tolerance while passing between languages and types
     }
-
     *theActuator.Actuated = true;
 }
 

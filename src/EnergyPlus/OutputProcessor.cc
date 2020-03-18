@@ -401,6 +401,7 @@ namespace OutputProcessor {
         EnergyMeters.deallocate();
         EndUseCategory.deallocate();
         UniqueMeterNames.clear();
+        apiVarRequests.clear();
     }
 
     void InitializeOutput()

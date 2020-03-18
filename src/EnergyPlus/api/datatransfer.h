@@ -80,7 +80,7 @@ ENERGYPLUSLIB_API int apiDataFullyReady();
 ///          This function allows marking variables as used even if they are not in the input file.
 /// \param[in] type Variable Type, such as "System Node Mass Flow Rate", or "Site Outdoor Air DryBulb Temperature"
 /// \param[in] key Variable Key, such as "Node 32", or "Environment"
-/// \remark This function should be called prior to executing the simulation.
+/// \remark This function should be called prior to executing each simulation, as the internal array is cleared when clearing the state of each run.
 ENERGYPLUSLIB_API void requestVariable(const char* type, const char* key);
 /// \brief Gets a handle to a variable
 /// \details Looks up a handle to a variable within a running simulation.
@@ -114,7 +114,8 @@ ENERGYPLUSLIB_API Real64 getVariableValue(int handle);
 /// \see apiDataFullyReady
 ENERGYPLUSLIB_API int getMeterHandle(const char* meterName);
 /// \brief Gets the current value of a meter
-/// \details Looks up the value of an existing meter within a running simulation.
+/// \details Looks up the value of an existing meter within a running simulation.  Caution: This function currently returns the instantaneous value
+///          of a meter, not the cumulative value.  This will change in a future version of the API.
 /// \param[in] handle The handle id of the meter, which can be retrieved using the `getMeterHandle` function
 /// \return The floating point value of a meter at the current time
 /// \throws std::runtime_error Throws a std::runtime_error if the meter handle is out of range.
@@ -148,6 +149,13 @@ ENERGYPLUSLIB_API void resetActuator(int handle);
 /// \brief Sets the value of an actuator in EnergyPlus
 /// \details Actuators are variables in the simulation which can be overridden.
 ///          Calculations made outside of EnergyPlus are performed and used to update values inside EnergyPlus via actuators.
+///          Internally, actuators can alter floating point, integer, and boolean operational values.  The API only exposes
+///          this set function with a floating point argument.  For floating point types, the value is assigned directly.  For
+///          integer types, the value is rounded using std::lround, which will round to the nearest integer, with the halfway point
+///          rounded away from zero (2.5 becomes 3), then cast to a plain integer.  For logical values, the original EMS convention
+///          is kept, where a value of 1.0 means TRUE, and a value of 0.0 means FALSE -- and any other value defaults to FALSE.
+///          A small tolerance is applied internally to allow for small floating point roundoff.  A value *very close* to 1.0 will
+///          still evaluate to TRUE.
 /// \param[in] handle The integer handle to the actuator, which can be retrieved using the `getActuatorHandle` function
 /// \param[in] value The floating point value to be assigned to the actuator in the simulation
 /// \remark Note the behavior of this function is not well-defined until the `apiDataFullyReady` function returns true

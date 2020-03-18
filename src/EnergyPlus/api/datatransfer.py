@@ -137,7 +137,8 @@ class DataExchange:
         EnergyPlus as a program, including when using Python Plugins, variables are requested through input objects.
         When running EnergyPlus as a library, variables can also be requested through this function call.  This
         function has the same signature as the get_variable_handle function, which is used to then request the ID
-        of a variable once the simulation has begun.
+        of a variable once the simulation has begun.  NOTE: Variables should be requested before *each* run of
+        EnergyPlus, as the internal array is cleared when clearing the state of each run.
 
         :param variable_name: The name of the variable to retrieve, e.g. "Site Outdoor Air DryBulb Temperature", or
                               "Fan Air Mass Flow Rate"
@@ -234,8 +235,8 @@ class DataExchange:
         to get a handle to the meter by name.  Then once the handle is retrieved, it is passed into this function to
         then get the value of the meter.
 
-        Note this function is not completed yet.  It currently gives an instant reading of the meter, not an aggregate
-        value throughout the simulation.  Use caution
+        Caution: This function currently returns the instantaneous value of a meter, not the cumulative value.
+        This will change in a future version of the API.
 
         :param meter_handle: An integer returned from the `get_meter_handle` function.
         :return: Floating point representation of the current meter value
@@ -246,10 +247,16 @@ class DataExchange:
         """
         Sets the value of an actuator in a running simulation.  The `get_actuator_handle` function is first used
         to get a handle to the actuator by name.  Then once the handle is retrieved, it is passed into this function,
-        along with the value to assign, to then set the value of the actuator.
+        along with the value to assign, to then set the value of the actuator.  Internally, actuators can alter floating
+        point, integer, and boolean operational values.  The API only exposes this set function with a floating point
+        argument.  For floating point types, the value is assigned directly.  For integer types, the value is rounded
+        to the nearest integer, with the halfway point rounded away from zero (2.5 becomes 3), then cast to a plain
+        integer.  For logical values, the original EMS convention is kept, where a value of 1.0 means TRUE, and a value
+        of 0.0 means FALSE -- and any other value defaults to FALSE.  A small tolerance is applied internally to allow
+        for small floating point roundoff.  A value *very close* to 1.0 will still evaluate to TRUE.
 
         :param actuator_handle: An integer returned from the `get_actuator_handle` function.
-        :param actuator_value: The value to assign to the actuator
+        :param actuator_value: The floating point value to assign to the actuator
         :return: Nothing
         """
         self.api.setActuatorValue(actuator_handle, actuator_value)
