@@ -256,6 +256,18 @@ SET( SRC
   GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh
   GroundTemperatureModeling/GroundTemperatureModelManager.cc
   GroundTemperatureModeling/GroundTemperatureModelManager.hh
+  GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.cc
+  GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh
+  GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.cc
+  GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.hh
+  GroundTemperatureModeling/SiteDeepGroundTemperatures.cc
+  GroundTemperatureModeling/SiteDeepGroundTemperatures.hh
+  GroundTemperatureModeling/SiteFCFactorMethodGroundTemperatures.cc
+  GroundTemperatureModeling/SiteFCFactorMethodGroundTemperatures.hh
+  GroundTemperatureModeling/SiteShallowGroundTemperatures.cc
+  GroundTemperatureModeling/SiteShallowGroundTemperatures.hh
+  GroundTemperatureModeling/XingGroundTemperatureModel.cc
+  GroundTemperatureModeling/XingGroundTemperatureModel.hh
   HVACControllers.cc
   HVACControllers.hh
   HVACCooledBeam.cc
@@ -328,18 +340,6 @@ SET( SRC
   HybridEvapCoolingModel.hh
   HybridModel.cc
   HybridModel.hh
-  GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.cc
-  GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh
-  GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.cc
-  GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.hh
-  GroundTemperatureModeling/SiteDeepGroundTemperatures.cc
-  GroundTemperatureModeling/SiteDeepGroundTemperatures.hh
-  GroundTemperatureModeling/SiteFCFactorMethodGroundTemperatures.cc
-  GroundTemperatureModeling/SiteFCFactorMethodGroundTemperatures.hh
-  GroundTemperatureModeling/SiteShallowGroundTemperatures.cc
-  GroundTemperatureModeling/SiteShallowGroundTemperatures.hh
-  GroundTemperatureModeling/XingGroundTemperatureModel.cc
-  GroundTemperatureModeling/XingGroundTemperatureModel.hh
   ICEngineElectricGenerator.cc
   ICEngineElectricGenerator.hh
   IceThermalStorage.cc
@@ -450,6 +450,8 @@ SET( SRC
   PlantHeatExchangerFluidToFluid.hh
   PlantLoadProfile.cc
   PlantLoadProfile.hh
+  PlantLoopHeatPumpEIR.cc
+  PlantLoopHeatPumpEIR.hh
   Plant/PlantLocation.hh
   Plant/PlantManager.cc
   Plant/PlantManager.hh
@@ -462,6 +464,8 @@ SET( SRC
   PlantValves.cc
   PlantValves.hh
   Platform.hh
+  PluginManager.cc
+  PluginManager.hh
   PollutionModule.cc
   PollutionModule.hh
   PondGroundHeatExchanger.cc
@@ -527,6 +531,8 @@ SET( SRC
   SplitterComponent.hh
   StandardRatings.cc
   StandardRatings.hh
+  StateManagement.cc
+  StateManagement.hh
   SteamBaseboardRadiator.cc
   SteamBaseboardRadiator.hh
   SteamCoils.cc
@@ -602,8 +608,6 @@ SET( SRC
   WaterToAirHeatPump.hh
   WaterToAirHeatPumpSimple.cc
   WaterToAirHeatPumpSimple.hh
-  PlantLoopHeatPumpEIR.cc
-  PlantLoopHeatPumpEIR.hh
   WaterToWaterHeatPumps.hh
   WaterUse.cc
   WaterUse.hh
@@ -638,11 +642,7 @@ SET( SRC
   ZonePlenum.cc
   ZonePlenum.hh
   ZoneTempPredictorCorrector.cc
-  ZoneTempPredictorCorrector.hh
-  StateManagement.cc
-  StateManagement.hh
-  PluginManager.cc
-  PluginManager.hh)
+  ZoneTempPredictorCorrector.hh)
 
 CREATE_SRC_GROUPS( "${SRC}" )
 
