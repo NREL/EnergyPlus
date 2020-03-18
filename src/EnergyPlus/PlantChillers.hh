@@ -97,7 +97,7 @@ namespace PlantChillers {
         Real64 NomCap;                    // design nominal capacity of chiller
         bool NomCapWasAutoSized;          // true if NomCap was autosize on input
         Real64 COP;                       // COP
-        int FlowMode;                     // one of 3 modes for componet flow during operation
+        int FlowMode;                     // one of 3 modes for component flow during operation
         bool ModulatedFlowSetToLoop;      // True if the setpoint is missing at the outlet node
         bool ModulatedFlowErrDone;        // true if setpoint warning issued
         bool HRSPErrDone;                 // TRUE if set point warning issued for heat recovery loop
@@ -311,7 +311,7 @@ namespace PlantChillers {
 
         // engine driven:
         Real64 HeatRecInletTemp;    // Inlet Temperature of the heat recovery fluid
-        Real64 HeatRecMdotActual;   // reporting: Heat Recovery Loop Mass flow rate
+        Real64 HeatRecMdotActual;   // Heat Recovery Loop Mass flow rate
         Real64 QTotalHeatRecovered; // total heat recovered (W)
         Real64 QJacketRecovered;    // heat recovered from jacket (W)
         Real64 QLubeOilRecovered;   // heat recovered from lube (W)
@@ -325,9 +325,9 @@ namespace PlantChillers {
         Real64 FuelMdot;            // Fuel Amount used (Kg/s)
         Real64 ExhaustStackTemp;    // Exhaust Stack Temperature (C)
 
-        Real64 HeatRecOutletTemp; // reporting: Heat Recovery Loop Outlet Temperature (C)
-        Real64 HeatRecMdot;       // reporting: Heat Recovery Loop Mass flow rate (kg/s)
-        Real64 FuelCOP;           // reporting: Fuel COP [delivered cooling rate/fuel energy input rate] (W/W)
+        Real64 HeatRecOutletTemp; // Heat Recovery Loop Outlet Temperature (C)
+        Real64 HeatRecMdot;       // Heat Recovery Loop Mass flow rate (kg/s)
+        Real64 FuelCOP;           // Fuel COP [delivered cooling rate/fuel energy input rate] (W/W)
 
         // Default Constructor
         EngineDrivenChillerSpecs()
@@ -403,7 +403,7 @@ namespace PlantChillers {
         int HeatRecOutletNodeNum;                  // Node number on the heat recovery outlet side of the condenser
         Real64 HeatRecInletTemp;                   // Inlet Temperature of the heat recovery fluid
         Real64 HeatRecOutletTemp;                  // Outlet Temperature of the heat recovery fluid
-        Real64 HeatRecMdot;                        // reporting: Heat Recovery Loop Mass flow rate
+        Real64 HeatRecMdot;                        // Heat Recovery Loop Mass flow rate
         Real64 DesignHeatRecVolFlowRate;           // m3/s, Design Water mass flow rate through heat recovery loop
         bool DesignHeatRecVolFlowRateWasAutoSized; // true if previous field was autosize on input
         Real64 DesignHeatRecMassFlowRate;          // kg/s, Design Water mass flow rate through heat recovery loop
@@ -417,11 +417,11 @@ namespace PlantChillers {
         int HRBranchNum;                           // heat recovery water plant loop branch index
         int HRCompNum;                             // heat recovery water plant loop component index
 
-        Real64 FuelEnergyUsed;     // reporting: Fuel Energy used
-        Real64 FuelEnergyUsedRate; // reporting: Fuel energy used rate (fuel consumption rate)
-        Real64 FuelMassUsed;       // reporting: Fuel Amount used
-        Real64 FuelMassUsedRate;   // reporting: Fuel amount used (fuel Mass consumption rate)
-        Real64 FuelCOP;            // reporting: Fuel coefficient of performance (Qevap/FuelEnergyUsedRate)
+        Real64 FuelEnergyUsed;     // Fuel Energy used
+        Real64 FuelEnergyUsedRate; // Fuel energy used rate (fuel consumption rate)
+        Real64 FuelMassUsed;       // Fuel Amount used
+        Real64 FuelMassUsedRate;   // Fuel amount used (fuel Mass consumption rate)
+        Real64 FuelCOP;            // Fuel coefficient of performance (Qevap/FuelEnergyUsedRate)
 
         // Default Constructor
         GTChillerSpecs()
@@ -481,14 +481,9 @@ namespace PlantChillers {
 
         void size() override;
 
-        void calculate(Real64 &MyLoad,
-                       bool RunFlag,
-                       int EquipFlowCtrl // Flow control mode for the equipment
-        );
+        void calculate(Real64 &MyLoad, bool RunFlag, int EquipFlowCtrl);
 
-        void update(Real64 MyLoad, // unused1208
-                    bool RunFlag   // unused1208
-        );
+        void update(Real64 MyLoad, bool RunFlag);
     };
 
     // Object Data
