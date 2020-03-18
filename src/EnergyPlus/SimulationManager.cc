@@ -1188,7 +1188,7 @@ namespace SimulationManager {
             ErrorsFound = true;
             ShowFatalError("GetProjectData: Only one (\"1\") " + CurrentModuleObject + " object per simulation is allowed.");
         }
-        DataGlobals::createProfLog = Num > 0;
+        DataGlobals::createPerfLog = Num > 0;
         std::string overrideModeValue = "Normal";
         if (instances != inputProcessor->epJSON.end()) {
             auto &instancesValue = instances.value();
@@ -1209,6 +1209,7 @@ namespace SimulationManager {
                 bool overrideMinNumWarmupDays(false);
                 bool overrideBeginEnvResetSuppress(false);
                 bool overrideMaxZoneTempDiff(false);
+                ZoneTempPredictorCorrector::OscillationVariablesNeeded = true;
                 if (fields.find("override_mode") != fields.end()) {
                     overrideModeValue = UtilityRoutines::MakeUPPERCase(fields.at("override_mode"));
                     if (overrideModeValue == "NORMAL") {
@@ -1264,6 +1265,9 @@ namespace SimulationManager {
                     if (overrideTimestep) {
                         ShowWarningError("Due to PerformancePrecisionTradeoffs Override Mode, the Number of TimeSteps has been changed to 1.");
                         DataGlobals::NumOfTimeStepInHour = 1;
+                        DataGlobals::TimeStepZone = 1.0 / double(DataGlobals::NumOfTimeStepInHour);
+                        DataGlobals::MinutesPerTimeStep = DataGlobals::TimeStepZone * 60;
+                        DataGlobals::TimeStepZoneSec = DataGlobals::TimeStepZone * SecInHour;
                     }
                     if (overrideZoneAirHeatBalAlg) {
                         ShowWarningError("Due to PerformancePrecisionTradeoffs Override Mode, the ZoneAirHeatBalanceAlgorithm has been changed to EulerMethod.");
@@ -1416,7 +1420,7 @@ namespace SimulationManager {
         //    ENDIF
         // unused0909743 Format(' Display Extra Warnings',2(', ',A))
         //  ENDIF
-        if (DataGlobals::createProfLog) {
+        if (DataGlobals::createPerfLog) {
             writeIntialPerfLogValues(overrideModeValue);
         }
     }
@@ -1436,7 +1440,7 @@ namespace SimulationManager {
         UtilityRoutines::appendPerfLog("Number of Timesteps per Hour", General::RoundSigDigits(DataGlobals::NumOfTimeStepInHour));
         UtilityRoutines::appendPerfLog("Minimum Number of Warmup Days", General::RoundSigDigits(DataHeatBalance::MinNumberOfWarmupDays));
         UtilityRoutines::appendPerfLog("SuppressAllBeginEnvironmentResets", bool_to_string(DataEnvironment::forceBeginEnvResetSuppress));
-        UtilityRoutines::appendPerfLog("MaxZoneTempDiff", General::RoundSigDigits(DataConvergParams::MaxZoneTempDiff));
+        UtilityRoutines::appendPerfLog("MaxZoneTempDiff", General::RoundSigDigits(DataConvergParams::MaxZoneTempDiff, 2));
      }
 
     std::string bool_to_string(bool logical)
