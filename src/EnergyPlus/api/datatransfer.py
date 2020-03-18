@@ -265,7 +265,6 @@ class DataExchange:
         """
         Resets the actuator internally to EnergyPlus.  This allows subsequent calculations to be used for the actuator
         instead of the externally set actuator value.
-        // TODO: Add a call to this in the test
 
         :param actuator_handle: An integer returned from the `get_actuator_handle` function.
         :return: Nothing
@@ -481,39 +480,39 @@ class DataExchange:
 
     def hour(self) -> int:
         """
-        Get the current hour of the simulation (1-24) TODO: VERIFY THIS
+        Get the current hour of the simulation (0-23)
 
-        :return: An integer hour of the day (1-24)
+        :return: An integer hour of the day (0-23)
         """
         return self.api.hour()
 
     def current_time(self) -> float:
         """
-        Get the current time of day in hours TODO: IM NOT SURE WHAT THIS GETS
+        Get the current time of day in hours, where current time represents the end time of the current time step.
 
-        :return: A floating point representation of the current time -- fractional hours?
+        :return: A floating point representation of the current time in hours
         """
         return self.api.currentTime()
 
     def minutes(self) -> int:
         """
-        Get the current minutes into the hour TODO: VERIFY THIS
+        Get the current minutes into the hour (1-60)
 
-        :return: An integer number of minutes into the current hour (1-60) # TODO VERIFY THIS
+        :return: An integer number of minutes into the current hour (1-60)
         """
         return self.api.minutes()
 
     def day_of_week(self) -> int:
         """
-        Get the current day of the week (0-6) TODO: VERIFY THIS
+        Get the current day of the week (1-7)
 
-        :return: An integer day of week (0-6)
+        :return: An integer day of week (1-7)
         """
         return self.api.dayOfWeek()
 
     def day_of_year(self) -> int:
         """
-        Get the current day of the year (1-366) TODO: VERIFY THIS
+        Get the current day of the year (1-366)
 
         :return: AN integer day of the year (1-366)
         """
