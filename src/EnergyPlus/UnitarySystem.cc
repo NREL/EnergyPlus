@@ -8785,7 +8785,7 @@ namespace UnitarySystems {
 
         FullSensibleOutput = TempSensOutput;
 
-        CpAir = Psychrometrics::PsyCpAirFnW(0.5 * (DataLoopNode::Node(this->CoolCoilInletNodeNum).HumRat + DataLoopNode::Node(this->HeatCoilOutletNodeNum).HumRat));
+        CpAir = Psychrometrics::PsyCpAirFnW(DataLoopNode::Node(this->CoolCoilInletNodeNum).HumRat);
         CoolingOnlySensibleOutput = DataLoopNode::Node(this->CoolCoilInletNodeNum).MassFlowRate * CpAir *
                                     ((DataLoopNode::Node(this->NodeNumOfControlledZone).Temp - DataLoopNode::Node(this->CoolCoilOutletNodeNum).Temp) -
                                      (DataLoopNode::Node(this->HeatCoilOutletNodeNum).Temp - DataLoopNode::Node(this->HeatCoilInletNodeNum).Temp));
@@ -9988,7 +9988,6 @@ namespace UnitarySystems {
         Real64 AirMassFlow = DataLoopNode::Node(OutletNode).MassFlowRate;
         Real64 RefTemp = 0.0;
         Real64 RefHumRat = 0.0;
-        //Real64 MinHumRatio = 0.0;
         if (this->m_ControlType == ControlType::Setpoint) {
             RefTemp = DataLoopNode::Node(this->AirInNode).Temp;
             RefHumRat = DataLoopNode::Node(this->AirInNode).HumRat;
@@ -9996,7 +9995,6 @@ namespace UnitarySystems {
             RefTemp = DataLoopNode::Node(this->NodeNumOfControlledZone).Temp;
             RefHumRat = DataLoopNode::Node(this->NodeNumOfControlledZone).HumRat;
         }
-
         Real64 SensibleOutput(0.0);  // sensible output rate, {W}
         Real64 LatentOutput(0.0);    // latent output rate, {W}
         Real64 TotalOutput(0.0);     // total output rate, {W}
@@ -10023,6 +10021,7 @@ namespace UnitarySystems {
                 }
             }
         } else {
+            // Calculate sensible load met 
             CalcTotalSensibleLatentOutput(AirMassFlow, DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, RefTemp, RefHumRat, TotalOutput, SensibleOutput, LatentOutput);
             SensOutput = SensibleOutput - this->m_SenLoadLoss;
             if (this->m_Humidistat) {

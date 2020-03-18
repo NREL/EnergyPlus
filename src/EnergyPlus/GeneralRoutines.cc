@@ -2198,7 +2198,7 @@ void CalcTotalSensibleLatentOutput(Real64 const MassFlow,  // air mass flow rate
         SensibleOutput = MassFlow * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(TDB2, dW2, TDB1, dW1); // sensible addition/removal rate, {W};
         ;
         //Real64 const h_fg_avg = Psychrometrics::PsyHfgAvgFnTdb2Tdb1(TDB2, TDB1); // average latent heat of vaporization, {J/kg};
-        if (SensibleOutput > TotalOutput) {SensibleOutput = TotalOutput;}; //  reset if sensible is higher than total, 
+        //if (SensibleOutput > TotalOutput) {SensibleOutput = TotalOutput;}; //  reset if sensible is higher than total, 
         LatentOutput = TotalOutput - SensibleOutput; // latent addition/removal rate, {W}
     }
 }
