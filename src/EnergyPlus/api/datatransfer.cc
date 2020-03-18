@@ -128,26 +128,62 @@ void requestVariable(const char* type, const char* key) {
 }
 
 int getVariableHandle(const char* type, const char* key) {
+    // Variables are accessed through a single integer ID, but there are multiple internal types: real and integer.
+    // I am going to make the integer handle span all both types, by carefully defining the handle.
+    // basically, the handles are contiguous, with:
+    //  - index 1 being the first real variable handle
+    //  - index N being the highest real variable handle
+    //  - index N+1 being the first integer variable handle
+    //  - index N+M being the highest integer variable handle
+    // In this function, it is as simple as looping over both types and continuing to increment
+    // the handle carefully.  In the getValue function it is just a matter of checking array sizes.
     std::string const typeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(type);
     std::string const keyUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(key);
-    int handle;
-    handle = 0; // initialize to zero to get 1 based array
-    if (!EnergyPlus::OutputProcessor::RVariableTypes.allocated()) {
-        return -1; // return -1 if it isn't even allocated yet
+    int handle = -1; // initialize to -1 as a flag
+    if (EnergyPlus::OutputProcessor::RVariableTypes.allocated()) {
+        handle = 0; // initialize to 0 to get a 1 based Array1D index
+        for (int i = 1; i <= EnergyPlus::OutputProcessor::NumOfRVariable; i++) {
+            auto &availOutputVar = EnergyPlus::OutputProcessor::RVariableTypes(i);
+            handle++;
+            if (typeUC == availOutputVar.VarNameOnlyUC && keyUC == availOutputVar.KeyNameOnlyUC) {
+                return handle;
+            }
+        }
     }
-    for (auto const & availOutputVar : EnergyPlus::OutputProcessor::RVariableTypes) {
-        handle++;
-        if (typeUC == availOutputVar.VarNameOnlyUC && keyUC == availOutputVar.KeyNameOnlyUC) {
-            return handle;
+    if (EnergyPlus::OutputProcessor::IVariableTypes.allocated()) {
+        // now, if real variables *were* searched, we need to pick up the handle where it left off, otherwise initialize it to zero
+        if (handle == -1) {
+            // real variables were not searched, init to zero
+            handle = 0;
+        } else {
+            // real variables where searched, let it just continue where it left off
+        }
+        for (int i = 1; i <= EnergyPlus::OutputProcessor::NumOfIVariable; i++) {
+            auto &availOutputVar = EnergyPlus::OutputProcessor::IVariableTypes(i);
+            handle++;
+            if (typeUC == availOutputVar.VarNameOnlyUC && keyUC == availOutputVar.KeyNameOnlyUC) {
+                return handle;
+            }
         }
     }
     return -1; // return -1 if it wasn't found
 }
 
 Real64 getVariableValue(const int handle) {
-    try {
-        return *EnergyPlus::OutputProcessor::RVariableTypes(handle).VarPtr.Which;
-    } catch (...) {
+    // this function works in conjunction with the plan set up in getVariableHandle
+    // basically, the handles are contiguous, with:
+    //  - index 1 being the first real variable handle
+    //  - index N being the highest real variable handle
+    //  - index N+1 being the first integer variable handle
+    //  - index N+M being the highest integer variable handle
+    if (handle > 0 && handle <= EnergyPlus::OutputProcessor::NumOfRVariable) {
+        auto &thisOutputVar = EnergyPlus::OutputProcessor::RVariableTypes(handle);
+        return *thisOutputVar.VarPtr.Which;
+    } else if (handle <= EnergyPlus::OutputProcessor::NumOfRVariable + EnergyPlus::OutputProcessor::NumOfIVariable) {
+        int thisHandle = handle - EnergyPlus::OutputProcessor::NumOfRVariable;
+        auto &thisOutputVar = EnergyPlus::OutputProcessor::IVariableTypes(thisHandle);
+        return (Real64)*thisOutputVar.VarPtr.Which;
+    } else {
         throw std::runtime_error("Variable handle out of range in getVariableValue");
     }
 }

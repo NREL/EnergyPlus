@@ -10,6 +10,7 @@ class AverageZoneTemps(EnergyPlusPlugin):
 
     def on_end_of_zone_timestep_before_zone_reporting(self) -> int:
         if self.do_setup:
+            self.data['dummy_int_var_handle'] = self.api.exchange.get_variable_handle("Site Rain Status", "Environment")
             self.data["zone_volumes"] = []
             self.data["zone_temps"] = []
             zone_names = ["perimeter_zn_" + str(i) for i in range(1, 5)] + ["core_zn"]
@@ -23,6 +24,7 @@ class AverageZoneTemps(EnergyPlusPlugin):
             self.data["avg_temp_variable"] = self.api.exchange.get_global_handle("AverageBuildingTemp")
             self.do_setup = False
         zone_temps = list()
+        dummy_val = self.api.exchange.get_variable_value(self.data['dummy_int_var_handle'])
         for t_handle in self.data["zone_temps"]:
             zone_temps.append(self.api.exchange.get_variable_value(t_handle))
         numerator = 0.0

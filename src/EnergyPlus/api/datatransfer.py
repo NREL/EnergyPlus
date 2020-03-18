@@ -253,7 +253,7 @@ class DataExchange:
         to the nearest integer, with the halfway point rounded away from zero (2.5 becomes 3), then cast to a plain
         integer.  For logical values, the original EMS convention is kept, where a value of 1.0 means TRUE, and a value
         of 0.0 means FALSE -- and any other value defaults to FALSE.  A small tolerance is applied internally to allow
-        for small floating point roundoff.  A value *very close* to 1.0 will still evaluate to TRUE.
+        for small floating point round-off.  A value *very close* to 1.0 will still evaluate to TRUE.
 
         :param actuator_handle: An integer returned from the `get_actuator_handle` function.
         :param actuator_value: The floating point value to assign to the actuator
