@@ -1698,7 +1698,7 @@ namespace WaterToAirHeatPump {
     }
 
     Real64 CalcCompSuctionTempResidual(Real64 const CompSuctionTemp, // HP compressor suction temperature (C)
-                                       Array1<Real64> const &Par     // Function parameters
+                                       Array1D<Real64> const &Par    // Function parameters
     )
     {
 

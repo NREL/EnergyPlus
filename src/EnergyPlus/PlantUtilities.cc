@@ -1679,7 +1679,7 @@ namespace PlantUtilities {
     }
 
     // In-Place Right Shift by 1 of Array Elements
-    void rshift1(Array1<Real64> &a, Real64 const a_l)
+    void rshift1(Array1D<Real64> &a, Real64 const a_l)
     {
         assert(a.size_bounded());
         for (int i = a.u(), e = a.l(); i > e; --i) {

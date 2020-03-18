@@ -2262,7 +2262,7 @@ namespace EvaporativeFluidCoolers {
         }
     }
 
-    Real64 EvapFluidCoolerSpecs::SimpleEvapFluidCoolerUAResidual(Real64 const UA, Array1<Real64> const &Par)
+    Real64 EvapFluidCoolerSpecs::SimpleEvapFluidCoolerUAResidual(Real64 const UA, Array1D<Real64> const &Par)
     {
 
         // FUNCTION INFORMATION:
