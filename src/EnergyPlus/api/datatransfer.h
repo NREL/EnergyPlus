@@ -49,7 +49,7 @@
 #define EnergyPlusAPIDataTransfer_h_INCLUDED
 
 #include <EnergyPlus/TypeDefs.h>
-#include <EnergyPlus/api/EnergyPlusAPI.hh>
+#include <EnergyPlus/api/EnergyPlusAPI.h>
 
 #ifdef __cplusplus
 extern "C" {

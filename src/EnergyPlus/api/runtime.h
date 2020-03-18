@@ -48,8 +48,8 @@
 #ifndef EnergyPlusAPIRuntime_h_INCLUDED
 #define EnergyPlusAPIRuntime_h_INCLUDED
 
-#include <EnergyPlus/api/EnergyPlusAPI.hh>
 #include <EnergyPlus/TypeDefs.h>
+#include <EnergyPlus/api/EnergyPlusAPI.h>
 
 #ifdef __cplusplus
 
