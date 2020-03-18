@@ -161,7 +161,7 @@ namespace PluginManagement {
         void setupOutputVariables();
 
         int maxGlobalVariableIndex = -1;
-        static void addGlobalVariable(const std::string& name);
+        void addGlobalVariable(const std::string& name);
         static int getGlobalVariableHandle(const std::string& name, bool suppress_warning = false);
         static Real64 getGlobalVariableValue(int handle);
         static void setGlobalVariableValue(int handle, Real64 value);

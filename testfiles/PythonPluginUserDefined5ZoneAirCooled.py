@@ -26,22 +26,22 @@ class UserDefinedCoilInit(EnergyPlusPlugin):
         cw_loop_vdot_design = self.api.exchange.get_internal_variable_value(cw_loop_vdot_design_handle)
 
         # set chiller design vdot
-        chiller_vdot_design_handle = self.api.exchange.get_actuator_handle("Central Chiller",
-                                                                           "Plant Connection 1",
-                                                                           "Design Volume Flow Rate")
+        chiller_vdot_design_handle = self.api.exchange.get_actuator_handle("Plant Connection 1",
+                                                                           "Design Volume Flow Rate",
+                                                                           "Central Chiller")
         self.api.exchange.set_actuator_value(chiller_vdot_design_handle, cw_loop_vdot_design)
 
         # set chiller minimum mdot
-        chiller_mdot_min_handle = self.api.exchange.get_actuator_handle("Central Chiller",
-                                                                        "Plant Connection 1",
-                                                                        "Minimum Mass Flow Rate")
+        chiller_mdot_min_handle = self.api.exchange.get_actuator_handle("Plant Connection 1",
+                                                                        "Minimum Mass Flow Rate",
+                                                                        "Central Chiller",)
         chiller_mdot_min = 0.0
         self.api.exchange.set_actuator_value(chiller_mdot_min_handle, chiller_mdot_min)
 
         # set chiller maximum mdot
-        chiller_mdot_max_handle = self.api.exchange.get_actuator_handle("Central Chiller",
-                                                                        "Plant Connection 1",
-                                                                        "Maximum Mass Flow Rate")
+        chiller_mdot_max_handle = self.api.exchange.get_actuator_handle("Plant Connection 1",
+                                                                        "Maximum Mass Flow Rate",
+                                                                        "Central Chiller")
         chiller_mdot_max = cw_loop_vdot_design * cw_rho
         self.api.exchange.set_actuator_value(chiller_mdot_max_handle, chiller_mdot_max)
 
@@ -49,23 +49,23 @@ class UserDefinedCoilInit(EnergyPlusPlugin):
         chiller_cap = cw_cp * cw_rho * cw_loop_delta_temp * cw_loop_vdot_design
 
         # set minimum chiller capacity
-        chiller_cap_min_handle = self.api.exchange.get_actuator_handle("Central Chiller",
-                                                                       "Plant Connection 1",
-                                                                       "Minimum Loading Capacity")
+        chiller_cap_min_handle = self.api.exchange.get_actuator_handle("Plant Connection 1",
+                                                                       "Minimum Loading Capacity",
+                                                                       "Central Chiller")
         chiller_cap_min = 0.0
         self.api.exchange.set_actuator_value(chiller_cap_min_handle, chiller_cap_min)
 
         # set maximum chiller capacity
-        chiller_cap_max_handle = self.api.exchange.get_actuator_handle("Central Chiller",
-                                                                       "Plant Connection 1",
-                                                                       "Maximum Loading Capacity")
+        chiller_cap_max_handle = self.api.exchange.get_actuator_handle("Plant Connection 1",
+                                                                       "Maximum Loading Capacity",
+                                                                       "Central Chiller")
         chiller_cap_max = chiller_cap
         self.api.exchange.set_actuator_value(chiller_cap_max_handle, chiller_cap_max)
 
         # set optimal chiller capacity
-        chiller_cap_opt_handle = self.api.exchange.get_actuator_handle("Central Chiller",
-                                                                       "Plant Connection 1",
-                                                                       "Optimal Loading Capacity")
+        chiller_cap_opt_handle = self.api.exchange.get_actuator_handle("Plant Connection 1",
+                                                                       "Optimal Loading Capacity",
+                                                                       "Central Chiller")
         chiller_cap_opt = 0.9 * chiller_cap
         self.api.exchange.set_actuator_value(chiller_cap_opt_handle, chiller_cap_opt)
 
@@ -88,9 +88,9 @@ class UserDefinedCoilSim(EnergyPlusPlugin):
         cw_load = self.api.exchange.get_internal_variable_value(cw_load_request_handle)
 
         # get loop inlet temp
-        cw_inlet_temp_handle = self.api.exchange.get_internal_variable_handle("Central Chiller",
-                                                                              "Inlet Temperature for "
-                                                                              "Plant Connection 1")
+        cw_inlet_temp_handle = self.api.exchange.get_internal_variable_handle("Inlet Temperature for "
+                                                                              "Plant Connection 1",
+                                                                              "Central Chiller")
         cw_inlet_temp = self.api.exchange.get_internal_variable_value(cw_inlet_temp_handle)
 
         # get loop mdot
@@ -99,14 +99,14 @@ class UserDefinedCoilSim(EnergyPlusPlugin):
         cw_mdot = self.api.exchange.get_internal_variable_value(cw_mdot_handle)
 
         # get loop outlet temp actuator handle
-        cw_outlet_temp_handle = self.api.exchange.get_actuator_handle("Central Chiller",
-                                                                      "Plant Connection 1",
-                                                                      "Outlet Temperature")
+        cw_outlet_temp_handle = self.api.exchange.get_actuator_handle("Plant Connection 1",
+                                                                      "Outlet Temperature",
+                                                                      "Central Chiller")
 
         # get loop mdot request actuator handle
-        cw_mdot_request_handle = self.api.exchange.get_actuator_handle("Central Chiller",
-                                                                       "Plant Connection 1",
-                                                                       "Mass Flow Rate")
+        cw_mdot_request_handle = self.api.exchange.get_actuator_handle("Plant Connection 1",
+                                                                       "Mass Flow Rate",
+                                                                       "Central Chiller")
 
         # get chiller electric energy actuator handle
         chiller_elect_energy_handle = self.api.exchange.get_global_handle("Chiller_ElectEnergy")
@@ -123,9 +123,9 @@ class UserDefinedCoilSim(EnergyPlusPlugin):
             return 0
 
         # set chiller load
-        chiller_cap_max_handle = self.api.exchange.get_actuator_handle("Central Chiller",
-                                                                       "Plant Connection 1",
-                                                                       "Maximum Loading Capacity")
+        chiller_cap_max_handle = self.api.exchange.get_actuator_handle("Plant Connection 1",
+                                                                       "Maximum Loading Capacity",
+                                                                       "Central Chiller")
         chiller_cap_max = self.api.exchange.get_variable_value(chiller_cap_max_handle)
 
         chiller_load = 0.0
@@ -137,9 +137,9 @@ class UserDefinedCoilSim(EnergyPlusPlugin):
         # set chiller mdot
         chiller_mdot = 0.0
         if cw_mdot == 0.0:
-            chiller_mdot_max_handle = self.api.exchange.get_actuator_handle("Central Chiller",
-                                                                            "Plant Connection 1",
-                                                                            "Maximum Mass Flow Rate")
+            chiller_mdot_max_handle = self.api.exchange.get_actuator_handle("Plant Connection 1",
+                                                                            "Maximum Mass Flow Rate",
+                                                                            "Central Chiller")
             chiller_mdot_max = self.api.exchange.get_variable_value(chiller_mdot_max_handle)
             chiller_mdot = chiller_mdot_max
         else:

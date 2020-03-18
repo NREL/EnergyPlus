@@ -415,6 +415,7 @@ namespace PluginManagement {
         FileSystem::makeNativePath(pathToPythonPackages);
         auto a = Py_DecodeLocale(pathToPythonPackages.c_str(), nullptr);
         Py_SetPath(a);
+        Py_SetPythonHome(a);
 
         // now that we have set the path, we can initialize python
         // from https://docs.python.org/3/c-api/init.html
@@ -531,19 +532,19 @@ namespace PluginManagement {
                 inputProcessor->markObjectAsUsed(sGlobals, thisObjectName);
                 // TODO: Make this an extensible object
                 if (fields.find("variable_name_1") != fields.end()) {
-                    PluginManager::addGlobalVariable(fields.at("variable_name_1"));
+                    this->addGlobalVariable(fields.at("variable_name_1"));
                 }
                 if (fields.find("variable_name_2") != fields.end()) {
-                    PluginManager::addGlobalVariable(fields.at("variable_name_2"));
+                    this->addGlobalVariable(fields.at("variable_name_2"));
                 }
                 if (fields.find("variable_name_3") != fields.end()) {
-                    PluginManager::addGlobalVariable(fields.at("variable_name_3"));
+                    this->addGlobalVariable(fields.at("variable_name_3"));
                 }
                 if (fields.find("variable_name_4") != fields.end()) {
-                    PluginManager::addGlobalVariable(fields.at("variable_name_4"));
+                    this->addGlobalVariable(fields.at("variable_name_4"));
                 }
                 if (fields.find("variable_name_5") != fields.end()) {
-                    PluginManager::addGlobalVariable(fields.at("variable_name_5"));
+                    this->addGlobalVariable(fields.at("variable_name_5"));
                 }
             }
         }
@@ -932,11 +933,11 @@ namespace PluginManagement {
 #endif
 
 #if LINK_WITH_PYTHON == 1
-    void PluginManager::addGlobalVariable(const std::string &name) {
+    void PluginManager:: addGlobalVariable(const std::string &name) {
         std::string const varNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(name);
         PluginManagement::globalVariableNames.push_back(varNameUC);
         PluginManagement::globalVariableValues.push_back(Real64());
-        PluginManagement::pluginManager->maxGlobalVariableIndex++;
+        this->maxGlobalVariableIndex++;
     }
 #else
     void PluginManager::addGlobalVariable(const std::string &EP_UNUSED(name)) {}
