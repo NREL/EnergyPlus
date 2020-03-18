@@ -82,6 +82,7 @@ See [#PR7577](https://github.com/NREL/EnergyPlus/pull/7577)
 
 The eio output related to `ShadowCalculations` has been changed to reflect the new input fields. See Rules9-2-0-to-9-3-0.md.
 
+See [#PR7302](https://github.com/NREL/EnergyPlus/pull/7302)
 
 ### End Use By Subcategory in SQL
 

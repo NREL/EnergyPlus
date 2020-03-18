@@ -7616,7 +7616,7 @@ namespace OutputReportTabular {
             collapsedTotal(5) = gatherTotalsBEPS(4) + gatherTotalsBEPS(5); // district heating <- purchased heating | <- steam
             collapsedTotal(6) = gatherTotalsBEPS(7);                       // water
 
-            if (DataGlobals::createProfLog) {
+            if (DataGlobals::createPerfLog) {
                 UtilityRoutines::appendPerfLog("Electricity ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(1), 3));
                 UtilityRoutines::appendPerfLog("Natural Gas ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(2), 3));
                 UtilityRoutines::appendPerfLog("Additional Fuel ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(3), 3));
@@ -7624,6 +7624,9 @@ namespace OutputReportTabular {
                 UtilityRoutines::appendPerfLog("District Heating ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(5), 3));
                 UtilityRoutines::appendPerfLog("Water ABUPS Total [m3]", General::RoundSigDigits(collapsedTotal(6), 3));
                 UtilityRoutines::appendPerfLog("Values Gathered Over [hours]", General::RoundSigDigits(gatherElapsedTimeBEPS, 2));
+                UtilityRoutines::appendPerfLog("Facility Any Zone Oscillating Temperatures Time [hours]", General::RoundSigDigits(ZoneTempPredictorCorrector::AnnualAnyZoneTempOscillate, 2));
+                UtilityRoutines::appendPerfLog("Facility Any Zone Oscillating Temperatures During Occupancy Time [hours]", General::RoundSigDigits(ZoneTempPredictorCorrector::AnnualAnyZoneTempOscillateDuringOccupancy, 2));
+                UtilityRoutines::appendPerfLog("Facility Any Zone Oscillating Temperatures in Deadband Time [hours]", General::RoundSigDigits(ZoneTempPredictorCorrector::AnnualAnyZoneTempOscillateInDeadband, 2));
             }
             for (jEndUse = 1; jEndUse <= NumEndUses; ++jEndUse) {
                 for (kEndUseSub = 1; kEndUseSub <= EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
