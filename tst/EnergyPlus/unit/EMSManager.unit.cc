@@ -1344,7 +1344,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
     EXPECT_EQ(DataRuntimeLanguage::ErlExpression(32).Operand(3).Type, 1); // argument was passed to EMS function
     index = 32 + offset;
     EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR32"); // verified at sugartech site using 30 C db and 0.01 kg/kg = 19.60536624685125 C
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 19.589790661, 0.00000001); // TwbFnTdbWPb 30.0 0.01 101325.0 =
+    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 19.60933534, 0.00000001); // TwbFnTdbWPb 30.0 0.01 101325.0 =
 
     EXPECT_EQ(DataRuntimeLanguage::ErlExpression(33).Operator, FuncVFnTdbWPb);
     EXPECT_EQ(DataRuntimeLanguage::ErlExpression(33).NumOperands, 3);

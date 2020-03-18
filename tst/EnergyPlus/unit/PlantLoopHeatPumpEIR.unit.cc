@@ -69,11 +69,7 @@
 using namespace EnergyPlus;
 using namespace EnergyPlus::EIRPlantLoopHeatPumps;
 
-class EIRPLHPFixture : public EnergyPlusFixture
-{
-};
-
-TEST_F(EIRPLHPFixture, ConstructionFullObjectsHeatingAndCooling_WaterSource)
+TEST_F(EnergyPlusFixture, ConstructionFullObjectsHeatingAndCooling_WaterSource)
 {
     std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Heating,",
                                                       "  hp heating side,",
@@ -148,7 +144,7 @@ TEST_F(EIRPLHPFixture, ConstructionFullObjectsHeatingAndCooling_WaterSource)
     EXPECT_THROW(EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"), std::runtime_error);
 }
 
-TEST_F(EIRPLHPFixture, PairingCompanionCoils)
+TEST_F(EnergyPlusFixture, PairingCompanionCoils)
 {
     heatPumps.resize(2);
     EIRPlantLoopHeatPump *coil1 = &heatPumps[0];
@@ -196,7 +192,7 @@ TEST_F(EIRPLHPFixture, PairingCompanionCoils)
     }
 }
 
-TEST_F(EIRPLHPFixture, HeatingConstructionFullObjectsNoCompanion)
+TEST_F(EnergyPlusFixture, HeatingConstructionFullObjectsNoCompanion)
 {
     std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Heating,",
                                                       "  hp heating side,",
@@ -244,7 +240,7 @@ TEST_F(EIRPLHPFixture, HeatingConstructionFullObjectsNoCompanion)
     EXPECT_THROW(EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP HEATING SIDE"), std::runtime_error);
 }
 
-TEST_F(EIRPLHPFixture, CoolingConstructionFullObjectsNoCompanion)
+TEST_F(EnergyPlusFixture, CoolingConstructionFullObjectsNoCompanion)
 {
     std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
                                                       "  hp cooling side,",
@@ -292,7 +288,7 @@ TEST_F(EIRPLHPFixture, CoolingConstructionFullObjectsNoCompanion)
     EXPECT_THROW(EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"), std::runtime_error);
 }
 
-TEST_F(EIRPLHPFixture, CoolingConstructionFullObjectWithDefaults)
+TEST_F(EnergyPlusFixture, CoolingConstructionFullObjectWithDefaults)
 {
     std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
                                                       "  hp cooling side,",
@@ -333,7 +329,7 @@ TEST_F(EIRPLHPFixture, CoolingConstructionFullObjectWithDefaults)
     EXPECT_NEAR(1, thisCoolingPLHP->sizingFactor, 0.001);
 }
 
-TEST_F(EIRPLHPFixture, CoolingConstructionFullyAutoSized_WaterSource)
+TEST_F(EnergyPlusFixture, CoolingConstructionFullyAutoSized_WaterSource)
 {
     std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
                                                       "  hp cooling side,",
@@ -381,7 +377,7 @@ TEST_F(EIRPLHPFixture, CoolingConstructionFullyAutoSized_WaterSource)
     EXPECT_THROW(EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"), std::runtime_error);
 }
 
-TEST_F(EIRPLHPFixture, CatchErrorsOnBadCurves)
+TEST_F(EnergyPlusFixture, CatchErrorsOnBadCurves)
 {
     std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
                                                       "  hp cooling side,",
@@ -404,7 +400,7 @@ TEST_F(EIRPLHPFixture, CatchErrorsOnBadCurves)
     EXPECT_THROW(EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRCooling, "HP COOLING SIDE"), std::runtime_error);
 }
 
-TEST_F(EIRPLHPFixture, Initialization)
+TEST_F(EnergyPlusFixture, Initialization)
 {
     std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
                                                       "  hp cooling side,",
@@ -504,7 +500,7 @@ TEST_F(EIRPLHPFixture, Initialization)
     EXPECT_NEAR(expectedSourceSideMassFlow, DataLoopNode::Node(thisCoolingPLHP->sourceSideNodes.inlet).MassFlowRateMaxAvail, flowTol);
 }
 
-TEST_F(EIRPLHPFixture, TestSizing_FullyAutosizedCoolingWithCompanion_WaterSource)
+TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_WaterSource)
 {
     std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
                                                       "  hp cooling side,",
@@ -691,7 +687,7 @@ TEST_F(EIRPLHPFixture, TestSizing_FullyAutosizedCoolingWithCompanion_WaterSource
     EXPECT_NEAR(expectedCapacity, thisHeatingPLHP->referenceCapacity, 0.0001);
 }
 
-TEST_F(EIRPLHPFixture, TestSizing_FullyHardsizedHeatingWithCompanion)
+TEST_F(EnergyPlusFixture, TestSizing_FullyHardsizedHeatingWithCompanion)
 {
     std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
                                                       "  hp cooling side,",
@@ -828,7 +824,7 @@ TEST_F(EIRPLHPFixture, TestSizing_FullyHardsizedHeatingWithCompanion)
     EXPECT_NEAR(1200, thisHeatingPLHP->referenceCapacity, 0.0001);
 }
 
-TEST_F(EIRPLHPFixture, TestSizing_WithCompanionNoPlantSizing)
+TEST_F(EnergyPlusFixture, TestSizing_WithCompanionNoPlantSizing)
 {
     std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
                                                       "  hp cooling side,",
@@ -957,7 +953,7 @@ TEST_F(EIRPLHPFixture, TestSizing_WithCompanionNoPlantSizing)
     EXPECT_NEAR(1000.0, thisCoolingPLHP->referenceCapacity, 0.0001);
 }
 
-TEST_F(EIRPLHPFixture, TestSizing_NoCompanionNoPlantSizingError)
+TEST_F(EnergyPlusFixture, TestSizing_NoCompanionNoPlantSizingError)
 {
     std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Heating,",
                                                       "  hp heating side,",
@@ -1046,7 +1042,7 @@ TEST_F(EIRPLHPFixture, TestSizing_NoCompanionNoPlantSizingError)
     EXPECT_THROW(thisHeatingPLHP->sizeLoadSide(), std::runtime_error);
 }
 
-TEST_F(EIRPLHPFixture, TestSizing_NoCompanionNoPlantSizingHardSized)
+TEST_F(EnergyPlusFixture, TestSizing_NoCompanionNoPlantSizingHardSized)
 {
     std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Heating,",
                                                       "  hp heating side,",
@@ -1139,7 +1135,7 @@ TEST_F(EIRPLHPFixture, TestSizing_NoCompanionNoPlantSizingHardSized)
     EXPECT_NEAR(1000, thisHeatingPLHP->referenceCapacity, 0.0001);
 }
 
-TEST_F(EIRPLHPFixture, CoolingOutletSetpointWorker)
+TEST_F(EnergyPlusFixture, CoolingOutletSetpointWorker)
 {
     std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
                                                       "  hp cooling side,",
@@ -1218,7 +1214,7 @@ TEST_F(EIRPLHPFixture, CoolingOutletSetpointWorker)
     EXPECT_NEAR(5.436, thisCoolingPLHP->getLoadSideOutletSetPointTemp(), 0.001);
 }
 
-TEST_F(EIRPLHPFixture, Initialization2_WaterSource)
+TEST_F(EnergyPlusFixture, Initialization2_WaterSource)
 {
     std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
                                                       "  hp cooling side,",
@@ -1351,7 +1347,7 @@ TEST_F(EIRPLHPFixture, Initialization2_WaterSource)
     EXPECT_NEAR(0.13, thisCoolingPLHP->sourceSideMassFlowRate, 0.001);
 }
 
-TEST_F(EIRPLHPFixture, OnInitLoopEquipTopologyErrorCases)
+TEST_F(EnergyPlusFixture, OnInitLoopEquipTopologyErrorCases)
 {
     std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
                                                       "  hp cooling side,",
@@ -1468,7 +1464,7 @@ TEST_F(EIRPLHPFixture, OnInitLoopEquipTopologyErrorCases)
     EXPECT_THROW(thisCoolingPLHP->onInitLoopEquip(myLoadLocation), std::runtime_error);
 }
 
-TEST_F(EIRPLHPFixture, CoolingSimulate_WaterSource)
+TEST_F(EnergyPlusFixture, CoolingSimulate_WaterSource)
 {
     std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
                                                       "  hp cooling side,",
@@ -1602,7 +1598,7 @@ TEST_F(EIRPLHPFixture, CoolingSimulate_WaterSource)
     }
 }
 
-TEST_F(EIRPLHPFixture, HeatingSimulate_WaterSource)
+TEST_F(EnergyPlusFixture, HeatingSimulate_WaterSource)
 {
     std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Heating,",
                                                       "  hp heating side,",
@@ -1727,7 +1723,7 @@ TEST_F(EIRPLHPFixture, HeatingSimulate_WaterSource)
     }
 }
 
-TEST_F(EIRPLHPFixture, TestConcurrentOperationChecking)
+TEST_F(EnergyPlusFixture, TestConcurrentOperationChecking)
 {
     heatPumps.resize(4);
     EIRPlantLoopHeatPump *coil1 = &heatPumps[0];
@@ -1756,7 +1752,7 @@ TEST_F(EIRPLHPFixture, TestConcurrentOperationChecking)
     ASSERT_EQ(1, coil4->recurringConcurrentOperationWarningIndex);
 }
 
-TEST_F(EIRPLHPFixture, ConstructionFullObjectsHeatingAndCooling_AirSource)
+TEST_F(EnergyPlusFixture, ConstructionFullObjectsHeatingAndCooling_AirSource)
 {
     std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Heating,",
                                                       "  hp heating side,",
@@ -1831,7 +1827,7 @@ TEST_F(EIRPLHPFixture, ConstructionFullObjectsHeatingAndCooling_AirSource)
     EXPECT_THROW(EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"), std::runtime_error);
 }
 
-TEST_F(EIRPLHPFixture, CoolingSimulate_AirSource)
+TEST_F(EnergyPlusFixture, CoolingSimulate_AirSource)
 {
     std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
                                                       "  hp cooling side,",
@@ -1948,7 +1944,7 @@ TEST_F(EIRPLHPFixture, CoolingSimulate_AirSource)
     }
 }
 
-TEST_F(EIRPLHPFixture, HeatingSimulate_AirSource)
+TEST_F(EnergyPlusFixture, HeatingSimulate_AirSource)
 {
     std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Heating,",
                                                       "  hp heating side,",
@@ -2063,7 +2059,7 @@ TEST_F(EIRPLHPFixture, HeatingSimulate_AirSource)
     }
 }
 
-TEST_F(EIRPLHPFixture, CoolingConstructionFullyAutoSized_AirSource)
+TEST_F(EnergyPlusFixture, CoolingConstructionFullyAutoSized_AirSource)
 {
     std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
                                                       "  hp cooling side,",
@@ -2111,7 +2107,7 @@ TEST_F(EIRPLHPFixture, CoolingConstructionFullyAutoSized_AirSource)
     EXPECT_THROW(EIRPlantLoopHeatPump::factory(DataPlant::TypeOf_HeatPumpEIRHeating, "HP COOLING SIDE"), std::runtime_error);
 }
 
-TEST_F(EIRPLHPFixture, ClearState)
+TEST_F(EnergyPlusFixture, ClearState)
 {
     std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
                                                       "  hp cooling side,",
@@ -2146,7 +2142,7 @@ TEST_F(EIRPLHPFixture, ClearState)
     EXPECT_EQ(heatPumps.size(), 0u);
 }
 
-TEST_F(EIRPLHPFixture, Initialization2_AirSource)
+TEST_F(EnergyPlusFixture, Initialization2_AirSource)
 {
     std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
                                                       "  hp cooling side,",
@@ -2259,7 +2255,7 @@ TEST_F(EIRPLHPFixture, Initialization2_AirSource)
     EXPECT_NEAR(1.29, thisCoolingPLHP->sourceSideMassFlowRate, 0.1);
 }
 
-TEST_F(EIRPLHPFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSource)
+TEST_F(EnergyPlusFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSource)
 {
     std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
                                                       "  hp cooling side,",
@@ -2423,7 +2419,7 @@ TEST_F(EIRPLHPFixture, TestSizing_FullyAutosizedCoolingWithCompanion_AirSource)
     EXPECT_NEAR(expectedCapacity, thisHeatingPLHP->referenceCapacity, 0.0001);
 }
 
-TEST_F(EIRPLHPFixture, TestSizing_HardsizedFlowAutosizedCoolingWithCompanion_AirSource)
+TEST_F(EnergyPlusFixture, TestSizing_HardsizedFlowAutosizedCoolingWithCompanion_AirSource)
 {
     std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
                                                       "  hp cooling side,",
@@ -2551,7 +2547,7 @@ TEST_F(EIRPLHPFixture, TestSizing_HardsizedFlowAutosizedCoolingWithCompanion_Air
     EXPECT_NEAR(expectedCapacity, tmpOpt, 0.001);
 }
 
-TEST_F(EIRPLHPFixture, Test_DoPhysics)
+TEST_F(EnergyPlusFixture, Test_DoPhysics)
 {
 
     std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
@@ -2702,7 +2698,7 @@ TEST_F(EIRPLHPFixture, Test_DoPhysics)
     EXPECT_NEAR(thisCoolingPLHP->sourceSideOutletTemp, 47.9, 0.1);
 }
 
-TEST_F(EIRPLHPFixture, CoolingMetering)
+TEST_F(EnergyPlusFixture, CoolingMetering)
 {
     std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Cooling,",
                                                       "  hp cooling side,",
@@ -2798,7 +2794,7 @@ TEST_F(EIRPLHPFixture, CoolingMetering)
     EXPECT_EQ(Groups(2), "PLANT");
 }
 
-TEST_F(EIRPLHPFixture, HeatingMetering)
+TEST_F(EnergyPlusFixture, HeatingMetering)
 {
     std::string const idf_objects = delimited_string({"HeatPump:PlantLoop:EIR:Heating,",
                                                       "  hp heating side,",

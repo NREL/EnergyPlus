@@ -5719,6 +5719,8 @@ namespace HeatBalanceSurfaceManager {
 
             QConvOutReport(SurfNum) = QdotConvOutRep(SurfNum) * TimeStepZoneSec;
 
+            QHeatEmiReport(SurfNum) = QAirExtReport(SurfNum) - QdotConvOutRep(SurfNum);
+
         } // ...end of DO loop over all surface (actually heat transfer surfaces)
     }
 
@@ -7132,8 +7134,6 @@ namespace HeatBalanceSurfaceManager {
 
         // Calculate surface heat emission to the air, positive values indicates heat transfer from surface to the outside
         QAirExtReport(SurfNum) = Surface(SurfNum).Area * HAirExtSurf(SurfNum) * (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp);
-        QHeatEmiReport(SurfNum) =
-            Surface(SurfNum).Area * (HcExtSurf(SurfNum) + HAirExtSurf(SurfNum)) * (TH(1, 1, SurfNum) - Surface(SurfNum).OutDryBulbTemp);
 
         // Set the radiant system heat balance coefficients if this surface is also a radiant system
         if (construct.SourceSinkPresent) {

@@ -393,7 +393,7 @@ namespace EvaporativeCoolers {
                                              Real64 const EHumRatSec);
 
     Real64 CalcEvapCoolRDDSecFlowResidual(Real64 const AirMassFlowSec,
-                                          Array1<Real64> const &Par // Par( 6 ) is desired temperature C
+                                          Array1D<Real64> const &Par // Par( 6 ) is desired temperature C
     );
 
     Real64 IndEvapCoolerPower(int const EvapCoolIndex, // Unit index
@@ -457,8 +457,8 @@ namespace EvaporativeCoolers {
                                    Real64 const ZoneCoolingLoad // target cooling load
     );
 
-    Real64 ZoneEvapUnitLoadResidual(Real64 const PartLoadRatio, // zone evap unit part load ratiod
-                                    Array1<Real64> const &Par   // parameters
+    Real64 ZoneEvapUnitLoadResidual(Real64 const PartLoadRatio,  // zone evap unit part load ratiod
+                                    Array1D<Real64> const &Par   // parameters
     );
 
     void ControlVSEvapUnitToMeetLoad(int const UnitNum,           // unit number
@@ -467,7 +467,7 @@ namespace EvaporativeCoolers {
     );
 
     Real64 VSEvapUnitLoadResidual(Real64 const FanSpeedRatio,
-                                  Array1<Real64> const &Par // parameters
+                                  Array1D<Real64> const &Par // parameters
     );
 
     void ReportZoneEvaporativeCoolerUnit(int const UnitNum); // unit number
