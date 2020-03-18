@@ -13153,12 +13153,18 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
 
         "Curve:Biquadratic,	",
         "NormalSHRTempCoolingFFF,	!- Name",
-        "3.9903739056,	!- Coefficient1 Constant",
-        "-0.2158168778,	!- Coefficient2 x",
-        "0.0034746418,	!- Coefficient3 x**2",
-        "0.0310505116,	!- Coefficient4 y",
-        "-0.0000360698,	!- Coefficient5 y**2",
-        "-0.0016903602,	!- Coefficient6 x*y",
+        //"3.9903739056,	!- Coefficient1 Constant",
+        //"-0.2158168778,	!- Coefficient2 x",
+        //"0.0034746418,	!- Coefficient3 x**2",
+        //"0.0310505116,	!- Coefficient4 y",
+        //"-0.0000360698,	!- Coefficient5 y**2",
+        //"-0.0016903602,	!- Coefficient6 x*y",
+        "1.0,	!- Coefficient1 Constant",
+        "0.0,	!- Coefficient2 x",
+        "0.0,	!- Coefficient3 x**2",
+        "0.0,	!- Coefficient4 y",
+        "0.0,	!- Coefficient5 y**2",
+        "0.0,	!- Coefficient6 x*y",
         "16.67,	!- Minimum Value of x",
         "22.22,	!- Maximum Value of x",
         "23.89, !- Minimum Value of y",
@@ -13758,8 +13764,8 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     DataZoneEnergyDemands::ZoneSysMoistureDemand(1).RemainingOutputReqToDehumidSP = -200.0 / 2500940.0;
     // test COOLING condition
     DataLoopNode::Node(1).Temp = 24.0;         // 24C db
-    DataLoopNode::Node(1).HumRat = 0.00922;    // 17C wb
-    DataLoopNode::Node(1).Enthalpy = 47597.03; // www.sugartech.com/psychro/index.php
+    DataLoopNode::Node(1).HumRat = 0.01522;    // 17C wb
+    DataLoopNode::Node(1).Enthalpy = Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(1).Temp, DataLoopNode::Node(1).HumRat);
     DataHeatBalFanSys::ZoneAirHumRat.allocate(1);
     DataHeatBalFanSys::MAT.allocate(1);
     DataHeatBalFanSys::ZoneAirHumRat(1) = DataLoopNode::Node(1).HumRat;
@@ -13797,9 +13803,9 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
     EXPECT_EQ(EnergyPlus::coilCoolingDXs[0].performance.ModeRatio, 1.0);
     EXPECT_NEAR(thisSys->CoilSHR, thisSys->LoadSHR, 0.001);
     EXPECT_NEAR(SenOutput, -227.705, 0.1);
-    EXPECT_NEAR(LatOutput, -646.34, 0.1);
+    EXPECT_NEAR(LatOutput, -750.9234, 0.1);
 
-    // OperatingMode 2
+    // OperatingMode 3 with mode ratio < 1
     thisSys->m_ZoneSequenceCoolingNum = 0;
     thisSys->m_ZoneSequenceHeatingNum = 0;
     DataLoopNode::Node(1).HumRat = 0.0114544;   // 17C wb
@@ -13825,18 +13831,19 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
                       ZoneEquipFlag,
                       SenOutput,
                       LatOutput);
-    EXPECT_EQ(EnergyPlus::coilCoolingDXs[0].performance.OperatingMode, 2);
-    EXPECT_NEAR(EnergyPlus::coilCoolingDXs[0].performance.ModeRatio, 0.3727, 0.001);
+    EXPECT_EQ(EnergyPlus::coilCoolingDXs[0].performance.OperatingMode, 3);
+    EXPECT_NEAR(EnergyPlus::coilCoolingDXs[0].performance.ModeRatio, 0.6552, 0.001);
     EXPECT_NEAR(thisSys->LoadSHR, 0.57154, 0.001);
-    EXPECT_NEAR(thisSys->CoilSHR, 0.54009, 0.001);
+    EXPECT_NEAR(thisSys->CoilSHR, 0.44680, 0.001);
     EXPECT_NEAR(SenOutput, -397.162, 0.1);
-    EXPECT_NEAR(LatOutput, -301.374, 0.1);
+    EXPECT_NEAR(LatOutput, -524.623, 0.1);
 
-    // OperatingMode 1
+    // OperatingMode 2
     thisSys->m_ZoneSequenceCoolingNum = 0;
     thisSys->m_ZoneSequenceHeatingNum = 0;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = -1000.00;
-    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -1000.00;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputRequired = -2000.00;
+    DataZoneEnergyDemands::ZoneSysEnergyDemand(1).RemainingOutputReqToCoolSP = -2000.00;
+    DataZoneEnergyDemands::ZoneSysMoistureDemand(1).RemainingOutputReqToDehumidSP = -1.1696238E-5;
     thisSys->simulate(compName,
                       FirstHVACIteration,
                       AirLoopNum,
@@ -13850,10 +13857,10 @@ TEST_F(EnergyPlusFixture, Test_UnitarySystemModel_SubcoolReheatCoil)
                       LatOutput);
     EXPECT_EQ(EnergyPlus::coilCoolingDXs[0].performance.OperatingMode, 1);
     EXPECT_EQ(EnergyPlus::coilCoolingDXs[0].performance.ModeRatio, 0.0);
-    EXPECT_NEAR(thisSys->LoadSHR, 0.77057, 0.001);
-    EXPECT_NEAR(thisSys->CoilSHR, 0.74727, 0.001);
-    EXPECT_NEAR(SenOutput, -1000.0, 0.5);
-    EXPECT_NEAR(LatOutput, -668.63, 0.1);
+    EXPECT_NEAR(thisSys->LoadSHR, 0.98533, 0.001);
+    EXPECT_NEAR(thisSys->CoilSHR, 0.97600, 0.001);
+    EXPECT_NEAR(SenOutput, -2000.0, 0.5);
+    EXPECT_NEAR(LatOutput, -330.85, 0.1);
 }
 // This issue tests for GetInput with respect to Autosizing, especially for issue #7771 where
 // 'Minimum Supply Air Temperature' == 'Autosize' produces a crash
