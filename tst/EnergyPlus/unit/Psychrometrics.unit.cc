@@ -385,3 +385,18 @@ TEST_F(EnergyPlusFixture, Psychrometrics_CpAirValue_Test)
     // check heat transfer rate calc method for heating
     EXPECT_DOUBLE_EQ(Qfrom_mdot_CpAir_DeltaT, Qfrom_mdot_DeltaH);
 }
+
+TEST_F(EnergyPlusFixture, Psychrometrics_PsyTwbFnTdbWPb_Test)
+{
+
+    InitializePsychRoutines();
+
+    // Test when wet bulb temperature is below zero
+    Real64 TDB = 1; // C
+    Real64 W = 0.002; // Kg.water/Kg.dryair
+    Real64 Pb = 101325.0;
+    Real64 result = PsyTwbFnTdbWPb(TDB, W, Pb);
+    Real64 expected_result = -2.200; // expected result from psychrometrics chart
+    EXPECT_NEAR(result, expected_result, 0.001);
+
+}
