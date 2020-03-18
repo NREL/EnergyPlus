@@ -689,7 +689,11 @@ namespace Psychrometrics {
 
             // Calculate new humidity ratio and determine difference from known
             // humidity ratio which is wStar calculated earlier
-            newW = ((2501.0 - 2.381 * WBT) * Wstar - (TDB - WBT)) / (2501.0 + 1.805 * TDB - 4.186 * WBT);
+            if (WBT >= 0.0) {
+                newW = ((2501.0 - 2.326 * WBT) * Wstar - 1.006 * (TDB - WBT)) / (2501.0 + 1.86 * TDB - 4.186 * WBT);
+            } else {
+                newW = ((2830.0 - 0.24 * WBT) * Wstar - 1.006 * (TDB - WBT)) / (2830.0 + 1.86 * TDB - 2.1 * WBT);
+            }
 
             // Check error, if not satisfied, calculate new guess and iterate
             error = W - newW;

@@ -255,52 +255,52 @@ namespace HVACDXSystem {
                          bool &HXUnitOn                 // flag to enable heat exchanger heat recovery
     );
 
-    Real64 DXCoilVarSpeedResidual(Real64 const SpeedRatio,  // compressor speed ratio (1.0 is max, 0.0 is min)
-                                  Array1<Real64> const &Par // par(1) = DX coil number
+    Real64 DXCoilVarSpeedResidual(Real64 const SpeedRatio,   // compressor speed ratio (1.0 is max, 0.0 is min)
+                                  Array1D<Real64> const &Par // par(1) = DX coil number
     );
 
-    Real64 DXCoilVarSpeedHumRatResidual(Real64 const SpeedRatio,  // compressor speed ratio (1.0 is max, 0.0 is min)
-                                        Array1<Real64> const &Par // par(1) = DX coil number
+    Real64 DXCoilVarSpeedHumRatResidual(Real64 const SpeedRatio,   // compressor speed ratio (1.0 is max, 0.0 is min)
+                                        Array1D<Real64> const &Par // par(1) = DX coil number
     );
 
-    Real64 DXCoilCyclingResidual(Real64 const CycRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                 Array1<Real64> const &Par // par(1) = DX coil number
+    Real64 DXCoilCyclingResidual(Real64 const CycRatio,     // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+                                 Array1D<Real64> const &Par // par(1) = DX coil number
     );
 
-    Real64 DXCoilCyclingHumRatResidual(Real64 const CycRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                       Array1<Real64> const &Par // par(1) = DX coil number
+    Real64 DXCoilCyclingHumRatResidual(Real64 const CycRatio,     // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+                                       Array1D<Real64> const &Par // par(1) = DX coil number
     );
 
     Real64 DOE2DXCoilResidual(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                              Array1<Real64> const &Par   // par(1) = DX coil number
+                              Array1D<Real64> const &Par  // par(1) = DX coil number
     );
 
     Real64 DOE2DXCoilHumRatResidual(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                    Array1<Real64> const &Par   // par(1) = DX coil number
+                                    Array1D<Real64> const &Par  // par(1) = DX coil number
     );
 
     Real64 MultiModeDXCoilResidual(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                   Array1<Real64> const &Par   // par(1) = DX coil number
+                                   Array1D<Real64> const &Par  // par(1) = DX coil number
     );
 
     Real64 MultiModeDXCoilHumRatResidual(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                         Array1<Real64> const &Par   // par(1) = DX coil number
+                                         Array1D<Real64> const &Par  // par(1) = DX coil number
     );
 
     Real64 HXAssistedCoolCoilTempResidual(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                          Array1<Real64> const &Par   // par(1) = DX coil number
+                                          Array1D<Real64> const &Par  // par(1) = DX coil number
     );
 
     Real64 HXAssistedCoolCoilHRResidual(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                        Array1<Real64> const &Par   // par(1) = DX coil number
+                                        Array1D<Real64> const &Par  // par(1) = DX coil number
     );
 
     Real64 TESCoilResidual(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                           Array1<Real64> const &Par   // par(1) = DX coil number
+                           Array1D<Real64> const &Par  // par(1) = DX coil number
     );
 
     Real64 TESCoilHumRatResidual(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                 Array1<Real64> const &Par   // par(1) = DX coil number
+                                 Array1D<Real64> const &Par  // par(1) = DX coil number
     );
 
     void FrostControlSetPointLimit(int const DXSystemNum,      // dx cooling coil system index
@@ -319,28 +319,28 @@ namespace HVACDXSystem {
     //******************************************************************************
 
     Real64 VSCoilCyclingResidual(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                 Array1<Real64> const &Par   // par(1) = DX coil number
+                                 Array1D<Real64> const &Par   // par(1) = DX coil number
     );
 
     //******************************************************************************
 
     Real64 VSCoilSpeedResidual(Real64 const SpeedRatio,  // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                               Array1<Real64> const &Par // par(1) = DX coil number
+                               Array1D<Real64> const &Par // par(1) = DX coil number
     );
 
     Real64 VSCoilCyclingHumResidual(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                    Array1<Real64> const &Par   // par(1) = DX coil number
+                                    Array1D<Real64> const &Par   // par(1) = DX coil number
     );
 
     //******************************************************************************
 
     Real64 VSCoilSpeedHumResidual(Real64 const SpeedRatio,  // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                  Array1<Real64> const &Par // par(1) = DX coil number
+                                  Array1D<Real64> const &Par // par(1) = DX coil number
     );
 
-    int GetCoolingCoilInletNodeNum(std::string const &DXCoilSysName);
+    int GetCoolingCoilInletNodeNum(std::string const &DXCoilSysName, bool &InletNodeErrFlag);
 
-    int GetCoolingCoilOutletNodeNum(std::string const &DXCoilSysName);
+    int GetCoolingCoilOutletNodeNum(std::string const &DXCoilSysName, bool &OutletNodeErrFlag);
 
     //        End of Calculation subroutines for the DXCoolingSystem Module
     // *****************************************************************************

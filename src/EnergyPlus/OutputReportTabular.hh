@@ -391,8 +391,35 @@ namespace OutputReportTabular {
     extern std::string activeForName;
     extern std::string prevReportName;
 
-    // SUBROUTINE SPECIFICATIONS FOR MODULE PrimaryPlantLoops
-    // PRIVATE      DateToStr
+    // LineTypes for reading the stat file
+    enum class StatLineType {
+        Initialized, // used as a dummy placeholder
+        StatisticsLine,
+        LocationLine,
+        LatLongLine,
+        ElevationLine,
+        StdPressureLine,
+        DataSourceLine,
+        WMOStationLine,
+        DesignConditionsLine,
+        heatingConditionsLine,
+        coolingConditionsLine,
+        stdHDDLine,
+        stdCDDLine,
+        maxDryBulbLine,
+        minDryBulbLine,
+        maxDewPointLine,
+        minDewPointLine,
+        wthHDDLine,
+        wthCDDLine,
+        KoppenLine,
+        KoppenDes1Line,
+        KoppenDes2Line,
+        AshStdLine,
+        AshStdDes1Line,
+        AshStdDes2Line,
+        AshStdDes3Line,
+    };
 
     // Types
 
@@ -754,6 +781,8 @@ namespace OutputReportTabular {
     //======================================================================================================================
 
     void WriteTabularReports();
+
+    void parseStatLine(const std::string & lineIn, StatLineType &lineType, bool & desConditionlinepassed, bool & heatingDesignlinepassed, bool & coolingDesignlinepassed, bool & isKoppen);
 
     void FillWeatherPredefinedEntries();
 

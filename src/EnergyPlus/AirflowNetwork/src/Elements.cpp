@@ -2764,6 +2764,8 @@ namespace AirflowNetwork {
         DisSysCompCPDData.deallocate();
         AirflowNetworkReportData.deallocate();
         AirflowNetworkLinkageViewFactorData.deallocate();
+        lowerLimitErrIdx = 0;
+        upperLimitErrIdx = 0;
     }
 
 } // namespace AirflowNetwork
