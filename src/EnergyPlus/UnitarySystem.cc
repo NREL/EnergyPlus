@@ -15412,8 +15412,7 @@ namespace UnitarySystems {
         }
     }
 
-    int UnitarySys::getAirInNode(std::string const &UnitarySysName, int const ZoneOAUnitNum)
-    {
+    int UnitarySys::getAirInNode(std::string const &UnitarySysName, int const ZoneOAUnitNum, bool &errFlag) {
         if (UnitarySystems::getInputOnceFlag) {
             getUnitarySystemInput(UnitarySysName, false, ZoneOAUnitNum);
             UnitarySystems::getInputOnceFlag = false;
@@ -15425,11 +15424,11 @@ namespace UnitarySystems {
                 break;
             }
         }
+        if (airNode == 0) errFlag = true;
         return airNode;
     }
 
-    int UnitarySys::getAirOutNode(std::string const &UnitarySysName, int const ZoneOAUnitNum)
-    {
+    int UnitarySys::getAirOutNode(std::string const &UnitarySysName, int const ZoneOAUnitNum, bool &errFlag) {
         if (UnitarySystems::getInputOnceFlag) {
             getUnitarySystemInput(UnitarySysName, false, ZoneOAUnitNum);
             UnitarySystems::getInputOnceFlag = false;
@@ -15441,6 +15440,7 @@ namespace UnitarySystems {
                 break;
             }
         }
+        if (airNode == 0) errFlag = true;
         return airNode;
     }
 

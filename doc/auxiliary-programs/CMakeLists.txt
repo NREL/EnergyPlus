@@ -89,8 +89,6 @@ SET( INCLUDED_TEX
   ${PROJECT_SOURCE_DIR}/auxiliary-programs/src/parametric-spreadsheets/g-function-spreadsheet.tex
   ${PROJECT_SOURCE_DIR}/auxiliary-programs/src/parametricpreprocessor.tex
   ${PROJECT_SOURCE_DIR}/auxiliary-programs/src/appgpostprocess-appendix-g-postprocessing.tex
-  ${PROJECT_SOURCE_DIR}/auxiliary-programs/src/blasttranslator.tex
-  ${PROJECT_SOURCE_DIR}/auxiliary-programs/src/doe2translator.tex
   ${PROJECT_SOURCE_DIR}/auxiliary-programs/src/running-console-applications.tex
   ${PROJECT_SOURCE_DIR}/auxiliary-programs/src/running-console-applications/modifying-the-batch-file.tex
   ${PROJECT_SOURCE_DIR}/auxiliary-programs/src/technical-details-of-running-energyplus.tex

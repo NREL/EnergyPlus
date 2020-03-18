@@ -4099,7 +4099,7 @@ namespace ZoneTempPredictorCorrector {
 
             } else if (SELECT_CASE_var == SingleHeatingSetPoint) {
 
-                // PH 3/2/04      LoadToHeatingSetPoint = (TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum))
+                // PH 3/2/04      LoadToHeatingSetPoint = TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum)
                 if (ZoneAirSolutionAlgo == Use3rdOrder) {
                     LoadToHeatingSetPoint = (TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum));
                     // Exact solution
@@ -4128,7 +4128,7 @@ namespace ZoneTempPredictorCorrector {
 
                 // PH 3/2/04      LoadToCoolingSetPoint = (TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum))
                 if (ZoneAirSolutionAlgo == Use3rdOrder) {
-                    LoadToCoolingSetPoint = (TempDepZnLd(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum)) - TempIndZnLd(ZoneNum));
+                    LoadToCoolingSetPoint = TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum);
                 } else if (ZoneAirSolutionAlgo == UseAnalyticalSolution) {
                     if (TempDepZnLd(ZoneNum) == 0.0) { // B=0
                         LoadToCoolingSetPoint = AIRRAT(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum)) - TempIndZnLd(ZoneNum);
@@ -7594,7 +7594,7 @@ namespace ZoneTempPredictorCorrector {
     }
 
     Real64 PMVResidual(Real64 const Tset,
-                       Array1<Real64> const &Par // par(1) = PMV set point
+                       Array1D<Real64> const &Par // par(1) = PMV set point
     )
     {
         // FUNCTION INFORMATION:
