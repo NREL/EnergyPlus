@@ -517,6 +517,8 @@ namespace HVACManager {
             // Update the plant and condenser loop capacitance model temperature history.
             UpdateNodeThermalHistory();
 
+            OutputReportTabular::CalcHeatEmissionReport();
+
             ManageEMS(emsCallFromEndSystemTimestepBeforeHVACReporting, anyEMSRan); // EMS calling point
 
             // This is where output processor data is updated for System Timestep reporting
@@ -795,6 +797,18 @@ namespace HVACManager {
         if (!SimHVACIterSetup) {
             SetupOutputVariable("HVAC System Solver Iteration Count", OutputProcessor::Unit::None, HVACManageIteration, "HVAC", "Sum", "SimHVAC");
             SetupOutputVariable("Air System Solver Iteration Count", OutputProcessor::Unit::None, RepIterAir, "HVAC", "Sum", "SimHVAC");
+            SetupOutputVariable("Air System Relief Air Total Heat Loss Energy",
+                                OutputProcessor::Unit::J,
+                                DataHeatBalance::SysTotalHVACReliefHeatLoss,
+                                "HVAC",
+                                "Sum",
+                                "SimHVAC");
+            SetupOutputVariable("HVAC System Total Heat Rejection Energy",
+                                OutputProcessor::Unit::J,
+                                DataHeatBalance::SysTotalHVACRejectHeatLoss,
+                                "HVAC",
+                                "Sum",
+                                "SimHVAC");
             ManageSetPoints(); // need to call this before getting plant loop data so setpoint checks can complete okay
             GetPlantLoopData();
             GetPlantInput();
