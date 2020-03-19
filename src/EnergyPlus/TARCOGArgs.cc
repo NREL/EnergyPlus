@@ -116,53 +116,53 @@ namespace TARCOGArgs {
                  Real64 const Pa,
                  Real64 const Pini,
                  Real64 const Tini,
-                 Array1A<Real64> const gap,
-                 Array1A<Real64> const GapDef,
-                 Array1A<Real64> const thick,
-                 Array1A<Real64> const scon,
-                 Array1A<Real64> const YoungsMod,
-                 Array1A<Real64> const PoissonsRat,
-                 Array1A<Real64> const tir,
-                 Array1A<Real64> const emis,
+                 const Array1D<Real64> &gap,
+                 const Array1D<Real64> &GapDef,
+                 const Array1D<Real64> &thick,
+                 const Array1D<Real64> &scon,
+                 const Array1D<Real64> &YoungsMod,
+                 const Array1D<Real64> &PoissonsRat,
+                 const Array1D<Real64> &tir,
+                 const Array1D<Real64> &emis,
                  Real64 const totsol,
                  Real64 const tilt,
-                 Array1A<Real64> const asol,
+                 const Array1D<Real64> &asol,
                  Real64 const height,
                  Real64 const heightt,
                  Real64 const width,
-                 Array1A<Real64> const presure,
+                 const Array1D<Real64> &presure,
                  Array2A_int const iprop,
                  Array2A<Real64> const frct,
                  Array2A<Real64> const xgcon,
                  Array2A<Real64> const xgvis,
                  Array2A<Real64> const xgcp,
-                 Array1A<Real64> const xwght,
-                 Array1A<Real64> const gama,
-                 Array1A_int const nmix,
-                 Array1A_int const SupportPillar,     // Shows whether or not gap have support pillar
-                 Array1A<Real64> const PillarSpacing, // Pillar spacing for each gap (used in case there is support pillar)
-                 Array1A<Real64> const PillarRadius,  // Pillar radius for each gap (used in case there is support pillar)
+                 const Array1D<Real64> &xwght,
+                 const Array1D<Real64> &gama,
+                 const Array1D_int &nmix,
+                 const Array1D_int &SupportPillar,     // Shows whether or not gap have support pillar
+                 const Array1D<Real64> &PillarSpacing, // Pillar spacing for each gap (used in case there is support pillar)
+                 const Array1D<Real64> &PillarRadius,  // Pillar radius for each gap (used in case there is support pillar)
                  Real64 &hin,
                  Real64 &hout,
-                 Array1A_int const ibc,
-                 Array1A<Real64> const Atop,
-                 Array1A<Real64> const Abot,
-                 Array1A<Real64> const Al,
-                 Array1A<Real64> const Ar,
-                 Array1A<Real64> const Ah,
-                 Array1A<Real64> const SlatThick,
-                 Array1A<Real64> const SlatWidth,
-                 Array1A<Real64> const SlatAngle,
-                 Array1A<Real64> const SlatCond,
-                 Array1A<Real64> const SlatSpacing,
-                 Array1A<Real64> const SlatCurve,
-                 Array1A<Real64> const vvent,
-                 Array1A<Real64> const tvent,
-                 Array1A_int const LayerType,
-                 Array1A_int const nslice,
-                 Array1A<Real64> const LaminateA,
-                 Array1A<Real64> const LaminateB,
-                 Array1A<Real64> const sumsol,
+                 const Array1D_int &ibc,
+                 const Array1D<Real64> &Atop,
+                 const Array1D<Real64> &Abot,
+                 const Array1D<Real64> &Al,
+                 const Array1D<Real64> &Ar,
+                 const Array1D<Real64> &Ah,
+                 const Array1D<Real64> &SlatThick,
+                 const Array1D<Real64> &SlatWidth,
+                 const Array1D<Real64> &SlatAngle,
+                 const Array1D<Real64> &SlatCond,
+                 const Array1D<Real64> &SlatSpacing,
+                 const Array1D<Real64> &SlatCurve,
+                 const Array1D<Real64> &vvent,
+                 const Array1D<Real64> &tvent,
+                 const Array1D_int &LayerType,
+                 const Array1D_int &nslice,
+                 const Array1D<Real64> &LaminateA,
+                 const Array1D<Real64> &LaminateB,
+                 const Array1D<Real64> &sumsol,
                  int const standard,
                  int const ThermalMod,
                  Real64 const SDScalar,
@@ -177,46 +177,46 @@ namespace TARCOGArgs {
         int ArgCheck;
 
         // Argument array dimensioning
-        gap.dim(maxlay);
-        GapDef.dim(MaxGap);
-        thick.dim(maxlay);
-        scon.dim(maxlay);
-        YoungsMod.dim(maxlay);
-        PoissonsRat.dim(maxlay);
-        tir.dim(maxlay2);
-        emis.dim(maxlay2);
-        asol.dim(maxlay);
-        presure.dim(maxlay1);
+        EP_SIZE_CHECK(gap, maxlay);
+        EP_SIZE_CHECK(GapDef, MaxGap);
+        EP_SIZE_CHECK(thick, maxlay);
+        EP_SIZE_CHECK(scon, maxlay);
+        EP_SIZE_CHECK(YoungsMod, maxlay);
+        EP_SIZE_CHECK(PoissonsRat, maxlay);
+        EP_SIZE_CHECK(tir, maxlay2);
+        EP_SIZE_CHECK(emis, maxlay2);
+        EP_SIZE_CHECK(asol, maxlay);
+        EP_SIZE_CHECK(presure, maxlay1);
         iprop.dim(maxgas, maxlay1);
         frct.dim(maxgas, maxlay1);
         xgcon.dim(3, maxgas);
         xgvis.dim(3, maxgas);
         xgcp.dim(3, maxgas);
-        xwght.dim(maxgas);
-        gama.dim(maxgas);
-        nmix.dim(maxlay1);
-        SupportPillar.dim(maxlay);
-        PillarSpacing.dim(maxlay);
-        PillarRadius.dim(maxlay);
-        ibc.dim(2);
-        Atop.dim(maxlay);
-        Abot.dim(maxlay);
-        Al.dim(maxlay);
-        Ar.dim(maxlay);
-        Ah.dim(maxlay);
-        SlatThick.dim(maxlay);
-        SlatWidth.dim(maxlay);
-        SlatAngle.dim(maxlay);
-        SlatCond.dim(maxlay);
-        SlatSpacing.dim(maxlay);
-        SlatCurve.dim(maxlay);
-        vvent.dim(maxlay1);
-        tvent.dim(maxlay1);
-        LayerType.dim(maxlay);
-        nslice.dim(maxlay);
-        LaminateA.dim(maxlay);
-        LaminateB.dim(maxlay);
-        sumsol.dim(maxlay);
+        EP_SIZE_CHECK(xwght, maxgas);
+        EP_SIZE_CHECK(gama, maxgas);
+        EP_SIZE_CHECK(nmix, maxlay1);
+        EP_SIZE_CHECK(SupportPillar, maxlay);
+        EP_SIZE_CHECK(PillarSpacing, maxlay);
+        EP_SIZE_CHECK(PillarRadius, maxlay);
+        EP_SIZE_CHECK(ibc, 2);
+        EP_SIZE_CHECK(Atop, maxlay);
+        EP_SIZE_CHECK(Abot, maxlay);
+        EP_SIZE_CHECK(Al, maxlay);
+        EP_SIZE_CHECK(Ar, maxlay);
+        EP_SIZE_CHECK(Ah, maxlay);
+        EP_SIZE_CHECK(SlatThick, maxlay);
+        EP_SIZE_CHECK(SlatWidth, maxlay);
+        EP_SIZE_CHECK(SlatAngle, maxlay);
+        EP_SIZE_CHECK(SlatCond, maxlay);
+        EP_SIZE_CHECK(SlatSpacing, maxlay);
+        EP_SIZE_CHECK(SlatCurve, maxlay);
+        EP_SIZE_CHECK(vvent, maxlay1);
+        EP_SIZE_CHECK(tvent, maxlay1);
+        EP_SIZE_CHECK(LayerType, maxlay);
+        EP_SIZE_CHECK(nslice, maxlay);
+        EP_SIZE_CHECK(LaminateA, maxlay);
+        EP_SIZE_CHECK(LaminateB, maxlay);
+        EP_SIZE_CHECK(sumsol, maxlay);
 
         // Locals
         /// Environment related:
@@ -567,35 +567,35 @@ namespace TARCOGArgs {
                                Real64 const tsky,
                                Real64 &esky,
                                Real64 const fclr,
-                               Array1A<Real64> gap,
-                               Array1A<Real64> thick,
-                               Array1A<Real64> scon,
-                               Array1A<Real64> const tir,
-                               Array1A<Real64> const emis,
+                               Array1D<Real64> &gap,
+                               Array1D<Real64> &thick,
+                               Array1D<Real64> &scon,
+                               const Array1D<Real64> &tir,
+                               const Array1D<Real64> &emis,
                                Real64 const tilt,
                                Real64 &hin,
                                Real64 &hout,
-                               Array1A_int const ibc,
-                               Array1A<Real64> const SlatThick,
-                               Array1A<Real64> const SlatWidth,
-                               Array1A<Real64> const SlatAngle,
-                               Array1A<Real64> const SlatCond,
-                               Array1A_int const LayerType,
+                               const Array1D_int &ibc,
+                               const Array1D<Real64> &SlatThick,
+                               const Array1D<Real64> &SlatWidth,
+                               const Array1D<Real64> &SlatAngle,
+                               const Array1D<Real64> &SlatCond,
+                               const Array1D_int &LayerType,
                                int const ThermalMod,
                                Real64 const SDScalar,
                                Real64 &ShadeEmisRatioOut,
                                Real64 &ShadeEmisRatioIn,
                                Real64 &ShadeHcRatioOut,
                                Real64 &ShadeHcRatioIn,
-                               Array1A<Real64> Keff,
-                               Array1A<Real64> ShadeGapKeffConv,
+                               Array1D<Real64> &Keff,
+                               Array1D<Real64> &ShadeGapKeffConv,
                                Real64 &sc,
                                Real64 &shgc,
                                Real64 &ufactor,
                                Real64 &flux,
-                               Array1A<Real64> LaminateAU,
-                               Array1A<Real64> sumsolU,
-                               Array1A<Real64> sol0,
+                               Array1D<Real64> &LaminateAU,
+                               Array1D<Real64> &sumsolU,
+                               Array1D<Real64> &sol0,
                                Real64 &hint,
                                Real64 &houtt,
                                Real64 &trmout,
@@ -603,31 +603,31 @@ namespace TARCOGArgs {
                                Real64 &ebroom,
                                Real64 &Gout,
                                Real64 &Gin,
-                               Array1A<Real64> rir,
-                               Array1A<Real64> vfreevent,
+                               Array1D<Real64> &rir,
+                               Array1D<Real64> &vfreevent,
                                int &nperr,
                                std::string &ErrorMessage)
     {
 
         // Argument array dimensioning
-        gap.dim(MaxGap);
-        thick.dim(maxlay);
-        scon.dim(maxlay);
-        tir.dim(maxlay2);
-        emis.dim(maxlay2);
-        ibc.dim(2);
-        SlatThick.dim(maxlay);
-        SlatWidth.dim(maxlay);
-        SlatAngle.dim(maxlay);
-        SlatCond.dim(maxlay);
-        LayerType.dim(maxlay);
-        Keff.dim(maxlay);
-        ShadeGapKeffConv.dim(MaxGap);
-        LaminateAU.dim(maxlay);
-        sumsolU.dim(maxlay);
-        sol0.dim(maxlay);
-        rir.dim(maxlay2);
-        vfreevent.dim(maxlay1);
+        EP_SIZE_CHECK(gap, MaxGap);
+        EP_SIZE_CHECK(thick, maxlay);
+        EP_SIZE_CHECK(scon, maxlay);
+        EP_SIZE_CHECK(tir, maxlay2);
+        EP_SIZE_CHECK(emis, maxlay2);
+        EP_SIZE_CHECK(ibc, 2);
+        EP_SIZE_CHECK(SlatThick, maxlay);
+        EP_SIZE_CHECK(SlatWidth, maxlay);
+        EP_SIZE_CHECK(SlatAngle, maxlay);
+        EP_SIZE_CHECK(SlatCond, maxlay);
+        EP_SIZE_CHECK(LayerType, maxlay);
+        EP_SIZE_CHECK(Keff, maxlay);
+        EP_SIZE_CHECK(ShadeGapKeffConv, MaxGap);
+        EP_SIZE_CHECK(LaminateAU, maxlay);
+        EP_SIZE_CHECK(sumsolU, maxlay);
+        EP_SIZE_CHECK(sol0, maxlay);
+        EP_SIZE_CHECK(rir, maxlay2);
+        EP_SIZE_CHECK(vfreevent, maxlay1);
 
         // Locals
         /// Environment related:

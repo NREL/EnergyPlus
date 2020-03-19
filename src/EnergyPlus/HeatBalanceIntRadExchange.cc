@@ -144,7 +144,7 @@ namespace HeatBalanceIntRadExchange {
 
     void CalcInteriorRadExchange(Array1S<Real64> const SurfaceTemp,   // Current surface temperatures
                                  int const SurfIterations,            // Number of iterations in calling subroutine
-                                 Array1<Real64> &NetLWRadToSurf,      // Net long wavelength radiant exchange from other surfaces
+                                 Array1D<Real64> &NetLWRadToSurf,      // Net long wavelength radiant exchange from other surfaces
                                  Optional_int_const ZoneToResimulate, // if passed in, then only calculate for this zone
 #ifdef EP_Count_Calls
                                  std::string const &CalledFrom)
@@ -169,7 +169,7 @@ namespace HeatBalanceIntRadExchange {
         // Hottel, H. C. and A. F. Sarofim, Radiative Transfer, Ch 3, McGraw Hill, 1967.
 
         // Types
-        typedef Array1<Real64>::size_type size_type;
+        typedef Array1D<Real64>::size_type size_type;
 
         // Using/Aliasing
         using General::InterpSlatAng; // Function for slat angle interpolation
@@ -1083,7 +1083,7 @@ namespace HeatBalanceIntRadExchange {
     void GetInputViewFactors(std::string const &ZoneName, // Needed to check for user input view factors.
                              int const N,                 // NUMBER OF SURFACES
                              Array2A<Real64> F,           // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
-                             Array1A_int const SPtr,      // pointer to actual surface number
+                             const Array1D_int &EP_UNUSED(SPtr),     // pointer to actual surface number
                              bool &NoUserInputF,          // Flag signifying no input F's for this
                              bool &ErrorsFound            // True when errors are found in number of fields vs max args
     )
@@ -1104,7 +1104,7 @@ namespace HeatBalanceIntRadExchange {
 
         // Argument array dimensioning
         F.dim(N, N);
-        SPtr.dim(N);
+        //EP_SIZE_CHECK(SPtr, N);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         //  INTEGER   :: NumZonesWithUserF
@@ -1269,7 +1269,7 @@ namespace HeatBalanceIntRadExchange {
     void GetInputViewFactorsbyName(std::string const &EnclosureName, // Needed to check for user input view factors.
                                    int const N,                      // NUMBER OF SURFACES
                                    Array2A<Real64> F,                // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
-                                   Array1A_int const SPtr,           // pointer to actual surface number
+                                   const Array1D_int &SPtr,          // pointer to actual surface number
                                    bool &NoUserInputF,               // Flag signifying no input F's for this
                                    bool &ErrorsFound                 // True when errors are found in number of fields vs max args
     )
@@ -1289,7 +1289,7 @@ namespace HeatBalanceIntRadExchange {
 
         // Argument array dimensioning
         F.dim(N, N);
-        SPtr.dim(N);
+        EP_SIZE_CHECK(SPtr, N);
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int UserFZoneIndex;
@@ -1352,12 +1352,12 @@ namespace HeatBalanceIntRadExchange {
         }
     }
 
-    void CalcApproximateViewFactors(int const N,                   // NUMBER OF SURFACES
-                                    Array1A<Real64> const A,       // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
-                                    Array1A<Real64> const Azimuth, // Facing angle of the surface (in degrees)
-                                    Array1A<Real64> const Tilt,    // Tilt angle of the surface (in degrees)
-                                    Array2A<Real64> F,             // APPROXIMATE DIRECT VIEW FACTOR MATRIX (N X N)
-                                    Array1A_int const SPtr         // pointer to REAL(r64) surface number (for error message)
+    void CalcApproximateViewFactors(int const N,                    // NUMBER OF SURFACES
+                                    const Array1D<Real64> &A,       // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
+                                    const Array1D<Real64> &Azimuth, // Facing angle of the surface (in degrees)
+                                    const Array1D<Real64> &Tilt,    // Tilt angle of the surface (in degrees)
+                                    Array2A<Real64> F,              // APPROXIMATE DIRECT VIEW FACTOR MATRIX (N X N)
+                                    const Array1D_int &SPtr         // pointer to REAL(r64) surface number (for error message)
     )
     {
 
@@ -1389,11 +1389,11 @@ namespace HeatBalanceIntRadExchange {
         // na
 
         // Argument array dimensioning
-        A.dim(N);
-        Azimuth.dim(N);
-        Tilt.dim(N);
+        EP_SIZE_CHECK(A, N);
+        EP_SIZE_CHECK(Azimuth, N);
+        EP_SIZE_CHECK(Tilt, N);
         F.dim(N, N);
-        SPtr.dim(N);
+        EP_SIZE_CHECK(SPtr, N);
 
         // Locals
         // SUBROUTINE ARGUMENTS:
@@ -1474,7 +1474,7 @@ namespace HeatBalanceIntRadExchange {
     }
 
     void FixViewFactors(int const N,                     // NUMBER OF SURFACES
-                        Array1A<Real64> const A,         // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
+                        const Array1D<Real64> &A,        // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
                         Array2A<Real64> F,               // APPROXIMATE DIRECT VIEW FACTOR MATRIX (N X N)
                         std::string &enclName,           // Name of Enclosure being fixed
                         std::vector<int> const zoneNums, // Zones which are part of this enclosure
@@ -1517,7 +1517,7 @@ namespace HeatBalanceIntRadExchange {
         using General::RoundSigDigits;
 
         // Argument array dimensioning
-        A.dim(N);
+        EP_SIZE_CHECK(A, N);
         F.dim(N, N);
 
         // Locals
@@ -1717,9 +1717,9 @@ namespace HeatBalanceIntRadExchange {
     }
 
     void CalcScriptF(int const N,             // Number of surfaces
-                     Array1<Real64> const &A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
+                     Array1D<Real64> const &A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
                      Array2<Real64> const &F, // DIRECT VIEW FACTOR MATRIX (N X N)
-                     Array1<Real64> &EMISS,   // VECTOR OF SURFACE EMISSIVITIES
+                     Array1D<Real64> &EMISS,   // VECTOR OF SURFACE EMISSIVITIES
                      Array2<Real64> &ScriptF  // MATRIX OF SCRIPT F FACTORS (N X N) //Tuned Transposed
     )
     {
@@ -1936,8 +1936,8 @@ namespace HeatBalanceIntRadExchange {
     }
 
     void CalcFMRT(int const N,             // Number of surfaces
-                  Array1<Real64> const &A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
-                  Array1<Real64> &FMRT     // VECTOR OF MEAN RADIANT TEMPERATURE "VIEW FACTORS"
+                  Array1D<Real64> const &A, // AREA VECTOR- ASSUMED,BE N ELEMENTS LONG
+                  Array1D<Real64> &FMRT     // VECTOR OF MEAN RADIANT TEMPERATURE "VIEW FACTORS"
     )
     {
         double sumAF = 0.0;
@@ -1982,9 +1982,9 @@ namespace HeatBalanceIntRadExchange {
     }
 
     void CalcFp(int const N,             // Number of surfaces
-                Array1<Real64> &EMISS,   // VECTOR OF SURFACE EMISSIVITIES
-                Array1<Real64> &FMRT,    // VECTOR OF MEAN RADIANT TEMPERATURE "VIEW FACTORS"
-                Array1<Real64> &Fp       // VECTOR OF OPPENHEIM RESISTANCE VALUES
+                Array1D<Real64> &EMISS,   // VECTOR OF SURFACE EMISSIVITIES
+                Array1D<Real64> &FMRT,    // VECTOR OF MEAN RADIANT TEMPERATURE "VIEW FACTORS"
+                Array1D<Real64> &Fp       // VECTOR OF OPPENHEIM RESISTANCE VALUES
     )
     {
         Real64 SB = DataGlobals::StefanBoltzmann;
