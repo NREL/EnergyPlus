@@ -5540,7 +5540,7 @@ namespace SolarShading {
                     if (!Surface(BackSurfaceNumber).HeatTransSurf) continue;              // Skip non-heat transfer surfaces
                     if (Surface(BackSurfaceNumber).BaseSurf == GRSNR) continue;           // Skip subsurfaces of this GRSNR
                     if (BackSurfaceNumber == GRSNR) continue;                             // A back surface cannot be GRSNR itself
-                    if (Surface(BackSurfaceNumber).Zone != Surface(GRSNR).Zone) continue; // Skip if back surface not in zone
+                    if (Surface(BackSurfaceNumber).SolarEnclIndex != Surface(GRSNR).SolarEnclIndex) continue; // Skip if back surface not in same solar enclosure
 
                     if (Surface(BackSurfaceNumber).Class == SurfaceClass_IntMass) continue;
 
@@ -5723,7 +5723,6 @@ namespace SolarShading {
         Real64 ZS; // Intermediate result
         int N;     // Vertex number
         int NGRS;  // Coordinate transformation index
-        int NZ;    // Zone Number of surface
         int NVT;
         static Array1D<Real64> XVT; // X Vertices of Shadows
         static Array1D<Real64> YVT; // Y vertices of Shadows
@@ -5772,7 +5771,6 @@ namespace SolarShading {
 
             SAREA(GRSNR) = 0.0;
 
-            NZ = Surface(GRSNR).Zone;
             NGSS = ShadowComb(GRSNR).NumGenSurf;
             NGSSHC = 0;
             NBKS = ShadowComb(GRSNR).NumBackSurf;
