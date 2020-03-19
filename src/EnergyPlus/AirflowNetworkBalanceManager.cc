@@ -238,7 +238,7 @@ namespace AirflowNetworkBalanceManager {
         // These are purposefully not in the header file as an extern variable. No one outside of this should
         // use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
         // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
-        bool ValidateDistributionSystemFlag(true);
+        bool ValidateFanFlowRateFlag(true);
     } // namespace
 
     // Report variables
@@ -321,7 +321,7 @@ namespace AirflowNetworkBalanceManager {
         IVEC.deallocate();
         SplitterNodeNumbers.deallocate();
         AirflowNetworkGetInputFlag = true;
-        ValidateDistributionSystemFlag = true;
+        ValidateFanFlowRateFlag = true;
         VentilationCtrl = 0;
         NumOfExhaustFans = 0;
         NumAirflowNetwork = 0;
@@ -494,11 +494,13 @@ namespace AirflowNetworkBalanceManager {
         // VAV terminal set only
         if (present(FirstHVACIteration) && FirstHVACIteration) VAVTerminalRatio = 0.0;
 
+        // validate AFN air distribution system - only call once
+        if (FirstHVACIteration) ValidateDistributionSystem();
+
         if (AirflowNetworkFanActivated && SimulateAirflowNetwork > AirflowNetworkControlMultizone) {
-            if (ValidateDistributionSystemFlag) {
-                ValidateDistributionSystem();
+            if (ValidateFanFlowRateFlag) {
                 ValidateFanFlowRate();
-                ValidateDistributionSystemFlag = false;
+                ValidateFanFlowRateFlag = false;
             }
         }
         CalcAirflowNetworkAirBalance();
