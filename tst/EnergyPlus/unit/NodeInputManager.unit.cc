@@ -114,7 +114,7 @@ TEST_F(EnergyPlusFixture, NodeMoreInfoEMSsensorCheck1)
 
     EXPECT_NEAR(DataLoopNode::MoreNodeInfo(1).RelHumidity, 67.65, 0.01);
     EXPECT_NEAR(DataLoopNode::MoreNodeInfo(1).AirDewPointTemp, 13.84, 0.01);
-    EXPECT_NEAR(DataLoopNode::MoreNodeInfo(1).WetBulbTemp, 16.11, 0.01);
+    EXPECT_NEAR(DataLoopNode::MoreNodeInfo(1).WetBulbTemp, 16.12, 0.01);
     EXPECT_NEAR(DataLoopNode::MoreNodeInfo(1).SpecificHeat, 1023.43, 0.01);
 }
 

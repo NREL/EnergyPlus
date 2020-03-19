@@ -255,7 +255,7 @@ namespace DataGlobals {
     bool AnyBasementsInModel(false);     // true if there are any basements in the input file
     // Performance tradeoff globals
     bool DoCoilDirectSolutions(false);       //true if use coil direction solutions
-    bool createProfLog(false); //true if the _proflog.csv file should be created and a PerformancePrecisionTradeoffs object is used
+    bool createPerfLog(false); //true if the _perflog.csv file should be created and a PerformancePrecisionTradeoffs object is used
 
     int Progress(0); // current progress (0-100)
     void (*fProgressPtr)(int const);

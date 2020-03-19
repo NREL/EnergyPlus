@@ -7880,3 +7880,42 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
         ASSERT_EQ(6u, result.size()) << "Failed for query: " << query;
     }
 }
+
+TEST_F(EnergyPlusFixture, StatFileCharacterMatching)
+{
+    StatLineType lineTypeReturn = StatLineType::Initialized;
+    bool desCondLinePassed = false;
+    bool htgDesignLinePassed = false;
+    bool clgDesignLinePassed = false;
+    bool isKoppen = false;
+    std::string coolingLineGoodDegrees = "    - 2874 annual (standard) cooling degree-days (10°C baseline)";
+    parseStatLine(coolingLineGoodDegrees, lineTypeReturn, desCondLinePassed, htgDesignLinePassed, clgDesignLinePassed, isKoppen);
+    EXPECT_EQ((int)StatLineType::stdCDDLine, (int)lineTypeReturn);
+
+    lineTypeReturn = StatLineType::Initialized;
+    desCondLinePassed = false;
+    htgDesignLinePassed = false;
+    clgDesignLinePassed = false;
+    isKoppen = false;
+    std::string coolingLineBadDegrees = "    - 2874 annual (standard) cooling degree-days (10_BADDEGREESYMBOL_C baseline)";
+    parseStatLine(coolingLineGoodDegrees, lineTypeReturn, desCondLinePassed, htgDesignLinePassed, clgDesignLinePassed, isKoppen);
+    EXPECT_EQ((int)StatLineType::stdCDDLine, (int)lineTypeReturn);
+
+    lineTypeReturn = StatLineType::Initialized;
+    desCondLinePassed = false;
+    htgDesignLinePassed = false;
+    clgDesignLinePassed = false;
+    isKoppen = false;
+    std::string koppenLineWithDots = " - Climate type \"Cfa\" (Köppen classification)**";
+    parseStatLine(koppenLineWithDots, lineTypeReturn, desCondLinePassed, htgDesignLinePassed, clgDesignLinePassed, isKoppen);
+    EXPECT_EQ((int)StatLineType::KoppenLine, (int)lineTypeReturn);
+
+    lineTypeReturn = StatLineType::Initialized;
+    desCondLinePassed = false;
+    htgDesignLinePassed = false;
+    clgDesignLinePassed = false;
+    isKoppen = false;
+    std::string koppenLineNoDots = " - Climate type \"Cfa\" (Koppen classification)**";
+    parseStatLine(koppenLineNoDots, lineTypeReturn, desCondLinePassed, htgDesignLinePassed, clgDesignLinePassed, isKoppen);
+    EXPECT_EQ((int)StatLineType::KoppenLine, (int)lineTypeReturn);
+}

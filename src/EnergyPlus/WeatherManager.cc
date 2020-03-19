@@ -1468,7 +1468,7 @@ namespace WeatherManager {
         } // for each loop over Environment data strucure
     }
 
-    void SetupWeekDaysByMonth(int const StMon, int const StDay, int const StWeekDay, Array1A_int WeekDays)
+    void SetupWeekDaysByMonth(int const StMon, int const StDay, int const StWeekDay, Array1D_int &WeekDays)
     {
 
         // SUBROUTINE INFORMATION:
@@ -1491,7 +1491,7 @@ namespace WeatherManager {
         // na
 
         // Argument array dimensioning
-        WeekDays.dim(12);
+        EP_SIZE_CHECK(WeekDays, 12);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -1585,7 +1585,7 @@ namespace WeatherManager {
         }
     }
 
-    void ResetWeekDaysByMonth(Array1A_int WeekDays,
+    void ResetWeekDaysByMonth(Array1D_int &WeekDays,
                               int const LeapYearAdd,
                               int const StartMonth,
                               int const StartMonthDay,
@@ -1615,7 +1615,7 @@ namespace WeatherManager {
         // na
 
         // Argument array dimensioning
-        WeekDays.dim(12);
+        EP_SIZE_CHECK(WeekDays, 12);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -3861,7 +3861,7 @@ namespace WeatherManager {
                                   Real64 &RField19,      // Visibility
                                   Real64 &RField20,      // CeilHeight
                                   int &WObs,             // PresWeathObs
-                                  Array1A_int WCodesArr, // PresWeathConds
+                                  Array1D_int &WCodesArr, // PresWeathConds
                                   Real64 &RField22,      // PrecipWater
                                   Real64 &RField23,      // AerosolOptDepth
                                   Real64 &RField24,      // SnowDepth
@@ -3899,7 +3899,7 @@ namespace WeatherManager {
         // na
 
         // Argument array dimensioning
-        WCodesArr.dim(9);
+        EP_SIZE_CHECK(WCodesArr, 9);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5109,7 +5109,7 @@ namespace WeatherManager {
                                       Real64 const EqOfTime,     // Equation of Time
                                       Real64 const SinSolDeclin, // Sine of Solar Declination
                                       Real64 const CosSolDeclin, // Cosine of Solar Declination
-                                      Array1A<Real64> SUNCOS)
+                                      Array1D<Real64> &SUNCOS)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5132,7 +5132,7 @@ namespace WeatherManager {
         // na
 
         // Argument array dimensioning
-        SUNCOS.dim(3);
+        EP_SIZE_CHECK(SUNCOS, 3);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:
@@ -5168,7 +5168,7 @@ namespace WeatherManager {
         }
     }
 
-    void DetermineSunUpDown(Array1A<Real64> SunDirectionCosines)
+    void DetermineSunUpDown(Array1D<Real64> &SunDirectionCosines)
     {
 
         // SUBROUTINE INFORMATION:
@@ -5191,7 +5191,7 @@ namespace WeatherManager {
         // na
 
         // Argument array dimensioning
-        SunDirectionCosines.dim(3);
+        EP_SIZE_CHECK(SunDirectionCosines, 3);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

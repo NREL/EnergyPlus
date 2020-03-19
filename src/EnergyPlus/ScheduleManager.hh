@@ -49,7 +49,6 @@
 #define ScheduleManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array1S.hh>
 #include <ObjexxFCL/Array2A.hh>
@@ -246,8 +245,8 @@ namespace ScheduleManager {
     bool isMinuteMultipleOfTimestep(int minute, int numMinutesPerTimestep);
 
     void ProcessForDayTypes(std::string const &ForDayField, // Field containing the "FOR:..."
-                            Array1A_bool TheseDays,         // Array to contain returned "true" days
-                            Array1A_bool AlReady,           // Array of days already done
+                            Array1D_bool &TheseDays,        // Array to contain returned "true" days
+                            Array1D_bool &AlReady,          // Array of days already done
                             bool &ErrorsFound               // Will be true if error found.
     );
 
