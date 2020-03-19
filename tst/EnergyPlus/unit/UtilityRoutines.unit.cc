@@ -143,7 +143,7 @@ TEST_F(EnergyPlusFixture, DisplayMessageTest)
 
 TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog1)
 {
-    DataStringGlobals::outputPerfLogFileName = "eplusout_perflog.csv";
+    DataStringGlobals::outputPerfLogFileName = "eplusout_1_perflog.csv";
 
     // start with no file 
     std::remove(DataStringGlobals::outputPerfLogFileName.c_str());
@@ -179,7 +179,7 @@ TEST_F(EnergyPlusFixture, UtilityRoutines_appendPerfLog2)
     // make sure the static variables are cleared
     UtilityRoutines::appendPerfLog("RESET", "RESET");
 
-    DataStringGlobals::outputPerfLogFileName = "eplusout_perflog.csv";
+    DataStringGlobals::outputPerfLogFileName = "eplusout_2_perflog.csv";
 
     //create a file for the equivalent of the previous run
     std::ofstream initPerfLogFile;

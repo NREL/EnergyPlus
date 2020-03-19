@@ -7740,7 +7740,7 @@ namespace FluidProperties {
     }
 
     Real64 GetSupHeatTempRefrigResidual(Real64 const Temp, // temperature of the refrigerant
-                                        Array1<Real64> const &Par)
+                                        Array1D<Real64> const &Par)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Rongpeng Zhang, LBNL
@@ -9013,7 +9013,7 @@ namespace FluidProperties {
         // Bit shifting is substantially faster than /2 at least on GCC even with high optimization
         // Linear indexing used to assure we are bit shifting positive values where behavior is assured
         // std::lower_bound was 4x slower for the small (~100) array sizes seen in EnergyPlus use
-        typedef Array1<Real64>::size_type size_type;
+        typedef Array1D<Real64>::size_type size_type;
         int const l(Array.l());
         assert(LowBound >= l);
         assert(LowBound <= UpperBound);
@@ -9065,7 +9065,7 @@ namespace FluidProperties {
         // Bit shifting is substantially faster than /2 at least on GCC even with high optimization
         // Linear indexing used to assure we are bit shifting positive values where behavior is assured
         // std::lower_bound was 4x slower for the small (~100) array sizes seen in EnergyPlus use
-        typedef Array1<Real64>::size_type size_type;
+        typedef Array1D<Real64>::size_type size_type;
         assert(Array.size() > 0u); // Empty arrays are not currently supported
         assert(Array.l() > 0);     // Returning 0 for Value smaller than lowest doesn't make sense if l() <= 0
         if (Value < Array[0]) {
