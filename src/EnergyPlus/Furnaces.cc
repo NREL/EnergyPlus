@@ -5265,8 +5265,8 @@ namespace Furnaces {
             Real64 SensibleOutputDelta(0.0);  // delta sensible output rate, {W}
             Real64 LatentOutputDelta(0.0);    // delta latent output rate, {W}
             Real64 TotalOutputDelta(0.0);     // delta total output rate, {W} 
-            CalcTotalSensibleLatentOutput(MassFlowRate, Node(OutNode).Temp, Node(OutNode).HumRat, Node(ZoneInNode).Temp, Node(ZoneInNode).HumRat, TotalOutput, SensibleOutput, LatentOutput);
-            CalcTotalSensibleLatentOutput(DeltaMassRate, Node(OutNode).Temp, Node(OutNode).HumRat, Node(Furnace(FurnaceNum).NodeNumOfControlledZone).Temp, Node(Furnace(FurnaceNum).NodeNumOfControlledZone).HumRat, TotalOutputDelta, SensibleOutputDelta, LatentOutputDelta);
+            CalcTotalSensibleLatentOutput(MassFlowRate, Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).Temp, Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).HumRat, Node(ZoneInNode).Temp, Node(ZoneInNode).HumRat, TotalOutput, SensibleOutput, LatentOutput);
+            CalcTotalSensibleLatentOutput(DeltaMassRate, Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).Temp, Node(Furnace(FurnaceNum).FurnaceOutletNodeNum).HumRat, Node(Furnace(FurnaceNum).NodeNumOfControlledZone).Temp, Node(Furnace(FurnaceNum).NodeNumOfControlledZone).HumRat, TotalOutputDelta, SensibleOutputDelta, LatentOutputDelta);
             Furnace(FurnaceNum).SenLoadLoss = SensibleOutput - SensibleOutputDelta;
             if (std::abs(Furnace(FurnaceNum).SensibleLoadMet) > 0.0) {
                 if (std::abs(Furnace(FurnaceNum).SenLoadLoss / Furnace(FurnaceNum).SensibleLoadMet) < 0.001) Furnace(FurnaceNum).SenLoadLoss = 0.0;
