@@ -6,7 +6,7 @@ Attribute VB_Name = "MainModule"
 ' needed both inside and outside of the main epl-ui.frm
 '=======================================================
 
-Public Const numOutputKinds = 57
+Public Const numOutputKinds = 58
 Public Const numOutputSets = 12
 Type outputKindType
   suffix As String 'end of file name plus extension (like "Table.html")
@@ -88,8 +88,9 @@ Public Const okBsmtCSV = 52
 Public Const okSlab = 53
 Public Const okSlabOut = 54
 Public Const okSlabErr = 55
-Public Const okErr = 56 'at end so it opens last
-Public Const okCsv = 57 'at end so it opens last
+Public Const okPerfLogCSV = 56
+Public Const okErr = 57 'at end so it opens last
+Public Const okCsv = 58 'at end so it opens last
 
 
 '=======================================================
@@ -309,6 +310,12 @@ outputKind(okSlab).viewer = ovpTextEditor
 'Slab Err
 outputKind(okSlabErr).suffix = "_slab.ger"
 outputKind(okSlabErr).viewer = ovpTextEditor
+'Perflog.csv
+outputKind(okPerfLogCSV).suffix = "_perflog.csv"
+outputKind(okPerfLogCSV).viewer = ovpSpreadsheet
+outputKind(okPerfLogCSV).outSet(outSetSpreadsheets) = True
+
+
 
 'NOT SHOWN ON ALL TAB BUT USED
 outputKind(okEnd).suffix = ".end"

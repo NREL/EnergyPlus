@@ -4062,7 +4062,7 @@ namespace ConvectionCoefficients {
         using namespace DataZoneEquipment;
 
         int ZoneNode = Zone(ZoneNum).SystemZoneNodeNumber;
-        int thisZoneInletNode;
+        int thisZoneInletNode = 0;
         if (ZoneNode > 0) {
             Real64 SumMdotTemp = 0.0;
             Real64 SumMdot = 0.0;

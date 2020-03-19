@@ -601,9 +601,6 @@ namespace OutputReportTabular {
         ffSchedIndex = Array1D_int(numResourceTypes, 0);
         meterNumEndUseBEPS = Array2D_int(numResourceTypes, NumEndUses, 0);
         meterNumEndUseSubBEPS.deallocate();
-        // resourceTypeNames.deallocate();
-        // sourceTypeNames.deallocate();
-        // endUseNames.deallocate();
         gatherTotalsBEPS = Array1D<Real64>(numResourceTypes, 0.0);
         gatherTotalsBySourceBEPS = Array1D<Real64>(numResourceTypes, 0.0);
         gatherTotalsSource = Array1D<Real64>(numSourceTypes, 0.0);
@@ -5739,6 +5736,65 @@ namespace OutputReportTabular {
         ObjexxFCL::gio::write(EchoInputFile, fmtLD) << "numCompSizeTableEntry=" << numCompSizeTableEntry;
     }
 
+    void parseStatLine(const std::string & lineIn, StatLineType &lineType, bool & desConditionlinepassed, bool & heatingDesignlinepassed, bool & coolingDesignlinepassed, bool & isKoppen) {
+        // assumes that all the variables are initialized outside of this routine -- it does not re-initialize them
+        if (has_prefix(lineIn, "Statistics")) {
+            lineType = StatLineType::StatisticsLine;
+        } else if (has_prefix(lineIn, "Location")) {
+            lineType = StatLineType::LocationLine;
+        } else if (has_prefix(lineIn, "{")) {
+            lineType = StatLineType::LatLongLine;
+        } else if (has_prefix(lineIn, "Elevation")) {
+            lineType = StatLineType::ElevationLine;
+        } else if (has_prefix(lineIn, "Standard Pressure")) {
+            lineType = StatLineType::StdPressureLine;
+        } else if (has_prefix(lineIn, "Data Source")) {
+            lineType = StatLineType::DataSourceLine;
+        } else if (has_prefix(lineIn, "WMO Station")) {
+            lineType = StatLineType::WMOStationLine;
+        } else if (has(lineIn, "Design Conditions")) {
+            if (!desConditionlinepassed) {
+                desConditionlinepassed = true;
+                lineType = StatLineType::DesignConditionsLine;
+            }
+        } else if (has_prefix(lineIn, "\tHeating")) {
+            if (!heatingDesignlinepassed) {
+                heatingDesignlinepassed = true;
+                lineType = StatLineType::heatingConditionsLine;
+            }
+        } else if (has_prefix(lineIn, "\tCooling")) {
+            if (!coolingDesignlinepassed) {
+                coolingDesignlinepassed = true;
+                lineType = StatLineType::coolingConditionsLine;
+            }
+        } else if (has(lineIn, "(standard) heating degree-days (18.3")) {
+            lineType = StatLineType::stdHDDLine;
+        } else if (has(lineIn, "(standard) cooling degree-days (10")) {
+            lineType = StatLineType::stdCDDLine;
+
+        } else if (has(lineIn, "Maximum Dry Bulb")) {
+            lineType = StatLineType::maxDryBulbLine;
+        } else if (has(lineIn, "Minimum Dry Bulb")) {
+            lineType = StatLineType::minDryBulbLine;
+        } else if (has(lineIn, "Maximum Dew Point")) {
+            lineType = StatLineType::maxDewPointLine;
+        } else if (has(lineIn, "Minimum Dew Point")) {
+            lineType = StatLineType::minDewPointLine;
+        } else if (has(lineIn, "(wthr file) heating degree-days (18") || has(lineIn, "heating degree-days (18")) {
+            lineType = StatLineType::wthHDDLine;
+        } else if (has(lineIn, "(wthr file) cooling degree-days (10") || has(lineIn, "cooling degree-days (10")) {
+            lineType = StatLineType::wthCDDLine;
+        }
+        // these not part of big if/else because sequential
+        if (lineType == StatLineType::KoppenDes1Line && isKoppen) lineType = StatLineType::KoppenDes2Line;
+        if (lineType == StatLineType::KoppenLine && isKoppen) lineType = StatLineType::KoppenDes1Line;
+        if (has(lineIn, "ppen classification)")) lineType = StatLineType::KoppenLine;
+        if (lineType == StatLineType::AshStdDes2Line) lineType = StatLineType::AshStdDes3Line;
+        if (lineType == StatLineType::AshStdDes1Line) lineType = StatLineType::AshStdDes2Line;
+        if (lineType == StatLineType::AshStdLine) lineType = StatLineType::AshStdDes1Line;
+        if (has(lineIn, "ASHRAE Standard")) lineType = StatLineType::AshStdLine;
+    }
+
     void FillWeatherPredefinedEntries()
     {
         // SUBROUTINE INFORMATION:
@@ -5755,53 +5811,16 @@ namespace OutputReportTabular {
         // Using/Aliasing
         using namespace OutputReportPredefined;
 
-        // Locals
-        // SUBROUTINE ARGUMENT DEFINITIONS:
-        // na
-
         // SUBROUTINE PARAMETER DEFINITIONS:
         static std::string const degChar("°");
-
-        // LineTypes for reading the stat file
-        int const StatisticsLine(1);
-        int const LocationLine(2);
-        int const LatLongLine(3);
-        int const ElevationLine(4);
-        int const StdPressureLine(5);
-        int const DataSourceLine(6);
-        int const WMOStationLine(7);
-        int const DesignConditionsLine(8);
-        int const heatingConditionsLine(9);
-        int const coolingConditionsLine(10);
-        int const stdHDDLine(11);
-        int const stdCDDLine(12);
-        int const maxDryBulbLine(13);
-        int const minDryBulbLine(14);
-        int const maxDewPointLine(15);
-        int const minDewPointLine(16);
-        int const wthHDDLine(17);
-        int const wthCDDLine(18);
-        int const KoppenLine(19);
-        int const KoppenDes1Line(20);
-        int const KoppenDes2Line(21);
-        int const AshStdLine(22);
-        int const AshStdDes1Line(23);
-        int const AshStdDes2Line(24);
-        int const AshStdDes3Line(25);
-
-        // INTERFACE BLOCK SPECIFICATIONS:
-        // na
-
-        // DERIVED TYPE DEFINITIONS:
-        // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         std::string lineIn;
         int statFile;
         bool fileExists;
-        static int lineType(0);
-        static int lineTypeinterim(0);
+        StatLineType lineType = StatLineType::Initialized;
+        StatLineType lineTypeinterim = StatLineType::Initialized;
         int readStat;
         bool isASHRAE;
         bool iscalc;
@@ -5842,7 +5861,7 @@ namespace OutputReportTabular {
         desConditionlinepassed = false;
         storeASHRAEHDD = "";
         storeASHRAECDD = "";
-        lineTypeinterim = 0;
+        lineTypeinterim = StatLineType::Initialized;
         if (fileExists) {
             statFile = GetNewUnitNumber();
             {
@@ -5862,69 +5881,15 @@ namespace OutputReportTabular {
                 // reconcile line with different versions of stat file
                 // v7.1 added version as first line.
                 strip(lineIn);
-                if (has_prefix(lineIn, "Statistics")) {
-                    lineType = StatisticsLine;
-                } else if (has_prefix(lineIn, "Location")) {
-                    lineType = LocationLine;
-                } else if (has_prefix(lineIn, "{")) {
-                    lineType = LatLongLine;
-                } else if (has_prefix(lineIn, "Elevation")) {
-                    lineType = ElevationLine;
-                } else if (has_prefix(lineIn, "Standard Pressure")) {
-                    lineType = StdPressureLine;
-                } else if (has_prefix(lineIn, "Data Source")) {
-                    lineType = DataSourceLine;
-                } else if (has_prefix(lineIn, "WMO Station")) {
-                    lineType = WMOStationLine;
-                } else if (has(lineIn, "Design Conditions")) {
-                    if (!desConditionlinepassed) {
-                        desConditionlinepassed = true;
-                        lineType = DesignConditionsLine;
-                    }
-                } else if (has_prefix(lineIn, "\tHeating")) {
-                    if (!heatingDesignlinepassed) {
-                        heatingDesignlinepassed = true;
-                        lineType = heatingConditionsLine;
-                    }
-                } else if (has_prefix(lineIn, "\tCooling")) {
-                    if (!coolingDesignlinepassed) {
-                        coolingDesignlinepassed = true;
-                        lineType = coolingConditionsLine;
-                    }
-                } else if (has(lineIn, "(standard) heating degree-days (18.3°C baseline)")) {
-                    lineType = stdHDDLine;
-                } else if (has(lineIn, "(standard) cooling degree-days (10°C baseline)")) {
-                    lineType = stdCDDLine;
-
-                } else if (has(lineIn, "Maximum Dry Bulb")) {
-                    lineType = maxDryBulbLine;
-                } else if (has(lineIn, "Minimum Dry Bulb")) {
-                    lineType = minDryBulbLine;
-                } else if (has(lineIn, "Maximum Dew Point")) {
-                    lineType = maxDewPointLine;
-                } else if (has(lineIn, "Minimum Dew Point")) {
-                    lineType = minDewPointLine;
-                } else if (has(lineIn, "(wthr file) heating degree-days (18°C baseline)") || has(lineIn, "heating degree-days (18°C baseline)")) {
-                    lineType = wthHDDLine;
-                } else if (has(lineIn, "(wthr file) cooling degree-days (10°C baseline)") || has(lineIn, "cooling degree-days (10°C baseline)")) {
-                    lineType = wthCDDLine;
-                }
-                // these not part of big if/else because sequential
-                if (lineType == KoppenDes1Line && isKoppen) lineType = KoppenDes2Line;
-                if (lineType == KoppenLine && isKoppen) lineType = KoppenDes1Line;
-                if (has(lineIn, "(Köppen classification)")) lineType = KoppenLine;
-                if (lineType == AshStdDes2Line) lineType = AshStdDes3Line;
-                if (lineType == AshStdDes1Line) lineType = AshStdDes2Line;
-                if (lineType == AshStdLine) lineType = AshStdDes1Line;
-                if (has(lineIn, "ASHRAE Standard")) lineType = AshStdLine;
+                parseStatLine(lineIn, lineType, desConditionlinepassed, heatingDesignlinepassed, coolingDesignlinepassed, isKoppen);
 
                 {
                     auto const SELECT_CASE_var(lineType);
-                    if (SELECT_CASE_var == StatisticsLine) { // Statistics for USA_CA_San.Francisco_TMY2
+                    if (SELECT_CASE_var == StatLineType::StatisticsLine) { // Statistics for USA_CA_San.Francisco_TMY2
                         PreDefTableEntry(pdchWthrVal, "Reference", lineIn.substr(15));
-                    } else if (SELECT_CASE_var == LocationLine) { // Location -- SAN_FRANCISCO CA USA
+                    } else if (SELECT_CASE_var == StatLineType::LocationLine) { // Location -- SAN_FRANCISCO CA USA
                         PreDefTableEntry(pdchWthrVal, "Site:Location", lineIn.substr(11));
-                    } else if (SELECT_CASE_var == LatLongLine) { //      {N 37° 37'} {W 122° 22'} {GMT -8.0 Hours}
+                    } else if (SELECT_CASE_var == StatLineType::LatLongLine) { //      {N 37° 37'} {W 122° 22'} {GMT -8.0 Hours}
                         // find the {}
                         sposlt = index(lineIn, '{');
                         eposlt = index(lineIn, '}');
@@ -5956,7 +5921,7 @@ namespace OutputReportTabular {
                         } else {
                             PreDefTableEntry(pdchWthrVal, "Time Zone", "not found");
                         }
-                    } else if (SELECT_CASE_var == ElevationLine) { // Elevation --     5m above sea level
+                    } else if (SELECT_CASE_var == StatLineType::ElevationLine) { // Elevation --     5m above sea level
                         lnPtr = index(lineIn.substr(12), 'm');
                         if (lnPtr != std::string::npos) {
                             curNameWithSIUnits = "Elevation (m) " + lineIn.substr(12 + lnPtr + 2);
@@ -5970,14 +5935,14 @@ namespace OutputReportTabular {
                         } else {
                             PreDefTableEntry(pdchWthrVal, "Elevation", "not found");
                         }
-                    } else if (SELECT_CASE_var == StdPressureLine) { // Standard Pressure at Elevation -- 101265Pa
+                    } else if (SELECT_CASE_var == StatLineType::StdPressureLine) { // Standard Pressure at Elevation -- 101265Pa
                         PreDefTableEntry(pdchWthrVal, "Standard Pressure at Elevation", lineIn.substr(34));
-                    } else if (SELECT_CASE_var == DataSourceLine) { // Data Source -- TMY2-23234
+                    } else if (SELECT_CASE_var == StatLineType::DataSourceLine) { // Data Source -- TMY2-23234
                         PreDefTableEntry(pdchWthrVal, "Data Source", lineIn.substr(15));
-                    } else if (SELECT_CASE_var == WMOStationLine) { // WMO Station 724940
+                    } else if (SELECT_CASE_var == StatLineType::WMOStationLine) { // WMO Station 724940
                         PreDefTableEntry(pdchWthrVal, "WMO Station", lineIn.substr(12));
                     } else if (SELECT_CASE_var ==
-                               DesignConditionsLine) { //  - Using Design Conditions from "Climate Design Data 2005 ASHRAE Handbook"
+                            StatLineType::DesignConditionsLine) { //  - Using Design Conditions from "Climate Design Data 2005 ASHRAE Handbook"
                         ashPtr = index(lineIn, "ASHRAE");
                         if (ashPtr != std::string::npos) {
                             isASHRAE = true;
@@ -5996,7 +5961,7 @@ namespace OutputReportTabular {
                             iscalc = true;
                             PreDefTableEntry(pdchWthrVal, "Weather File Design Conditions", "Calculated from the weather file");
                         }
-                    } else if (SELECT_CASE_var == heatingConditionsLine) { //  winter/heating design conditions
+                    } else if (SELECT_CASE_var == StatLineType::heatingConditionsLine) { //  winter/heating design conditions
                         if (iscalc) {
                             if (isASHRAE) {
                                 if (ashDesYear == "2001") {
@@ -6053,7 +6018,7 @@ namespace OutputReportTabular {
                                 }
                             }
                         }
-                    } else if (SELECT_CASE_var == coolingConditionsLine) { //  summer/cooling design conditions
+                    } else if (SELECT_CASE_var == StatLineType::coolingConditionsLine) { //  summer/cooling design conditions
                         if (iscalc) {
                             if (isASHRAE) {
                                 if (ashDesYear == "2001") {
@@ -6122,11 +6087,11 @@ namespace OutputReportTabular {
                                 }
                             }
                         }
-                    } else if (SELECT_CASE_var == stdHDDLine) { //  - 1745 annual (standard) heating degree-days (10°C baseline)
+                    } else if (SELECT_CASE_var == StatLineType::stdHDDLine) { //  - 1745 annual (standard) heating degree-days (10°C baseline)
                         storeASHRAEHDD = lineIn.substr(2, 4);
-                    } else if (SELECT_CASE_var == stdCDDLine) { //  -  464 annual (standard) cooling degree-days (18.3°C baseline)
+                    } else if (SELECT_CASE_var == StatLineType::stdCDDLine) { //  -  464 annual (standard) cooling degree-days (18.3°C baseline)
                         storeASHRAECDD = lineIn.substr(2, 4);
-                    } else if (SELECT_CASE_var == maxDryBulbLine) { //   - Maximum Dry Bulb temperature of  35.6°C on Jul  9
+                    } else if (SELECT_CASE_var == StatLineType::maxDryBulbLine) { //   - Maximum Dry Bulb temperature of  35.6°C on Jul  9
                         sposlt = index(lineIn, "of");
                         eposlt = index(lineIn, 'C');
                         sposlt += 2;
@@ -6158,7 +6123,7 @@ namespace OutputReportTabular {
                         } else {
                             PreDefTableEntry(pdchWthrVal, "Maximum Dry Bulb Occurs on", "not found");
                         }
-                    } else if (SELECT_CASE_var == minDryBulbLine) { //   - Minimum Dry Bulb temperature of -22.8°C on Jan  7
+                    } else if (SELECT_CASE_var == StatLineType::minDryBulbLine) { //   - Minimum Dry Bulb temperature of -22.8°C on Jan  7
                         sposlt = index(lineIn, "of");
                         eposlt = index(lineIn, 'C');
                         sposlt += 2;
@@ -6190,7 +6155,7 @@ namespace OutputReportTabular {
                         } else {
                             PreDefTableEntry(pdchWthrVal, "Minimum Dry Bulb Occurs on", "not found");
                         }
-                    } else if (SELECT_CASE_var == maxDewPointLine) { //   - Maximum Dew Point temperature of  25.6°C on Aug  4
+                    } else if (SELECT_CASE_var == StatLineType::maxDewPointLine) { //   - Maximum Dew Point temperature of  25.6°C on Aug  4
                         sposlt = index(lineIn, "of");
                         eposlt = index(lineIn, 'C');
                         sposlt += 2;
@@ -6222,7 +6187,7 @@ namespace OutputReportTabular {
                         } else {
                             PreDefTableEntry(pdchWthrVal, "Maximum Dew Point Occurs on", "not found");
                         }
-                    } else if (SELECT_CASE_var == minDewPointLine) { //   - Minimum Dew Point temperature of -28.9°C on Dec 31
+                    } else if (SELECT_CASE_var == StatLineType::minDewPointLine) { //   - Minimum Dew Point temperature of -28.9°C on Dec 31
                         sposlt = index(lineIn, "of");
                         eposlt = index(lineIn, 'C');
                         sposlt += 2;
@@ -6254,7 +6219,7 @@ namespace OutputReportTabular {
                         } else {
                             PreDefTableEntry(pdchWthrVal, "Minimum Dew Point Occurs on", "not found");
                         }
-                    } else if (SELECT_CASE_var == wthHDDLine) { //  - 1745 (wthr file) annual heating degree-days (10°C baseline)
+                    } else if (SELECT_CASE_var == StatLineType::wthHDDLine) { //  - 1745 (wthr file) annual heating degree-days (10°C baseline)
                         if (storeASHRAEHDD != "") {
                             if (unitsStyle == unitsStyleInchPound) {
                                 curNameWithSIUnits = "ASHRAE Handbook 2009 Heating Degree-Days - base 65°(C)";
@@ -6283,7 +6248,7 @@ namespace OutputReportTabular {
                             PreDefTableEntry(pdchLeedGenData, "Heating Degree Days", lineIn.substr(2, 4));
                         }
                         PreDefTableEntry(pdchLeedGenData, "HDD and CDD data source", "Weather File Stat");
-                    } else if (SELECT_CASE_var == wthCDDLine) { //  -  464 (wthr file) annual cooling degree-days (18°C baseline)
+                    } else if (SELECT_CASE_var == StatLineType::wthCDDLine) { //  -  464 (wthr file) annual cooling degree-days (18°C baseline)
                         if (storeASHRAECDD != "") {
                             if (unitsStyle == unitsStyleInchPound) {
                                 curNameWithSIUnits = "ASHRAE Handbook 2009  Cooling Degree-Days - base 50°(C)";
@@ -6311,7 +6276,7 @@ namespace OutputReportTabular {
                             PreDefTableEntry(pdchWthrVal, "Weather File Cooling Degree-Days (base 10°C)", lineIn.substr(2, 4));
                             PreDefTableEntry(pdchLeedGenData, "Cooling Degree Days", lineIn.substr(2, 4));
                         }
-                    } else if (SELECT_CASE_var == KoppenLine) { // - Climate type "BSk" (Köppen classification)
+                    } else if (SELECT_CASE_var == StatLineType::KoppenLine) { // - Climate type "BSk" (Köppen classification)
                         if (!has(lineIn, "not shown")) {
                             isKoppen = true;
                             if (lineIn[18] == '"') { // two character classification
@@ -6323,11 +6288,11 @@ namespace OutputReportTabular {
                             isKoppen = false;
                             PreDefTableEntry(pdchWthrVal, "Köppen Recommendation", lineIn.substr(2));
                         }
-                    } else if (SELECT_CASE_var == KoppenDes1Line) { // - Tropical monsoonal or tradewind-coastal (short dry season, lat. 5-25°)
+                    } else if (SELECT_CASE_var == StatLineType::KoppenDes1Line) { // - Tropical monsoonal or tradewind-coastal (short dry season, lat. 5-25°)
                         if (isKoppen) {
                             PreDefTableEntry(pdchWthrVal, "Köppen Description", lineIn.substr(2));
                         }
-                    } else if (SELECT_CASE_var == KoppenDes2Line) { // - Unbearably humid periods in summer, but passive cooling is possible
+                    } else if (SELECT_CASE_var == StatLineType::KoppenDes2Line) { // - Unbearably humid periods in summer, but passive cooling is possible
                         if (isKoppen) {
                             if (len(lineIn) > 3) {                 // avoid blank lines
                                 if (lineIn.substr(2, 2) != "**") { // avoid line with warning
@@ -6339,8 +6304,8 @@ namespace OutputReportTabular {
                                 PreDefTableEntry(pdchWthrVal, "Köppen Recommendation", "");
                             }
                         }
-                    } else if ((SELECT_CASE_var == AshStdLine) || (SELECT_CASE_var == AshStdDes1Line) || (SELECT_CASE_var == AshStdDes2Line) ||
-                               (SELECT_CASE_var == AshStdDes3Line)) {
+                    } else if ((SELECT_CASE_var == StatLineType::AshStdLine) || (SELECT_CASE_var == StatLineType::AshStdDes1Line) || (SELECT_CASE_var == StatLineType::AshStdDes2Line) ||
+                               (SELECT_CASE_var == StatLineType::AshStdDes3Line)) {
                         //  - Climate type "1A" (ASHRAE Standards 90.1-2004 and 90.2-2004 Climate Zone)**
                         if (has(lineIn, "Standard")) {
                             ashZone = lineIn.substr(16, 2);
@@ -6386,14 +6351,14 @@ namespace OutputReportTabular {
                     }
                 }
                 lineIn = "";
-                lineTypeinterim = 0;
-                if (lineType == AshStdDes3Line) lineTypeinterim = 0;
-                if (lineType == AshStdDes2Line) lineTypeinterim = AshStdDes2Line;
-                if (lineType == AshStdDes1Line) lineTypeinterim = AshStdDes1Line;
-                if (lineType == AshStdLine) lineTypeinterim = AshStdLine;
-                if (lineType == KoppenDes2Line) lineTypeinterim = 0;
-                if (lineType == KoppenDes1Line) lineTypeinterim = KoppenDes1Line;
-                if (lineType == KoppenLine) lineTypeinterim = KoppenLine;
+                lineTypeinterim = StatLineType::Initialized;
+                if (lineType == StatLineType::AshStdDes3Line) lineTypeinterim = StatLineType::Initialized;
+                if (lineType == StatLineType::AshStdDes2Line) lineTypeinterim = StatLineType::AshStdDes2Line;
+                if (lineType == StatLineType::AshStdDes1Line) lineTypeinterim = StatLineType::AshStdDes1Line;
+                if (lineType == StatLineType::AshStdLine) lineTypeinterim = StatLineType::AshStdLine;
+                if (lineType == StatLineType::KoppenDes2Line) lineTypeinterim = StatLineType::Initialized;
+                if (lineType == StatLineType::KoppenDes1Line) lineTypeinterim = StatLineType::KoppenDes1Line;
+                if (lineType == StatLineType::KoppenLine) lineTypeinterim = StatLineType::KoppenLine;
             }
             ObjexxFCL::gio::close(statFile);
         }
@@ -7671,7 +7636,7 @@ namespace OutputReportTabular {
             collapsedTotal(5) = gatherTotalsBEPS(4) + gatherTotalsBEPS(5); // district heating <- purchased heating | <- steam
             collapsedTotal(6) = gatherTotalsBEPS(7);                       // water
 
-            if (DataGlobals::createProfLog) {
+            if (DataGlobals::createPerfLog) {
                 UtilityRoutines::appendPerfLog("Electricity ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(1), 3));
                 UtilityRoutines::appendPerfLog("Natural Gas ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(2), 3));
                 UtilityRoutines::appendPerfLog("Additional Fuel ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(3), 3));
@@ -7679,6 +7644,9 @@ namespace OutputReportTabular {
                 UtilityRoutines::appendPerfLog("District Heating ABUPS Total [J]", General::RoundSigDigits(collapsedTotal(5), 3));
                 UtilityRoutines::appendPerfLog("Water ABUPS Total [m3]", General::RoundSigDigits(collapsedTotal(6), 3));
                 UtilityRoutines::appendPerfLog("Values Gathered Over [hours]", General::RoundSigDigits(gatherElapsedTimeBEPS, 2));
+                UtilityRoutines::appendPerfLog("Facility Any Zone Oscillating Temperatures Time [hours]", General::RoundSigDigits(ZoneTempPredictorCorrector::AnnualAnyZoneTempOscillate, 2));
+                UtilityRoutines::appendPerfLog("Facility Any Zone Oscillating Temperatures During Occupancy Time [hours]", General::RoundSigDigits(ZoneTempPredictorCorrector::AnnualAnyZoneTempOscillateDuringOccupancy, 2));
+                UtilityRoutines::appendPerfLog("Facility Any Zone Oscillating Temperatures in Deadband Time [hours]", General::RoundSigDigits(ZoneTempPredictorCorrector::AnnualAnyZoneTempOscillateInDeadband, 2));
             }
             for (jEndUse = 1; jEndUse <= NumEndUses; ++jEndUse) {
                 for (kEndUseSub = 1; kEndUseSub <= EndUseCategory(jEndUse).NumSubcategories; ++kEndUseSub) {
