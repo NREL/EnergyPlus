@@ -55,13 +55,22 @@
 extern "C" {
 #endif
 
-/// This file provides data transfer API functions
+/// \file datatransfer.h
+/// \brief This "data exchange" API category provides access to read and write real-time data within a running simulation.
+/// \details While an EnergyPlus simulation is running, simulation state is constantly being calculated and updated.  EMS was implemented in
+///          EnergyPlus to allow user scripts to read variable data and write actuator data in custom ways.  This builds on top of that implementation
+///          by allowing the user to write C code that can read/write simulation data.  This file includes methods that are specific to
+///          PythonPlugin workflows, including PythonPlugin "Trend" and "Global" variables.  These mechanisms are only available in Plugin workflows
+///          and will cause a program error if they are accessed in an "EnergyPlus-as-a-library" workflow.  However, there are many functions in this
+///          file that are available for all API usages, including getting access to variables and meters, writing actuator values, and accessing
+///          simulation state such as the day of week, hour of day, etc.
 
 // ----- GENERIC QUERY FUNCTIONS
 
 /// \brief Gets available API data for the current simulation
 /// \details This function returns a string of API data in CSV form for the current simulation
-/// The data can be easily parsed and then used in subsequent API code.
+///          The data can be easily parsed and then used in subsequent API code.
+/// \remark A future version of this will more intelligently return available data in a structured format in memory.
 /// \return A const char * pointing to a CSV formatted string
 ENERGYPLUSLIB_API const char * listAllAPIDataCSV();
 /// \brief Provides a user-facing check for whether API data is ready to be accessed

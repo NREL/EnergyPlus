@@ -260,7 +260,7 @@ int getInternalVariableHandle(const char* type, const char* key) {
             return handle;
         }
     }
-    return 0;
+    return -1;
 }
 
 Real64 getInternalVariableValue(int handle) {

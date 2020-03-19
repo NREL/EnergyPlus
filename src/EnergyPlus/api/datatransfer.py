@@ -283,7 +283,7 @@ class DataExchange:
 
         :param variable_type: The name of the variable to retrieve, e.g. "Zone Air Volume", or "Zone Floor Area"
         :param variable_key: The instance of the variable to retrieve, e.g. "Zone 1"
-        :return: An integer ID for this output variable, or zero if one could not be found.
+        :return: An integer ID for this output variable, or -1 if one could not be found.
         """
         if isinstance(variable_type, str):
             variable_type = variable_type.encode('utf-8')
@@ -320,7 +320,7 @@ class DataExchange:
 
         :param var_name: The name of the global variable to retrieve, this name must be listed in the IDF object:
                          `PythonPlugin:GlobalVariables`
-        :return: An integer ID for this global variable, or zero if one could not be found.
+        :return: An integer ID for this global variable, or -1 if one could not be found.
         """
         if not self.running_as_python_plugin:
             raise EnergyPlusException("get_global_handle is only available as part of a Python Plugin workflow")
@@ -378,9 +378,22 @@ class DataExchange:
 
     def get_trend_handle(self, trend_var_name: Union[str, bytes]) -> int:
         """
+        Get a handle to a trend variable in a running simulation.  This is only used for Python Plugin applications!
 
-        :param trend_var_name:
-        :return:
+        Trend variables are used as a way to track history of a PythonPlugin:Variable over time.  First a trend variable
+        must be declared in the input file using the PythonPlugin:TrendVariable object.  Once a variable has been
+        declared there, it can be accessed in the Plugin by getting a handle to the variable using this get_trend_handle
+        function, then using the other trend variable worker functions as needed.
+
+        The arguments passed into this function do not need to be a particular case, as the EnergyPlus API
+        automatically converts values to upper-case when finding matches to internal variables in the simulation.
+
+        Note also that the arguments passed in here can be either strings or bytes, as this wrapper handles conversion
+        as needed.
+
+        :param trend_var_name: The name of the global variable to retrieve, this name must match the name of a
+                               `PythonPlugin:TrendVariable` IDF object.
+        :return: An integer ID for this trend variable, or -1 if one could not be found.
         """
         if not self.running_as_python_plugin:
             raise EnergyPlusException("get_trend_handle is only available as part of a Python Plugin workflow")
@@ -390,10 +403,20 @@ class DataExchange:
 
     def get_trend_value(self, trend_handle: int, time_index: int) -> RealEP:
         """
+        Get the value of a plugin trend variable at a specific history point.  The time_index argument specifies how
+        many time steps to go back in the trend history.  A value of 1 indicates taking the most recent value.  The
+        value of time_index must be less than or equal to the number of history terms specified in the matching
+        PythonPlugin:TrendVariable object declaration in the input file.  This is only used for Python Plugin
+        applications!
 
-        :param trend_handle:
-        :param time_index:
-        :return:
+        Trend variables are used as a way to track history of a PythonPlugin:Variable over time.  First a trend variable
+        must be declared in the input file using the PythonPlugin:TrendVariable object.  Once a variable has been
+        declared there, it can be accessed in the Plugin by getting a handle to the variable using the get_trend_handle
+        function, then using the other trend variable worker functions as needed.
+
+        :param trend_handle: An integer returned from the `get_trend_handle` function.
+        :param time_index: The number of time steps to search back in history to evaluate this function.
+        :return: Floating point value representation of the specific evaluation.
         """
         if not self.running_as_python_plugin:
             raise EnergyPlusException("get_trend_value is only available as part of a Python Plugin workflow")
@@ -401,10 +424,20 @@ class DataExchange:
 
     def get_trend_average(self, trend_handle: int, count: int) -> RealEP:
         """
+        Get the average of a plugin trend variable over a specific history set.  The count argument specifies how
+        many time steps to go back in the trend history.  A value of 1 indicates averaging just the most recent value.
+        The value of time_index must be less than or equal to the number of history terms specified in the matching
+        PythonPlugin:TrendVariable object declaration in the input file.  This is only used for Python Plugin
+        applications!
 
-        :param trend_handle:
-        :param count:
-        :return:
+        Trend variables are used as a way to track history of a PythonPlugin:Variable over time.  First a trend variable
+        must be declared in the input file using the PythonPlugin:TrendVariable object.  Once a variable has been
+        declared there, it can be accessed in the Plugin by getting a handle to the variable using the get_trend_handle
+        function, then using the other trend variable worker functions as needed.
+
+        :param trend_handle: An integer returned from the `get_trend_handle` function.
+        :param count: The number of time steps to search back in history to evaluate this function.
+        :return: Floating point value representation of the specific evaluation.
         """
         if not self.running_as_python_plugin:
             raise EnergyPlusException("get_trend_average is only available as part of a Python Plugin workflow")
@@ -412,10 +445,20 @@ class DataExchange:
 
     def get_trend_min(self, trend_handle: int, count: int) -> RealEP:
         """
+        Get the minimum of a plugin trend variable over a specific history set.  The count argument specifies how
+        many time steps to go back in the trend history.  A value of 1 indicates sweeping just the most recent value.
+        The value of time_index must be less than or equal to the number of history terms specified in the matching
+        PythonPlugin:TrendVariable object declaration in the input file.  This is only used for Python Plugin
+        applications!
 
-        :param trend_handle:
-        :param count:
-        :return:
+        Trend variables are used as a way to track history of a PythonPlugin:Variable over time.  First a trend variable
+        must be declared in the input file using the PythonPlugin:TrendVariable object.  Once a variable has been
+        declared there, it can be accessed in the Plugin by getting a handle to the variable using the get_trend_handle
+        function, then using the other trend variable worker functions as needed.
+
+        :param trend_handle: An integer returned from the `get_trend_handle` function.
+        :param count: The number of time steps to search back in history to evaluate this function.
+        :return: Floating point value representation of the specific evaluation.
         """
         if not self.running_as_python_plugin:
             raise EnergyPlusException("get_trend_min is only available as part of a Python Plugin workflow")
@@ -423,10 +466,20 @@ class DataExchange:
 
     def get_trend_max(self, trend_handle: int, count: int) -> RealEP:
         """
+        Get the maximum of a plugin trend variable over a specific history set.  The count argument specifies how
+        many time steps to go back in the trend history.  A value of 1 indicates sweeping just the most recent value.
+        The value of time_index must be less than or equal to the number of history terms specified in the matching
+        PythonPlugin:TrendVariable object declaration in the input file.  This is only used for Python Plugin
+        applications!
 
-        :param trend_handle:
-        :param count:
-        :return:
+        Trend variables are used as a way to track history of a PythonPlugin:Variable over time.  First a trend variable
+        must be declared in the input file using the PythonPlugin:TrendVariable object.  Once a variable has been
+        declared there, it can be accessed in the Plugin by getting a handle to the variable using the get_trend_handle
+        function, then using the other trend variable worker functions as needed.
+
+        :param trend_handle: An integer returned from the `get_trend_handle` function.
+        :param count: The number of time steps to search back in history to evaluate this function.
+        :return: Floating point value representation of the specific evaluation.
         """
         if not self.running_as_python_plugin:
             raise EnergyPlusException("get_trend_max is only available as part of a Python Plugin workflow")
@@ -434,10 +487,20 @@ class DataExchange:
 
     def get_trend_sum(self, trend_handle: int, count: int) -> RealEP:
         """
+        Get the summation of a plugin trend variable over a specific history set.  The count argument specifies how
+        many time steps to go back in the trend history.  A value of 1 indicates sweeping just the most recent value.
+        The value of time_index must be less than or equal to the number of history terms specified in the matching
+        PythonPlugin:TrendVariable object declaration in the input file.  This is only used for Python Plugin
+        applications!
 
-        :param trend_handle:
-        :param count:
-        :return:
+        Trend variables are used as a way to track history of a PythonPlugin:Variable over time.  First a trend variable
+        must be declared in the input file using the PythonPlugin:TrendVariable object.  Once a variable has been
+        declared there, it can be accessed in the Plugin by getting a handle to the variable using the get_trend_handle
+        function, then using the other trend variable worker functions as needed.
+
+        :param trend_handle: An integer returned from the `get_trend_handle` function.
+        :param count: The number of time steps to search back in history to evaluate this function.
+        :return: Floating point value representation of the specific evaluation.
         """
         if not self.running_as_python_plugin:
             raise EnergyPlusException("get_trend_sum is only available as part of a Python Plugin workflow")
@@ -445,10 +508,22 @@ class DataExchange:
 
     def get_trend_direction(self, trend_handle: int, count: int) -> RealEP:
         """
+        Get the trajectory of a plugin trend variable over a specific history set.  The count argument specifies how
+        many time steps to go back in the trend history.  A value of 1 indicates sweeping just the most recent value.
+        A linear regression is performed over the swept values and the slope of the regression line is returned as a
+        representation of the average trajectory over this range.
+        The value of time_index must be less than or equal to the number of history terms specified in the matching
+        PythonPlugin:TrendVariable object declaration in the input file.  This is only used for Python Plugin
+        applications!
 
-        :param trend_handle:
-        :param count:
-        :return:
+        Trend variables are used as a way to track history of a PythonPlugin:Variable over time.  First a trend variable
+        must be declared in the input file using the PythonPlugin:TrendVariable object.  Once a variable has been
+        declared there, it can be accessed in the Plugin by getting a handle to the variable using the get_trend_handle
+        function, then using the other trend variable worker functions as needed.
+
+        :param trend_handle: An integer returned from the `get_trend_handle` function.
+        :param count: The number of time steps to search back in history to evaluate this function.
+        :return: Floating point value representation of the specific evaluation.
         """
         if not self.running_as_python_plugin:
             raise EnergyPlusException("get_trend_direction is only available as part of a Python Plugin workflow")
@@ -456,9 +531,10 @@ class DataExchange:
 
     def year(self) -> int:
         """
-        Get the current year of the simulation.
+        Get the "current" calendar year of the simulation.  All simulations operate at a real year, either user
+        specified or automatically selected by EnergyPlus based on other data (start day of week + leap year option).
 
-        :return: An integer year
+        :return: An integer year (2020, for example)
         """
         return self.api.year()
 
