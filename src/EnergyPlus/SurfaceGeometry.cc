@@ -718,7 +718,8 @@ namespace SurfaceGeometry {
         } // ZoneNum
 
         // Set up solar distribution enclosures allowing for any air boundaries
-        SetupSolarEnclosuresAndAirBoundaries(ErrorsFound);
+        //SetupSolarEnclosuresAndAirBoundaries(ErrorsFound);
+        SetupEnclosuresAndAirBoundaries(DataViewFactorInformation::ZoneSolarInfo, SurfaceGeometry::enclosureType::SolarEnclosures, ErrorsFound);
 
         // Do the Stratosphere check
         SetZoneOutBulbTempAt();
@@ -2089,7 +2090,8 @@ namespace SurfaceGeometry {
         GetSurfaceHeatTransferAlgorithmOverrides(outputFiles, ErrorsFound);
 
         // Set up enclosures, process Air Boundaries if any
-        SetupRadiantEnclosuresAndAirBoundaries(ErrorsFound);
+        //SetupRadiantEnclosuresAndAirBoundaries(ErrorsFound);
+        SetupEnclosuresAndAirBoundaries(DataViewFactorInformation::ZoneRadiantInfo, SurfaceGeometry::enclosureType::RadiantEnclosures, ErrorsFound);
 
         GetSurfaceSrdSurfsData(ErrorsFound);
 
@@ -12725,11 +12727,30 @@ namespace SurfaceGeometry {
                             thisRadEnclosure.ZoneNums.push_back(Surface(surf.ExtBoundCond).Zone);
                             thisRadEnclosure.FloorArea += Zone(Surface(surf.ExtBoundCond).Zone).FloorArea;
                         } else if (thisSideEnclosureNum != otherSideEnclosureNum) {
-                            // This should never happen
-                            ErrorsFound = true;
-                            ShowSevereError(RoutineName + ": Radiant enclosure grouping error for Surface=\"" + surf.Name + "\"." +
-                                            "This surface enclosure num=" + General::RoundSigDigits(thisSideEnclosureNum) +
-                                            ". Other side enclosure num=" + General::RoundSigDigits(otherSideEnclosureNum));
+                            // If both sides are already assigned to an enclosure, then merge the two enclosures
+                            int originalThisSideEnclNum = thisSideEnclosureNum;
+                            auto& thisRadEnclosure(DataViewFactorInformation::ZoneRadiantInfo(originalThisSideEnclNum));
+                            auto& otherRadEnclosure(DataViewFactorInformation::ZoneRadiantInfo(otherSideEnclosureNum));
+                            for (auto zName : thisRadEnclosure.ZoneNames) {
+                                otherRadEnclosure.ZoneNames.push_back(zName);
+                            }
+                            for (auto zNum : thisRadEnclosure.ZoneNums) {
+                                otherRadEnclosure.ZoneNums.push_back(zNum);
+                                Zone(zNum).RadiantEnclosureNum = otherSideEnclosureNum;
+                            }
+                            otherRadEnclosure.FloorArea += thisRadEnclosure.FloorArea;
+                            // Move any enclosures beyond thisEnclosure down one slot - at this point all enclosures are named "Radiant Enclosure N"
+                            for (int enclNum = originalThisSideEnclNum; enclNum < enclosureNum; ++enclNum) {
+                                std::string saveName = DataViewFactorInformation::ZoneRadiantInfo(enclNum).Name;
+                                DataViewFactorInformation::ZoneRadiantInfo(enclNum) = DataViewFactorInformation::ZoneRadiantInfo(enclNum + 1);
+                                DataViewFactorInformation::ZoneRadiantInfo(enclNum).Name = saveName;
+                            }
+                            // Clear the last rad enclosure and reduce the total number of enclosures by 1
+                            DataViewFactorInformation::ZoneRadiantInfo(enclosureNum).Name.clear();
+                            DataViewFactorInformation::ZoneRadiantInfo(enclosureNum).ZoneNames.clear();
+                            DataViewFactorInformation::ZoneRadiantInfo(enclosureNum).ZoneNums.clear();
+                            DataViewFactorInformation::ZoneRadiantInfo(enclosureNum).FloorArea = 0;
+                            enclosureNum -= 1;
                         }
                     }
                 }
@@ -12893,6 +12914,258 @@ namespace SurfaceGeometry {
                 thisSolEnclosure.TotalSurfArea = Zone(zoneNum).TotalSurfArea;
             }
             DataViewFactorInformation::NumOfSolarEnclosures = DataGlobals::NumOfZones;
+        }
+    }
+
+    void SetupEnclosuresAndAirBoundaries(Array1D<DataViewFactorInformation::ZoneViewFactorInformation> &Enclosures, // Radiant or Solar Enclosures
+                                         SurfaceGeometry::enclosureType const &EnclosureType,                       // Radiant or Solar
+                                         bool &ErrorsFound)                                                         // Set to true if errors found
+    {
+        std::string RoutineName = "SetupEnclosuresAndAirBoundaries";
+        bool anyGroupedZones = false;
+        bool radiantSetup = false;
+        bool solarSetup = false;
+        std::string RadiantOrSolar = "";
+        int enclosureNum = 0;
+        if (EnclosureType == RadiantEnclosures) {
+            radiantSetup = true;
+            RadiantOrSolar = "Radiant";
+        } else if (EnclosureType == SolarEnclosures) {
+            solarSetup = true;
+            RadiantOrSolar = "Solar";
+        } else {
+            ShowFatalError(RoutineName + ": Illegal call to this function. Second argument must be 'RadiantEnclosures' or 'SolarEnclosures'");
+        }
+        if (std::any_of(Construct.begin(), Construct.end(), [](DataHeatBalance::ConstructionData const &e) { return e.TypeIsAirBoundary; })) {
+            int errorCount = 0;
+            for (int surfNum = 1; surfNum <= DataSurfaces::TotSurfaces; ++surfNum) {
+                auto &surf(Surface(surfNum));
+                if (surf.Construction == 0) continue;
+                auto &constr(Construct(surf.Construction));
+                if (!constr.TypeIsAirBoundary) continue;
+
+                // Check for invalid air boundary surfaces - valid only on non-adiabatic interzone surfaces
+                // Only check this once during radiant setup, skip for solar setup
+                if (radiantSetup && (surf.ExtBoundCond <= 0 || surf.ExtBoundCond == surfNum)) {
+                    ErrorsFound = true;
+                    if (!DisplayExtraWarnings) {
+                        ++errorCount;
+                    } else {
+                        ShowSevereError(RoutineName + ": Surface=\"" + surf.Name + "\" uses Construction:AirBoundary in a non-interzone surface.");
+                    }
+                } else {
+                    // Process air boundary - set surface properties and set up enclosures
+                    // Radiant exchange
+                    if (radiantSetup && constr.TypeIsAirBoundaryIRTSurface) {
+                        // IRT air boundaries use CTF algorithm
+                        surf.HeatTransferAlgorithm = DataSurfaces::HeatTransferModel_CTF;
+                        surf.HeatTransSurf = true;
+                        // Interior convection coefficient set to low H limit in ConvectionCoefficients::GetUserConvectionCoefficients
+                    } else if (solarSetup && constr.TypeIsAirBoundaryInteriorWindow) {
+                        // Override surface class for interior window
+                        surf.Class = SurfaceClass_Window;
+                        Zone(surf.Zone).HasInterZoneWindow = true;
+                    } else if ((radiantSetup && constr.TypeIsAirBoundaryGroupedRadiant) || (solarSetup && constr.TypeIsAirBoundarySolar)) {
+                        // Boundary is grouped - assign enclosure
+                        int thisSideEnclosureNum = 0;
+                        int otherSideEnclosureNum = 0;
+                        if (radiantSetup) {
+                            // Radiant enclosure setup
+                            constr.IsUsedCTF = false;
+                            surf.HeatTransSurf = false;
+                            surf.HeatTransferAlgorithm = DataSurfaces::HeatTransferModel_AirBoundaryNoHT;
+                            thisSideEnclosureNum = Zone(surf.Zone).RadiantEnclosureNum;
+                            otherSideEnclosureNum = Zone(Surface(surf.ExtBoundCond).Zone).RadiantEnclosureNum;
+                        } else {
+                            // Solar enclosure setup
+                            DataHeatBalance::AnyAirBoundaryGroupedSolar = true;
+                            thisSideEnclosureNum = Zone(surf.Zone).SolarEnclosureNum;
+                            otherSideEnclosureNum = Zone(Surface(surf.ExtBoundCond).Zone).SolarEnclosureNum;
+                        }
+                        anyGroupedZones = true;
+                        if ((thisSideEnclosureNum == 0) && (otherSideEnclosureNum == 0)) {
+                            // Neither zone is assigned to an enclosure, so increment the counter and assign to both
+                            ++enclosureNum;
+                            auto &thisEnclosure(Enclosures(enclosureNum));
+                            thisSideEnclosureNum = enclosureNum;
+                            thisEnclosure.Name = RadiantOrSolar + " Enclosure " + General::RoundSigDigits(enclosureNum);
+                            thisEnclosure.ZoneNames.push_back(surf.ZoneName);
+                            thisEnclosure.ZoneNums.push_back(surf.Zone);
+                            thisEnclosure.FloorArea += Zone(surf.Zone).FloorArea;
+                            otherSideEnclosureNum = enclosureNum;
+                            thisEnclosure.ZoneNames.push_back(Surface(surf.ExtBoundCond).ZoneName);
+                            thisEnclosure.ZoneNums.push_back(Surface(surf.ExtBoundCond).Zone);
+                            thisEnclosure.FloorArea += Zone(Surface(surf.ExtBoundCond).Zone).FloorArea;
+                            if (radiantSetup) {
+                                Zone(surf.Zone).RadiantEnclosureNum = thisSideEnclosureNum;
+                                Zone(Surface(surf.ExtBoundCond).Zone).RadiantEnclosureNum = otherSideEnclosureNum;
+                            } else {
+                                thisEnclosure.ExtWindowArea += Zone(surf.Zone).ExtWindowArea;
+                                thisEnclosure.TotalSurfArea += Zone(surf.Zone).TotalSurfArea;
+                                thisEnclosure.ExtWindowArea += Zone(Surface(surf.ExtBoundCond).Zone).ExtWindowArea;
+                                thisEnclosure.TotalSurfArea += Zone(Surface(surf.ExtBoundCond).Zone).TotalSurfArea;
+                                Zone(surf.Zone).SolarEnclosureNum = thisSideEnclosureNum;
+                                Zone(Surface(surf.ExtBoundCond).Zone).SolarEnclosureNum = otherSideEnclosureNum;
+                            }
+                        } else if (thisSideEnclosureNum == 0) {
+                            // Other side is assigned, so use that one for both
+                            thisSideEnclosureNum = otherSideEnclosureNum;
+                            auto &thisEnclosure(Enclosures(thisSideEnclosureNum));
+                            thisEnclosure.ZoneNames.push_back(surf.ZoneName);
+                            thisEnclosure.ZoneNums.push_back(surf.Zone);
+                            thisEnclosure.FloorArea += Zone(surf.Zone).FloorArea;
+                            if (radiantSetup) {
+                                Zone(surf.Zone).RadiantEnclosureNum = thisSideEnclosureNum;
+                            } else {
+                                thisEnclosure.ExtWindowArea += Zone(surf.Zone).ExtWindowArea;
+                                thisEnclosure.TotalSurfArea += Zone(surf.Zone).TotalSurfArea;
+                                Zone(surf.Zone).SolarEnclosureNum = thisSideEnclosureNum;
+                            }
+                        } else if (otherSideEnclosureNum == 0) {
+                            // This side is assigned, so use that one for both
+                            otherSideEnclosureNum = thisSideEnclosureNum;
+                            auto &thisEnclosure(Enclosures(thisSideEnclosureNum));
+                            thisEnclosure.ZoneNames.push_back(Surface(surf.ExtBoundCond).ZoneName);
+                            thisEnclosure.ZoneNums.push_back(Surface(surf.ExtBoundCond).Zone);
+                            thisEnclosure.FloorArea += Zone(Surface(surf.ExtBoundCond).Zone).FloorArea;
+                            if (radiantSetup) {
+                                Zone(Surface(surf.ExtBoundCond).Zone).RadiantEnclosureNum = otherSideEnclosureNum;
+                            } else {
+                                thisEnclosure.ExtWindowArea += Zone(Surface(surf.ExtBoundCond).Zone).ExtWindowArea;
+                                thisEnclosure.TotalSurfArea += Zone(Surface(surf.ExtBoundCond).Zone).TotalSurfArea;
+                                Zone(Surface(surf.ExtBoundCond).Zone).SolarEnclosureNum = otherSideEnclosureNum;
+                            }
+                        } else if (thisSideEnclosureNum != otherSideEnclosureNum) {
+                            // If both sides are already assigned to an enclosure, then merge the two enclosures
+                            auto &thisEnclosure(Enclosures(thisSideEnclosureNum));
+                            auto &otherEnclosure(Enclosures(otherSideEnclosureNum));
+                            for (auto zName : thisEnclosure.ZoneNames) {
+                                otherEnclosure.ZoneNames.push_back(zName);
+                            }
+                            for (auto zNum : thisEnclosure.ZoneNums) {
+                                otherEnclosure.ZoneNums.push_back(zNum);
+                                if (radiantSetup) {
+                                    Zone(zNum).RadiantEnclosureNum = otherSideEnclosureNum;
+                                } else {
+                                    Zone(zNum).SolarEnclosureNum = otherSideEnclosureNum;
+                                }
+                            }
+                            otherEnclosure.FloorArea += thisEnclosure.FloorArea;
+                            otherEnclosure.ExtWindowArea += thisEnclosure.ExtWindowArea;
+                            otherEnclosure.TotalSurfArea += thisEnclosure.TotalSurfArea;
+                            // Move any enclosures beyond thisEnclosure down one slot - at this point all enclosures are named "Radiant Enclosure N"
+                            for (int enclNum = thisSideEnclosureNum; enclNum < enclosureNum; ++enclNum) {
+                                std::string saveName = Enclosures(enclNum).Name;
+                                Enclosures(enclNum) = Enclosures(enclNum + 1);
+                                Enclosures(enclNum).Name = saveName;
+                                for (auto zNum : thisEnclosure.ZoneNums) {
+                                    if (radiantSetup) {
+                                        Zone(zNum).RadiantEnclosureNum = enclNum;
+                                    } else {
+                                        Zone(zNum).SolarEnclosureNum = enclNum;
+                                    }
+                                }
+                            }
+                            // Clear the last rad enclosure and reduce the total number of enclosures by 1
+                            Enclosures(enclosureNum).Name.clear();
+                            Enclosures(enclosureNum).ZoneNames.clear();
+                            Enclosures(enclosureNum).ZoneNums.clear();
+                            Enclosures(enclosureNum).FloorArea = 0;
+                            Enclosures(enclosureNum).ExtWindowArea = 0;
+                            Enclosures(enclosureNum).TotalSurfArea = 0;
+                            enclosureNum -= 1;
+                        }
+                    } else {
+                        ShowSevereError(RoutineName + ": Surface=" + surf.Name + " uses Construction:AirBoundary with illegal option:");
+                        if (radiantSetup) {
+                            ShowContinueError("Radiant Exchange Method must be either GroupedZones or IRTSurface.");
+                        } else {
+                            ShowContinueError("Solar and Daylighting Method must be either GroupedZones or InteriorWindow");
+                        }
+                    }
+                    if (solarSetup && constr.TypeIsAirBoundaryMixing) {
+                        // Set up mixing air boundaries only once, during solar setup
+                        int zoneNum1 = min(surf.Zone, Surface(surf.ExtBoundCond).Zone);
+                        int zoneNum2 = min(surf.Zone, Surface(surf.ExtBoundCond).Zone);
+                        // This pair already saved?
+                        bool found = false;
+                        for (int n = 0; n < DataHeatBalance::NumAirBoundaryMixing - 1; ++n) {
+                            if ((zoneNum1 == DataHeatBalance::AirBoundaryMixingZone1[n]) &&
+                                (zoneNum2 == DataHeatBalance::AirBoundaryMixingZone2[n])) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            // Store the zone pairs to use later to create cross mixing objects
+                            ++DataHeatBalance::NumAirBoundaryMixing;
+                            DataHeatBalance::AirBoundaryMixingZone1.push_back(zoneNum1);
+                            DataHeatBalance::AirBoundaryMixingZone2.push_back(zoneNum2);
+                            DataHeatBalance::AirBoundaryMixingSched.push_back(DataHeatBalance::Construct(surf.Construction).AirBoundaryMixingSched);
+                            Real64 mixingVol = Construct(surf.Construction).AirBoundaryACH * min(Zone(zoneNum1).Volume, Zone(zoneNum2).Volume) /
+                                               DataGlobals::SecInHour;
+                            DataHeatBalance::AirBoundaryMixingVol.push_back(mixingVol);
+                        }
+                    }
+                }
+            }
+            if (errorCount > 0) {
+                ShowSevereError(RoutineName + ": " + General::TrimSigDigits(errorCount) +
+                                " surfaces use Construction:AirBoundary in non-interzone surfaces.");
+                ShowContinueError("For explicit details on each use, use Output:Diagnostics,DisplayExtraWarnings;");
+            }
+        }
+        if (anyGroupedZones) {
+            // All grouped zones have been assigned to an enclosure, now assign remaining zones
+            for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
+                int zoneEnclosureNum = 0;
+                if (radiantSetup) {
+                    zoneEnclosureNum = Zone(zoneNum).RadiantEnclosureNum;
+                } else {
+                    zoneEnclosureNum = Zone(zoneNum).SolarEnclosureNum;
+                }
+                if (zoneEnclosureNum == 0) {
+                    ++enclosureNum;
+                    if (radiantSetup) {
+                        Zone(zoneNum).RadiantEnclosureNum = enclosureNum;
+                    } else {
+                        Zone(zoneNum).SolarEnclosureNum = enclosureNum;
+                    }
+                    auto &thisEnclosure(Enclosures(enclosureNum));
+                    thisEnclosure.Name = Zone(zoneNum).Name;
+                    thisEnclosure.ZoneNames.push_back(Zone(zoneNum).Name);
+                    thisEnclosure.ZoneNums.push_back(zoneNum);
+                    thisEnclosure.FloorArea = Zone(zoneNum).FloorArea;
+                    thisEnclosure.ExtWindowArea = Zone(zoneNum).ExtWindowArea;
+                    thisEnclosure.TotalSurfArea = Zone(zoneNum).TotalSurfArea;
+                }
+            }
+            if (radiantSetup) {
+                DataViewFactorInformation::NumOfRadiantEnclosures = enclosureNum;
+            } else {
+                DataViewFactorInformation::NumOfSolarEnclosures = enclosureNum;
+            }
+        } else {
+            // There are no grouped radiant air boundaries, assign each zone to it's own radiant enclosure
+            for (int zoneNum = 1; zoneNum <= DataGlobals::NumOfZones; ++zoneNum) {
+                auto &thisEnclosure(Enclosures(zoneNum));
+                thisEnclosure.Name = Zone(zoneNum).Name;
+                thisEnclosure.ZoneNames.push_back(Zone(zoneNum).Name);
+                thisEnclosure.ZoneNums.push_back(zoneNum);
+                thisEnclosure.FloorArea = Zone(zoneNum).FloorArea;
+                if (radiantSetup) {
+                    Zone(zoneNum).RadiantEnclosureNum = zoneNum;
+                } else {
+                    Zone(zoneNum).SolarEnclosureNum = zoneNum;
+                    thisEnclosure.ExtWindowArea = Zone(zoneNum).ExtWindowArea;
+                    thisEnclosure.TotalSurfArea = Zone(zoneNum).TotalSurfArea;
+                }
+            }
+            if (radiantSetup) {
+                DataViewFactorInformation::NumOfRadiantEnclosures = DataGlobals::NumOfZones;
+            } else {
+                DataViewFactorInformation::NumOfSolarEnclosures = DataGlobals::NumOfZones;
+            }
         }
     }
 
