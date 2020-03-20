@@ -194,7 +194,7 @@ namespace ResultsFramework {
         bool rVariablesScanned() const;
         bool iVariablesScanned() const;
 
-        void newRow(const int month, const int dayOfMonth, const int hourOfDay, const int curMin);
+        void newRow(const int month, const int dayOfMonth, int hourOfDay, int curMin);
         void newRow(const std::string &ts);
         void pushVariableValue(const int reportID, double value);
 
@@ -276,6 +276,7 @@ namespace ResultsFramework {
     class ResultsSchema : public BaseResultObject
     {
     public:
+
         ResultsSchema() = default;
         virtual ~ResultsSchema() = default;
 
