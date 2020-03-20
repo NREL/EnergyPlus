@@ -385,10 +385,6 @@ namespace SurfaceGeometry {
 
     void SetupShadeSurfacesForSolarCalcs();
 
-    void SetupRadiantEnclosuresAndAirBoundaries(bool &ErrorsFound); // Set to true if errors found
-
-    void SetupSolarEnclosuresAndAirBoundaries(bool &ErrorsFound); // Set to true if errors found
-
     void SetupEnclosuresAndAirBoundaries(Array1D<DataViewFactorInformation::ZoneViewFactorInformation> &Enclosures, // Radiant or Solar Enclosures
                                          SurfaceGeometry::enclosureType const &EnclosureType,                       // Radiant or Solar
                                          bool &ErrorsFound);                                                        // Set to true if errors found
