@@ -8906,7 +8906,7 @@ namespace Furnaces {
     // *****************************************************************************
 
     Real64 CalcFurnaceResidual(Real64 const PartLoadRatio, // DX cooling coil part load ratio
-                               Array1<Real64> const &Par   // Function parameters
+                               Array1D<Real64> const &Par  // Function parameters
     )
     {
 
@@ -9060,7 +9060,7 @@ namespace Furnaces {
     }
 
     Real64 CalcWaterToAirResidual(Real64 const PartLoadRatio, // DX cooling coil part load ratio
-                                  Array1<Real64> const &Par   // Function parameters
+                                  Array1D<Real64> const &Par  // Function parameters
     )
     {
 
@@ -9655,8 +9655,8 @@ namespace Furnaces {
         HeatCoilLoadmet = QActual;
     }
 
-    Real64 HotWaterCoilResidual(Real64 const HWFlow,      // hot water flow rate in kg/s
-                                Array1<Real64> const &Par // Par(5) is the requested coil load
+    Real64 HotWaterCoilResidual(Real64 const HWFlow,       // hot water flow rate in kg/s
+                                Array1D<Real64> const &Par // Par(5) is the requested coil load
     )
     {
 
@@ -11056,7 +11056,7 @@ namespace Furnaces {
     //******************************************************************************
 
     Real64 VSHPCyclingResidual(Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                               Array1<Real64> const &Par  // par(1) = FurnaceNum
+                               Array1D<Real64> const &Par  // par(1) = FurnaceNum
     )
     {
         // FUNCTION INFORMATION:
@@ -11171,8 +11171,8 @@ namespace Furnaces {
 
     //******************************************************************************
 
-    Real64 VSHPSpeedResidual(Real64 const SpeedRatio,  // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                             Array1<Real64> const &Par // par(1) = MSHPNum
+    Real64 VSHPSpeedResidual(Real64 const SpeedRatio,   // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+                             Array1D<Real64> const &Par // par(1) = MSHPNum
     )
     {
         // FUNCTION INFORMATION:
