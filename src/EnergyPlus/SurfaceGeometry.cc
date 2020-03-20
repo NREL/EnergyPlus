@@ -12819,6 +12819,7 @@ namespace SurfaceGeometry {
                             enclosureNum -= 1;
                         }
                     } else {
+                        ErrorsFound = true;
                         ShowSevereError(RoutineName + ": Surface=" + surf.Name + " uses Construction:AirBoundary with illegal option:");
                         if (radiantSetup) {
                             ShowContinueError("Radiant Exchange Method must be either GroupedZones or IRTSurface.");
