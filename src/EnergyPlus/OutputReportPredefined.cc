@@ -2559,8 +2559,8 @@ namespace OutputReportPredefined {
         pdchLeedPerfElDem = newPreDefColumn(pdstLeedPerf, "Electric Demand [W]");
         pdchLeedPerfGasEneUse = newPreDefColumn(pdstLeedPerf, "Natural Gas Energy Use [GJ]");
         pdchLeedPerfGasDem = newPreDefColumn(pdstLeedPerf, "Natural Gas Demand [W]");
-       // pdchLeedPerfAddFuelEneUse = newPreDefColumn(pdstLeedPerf, "Additional Fuel Use [GJ]");
-       // pdchLeedPerfAddFuelDem = newPreDefColumn(pdstLeedPerf, "Additional Fuel Demand [W]");
+        pdchLeedPerfAddFuelEneUse = newPreDefColumn(pdstLeedPerf, "Additional Fuel Use [GJ]");
+        pdchLeedPerfAddFuelDem = newPreDefColumn(pdstLeedPerf, "Additional Fuel Demand [W]");
         pdchLeedPerfPropaneEneUse = newPreDefColumn(pdstLeedPerf, "Propane Use [GJ]");
         pdchLeedPerfPropaneDem = newPreDefColumn(pdstLeedPerf, "Propane Demand [W]");
         pdchLeedPerfGasolineEneUse = newPreDefColumn(pdstLeedPerf, "Gasoline Use [GJ]");
