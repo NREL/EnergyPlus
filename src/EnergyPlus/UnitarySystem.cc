@@ -3039,8 +3039,8 @@ namespace UnitarySystems {
                     loc_sysAvailSched = UtilityRoutines::MakeUPPERCase(fields.at("availability_schedule_name"));
                     thisSys.m_SysAvailSchedPtr = ScheduleManager::GetScheduleIndex(loc_sysAvailSched);
                     if (thisSys.m_SysAvailSchedPtr == 0) {
-                        ShowWarningError(getUnitarySystemInput + cCurrentModuleObject + "=\"" + thisSys.Name + "\", invalid Availability Schedule Name" +
-                                         " = " + loc_sysAvailSched);
+                        ShowWarningError(getUnitarySystemInput + cCurrentModuleObject + "=\"" + thisSys.Name +
+                                         "\", invalid Availability Schedule Name" + " = " + loc_sysAvailSched);
                         ShowContinueError("Set the default as Always On. Simulation continues.");
                         thisSys.m_SysAvailSchedPtr = DataGlobals::ScheduleAlwaysOn;
                     }
@@ -4475,10 +4475,17 @@ namespace UnitarySystems {
                             newCoil.supplyFanType = thisSys.m_FanType_Num;
                             if (newCoil.CoolingCoilType == DataHVACGlobals::CoilDX_SubcoolReheat) {
                                 thisSys.m_CoolingCoilSubType_Num = DataHVACGlobals::CoilDX_SubcoolReheat;
+                                thisSys.m_Humidistat = true;
                                 if (thisSys.m_NumOfSpeedCooling > 1) {
                                     thisSys.FullOutput.resize(thisSys.m_NumOfSpeedCooling + 1);
                                     thisSys.FullLatOutput.resize(thisSys.m_NumOfSpeedCooling + 1);
                                     thisSys.SpeedSHR.resize(thisSys.m_NumOfSpeedCooling + 1);
+                                }
+                                if (thisSys.m_ControlType == ControlType::Setpoint) {
+                                    ShowSevereError(cCurrentModuleObject + " = " + thisObjectName);
+                                    ShowContinueError(
+                                        "Setpoint control is not available for SubcoolReheat cooling coil. Load control is forced. Simulation continues.");
+                                    thisSys.m_ControlType = ControlType::Load;
                                 }
                             }
                             // Push heating coil PLF curve index to DX coil
@@ -6147,8 +6154,9 @@ namespace UnitarySystems {
                                 ShowContinueError("Heating Supply Air Flow Rate Per Floor Area field is blank.");
                                 ShowContinueError("Heating Fraction of Autosized Heating Supply Air Flow Rate field is blank.");
                                 ShowContinueError("Heating Supply Air Flow Rate Per Unit of Capacity field is blank.");
-                                ShowContinueError("Blank field not allowed for all four heating supply air flow rate calculation methods when heating "
-                                                  "coil is present.");
+                                ShowContinueError(
+                                    "Blank field not allowed for all four heating supply air flow rate calculation methods when heating "
+                                    "coil is present.");
                             }
                         }
                     }
@@ -8328,11 +8336,11 @@ namespace UnitarySystems {
                             Real64 SenPLR = (ZoneLoad - SensOutputOff) / (SensOutputOn - SensOutputOff);
                             Real64 LatPLR = (ZoneLatLoad - LatOutputOff) / (LatOutputOn - LatOutputOff);
                             Real64 totalRate = DataLoopNode::Node(this->AirOutNode).MassFlowRate *
-                                        (DataLoopNode::Node(CoilInletNode).Enthalpy - DataLoopNode::Node(this->AirOutNode).Enthalpy);
+                                               (DataLoopNode::Node(CoilInletNode).Enthalpy - DataLoopNode::Node(this->AirOutNode).Enthalpy);
                             Real64 minAirHumRat = min(DataLoopNode::Node(CoilInletNode).HumRat, DataLoopNode::Node(this->AirOutNode).HumRat);
                             Real64 sensRate = DataLoopNode::Node(this->AirOutNode).MassFlowRate *
-                                       (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(CoilInletNode).Temp, minAirHumRat) -
-                                        Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(this->AirOutNode).Temp, minAirHumRat));
+                                              (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(CoilInletNode).Temp, minAirHumRat) -
+                                               Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(this->AirOutNode).Temp, minAirHumRat));
                             Real64 latRate = totalRate - sensRate;
                             if (LatPLR > 1.0 || LatPLR < 0.0) {
                                 this->CoilSHR = this->LoadSHR;
@@ -10291,7 +10299,8 @@ namespace UnitarySystems {
             } else {
                 // Air terminal inlet side mixer
                 SensOutput = AirMassFlow * (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, MinHumRatio) -
-                                            Psychrometrics::PsyHFnTdbW(RefTemp, MinHumRatio)) - this->m_SenLoadLoss;
+                                            Psychrometrics::PsyHFnTdbW(RefTemp, MinHumRatio)) -
+                             this->m_SenLoadLoss;
                 if (this->m_Humidistat) {
                     //   Calculate latent load met (at constant temperature)
                     LatOutput = AirMassFlow * (Psychrometrics::PsyHFnTdbW(RefTemp, DataLoopNode::Node(OutletNode).HumRat) -
@@ -10307,8 +10316,7 @@ namespace UnitarySystems {
                                         Psychrometrics::PsyHFnTdbW(RefTemp, MinHumRatio)) -
                          this->m_SenLoadLoss;
 
-            if (this->m_Humidistat || this->m_CoolingCoilSubType_Num == DataHVACGlobals::CoilDX_SubcoolReheat) {
-
+            if (this->m_Humidistat) {
                 //   Calculate latent load met (at constant temperature)
                 LatOutput = AirMassFlow * (Psychrometrics::PsyHFnTdbW(RefTemp, DataLoopNode::Node(OutletNode).HumRat) -
                                            Psychrometrics::PsyHFnTdbW(RefTemp, RefHumRat)) -
@@ -15606,7 +15614,8 @@ namespace UnitarySystems {
         }
     }
 
-    int UnitarySys::getAirInNode(std::string const &UnitarySysName, int const ZoneOAUnitNum, bool &errFlag) {
+    int UnitarySys::getAirInNode(std::string const &UnitarySysName, int const ZoneOAUnitNum, bool &errFlag)
+    {
         if (UnitarySystems::getInputOnceFlag) {
             getUnitarySystemInput(UnitarySysName, false, ZoneOAUnitNum);
             UnitarySystems::getInputOnceFlag = false;
@@ -15622,7 +15631,8 @@ namespace UnitarySystems {
         return airNode;
     }
 
-    int UnitarySys::getAirOutNode(std::string const &UnitarySysName, int const ZoneOAUnitNum, bool &errFlag) {
+    int UnitarySys::getAirOutNode(std::string const &UnitarySysName, int const ZoneOAUnitNum, bool &errFlag)
+    {
         if (UnitarySystems::getInputOnceFlag) {
             getUnitarySystemInput(UnitarySysName, false, ZoneOAUnitNum);
             UnitarySystems::getInputOnceFlag = false;
