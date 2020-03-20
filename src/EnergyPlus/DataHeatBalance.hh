@@ -1495,6 +1495,7 @@ namespace DataHeatBalance {
         Real64 DesignFanPowerFrac;         // Fraction (0.0-1.0) of design power level that is fans
         int OperSchedPtr;                  // Schedule pointer for design power input or operating schedule
         int CPULoadSchedPtr;               // Schedule pointer for CPU loading schedule
+        Real64 SizingTAirIn;               // Entering air dry-bulb temperature at maximum value during sizing[C]
         Real64 DesignTAirIn;               // Design entering air dry-bulb temperature [C]
         Real64 DesignFanPower;             // Design fan power input [W]
         Real64 DesignCPUPower;             // Design CPU power input [W]
@@ -1568,7 +1569,7 @@ namespace DataHeatBalance {
         // Default Constructor
         ITEquipData()
             : ZonePtr(0), FlowControlWithApproachTemps(false), DesignTotalPower(0.0), NomMinDesignLevel(0.0), NomMaxDesignLevel(0.0),
-              DesignFanPowerFrac(0.0), OperSchedPtr(0), CPULoadSchedPtr(0), DesignTAirIn(0.0), DesignFanPower(0.0), DesignCPUPower(0.0),
+              DesignFanPowerFrac(0.0), OperSchedPtr(0), CPULoadSchedPtr(0), SizingTAirIn(0.0), DesignTAirIn(0.0), DesignFanPower(0.0), DesignCPUPower(0.0),
               DesignAirVolFlowRate(0.0), Class(0), AirFlowFLTCurve(0), CPUPowerFLTCurve(0), FanPowerFFCurve(0), AirConnectionType(0),
               InletRoomAirNodeNum(0), OutletRoomAirNodeNum(0), SupplyAirNodeNum(0), DesignRecircFrac(0.0), RecircFLTCurve(0),
               DesignUPSEfficiency(0.0), UPSEfficFPLRCurve(0), UPSLossToZoneFrac(0.0), EMSCPUPowerOverrideOn(false), EMSCPUPower(0.0),
