@@ -299,7 +299,15 @@
         <dt>GPU Calculations</dt>
         <dd>
             Another high impact change with this release is the ability to leverage GPU calculations to improve runtime
-            performance of the simulation.  Describe theoretical impacts on dependencies that could need to be installed.
+            performance of the simulation.  The documentation contains plenty of information to let users take
+            advantage of this new feature, which has the potential to drastically speed up simulation runtime.
+            There is a performance overhead associated with passing calculations between the GPU and the CPU, with the GPU becoming noticeably more efficient in models with more than around 200 shadow-casting surfaces. The actual number of surfaces where the GPU becomes more efficient will depend on the specifications of the respective hardware.
+            Some machines (mostly server machines) do not have GPU hardware or the required graphics drivers to utilize this capability. If this scenario is detected on a computer, EnergyPlus will issue a warning and proceed with the simulation using the calculations on the CPU. Note: there are ways to emulate GPU calculations on a CPU on machines without GPU hardware [link to Mesa3D?].
+            Users may execute shading calculations on a GPU by setting the Shading Calculation Method  to PixelCounting in the ShadowCalculation simulation parameters object.
+            Some computers have multiple GPUs. In this case, the highest performance GPU is not always used by default. You may want to select which GPU is used when running EnergyPlus by setting the graphics performance preferences on your computer.
+
+
+            Describe theoretical impacts on dependencies that could need to be installed.
             Describe what problems *could* arise maybe if you can think of any.  Describe what E+ does if you don't have
             these dependencies.  Describe how a user can make the most of this enhancement.
         </dd>

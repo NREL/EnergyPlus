@@ -54,28 +54,32 @@
 int outdoorDewPointActuator = -1;
 int outdoorTempSensor = -1;
 int outdoorDewPointSensor = -1;
+int handlesRetrieved = 0;
 
 void afterZoneTimeStepHandler()
 {
     printf("STARTING A NEW TIME STEP\n");
-    if (outdoorDewPointActuator == -1) {
+    if (handlesRetrieved == 0) {
+        if (!apiDataFullyReady()) return;
         outdoorDewPointActuator = getActuatorHandle("Weather Data", "Outdoor Dew Point", "Environment");
         outdoorTempSensor = getVariableHandle("SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT");
         outdoorDewPointSensor = getVariableHandle("SITE OUTDOOR AIR DEWPOINT TEMPERATURE", "ENVIRONMENT");
         if (outdoorDewPointActuator == -1 || outdoorTempSensor == -1 || outdoorDewPointSensor == -1) {
             exit(1);
         }
-        FILE *apiAvailFile;
-        apiAvailFile = fopen("/tmp/api_stuff_available.csv", "w");
-        const char * apiStuff = listAllAPIDataCSV();
-        fputs(apiStuff, apiAvailFile);
-        fclose(apiAvailFile);
+//        FILE *apiAvailFile;
+//        apiAvailFile = fopen("/tmp/api_stuff_available.csv", "w");
+//        const char * apiStuff = listAllAPIDataCSV();
+//        fputs(apiStuff, apiAvailFile);
+//        fclose(apiAvailFile);
+        handlesRetrieved = 1;
     }
     setActuatorValue(outdoorDewPointActuator, -25.0);
     Real64 oa_temp = getVariableValue(outdoorTempSensor);
     printf("Reading outdoor temp via getVariable, value is: %8.4f \n", oa_temp);
     Real64 dp_temp = getVariableValue(outdoorDewPointSensor);
     printf("Actuated Dew Point temp value is: %8.4f \n", dp_temp);
+    setActuatorValue(outdoorDewPointActuator, oa_temp - 4);
 }
 
 void beginTimeStepHandler()

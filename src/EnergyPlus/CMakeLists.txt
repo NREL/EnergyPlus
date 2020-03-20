@@ -845,7 +845,7 @@ if(BUILD_PACKAGE)
   # we'll want to always provide the C API headers
   foreach(HEADER ${API_HEADERS})
     install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/${HEADER}"
-            DESTINATION "./include")
+            DESTINATION "./include/EnergyPlus/api")
   endforeach()
   # we'll want to always grab the python API wrapper
   install(DIRECTORY "$<TARGET_FILE_DIR:energyplus>/pyenergyplus/"

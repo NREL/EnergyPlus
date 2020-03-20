@@ -93,6 +93,7 @@ extern "C" {
 /// \brief Clears the simulation state of EnergyPlus
 /// \details After a simulation is complete, if a second is to be run using the same memory space, the simulation state
 ///          must be cleared, or unexpected errors will occur.
+/// \remark This function will also clear any callback functions, so callback functions must be registered again.
 ENERGYPLUSLIB_API void cClearAllStates();
 
 /// \brief Runs an EnergyPlus simulation

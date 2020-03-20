@@ -400,10 +400,10 @@ class Runtime:
     @staticmethod
     def clear_callbacks() -> None:
         """
-        This function is only used if you are running this script continually making many calls into the E+ library in
-        one thread, each with new and different callbacks, and you need to clean up.
+        This function is used if you are running this script continually making multiple calls into the E+ library in
+        one thread.  EnergyPlus should be cleaned up between runs.
 
-        Note this will affect all current Runtime instances in this thread, so use carefully!
+        Note this will clean all registered callbacks, so functions must be registered again prior to the next run.
 
         :return: Nothing
         """
