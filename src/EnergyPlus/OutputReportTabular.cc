@@ -4888,22 +4888,22 @@ namespace OutputReportTabular {
 
         // Air- and Evap-cooled chiller
         for (iChiller = 1; iChiller <= NumElectricChillers; ++iChiller) {
-            if (ElectricChiller(iChiller).CondenserType != WaterCooled) {
+            if (ElectricChiller(iChiller).CondenserType != PlantChillers::CondType::WaterCooled) {
                 SysTotalHVACRejectHeatLoss += ElectricChiller(iChiller).CondenserEnergy;
             }
         }
         for (iChiller = 1; iChiller <= NumEngineDrivenChillers; ++iChiller) {
-            if (EngineDrivenChiller(iChiller).CondenserType != WaterCooled) {
+            if (EngineDrivenChiller(iChiller).CondenserType != PlantChillers::CondType::WaterCooled) {
                 SysTotalHVACRejectHeatLoss += ElectricChiller(iChiller).CondenserEnergy;
             }
         }
         for (iChiller = 1; iChiller <= NumGTChillers; ++iChiller) {
-            if (GTChiller(iChiller).CondenserType != WaterCooled) {
+            if (GTChiller(iChiller).CondenserType != PlantChillers::CondType::WaterCooled) {
                 SysTotalHVACRejectHeatLoss += ElectricChiller(iChiller).CondenserEnergy;
             }
         }
         for (iChiller = 1; iChiller <= NumConstCOPChillers; ++iChiller) {
-            if (ConstCOPChiller(iChiller).CondenserType != WaterCooled) {
+            if (ConstCOPChiller(iChiller).CondenserType != PlantChillers::CondType::WaterCooled) {
                 SysTotalHVACRejectHeatLoss += ElectricChiller(iChiller).CondenserEnergy;
             }
         }
