@@ -250,30 +250,30 @@ TEST_F(EnergyPlusFixture, JsonOutput_DataFrameInfo2)
 
     OutputData["Timestep"] = OutputSchema->RITimestepTSData.getJSON();
 
-    json expectedObject = R"( {
-            "Timestep": {
-                "Cols":[
-                    {
-                        "Units" : "kgWater/kgDryAir",
-                        "Variable" : "SALESFLOOR INLET NODE:System Node Humidity Ratio"
-                    },
-                    {
-                        "Units" : "C",
-                        "Variable":"SALESFLOOR INLET NODE:System Node Temperature"
-                    }
-                ],
-                "ReportFrequency" : "Timestep",
-                "Rows":[
-                    { "02/25 00:45:00" : [5.0,1.0] },
-                    { "02/25 01:00:00" : [6.0,2.0] },
-                    { "02/25 23:45:00" : [7.0,3.0] },
-                    { "02/25 24:00:00" : [8.0,4.0] }
-                ]
-            }
-        } )"_json;
 
-    // There is some weird *nix vs windows issue when dumping the json. It changes ordering but I don't know why.
-     EXPECT_EQ( expectedObject.dump(), OutputData.dump());
+    json expectedObject = {
+        {"Timestep", {
+            {"Cols", {
+                {
+                    {"Units", "kgWater/kgDryAir"},
+                    {"Variable", "SALESFLOOR INLET NODE:System Node Humidity Ratio"}
+                },
+                {
+                    {"Units", "C"},
+                    {"Variable", "SALESFLOOR INLET NODE:System Node Temperature"}
+                }
+            }},
+            {"ReportFrequency", "Timestep"},
+            {"Rows", {
+                {{"02/25 00:45:00", {5.0, 1.0}}},
+                {{"02/25 01:00:00", {6.0, 2.0}}},
+                {{"02/25 23:45:00", {7.0, 3.0}}},
+                {{"02/25 24:00:00", {8.0, 4.0}}}
+            }}
+        }}
+    };
+
+    EXPECT_EQ( expectedObject.dump(), OutputData.dump());
 
     // If add one more, it also should go to the top of json cols array
     reportId++;
@@ -285,34 +285,33 @@ TEST_F(EnergyPlusFixture, JsonOutput_DataFrameInfo2)
     OutputSchema->RITimestepTSData.pushVariableValue(reportId, 12.0);
     OutputData["Timestep"] = OutputSchema->RITimestepTSData.getJSON();
 
-    expectedObject = R"( {
-            "Timestep": {
-                "Cols":[
-                    {
-                        "Units": "C",
-                        "Variable" : "SALESFLOOR OUTLET NODE:System Node Temperature"
-                    },
-                    {
-                        "Units" : "kgWater/kgDryAir",
-                        "Variable" : "SALESFLOOR INLET NODE:System Node Humidity Ratio"
-                    },
-                    {
-                        "Units" : "C",
-                        "Variable":"SALESFLOOR INLET NODE:System Node Temperature"
-                    }
-                ],
-                "ReportFrequency" : "Timestep",
-                "Rows":[
-                    { "02/25 00:45:00" : [9.0,5.0,1.0] },
-                    { "02/25 01:00:00" : [10.0,6.0,2.0] },
-                    { "02/25 23:45:00" : [11.0,7.0,3.0] },
-                    { "02/25 24:00:00" : [12.0,8.0,4.0] }
-                ]
-            }
-        } )"_json;
+    expectedObject = {
+        {"Timestep", {
+            {"Cols", {
+                {
+                    {"Units", "C"},
+                    {"Variable", "SALESFLOOR OUTLET NODE:System Node Temperature"}
+                },
+                {
+                    {"Units", "kgWater/kgDryAir"},
+                    {"Variable", "SALESFLOOR INLET NODE:System Node Humidity Ratio"}
+                },
+                {
+                    {"Units", "C"},
+                    {"Variable", "SALESFLOOR INLET NODE:System Node Temperature"}
+                }
+            }},
+            {"ReportFrequency", "Timestep"},
+            {"Rows", {
+                {{"02/25 00:45:00", {9.0, 5.0, 1.0}}},
+                {{"02/25 01:00:00", {10.0, 6.0, 2.0}}},
+                {{"02/25 23:45:00", {11.0, 7.0, 3.0}}},
+                {{"02/25 24:00:00", {12.0, 8.0, 4.0}}}
+            }}
+        }}
+    };
 
-    // There is some weird *nix vs windows issue when dumping the json. It changes ordering but I don't know why.
-     EXPECT_EQ( expectedObject.dump(), OutputData.dump());
+    EXPECT_EQ( expectedObject.dump(), OutputData.dump());
 }
 
 TEST_F(EnergyPlusFixture, JsonOutput_TableInfo)
