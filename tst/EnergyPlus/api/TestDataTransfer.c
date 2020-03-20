@@ -79,7 +79,6 @@ void afterZoneTimeStepHandler()
     printf("Reading outdoor temp via getVariable, value is: %8.4f \n", oa_temp);
     Real64 dp_temp = getVariableValue(outdoorDewPointSensor);
     printf("Actuated Dew Point temp value is: %8.4f \n", dp_temp);
-    setActuatorValue(outdoorDewPointActuator, oa_temp - 4);
 }
 
 void beginTimeStepHandler()
