@@ -64,7 +64,6 @@ namespace PlantChillers {
     extern int const AirCooled;
     extern int const WaterCooled;
     extern int const EvapCooled;
-    extern Real64 const KJtoJ; // convert Kjoules to joules
 
     // chiller flow modes
     extern int const FlowModeNotSet;
@@ -76,11 +75,6 @@ namespace PlantChillers {
     extern int NumEngineDrivenChillers; // number of EngineDriven chillers specified in input
     extern int NumGTChillers;           // number of GT chillers specified in input
     extern int NumConstCOPChillers;
-
-    extern bool GetEngineDrivenInput; // then TRUE, calls subroutine to read input file.
-    extern bool GetElectricInput;     // then TRUE, calls subroutine to read input file.
-    extern bool GetGasTurbineInput;   // then TRUE, calls subroutine to read input file.
-    extern bool GetConstCOPInput;
 
     struct BaseChillerSpecs : PlantComponent // NOTE: This base class is abstract, derived classes must override pure virtual methods
     {
@@ -487,10 +481,10 @@ namespace PlantChillers {
     };
 
     // Object Data
-    extern Array1D<ElectricChillerSpecs> ElectricChiller;         // dimension to number of machines
-    extern Array1D<EngineDrivenChillerSpecs> EngineDrivenChiller; // dimension to number of machines
-    extern Array1D<GTChillerSpecs> GTChiller;                     // dimension to number of machines
-    extern Array1D<ConstCOPChillerSpecs> ConstCOPChiller;         // dimension to number of machines
+    extern Array1D<ElectricChillerSpecs> ElectricChiller;
+    extern Array1D<EngineDrivenChillerSpecs> EngineDrivenChiller;
+    extern Array1D<GTChillerSpecs> GTChiller;
+    extern Array1D<ConstCOPChillerSpecs> ConstCOPChiller;
 
     void clear_state();
 
