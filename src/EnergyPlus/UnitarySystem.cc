@@ -8292,14 +8292,6 @@ namespace UnitarySystems {
                         if (CoolingLoad && this->LoadSHR > 0.0) {
                             int CoilInletNode = coilCoolingDXs[this->m_CoolingCoilIndex].evapInletNodeIndex;
                             this->CoilSHR = 0.0;
-                            Real64 totalRate = 0.0;
-                            Real64 minAirHumRat;
-                            Real64 sensRate = 0.0;
-                            Real64 latRate = 0.0;
-                            // Real64 latLoad;
-                            Real64 LowSpeedEnthalpy;
-                            Real64 LowSpeedTemp;
-                            Real64 LowSpeedHumRat;
                             Real64 LowSpeedCoilSen;
                             Real64 LowSpeedCoilLat;
                             CoolPLR = 0.0;
@@ -8318,11 +8310,6 @@ namespace UnitarySystems {
                                                           CompressorONFlag);
                             CoolPLR = 1.0;
                             HeatPLR = 0.0;
-                            // if (this->m_NumOfSpeedCooling == 1) {
-                            //    this->m_CoolingSpeedRatio = 0.0;
-                            //} else {
-                            //    this->m_CoolingSpeedRatio = 1.0;
-                            //}
                             this->m_CoolingCycRatio = 1.0;
                             this->m_CoolingSpeedRatio = 0.0;
                             // this->m_CoolingSpeedNum = this->m_NumOfSpeedCooling;
@@ -8340,13 +8327,13 @@ namespace UnitarySystems {
                             Real64 ZoneLatLoad = ZoneLoad * (1.0 / this->LoadSHR - 1.0);
                             Real64 SenPLR = (ZoneLoad - SensOutputOff) / (SensOutputOn - SensOutputOff);
                             Real64 LatPLR = (ZoneLatLoad - LatOutputOff) / (LatOutputOn - LatOutputOff);
-                            totalRate = DataLoopNode::Node(this->AirOutNode).MassFlowRate *
+                            Real64 totalRate = DataLoopNode::Node(this->AirOutNode).MassFlowRate *
                                         (DataLoopNode::Node(CoilInletNode).Enthalpy - DataLoopNode::Node(this->AirOutNode).Enthalpy);
-                            minAirHumRat = min(DataLoopNode::Node(CoilInletNode).HumRat, DataLoopNode::Node(this->AirOutNode).HumRat);
-                            sensRate = DataLoopNode::Node(this->AirOutNode).MassFlowRate *
+                            Real64 minAirHumRat = min(DataLoopNode::Node(CoilInletNode).HumRat, DataLoopNode::Node(this->AirOutNode).HumRat);
+                            Real64 sensRate = DataLoopNode::Node(this->AirOutNode).MassFlowRate *
                                        (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(CoilInletNode).Temp, minAirHumRat) -
                                         Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(this->AirOutNode).Temp, minAirHumRat));
-                            latRate = totalRate - sensRate;
+                            Real64 latRate = totalRate - sensRate;
                             if (LatPLR > 1.0 || LatPLR < 0.0) {
                                 this->CoilSHR = this->LoadSHR;
                             } else {
@@ -8370,9 +8357,6 @@ namespace UnitarySystems {
                                 Real64 LatSPR;
                                 this->FullOutput[1] = SensOutputOn;
                                 this->FullLatOutput[1] = LatOutputOn;
-                                LowSpeedEnthalpy = DataLoopNode::Node(this->AirOutNode).Enthalpy;
-                                LowSpeedTemp = DataLoopNode::Node(this->AirOutNode).Temp;
-                                LowSpeedHumRat = DataLoopNode::Node(this->AirOutNode).HumRat;
                                 for (SpeedNum = 2; SpeedNum <= this->m_NumOfSpeedCooling; ++SpeedNum) {
                                     this->CoilSHR = 0.0;
                                     CoolPLR = 1.0;
@@ -8410,9 +8394,6 @@ namespace UnitarySystems {
                                         this->CoilSHR = coilSens / (coilSens + coilLat);
                                     }
                                     this->SpeedSHR[SpeedNum] = this->CoilSHR;
-                                    LowSpeedEnthalpy = DataLoopNode::Node(this->AirOutNode).Enthalpy;
-                                    LowSpeedTemp = DataLoopNode::Node(this->AirOutNode).Temp;
-                                    LowSpeedHumRat = DataLoopNode::Node(this->AirOutNode).HumRat;
                                     LowSpeedCoilSen = sensRate;
                                     LowSpeedCoilLat = latRate;
                                 }
