@@ -79,12 +79,12 @@ namespace AirflowNetworkBalanceManager {
 
     // MODULE VARIABLE DECLARATIONS:
     // Report variables
-    extern Array1D<Real64> PZ;
+    extern EPVector<Real64> PZ;
     // Inverse matrix
-    extern Array1D<Real64> MA;
-    extern Array1D<Real64> MV;
-    extern Array1D_int IVEC;
-    extern Array1D_int SplitterNodeNumbers;
+    extern EPVector<Real64> MA;
+    extern EPVector<Real64> MV;
+    extern EPVector<int> IVEC;
+    extern Array1D<int> SplitterNodeNumbers;
 
     extern bool AirflowNetworkGetInputFlag;
     extern int VentilationCtrl;  // Hybrid ventilation control type
@@ -114,7 +114,7 @@ namespace AirflowNetworkBalanceManager {
     extern int NumOfExtNodes;
     extern int AirflowNetworkNumOfExtSurfaces;
     extern Real64 IncAng;                  // Wind incidence angle relative to facade normal (deg)
-    extern Array1D<Real64> FacadeAng;      // Facade azimuth angle (for walls, angle of outward normal to facade measured clockwise from North) (deg)
+    extern EPVector<Real64> FacadeAng;      // Facade azimuth angle (for walls, angle of outward normal to facade measured clockwise from North) (deg)
     extern int WindDirNum;                 // Wind direction number
     extern Real64 WindAng;                 // Wind direction angle (degrees clockwise from North)
     extern int SupplyFanInletNode;         // Supply air fan inlet node number
@@ -159,7 +159,7 @@ namespace AirflowNetworkBalanceManager {
     };
 
     // Object Data
-    extern Array1D<AirflowNetworkReportVars> AirflowNetworkZnRpt;
+    extern EPVector<AirflowNetworkReportVars> AirflowNetworkZnRpt;
 
     // Functions
 
@@ -282,7 +282,7 @@ namespace AirflowNetworkBalanceManager {
         bool closingProbability(Real64 const TimeCloseDuration); // function to perform calculations of closing probability
     };
 
-    extern Array1D<OccupantVentilationControlProp> OccupantVentilationControl;
+    extern EPVector<OccupantVentilationControlProp> OccupantVentilationControl;
 
 } // namespace AirflowNetworkBalanceManager
 

@@ -80,11 +80,11 @@ namespace AirflowNetwork {
         int const NrInt; // Number of intervals for a large opening
 
         // Common block AFEDAT
-        Array1D<Real64> AFECTL;
-        Array1D<Real64> AFLOW2;
-        Array1D<Real64> AFLOW;
-        Array1D<Real64> PS;
-        Array1D<Real64> PW;
+        EPVector<Real64> AFECTL;
+        EPVector<Real64> AFLOW2;
+        EPVector<Real64> AFLOW;
+        EPVector<Real64> PS;
+        EPVector<Real64> PW;
 
         // Common block CONTRL
         Real64 PB;
@@ -94,24 +94,24 @@ namespace AirflowNetwork {
         // extern Array1D<Real64> RHOZ;
         // extern Array1D<Real64> SQRTDZ;
         // extern Array1D<Real64> VISCZ;
-        Array1D<Real64> SUMAF;
+        EPVector<Real64> SUMAF;
         // extern Array1D<Real64> TZ; // Temperature [C]
         // extern Array1D<Real64> WZ; // Humidity ratio [kg/kg]
-        Array1D<Real64> PZ; // Pressure [Pa]
+        EPVector<Real64> PZ; // Pressure [Pa]
 
         // Other array variables
-        Array1D_int ID;
-        Array1D_int IK;
-        Array1D<Real64> AD;
-        Array1D<Real64> AU;
+        EPVector<int> ID;
+        EPVector<int> IK;
+        EPVector<Real64> AD;
+        EPVector<Real64> AU;
 
 #ifdef SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
-        Array1D_int newIK;     // noel
-        Array1D<Real64> newAU; // noel
+        EPVector<int> newIK;     // noel
+        EPVector<Real64> newAU; // noel
 #endif
 
         // REAL(r64), ALLOCATABLE, DIMENSION(:) :: AL
-        Array1D<Real64> SUMF;
+        EPVector<Real64> SUMF;
     };
 
     extern std::vector<AirProperties> properties;
@@ -123,11 +123,11 @@ namespace AirflowNetwork {
     extern int const NrInt; // Number of intervals for a large opening
 
     // Common block AFEDAT
-    extern Array1D<Real64> AFECTL;
-    extern Array1D<Real64> AFLOW2;
-    extern Array1D<Real64> AFLOW;
-    extern Array1D<Real64> PS;
-    extern Array1D<Real64> PW;
+    extern EPVector<Real64> AFECTL;
+    extern EPVector<Real64> AFLOW2;
+    extern EPVector<Real64> AFLOW;
+    extern EPVector<Real64> PS;
+    extern EPVector<Real64> PW;
 
     // Common block CONTRL
     extern Real64 PB;
@@ -137,31 +137,31 @@ namespace AirflowNetwork {
     // extern Array1D<Real64> RHOZ;
     // extern Array1D<Real64> SQRTDZ;
     // extern Array1D<Real64> VISCZ;
-    extern Array1D<Real64> SUMAF;
+    extern EPVector<Real64> SUMAF;
     // extern Array1D<Real64> TZ; // Temperature [C]
     // extern Array1D<Real64> WZ; // Humidity ratio [kg/kg]
-    extern Array1D<Real64> PZ; // Pressure [Pa]
+    extern EPVector<Real64> PZ; // Pressure [Pa]
 
     // Other array variables
-    extern Array1D_int ID;
-    extern Array1D_int IK;
-    extern Array1D<Real64> AD;
-    extern Array1D<Real64> AU;
+    extern EPVector<int> ID;
+    extern EPVector<int> IK;
+    extern EPVector<Real64> AD;
+    extern EPVector<Real64> AU;
 
 #ifdef SKYLINE_MATRIX_REMOVE_ZERO_COLUMNS
-    extern Array1D_int newIK;     // noel
-    extern Array1D<Real64> newAU; // noel
+    extern EPVector<int> newIK;     // noel
+    extern EPVector<Real64> newAU; // noel
 #endif
 
     // REAL(r64), ALLOCATABLE, DIMENSION(:) :: AL
-    extern Array1D<Real64> SUMF;
+    extern EPVector<Real64> SUMF;
     extern int Unit11;
     extern int Unit21;
 
     // Large opening variables
-    extern Array1D<Real64> DpProf;   // Differential pressure profile for Large Openings [Pa]
-    extern Array1D<Real64> RhoProfF; // Density profile in FROM zone [kg/m3]
-    extern Array1D<Real64> RhoProfT; // Density profile in TO zone [kg/m3]
+    extern EPVector<Real64> DpProf;   // Differential pressure profile for Large Openings [Pa]
+    extern EPVector<Real64> RhoProfF; // Density profile in FROM zone [kg/m3]
+    extern EPVector<Real64> RhoProfT; // Density profile in TO zone [kg/m3]
     extern Array2D<Real64> DpL;      // Array of stack pressures in link
 
     // Functions
@@ -174,9 +174,9 @@ namespace AirflowNetwork {
 
     void AIRMOV();
 
-    void SOLVZP(Array1D_int &IK,     // pointer to the top of column/row "K"
-                Array1D<Real64> &AD, // the main diagonal of [A] before and after factoring
-                Array1D<Real64> &AU, // the upper triangle of [A] before and after factoring
+    void SOLVZP(EPVector<int> &IK,     // pointer to the top of column/row "K"
+                EPVector<Real64> &AD, // the main diagonal of [A] before and after factoring
+                EPVector<Real64> &AU, // the upper triangle of [A] before and after factoring
                 int &ITER            // number of iterations
     );
 
@@ -238,39 +238,39 @@ namespace AirflowNetwork {
                     std::array<Real64, 2> &DF   // Partial derivative:  DF/DP
     );
 
-    void FACSKY(Array1D<Real64> &AU,   // the upper triangle of [A] before and after factoring
-                Array1D<Real64> &AD,   // the main diagonal of [A] before and after factoring
-                Array1D<Real64> &AL,   // the lower triangle of [A] before and after factoring
-                const Array1D_int &IK, // pointer to the top of column/row "K"
+    void FACSKY(EPVector<Real64> &AU,   // the upper triangle of [A] before and after factoring
+                EPVector<Real64> &AD,   // the main diagonal of [A] before and after factoring
+                EPVector<Real64> &AL,   // the lower triangle of [A] before and after factoring
+                const EPVector<int> &IK, // pointer to the top of column/row "K"
                 int const NEQ,         // number of equations
                 int const NSYM         // symmetry:  0 = symmetric matrix, 1 = non-symmetric
     );
 
-    void SLVSKY(const Array1D<Real64> &AU, // the upper triangle of [A] before and after factoring
-                const Array1D<Real64> &AD, // the main diagonal of [A] before and after factoring
-                const Array1D<Real64> &AL, // the lower triangle of [A] before and after factoring
-                Array1D<Real64> &B,        // "B" vector (input); "X" vector (output).
-                const Array1D_int &IK,     // pointer to the top of column/row "K"
+    void SLVSKY(const EPVector<Real64> &AU, // the upper triangle of [A] before and after factoring
+                const EPVector<Real64> &AD, // the main diagonal of [A] before and after factoring
+                const EPVector<Real64> &AL, // the lower triangle of [A] before and after factoring
+                EPVector<Real64> &B,        // "B" vector (input); "X" vector (output).
+                const EPVector<int> &IK,     // pointer to the top of column/row "K"
                 int const NEQ,             // number of equations
                 int const NSYM             // symmetry:  0 = symmetric matrix, 1 = non-symmetric
     );
 
-    void FILSKY(const Array1D<Real64> &X,    // element array (row-wise sequence)
+    void FILSKY(const EPVector<Real64> &X,    // element array (row-wise sequence)
                 std::array<int, 2> const LM, // location matrix
-                const Array1D_int &IK,       // pointer to the top of column/row "K"
-                Array1D<Real64> &AU,         // the upper triangle of [A] before and after factoring
-                Array1D<Real64> &AD,         // the main diagonal of [A] before and after factoring
+                const EPVector<int> &IK,       // pointer to the top of column/row "K"
+                EPVector<Real64> &AU,         // the upper triangle of [A] before and after factoring
+                EPVector<Real64> &AD,         // the main diagonal of [A] before and after factoring
                 int const FLAG               // mode of operation
     );
 
     void DUMPVD(std::string const &S,     // Description
-                const Array1D<Real64> &V, // Output values
+                const EPVector<Real64> &V, // Output values
                 int const n,              // Array size
                 int const UOUT            // Output file unit
     );
 
     void DUMPVR(std::string const &S,     // Description
-                const Array1D<Real64> &V, // Output values
+                const EPVector<Real64> &V, // Output values
                 int const n,              // Array size
                 int const UOUT            // Output file unit
     );
@@ -288,12 +288,12 @@ namespace AirflowNetwork {
     void PresProfile(int const il,                  // Linkage number
                      int const Pprof,               // Opening number
                      Real64 const G,                // gravitation field strength [N/kg]
-                     const Array1D<Real64> &DpF,    // Stack pressures at start heights of Layers
-                     const Array1D<Real64> &DpT,    // Stack pressures at start heights of Layers
-                     const Array1D<Real64> &BetaF,  // Density gradients in the FROM zone (starting at linkheight) [Kg/m3/m]
-                     const Array1D<Real64> &BetaT,  // Density gradients in the TO zone (starting at linkheight) [Kg/m3/m]
-                     const Array1D<Real64> &RhoStF, // Density at the start heights of Layers in the FROM zone
-                     const Array1D<Real64> &RhoStT, // Density at the start heights of Layers in the TO zone
+                     const EPVector<Real64> &DpF,    // Stack pressures at start heights of Layers
+                     const EPVector<Real64> &DpT,    // Stack pressures at start heights of Layers
+                     const EPVector<Real64> &BetaF,  // Density gradients in the FROM zone (starting at linkheight) [Kg/m3/m]
+                     const EPVector<Real64> &BetaT,  // Density gradients in the TO zone (starting at linkheight) [Kg/m3/m]
+                     const EPVector<Real64> &RhoStF, // Density at the start heights of Layers in the FROM zone
+                     const EPVector<Real64> &RhoStT, // Density at the start heights of Layers in the TO zone
                      int const From,                // Number of FROM zone
                      int const To,                  // Number of To zone
                      Real64 const ActLh,            // Actual height of opening [m]

@@ -53,8 +53,8 @@
 // Language: C++
 
 // C++ Headers
-#include <cstdint> // C++11
 #include <cassert>
+#include <cstdint> // C++11
 
 #include <EnergyPlus/TypeDefs.h>
 
@@ -62,7 +62,9 @@
 // UNUSED( foo );
 #define EP_UNUSED(expr)
 // macro to guarantee array sizing in debug builds
-#define EP_SIZE_CHECK(array, min_size) assert(min_size >= 0);assert(array.size() >= (size_t)min_size)
+#define EP_SIZE_CHECK(array, min_size)                                                                                                               \
+    assert(min_size >= 0);                                                                                                                           \
+    assert(array.size() >= (size_t)min_size)
 
 typedef std::int32_t Int32;
 typedef std::int64_t Int64;
@@ -215,5 +217,53 @@ using ObjexxFCL::bit::bit_and;
 using ObjexxFCL::bit::bit_shift;
 using ObjexxFCL::bit::bit_transfer;
 using ObjexxFCL::bit::bit_xor;
+
+template <typename T> struct EPVector : std::vector<T>
+{
+    using std::vector<T>::vector;
+
+    T &operator()(std::size_t n)
+    {
+        return this->at(n - 1);
+    }
+
+    const T &operator()(std::size_t n) const
+    {
+        return this->at(n - 1);
+    }
+
+    void allocate(int size)
+    {
+        this->reserve(size);
+    }
+
+    void redimension(int size)
+    {
+        this->reserve(size);
+    }
+
+    // EPVector<T> & deallocate()
+    void deallocate()
+    {
+        return;
+        // EPVector<T>().swap(this);
+        // return *this;
+    }
+
+    void operator=(T v)
+    {
+        std::fill(this->begin(), this->end(), v);
+    }
+
+    void dimension(int size, const T v)
+    {
+        this->resize(size, v);
+    }
+
+    int isize() const
+    {
+        return static_cast<int>(this->size());
+    }
+};
 
 #endif

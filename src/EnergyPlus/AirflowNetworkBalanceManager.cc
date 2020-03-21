@@ -242,12 +242,12 @@ namespace AirflowNetworkBalanceManager {
     } // namespace
 
     // Report variables
-    Array1D<Real64> PZ;
+    EPVector<Real64> PZ;
     // Inverse matrix
-    Array1D<Real64> MA;
-    Array1D<Real64> MV;
-    Array1D_int IVEC;
-    Array1D_int SplitterNodeNumbers;
+    EPVector<Real64> MA;
+    EPVector<Real64> MV;
+    EPVector<int> IVEC;
+    Array1D<int> SplitterNodeNumbers;
 
     bool AirflowNetworkGetInputFlag(true);
     int VentilationCtrl(0);  // Hybrid ventilation control type
@@ -278,7 +278,7 @@ namespace AirflowNetworkBalanceManager {
     int NumOfExtNodes(0);
     int AirflowNetworkNumOfExtSurfaces(0);
     Real64 IncAng(0.0);                     // Wind incidence angle relative to facade normal (deg)
-    Array1D<Real64> FacadeAng(5);           // Facade azimuth angle (for walls, angle of outward normal to facade measured clockwise from North) (deg)
+    EPVector<Real64> FacadeAng(5);          // Facade azimuth angle (for walls, angle of outward normal to facade measured clockwise from North) (deg)
     int WindDirNum;                         // Wind direction number
     Real64 WindAng;                         // Wind direction angle (degrees clockwise from North)
     int SupplyFanInletNode(0);              // Supply air fan inlet node number
@@ -298,18 +298,18 @@ namespace AirflowNetworkBalanceManager {
     int NumOfOAFans(0);              // number of OutdoorAir fans
     int NumOfReliefFans(0);          // number of OutdoorAir relief fans
 
-    Array1D<Real64> LoopPartLoadRatio;
-    Array1D<Real64> LoopOnOffFanRunTimeFraction;
+    EPVector<Real64> LoopPartLoadRatio;
+    EPVector<Real64> LoopOnOffFanRunTimeFraction;
     Array1D<bool> LoopOnOffFlag;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE AirflowNetworkBalanceManager:
     // Name Public routines, optionally name Private routines within this module
 
     // Object Data
-    Array1D<AirflowNetworkReportVars> AirflowNetworkZnRpt;
+    EPVector<AirflowNetworkReportVars> AirflowNetworkZnRpt;
     std::unordered_map<std::string, std::string> UniqueAirflowNetworkSurfaceName;
 
-    Array1D<OccupantVentilationControlProp> OccupantVentilationControl;
+    EPVector<OccupantVentilationControlProp> OccupantVentilationControl;
 
     // Functions
 
@@ -349,7 +349,7 @@ namespace AirflowNetworkBalanceManager {
         NumOfExtNodes = 0;
         AirflowNetworkNumOfExtSurfaces = 0;
         IncAng = 0.0;
-        FacadeAng = Array1D<Real64>(5);
+        FacadeAng = EPVector<Real64>(5);
         WindDirNum = 0; // added default value
         WindAng = 0;    // added default value
         SupplyFanInletNode = 0;
@@ -1610,7 +1610,7 @@ namespace AirflowNetworkBalanceManager {
         bool NodeFound1;
         bool NodeFound2;
         int NumAPL;
-        Array1D_string CompName(2);
+        EPVector<std::string> CompName(2);
         std::string SimAirNetworkKey;
         bool SimObjectError;
         std::string StringOut;
@@ -1619,23 +1619,23 @@ namespace AirflowNetworkBalanceManager {
 
         // Declare variables used in this subroutine for debug purpose
         bool AirflowNetworkInitFlag;
-        Array1D_int ZoneCheck;
-        Array1D_int ZoneBCCheck;
+        EPVector<int> ZoneCheck;
+        EPVector<int> ZoneBCCheck;
         bool SurfaceFound;
 
         int NumAlphas;  // Number of Alphas for each GetObjectItem call
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;   // Used in GetObjectItem
         std::string CurrentModuleObject;
-        Array1D_string Alphas;         // Alpha input items for object
-        Array1D_string cAlphaFields;   // Alpha field names
-        Array1D_string cNumericFields; // Numeric field names
-        Array1D<Real64> Numbers;       // Numeric input items for object
-        Array1D_bool lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
-        static int MaxNums(0);         // Maximum number of numeric input fields
-        static int MaxAlphas(0);       // Maximum number of alpha input fields
-        static int TotalArgs(0);       // Total number of alpha and numeric arguments (max) for a
+        Array1D<std::string> Alphas;         // Alpha input items for object
+        Array1D<std::string> cAlphaFields;   // Alpha field names
+        Array1D<std::string> cNumericFields; // Numeric field names
+        Array1D<Real64> Numbers;              // Numeric input items for object
+        Array1D<bool> lAlphaBlanks;           // Logical array, alpha field input BLANK = .TRUE.
+        Array1D<bool> lNumericBlanks;         // Logical array, numeric field input BLANK = .TRUE.
+        static int MaxNums(0);                // Maximum number of numeric input fields
+        static int MaxAlphas(0);              // Maximum number of alpha input fields
+        static int TotalArgs(0);              // Total number of alpha and numeric arguments (max) for a
         bool Errorfound1;
         Real64 minHeight;
         Real64 maxHeight;
@@ -2129,7 +2129,8 @@ namespace AirflowNetworkBalanceManager {
         AirflowNetworkNumOfZones = inputProcessor->getNumObjectsFound(CurrentModuleObject);
         if (AirflowNetworkNumOfZones > 0) {
             MultizoneZoneData.allocate(AirflowNetworkNumOfZones);
-            AirflowNetworkZoneFlag.dimension(NumOfZones, false); // AirflowNetwork zone flag
+            AirflowNetworkZoneFlag.allocate(NumOfZones);
+            AirflowNetworkZoneFlag = false; // AirflowNetwork zone flag
             for (i = 1; i <= AirflowNetworkNumOfZones; ++i) {
                 inputProcessor->getObjectItem(CurrentModuleObject,
                                               i,
@@ -3625,7 +3626,7 @@ namespace AirflowNetworkBalanceManager {
                 } else {
                     ShowSevereError(RoutineName + CurrentModuleObject + "=\"" + Alphas(1) + "\" invalid " + cAlphaFields(3) + "=\"" + Alphas(3) +
                                     "\" illegal key.");
-                    ShowContinueError("Valid keys are: AirLoopHVAC:ZoneMixer, AirLoopHVAC:ZoneSplitter, AirLoopHVAC:OutdoorAirSystem, " 
+                    ShowContinueError("Valid keys are: AirLoopHVAC:ZoneMixer, AirLoopHVAC:ZoneSplitter, AirLoopHVAC:OutdoorAirSystem, "
                                       "OAMixerOutdoorAirStreamNode, OutdoorAir:NodeList, OutdoorAir:Node or Other.");
                     ErrorsFound = true;
                 }
@@ -6126,7 +6127,7 @@ namespace AirflowNetworkBalanceManager {
     }
 
     Real64 AFNPressureResidual(Real64 const ControllerMassFlowRate, // Pressure setpoint
-                               Array1D<Real64> const &Par           // par(1) = PressureSet
+                               Array1D<Real64> const &Par          // par(1) = PressureSet
     )
     {
         // FUNCTION INFORMATION:
@@ -6947,7 +6948,7 @@ namespace AirflowNetworkBalanceManager {
                         Real64 hrjTj_sum = 0;
                         Real64 hrj_sum = 0;
 
-                        for (int j = 1; j <= VFObj.LinkageSurfaceData.u(); ++j) {
+                        for (int j = 1; j <= VFObj.LinkageSurfaceData.size(); ++j) {
 
                             int ZoneSurfNum = VFObj.LinkageSurfaceData(j).SurfaceNum;
 
@@ -6988,7 +6989,7 @@ namespace AirflowNetworkBalanceManager {
                         TDuctSurf_K = TDuctSurf + KelvinConv;
                     }
 
-                    for (int j = 1; j <= VFObj.LinkageSurfaceData.u(); ++j) {
+                    for (int j = 1; j <= VFObj.LinkageSurfaceData.size(); ++j) {
                         int ZoneSurfNum = VFObj.LinkageSurfaceData(j).SurfaceNum;
                         Real64 TSurfj = TH(1, 1, ZoneSurfNum);
                         Real64 TSurfj_K = TSurfj + KelvinConv;
@@ -9645,12 +9646,12 @@ namespace AirflowNetworkBalanceManager {
         int R1;
         int R2;
         bool LocalError;
-        Array1D_bool NodeFound;
+        Array1D<bool> NodeFound;
 
         bool ErrorsFound(false);
         bool IsNotOK(false);
         bool errFlag(false);
-        Array1D_int NodeConnectionType; // Specifies the type of node connection
+        Array1D<int> NodeConnectionType; // Specifies the type of node connection
         std::string CurrentModuleObject;
 
         // Validate supply and return connections
@@ -10728,16 +10729,16 @@ namespace AirflowNetworkBalanceManager {
         Real64 ZoneAng1;
         Real64 ZoneAng2;
         Real64 ZoneAngDiff;
-        Array1D<Real64> ZoneAng;           // Azimuth angle of the exterior wall of the zone
-        Array1D<Real64> PiFormula;         // Formula for the mean pressure difference
-        Array1D<Real64> SigmaFormula;      // Formula for the fluctuating pressure difference
-        Array1D<Real64> Sprime;            // The dimensionless ratio of the window separation to the building width
-        Array1D<Real64> CPV1;              // Wind pressure coefficient for the first opening in the zone
-        Array1D<Real64> CPV2;              // Wind pressure coefficient for the second opening in the zone
+        EPVector<Real64> ZoneAng;          // Azimuth angle of the exterior wall of the zone
+        EPVector<Real64> PiFormula;        // Formula for the mean pressure difference
+        EPVector<Real64> SigmaFormula;     // Formula for the fluctuating pressure difference
+        EPVector<Real64> Sprime;           // The dimensionless ratio of the window separation to the building width
+        EPVector<Real64> CPV1;             // Wind pressure coefficient for the first opening in the zone
+        EPVector<Real64> CPV2;             // Wind pressure coefficient for the second opening in the zone
         static int AFNNumOfExtOpenings(0); // Total number of external openings in the model
         static int OpenNuminZone(0);       // Counts which opening this is in the zone, 1 or 2
         std::string Name;                  // External node name
-        Array1D_int NumofExtSurfInZone;    // List of the number of exterior openings in each zone
+        EPVector<int> NumofExtSurfInZone;  // List of the number of exterior openings in each zone
 
         struct AFNExtSurfacesProp // External opening information
         {
@@ -10767,7 +10768,7 @@ namespace AirflowNetworkBalanceManager {
         };
 
         // Object Data
-        Array1D<AFNExtSurfacesProp> AFNExtSurfaces; // Surface numbers of all exterior openings
+        EPVector<AFNExtSurfacesProp> AFNExtSurfaces; // Surface numbers of all exterior openings
 
         // Count the total number of exterior simple and detailed openings and the number in each zone
         // Verify that each zone with "ADVANCED" single sided wind pressure coefficients has exactly two openings.
@@ -11155,12 +11156,12 @@ namespace AirflowNetworkBalanceManager {
                         if (IsParentObject(TypeOfComp, NameOfComp)) {
 
                             int NumChildren = GetNumChildren(TypeOfComp, NameOfComp);
-                            Array1D_string SubCompTypes;
-                            Array1D_string SubCompNames;
-                            Array1D_string InletNodeNames;
-                            Array1D_int InletNodeNumbers;
-                            Array1D_string OutletNodeNames;
-                            Array1D_int OutletNodeNumbers;
+                            Array1D<std::string> SubCompTypes;
+                            Array1D<std::string> SubCompNames;
+                            Array1D<std::string> InletNodeNames;
+                            Array1D<int> InletNodeNumbers;
+                            Array1D<std::string> OutletNodeNames;
+                            Array1D<int> OutletNodeNumbers;
 
                             SubCompTypes.allocate(NumChildren);
                             SubCompNames.allocate(NumChildren);
@@ -11206,12 +11207,12 @@ namespace AirflowNetworkBalanceManager {
                                 if (IsParentObject(TypeOfComp, NameOfComp)) {
 
                                     int NumGrandChildren = GetNumChildren(TypeOfComp, NameOfComp);
-                                    Array1D_string SubSubCompTypes;
-                                    Array1D_string SubSubCompNames;
-                                    Array1D_string SubSubInletNodeNames;
-                                    Array1D_int SubSubInletNodeNumbers;
-                                    Array1D_string SubSubOutletNodeNames;
-                                    Array1D_int SubSubOutletNodeNumbers;
+                                    Array1D<std::string> SubSubCompTypes;
+                                    Array1D<std::string> SubSubCompNames;
+                                    Array1D<std::string> SubSubInletNodeNames;
+                                    Array1D<int> SubSubInletNodeNumbers;
+                                    Array1D<std::string> SubSubOutletNodeNames;
+                                    Array1D<int> SubSubOutletNodeNumbers;
 
                                     SubSubCompTypes.allocate(NumGrandChildren);
                                     SubSubCompNames.allocate(NumGrandChildren);

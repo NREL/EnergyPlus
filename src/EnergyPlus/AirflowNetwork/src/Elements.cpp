@@ -149,7 +149,7 @@ namespace AirflowNetwork {
     int const AirflowNetworkControlMultiADS(5); // Perform distribution system during system on time
     // and multizone calculations during off time
 
-    Array1D_bool AirflowNetworkZoneFlag;
+    Array1D<bool> AirflowNetworkZoneFlag;
 
     int NumOfNodesMultiZone(0);    // Number of nodes for multizone calculation
     int NumOfNodesDistribution(0); // Number of nodes for distribution system calculation
@@ -168,12 +168,12 @@ namespace AirflowNetwork {
     int AirflowNetworkNumOfZones(0);    // The number of zones for multizone calculation
 
     bool RollBackFlag(false);                  // Roll back flag when system time step down shifting
-    Array1D<Real64> ANZT;                      // Local zone air temperature for roll back use
-    Array1D<Real64> ANZW;                      // Local zone air humidity ratio for roll back use
-    Array1D<Real64> ANCO;                      // Local zone air CO2 for roll back use
-    Array1D<Real64> ANGC;                      // Local zone air generic contaminant for roll back use
+    EPVector<Real64> ANZT;                      // Local zone air temperature for roll back use
+    EPVector<Real64> ANZW;                      // Local zone air humidity ratio for roll back use
+    EPVector<Real64> ANCO;                      // Local zone air CO2 for roll back use
+    EPVector<Real64> ANGC;                      // Local zone air generic contaminant for roll back use
     int AirflowNetworkNumOfExhFan(0);          // Number of zone exhaust fans
-    Array1D_bool AirflowNetworkZoneExhaustFan; // Logical to use zone exhaust fans
+    Array1D<bool> AirflowNetworkZoneExhaustFan; // Logical to use zone exhaust fans
     bool AirflowNetworkFanActivated(false);    // Supply fan activation flag
     bool AirflowNetworkUnitarySystem(false);   // set to TRUE for unitary systems (to make answers equal, will remove eventually)
     // Multispeed HP only
@@ -186,47 +186,47 @@ namespace AirflowNetwork {
     Real64 ReliefMassFlowRate(0.0);     // OA Mixer relief node flow rate used in PressureStat
 
     // Object Data
-    Array1D<AirflowNetworkNodeSimuData> AirflowNetworkNodeSimu;
-    Array1D<AirflowNetworkLinkSimuData> AirflowNetworkLinkSimu;
-    Array1D<AirflowNetworkExchangeProp> AirflowNetworkExchangeData;
-    Array1D<AirflowNetworkExchangeProp> AirflowNetworkMultiExchangeData;
-    Array1D<AirflowNetworkLinkReportData> AirflowNetworkLinkReport;
-    Array1D<AirflowNetworkNodeReportData> AirflowNetworkNodeReport;
-    Array1D<AirflowNetworkLinkReportData> AirflowNetworkLinkReport1;
+    EPVector<AirflowNetworkNodeSimuData> AirflowNetworkNodeSimu;
+    EPVector<AirflowNetworkLinkSimuData> AirflowNetworkLinkSimu;
+    EPVector<AirflowNetworkExchangeProp> AirflowNetworkExchangeData;
+    EPVector<AirflowNetworkExchangeProp> AirflowNetworkMultiExchangeData;
+    EPVector<AirflowNetworkLinkReportData> AirflowNetworkLinkReport;
+    EPVector<AirflowNetworkNodeReportData> AirflowNetworkNodeReport;
+    EPVector<AirflowNetworkLinkReportData> AirflowNetworkLinkReport1;
     AirflowNetworkSimuProp AirflowNetworkSimu;
-    Array1D<AirflowNetworkNodeProp> AirflowNetworkNodeData;
-    Array1D<AirflowNetworkCompProp> AirflowNetworkCompData;
-    Array1D<AirflowNetworkLinkageProp> AirflowNetworkLinkageData;
-    Array1D<MultizoneZoneProp> MultizoneZoneData;
-    Array1D<MultizoneSurfaceProp> MultizoneSurfaceData;
-    Array1D<DetailedOpening> MultizoneCompDetOpeningData;
-    Array1D<SimpleOpening> MultizoneCompSimpleOpeningData;
-    Array1D<HorizontalOpening> MultizoneCompHorOpeningData;
+    EPVector<AirflowNetworkNodeProp> AirflowNetworkNodeData;
+    EPVector<AirflowNetworkCompProp> AirflowNetworkCompData;
+    EPVector<AirflowNetworkLinkageProp> AirflowNetworkLinkageData;
+    EPVector<MultizoneZoneProp> MultizoneZoneData;
+    EPVector<MultizoneSurfaceProp> MultizoneSurfaceData;
+    EPVector<DetailedOpening> MultizoneCompDetOpeningData;
+    EPVector<SimpleOpening> MultizoneCompSimpleOpeningData;
+    EPVector<HorizontalOpening> MultizoneCompHorOpeningData;
     // Array1D<ReferenceConditions> MultizoneSurfaceStdConditionsCrackData;
-    Array1D<SurfaceCrack> MultizoneSurfaceCrackData;
-    Array1D<EffectiveLeakageArea> MultizoneSurfaceELAData;
-    Array1D<MultizoneExternalNodeProp> MultizoneExternalNodeData;
-    Array1D<DeltaCpProp> DeltaCp;
-    Array1D<DeltaCpProp> EPDeltaCP;
-    Array1D<ZoneExhaustFan> MultizoneCompExhaustFanData;
-    Array1D<IntraZoneNodeProp> IntraZoneNodeData;
-    Array1D<IntraZoneLinkageProp> IntraZoneLinkageData;
-    Array1D<DisSysNodeProp> DisSysNodeData;
-    Array1D<DuctLeak> DisSysCompLeakData;
-    Array1D<EffectiveLeakageRatio> DisSysCompELRData;
-    Array1D<Duct> DisSysCompDuctData;
-    Array1D<Damper> DisSysCompDamperData;
-    Array1D<ConstantVolumeFan> DisSysCompCVFData;
-    Array1D<DetailedFan> DisSysCompDetFanData;
-    Array1D<DisSysCompCoilProp> DisSysCompCoilData;
-    Array1D<DisSysCompHXProp> DisSysCompHXData;
-    Array1D<DisSysCompTermUnitProp> DisSysCompTermUnitData;
-    Array1D<ConstantPressureDrop> DisSysCompCPDData;
-    Array1D<AiflowNetworkReportProp> AirflowNetworkReportData;
-    Array1D<PressureControllerProp> PressureControllerData;
-    Array1D<OutdoorAirFan> DisSysCompOutdoorAirData;
-    Array1D<ReliefFlow> DisSysCompReliefAirData;
-    Array1D<AirflowNetworkLinkageViewFactorProp> AirflowNetworkLinkageViewFactorData;
+    EPVector<SurfaceCrack> MultizoneSurfaceCrackData;
+    EPVector<EffectiveLeakageArea> MultizoneSurfaceELAData;
+    EPVector<MultizoneExternalNodeProp> MultizoneExternalNodeData;
+    EPVector<DeltaCpProp> DeltaCp;
+    EPVector<DeltaCpProp> EPDeltaCP;
+    EPVector<ZoneExhaustFan> MultizoneCompExhaustFanData;
+    EPVector<IntraZoneNodeProp> IntraZoneNodeData;
+    EPVector<IntraZoneLinkageProp> IntraZoneLinkageData;
+    EPVector<DisSysNodeProp> DisSysNodeData;
+    EPVector<DuctLeak> DisSysCompLeakData;
+    EPVector<EffectiveLeakageRatio> DisSysCompELRData;
+    EPVector<Duct> DisSysCompDuctData;
+    EPVector<Damper> DisSysCompDamperData;
+    EPVector<ConstantVolumeFan> DisSysCompCVFData;
+    EPVector<DetailedFan> DisSysCompDetFanData;
+    EPVector<DisSysCompCoilProp> DisSysCompCoilData;
+    EPVector<DisSysCompHXProp> DisSysCompHXData;
+    EPVector<DisSysCompTermUnitProp> DisSysCompTermUnitData;
+    EPVector<ConstantPressureDrop> DisSysCompCPDData;
+    EPVector<AiflowNetworkReportProp> AirflowNetworkReportData;
+    EPVector<PressureControllerProp> PressureControllerData;
+    EPVector<OutdoorAirFan> DisSysCompOutdoorAirData;
+    EPVector<ReliefFlow> DisSysCompReliefAirData;
+    EPVector<AirflowNetworkLinkageViewFactorProp> AirflowNetworkLinkageViewFactorData;
 
     static Real64 square(Real64 x)
     {
@@ -1058,7 +1058,7 @@ namespace AirflowNetwork {
         Real64 fma21;                         // massflow in direction "to-from" [kg/s]
         Real64 dp1fma12;                      // derivative d fma12 / d Dp [kg/s/Pa]
         Real64 dp1fma21;                      // derivative d fma21 / d Dp [kg/s/Pa]
-        Array1D<Real64> DpProfNew(NrInt + 2); // Differential pressure profile for Large Openings, taking into account fixed
+        EPVector<Real64> DpProfNew(NrInt + 2); // Differential pressure profile for Large Openings, taking into account fixed
         // pressures and actual zone pressures at reference height
         Real64 Fact;   // Actual opening factor
         Real64 DifLim; // Limit for the pressure difference where laminarization takes place [Pa]
@@ -1077,7 +1077,7 @@ namespace AirflowNetwork {
         Real64 fmasum;
         Real64 dfmasum;
         Real64 Prefact;
-        Array1D<Real64> EvalHghts(NrInt + 2);
+        EPVector<Real64> EvalHghts(NrInt + 2);
         Real64 h2;
         Real64 h4;
         Real64 alpha;
