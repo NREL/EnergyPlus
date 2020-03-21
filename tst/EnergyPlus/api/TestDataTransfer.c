@@ -64,14 +64,10 @@ void afterZoneTimeStepHandler()
         outdoorDewPointActuator = getActuatorHandle("Weather Data", "Outdoor Dew Point", "Environment");
         outdoorTempSensor = getVariableHandle("SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT");
         outdoorDewPointSensor = getVariableHandle("SITE OUTDOOR AIR DEWPOINT TEMPERATURE", "ENVIRONMENT");
+        printf
         if (outdoorDewPointActuator == -1 || outdoorTempSensor == -1 || outdoorDewPointSensor == -1) {
             exit(1);
         }
-//        FILE *apiAvailFile;
-//        apiAvailFile = fopen("/tmp/api_stuff_available.csv", "w");
-//        const char * apiStuff = listAllAPIDataCSV();
-//        fputs(apiStuff, apiAvailFile);
-//        fclose(apiAvailFile);
         handlesRetrieved = 1;
     }
     setActuatorValue(outdoorDewPointActuator, -25.0);
@@ -81,29 +77,8 @@ void afterZoneTimeStepHandler()
     printf("Actuated Dew Point temp value is: %8.4f \n", dp_temp);
 }
 
-void beginTimeStepHandler()
-{
-    int curYear = year();
-    int curMonth = month();
-    int curDay = dayOfMonth();
-    int curDayOfWeek = dayOfWeek();
-    int curHour = hour();
-    int curMinute = minutes();
-    int curDayOfYear = dayOfYear();
-    int curDSTIndicator = daylightSavingsTimeIndicator();
-    int curHolidayIndex = holidayIndex();
-    int curSunIsUp = sunIsUp();
-    int curIsRaining = isRaining();
-    double curCurrentTime = currentTime();
-    double curSysTimeStep = systemTimeStep();
-    int curWarmupFlag = warmupFlag();
-    int curKindOfSim = kindOfSim();
-    printf("Minute = %4d\n", curMinute);
-}
-
 int main(int argc, const char * argv[]) {
     callbackEndOfZoneTimeStepAfterZoneReporting(afterZoneTimeStepHandler);
-    callbackBeginTimeStepBeforePredictor(beginTimeStepHandler);
     requestVariable("SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT");
     requestVariable("SITE OUTDOOR AIR DEWPOINT TEMPERATURE", "ENVIRONMENT");
     energyplus(argc, argv);
