@@ -255,20 +255,20 @@ TEST_F(EnergyPlusFixture, JsonOutput_DataFrameInfo2)
         {"Timestep", {
             {"Cols", {
                 {
-                    {"Units", "kgWater/kgDryAir"},
-                    {"Variable", "SALESFLOOR INLET NODE:System Node Humidity Ratio"}
-                },
-                {
                     {"Units", "C"},
                     {"Variable", "SALESFLOOR INLET NODE:System Node Temperature"}
+                },
+                {
+                    {"Units", "kgWater/kgDryAir"},
+                    {"Variable", "SALESFLOOR INLET NODE:System Node Humidity Ratio"}
                 }
             }},
             {"ReportFrequency", "Timestep"},
             {"Rows", {
-                {{"02/25 00:45:00", {5.0, 1.0}}},
-                {{"02/25 01:00:00", {6.0, 2.0}}},
-                {{"02/25 23:45:00", {7.0, 3.0}}},
-                {{"02/25 24:00:00", {8.0, 4.0}}}
+                {{"02/25 00:45:00", {1.0, 5.0}}},
+                {{"02/25 01:00:00", {2.0, 6.0}}},
+                {{"02/25 23:45:00", {3.0, 7.0}}},
+                {{"02/25 24:00:00", {4.0, 8.0}}}
             }}
         }}
     };
@@ -290,7 +290,7 @@ TEST_F(EnergyPlusFixture, JsonOutput_DataFrameInfo2)
             {"Cols", {
                 {
                     {"Units", "C"},
-                    {"Variable", "SALESFLOOR OUTLET NODE:System Node Temperature"}
+                    {"Variable", "SALESFLOOR INLET NODE:System Node Temperature"}
                 },
                 {
                     {"Units", "kgWater/kgDryAir"},
@@ -298,15 +298,15 @@ TEST_F(EnergyPlusFixture, JsonOutput_DataFrameInfo2)
                 },
                 {
                     {"Units", "C"},
-                    {"Variable", "SALESFLOOR INLET NODE:System Node Temperature"}
+                    {"Variable", "SALESFLOOR OUTLET NODE:System Node Temperature"}
                 }
             }},
             {"ReportFrequency", "Timestep"},
             {"Rows", {
-                {{"02/25 00:45:00", {9.0, 5.0, 1.0}}},
-                {{"02/25 01:00:00", {10.0, 6.0, 2.0}}},
-                {{"02/25 23:45:00", {11.0, 7.0, 3.0}}},
-                {{"02/25 24:00:00", {12.0, 8.0, 4.0}}}
+                {{"02/25 00:45:00", {1.0, 5.0, 9.0}}},
+                {{"02/25 01:00:00", {2.0, 6.0, 10.0}}},
+                {{"02/25 23:45:00", {3.0, 7.0, 11.0}}},
+                {{"02/25 24:00:00", {4.0, 8.0, 12.0}}}
             }}
         }}
     };

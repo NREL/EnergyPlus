@@ -212,7 +212,7 @@ namespace ResultsFramework {
         bool IVariablesScanned = false;
         std::string ReportFrequency;
         std::vector<std::string> TS;
-        std::unordered_map<int, Variable> variableMap; // for O(1) lookup when adding to data structure
+        std::map<int, Variable> variableMap;
         int lastVarID;
     };
 
