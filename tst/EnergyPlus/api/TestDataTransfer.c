@@ -64,7 +64,7 @@ void afterZoneTimeStepHandler()
         outdoorDewPointActuator = getActuatorHandle("Weather Data", "Outdoor Dew Point", "Environment");
         outdoorTempSensor = getVariableHandle("SITE OUTDOOR AIR DRYBULB TEMPERATURE", "ENVIRONMENT");
         outdoorDewPointSensor = getVariableHandle("SITE OUTDOOR AIR DEWPOINT TEMPERATURE", "ENVIRONMENT");
-        printf
+        printf("Got handles %d, %d, %d", outdoorDewPointActuator, outdoorTempSensor, outdoorDewPointSensor);
         if (outdoorDewPointActuator == -1 || outdoorTempSensor == -1 || outdoorDewPointSensor == -1) {
             exit(1);
         }
