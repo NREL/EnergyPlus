@@ -250,28 +250,27 @@ TEST_F(EnergyPlusFixture, JsonOutput_DataFrameInfo2)
 
     OutputData["Timestep"] = OutputSchema->RITimestepTSData.getJSON();
 
-
-    json expectedObject = {
-        {"Timestep", {
-            {"Cols", {
-                {
-                    {"Units", "C"},
-                    {"Variable", "SALESFLOOR INLET NODE:System Node Temperature"}
-                },
-                {
-                    {"Units", "kgWater/kgDryAir"},
-                    {"Variable", "SALESFLOOR INLET NODE:System Node Humidity Ratio"}
-                }
-            }},
-            {"ReportFrequency", "Timestep"},
-            {"Rows", {
-                {{"02/25 00:45:00", {1.0, 5.0}}},
-                {{"02/25 01:00:00", {2.0, 6.0}}},
-                {{"02/25 23:45:00", {3.0, 7.0}}},
-                {{"02/25 24:00:00", {4.0, 8.0}}}
-            }}
-        }}
-    };
+    json expectedObject = R"( {
+            "Timestep": {
+                "Cols":[
+                    {
+                        "Units" : "C",
+                        "Variable":"SALESFLOOR INLET NODE:System Node Temperature"
+                    },
+                    {
+                        "Units" : "kgWater/kgDryAir",
+                        "Variable" : "SALESFLOOR INLET NODE:System Node Humidity Ratio"
+                    }
+                ],
+                "ReportFrequency" : "Timestep",
+                "Rows":[
+                    { "02/25 00:45:00" : [1.0,5.0] },
+                    { "02/25 01:00:00" : [2.0,6.0] },
+                    { "02/25 23:45:00" : [3.0,7.0] },
+                    { "02/25 24:00:00" : [4.0,8.0] }
+                ]
+            }
+        } )"_json;
 
     EXPECT_EQ( expectedObject.dump(), OutputData.dump());
 
@@ -285,31 +284,31 @@ TEST_F(EnergyPlusFixture, JsonOutput_DataFrameInfo2)
     OutputSchema->RITimestepTSData.pushVariableValue(reportId, 12.0);
     OutputData["Timestep"] = OutputSchema->RITimestepTSData.getJSON();
 
-    expectedObject = {
-        {"Timestep", {
-            {"Cols", {
-                {
-                    {"Units", "C"},
-                    {"Variable", "SALESFLOOR INLET NODE:System Node Temperature"}
-                },
-                {
-                    {"Units", "kgWater/kgDryAir"},
-                    {"Variable", "SALESFLOOR INLET NODE:System Node Humidity Ratio"}
-                },
-                {
-                    {"Units", "C"},
-                    {"Variable", "SALESFLOOR OUTLET NODE:System Node Temperature"}
-                }
-            }},
-            {"ReportFrequency", "Timestep"},
-            {"Rows", {
-                {{"02/25 00:45:00", {1.0, 5.0, 9.0}}},
-                {{"02/25 01:00:00", {2.0, 6.0, 10.0}}},
-                {{"02/25 23:45:00", {3.0, 7.0, 11.0}}},
-                {{"02/25 24:00:00", {4.0, 8.0, 12.0}}}
-            }}
-        }}
-    };
+    expectedObject = R"( {
+            "Timestep": {
+                "Cols":[
+                    {
+                        "Units" : "C",
+                        "Variable":"SALESFLOOR INLET NODE:System Node Temperature"
+                    },
+                    {
+                        "Units" : "kgWater/kgDryAir",
+                        "Variable" : "SALESFLOOR INLET NODE:System Node Humidity Ratio"
+                    },
+                    {
+                        "Units": "C",
+                        "Variable" : "SALESFLOOR OUTLET NODE:System Node Temperature"
+                    }
+                ],
+                "ReportFrequency" : "Timestep",
+                "Rows":[
+                    { "02/25 00:45:00" : [1.0,5.0,9.0] },
+                    { "02/25 01:00:00" : [2.0,6.0,10.0] },
+                    { "02/25 23:45:00" : [3.0,7.0,11.0] },
+                    { "02/25 24:00:00" : [4.0,8.0,12.0] }
+                ]
+            }
+        } )"_json;
 
     EXPECT_EQ( expectedObject.dump(), OutputData.dump());
 }
