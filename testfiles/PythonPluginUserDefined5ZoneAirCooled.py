@@ -1,3 +1,4 @@
+import sys
 from pyenergyplus.plugin import EnergyPlusPlugin
 
 
@@ -30,8 +31,8 @@ class UserDefinedCoilInit(EnergyPlusPlugin):
 
         if self.need_to_get_handles:
             self.cw_loop_vdot_design_handle = self.api.exchange.get_internal_variable_handle(
-                "Chilled Water Loop",
-                "Plant Design Volume Flow Rate"
+                "Plant Design Volume Flow Rate",
+                "Chilled Water Loop"
             )
             self.chiller_vdot_design_handle = self.api.exchange.get_actuator_handle(
                 "Plant Connection 1",
@@ -119,17 +120,16 @@ class UserDefinedCoilSim(EnergyPlusPlugin):
 
         if self.need_to_get_handles:
             self.cw_load_request_handle = self.api.exchange.get_internal_variable_handle(
-                "Central Chiller",
-                "Load Request for Plant Connection 1"
+                "Load Request for Plant Connection 1",
+                "Central Chiller"
             )
             self.cw_inlet_temp_handle = self.api.exchange.get_internal_variable_handle(
-                "Inlet Temperature for "
-                "Plant Connection 1",
+                "Inlet Temperature for Plant Connection 1",
                 "Central Chiller"
             )
             self.cw_mdot_handle = self.api.exchange.get_internal_variable_handle(
-                "Central Chiller",
-                "Inlet Mass Flow Rate for Plant Connection 1"
+                "Inlet Mass Flow Rate for Plant Connection 1",
+                "Central Chiller"
             )
             self.cw_outlet_temp_handle = self.api.exchange.get_actuator_handle(
                 "Plant Connection 1",
@@ -155,41 +155,30 @@ class UserDefinedCoilSim(EnergyPlusPlugin):
             )
             self.need_to_get_handles = False
 
-        # get loop load request
+        # get load, inlet temp, and mdot
         cw_load = self.api.exchange.get_internal_variable_value(self.cw_load_request_handle)
-
-        # get loop inlet temp
         cw_inlet_temp = self.api.exchange.get_internal_variable_value(self.cw_inlet_temp_handle)
-
-        # get loop mdot
         cw_mdot = self.api.exchange.get_internal_variable_value(self.cw_mdot_handle)
 
-        # chiller is off
+        # leave early if chiller is off
         if cw_load > -100.0:
             # pass inlet temp through
             self.api.exchange.set_actuator_value(self.cw_outlet_temp_handle, cw_inlet_temp)
-
             # set mass flow rate and electricity to 0
             self.api.exchange.set_actuator_value(self.cw_mdot_request_handle, 0.0)
             self.api.exchange.set_global_value(self.chiller_elect_energy_handle, 0.0)
-
             return 0
 
         # set chiller load
-
-        chiller_cap_max = self.api.exchange.get_variable_value(self.chiller_cap_max_handle)
-
-        chiller_load = 0.0
+        chiller_cap_max = self.api.exchange.get_actuator_value(self.chiller_cap_max_handle)
         if abs(cw_load) > chiller_cap_max:
             chiller_load = chiller_cap_max
         else:
             chiller_load = abs(cw_load)
 
         # set chiller mdot
-        chiller_mdot = 0.0
         if cw_mdot == 0.0:
-
-            chiller_mdot_max = self.api.exchange.get_variable_value(self.chiller_mdot_max_handle)
+            chiller_mdot_max = self.api.exchange.get_actuator_value(self.chiller_mdot_max_handle)
             chiller_mdot = chiller_mdot_max
         else:
             chiller_mdot = cw_mdot

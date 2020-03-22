@@ -52,6 +52,8 @@ class DataExchange:
         self.api.setActuatorValue.restype = c_void_p
         self.api.resetActuator.argtypes = [c_int]
         self.api.resetActuator.restype = c_void_p
+        self.api.getActuatorValue.argtypes = [c_int]
+        self.api.getActuatorValue.restype = RealEP
         self.api.getInternalVariableHandle.argtypes = [c_char_p, c_char_p]
         self.api.getInternalVariableHandle.restype = c_int
         self.api.getInternalVariableValue.argtypes = [c_int]
@@ -270,6 +272,16 @@ class DataExchange:
         :return: Nothing
         """
         self.api.resetActuator(actuator_handle)
+
+    def get_actuator_value(self, actuator_handle: int) -> RealEP:
+        """
+        Gets the most recent value of an actuator.  In some applications, actuators are altered by multiple scripts, and
+        this allows getting the most recent value.
+
+        :param actuator_handle: An integer returned from the `get_actuator_handle` function.
+        :return: A floating point of the actuator value.  For boolean actuators returns 1.0 for true and 0.0 for false.
+        """
+        return self.api.getActuatorValue(actuator_handle)
 
     def get_internal_variable_handle(self, variable_type: Union[str, bytes], variable_key: Union[str, bytes]) -> int:
         """

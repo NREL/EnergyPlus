@@ -172,6 +172,18 @@ ENERGYPLUSLIB_API void resetActuator(int handle);
 /// \see getActuatorHandle
 /// \see setActuatorValue
 ENERGYPLUSLIB_API void setActuatorValue(int handle, Real64 value);
+/// \brief Gets the value of an actuator in EnergyPlus
+/// \details Actuators are variables in the simulation which can be overridden. This function allows a client to get the last
+///          value assigned to the actuator.  Although in most applications, the client can just track the last value it assigned
+///          to the actuator, there are some occasions (Python Plugins) where multiple scripts could read/write from/to the actuator.
+///          In this case, being able to grab the last value that was assigned with `setActuatorValue` is reasonable.
+/// \param[in] handle The integer handle to the actuator, which can be retrieved using the `getActuatorHandle` function
+/// \return The floating point value last assigned to the actuator in the program.
+/// \remark Note the behavior of this function is not well-defined until the `apiDataFullyReady` function returns true
+/// \see apiDataFullyReady
+/// \see getActuatorHandle
+/// \see setActuatorValue
+ENERGYPLUSLIB_API Real64 getActuatorValue(int handle);
 
 // ----- FUNCTIONS RELATED TO STATIC "INTERNAL VARIABLES"
 

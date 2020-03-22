@@ -246,6 +246,21 @@ void setActuatorValue(const int handle, const Real64 value) {
     *theActuator.Actuated = true;
 }
 
+Real64 getActuatorValue(const int handle) {
+    auto & theActuator(EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable(handle));
+    if (theActuator.RealValue) {
+        return *theActuator.RealValue;
+    } else if (theActuator.IntValue) {
+        return (float)*theActuator.IntValue;
+    } else {
+        // follow protocol from EMS manager, where 1.0 is true, 0.0 is false, and anything else is also false
+        if (*theActuator.LogValue) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+}
 
 int getInternalVariableHandle(const char* type, const char* key) {
     int handle;
