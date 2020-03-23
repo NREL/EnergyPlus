@@ -6297,6 +6297,7 @@ namespace ZoneTempPredictorCorrector {
         int ADUInNode;
         int ADUOutNode;
         Real64 RetAirGain;
+        Real64 NodeHumRat(0.0);
 
         // FLOW:
         SumIntGain = 0.0;
@@ -6352,8 +6353,9 @@ namespace ZoneTempPredictorCorrector {
                 //  how can we tell?  predict step must be lagged ?  correct step, systems have run.
                 auto const &node(Node(zec.InletNode(NodeNum)));
                 NodeTemp = node.Temp;
+                NodeHumRat = node.HumRat;
                 MassFlowRate = node.MassFlowRate;
-                CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
+                CpAir = PsyCpAirFnW(0.5 * (NodeHumRat + ZoneAirHumRat(ZoneNum)));
 
                 Real64 const MassFlowRate_CpAir(MassFlowRate * CpAir);
                 SumSysMCp += MassFlowRate_CpAir;
@@ -6368,8 +6370,9 @@ namespace ZoneTempPredictorCorrector {
                 // Get node conditions
                 auto const &node(Node(zrpc.InletNode(NodeNum)));
                 NodeTemp = node.Temp;
+                NodeHumRat = node.HumRat;
                 MassFlowRate = node.MassFlowRate;
-                CpAir = PsyCpAirFnW(air_hum_rat);
+                CpAir = PsyCpAirFnW(0.5 * (NodeHumRat + air_hum_rat));
 
                 Real64 const MassFlowRate_CpAir(MassFlowRate * CpAir);
                 SumSysMCp += MassFlowRate_CpAir;
@@ -6382,8 +6385,9 @@ namespace ZoneTempPredictorCorrector {
                 if (AirDistUnit(ADUNum).UpStreamLeak) {
                     ADUInNode = AirDistUnit(ADUNum).InletNodeNum;
                     NodeTemp = Node(ADUInNode).Temp;
+                    NodeHumRat = Node(ADUInNode).HumRat;
                     MassFlowRate = AirDistUnit(ADUNum).MassFlowRateUpStrLk;
-                    CpAir = PsyCpAirFnW(air_hum_rat);
+                    CpAir = PsyCpAirFnW(0.5 * (NodeHumRat + air_hum_rat));
                     Real64 const MassFlowRate_CpAir(MassFlowRate * CpAir);
                     SumSysMCp += MassFlowRate_CpAir;
                     SumSysMCpT += MassFlowRate_CpAir * NodeTemp;
@@ -6391,8 +6395,9 @@ namespace ZoneTempPredictorCorrector {
                 if (AirDistUnit(ADUNum).DownStreamLeak) {
                     ADUOutNode = AirDistUnit(ADUNum).OutletNodeNum;
                     NodeTemp = Node(ADUOutNode).Temp;
+                    NodeHumRat = Node(ADUOutNode).HumRat;
                     MassFlowRate = AirDistUnit(ADUNum).MassFlowRateDnStrLk;
-                    CpAir = PsyCpAirFnW(air_hum_rat);
+                    CpAir = PsyCpAirFnW(0.5 * (NodeHumRat + air_hum_rat));
                     Real64 const MassFlowRate_CpAir(MassFlowRate * CpAir);
                     SumSysMCp += MassFlowRate_CpAir;
                     SumSysMCpT += MassFlowRate_CpAir * NodeTemp;
@@ -6403,8 +6408,9 @@ namespace ZoneTempPredictorCorrector {
             ZoneSupPlenumNum = Zone(ZoneNum).PlenumCondNum;
             // Get node conditions
             NodeTemp = Node(ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).Temp;
+            NodeHumRat = Node(ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).HumRat;
             MassFlowRate = Node(ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate;
-            CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
+            CpAir = PsyCpAirFnW(0.5 * (NodeHumRat + ZoneAirHumRat(ZoneNum)));
 
             SumSysMCp += MassFlowRate * CpAir;
             SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
