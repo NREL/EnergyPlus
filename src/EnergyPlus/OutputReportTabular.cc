@@ -8181,7 +8181,7 @@ namespace OutputReportTabular {
 
             //---- End Use Sub-Table
             rowHead.allocate(16);
-            columnHead.allocate(6);
+            columnHead.allocate(13);
             columnWidth.allocate(6);
             columnWidth = 14; // array assignment - same for all columns
             tableBody.allocate(6, 16);
@@ -8226,24 +8226,45 @@ namespace OutputReportTabular {
                 if (SELECT_CASE_var == unitsStyleJtoKWH) {
                     columnHead(1) = "Electricity [kWh]";
                     columnHead(2) = "Natural Gas [kWh]";
-                    columnHead(3) = "Additional Fuel [kWh]";
-                    columnHead(4) = "District Cooling [kWh]";
-                    columnHead(5) = "District Heating [kWh]";
-                    columnHead(6) = "Water [m3]";
+                    columnHead(3) = "Gasoline [kWh]";
+                    columnHead(4) = "Diesel [kWh]";
+                    columnHead(5) = "Coal [kWh]";
+                    columnHead(6) = "Fuel Oil No 1 [kWh]";
+                    columnHead(7) = "Fuel Oil No 2 [kWh]";
+                    columnHead(8) = "Propane [kWh]";
+                    columnHead(9) = "Other Fuel 1 [kWh]";
+                    columnHead(10) = "Other Fuel 2 [kWh]";
+                    columnHead(11) = "District Cooling [kWh]";
+                    columnHead(12) = "District Heating [kWh]";
+                    columnHead(13) = "Water [m3]";
                 } else if (SELECT_CASE_var == unitsStyleInchPound) {
                     columnHead(1) = "Electricity [kBtu]";
                     columnHead(2) = "Natural Gas [kBtu]";
-                    columnHead(3) = "Additional Fuel [kBtu]";
-                    columnHead(4) = "District Cooling [kBtu]";
-                    columnHead(5) = "District Heating [kBtu]";
-                    columnHead(6) = "Water [gal]";
+                    columnHead(3) = "Gasoline [kBtu]";
+                    columnHead(4) = "Diesel [kBtu]";
+                    columnHead(5) = "Coal [kBtu]";
+                    columnHead(6) = "Fuel Oil No 1 [kBtu]";
+                    columnHead(7) = "Fuel Oil No 2 [kBtu]";
+                    columnHead(8) = "Propane [kBtu]";
+                    columnHead(9) = "Other Fuel 1 [kBtu]";
+                    columnHead(10) = "Other Fuel 2 [kBtu]";
+                    columnHead(11) = "District Cooling [kBtu]";
+                    columnHead(12) = "District Heating [kBtu]";
+                    columnHead(13) = "Water [gal]";
                 } else {
                     columnHead(1) = "Electricity [GJ]";
                     columnHead(2) = "Natural Gas [GJ]";
-                    columnHead(3) = "Additional Fuel [GJ]";
-                    columnHead(4) = "District Cooling [GJ]";
-                    columnHead(5) = "District Heating [GJ]";
-                    columnHead(6) = "Water [m3]";
+                    columnHead(3) = "Gasoline [GJ]";
+                    columnHead(4) = "Diesel [GJ]";
+                    columnHead(5) = "Coal [GJ]";
+                    columnHead(6) = "Fuel Oil No 1 [GJ]";
+                    columnHead(7) = "Fuel Oil No 2 [GJ]";
+                    columnHead(8) = "Propane [GJ]";
+                    columnHead(9) = "Other Fuel 1 [GJ]";
+                    columnHead(10) = "Other Fuel 2 [GJ]";
+                    columnHead(11) = "District Cooling [GJ]";
+                    columnHead(12) = "District Heating [GJ]";
+                    columnHead(13) = "Water [m3]";
                 }
             }
 
@@ -8447,7 +8468,7 @@ namespace OutputReportTabular {
             }
 
             rowHead.allocate(numRows);
-            columnHead.allocate(7);
+            columnHead.allocate(14);
             columnWidth.allocate(7);
             columnWidth = 14;               // array assignment - same for all columns
             tableBody.allocate(7, numRows); // TODO: this appears to be (column, row)...
@@ -8481,24 +8502,45 @@ namespace OutputReportTabular {
                 if (SELECT_CASE_var == unitsStyleJtoKWH) {
                     columnHead(2) = "Electricity [kWh]";
                     columnHead(3) = "Natural Gas [kWh]";
-                    columnHead(4) = "Additional Fuel [kWh]";
-                    columnHead(5) = "District Cooling [kWh]";
-                    columnHead(6) = "District Heating [kWh]";
-                    columnHead(7) = "Water [m3]";
+                    columnHead(4) = "Gasoline [kWh]";
+                    columnHead(5) = "Diesel [kWh]";
+                    columnHead(6) = "Coal [kWh]";
+                    columnHead(7) = "Fuel Oil No 1 [kWh]";
+                    columnHead(8) = "Fuel Oil No 2 [kWh]";
+                    columnHead(9) = "Propane [kWh]";
+                    columnHead(10) = "Other Fuel 1 [kWh]";
+                    columnHead(11) = "Other Fuel 2 [kWh]";
+                    columnHead(12) = "District Cooling [kWh]";
+                    columnHead(13) = "District Heating [kWh]";
+                    columnHead(14) = "Water [m3]";
                 } else if (SELECT_CASE_var == unitsStyleInchPound) {
                     columnHead(2) = "Electricity [kBtu]";
                     columnHead(3) = "Natural Gas [kBtu]";
-                    columnHead(4) = "Additional Fuel [kBtu]";
-                    columnHead(5) = "District Cooling [kBtu]";
-                    columnHead(6) = "District Heating [kBtu]";
-                    columnHead(7) = "Water [gal]";
+                    columnHead(4) = "Gasoline [kBtu]";
+                    columnHead(5) = "Diesel [kBtu]";
+                    columnHead(6) = "Coal [kBtu]";
+                    columnHead(7) = "Fuel Oil No 1 [kBtu]";
+                    columnHead(8) = "Fuel Oil No 2 [kBtu]";
+                    columnHead(9) = "Propane [kBtu]";
+                    columnHead(10) = "Other Fuel 1 [kBtu]";
+                    columnHead(11) = "Other Fuel 2 [kBtu]";
+                    columnHead(12) = "District Cooling [kBtu]";
+                    columnHead(13) = "District Heating [kBtu]";
+                    columnHead(14) = "Water [gal]";
                 } else {
                     columnHead(2) = "Electricity [GJ]";
                     columnHead(3) = "Natural Gas [GJ]";
-                    columnHead(4) = "Additional Fuel [GJ]";
-                    columnHead(5) = "District Cooling [GJ]";
-                    columnHead(6) = "District Heating [GJ]";
-                    columnHead(7) = "Water [m3]";
+                    columnHead(4) = "Gasoline [GJ]";
+                    columnHead(5) = "Diesel [GJ]";
+                    columnHead(6) = "Coal [GJ]";
+                    columnHead(7) = "Fuel Oil No 1 [GJ]";
+                    columnHead(8) = "Fuel Oil No 2 [GJ]";
+                    columnHead(9) = "Propane [GJ]";
+                    columnHead(10) = "Other Fuel 1 [GJ]";
+                    columnHead(11) = "Other Fuel 2 [GJ]";
+                    columnHead(12) = "District Cooling [GJ]";
+                    columnHead(13) = "District Heating [GJ]";
+                    columnHead(14) = "Water [m3]";
                 }
             }
 
@@ -8608,7 +8650,7 @@ namespace OutputReportTabular {
             //---- Normalized by Conditioned Area Sub-Table
             // Calculations for both normalized tables are first
             rowHead.allocate(4);
-            columnHead.allocate(6);
+            columnHead.allocate(13);
             columnWidth.allocate(6);
             columnWidth = 14; // array assignment - same for all columns
             tableBody.allocate(6, 4);
@@ -8648,24 +8690,45 @@ namespace OutputReportTabular {
                 if (SELECT_CASE_var == unitsStyleJtoKWH) {
                     columnHead(1) = "Electricity Intensity [kWh/m2]";
                     columnHead(2) = "Natural Gas Intensity [kWh/m2]";
-                    columnHead(3) = "Additional Fuel Intensity [kWh/m2]";
-                    columnHead(4) = "District Cooling Intensity [kWh/m2]";
-                    columnHead(5) = "District Heating Intensity [kWh/m2]";
-                    columnHead(6) = "Water Intensity [m3/m2]";
+                    columnHead(3) = "Gasoline Intensity [kWh/m2]";
+                    columnHead(4) = "Diesel Intensity [kWh/m2]";
+                    columnHead(5) = "Coal Intensity [kWh/m2]";
+                    columnHead(6) = "Fuel Oil No 1 Intensity [kWh/m2]";
+                    columnHead(7) = "Fuel Oil No 2 Intensity [kWh/m2]";
+                    columnHead(8) = "Propane Intensity [kWh/m2]";
+                    columnHead(9) = "Other Fuel 1 Intensity [kWh/m2]";
+                    columnHead(10) = "Other Fuel 2 Intensity [kWh/m2]";
+                    columnHead(11) = "District Cooling Intensity [kWh/m2]";
+                    columnHead(12) = "District Heating Intensity [kWh/m2]";
+                    columnHead(13) = "Water Intensity [m3/m2]";
                 } else if (SELECT_CASE_var == unitsStyleInchPound) {
                     columnHead(1) = "Electricity Intensity [kBtu/ft2]";
                     columnHead(2) = "Natural Gas Intensity [kBtu/ft2]";
-                    columnHead(3) = "Additional Fuel Intensity [kBtu/ft2]";
-                    columnHead(4) = "District Cooling Intensity [kBtu/ft2]";
-                    columnHead(5) = "District Heating Intensity [kBtu/ft2]";
-                    columnHead(6) = "Water Intensity [gal/ft2]";
+                    columnHead(3) = "Gasoline Intensity [kBtu/ft2]";
+                    columnHead(4) = "Diesel Intensity [kBtu/ft2]";
+                    columnHead(5) = "Coal Intensity [kBtu/ft2]";
+                    columnHead(6) = "Fuel Oil No 1 Intensity [kBtu/ft2]";
+                    columnHead(7) = "Fuel Oil No 2 Intensity [kBtu/ft2]";
+                    columnHead(8) = "Propane Intensity [kBtu/ft2]";
+                    columnHead(9) = "Other Fuel 1 Intensity [kBtu/ft2]";
+                    columnHead(10) = "Other Fuel 2 Intensity [kBtu/ft2]";
+                    columnHead(11) = "District Cooling Intensity [kBtu/ft2]";
+                    columnHead(12) = "District Heating Intensity [kBtu/ft2]";
+                    columnHead(13) = "Water Intensity [gal/ft2]";
                 } else {
                     columnHead(1) = "Electricity Intensity [MJ/m2]";
                     columnHead(2) = "Natural Gas Intensity [MJ/m2]";
-                    columnHead(3) = "Additional Fuel Intensity [MJ/m2]";
-                    columnHead(4) = "District Cooling Intensity [MJ/m2]";
-                    columnHead(5) = "District Heating Intensity [MJ/m2]";
-                    columnHead(6) = "Water Intensity [m3/m2]";
+                    columnHead(3) = "Gasoline Intensity [MJ/m2]";
+                    columnHead(4) = "Diesel Intensity [MJ/m2]";
+                    columnHead(5) = "Coal Intensity [MJ/m2]";
+                    columnHead(6) = "Fuel Oil No 1 Intensity [MJ/m2]";
+                    columnHead(7) = "Fuel Oil No 2 Intensity [MJ/m2]";
+                    columnHead(8) = "Propane Intensity [MJ/m2]";
+                    columnHead(9) = "Other Fuel 1 Intensity [MJ/m2]";
+                    columnHead(10) = "Other Fuel 2 Intensity [MJ/m2]";
+                    columnHead(11) = "District Cooling Intensity [MJ/m2]";
+                    columnHead(12) = "District Heating Intensity [MJ/m2]";
+                    columnHead(13) = "Water Intensity [m3/m2]";
                 }
             }
 
