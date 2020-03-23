@@ -157,13 +157,6 @@
                     <ul class="list-group">
                         <li class="list-group-item transition-object-name">AirConditioner:VariableRefrigerantFlow</li>
                         <li class="list-group-item transition-object-name">AirTerminal:SingleDuct:Uncontrolled <i>(spoiler...it's gone!)</i></li>
-                        <li class="list-group-item transition-object-name">ZoneHVAC:EquipmentList</li>
-                        <li class="list-group-item transition-object-name">AirLoopHVAC:ZoneSplitter</li>
-                        <li class="list-group-item transition-object-name">AirLoopHVAC:SupplyPlenum</li>
-                        <li class="list-group-item transition-object-name">AirLoopHVAC</li>
-                        <li class="list-group-item transition-object-name">RoomAir:Node:AirflowNetwork:HVACEquipment</li>
-                        <li class="list-group-item transition-object-name">AirflowNetwork:Distribution:Node</li>
-                        <li class="list-group-item transition-object-name">AirflowNetwork:Distribution:Linkage</li>
                         <li class="list-group-item transition-object-name">Boiler:HotWater</li>
                         <li class="list-group-item transition-object-name">Boiler:Steam</li>
                         <li class="list-group-item transition-object-name">Chiller:EngineDriven</li>
@@ -259,9 +252,10 @@
     <dl>
         <dt>C/Python API</dt>
         <dd>
-            A significant change to this release is the ability to call EnergyPlus as a library.  Up until now, the way
+            A significant change to this release is the ability to call EnergyPlus as a library.  Up until now, the way almost all
             users interacted with EnergyPlus has always been to setup an input file, and call the EnergyPlus(.exe) binary to run
-            the file, then gather results as needed from output files.  While this is still available, a new approach has been
+            the file, then gather results as needed from output files.  (ExternalInterface being one exception).
+            While this traditional method is still available, a new approach has been
             added.  The simulation code has been refactored to allow a C API to be created, exposing functions that enable users
             to register callback functions, call functional methods and interact with the simulation state.  Through this C API,
             a user may create a small C program that includes a callback function registered for each time step.  Then at each
@@ -339,7 +333,7 @@
         </tr>
         <tr>
             <td><a href="https://github.com/NREL/EnergyPlus/pull/7603">7603</a></td>
-            <td>Input file conversion utility</td>
+            <td>Input file conversion utility IDF->epJSON and reverse</td>
         </tr>
         <tr>
             <td><a href="https://github.com/NREL/EnergyPlus/pull/7605">7605</a></td>
@@ -433,6 +427,17 @@
         </tr>
     </table>
 
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <blockquote class="blockquote text-center">
+                <p class="mb-0">
+                    <b>A complete list of addressed issues may be found in the installed <a href="changelog.html" >changelog</a>.</b>
+                </p>
+            </blockquote>
+        </div>
+        <div class="col-md-2"></div>
+    </div>
 
     <h2><a id="Platforms_90"></a>Platforms</h2>
     <ul class="list-group">
