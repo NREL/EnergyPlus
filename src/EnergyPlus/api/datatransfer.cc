@@ -272,7 +272,7 @@ void setActuatorValue(const int handle, const Real64 value) {
             *theActuator.IntValue = (int)std::lround(value);
         } else {
             // follow protocol from EMS manager, where 1.0 is true, 0.0 is false, and anything else is also false
-            *theActuator.LogValue = value < 0.99999 && value < 1.00001; // allow small tolerance while passing between languages and types
+            *theActuator.LogValue = value > 0.99999 && value < 1.00001; // allow small tolerance while passing between languages and types
         }
         *theActuator.Actuated = true;
     } else {
