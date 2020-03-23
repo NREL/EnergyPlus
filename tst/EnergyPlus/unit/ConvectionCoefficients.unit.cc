@@ -900,7 +900,6 @@ TEST_F(ConvectionCoefficientsFixture, TestWindward)
 
 }
 
-<<<<<<< Updated upstream
 TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedAssistedWall)
 {
 
