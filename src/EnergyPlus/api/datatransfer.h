@@ -108,7 +108,8 @@ ENERGYPLUSLIB_API int getVariableHandle(const char* type, const char* key);
 /// \details This function uses the integer handle of a variable and retrieves the current value of the variable.
 /// \param[in] handle The handle id to a variable which can be retrieved using the `getVariableHandle` function.
 /// \return The current value of the variable, in floating point form.
-/// \throws std::runtime_error Throws a std::runtime_error if there is a problem looking up the variable, most likely a handle out of range.
+/// \throws If running this from an API (library) workflow, a handle index or other problem will throw a std::runtime_error.
+///         When calling during a Python plugin workflow, this will return 0 but set a flag to cause EnergyPlus to terminate once Python completes
 /// \see getVariableHandle
 ENERGYPLUSLIB_API Real64 getVariableValue(int handle);
 
@@ -127,7 +128,8 @@ ENERGYPLUSLIB_API int getMeterHandle(const char* meterName);
 ///          of a meter, not the cumulative value.  This will change in a future version of the API.
 /// \param[in] handle The handle id of the meter, which can be retrieved using the `getMeterHandle` function
 /// \return The floating point value of a meter at the current time
-/// \throws std::runtime_error Throws a std::runtime_error if the meter handle is out of range.
+/// \throws If running this from an API (library) workflow, a handle index or other problem will throw a std::runtime_error.
+///         When calling during a Python plugin workflow, this will return 0 but set a flag to cause EnergyPlus to terminate once Python completes
 /// \remark Note the behavior of this function is not well-defined until the `apiDataFullyReady` function returns true
 /// \see apiDataFullyReady
 /// \see getMeterHandle
@@ -150,6 +152,8 @@ ENERGYPLUSLIB_API int getActuatorHandle(const char* componentType, const char* c
 ///          overridden.  If the user desires to revert back and let EnergyPlus calculate the actuated value, this
 ///          function will reset the flag.  The user can always set the actuated value again anytime.
 /// \param[in] handle The integer handle to the actuator, which can be retrieved using the `getActuatorHandle` function
+/// \throws If running this from an API (library) workflow, a handle index or other problem will throw a std::runtime_error.
+///         When calling during a Python plugin workflow, this will return 0 but set a flag to cause EnergyPlus to terminate once Python completes
 /// \remark Note the behavior of this function is not well-defined until the `apiDataFullyReady` function returns true
 /// \see apiDataFullyReady
 /// \see getActuatorHandle
@@ -167,6 +171,8 @@ ENERGYPLUSLIB_API void resetActuator(int handle);
 ///          still evaluate to TRUE.
 /// \param[in] handle The integer handle to the actuator, which can be retrieved using the `getActuatorHandle` function
 /// \param[in] value The floating point value to be assigned to the actuator in the simulation
+/// \throws If running this from an API (library) workflow, a handle index or other problem will throw a std::runtime_error.
+///         When calling during a Python plugin workflow, this will return 0 but set a flag to cause EnergyPlus to terminate once Python completes
 /// \remark Note the behavior of this function is not well-defined until the `apiDataFullyReady` function returns true
 /// \see apiDataFullyReady
 /// \see getActuatorHandle
@@ -179,6 +185,8 @@ ENERGYPLUSLIB_API void setActuatorValue(int handle, Real64 value);
 ///          In this case, being able to grab the last value that was assigned with `setActuatorValue` is reasonable.
 /// \param[in] handle The integer handle to the actuator, which can be retrieved using the `getActuatorHandle` function
 /// \return The floating point value last assigned to the actuator in the program.
+/// \throws If running this from an API (library) workflow, a handle index or other problem will throw a std::runtime_error.
+///         When calling during a Python plugin workflow, this will return 0 but set a flag to cause EnergyPlus to terminate once Python completes
 /// \remark Note the behavior of this function is not well-defined until the `apiDataFullyReady` function returns true
 /// \see apiDataFullyReady
 /// \see getActuatorHandle
@@ -199,6 +207,8 @@ ENERGYPLUSLIB_API int getInternalVariableHandle(const char* type, const char* ke
 /// \brief Gets the current value of an internal variable
 /// \details This function uses the integer handle of a variable and retrieves the static value of the variable.
 /// \param[in] handle The handle id to a variable which can be retrieved using the `getInternalVariableHandle` function.
+/// \throws If running this from an API (library) workflow, a handle index or other problem will throw a std::runtime_error.
+///         When calling during a Python plugin workflow, this will return 0 but set a flag to cause EnergyPlus to terminate once Python completes
 /// \return The current value of the variable, in floating point form.
 /// \see getInternalVariableHandle
 ENERGYPLUSLIB_API Real64 getInternalVariableValue(int handle);
@@ -221,7 +231,7 @@ ENERGYPLUSLIB_API int getPluginGlobalVariableHandle(const char* name);
 /// \param[in] handle The handle id to a Python Plugin "Global" variable, which can be retrieved using the `getPluginGlobalVariableHandle` function.
 /// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
 /// \remark This function only has meaning in the context of Python Plugin workflows, not in regular API workflows.
-/// \throws std::runtime_error Throws a std::runtime_error if the handle is out of range.
+/// \throws A handle index or other problem will not throw, but instead return 0 and set a flag to cause EnergyPlus to terminate once Python completes.
 /// \see apiDataFullyReady
 /// \see getPluginGlobalVariableHandle
 ENERGYPLUSLIB_API Real64 getPluginGlobalVariableValue(int handle);
@@ -232,7 +242,7 @@ ENERGYPLUSLIB_API Real64 getPluginGlobalVariableValue(int handle);
 /// \param[in] value The floating point value to be assigned to the global variable
 /// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
 /// \remark This function only has meaning in the context of Python Plugin workflows, not in regular API workflows.
-/// \throws std::runtime_error Throws a std::runtime_error if the handle is out of range.
+/// \throws A handle index or other problem will not throw, but instead return 0 and set a flag to cause EnergyPlus to terminate once Python completes.
 /// \see apiDataFullyReady
 /// \see getPluginGlobalVariableHandle
 ENERGYPLUSLIB_API void setPluginGlobalVariableValue(int handle, Real64 value);
@@ -256,7 +266,7 @@ ENERGYPLUSLIB_API int getPluginTrendVariableHandle(const char* name);
 /// \param[in] timeIndex The number of timesteps backward to traverse the trend when returning this value.
 /// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
 /// \remark This function only has meaning in the context of Python Plugin workflows, not in regular API workflows.
-/// \throws std::runtime_error Throws a std::runtime_error if the handle or timeIndex is out of range.
+/// \throws A handle index or other problem will not throw, but instead return 0 and set a flag to cause EnergyPlus to terminate once Python completes.
 /// \see apiDataFullyReady
 /// \see getPluginTrendVariableHandle
 ENERGYPLUSLIB_API Real64 getPluginTrendVariableValue(int handle, int timeIndex);
@@ -267,7 +277,7 @@ ENERGYPLUSLIB_API Real64 getPluginTrendVariableValue(int handle, int timeIndex);
 /// \param[in] count The number of timesteps backward to traverse the trend when returning this value.
 /// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
 /// \remark This function only has meaning in the context of Python Plugin workflows, not in regular API workflows.
-/// \throws std::runtime_error Throws a std::runtime_error if the handle or count is out of range.
+/// \throws A handle index or other problem will not throw, but instead return 0 and set a flag to cause EnergyPlus to terminate once Python completes.
 /// \see apiDataFullyReady
 /// \see getPluginTrendVariableHandle
 ENERGYPLUSLIB_API Real64 getPluginTrendVariableAverage(int handle, int count);
@@ -278,7 +288,7 @@ ENERGYPLUSLIB_API Real64 getPluginTrendVariableAverage(int handle, int count);
 /// \param[in] count The number of timesteps backward to traverse the trend when returning this value.
 /// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
 /// \remark This function only has meaning in the context of Python Plugin workflows, not in regular API workflows.
-/// \throws std::runtime_error Throws a std::runtime_error if the handle or count is out of range.
+/// \throws A handle index or other problem will not throw, but instead return 0 and set a flag to cause EnergyPlus to terminate once Python completes.
 /// \see apiDataFullyReady
 /// \see getPluginTrendVariableHandle
 ENERGYPLUSLIB_API Real64 getPluginTrendVariableMin(int handle, int count);
@@ -289,7 +299,7 @@ ENERGYPLUSLIB_API Real64 getPluginTrendVariableMin(int handle, int count);
 /// \param[in] count The number of timesteps backward to traverse the trend when returning this value.
 /// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
 /// \remark This function only has meaning in the context of Python Plugin workflows, not in regular API workflows.
-/// \throws std::runtime_error Throws a std::runtime_error if the handle or count is out of range.
+/// \throws A handle index or other problem will not throw, but instead return 0 and set a flag to cause EnergyPlus to terminate once Python completes.
 /// \see apiDataFullyReady
 /// \see getPluginTrendVariableHandle
 ENERGYPLUSLIB_API Real64 getPluginTrendVariableMax(int handle, int count);
@@ -300,7 +310,7 @@ ENERGYPLUSLIB_API Real64 getPluginTrendVariableMax(int handle, int count);
 /// \param[in] count The number of timesteps backward to traverse the trend when returning this value.
 /// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
 /// \remark This function only has meaning in the context of Python Plugin workflows, not in regular API workflows.
-/// \throws std::runtime_error Throws a std::runtime_error if the handle or count is out of range.
+/// \throws A handle index or other problem will not throw, but instead return 0 and set a flag to cause EnergyPlus to terminate once Python completes.
 /// \see apiDataFullyReady
 /// \see getPluginTrendVariableHandle
 ENERGYPLUSLIB_API Real64 getPluginTrendVariableSum(int handle, int count);
@@ -313,7 +323,7 @@ ENERGYPLUSLIB_API Real64 getPluginTrendVariableSum(int handle, int count);
 /// \param[in] count The number of timesteps backward to traverse the trend when calculate this average direction.
 /// \remark The behavior of this function is not well-defined until the `apiDataFullyReady` function returns true.
 /// \remark This function only has meaning in the context of Python Plugin workflows, not in regular API workflows.
-/// \throws std::runtime_error Throws a std::runtime_error if the handle or count is out of range.
+/// \throws A handle index or other problem will not throw, but instead return 0 and set a flag to cause EnergyPlus to terminate once Python completes.
 /// \see apiDataFullyReady
 /// \see getPluginTrendVariableHandle
 ENERGYPLUSLIB_API Real64 getPluginTrendVariableDirection(int handle, int count);

@@ -81,6 +81,7 @@ namespace PluginManagement {
 
     // some flags
     bool fullyReady = false;
+    bool shouldIssueFatalAfterPluginCompletes = false;
 
     void registerNewCallback(int iCalledFrom, std::function<void ()> f)
     {
@@ -398,6 +399,7 @@ namespace PluginManagement {
         plugins.clear();
         pluginManager.reset(); // delete the current plugin manager instance, which was created in simulation manager, this clean up Python
         PluginManagement::fullyReady = false;
+        PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
 #endif
     }
 
@@ -910,6 +912,9 @@ namespace PluginManagement {
                                        ", make sure it returns an integer exit code, either zero (success) or one (failure)");
         }
         Py_DECREF(pFunctionResponse); // PyObject_CallFunction returns new reference, decrement
+        if (EnergyPlus::PluginManagement::shouldIssueFatalAfterPluginCompletes) {
+            EnergyPlus::ShowFatalError("API problems encountered while running plugin cause program termination.");
+        }
     }
 #else
     void PluginInstance::run(int EP_UNUSED(iCalledFrom)) {}

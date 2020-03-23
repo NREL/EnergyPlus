@@ -209,6 +209,7 @@ namespace PluginManagement {
 
     // some flags
     extern bool fullyReady;
+    extern bool shouldIssueFatalAfterPluginCompletes;
 }
 }
 
