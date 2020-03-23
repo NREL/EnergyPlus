@@ -944,7 +944,7 @@ namespace HVACDXHeatPumpSystem {
                                         Par(2) = DesOutTemp;
                                         Par(5) = double(FanOpMode);
                                         Par(3) = double(SpeedNum);
-                                        SolveRoot(state, Acc, MaxIte, SolFla, SpeedRatio, VSCoilSpeedResidual, 1.0e-10, 1.0, Par);
+                                        TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, SpeedRatio, VSCoilSpeedResidual, 1.0e-10, 1.0, Par);
 
                                         if (SolFla == -1) {
                                             if (!WarmupFlag) {
@@ -1012,7 +1012,7 @@ namespace HVACDXHeatPumpSystem {
                                         Par(1) = double(VSCoilIndex);
                                         Par(2) = DesOutTemp;
                                         Par(5) = double(FanOpMode);
-                                        SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, VSCoilCyclingResidual, 1.0e-10, 1.0, Par);
+                                        TempSolveRoot::SolveRoot(state, Acc, MaxIte, SolFla, PartLoadFrac, VSCoilCyclingResidual, 1.0e-10, 1.0, Par);
                                         if (SolFla == -1) {
                                             if (!WarmupFlag) {
                                                 if (DXHeatPumpSystem(DXSystemNum).DXCoilSensPLRIter < 1) {

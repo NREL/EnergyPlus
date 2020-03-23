@@ -507,7 +507,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_CoilNotFound)
     // Process inputs
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ASSERT_THROW(FaultsManager::CheckAndReadFaults(), std::runtime_error);
+    ASSERT_THROW(FaultsManager::CheckAndReadFaults(state), std::runtime_error);
 
     std::string const error_string = delimited_string({
         "   ** Severe  ** FaultModel:Fouling:Coil = \"FOULEDHEATINGCOIL\". Referenced Coil named \"NON EXISTENT COOLING COIL\" was not found.",
@@ -571,7 +571,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_BadCoilType)
     // Process inputs
     ASSERT_TRUE(process_idf(idf_objects));
 
-    ASSERT_THROW(FaultsManager::CheckAndReadFaults(), std::runtime_error);
+    ASSERT_THROW(FaultsManager::CheckAndReadFaults(state), std::runtime_error);
 
     std::string const error_string = delimited_string({
         "   ** Severe  ** FaultModel:Fouling:Coil = \"FOULEDHEATINGCOIL\" invalid Coil Name = \"DETAILED PRE COOLING COIL\".",
@@ -702,7 +702,7 @@ TEST_F(EnergyPlusFixture, FaultsManager_FoulingCoil_AssignmentAndCalc)
     //HVACControllers::GetControllerInput();
 
     // Run
-    ASSERT_NO_THROW(FaultsManager::CheckAndReadFaults());
+    ASSERT_NO_THROW(FaultsManager::CheckAndReadFaults(state));
 
     // Read schedule values
     DataGlobals::TimeStep = 1;

@@ -8306,7 +8306,7 @@ namespace UnitarySystems {
                             CoolPLR = 0.0;
                             HeatPLR = 0.0;
                             this->m_CoolingSpeedNum = 1;
-                            this->calcUnitarySystemToLoad(AirLoopNum,
+                            this->calcUnitarySystemToLoad(state, AirLoopNum,
                                                           FirstHVACIteration,
                                                           CoolPLR,
                                                           HeatPLR,
@@ -8322,7 +8322,7 @@ namespace UnitarySystems {
                             this->m_CoolingCycRatio = 1.0;
                             this->m_CoolingSpeedRatio = 0.0;
                             // this->m_CoolingSpeedNum = this->m_NumOfSpeedCooling;
-                            this->calcUnitarySystemToLoad(AirLoopNum,
+                            this->calcUnitarySystemToLoad(state, AirLoopNum,
                                                           FirstHVACIteration,
                                                           CoolPLR,
                                                           HeatPLR,
@@ -8373,7 +8373,7 @@ namespace UnitarySystems {
                                     this->m_CoolingSpeedRatio = 1.0;
                                     this->m_CoolingCycRatio = 1.0;
                                     this->m_CoolingSpeedNum = SpeedNum;
-                                    this->calcUnitarySystemToLoad(AirLoopNum,
+                                    this->calcUnitarySystemToLoad(state, AirLoopNum,
                                                                   FirstHVACIteration,
                                                                   CoolPLR,
                                                                   HeatPLR,
@@ -8416,7 +8416,7 @@ namespace UnitarySystems {
                                     }
                                     this->m_CoolingCycRatio = 1.0;
                                     this->m_CoolingSpeedNum = SpeedNum;
-                                    this->calcUnitarySystemToLoad(AirLoopNum,
+                                    this->calcUnitarySystemToLoad(state, AirLoopNum,
                                                                   FirstHVACIteration,
                                                                   CoolPLR,
                                                                   HeatPLR,
@@ -8842,7 +8842,7 @@ namespace UnitarySystems {
                         this->m_CoolingSpeedRatio = 1.0;
                         this->m_CoolingCycRatio = 1.0;
                         this->m_CoolingSpeedNum = SpeedNum;
-                        this->calcUnitarySystemToLoad(AirLoopNum,
+                        this->calcUnitarySystemToLoad(state, AirLoopNum,
                                                       FirstHVACIteration,
                                                       CoolPLR,
                                                       HeatPLR,
@@ -8874,7 +8874,7 @@ namespace UnitarySystems {
                                 }
                             }
 
-                            this->calcUnitarySystemToLoad(AirLoopNum,
+                            this->calcUnitarySystemToLoad(state, AirLoopNum,
                                                           FirstHVACIteration,
                                                           CoolPLR,
                                                           HeatPLR,
@@ -8893,7 +8893,7 @@ namespace UnitarySystems {
                     }
                 } else {
                     CoolPLR = 1.0;
-                    this->calcUnitarySystemToLoad(AirLoopNum,
+                    this->calcUnitarySystemToLoad(state, AirLoopNum,
                                                   FirstHVACIteration,
                                                   CoolPLR,
                                                   HeatPLR,

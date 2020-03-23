@@ -13669,7 +13669,7 @@ namespace DXCoils {
 
             LowerBoundMassFlowRate = 0.01 * DXCoil(DXCoilNum).RatedAirMassFlowRate(1);
 
-            SolveRoot(state, AccuracyTolerance,
+            TempSolveRoot::SolveRoot(state, AccuracyTolerance,
                       MaximumIterations,
                       SolverFlag,
                       PartLoadAirMassFlowRate,
