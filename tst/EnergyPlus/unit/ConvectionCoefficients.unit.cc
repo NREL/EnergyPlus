@@ -900,6 +900,7 @@ TEST_F(ConvectionCoefficientsFixture, TestWindward)
 
 }
 
+<<<<<<< Updated upstream
 TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedAssistedWall)
 {
 
@@ -1240,4 +1241,20 @@ TEST_F(ConvectionCoefficientsFixture, CalcBeausoleilMorrisonMixedUnstableCeiling
     height = 0.0;
     convCoeff = CalcBeausoleilMorrisonMixedUnstableCeiling(deltaTemp, height, surfTemp, zoneNum);
     EXPECT_NEAR(convCoeff, 9.999, tolerance);
+}
+
+TEST_F(EnergyPlusFixture, ConvectionCoefficientsTest_HConvIn)
+{
+    // The equation for simple convection coefficients is:
+    // ConvectionCoefficient =  Hconv* (T_Ambient - T_Surface)
+
+    Real64 Tsurf = 20.0;
+    Real64 Tamb = 30.0;
+    Real64 CosTilt = 0.436;
+    Real64 ConvectionCoefficient;
+    Real64 ExpectedCoefficient = 2.283;
+
+    ConvectionCoefficient = CalcASHRAESimpleIntConvCoeff(Tsurf, Tamb, CosTilt);
+    EXPECT_EQ(ConvectionCoefficient, ExpectedCoefficient);
+
 }
