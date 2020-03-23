@@ -1266,6 +1266,7 @@ namespace PlantChillers {
         this->CondenserEnergy = 0.0;
         this->EvaporatorEnergy = 0.0;
         this->QHeatRecovered = 0.0;
+        this->ActualCOP = 0.0;
 
         //   calculate end time of current time step
         Real64 CurrentEndTime = DataGlobals::CurrentTime + DataHVACGlobals::SysTimeElapsed;
@@ -1348,9 +1349,6 @@ namespace PlantChillers {
         }
 
         //  LOAD LOCAL VARIABLES FROM DATA STRUCTURE (for code readability)
-        auto const &CapacityRat(this->CapRatCoef);
-        auto const &PowerRat(this->PowerRatCoef);
-        auto const &FullLoadFactor(this->FullLoadCoef);
         Real64 PartLoadRat = this->MinPartLoadRat;
         Real64 ChillerNomCap = this->NomCap;
         Real64 TempEvapOut = DataLoopNode::Node(this->EvapOutletNodeNum).Temp;
@@ -1437,11 +1435,11 @@ namespace PlantChillers {
         Real64 DeltaTemp = (this->AvgCondSinkTemp - this->TempDesCondIn) / this->TempRiseCoef - (TempEvapOut - this->TempDesEvapOut);
 
         // model should have bounds on DeltaTemp and check them (also needs engineering ref content)
-        Real64 AvailNomCapRat = CapacityRat(1) + CapacityRat(2) * DeltaTemp + CapacityRat(3) * pow_2(DeltaTemp);
+        Real64 AvailNomCapRat = this->CapRatCoef(1) + this->CapRatCoef(2) * DeltaTemp + this->CapRatCoef(3) * pow_2(DeltaTemp);
 
         Real64 AvailChillerCap = ChillerNomCap * AvailNomCapRat;
 
-        Real64 FullLoadPowerRat = PowerRat(1) + PowerRat(2) * AvailNomCapRat + PowerRat(3) * pow_2(AvailNomCapRat);
+        Real64 FullLoadPowerRat = this->PowerRatCoef(1) + this->PowerRatCoef(2) * AvailNomCapRat + this->PowerRatCoef(3) * pow_2(AvailNomCapRat);
 
         // Calculate the PLR. When there is Min PLR and the load is less than Min PLR then the Frac Full load Power
         // is calculated at Min PLR, while all other calculations are based on the actual PLR. So in that case once
@@ -1450,7 +1448,7 @@ namespace PlantChillers {
             PartLoadRat = max(this->MinPartLoadRat, min(std::abs(MyLoad) / AvailChillerCap, this->MaxPartLoadRat));
         }
 
-        Real64 FracFullLoadPower = FullLoadFactor(1) + FullLoadFactor(2) * PartLoadRat + FullLoadFactor(3) * pow_2(PartLoadRat);
+        Real64 FracFullLoadPower = this->FullLoadCoef(1) + this->FullLoadCoef(2) * PartLoadRat + this->FullLoadCoef(3) * pow_2(PartLoadRat);
 
         // If the PLR is less than Min PLR calculate the actual PLR for calculations. The power will then adjust for
         // the cycling.
@@ -1747,7 +1745,7 @@ namespace PlantChillers {
         this->Energy = this->Power * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
         this->EvaporatorEnergy = this->QEvaporator * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
 
-        // check for problems BG 9/12/06 (deal with observed negative energy results)
+        // check for problems (deal with observed negative energy results)
         if (this->Energy < 0.0) { // there is a serious problem
 
             if (this->CondenserType == CondType::WaterCooled) {
@@ -1875,17 +1873,11 @@ namespace PlantChillers {
                 DataLoopNode::Node(this->CondOutletNodeNum).Enthalpy = DataLoopNode::Node(this->CondInletNodeNum).Enthalpy;
             }
 
-            this->Power = 0.0;
-            this->QEvaporator = 0.0;
-            this->QCondenser = 0.0;
-            this->Energy = 0.0;
-            this->EvaporatorEnergy = 0.0;
-            this->CondenserEnergy = 0.0;
             this->EvapInletTemp = DataLoopNode::Node(this->EvapInletNodeNum).Temp;
             this->CondInletTemp = DataLoopNode::Node(this->CondInletNodeNum).Temp;
             this->CondOutletTemp = DataLoopNode::Node(this->CondOutletNodeNum).Temp;
             this->EvapOutletTemp = DataLoopNode::Node(this->EvapOutletNodeNum).Temp;
-            this->ActualCOP = 0.0;
+
             if (this->CondenserType == CondType::EvapCooled) {
                 this->BasinHeaterPower = this->BasinHeaterPower;
                 this->BasinHeaterConsumption = this->BasinHeaterPower * ReportingConstant;
