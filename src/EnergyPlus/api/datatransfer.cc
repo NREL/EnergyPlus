@@ -185,6 +185,7 @@ Real64 getVariableValue(const int handle) {
         return (Real64)*thisOutputVar.VarPtr.Which;
     } else {
         if (EnergyPlus::DataGlobals::eplusRunningViaAPI) {
+            std::cout << "ERROR: Variable handle out of range in getVariableValue" << std::endl;
             throw std::runtime_error("Variable handle out of range in getVariableValue");
         } else {
             // must be running from python plugin, need to fatal out once the plugin is done
@@ -214,6 +215,7 @@ Real64 getMeterValue(int handle) {
         return EnergyPlus::GetCurrentMeterValue(handle);
     } else {
         if (EnergyPlus::DataGlobals::eplusRunningViaAPI) {
+            std::cout << "ERROR: Meter handle out of range in getMeterValue" << std::endl;
             throw std::runtime_error("Meter handle out of range in getMeterValue");
         } else {
             // must be running from python plugin, need to fatal out once the plugin is done
@@ -252,6 +254,7 @@ void resetActuator(int handle) {
         *theActuator.Actuated = false;
     } else {
         if (EnergyPlus::DataGlobals::eplusRunningViaAPI) {
+            std::cout << "ERROR: Actuator handle out of range in resetActuator" << std::endl;
             throw std::runtime_error("Actuator handle out of range in resetActuator");
         } else {
             // must be running from python plugin, need to fatal out once the plugin is done
@@ -277,6 +280,7 @@ void setActuatorValue(const int handle, const Real64 value) {
         *theActuator.Actuated = true;
     } else {
         if (EnergyPlus::DataGlobals::eplusRunningViaAPI) {
+            std::cout << "ERROR: Actuator handle out of range in setActuatorValue" << std::endl;
             throw std::runtime_error("Actuator handle out of range in setActuatorValue");
         } else {
             // must be running from python plugin, need to fatal out once the plugin is done
@@ -305,6 +309,7 @@ Real64 getActuatorValue(const int handle) {
         }
     } else {
         if (EnergyPlus::DataGlobals::eplusRunningViaAPI) {
+            std::cout << "ERROR: Actuator handle out of range in getActuatorValue" << std::endl;
             throw std::runtime_error("Actuator handle out of range in getActuatorValue");
         } else {
             // must be running from python plugin, need to fatal out once the plugin is done
@@ -342,10 +347,12 @@ Real64 getInternalVariableValue(int handle) {
             return (Real64)(*thisVar.IntValue);
         } else {
             // Doesn't look like this struct actually has a logical member type, so uh, throw here?
+            std::cout << "ERROR: Invalid internal variable type here, developer issue." << std::endl;
             throw std::runtime_error("Invalid internal variable type here, developer issue.");
         }
     } else {
         if (EnergyPlus::DataGlobals::eplusRunningViaAPI) {
+            std::cout << "ERROR: Internal variable handle out of range in getInternalVariableValue" << std::endl;
             throw std::runtime_error("Internal variable handle out of range in getInternalVariableValue");
         } else {
             // must be running from python plugin, need to fatal out once the plugin is done
