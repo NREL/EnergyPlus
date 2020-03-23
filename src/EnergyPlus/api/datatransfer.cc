@@ -210,9 +210,9 @@ int getMeterHandle(const char* meterName) {
 }
 
 Real64 getMeterValue(int handle) {
-    try {
+    if (handle >= 1 && handle <= (int)EnergyPlus::OutputProcessor::EnergyMeters.size()) {
         return EnergyPlus::GetCurrentMeterValue(handle);
-    } catch (...) {
+    } else {
         if (EnergyPlus::DataGlobals::eplusRunningViaAPI) {
             throw std::runtime_error("Meter handle out of range in getMeterValue");
         } else {
@@ -233,7 +233,7 @@ int getActuatorHandle(const char* componentType, const char* controlType, const 
     std::string const typeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(componentType);
     std::string const keyUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(uniqueKey);
     std::string const controlUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(controlType);
-    for (auto const & availActuator : EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable) {
+    for (auto const & availActuator : EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable) { // is this iterating over cushion space?
         handle++;
         std::string const actuatorTypeUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availActuator.ComponentTypeName);
         std::string const actuatorIDUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(availActuator.UniqueIDName);
@@ -247,16 +247,16 @@ int getActuatorHandle(const char* componentType, const char* controlType, const 
 
 void resetActuator(int handle) {
     // resets the actuator so that E+ will use the internally calculated value again
-    try {
+    if (handle >= 1 && handle <= (int)EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable.size()) {
         auto & theActuator(EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable(handle));
         *theActuator.Actuated = false;
-    } catch (...) {
+    } else {
         if (EnergyPlus::DataGlobals::eplusRunningViaAPI) {
-            throw std::runtime_error("Actuator problem (likely handle out of range) in resetActuator");
+            throw std::runtime_error("Actuator handle out of range in resetActuator");
         } else {
             // must be running from python plugin, need to fatal out once the plugin is done
             // throw an error, set the fatal flag, and then return
-            EnergyPlus::ShowSevereError("Data Exchange API: Problem -- likely an index error in resetActuator; received handle: " + std::to_string(handle));
+            EnergyPlus::ShowSevereError("Data Exchange API: index error in resetActuator; received handle: " + std::to_string(handle));
             EnergyPlus::ShowContinueError("The resetActuator function will return to allow the plugin to finish, then EnergyPlus will abort");
             EnergyPlus::PluginManagement::shouldIssueFatalAfterPluginCompletes = true;
         }
@@ -264,7 +264,7 @@ void resetActuator(int handle) {
 }
 
 void setActuatorValue(const int handle, const Real64 value) {
-    try {
+    if (handle >= 1 && handle <= (int)EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable.size()) {
         auto & theActuator(EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable(handle));
         if (theActuator.RealValue) {
             *theActuator.RealValue = value;
@@ -275,13 +275,13 @@ void setActuatorValue(const int handle, const Real64 value) {
             *theActuator.LogValue = value < 0.99999 && value < 1.00001; // allow small tolerance while passing between languages and types
         }
         *theActuator.Actuated = true;
-    } catch (...) {
+    } else {
         if (EnergyPlus::DataGlobals::eplusRunningViaAPI) {
-            throw std::runtime_error("Actuator problem (likely handle out of range) in setActuatorValue");
+            throw std::runtime_error("Actuator handle out of range in setActuatorValue");
         } else {
             // must be running from python plugin, need to fatal out once the plugin is done
             // throw an error, set the fatal flag, and then return
-            EnergyPlus::ShowSevereError("Data Exchange API: Problem -- likely an index error in setActuatorValue; received handle: " + std::to_string(handle));
+            EnergyPlus::ShowSevereError("Data Exchange API: index error in setActuatorValue; received handle: " + std::to_string(handle));
             EnergyPlus::ShowContinueError("The setActuatorValue function will return to allow the plugin to finish, then EnergyPlus will abort");
             EnergyPlus::PluginManagement::shouldIssueFatalAfterPluginCompletes = true;
         }
@@ -289,7 +289,7 @@ void setActuatorValue(const int handle, const Real64 value) {
 }
 
 Real64 getActuatorValue(const int handle) {
-    try {
+    if (handle >= 1 && handle <= (int)EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable.size()) {
         auto &theActuator(EnergyPlus::DataRuntimeLanguage::EMSActuatorAvailable(handle));
         if (theActuator.RealValue) {
             return *theActuator.RealValue;
@@ -303,15 +303,16 @@ Real64 getActuatorValue(const int handle) {
                 return 0;
             }
         }
-    } catch (...) {
+    } else {
         if (EnergyPlus::DataGlobals::eplusRunningViaAPI) {
-            throw std::runtime_error("Actuator problem (likely handle out of range) in getActuatorValue");
+            throw std::runtime_error("Actuator handle out of range in getActuatorValue");
         } else {
             // must be running from python plugin, need to fatal out once the plugin is done
             // throw an error, set the fatal flag, and then return 0
-            EnergyPlus::ShowSevereError("Data Exchange API: Problem -- likely an index error in getActuatorValue; received handle: " + std::to_string(handle));
+            EnergyPlus::ShowSevereError("Data Exchange API: index error in getActuatorValue; received handle: " + std::to_string(handle));
             EnergyPlus::ShowContinueError("The getActuatorValue function will return 0 for now to allow the plugin to finish, then EnergyPlus will abort");
             EnergyPlus::PluginManagement::shouldIssueFatalAfterPluginCompletes = true;
+            return 0;
         }
     }
 }
@@ -333,7 +334,7 @@ int getInternalVariableHandle(const char* type, const char* key) {
 }
 
 Real64 getInternalVariableValue(int handle) {
-    try {
+    if (handle >= 1 && handle <= (int)EnergyPlus::DataRuntimeLanguage::EMSInternalVarsAvailable.size()) {
         auto thisVar = EnergyPlus::DataRuntimeLanguage::EMSInternalVarsAvailable(handle);
         if (thisVar.PntrVarTypeUsed == EnergyPlus::DataRuntimeLanguage::PntrReal) {
             return *thisVar.RealValue;
@@ -343,13 +344,13 @@ Real64 getInternalVariableValue(int handle) {
             // Doesn't look like this struct actually has a logical member type, so uh, throw here?
             throw std::runtime_error("Invalid internal variable type here, developer issue.");
         }
-    } catch (...) {
+    } else {
         if (EnergyPlus::DataGlobals::eplusRunningViaAPI) {
-            throw std::runtime_error("Internal variable problem (likely handle out of range) in getInternalVariableValue");
+            throw std::runtime_error("Internal variable handle out of range in getInternalVariableValue");
         } else {
             // must be running from python plugin, need to fatal out once the plugin is done
             // throw an error, set the fatal flag, and then return 0
-            EnergyPlus::ShowSevereError("Data Exchange API: Problem -- likely an index error in getInternalVariableValue; received handle: " + std::to_string(handle));
+            EnergyPlus::ShowSevereError("Data Exchange API: index error in getInternalVariableValue; received handle: " + std::to_string(handle));
             EnergyPlus::ShowContinueError("The getInternalVariableValue function will return 0 for now to allow the plugin to finish, then EnergyPlus will abort");
             EnergyPlus::PluginManagement::shouldIssueFatalAfterPluginCompletes = true;
             return 0;
