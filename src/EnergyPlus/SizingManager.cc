@@ -2138,14 +2138,14 @@ namespace SizingManager {
 
     void ProcessInputOARequirements(std::string const &CurrentModuleObject,
                                     int const OAIndex,
-                                    Array1_string const &Alphas,
+                                    Array1D_string const &Alphas,
                                     int &NumAlphas,
-                                    Array1<Real64> const &Numbers,
+                                    Array1D<Real64> const &Numbers,
                                     int &NumNumbers,
-                                    Array1_bool const &EP_UNUSED(lNumericBlanks), // Unused
-                                    Array1_bool const &lAlphaBlanks,
-                                    Array1_string const &cAlphaFields,
-                                    Array1_string const &EP_UNUSED(cNumericFields), // Unused
+                                    Array1D_bool const &EP_UNUSED(lNumericBlanks), // Unused
+                                    Array1D_bool const &lAlphaBlanks,
+                                    Array1D_string const &cAlphaFields,
+                                    Array1D_string const &EP_UNUSED(cNumericFields), // Unused
                                     bool &ErrorsFound                               // If errors found in input
     )
     {

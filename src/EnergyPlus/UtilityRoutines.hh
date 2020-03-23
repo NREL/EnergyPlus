@@ -196,6 +196,8 @@ void ShowRecurringErrors();
 namespace UtilityRoutines {
     extern bool outputErrorHeader;
 
+    void clear_state();
+
     template <class T> struct is_shared_ptr : std::false_type
     {
     };
@@ -567,6 +569,8 @@ namespace UtilityRoutines {
     };
 
     void appendPerfLog(std::string const &colHeader, std::string const &colValue, bool finalColumn=false);
+
+    inline bool exists(const std::string& filename);
 
 } // namespace UtilityRoutines
 

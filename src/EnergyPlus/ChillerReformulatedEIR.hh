@@ -276,7 +276,7 @@ namespace ChillerReformulatedEIR {
 
         void checkMinMaxCurveBoundaries(bool FirstIteration);
 
-        Real64 condOutTempResidual(Real64 FalsiCondOutTemp, Array1<Real64> const &Par);
+        Real64 condOutTempResidual(Real64 FalsiCondOutTemp, Array1D<Real64> const &Par);
     };
 
     // Object Data

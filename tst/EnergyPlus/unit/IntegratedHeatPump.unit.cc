@@ -58,9 +58,7 @@ using namespace EnergyPlus;
 
 using namespace IntegratedHeatPump;
 
-class IHPFixture : public EnergyPlusFixture {};
-
-TEST_F(IHPFixture, ASIHP_GetCurWorkMode)
+TEST_F(EnergyPlusFixture, ASIHP_GetCurWorkMode)
 {
 
     // Don't get any inputs
@@ -79,7 +77,7 @@ TEST_F(IHPFixture, ASIHP_GetCurWorkMode)
     EXPECT_EQ(IHPOperationMode::DWHMode, GetCurWorkMode(state, 1));
 }
 
-TEST_F(IHPFixture, ASIHP_GetCoilIndexIHP)
+TEST_F(EnergyPlusFixture, ASIHP_GetCoilIndexIHP)
 {
 
     // Don't get any inputs
@@ -101,7 +99,7 @@ TEST_F(IHPFixture, ASIHP_GetCoilIndexIHP)
     EXPECT_FALSE(ErrorsFound);
 }
 
-TEST_F(IHPFixture, ASIHP_GetCoilInletNodeIHP)
+TEST_F(EnergyPlusFixture, ASIHP_GetCoilInletNodeIHP)
 {
 
     // Don't get any inputs
@@ -124,7 +122,7 @@ TEST_F(IHPFixture, ASIHP_GetCoilInletNodeIHP)
     EXPECT_FALSE(ErrorsFound);
 }
 
-TEST_F(IHPFixture, ASIHP_GetLowSpeedNumIHP)
+TEST_F(EnergyPlusFixture, ASIHP_GetLowSpeedNumIHP)
 {
 
     // Don't get any inputs
@@ -172,7 +170,7 @@ TEST_F(IHPFixture, ASIHP_GetLowSpeedNumIHP)
     EXPECT_EQ(IHP.MinSpedSHDWH, GetLowSpeedNumIHP(1));
 }
 
-TEST_F(IHPFixture, ASIHP_GetMaxSpeedNumIHP)
+TEST_F(EnergyPlusFixture, ASIHP_GetMaxSpeedNumIHP)
 {
 
     // Don't get any inputs
@@ -230,7 +228,7 @@ TEST_F(IHPFixture, ASIHP_GetMaxSpeedNumIHP)
     EXPECT_EQ(vsCoil.NumOfSpeeds, GetMaxSpeedNumIHP(1));
 }
 
-TEST_F(IHPFixture, ASIHP_GetIHPInput)
+TEST_F(EnergyPlusFixture, ASIHP_GetIHPInput)
 {
 
     std::string const idf_objects = delimited_string({

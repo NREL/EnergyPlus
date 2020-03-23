@@ -3938,7 +3938,7 @@ namespace UnitVentilator {
     }
 
     Real64 CalcUnitVentilatorResidual(EnergyPlusData &state, Real64 const PartLoadRatio, // Coil Part Load Ratio
-                                      Array1<Real64> const &Par   // Function parameters
+                                      Array1D<Real64> const &Par  // Function parameters
     )
     {
         // FUNCTION INFORMATION:

@@ -3303,10 +3303,8 @@ namespace SingleDuct {
         if ((QTotLoad < 0.0) && (this->sd_airterminalInlet.AirMassFlowRateMaxAvail > 0.0) && (TempControlType(ZoneNum) != SingleHeatingSetPoint) &&
             (GetCurrentScheduleValue(this->SchedPtr) > 0.0)) {
             // Calculate the flow required for cooling
+
             DeltaTemp = CpAirAvg * (this->sd_airterminalInlet.AirTemp - ZoneTemp);
-            if (DataHeatBalance::Zone(ZoneNum).HasAdjustedReturnTempByITE && !(DataGlobals::BeginSimFlag)) {
-                DeltaTemp = CpAirAvg * (this->sd_airterminalInlet.AirTemp - DataHeatBalance::Zone(ZoneNum).AdjustedReturnTempByITE);
-            }
 
             // Need to check DeltaTemp and ensure that it is not zero
             if (DeltaTemp != 0.0) {
@@ -4928,7 +4926,7 @@ namespace SingleDuct {
     }
 
     Real64 SingleDuctAirTerminal::VAVVSCoolingResidual(EnergyPlusData &state, Real64 const SupplyAirMassFlow, // supply air mass flow rate [kg/s]
-                                Array1<Real64> const &Par       // Par(1) = REAL(SysNum)
+                                Array1D<Real64> const &Par       // Par(1) = REAL(SysNum)
     )
     {
 
@@ -5000,7 +4998,7 @@ namespace SingleDuct {
     }
 
     Real64 SingleDuctAirTerminal::VAVVSHWNoFanResidual(EnergyPlusData &state, Real64 const HWMassFlow,  // hot water mass flow rate [kg/s]
-                                Array1<Real64> const &Par // Par(1) = REAL(SysNum)
+                                Array1D<Real64> const &Par // Par(1) = REAL(SysNum)
     )
     {
 
@@ -5091,7 +5089,7 @@ namespace SingleDuct {
     }
 
     Real64 SingleDuctAirTerminal::VAVVSHWFanOnResidual(EnergyPlusData &state, Real64 const SupplyAirMassFlow, // supply air mass flow rate [kg/s]
-                                Array1<Real64> const &Par       // Par(1) = REAL(SysNum)
+                                Array1D<Real64> const &Par       // Par(1) = REAL(SysNum)
     )
     {
 
@@ -5163,7 +5161,7 @@ namespace SingleDuct {
     }
 
     Real64 SingleDuctAirTerminal::VAVVSHCFanOnResidual(EnergyPlusData &state, Real64 const HeatingFrac, // fraction of maximum heating output
-                                Array1<Real64> const &Par // Par(1) = REAL(SysNum)
+                                Array1D<Real64> const &Par // Par(1) = REAL(SysNum)
     )
     {
 

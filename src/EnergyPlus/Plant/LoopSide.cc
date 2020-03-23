@@ -652,8 +652,8 @@ namespace DataPlant {
     }
 
     Real64 HalfLoopData::EvaluateLoopSetPointLoad(int const FirstBranchNum,
-                                                          int const LastBranchNum,
-                                                          Real64 ThisLoopSideFlow) {
+                                                  int const LastBranchNum,
+                                                  Real64 ThisLoopSideFlow) {
 
         // FUNCTION INFORMATION:
         //       AUTHOR         Edwin Lee

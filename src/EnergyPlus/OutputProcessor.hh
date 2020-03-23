@@ -234,6 +234,7 @@ namespace OutputProcessor {
         J_m2,
         clo,
         W_K,
+        K_W,
         kgWater_s,
         unknown,
         customEMS
@@ -1008,25 +1009,25 @@ int GetNumMeteredVariables(std::string const &ComponentType, // Given Component 
                            std::string const &ComponentName  // Given Component Name (user defined)
 );
 
-void GetMeteredVariables(std::string const &ComponentType,                     // Given Component Type
-                         std::string const &ComponentName,                     // Given Component Name (user defined)
+void GetMeteredVariables(std::string const &ComponentType,                      // Given Component Type
+                         std::string const &ComponentName,                      // Given Component Name (user defined)
                          Array1D_int &VarIndexes,                               // Variable Numbers
                          Array1D_int &VarTypes,                                 // Variable Types (1=integer, 2=real, 3=meter)
-                         Array1A<OutputProcessor::TimeStepType> TimeStepTypes, // Variable Index Types (1=Zone,2=HVAC),
-                         Array1A<OutputProcessor::Unit> unitsForVar,           // units from enum for each variable
+                         Array1D<OutputProcessor::TimeStepType> &TimeStepTypes, // Variable Index Types (1=Zone,2=HVAC),
+                         Array1D<OutputProcessor::Unit> &unitsForVar,           // units from enum for each variable
                          Array1D_int &ResourceTypes,                            // ResourceTypes for each variable
                          Array1D_string &EndUses,                               // EndUses for each variable
                          Array1D_string &Groups,                                // Groups for each variable
                          Array1D_string &Names,                                 // Variable Names for each variable
-                         int &NumFound                                         // Number Found
+                         int &NumFound                                          // Number Found
 );
 
-void GetMeteredVariables(std::string const &ComponentType,                      // Given Component Type
-                         std::string const &ComponentName,                      // Given Component Name (user defined)
+void GetMeteredVariables(std::string const &ComponentType,                       // Given Component Type
+                         std::string const &ComponentName,                       // Given Component Name (user defined)
                          Array1D_int &VarIndexes,                                // Variable Numbers
                          Array1D_int &VarTypes,                                  // Variable Types (1=integer, 2=real, 3=meter)
-                         Array1A<OutputProcessor::TimeStepType> TimeStepTypes,  // Variable Index Types (1=Zone,2=HVAC),
-                         Array1A<OutputProcessor::Unit> unitsForVar,            // units from enum for each variable
+                         Array1D<OutputProcessor::TimeStepType> &TimeStepTypes,  // Variable Index Types (1=Zone,2=HVAC),
+                         Array1D<OutputProcessor::Unit> &unitsForVar,            // units from enum for each variable
                          Array1D_int &ResourceTypes,                             // ResourceTypes for each variable
                          Array1D_string &EndUses,                                // EndUses for each variable
                          Array1D_string &Groups,                                 // Groups for each variable

@@ -86,6 +86,11 @@ protected:
         EnergyPlus::EnergyPlusFixture::SetUp();
     }
 
+    void TearDown() override
+    {
+        EnergyPlus::EnergyPlusFixture::TearDown();  // Remember to tear down the base fixture after cleaning up derived fixture!
+    };
+
     std::string getIDFString()
     {
         std::vector<std::string> idf_lines = {

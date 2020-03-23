@@ -382,46 +382,46 @@ namespace FanCoilUnits {
     void GetFanCoilIndex(EnergyPlusData &state, std::string const &FanCoilName, int &FanCoilIndex);
 
     Real64 CalcFanCoilLoadResidual(EnergyPlusData &state, Real64 const PartLoadRatio, // DX cooling coil part load ratio
-                                   Array1<Real64> const &Par   // Function parameters
+                                   Array1D<Real64> const &Par  // Function parameters
     );
 
-    Real64 CalcFanCoilPLRResidual(EnergyPlusData &state, Real64 const PLR,         // part-load ratio of air and water mass flow rate
-                                  Array1<Real64> const &Par // Function parameters
+    Real64 CalcFanCoilPLRResidual(EnergyPlusData &state, Real64 const PLR,          // part-load ratio of air and water mass flow rate
+                                  Array1D<Real64> const &Par // Function parameters
     );
 
-    Real64 CalcFanCoilHWLoadResidual(EnergyPlusData &state, Real64 const HWFlow,      // water mass flow rate [kg/s]
-                                     Array1<Real64> const &Par // Function parameters
+    Real64 CalcFanCoilHWLoadResidual(EnergyPlusData &state, Real64 const HWFlow,       // water mass flow rate [kg/s]
+                                     Array1D<Real64> const &Par // Function parameters
     );
 
-    Real64 CalcFanCoilCWLoadResidual(EnergyPlusData &state, Real64 const CWFlow,      // water mass flow rate [kg/s]
-                                     Array1<Real64> const &Par // Function parameters
+    Real64 CalcFanCoilCWLoadResidual(EnergyPlusData &state, Real64 const CWFlow,       // water mass flow rate [kg/s]
+                                     Array1D<Real64> const &Par // Function parameters
     );
-    Real64 CalcFanCoilWaterFlowTempResidual(EnergyPlusData &state, Real64 const WaterFlow,   // water mass flow rate [kg/s]
-                                            Array1<Real64> const &Par // Function parameters
-    );
-
-    Real64 CalcFanCoilWaterFlowResidual(EnergyPlusData &state, Real64 const WaterFlow,   // water mass flow rate [kg/s]
-                                        Array1<Real64> const &Par // Function parameters
+    Real64 CalcFanCoilWaterFlowTempResidual(EnergyPlusData &state, Real64 const WaterFlow,    // water mass flow rate [kg/s]
+                                            Array1D<Real64> const &Par // Function parameters
     );
 
-    Real64 CalcFanCoilAirAndWaterFlowResidual(EnergyPlusData &state, Real64 const WaterFlow,   // water mass flow rate [kg/s]
-                                              Array1<Real64> const &Par // Function parameters
+    Real64 CalcFanCoilWaterFlowResidual(EnergyPlusData &state, Real64 const WaterFlow,    // water mass flow rate [kg/s]
+                                        Array1D<Real64> const &Par // Function parameters
     );
 
-    Real64 CalcFanCoilAirAndWaterInStepResidual(EnergyPlusData &state, Real64 const PLR,         // air and water mass flow rate ratio
-                                                Array1<Real64> const &Par // Function parameters
+    Real64 CalcFanCoilAirAndWaterFlowResidual(EnergyPlusData &state, Real64 const WaterFlow,    // water mass flow rate [kg/s]
+                                              Array1D<Real64> const &Par // Function parameters
     );
 
-    Real64 CalcFanCoilBothFlowResidual(EnergyPlusData &state, Real64 const PLR,         // air and water mass flow rate ratio
-                                       Array1<Real64> const &Par // Function parameters
+    Real64 CalcFanCoilAirAndWaterInStepResidual(EnergyPlusData &state, Real64 const PLR,          // air and water mass flow rate ratio
+                                                Array1D<Real64> const &Par // Function parameters
     );
 
-    Real64 CalcFanCoilElecHeatResidual(EnergyPlusData &state, Real64 const PLR,         // electric heating coil part load ratio
-                                       Array1<Real64> const &Par // Function parameters
+    Real64 CalcFanCoilBothFlowResidual(EnergyPlusData &state, Real64 const PLR,          // air and water mass flow rate ratio
+                                       Array1D<Real64> const &Par // Function parameters
     );
 
-    Real64 CalcFanCoilElecHeatTempResidual(EnergyPlusData &state, Real64 const PLR,         // electric heating coil part load ratio
-                                           Array1<Real64> const &Par // Function parameters
+    Real64 CalcFanCoilElecHeatResidual(EnergyPlusData &state, Real64 const PLR,          // electric heating coil part load ratio
+                                       Array1D<Real64> const &Par // Function parameters
+    );
+
+    Real64 CalcFanCoilElecHeatTempResidual(EnergyPlusData &state, Real64 const PLR,          // electric heating coil part load ratio
+                                           Array1D<Real64> const &Par // Function parameters
     );
 } // namespace FanCoilUnits
 

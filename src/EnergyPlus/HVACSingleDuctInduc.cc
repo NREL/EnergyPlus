@@ -1440,8 +1440,8 @@ namespace HVACSingleDuctInduc {
         LoadMet = TotAirMassFlow * CpAirZn * (Node(OutletNode).Temp - Node(ZoneNode).Temp);
     }
 
-    Real64 FourPipeIUHeatingResidual(EnergyPlusData &state, Real64 const HWFlow,      // hot water flow rate in kg/s
-                                     Array1<Real64> const &Par // Par(5) is the requested zone load
+    Real64 FourPipeIUHeatingResidual(EnergyPlusData &state, Real64 const HWFlow,       // hot water flow rate in kg/s
+                                     Array1D<Real64> const &Par // Par(5) is the requested zone load
     )
     {
 
@@ -1498,8 +1498,8 @@ namespace HVACSingleDuctInduc {
         return Residuum;
     }
 
-    Real64 FourPipeIUCoolingResidual(EnergyPlusData &state, Real64 const CWFlow,      // cold water flow rate in kg/s
-                                     Array1<Real64> const &Par // Par(5) is the requested zone load
+    Real64 FourPipeIUCoolingResidual(EnergyPlusData &state, Real64 const CWFlow,       // cold water flow rate in kg/s
+                                     Array1D<Real64> const &Par // Par(5) is the requested zone load
     )
     {
 

@@ -1584,7 +1584,7 @@ namespace HeatBalanceHAMTManager {
         surfvp(sid) = RHtoVP(cells(Intcell(sid)).rh, cells(Intcell(sid)).temp);
     }
 
-    void interp(int const ndata, Array1A<Real64> const xx, Array1A<Real64> const yy, Real64 const invalue, Real64 &outvalue, Optional<Real64> outgrad)
+    void interp(int const ndata, const Array1D<Real64> &xx, const Array1D<Real64> &yy, Real64 const invalue, Real64 &outvalue, Optional<Real64> outgrad)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR         Phillip Biddulph
@@ -1606,8 +1606,8 @@ namespace HeatBalanceHAMTManager {
         // na
 
         // Argument array dimensioning
-        xx.dim(ndata);
-        yy.dim(ndata);
+        EP_SIZE_CHECK(xx, ndata);
+        EP_SIZE_CHECK(yy, ndata);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

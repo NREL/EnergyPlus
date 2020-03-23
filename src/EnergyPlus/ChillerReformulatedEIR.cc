@@ -1790,7 +1790,7 @@ namespace ChillerReformulatedEIR {
         }
     }
 
-    Real64 ReformulatedEIRChillerSpecs::condOutTempResidual(Real64 const FalsiCondOutTemp, Array1<Real64> const &Par)
+    Real64 ReformulatedEIRChillerSpecs::condOutTempResidual(Real64 const FalsiCondOutTemp, Array1D<Real64> const &Par)
     {
 
         // FUNCTION INFORMATION:

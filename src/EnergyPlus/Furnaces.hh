@@ -415,12 +415,12 @@ namespace Furnaces {
     //        End of Update subroutines for the Furnace Module
     // *****************************************************************************
 
-    Real64 CalcFurnaceResidual(EnergyPlusData &state, Real64 const PartLoadRatio, // DX cooling coil part load ratio
-                               Array1<Real64> const &Par   // Function parameters
+    Real64 CalcFurnaceResidual(EnergyPlusData &state, Real64 const PartLoadRatio,  // DX cooling coil part load ratio
+                               Array1D<Real64> const &Par   // Function parameters
     );
 
-    Real64 CalcWaterToAirResidual(EnergyPlusData &state, Real64 const PartLoadRatio, // DX cooling coil part load ratio
-                                  Array1<Real64> const &Par   // Function parameters
+    Real64 CalcWaterToAirResidual(EnergyPlusData &state, Real64 const PartLoadRatio,  // DX cooling coil part load ratio
+                                  Array1D<Real64> const &Par   // Function parameters
     );
 
     void SetAverageAirFlow(int const FurnaceNum,       // Unit index
@@ -449,8 +449,8 @@ namespace Furnaces {
                                Real64 &HeatCoilLoadmet         // Heating Load Met
     );
 
-    Real64 HotWaterCoilResidual(EnergyPlusData &state, Real64 const HWFlow,      // hot water flow rate in kg/s
-                                Array1<Real64> const &Par // Par(5) is the requested coil load
+    Real64 HotWaterCoilResidual(EnergyPlusData &state, Real64 const HWFlow,       // hot water flow rate in kg/s
+                                Array1D<Real64> const &Par // Par(5) is the requested coil load
     );
 
     //        End of Reporting subroutines for the Furnace Module
@@ -500,13 +500,13 @@ namespace Furnaces {
     //******************************************************************************
 
     Real64 VSHPCyclingResidual(EnergyPlusData &state, Real64 const PartLoadFrac, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                               Array1<Real64> const &Par  // par(1) = FurnaceNum
+                               Array1D<Real64> const &Par  // par(1) = FurnaceNum
     );
 
     //******************************************************************************
 
-    Real64 VSHPSpeedResidual(EnergyPlusData &state, Real64 const SpeedRatio,  // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                             Array1<Real64> const &Par // par(1) = MSHPNum
+    Real64 VSHPSpeedResidual(EnergyPlusData &state, Real64 const SpeedRatio,   // compressor cycling ratio (1.0 is continuous, 0.0 is off)
+                             Array1D<Real64> const &Par // par(1) = MSHPNum
     );
 
     void SetVSHPAirFlow(EnergyPlusData &state, int const FurnaceNum,                 // Unit index

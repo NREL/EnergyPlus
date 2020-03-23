@@ -1321,8 +1321,8 @@ namespace BaseboardRadiator {
         Baseboard(BaseboardNum).Energy = Baseboard(BaseboardNum).Power * TimeStepSys * SecInHour;
     }
 
-    Real64 HWBaseboardUAResidual(Real64 const UA,          // UA of coil
-                                 Array1<Real64> const &Par // par(1) = design coil load [W]
+    Real64 HWBaseboardUAResidual(Real64 const UA,           // UA of coil
+                                 Array1D<Real64> const &Par // par(1) = design coil load [W]
     )
     {
 

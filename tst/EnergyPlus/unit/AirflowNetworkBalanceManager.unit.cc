@@ -8755,6 +8755,8 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithLocalAirNode)
          "  SFacade_WPCCurve,        !- Wind Pressure Coefficient Values Object Name",
          "  No,                      !- Symmetric Wind Pressure Coefficient Curve",
          "  Absolute;                !- Wind Angle Type",
+         "OutdoorAir:Node,",
+         "  Model Outdoor Air Node;   !- Name",
          "AirflowNetwork:MultiZone:ReferenceCrackConditions,",
          "  ReferenceCrackConditions,!- Name",
          "  20.0,                    !- Reference Temperature{ C }",
@@ -8895,6 +8897,13 @@ TEST_F(EnergyPlusFixture, TestExternalNodesWithLocalAirNode)
     DataGlobals::AnyLocalEnvironmentsInModel = true;
     OutAirNodeManager::SetOutAirNodes();
     GetAirflowNetworkInput(state, OutputFiles::getSingleton());
+    // Issue 7656
+    std::string const error_string = delimited_string({
+        "   ** Warning ** No Timestep object found.  Number of TimeSteps in Hour defaulted to 4.",
+        "   ** Warning ** CheckUsedConstructions: There are 2 nominally unused constructions in input.",
+        "   **   ~~~   ** For explicit details on each unused construction, use Output:Diagnostics,DisplayExtraWarnings;",
+    });
+    EXPECT_TRUE(compare_err_stream(error_string, true));
     InitAirflowNetwork();
 
     // Check the airflow elements

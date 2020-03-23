@@ -8893,7 +8893,7 @@ namespace HVACVariableRefrigerantFlow {
     // Utility subroutines for the Module
 
     Real64 PLRResidual(EnergyPlusData &state, Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                       Array1<Real64> const &Par   // par(1) = VRFTUNum
+                       Array1D<Real64> const &Par  // par(1) = VRFTUNum
     )
     {
         // FUNCTION INFORMATION:
@@ -11867,8 +11867,8 @@ namespace HVACVariableRefrigerantFlow {
         return AirMassFlowRate;
     }
 
-    Real64 VRFTUAirFlowResidual_FluidTCtrl(EnergyPlusData &state, Real64 const FanSpdRatio, // fan speed ratio of VRF VAV TU
-                                           Array1<Real64> const &Par // par(1) = VRFTUNum
+    Real64 VRFTUAirFlowResidual_FluidTCtrl(EnergyPlusData &state, Real64 const FanSpdRatio,  // fan speed ratio of VRF VAV TU
+                                           Array1D<Real64> const &Par // par(1) = VRFTUNum
     )
     {
         // FUNCTION INFORMATION:
@@ -11986,8 +11986,8 @@ namespace HVACVariableRefrigerantFlow {
         return AirFlowRateResidual;
     }
 
-    Real64 VRFOUTeResidual_FluidTCtrl(Real64 const Te,          // outdoor unit evaporating temperature
-                                      Array1<Real64> const &Par // par(1) = VRFTUNum
+    Real64 VRFOUTeResidual_FluidTCtrl(Real64 const Te,           // outdoor unit evaporating temperature
+                                      Array1D<Real64> const &Par // par(1) = VRFTUNum
     )
     {
         // FUNCTION INFORMATION:
@@ -12040,8 +12040,8 @@ namespace HVACVariableRefrigerantFlow {
         return TeResidual;
     }
 
-    Real64 CompResidual_FluidTCtrl(Real64 const T_suc,       // Compressor suction temperature Te' [C]
-                                   Array1<Real64> const &Par // parameters
+    Real64 CompResidual_FluidTCtrl(Real64 const T_suc,        // Compressor suction temperature Te' [C]
+                                   Array1D<Real64> const &Par // parameters
     )
     {
         // FUNCTION INFORMATION:

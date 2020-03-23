@@ -2928,7 +2928,7 @@ namespace EvaporativeCoolers {
     }
 
     Real64 CalcEvapCoolRDDSecFlowResidual(Real64 const AirMassFlowSec, // secondary air mass flow rate in kg/s
-                                          Array1<Real64> const &Par    // Par(2) is desired outlet temperature of Evap Cooler
+                                          Array1D<Real64> const &Par   // Par(2) is desired outlet temperature of Evap Cooler
     )
     {
         // SUBROUTINE INFORMATION:
@@ -4682,7 +4682,7 @@ namespace EvaporativeCoolers {
     }
 
     Real64 ZoneEvapUnitLoadResidual(EnergyPlusData &state, Real64 const PartLoadRatio,
-                                    Array1<Real64> const &Par // parameters
+                                    Array1D<Real64> const &Par // parameters
     )
     {
         // calculates cooling load residual by varying part load ratio
@@ -4837,7 +4837,7 @@ namespace EvaporativeCoolers {
     }
 
     Real64 VSEvapUnitLoadResidual(EnergyPlusData &state, Real64 const FanSpeedRatio,
-                                  Array1<Real64> const &Par // parameters
+                                  Array1D<Real64> const &Par // parameters
     )
     {
 
