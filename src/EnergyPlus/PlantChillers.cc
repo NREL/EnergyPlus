@@ -589,17 +589,14 @@ namespace PlantChillers {
                             _,
                             "Plant");
         SetupOutputVariable("Chiller COP", OutputProcessor::Unit::W_W, this->ActualCOP, "System", "Average", this->Name);
+        SetupOutputVariable("Chiller Condenser Inlet Temperature", OutputProcessor::Unit::C, this->CondInletTemp, "System", "Average", this->Name);
 
         // Condenser mass flow and outlet temp are valid for water cooled
         if (this->CondenserType == CondType::WaterCooled) {
-            SetupOutputVariable(
-                "Chiller Condenser Inlet Temperature", OutputProcessor::Unit::C, this->CondInletTemp, "System", "Average", this->Name);
             SetupOutputVariable("Chiller Condenser Outlet Temperature", OutputProcessor::Unit::C, this->CondOutletTemp, "System", "Average", this->Name);
             SetupOutputVariable("Chiller Condenser Mass Flow Rate", OutputProcessor::Unit::kg_s, this->CondMassFlowRate, "System", "Average", this->Name);
         } else if (this->CondenserType == CondType::AirCooled) {
-            SetupOutputVariable("Chiller Condenser Inlet Temperature", OutputProcessor::Unit::C, this->CondInletTemp, "System", "Average", this->Name);
         } else if (this->CondenserType == CondType::EvapCooled) {
-            SetupOutputVariable("Chiller Condenser Inlet Temperature", OutputProcessor::Unit::C, this->CondInletTemp, "System", "Average", this->Name);
             if (this->BasinHeaterPowerFTempDiff > 0.0) {
                 SetupOutputVariable("Chiller Basin Heater Electric Power", OutputProcessor::Unit::W, this->BasinHeaterPower, "System", "Average", this->Name);
                 SetupOutputVariable("Chiller Basin Heater Electric Energy",
@@ -1359,7 +1356,7 @@ namespace PlantChillers {
         Real64 TempEvapOut = DataLoopNode::Node(this->EvapOutletNodeNum).Temp;
         EvapMassFlowRateMax = this->EvapMassFlowRateMax;
 
-        // If there is a fault of chiller fouling (zrp_Nov2016)
+        // If there is a fault of chiller fouling
         if (this->FaultyChillerFoulingFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
             int FaultIndex = this->FaultyChillerFoulingIndex;
             Real64 NomCap_ff = ChillerNomCap;
@@ -1424,7 +1421,7 @@ namespace PlantChillers {
             this->AvgCondSinkTemp = _CondInletTemp;
         }
 
-        // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+        // If there is a fault of Chiller SWT Sensor
         if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
             int FaultIndex = this->FaultyChillerSWTIndex;
             Real64 EvapOutletTemp_ff = TempEvapOut;
@@ -1559,7 +1556,7 @@ namespace PlantChillers {
 
             } // End of Constant Variable Flow If Block
 
-            // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+            // If there is a fault of Chiller SWT Sensor
             if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
                 (this->EvapMassFlowRate > 0)) {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
@@ -1662,7 +1659,7 @@ namespace PlantChillers {
                 }
             }
 
-            // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+            // If there is a fault of Chiller SWT Sensor
             if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
                 (this->EvapMassFlowRate > 0)) {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
@@ -3219,7 +3216,7 @@ namespace PlantChillers {
         Real64 TempCondIn = DataLoopNode::Node(this->CondInletNodeNum).Temp;
         Real64 TempEvapOut = DataLoopNode::Node(this->EvapOutletNodeNum).Temp;
 
-        // If there is a fault of chiller fouling (zrp_Nov2016)
+        // If there is a fault of chiller fouling
         if (this->FaultyChillerFoulingFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
             int FaultIndex = this->FaultyChillerFoulingIndex;
             Real64 NomCap_ff = ChillerNomCap;
@@ -5021,7 +5018,7 @@ namespace PlantChillers {
         Real64 TempCondIn = DataLoopNode::Node(this->CondInletNodeNum).Temp;
         Real64 TempEvapOut = DataLoopNode::Node(this->EvapOutletNodeNum).Temp;
 
-        // If there is a fault of chiller fouling (zrp_Nov2016)
+        // If there is a fault of chiller fouling
         if (this->FaultyChillerFoulingFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
             int FaultIndex = this->FaultyChillerFoulingIndex;
             Real64 NomCap_ff = ChillerNomCap;
@@ -6319,7 +6316,7 @@ namespace PlantChillers {
         ChillerNomCap = this->NomCap;
         COP = this->COP;
 
-        // If there is a fault of chiller fouling (zrp_Nov2016)
+        // If there is a fault of chiller fouling
         if (this->FaultyChillerFoulingFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
             int FaultIndex = this->FaultyChillerFoulingIndex;
             Real64 NomCap_ff = ChillerNomCap;
@@ -6356,7 +6353,7 @@ namespace PlantChillers {
             }
         }
 
-        // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+        // If there is a fault of Chiller SWT Sensor
         if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation)) {
             int FaultIndex = this->FaultyChillerSWTIndex;
             Real64 EvapOutletTemp_ff = TempEvapOutSetPoint;
@@ -6572,7 +6569,7 @@ namespace PlantChillers {
                 }
             } // End of Constant or Variable Flow If Block for FlowLock = 0 (or making a flow request)
 
-            // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+            // If there is a fault of Chiller SWT Sensor
             if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
                 (this->EvapMassFlowRate > 0)) {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
@@ -6645,7 +6642,7 @@ namespace PlantChillers {
                 }
             }
 
-            // If there is a fault of Chiller SWT Sensor (zrp_Jun2016)
+            // If there is a fault of Chiller SWT Sensor
             if (this->FaultyChillerSWTFlag && (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
                 (this->EvapMassFlowRate > 0)) {
                 // calculate directly affected variables at faulty case: EvapOutletTemp, EvapMassFlowRate, QEvaporator
