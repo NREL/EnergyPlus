@@ -738,6 +738,7 @@ SET( API_HEADERS
   api/datatransfer.h
   api/EnergyPlusPgm.hh
   api/EnergyPlusAPI.h
+  api/TypeDefs.h
 )
 SET( API_CORE_SRC
   api/func.cc

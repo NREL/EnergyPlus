@@ -406,7 +406,7 @@ Real64 getPluginTrendVariableValue(int handle, int timeIndex) {
         EnergyPlus::PluginManagement::shouldIssueFatalAfterPluginCompletes = true;
         return 0;
     }
-    if (timeIndex < 1 || timeIndex > ((int)EnergyPlus::PluginManagement::pluginManager->getTrendVariableHistorySize(handle) - 1)) {
+    if (timeIndex < 1 || timeIndex > ((int)EnergyPlus::PluginManagement::pluginManager->getTrendVariableHistorySize(handle))) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
         EnergyPlus::ShowSevereError("Data Exchange API: Problem -- trend history count argument out of range in getPluginTrendVariableValue; received value: " + std::to_string(timeIndex));
@@ -426,7 +426,7 @@ Real64 getPluginTrendVariableAverage(int handle, int count) {
         EnergyPlus::PluginManagement::shouldIssueFatalAfterPluginCompletes = true;
         return 0;
     }
-    if (count < 2 || count > ((int)EnergyPlus::PluginManagement::pluginManager->getTrendVariableHistorySize(handle) - 1)) {
+    if (count < 2 || count > ((int)EnergyPlus::PluginManagement::pluginManager->getTrendVariableHistorySize(handle))) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
         EnergyPlus::ShowSevereError("Data Exchange API: Problem -- trend history count argument out of range in getPluginTrendVariableAverage; received value: " + std::to_string(count));
@@ -446,7 +446,7 @@ Real64 getPluginTrendVariableMin(int handle, int count) {
         EnergyPlus::PluginManagement::shouldIssueFatalAfterPluginCompletes = true;
         return 0;
     }
-    if (count < 2 || count > ((int)EnergyPlus::PluginManagement::pluginManager->getTrendVariableHistorySize(handle) - 1)) {
+    if (count < 2 || count > ((int)EnergyPlus::PluginManagement::pluginManager->getTrendVariableHistorySize(handle))) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
         EnergyPlus::ShowSevereError("Data Exchange API: Problem -- trend history count argument out of range in getPluginTrendVariableMin; received value: " + std::to_string(count));
@@ -466,7 +466,7 @@ Real64 getPluginTrendVariableMax(int handle, int count) {
         EnergyPlus::PluginManagement::shouldIssueFatalAfterPluginCompletes = true;
         return 0;
     }
-    if (count < 2 || count > ((int)EnergyPlus::PluginManagement::pluginManager->getTrendVariableHistorySize(handle) - 1)) {
+    if (count < 2 || count > ((int)EnergyPlus::PluginManagement::pluginManager->getTrendVariableHistorySize(handle))) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
         EnergyPlus::ShowSevereError("Data Exchange API: Problem -- trend history count argument out of range in getPluginTrendVariableMax; received value: " + std::to_string(count));
@@ -486,7 +486,7 @@ Real64 getPluginTrendVariableSum(int handle, int count) {
         EnergyPlus::PluginManagement::shouldIssueFatalAfterPluginCompletes = true;
         return 0;
     }
-    if (count < 2 || count > ((int)EnergyPlus::PluginManagement::pluginManager->getTrendVariableHistorySize(handle) - 1)) {
+    if (count < 2 || count > ((int)EnergyPlus::PluginManagement::pluginManager->getTrendVariableHistorySize(handle))) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
         EnergyPlus::ShowSevereError("Data Exchange API: Problem -- trend history count argument out of range in getPluginTrendVariableSum; received value: " + std::to_string(count));
@@ -506,7 +506,7 @@ Real64 getPluginTrendVariableDirection(int handle, int count) {
         EnergyPlus::PluginManagement::shouldIssueFatalAfterPluginCompletes = true;
         return 0;
     }
-    if (count < 2 || count > ((int)EnergyPlus::PluginManagement::pluginManager->getTrendVariableHistorySize(handle) - 1)) {
+    if (count < 2 || count > ((int)EnergyPlus::PluginManagement::pluginManager->getTrendVariableHistorySize(handle))) {
         // need to fatal out once the plugin is done
         // throw an error, set the fatal flag, and then return
         EnergyPlus::ShowSevereError("Data Exchange API: Problem -- trend history count argument out of range in getPluginTrendVariableDirection; received value: " + std::to_string(count));
