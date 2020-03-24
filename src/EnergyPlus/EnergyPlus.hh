@@ -56,7 +56,7 @@
 #include <cstdint> // C++11
 #include <cassert>
 
-#include <EnergyPlus/TypeDefs.h>
+#include <EnergyPlus/api/TypeDefs.h>
 
 // macro to suppress unused parameter
 // UNUSED( foo );
