@@ -44,12 +44,12 @@ Since this default temperature profile may not be applicable to all locations, t
 
 \subsection{Sky Radiation Modeling}\label{sky-radiation-modeling}
 
-EnergyPlus calculates the Horizontal Infrared Radiation ($IR_H$), if it is missing in the weather file or for design days, from the Dry Bulb Temperature, Dewpoint Temperature, and Opaque Cloud Cover as described below.
+EnergyPlus calculates the Horizontal Infrared Radiation Intensity ($IR_H$), if it is missing in the weather file or for design days, from the Dry Bulb Temperature, Dewpoint Temperature or Partial Pressure of Water Vapor, and Opaque Cloud Cover as described below. Regardless of whether or not $IR_H$ is present in the weather file, it can be specified in the \textbf{WeatherProperty:SkyTemperature} object to ignore the reported value of $IR_H$ and instead calculate it from the specified sky emissivity model as described below.
 
 $IR_H$ is defined as the rate of infrared radiation emitted from the sky falling on a horizontal upward-facing surface, in \si{\watt\per\m\squared}.
 
 \begin{equation}
-IR_H = \sigma \cdot T_{sky}^4
+IR_H = \sigma T_{sky}^4
 \end{equation}
 
 \noindent where:
@@ -60,10 +60,10 @@ $\sigma$ = Stefan-Boltzmann constant = \SI{5.6697e-8}{\watt\per\meter\squared\pe
 $T_{sky}$ = Effective mean sky temperature, or sky radiative temperature, \si{\kelvin}.
 \newline
 
-Walton (1983) proposed a fictitious quantity called the Sky Emissivity ($\epsilon_{sky}$) such that the following energy balance is satisfied:
+Over the years authors have proposed a fictitious quantity called the Sky Emissivity ($\epsilon_{sky}$) such that the following energy balance is satisfied:
 
 \begin{equation}
-IR_H = \epsilon_{sky} \cdot \sigma \cdot T_{db}}^4
+IR_H = \epsilon_{sky} \cdot \sigma \cdot T_{db}^4
 \end{equation}
 
 $\epsilon_{sky}$ = sky emissivity
@@ -71,29 +71,56 @@ $\epsilon_{sky}$ = sky emissivity
 $T_{db}$ = drybulb temperature, \si{\kelvin}
 \newline
 
-Walton also proposed the following correlation for $\epsilon_{sky}$:
+Four correlations for $\epsilon_{sky}$ under clear-sky conditions, proposed by four sets of authors, are available in EnergyPlus. The default correlation is from Clark \& Allen (1978):
+
+\begin{table}[hbtp]
+\centering
+\begin{tabular}{cl}
+\textbf{Author}   & \epsilon_{sky, clear} \\ \\
+Clark \& Allen    & $= 0.787 + 0.764 \ln\left(T_{dp}/273\right)$ \\ \\
+Martin \& Berdahl & $= 0.711 + 0.56 \left(T_{dp}/100\right) + 0.73  \left(T_{dp} / 100\right)^2$ \\ \\
+Brunt             & $= 0.52 + 0.065 \left(P_{wv}\right)^{0.5}$ \\ \\
+Idso              & $= 0.70 + 5.95\times10^{-5} \left(P_{wv}\right) e^{1500/T_{db}} $
+\end{tabular}
+\end{table}
+
+\noindent where:
+\newline
+
+$\epsilon_{sky, clear}$ = $\epsilon_{sky}$ under clear-sky conditions
+\newline
+
+$T_{dp}$ = dewpoint temperature, in \si{\kelvin}
+\newline
+
+$P_{wv}$ = partial pressor of water vapor, in \si{\hecto\pascal}
+\newline
+
+The clear sky emissivity is modified for partially-cloudy conditions using the correlation from Walton (1983) which uses the opaque cloud cover fraction:
 
 \begin{equation}
-\epsilon_{sky} = \left(0.787 + 0.764 \cdot \ln\left(T_{dp}}/273\right)\right) \cdot \left(1 + 0.0224 \cdot N - 0.0035 \cdot N^2 + 0.00028 \cdot N^3)
+\epsilon_{sky} = \epsilon_{sky, clear} \left(1 + 0.0224  N - 0.0035  N^2 + 0.00028  N^3\right)
 \end{equation}
 
 \noindent where:
 \newline
 
-$T_{dp}$ = dewpoint temperature, in \si{\kelvin}
-
 $N$ = opaque sky cover, in tenths.
 \newline
 
 \noindent Example:
+\newline
 
 Clear sky ($N=0$), $T_{db} = 20 + 273.15 = \SI{293.15}{\kelivin}$, $T_{dp} = 10 + 273.15 = \SI{283.15}{\kelvin}$
 \newline
 
-$\epsilon_{sky} = \left(0.787 + 0.764 \cdot \ln\left(283.15/273\right)\right) \cdot \left(1 + 0.0224 \cdot N - 0.0035 \cdot N^2 + 0.00028 \cdot N^3) = 0.815$
+$\epsilon_{sky} = \left(0.787 + 0.764  \ln\left(283.15/273\right)\right)  \left(1 + 0.0224  N - 0.0035  N^2 + 0.00028  N^3) = 0.815$
 \newline
 
-$IR_H = 0.815 \cdot 5.6697E-8 \cdot 293.15^4 = \SI{341.2}{\watt\per\meter\squared}$
+$IR_H = 0.815  5.6697E-8  293.15^4 = \SI{341.2}{\watt\per\meter\squared}$
+\newline
+
+References for these calculations are contained in the references section at the end of this list of fields. (Walton, 1983) (Clark \& Allen, 1978), (Li et al, 2017).
 
 \subsection{EnergyPlus Sky Temperature Calculation}\label{energyplus-sky-temperature-calculation}
 
