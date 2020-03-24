@@ -850,7 +850,7 @@ OutputFull = System output at PLR =1 as full output
 The Speed Ratio for a multiple speed coil at speed > 1 is calculated using the equation below
 
 \begin{equation}
-{\left {SpeedRatio}\right} = \frac{SystemLoad-OutputFull_{i-1}}{OutputFull_{i} - OutputFull_{i-1}}
+\left\{ SpeedRatio \right\} = \frac{SystemLoad-OutputFull_{i-1}}{OutputFull_{i} - OutputFull_{i-1}}
 \end{equation}
 
 where
@@ -859,9 +859,9 @@ SpeedRatio = Ratio to represent how long the higher speed runs as a fraction of 
 
 SystemLoad = Load requested to meet thermostat setpoint
 
-OutputFull_{i} = System full output at the higher speed
+OutputFull\(_{i}\) = System full output at the higher speed
 
-OutputFull_{i-1} = System full output at the lower speed
+OutputFull\(_{i-1}\) = System full output at the lower speed
 
 Note: When a DX cooling coil with a constant volume fan is used, latent degradation is disabled.
 
@@ -870,7 +870,7 @@ When coils of Coil:Cooling:DX:VariableSpeed, Coil:Heating:DX:SingleSpeed, and Co
 The Part Load Ratio (PLR) for a single speed coil or a multiple speed coil at speed 1 is calculated using the equation below
 
 \begin{equation}
-{\left {PLR}\right} = \frac{DesOutTemp - InletTemp}{OutTempFull - InletTemp}
+\left\{ PLR \right\} = \frac{DesOutTemp - InletTemp}{OutTempFull - InletTemp}
 \end{equation}
 
 where
@@ -886,7 +886,7 @@ OutTemptFull = Outlet temperature at PLR =1 as full output
 The Speed Ratio for a multiple speed coil at speed > 1 is calculated using the equation below
 
 \begin{equation}
-{\left {SpeedRatio}\right} = \frac{DesOutTemp - OutTempFull_{i-1}}{OutTempFull_{i} - OutTempFull_{i-1}}
+  \left\{ SpeedRatio \right\} = \frac{DesOutTemp - OutTempFull_{i-1}}{OutTempFull_{i} - OutTempFull_{i-1}}
 \end{equation}
 
 where
@@ -895,9 +895,9 @@ SpeedRatio = Ratio to represent how long the higher speed runs as a fraction of 
 
 DesOutTemp = Desired outlet temperature to meet setpoint
 
-OutTempFull_{i} = Outlet temperature of full output at the higher speed
+OutTempFull\(_{i}\) = Outlet temperature of full output at the higher speed
 
-OutTempFull_{i-1} = Outlet temperature of full output at the lower speed
+OutTempFull\(_{i-1}\) = Outlet temperature of full output at the lower speed
 
 % table 2
 \begin{longtable}[c]{p{4in}p{2.5in}}
