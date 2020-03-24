@@ -81,6 +81,7 @@ namespace PluginManagement {
 
     // some flags
     bool fullyReady = false;
+    bool shouldIssueFatalAfterPluginCompletes = false;
 
     void registerNewCallback(int iCalledFrom, std::function<void ()> f)
     {
@@ -108,6 +109,17 @@ namespace PluginManagement {
 #endif
     }
 
+#if LINK_WITH_PYTHON == 1
+    std::string pythonStringForUsage() {
+        std::string sVersion = Py_GetVersion();
+        return "Linked to Python Version: \"" + sVersion + "\"";
+    }
+#else
+    std::string pythonStringForUsage() {
+        return "This version of EnergyPlus not linked to Python library.";
+    }
+#endif
+
     void PluginManager::setupOutputVariables() {
 #if LINK_WITH_PYTHON == 1
         // with the PythonPlugin:Variables all set in memory, we can now set them up as outputs as needed
@@ -130,7 +142,7 @@ namespace PluginManagement {
                 std::string updateFreq = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("update_frequency"));
                 std::string units;
                 if (fields.find("units") != fields.end()) {
-                    units = fields.at("units");
+                    units = fields.at("units").get<std::string>();
                 }
                 // get the index of the global variable, fatal if it doesn't mach one
                 // validate type of data, update frequency, and look up units enum value
@@ -190,7 +202,7 @@ namespace PluginManagement {
                         EnergyPlus::ShowSevereError("Input error on PythonPlugin:OutputVariable = " + thisObjectName);
                         EnergyPlus::ShowContinueError("The variable was marked as metered, but did not define a resource type");
                         EnergyPlus::ShowContinueError("For metered variables, the resource type, group type, and end use category must be defined");
-                        EnergyPlus::ShowFatalError("Input error on PythonPlugin::OutputVariable causes program termination");
+                        EnergyPlus::ShowFatalError("Input error on PythonPlugin:OutputVariable causes program termination");
                     }
                     std::string const resourceType = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("resource_type"));
                     std::string sResourceType;
@@ -250,7 +262,7 @@ namespace PluginManagement {
                         EnergyPlus::ShowSevereError("Input error on PythonPlugin:OutputVariable = " + thisObjectName);
                         EnergyPlus::ShowContinueError("The variable was marked as metered, but did not define a group type");
                         EnergyPlus::ShowContinueError("For metered variables, the resource type, group type, and end use category must be defined");
-                        EnergyPlus::ShowFatalError("Input error on PythonPlugin::OutputVariable causes program termination");
+                        EnergyPlus::ShowFatalError("Input error on PythonPlugin:OutputVariable causes program termination");
                     }
                     std::string const groupType = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("group_type"));
                     std::string sGroupType;
@@ -272,7 +284,7 @@ namespace PluginManagement {
                         EnergyPlus::ShowSevereError("Input error on PythonPlugin:OutputVariable = " + thisObjectName);
                         EnergyPlus::ShowContinueError("The variable was marked as metered, but did not define an end-use category");
                         EnergyPlus::ShowContinueError("For metered variables, the resource type, group type, and end use category must be defined");
-                        EnergyPlus::ShowFatalError("Input error on PythonPlugin::OutputVariable causes program termination");
+                        EnergyPlus::ShowFatalError("Input error on PythonPlugin:OutputVariable causes program termination");
                     }
                     std::string const endUse = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("end_use_category"));
                     std::string sEndUse;
@@ -340,7 +352,7 @@ namespace PluginManagement {
 
                     std::string sEndUseSubcategory;
                     if (fields.find("end_use_subcategory") != fields.end()) {
-                        sEndUseSubcategory = fields.at("end_use_subcategory");
+                        sEndUseSubcategory = fields.at("end_use_subcategory").get<std::string>();
                     }
 
                     if (sEndUseSubcategory.empty()) { // no subcategory
@@ -387,6 +399,7 @@ namespace PluginManagement {
         plugins.clear();
         pluginManager.reset(); // delete the current plugin manager instance, which was created in simulation manager, this clean up Python
         PluginManagement::fullyReady = false;
+        PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
 #endif
     }
 
@@ -404,6 +417,7 @@ namespace PluginManagement {
         FileSystem::makeNativePath(pathToPythonPackages);
         auto a = Py_DecodeLocale(pathToPythonPackages.c_str(), nullptr);
         Py_SetPath(a);
+        Py_SetPythonHome(a);
 
         // now that we have set the path, we can initialize python
         // from https://docs.python.org/3/c-api/init.html
@@ -520,19 +534,19 @@ namespace PluginManagement {
                 inputProcessor->markObjectAsUsed(sGlobals, thisObjectName);
                 // TODO: Make this an extensible object
                 if (fields.find("variable_name_1") != fields.end()) {
-                    PluginManager::addGlobalVariable(fields.at("variable_name_1"));
+                    this->addGlobalVariable(fields.at("variable_name_1"));
                 }
                 if (fields.find("variable_name_2") != fields.end()) {
-                    PluginManager::addGlobalVariable(fields.at("variable_name_2"));
+                    this->addGlobalVariable(fields.at("variable_name_2"));
                 }
                 if (fields.find("variable_name_3") != fields.end()) {
-                    PluginManager::addGlobalVariable(fields.at("variable_name_3"));
+                    this->addGlobalVariable(fields.at("variable_name_3"));
                 }
                 if (fields.find("variable_name_4") != fields.end()) {
-                    PluginManager::addGlobalVariable(fields.at("variable_name_4"));
+                    this->addGlobalVariable(fields.at("variable_name_4"));
                 }
                 if (fields.find("variable_name_5") != fields.end()) {
-                    PluginManager::addGlobalVariable(fields.at("variable_name_5"));
+                    this->addGlobalVariable(fields.at("variable_name_5"));
                 }
             }
         }
@@ -567,6 +581,7 @@ namespace PluginManagement {
                 int variableIndex = EnergyPlus::PluginManagement::PluginManager::getGlobalVariableHandle(variableName);
                 int numValues = fields.at("number_of_timesteps_to_be_logged");
                 trends.emplace_back(thisObjectName, numValues, variableIndex);
+                this->maxTrendVariableIndex++;
             }
         }
 
@@ -897,6 +912,9 @@ namespace PluginManagement {
                                        ", make sure it returns an integer exit code, either zero (success) or one (failure)");
         }
         Py_DECREF(pFunctionResponse); // PyObject_CallFunction returns new reference, decrement
+        if (EnergyPlus::PluginManagement::shouldIssueFatalAfterPluginCompletes) {
+            EnergyPlus::ShowFatalError("API problems encountered while running plugin cause program termination.");
+        }
     }
 #else
     void PluginInstance::run(int EP_UNUSED(iCalledFrom)) {}
@@ -920,10 +938,11 @@ namespace PluginManagement {
 #endif
 
 #if LINK_WITH_PYTHON == 1
-    void PluginManager::addGlobalVariable(const std::string &name) {
+    void PluginManager:: addGlobalVariable(const std::string &name) {
         std::string const varNameUC = EnergyPlus::UtilityRoutines::MakeUPPERCase(name);
         PluginManagement::globalVariableNames.push_back(varNameUC);
         PluginManagement::globalVariableValues.push_back(Real64());
+        this->maxGlobalVariableIndex++;
     }
 #else
     void PluginManager::addGlobalVariable(const std::string &EP_UNUSED(name)) {}
@@ -1070,7 +1089,7 @@ namespace PluginManagement {
 #if LINK_WITH_PYTHON == 1
     Real64 PluginManager::getGlobalVariableValue(int handle) {
         if (PluginManagement::globalVariableValues.empty()) {
-            EnergyPlus::ShowFatalError("Tried to access plugin global variable but it looks like there aren't any; use the PythonPlugin:GlobalVariables object to declare them.");
+            EnergyPlus::ShowFatalError("Tried to access plugin global variable but it looks like there aren't any; use the PythonPlugin:Variables object to declare them.");
         }
         try {
             return PluginManagement::globalVariableValues[handle];
@@ -1122,6 +1141,32 @@ namespace PluginManagement {
     }
 #else
     void PluginManager::runSingleUserDefinedPlugin(int EP_UNUSED(index)) {}
+#endif
+
+#if LINK_WITH_PYTHON == 1
+    bool PluginManager::anyUnexpectedPluginObjects() {
+        static std::vector<std::string> objectsToFind = {
+            "PythonPlugin:OutputVariable",
+            "PythonPlugin:SearchPaths",
+            "PythonPlugin:Instance",
+            "PythonPlugin:Variables",
+            "PythonPlugin:TrendVariable"
+        };
+        int numTotalThings = 0;
+        for (auto const &objToFind : objectsToFind) {
+            int instances = inputProcessor->getNumObjectsFound(objToFind);
+            numTotalThings += instances;
+            if (numTotalThings == 1) {
+                ShowSevereMessage("Found PythonPlugin objects in an IDF that is running in an API/Library workflow...this is invalid");
+            }
+            if (instances > 0) {
+                ShowContinueError("Invalid PythonPlugin object type: " + objToFind);
+            }
+        }
+        return numTotalThings > 0;
+    }
+#else
+    bool PluginManager::anyUnexpectedPluginObjects() {return false;}
 #endif
 
 } // namespace PluginManagement
