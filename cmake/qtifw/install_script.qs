@@ -9,15 +9,20 @@ NOTE: By running a silent install, you agree to the EnergyPlus License Agreement
 Usage:
 
 ```
+# You can get the latest version of this script by doing something similar to:
+wget https://raw.githubusercontent.com/NREL/EnergyPlus/develop/cmake/qtifw/install_script.qs
+# Windows Powershell
+wget https://raw.githubusercontent.com/NREL/EnergyPlus/develop/cmake/qtifw/install_script.qs -OutFile install_script.qs
+
 # Linux
-sudo ./EnergyPlus-9.2.0-0e6e9c08a0-Linux-x86_64.run --verbose --platform minimal --script install_script.qs
+sudo ./EnergyPlus-9.2.0-0e6e9c08a0-Linux-x86_64.run --verbose --platform minimal --script /path/to/install_script.qs
 
 # Mac: `--plaftorm minimal` appears to produce a segmentation fault
 open EnergyPlus-9.2.0-0e6e9c08a0-Darwin-x86_64.dmg
-sudo /Volumes/EnergyPlus-9.2.0-0e6e9c08a0-Darwin-x86_64/EnergyPlus-9.2.0-0e6e9c08a0-Darwin-x86_64.app/Contents/MacOS/EnergyPlus-9.2.0-0e6e9c08a0-Darwin-x86_64 --verbose --script install_script.qs
+sudo /Volumes/EnergyPlus-9.2.0-0e6e9c08a0-Darwin-x86_64/EnergyPlus-9.2.0-0e6e9c08a0-Darwin-x86_64.app/Contents/MacOS/EnergyPlus-9.2.0-0e6e9c08a0-Darwin-x86_64 --verbose --script /path/to/install_script.qs
 
 # Windows: open cmd.exe as admin: `--platform minimal` appears unsupported (but we use gui.setSilent(true) so nothing will pop up)
-EnergyPlus-9.2.0-0e6e9c08a0-Windows-x86_64.exe --verbose --script install_script.qs
+EnergyPlus-9.2.0-0e6e9c08a0-Windows-x86_64.exe --verbose --script /path/to/install_script.qs
 ```
 
 You can also customize the install directory by passing `TargetDir`
@@ -27,7 +32,7 @@ If you don't, it defaults to:
 * Windows: `C:\EnergyPlusV9-2-0`
 
 ```
- sudo ./EnergyPlus-9.2.0-0e6e9c08a0-Linux-x86_64.run --verbose --platform minimal --script install_script.qs TargetDir=/usr/local/Eplus
+ sudo ./EnergyPlus-9.2.0-0e6e9c08a0-Linux-x86_64.run --verbose --platform minimal --script /path/to/install_script.qs TargetDir=/usr/local/Eplus
 ```
 
 By default, all components will be installed.
@@ -36,13 +41,13 @@ We also built-in a way to unselect components via the command line by passing
 
 Unix:
 ```
- sudo ./EnergyPlus-9.2.0-0e6e9c08a0-Linux-x86_64.run --verbose --platform minimal --script install_script.qs Documentation=false ExampleFiles=false WeatherData=false Datasets=false Symlinks=false
+ sudo ./EnergyPlus-9.2.0-0e6e9c08a0-Linux-x86_64.run --verbose --platform minimal --script /path/to/install_script.qs Documentation=false ExampleFiles=false WeatherData=false Datasets=false Symlinks=false
 ```
 
 Windows: Open cmd.exe as admin
 
 ```
-EnergyPlus-9.2.0-0e6e9c08a0-Windows-x86_64.exe --verbose --script install_script.qs Documentation=false ExampleFiles=false WeatherData=false Datasets=false CreateStartMenu=false RegisterFileType=false
+EnergyPlus-9.2.0-0e6e9c08a0-Windows-x86_64.exe --verbose --script /path/to/install_script.qs Documentation=false ExampleFiles=false WeatherData=false Datasets=false CreateStartMenu=false RegisterFileType=false
 ```
 
 On Windows only, if CreateStartMenu is true (default), there is a built-in option `AllUsers=true`
@@ -50,7 +55,7 @@ which will in particular create the shortcuts in the All Users start menu (C:\Pr
 which is useful if you use SCCM (or psexec) to run the commands as you are LOCAL SYSTEM account when you do and these shortcuts won't work for the regular user
 
 ```
-EnergyPlus-9.2.0-0e6e9c08a0-Windows-x86_64.exe --verbose --script install_script.qs AllUsers=true
+EnergyPlus-9.2.0-0e6e9c08a0-Windows-x86_64.exe --verbose --script /path/to/install_script.qs AllUsers=true
 ```
 
 -------------------------------------------------------------------------------
@@ -62,13 +67,13 @@ complete uninstall
 
 ```
 # Linux
-sudo /usr/local/EnergyPlus-9-2-0/maintenancetool --verbose --plaftorm minimal --script install_script.qs
+sudo /usr/local/EnergyPlus-9-2-0/maintenancetool --verbose --plaftorm minimal --script /path/to/install_script.qs
 
 # Mac: `--platform minimal` appears to produce a segfault right now
-sudo /Applications/EnergyPlus-9-2-0/maintenancetool.app/Contents/MacOS/maintenancetool --verbose --script install_script.qs
+sudo /Applications/EnergyPlus-9-2-0/maintenancetool.app/Contents/MacOS/maintenancetool --verbose --script /path/to/install_script.qs
 
 # Windows: `--platform minimal` appears unsupported at the moment
-C:\EnergyPlusV9-2-0\maintenancetool.exe --verbose --script install_script.qs
+C:\EnergyPlusV9-2-0\maintenancetool.exe --verbose --script /path/to/install_script.qs
 ```
 
 **/
