@@ -142,7 +142,7 @@ namespace PluginManagement {
                 std::string updateFreq = EnergyPlus::UtilityRoutines::MakeUPPERCase(fields.at("update_frequency"));
                 std::string units;
                 if (fields.find("units") != fields.end()) {
-                    units = fields.at("units");
+                    units = fields.at("units").get<std::string>();
                 }
                 // get the index of the global variable, fatal if it doesn't mach one
                 // validate type of data, update frequency, and look up units enum value
@@ -352,7 +352,7 @@ namespace PluginManagement {
 
                     std::string sEndUseSubcategory;
                     if (fields.find("end_use_subcategory") != fields.end()) {
-                        sEndUseSubcategory = fields.at("end_use_subcategory");
+                        sEndUseSubcategory = fields.at("end_use_subcategory").get<std::string>();
                     }
 
                     if (sEndUseSubcategory.empty()) { // no subcategory
