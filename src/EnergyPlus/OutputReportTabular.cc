@@ -7536,12 +7536,12 @@ namespace OutputReportTabular {
         Array2D_string tableBody;
 
         // all arrays are in the format: (row, columnm)
-        Array2D<Real64> useVal(6, 15);
-        Array2D<Real64> normalVal(6, 4);
+        Array2D<Real64> useVal(13, 15);
+        Array2D<Real64> normalVal(13, 4);
         Array1D<Real64> collapsedTotal(13);
         Array2D<Real64> collapsedEndUse(13, NumEndUses);
         Array3D<Real64> collapsedEndUseSub(MaxNumSubcategories, NumEndUses, 13);
-        Array2D<Real64> endUseSubOther(6, NumEndUses);
+        Array2D<Real64> endUseSubOther(13, NumEndUses);
         Real64 totalOnsiteHeat;
         Real64 totalOnsiteWater;
         Real64 totalWater;
@@ -8182,9 +8182,9 @@ namespace OutputReportTabular {
             //---- End Use Sub-Table
             rowHead.allocate(16);
             columnHead.allocate(13);
-            columnWidth.allocate(6);
-            columnWidth = 14; // array assignment - same for all columns
-            tableBody.allocate(6, 16);
+            columnWidth.allocate(13);
+            columnWidth = 7; // array assignment - same for all columns
+            tableBody.allocate(13, 16);
             for (iResource = 1; iResource <= 13; ++iResource) {
                 useVal(iResource, 1) = collapsedEndUse(iResource, endUseHeating);
                 useVal(iResource, 2) = collapsedEndUse(iResource, endUseCooling);
@@ -8469,9 +8469,9 @@ namespace OutputReportTabular {
 
             rowHead.allocate(numRows);
             columnHead.allocate(14);
-            columnWidth.allocate(7);
-            columnWidth = 14;               // array assignment - same for all columns
-            tableBody.allocate(7, numRows); // TODO: this appears to be (column, row)...
+            columnWidth.allocate(14);
+            columnWidth = 7;               // array assignment - same for all columns
+            tableBody.allocate(14, numRows); // TODO: this appears to be (column, row)...
             rowHead = "";
             tableBody = "";
 
@@ -8651,9 +8651,9 @@ namespace OutputReportTabular {
             // Calculations for both normalized tables are first
             rowHead.allocate(4);
             columnHead.allocate(13);
-            columnWidth.allocate(6);
-            columnWidth = 14; // array assignment - same for all columns
-            tableBody.allocate(6, 4);
+            columnWidth.allocate(13);
+            columnWidth = 7; // array assignment - same for all columns
+            tableBody.allocate(13, 4);
             for (iResource = 1; iResource <= 13; ++iResource) {
                 normalVal(iResource, 1) = collapsedEndUse(iResource, endUseInteriorLights) +
                                           collapsedEndUse(iResource, endUseExteriorLights); // Lights     <- InteriorLights | <- ExteriorLights
@@ -9997,21 +9997,14 @@ namespace OutputReportTabular {
             }
 
             Array1D_int resource_entry_map;
-            resource_entry_map.allocate(12);
-            resource_entry_map(1) = pdchLeedPerfElDem;             // electricity
-            resource_entry_map(2) = pdchLeedPerfGasDem;            // natural gas
-            resource_entry_map(3) = pdchLeedPerfPropaneEneUse;     // Propane
-            resource_entry_map(4) = pdchLeedPerfGasolineEneUse;    // Gasoline
-            resource_entry_map(5) = pdchLeedPerfDieselEneUse;      // Diesel
-            resource_entry_map(6) = pdchLeedPerfCoalEneUse;        // Coal
-            resource_entry_map(7) = pdchLeedPerfFuelOil1EneUse;    // Fuel oil No.1
-            resource_entry_map(8) = pdchLeedPerfFuelOil2EneUse;    // Fuel oil No.2
-            resource_entry_map(9) = pdchLeedPerfOtherFuel1EneUse;  // Other fuel 1
-            resource_entry_map(10) = pdchLeedPerfOtherFuel2EneUse; // Other fuel 2
-            resource_entry_map(11) = pdchLeedPerfDisClEneUse;      // district cooling
-            resource_entry_map(12) = pdchLeedPerfDisHtEneUse;      // district heating
+            resource_entry_map.allocate(5);
+            resource_entry_map(1) = pdchLeedPerfElDem;      // electricity
+            resource_entry_map(2) = pdchLeedPerfGasDem;     // natural gas
+            resource_entry_map(3) = pdchLeedPerfAddFuelDem; // additional fuel
+            resource_entry_map(4) = pdchLeedPerfDisClDem;   // district cooling
+            resource_entry_map(5) = pdchLeedPerfDisHtDem;   // district heating
 
-            for (iResource = 1; iResource <= 12; ++iResource) {
+            for (iResource = 1; iResource <= 5; ++iResource) {
                 i = 1;
                 for (jEndUse = 1; jEndUse <= NumEndUses; ++jEndUse) {
                     if (EndUseCategory(jEndUse).NumSubcategories > 0) {
