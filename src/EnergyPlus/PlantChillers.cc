@@ -1792,6 +1792,11 @@ namespace PlantChillers {
 
         static std::string const RoutineName("ChillerHeatRecovery");
 
+        // setup initial state
+        PlantUtilities::SafeCopyPlantNode(this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum);
+        this->QHeatRecovery = 0.0;
+        this->EnergyHeatRecovery = 0.0;
+
         // Begin routine
         this->HeatRecInletTemp = DataLoopNode::Node(this->HeatRecInletNodeNum).Temp;
         Real64 HeatRecMassFlowRate = DataLoopNode::Node(this->HeatRecInletNodeNum).MassFlowRate;
@@ -1854,6 +1859,13 @@ namespace PlantChillers {
         } else {
             this->HeatRecOutletTemp = this->HeatRecInletTemp;
         }
+
+        this->QHeatRecovery = this->QHeatRecovered;
+        this->EnergyHeatRecovery = this->QHeatRecovered * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
+        DataLoopNode::Node(this->HeatRecOutletNodeNum).Temp = this->HeatRecOutletTemp;
+        this->HeatRecMdot = DataLoopNode::Node(this->HeatRecInletNodeNum).MassFlowRate;
+        this->ChillerCondAvgTemp = this->AvgCondSinkTemp;
+
     }
 
     void ElectricChillerSpecs::update(Real64 const MyLoad, bool const RunFlag)
@@ -1886,9 +1898,6 @@ namespace PlantChillers {
             if (this->HeatRecActive) {
 
                 PlantUtilities::SafeCopyPlantNode(this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum);
-
-                this->QHeatRecovery = 0.0;
-                this->EnergyHeatRecovery = 0.0;
                 this->HeatRecInletTemp = DataLoopNode::Node(this->HeatRecInletNodeNum).Temp;
                 this->HeatRecOutletTemp = DataLoopNode::Node(this->HeatRecOutletNodeNum).Temp;
                 this->HeatRecMdot = DataLoopNode::Node(this->HeatRecInletNodeNum).MassFlowRate;
@@ -1918,17 +1927,6 @@ namespace PlantChillers {
                 this->ActualCOP = this->QEvaporator / this->Power;
             } else {
                 this->ActualCOP = 0.0;
-            }
-
-            if (this->HeatRecActive) {
-
-                PlantUtilities::SafeCopyPlantNode(this->HeatRecInletNodeNum, this->HeatRecOutletNodeNum);
-                this->QHeatRecovery = this->QHeatRecovered;
-                this->EnergyHeatRecovery = this->QHeatRecovered * DataHVACGlobals::TimeStepSys * DataGlobals::SecInHour;
-                DataLoopNode::Node(this->HeatRecOutletNodeNum).Temp = this->HeatRecOutletTemp;
-                this->HeatRecInletTemp = DataLoopNode::Node(this->HeatRecInletNodeNum).Temp;
-                this->HeatRecMdot = DataLoopNode::Node(this->HeatRecInletNodeNum).MassFlowRate;
-                this->ChillerCondAvgTemp = this->AvgCondSinkTemp;
             }
         }
     }
