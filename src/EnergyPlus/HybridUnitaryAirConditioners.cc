@@ -100,6 +100,14 @@ namespace HybridUnitaryAirConditioners {
     bool GetInputZoneHybridEvap(true);
     bool ZoneEquipmentListChecked(false);
 
+    void clear_state() {
+        ZoneHybridUnitaryAirConditioner.deallocate();
+        NumZoneHybridEvap = 0;
+        CheckZoneHybridEvapName.deallocate();
+        GetInputZoneHybridEvap = true;
+        ZoneEquipmentListChecked = false;
+    }
+
     // Begin routines for zone HVAC Hybrid Evaporative cooler unit
     //_______________________________________________________________________________________________________________________
     //***************

@@ -8026,6 +8026,7 @@ namespace PackagedTerminalHeatPump {
         }
 
         if (CoolingLoad && OutsideDryBulbTemp > PTUnit(PTUnitNum).MinOATCompressorCooling) {
+
             SimVariableSpeedCoils(BlankString,
                                   PTUnit(PTUnitNum).DXCoolCoilIndexNum,
                                   PTUnit(PTUnitNum).OpMode,
