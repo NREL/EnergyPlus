@@ -3884,7 +3884,7 @@ namespace ConvectionCoefficients {
         }
 
         // Establish some lower limit to avoid a zero convection coefficient (and potential divide by zero problems)
-        HConvIn(SurfNum) = min(HConvIn(SurfNum), LowHConvLimit);
+        HConvIn(SurfNum) = max(HConvIn(SurfNum), LowHConvLimit);
     }
 
     Real64 CalcASHRAETARPNatural(Real64 const Tsurf, Real64 const Tamb, Real64 const cosTilt)
