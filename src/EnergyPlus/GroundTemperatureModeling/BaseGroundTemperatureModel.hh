@@ -51,6 +51,7 @@
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
+#include <EnergyPlus/OutputFiles.hh>
 
 namespace EnergyPlus {
 
@@ -63,14 +64,14 @@ public:
     std::string objectName;
     bool errorsFound;
 
-    // Destructor
-    virtual ~BaseGroundTempsModel()
-    {
-    }
+    virtual ~BaseGroundTempsModel() = default;
+    BaseGroundTempsModel(const BaseGroundTempsModel &) = delete;
+    BaseGroundTempsModel(BaseGroundTempsModel &&) = delete;
+    BaseGroundTempsModel &operator=(const BaseGroundTempsModel &) = delete;
+    BaseGroundTempsModel &operator=(BaseGroundTempsModel &&) = delete;
 
     // Default Constructor
     BaseGroundTempsModel() : objectType(0), errorsFound(false)
-
     {
     }
 
@@ -80,6 +81,19 @@ public:
     virtual Real64 getGroundTempAtTimeInSeconds(Real64 const, Real64 const) = 0;
 
     virtual Real64 getGroundTempAtTimeInMonths(Real64 const, int const) = 0;
+
+protected:
+    static void write_ground_temps(OutputFile &os, const std::string &name, const Array1D<Real64> &data)
+    {
+        print(os,
+              "! <Site:GroundTemperature:{}>,Jan{{C}},Feb{{C}},Mar{{C}},Apr{{C}},May{{C}},Jun{{C}},Jul{{C}},Aug{{C}},Sep{{C}},Oct{{C}},Nov{{C}},Dec{{C}}\n", name);
+        print(os, " Site:GroundTemperature:{}", name);
+        for (int i = 1; i <= 12; ++i) {
+            print(os, ", {:6.2F}", data(i));
+        }
+        print(os, "\n");
+    }
+
 };
 
 } // namespace EnergyPlus

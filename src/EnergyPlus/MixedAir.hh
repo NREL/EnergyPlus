@@ -58,6 +58,7 @@
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class OutputFiles;
 
 namespace MixedAir {
 
@@ -86,7 +87,6 @@ namespace MixedAir {
     extern int const OAMixer_Num;
     extern int const Fan_Simple_CV;
     extern int const Fan_Simple_VAV;
-    extern int const Fan_System_Object;
     extern int const WaterCoil_SimpleCool;
     extern int const WaterCoil_Cooling;
     extern int const WaterCoil_SimpleHeat;
@@ -104,8 +104,10 @@ namespace MixedAir {
     extern int const Fan_ComponentModel; // cpw22Aug2010 (new)
     extern int const DXHeatPumpSystem;
     extern int const Coil_UserDefined;
-    extern int const UnitarySystem;
     extern int const Humidifier;
+    extern int const Fan_System_Object;
+    extern int const UnitarySystem;
+    extern int const VRFTerminalUnit;
 
     extern int const ControllerOutsideAir;
     extern int const ControllerStandAloneERV;
@@ -458,7 +460,7 @@ namespace MixedAir {
 
     void GetOutsideAirSysInputs();
 
-    void GetOAControllerInputs();
+    void GetOAControllerInputs(OutputFiles &outputFiles);
 
     void AllocateOAControllers();
 
@@ -466,14 +468,14 @@ namespace MixedAir {
 
     void ProcessOAControllerInputs(std::string const &CurrentModuleObject,
                                    int const OutAirNum,
-                                   Array1_string const &AlphArray,
+                                   Array1D_string const &AlphArray,
                                    int &NumAlphas,
-                                   Array1<Real64> const &NumArray,
+                                   Array1D<Real64> const &NumArray,
                                    int &NumNums,
-                                   Array1_bool const &lNumericBlanks, // Unused
-                                   Array1_bool const &lAlphaBlanks,
-                                   Array1_string const &cAlphaFields,
-                                   Array1_string const &cNumericFields, // Unused
+                                   Array1D_bool const &lNumericBlanks, // Unused
+                                   Array1D_bool const &lAlphaBlanks,
+                                   Array1D_string const &cAlphaFields,
+                                   Array1D_string const &cNumericFields, // Unused
                                    bool &ErrorsFound                    // If errors found in input
     );
 
@@ -519,12 +521,12 @@ namespace MixedAir {
     // Beginning Utility Section of the Module
     //******************************************************************************
 
-    Real64 MixedAirControlTempResidual(Real64 const OASignal,    // Relative outside air flow rate (0 to 1)
-                                       Array1<Real64> const &Par // par(1) = mixed node number
+    Real64 MixedAirControlTempResidual(Real64 const OASignal,     // Relative outside air flow rate (0 to 1)
+                                       Array1D<Real64> const &Par // par(1) = mixed node number
     );
 
-    Real64 MultiCompControlTempResidual(Real64 const OASignal,    // Relative outside air flow rate (0 to 1)
-                                        Array1<Real64> const &Par // par(1) = mixed node number
+    Real64 MultiCompControlTempResidual(Real64 const OASignal,     // Relative outside air flow rate (0 to 1)
+                                        Array1D<Real64> const &Par // par(1) = mixed node number
     );
 
     Array1D_int GetOAMixerNodeNumbers(std::string const &OAMixerName, // must match OA mixer names for the OA mixer type

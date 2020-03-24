@@ -55,10 +55,11 @@
 #include <EnergyPlus/CurveManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/Psychrometrics.hh>
 #include <EnergyPlus/StandardRatings.hh>
 #include <EnergyPlus/ChillerElectricEIR.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 
 using namespace EnergyPlus;
 using namespace EnergyPlus::StandardRatings;
@@ -278,7 +279,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTest)
     PerfCurve(CurveNum).Var1Max = 10;
     PerfCurve(CurveNum).Var2Min = 23.89;
     PerfCurve(CurveNum).Var2Max = 46.11;
-    ChillerElectricEIR::ElectricEIRChiller(1).ChillerCapFT = 1;
+    ChillerElectricEIR::ElectricEIRChiller(1).ChillerCapFTIndex = 1;
 
     // EIR=f(T)
     CurveNum = 2;
@@ -297,7 +298,7 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTest)
     PerfCurve(CurveNum).Var1Max = 10;
     PerfCurve(CurveNum).Var2Min = 10;
     PerfCurve(CurveNum).Var2Max = 46.11;
-    ChillerElectricEIR::ElectricEIRChiller(1).ChillerEIRFT = 2;
+    ChillerElectricEIR::ElectricEIRChiller(1).ChillerEIRFTIndex = 2;
 
     // EIR=f(PLR)
     CurveNum = 3;
@@ -312,19 +313,23 @@ TEST_F(EnergyPlusFixture, ChillerIPLVTest)
     PerfCurve(CurveNum).Coeff4 = 0.412199944;
     PerfCurve(CurveNum).Var1Min = 0;
     PerfCurve(CurveNum).Var1Max = 1;
-    ChillerElectricEIR::ElectricEIRChiller(1).ChillerEIRFPLR = 3;
+    ChillerElectricEIR::ElectricEIRChiller(1).ChillerEIRFPLRIndex = 3;
 
     Real64 IPLV;
-    CalcChillerIPLV(ChillerElectricEIR::ElectricEIRChiller(1).Name,
-                    TypeOf_Chiller_ElectricEIR, 
-                    ChillerElectricEIR::ElectricEIRChiller(1).RefCap, 
-                    ChillerElectricEIR::ElectricEIRChiller(1).RefCOP, 
+    CalcChillerIPLV(OutputFiles::getSingleton(),
+                    ChillerElectricEIR::ElectricEIRChiller(1).Name,
+                    TypeOf_Chiller_ElectricEIR,
+                    ChillerElectricEIR::ElectricEIRChiller(1).RefCap,
+                    ChillerElectricEIR::ElectricEIRChiller(1).RefCOP,
                     ChillerElectricEIR::ElectricEIRChiller(1).CondenserType,
-                    ChillerElectricEIR::ElectricEIRChiller(1).ChillerCapFT,
-                    ChillerElectricEIR::ElectricEIRChiller(1).ChillerEIRFT,
-                    ChillerElectricEIR::ElectricEIRChiller(1).ChillerEIRFPLR,
+                    ChillerElectricEIR::ElectricEIRChiller(1).ChillerCapFTIndex,
+                    ChillerElectricEIR::ElectricEIRChiller(1).ChillerEIRFTIndex,
+                    ChillerElectricEIR::ElectricEIRChiller(1).ChillerEIRFPLRIndex,
                     ChillerElectricEIR::ElectricEIRChiller(1).MinUnloadRat,
-                    IPLV);
+                    IPLV,
+                    Optional<const Real64>(),
+                    ObjexxFCL::Optional_int_const(),
+                    Optional<const Real64>());
 
     EXPECT_DOUBLE_EQ(round(IPLV * 100) / 100, 3.87); // 13.20 IPLV
 

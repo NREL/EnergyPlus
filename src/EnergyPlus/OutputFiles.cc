@@ -48,18 +48,126 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/OutputFiles.hh>
 
+#include "DataStringGlobals.hh"
 #include <ObjexxFCL/gio.hh>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
 namespace EnergyPlus {
+
+std::ostream &open_out_stream(int const fileID, const std::string &fileName)
+{
+    IOFlags flags;
+    flags.ACTION("write");
+    flags.STATUS("UNKNOWN");
+    flags.POSITION("APPEND");
+    ObjexxFCL::gio::open(fileID, fileName, flags);
+    return *ObjexxFCL::gio::out_stream(fileID);
+}
+
+std::ostream &get_out_stream(int const FileID, const std::string &fileName)
+{
+    if (!ObjexxFCL::gio::out_stream(FileID)) {
+        return open_out_stream(FileID, fileName);
+    } else {
+        return *ObjexxFCL::gio::out_stream(FileID);
+    }
+}
+
+bool OutputFile::good() const
+{
+    if (os) {
+        return os->good();
+    } else {
+        return false;
+    }
+}
+
+void OutputFile::close()
+{
+    os.reset();
+}
+
+void OutputFile::del()
+{
+    if (os) {
+        os.reset();
+        std::remove(fileName.c_str());
+    }
+}
+
+void OutputFile::open_as_stringstream()
+{
+    os = std::unique_ptr<std::iostream>(new std::stringstream());
+}
+
+std::string OutputFile::get_output()
+{
+    auto *ss = dynamic_cast<std::stringstream *>(os.get());
+    if (ss) {
+        return ss->str();
+    } else {
+        return "";
+    }
+}
+
+OutputFile::OutputFile(std::string FileName) : fileName(std::move(FileName))
+{
+}
+
+void OutputFile::open()
+{
+    os = std::unique_ptr<std::iostream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::out | std::ios_base::trunc));
+}
+
+std::vector<std::string> OutputFile::getLines()
+{
+    if (os) {
+        // avoid saving and reloading the file by simply reading the current input stream
+        os->flush();
+        const auto last_pos = os->tellg();
+        std::string line;
+        std::vector<std::string> lines;
+        os->seekg(0);
+
+        while (std::getline(*os, line)) {
+            lines.push_back(line);
+        }
+
+        // after getline is done, we're at eof/fail bit
+        os->clear();
+        os->seekg(last_pos);
+        return lines;
+    }
+    return std::vector<std::string>();
+}
+
+void OutputFile::open_at_end()
+{
+    os = std::unique_ptr<std::iostream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::out | std::ios_base::ate));
+}
+
+OutputFiles::GIOOutputFile::GIOOutputFile(int const FileID, std::string FileName)
+    : fileID{FileID}, fileName{std::move(FileName)}, os{get_out_stream(FileID, FileName)}
+{
+}
+
+void OutputFiles::GIOOutputFile::close()
+{
+    ObjexxFCL::gio::close(fileID);
+}
+
+void OutputFiles::GIOOutputFile::open_at_end()
+{
+    os = open_out_stream(fileID, fileName);
+}
+
 OutputFiles OutputFiles::makeOutputFiles()
 {
-    assert(ObjexxFCL::gio::out_stream(EnergyPlus::DataGlobals::OutputFileInits));
     return OutputFiles();
 }
 
-OutputFiles::OutputFiles() : eio{*ObjexxFCL::gio::out_stream(EnergyPlus::DataGlobals::OutputFileInits)}
+OutputFiles::OutputFiles()
 {
 }
 
@@ -71,41 +179,232 @@ OutputFiles &OutputFiles::getSingleton()
 
 using arg_formatter = fmt::arg_formatter<fmt::buffer_range<char>>;
 
-// A custom argument formatter that formats negative integers as unsigned
-
-// with the ``x`` format specifier.
-
 class custom_arg_formatter : public arg_formatter
 {
 public:
     explicit custom_arg_formatter(fmt::format_context &ctx, fmt::format_parse_context *parse_ctx = nullptr, fmt::format_specs *spec = nullptr)
         : arg_formatter(ctx, parse_ctx, spec)
+
     {
     }
 
     using arg_formatter::operator();
 
-    iterator operator()(Real64 value)
+    static constexpr bool should_be_fixed_output(const Real64 value)
     {
-        if (specs() && specs()->type == 'R') {
-            if (value >= 0.1 || value <= -0.1) {
-                specs()->type = 'F';
-            } else {
-                specs()->type = 'E';
+        return (value >= 0.099999999999999995 || value <= -0.099999999999999995) || (value == 0.0) || (value == -0.0);
+    }
+
+    static bool fixed_will_fit(const Real64 value, const int places)
+    {
+        if (value < 1.0 && value > -1.0) {
+            return true;
+        } else {
+            return static_cast<int>(std::log10(std::abs(value))) < places;
+        }
+    }
+
+    static std::string zero_pad_exponent(std::string str)
+    {
+        // if necessary, pad the exponent with a 0 to match the old formatting from Objexx
+        if (str.size() > 3) {
+            if (!std::isdigit(str[str.size() - 3])) {
+                // wants a 0 inserted
+                str.insert(str.size() - 2, "0");
             }
-            return (*this)(value);
+        }
+        return str;
+    }
+
+    static std::string write_to_string(const Real64 value, fmt::format_specs &specs)
+    {
+        std::string str;
+
+        struct string_ref
+        {
+            std::reference_wrapper<std::string> ref;
+            std::back_insert_iterator<std::string> begin()
+            {
+                return std::back_inserter(ref.get());
+            }
+
+            using value_type = std::string::value_type;
+            using iterator = std::back_insert_iterator<std::string>;
+        };
+
+        fmt::internal::basic_writer<string_ref> bw(string_ref{str});
+        bw.write(value, specs);
+        return str;
+    }
+
+    iterator write_string(const std::string &str)
+    {
+        // write one character at a time to avoid any spec formatting from {fmt}
+        // which may truncate our output otherwise
+        std::for_each(std::begin(str), std::end(str), [&](const char c) { writer().write(c); });
+        return out();
+    }
+
+    iterator operator()(Real64 const value)
+    {
+        if (specs()) {
+            const auto next_float = [](const Real64 value) {
+                if (std::signbit(value)) {
+                    if (value == -0.0) {
+                        return value;
+                    } else {
+                        return std::nextafter(value, std::numeric_limits<decltype(value)>::lowest());
+                    }
+                } else {
+                    if (value == 0.0) {
+                        return value;
+                    } else {
+                        return std::nextafter(value, std::numeric_limits<decltype(value)>::max());
+                    }
+                }
+            };
+
+            // matches Fortran's 'G' format
+            if (specs()->type == 'N') {
+
+                if (should_be_fixed_output(value) && fixed_will_fit(value, specs()->width - 5)) {
+                    specs()->type = 'F';
+
+                    // account for alignment with E formatted
+                    specs()->width -= 4;
+                    if (value == 0.0) {
+                        --specs()->precision;
+                    } else if (value < 1.0 && value > -1.0) {
+                        // No adjustment necessary
+                    } else {
+                        const auto order_of_magnitude = value == 0.0 ? 1 : static_cast<int>(std::log10(std::abs(value)));
+                        specs()->precision -= (order_of_magnitude + 1);
+                    }
+
+                    // if precision adjustment would result in negative, make it 0 to get rounding
+                    // and adjust spacing
+                    if (specs()->precision <= 0) {
+                        specs()->width -= 1;
+                        specs()->precision = 0;
+                    }
+
+                    (*this)(value);
+
+                    // When precision hit 0, add . to match Fortran formatting
+                    if (specs()->precision == 0) {
+                        write_string(".");
+                    }
+
+                    // write the last 4 chars
+                    return write_string("    ");
+                } else {
+                    // The Fortran 'G' format insists on a leading 0, even though
+                    // that actually means losing data
+                    specs()->type = 'E';
+
+                    // 0 pad the end
+                    specs()->alt = true;
+
+                    // reduce the precision to get rounding behavior
+                    --specs()->precision;
+
+                    // multiply by 10 to get the exponent we want
+                    auto str = write_to_string(value * 10, *specs());
+
+                    // swap around the first few characters and add in the leading
+                    // 0 that we need to get the same formatting behavior on the rounded
+                    // value that was acquired from the reduction in precision
+                    auto begin = std::next(std::begin(str), specs()->width - (specs()->precision + 8));
+                    std::swap(*begin, *std::next(begin));
+                    std::advance(begin, 1);
+                    std::swap(*std::next(begin), *std::next(begin, 2));
+                    *begin = '0';
+                    return write_string(str);
+                }
+            } else if (specs()->type == 'R') { // matches RoundSigDigits() behavior
+                // push the value up a tad to get the same rounding behavior as Objexx
+                const auto fixed_output = should_be_fixed_output(value);
+
+                if (fixed_output) {
+                    specs()->type = 'F';
+
+                    if (value > 100000.0) {
+                        const auto digits10 = static_cast<int>(std::log10(value));
+                        // we cannot represent this value to the require precision, truncate the floating
+                        // point portion
+                        if (digits10 + specs()->precision >= std::numeric_limits<decltype(value)>::max_digits10) {
+                            specs()->precision = 0;
+                            // add '.' to match old RoundSigDigits
+                            const auto str = write_to_string(value, *specs()) + '.';
+                            return write_string(str);
+                        } else {
+                            return (*this)(value);
+                        }
+                    } else {
+                        if (value == 0.0 || value == -0.0) {
+                            return (*this)(0.0);
+                        } else {
+                            // nudge up to next rounded value
+                            return (*this)(next_float(next_float(next_float(value))));
+                        }
+                    }
+                } else {
+                    specs()->type = 'E';
+                    return write_string(zero_pad_exponent(write_to_string(next_float(value), *specs())));
+                }
+            } else if (specs()->type == 'T') { // matches TrimSigDigits behavior
+                const auto fixed_output = should_be_fixed_output(value);
+
+                if (fixed_output) {
+                    const auto magnitude = std::pow(10, specs()->precision);
+                    const auto adjusted = (value * magnitude) + 0.0001;
+                    const auto truncated = std::trunc(adjusted) / magnitude;
+                    specs()->type = 'F';
+                    return (*this)(truncated);
+                } else {
+                    specs()->type = 'E';
+                    specs()->precision += 2;
+
+                    // write the `E` formatted float to a std::string
+                    auto str = zero_pad_exponent(write_to_string(value, *specs()));
+
+                    // Erase last 2 numbers to truncate the value
+                    const auto E_itr = std::find(begin(str), end(str), 'E');
+                    if (E_itr != str.end()) {
+                        str.erase(std::prev(E_itr, 2), E_itr);
+                    }
+
+                    return write_string(str);
+                }
+            }
         }
         return arg_formatter::operator()(value);
     }
-};
+}; // namespace EnergyPlus
 
-void vprint(std::ostream &os, fmt::string_view format_str, fmt::format_args args)
+void vprint(std::ostream &os, fmt::string_view format_str, fmt::format_args args, const std::size_t count)
 {
+    assert(os.good());
     fmt::memory_buffer buffer;
-    // Pass custom argument formatter as a template arg to vformat_to.
-    fmt::vformat_to<custom_arg_formatter>(buffer, format_str, args);
+    try {
+        // Pass custom argument formatter as a template arg to vformat_to.
+        fmt::vformat_to<custom_arg_formatter>(buffer, format_str, args);
+    } catch (const fmt::format_error &) {
+        throw fmt::format_error(fmt::format("Error with format, '{}', passed {} args", format_str, count));
+    }
     os.write(buffer.data(), buffer.size());
 }
 
-} // namespace EnergyPlus
+std::string vprint(fmt::string_view format_str, fmt::format_args args, const std::size_t count)
+{
+    fmt::memory_buffer buffer;
+    try {
+        // Pass custom argument formatter as a template arg to vformat_to.
+        fmt::vformat_to<custom_arg_formatter>(buffer, format_str, args);
+    } catch (const fmt::format_error &) {
+        throw fmt::format_error(fmt::format("Error with format, '{}', passed {} args", format_str, count));
+    }
+    return fmt::to_string(buffer);
+}
 
+} // namespace EnergyPlus

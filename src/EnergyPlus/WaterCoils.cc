@@ -51,7 +51,6 @@
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
 #include <ObjexxFCL/Fmath.hh>
-#include <ObjexxFCL/gio.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/BranchNodeConnections.hh>
@@ -62,7 +61,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataIPShortCuts.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataWater.hh>
@@ -76,6 +75,7 @@
 #include <EnergyPlus/HVACHXAssistedCoolingCoil.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/NodeInputManager.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/PlantUtilities.hh>
@@ -127,7 +127,7 @@ namespace WaterCoils {
     using DataPlant::TypeOf_CoilWaterSimpleHeating;
     using FluidProperties::GetDensityGlycol;
     using FluidProperties::GetSpecificHeatGlycol;
-    using Psychrometrics::PsyCpAirFnWTdb;
+    using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyHFnTdbRhPb;
     using Psychrometrics::PsyHFnTdbW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
@@ -300,7 +300,7 @@ namespace WaterCoils {
         }
 
         // With the correct CoilNum Initialize
-        InitWaterCoil(CoilNum, FirstHVACIteration); // Initialize all WaterCoil related parameters
+        InitWaterCoil(OutputFiles::getSingleton(), CoilNum, FirstHVACIteration); // Initialize all WaterCoil related parameters
 
         if (present(FanOpMode)) {
             OpMode = FanOpMode;
@@ -389,7 +389,6 @@ namespace WaterCoils {
         static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
         //  certain object in the input file
         static bool ErrorsFound(false); // If errors detected in input
-        static int j1(0);
 
         // Flow
         NumSimpHeat = inputProcessor->getNumObjectsFound("Coil:Heating:Water");
@@ -941,18 +940,6 @@ namespace WaterCoils {
             }
         }
 
-        // added to store FouledCoilID for simple water heating and cooling coils
-        for (CoilNum = 1; CoilNum <= NumWaterCoils; ++CoilNum) {
-            if (WaterCoil(CoilNum).WaterCoilType_Num == WaterCoil_Cooling || WaterCoil(CoilNum).WaterCoilType_Num == WaterCoil_SimpleHeating) {
-                for (j1 = 1; j1 <= NumFouledCoil; ++j1) {
-                    if (UtilityRoutines::SameString(WaterCoil(CoilNum).Name, FouledCoils(j1).FouledCoilName)) {
-                        FouledCoils(j1).FouledCoilID = CoilNum;
-                        break;
-                    }
-                }
-            }
-        }
-
         if (ErrorsFound) {
             ShowFatalError(RoutineName + "Errors found in getting input.");
         }
@@ -971,7 +958,8 @@ namespace WaterCoils {
     // Beginning Initialization Section of the Module
     //******************************************************************************
 
-    void InitWaterCoil(int const CoilNum,
+    void InitWaterCoil(OutputFiles &outputFiles,
+                       int const CoilNum,
                        bool const FirstHVACIteration // unused1208
     )
     {
@@ -1011,7 +999,6 @@ namespace WaterCoils {
         int const itmax(10);
         int const MaxIte(500); // Maximum number of iterations
         static std::string const RoutineName("InitWaterCoil");
-        static ObjexxFCL::gio::Fmt fmtA("(A)");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int tempCoilNum;                   // loop variable
@@ -1088,8 +1075,6 @@ namespace WaterCoils {
         bool errFlag;
         static Real64 EnthCorrFrac(0.0); // enthalpy correction factor
         static Real64 TempCorrFrac(0.0); // temperature correction factor
-        int i;
-        static Real64 rSchVal(0.0);
 
         // FLOW:
 
@@ -1199,7 +1184,7 @@ namespace WaterCoils {
             WaterInletNode = WaterCoil(CoilNum).WaterInletNodeNum;
             WaterOutletNode = WaterCoil(CoilNum).WaterOutletNodeNum;
 
-            DesCpAir(CoilNum) = PsyCpAirFnWTdb(0.0, WaterCoil(CoilNum).DesInletAirTemp);
+            DesCpAir(CoilNum) = PsyCpAirFnW(0.0);
             DesUARangeCheck(CoilNum) = (-1568.6 * WaterCoil(CoilNum).DesInletAirHumRat + 20.157);
 
             if (WaterCoil(CoilNum).WaterCoilType == CoilType_Cooling) { // 'Cooling'
@@ -1230,7 +1215,7 @@ namespace WaterCoils {
                 Node(WaterInletNode).HumRat = 0.0;
                 MyUAAndFlowCalcFlag(CoilNum) = false;
                 // fill values for variable UA
-                CpAirStd = PsyCpAirFnWTdb(0.0, 20.0);
+                CpAirStd = PsyCpAirFnW(0.0);
                 WaterCoil(CoilNum).DesAirMassFlowRate = StdRhoAir * WaterCoil(CoilNum).DesAirVolFlowRate;
                 WaterCoil(CoilNum).LiquidSideNominalConvect = WaterCoil(CoilNum).UACoil * (WaterCoil(CoilNum).RatioAirSideToWaterSideConvect + 1) /
                                                               WaterCoil(CoilNum).RatioAirSideToWaterSideConvect;
@@ -1523,8 +1508,7 @@ namespace WaterCoils {
                             LogMeanEnthDiff = 2000.0; // UA will be 1/2 the design coil load
                         }
                         DesUACoilExternalEnth = WaterCoil(CoilNum).DesTotWaterCoilLoad / LogMeanEnthDiff;
-                        WaterCoil(CoilNum).UACoilExternal =
-                            DesUACoilExternalEnth * PsyCpAirFnWTdb(WaterCoil(CoilNum).DesInletAirHumRat, WaterCoil(CoilNum).DesInletAirTemp);
+                        WaterCoil(CoilNum).UACoilExternal = DesUACoilExternalEnth * PsyCpAirFnW(WaterCoil(CoilNum).DesInletAirHumRat);
 
                         if (Ipass == 1 && (NoSatCurveIntersect || CBFTooLarge || BelowInletWaterTemp)) {
                             // reset outlet conditions to 90% relative humidity at the same outlet enthalpy
@@ -1654,8 +1638,7 @@ namespace WaterCoils {
             WaterCoil(CoilNum).InletAirEnthalpy = PsyHFnTdbW(WaterCoil(CoilNum).InletAirTemp, WaterCoil(CoilNum).InletAirHumRat);
             WaterCoil(CoilNum).InletWaterMassFlowRate = WaterCoil(CoilNum).MaxWaterMassFlowRate;
             WaterCoil(CoilNum).InletAirMassFlowRate = StdRhoAir * WaterCoil(CoilNum).DesAirVolFlowRate;
-            CapacitanceAir =
-                WaterCoil(CoilNum).InletAirMassFlowRate * PsyCpAirFnWTdb(WaterCoil(CoilNum).InletAirHumRat, WaterCoil(CoilNum).InletAirTemp);
+            CapacitanceAir = WaterCoil(CoilNum).InletAirMassFlowRate * PsyCpAirFnW(WaterCoil(CoilNum).InletAirHumRat);
 
             Cp = GetSpecificHeatGlycol(PlantLoop(WaterCoil(CoilNum).WaterLoopNum).FluidName,
                                        WaterCoil(CoilNum).InletWaterTemp,
@@ -1706,8 +1689,7 @@ namespace WaterCoils {
                     auto const SELECT_CASE_var(WaterCoil(CoilNum).WaterCoilType_Num);
                     if (SELECT_CASE_var == WaterCoil_SimpleHeating) {
                         if (RptCoilHeaderFlag(1)) {
-                            ObjexxFCL::gio::write(OutputFileInits, fmtA)
-                                << "! <Water Heating Coil Capacity Information>,Component Type,Name,Nominal Total Capacity {W}";
+                            print(outputFiles.eio, "{}", "! <Water Heating Coil Capacity Information>,Component Type,Name,Nominal Total Capacity {W}\n");
                             RptCoilHeaderFlag(1) = false;
                         }
                         PreDefTableEntry(pdchHeatCoilType, WaterCoil(CoilNum).Name, "Coil:Heating:Water");
@@ -1717,8 +1699,11 @@ namespace WaterCoils {
                         addFootNoteSubTable(
                             pdstHeatCoil,
                             "Nominal values are gross at rated conditions, i.e., the supply air fan heat and electric power NOT accounted for.");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Water Heating Coil Capacity Information,Coil:Heating:Water," + WaterCoil(CoilNum).Name +
-                                                                 ',' + RoundSigDigits(WaterCoil(CoilNum).TotWaterHeatingCoilRate, 2);
+                        print(outputFiles.eio,
+                              "{},{},{:.2R}\n",
+                              "Water Heating Coil Capacity Information,Coil:Heating:Water",
+                              WaterCoil(CoilNum).Name,
+                              WaterCoil(CoilNum).TotWaterHeatingCoilRate);
                         coilSelectionReportObj->setCoilAirFlow(WaterCoil(CoilNum).Name,
                                                                "Coil:Heating:Water",
                                                                WaterCoil(CoilNum).DesAirVolFlowRate,
@@ -1732,9 +1717,11 @@ namespace WaterCoils {
                                                                                    WaterCoil(CoilNum).WaterLoopNum); // coil report
                     } else if (SELECT_CASE_var == WaterCoil_DetFlatFinCooling) {
                         if (RptCoilHeaderFlag(2)) {
-                            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Water Cooling Coil Capacity Information>,Component Type,Name,Nominal Total "
-                                                                 "Capacity {W},Nominal Sensible Capacity {W},Nominal Latent Capacity {W},Nominal "
-                                                                 "Sensible Heat Ratio";
+                            print(outputFiles.eio,
+                                  "{}\n",
+                                  "! <Water Cooling Coil Capacity Information>,Component Type,Name,Nominal Total "
+                                  "Capacity {W},Nominal Sensible Capacity {W},Nominal Latent Capacity {W},Nominal "
+                                  "Sensible Heat Ratio");
                             RptCoilHeaderFlag(2) = false;
                         }
                         RatedLatentCapacity = WaterCoil(CoilNum).TotWaterCoolingCoilRate - WaterCoil(CoilNum).SenWaterCoolingCoilRate;
@@ -1749,11 +1736,14 @@ namespace WaterCoils {
                         addFootNoteSubTable(
                             pdstCoolCoil,
                             "Nominal values are gross at rated conditions, i.e., the supply air fan heat and electric power NOT accounted for.");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Water Cooling Coil Capacity Information,Coil:Cooling:Water:DetailedGeometry," +
-                                                                 WaterCoil(CoilNum).Name + ',' +
-                                                                 RoundSigDigits(WaterCoil(CoilNum).TotWaterCoolingCoilRate, 2) + ',' +
-                                                                 RoundSigDigits(WaterCoil(CoilNum).SenWaterCoolingCoilRate, 2) + ',' +
-                                                                 RoundSigDigits(RatedLatentCapacity, 2) + ',' + RoundSigDigits(RatedSHR, 2);
+                        print(outputFiles.eio,
+                              "{},{},{:.2R},{:.2R},{:.2R},{:.2R}\n",
+                              "Water Cooling Coil Capacity Information,Coil:Cooling:Water:DetailedGeometry",
+                              WaterCoil(CoilNum).Name,
+                              WaterCoil(CoilNum).TotWaterCoolingCoilRate,
+                              WaterCoil(CoilNum).SenWaterCoolingCoilRate,
+                              RatedLatentCapacity,
+                              RatedSHR);
                         coilSelectionReportObj->setCoilAirFlow(WaterCoil(CoilNum).Name,
                                                                "Coil:Cooling:Water:DetailedGeometry",
                                                                WaterCoil(CoilNum).DesAirVolFlowRate,
@@ -1767,9 +1757,11 @@ namespace WaterCoils {
                                                                             WaterCoil(CoilNum).WaterLoopNum); // Coil Report
                     } else if (SELECT_CASE_var == WaterCoil_Cooling) {
                         if (RptCoilHeaderFlag(2)) {
-                            ObjexxFCL::gio::write(OutputFileInits, fmtA) << "! <Water Cooling Coil Capacity Information>,Component Type,Name,Nominal Total "
-                                                                 "Capacity {W},Nominal Sensible Capacity {W},Nominal Latent Capacity {W},Nominal "
-                                                                 "Sensible Heat Ratio, Nominal Coil UA Value {W/C}, Nominal Coil Surface Area {m2}";
+                            print(outputFiles.eio,
+                                  "{}\n",
+                                  "! <Water Cooling Coil Capacity Information>,Component Type,Name,Nominal Total "
+                                  "Capacity {W},Nominal Sensible Capacity {W},Nominal Latent Capacity {W},Nominal "
+                                  "Sensible Heat Ratio, Nominal Coil UA Value {W/C}, Nominal Coil Surface Area {m2}");
                             RptCoilHeaderFlag(2) = false;
                         }
                         RatedLatentCapacity = WaterCoil(CoilNum).TotWaterCoolingCoilRate - WaterCoil(CoilNum).SenWaterCoolingCoilRate;
@@ -1786,11 +1778,16 @@ namespace WaterCoils {
                         addFootNoteSubTable(
                             pdstCoolCoil,
                             "Nominal values are gross at rated conditions, i.e., the supply air fan heat and electric power NOT accounted for.");
-                        ObjexxFCL::gio::write(OutputFileInits, fmtA) << "Water Cooling Coil Capacity Information,Coil:Cooling:Water," + WaterCoil(CoilNum).Name +
-                                                                 ',' + RoundSigDigits(WaterCoil(CoilNum).TotWaterCoolingCoilRate, 2) + ',' +
-                                                                 RoundSigDigits(WaterCoil(CoilNum).SenWaterCoolingCoilRate, 2) + ',' +
-                                                                 RoundSigDigits(RatedLatentCapacity, 2) + ',' + RoundSigDigits(RatedSHR, 2) + ',' +
-                                                                 RoundSigDigits(UATotal, 2) + ',' + RoundSigDigits(SurfaceArea, 2);
+                        print(outputFiles.eio,
+                              "{},{},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R},{:.2R}\n",
+                              "Water Cooling Coil Capacity Information,Coil:Cooling:Water",
+                              WaterCoil(CoilNum).Name,
+                              WaterCoil(CoilNum).TotWaterCoolingCoilRate,
+                              WaterCoil(CoilNum).SenWaterCoolingCoilRate,
+                              RatedLatentCapacity,
+                              RatedSHR,
+                              UATotal,
+                              SurfaceArea);
                         coilSelectionReportObj->setCoilAirFlow(WaterCoil(CoilNum).Name,
                                                                "Coil:Cooling:Water",
                                                                WaterCoil(CoilNum).DesAirVolFlowRate,
@@ -1826,7 +1823,7 @@ namespace WaterCoils {
                 WaterCoil(CoilNum).InletWaterEnthalpy = cp * WaterCoil(CoilNum).InletWaterTemp;
 
                 WaterCoil(CoilNum).UACoilVariable = WaterCoil(CoilNum).UACoil;
-                WaterCoil(CoilNum).FoulingFactor = 0.0;
+                WaterCoil(CoilNum).FaultyCoilFoulingFactor = 0.0;
                 Real64 holdOutBaroPress = DataEnvironment::OutBaroPress;
                 DataEnvironment::OutBaroPress = DataEnvironment::StdPressureSeaLevel; // assume rating is for sea level.
                 CalcAdjustedCoilUA(CoilNum);
@@ -1911,40 +1908,6 @@ namespace WaterCoils {
 
         WaterCoil(CoilNum).UACoilVariable = WaterCoil(CoilNum).UACoil;
 
-        // added for fouling coils
-        WaterCoil(CoilNum).FoulingFactor = 0.0;
-        if (((WaterCoil(CoilNum).WaterCoilType_Num == WaterCoil_SimpleHeating) || (WaterCoil(CoilNum).WaterCoilType_Num == WaterCoil_Cooling)) &&
-            (!(MyUAAndFlowCalcFlag(CoilNum)))) {
-
-            for (i = 1; i <= NumFouledCoil; ++i) {
-                if (FouledCoils(i).FouledCoilID == CoilNum) {
-                    // Check faults availability and severity schedules
-                    rSchVal = 0.0;
-                    if (GetCurrentScheduleValue(FouledCoils(i).AvaiSchedPtr) > 0.0) {
-                        rSchVal = 1.0;
-                        if (FouledCoils(i).SeveritySchedPtr > 0) {
-                            rSchVal = GetCurrentScheduleValue(FouledCoils(i).SeveritySchedPtr);
-                        }
-                    }
-
-                    if (FouledCoils(i).FoulingInputMethod == iFouledCoil_UARated) {
-                        if (WaterCoil(CoilNum).WaterCoilType_Num == WaterCoil_SimpleHeating) {
-                            WaterCoil(CoilNum).FoulingFactor = rSchVal * (1.0 / FouledCoils(i).UAFouled - 1.0 / WaterCoil(CoilNum).UACoil);
-                        } else {
-                            WaterCoil(CoilNum).FoulingFactor = rSchVal * (1.0 / FouledCoils(i).UAFouled - 1.0 / WaterCoil(CoilNum).UACoilTotal);
-                        }
-                    } else {
-                        WaterCoil(CoilNum).FoulingFactor =
-                            rSchVal * (FouledCoils(i).Rfw / (FouledCoils(i).Aratio * FouledCoils(i).Aout) + FouledCoils(i).Rfa / FouledCoils(i).Aout);
-                    }
-
-                    if (WaterCoil(CoilNum).FoulingFactor < 0.0) WaterCoil(CoilNum).FoulingFactor = 0.0;
-
-                    break;
-                }
-            }
-        }
-
         CalcAdjustedCoilUA(CoilNum);
 
         WaterCoil(CoilNum).TotWaterHeatingCoilRate = 0.0;
@@ -1962,6 +1925,8 @@ namespace WaterCoils {
         Real64 AirConvectTerm;       // result of Eq.71 in Wetter 1999
         Real64 WaterConvectTerm;     // result of Eq.73 in Wetter 1999
         Real64 WaterConvSensitivity; // "s" in Wetter 1999, temperature sensitivity in water side convection
+
+        // Coil:Heating:Water
         if ((WaterCoil(CoilNum).WaterCoilType_Num == WaterCoil_SimpleHeating) &&
             (!(MyUAAndFlowCalcFlag(CoilNum)))) { // update Coil UA based on inlet mass flows and temps
             x_a = 1.0 + 4.769E-3 * (WaterCoil(CoilNum).InletAirTemp - WaterCoil(CoilNum).DesInletAirTemp);
@@ -1980,41 +1945,150 @@ namespace WaterCoils {
                 WaterConvectTerm = 0.0;
             }
             if ((AirConvectTerm > 0.0) && (WaterConvectTerm > 0.0)) {
-                WaterCoil(CoilNum).UACoilVariable = 1.0 / ((1.0 / WaterConvectTerm) + WaterCoil(CoilNum).FoulingFactor + (1.0 / AirConvectTerm));
+                WaterCoil(CoilNum).UACoilVariable = 1.0 / ((1.0 / WaterConvectTerm) + (1.0 / AirConvectTerm));
             } else {
                 // use nominal UA since variable UA cannot be calculated
-                WaterCoil(CoilNum).UACoilVariable = 1.0 / (1.0 / WaterCoil(CoilNum).UACoil + WaterCoil(CoilNum).FoulingFactor);
+                WaterCoil(CoilNum).UACoilVariable = WaterCoil(CoilNum).UACoil;
+            }
+
+            // calculate the Faulty Coil Fouling (thermal insulance) Factor using fault information
+            if (WaterCoil(CoilNum).FaultyCoilFoulingFlag &&
+                // The fault shouldn't apply during sizing.
+                (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+                // This was preexisting
+                !(MyUAAndFlowCalcFlag(CoilNum)))
+            {
+                // Store original value
+                WaterCoil(CoilNum).OriginalUACoilVariable = WaterCoil(CoilNum).UACoilVariable;
+
+                int FaultIndex = WaterCoil(CoilNum).FaultyCoilFoulingIndex;
+                FaultsManager::FaultPropertiesFoulingCoil &fouling = FaultsManager::FouledCoils(FaultIndex);
+                Real64 FaultFrac = fouling.FaultFraction();
+
+                if (fouling.FoulingInputMethod == FaultsManager::iFouledCoil_UARated) {
+                    // 1/UA' = Frac * (1/UAFouled) + (1-Frac) / UA
+                    WaterCoil(CoilNum).UACoilVariable = 1 / (FaultFrac / (fouling.UAFouled) + (1 - FaultFrac) / WaterCoil(CoilNum).UACoilVariable);
+                } else {
+                    // R' = R + Rfoul
+                    // Rfoul = r_air/A_air + r_water/A_water (FoulingFactor = thermal insulance [K/W, A] = Area [m2], r=fouling factor [m2.K/W]
+                    Real64 FoulingFactor = FaultFrac * (fouling.Rfw / (fouling.Aratio * fouling.Aout) + fouling.Rfa / fouling.Aout);
+                    WaterCoil(CoilNum).UACoilVariable = 1.0 / ( (1.0 / WaterCoil(CoilNum).UACoilVariable) + FoulingFactor);
+                }
+
+                // Do not allow improving coil performance
+                WaterCoil(CoilNum).UACoilVariable = min(WaterCoil(CoilNum).UACoilVariable, WaterCoil(CoilNum).OriginalUACoilVariable);
+
+                // Only for reporting purposes
+                WaterCoil(CoilNum).FaultyCoilFoulingFactor = (1.0 / WaterCoil(CoilNum).UACoilVariable) -
+                                                             (1.0 / WaterCoil(CoilNum).OriginalUACoilVariable);
+            } else {
+                WaterCoil(CoilNum).FaultyCoilFoulingFactor = 0;
             }
         }
 
+        // Coil:Cooling:Water
         // update Coil UA based on inlet mass flows and temps
         if (WaterCoil(CoilNum).WaterCoilType_Num == WaterCoil_Cooling && (!MyCoilDesignFlag(CoilNum))) {
-            x_a = 1.0 + 4.769E-3 * (WaterCoil(CoilNum).InletAirTemp - WaterCoil(CoilNum).DesInletAirTemp);
             if (WaterCoil(CoilNum).DesAirMassFlowRate > 0.0) {
+                x_a = 1.0 + 4.769E-3 * (WaterCoil(CoilNum).InletAirTemp - WaterCoil(CoilNum).DesInletAirTemp);
                 WaterCoil(CoilNum).UACoilExternal = x_a *
                                                     std::pow(WaterCoil(CoilNum).InletAirMassFlowRate / WaterCoil(CoilNum).DesAirMassFlowRate, 0.8) *
                                                     WaterCoil(CoilNum).UACoilExternalDes;
             } else {
                 WaterCoil(CoilNum).UACoilExternal = WaterCoil(CoilNum).UACoilExternalDes;
             }
-            WaterConvSensitivity = 0.014 / (1.0 + 0.014 * WaterCoil(CoilNum).DesInletWaterTemp);
-            x_w = 1.0 + WaterConvSensitivity * (WaterCoil(CoilNum).InletWaterTemp - WaterCoil(CoilNum).DesInletWaterTemp);
+
             if (WaterCoil(CoilNum).MaxWaterMassFlowRate > 0.0) {
+                WaterConvSensitivity = 0.014 / (1.0 + 0.014 * WaterCoil(CoilNum).DesInletWaterTemp);
+                x_w = 1.0 + WaterConvSensitivity * (WaterCoil(CoilNum).InletWaterTemp - WaterCoil(CoilNum).DesInletWaterTemp);
                 WaterCoil(CoilNum).UACoilInternal =
                     x_w * std::pow(WaterCoil(CoilNum).InletWaterMassFlowRate / WaterCoil(CoilNum).MaxWaterMassFlowRate, 0.85) *
                     WaterCoil(CoilNum).UACoilInternalDes;
             } else {
                 WaterCoil(CoilNum).UACoilInternal = WaterCoil(CoilNum).UACoilInternalDes;
             }
-            if (WaterCoil(CoilNum).UACoilInternal > 0.0 && WaterCoil(CoilNum).UACoilExternal > 0.0) {
-                WaterCoil(CoilNum).UACoilTotal =
-                    1.0 / (1.0 / WaterCoil(CoilNum).UACoilExternal + WaterCoil(CoilNum).FoulingFactor + 1.0 / WaterCoil(CoilNum).UACoilInternal);
-            } else {
+
+            if (!(WaterCoil(CoilNum).UACoilInternal > 0.0 && WaterCoil(CoilNum).UACoilExternal > 0.0)) {
                 WaterCoil(CoilNum).UACoilInternal = WaterCoil(CoilNum).UACoilInternalDes;
                 WaterCoil(CoilNum).UACoilExternal = WaterCoil(CoilNum).UACoilExternalDes;
-                WaterCoil(CoilNum).UACoilTotal =
-                    1.0 / (1.0 / WaterCoil(CoilNum).UACoilExternal + WaterCoil(CoilNum).FoulingFactor + 1.0 / WaterCoil(CoilNum).UACoilInternal);
             }
+
+            // If Fouling
+            if (WaterCoil(CoilNum).FaultyCoilFoulingFlag &&
+                // The fault shouldn't apply during sizing.
+                (!DataGlobals::WarmupFlag) && (!DataGlobals::DoingSizing) && (!DataGlobals::KickOffSimulation) &&
+                // This was preexisting
+                !(MyUAAndFlowCalcFlag(CoilNum)))
+            {
+                // Store original value
+                // This is really UACoilTotal technically, but I don't see the point of declaring another Real on the struct just for that
+                WaterCoil(CoilNum).OriginalUACoilVariable = 1.0 /
+                    (1.0 / WaterCoil(CoilNum).UACoilExternal + 1.0 / WaterCoil(CoilNum).UACoilInternal);
+
+                WaterCoil(CoilNum).OriginalUACoilExternal = WaterCoil(CoilNum).UACoilExternal;
+                WaterCoil(CoilNum).OriginalUACoilInternal = WaterCoil(CoilNum).UACoilInternal;
+
+                int FaultIndex = WaterCoil(CoilNum).FaultyCoilFoulingIndex;
+
+                FaultsManager::FaultPropertiesFoulingCoil &fouling = FaultsManager::FouledCoils(FaultIndex);
+                Real64 FaultFrac = fouling.FaultFraction();
+
+                if (fouling.FoulingInputMethod == FaultsManager::iFouledCoil_FoulingFactor) {
+                    // Adjust the External (air) UA and Internal (water) UA accordingly
+                    Real64 Rfoul_air = FaultFrac * (fouling.Rfa / fouling.Aout);
+                    Real64 Rfoul_water = FaultFrac * (fouling.Rfw / (fouling.Aratio * fouling.Aout));
+
+                    WaterCoil(CoilNum).UACoilInternal = 1.0 / (1.0 / WaterCoil(CoilNum).UACoilInternal + Rfoul_water);
+                    WaterCoil(CoilNum).UACoilExternal = 1.0 / (1.0 / WaterCoil(CoilNum).UACoilExternal + Rfoul_air);
+                    //
+                } else { // iFouledCoil_UARated
+                    // FouledUARated is supposed to be the overall UA. So we need to split between Internal and External UAs
+
+                    // How should I split fouling between internal/external?
+                    // We can actually use the current ratio before fouling...
+                    // splitRatio = UACoilInternal/UACoilExternal
+                    // UACoilInternal = UACoilExternal * splitRatio
+
+                    // UACoilTotal = 1 / (1 / UACoilExternal + 1 / UACoilInternal)
+                    // UACoilTotal = 1 / (1 / UACoilExternal + 1 / (UACoilExernal * splitRatio))
+                    // UACoilTotal = UACoilExternal / (1 + 1 / splitRatio) = UACoilExternal  * splitRatio / (1 + splitRatio)
+                    // UACoilExternal = UACoilTotal * (1 + splitRatio) / splitRatio
+                    // UACoilInternal = UACoilTotal * (1 + splitRatio)
+
+                    // Adding in FaultFrac:
+                    // UACoilExternal = FaultFrac * [UAFouled * (1+splitRatio) / splitRatio] + (1-FaultFrac) * UACoilExternal
+                    // UACoilInternal = FaultFrac * [UAFouled * splitRatio] + (1-FaultFrac) * UACoilInternal
+
+                    Real64 splitRatio = WaterCoil(CoilNum).UACoilInternal / WaterCoil(CoilNum).UACoilExternal;
+
+                    WaterCoil(CoilNum).UACoilExternal =   1.0 /
+                        ( (FaultFrac * splitRatio) / ((1 + splitRatio) * fouling.UAFouled) +
+                          (1-FaultFrac) / WaterCoil(CoilNum).UACoilExternal);
+
+                    //WaterCoil(CoilNum).UACoilInternal =   1.0 /
+                        //( FaultFrac / ((1 + splitRatio) * fouling.UAFouled) +
+                          //(1-FaultFrac) / WaterCoil(CoilNum).UACoilInternal);
+
+                    WaterCoil(CoilNum).UACoilInternal = splitRatio * WaterCoil(CoilNum).UACoilExternal;
+
+                }
+
+                // Do not allow improving coil performance
+                WaterCoil(CoilNum).UACoilExternal = min(WaterCoil(CoilNum).UACoilExternal, WaterCoil(CoilNum).OriginalUACoilExternal);
+                WaterCoil(CoilNum).UACoilInternal = min(WaterCoil(CoilNum).UACoilInternal, WaterCoil(CoilNum).OriginalUACoilInternal);
+
+                // Only for reporting purposes
+                WaterCoil(CoilNum).FaultyCoilFoulingFactor = (1.0 / WaterCoil(CoilNum).UACoilExternal) -
+                                                             (1.0 / WaterCoil(CoilNum).OriginalUACoilExternal) +
+                                                             (1.0 / WaterCoil(CoilNum).UACoilInternal) -
+                                                             (1.0 / WaterCoil(CoilNum).OriginalUACoilInternal);
+            } else {
+                WaterCoil(CoilNum).FaultyCoilFoulingFactor = 0;
+            }
+
+            WaterCoil(CoilNum).UACoilTotal = 1.0 /
+                (1.0 / WaterCoil(CoilNum).UACoilExternal + 1.0 / WaterCoil(CoilNum).UACoilInternal);
+
             WaterCoil(CoilNum).UACoilInternalPerUnitArea = WaterCoil(CoilNum).UACoilInternal / WaterCoil(CoilNum).TotCoilOutsideSurfArea;
             WaterCoil(CoilNum).UAWetExtPerUnitArea = WaterCoil(CoilNum).UACoilExternal / WaterCoil(CoilNum).TotCoilOutsideSurfArea;
             WaterCoil(CoilNum).UADryExtPerUnitArea = WaterCoil(CoilNum).UAWetExtPerUnitArea;
@@ -2095,7 +2169,7 @@ namespace WaterCoils {
         DesCoilAirFlow = 0.0;
         DesCoilExitTemp = 0.0;
         LoopErrorsFound = false;
-        CpAirStd = PsyCpAirFnWTdb(0.0, 20.0);
+        CpAirStd = PsyCpAirFnW(0.0);
 
         // cooling coils
         if (WaterCoil(CoilNum).WaterCoilType == CoilType_Cooling && WaterCoil(CoilNum).RequestingAutoSize) {
@@ -2763,7 +2837,7 @@ namespace WaterCoils {
         }
 
         if (WaterMassFlowRate > MassFlowTolerance) { // If the coil is operating
-            CapacitanceAir = PsyCpAirFnWTdb(Win, 0.5 * (TempAirIn + TempWaterIn)) * AirMassFlow;
+            CapacitanceAir = PsyCpAirFnW(Win) * AirMassFlow;
             Cp = GetSpecificHeatGlycol(PlantLoop(WaterCoil(CoilNum).WaterLoopNum).FluidName,
                                        TempWaterIn,
                                        PlantLoop(WaterCoil(CoilNum).WaterLoopNum).FluidIndex,
@@ -3043,8 +3117,8 @@ namespace WaterCoils {
             //        known thermodynamic functions
             // All coil calcs are done in KJoules.  Convert to KJ here and then convert
             //  back to Joules at the end of the Subroutine.
-            DryAirSpecHeat = PsyCpAirFnWTdb(zero, TempAirIn) * ConvK;
-            MoistAirSpecificHeat = PsyCpAirFnWTdb(InletAirHumRat, TempAirIn) * ConvK;
+            DryAirSpecHeat = PsyCpAirFnW(zero) * ConvK;
+            MoistAirSpecificHeat = PsyCpAirFnW(InletAirHumRat) * ConvK;
             InletAirEnthalpy = WaterCoil(CoilNum).InletAirEnthalpy * ConvK;
 
             EnterAirDewPoint = PsyTdpFnWPb(InletAirHumRat, OutBaroPress, RoutineName);
@@ -3448,9 +3522,7 @@ namespace WaterCoils {
                 //       Implementation of epsilon*NTU method
                 TempAirOut = AirExitCoilSurfTemp + (AirWetDryInterfcTemp - AirExitCoilSurfTemp) * y;
                 OutletAirHumRat = PsyWFnTdbH(TempAirOut, 1000.0 * OutletAirEnthalpy, RoutineName);
-                SenWaterCoilLoad =
-                    AirMassFlow * (PsyCpAirFnWTdb(InletAirHumRat, TempAirIn) * TempAirIn - PsyCpAirFnWTdb(OutletAirHumRat, TempAirOut) * TempAirOut) *
-                    ConvK;
+                SenWaterCoilLoad = AirMassFlow * (PsyCpAirFnW(InletAirHumRat) * TempAirIn - PsyCpAirFnW(OutletAirHumRat) * TempAirOut) * ConvK;
             }
 
             if (FanOpMode == CycFanCycCoil) {
@@ -3795,7 +3867,7 @@ namespace WaterCoils {
         }
 
         // Calculate air and water capacity rates
-        CapacitanceAir = AirMassFlow * PsyCpAirFnWTdb(WaterCoil(CoilNum).InletAirHumRat, WaterCoil(CoilNum).InletAirTemp);
+        CapacitanceAir = AirMassFlow * PsyCpAirFnW(WaterCoil(CoilNum).InletAirHumRat);
         // Water Capacity Rate
         Cp = GetSpecificHeatGlycol(
             PlantLoop(WaterCoil(CoilNum).WaterLoopNum).FluidName, WaterTempIn, PlantLoop(WaterCoil(CoilNum).WaterLoopNum).FluidIndex, RoutineName);
@@ -3936,7 +4008,7 @@ namespace WaterCoils {
 
         // Determine air and water enthalpy outlet conditions by modeling
         // coil as counterflow enthalpy heat exchanger
-        UACoilTotalEnth = 1.0 / (IntermediateCpSat * WaterSideResist + AirSideResist * PsyCpAirFnWTdb(0.0, AirTempIn));
+        UACoilTotalEnth = 1.0 / (IntermediateCpSat * WaterSideResist + AirSideResist * PsyCpAirFnW(0.0));
         CapacityRateAirWet = AirMassFlow;
         Cp = GetSpecificHeatGlycol(
             PlantLoop(WaterCoil(CoilNum).WaterLoopNum).FluidName, WaterTempIn, PlantLoop(WaterCoil(CoilNum).WaterLoopNum).FluidIndex, RoutineName);
@@ -3952,7 +4024,7 @@ namespace WaterCoils {
 
         // Calculate entering and leaving external surface conditions from
         // air and water conditions and the ratio of resistances
-        ResistRatio = (WaterSideResist) / (WaterSideResist + PsyCpAirFnWTdb(0.0, AirTempIn) / IntermediateCpSat * AirSideResist);
+        ResistRatio = (WaterSideResist) / (WaterSideResist + PsyCpAirFnW(0.0) / IntermediateCpSat * AirSideResist);
         EnthSatAirCoilSurfaceEntryTemp = EnthSatAirOutletWaterTemp + ResistRatio * (EnthAirInlet - EnthSatAirOutletWaterTemp);
         EnthSatAirCoilSurfaceExitTemp = EnthSatAirInletWaterTemp + ResistRatio * (EnthAirOutlet - EnthSatAirInletWaterTemp);
 
@@ -4528,7 +4600,7 @@ namespace WaterCoils {
         // Determine the temperature effectiveness, assuming the temperature
         // of the condensate is constant (MinimumCapacityStream/MaximumCapacityStream = 0) and the specific heat
         // of moist air is constant
-        CapacitanceAir = WaterCoil(CoilNum).InletAirMassFlowRate * PsyCpAirFnWTdb(WaterCoil(CoilNum).InletAirHumRat, AirTempIn);
+        CapacitanceAir = WaterCoil(CoilNum).InletAirMassFlowRate * PsyCpAirFnW(WaterCoil(CoilNum).InletAirHumRat);
 
         // Calculating NTU from UA and Capacitance.
         // del      NTU = UACoilExternal/MAX(CapacitanceAir,SmallNo)
@@ -4759,7 +4831,7 @@ namespace WaterCoils {
     // Beginning of Coil Utility subroutines for the Detailed Model
     // *****************************************************************************
 
-    void CalcDryFinEffCoef(Real64 const OutTubeEffFinDiamRatio, Array1<Real64> &PolynomCoef)
+    void CalcDryFinEffCoef(Real64 const OutTubeEffFinDiamRatio, Array1D<Real64> &PolynomCoef)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR   Unknown
@@ -5107,7 +5179,7 @@ namespace WaterCoils {
         KBessFunc = GJ;
     }
 
-    void CalcPolynomCoef(Array2<Real64> const &OrderedPair, Array1<Real64> &PolynomCoef)
+    void CalcPolynomCoef(Array2<Real64> const &OrderedPair, Array1D<Real64> &PolynomCoef)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR   Unknown
@@ -5223,8 +5295,8 @@ namespace WaterCoils {
         }
     }
 
-    Real64 SimpleHeatingCoilUAResidual(Real64 const UA,          // UA of coil
-                                       Array1<Real64> const &Par // par(1) = design coil load [W]
+    Real64 SimpleHeatingCoilUAResidual(Real64 const UA,           // UA of coil
+                                       Array1D<Real64> const &Par // par(1) = design coil load [W]
     )
     {
 
@@ -5280,8 +5352,8 @@ namespace WaterCoils {
         return Residuum;
     }
 
-    Real64 SimpleCoolingCoilUAResidual(Real64 const UA,          // UA of coil
-                                       Array1<Real64> const &Par // par(1) = design coil load [W]
+    Real64 SimpleCoolingCoilUAResidual(Real64 const UA,           // UA of coil
+                                       Array1D<Real64> const &Par // par(1) = design coil load [W]
     )
     {
 
@@ -6198,8 +6270,8 @@ namespace WaterCoils {
         return T;
     }
 
-    Real64 EnthalpyResidual(Real64 const Tprov,       // test value of Tdb [C]
-                            Array1<Real64> const &Par // Par(1) = desired enthaply H [J/kg]
+    Real64 EnthalpyResidual(Real64 const Tprov,        // test value of Tdb [C]
+                            Array1D<Real64> const &Par // Par(1) = desired enthaply H [J/kg]
     )
     {
 
@@ -6677,7 +6749,7 @@ namespace WaterCoils {
             WaterMassFlowRate = WaterCoil(CoilNum).InletWaterMassFlowRate;
         }
         if (WaterMassFlowRate > MassFlowTolerance) { // if the coil is operating
-            CapacitanceAir = PsyCpAirFnWTdb(Win, 0.5 * (TempAirIn + TempWaterIn)) * AirMassFlow;
+            CapacitanceAir = PsyCpAirFnW(Win) * AirMassFlow;
             Cp = GetSpecificHeatGlycol(PlantLoop(WaterCoil(CoilNum).WaterLoopNum).FluidName,
                                        TempWaterIn,
                                        PlantLoop(WaterCoil(CoilNum).WaterLoopNum).FluidIndex,

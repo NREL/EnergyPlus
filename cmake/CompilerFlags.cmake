@@ -3,6 +3,10 @@
 ADD_CXX_DEFINITIONS("-DOBJEXXFCL_ALIGN=64") # Align ObjexxFCL arrays to 64B
 ADD_CXX_DEBUG_DEFINITIONS("-DOBJEXXFCL_ARRAY_INIT_DEBUG") # Initialize ObjexxFCL arrays to aid debugging
 
+if (NOT OPENGL_FOUND)
+  add_definitions("-DEP_NO_OPENGL")
+endif()
+
 # Make sure expat is compiled as a static library
 ADD_DEFINITIONS("-DXML_STATIC")
 
@@ -38,7 +42,7 @@ IF ( MSVC AND NOT ( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel" ) ) # Visual C++
     ADD_CXX_DEBUG_DEFINITIONS("/fp:strict") # Floating point model
     ADD_CXX_DEBUG_DEFINITIONS("/DMSVC_DEBUG") # Triggers code in main.cc to catch floating point NaNs
 
-ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" ) # g++/Clang
+ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang"  ) # g++/Clang
     option(ENABLE_THREAD_SANITIZER "Enable thread sanitizer testing in gcc/clang" FALSE)
     set(LINKER_FLAGS "")
     if (ENABLE_THREAD_SANITIZER)
@@ -101,7 +105,7 @@ ELSEIF ( CMAKE_COMPILER_IS_GNUCXX OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"
       ADD_CXX_DEFINITIONS("-Wno-unused-but-set-parameter -Wno-unused-but-set-variable") # Suppress unused-but-set warnings until more serious ones are addressed
       ADD_CXX_DEFINITIONS("-Wno-maybe-uninitialized")
       ADD_CXX_DEFINITIONS("-Wno-aggressive-loop-optimizations")
-    elseif( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" )
+    elseif( "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
       ADD_CXX_DEFINITIONS("-Wno-vexing-parse")
       ADD_CXX_DEFINITIONS("-Wno-invalid-source-encoding")
     endif()
@@ -225,7 +229,7 @@ macro(AddFlagIfSupported flag test)
   if( ${${test}} )
     message(STATUS "Adding ${flag}")
     # On Mac with Ninja (kitware binary for fortran support) and brew gfortran, I get build errors due to this flag.
-    if(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang") AND BUILD_FORTRAN)
+    if(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang") AND BUILD_FORTRAN)
       add_compile_options($<$<NOT:$<COMPILE_LANGUAGE:Fortran>>:${flag}>)
     else()
       add_compile_options("${flag}")
@@ -238,7 +242,7 @@ endmacro()
 if("Ninja" STREQUAL ${CMAKE_GENERATOR})
   include(CheckCXXCompilerFlag)
   # Clang
-  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+  if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" OR "${CMAKE_CXX_COMPILER_ID}" STREQUAL "AppleClang")
     AddFlagIfSupported(-fcolor-diagnostics COMPILER_SUPPORTS_fdiagnostics_color)
   endif()
 
@@ -261,4 +265,3 @@ if(CMAKE_GENERATOR MATCHES "Make")
 else()
   set(MAKE make)
 endif()
-

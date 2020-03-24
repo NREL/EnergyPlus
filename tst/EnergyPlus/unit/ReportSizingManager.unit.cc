@@ -62,6 +62,7 @@
 #include <EnergyPlus/DataZoneEquipment.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/HVACFan.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputReportPredefined.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/Psychrometrics.hh>
@@ -1415,7 +1416,7 @@ TEST_F(EnergyPlusFixture, ReportSizingManager_SupplyAirTempLessThanZoneTStatTest
 
     ASSERT_TRUE(process_idf(idf_objects));
 
-    SimulationManager::ManageSimulation();
+    SimulationManager::ManageSimulation(OutputFiles::getSingleton());
 
     int CtrlZoneNum(1);
     // design peak load conditons and design supply air temperature
