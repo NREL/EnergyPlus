@@ -45,8 +45,11 @@
 // OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef ENERGYPLUS_LIB_ENERGYPLUSAPI_HPP
-#define ENERGYPLUS_LIB_ENERGYPLUSAPI_HPP
+#ifndef ENERGYPLUS_LIB_ENERGYPLUSAPI_H
+#define ENERGYPLUS_LIB_ENERGYPLUSAPI_H
+
+/// \file EnergyPlusAPI.h
+/// \brief This file provides a define that enables exposing methods on the API.  No client needs to directly import this file.
 
 #if _WIN32 || _MSC_VER
 #if defined(energypluslib_EXPORTS) || defined(energyplusapi_EXPORTS) || defined(energypluslib2_EXPORTS)

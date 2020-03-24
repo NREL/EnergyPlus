@@ -43,6 +43,7 @@ SET( INCLUDED_TEX
   ${PROJECT_SOURCE_DIR}/input-output-reference/src/output/using-readvarseso.tex
   ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/what-s-different-about-energyplus-input.tex
   ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/idd-conventions.tex
+  ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/api-usage.tex
   ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/input-output-descriptions.tex
   ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-simulation-parameters.tex
   ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-compliance-objects.tex
@@ -85,6 +86,7 @@ SET( INCLUDED_TEX
   ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-humidifiers.tex
   ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-desiccant-dehumidifiers.tex
   ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-energy-management-system-ems.tex
+  ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-python-plugins.tex
   ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-externalinterface.tex
   ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-user-defined-hvac-and-plant-component.tex
   ${PROJECT_SOURCE_DIR}/input-output-reference/src/overview/group-system-availability-managers.tex
