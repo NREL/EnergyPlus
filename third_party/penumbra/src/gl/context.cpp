@@ -1,7 +1,11 @@
 /* Copyright (c) 2017 Big Ladder Software LLC. All rights reserved.
  * See the LICENSE file for additional terms and conditions. */
 
-#include <iostream>
+#ifndef NDEBUG
+#ifdef __unix__
+#include <cfenv>
+#endif
+#endif
 
 // Penumbra
 #include "context.h"
@@ -62,7 +66,18 @@ Context::Context(unsigned size)
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
   glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+#ifndef NDEBUG
+#ifdef __unix__
+  // Temporarily Disable floating point exceptions
+  fedisableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
+#endif
+#endif
   window = glfwCreateWindow(1, 1, "Penumbra", NULL, NULL);
+#ifndef NDEBUG
+#ifdef __unix__
+  feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
+#endif
+#endif
   glfwMakeContextCurrent(window);
   if (!window) {
     showMessage(
@@ -330,10 +345,15 @@ float Context::setScene(mat4x4 sunView, const SurfaceBuffer *surfaceBuffer, bool
 
   auto const pixelArea = (right - left) * (top - bottom) / (size * size);
 
-  mat4x4_ortho(projection, left, right, bottom, top, -near_, -far_);
-  mat4x4_mul(mvp, projection, view);
+  if (pixelArea > 0.0)
+  {
+      mat4x4_ortho(projection, left, right, bottom, top, -near_, -far_);
+      mat4x4_mul(mvp, projection, view);
 
-  setMVP();
+      setMVP();
+  }
+
+  // TODO: Consider what to do with the camera if pixelArea happens to be zero
 
   return pixelArea;
 }
@@ -386,7 +406,18 @@ void Context::setCameraMVP() {
 
 void Context::drawModel() {
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+#ifndef NDEBUG
+#ifdef __unix__
+  // Temporarily Disable floating point exceptions
+  fedisableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
+#endif
+#endif
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+#ifndef NDEBUG
+#ifdef __unix__
+  feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
+#endif
+#endif
   glDepthFunc(GL_LESS);
   model.drawAll();
   glDepthFunc(GL_EQUAL);
@@ -394,7 +425,18 @@ void Context::drawModel() {
 
 void Context::drawExcept(const std::vector<SurfaceBuffer> &hiddenSurfaces) {
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+#ifndef NDEBUG
+#ifdef __unix__
+  // Temporarily Disable floating point exceptions
+  fedisableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
+#endif
+#endif
   glClear(GL_DEPTH_BUFFER_BIT);
+#ifndef NDEBUG
+#ifdef __unix__
+  feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
+#endif
+#endif
   glDepthFunc(GL_LESS);
   model.drawExcept(hiddenSurfaces);
   glDepthFunc(GL_EQUAL);
