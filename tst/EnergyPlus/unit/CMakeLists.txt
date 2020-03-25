@@ -24,6 +24,7 @@ set( test_src
   AirTerminalSingleDuctConstantVolumeNoReheat.unit.cc
   AirTerminalSingleDuctMixer.unit.cc
   AirTerminalSingleDuctPIUReheat.unit.cc
+  api/datatransfer.unit.cc
   BaseboardRadiator.unit.cc
   BoilerHotWater.unit.cc
   BoilerSteam.unit.cc
@@ -220,6 +221,12 @@ if(CMAKE_HOST_UNIX)
   if(NOT APPLE)
     list(APPEND test_dependencies dl )
   endif()
+endif()
+
+if(LINK_WITH_PYTHON)
+  add_definitions("-DLINK_WITH_PYTHON=1")
+else()
+  add_definitions("-DLINK_WITH_PYTHON=0")
 endif()
 
 list(APPEND test_dependencies ${PYTHON_LIBRARIES} )

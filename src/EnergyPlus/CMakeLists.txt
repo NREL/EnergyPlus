@@ -9,7 +9,6 @@ configure_file( DataStringGlobals.in.cc "${CMAKE_CURRENT_BINARY_DIR}/DataStringG
 configure_file( ConfiguredFunctions.in.cc "${CMAKE_CURRENT_BINARY_DIR}/ConfiguredFunctions.cc" )
 file( WRITE "${CMAKE_CURRENT_BINARY_DIR}/EmbeddedEpJSONSchema.cc" "Will be filled in later by GenerateEmbeddedEpJSONSchema" )
 
-option( LINK_WITH_PYTHON "Build package" OFF )
 if(LINK_WITH_PYTHON)
   add_definitions("-DLINK_WITH_PYTHON=1")
 else()

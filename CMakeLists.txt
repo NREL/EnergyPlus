@@ -34,6 +34,7 @@ option( BUILD_PACKAGE "Build package" OFF )
 option( BUILD_TESTING "Build testing targets" OFF )
 option( BUILD_FORTRAN "Build Fortran stuff" OFF )
 option( BUILD_DOCS "Build LaTeX-pdf documentation" OFF )
+option( LINK_WITH_PYTHON "Link with Python Library for Python Plugin Builds" OFF )
 
 # Turning ENABLE_GTEST_DEBUG_MODE ON will cause assertions and exceptions to halt the test case and unwind.
 # Turn this option OFF for automated testing.
