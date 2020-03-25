@@ -5,6 +5,12 @@
 #include <memory>
 #include <iostream>
 
+#ifndef NDEBUG
+#ifdef __unix__
+#include <cfenv>
+#endif
+#endif
+
 // Penumbra
 #include <penumbra/penumbra.h>
 #include <penumbra-private.h>
@@ -39,7 +45,18 @@ bool Penumbra::isValidContext() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 	glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
-	GLFWwindow* window = glfwCreateWindow(1, 1, "Penumbra", NULL, NULL);
+#ifndef NDEBUG
+#ifdef __unix__
+  // Temporarily Disable floating point exceptions
+  fedisableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
+#endif
+#endif
+    GLFWwindow* window = glfwCreateWindow(1, 1, "Penumbra", NULL, NULL);
+#ifndef NDEBUG
+#ifdef __unix__
+  feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
+#endif
+#endif
 	glfwMakeContextCurrent(window);
 	invalid |= !window;
 	glfwDestroyWindow(window);
