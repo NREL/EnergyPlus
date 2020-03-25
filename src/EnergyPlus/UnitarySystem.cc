@@ -8335,13 +8335,10 @@ namespace UnitarySystems {
                             Real64 ZoneLatLoad = ZoneLoad * (1.0 / this->LoadSHR - 1.0);
                             Real64 SenPLR = (ZoneLoad - SensOutputOff) / (SensOutputOn - SensOutputOff);
                             Real64 LatPLR = (ZoneLatLoad - LatOutputOff) / (LatOutputOn - LatOutputOff);
-                            Real64 totalRate = DataLoopNode::Node(this->AirOutNode).MassFlowRate *
-                                               (DataLoopNode::Node(CoilInletNode).Enthalpy - DataLoopNode::Node(this->AirOutNode).Enthalpy);
-                            Real64 minAirHumRat = min(DataLoopNode::Node(CoilInletNode).HumRat, DataLoopNode::Node(this->AirOutNode).HumRat);
-                            Real64 sensRate = DataLoopNode::Node(this->AirOutNode).MassFlowRate *
-                                              (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(CoilInletNode).Temp, minAirHumRat) -
-                                               Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(this->AirOutNode).Temp, minAirHumRat));
-                            Real64 latRate = totalRate - sensRate;
+                            Real64 totalRate;
+                            Real64 sensRate;
+                            Real64 latRate;
+                            CalcTotalSensibleLatentOutput(DataLoopNode::Node(this->AirOutNode).MassFlowRate, DataLoopNode::Node(CoilInletNode).Temp, DataLoopNode::Node(CoilInletNode).HumRat, DataLoopNode::Node(this->AirOutNode).Temp, DataLoopNode::Node(this->AirOutNode).HumRat, totalRate, sensRate, latRate);
                             if (LatPLR > 1.0 || LatPLR < 0.0) {
                                 this->CoilSHR = this->LoadSHR;
                             } else {
@@ -8383,13 +8380,7 @@ namespace UnitarySystems {
                                                                   HeatCoilLoad,
                                                                   SupHeaterLoad,
                                                                   CompressorONFlag);
-                                    totalRate = DataLoopNode::Node(this->AirOutNode).MassFlowRate *
-                                                (DataLoopNode::Node(CoilInletNode).Enthalpy - DataLoopNode::Node(this->AirOutNode).Enthalpy);
-                                    minAirHumRat = min(DataLoopNode::Node(CoilInletNode).HumRat, DataLoopNode::Node(this->AirOutNode).HumRat);
-                                    sensRate = DataLoopNode::Node(this->AirOutNode).MassFlowRate *
-                                               (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(CoilInletNode).Temp, minAirHumRat) -
-                                                Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(this->AirOutNode).Temp, minAirHumRat));
-                                    latRate = totalRate - sensRate;
+                                    CalcTotalSensibleLatentOutput(DataLoopNode::Node(this->AirOutNode).MassFlowRate, DataLoopNode::Node(CoilInletNode).Temp, DataLoopNode::Node(CoilInletNode).HumRat, DataLoopNode::Node(this->AirOutNode).Temp, DataLoopNode::Node(this->AirOutNode).HumRat, totalRate, sensRate, latRate);
                                     SenSPR =
                                         (ZoneLoad - this->FullOutput[SpeedNum - 1]) / (this->FullOutput[SpeedNum] - this->FullOutput[SpeedNum - 1]);
                                     LatSPR = (ZoneLatLoad - this->FullLatOutput[SpeedNum - 1]) /
