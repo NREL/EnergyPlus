@@ -10,7 +10,7 @@ function Component()
     // ... add custom operations
 
     var kernel = systemInfo.kernelType;
-    if( kernel == "darwin" ) {
+    if(( kernel == "darwin" ) || ( kernel == "linux")) {
 
       // Symlinks: require admin privileges
       var linktarget = "/usr/local/bin";
@@ -47,10 +47,30 @@ function Component()
       component.addElevatedOperation("Execute", "ln", "-sf", "@TargetDir@/PreProcess/GrndTempCalc/SlabGHT.idd", linktarget,
                                      "UNDOEXECUTE", "rm", linktarget + "/SlabGHT.idd");
 
+      if( kernel == "linux") {
+        // Historical: TODO: is this needed really?
+        component.addElevatedOperation("Execute", "ln", "-sf", "@TargetDir@/energyplus", linktarget + "/EnergyPlus",
+                                       "UNDOEXECUTE", "rm", linktarget + "/EnergyPlus")
+
+        component.addElevatedOperation("Execute", "ln", "-sf", "@TargetDir@/PostProcess/EP-Compare/EP-Compare", linktarget,
+                                       "UNDOEXECUTE", "rm", linktarget + "/EP-Compare");
+
+        component.addElevatedOperation("Execute", "ln", "-sf", "@TargetDir@/PreProcess/IDFVersionUpdater/IDFVersionUpdater", linktarget,
+                                       "UNDOEXECUTE", "rm", linktarget + "/IDFVersionUpdater");
+
+        component.addElevatedOperation("Execute", "ln", "-sf", "@TargetDir@/PreProcess/FMUParser/parser", linktarget,
+                                       "UNDOEXECUTE", "rm", linktarget + "/parser");
+      }
+
+      // TODO: we should perhaps create symlinks to EP-Compare,
+      // IDFVersionUpdater and and FMUparser on mac too, eg:
+      // "@TargetDir@/PostProcess/EP-Compare/EP-Compare.app/Contents/MacOS/EP-Compare"
+
       // man page:
       linktarget = "/usr/local/share/man/man1";
       component.addElevatedOperation("Execute", "ln", "-sf", "@TargetDir@/energyplus.1", linktarget,
                                      "UNDOEXECUTE", "rm", linktarget + "/energyplus.1");
+
     }
   }
 }
