@@ -65,36 +65,47 @@
 
 using namespace EnergyPlus;
 
-class DataExchangeAPIUnitTestFixture : public EnergyPlusFixture {
+class DataExchangeAPIUnitTestFixture : public EnergyPlusFixture
+{
     // create a plugin manager instance
     // TODO: Note that this requires the Python package to be built next to the E+ unit test binary
     //       Right now, this is built inside the E+ src/EnergyPlus/CMakeLists.txt file, it should probably be a separate project
     //       so that both E+ and the unit test binary can depend on it.
     EnergyPlus::PluginManagement::PluginManager pluginManager;
 
-    struct DummyRealVariable {
+    struct DummyRealVariable
+    {
         std::string varName;
         std::string varKey;
         Real64 value = 0.0;
         bool meterType = false;
-        DummyRealVariable(std::string _varName, std::string _varKey, Real64 _value, bool _meterType) : varName(std::move(_varName)), varKey(std::move(_varKey)), value(_value), meterType(_meterType) {}
+        DummyRealVariable(std::string _varName, std::string _varKey, Real64 _value, bool _meterType)
+            : varName(std::move(_varName)), varKey(std::move(_varKey)), value(_value), meterType(_meterType)
+        {
+        }
     };
     std::vector<DummyRealVariable> realVariablePlaceholders;
-    struct DummyIntVariable {
+    struct DummyIntVariable
+    {
         std::string varName;
         std::string varKey;
         int value = 0;
-        DummyIntVariable(std::string _varName, std::string _varKey, Real64 _value) : varName(std::move(_varName)), varKey(std::move(_varKey)), value(_value) {}
+        DummyIntVariable(std::string _varName, std::string _varKey, Real64 _value)
+            : varName(std::move(_varName)), varKey(std::move(_varKey)), value(_value)
+        {
+        }
     };
     std::vector<DummyIntVariable> intVariablePlaceholders;
-    struct actuator {
+    struct actuator
+    {
         Real64 val;
         bool flag;
     };
     std::vector<actuator> actuatorPlaceholders;
     std::vector<Real64> internalVarPlaceholders;
 
-    void SetUp() override {
+    void SetUp() override
+    {
         EnergyPlusFixture::SetUp();
         Real64 timeStep = 1.0;
         OutputProcessor::SetupTimePointers("Zone", timeStep);
@@ -103,60 +114,80 @@ class DataExchangeAPIUnitTestFixture : public EnergyPlusFixture {
         *OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
     }
 
-    void TearDown() override {
+    void TearDown() override
+    {
         this->realVariablePlaceholders.clear();
         this->actuatorPlaceholders.clear();
         EnergyPlusFixture::TearDown();
     }
 
 public:
-    void preRequestRealVariable(std::string const & varName, std::string const & key, Real64 initialValue = 0.0, bool meterType = false) {
+    void preRequestRealVariable(std::string const &varName, std::string const &key, Real64 initialValue = 0.0, bool meterType = false)
+    {
         this->realVariablePlaceholders.emplace_back(varName, key, initialValue, meterType);
         requestVariable(varName.c_str(), key.c_str());
     }
 
-    void preRequestIntegerVariable(std::string const & varName, std::string const & key, int initialValue = 0) {
+    void preRequestIntegerVariable(std::string const &varName, std::string const &key, int initialValue = 0)
+    {
         this->intVariablePlaceholders.emplace_back(varName, key, initialValue);
         requestVariable(varName.c_str(), key.c_str());
     }
 
-    void setupVariablesOnceAllAreRequested() {
+    void setupVariablesOnceAllAreRequested()
+    {
         inputProcessor->preScanReportingVariables();
-        for (auto & val: this->realVariablePlaceholders) {
+        for (auto &val : this->realVariablePlaceholders) {
             if (val.meterType) {
-                SetupOutputVariable(val.varName, OutputProcessor::Unit::kg_s, val.value, "Zone", "Sum", val.varKey, _, "ELECTRICITY", "HEATING", _, "System");
+                SetupOutputVariable(
+                    val.varName, OutputProcessor::Unit::kg_s, val.value, "Zone", "Sum", val.varKey, _, "ELECTRICITY", "HEATING", _, "System");
             } else {
                 SetupOutputVariable(val.varName, OutputProcessor::Unit::kg_s, val.value, "Zone", "Average", val.varKey);
             }
         }
-        for (auto & val: this->intVariablePlaceholders) {
+        for (auto &val : this->intVariablePlaceholders) {
             SetupOutputVariable(val.varName, OutputProcessor::Unit::kg_s, val.value, "Zone", "Average", val.varKey);
         }
     }
 
-    void addActuator(std::string const & objType, std::string const & controlType, std::string const & objKey) {
+    constexpr static auto dummyActuatorType = "Chiller:Electric";
+    constexpr static auto dummyActuatorVar = "Max Flow Rate";
+    constexpr static auto dummyActuatorInstance = "Chiller 1";
+    void addActuator(std::string const &objType = DataExchangeAPIUnitTestFixture::dummyActuatorType,
+                     std::string const &controlType = DataExchangeAPIUnitTestFixture::dummyActuatorVar,
+                     std::string const &objKey = DataExchangeAPIUnitTestFixture::dummyActuatorInstance)
+    {
         this->actuatorPlaceholders.emplace_back();
         int lastActuatorIndex = (int)this->actuatorPlaceholders.size() - 1;
-        SetupEMSActuator(objType, objKey, controlType, "kg/s", this->actuatorPlaceholders[lastActuatorIndex].flag, this->actuatorPlaceholders[lastActuatorIndex].val);
+        SetupEMSActuator(objType,
+                         objKey,
+                         controlType,
+                         "kg/s",
+                         this->actuatorPlaceholders[lastActuatorIndex].flag,
+                         this->actuatorPlaceholders[lastActuatorIndex].val);
     }
 
-    void addInternalVariable(std::string const & varType, std::string const & varKey) {
+    void addInternalVariable(std::string const &varType, std::string const &varKey)
+    {
         this->internalVarPlaceholders.emplace_back();
         SetupEMSInternalVariable(varType, varKey, "kg/s", this->internalVarPlaceholders.back());
         this->internalVarPlaceholders.clear();
     }
 
-    void addPluginGlobal(std::string const & varName) {
+    void addPluginGlobal(std::string const &varName)
+    {
         this->pluginManager.addGlobalVariable(varName);
     }
 
-    void addTrendWithNewGlobal(std::string const & newGlobalVarName, std::string const & trendName, int numTrendValues) {
+    void addTrendWithNewGlobal(std::string const &newGlobalVarName, std::string const &trendName, int numTrendValues)
+    {
         this->pluginManager.addGlobalVariable(newGlobalVarName);
         int i = EnergyPlus::PluginManagement::PluginManager::getGlobalVariableHandle(newGlobalVarName, true);
         EnergyPlus::PluginManagement::trends.emplace_back(trendName, numTrendValues, i);
     }
 
-    static void simulateTimeStepAndReport() {
+    static void simulateTimeStepAndReport()
+    {
         UpdateMeterReporting(OutputFiles::getSingleton());
         UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
     }
@@ -174,15 +205,16 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestListAllDataInCSV)
     // then as we add stuff, and make sure it appears in the output
     this->preRequestRealVariable("Boiler Heat Transfer", "Boiler 1");
     this->setupVariablesOnceAllAreRequested();
-    this->addActuator("Chiller:Electric", "Max Flow Rate", "Chiller 1");
+    this->addActuator();
     this->addInternalVariable("Floor Area", "Zone 1");
     this->addPluginGlobal("PluginGlobalVarName");
     this->addTrendWithNewGlobal("NewGlobalVarHere", "Trend 1", 3);
     std::string csvData = listAllAPIDataCSV();
     std::size_t foundAddedBoiler = csvData.find("BOILER 1") != std::string::npos; // Note output variables only keep UC, so we should check UC here
-    std::size_t foundAddedActuator = csvData.find("Chiller 1") != std::string::npos;
+    std::size_t foundAddedActuator = csvData.find(DataExchangeAPIUnitTestFixture::dummyActuatorType) != std::string::npos;
     std::size_t foundAddedIV = csvData.find("Zone 1") != std::string::npos;
-    std::size_t foundAddedGlobal = csvData.find("PLUGINGLOBALVARNAME") != std::string::npos; // Note globals are kept in upper case internally, check UC here
+    std::size_t foundAddedGlobal =
+        csvData.find("PLUGINGLOBALVARNAME") != std::string::npos; // Note globals are kept in upper case internally, check UC here
     std::size_t foundAddedTrend = csvData.find("Trend 1") != std::string::npos;
     EXPECT_TRUE(foundAddedBoiler);
     EXPECT_TRUE(foundAddedActuator);
@@ -196,7 +228,6 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestApiDataFullyReady)
     // basically, the data should not be ready at the beginning of a unit test -- ever, so just check that for now
     EXPECT_EQ(1, apiDataFullyReady()); // 1 is false
 }
-
 
 TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetVariableHandlesRealTypes)
 {
@@ -299,4 +330,31 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetMeterValues)
     // get the value for a valid meter
     Real64 curFacilityElectricity = getMeterValue(hFacilityElectricity);
     EXPECT_NEAR(3.14, curFacilityElectricity, 0.001);
+    // TODO: Figure out how to get accrued meter value and test that here
+}
+
+TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestActuators)
+{
+    this->addActuator();
+    // Then try to get the actuator handle
+    int hActuator = getActuatorHandle(DataExchangeAPIUnitTestFixture::dummyActuatorType,
+                                      DataExchangeAPIUnitTestFixture::dummyActuatorVar,
+                                      DataExchangeAPIUnitTestFixture::dummyActuatorInstance);
+    EXPECT_GT(hActuator, -1);
+    // now try to get handles to invalid actuators
+    {
+        int hActuatorBad =
+            getActuatorHandle(DataExchangeAPIUnitTestFixture::dummyActuatorType, DataExchangeAPIUnitTestFixture::dummyActuatorVar, "InvalidInstance");
+        EXPECT_EQ(hActuatorBad, -1);
+    }
+    {
+        int hActuatorBad =
+            getActuatorHandle(DataExchangeAPIUnitTestFixture::dummyActuatorType, "InvalidVar", DataExchangeAPIUnitTestFixture::dummyActuatorInstance);
+        EXPECT_EQ(hActuatorBad, -1);
+    }
+    {
+        int hActuatorBad =
+            getActuatorHandle("InvalidType", DataExchangeAPIUnitTestFixture::dummyActuatorVar, DataExchangeAPIUnitTestFixture::dummyActuatorInstance);
+        EXPECT_EQ(hActuatorBad, -1);
+    }
 }
