@@ -46,6 +46,7 @@
 // POSSIBILITY OF SUCH DAMAGE.
 
 // Unit tests for data transfer API methods
+#include <utility>
 #include <vector>
 
 // Google Test Headers
@@ -55,6 +56,7 @@
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/api/datatransfer.h>
@@ -63,7 +65,7 @@
 
 using namespace EnergyPlus;
 
-class DataExchangeUnitTestFixture : public EnergyPlusFixture {
+class DataExchangeAPIUnitTestFixture : public EnergyPlusFixture {
     // create a plugin manager instance
     // TODO: Note that this requires the Python package to be built next to the E+ unit test binary
     //       Right now, this is built inside the E+ src/EnergyPlus/CMakeLists.txt file, it should probably be a separate project
@@ -73,13 +75,16 @@ class DataExchangeUnitTestFixture : public EnergyPlusFixture {
     struct DummyRealVariable {
         std::string varName;
         std::string varKey;
-        Real64 value;
+        Real64 value = 0.0;
+        bool meterType = false;
+        DummyRealVariable(std::string _varName, std::string _varKey, Real64 _value, bool _meterType) : varName(std::move(_varName)), varKey(std::move(_varKey)), value(_value), meterType(_meterType) {}
     };
     std::vector<DummyRealVariable> realVariablePlaceholders;
     struct DummyIntVariable {
         std::string varName;
         std::string varKey;
-        int value;
+        int value = 0;
+        DummyIntVariable(std::string _varName, std::string _varKey, Real64 _value) : varName(std::move(_varName)), varKey(std::move(_varKey)), value(_value) {}
     };
     std::vector<DummyIntVariable> intVariablePlaceholders;
     struct actuator {
@@ -90,6 +95,7 @@ class DataExchangeUnitTestFixture : public EnergyPlusFixture {
     std::vector<Real64> internalVarPlaceholders;
 
     void SetUp() override {
+        EnergyPlusFixture::SetUp();
         Real64 timeStep = 1.0;
         OutputProcessor::SetupTimePointers("Zone", timeStep);
         OutputProcessor::SetupTimePointers("HVAC", timeStep);
@@ -100,50 +106,28 @@ class DataExchangeUnitTestFixture : public EnergyPlusFixture {
     void TearDown() override {
         this->realVariablePlaceholders.clear();
         this->actuatorPlaceholders.clear();
+        EnergyPlusFixture::TearDown();
     }
 
 public:
-    void preRequestRealVariable(std::string const & varName, std::string const & key, Real64 initialValue = 0.0) {
-        // keep hold of the old values before emplacing
-        std::vector<DummyRealVariable> tmp;
-        for (auto & val: this->realVariablePlaceholders) {
-            tmp.emplace_back();
-            tmp.back().varName = val.varName;
-            tmp.back().varKey = val.varKey;
-            tmp.back().value = val.value;
-        }
-        this->realVariablePlaceholders.emplace_back();
-        for (size_t i = 0; i < tmp.size(); i++) {
-            this->realVariablePlaceholders[i].varName = tmp[i].varName;
-            this->realVariablePlaceholders[i].varKey = tmp[i].varKey;
-            this->realVariablePlaceholders[i].value = tmp[i].value;
-        }
-        this->realVariablePlaceholders.back().varName = varName;
-        this->realVariablePlaceholders.back().varKey = key;
-        this->realVariablePlaceholders.back().value = initialValue;
+    void preRequestRealVariable(std::string const & varName, std::string const & key, Real64 initialValue = 0.0, bool meterType = false) {
+        this->realVariablePlaceholders.emplace_back(varName, key, initialValue, meterType);
         requestVariable(varName.c_str(), key.c_str());
     }
 
     void preRequestIntegerVariable(std::string const & varName, std::string const & key, int initialValue = 0) {
-        // keep hold of the old values before emplacing
-        std::vector<DummyIntVariable> tmp;
-        for (auto & val: this->intVariablePlaceholders) {
-            tmp.push_back(val);
-        }
-        this->intVariablePlaceholders.emplace_back();
-        for (size_t i = 0; i < tmp.size(); i++) {
-            this->intVariablePlaceholders[i] = tmp[i];
-        }
-        this->intVariablePlaceholders.back().varName = varName;
-        this->intVariablePlaceholders.back().varKey = key;
-        this->intVariablePlaceholders.back().value = initialValue;
+        this->intVariablePlaceholders.emplace_back(varName, key, initialValue);
         requestVariable(varName.c_str(), key.c_str());
     }
 
     void setupVariablesOnceAllAreRequested() {
         inputProcessor->preScanReportingVariables();
         for (auto & val: this->realVariablePlaceholders) {
-            SetupOutputVariable(val.varName, OutputProcessor::Unit::kg_s, val.value, "Zone", "Average", val.varKey);
+            if (val.meterType) {
+                SetupOutputVariable(val.varName, OutputProcessor::Unit::kg_s, val.value, "Zone", "Sum", val.varKey, _, "ELECTRICITY", "HEATING", _, "System");
+            } else {
+                SetupOutputVariable(val.varName, OutputProcessor::Unit::kg_s, val.value, "Zone", "Average", val.varKey);
+            }
         }
         for (auto & val: this->intVariablePlaceholders) {
             SetupOutputVariable(val.varName, OutputProcessor::Unit::kg_s, val.value, "Zone", "Average", val.varKey);
@@ -172,12 +156,13 @@ public:
         EnergyPlus::PluginManagement::trends.emplace_back(trendName, numTrendValues, i);
     }
 
-    void simulateATimeStepAndReport() {
+    static void simulateTimeStepAndReport() {
+        UpdateMeterReporting(OutputFiles::getSingleton());
         UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
     }
 };
 
-TEST_F(DataExchangeUnitTestFixture, DataTransfer_TestListAllDataInCSV)
+TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestListAllDataInCSV)
 {
 
     std::string const idf_objects = delimited_string({"Version, 9.3.0;"});
@@ -206,36 +191,36 @@ TEST_F(DataExchangeUnitTestFixture, DataTransfer_TestListAllDataInCSV)
     EXPECT_TRUE(foundAddedTrend);
 }
 
-TEST_F(DataExchangeUnitTestFixture, DataTransfer_TestApiDataFullyReady)
+TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestApiDataFullyReady)
 {
     // basically, the data should not be ready at the beginning of a unit test -- ever, so just check that for now
     EXPECT_EQ(1, apiDataFullyReady()); // 1 is false
 }
 
 
-TEST_F(DataExchangeUnitTestFixture, DataTransfer_TestGetVariableHandlesRealTypes)
+TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetVariableHandlesRealTypes)
 {
     this->preRequestRealVariable("Chiller Heat Transfer", "Chiller 1");
     this->preRequestRealVariable("Zone Mean Temperature", "Zone 1");
     this->setupVariablesOnceAllAreRequested();
     int hChillerHT = getVariableHandle("Chiller Heat Transfer", "Chiller 1");
     int hZoneTemp = getVariableHandle("Zone Mean Temperature", "Zone 1");
-    EXPECT_GT(hChillerHT, 0);
-    EXPECT_GT(hZoneTemp, 0);
+    EXPECT_GT(hChillerHT, -1);
+    EXPECT_GT(hZoneTemp, -1);
 }
 
-TEST_F(DataExchangeUnitTestFixture, DataTransfer_TestGetVariableHandlesIntegerTypes)
+TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetVariableHandlesIntegerTypes)
 {
     this->preRequestIntegerVariable("Chiller Operating Mode", "Chiller 1");
     this->preRequestIntegerVariable("Chiller Operating Mode", "Chiller 2");
     this->setupVariablesOnceAllAreRequested();
     int hChillerMode1 = getVariableHandle("Chiller Operating Mode", "Chiller 1");
     int hChillerMode2 = getVariableHandle("Chiller Operating Mode", "Chiller 2");
-    EXPECT_GT(hChillerMode1, 0);
-    EXPECT_GT(hChillerMode2, 0);
+    EXPECT_GT(hChillerMode1, -1);
+    EXPECT_GT(hChillerMode2, -1);
 }
 
-TEST_F(DataExchangeUnitTestFixture, DataTransfer_TestGetVariableHandlesMixedTypes)
+TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetVariableHandlesMixedTypes)
 {
     // In order to access them, you must request them to make them available, then look them up...add a couple floating point ones and an integer one
     this->preRequestRealVariable("Chiller Heat Transfer", "Chiller 1");
@@ -246,9 +231,9 @@ TEST_F(DataExchangeUnitTestFixture, DataTransfer_TestGetVariableHandlesMixedType
     int hChillerHT = getVariableHandle("Chiller Heat Transfer", "Chiller 1");
     int hZoneTemp = getVariableHandle("Zone Mean Temperature", "Zone 1");
     int hChillerMode = getVariableHandle("Chiller Operating Mode", "Chiller 1");
-    EXPECT_GT(hChillerHT, 0);
-    EXPECT_GT(hZoneTemp, 0);
-    EXPECT_GT(hChillerMode, 0);
+    EXPECT_GT(hChillerHT, -1);
+    EXPECT_GT(hZoneTemp, -1);
+    EXPECT_GT(hChillerMode, -1);
     // now try to get handles to variables that doesn't exist
     int hChiller2HT = getVariableHandle("Chiller Heat Transfer", "Chiller 2");
     int hZone2Temp = getVariableHandle("Zone Mean Radiant Temperature", "Zone 1");
@@ -256,7 +241,7 @@ TEST_F(DataExchangeUnitTestFixture, DataTransfer_TestGetVariableHandlesMixedType
     EXPECT_EQ(-1, hZone2Temp);
 }
 
-TEST_F(DataExchangeUnitTestFixture, DataTransfer_TestGetVariableValuesRealTypes)
+TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetVariableValuesRealTypes)
 {
     this->preRequestRealVariable("Chiller Heat Transfer", "Chiller 1", 3.14);
     this->preRequestRealVariable("Zone Mean Temperature", "Zone 1", 2.718);
@@ -265,7 +250,7 @@ TEST_F(DataExchangeUnitTestFixture, DataTransfer_TestGetVariableValuesRealTypes)
     int hZoneTemp = getVariableHandle("Zone Mean Temperature", "Zone 1");
 
     // pretend like E+ ran a time step
-    this->simulateATimeStepAndReport();
+    DataExchangeAPIUnitTestFixture::simulateTimeStepAndReport();
 
     // get the values for valid handles
     Real64 curHeatTransfer = getVariableValue(hChillerHT);
@@ -289,4 +274,29 @@ TEST_F(DataExchangeUnitTestFixture, DataTransfer_TestGetVariableValuesRealTypes)
     PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
     getVariableValue(3);
     EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
+}
+
+TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetMeterHandles)
+{
+    this->preRequestRealVariable("Chiller Electric Energy", "Chiller 1", 3.14, true);
+    this->setupVariablesOnceAllAreRequested();
+    // Then try to get the meter handle
+    int hFacilityElectricity = getMeterHandle("Electricity:Facility");
+    EXPECT_GT(hFacilityElectricity, -1);
+    // now try to get handles to meters that doesn't exist
+    int hDummyMeter = getMeterHandle("EnergySomething");
+    EXPECT_EQ(-1, hDummyMeter);
+}
+
+TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetMeterValues)
+{
+    this->preRequestRealVariable("Chiller Electric Energy", "Chiller 1", 3.14, true);
+    this->setupVariablesOnceAllAreRequested();
+    int hFacilityElectricity = getMeterHandle("Electricity:Facility");
+    EXPECT_GT(hFacilityElectricity, -1);
+    // pretend like E+ ran a time step
+    DataExchangeAPIUnitTestFixture::simulateTimeStepAndReport();
+    // get the value for a valid meter
+    Real64 curFacilityElectricity = getMeterValue(hFacilityElectricity);
+    EXPECT_NEAR(3.14, curFacilityElectricity, 0.001);
 }
