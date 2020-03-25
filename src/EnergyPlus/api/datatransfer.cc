@@ -183,7 +183,7 @@ Real64 getVariableValue(const int handle) {
     if (handle > 0 && handle <= EnergyPlus::OutputProcessor::NumOfRVariable) {
         auto &thisOutputVar = EnergyPlus::OutputProcessor::RVariableTypes(handle);
         return *thisOutputVar.VarPtr.Which;
-    } else if (handle <= EnergyPlus::OutputProcessor::NumOfRVariable + EnergyPlus::OutputProcessor::NumOfIVariable) {
+    } else if (handle > EnergyPlus::OutputProcessor::NumOfRVariable && handle <= EnergyPlus::OutputProcessor::NumOfRVariable + EnergyPlus::OutputProcessor::NumOfIVariable) {
         int thisHandle = handle - EnergyPlus::OutputProcessor::NumOfRVariable;
         auto &thisOutputVar = EnergyPlus::OutputProcessor::IVariableTypes(thisHandle);
         return (Real64)*thisOutputVar.VarPtr.Which;

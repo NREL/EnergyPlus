@@ -70,7 +70,18 @@ class DataExchangeUnitTestFixture : public EnergyPlusFixture {
     //       so that both E+ and the unit test binary can depend on it.
     EnergyPlus::PluginManagement::PluginManager pluginManager;
 
-    std::vector<Real64> variablePlaceholders;
+    struct DummyRealVariable {
+        std::string varName;
+        std::string varKey;
+        Real64 value;
+    };
+    std::vector<DummyRealVariable> realVariablePlaceholders;
+    struct DummyIntVariable {
+        std::string varName;
+        std::string varKey;
+        int value;
+    };
+    std::vector<DummyIntVariable> intVariablePlaceholders;
     struct actuator {
         Real64 val;
         bool flag;
@@ -78,17 +89,65 @@ class DataExchangeUnitTestFixture : public EnergyPlusFixture {
     std::vector<actuator> actuatorPlaceholders;
     std::vector<Real64> internalVarPlaceholders;
 
+    void SetUp() override {
+        Real64 timeStep = 1.0;
+        OutputProcessor::SetupTimePointers("Zone", timeStep);
+        OutputProcessor::SetupTimePointers("HVAC", timeStep);
+        *OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepZone).TimeStep = 60;
+        *OutputProcessor::TimeValue.at(OutputProcessor::TimeStepType::TimeStepSystem).TimeStep = 60;
+    }
+
     void TearDown() override {
-        this->variablePlaceholders.clear();
+        this->realVariablePlaceholders.clear();
         this->actuatorPlaceholders.clear();
     }
 
 public:
-    void addOutputVariable(std::string const & varName, std::string const & key) {
-        this->variablePlaceholders.emplace_back();
+    void preRequestRealVariable(std::string const & varName, std::string const & key, Real64 initialValue = 0.0) {
+        // keep hold of the old values before emplacing
+        std::vector<DummyRealVariable> tmp;
+        for (auto & val: this->realVariablePlaceholders) {
+            tmp.emplace_back();
+            tmp.back().varName = val.varName;
+            tmp.back().varKey = val.varKey;
+            tmp.back().value = val.value;
+        }
+        this->realVariablePlaceholders.emplace_back();
+        for (size_t i = 0; i < tmp.size(); i++) {
+            this->realVariablePlaceholders[i].varName = tmp[i].varName;
+            this->realVariablePlaceholders[i].varKey = tmp[i].varKey;
+            this->realVariablePlaceholders[i].value = tmp[i].value;
+        }
+        this->realVariablePlaceholders.back().varName = varName;
+        this->realVariablePlaceholders.back().varKey = key;
+        this->realVariablePlaceholders.back().value = initialValue;
         requestVariable(varName.c_str(), key.c_str());
+    }
+
+    void preRequestIntegerVariable(std::string const & varName, std::string const & key, int initialValue = 0) {
+        // keep hold of the old values before emplacing
+        std::vector<DummyIntVariable> tmp;
+        for (auto & val: this->intVariablePlaceholders) {
+            tmp.push_back(val);
+        }
+        this->intVariablePlaceholders.emplace_back();
+        for (size_t i = 0; i < tmp.size(); i++) {
+            this->intVariablePlaceholders[i] = tmp[i];
+        }
+        this->intVariablePlaceholders.back().varName = varName;
+        this->intVariablePlaceholders.back().varKey = key;
+        this->intVariablePlaceholders.back().value = initialValue;
+        requestVariable(varName.c_str(), key.c_str());
+    }
+
+    void setupVariablesOnceAllAreRequested() {
         inputProcessor->preScanReportingVariables();
-        SetupOutputVariable(varName, OutputProcessor::Unit::kg_s, this->variablePlaceholders.back(), "Zone", "Average", key);
+        for (auto & val: this->realVariablePlaceholders) {
+            SetupOutputVariable(val.varName, OutputProcessor::Unit::kg_s, val.value, "Zone", "Average", val.varKey);
+        }
+        for (auto & val: this->intVariablePlaceholders) {
+            SetupOutputVariable(val.varName, OutputProcessor::Unit::kg_s, val.value, "Zone", "Average", val.varKey);
+        }
     }
 
     void addActuator(std::string const & objType, std::string const & controlType, std::string const & objKey) {
@@ -112,91 +171,122 @@ public:
         int i = EnergyPlus::PluginManagement::PluginManager::getGlobalVariableHandle(newGlobalVarName, true);
         EnergyPlus::PluginManagement::trends.emplace_back(trendName, numTrendValues, i);
     }
+
+    void simulateATimeStepAndReport() {
+        UpdateDataandReport(OutputProcessor::TimeStepType::TimeStepZone);
+    }
 };
 
 TEST_F(DataExchangeUnitTestFixture, DataTransfer_TestListAllDataInCSV)
 {
 
     std::string const idf_objects = delimited_string({"Version, 9.3.0;"});
-    ASSERT_TRUE(process_idf(idf_objects, false));
+    ASSERT_TRUE(process_idf(idf_objects, false)); // this had to be here or I was getting a strange segfault during a JSON string dtor
 
     // first off, the function should return, even if there isn't anything meaningful in it (it will have headers)
     std::string csvDataEmpty = listAllAPIDataCSV();
 
-    // then as we add stuff, it should appear in there incrementally
-    this->addOutputVariable("Boiler Heat Transfer", "Boiler 1");
-    {
-        std::string csvData = listAllAPIDataCSV();
-        std::size_t foundAddedBoiler = csvData.find("BOILER 1") != std::string::npos; // Note output variables only keep UC, so we should check UC here
-        std::size_t foundAddedActuator = csvData.find("Chiller 1") != std::string::npos;
-        std::size_t foundAddedIV = csvData.find("Zone 1") != std::string::npos;
-        std::size_t foundAddedGlobal = csvData.find("PLUGINGLOBALVARNAME") != std::string::npos; // Note globals are kept in upper case internally, check UC here
-        std::size_t foundAddedTrend = csvData.find("Trend 1") != std::string::npos;
-        EXPECT_TRUE(foundAddedBoiler);
-        EXPECT_FALSE(foundAddedActuator);
-        EXPECT_FALSE(foundAddedIV);
-        EXPECT_FALSE(foundAddedGlobal);
-        EXPECT_FALSE(foundAddedTrend);
-    }
-
+    // then as we add stuff, and make sure it appears in the output
+    this->preRequestRealVariable("Boiler Heat Transfer", "Boiler 1");
+    this->setupVariablesOnceAllAreRequested();
     this->addActuator("Chiller:Electric", "Max Flow Rate", "Chiller 1");
-    {
-        std::string csvData = listAllAPIDataCSV();
-        std::size_t foundAddedBoiler = csvData.find("BOILER 1") != std::string::npos; // Note output variables only keep UC, so we should check UC here
-        std::size_t foundAddedActuator = csvData.find("Chiller 1") != std::string::npos;
-        std::size_t foundAddedIV = csvData.find("Zone 1") != std::string::npos;
-        std::size_t foundAddedGlobal = csvData.find("PLUGINGLOBALVARNAME") != std::string::npos; // Note globals are kept in upper case internally, check UC here
-        std::size_t foundAddedTrend = csvData.find("Trend 1") != std::string::npos;
-        EXPECT_TRUE(foundAddedBoiler);
-        EXPECT_TRUE(foundAddedActuator);
-        EXPECT_FALSE(foundAddedIV);
-        EXPECT_FALSE(foundAddedGlobal);
-        EXPECT_FALSE(foundAddedTrend);
-    }
-
     this->addInternalVariable("Floor Area", "Zone 1");
-    {
-        std::string csvData = listAllAPIDataCSV();
-        std::size_t foundAddedBoiler = csvData.find("BOILER 1") != std::string::npos; // Note output variables only keep UC, so we should check UC here
-        std::size_t foundAddedActuator = csvData.find("Chiller 1") != std::string::npos;
-        std::size_t foundAddedIV = csvData.find("Zone 1") != std::string::npos;
-        std::size_t foundAddedGlobal = csvData.find("PLUGINGLOBALVARNAME") != std::string::npos; // Note globals are kept in upper case internally, check UC here
-        std::size_t foundAddedTrend = csvData.find("Trend 1") != std::string::npos;
-        EXPECT_TRUE(foundAddedBoiler);
-        EXPECT_TRUE(foundAddedActuator);
-        EXPECT_TRUE(foundAddedIV);
-        EXPECT_FALSE(foundAddedGlobal);
-        EXPECT_FALSE(foundAddedTrend);
-    }
-
     this->addPluginGlobal("PluginGlobalVarName");
-    {
-        std::string csvData = listAllAPIDataCSV();
-        std::size_t foundAddedBoiler = csvData.find("BOILER 1") != std::string::npos; // Note output variables only keep UC, so we should check UC here
-        std::size_t foundAddedActuator = csvData.find("Chiller 1") != std::string::npos;
-        std::size_t foundAddedIV = csvData.find("Zone 1") != std::string::npos;
-        std::size_t foundAddedGlobal = csvData.find("PLUGINGLOBALVARNAME") != std::string::npos; // Note globals are kept in upper case internally, check UC here
-        std::size_t foundAddedTrend = csvData.find("Trend 1") != std::string::npos;
-        EXPECT_TRUE(foundAddedBoiler);
-        EXPECT_TRUE(foundAddedActuator);
-        EXPECT_TRUE(foundAddedIV);
-        EXPECT_TRUE(foundAddedGlobal);
-        EXPECT_FALSE(foundAddedTrend);
-    }
-
     this->addTrendWithNewGlobal("NewGlobalVarHere", "Trend 1", 3);
-    {
-        std::string csvData = listAllAPIDataCSV();
-        std::size_t foundAddedBoiler = csvData.find("BOILER 1") != std::string::npos; // Note output variables only keep UC, so we should check UC here
-        std::size_t foundAddedActuator = csvData.find("Chiller 1") != std::string::npos;
-        std::size_t foundAddedIV = csvData.find("Zone 1") != std::string::npos;
-        std::size_t foundAddedGlobal = csvData.find("PLUGINGLOBALVARNAME") != std::string::npos; // Note globals are kept in upper case internally, check UC here
-        std::size_t foundAddedTrend = csvData.find("Trend 1") != std::string::npos;
-        EXPECT_TRUE(foundAddedBoiler);
-        EXPECT_TRUE(foundAddedActuator);
-        EXPECT_TRUE(foundAddedIV);
-        EXPECT_TRUE(foundAddedGlobal);
-        EXPECT_TRUE(foundAddedTrend);
-    }
+    std::string csvData = listAllAPIDataCSV();
+    std::size_t foundAddedBoiler = csvData.find("BOILER 1") != std::string::npos; // Note output variables only keep UC, so we should check UC here
+    std::size_t foundAddedActuator = csvData.find("Chiller 1") != std::string::npos;
+    std::size_t foundAddedIV = csvData.find("Zone 1") != std::string::npos;
+    std::size_t foundAddedGlobal = csvData.find("PLUGINGLOBALVARNAME") != std::string::npos; // Note globals are kept in upper case internally, check UC here
+    std::size_t foundAddedTrend = csvData.find("Trend 1") != std::string::npos;
+    EXPECT_TRUE(foundAddedBoiler);
+    EXPECT_TRUE(foundAddedActuator);
+    EXPECT_TRUE(foundAddedIV);
+    EXPECT_TRUE(foundAddedGlobal);
+    EXPECT_TRUE(foundAddedTrend);
+}
 
+TEST_F(DataExchangeUnitTestFixture, DataTransfer_TestApiDataFullyReady)
+{
+    // basically, the data should not be ready at the beginning of a unit test -- ever, so just check that for now
+    EXPECT_EQ(1, apiDataFullyReady()); // 1 is false
+}
+
+
+TEST_F(DataExchangeUnitTestFixture, DataTransfer_TestGetVariableHandlesRealTypes)
+{
+    this->preRequestRealVariable("Chiller Heat Transfer", "Chiller 1");
+    this->preRequestRealVariable("Zone Mean Temperature", "Zone 1");
+    this->setupVariablesOnceAllAreRequested();
+    int hChillerHT = getVariableHandle("Chiller Heat Transfer", "Chiller 1");
+    int hZoneTemp = getVariableHandle("Zone Mean Temperature", "Zone 1");
+    EXPECT_GT(hChillerHT, 0);
+    EXPECT_GT(hZoneTemp, 0);
+}
+
+TEST_F(DataExchangeUnitTestFixture, DataTransfer_TestGetVariableHandlesIntegerTypes)
+{
+    this->preRequestIntegerVariable("Chiller Operating Mode", "Chiller 1");
+    this->preRequestIntegerVariable("Chiller Operating Mode", "Chiller 2");
+    this->setupVariablesOnceAllAreRequested();
+    int hChillerMode1 = getVariableHandle("Chiller Operating Mode", "Chiller 1");
+    int hChillerMode2 = getVariableHandle("Chiller Operating Mode", "Chiller 2");
+    EXPECT_GT(hChillerMode1, 0);
+    EXPECT_GT(hChillerMode2, 0);
+}
+
+TEST_F(DataExchangeUnitTestFixture, DataTransfer_TestGetVariableHandlesMixedTypes)
+{
+    // In order to access them, you must request them to make them available, then look them up...add a couple floating point ones and an integer one
+    this->preRequestRealVariable("Chiller Heat Transfer", "Chiller 1");
+    this->preRequestRealVariable("Zone Mean Temperature", "Zone 1");
+    this->preRequestIntegerVariable("Chiller Operating Mode", "Chiller 1");
+    this->setupVariablesOnceAllAreRequested();
+    // Then try to get their handles
+    int hChillerHT = getVariableHandle("Chiller Heat Transfer", "Chiller 1");
+    int hZoneTemp = getVariableHandle("Zone Mean Temperature", "Zone 1");
+    int hChillerMode = getVariableHandle("Chiller Operating Mode", "Chiller 1");
+    EXPECT_GT(hChillerHT, 0);
+    EXPECT_GT(hZoneTemp, 0);
+    EXPECT_GT(hChillerMode, 0);
+    // now try to get handles to variables that doesn't exist
+    int hChiller2HT = getVariableHandle("Chiller Heat Transfer", "Chiller 2");
+    int hZone2Temp = getVariableHandle("Zone Mean Radiant Temperature", "Zone 1");
+    EXPECT_EQ(-1, hChiller2HT);
+    EXPECT_EQ(-1, hZone2Temp);
+}
+
+TEST_F(DataExchangeUnitTestFixture, DataTransfer_TestGetVariableValuesRealTypes)
+{
+    this->preRequestRealVariable("Chiller Heat Transfer", "Chiller 1", 3.14);
+    this->preRequestRealVariable("Zone Mean Temperature", "Zone 1", 2.718);
+    this->setupVariablesOnceAllAreRequested();
+    int hChillerHT = getVariableHandle("Chiller Heat Transfer", "Chiller 1");
+    int hZoneTemp = getVariableHandle("Zone Mean Temperature", "Zone 1");
+
+    // pretend like E+ ran a time step
+    this->simulateATimeStepAndReport();
+
+    // get the values for valid handles
+    Real64 curHeatTransfer = getVariableValue(hChillerHT);
+    Real64 curZoneTemp = getVariableValue(hZoneTemp);
+    EXPECT_NEAR(3.14, curHeatTransfer, 0.0001);
+    EXPECT_NEAR(2.718, curZoneTemp, 0.0001);
+    // invalid handles will respond differently based on whether E+ is in API or Plugin mode
+
+    // in API mode, the function will throw an exception (for now)
+    DataGlobals::eplusRunningViaAPI = true;
+    EXPECT_THROW(getVariableValue(-1), std::runtime_error);
+    EXPECT_THROW(getVariableValue(3), std::runtime_error);
+
+    // in Plugin mode, there is a flag that should be set to true
+    DataGlobals::eplusRunningViaAPI = false;
+    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
+    // first the thing should just pass
+    getVariableValue(-1);
+    // but the flag should be set
+    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
+    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
+    getVariableValue(3);
+    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
 }
