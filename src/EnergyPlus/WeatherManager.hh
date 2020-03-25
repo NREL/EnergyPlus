@@ -117,7 +117,7 @@ namespace WeatherManager {
     extern Real64 const Sigma;   // Stefan-Boltzmann constant
     extern Real64 const TKelvin; // conversion from Kelvin to Celsius
 
-    extern Array1D_string const DaysOfWeek;
+    extern Array1D<std::string> const DaysOfWeek;
 
     extern bool Debugout;
 
@@ -144,7 +144,7 @@ namespace WeatherManager {
     extern Real64 WeatherFileTimeZone;
     extern Real64 WeatherFileElevation;
     extern int WeatherFileUnitNumber;                  // File unit number for the weather file
-    extern Array1D<Real64> GroundTempsFCFromEPWHeader; // F or C factor method
+    extern EPVector<Real64> GroundTempsFCFromEPWHeader; // F or C factor method
     extern Array1D<Real64> GroundReflectances;         // User Specified Ground Reflectances
     extern Real64 SnowGndRefModifier;                  // Modifier to ground reflectance during snow
     extern Real64 SnowGndRefModifierForDayltg;         // Modifier to ground reflectance during snow for daylighting
@@ -161,9 +161,9 @@ namespace WeatherManager {
     extern int TotRunDesPers; // Total number of Run Design Periods (Weather data) to Setup
 
     extern int NumSpecialDays;
-    extern Array1D_int SpecialDayTypes; // To hold holiday types given in input file
-    extern Array1D_int WeekDayTypes;    // To hold Week day types using specified first day
-    extern Array1D_int DSTIndex;        // To hold DST Index based on weather file or input
+    extern EPVector<int> SpecialDayTypes; // To hold holiday types given in input file
+    extern EPVector<int> WeekDayTypes;    // To hold Week day types using specified first day
+    extern EPVector<int> DSTIndex;        // To hold DST Index based on weather file or input
 
     extern int NumDataPeriods;
 
@@ -237,19 +237,19 @@ namespace WeatherManager {
     extern Real64 SolarAzimuthAngle;                             // Angle of Solar Azimuth (degrees)
     extern Real64 HorizIRSky;                                    // Horizontal Infrared Radiation Intensity (W/m2)
     extern Real64 TimeStepFraction;                              // Fraction of hour each time step represents
-    extern Array1D<Real64> SPSiteDryBulbRangeModScheduleValue;   // reporting Drybulb Temperature Range Modifier Schedule Value
-    extern Array1D<Real64> SPSiteHumidityConditionScheduleValue; // reporting Humidity Condition Schedule Value
-    extern Array1D<Real64> SPSiteBeamSolarScheduleValue;         // reporting Beam Solar Schedule Value
-    extern Array1D<Real64> SPSiteDiffuseSolarScheduleValue;      // reporting Diffuse Solar Schedule Value
-    extern Array1D<Real64> SPSiteSkyTemperatureScheduleValue;    // reporting SkyTemperature Modifier Schedule Value
-    extern Array1D_int SPSiteScheduleNamePtr;                    // SP Site Schedule Name Ptrs
-    extern Array1D_string SPSiteScheduleUnits;                   // SP Site Schedule Units
+    extern EPVector<Real64> SPSiteDryBulbRangeModScheduleValue;   // reporting Drybulb Temperature Range Modifier Schedule Value
+    extern EPVector<Real64> SPSiteHumidityConditionScheduleValue; // reporting Humidity Condition Schedule Value
+    extern EPVector<Real64> SPSiteBeamSolarScheduleValue;         // reporting Beam Solar Schedule Value
+    extern EPVector<Real64> SPSiteDiffuseSolarScheduleValue;      // reporting Diffuse Solar Schedule Value
+    extern EPVector<Real64> SPSiteSkyTemperatureScheduleValue;    // reporting SkyTemperature Modifier Schedule Value
+    extern Array1D<int> SPSiteScheduleNamePtr;                    // SP Site Schedule Name Ptrs
+    extern EPVector<std::string> SPSiteScheduleUnits;                   // SP Site Schedule Units
     extern int NumSPSiteScheduleNamePtrs;                        // Number of SP Site Schedules (DesignDay only)
     extern int NumMissing;                                       // Number of hours of missing data
-    extern Array1D<Real64> Interpolation;                        // Interpolation values based on Number of Time Steps in Hour
-    extern Array1D<Real64> SolarInterpolation;                   // Solar Interpolation values based on
+    extern EPVector<Real64> Interpolation;                        // Interpolation values based on Number of Time Steps in Hour
+    extern EPVector<Real64> SolarInterpolation;                   // Solar Interpolation values based on
     //      Number of Time Steps in Hour
-    extern Array1D_int EndDayOfMonth;
+    extern EPVector<int> EndDayOfMonth;
     extern bool ErrorInWeatherFile;           // Set to TRUE when there is a problem with dates
     extern int LeapYearAdd;                   // Set during environment if leap year is active (adds 1 to number days in Feb)
     extern bool DatesShouldBeReset;           // True when weekdays should be reset
@@ -310,7 +310,7 @@ namespace WeatherManager {
         bool ApplyWeekendRule; // True if "Weekend Rule" is to be applied to RunPeriod
         bool UseRain;          // True if Rain from weather file should be used (set rain to true)
         bool UseSnow;          // True if Snow from weather file should be used (set Snow to true)
-        Array1D_int MonWeekDay;
+        EPVector<int> MonWeekDay;
         bool SetWeekDays;             // true when weekdays will be reset (after first year or on repeat)
         int NumSimYears;              // Total Number of times this period to be performed
         int CurrentCycle;             // Current cycle through weather file in NumSimYears repeats
@@ -401,7 +401,7 @@ namespace WeatherManager {
         bool applyWeekendRule; // True if "Weekend Rule" is to be applied to RunPeriod
         bool useRain;          // True if Rain from weather file should be used (set rain to true)
         bool useSnow;          // True if Snow from weather file should be used (set Snow to true)
-        Array1D_int monWeekDay;
+        EPVector<int> monWeekDay;
         int numSimYears;              // Total Number of years of simulation to be performed
         bool isLeapYear;              // True if Begin Year is leap year.
         bool RollDayTypeOnRepeat;     // If repeating run period, increment day type on repeat.
@@ -478,7 +478,7 @@ namespace WeatherManager {
         int EnDay;
         int EnYear;
         int NumDays;
-        Array1D_int MonWeekDay;
+        EPVector<int> MonWeekDay;
         int DataStJDay;
         int DataEnJDay;
         bool HasYearData;
@@ -660,24 +660,24 @@ namespace WeatherManager {
                                                   // Day of week for weather data | Daylight Saving Time Period indicator (0=no,1=yes) | Holiday
                                                   // indicator (0=no holiday, non-zero=holiday type) | Sine of the solar declination angle | Cosine of
                                                   // the solar declination angle | Value of the equation of time formula
-    extern Array1D<DayWeatherVariables> DesignDay; // Design day environments
+    extern EPVector<DayWeatherVariables> DesignDay; // Design day environments
     extern MissingData Missing; // Dry Bulb Temperature (C) | Dew Point Temperature (C) | Relative Humidity (%) | Atmospheric Pressure (Pa) | Wind
                                 // Direction (deg) | Wind Speed/Velocity (m/s) | Total Sky Cover (tenths) | Opaque Sky Cover (tenths) | Visibility
                                 // (km) | Ceiling Height (m) | Precipitable Water (mm) | Aerosol Optical Depth | Snow Depth (cm) | Number of Days
                                 // since last snow | Albedo | Rain/Liquid Precipitation (mm)
     extern MissingDataCounts Missed;
     extern RangeDataCounts OutOfRange;
-    extern Array1D<DesignDayData> DesDayInput;   // Design day Input Data
-    extern Array1D<EnvironmentData> Environment; // Environment data
-    extern Array1D<RunPeriodData> RunPeriodInput;
-    extern Array1D<RunPeriodData> RunPeriodDesignInput;
-    extern Array1D<TypicalExtremeData> TypicalExtremePeriods;
+    extern EPVector<DesignDayData> DesDayInput;   // Design day Input Data
+    extern EPVector<EnvironmentData> Environment; // Environment data
+    extern EPVector<RunPeriodData> RunPeriodInput;
+    extern EPVector<RunPeriodData> RunPeriodDesignInput;
+    extern EPVector<TypicalExtremeData> TypicalExtremePeriods;
     extern DaylightSavingPeriodData EPWDST; // Daylight Saving Period Data from EPW file
     extern DaylightSavingPeriodData IDFDST; // Daylight Saving Period Data from IDF file
     extern DaylightSavingPeriodData DST;    // Daylight Saving Period Data, if active
-    extern Array1D<WeatherProperties> WPSkyTemperature;
-    extern Array1D<SpecialDayData> SpecialDays;
-    extern Array1D<DataPeriodData> DataPeriods;
+    extern EPVector<WeatherProperties> WPSkyTemperature;
+    extern EPVector<SpecialDayData> SpecialDays;
+    extern EPVector<DataPeriodData> DataPeriods;
 
     // Functions
     void clear_state();
@@ -706,9 +706,9 @@ namespace WeatherManager {
 
     void UpdateLocationAndOrientation();
 
-    void SetupWeekDaysByMonth(int const StMon, int const StDay, int const StWeekDay, Array1D_int &WeekDays);
+    void SetupWeekDaysByMonth(int const StMon, int const StDay, int const StWeekDay, EPVector<int> &WeekDays);
 
-    void ResetWeekDaysByMonth(Array1D_int &WeekDays,
+    void ResetWeekDaysByMonth(EPVector<int> &WeekDays,
                               int const LeapYearAdd,
                               int const StartMonth,
                               int const StartMonthDay,
@@ -717,14 +717,14 @@ namespace WeatherManager {
                               bool const Rollover,
                               Optional_bool_const MidSimReset = _);
 
-    void SetDSTDateRanges(Array1D_int &MonWeekDay, // Weekday of each day 1 of month
-                          Array1D_int &DSTIndex,   // DST Index for each julian day (1:366)
+    void SetDSTDateRanges(EPVector<int> &MonWeekDay, // Weekday of each day 1 of month
+                          EPVector<int> &DSTIndex,   // DST Index for each julian day (1:366)
                           Optional_int DSTActStMon = _,
                           Optional_int DSTActStDay = _,
                           Optional_int DSTActEnMon = _,
                           Optional_int DSTActEnDay = _);
 
-    void SetSpecialDayDates(Array1D_int &MonWeekDay); // Weekday of each day 1 of month
+    void SetSpecialDayDates(EPVector<int> &MonWeekDay); // Weekday of each day 1 of month
 
     void InitializeWeather(bool &PrintEnvrnStamp); // Set to true when the environment header should be printed
 
@@ -777,7 +777,7 @@ namespace WeatherManager {
                                   Real64 &RField19,       // Visibility
                                   Real64 &RField20,       // CeilHeight
                                   int &WObs,              // PresWeathObs
-                                  Array1D_int &WCodesArr, // PresWeathConds
+                                  Array1D<int> &WCodesArr, // PresWeathConds
                                   Real64 &RField22,       // PrecipWater
                                   Real64 &RField23,       // AerosolOptDepth
                                   Real64 &RField24,       // SnowDepth
@@ -822,9 +822,9 @@ namespace WeatherManager {
                                       Real64 const EqOfTime,     // Equation of Time
                                       Real64 const SinSolDeclin, // Sine of Solar Declination
                                       Real64 const CosSolDeclin, // Cosine of Solar Declination
-                                      Array1D<Real64> &SUNCOS);
+                                      EPVector<Real64> &SUNCOS);
 
-    void DetermineSunUpDown(Array1D<Real64> &SunDirectionCosines);
+    void DetermineSunUpDown(EPVector<Real64> &SunDirectionCosines);
 
     void OpenWeatherFile(bool &ErrorsFound);
 
@@ -930,7 +930,7 @@ namespace WeatherManager {
         bool OADryBulbWeatherDataProcessed;             // if false stat or weather file OA Dry-bulb temp is not processed yet
         Real64 AnnualAvgOADryBulbTemp;                  // annual average outdoor air temperature (C)
         Real64 MonthlyAvgOADryBulbTempMaxDiff;          // monthly daily average OA drybulb temperature maximum difference (deltaC)
-        Array1D<Real64> MonthlyDailyAverageDryBulbTemp; // monthly-daily average outdoor air temperatures (C)
+        EPVector<Real64> MonthlyDailyAverageDryBulbTemp; // monthly-daily average outdoor air temperatures (C)
 
         // Default Constructor
         AnnualMonthlyDryBulbWeatherData()

@@ -449,7 +449,7 @@ TEST_F(EnergyPlusFixture, WaterMainsCorrelationFromStatFileTest)
     EXPECT_EQ(WeatherManager::WaterMainsTempsAnnualAvgAirTemp, 0.0);
     EXPECT_EQ(WeatherManager::WaterMainsTempsMaxDiffAirTemp, 0.0);
 
-    Array1D<Real64> MonthlyDryBulbTempFromStatFile(12, {-4.60, -2.50, 3.80, 10.00, 15.30, 21.10, 24.10, 21.80, 18.10, 11.00, 4.70, -3.70});
+    EPVector<Real64> MonthlyDryBulbTempFromStatFile{{-4.60, -2.50, 3.80, 10.00, 15.30, 21.10, 24.10, 21.80, 18.10, 11.00, 4.70, -3.70}};
     OADryBulbAverage.MonthlyDailyAverageDryBulbTemp = MonthlyDryBulbTempFromStatFile;
 
     // calc water mains parameters for CorrelationFromWeatherFile method

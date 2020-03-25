@@ -234,32 +234,33 @@ template <typename T> struct EPVector : std::vector<T>
 
     void allocate(int size)
     {
-        this->reserve(size);
+        this->resize(size);
     }
 
     void redimension(int size)
     {
-        this->reserve(size);
+        this->resize(size);
     }
 
-    // EPVector<T> & deallocate()
     void deallocate()
     {
+        this->clear();
         return;
-        // EPVector<T>().swap(this);
-        // return *this;
     }
 
+    // operator= used for initialization of the vector
     void operator=(T v)
     {
         std::fill(this->begin(), this->end(), v);
     }
 
+    // dimension is often used to initalize the vector instead of allocate + operator=
     void dimension(int size, const T v)
     {
         this->resize(size, v);
     }
 
+    // isize needed for current FindItemInList
     int isize() const
     {
         return static_cast<int>(this->size());
