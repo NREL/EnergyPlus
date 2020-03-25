@@ -2943,6 +2943,7 @@ namespace WindowManager {
                 if (AnyLocalEnvironmentsInModel) {
                     if (Surface(SurfNum).HasSurroundingSurfProperties) {
                         SrdSurfsNum = Surface(SurfNum).SurroundingSurfacesNum;
+
                         if (SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor != -1) {
                             surface.ViewFactorSkyIR = SurroundingSurfsProperty(SrdSurfsNum).SkyViewFactor;
                         }
@@ -2953,7 +2954,7 @@ namespace WindowManager {
                             SrdSurfViewFac = SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
                             SrdSurfTempAbs =
                                 GetCurrentScheduleValue(SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) + KelvinConv;
-                            OutSrdIR += sigma * SrdSurfViewFac * (pow_4(SrdSurfTempAbs));
+                            OutSrdIR += sigma * SrdSurfViewFac * pow_4(SrdSurfTempAbs);
                         }
                     }
                 }
@@ -2967,7 +2968,7 @@ namespace WindowManager {
                     tout = surface.OutDryBulbTemp + TKelvin;
                 }
                 Ebout = sigma * pow_4(tout);
-                Outir = surface.ViewFactorSkyIR * (AirSkyRadSplit(SurfNum) * sigma * pow_4(SkyTempKelvin) + (1.0 - AirSkyRadSplit(SurfNum)) * Ebout) +
+                Outir = surface.ViewFactorSkyIR * (AirSkyRadSplit(SurfNum) * pow_4(SkyTempKelvin) + (1.0 - AirSkyRadSplit(SurfNum)) * Ebout) +
                         surface.ViewFactorGroundIR * Ebout + OutSrdIR;
             }
 
@@ -3084,14 +3085,14 @@ namespace WindowManager {
                     SrdSurfViewFac = SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).ViewFactor;
                     SrdSurfTempAbs =
                         GetCurrentScheduleValue(SurroundingSurfsProperty(SrdSurfsNum).SurroundingSurfs(SrdSurfNum).TempSchNum) + KelvinConv;
-                    rad_out_lw_srd_per_area += - emiss_sigma_product * SrdSurfViewFac * (Tsout_4 - pow_4(SrdSurfTempAbs));
+                    rad_out_lw_srd_per_area += emiss_sigma_product * SrdSurfViewFac * pow_4(SrdSurfTempAbs);
                 }
             }
         }
 
-        Real64 const rad_out_air_per_area = - emiss_sigma_product * (1.0 - AirSkyRadSplit(SurfNum)) * surface.ViewFactorSkyIR * (Tsout_4 - Tout_4);
-        Real64 const rad_out_ground_per_area = - emiss_sigma_product * surface.ViewFactorGroundIR * (Tsout_4 - Tout_4);
-        Real64 const rad_out_sky_per_area = - emiss_sigma_product * AirSkyRadSplit(SurfNum) * surface.ViewFactorSkyIR * (Tsout_4 - pow_4(SkyTempKelvin));
+        Real64 const rad_out_air_per_area = emiss_sigma_product * (1.0 - AirSkyRadSplit(SurfNum)) * surface.ViewFactorSkyIR * Tout_4;
+        Real64 const rad_out_ground_per_area = emiss_sigma_product * surface.ViewFactorGroundIR * Tout_4;
+        Real64 const rad_out_sky_per_area = emiss_sigma_product * AirSkyRadSplit(SurfNum) * surface.ViewFactorSkyIR * pow_4(SkyTempKelvin);
         Real64 const rad_out_per_area = rad_out_air_per_area + rad_out_sky_per_area + rad_out_ground_per_area + rad_out_lw_srd_per_area;
 
         QRadLWOutSrdSurfs(SurfNum) = rad_out_lw_srd_per_area;
