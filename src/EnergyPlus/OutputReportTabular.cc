@@ -8611,12 +8611,12 @@ namespace OutputReportTabular {
             resource_entry_map.allocate(12);
             resource_entry_map(1) = pdchLeedPerfElEneUse;          // electricity
             resource_entry_map(2) = pdchLeedPerfGasEneUse;         // natural gas
-            resource_entry_map(3) = pdchLeedPerfPropaneEneUse;     // propane
-            resource_entry_map(4) = pdchLeedPerfGasolineEneUse;    // gasoline
-            resource_entry_map(5) = pdchLeedPerfDieselEneUse;      // diesel
-            resource_entry_map(6) = pdchLeedPerfCoalEneUse;        // coal
-            resource_entry_map(7) = pdchLeedPerfFuelOil1EneUse;    // fuel oil no 1
-            resource_entry_map(8) = pdchLeedPerfFuelOil2EneUse;    // fuel oil no 2
+            resource_entry_map(3) = pdchLeedPerfGasolineEneUse;    // gasoline
+            resource_entry_map(4) = pdchLeedPerfDieselEneUse;      // diesel
+            resource_entry_map(5) = pdchLeedPerfCoalEneUse;        // coal
+            resource_entry_map(6) = pdchLeedPerfFuelOil1EneUse;    // fuel oil no 1
+            resource_entry_map(7) = pdchLeedPerfFuelOil2EneUse;    // fuel oil no 2
+            resource_entry_map(8) = pdchLeedPerfPropaneEneUse;     // propane
             resource_entry_map(9) = pdchLeedPerfOtherFuel1EneUse;  // other fuel 1
             resource_entry_map(10) = pdchLeedPerfOtherFuel2EneUse; // other fuel 2
             resource_entry_map(11) = pdchLeedPerfDisClEneUse;      // district cooling
@@ -9283,7 +9283,7 @@ namespace OutputReportTabular {
             columnWidth.allocate(12);
             columnWidth = 10; // array assignment - same for all columns
             tableBody.allocate(12, 16);
-            for (iResource = 1; iResource <= 6; ++iResource) {
+            for (iResource = 1; iResource <= 13; ++iResource) {
                 useVal(iResource, 1) = collapsedEndUse(iResource, endUseHeating);
                 useVal(iResource, 2) = collapsedEndUse(iResource, endUseCooling);
                 useVal(iResource, 3) = collapsedEndUse(iResource, endUseInteriorLights);
@@ -9564,7 +9564,7 @@ namespace OutputReportTabular {
         Array1D_string rowHead;
         Array2D_string tableBody;
 
-        // all arrays are in the format: (row, columnm)
+        // all arrays are in the format: (row, column)
         Array2D<Real64> useVal(13, 15);
         Array1D<Real64> collapsedTotal(13);
         Array2D<Real64> collapsedEndUse(13, NumEndUses);
@@ -10053,14 +10053,14 @@ namespace OutputReportTabular {
             resource_entry_map.allocate(12);
             resource_entry_map(1) = pdchLeedPerfElDem;      // electricity
             resource_entry_map(2) = pdchLeedPerfGasDem;     // natural gas
-            resource_entry_map(3) = pdchLeedPerfPropaneEneUse;     // propane
-            resource_entry_map(4) = pdchLeedPerfGasolineEneUse;    // gasoline
-            resource_entry_map(5) = pdchLeedPerfDieselEneUse;      // diesel
-            resource_entry_map(6) = pdchLeedPerfCoalEneUse;        // coal
-            resource_entry_map(7) = pdchLeedPerfFuelOil1EneUse;    // fuel oil no 1
-            resource_entry_map(8) = pdchLeedPerfFuelOil2EneUse;    // fuel oil no 2
-            resource_entry_map(9) = pdchLeedPerfOtherFuel1EneUse;  // other fuel 1
-            resource_entry_map(10) = pdchLeedPerfOtherFuel2EneUse; // other fuel 2
+            resource_entry_map(3) = pdchLeedPerfGasolineDem;       // gasoline
+            resource_entry_map(4) = pdchLeedPerfDieselDem;         // diesel
+            resource_entry_map(5) = pdchLeedPerfCoalDem;           // coal
+            resource_entry_map(6) = pdchLeedPerfFuelOil1Dem;       // fuel oil no 1
+            resource_entry_map(7) = pdchLeedPerfFuelOil2Dem;       // fuel oil no 2
+            resource_entry_map(8) = pdchLeedPerfPropaneDem;        // propane
+            resource_entry_map(9) = pdchLeedPerfOtherFuel1Dem;     // other fuel 1
+            resource_entry_map(10) = pdchLeedPerfOtherFuel2Dem;    // other fuel 2
             resource_entry_map(11) = pdchLeedPerfDisClDem;   // district cooling
             resource_entry_map(12) = pdchLeedPerfDisHtDem;   // district heating
 
