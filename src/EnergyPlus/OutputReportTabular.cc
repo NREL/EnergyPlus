@@ -9326,40 +9326,40 @@ namespace OutputReportTabular {
                 if (SELECT_CASE_var == unitsStyleJtoKWH) {
                     columnHead(1) = "Source Electricity [kWh]";
                     columnHead(2) = "Source Natural Gas [kWh]";
-                    columnHead(3) = "Gasoline [kWh]";
-                    columnHead(4) = "Diesel [kWh]";
-                    columnHead(5) = "Coal [kWh]";
-                    columnHead(6) = "Fuel Oil No 1 [kWh]";
-                    columnHead(7) = "Fuel Oil No 2 [kWh]";
-                    columnHead(8) = "Propane [kWh]";
-                    columnHead(9) = "Other Fuel 1 [kWh]";
-                    columnHead(10) = "Other Fuel 2 [kWh]";
+                    columnHead(3) = "Source Gasoline [kWh]";
+                    columnHead(4) = "Source Diesel [kWh]";
+                    columnHead(5) = "Source Coal [kWh]";
+                    columnHead(6) = "Source Fuel Oil No 1 [kWh]";
+                    columnHead(7) = "Source Fuel Oil No 2 [kWh]";
+                    columnHead(8) = "Source Propane [kWh]";
+                    columnHead(9) = "Source Other Fuel 1 [kWh]";
+                    columnHead(10) = "Source Other Fuel 2 [kWh]";
                     columnHead(11) = "Source District Cooling [kWh]";
                     columnHead(12) = "Source District Heating [kWh]";
                 } else if (SELECT_CASE_var == unitsStyleInchPound) {
                     columnHead(1) = "Source Electricity [kBtu]";
                     columnHead(2) = "Source Natural Gas [kBtu]";
-                    columnHead(3) = "Gasoline [kBtu]";
-                    columnHead(4) = "Diesel [kBtu]";
-                    columnHead(5) = "Coal [kBtu]";
-                    columnHead(6) = "Fuel Oil No 1 [kBtu]";
-                    columnHead(7) = "Fuel Oil No 2 [kBtu]";
-                    columnHead(8) = "Propane [kBtu]";
-                    columnHead(9) = "Other Fuel 1 [kBtu]";
-                    columnHead(10) = "Other Fuel 2 [kBtu]";
+                    columnHead(3) = "Source Gasoline [kBtu]";
+                    columnHead(4) = "Source Diesel [kBtu]";
+                    columnHead(5) = "Source Coal [kBtu]";
+                    columnHead(6) = "Source Fuel Oil No 1 [kBtu]";
+                    columnHead(7) = "Source Fuel Oil No 2 [kBtu]";
+                    columnHead(8) = "Source Propane [kBtu]";
+                    columnHead(9) = "Source Other Fuel 1 [kBtu]";
+                    columnHead(10) = "Source Other Fuel 2 [kBtu]";
                     columnHead(11) = "Source District Cooling [kBtu]";
                     columnHead(12) = "Source District Heating [kBtu]";
                 } else {
                     columnHead(1) = "Source Electricity [GJ]";
                     columnHead(2) = "Source Natural Gas [GJ]";
-                    columnHead(3) = "Gasoline [GJ]";
-                    columnHead(4) = "Diesel [GJ]";
-                    columnHead(5) = "Coal [GJ]";
-                    columnHead(6) = "Fuel Oil No 1 [GJ]";
-                    columnHead(7) = "Fuel Oil No 2 [GJ]";
-                    columnHead(8) = "Propane [GJ]";
-                    columnHead(9) = "Other Fuel 1 [GJ]";
-                    columnHead(10) = "Other Fuel 2 [GJ]";
+                    columnHead(3) = "Source Gasoline [GJ]";
+                    columnHead(4) = "Source Diesel [GJ]";
+                    columnHead(5) = "Source Coal [GJ]";
+                    columnHead(6) = "Source Fuel Oil No 1 [GJ]";
+                    columnHead(7) = "Source Fuel Oil No 2 [GJ]";
+                    columnHead(8) = "Source Propane [GJ]";
+                    columnHead(9) = "Source Other Fuel 1 [GJ]";
+                    columnHead(10) = "Source Other Fuel 2 [GJ]";
                     columnHead(11) = "Source District Cooling [GJ]";
                     columnHead(12) = "Source District Heating [GJ]";
                     largeConversionFactor = 1000.0; // for converting MJ to GJ
@@ -9580,8 +9580,8 @@ namespace OutputReportTabular {
         int numRows;
         static std::string footnote;
         Real64 additionalFuelMax;
-        int additionalFuelSelected;
-        int additionalFuelNonZeroCount;
+       // int additionalFuelSelected;
+       // int additionalFuelNonZeroCount;
         int distrHeatSelected;
         bool bothDistrHeatNonZero;
         Real64 powerConversion;
@@ -9677,7 +9677,6 @@ namespace OutputReportTabular {
             // set the time of peak demand and total demand for the additinoal fuel selected
            // collapsedTimeStep(3) = gatherDemandTimeStamp(additionalFuelSelected);
            // collapsedTotal(3) = gatherDemandTotal(additionalFuelSelected);
-
             */
 
             // set flag if both puchased heating and steam both have positive demand
