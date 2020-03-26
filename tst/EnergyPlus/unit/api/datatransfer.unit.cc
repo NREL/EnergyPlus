@@ -249,14 +249,14 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestListAllDataInCSV)
     this->preRequestActuator("Chiller:Electric", "Max Flow Rate", "Chiller 1", ActuatorType::REAL);
     this->setupActuatorsOnceAllAreRequested();
     this->addInternalVariable("Floor Area", "Zone 1");
-    this->addPluginGlobal("PluginGlobalVarName");
+    this->addPluginGlobal("Plugin_Global_Var_Name");
     this->addTrendWithNewGlobal("NewGlobalVarHere", "Trend 1", 3);
     std::string csvData = listAllAPIDataCSV();
     std::size_t foundAddedBoiler = csvData.find("BOILER 1") != std::string::npos; // Note output variables only keep UC, so we should check UC here
     std::size_t foundAddedActuator = csvData.find("Chiller:Electric") != std::string::npos;
     std::size_t foundAddedIV = csvData.find("Zone 1") != std::string::npos;
     std::size_t foundAddedGlobal =
-        csvData.find("PLUGINGLOBALVARNAME") != std::string::npos; // Note globals are kept in upper case internally, check UC here
+        csvData.find("PLUGIN_GLOBAL_VAR_NAME") != std::string::npos; // Note globals are kept in upper case internally, check UC here
     std::size_t foundAddedTrend = csvData.find("Trend 1") != std::string::npos;
     EXPECT_TRUE(foundAddedBoiler);
     EXPECT_TRUE(foundAddedActuator);
@@ -606,4 +606,3 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestResetActuators)
     resetActuator(8);
     EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
 }
-

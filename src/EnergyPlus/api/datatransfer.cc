@@ -327,6 +327,7 @@ Real64 getActuatorValue(const int handle) {
     }
 }
 
+
 int getInternalVariableHandle(const char* type, const char* key) {
     int handle;
     handle = 0;
