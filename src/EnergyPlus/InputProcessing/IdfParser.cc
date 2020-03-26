@@ -269,7 +269,7 @@ json IdfParser::parse_idf(std::string const &idf, size_t &index, bool &success, 
                 auto const &name_iter = obj.find("name");
                 // If you find a name field, use that
                 if (name_iter != obj.end()) {
-                    name = name_iter.value();
+                    name = name_iter.value().get<std::string>();
                     obj.erase(name_iter);
                 } else {
                     // Otherwise, see if it should have a name field
@@ -328,7 +328,7 @@ json IdfParser::parse_object(
             success = false;
             return root;
         }
-        extension_key = key.value();
+        extension_key = key.value().get<std::string>();
         schema_obj_extensions = &schema_obj_props[extension_key]["items"]["properties"];
     }
 
