@@ -234,20 +234,18 @@ template <typename T> struct EPVector : std::vector<T>
 
     void allocate(int size)
     {
-        this->reserve(size);
+        this->resize(size);
     }
 
     void redimension(int size)
     {
-        this->reserve(size);
+        this->resize(size);
     }
 
-    // EPVector<T> & deallocate()
     void deallocate()
     {
+        this->clear();
         return;
-        // EPVector<T>().swap(this);
-        // return *this;
     }
 
     void operator=(T v)
