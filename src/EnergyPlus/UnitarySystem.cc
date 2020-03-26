@@ -10981,9 +10981,7 @@ namespace UnitarySystems {
             if ((SensibleLoad && this->m_RunOnSensibleLoad) || (LatentLoad && this->m_RunOnLatentLoad)) {
                 // calculate sensible PLR, don't care IF latent is true here but need to gaurd for
                 // when LatentLoad=TRUE and SensibleLoad=FALSE
-                ReqOutput = DataLoopNode::Node(InletNode).MassFlowRate *
-                            (Psychrometrics::PsyHFnTdbW(DesOutTemp, DataLoopNode::Node(OutletNode).HumRat) -
-                             Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(OutletNode).HumRat));
+                ReqOutput = DataLoopNode::Node(InletNode).MassFlowRate * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(DesOutTemp, DataLoopNode::Node(OutletNode).HumRat, DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat);
 
                 PartLoadFrac = 0.0;
                 CompOn = 0;
@@ -11246,9 +11244,7 @@ namespace UnitarySystems {
                     } else {
                     }
 
-                    FullOutput = DataLoopNode::Node(InletNode).MassFlowRate *
-                                 (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat) -
-                                  Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(OutletNode).HumRat));
+                    FullOutput = DataLoopNode::Node(InletNode).MassFlowRate * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat);
 
                     FullLoadHumRatOut = DataLoopNode::Node(OutletNode).HumRat;
 
@@ -11559,9 +11555,7 @@ namespace UnitarySystems {
                         OutletTempDXCoil = HVACHXAssistedCoolingCoil::HXAssistedCoilOutletTemp(this->m_CoolingCoilIndex);
 
                         //               FullOutput will be different than the FullOutput determined above during sensible PLR calculations
-                        FullOutput = DataLoopNode::Node(InletNode).MassFlowRate *
-                                     (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat) -
-                                      Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(OutletNode).HumRat));
+                        FullOutput = DataLoopNode::Node(InletNode).MassFlowRate * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat);
                         FullLoadHumRatOut = DataLoopNode::Node(OutletNode).HumRat;
 
                         //   Check to see if the system can meet the load with the compressor off
@@ -11600,9 +11594,7 @@ namespace UnitarySystems {
                         DehumidMode = 1;
                         this->m_DehumidificationMode = DehumidMode;
                         DXCoils::SimDXCoilMultiMode(CompName, On, FirstHVACIteration, PartLoadFrac, DehumidMode, this->m_CoolingCoilIndex, FanOpMode);
-                        FullOutput = DataLoopNode::Node(InletNode).MassFlowRate *
-                                     (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(InletNode).HumRat) -
-                                      Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat));
+                        FullOutput = DataLoopNode::Node(InletNode).MassFlowRate * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat);
                         FullLoadHumRatOut = DataLoopNode::Node(OutletNode).HumRat;
 
                         // Since we are cooling, we expect FullOutput to be < 0 and FullOutput < NoCoolOutput
@@ -12225,9 +12217,7 @@ namespace UnitarySystems {
             // IF DXHeatingSystem runs with a heating load then set PartLoadFrac on Heating System
             if (SensibleLoad) {
 
-                ReqOutput = DataLoopNode::Node(InletNode).MassFlowRate *
-                            (Psychrometrics::PsyHFnTdbW(DesOutTemp, DataLoopNode::Node(InletNode).HumRat) -
-                             Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat));
+                ReqOutput = DataLoopNode::Node(InletNode).MassFlowRate * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(DesOutTemp, DataLoopNode::Node(InletNode).HumRat, DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat);
                 ReqOutput = max(0.0, ReqOutput);
 
                 // Get no load result
@@ -12497,10 +12487,7 @@ namespace UnitarySystems {
                         }
                     }
 
-                    FullOutput = DataLoopNode::Node(InletNode).MassFlowRate *
-                                 (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(InletNode).HumRat) -
-                                  Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat));
-
+                    FullOutput = DataLoopNode::Node(InletNode).MassFlowRate * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat);
                     //       If the outlet temp is within ACC of set point,
                     if (std::abs(DataLoopNode::Node(OutletNode).Temp - DesOutTemp) < Acc ||
                         this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_UserDefined) {
@@ -12798,10 +12785,7 @@ namespace UnitarySystems {
 
             if (SensibleLoad) {
 
-                ReqOutput = DataLoopNode::Node(InletNode).MassFlowRate *
-                            (Psychrometrics::PsyHFnTdbW(DesOutTemp, DataLoopNode::Node(InletNode).HumRat) -
-                             Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat));
-
+                ReqOutput = DataLoopNode::Node(InletNode).MassFlowRate * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(DesOutTemp, DataLoopNode::Node(InletNode).HumRat, DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat);
                 // Get no load result
                 PartLoadFrac = 0.0;
 
@@ -12931,9 +12915,7 @@ namespace UnitarySystems {
                         }
                     }
 
-                    FullOutput = DataLoopNode::Node(InletNode).MassFlowRate *
-                                 (Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(InletNode).HumRat) -
-                                  Psychrometrics::PsyHFnTdbW(DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat));
+                    FullOutput = DataLoopNode::Node(InletNode).MassFlowRate * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(DataLoopNode::Node(OutletNode).Temp, DataLoopNode::Node(OutletNode).HumRat, DataLoopNode::Node(InletNode).Temp, DataLoopNode::Node(InletNode).HumRat);
 
                     //         If the FullOutput outlet temp is less than (insufficient heating) or very near set point,
                     //         run the coil at PartLoadFrac = 1.
