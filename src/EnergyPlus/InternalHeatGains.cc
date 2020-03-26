@@ -6529,7 +6529,7 @@ namespace InternalHeatGains {
             }
         }
 
-        if (Contaminant.GenericContamSimulation && allocated(ZoneGCGain)) {
+        if (Contaminant.GenericContamSimulation && ZoneGCGain.size() > 0) {
             for (NZ = 1; NZ <= NumOfZones; ++NZ) {
                 SumAllInternalGenericContamGains(NZ, ZoneGCGain(NZ));
                 ZnRpt(NZ).GCRate = ZoneGCGain(NZ);

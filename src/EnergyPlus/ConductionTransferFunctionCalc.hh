@@ -49,7 +49,6 @@
 #define ConductionTransferFunctionCalc_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Array3D.hh>
 
@@ -83,10 +82,10 @@ namespace ConductionTransferFunctionCalc {
     extern Array2D<Real64> AInv; // Inverse of AMat
     extern Array2D<Real64> AMat; // "A" matrix from Seem's dissertation
     // (constant coefficients of linear system)
-    extern Array1D<Real64> BMat;   // "B" matrix of state space method (non-zero elements)
-    extern Array1D<Real64> CMat;   // "C" matrix of state space method (non-zero elements)
-    extern Array1D<Real64> DMat;   // "D" matrix of state space method (non-zero elements)
-    extern Array1D<Real64> e;      // Coefficients for the surface flux history term
+    extern EPVector<Real64> BMat;   // "B" matrix of state space method (non-zero elements)
+    extern EPVector<Real64> CMat;   // "C" matrix of state space method (non-zero elements)
+    extern EPVector<Real64> DMat;   // "D" matrix of state space method (non-zero elements)
+    extern EPVector<Real64> e;      // Coefficients for the surface flux history term
     extern Array2D<Real64> Gamma1; // Intermediate calculation array corresponding to a term
     // in Seem's dissertation
     extern Array2D<Real64> Gamma2; // Intermediate calculation array corresponding to a term

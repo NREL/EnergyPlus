@@ -361,7 +361,7 @@ namespace HVACManager {
         }
         if (Contaminant.GenericContamSimulation) {
             OutdoorGC = GetCurrentScheduleValue(Contaminant.GenericContamOutdoorSchedPtr);
-            if (allocated(ZoneAirGCAvg)) ZoneAirGCAvg = 0.0;
+            ZoneAirGCAvg = 0.0; // Used to do an allocated check here, no longer needed
         }
 
         if (BeginEnvrnFlag && MyEnvrnFlag) {
