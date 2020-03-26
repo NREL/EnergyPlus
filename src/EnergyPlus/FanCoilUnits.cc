@@ -2439,8 +2439,7 @@ namespace FanCoilUnits {
                             Calc4PipeFanCoil(FanCoilNum, ControlledZoneNum, FirstHVACIteration, QUnitOut);
                         }
                     }
-                    QUnitOut = AirMassFlow *
-                               (PsyHFnTdbW(Node(OutletNode).Temp, Node(InletNode).HumRat) - PsyHFnTdbW(Node(InletNode).Temp, Node(InletNode).HumRat));
+                    QUnitOut = AirMassFlow * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(Node(OutletNode).Temp, Node(OutletNode).HumRat, Node(InletNode).Temp, Node(InletNode).HumRat);
                     // if heating
                 } else if (UnitOn && QCoilHeatSP > SmallLoad && TempControlType(ZoneNum) != SingleCoolingSetPoint) {
                     // get full load result
@@ -2596,8 +2595,7 @@ namespace FanCoilUnits {
                             }
                         }
                     }
-                    QUnitOut = AirMassFlow *
-                               (PsyHFnTdbW(Node(OutletNode).Temp, Node(InletNode).HumRat) - PsyHFnTdbW(Node(InletNode).Temp, Node(InletNode).HumRat));
+                    QUnitOut = AirMassFlow * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(Node(OutletNode).Temp, Node(OutletNode).HumRat, Node(InletNode).Temp, Node(InletNode).HumRat);
                 } else {
                     // no action
                     QUnitOut = QUnitOutNoHC;
@@ -3258,8 +3256,7 @@ namespace FanCoilUnits {
                 SpecHumOut = Node(OutletNode).HumRat;
                 SpecHumIn = Node(InletNode).HumRat;
                 LatentOutput = AirMassFlow * (SpecHumOut - SpecHumIn); // Latent rate (kg/s), dehumid = negative
-                QSensUnitOutNoATM = AirMassFlow * (PsyHFnTdbW(Node(OutletNode).Temp, Node(InletNode).HumRat) -
-                                                   PsyHFnTdbW(Node(InletNode).Temp, Node(InletNode).HumRat));
+                QSensUnitOutNoATM = AirMassFlow * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(Node(OutletNode).Temp, Node(OutletNode).HumRat, Node(InletNode).Temp, Node(InletNode).HumRat);
                 QTotUnitOut = AirMassFlow * (Node(OutletNode).Enthalpy - Node(InletNode).Enthalpy);
                 // report variables
                 FanCoil(FanCoilNum).HeatPower = max(0.0, QSensUnitOutNoATM);
@@ -3281,8 +3278,7 @@ namespace FanCoilUnits {
                 SpecHumOut = Node(OutletNode).HumRat;
                 SpecHumIn = Node(InletNode).HumRat;
                 LatentOutput = AirMassFlow * (SpecHumOut - SpecHumIn); // Latent rate (kg/s), dehumid = negative
-                QSensUnitOutNoATM = AirMassFlow * (PsyHFnTdbW(Node(OutletNode).Temp, Node(InletNode).HumRat) -
-                                                   PsyHFnTdbW(Node(InletNode).Temp, Node(InletNode).HumRat));
+                QSensUnitOutNoATM = AirMassFlow * Psychrometrics::PsyDeltaHSenFnTdb2W2Tdb1W1(Node(OutletNode).Temp, Node(OutletNode).HumRat, Node(InletNode).Temp, Node(InletNode).HumRat);
                 QTotUnitOut = AirMassFlow * (Node(OutletNode).Enthalpy - Node(InletNode).Enthalpy);
                 // report variables
                 FanCoil(FanCoilNum).HeatPower = max(0.0, QSensUnitOutNoATM);
