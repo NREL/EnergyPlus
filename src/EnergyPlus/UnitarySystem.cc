@@ -1695,6 +1695,11 @@ namespace UnitarySystems {
             DataSizing::CurDuctType = DataHVACGlobals::Heating;
             if ((HeatingSAFlowMethod == SupplyAirFlowRate) || (HeatingSAFlowMethod == None)) {
                 ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
+                if (DataSizing::CurSysNum > 0 && DataSizing::CurOASysNum == 0) {
+                    if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWater &&
+                        DataSizing::FinalSysSizing(DataSizing::CurSysNum).SysAirMinFlowRat > 0.0)
+                        TempSize *= DataSizing::FinalSysSizing(DataSizing::CurSysNum).SysAirMinFlowRat;
+                }
                 SysHeatingFlow = TempSize;
             } else if (HeatingSAFlowMethod == FlowPerFloorArea) {
                 ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
@@ -1790,7 +1795,11 @@ namespace UnitarySystems {
         // Delete next 2 lines and uncomment 2 lines inside next if (HeatPump) statement to allow non-heat pump systems to operate at different flow
         // rates (might require additional change to if block logic).
         EqSizing.CoolingAirVolFlow = max(EqSizing.CoolingAirVolFlow, EqSizing.HeatingAirVolFlow);
-        EqSizing.HeatingAirVolFlow = EqSizing.CoolingAirVolFlow;
+        if (this->m_HeatingCoilType_Num == DataHVACGlobals::Coil_HeatingWater) {
+            EqSizing.HeatingAirVolFlow = EqSizing.HeatingAirVolFlow;
+        } else {
+            EqSizing.HeatingAirVolFlow = EqSizing.CoolingAirVolFlow;
+        }
 
         // STEP 4: set heat pump coil capacities equal to greater of cooling or heating capacity
         if (this->m_HeatPump) { // if a heat pump, use maximum values and set main air flow and capacity variables
@@ -2768,6 +2777,33 @@ namespace UnitarySystems {
                                                                              1,
                                                                              DataLoopNode::ObjectIsParent);
 
+                // these are needed for call from GetOASysNumHeat(Cool)ingCoils 
+                std::string loc_heatingCoilType("");
+                if ( fields.find("heating_coil_object_type") != fields.end() ) { // not required field
+                    loc_heatingCoilType = UtilityRoutines::MakeUPPERCase(fields.at("heating_coil_object_type"));
+                    thisSys.m_HeatCoilExists = true;
+                }
+
+                std::string loc_coolingCoilType("");
+                if ( fields.find("cooling_coil_object_type") != fields.end() ) { // not required field
+                    loc_coolingCoilType = UtilityRoutines::MakeUPPERCase(fields.at("cooling_coil_object_type"));
+                    thisSys.m_CoolCoilExists = true;
+                }
+
+                // needed for checkUnitarySysCoilInOASysExists
+                if ( UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:DX:VariableSpeed") ) {
+                    thisSys.m_CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed;
+                } else if ( UtilityRoutines::SameString(loc_coolingCoilType,
+                    "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit") ) {
+                    thisSys.m_CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit;
+                }
+
+                std::string loc_suppHeatCoilType("");
+                if ( fields.find("supplemental_heating_coil_object_type") != fields.end() ) { // not required field
+                    loc_suppHeatCoilType = UtilityRoutines::MakeUPPERCase(fields.at("supplemental_heating_coil_object_type"));
+                    thisSys.m_SuppCoilExists = true;
+                }
+
                 // Early calls to ATMixer don't have enough info to pass GetInput. Need push_back here, and protect against the next time through.
                 if (sysNum == -1 || !DataZoneEquipment::ZoneEquipInputsFilled) {
                     if (sysNum == -1) unitarySys.push_back(thisSys);
@@ -2783,11 +2819,6 @@ namespace UnitarySystems {
 
                 thisSys.m_IterationMode.resize(3);
 
-                std::string loc_heatingCoilType("");
-                if (fields.find("heating_coil_object_type") != fields.end()) { // not required field
-                    loc_heatingCoilType = UtilityRoutines::MakeUPPERCase(fields.at("heating_coil_object_type"));
-                }
-
                 std::string loc_m_HeatingCoilName("");
                 if (fields.find("heating_coil_name") != fields.end()) { // not required field
                     loc_m_HeatingCoilName = UtilityRoutines::MakeUPPERCase(fields.at("heating_coil_name"));
@@ -2796,11 +2827,6 @@ namespace UnitarySystems {
                 Real64 loc_m_HeatingSizingRatio(1.0);
                 if (fields.find("dx_heating_coil_sizing_ratio") != fields.end()) { // not required field, has default
                     loc_m_HeatingSizingRatio = fields.at("dx_heating_coil_sizing_ratio");
-                }
-
-                std::string loc_coolingCoilType("");
-                if (fields.find("cooling_coil_object_type") != fields.end()) { // not required field
-                    loc_coolingCoilType = UtilityRoutines::MakeUPPERCase(fields.at("cooling_coil_object_type"));
                 }
 
                 std::string loc_m_CoolingCoilName("");
@@ -2826,11 +2852,6 @@ namespace UnitarySystems {
                 std::string loc_latentControlFlag("SensibleOnlyLoadControl");
                 if (fields.find("latent_load_control") != fields.end()) { // not required field, has default
                     loc_latentControlFlag = UtilityRoutines::MakeUPPERCase(fields.at("latent_load_control"));
-                }
-
-                std::string loc_suppHeatCoilType("");
-                if (fields.find("supplemental_heating_coil_object_type") != fields.end()) { // not required field
-                    loc_suppHeatCoilType = UtilityRoutines::MakeUPPERCase(fields.at("supplemental_heating_coil_object_type"));
                 }
 
                 std::string loc_m_SuppHeatCoilName("");
@@ -3647,7 +3668,6 @@ namespace UnitarySystems {
                 thisSys.m_HeatingCoilName = loc_m_HeatingCoilName;
                 thisSys.m_HeatingCoilTypeName = loc_heatingCoilType; //  for coil selection report
                 if (loc_heatingCoilType != "") {
-                    thisSys.m_HeatCoilExists = true;
                     PrintMessage = false;
                 } else {
                     thisSys.m_ValidASHRAEHeatCoil = false;
@@ -4279,7 +4299,6 @@ namespace UnitarySystems {
 
                 // Get Cooling Coil Information IF available
                 if (loc_coolingCoilType != "" && loc_m_CoolingCoilName != "") {
-                    thisSys.m_CoolCoilExists = true;
 
                     //       Find the type of coil. do not print message since this may not be the correct coil type.
                     errFlag = false;
@@ -5433,7 +5452,6 @@ namespace UnitarySystems {
                 }
 
                 if (loc_suppHeatCoilType != "" && loc_m_SuppHeatCoilName != "") {
-                    thisSys.m_SuppCoilExists = true;
 
                     if (thisSys.m_SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingGasOrOtherFuel ||
                         thisSys.m_SuppHeatCoilType_Num == DataHVACGlobals::Coil_HeatingElectric ||
@@ -15562,7 +15580,6 @@ namespace UnitarySystems {
         if (numUnitarySystems > 0) {
             for (int UnitarySysNum = 0; UnitarySysNum < numUnitarySystems; ++UnitarySysNum) {
                 if (UtilityRoutines::SameString(UnitarySysName, unitarySys[UnitarySysNum].Name)) {
-                    if (unitarySys[UnitarySysNum].m_ThisSysInputShouldBeGotten) getUnitarySystemInput(UnitarySysName, false, ZoneOAUnitNum);
                     if (unitarySys[UnitarySysNum].m_ISHundredPercentDOASDXCoil) {
                         if (!(unitarySys[UnitarySysNum].m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed ||
                               unitarySys[UnitarySysNum].m_CoolingCoilType_Num == DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit)) {
@@ -15602,7 +15619,6 @@ namespace UnitarySystems {
 
         for (int UnitarySysNum = 0; UnitarySysNum < numUnitarySystems; ++UnitarySysNum) {
             if (UtilityRoutines::SameString(UnitarySysName, unitarySys[UnitarySysNum].Name)) {
-                if (unitarySys[UnitarySysNum].m_ThisSysInputShouldBeGotten) getUnitarySystemInput(UnitarySysName, false, ZoneOAUnitNum);
                 if (unitarySys[UnitarySysNum].m_CoolCoilExists) {
                     CoolingCoil = true;
                 }
