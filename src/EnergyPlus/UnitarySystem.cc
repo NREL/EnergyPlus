@@ -1456,7 +1456,6 @@ namespace UnitarySystems {
         std::string SystemType;    // type of air loop equipment
         std::string HXCoilName;    // cooling coil name in HXAssisted parent
         int ActualCoolCoilType;    // cooling coil type in HXAssisted parent
-        int SaveCurDuctType;       // used during sizing to save the current duct type
         Real64 QActual;            // water coil output [W]
         Real64 capacityMultiplier; // used for ASHRAE model sizing
 
@@ -1580,8 +1579,6 @@ namespace UnitarySystems {
             SizingMethod = DataHVACGlobals::CoolingAirflowSizing;
             // SizingString = UnitarySystemNumericFields(UnitarySysNum).FieldNames(FieldNum) + " [m3/s]";
             TempSize = this->m_MaxCoolAirVolFlow;
-            SaveCurDuctType = DataSizing::CurDuctType;
-            DataSizing::CurDuctType = DataHVACGlobals::Cooling;
             if ((CoolingSAFlowMethod == SupplyAirFlowRate) || (CoolingSAFlowMethod == None)) {
                 ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                 SysCoolingFlow = TempSize;
@@ -1629,7 +1626,6 @@ namespace UnitarySystems {
                 ShowContinueError("Illegal entry for Cooling Supply Air Flow Rate Method.");
             }
 
-            DataSizing::CurDuctType = SaveCurDuctType;
             EqSizing.CoolingAirFlow = true;
             EqSizing.CoolingAirVolFlow = SysCoolingFlow;
 
@@ -1691,8 +1687,6 @@ namespace UnitarySystems {
             SizingMethod = DataHVACGlobals::HeatingAirflowSizing;
             // SizingString = UnitarySystemNumericFields(UnitarySysNum).FieldNames(FieldNum) + " [m3/s]";
             TempSize = this->m_MaxHeatAirVolFlow;
-            SaveCurDuctType = DataSizing::CurDuctType;
-            DataSizing::CurDuctType = DataHVACGlobals::Heating;
             if ((HeatingSAFlowMethod == SupplyAirFlowRate) || (HeatingSAFlowMethod == None)) {
                 ReportSizingManager::RequestSizing(CompType, CompName, SizingMethod, SizingString, TempSize, PrintFlag, RoutineName);
                 if (DataSizing::CurSysNum > 0 && DataSizing::CurOASysNum == 0) {
@@ -1739,7 +1733,6 @@ namespace UnitarySystems {
                 ShowContinueError("Illegal entry for Heating Supply Air Flow Rate Method.");
             }
 
-            DataSizing::CurDuctType = SaveCurDuctType;
             EqSizing.HeatingAirFlow = true;
             EqSizing.HeatingAirVolFlow = SysHeatingFlow;
 
