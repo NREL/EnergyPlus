@@ -53,7 +53,6 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
 #include <EnergyPlus/OutputFiles.hh>
@@ -92,28 +91,44 @@ class DataExchangeAPIUnitTestFixture : public EnergyPlusFixture
         int value = 0;
         DummyIntVariable(std::string _varName, std::string _varKey, Real64 _value)
             : varName(std::move(_varName)), varKey(std::move(_varKey)), value(_value)
-        {
-        }
+        {}
     };
     std::vector<DummyIntVariable> intVariablePlaceholders;
-    struct DummyRealActuator
-    {
-        Real64 val;
-        bool flag;
+
+    struct DummyBaseActuator {
+        std::string objType;
+        std::string controlType;
+        std::string key;
+        bool flag = false;
+        DummyBaseActuator(std::string _objType, std::string _controlType, std::string _key)
+            : objType(std::move(_objType)), controlType(std::move(_controlType)), key(std::move(_key))
+        {}
     };
-    struct DummyIntActuator
+    struct DummyRealActuator : DummyBaseActuator
     {
-        int val;
-        bool flag;
+        Real64 val = 0.0;
+        DummyRealActuator(const std::string& _objType, const std::string& _controlType, const std::string& _key)
+            : DummyBaseActuator(_objType, _controlType, _key)
+        {}
     };
-    struct DummyBoolActuator
+    struct DummyIntActuator : DummyBaseActuator
     {
-        bool val;
-        bool flag;
+        int val = 0;
+        DummyIntActuator(const std::string& _objType, const std::string& _controlType, const std::string& _key)
+            : DummyBaseActuator(_objType, _controlType, _key)
+        {}
+    };
+    struct DummyBoolActuator : DummyBaseActuator
+    {
+        bool val = true;
+        DummyBoolActuator(const std::string& _objType, const std::string& _controlType, const std::string& _key)
+            : DummyBaseActuator(_objType, _controlType, _key)
+        {}
     };
     std::vector<DummyRealActuator> realActuatorPlaceholders;
     std::vector<DummyIntActuator> intActuatorPlaceholders;
     std::vector<DummyBoolActuator> boolActuatorPlaceholders;
+
     std::vector<Real64> internalVarPlaceholders;
 
     void SetUp() override
@@ -162,49 +177,34 @@ public:
         }
     }
 
-    constexpr static auto dummyActuatorType = "Chiller:Electric";
-    constexpr static auto dummyActuatorVar = "Max Flow Rate";
-    constexpr static auto dummyActuatorInstance = "Chiller 1";
     enum class ActuatorType {REAL, INTEGER, BOOL};
-    void addActuator(std::string const &objType = DataExchangeAPIUnitTestFixture::dummyActuatorType,
-                     std::string const &controlType = DataExchangeAPIUnitTestFixture::dummyActuatorVar,
-                     std::string const &objKey = DataExchangeAPIUnitTestFixture::dummyActuatorInstance,
-                     ActuatorType t = ActuatorType::REAL)
+    void preRequestActuator(std::string const &objType,
+                            std::string const &controlType,
+                            std::string const &objKey,
+                            ActuatorType t)
     {
         switch (t) {
-        case ActuatorType::REAL: {
-            this->realActuatorPlaceholders.emplace_back();
-            int lastActuatorIndex = (int)this->realActuatorPlaceholders.size() - 1;
-            SetupEMSActuator(objType,
-                             objKey,
-                             controlType,
-                             "kg/s",
-                             this->realActuatorPlaceholders[lastActuatorIndex].flag,
-                             this->realActuatorPlaceholders[lastActuatorIndex].val);
+        case ActuatorType::REAL:
+            this->realActuatorPlaceholders.emplace_back(objType, controlType, objKey);
+            break;
+        case ActuatorType::INTEGER:
+            this->intActuatorPlaceholders.emplace_back(objType, controlType, objKey);
+            break;
+        case ActuatorType::BOOL:
+            this->boolActuatorPlaceholders.emplace_back(objType, controlType, objKey);
             break;
         }
-        case ActuatorType::INTEGER: {
-            this->intActuatorPlaceholders.emplace_back();
-            int lastActuatorIndex = (int)this->intActuatorPlaceholders.size() - 1;
-            SetupEMSActuator(objType,
-                             objKey,
-                             controlType,
-                             "kg/s",
-                             this->intActuatorPlaceholders[lastActuatorIndex].flag,
-                             this->intActuatorPlaceholders[lastActuatorIndex].val);
-            break;
+    }
+
+    void setupActuatorsOnceAllAreRequested() {
+        for (auto & act : this->realActuatorPlaceholders) {
+            SetupEMSActuator(act.objType, act.key, act.controlType, "kg/s", act.flag, act.val);
         }
-        case ActuatorType::BOOL: {
-            this->boolActuatorPlaceholders.emplace_back();
-            int lastActuatorIndex = (int)this->boolActuatorPlaceholders.size() - 1;
-            SetupEMSActuator(objType,
-                             objKey,
-                             controlType,
-                             "kg/s",
-                             this->boolActuatorPlaceholders[lastActuatorIndex].flag,
-                             this->boolActuatorPlaceholders[lastActuatorIndex].val);
-            break;
+        for (auto & act : this->intActuatorPlaceholders) {
+            SetupEMSActuator(act.objType, act.key, act.controlType, "kg/s", act.flag, act.val);
         }
+        for (auto & act : this->boolActuatorPlaceholders) {
+            SetupEMSActuator(act.objType, act.key, act.controlType, "kg/s", act.flag, act.val);
         }
     }
 
@@ -246,13 +246,14 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestListAllDataInCSV)
     // then as we add stuff, and make sure it appears in the output
     this->preRequestRealVariable("Boiler Heat Transfer", "Boiler 1");
     this->setupVariablesOnceAllAreRequested();
-    this->addActuator();
+    this->preRequestActuator("Chiller:Electric", "Max Flow Rate", "Chiller 1", ActuatorType::REAL);
+    this->setupActuatorsOnceAllAreRequested();
     this->addInternalVariable("Floor Area", "Zone 1");
     this->addPluginGlobal("PluginGlobalVarName");
     this->addTrendWithNewGlobal("NewGlobalVarHere", "Trend 1", 3);
     std::string csvData = listAllAPIDataCSV();
     std::size_t foundAddedBoiler = csvData.find("BOILER 1") != std::string::npos; // Note output variables only keep UC, so we should check UC here
-    std::size_t foundAddedActuator = csvData.find(DataExchangeAPIUnitTestFixture::dummyActuatorType) != std::string::npos;
+    std::size_t foundAddedActuator = csvData.find("Chiller:Electric") != std::string::npos;
     std::size_t foundAddedIV = csvData.find("Zone 1") != std::string::npos;
     std::size_t foundAddedGlobal =
         csvData.find("PLUGINGLOBALVARNAME") != std::string::npos; // Note globals are kept in upper case internally, check UC here
@@ -376,14 +377,9 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetMeterValues)
 
 TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetRealActuatorHandles)
 {
-    this->addActuator("Chiller",
-                      "Max Flow",
-                      "Chiller 1",
-                      ActuatorType::REAL);
-    this->addActuator("Chiller",
-                      "Max Flow",
-                      "Chiller 2",
-                      ActuatorType::REAL);
+    this->preRequestActuator("Chiller", "Max Flow", "Chiller 1", ActuatorType::REAL);
+    this->preRequestActuator("Chiller", "Max Flow", "Chiller 2", ActuatorType::REAL);
+    this->setupActuatorsOnceAllAreRequested();
     // Then try to get the actuator handle
     int hActuator = getActuatorHandle("Chiller", "Max Flow", "Chiller 1");
     EXPECT_GT(hActuator, -1);
@@ -394,14 +390,9 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetRealActuatorHandles)
 
 TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetIntActuatorHandles)
 {
-    this->addActuator("Chiller",
-                      "Max Flow",
-                      "Chiller 1",
-                      ActuatorType::INTEGER);
-    this->addActuator("Chiller",
-                      "Max Flow",
-                      "Chiller 2",
-                      ActuatorType::INTEGER);
+    this->preRequestActuator("Chiller", "Max Flow", "Chiller 1", ActuatorType::INTEGER);
+    this->preRequestActuator("Chiller", "Max Flow", "Chiller 2", ActuatorType::INTEGER);
+    this->setupActuatorsOnceAllAreRequested();
     // Then try to get the actuator handle
     int hActuator = getActuatorHandle("Chiller", "Max Flow", "Chiller 1");
     EXPECT_GT(hActuator, -1);
@@ -412,14 +403,9 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetIntActuatorHandles)
 
 TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetBoolActuatorHandles)
 {
-    this->addActuator("Chiller",
-                      "Max Flow",
-                      "Chiller 1",
-                      ActuatorType::BOOL);
-    this->addActuator("Chiller",
-                      "Max Flow",
-                      "Chiller 2",
-                      ActuatorType::BOOL);
+    this->preRequestActuator("Chiller", "Max Flow", "Chiller 1", ActuatorType::BOOL);
+    this->preRequestActuator("Chiller", "Max Flow", "Chiller 2", ActuatorType::BOOL);
+    this->setupActuatorsOnceAllAreRequested();
     // Then try to get the actuator handle
     int hActuator = getActuatorHandle("Chiller", "Max Flow", "Chiller 1");
     EXPECT_GT(hActuator, -1);
@@ -430,18 +416,10 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetBoolActuatorHandles)
 
 TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetMixedActuatorHandles)
 {
-    this->addActuator("Chiller",
-                      "Max Flow",
-                      "Chiller 1",
-                      ActuatorType::BOOL);
-    this->addActuator("Chiller",
-                      "Max Flow",
-                      "Chiller 2",
-                      ActuatorType::INTEGER);
-    this->addActuator("Chiller",
-                      "Max Flow",
-                      "Chiller 3",
-                      ActuatorType::REAL);
+    this->preRequestActuator("Chiller", "Max Flow", "Chiller 1", ActuatorType::BOOL);
+    this->preRequestActuator("Chiller", "Max Flow", "Chiller 2", ActuatorType::INTEGER);
+    this->preRequestActuator("Chiller", "Max Flow", "Chiller 3", ActuatorType::REAL);
+    this->setupActuatorsOnceAllAreRequested();
     // Then try to get the actuator handle
     int hActuator = getActuatorHandle("Chiller", "Max Flow", "Chiller 1");
     EXPECT_GT(hActuator, -1);
@@ -457,26 +435,25 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetMixedActuatorHandles)
 
 TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetBadActuatorHandles)
 {
-    this->addActuator();
+    this->preRequestActuator("Chiller:Electric", "Max Flow Rate", "Chiller 1", ActuatorType::REAL);
+    this->setupActuatorsOnceAllAreRequested();
     // Then try to get the actuator handle
-    int hActuator = getActuatorHandle(DataExchangeAPIUnitTestFixture::dummyActuatorType,
-                                      DataExchangeAPIUnitTestFixture::dummyActuatorVar,
-                                      DataExchangeAPIUnitTestFixture::dummyActuatorInstance);
+    int hActuator = getActuatorHandle("Chiller:Electric", "Max Flow Rate", "Chiller 1");
     EXPECT_GT(hActuator, -1);
     // now try to get handles to invalid actuators
     {
         int hActuatorBad =
-            getActuatorHandle(DataExchangeAPIUnitTestFixture::dummyActuatorType, DataExchangeAPIUnitTestFixture::dummyActuatorVar, "InvalidInstance");
+            getActuatorHandle("Chiller:Electric", "Max Flow Rate", "InvalidInstance");
         EXPECT_EQ(hActuatorBad, -1);
     }
     {
         int hActuatorBad =
-            getActuatorHandle(DataExchangeAPIUnitTestFixture::dummyActuatorType, "InvalidVar", DataExchangeAPIUnitTestFixture::dummyActuatorInstance);
+            getActuatorHandle("Chiller:Electric", "InvalidVar", "Chiller 1");
         EXPECT_EQ(hActuatorBad, -1);
     }
     {
         int hActuatorBad =
-            getActuatorHandle("InvalidType", DataExchangeAPIUnitTestFixture::dummyActuatorVar, DataExchangeAPIUnitTestFixture::dummyActuatorInstance);
+            getActuatorHandle("InvalidType", "Max Flow Rate", "Chiller 1");
         EXPECT_EQ(hActuatorBad, -1);
     }
 }
@@ -484,39 +461,149 @@ TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetBadActuatorHandles)
 TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetAndSetRealActuators)
 {
     // add two actuators, just to differentiate
-    this->addActuator("a", "b", "c", ActuatorType::REAL);
-    this->addActuator("d", "e", "f", ActuatorType::REAL);
+    this->preRequestActuator("a", "b", "c", ActuatorType::REAL);
+    this->preRequestActuator("d", "e", "f", ActuatorType::REAL);
+    this->setupActuatorsOnceAllAreRequested();
     // Then try to get the actuator handle
     int hActuator1 = getActuatorHandle("a", "b", "c");
     int hActuator2 = getActuatorHandle("d", "e", "f");
     // just for good measure here
     EXPECT_GT(hActuator1, -1);
     EXPECT_GT(hActuator2, -1);
+    // now let's set the values of the actuators
+    setActuatorValue(hActuator1, 3.14);
+    setActuatorValue(hActuator2, 6.28);
     // now make sure we don't get them mixed up
     Real64 val1 = getActuatorValue(hActuator1);
     Real64 val2 = getActuatorValue(hActuator2);
-//    EXPECT_DOUBLE_EQ(3.14, val1);
-//    EXPECT_DOUBLE_EQ(6.28, val2);
-    // now let's set the values of the actuators
-
-//    setActuatorValue(hActuator1, 3.14);    ********** START HERE -- running setActuatorValue on hActuator1 causes segfault -- just on 2 and it runs fine
-    setActuatorValue(hActuator2, 6.28);
+    EXPECT_DOUBLE_EQ(3.14, val1);
+    EXPECT_DOUBLE_EQ(6.28, val2);
 
     // now try to get and set actuator values for invalid handles
     // in API mode, the function will throw an exception (for now)
-//    DataGlobals::eplusRunningViaAPI = true;
-//    EXPECT_THROW(getActuatorValue(-1), std::runtime_error);
-//    EXPECT_THROW(getActuatorValue(3), std::runtime_error);
+    DataGlobals::eplusRunningViaAPI = true;
+    EXPECT_THROW(getActuatorValue(-1), std::runtime_error);
+    EXPECT_THROW(getActuatorValue(3), std::runtime_error);
 
-//    // in Plugin mode, there is a flag that should be set to true
-//    DataGlobals::eplusRunningViaAPI = false;
-//    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
-//    // first the thing should just pass
-//    getActuatorValue(-1);
-//    // but the flag should be set
-//    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
-//    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
-//    getActuatorValue(3);
-//    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
-
+    // in Plugin mode, there is a flag that should be set to true
+    DataGlobals::eplusRunningViaAPI = false;
+    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
+    // first the thing should just pass
+    getActuatorValue(-1);
+    // but the flag should be set
+    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
+    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
+    getActuatorValue(3);
+    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
 }
+
+TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetAndSetIntActuators)
+{
+    // add two actuators, just to differentiate
+    this->preRequestActuator("a", "b", "c", ActuatorType::INTEGER);
+    this->preRequestActuator("d", "e", "f", ActuatorType::INTEGER);
+    this->setupActuatorsOnceAllAreRequested();
+    // Then try to get the actuator handle
+    int hActuator1 = getActuatorHandle("a", "b", "c");
+    int hActuator2 = getActuatorHandle("d", "e", "f");
+    // just for good measure here
+    EXPECT_GT(hActuator1, -1);
+    EXPECT_GT(hActuator2, -1);
+    // now let's set the values of the actuators
+    setActuatorValue(hActuator1, 3);
+    setActuatorValue(hActuator2, -6.1);  // should get rounded
+    // now make sure we don't get them mixed up
+    Real64 val1 = getActuatorValue(hActuator1);
+    Real64 val2 = getActuatorValue(hActuator2);
+    EXPECT_DOUBLE_EQ(3, val1);
+    EXPECT_DOUBLE_EQ(-6, val2);
+
+    // now try to get and set actuator values for invalid handles
+    // in API mode, the function will throw an exception (for now)
+    DataGlobals::eplusRunningViaAPI = true;
+    EXPECT_THROW(getActuatorValue(-1), std::runtime_error);
+    EXPECT_THROW(getActuatorValue(3), std::runtime_error);
+
+    // in Plugin mode, there is a flag that should be set to true
+    DataGlobals::eplusRunningViaAPI = false;
+    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
+    // first the thing should just pass
+    getActuatorValue(-1);
+    // but the flag should be set
+    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
+    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
+    getActuatorValue(3);
+    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
+}
+
+TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestGetAndSetBoolActuators)
+{
+    // add two actuators, just to differentiate
+    this->preRequestActuator("a", "b", "c", ActuatorType::BOOL);
+    this->preRequestActuator("d", "e", "f", ActuatorType::BOOL);
+    this->setupActuatorsOnceAllAreRequested();
+    // Then try to get the actuator handle
+    int hActuator1 = getActuatorHandle("a", "b", "c");
+    int hActuator2 = getActuatorHandle("d", "e", "f");
+    // just for good measure here
+    EXPECT_GT(hActuator1, -1);
+    EXPECT_GT(hActuator2, -1);
+    // now let's set the values of the actuators
+    setActuatorValue(hActuator1, 0);  // false
+    setActuatorValue(hActuator2, 1);  // true
+    // now make sure we don't get them mixed up
+    Real64 val1 = getActuatorValue(hActuator1);
+    Real64 val2 = getActuatorValue(hActuator2);
+    EXPECT_DOUBLE_EQ(0, val1);
+    EXPECT_DOUBLE_EQ(1, val2);
+
+    // now try to get and set actuator values for invalid handles
+    // in API mode, the function will throw an exception (for now)
+    DataGlobals::eplusRunningViaAPI = true;
+    EXPECT_THROW(getActuatorValue(-1), std::runtime_error);
+    EXPECT_THROW(getActuatorValue(3), std::runtime_error);
+
+    // in Plugin mode, there is a flag that should be set to true
+    DataGlobals::eplusRunningViaAPI = false;
+    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
+    // first the thing should just pass
+    getActuatorValue(-1);
+    // but the flag should be set
+    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
+    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
+    getActuatorValue(3);
+    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
+}
+
+TEST_F(DataExchangeAPIUnitTestFixture, DataTransfer_TestResetActuators)
+{
+    // we can't really test that the actuator is being recalculated by E+ again, but we can make sure the call works anyway
+    this->preRequestActuator("a", "b", "c", ActuatorType::REAL);
+    this->preRequestActuator("d", "e", "f", ActuatorType::INTEGER);
+    this->preRequestActuator("g", "h", "i", ActuatorType::BOOL);
+    this->setupActuatorsOnceAllAreRequested();
+    int hActuator1 = getActuatorHandle("a", "b", "c");
+    int hActuator2 = getActuatorHandle("d", "e", "f");
+    int hActuator3 = getActuatorHandle("g", "h", "i");
+    resetActuator(hActuator1);
+    resetActuator(hActuator2);
+    resetActuator(hActuator3);
+
+    // now try to get and set actuator values for invalid handles
+    // in API mode, the function will throw an exception (for now)
+    DataGlobals::eplusRunningViaAPI = true;
+    EXPECT_THROW(resetActuator(-1), std::runtime_error);
+    EXPECT_THROW(resetActuator(8), std::runtime_error);
+
+    // in Plugin mode, there is a flag that should be set to true
+    DataGlobals::eplusRunningViaAPI = false;
+    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
+    // first the thing should just pass
+    resetActuator(-1);
+    // but the flag should be set
+    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
+    PluginManagement::shouldIssueFatalAfterPluginCompletes = false;
+    resetActuator(8);
+    EXPECT_TRUE(PluginManagement::shouldIssueFatalAfterPluginCompletes);
+}
+

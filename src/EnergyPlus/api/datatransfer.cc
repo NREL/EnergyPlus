@@ -283,7 +283,6 @@ void setActuatorValue(const int handle, const Real64 value) {
             *theActuator.LogValue = value > 0.99999 && value < 1.00001; // allow small tolerance while passing between languages and types
         }
         *theActuator.Actuated = true;
-        int i = 1;
     } else {
         if (EnergyPlus::DataGlobals::eplusRunningViaAPI) {
             std::cout << "ERROR: Actuator handle out of range in setActuatorValue" << std::endl;
