@@ -1470,7 +1470,7 @@ namespace ZoneContaminantPredictorCorrector {
                 ZoneGCM2.dimension(NumOfZones, 0.0);
                 ZoneGC1.dimension(NumOfZones, 0.0);
 
-                if (!allocated(ZoneSysContDemand)) ZoneSysContDemand.allocate(NumOfZones);
+                if (ZoneSysContDemand.size() == 0) ZoneSysContDemand.allocate(NumOfZones);
                 ZoneGCGain.dimension(NumOfZones, 0.0);
                 MixingMassFlowGC.dimension(NumOfZones, 0.0);
                 ZoneAirDensityGC.dimension(NumOfZones, 0.0);
