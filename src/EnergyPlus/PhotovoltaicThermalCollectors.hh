@@ -90,6 +90,36 @@ namespace PhotovoltaicThermalCollectors {
         }
     };
 
+    struct BIPVTModelStruct
+    {
+
+        // Members
+        std::string Name;
+        std::string OSCMName;         // OtherSideConditionsModel
+        int OSCMPtr;                  // OtherSideConditionsModel index
+        int SchedPtr;                 // Availablity schedule
+        Real64 PVEffGapWidth;         // Effective Gap Plenum Behind PV modules
+        Real64 EffCollHeight;         // Effective Overall Width of Collector
+        Real64 EffCollWidth;          // Effective Overall Height of Collector
+        Real64 PVTranAbsProduct;      // PV Transmittance-Absorptance Product
+        Real64 BackMatTranAbsProduct; // Backing Material Normal Transmittance-Absorptance Product
+        Real64 PVAreaFract;           // Fraction of collector gross area covered by PV cellsn
+        Real64 PVRTop;                // PV module top thermal resistance
+        Real64 PVRBot;                // PV module bottom thermal resistance
+        Real64 PVGEmiss;              // Emissivity PV modules
+        Real64 BackMatEmiss;          // Emissivity of backing material
+        Real64 LastCollectorTemp;     // store previous temperature
+        Real64 CollectorTemp;         // average solar collector temp.
+
+        // Default Constructor
+        BIPVTModelStruct()
+            : OSCMPtr(0), SchedPtr(0), PVEffGapWidth(0.0), EffCollHeight(0.0), EffCollWidth(0.0), PVTranAbsProduct(0.0), BackMatTranAbsProduct(0.0),
+              PVAreaFract(0.0), PVRTop(0.0), PVRBot(0.0), PVGEmiss(0.0), BackMatEmiss(0.0), LastCollectorTemp(0.0),
+              CollectorTemp(0.0)
+        {
+        }
+    };
+
     struct PVTReportStruct
     {
         // Members
@@ -128,7 +158,8 @@ namespace PhotovoltaicThermalCollectors {
         std::string PVname;          // named Generator:Photovoltaic object
         int PVnum;                   // PV index
         bool PVfound;                // init, need to delay get input until PV gotten
-        SimplePVTModelStruct Simple; // performance data structure.
+        SimplePVTModelStruct Simple; // Simple performance data structure.
+        BIPVTModelStruct BIPVT;      // BIPVT performance data structure.
         WorkingFluidEnum WorkingFluidType;
         int PlantInletNodeNum;
         int PlantOutletNodeNum;
@@ -173,7 +204,15 @@ namespace PhotovoltaicThermalCollectors {
 
         void calculate();
 
-        void update();
+       void SimplePVTcalculate();
+
+       void BIPVTcalculate();
+
+       void BIPVT_MaxHeatGain_calculate();
+
+       void solve_lin_sys_back_sub(Real64 jj[9], Real64 f[3], Real64 (&y)[3]);
+
+       void update();
     };
 
     extern Array1D<PVTCollectorStruct> PVT;
@@ -181,6 +220,12 @@ namespace PhotovoltaicThermalCollectors {
     void clear_state();
 
     void GetPVTcollectorsInput();
+
+    void GetPVTSimpleCollectorsInput(int NumSimplePVTPerform, Array1D<SimplePVTModelStruct> &tmpSimplePVTperf);
+
+    void GetBIPVTCollectorsInput(int NumBIPVTPerform, Array1D<BIPVTModelStruct> &tmpBIPVTperf);
+
+    void GetMainPVTInput(int NumPVT, Array1D<PVTCollectorStruct> &PVT, Array1D<SimplePVTModelStruct> tmpSimplePVTperf, Array1D<BIPVTModelStruct> tmpBIPVTperf);
 
     void simPVTfromOASys(int index, bool FirstHVACIteration);
 
