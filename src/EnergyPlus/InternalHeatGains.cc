@@ -3942,7 +3942,7 @@ namespace InternalHeatGains {
                 }
 
                 if (ZoneITEq(Loop).FlowControlWithApproachTemps) {
-                    Real64 TAirInSizing;
+                    Real64 TAirInSizing = 0.0;
                     // Set the TAirInSizing to the maximun setpoint value to do sizing based on the maximum fan and cpu power of the ite object
                     SetPointManager::GetSetPointManagerInputData(state, ErrorsFound);
                     for (int SetPtMgrNum = 1; SetPtMgrNum <= SetPointManager::NumSZClSetPtMgrs; ++SetPtMgrNum) {

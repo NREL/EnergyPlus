@@ -48,7 +48,7 @@
 #ifndef CommandLineInterface_hh_INCLUDED
 #define CommandLineInterface_hh_INCLUDED
 
-#include <EnergyPlus/api/EnergyPlusAPI.hh>
+#include <EnergyPlus/api/EnergyPlusAPI.h>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <string>
 

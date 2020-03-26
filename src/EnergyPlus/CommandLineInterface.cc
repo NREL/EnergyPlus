@@ -61,6 +61,7 @@
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/Data/EnergyPlusData.hh>
 #include <EnergyPlus/OutputFiles.hh>
+#include <EnergyPlus/PluginManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/OutputReportTabular.hh>
 #include <EnergyPlus/OutputReports.hh>
@@ -130,7 +131,7 @@ namespace CommandLineInterface {
         // Define options
         ezOptionParser opt;
 
-        opt.overview = VerString;
+        opt.overview = VerString + "\nPythonLinkage: " + PluginManagement::pythonStringForUsage();
 
         opt.syntax = "energyplus [options] [input-file]";
 

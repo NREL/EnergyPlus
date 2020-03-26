@@ -257,6 +257,18 @@ SET( SRC
   GroundTemperatureModeling/FiniteDifferenceGroundTemperatureModel.hh
   GroundTemperatureModeling/GroundTemperatureModelManager.cc
   GroundTemperatureModeling/GroundTemperatureModelManager.hh
+  GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.cc
+  GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh
+  GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.cc
+  GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.hh
+  GroundTemperatureModeling/SiteDeepGroundTemperatures.cc
+  GroundTemperatureModeling/SiteDeepGroundTemperatures.hh
+  GroundTemperatureModeling/SiteFCFactorMethodGroundTemperatures.cc
+  GroundTemperatureModeling/SiteFCFactorMethodGroundTemperatures.hh
+  GroundTemperatureModeling/SiteShallowGroundTemperatures.cc
+  GroundTemperatureModeling/SiteShallowGroundTemperatures.hh
+  GroundTemperatureModeling/XingGroundTemperatureModel.cc
+  GroundTemperatureModeling/XingGroundTemperatureModel.hh
   HVACControllers.cc
   HVACControllers.hh
   HVACCooledBeam.cc
@@ -329,18 +341,6 @@ SET( SRC
   HybridEvapCoolingModel.hh
   HybridModel.cc
   HybridModel.hh
-  GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.cc
-  GroundTemperatureModeling/KusudaAchenbachGroundTemperatureModel.hh
-  GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.cc
-  GroundTemperatureModeling/SiteBuildingSurfaceGroundTemperatures.hh
-  GroundTemperatureModeling/SiteDeepGroundTemperatures.cc
-  GroundTemperatureModeling/SiteDeepGroundTemperatures.hh
-  GroundTemperatureModeling/SiteFCFactorMethodGroundTemperatures.cc
-  GroundTemperatureModeling/SiteFCFactorMethodGroundTemperatures.hh
-  GroundTemperatureModeling/SiteShallowGroundTemperatures.cc
-  GroundTemperatureModeling/SiteShallowGroundTemperatures.hh
-  GroundTemperatureModeling/XingGroundTemperatureModel.cc
-  GroundTemperatureModeling/XingGroundTemperatureModel.hh
   ICEngineElectricGenerator.cc
   ICEngineElectricGenerator.hh
   IceThermalStorage.cc
@@ -451,6 +451,8 @@ SET( SRC
   PlantHeatExchangerFluidToFluid.hh
   PlantLoadProfile.cc
   PlantLoadProfile.hh
+  PlantLoopHeatPumpEIR.cc
+  PlantLoopHeatPumpEIR.hh
   Plant/PlantLocation.hh
   Plant/PlantManager.cc
   Plant/PlantManager.hh
@@ -463,6 +465,8 @@ SET( SRC
   PlantValves.cc
   PlantValves.hh
   Platform.hh
+  PluginManager.cc
+  PluginManager.hh
   PollutionModule.cc
   PollutionModule.hh
   PondGroundHeatExchanger.cc
@@ -528,6 +532,8 @@ SET( SRC
   SplitterComponent.hh
   StandardRatings.cc
   StandardRatings.hh
+  StateManagement.cc
+  StateManagement.hh
   SteamBaseboardRadiator.cc
   SteamBaseboardRadiator.hh
   SteamCoils.cc
@@ -605,8 +611,6 @@ SET( SRC
   WaterToAirHeatPump.hh
   WaterToAirHeatPumpSimple.cc
   WaterToAirHeatPumpSimple.hh
-  PlantLoopHeatPumpEIR.cc
-  PlantLoopHeatPumpEIR.hh
   WaterToWaterHeatPumps.hh
   WaterUse.cc
   WaterUse.hh
@@ -641,11 +645,7 @@ SET( SRC
   ZonePlenum.cc
   ZonePlenum.hh
   ZoneTempPredictorCorrector.cc
-  ZoneTempPredictorCorrector.hh
-  StateManagement.cc
-  StateManagement.hh
-  PluginManager.cc
-  PluginManager.hh)
+  ZoneTempPredictorCorrector.hh)
 
 CREATE_SRC_GROUPS( "${SRC}" )
 
@@ -735,19 +735,23 @@ if(LINK_WITH_PYTHON)
 endif()
 
 # second we will create the shared library that is actually packaged with EnergyPlus
-SET( API_CORE_SRC
+SET( API_HEADERS
   api/func.h
-  api/func.cc
   api/runtime.h
-  api/runtime.cc
   api/datatransfer.h
-  api/datatransfer.cc
   api/EnergyPlusPgm.hh
+  api/EnergyPlusAPI.h
+  api/TypeDefs.h
+)
+SET( API_CORE_SRC
+  api/func.cc
+  api/runtime.cc
+  api/datatransfer.cc
   api/EnergyPlusPgm.cc
 )
 
 if(APPLE OR UNIX)
-  add_library( energyplusapi SHARED CommandLineInterface.hh CommandLineInterface.cc ${API_CORE_SRC})
+  add_library( energyplusapi SHARED CommandLineInterface.hh CommandLineInterface.cc ${API_CORE_SRC} ${API_HEADERS})
 else()  # windows
   add_library( energyplusapi SHARED CommandLineInterface.hh CommandLineInterface.cc ${API_CORE_SRC} "${CMAKE_CURRENT_BINARY_DIR}/energyplusapi.rc" )
 endif()
@@ -836,10 +840,18 @@ if(LINK_WITH_PYTHON)
 endif()
 
 if(BUILD_PACKAGE)
+  # if we are building package, we need to drop in some API/Plugin stuff
   if(LINK_WITH_PYTHON)
+    # we'll want to grab the standard lib for python plugins
     install(DIRECTORY "$<TARGET_FILE_DIR:energyplus>/python_standard_lib/"
             DESTINATION "./python_standard_lib")
   endif()
+  # we'll want to always provide the C API headers
+  foreach(HEADER ${API_HEADERS})
+    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/${HEADER}"
+            DESTINATION "./include/EnergyPlus/api")
+  endforeach()
+  # we'll want to always grab the python API wrapper
   install(DIRECTORY "$<TARGET_FILE_DIR:energyplus>/pyenergyplus/"
           DESTINATION "./pyenergyplus")
 endif()

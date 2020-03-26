@@ -1839,11 +1839,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
     EXPECT_TRUE(UtilityRoutines::SameString(DataHeatBalance::Construct(constrNum).Name, "Non-Grouped Air Boundary"));
     EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundary);
     EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
-    // InteriorWindow option currently disabled
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundarySolar);
-    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
-    //EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundarySolar);
-    //EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
+    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundarySolar);
+    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
     EXPECT_TRUE(DataHeatBalance::Construct(constrNum).IsUsedCTF);
     EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryIRTSurface);
     EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryMixing);
@@ -1871,11 +1868,8 @@ TEST_F(EnergyPlusFixture, HeatBalanceManager_GetAirBoundaryConstructData)
     EXPECT_TRUE(UtilityRoutines::SameString(DataHeatBalance::Construct(constrNum).Name, "Air Boundary with Good Mixing Schedule"));
     EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundary);
     EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryGroupedRadiant);
-    // InteriorWindow option currently disabled
-    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundarySolar);
-    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
-    //EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundarySolar);
-    //EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
+    EXPECT_FALSE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundarySolar);
+    EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryInteriorWindow);
     EXPECT_TRUE(DataHeatBalance::Construct(constrNum).IsUsedCTF);
     EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryIRTSurface);
     EXPECT_TRUE(DataHeatBalance::Construct(constrNum).TypeIsAirBoundaryMixing);
