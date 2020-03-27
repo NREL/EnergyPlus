@@ -529,6 +529,8 @@ namespace OutputReportPredefined {
 
     // Outside Air Report
     int pdrOutsideAir;
+
+    // remove this subtable when new subtables have been implemented
     int pdstOAavgOcc;
     int pdchOaoAvgNumOcc1;
     int pdchOaoNomNumOcc1;
@@ -538,6 +540,7 @@ namespace OutputReportPredefined {
     int pdchOaoAvgAFNInfil;
     int pdchOaoAvgSimpVent;
     int pdchOaoAvgTotVent;
+    // remove this subtable when new subtables have been implemented
     int pdstOAminOcc;
     int pdchOaoAvgNumOcc2;
     int pdchOaoNomNumOcc2;
@@ -547,6 +550,75 @@ namespace OutputReportPredefined {
     int pdchOaoMinAFNInfil;
     int pdchOaoMinSimpVent;
     int pdchOaoMinTotVent;
+
+    int pdstOAmechVentParByZone;
+    int pdchOaMvAirLpNm;
+    int pdchOaMvAvgNumOcc;
+    int pdchOaMvNomNumOcc;
+    int pdchOaMvZoneVol;
+    int pdchOaMvZoneArea;
+    int pdchOaMvDesZnOa;
+    int pdchOaMvMinDynTrgVent;
+
+    int pdstOAtotAirByZone;
+    int pdchOaTaBzMechVent;
+    int pdchOaTaBzNatVent;
+    int pdchOaTaBzTotVent;
+    int pdchOaTaBzInfil;
+    int pdchOaTaBzTotVentInfil;
+    int pdchOaTaBzDynTrgVent;
+    int pdchOaTaBzTmBelow;
+    int pdchOaTaBzTmAt;
+    int pdchOaTaBzTmAbove;
+    int pdchOaTaBzTmAboveUnocc;
+    
+    int pdstOAavgOccByZone;
+    int pdchOaOccBzMechVent;
+    int pdchOaOccBzNatVent;
+    int pdchOaOccBzTotVent;
+    int pdchOaOccBzInfil;
+    int pdchOaOccBzTotVentInfil;
+    int pdchOaOccBzDynTrgVent;
+    int pdchOaOccBzTmBelow;
+    int pdchOaOccBzTmAt;
+    int pdchOaOccBzTmAbove;
+    
+    int pdstOAtotAirByLoop;
+    int pdchOaTaAlMechVent;
+    int pdchOaTaAlSumDynTrgVent;
+    int pdchOaTaAlTmBelow;
+    int pdchOaTaAlTmAt;
+    int pdchOaTaAlTmAbove;
+    int pdchOaTaAlTmAboveUnocc;
+    
+    int pdstOAavgOccByLoop;
+    int pdchOaOccAlMechVent;
+    int pdchOaOccAlSumDynTrgVent;
+    int pdchOaOccAlTmBelow;
+    int pdchOaOccAlTmAt;
+    int pdchOaOccAlTmAbove;
+    
+    int pdstOAtimeFactorsDurOcc;
+    int pdchOaTmFctNoLimit;
+    int pdchOaTmFctHiHumid;
+    int pdchOaTmFctNiteVent;
+    int pdchOaTmFctEcono;
+    int pdchOaTmFctDCV;
+    int pdchOaTmFctExhaust;
+    int pdchOaTmFctLimit;
+    int pdchOaTmFctDemand;
+    int pdchOaTmFctEMS;
+    
+    int pdstOAavgFactorsDurOcc;
+    int pdchOaAvFctNoLimit;
+    int pdchOaAvFctHiHumid;
+    int pdchOaAvFctNiteVent;
+    int pdchOaAvFctEcono;
+    int pdchOaAvFctDCV;
+    int pdchOaAvFctExhaust;
+    int pdchOaAvFctLimit;
+    int pdchOaAvFctDemand;
+    int pdchOaAvFctEMS;
 
     // Object Count Report
     int pdrObjCnt;
@@ -1303,6 +1375,7 @@ namespace OutputReportPredefined {
         pdchULnotMetHeatOcc = 0;
         pdchULnotMetCoolOcc = 0;
         pdrOutsideAir = 0;
+        // remove this subtable when new subtables have been implemented
         pdstOAavgOcc = 0;
         pdchOaoAvgNumOcc1 = 0;
         pdchOaoNomNumOcc1 = 0;
@@ -1312,6 +1385,7 @@ namespace OutputReportPredefined {
         pdchOaoAvgAFNInfil = 0;
         pdchOaoAvgSimpVent = 0;
         pdchOaoAvgTotVent = 0;
+        // remove this subtable when new subtables have been implemented
         pdstOAminOcc = 0;
         pdchOaoAvgNumOcc2 = 0;
         pdchOaoNomNumOcc2 = 0;
@@ -1321,6 +1395,76 @@ namespace OutputReportPredefined {
         pdchOaoMinAFNInfil = 0;
         pdchOaoMinSimpVent = 0;
         pdchOaoMinTotVent = 0;
+
+        pdstOAmechVentParByZone = 0;
+        pdchOaMvAirLpNm = 0;
+        pdchOaMvAvgNumOcc = 0;
+        pdchOaMvNomNumOcc = 0;
+        pdchOaMvZoneVol = 0;
+        pdchOaMvZoneArea = 0;
+        pdchOaMvDesZnOa = 0;
+        pdchOaMvMinDynTrgVent = 0;
+
+        pdstOAtotAirByZone = 0;
+        pdchOaTaBzMechVent = 0;
+        pdchOaTaBzNatVent = 0;
+        pdchOaTaBzTotVent = 0;
+        pdchOaTaBzInfil = 0;
+        pdchOaTaBzTotVentInfil = 0;
+        pdchOaTaBzDynTrgVent = 0;
+        pdchOaTaBzTmBelow = 0;
+        pdchOaTaBzTmAt = 0;
+        pdchOaTaBzTmAbove = 0;
+        pdchOaTaBzTmAboveUnocc = 0;
+    
+        pdstOAavgOccByZone = 0;
+        pdchOaOccBzMechVent = 0;
+        pdchOaOccBzNatVent = 0;
+        pdchOaOccBzTotVent = 0;
+        pdchOaOccBzInfil = 0;
+        pdchOaOccBzTotVentInfil = 0;
+        pdchOaOccBzDynTrgVent = 0;
+        pdchOaOccBzTmBelow = 0;
+        pdchOaOccBzTmAt = 0;
+        pdchOaOccBzTmAbove = 0;
+    
+        pdstOAtotAirByLoop = 0;
+        pdchOaTaAlMechVent = 0;
+        pdchOaTaAlSumDynTrgVent = 0;
+        pdchOaTaAlTmBelow = 0;
+        pdchOaTaAlTmAt = 0;
+        pdchOaTaAlTmAbove = 0;
+        pdchOaTaAlTmAboveUnocc = 0;
+    
+        pdstOAavgOccByLoop = 0;
+        pdchOaOccAlMechVent = 0;
+        pdchOaOccAlSumDynTrgVent = 0;
+        pdchOaOccAlTmBelow = 0;
+        pdchOaOccAlTmAt = 0;
+        pdchOaOccAlTmAbove = 0;
+    
+        pdstOAtimeFactorsDurOcc = 0;
+        pdchOaTmFctNoLimit = 0;
+        pdchOaTmFctHiHumid = 0;
+        pdchOaTmFctNiteVent = 0;
+        pdchOaTmFctEcono = 0;
+        pdchOaTmFctDCV = 0;
+        pdchOaTmFctExhaust = 0;
+        pdchOaTmFctLimit = 0;
+        pdchOaTmFctDemand = 0;
+        pdchOaTmFctEMS = 0;
+    
+        pdstOAavgFactorsDurOcc = 0;
+        pdchOaAvFctNoLimit = 0;
+        pdchOaAvFctHiHumid = 0;
+        pdchOaAvFctNiteVent = 0;
+        pdchOaAvFctEcono = 0;
+        pdchOaAvFctDCV = 0;
+        pdchOaAvFctExhaust = 0;
+        pdchOaAvFctLimit = 0;
+        pdchOaAvFctDemand = 0;
+        pdchOaAvFctEMS = 0;
+
         pdrObjCnt = 0;
         pdstSurfCnt = 0;
         pdchSurfCntTot = 0;
@@ -2172,6 +2316,7 @@ namespace OutputReportPredefined {
         // Outside Air Report
         pdrOutsideAir = newPreDefReport("OutdoorAirSummary", "OA", "Outdoor Air Summary");
 
+        // remove this subtable when new subtables have been implemented
         pdstOAavgOcc = newPreDefSubTable(pdrOutsideAir, "Average Outdoor Air During Occupied Hours");
 
         pdchOaoAvgNumOcc1 = newPreDefColumn(pdstOAavgOcc, "Average Number of Occupants");
@@ -2185,6 +2330,7 @@ namespace OutputReportPredefined {
 
         addFootNoteSubTable(pdstOAavgOcc, "Values shown for a single zone without multipliers");
 
+        // remove this subtable when new subtables have been implemented
         pdstOAminOcc = newPreDefSubTable(pdrOutsideAir, "Minimum Outdoor Air During Occupied Hours");
 
         pdchOaoAvgNumOcc2 = newPreDefColumn(pdstOAminOcc, "Average Number of Occupants");
@@ -2196,6 +2342,75 @@ namespace OutputReportPredefined {
         pdchOaoMinSimpVent = newPreDefColumn(pdstOAminOcc, "Simple Ventilation [ach]");
         // pdchOaoMinTotVent =   newPreDefColumn(pdstOAminOcc,'Total Ventilation [ach]')
         addFootNoteSubTable(pdstOAminOcc, "Values shown for a single zone without multipliers");
+
+        pdstOAmechVentParByZone = newPreDefSubTable(pdrOutsideAir, "Mechanical Ventilation Parameters by Zone");
+        pdchOaMvAirLpNm = newPreDefColumn(pdstOAmechVentParByZone, "AirLoop Name");
+        pdchOaMvAvgNumOcc = newPreDefColumn(pdstOAmechVentParByZone, "Average Number of Occupants");
+        pdchOaMvNomNumOcc = newPreDefColumn(pdstOAmechVentParByZone, "Nominal Number of Occupants");
+        pdchOaMvZoneVol = newPreDefColumn(pdstOAmechVentParByZone, "Zone Volume [m3]");
+        pdchOaMvZoneArea = newPreDefColumn(pdstOAmechVentParByZone, "Zone Area [m2]");
+        pdchOaMvDesZnOa = newPreDefColumn(pdstOAmechVentParByZone, "Design Zone Outdoor Airflow - Voz [m3/s]");
+        pdchOaMvMinDynTrgVent = newPreDefColumn(pdstOAmechVentParByZone, "Minimum Dynamic Target Ventilation - Voz-dyn-min [m3/s]");
+
+        pdstOAtotAirByZone = newPreDefSubTable(pdrOutsideAir, "Total Outdoor Air by Zone");
+        pdchOaTaBzMechVent = newPreDefColumn(pdstOAtotAirByZone, "Mechanical Ventilation [m3]");
+        pdchOaTaBzNatVent = newPreDefColumn(pdstOAtotAirByZone, "Natural Ventilation [m3]");
+        pdchOaTaBzTotVent = newPreDefColumn(pdstOAtotAirByZone, "Total Ventilation [m3]");
+        pdchOaTaBzInfil = newPreDefColumn(pdstOAtotAirByZone, "Infiltration [m3]");
+        pdchOaTaBzTotVentInfil = newPreDefColumn(pdstOAtotAirByZone, "Total Ventilation and Infiltration [m3]");
+        pdchOaTaBzDynTrgVent = newPreDefColumn(pdstOAtotAirByZone, "Dynamic Target Ventilation - Voz-dyn [m3]");
+        pdchOaTaBzTmBelow = newPreDefColumn(pdstOAtotAirByZone, "Time Below Voz-dyn [hr]");
+        pdchOaTaBzTmAt = newPreDefColumn(pdstOAtotAirByZone, "Time At Voz-dyn [hr]");
+        pdchOaTaBzTmAbove = newPreDefColumn(pdstOAtotAirByZone, "Time Above Voz-dyn [hr]");
+        pdchOaTaBzTmAboveUnocc = newPreDefColumn(pdstOAtotAirByZone, "Time Above Zero When Unoccupied [hr]");
+
+        pdstOAavgOccByZone = newPreDefSubTable(pdrOutsideAir, "Average Outdoor Air During Occupancy by Zone - Flow Rates");
+        pdchOaOccBzMechVent = newPreDefColumn(pdstOAavgOccByZone, "Mechanical Ventilation [m3/s]");
+        pdchOaOccBzNatVent = newPreDefColumn(pdstOAavgOccByZone, "Natural Ventilation [m3/s]");
+        pdchOaOccBzTotVent = newPreDefColumn(pdstOAavgOccByZone, "Total Ventilation [m3/s]");
+        pdchOaOccBzInfil = newPreDefColumn(pdstOAavgOccByZone, "Infiltration [m3/s]");
+        pdchOaOccBzTotVentInfil = newPreDefColumn(pdstOAavgOccByZone, "Total Ventilation and Infiltration [m3/s]");
+        pdchOaOccBzDynTrgVent = newPreDefColumn(pdstOAavgOccByZone, "Dynamic Target Ventilation - Voz-dyn [m3/s]");
+        pdchOaOccBzTmBelow = newPreDefColumn(pdstOAavgOccByZone, "Time Below Voz-dyn [hr]");
+        pdchOaOccBzTmAt = newPreDefColumn(pdstOAavgOccByZone, "Time At Voz-dyn [hr]");
+        pdchOaOccBzTmAbove = newPreDefColumn(pdstOAavgOccByZone, "Time Above Voz-dyn [hr]");
+
+        pdstOAtotAirByLoop = newPreDefSubTable(pdrOutsideAir, "Total Outdoor Air by Airloop");
+        pdchOaTaAlMechVent = newPreDefColumn(pdstOAtotAirByLoop, "Mechanical Ventilation [m3]");
+        pdchOaTaAlSumDynTrgVent = newPreDefColumn(pdstOAtotAirByLoop, "Sum Zone Dynamic Target Ventilation - Voz-sum-dyn [m3]");
+        pdchOaTaAlTmBelow = newPreDefColumn(pdstOAtotAirByLoop, "Time Below Voz-sum-dyn [hr]");
+        pdchOaTaAlTmAt = newPreDefColumn(pdstOAtotAirByLoop, "Time At Voz-sum-dyn [hr]");
+        pdchOaTaAlTmAbove = newPreDefColumn(pdstOAtotAirByLoop, "Time Above Voz-sum-dyn [hr]");
+        pdchOaTaAlTmAboveUnocc = newPreDefColumn(pdstOAtotAirByLoop, "Time Above Zero When Unoccupied [hr]");
+
+        pdstOAavgOccByLoop = newPreDefSubTable(pdrOutsideAir, "Average Outdoor Air During Occupancy by Airloop");
+        pdchOaOccAlMechVent = newPreDefColumn(pdstOAavgOccByLoop, "Mechanical Ventilation [m3/s]");
+        pdchOaOccAlSumDynTrgVent = newPreDefColumn(pdstOAavgOccByLoop, "Sum Zone Dynamic Zone Outdoor Airflow - Voz-sum-dyn [m3/s]");
+        pdchOaOccAlTmBelow = newPreDefColumn(pdstOAavgOccByLoop, "Time Below Voz-sum-dyn [hr]");
+        pdchOaOccAlTmAt = newPreDefColumn(pdstOAavgOccByLoop, "Time At Voz-sum-dyn [hr]");
+        pdchOaOccAlTmAbove = newPreDefColumn(pdstOAavgOccByLoop, "Time Above Voz-sum-dyn [hr]");
+
+        pdstOAtimeFactorsDurOcc = newPreDefSubTable(pdrOutsideAir, "Times for Outdoor Air Limiting Factors During Occupancy");
+        pdchOaTmFctNoLimit = newPreDefColumn(pdstOAtimeFactorsDurOcc, "No Limiting Factor [hr]");
+        pdchOaTmFctHiHumid = newPreDefColumn(pdstOAtimeFactorsDurOcc, "High Humidity [hr]");
+        pdchOaTmFctNiteVent = newPreDefColumn(pdstOAtimeFactorsDurOcc, "Night Ventilation [hr]");
+        pdchOaTmFctEcono = newPreDefColumn(pdstOAtimeFactorsDurOcc, "Economizer [hr]");
+        pdchOaTmFctDCV = newPreDefColumn(pdstOAtimeFactorsDurOcc, "Demand Controlled Ventilation [hr]");
+        pdchOaTmFctExhaust = newPreDefColumn(pdstOAtimeFactorsDurOcc, "Exhaust Flow [hr]");
+        pdchOaTmFctLimit = newPreDefColumn(pdstOAtimeFactorsDurOcc, "Limits and Scheduled Limits [hr]");
+        pdchOaTmFctDemand = newPreDefColumn(pdstOAtimeFactorsDurOcc, "Demand Limiting [hr]");
+        pdchOaTmFctEMS = newPreDefColumn(pdstOAtimeFactorsDurOcc, "Energy Management System [hr]");
+
+        pdstOAavgFactorsDurOcc = newPreDefSubTable(pdrOutsideAir, "Average Outdoor Air For Each Outdoor Air Limiting Factors During Occupancy");
+        pdchOaAvFctNoLimit = newPreDefColumn(pdstOAavgFactorsDurOcc, "No Limiting Factor [m3/s]");
+        pdchOaAvFctHiHumid = newPreDefColumn(pdstOAavgFactorsDurOcc, "High Humidity [m3/s]");
+        pdchOaAvFctNiteVent = newPreDefColumn(pdstOAavgFactorsDurOcc, "Night Ventilation [m3/s]");
+        pdchOaAvFctEcono = newPreDefColumn(pdstOAavgFactorsDurOcc, "Economizer [m3/s]");
+        pdchOaAvFctDCV = newPreDefColumn(pdstOAavgFactorsDurOcc, "Demand Controlled Ventilation [m3/s]");
+        pdchOaAvFctExhaust = newPreDefColumn(pdstOAavgFactorsDurOcc, "Exhaust Flow [m3/s]");
+        pdchOaAvFctLimit = newPreDefColumn(pdstOAavgFactorsDurOcc, "Limits and Scheduled Limits [m3/s]");
+        pdchOaAvFctDemand = newPreDefColumn(pdstOAavgFactorsDurOcc, "Demand Limiting [m3/s]");
+        pdchOaAvFctEMS = newPreDefColumn(pdstOAavgFactorsDurOcc, "Energy Management System [m3/s]");
 
         // Object Count Report
         pdrObjCnt = newPreDefReport("ObjectCountSummary", "Count", "Object Count Summary");

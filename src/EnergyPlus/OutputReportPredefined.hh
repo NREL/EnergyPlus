@@ -513,6 +513,8 @@ namespace OutputReportPredefined {
 
     // Outside Air Report
     extern int pdrOutsideAir;
+
+    // remove this subtable when new subtables have been implemented
     extern int pdstOAavgOcc;
     extern int pdchOaoAvgNumOcc1;
     extern int pdchOaoNomNumOcc1;
@@ -522,6 +524,7 @@ namespace OutputReportPredefined {
     extern int pdchOaoAvgAFNInfil;
     extern int pdchOaoAvgSimpVent;
     extern int pdchOaoAvgTotVent;
+    // remove this subtable when new subtables have been implemented
     extern int pdstOAminOcc;
     extern int pdchOaoAvgNumOcc2;
     extern int pdchOaoNomNumOcc2;
@@ -531,6 +534,75 @@ namespace OutputReportPredefined {
     extern int pdchOaoMinAFNInfil;
     extern int pdchOaoMinSimpVent;
     extern int pdchOaoMinTotVent;
+
+    extern int pdstOAmechVentParByZone;
+    extern int pdchOaMvAirLpNm;
+    extern int pdchOaMvAvgNumOcc;
+    extern int pdchOaMvNomNumOcc;
+    extern int pdchOaMvZoneVol;
+    extern int pdchOaMvZoneArea;
+    extern int pdchOaMvDesZnOa;
+    extern int pdchOaMvMinDynTrgVent;
+
+    extern int pdstOAtotAirByZone;
+    extern int pdchOaTaBzMechVent;
+    extern int pdchOaTaBzNatVent;
+    extern int pdchOaTaBzTotVent;
+    extern int pdchOaTaBzInfil;
+    extern int pdchOaTaBzTotVentInfil;
+    extern int pdchOaTaBzDynTrgVent;
+    extern int pdchOaTaBzTmBelow;
+    extern int pdchOaTaBzTmAt;
+    extern int pdchOaTaBzTmAbove;
+    extern int pdchOaTaBzTmAboveUnocc;
+    
+    extern int pdstOAavgOccByZone;
+    extern int pdchOaOccBzMechVent;
+    extern int pdchOaOccBzNatVent;
+    extern int pdchOaOccBzTotVent;
+    extern int pdchOaOccBzInfil;
+    extern int pdchOaOccBzTotVentInfil;
+    extern int pdchOaOccBzDynTrgVent;
+    extern int pdchOaOccBzTmBelow;
+    extern int pdchOaOccBzTmAt;
+    extern int pdchOaOccBzTmAbove;
+    
+    extern int pdstOAtotAirByLoop;
+    extern int pdchOaTaAlMechVent;
+    extern int pdchOaTaAlSumDynTrgVent;
+    extern int pdchOaTaAlTmBelow;
+    extern int pdchOaTaAlTmAt;
+    extern int pdchOaTaAlTmAbove;
+    extern int pdchOaTaAlTmAboveUnocc;
+    
+    extern int pdstOAavgOccByLoop;
+    extern int pdchOaOccAlMechVent;
+    extern int pdchOaOccAlSumDynTrgVent;
+    extern int pdchOaOccAlTmBelow;
+    extern int pdchOaOccAlTmAt;
+    extern int pdchOaOccAlTmAbove;
+    
+    extern int pdstOAtimeFactorsDurOcc;
+    extern int pdchOaTmFctNoLimit;
+    extern int pdchOaTmFctHiHumid;
+    extern int pdchOaTmFctNiteVent;
+    extern int pdchOaTmFctEcono;
+    extern int pdchOaTmFctDCV;
+    extern int pdchOaTmFctExhaust;
+    extern int pdchOaTmFctLimit;
+    extern int pdchOaTmFctDemand;
+    extern int pdchOaTmFctEMS;
+    
+    extern int pdstOAavgFactorsDurOcc;
+    extern int pdchOaAvFctNoLimit;
+    extern int pdchOaAvFctHiHumid;
+    extern int pdchOaAvFctNiteVent;
+    extern int pdchOaAvFctEcono;
+    extern int pdchOaAvFctDCV;
+    extern int pdchOaAvFctExhaust;
+    extern int pdchOaAvFctLimit;
+    extern int pdchOaAvFctDemand;
+    extern int pdchOaAvFctEMS;
 
     // Object Count Report
     extern int pdrObjCnt;
