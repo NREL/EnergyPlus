@@ -8761,8 +8761,8 @@ namespace WeatherManager {
         // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        EPVector<Real64> longl({-12, 12}); // Lower Longitude value for a Time Zone
-        EPVector<Real64> longh({-12, 12}); // Upper Longitude value for a Time Zone
+        Array1D<Real64> longl({-12, 12}); // Lower Longitude value for a Time Zone
+        Array1D<Real64> longh({-12, 12}); // Upper Longitude value for a Time Zone
         int i;                             // Loop variable
         Real64 temp;                       // temporary value used to determine time zone
         Real64 tz;                         // resultant tz meridian
