@@ -4473,8 +4473,7 @@ namespace UnitarySystems {
                             newCoil.supplyFanName = thisSys.m_FanName;
                             newCoil.supplyFanIndex = thisSys.m_FanIndex;
                             newCoil.supplyFanType = thisSys.m_FanType_Num;
-                            if (newCoil.CoolingCoilType == DataHVACGlobals::CoilDX_SubcoolReheat) {
-                                thisSys.m_CoolingCoilSubType_Num = DataHVACGlobals::CoilDX_SubcoolReheat;
+                            if (newCoil.SubcoolReheatFlag) {
                                 thisSys.m_Humidistat = true;
                                 if (thisSys.m_NumOfSpeedCooling > 1) {
                                     thisSys.FullOutput.resize(thisSys.m_NumOfSpeedCooling + 1);
@@ -7044,7 +7043,8 @@ namespace UnitarySystems {
                     } else {
                     }
                 }
-                if (unitarySys[sysNum].m_CoolingCoilSubType_Num == DataHVACGlobals::CoilDX_SubcoolReheat) {
+                if (unitarySys[sysNum].m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling &&
+                    coilCoolingDXs[unitarySys[sysNum].m_CoolingCoilIndex].SubcoolReheatFlag) {
                     SetupOutputVariable("Unitary System Zone Load Sensible Heat Ratio",
                                         OutputProcessor::Unit::None,
                                         unitarySys[sysNum].LoadSHR,
@@ -7621,7 +7621,8 @@ namespace UnitarySystems {
                     MoistureLoad = DataZoneEnergyDemands::ZoneSysMoistureDemand(this->ControlZoneNum).RemainingOutputReqToDehumidSP;
                 }
 
-                if (ZoneLoad < 0.0 && MoistureLoad <= 0.0 && this->m_CoolingCoilSubType_Num == DataHVACGlobals::CoilDX_SubcoolReheat) {
+                if (ZoneLoad < 0.0 && MoistureLoad <= 0.0 && (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling &&
+                    coilCoolingDXs[this->m_CoolingCoilIndex].SubcoolReheatFlag)) {
                     this->LoadSHR =
                         ZoneLoad / (ZoneLoad + MoistureLoad * Psychrometrics::PsyHgAirFnWTdb(DataHeatBalFanSys::ZoneAirHumRat(this->ControlZoneNum),
                                                                                              DataHeatBalFanSys::MAT(this->ControlZoneNum)));
@@ -8296,7 +8297,8 @@ namespace UnitarySystems {
                 if ((HeatingLoad && ZoneLoad > SensOutputOff) || (CoolingLoad && ZoneLoad < SensOutputOff)) {
                     Real64 SensOutput;
                     Real64 LatOutput;
-                    if (this->m_CoolingCoilSubType_Num == DataHVACGlobals::CoilDX_SubcoolReheat) {
+                    if (this->m_CoolingCoilType_Num == DataHVACGlobals::CoilDX_Cooling &&
+                        coilCoolingDXs[this->m_CoolingCoilIndex].SubcoolReheatFlag) {
                         if (CoolingLoad && this->LoadSHR > 0.0) {
                             int CoilInletNode = coilCoolingDXs[this->m_CoolingCoilIndex].evapInletNodeIndex;
                             this->CoilSHR = 0.0;
@@ -10404,11 +10406,11 @@ namespace UnitarySystems {
                 } else {
                     CoilPLR = 0.0;
                 }
-                int OperationMode = coilNormalMode;
-                if (coilCoolingDXs[this->m_CoolingCoilIndex].CoolingCoilType == DataHVACGlobals::CoilDX_SubcoolReheat) {
-                    OperationMode = coilSubcoolReheatMode;
+                int OperationMode = DataHVACGlobals::coilNormalMode;
+                if (coilCoolingDXs[this->m_CoolingCoilIndex].SubcoolReheatFlag) {
+                    OperationMode = DataHVACGlobals::coilSubcoolReheatMode;
                 } else if (this->m_DehumidificationMode == 1) {
-                    OperationMode = coilEnhancedMode;
+                    OperationMode = DataHVACGlobals::coilEnhancedMode;
                 }
 
                 coilCoolingDXs[this->m_CoolingCoilIndex].simulate(
@@ -13237,11 +13239,11 @@ namespace UnitarySystems {
                     }
                 }
             }
-            int OperationMode = coilNormalMode;
-            if (coilCoolingDXs[this->m_CoolingCoilIndex].CoolingCoilType == DataHVACGlobals::CoilDX_SubcoolReheat) {
-                OperationMode = coilSubcoolReheatMode;
+            int OperationMode = DataHVACGlobals::coilNormalMode;
+            if (coilCoolingDXs[this->m_CoolingCoilIndex].SubcoolReheatFlag) {
+                OperationMode = DataHVACGlobals::coilSubcoolReheatMode;
             } else if (this->m_DehumidificationMode == 1) {
-                OperationMode = coilEnhancedMode;
+                OperationMode = DataHVACGlobals::coilEnhancedMode;
             }
 
             coilCoolingDXs[this->m_CoolingCoilIndex].simulate(
@@ -13547,7 +13549,7 @@ namespace UnitarySystems {
                 this->m_ElecPower = locFanElecPower;
                 this->m_ElecPowerConsumption = this->m_ElecPower * ReportingConstant;
             } else if (SELECT_CASE_var == DataHVACGlobals::CoilDX_Cooling) {
-                if (this->m_CoolingCoilSubType_Num == DataHVACGlobals::CoilDX_SubcoolReheat) {
+                if (coilCoolingDXs[this->m_CoolingCoilIndex].SubcoolReheatFlag) {
                     if (CoolingLoad && this->LoadSHR == 0.0) {
                         this->LoadSHR = 1.0;
                         this->CoilSHR = coilCoolingDXs[this->m_CoolingCoilIndex].performance.NormalSHR;

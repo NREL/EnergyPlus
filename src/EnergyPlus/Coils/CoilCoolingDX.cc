@@ -76,10 +76,6 @@ using namespace DataIPShortCuts;
 
 namespace EnergyPlus {
 
-    int const coilNormalMode = 0;       // Normal operation mode
-    int const coilEnhancedMode = 1;     // Enhanced operation mode
-    int const coilSubcoolReheatMode = 2; // SubcoolReheat operation mode
-
     std::vector<CoilCoolingDX> coilCoolingDXs;
     bool coilCoolingDXGetInputFlag = true;
     std::string const coilCoolingDXObjectName = "Coil:Cooling:DX";
@@ -144,7 +140,7 @@ void CoilCoolingDX::instantiateFromInputSpec(const CoilCoolingDXInputSpecificati
     if (!this->performance.original_input_specs.base_operating_mode_name.empty() &&
         !this->performance.original_input_specs.alternate_operating_mode_name.empty() && 
         !this->performance.original_input_specs.alternate_operating_mode2_name.empty()) {
-        this->CoolingCoilType = DataHVACGlobals::CoilDX_SubcoolReheat;
+        this->SubcoolReheatFlag = true;
     }
 
     // other construction below
@@ -383,7 +379,7 @@ void CoilCoolingDX::oneTimeInit() {
                             _,
                             "System");
     }
-    if (this->CoolingCoilType == DataHVACGlobals::CoilDX_SubcoolReheat) {
+    if (this->SubcoolReheatFlag) {
         SetupOutputVariable("SubcoolReheat Cooling Coil Operation Mode",
                             OutputProcessor::Unit::None,
                             this->performance.OperatingMode,
@@ -521,7 +517,7 @@ void CoilCoolingDX::simulate(int useAlternateMode, Real64 PLR, int speedNum, Rea
             Real64 condAirMassFlow = condInletNode.MassFlowRate; // TODO: How is this getting a value?
             Real64 waterDensity = Psychrometrics::RhoH2O(DataEnvironment::OutDryBulbTemp);
             this->evaporativeCondSupplyTankVolumeFlow = (condInletHumRat - outdoorHumRat) * condAirMassFlow / waterDensity;
-            if (useAlternateMode == coilNormalMode) {
+            if (useAlternateMode == DataHVACGlobals::coilNormalMode) {
                 this->evapCondPumpElecPower = this->performance.normalMode.getCurrentEvapCondPumpPower(speedNum);
             }
             DataWater::WaterStorage(this->evaporativeCondSupplyTankIndex).VdotRequestDemand(this->evaporativeCondSupplyTankARRID) =
@@ -559,7 +555,7 @@ void CoilCoolingDX::simulate(int useAlternateMode, Real64 PLR, int speedNum, Rea
     this->speedNumReport = speedNum;
     this->speedRatioReport = speedRatio;
 
-    if (useAlternateMode == coilSubcoolReheatMode) {
+    if (useAlternateMode == DataHVACGlobals::coilSubcoolReheatMode) {
         this->recoveredHeatEnergyRate = this->performance.recoveredEnergyRate;
         this->recoveredHeatEnergy = this->recoveredHeatEnergyRate * reportingConstant;
     }
