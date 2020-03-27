@@ -2770,29 +2770,28 @@ namespace UnitarySystems {
                                                                              1,
                                                                              DataLoopNode::ObjectIsParent);
 
-                // these are needed for call from GetOASysNumHeat(Cool)ingCoils 
+                // these are needed for call from GetOASysNumHeat(Cool)ingCoils
                 std::string loc_heatingCoilType("");
-                if ( fields.find("heating_coil_object_type") != fields.end() ) { // not required field
+                if (fields.find("heating_coil_object_type") != fields.end()) { // not required field
                     loc_heatingCoilType = UtilityRoutines::MakeUPPERCase(fields.at("heating_coil_object_type"));
                     thisSys.m_HeatCoilExists = true;
                 }
 
                 std::string loc_coolingCoilType("");
-                if ( fields.find("cooling_coil_object_type") != fields.end() ) { // not required field
+                if (fields.find("cooling_coil_object_type") != fields.end()) { // not required field
                     loc_coolingCoilType = UtilityRoutines::MakeUPPERCase(fields.at("cooling_coil_object_type"));
                     thisSys.m_CoolCoilExists = true;
                 }
 
                 // needed for checkUnitarySysCoilInOASysExists
-                if ( UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:DX:VariableSpeed") ) {
+                if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:DX:VariableSpeed")) {
                     thisSys.m_CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingAirToAirVariableSpeed;
-                } else if ( UtilityRoutines::SameString(loc_coolingCoilType,
-                    "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit") ) {
+                } else if (UtilityRoutines::SameString(loc_coolingCoilType, "Coil:Cooling:WaterToAirHeatPump:VariableSpeedEquationFit")) {
                     thisSys.m_CoolingCoilType_Num = DataHVACGlobals::Coil_CoolingWaterToAirHPVSEquationFit;
                 }
 
                 std::string loc_suppHeatCoilType("");
-                if ( fields.find("supplemental_heating_coil_object_type") != fields.end() ) { // not required field
+                if (fields.find("supplemental_heating_coil_object_type") != fields.end()) { // not required field
                     loc_suppHeatCoilType = UtilityRoutines::MakeUPPERCase(fields.at("supplemental_heating_coil_object_type"));
                     thisSys.m_SuppCoilExists = true;
                 }

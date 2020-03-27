@@ -3231,55 +3231,56 @@ namespace ReportSizingManager {
                             CoilInEnth = PsyHFnTdbW(CoilInTemp, CoilInHumRat);
                             CoilInWetBulb = PsyTwbFnTdbWPb(CoilInTemp, CoilInHumRat, StdBaroPress, CallingRoutine);
                             CoilOutEnth = PsyHFnTdbW(CoilOutTemp, CoilOutHumRat);
-                            if ( CurOASysNum > 0 ) { // coil is in the OA stream
+                            if (CurOASysNum > 0) { // coil is in the OA stream
                                 // need to find fan type in OA system
                             } else {
                                 SupFanNum = PrimaryAirSystem(CurSysNum).SupFanNum;
                                 RetFanNum = PrimaryAirSystem(CurSysNum).RetFanNum;
-                                switch ( PrimaryAirSystem(CurSysNum).supFanModelTypeEnum ) {
-                                    case DataAirSystems::structArrayLegacyFanModels: {
-                                            FanCoolLoad = FanDesHeatGain(PrimaryAirSystem(CurSysNum).SupFanNum, DesVolFlow);
-                                            if ( coilSelectionReportObj->isCompTypeCoil(CompType) && ( SupFanNum > 0 ) ) {
-                                                coilSelectionReportObj->setCoilSupplyFanInfo(CompName,
-                                                    CompType,
-                                                    Fans::Fan(PrimaryAirSystem(CurSysNum).SupFanNum).FanName,
-                                                    DataAirSystems::structArrayLegacyFanModels,
-                                                    PrimaryAirSystem(CurSysNum).SupFanNum);
-                                            }
+                                switch (PrimaryAirSystem(CurSysNum).supFanModelTypeEnum) {
+                                case DataAirSystems::structArrayLegacyFanModels: {
+                                    FanCoolLoad = FanDesHeatGain(PrimaryAirSystem(CurSysNum).SupFanNum, DesVolFlow);
+                                    if (coilSelectionReportObj->isCompTypeCoil(CompType) && (SupFanNum > 0)) {
+                                        coilSelectionReportObj->setCoilSupplyFanInfo(CompName,
+                                                                                     CompType,
+                                                                                     Fans::Fan(PrimaryAirSystem(CurSysNum).SupFanNum).FanName,
+                                                                                     DataAirSystems::structArrayLegacyFanModels,
+                                                                                     PrimaryAirSystem(CurSysNum).SupFanNum);
+                                    }
 
-                                            break;
-                                        }
-                                    case DataAirSystems::objectVectorOOFanSystemModel: {
-                                            FanCoolLoad = HVACFan::fanObjs[ PrimaryAirSystem(CurSysNum).supFanVecIndex ]->getFanDesignHeatGain(DesVolFlow);
-                                            if ( coilSelectionReportObj->isCompTypeCoil(CompType) && ( PrimaryAirSystem(CurSysNum).supFanVecIndex >= 0 ) ) {
-                                                coilSelectionReportObj->setCoilSupplyFanInfo(CompName,
-                                                    CompType,
-                                                    HVACFan::fanObjs[ PrimaryAirSystem(CurSysNum).supFanVecIndex ]->name,
-                                                    DataAirSystems::objectVectorOOFanSystemModel,
-                                                    PrimaryAirSystem(CurSysNum).supFanVecIndex);
-                                            }
-                                            break;
-                                        }
-                                    case DataAirSystems::fanModelTypeNotYetSet: {
-                                            // do nothing
-                                            break;
-                                        }
+                                    break;
+                                }
+                                case DataAirSystems::objectVectorOOFanSystemModel: {
+                                    FanCoolLoad = HVACFan::fanObjs[PrimaryAirSystem(CurSysNum).supFanVecIndex]->getFanDesignHeatGain(DesVolFlow);
+                                    if (coilSelectionReportObj->isCompTypeCoil(CompType) && (PrimaryAirSystem(CurSysNum).supFanVecIndex >= 0)) {
+                                        coilSelectionReportObj->setCoilSupplyFanInfo(
+                                            CompName,
+                                            CompType,
+                                            HVACFan::fanObjs[PrimaryAirSystem(CurSysNum).supFanVecIndex]->name,
+                                            DataAirSystems::objectVectorOOFanSystemModel,
+                                            PrimaryAirSystem(CurSysNum).supFanVecIndex);
+                                    }
+                                    break;
+                                }
+                                case DataAirSystems::fanModelTypeNotYetSet: {
+                                    // do nothing
+                                    break;
+                                }
                                 } // end switch
 
-                                switch ( PrimaryAirSystem(CurSysNum).retFanModelTypeEnum ) {
-                                    case DataAirSystems::structArrayLegacyFanModels: {
-                                            FanCoolLoad += ( 1.0 - OutAirFrac ) * FanDesHeatGain(PrimaryAirSystem(CurSysNum).RetFanNum, DesVolFlow);
-                                            break;
-                                        }
-                                    case DataAirSystems::objectVectorOOFanSystemModel: {
-                                            FanCoolLoad += ( 1.0 - OutAirFrac ) *
-                                                HVACFan::fanObjs[ PrimaryAirSystem(CurSysNum).retFanVecIndex ]->getFanDesignHeatGain(DesVolFlow);
-                                            break;
-                                        }
-                                    case DataAirSystems::fanModelTypeNotYetSet: {
-                                            // do nothing
-                                            break;
-                                        }
+                                switch (PrimaryAirSystem(CurSysNum).retFanModelTypeEnum) {
+                                case DataAirSystems::structArrayLegacyFanModels: {
+                                    FanCoolLoad += (1.0 - OutAirFrac) * FanDesHeatGain(PrimaryAirSystem(CurSysNum).RetFanNum, DesVolFlow);
+                                    break;
+                                }
+                                case DataAirSystems::objectVectorOOFanSystemModel: {
+                                    FanCoolLoad += (1.0 - OutAirFrac) *
+                                                   HVACFan::fanObjs[PrimaryAirSystem(CurSysNum).retFanVecIndex]->getFanDesignHeatGain(DesVolFlow);
+                                    break;
+                                }
+                                case DataAirSystems::fanModelTypeNotYetSet: {
+                                    // do nothing
+                                    break;
+                                }
                                 } // end switch
 
                                 PrimaryAirSystem(CurSysNum).FanDesCoolLoad = FanCoolLoad;

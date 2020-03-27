@@ -487,11 +487,13 @@ TEST_F(AirloopUnitarySysTest, MultipleWaterCoolingCoilSizing)
     Real64 CoilInTemp = DataSizing::FinalSysSizing(1).MixTempAtCoolPeak;
     Real64 CoilInHumRat = DataSizing::FinalSysSizing(1).MixHumRatAtCoolPeak;
     Real64 rhoair = Psychrometrics::PsyRhoAirFnPbTdbW(DataEnvironment::StdBaroPress, CoilInTemp, CoilInHumRat);
-    // this is the ratio of UnitarySystem cooling coil size to water cooling coil on main branch
+    // this is the ratio of UnitarySystem cooling coil size to coil-on-branch water cooling coil size
     Real64 rhoRatio = DataEnvironment::StdRhoAir / rhoair;
 
     EXPECT_NEAR(coil1CoolingCoilRate, rhoRatio * WaterCoils::WaterCoil(1).DesWaterCoolingCoilRate, 1.0);
+    EXPECT_NEAR(coil1CoolingCoilRate, rhoRatio * mySys->m_DesignCoolingCapacity, 1.0);
     EXPECT_NEAR(coil2HeatingCoilRate, WaterCoils::WaterCoil(2).DesWaterHeatingCoilRate, 1.0);
+    EXPECT_NEAR(coil2HeatingCoilRate, mySys->m_DesignHeatingCapacity, 1.0);
 }
 
 TEST_F(ZoneUnitarySysTest, Test_UnitarySystemModel_factory)

@@ -592,7 +592,6 @@ namespace MixedAir {
 
         // USE Statements
         // Using/Aliasing
-        using DataAirLoop::AirLoopInputsFilled;
         using DesiccantDehumidifiers::SimDesiccantDehumidifier;
         using EvaporativeCoolers::SimEvapCooler;
         using HeatingCoils::SimulateHeatingCoilComponents;
