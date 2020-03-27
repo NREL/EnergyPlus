@@ -56,7 +56,7 @@
 #include <EnergyPlus/DataRuntimeLanguage.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/NodeInputManager.hh>
 #include <EnergyPlus/OutAirNodeManager.hh>
 #include <EnergyPlus/OutputProcessor.hh>
@@ -965,7 +965,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
         "set Var15 = @RANDOMUNIFORM 0.0 1.0,",
         "set Var16 = @RANDOMNORMAL 1.5 0.5 0.75 2.25,", // negative number does not get processed correctly
         "set Var17 = @RhoAirFnPbTdbW 101325.0 30.0 0.01,",
-        "set Var18 = @CpAirFnWTdb 0.01 30.0,",
+        "set Var18 = @CpAirFnW 0.01,",
         "set Var19 = @HfgAirFnWTdb 0.01 30.0,",
         "set Var20 = @HgAirFnWTdb 0.01 30.0,",
         "set Var21 = @TdpFnTdbTwbPb 30.0 16.0 101325.0,",
@@ -1225,13 +1225,12 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
     EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR17");
     EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 1.146173145, 0.00000001); // RhoAirFnPbTdbW 101325.0 30.0 0.01 =
 
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(18).Operator, FuncCpAirFnWTdb);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(18).NumOperands, 2);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(18).Operand.size(), 2u);
-    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(18).Operand(2).Type, 1); // argument was passed to EMS function
+    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(18).Operator, FuncCpAirFnW);
+    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(18).NumOperands, 1);
+    EXPECT_EQ(DataRuntimeLanguage::ErlExpression(18).Operand.size(), 1u);
     index = 18 + offset;
     EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR18");
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 1023.42949999999, 0.00000001); // CpAirFnWTdb 0.01 30.0 =
+    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 1023.42949999999, 0.00000001); // CpAirFnW 0.01 =
 
     EXPECT_EQ(DataRuntimeLanguage::ErlExpression(19).Operator, FuncHfgAirFnWTdb);
     EXPECT_EQ(DataRuntimeLanguage::ErlExpression(19).NumOperands, 2);
@@ -1345,7 +1344,7 @@ TEST_F(EnergyPlusFixture, EMSManager_TestFuntionCall)
     EXPECT_EQ(DataRuntimeLanguage::ErlExpression(32).Operand(3).Type, 1); // argument was passed to EMS function
     index = 32 + offset;
     EXPECT_EQ(DataRuntimeLanguage::ErlVariable(index).Name, "VAR32"); // verified at sugartech site using 30 C db and 0.01 kg/kg = 19.60536624685125 C
-    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 19.589790661, 0.00000001); // TwbFnTdbWPb 30.0 0.01 101325.0 =
+    EXPECT_NEAR(DataRuntimeLanguage::ErlVariable(index).Value.Number, 19.60933534, 0.00000001); // TwbFnTdbWPb 30.0 0.01 101325.0 =
 
     EXPECT_EQ(DataRuntimeLanguage::ErlExpression(33).Operator, FuncVFnTdbWPb);
     EXPECT_EQ(DataRuntimeLanguage::ErlExpression(33).NumOperands, 3);

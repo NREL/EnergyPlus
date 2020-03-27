@@ -57,6 +57,8 @@
 #include <EnergyPlus/DataSystemVariables.hh>
 #include <EnergyPlus/FileSystem.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
+#include <EnergyPlus/DataGlobals.hh>
+#include <EnergyPlus/DataEnvironment.hh>
 
 namespace EnergyPlus {
 
@@ -118,6 +120,7 @@ namespace DataSystemVariables {
     std::string const cIgnoreBeamRadiation("IgnoreBeamRadiation");
     std::string const cIgnoreDiffuseRadiation("IgnoreDiffuseRadiation");
     std::string const cSutherlandHodgman("SutherlandHodgman");
+    std::string const cSlaterBarsky("SlaterBarsky");
     std::string const cMinimalSurfaceVariables("CreateMinimalSurfaceVariables");
     std::string const cMinimalShadowing("MinimalShadowing");
     std::string const cNumActiveSims("cntActv");
@@ -149,9 +152,17 @@ namespace DataSystemVariables {
     bool FullAnnualRun(false);                    // TRUE if full annual simulation is to be run.
     bool DeveloperFlag(false);                    // TRUE if developer flag is turned on. (turns on more displays to console)
     bool TimingFlag(false);                       // TRUE if timing flag is turned on. (turns on more timing displays to console)
+
+    // Shading methods
+    ShadingMethod shadingMethod(ShadingMethod::PolygonClipping);
     bool SutherlandHodgman(true);                 // TRUE if SutherlandHodgman algorithm for polygon clipping is to be used.
+    bool SlaterBarsky(false);                  // TRUE if SlaterBarsky algorithm for polygon clipping is to be used for vertical polygons.
     bool DetailedSkyDiffuseAlgorithm(false);      // use detailed diffuse shading algorithm for sky (shading transmittance varies)
     bool DetailedSolarTimestepIntegration(false); // when true, use detailed timestep integration for all solar,shading, etc.
+    bool DisableGroupSelfShading(false); // when true, defined shadowing surfaces group is ignored when calculating sunlit fraction
+    bool DisableAllSelfShading(false);   // when true, all external shadowing surfaces is ignored when calculating sunlit fraction
+
+
     bool TrackAirLoopEnvFlag(false);              // If TRUE generates a file with runtime statistics for each HVAC
     //  controller on each air loop
     bool TraceAirLoopEnvFlag(false); // If TRUE generates a trace file with the converged solutions of all
@@ -162,12 +173,7 @@ namespace DataSystemVariables {
     bool ReportDuringHVACSizingSimulation(false);        // true when reporting outputs during HVAC sizing Simulation
     bool ReportDetailedWarmupConvergence(false);         // True when the detailed warmup convergence is requested
     bool UpdateDataDuringWarmupExternalInterface(false); // variable sets in the external interface.
-    bool UseScheduledSunlitFrac(false);                  // when true, the sunlit fraction for all surfaces are imported from schedule inputs
     bool ReportExtShadingSunlitFrac(false);              // when true, the sunlit fraction for all surfaces are exported as a csv format output
-    bool UseImportedSunlitFrac(false);                   // when true, the sunlit fraction for all surfaces are imported altogether as a CSV/JSON file
-
-    bool DisableGroupSelfShading(false); // when true, defined shadowing surfaces group is ignored when calculating sunlit fraction
-    bool DisableAllSelfShading(false);   // when true, all external shadowing surfaces is ignored when calculating sunlit fraction
 
     // This update the value during the warmup added for FMI
     Real64 Elapsed_Time(0.0);       // For showing elapsed time at end of run
@@ -374,7 +380,9 @@ namespace DataSystemVariables {
         FullAnnualRun = false;
         DeveloperFlag = false;
         TimingFlag = false;
+        shadingMethod = ShadingMethod::PolygonClipping;
         SutherlandHodgman = true;
+        SlaterBarsky = false;
         DetailedSkyDiffuseAlgorithm = false;
         DetailedSolarTimestepIntegration = false;
         TrackAirLoopEnvFlag = false;
@@ -384,9 +392,7 @@ namespace DataSystemVariables {
         ReportDuringHVACSizingSimulation = false;
         ReportDetailedWarmupConvergence = false;
         UpdateDataDuringWarmupExternalInterface = false;
-        UseScheduledSunlitFrac = false;
         ReportExtShadingSunlitFrac = false;
-        UseImportedSunlitFrac = false;
         DisableGroupSelfShading = false;
         DisableAllSelfShading = false;
         Elapsed_Time = 0.0;
@@ -407,6 +413,107 @@ namespace DataSystemVariables {
         NumberIntRadThreads = 1;
         iNominalTotSurfaces = 0;
         Threading = false;
+    }
+
+    void processEnvironmentVariables() {
+
+        static std::string cEnvValue;
+
+        get_environment_variable(DDOnlyEnvVar, cEnvValue);
+        DDOnly = env_var_on(cEnvValue); // Yes or True
+        if (DataGlobals::DDOnlySimulation) DDOnly = true;
+
+        get_environment_variable(ReverseDDEnvVar, cEnvValue);
+        ReverseDD = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(DisableGLHECachingEnvVar, cEnvValue);
+        DisableGLHECaching = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(FullAnnualSimulation, cEnvValue);
+        FullAnnualRun = env_var_on(cEnvValue); // Yes or True
+        if (DataGlobals::AnnualSimulation) FullAnnualRun = true;
+
+        get_environment_variable(cDisplayAllWarnings, cEnvValue);
+        DataGlobals::DisplayAllWarnings = env_var_on(cEnvValue); // Yes or True
+        if (DataGlobals::DisplayAllWarnings) {
+            DataGlobals::DisplayAllWarnings = true;
+            DataGlobals::DisplayExtraWarnings = true;
+            DataGlobals::DisplayUnusedSchedules = true;
+            DataGlobals::DisplayUnusedObjects = true;
+        }
+
+        get_environment_variable(cDisplayExtraWarnings, cEnvValue);
+        if (!cEnvValue.empty()) DataGlobals::DisplayExtraWarnings = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cDisplayUnusedObjects, cEnvValue);
+        if (!cEnvValue.empty()) DataGlobals::DisplayUnusedObjects = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cDisplayUnusedSchedules, cEnvValue);
+        if (!cEnvValue.empty()) DataGlobals::DisplayUnusedSchedules = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cDisplayZoneAirHeatBalanceOffBalance, cEnvValue);
+        if (!cEnvValue.empty()) DataGlobals::DisplayZoneAirHeatBalanceOffBalance = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cDisplayAdvancedReportVariables, cEnvValue);
+        if (!cEnvValue.empty()) DataGlobals::DisplayAdvancedReportVariables = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cReportDuringWarmup, cEnvValue);
+        if (!cEnvValue.empty()) ReportDuringWarmup = env_var_on(cEnvValue); // Yes or True
+        if (ReverseDD) ReportDuringWarmup = false;                          // force to false for ReverseDD runs
+
+        get_environment_variable(cReportDuringWarmup, cEnvValue);
+        if (!cEnvValue.empty()) ReportDuringWarmup = env_var_on(cEnvValue); // Yes or True
+        if (DisableGLHECaching) ReportDuringWarmup = true;                  // force to true for standard runs runs
+
+        get_environment_variable(cReportDuringHVACSizingSimulation, cEnvValue);
+        if (!cEnvValue.empty()) ReportDuringHVACSizingSimulation = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cIgnoreSolarRadiation, cEnvValue);
+        if (!cEnvValue.empty()) DataEnvironment::IgnoreSolarRadiation = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cMinimalSurfaceVariables, cEnvValue);
+        if (!cEnvValue.empty()) DataGlobals::CreateMinimalSurfaceVariables = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cSortIDD, cEnvValue);
+        if (!cEnvValue.empty()) SortedIDD = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(MinReportFrequencyEnvVar, cEnvValue);
+        if (!cEnvValue.empty()) MinReportFrequency = cEnvValue; // turned into value later
+
+        get_environment_variable(cDeveloperFlag, cEnvValue);
+        if (!cEnvValue.empty()) DeveloperFlag = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cIgnoreBeamRadiation, cEnvValue);
+        if (!cEnvValue.empty()) DataEnvironment::IgnoreBeamRadiation = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cIgnoreDiffuseRadiation, cEnvValue);
+        if (!cEnvValue.empty()) DataEnvironment::IgnoreDiffuseRadiation = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cSutherlandHodgman, cEnvValue);
+        if (!cEnvValue.empty()) SutherlandHodgman = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cSlaterBarsky, cEnvValue);
+        if (!cEnvValue.empty()) SlaterBarsky = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cMinimalShadowing, cEnvValue);
+        if (!cEnvValue.empty()) lMinimalShadowing = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cTimingFlag, cEnvValue);
+        if (!cEnvValue.empty()) TimingFlag = env_var_on(cEnvValue); // Yes or True
+
+        // Initialize env flags for air loop simulation debugging
+        get_environment_variable(TrackAirLoopEnvVar, cEnvValue);
+        if (!cEnvValue.empty()) TrackAirLoopEnvFlag = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(TraceAirLoopEnvVar, cEnvValue);
+        if (!cEnvValue.empty()) TraceAirLoopEnvFlag = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(TraceHVACControllerEnvVar, cEnvValue);
+        if (!cEnvValue.empty()) TraceHVACControllerEnvFlag = env_var_on(cEnvValue); // Yes or True
+
+        get_environment_variable(cDisplayInputInAuditEnvVar, cEnvValue);
+        if (!cEnvValue.empty()) DataGlobals::DisplayInputInAudit = env_var_on(cEnvValue); // Yes or True
+
     }
 
 } // namespace DataSystemVariables

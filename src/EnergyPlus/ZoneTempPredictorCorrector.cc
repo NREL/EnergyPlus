@@ -71,7 +71,6 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/DirectAirManager.hh>
 #include <EnergyPlus/EMSManager.hh>
 #include <EnergyPlus/FaultsManager.hh>
 #include <EnergyPlus/General.hh>
@@ -269,7 +268,16 @@ namespace ZoneTempPredictorCorrector {
     // Zone temperature history - used only for oscillation test
     Array2D<Real64> ZoneTempHist;
     Array1D<Real64> ZoneTempOscillate;
+    Array1D<Real64> ZoneTempOscillateDuringOccupancy;
+    Array1D<Real64> ZoneTempOscillateInDeadband;
     Real64 AnyZoneTempOscillate;
+    Real64 AnyZoneTempOscillateDuringOccupancy;
+    Real64 AnyZoneTempOscillateInDeadband;
+    Real64 AnnualAnyZoneTempOscillate(0.0);
+    Real64 AnnualAnyZoneTempOscillateDuringOccupancy(0.0);
+    Real64 AnnualAnyZoneTempOscillateInDeadband(0.0);
+    bool OscillationVariablesNeeded(false);
+
 
     // SUBROUTINE SPECIFICATIONS:
 
@@ -301,6 +309,7 @@ namespace ZoneTempPredictorCorrector {
         NumStageCtrZone = 0;
         InitZoneAirSetPointsOneTimeFlag = true;
         SetupOscillationOutputFlag = true;
+        OscillationVariablesNeeded = false;
         ZoneSetPointLast.deallocate();
         TempIndZnLd.deallocate();
         TempDepZnLd.deallocate();
@@ -308,6 +317,11 @@ namespace ZoneTempPredictorCorrector {
         ZoneTempHist.deallocate();
         ZoneTempOscillate.deallocate();
         AnyZoneTempOscillate = 0.0;
+        AnyZoneTempOscillateDuringOccupancy = 0.0;
+        AnyZoneTempOscillateInDeadband = 0.0;
+        AnnualAnyZoneTempOscillate = 0.0;
+        AnnualAnyZoneTempOscillateDuringOccupancy = 0.0;
+        AnnualAnyZoneTempOscillateInDeadband = 0.0;
         SetPointSingleHeating.deallocate();
         SetPointSingleCooling.deallocate();
         SetPointSingleHeatCool.deallocate();
@@ -2782,6 +2796,8 @@ namespace ZoneTempPredictorCorrector {
             SNLoadPredictedHSPRate.dimension(NumOfZones, 0.0);
             SNLoadPredictedCSPRate.dimension(NumOfZones, 0.0);
             MoisturePredictedRate.dimension(NumOfZones, 0.0);
+            MoisturePredictedHumSPRate.dimension(NumOfZones, 0.0);
+            MoisturePredictedDehumSPRate.dimension(NumOfZones, 0.0);
             WZoneTimeMinus1.dimension(NumOfZones, 0.0);
             WZoneTimeMinus2.dimension(NumOfZones, 0.0);
             WZoneTimeMinus3.dimension(NumOfZones, 0.0);
@@ -2921,17 +2937,16 @@ namespace ZoneTempPredictorCorrector {
                                     Zone(Loop).Name);
                 SetupOutputVariable("Zone Predicted Moisture Load to Humidifying Setpoint Moisture Transfer Rate",
                                     OutputProcessor::Unit::kgWater_s,
-                                    ZoneSysMoistureDemand(Loop).OutputRequiredToHumidifyingSP,
+                                    MoisturePredictedHumSPRate(Loop),
                                     "System",
                                     "Average",
                                     Zone(Loop).Name);
                 SetupOutputVariable("Zone Predicted Moisture Load to Dehumidifying Setpoint Moisture Transfer Rate",
                                     OutputProcessor::Unit::kgWater_s,
-                                    ZoneSysMoistureDemand(Loop).OutputRequiredToDehumidifyingSP,
+                                    MoisturePredictedDehumSPRate(Loop),
                                     "System",
                                     "Average",
                                     Zone(Loop).Name);
-                // Zone thermostat setpoints
                 SetupOutputVariable(
                     "Zone Thermostat Control Type", OutputProcessor::Unit::None, TempControlType(Loop), "Zone", "Average", Zone(Loop).Name);
                 SetupOutputVariable("Zone Thermostat Heating Setpoint Temperature",
@@ -3097,6 +3112,9 @@ namespace ZoneTempPredictorCorrector {
             SNLoadPredictedHSPRate = 0.0;
             SNLoadPredictedCSPRate = 0.0;
             MoisturePredictedRate = 0.0;
+            MoisturePredictedHumSPRate = 0.0;
+            MoisturePredictedDehumSPRate = 0.0;
+
             TempIndZnLd = 0.0;
             TempDepZnLd = 0.0;
             NonAirSystemResponse = 0.0;
@@ -3695,8 +3713,8 @@ namespace ZoneTempPredictorCorrector {
             }
 
             AIRRAT(ZoneNum) = Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpSens *
-                              PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum)) *
-                              PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), MAT(ZoneNum)) / (TimeStepSys * SecInHour);
+                              PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum)) * PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) /
+                              (TimeStepSys * SecInHour);
             AirCap = AIRRAT(ZoneNum);
             RAFNFrac = 0.0;
 
@@ -4092,7 +4110,7 @@ namespace ZoneTempPredictorCorrector {
 
             } else if (SELECT_CASE_var == SingleHeatingSetPoint) {
 
-                // PH 3/2/04      LoadToHeatingSetPoint = (TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum))
+                // PH 3/2/04      LoadToHeatingSetPoint = TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum)
                 if (ZoneAirSolutionAlgo == Use3rdOrder) {
                     LoadToHeatingSetPoint = (TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum));
                     // Exact solution
@@ -4121,7 +4139,7 @@ namespace ZoneTempPredictorCorrector {
 
                 // PH 3/2/04      LoadToCoolingSetPoint = (TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum))
                 if (ZoneAirSolutionAlgo == Use3rdOrder) {
-                    LoadToCoolingSetPoint = (TempDepZnLd(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum)) - TempIndZnLd(ZoneNum));
+                    LoadToCoolingSetPoint = TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum);
                 } else if (ZoneAirSolutionAlgo == UseAnalyticalSolution) {
                     if (TempDepZnLd(ZoneNum) == 0.0) { // B=0
                         LoadToCoolingSetPoint = AIRRAT(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum)) - TempIndZnLd(ZoneNum);
@@ -4743,12 +4761,11 @@ namespace ZoneTempPredictorCorrector {
         }
 
         // Save the unmultiplied zone moisture load to a report variable
-        MoisturePredictedRate(ZoneNum) = ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired;
-
-        // Apply the Zone Multiplier to the total zone moisture load
-        ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired *= Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
-        ZoneSysMoistureDemand(ZoneNum).OutputRequiredToHumidifyingSP *= Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
-        ZoneSysMoistureDemand(ZoneNum).OutputRequiredToDehumidifyingSP *= Zone(ZoneNum).Multiplier * Zone(ZoneNum).ListMultiplier;
+        ReportMoistLoadsZoneMultiplier(ZoneSysMoistureDemand(ZoneNum).TotalOutputRequired,
+                                       ZoneSysMoistureDemand(ZoneNum).OutputRequiredToHumidifyingSP,
+                                       ZoneSysMoistureDemand(ZoneNum).OutputRequiredToDehumidifyingSP,
+                                       MoisturePredictedRate(ZoneNum),MoisturePredictedHumSPRate(ZoneNum),MoisturePredictedDehumSPRate(ZoneNum),
+                                       Zone(ZoneNum).Multiplier,Zone(ZoneNum).ListMultiplier);
 
         // init each sequenced demand to the full output
         if (allocated(ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequired))
@@ -4760,6 +4777,28 @@ namespace ZoneTempPredictorCorrector {
             ZoneSysMoistureDemand(ZoneNum).SequencedOutputRequiredToDehumidSP =
                 ZoneSysMoistureDemand(ZoneNum).OutputRequiredToDehumidifyingSP; // array assignment
     }
+
+    void ReportMoistLoadsZoneMultiplier(Real64 &TotalLoad,
+                                        Real64 &TotalHumidLoad,
+                                        Real64 &TotalDehumidLoad,
+                                        Real64 &MoistLoadSingleZone,
+                                        Real64 &MoistLoadHumidSingleZone,
+                                        Real64 &MoistLoadDehumidSingleZone,
+                                        Real64 const ZoneMultiplier,
+                                        Real64 const ZoneMultiplierList
+    )
+    {
+        MoistLoadSingleZone = TotalLoad;
+        MoistLoadHumidSingleZone = TotalHumidLoad;
+        MoistLoadDehumidSingleZone = TotalDehumidLoad;
+        
+        Real64 ZoneMultFac = ZoneMultiplier * ZoneMultiplierList;
+        
+        TotalLoad *= ZoneMultFac;
+        TotalHumidLoad *= ZoneMultFac;
+        TotalDehumidLoad *= ZoneMultFac;
+    }
+
 
     void CorrectZoneAirTemp(Real64 &ZoneTempChange, // Temperature change in zone air between previous and current timestep
                             bool const ShortenTimeStepSys,
@@ -4979,7 +5018,7 @@ namespace ZoneTempPredictorCorrector {
 
             AIRRAT(ZoneNum) = Zone(ZoneNum).Volume * Zone(ZoneNum).ZoneVolCapMultpSens *
                               PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum), RoutineName) *
-                              PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), MAT(ZoneNum)) / (TimeStepSys * SecInHour);
+                              PsyCpAirFnW(ZoneAirHumRat(ZoneNum)) / (TimeStepSys * SecInHour);
 
             AirCap = AIRRAT(ZoneNum);
 
@@ -5083,7 +5122,7 @@ namespace ZoneTempPredictorCorrector {
                 }
 
                 // Sensible load is the enthalpy into the zone minus the enthalpy that leaves the zone.
-                CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), Node(ZoneNodeNum).Temp);
+                CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
                 ZoneEnthalpyIn = SumSysMCpT;
 
                 // SNLOAD is the single zone load, without Zone Multiplier or Zone List Multiplier
@@ -5858,7 +5897,7 @@ namespace ZoneTempPredictorCorrector {
                         GetCurrentScheduleValue(HybridModelZone(ZoneNum).ZoneSupplyAirHumidityRatioSchedulePtr);
                     // Calculate the air humidity ratio at supply air inlet.
                     Real64 CpAirInlet(0.0);
-                    CpAirInlet = PsyCpAirFnWTdb(Zone(ZoneNum).ZoneMeasuredSupplyAirHumidityRatio, Zone(ZoneNum).ZoneMeasuredSupplyAirTemperature);
+                    CpAirInlet = PsyCpAirFnW(Zone(ZoneNum).ZoneMeasuredSupplyAirHumidityRatio);
 
                     SumSysMCp_HM = Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate * CpAirInlet;
                     SumSysMCpT_HM = Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate * CpAirInlet * Zone(ZoneNum).ZoneMeasuredSupplyAirTemperature;
@@ -5877,7 +5916,7 @@ namespace ZoneTempPredictorCorrector {
 
                 zone_M_T = Zone(ZoneNum).ZoneMeasuredTemperature;
                 delta_T = (Zone(ZoneNum).ZoneMeasuredTemperature - Zone(ZoneNum).OutDryBulbTemp);
-                CpAir = PsyCpAirFnWTdb(OutHumRat, Zone(ZoneNum).OutDryBulbTemp);
+                CpAir = PsyCpAirFnW(OutHumRat);
                 AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Zone(ZoneNum).OutDryBulbTemp, OutHumRat, RoutineNameInfiltration);
                 Zone(ZoneNum).delta_T = delta_T;
 
@@ -5932,7 +5971,7 @@ namespace ZoneTempPredictorCorrector {
                 if (std::abs(ZT(ZoneNum) - PreviousMeasuredZT1(ZoneNum)) > 0.05) { // Filter
                     MultpHM = AirCapHM /
                               (Zone(ZoneNum).Volume * PsyRhoAirFnPbTdbW(OutBaroPress, ZT(ZoneNum), ZoneAirHumRat(ZoneNum)) *
-                               PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), ZT(ZoneNum))) *
+                               PsyCpAirFnW(ZoneAirHumRat(ZoneNum))) *
                               (TimeStepZone * SecInHour);      // Inverse equation
                     if ((MultpHM < 1.0) || (MultpHM > 30.0)) { // Temperature capacity multiplier greater than
                                                                // 1 and less than 30
@@ -6000,7 +6039,7 @@ namespace ZoneTempPredictorCorrector {
 
                     // Calculate the air humidity ratio at supply air inlet.
                     Real64 CpAirInlet(0.0);
-                    CpAirInlet = PsyCpAirFnWTdb(Zone(ZoneNum).ZoneMeasuredSupplyAirHumidityRatio, Zone(ZoneNum).ZoneMeasuredSupplyAirTemperature);
+                    CpAirInlet = PsyCpAirFnW(Zone(ZoneNum).ZoneMeasuredSupplyAirHumidityRatio);
 
                     SumSysMCp_HM = Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate * CpAirInlet;
                     SumSysMCpT_HM = Zone(ZoneNum).ZoneMeasuredSupplyAirFlowRate * CpAirInlet * Zone(ZoneNum).ZoneMeasuredSupplyAirTemperature;
@@ -6113,7 +6152,7 @@ namespace ZoneTempPredictorCorrector {
                 zone_M_HR = Zone(ZoneNum).ZoneMeasuredHumidityRatio;
                 delta_HR = (Zone(ZoneNum).ZoneMeasuredHumidityRatio - OutHumRat);
 
-                CpAir = PsyCpAirFnWTdb(OutHumRat, Zone(ZoneNum).OutDryBulbTemp);
+                CpAir = PsyCpAirFnW(OutHumRat);
                 AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, Zone(ZoneNum).OutDryBulbTemp, OutHumRat, RoutineName);
 
                 if (std::abs(Zone(ZoneNum).ZoneMeasuredHumidityRatio - OutHumRat) < 0.0000001) {
@@ -6314,7 +6353,7 @@ namespace ZoneTempPredictorCorrector {
                 auto const &node(Node(zec.InletNode(NodeNum)));
                 NodeTemp = node.Temp;
                 MassFlowRate = node.MassFlowRate;
-                CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), NodeTemp);
+                CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
 
                 Real64 const MassFlowRate_CpAir(MassFlowRate * CpAir);
                 SumSysMCp += MassFlowRate_CpAir;
@@ -6330,7 +6369,7 @@ namespace ZoneTempPredictorCorrector {
                 auto const &node(Node(zrpc.InletNode(NodeNum)));
                 NodeTemp = node.Temp;
                 MassFlowRate = node.MassFlowRate;
-                CpAir = PsyCpAirFnWTdb(air_hum_rat, NodeTemp);
+                CpAir = PsyCpAirFnW(air_hum_rat);
 
                 Real64 const MassFlowRate_CpAir(MassFlowRate * CpAir);
                 SumSysMCp += MassFlowRate_CpAir;
@@ -6344,7 +6383,7 @@ namespace ZoneTempPredictorCorrector {
                     ADUInNode = AirDistUnit(ADUNum).InletNodeNum;
                     NodeTemp = Node(ADUInNode).Temp;
                     MassFlowRate = AirDistUnit(ADUNum).MassFlowRateUpStrLk;
-                    CpAir = PsyCpAirFnWTdb(air_hum_rat, NodeTemp);
+                    CpAir = PsyCpAirFnW(air_hum_rat);
                     Real64 const MassFlowRate_CpAir(MassFlowRate * CpAir);
                     SumSysMCp += MassFlowRate_CpAir;
                     SumSysMCpT += MassFlowRate_CpAir * NodeTemp;
@@ -6353,7 +6392,7 @@ namespace ZoneTempPredictorCorrector {
                     ADUOutNode = AirDistUnit(ADUNum).OutletNodeNum;
                     NodeTemp = Node(ADUOutNode).Temp;
                     MassFlowRate = AirDistUnit(ADUNum).MassFlowRateDnStrLk;
-                    CpAir = PsyCpAirFnWTdb(air_hum_rat, NodeTemp);
+                    CpAir = PsyCpAirFnW(air_hum_rat);
                     Real64 const MassFlowRate_CpAir(MassFlowRate * CpAir);
                     SumSysMCp += MassFlowRate_CpAir;
                     SumSysMCpT += MassFlowRate_CpAir * NodeTemp;
@@ -6365,7 +6404,7 @@ namespace ZoneTempPredictorCorrector {
             // Get node conditions
             NodeTemp = Node(ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).Temp;
             MassFlowRate = Node(ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate;
-            CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), NodeTemp);
+            CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
 
             SumSysMCp += MassFlowRate * CpAir;
             SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
@@ -6522,7 +6561,6 @@ namespace ZoneTempPredictorCorrector {
         using DataDefineEquip::AirDistUnit;
         using DataLoopNode::Node;
         using DataZoneEquipment::ZoneEquipConfig;
-        using DirectAirManager::DirectAir;
         using General::RoundSigDigits;
         using InternalHeatGains::SumAllInternalConvectionGains;
         using InternalHeatGains::SumAllReturnAirConvectionGains;
@@ -6555,13 +6593,11 @@ namespace ZoneTempPredictorCorrector {
         int ADUNum;
         int ADUInNode;
         int ADUOutNode;
-        int SDUNum;
         Real64 SumSysMCp;
         Real64 SumSysMCpT;
         Real64 Threshold;
         Real64 SumRetAirGains;
         Real64 ADUHeatAddRate;
-        Real64 SDUHeatAddRate;
 
         SumIntGains = 0.0;    // Zone sum of convective internal gains
         SumHADTsurfs = 0.0;   // Zone sum of Hc*Area*(Tsurf - Tz)
@@ -6576,9 +6612,7 @@ namespace ZoneTempPredictorCorrector {
         SumSysMCp = 0.0;
         SumSysMCpT = 0.0;
         ADUHeatAddRate = 0.0;
-        SDUHeatAddRate = 0.0;
         ADUNum = 0;
-        SDUNum = 0;
 
         // Sum all convective internal gains: SumIntGain
         SumAllInternalConvectionGains(ZoneNum, SumIntGains);
@@ -6628,7 +6662,7 @@ namespace ZoneTempPredictorCorrector {
                 // Get node conditions
                 NodeTemp = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
                 MassFlowRate = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
-                CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), NodeTemp);
+                CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
 
                 SumMCpDTsystem += MassFlowRate * CpAir * (NodeTemp - MAT(ZoneNum));
 
@@ -6636,24 +6670,12 @@ namespace ZoneTempPredictorCorrector {
                 if (ADUNum > 0) {
                     NodeTemp = Node(AirDistUnit(ADUNum).OutletNodeNum).Temp;
                     MassFlowRate = Node(AirDistUnit(ADUNum).OutletNodeNum).MassFlowRate;
-                    CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), NodeTemp);
+                    CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
                     ADUHeatAddRate = MassFlowRate * CpAir * (NodeTemp - MAT(ZoneNum));
                     AirDistUnit(ADUNum).HeatRate = max(0.0, ADUHeatAddRate);
                     AirDistUnit(ADUNum).CoolRate = std::abs(min(0.0, ADUHeatAddRate));
                     AirDistUnit(ADUNum).HeatGain = AirDistUnit(ADUNum).HeatRate * TimeStepSys * SecInHour;
                     AirDistUnit(ADUNum).CoolGain = AirDistUnit(ADUNum).CoolRate * TimeStepSys * SecInHour;
-                }
-
-                SDUNum = ZoneEquipConfig(ZoneEquipConfigNum).InletNodeSDUNum(NodeNum);
-                if (SDUNum > 0) {
-                    NodeTemp = Node(DirectAir(SDUNum).ZoneSupplyAirNode).Temp;
-                    MassFlowRate = Node(DirectAir(SDUNum).ZoneSupplyAirNode).MassFlowRate;
-                    CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), NodeTemp);
-                    SDUHeatAddRate = MassFlowRate * CpAir * (NodeTemp - MAT(ZoneNum));
-                    DirectAir(SDUNum).HeatRate = max(SDUHeatAddRate, 0.0);
-                    DirectAir(SDUNum).CoolRate = std::abs(min(SDUHeatAddRate, 0.0));
-                    DirectAir(SDUNum).HeatEnergy = DirectAir(SDUNum).HeatRate * TimeStepSys * SecInHour;
-                    DirectAir(SDUNum).CoolEnergy = DirectAir(SDUNum).CoolRate * TimeStepSys * SecInHour;
                 }
 
             } // NodeNum
@@ -6664,7 +6686,7 @@ namespace ZoneTempPredictorCorrector {
                 // Get node conditions
                 NodeTemp = Node(ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).Temp;
                 MassFlowRate = Node(ZoneRetPlenCond(ZoneRetPlenumNum).InletNode(NodeNum)).MassFlowRate;
-                CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), NodeTemp);
+                CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
 
                 SumMCpDTsystem += MassFlowRate * CpAir * (NodeTemp - MAT(ZoneNum));
 
@@ -6676,14 +6698,14 @@ namespace ZoneTempPredictorCorrector {
                     ADUInNode = AirDistUnit(ADUNum).InletNodeNum;
                     NodeTemp = Node(ADUInNode).Temp;
                     MassFlowRate = AirDistUnit(ADUNum).MassFlowRateUpStrLk;
-                    CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), NodeTemp);
+                    CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
                     SumMCpDTsystem += MassFlowRate * CpAir * (NodeTemp - MAT(ZoneNum));
                 }
                 if (AirDistUnit(ADUNum).DownStreamLeak) {
                     ADUOutNode = AirDistUnit(ADUNum).OutletNodeNum;
                     NodeTemp = Node(ADUOutNode).Temp;
                     MassFlowRate = AirDistUnit(ADUNum).MassFlowRateDnStrLk;
-                    CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), NodeTemp);
+                    CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
                     SumMCpDTsystem += MassFlowRate * CpAir * (NodeTemp - MAT(ZoneNum));
                 }
             }
@@ -6693,7 +6715,7 @@ namespace ZoneTempPredictorCorrector {
             // Get node conditions
             NodeTemp = Node(ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).Temp;
             MassFlowRate = Node(ZoneSupPlenCond(ZoneSupPlenumNum).InletNode).MassFlowRate;
-            CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), NodeTemp);
+            CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
 
             SumMCpDTsystem += MassFlowRate * CpAir * (NodeTemp - MAT(ZoneNum));
         }
@@ -6726,7 +6748,7 @@ namespace ZoneTempPredictorCorrector {
                         // Get node conditions
                         NodeTemp = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).Temp;
                         MassFlowRate = Node(ZoneEquipConfig(ZoneEquipConfigNum).InletNode(NodeNum)).MassFlowRate;
-                        CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), NodeTemp);
+                        CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
 
                         SumSysMCp += MassFlowRate * CpAir;
                         SumSysMCpT += MassFlowRate * CpAir * NodeTemp;
@@ -6801,7 +6823,7 @@ namespace ZoneTempPredictorCorrector {
 
         // now calculate air energy storage source term.
         // capacitance is volume * density * heat capacity
-        CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), MAT(ZoneNum));
+        CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
         RhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum));
 
         {
@@ -6926,64 +6948,120 @@ namespace ZoneTempPredictorCorrector {
         // static bool SetupOscillationOutputFlag( true );
         /////////////////////////////////////////////////
         bool isAnyZoneOscillating;
+        bool isAnyZoneOscillatingDuringOccupancy;
+        bool isAnyZoneOscillatingInDeadband;
+
+        using ThermalComfort::ThermalComfortInASH55;
+        using DataZoneEnergyDemands::CurDeadBandOrSetback;
 
         // first time run allocate arrays and setup output variable
         if (SetupOscillationOutputFlag) {
             ZoneTempHist.allocate(4, NumOfZones);
             ZoneTempHist = 0.0;
             ZoneTempOscillate.dimension(NumOfZones, 0.0);
+            ZoneTempOscillateDuringOccupancy.dimension(NumOfZones, 0.0);
+            ZoneTempOscillateInDeadband.dimension(NumOfZones, 0.0);
             // set up zone by zone variables
             // CurrentModuleObject='Zone'
             for (iZone = 1; iZone <= NumOfZones; ++iZone) {
                 SetupOutputVariable(
                     "Zone Oscillating Temperatures Time", OutputProcessor::Unit::hr, ZoneTempOscillate(iZone), "System", "Sum", Zone(iZone).Name);
+                SetupOutputVariable(
+                    "Zone Oscillating Temperatures During Occupancy Time", OutputProcessor::Unit::hr, ZoneTempOscillateDuringOccupancy(iZone), "System", "Sum", Zone(iZone).Name);
+                SetupOutputVariable(
+                    "Zone Oscillating Temperatures in Deadband Time", OutputProcessor::Unit::hr, ZoneTempOscillateInDeadband(iZone), "System", "Sum", Zone(iZone).Name);
             }
             // set up a variable covering all zones
             SetupOutputVariable(
                 "Facility Any Zone Oscillating Temperatures Time", OutputProcessor::Unit::hr, AnyZoneTempOscillate, "System", "Sum", "Facility");
+            SetupOutputVariable(
+                "Facility Any Zone Oscillating Temperatures During Occupancy Time", OutputProcessor::Unit::hr, AnyZoneTempOscillateDuringOccupancy, "System", "Sum", "Facility");
+            SetupOutputVariable(
+                "Facility Any Zone Oscillating Temperatures in Deadband Time", OutputProcessor::Unit::hr, AnyZoneTempOscillateInDeadband, "System", "Sum", "Facility");
+            // test if the oscillation variables are even used
+            if (ReportingThisVariable("Zone Oscillating Temperatures Time") ||
+                ReportingThisVariable("Zone Oscillating Temperatures During Occupancy Time") ||
+                ReportingThisVariable("Zone Oscillating Temperatures in Deadband Time") ||
+                ReportingThisVariable("Facility Any Zone Oscillating Temperatures Time") ||
+                ReportingThisVariable("Facility Any Zone Oscillating Temperatures During Occupancy Time") ||
+                ReportingThisVariable("Facility Any Zone Oscillating Temperatures in Deadband Time") ) {
+                OscillationVariablesNeeded = true;
+            }
             SetupOscillationOutputFlag = false;
         }
-        // precalc the negative value for performance
-        NegOscillateMagnitude = -OscillateMagnitude;
-        // assume no zone is oscillating
-        isAnyZoneOscillating = false;
-        for (iZone = 1; iZone <= NumOfZones; ++iZone) {
-            isOscillate = false;
-            ZoneTempHist(4, iZone) = ZoneTempHist(3, iZone);
-            ZoneTempHist(3, iZone) = ZoneTempHist(2, iZone);
-            ZoneTempHist(2, iZone) = ZoneTempHist(1, iZone);
-            ZoneTempHist(1, iZone) = ZT(iZone);
-            Diff34 = ZoneTempHist(3, iZone) - ZoneTempHist(4, iZone);
-            Diff23 = ZoneTempHist(2, iZone) - ZoneTempHist(3, iZone);
-            Diff12 = ZoneTempHist(1, iZone) - ZoneTempHist(2, iZone);
-            // roll out the conditionals for increased performance
-            if (Diff12 > OscillateMagnitude) {
-                if (Diff23 < NegOscillateMagnitude) {
-                    if (Diff34 > OscillateMagnitude) {
-                        isOscillate = true;
+        if (OscillationVariablesNeeded) {
+            // precalc the negative value for performance
+            NegOscillateMagnitude = -OscillateMagnitude;
+            // assume no zone is oscillating
+            isAnyZoneOscillating = false;
+            isAnyZoneOscillatingDuringOccupancy = false;
+            isAnyZoneOscillatingInDeadband = false;
+
+            for (iZone = 1; iZone <= NumOfZones; ++iZone) {
+                isOscillate = false;
+                ZoneTempHist(4, iZone) = ZoneTempHist(3, iZone);
+                ZoneTempHist(3, iZone) = ZoneTempHist(2, iZone);
+                ZoneTempHist(2, iZone) = ZoneTempHist(1, iZone);
+                ZoneTempHist(1, iZone) = ZT(iZone);
+                Diff34 = ZoneTempHist(3, iZone) - ZoneTempHist(4, iZone);
+                Diff23 = ZoneTempHist(2, iZone) - ZoneTempHist(3, iZone);
+                Diff12 = ZoneTempHist(1, iZone) - ZoneTempHist(2, iZone);
+                // roll out the conditionals for increased performance
+                if (Diff12 > OscillateMagnitude) {
+                    if (Diff23 < NegOscillateMagnitude) {
+                        if (Diff34 > OscillateMagnitude) {
+                            isOscillate = true;
+                        }
                     }
                 }
-            }
-            // now try the opposite sequence of swings
-            if (Diff12 < NegOscillateMagnitude) {
-                if (Diff23 > OscillateMagnitude) {
-                    if (Diff34 < NegOscillateMagnitude) {
-                        isOscillate = true;
+                // now try the opposite sequence of swings
+                if (Diff12 < NegOscillateMagnitude) {
+                    if (Diff23 > OscillateMagnitude) {
+                        if (Diff34 < NegOscillateMagnitude) {
+                            isOscillate = true;
+                        }
                     }
                 }
+                ZoneTempOscillateDuringOccupancy(iZone) = 0.0;
+                ZoneTempOscillateInDeadband(iZone) = 0.0;
+                if (isOscillate) {
+                    ZoneTempOscillate(iZone) = TimeStepSys;
+                    isAnyZoneOscillating = true;
+                    if (allocated(ThermalComfortInASH55)) {
+                        if (ThermalComfortInASH55(iZone).ZoneIsOccupied) {
+                            ZoneTempOscillateDuringOccupancy(iZone) = TimeStepSys;
+                            isAnyZoneOscillatingDuringOccupancy = true;
+                        }
+                    }
+                    if (CurDeadBandOrSetback(iZone)) {
+                        ZoneTempOscillateInDeadband(iZone) = TimeStepSys;
+                        isAnyZoneOscillatingInDeadband = true;
+                    }
+                } else {
+                    ZoneTempOscillate(iZone) = 0.0;
+                }
             }
-            if (isOscillate) {
-                ZoneTempOscillate(iZone) = TimeStepSys;
-                isAnyZoneOscillating = true;
+            // any zone variable
+            if (isAnyZoneOscillating) {
+                AnyZoneTempOscillate = TimeStepSys;
             } else {
-                ZoneTempOscillate(iZone) = 0.0;
+                AnyZoneTempOscillate = 0.0;
             }
-        }
-        // any zone variable
-        if (isAnyZoneOscillating) {
-            AnyZoneTempOscillate = TimeStepSys;
-        } else {
-            AnyZoneTempOscillate = 0.0;
+            if (isAnyZoneOscillatingDuringOccupancy) {
+                AnyZoneTempOscillateDuringOccupancy = TimeStepSys;
+            } else {
+                AnyZoneTempOscillateDuringOccupancy = 0.0;
+            }
+            if (isAnyZoneOscillatingInDeadband) {
+                AnyZoneTempOscillateInDeadband = TimeStepSys;
+            } else {
+                AnyZoneTempOscillateInDeadband = 0.0;
+            }
+
+            // annual/runperiod sum for _perflog.csv file
+            AnnualAnyZoneTempOscillate += AnyZoneTempOscillate;
+            AnnualAnyZoneTempOscillateDuringOccupancy += AnyZoneTempOscillateDuringOccupancy;
+            AnnualAnyZoneTempOscillateInDeadband += AnyZoneTempOscillateInDeadband;
         }
     }
 
@@ -7543,7 +7621,7 @@ namespace ZoneTempPredictorCorrector {
     }
 
     Real64 PMVResidual(Real64 const Tset,
-                       Array1<Real64> const &Par // par(1) = PMV set point
+                       Array1D<Real64> const &Par // par(1) = PMV set point
     )
     {
         // FUNCTION INFORMATION:

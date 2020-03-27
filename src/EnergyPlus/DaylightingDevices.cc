@@ -68,6 +68,7 @@
 #include <EnergyPlus/General.hh>
 #include <EnergyPlus/HeatBalanceInternalHeatGains.hh>
 #include <EnergyPlus/InputProcessing/InputProcessor.hh>
+#include <EnergyPlus/OutputFiles.hh>
 #include <EnergyPlus/OutputProcessor.hh>
 #include <EnergyPlus/UtilityRoutines.hh>
 #include <EnergyPlus/Vectors.hh>
@@ -349,7 +350,7 @@ namespace DaylightingDevices {
                                           "DaylightingDevice:Tubular",
                                           TDDPipe(PipeNum).Name,
                                           IntGainTypeOf_DaylightingDeviceTubular,
-                                          TDDPipe(PipeNum).TZoneHeatGain(TZoneNum));
+                                          &TDDPipe(PipeNum).TZoneHeatGain(TZoneNum));
 
                 } // TZoneNum
 
@@ -1326,8 +1327,8 @@ namespace DaylightingDevices {
         return TransTDD;
     }
 
-    Real64 InterpolatePipeTransBeam(Real64 const COSI,              // Cosine of the incident angle
-                                    Array1A<Real64> const transBeam // Table of beam transmittance vs. cosine angle
+    Real64 InterpolatePipeTransBeam(Real64 const COSI,               // Cosine of the incident angle
+                                    const Array1D<Real64> &transBeam // Table of beam transmittance vs. cosine angle
     )
     {
 
@@ -1350,7 +1351,7 @@ namespace DaylightingDevices {
         Real64 InterpolatePipeTransBeam;
 
         // Argument array dimensioning
-        transBeam.dim(NumOfAngles);
+        EP_SIZE_CHECK(transBeam, NumOfAngles);
 
         // Locals
         // FUNCTION ARGUMENT DEFINITIONS:

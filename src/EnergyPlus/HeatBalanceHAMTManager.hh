@@ -49,13 +49,13 @@
 #define HeatBalanceHAMTManager_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1A.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
 
 namespace EnergyPlus {
+    class OutputFiles;
 
 namespace HeatBalanceHAMTManager {
 
@@ -160,14 +160,14 @@ namespace HeatBalanceHAMTManager {
 
     void GetHeatBalHAMTInput();
 
-    void InitHeatBalHAMT();
+    void InitHeatBalHAMT(EnergyPlus::OutputFiles &outputFiles);
 
     void CalcHeatBalHAMT(int const sid, Real64 &TempSurfInTmp, Real64 &TempSurfOutTmp);
 
     void UpdateHeatBalHAMT(int const sid);
 
     void
-    interp(int const ndata, Array1A<Real64> const xx, Array1A<Real64> const yy, Real64 const invalue, Real64 &outvalue, Optional<Real64> outgrad = _);
+    interp(int const ndata, const Array1D<Real64> &xx, const Array1D<Real64> &yy, Real64 const invalue, Real64 &outvalue, Optional<Real64> outgrad = _);
 
     Real64 RHtoVP(Real64 const RH, Real64 const Temperature);
 

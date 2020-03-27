@@ -1859,7 +1859,7 @@ namespace EvaporativeCoolers {
             //                  CALCULATE THE TLDB FROM HX EQUATIONS GIVEN AN EFFICIENCY
             //***************************************************************************
             EffHX = EvapCond(EvapCoolNum).IndirectHXEffectiveness;
-            CpAir = PsyCpAirFnWTdb(EvapCond(EvapCoolNum).InletHumRat, EvapCond(EvapCoolNum).InletTemp);
+            CpAir = PsyCpAirFnW(EvapCond(EvapCoolNum).InletHumRat);
             RhoAir = PsyRhoAirFnPbTdbW(OutBaroPress, EvapCond(EvapCoolNum).InletTemp, EvapCond(EvapCoolNum).InletHumRat);
             CFMAir = EvapCond(EvapCoolNum).VolFlowRate;         // Volume Flow Rate Primary Side
             CFMSec = EvapCond(EvapCoolNum).IndirectVolFlowRate; // Volume Flolw Rate Secondary Side
@@ -2926,7 +2926,7 @@ namespace EvaporativeCoolers {
     }
 
     Real64 CalcEvapCoolRDDSecFlowResidual(Real64 const AirMassFlowSec, // secondary air mass flow rate in kg/s
-                                          Array1<Real64> const &Par    // Par(2) is desired outlet temperature of Evap Cooler
+                                          Array1D<Real64> const &Par   // Par(2) is desired outlet temperature of Evap Cooler
     )
     {
         // SUBROUTINE INFORMATION:
@@ -3047,10 +3047,10 @@ namespace EvaporativeCoolers {
                 if (OutletTemp > EvapCond(EvapCoolNum).InletTemp) {
                     OutletTemp = EvapCond(EvapCoolNum).InletTemp;
                 }
-                CpAirSys = PsyCpAirFnWTdb(EvapCond(EvapCoolNum).InletHumRat, EvapCond(EvapCoolNum).InletTemp);
+                CpAirSys = PsyCpAirFnW(EvapCond(EvapCoolNum).InletHumRat);
                 CapFlowSys = EvapCond(EvapCoolNum).InletMassFlowRate * CpAirSys;
                 QHXRate = CapFlowSys * (EvapCond(EvapCoolNum).InletTemp - OutletTemp);
-                CpAirSec = PsyCpAirFnWTdb(EHumRatSec, EDBTSec);
+                CpAirSec = PsyCpAirFnW(EHumRatSec);
                 CapFlowSec = AirMassFlowSec * CpAirSec;
                 OutletTempSec = EDBTSec + QHXRate / CapFlowSec;
                 if (OutletTempSec >= EvapCond(EvapCoolNum).InletTemp) {
@@ -3071,7 +3071,7 @@ namespace EvaporativeCoolers {
                 if (OutletTemp > EvapCond(EvapCoolNum).InletTemp) {
                     OutletTemp = EvapCond(EvapCoolNum).InletTemp;
                 }
-                CpAirSys = PsyCpAirFnWTdb(EvapCond(EvapCoolNum).InletHumRat, EvapCond(EvapCoolNum).InletTemp);
+                CpAirSys = PsyCpAirFnW(EvapCond(EvapCoolNum).InletHumRat);
                 CapFlowSys = EvapCond(EvapCoolNum).InletMassFlowRate * CpAirSys;
                 QHXRate = CapFlowSys * (EvapCond(EvapCoolNum).InletTemp - OutletTemp);
                 SecOutletEnthalpy = EvapCond(EvapCoolNum).SecInletEnthalpy + QHXRate / AirMassFlowSec;
@@ -3120,7 +3120,7 @@ namespace EvaporativeCoolers {
 
         // Using/Aliasing
         using DataEnvironment::OutBaroPress;
-        using Psychrometrics::PsyCpAirFnWTdb;
+        using Psychrometrics::PsyCpAirFnW;
         using Psychrometrics::PsyHfgAirFnWTdb;
         using Psychrometrics::PsyWFnTdbH;
         using Psychrometrics::PsyWFnTdbTwbPb;
@@ -3147,7 +3147,7 @@ namespace EvaporativeCoolers {
         if (AirMassFlowSec > 0.0) {
             if ((OperatingMode == DryModulated || OperatingMode == DryFull)) {
                 EvapCond(EvapCoolNum).SecOutletHumRat = EHumRatSec;
-                CpAirSec = PsyCpAirFnWTdb(EHumRatSec, EDBTSec);
+                CpAirSec = PsyCpAirFnW(EHumRatSec);
                 EvapCond(EvapCoolNum).SecOutletTemp = EDBTSec + QHXTotal / AirMassFlowSec / CpAirSec;
                 EvapCond(EvapCoolNum).SecOutletEnthalpy = PsyHFnTdbW(EvapCond(EvapCoolNum).SecOutletTemp, EHumRatSec);
                 EvapCond(EvapCoolNum).SecOuletWetBulbTemp = PsyTwbFnTdbWPb(EvapCond(EvapCoolNum).SecOutletTemp, EHumRatSec, OutBaroPress);
@@ -4680,7 +4680,7 @@ namespace EvaporativeCoolers {
     }
 
     Real64 ZoneEvapUnitLoadResidual(Real64 const PartLoadRatio,
-                                    Array1<Real64> const &Par // parameters
+                                    Array1D<Real64> const &Par // parameters
     )
     {
         // calculates cooling load residual by varying part load ratio
@@ -4834,7 +4834,7 @@ namespace EvaporativeCoolers {
     }
 
     Real64 VSEvapUnitLoadResidual(Real64 const FanSpeedRatio,
-                                  Array1<Real64> const &Par // parameters
+                                  Array1D<Real64> const &Par // parameters
     )
     {
 
@@ -5012,9 +5012,7 @@ namespace EvaporativeCoolers {
         ZoneEquipmentListChecked = false;
     }
 
-    int GetInletNodeNum(std::string const &EvapCondName,
-        bool &ErrorsFound
-    )
+    int GetInletNodeNum(std::string const &EvapCondName, bool &ErrorsFound)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu
@@ -5049,9 +5047,7 @@ namespace EvaporativeCoolers {
         return NodeNum;
     }
 
-    int GetOutletNodeNum(std::string const &EvapCondName,
-        bool &ErrorsFound
-    )
+    int GetOutletNodeNum(std::string const &EvapCondName, bool &ErrorsFound)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         Lixing Gu

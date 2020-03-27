@@ -58,7 +58,7 @@
 #include <EnergyPlus/DataHVACGlobals.hh>
 #include <EnergyPlus/DataHeatBalance.hh>
 #include <EnergyPlus/DataLoopNode.hh>
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataPrecisionGlobals.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
@@ -127,7 +127,7 @@ namespace UnitHeater {
     using DataHVACGlobals::SmallLoad;
     using DataHVACGlobals::SmallMassFlow;
     using namespace ScheduleManager;
-    using Psychrometrics::PsyCpAirFnWTdb;
+    using Psychrometrics::PsyCpAirFnW;
     using Psychrometrics::PsyHFnTdbW;
     using Psychrometrics::PsyRhoAirFnPbTdbW;
     using namespace FluidProperties;
@@ -1762,7 +1762,7 @@ namespace UnitHeater {
                         QCoilReq = 0.0;
                     } else {
                         HCoilInAirNode = UnitHeat(UnitHeatNum).FanOutletNode;
-                        CpAirZn = PsyCpAirFnWTdb(Node(UnitHeat(UnitHeatNum).AirInNode).HumRat, Node(UnitHeat(UnitHeatNum).AirInNode).Temp);
+                        CpAirZn = PsyCpAirFnW(Node(UnitHeat(UnitHeatNum).AirInNode).HumRat);
                         QCoilReq = QZnReq - Node(HCoilInAirNode).MassFlowRate * CpAirZn *
                                                 (Node(HCoilInAirNode).Temp - Node(UnitHeat(UnitHeatNum).AirInNode).Temp);
                     }
@@ -1775,7 +1775,7 @@ namespace UnitHeater {
                         QCoilReq = 0.0;
                     } else {
                         HCoilInAirNode = UnitHeat(UnitHeatNum).FanOutletNode;
-                        CpAirZn = PsyCpAirFnWTdb(Node(UnitHeat(UnitHeatNum).AirInNode).HumRat, Node(UnitHeat(UnitHeatNum).AirInNode).Temp);
+                        CpAirZn = PsyCpAirFnW(Node(UnitHeat(UnitHeatNum).AirInNode).HumRat);
                         QCoilReq = QZnReq - Node(HCoilInAirNode).MassFlowRate * CpAirZn *
                                                 (Node(HCoilInAirNode).Temp - Node(UnitHeat(UnitHeatNum).AirInNode).Temp);
                     }
@@ -1812,7 +1812,7 @@ namespace UnitHeater {
                         QCoilReq = 0.0;
                     } else {
                         HCoilInAirNode = UnitHeat(UnitHeatNum).FanOutletNode;
-                        CpAirZn = PsyCpAirFnWTdb(Node(UnitHeat(UnitHeatNum).AirInNode).HumRat, Node(UnitHeat(UnitHeatNum).AirInNode).Temp);
+                        CpAirZn = PsyCpAirFnW(Node(UnitHeat(UnitHeatNum).AirInNode).HumRat);
                         QCoilReq = QZnReq - Node(HCoilInAirNode).MassFlowRate * CpAirZn *
                                                 (Node(HCoilInAirNode).Temp - Node(UnitHeat(UnitHeatNum).AirInNode).Temp);
                         mdot = UnitHeat(UnitHeatNum).MaxHotWaterFlow * PartLoadFrac;
@@ -1833,7 +1833,7 @@ namespace UnitHeater {
                         QCoilReq = 0.0;
                     } else {
                         HCoilInAirNode = UnitHeat(UnitHeatNum).FanOutletNode;
-                        CpAirZn = PsyCpAirFnWTdb(Node(UnitHeat(UnitHeatNum).AirInNode).HumRat, Node(UnitHeat(UnitHeatNum).AirInNode).Temp);
+                        CpAirZn = PsyCpAirFnW(Node(UnitHeat(UnitHeatNum).AirInNode).HumRat);
                         QCoilReq = QZnReq - Node(HCoilInAirNode).MassFlowRate * CpAirZn *
                                                 (Node(HCoilInAirNode).Temp - Node(UnitHeat(UnitHeatNum).AirInNode).Temp);
                         mdot = UnitHeat(UnitHeatNum).MaxHotSteamFlow * PartLoadFrac;
@@ -1854,7 +1854,7 @@ namespace UnitHeater {
                         QCoilReq = 0.0;
                     } else {
                         HCoilInAirNode = UnitHeat(UnitHeatNum).FanOutletNode;
-                        CpAirZn = PsyCpAirFnWTdb(Node(UnitHeat(UnitHeatNum).AirInNode).HumRat, Node(UnitHeat(UnitHeatNum).AirInNode).Temp);
+                        CpAirZn = PsyCpAirFnW(Node(UnitHeat(UnitHeatNum).AirInNode).HumRat);
                         QCoilReq = QZnReq - Node(HCoilInAirNode).MassFlowRate * CpAirZn *
                                                 (Node(HCoilInAirNode).Temp - Node(UnitHeat(UnitHeatNum).AirInNode).Temp);
                     }
@@ -1931,7 +1931,7 @@ namespace UnitHeater {
     }
 
     Real64 CalcUnitHeaterResidual(Real64 const PartLoadRatio, // heating coil part load ratio
-                                  Array1<Real64> const &Par   // Function parameters
+                                  Array1D<Real64> const &Par  // Function parameters
     )
     {
 

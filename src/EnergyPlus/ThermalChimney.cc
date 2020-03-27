@@ -642,7 +642,7 @@ namespace ThermalChimney {
             }
 
             AirDensityThermalChim = PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ZoneNum), ZoneAirHumRat(ZoneNum));
-            AirSpecHeatThermalChim = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneNum), MAT(ZoneNum));
+            AirSpecHeatThermalChim = PsyCpAirFnW(ZoneAirHumRat(ZoneNum));
             AirOutletCrossAreaTC = ThermalChimneySys(Loop).AirOutletCrossArea;
             DischargeCoeffTC = ThermalChimneySys(Loop).DischargeCoeff;
 
@@ -761,7 +761,7 @@ namespace ThermalChimney {
             for (TCZoneNum = 1; TCZoneNum <= ThermalChimneySys(Loop).TotZoneToDistrib; ++TCZoneNum) {
                 TCZoneNumCounter = ThermalChimneySys(Loop).ZonePtr(TCZoneNum);
                 AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, MAT(TCZoneNumCounter), ZoneAirHumRat(TCZoneNumCounter));
-                CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(TCZoneNumCounter), MAT(TCZoneNumCounter));
+                CpAir = PsyCpAirFnW(ZoneAirHumRat(TCZoneNumCounter));
                 MCPThermChim(TCZoneNumCounter) = TCVolumeAirFlowRate * AirDensity * CpAir * ThermalChimneySys(Loop).RatioThermChimAirFlow(TCZoneNum);
                 if (MCPThermChim(TCZoneNumCounter) <= 0.0) {
                     MCPThermChim(TCZoneNumCounter) = 0.0;
@@ -850,7 +850,7 @@ namespace ThermalChimney {
 
             // Break the infiltration load into heat gain and loss components.
             AirDensity = PsyRhoAirFnPbTdbW(OutBaroPress, MAT(ZoneLoop), ZoneAirHumRat(ZoneLoop));
-            CpAir = PsyCpAirFnWTdb(ZoneAirHumRat(ZoneLoop), MAT(ZoneLoop));
+            CpAir = PsyCpAirFnW(ZoneAirHumRat(ZoneLoop));
             ZnRptThermChim(ZoneLoop).ThermalChimneyVolume = (MCPThermChim(ZoneLoop) / CpAir / AirDensity) * TSMult;
             ZnRptThermChim(ZoneLoop).ThermalChimneyMass = (MCPThermChim(ZoneLoop) / CpAir) * TSMult;
 
@@ -871,7 +871,7 @@ namespace ThermalChimney {
         } // ... end of zone loads report variable update loop.
     }
 
-    void GaussElimination(Array2A<Real64> EquaCoef, Array1A<Real64> EquaConst, Array1A<Real64> ThermChimSubTemp, int const NTC)
+    void GaussElimination(Array2A<Real64> EquaCoef, Array1D<Real64> &EquaConst, Array1D<Real64> &ThermChimSubTemp, int const NTC)
     {
         // SUBROUTINE INFORMATION:
 
@@ -888,8 +888,8 @@ namespace ThermalChimney {
 
         // Argument array dimensioning
         EquaCoef.dim(NTC, NTC);
-        EquaConst.dim(NTC);
-        ThermChimSubTemp.dim(NTC);
+        EP_SIZE_CHECK(EquaConst, NTC);
+        EP_SIZE_CHECK(ThermChimSubTemp, NTC);
 
         // Locals
         // SUBROUTINE ARGUMENT DEFINITIONS:

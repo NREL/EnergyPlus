@@ -65,7 +65,6 @@
 #include <EnergyPlus/DataZoneControls.hh>
 #include <EnergyPlus/DataZoneEnergyDemands.hh>
 #include <EnergyPlus/DataZoneEquipment.hh>
-#include <EnergyPlus/DirectAirManager.hh>
 #include <EnergyPlus/DXCoils.hh>
 #include <EnergyPlus/Fans.hh>
 #include <EnergyPlus/HVACMultiSpeedHeatPump.hh>
@@ -88,7 +87,6 @@ using namespace EnergyPlus::DataZoneControls;
 using namespace EnergyPlus::DataZoneEquipment;
 using namespace EnergyPlus::DataZoneEnergyDemands;
 using namespace EnergyPlus::DataGlobals;
-using namespace EnergyPlus::DirectAirManager;
 using namespace EnergyPlus::HeatBalanceManager;
 using namespace EnergyPlus::HVACMultiSpeedHeatPump;
 using namespace EnergyPlus::MixedAir;
@@ -1253,7 +1251,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     ASSERT_TRUE(process_idf(idf_objects));
     NumOfTimeStepInHour = 1; // must initialize this to get schedules initialized
     MinutesPerTimeStep = 60; // must initialize this to get schedules initialized
-    ProcessScheduleInput();
+    ProcessScheduleInput(OutputFiles::getSingleton());
 
     HeatBalanceManager::GetZoneData(ErrorsFound); // read zone data
     EXPECT_FALSE(ErrorsFound);                    // zones are specified in the idf snippet
@@ -1263,7 +1261,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     DataZoneEquipment::ZoneEquipList(1).EquipIndex(1) = 2; // 1st zone is 402, so this is 2nd direct air unit
     DataZoneEquipment::ZoneEquipList(2).EquipIndex(1) = 1; // 2nd zone is 401, so this is 1st direct air unit
     MixedAir::GetOutsideAirSysInputs();
-    MixedAir::GetOAControllerInputs();
+    MixedAir::GetOAControllerInputs(OutputFiles::getSingleton());
     SplitterComponent::GetSplitterInput();
     BranchInputManager::GetMixerInput();
     BranchInputManager::ManageBranchInput();
@@ -1355,7 +1353,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     // Check outlet conditions
     EXPECT_NEAR(DataLoopNode::Node(22).Temp, 23.363295, 0.0001);
     EXPECT_NEAR(DataLoopNode::Node(22).HumRat, 0.00796611, 0.0001);
-    EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 43745.1322, 0.0001);
+    EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 43744.6339, 0.0001);
     EXPECT_NEAR(MSHeatPump(2).CompPartLoadRatio, 0.12352, 0.0001);
 
     // Direct solution
@@ -1365,7 +1363,7 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     // Check outlet conditions
     EXPECT_NEAR(DataLoopNode::Node(22).Temp, 23.364114, 0.0001);
     EXPECT_NEAR(DataLoopNode::Node(22).HumRat, 0.00796613, 0.0001);
-    EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 43746.0164, 0.0001);
+    EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 43745.5237, 0.0001);
     EXPECT_NEAR(MSHeatPump(2).CompPartLoadRatio, 0.1234600, 0.0001);
 
     QZnReq = -10000.00;
@@ -1374,13 +1372,13 @@ TEST_F(EnergyPlusFixture, HVACMultiSpeedHeatPump_ReportVariableInitTest)
     SimMSHP(MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
     EXPECT_NEAR(DataLoopNode::Node(22).Temp, 21.454516, 0.0001);
     EXPECT_NEAR(DataLoopNode::Node(22).HumRat, 0.00792169, 0.0001);
-    EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 41685.992, 0.0001);
+    EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 41684.8508, 0.0001);
     EXPECT_NEAR(MSHeatPump(2).CompPartLoadRatio, 0.2859843, 0.0001);
     DataGlobals::DoCoilDirectSolutions = true;
     SimMSHP(MSHeatPumpNum, FirstHVACIteration, AirLoopNum, QSensUnitOut, QZnReq, OnOffAirFlowRatio);
     EXPECT_NEAR(DataLoopNode::Node(22).Temp, 21.454516, 0.0001);
     EXPECT_NEAR(DataLoopNode::Node(22).HumRat, 0.00792169, 0.0001);
-    EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 41685.992, 0.0001);
+    EXPECT_NEAR(DataLoopNode::Node(22).Enthalpy, 41684.8508, 0.0001);
     EXPECT_NEAR(MSHeatPump(2).CompPartLoadRatio, 0.2859843, 0.0001);
 
     // Heating

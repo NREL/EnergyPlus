@@ -48,18 +48,126 @@
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/OutputFiles.hh>
 
+#include "DataStringGlobals.hh"
 #include <ObjexxFCL/gio.hh>
 #include <fmt/format.h>
 #include <fmt/ostream.h>
 
 namespace EnergyPlus {
+
+std::ostream &open_out_stream(int const fileID, const std::string &fileName)
+{
+    IOFlags flags;
+    flags.ACTION("write");
+    flags.STATUS("UNKNOWN");
+    flags.POSITION("APPEND");
+    ObjexxFCL::gio::open(fileID, fileName, flags);
+    return *ObjexxFCL::gio::out_stream(fileID);
+}
+
+std::ostream &get_out_stream(int const FileID, const std::string &fileName)
+{
+    if (!ObjexxFCL::gio::out_stream(FileID)) {
+        return open_out_stream(FileID, fileName);
+    } else {
+        return *ObjexxFCL::gio::out_stream(FileID);
+    }
+}
+
+bool OutputFile::good() const
+{
+    if (os) {
+        return os->good();
+    } else {
+        return false;
+    }
+}
+
+void OutputFile::close()
+{
+    os.reset();
+}
+
+void OutputFile::del()
+{
+    if (os) {
+        os.reset();
+        std::remove(fileName.c_str());
+    }
+}
+
+void OutputFile::open_as_stringstream()
+{
+    os = std::unique_ptr<std::iostream>(new std::stringstream());
+}
+
+std::string OutputFile::get_output()
+{
+    auto *ss = dynamic_cast<std::stringstream *>(os.get());
+    if (ss) {
+        return ss->str();
+    } else {
+        return "";
+    }
+}
+
+OutputFile::OutputFile(std::string FileName) : fileName(std::move(FileName))
+{
+}
+
+void OutputFile::open()
+{
+    os = std::unique_ptr<std::iostream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::out | std::ios_base::trunc));
+}
+
+std::vector<std::string> OutputFile::getLines()
+{
+    if (os) {
+        // avoid saving and reloading the file by simply reading the current input stream
+        os->flush();
+        const auto last_pos = os->tellg();
+        std::string line;
+        std::vector<std::string> lines;
+        os->seekg(0);
+
+        while (std::getline(*os, line)) {
+            lines.push_back(line);
+        }
+
+        // after getline is done, we're at eof/fail bit
+        os->clear();
+        os->seekg(last_pos);
+        return lines;
+    }
+    return std::vector<std::string>();
+}
+
+void OutputFile::open_at_end()
+{
+    os = std::unique_ptr<std::iostream>(new std::fstream(fileName.c_str(), std::ios_base::in | std::ios_base::out | std::ios_base::ate));
+}
+
+OutputFiles::GIOOutputFile::GIOOutputFile(int const FileID, std::string FileName)
+    : fileID{FileID}, fileName{std::move(FileName)}, os{get_out_stream(FileID, FileName)}
+{
+}
+
+void OutputFiles::GIOOutputFile::close()
+{
+    ObjexxFCL::gio::close(fileID);
+}
+
+void OutputFiles::GIOOutputFile::open_at_end()
+{
+    os = open_out_stream(fileID, fileName);
+}
+
 OutputFiles OutputFiles::makeOutputFiles()
 {
-    assert(ObjexxFCL::gio::out_stream(EnergyPlus::DataGlobals::OutputFileInits));
     return OutputFiles();
 }
 
-OutputFiles::OutputFiles() : eio{*ObjexxFCL::gio::out_stream(EnergyPlus::DataGlobals::OutputFileInits)}
+OutputFiles::OutputFiles()
 {
 }
 
@@ -84,7 +192,7 @@ public:
 
     static constexpr bool should_be_fixed_output(const Real64 value)
     {
-        return (value >= 0.1 || value <= -0.1) || (value == 0.0);
+        return (value >= 0.099999999999999995 || value <= -0.099999999999999995) || (value == 0.0) || (value == -0.0);
     }
 
     static bool fixed_will_fit(const Real64 value, const int places)
@@ -94,6 +202,18 @@ public:
         } else {
             return static_cast<int>(std::log10(std::abs(value))) < places;
         }
+    }
+
+    static std::string zero_pad_exponent(std::string str)
+    {
+        // if necessary, pad the exponent with a 0 to match the old formatting from Objexx
+        if (str.size() > 3) {
+            if (!std::isdigit(str[str.size() - 3])) {
+                // wants a 0 inserted
+                str.insert(str.size() - 2, "0");
+            }
+        }
+        return str;
     }
 
     static std::string write_to_string(const Real64 value, fmt::format_specs &specs)
@@ -128,7 +248,24 @@ public:
     iterator operator()(Real64 const value)
     {
         if (specs()) {
-            if (specs()->type == 'T') {
+            const auto next_float = [](const Real64 value) {
+                if (std::signbit(value)) {
+                    if (value == -0.0) {
+                        return value;
+                    } else {
+                        return std::nextafter(value, std::numeric_limits<decltype(value)>::lowest());
+                    }
+                } else {
+                    if (value == 0.0) {
+                        return value;
+                    } else {
+                        return std::nextafter(value, std::numeric_limits<decltype(value)>::max());
+                    }
+                }
+            };
+
+            // matches Fortran's 'G' format
+            if (specs()->type == 'N') {
 
                 if (should_be_fixed_output(value) && fixed_will_fit(value, specs()->width - 5)) {
                     specs()->type = 'F';
@@ -175,7 +312,7 @@ public:
                     auto str = write_to_string(value * 10, *specs());
 
                     // swap around the first few characters and add in the leading
-                    // 0 that we need to get the same formatting behavor on the rounded
+                    // 0 that we need to get the same formatting behavior on the rounded
                     // value that was acquired from the reduction in precision
                     auto begin = std::next(std::begin(str), specs()->width - (specs()->precision + 8));
                     std::swap(*begin, *std::next(begin));
@@ -184,38 +321,57 @@ public:
                     *begin = '0';
                     return write_string(str);
                 }
-            } else if (specs()->type == 'R') {
+            } else if (specs()->type == 'R') { // matches RoundSigDigits() behavior
                 // push the value up a tad to get the same rounding behavior as Objexx
-                auto adjusted = value;
                 const auto fixed_output = should_be_fixed_output(value);
 
-                if (value != 0.0) {
-                    // we're looking for a reasonable place to push up the rounding, based on
-                    // how many places are displayed
-                    if (fixed_output) {
-                        adjusted += std::pow(10, -(specs()->precision + 10));
+                if (fixed_output) {
+                    specs()->type = 'F';
+
+                    if (value > 100000.0) {
+                        const auto digits10 = static_cast<int>(std::log10(value));
+                        // we cannot represent this value to the require precision, truncate the floating
+                        // point portion
+                        if (digits10 + specs()->precision >= std::numeric_limits<decltype(value)>::max_digits10) {
+                            specs()->precision = 0;
+                            // add '.' to match old RoundSigDigits
+                            const auto str = write_to_string(value, *specs()) + '.';
+                            return write_string(str);
+                        } else {
+                            return (*this)(value);
+                        }
                     } else {
-                        adjusted = (std::nextafter(adjusted, static_cast<Real64>(1)));
+                        if (value == 0.0 || value == -0.0) {
+                            return (*this)(0.0);
+                        } else {
+                            // nudge up to next rounded value
+                            return (*this)(next_float(next_float(next_float(value))));
+                        }
                     }
+                } else {
+                    specs()->type = 'E';
+                    return write_string(zero_pad_exponent(write_to_string(next_float(value), *specs())));
                 }
+            } else if (specs()->type == 'T') { // matches TrimSigDigits behavior
+                const auto fixed_output = should_be_fixed_output(value);
 
                 if (fixed_output) {
                     const auto magnitude = std::pow(10, specs()->precision);
-                    const auto rounded = std::round(adjusted * magnitude) / magnitude;
+                    const auto adjusted = (value * magnitude) + 0.0001;
+                    const auto truncated = std::trunc(adjusted) / magnitude;
                     specs()->type = 'F';
-                    return (*this)(rounded);
+                    return (*this)(truncated);
                 } else {
                     specs()->type = 'E';
+                    specs()->precision += 2;
 
                     // write the `E` formatted float to a std::string
-                    auto str = write_to_string(adjusted, *specs());
+                    auto str = zero_pad_exponent(write_to_string(value, *specs()));
 
-                    // if necessary, pad the exponent with a 0 to match the old formatting from Objexx
-                    if (str.size() > 3) {
-                        if (!std::isdigit(str[str.size() - 3])) {
-                            // wants a 0 inserted
-                            str.insert(str.size() - 2, "0");
-                        }
+                    // Erase last 2 numbers to truncate the value
+                    const auto E_itr = std::find(begin(str), end(str), 'E');
+                    if (E_itr != str.end()) {
+                        str.erase(std::prev(E_itr, 2), E_itr);
                     }
 
                     return write_string(str);
@@ -228,6 +384,7 @@ public:
 
 void vprint(std::ostream &os, fmt::string_view format_str, fmt::format_args args, const std::size_t count)
 {
+    assert(os.good());
     fmt::memory_buffer buffer;
     try {
         // Pass custom argument formatter as a template arg to vformat_to.

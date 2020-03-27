@@ -51,7 +51,7 @@
 #include <gtest/gtest.h>
 
 // EnergyPlus Headers
-#include <EnergyPlus/DataPlant.hh>
+#include <EnergyPlus/Plant/DataPlant.hh>
 #include <EnergyPlus/DataSizing.hh>
 #include <EnergyPlus/FluidProperties.hh>
 #include <EnergyPlus/PlantCentralGSHP.hh>
@@ -60,11 +60,7 @@
 
 using namespace EnergyPlus;
 
-class PlantCentralGSHPFixture : public EnergyPlusFixture
-{
-};
-
-TEST_F(PlantCentralGSHPFixture, ChillerHeater_Autosize)
+TEST_F(EnergyPlusFixture, ChillerHeater_Autosize)
 {
     // Allocate One Wrapper with One module (=distinct ChillerHeaterPerformance:Electric:EIR)
     // but with a number of identical number module of 2 in CentralHeatPumpSystem
