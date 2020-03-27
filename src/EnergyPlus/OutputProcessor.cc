@@ -401,6 +401,7 @@ namespace OutputProcessor {
         EnergyMeters.deallocate();
         EndUseCategory.deallocate();
         UniqueMeterNames.clear();
+        apiVarRequests.clear();
     }
 
     void InitializeOutput()
@@ -6126,7 +6127,9 @@ void SetupOutputVariable(std::string const &VariableName,           // String Na
         thisIVar.storeType = VariableType;
         thisIVar.VarName = KeyedValue + ':' + VarName;
         thisIVar.VarNameOnly = VarName;
+        thisIVar.VarNameOnlyUC = UtilityRoutines::MakeUPPERCase(VarName);
         thisIVar.VarNameUC = UtilityRoutines::MakeUPPERCase(thisIVar.VarName);
+        thisIVar.KeyNameOnlyUC = UtilityRoutines::MakeUPPERCase(KeyedValue);
         thisIVar.units = VariableUnit;
         AssignReportNumber(CurrentReportNumber);
         ObjexxFCL::gio::write(IDOut, fmtLD) << CurrentReportNumber;
