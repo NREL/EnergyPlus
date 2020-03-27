@@ -223,6 +223,8 @@ namespace AirflowNetworkBalanceManager {
                                       Real64 &OpenFactor // Window or door opening factor (used to calculate airflow)
     );
 
+    void AssignSystemAirLoopNum();
+
     void ValidateDistributionSystem();
 
     void ValidateFanFlowRate(); // Catch a fan flow rate from EPlus input file and add a flag for VAV terminal damper
