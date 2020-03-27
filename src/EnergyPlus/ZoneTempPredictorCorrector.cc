@@ -273,6 +273,11 @@ namespace ZoneTempPredictorCorrector {
     Real64 AnyZoneTempOscillate;
     Real64 AnyZoneTempOscillateDuringOccupancy;
     Real64 AnyZoneTempOscillateInDeadband;
+    Real64 AnnualAnyZoneTempOscillate(0.0);
+    Real64 AnnualAnyZoneTempOscillateDuringOccupancy(0.0);
+    Real64 AnnualAnyZoneTempOscillateInDeadband(0.0);
+    bool OscillationVariablesNeeded(false);
+
 
     // SUBROUTINE SPECIFICATIONS:
 
@@ -304,6 +309,7 @@ namespace ZoneTempPredictorCorrector {
         NumStageCtrZone = 0;
         InitZoneAirSetPointsOneTimeFlag = true;
         SetupOscillationOutputFlag = true;
+        OscillationVariablesNeeded = false;
         ZoneSetPointLast.deallocate();
         TempIndZnLd.deallocate();
         TempDepZnLd.deallocate();
@@ -311,6 +317,11 @@ namespace ZoneTempPredictorCorrector {
         ZoneTempHist.deallocate();
         ZoneTempOscillate.deallocate();
         AnyZoneTempOscillate = 0.0;
+        AnyZoneTempOscillateDuringOccupancy = 0.0;
+        AnyZoneTempOscillateInDeadband = 0.0;
+        AnnualAnyZoneTempOscillate = 0.0;
+        AnnualAnyZoneTempOscillateDuringOccupancy = 0.0;
+        AnnualAnyZoneTempOscillateInDeadband = 0.0;
         SetPointSingleHeating.deallocate();
         SetPointSingleCooling.deallocate();
         SetPointSingleHeatCool.deallocate();
@@ -4099,7 +4110,7 @@ namespace ZoneTempPredictorCorrector {
 
             } else if (SELECT_CASE_var == SingleHeatingSetPoint) {
 
-                // PH 3/2/04      LoadToHeatingSetPoint = (TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum))
+                // PH 3/2/04      LoadToHeatingSetPoint = TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum)
                 if (ZoneAirSolutionAlgo == Use3rdOrder) {
                     LoadToHeatingSetPoint = (TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum));
                     // Exact solution
@@ -4128,7 +4139,7 @@ namespace ZoneTempPredictorCorrector {
 
                 // PH 3/2/04      LoadToCoolingSetPoint = (TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum))
                 if (ZoneAirSolutionAlgo == Use3rdOrder) {
-                    LoadToCoolingSetPoint = (TempDepZnLd(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum)) - TempIndZnLd(ZoneNum));
+                    LoadToCoolingSetPoint = TempDepZnLd(ZoneNum) * TempZoneThermostatSetPoint(ZoneNum) - TempIndZnLd(ZoneNum);
                 } else if (ZoneAirSolutionAlgo == UseAnalyticalSolution) {
                     if (TempDepZnLd(ZoneNum) == 0.0) { // B=0
                         LoadToCoolingSetPoint = AIRRAT(ZoneNum) * (TempZoneThermostatSetPoint(ZoneNum) - ZoneT1(ZoneNum)) - TempIndZnLd(ZoneNum);
@@ -6967,74 +6978,90 @@ namespace ZoneTempPredictorCorrector {
                 "Facility Any Zone Oscillating Temperatures During Occupancy Time", OutputProcessor::Unit::hr, AnyZoneTempOscillateDuringOccupancy, "System", "Sum", "Facility");
             SetupOutputVariable(
                 "Facility Any Zone Oscillating Temperatures in Deadband Time", OutputProcessor::Unit::hr, AnyZoneTempOscillateInDeadband, "System", "Sum", "Facility");
+            // test if the oscillation variables are even used
+            if (ReportingThisVariable("Zone Oscillating Temperatures Time") ||
+                ReportingThisVariable("Zone Oscillating Temperatures During Occupancy Time") ||
+                ReportingThisVariable("Zone Oscillating Temperatures in Deadband Time") ||
+                ReportingThisVariable("Facility Any Zone Oscillating Temperatures Time") ||
+                ReportingThisVariable("Facility Any Zone Oscillating Temperatures During Occupancy Time") ||
+                ReportingThisVariable("Facility Any Zone Oscillating Temperatures in Deadband Time") ) {
+                OscillationVariablesNeeded = true;
+            }
             SetupOscillationOutputFlag = false;
         }
-        // precalc the negative value for performance
-        NegOscillateMagnitude = -OscillateMagnitude;
-        // assume no zone is oscillating
-        isAnyZoneOscillating = false;
-        isAnyZoneOscillatingDuringOccupancy = false;
-        isAnyZoneOscillatingInDeadband = false;
+        if (OscillationVariablesNeeded) {
+            // precalc the negative value for performance
+            NegOscillateMagnitude = -OscillateMagnitude;
+            // assume no zone is oscillating
+            isAnyZoneOscillating = false;
+            isAnyZoneOscillatingDuringOccupancy = false;
+            isAnyZoneOscillatingInDeadband = false;
 
-        for (iZone = 1; iZone <= NumOfZones; ++iZone) {
-            isOscillate = false;
-            ZoneTempHist(4, iZone) = ZoneTempHist(3, iZone);
-            ZoneTempHist(3, iZone) = ZoneTempHist(2, iZone);
-            ZoneTempHist(2, iZone) = ZoneTempHist(1, iZone);
-            ZoneTempHist(1, iZone) = ZT(iZone);
-            Diff34 = ZoneTempHist(3, iZone) - ZoneTempHist(4, iZone);
-            Diff23 = ZoneTempHist(2, iZone) - ZoneTempHist(3, iZone);
-            Diff12 = ZoneTempHist(1, iZone) - ZoneTempHist(2, iZone);
-            // roll out the conditionals for increased performance
-            if (Diff12 > OscillateMagnitude) {
-                if (Diff23 < NegOscillateMagnitude) {
-                    if (Diff34 > OscillateMagnitude) {
-                        isOscillate = true;
+            for (iZone = 1; iZone <= NumOfZones; ++iZone) {
+                isOscillate = false;
+                ZoneTempHist(4, iZone) = ZoneTempHist(3, iZone);
+                ZoneTempHist(3, iZone) = ZoneTempHist(2, iZone);
+                ZoneTempHist(2, iZone) = ZoneTempHist(1, iZone);
+                ZoneTempHist(1, iZone) = ZT(iZone);
+                Diff34 = ZoneTempHist(3, iZone) - ZoneTempHist(4, iZone);
+                Diff23 = ZoneTempHist(2, iZone) - ZoneTempHist(3, iZone);
+                Diff12 = ZoneTempHist(1, iZone) - ZoneTempHist(2, iZone);
+                // roll out the conditionals for increased performance
+                if (Diff12 > OscillateMagnitude) {
+                    if (Diff23 < NegOscillateMagnitude) {
+                        if (Diff34 > OscillateMagnitude) {
+                            isOscillate = true;
+                        }
                     }
+                }
+                // now try the opposite sequence of swings
+                if (Diff12 < NegOscillateMagnitude) {
+                    if (Diff23 > OscillateMagnitude) {
+                        if (Diff34 < NegOscillateMagnitude) {
+                            isOscillate = true;
+                        }
+                    }
+                }
+                ZoneTempOscillateDuringOccupancy(iZone) = 0.0;
+                ZoneTempOscillateInDeadband(iZone) = 0.0;
+                if (isOscillate) {
+                    ZoneTempOscillate(iZone) = TimeStepSys;
+                    isAnyZoneOscillating = true;
+                    if (allocated(ThermalComfortInASH55)) {
+                        if (ThermalComfortInASH55(iZone).ZoneIsOccupied) {
+                            ZoneTempOscillateDuringOccupancy(iZone) = TimeStepSys;
+                            isAnyZoneOscillatingDuringOccupancy = true;
+                        }
+                    }
+                    if (CurDeadBandOrSetback(iZone)) {
+                        ZoneTempOscillateInDeadband(iZone) = TimeStepSys;
+                        isAnyZoneOscillatingInDeadband = true;
+                    }
+                } else {
+                    ZoneTempOscillate(iZone) = 0.0;
                 }
             }
-            // now try the opposite sequence of swings
-            if (Diff12 < NegOscillateMagnitude) {
-                if (Diff23 > OscillateMagnitude) {
-                    if (Diff34 < NegOscillateMagnitude) {
-                        isOscillate = true;
-                    }
-                }
-            }
-            ZoneTempOscillateDuringOccupancy(iZone) = 0.0;
-            ZoneTempOscillateInDeadband(iZone) = 0.0;
-            if (isOscillate) {
-                ZoneTempOscillate(iZone) = TimeStepSys;
-                isAnyZoneOscillating = true;
-                if (allocated(ThermalComfortInASH55)) {
-                    if (ThermalComfortInASH55(iZone).ZoneIsOccupied) {
-                        ZoneTempOscillateDuringOccupancy(iZone) = TimeStepSys;
-                        isAnyZoneOscillatingDuringOccupancy = true;
-                    }
-                }
-                if (CurDeadBandOrSetback(iZone)) {
-                    ZoneTempOscillateInDeadband(iZone) = TimeStepSys;
-                    isAnyZoneOscillatingInDeadband = true;
-                }
+            // any zone variable
+            if (isAnyZoneOscillating) {
+                AnyZoneTempOscillate = TimeStepSys;
             } else {
-                ZoneTempOscillate(iZone) = 0.0;
+                AnyZoneTempOscillate = 0.0;
             }
-        }
-        // any zone variable
-        if (isAnyZoneOscillating) {
-            AnyZoneTempOscillate = TimeStepSys;
-        } else {
-            AnyZoneTempOscillate = 0.0;
-        }
-        if (isAnyZoneOscillatingDuringOccupancy) {
-            AnyZoneTempOscillateDuringOccupancy = TimeStepSys;
-        } else {
-            AnyZoneTempOscillateDuringOccupancy = 0.0;
-        }
-        if (isAnyZoneOscillatingInDeadband) {
-            AnyZoneTempOscillateInDeadband = TimeStepSys;
-        } else {
-            AnyZoneTempOscillateInDeadband = 0.0;
+            if (isAnyZoneOscillatingDuringOccupancy) {
+                AnyZoneTempOscillateDuringOccupancy = TimeStepSys;
+            } else {
+                AnyZoneTempOscillateDuringOccupancy = 0.0;
+            }
+            if (isAnyZoneOscillatingInDeadband) {
+                AnyZoneTempOscillateInDeadband = TimeStepSys;
+            } else {
+                AnyZoneTempOscillateInDeadband = 0.0;
+            }
+
+            // annual/runperiod sum for _perflog.csv file
+            AnnualAnyZoneTempOscillate += AnyZoneTempOscillate;
+            AnnualAnyZoneTempOscillateDuringOccupancy += AnyZoneTempOscillateDuringOccupancy;
+            AnnualAnyZoneTempOscillateInDeadband += AnyZoneTempOscillateInDeadband;
         }
     }
 
@@ -7594,7 +7621,7 @@ namespace ZoneTempPredictorCorrector {
     }
 
     Real64 PMVResidual(Real64 const Tset,
-                       Array1<Real64> const &Par // par(1) = PMV set point
+                       Array1D<Real64> const &Par // par(1) = PMV set point
     )
     {
         // FUNCTION INFORMATION:

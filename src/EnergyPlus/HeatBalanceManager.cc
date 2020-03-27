@@ -5000,14 +5000,14 @@ namespace HeatBalanceManager {
 
     void ProcessZoneData(std::string const &cCurrentModuleObject,
                          int const ZoneLoop,
-                         Array1_string const &cAlphaArgs,
+                         Array1D_string const &cAlphaArgs,
                          int &NumAlphas,
-                         Array1<Real64> const &rNumericArgs,
+                         Array1D<Real64> const &rNumericArgs,
                          int &NumNumbers,
-                         Array1_bool const &EP_UNUSED(lNumericFieldBlanks), // Unused
-                         Array1_bool const &lAlphaFieldBlanks,
-                         Array1_string const &cAlphaFieldNames,
-                         Array1_string const &EP_UNUSED(cNumericFieldNames), // Unused
+                         Array1D_bool const &EP_UNUSED(lNumericFieldBlanks), // Unused
+                         Array1D_bool const &lAlphaFieldBlanks,
+                         Array1D_string const &cAlphaFieldNames,
+                         Array1D_string const &EP_UNUSED(cNumericFieldNames), // Unused
                          bool &ErrorsFound                                   // If errors found in input
     )
     {
@@ -5891,7 +5891,7 @@ namespace HeatBalanceManager {
             auto &thisSurface(DataSurfaces::Surface(SurfNum));
             if (thisSurface.Class == DataSurfaces::SurfaceClass_Window) {
                 auto &thisConstruct(thisSurface.Construction);
-                if (!Construct(thisConstruct).WindowTypeBSDF) {
+                if (!Construct(thisConstruct).WindowTypeBSDF && !Construct(thisConstruct).TypeIsAirBoundaryInteriorWindow) {
                     FenLaySurfTempFront(1, SurfNum) = TH(1, 1, SurfNum);
                     FenLaySurfTempBack(Construct(thisConstruct).TotLayers, SurfNum) = TH(2, 1, SurfNum);
                 }
@@ -7560,15 +7560,26 @@ namespace HeatBalanceManager {
                 if (UtilityRoutines::SameString(solarMethod, "GroupedZones")) {
                     thisConstruct.TypeIsAirBoundarySolar = true;
                 } else if (UtilityRoutines::SameString(solarMethod, "InteriorWindow")) {
-                    ShowWarningError(RoutineName + ": Construction:AirBoundary Solar and Daylighting Method=InteriorWindow is not functional.");
-                    ShowContinueError("Using GroupedZones method instead for Construction:AirBoundary = " + thisConstruct.Name + ".");
-                    thisConstruct.TypeIsAirBoundarySolar = true;
-                    // thisConstruct.TypeIsAirBoundaryInteriorWindow = true;
-                    // thisConstruct.TransDiff = 1.0;
-                    // thisConstruct.TransDiffVis = 1.0;
-                    // thisConstruct.TotGlassLayers = 0; // Yes, zero, so it doesn't calculate any glass absorbed solar
-                    // thisConstruct.TransSolBeamCoef = 1.0;
-                    // thisConstruct.ReflectSolDiffBack = 0.0;
+                    thisConstruct.TypeIsAirBoundaryInteriorWindow = true;
+                    thisConstruct.TotGlassLayers = 0; // Yes, zero, so it doesn't calculate any glass absorbed solar
+                    thisConstruct.TransDiff = 1.0;
+                    thisConstruct.TransDiffVis = 1.0;
+                    thisConstruct.AbsDiffBackShade = 0.0;
+                    thisConstruct.ShadeAbsorpThermal = 0.0;
+                    thisConstruct.ReflectSolDiffBack = 0.0;
+                    thisConstruct.ReflectSolDiffFront = 0.0;
+                    thisConstruct.ReflectVisDiffFront = 0.0;
+                    thisConstruct.AbsBeamShadeCoef = 0.0;
+                    thisConstruct.TransSolBeamCoef = 0.0;
+                    thisConstruct.TransSolBeamCoef(1) = 1.0;
+                    thisConstruct.ReflSolBeamFrontCoef = 0.0;
+                    thisConstruct.ReflSolBeamBackCoef = 0.0;
+                    thisConstruct.TransVisBeamCoef = 0.0;
+                    thisConstruct.TransVisBeamCoef(1) = 1.0;
+                    thisConstruct.AbsBeamCoef = 0.0;
+                    thisConstruct.AbsBeamBackCoef = 0.0;
+                    thisConstruct.AbsDiff = 0.0;
+                    thisConstruct.AbsDiffBack = 0.0;
                 }
 
                 // Radiant Exchange Method

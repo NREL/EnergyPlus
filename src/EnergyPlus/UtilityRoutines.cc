@@ -54,6 +54,7 @@ extern "C" {
 #include <cstdlib>
 #include <exception>
 #include <iostream>
+#include <sys/stat.h>
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array1D.hh>
@@ -98,6 +99,14 @@ namespace UtilityRoutines {
     bool outputErrorHeader(true);
     ObjexxFCL::gio::Fmt fmtLD("*");
     ObjexxFCL::gio::Fmt fmtA("(A)");
+    std::string appendPerfLog_headerRow("");
+    std::string appendPerfLog_valuesRow("");
+
+    void clear_state()
+    {
+        appendPerfLog_headerRow = "";
+        appendPerfLog_valuesRow = "";
+    }
 
     Real64 ProcessNumber(std::string const &String, bool &ErrorFlag)
     {
@@ -443,43 +452,39 @@ namespace UtilityRoutines {
     // The finalColumn (an optional argument) being true triggers the actual file to be written or appended.
     // J.Glazer February 2020
     {
-        static std::string headerRow = "";
-        static std::string valuesRow = "";
-
         // the following was added for unit testing to clear the static strings
         if (colHeader == "RESET" && colValue == "RESET") {
-            headerRow = "";
-            valuesRow = "";
+            appendPerfLog_headerRow = "";
+            appendPerfLog_valuesRow = "";
             return;
         }
 
         //accumuate the row until ready to be written to the file.
-        headerRow = headerRow + colHeader + ",";
-        valuesRow = valuesRow + colValue + ",";
+        appendPerfLog_headerRow = appendPerfLog_headerRow + colHeader + ",";
+        appendPerfLog_valuesRow = appendPerfLog_valuesRow + colValue + ",";
 
         if (finalColumn) {
-            bool FileExists;
-            {
-                IOFlags flags;
-                ObjexxFCL::gio::inquire(DataStringGlobals::outputPerfLogFileName, flags);
-                FileExists = flags.exists();
-            }
-            // only write the header row if the file does not already exist
             std::fstream fsPerfLog;
-            if (!FileExists) {
+            if (!exists(DataStringGlobals::outputPerfLogFileName)) {
                 fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::out); //open file normally
                 if (!fsPerfLog.fail()) {
-                    fsPerfLog << headerRow << std::endl;
-                    fsPerfLog << valuesRow << std::endl;
+                    fsPerfLog << appendPerfLog_headerRow << std::endl;
+                    fsPerfLog << appendPerfLog_valuesRow << std::endl;
                 }
             } else {
                 fsPerfLog.open(DataStringGlobals::outputPerfLogFileName, std::fstream::app); //append to already existing file
                 if (!fsPerfLog.fail()) {
-                    fsPerfLog << valuesRow << std::endl;
+                    fsPerfLog << appendPerfLog_valuesRow << std::endl;
                 }
             }
             fsPerfLog.close();
         }
+    }
+
+    inline bool exists (const std::string& filename) {
+    // https://stackoverflow.com/questions/25225948/how-to-check-if-a-file-exists-in-c-with-fstreamopen/51300933
+      struct stat buffer;   
+      return (stat (filename.c_str(), &buffer) == 0); 
     }
 
 } // namespace UtilityRoutines
@@ -889,7 +894,7 @@ int EndEnergyPlus()
     Time_Finish = epElapsedTime();
     if (Time_Finish < Time_Start) Time_Finish += 24.0 * 3600.0;
     Elapsed_Time = Time_Finish - Time_Start;
-    if (DataGlobals::createProfLog) {
+    if (DataGlobals::createPerfLog) {
         UtilityRoutines::appendPerfLog("Run Time [seconds]", RoundSigDigits(Elapsed_Time, 2));
     }
 #ifdef EP_Detailed_Timings
@@ -908,7 +913,7 @@ int EndEnergyPlus()
     ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSizing(NumWarningsDuringSizing, NumSevereDuringSizing);
     ResultsFramework::OutputSchema->SimulationInformation.setNumErrorsSummary(NumWarnings, NumSevere);
 
-    if (DataGlobals::createProfLog) {
+    if (DataGlobals::createPerfLog) {
         UtilityRoutines::appendPerfLog("Run Time [string]", Elapsed);
         UtilityRoutines::appendPerfLog("Number of Warnings", NumWarnings);
         UtilityRoutines::appendPerfLog("Number of Severe", NumSevere, true); //last item so write the perfLog file
