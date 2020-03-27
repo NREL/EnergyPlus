@@ -796,8 +796,6 @@ namespace OutputReportPredefined {
     extern int pdchLeedPerfElDem;
     extern int pdchLeedPerfGasEneUse;
     extern int pdchLeedPerfGasDem;
-//    extern int pdchLeedPerfAddFuelEneUse;
-//    extern int pdchLeedPerfAddFuelDem;
     extern int pdchLeedPerfGasolineEneUse;
     extern int pdchLeedPerfGasolineDem;
     extern int pdchLeedPerfDieselEneUse;
