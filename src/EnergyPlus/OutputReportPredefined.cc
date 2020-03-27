@@ -812,6 +812,8 @@ namespace OutputReportPredefined {
     int pdchLeedPerfElDem;
     int pdchLeedPerfGasEneUse;
     int pdchLeedPerfGasDem;
+ //   int pdchLeedPerfAddFuelEneUse;
+ //   int pdchLeedPerfAddFuelDem;
     int pdchLeedPerfGasolineEneUse;
     int pdchLeedPerfGasolineDem;
     int pdchLeedPerfDieselEneUse;
@@ -1565,6 +1567,8 @@ namespace OutputReportPredefined {
         pdchLeedPerfElDem = 0;
         pdchLeedPerfGasEneUse = 0;
         pdchLeedPerfGasDem = 0;
+    //    pdchLeedPerfAddFuelEneUse = 0;
+    //    pdchLeedPerfAddFuelDem = 0;
         pdchLeedPerfGasolineEneUse = 0;
         pdchLeedPerfGasolineDem = 0;
         pdchLeedPerfDieselEneUse = 0;
@@ -2555,6 +2559,8 @@ namespace OutputReportPredefined {
         pdchLeedPerfElDem = newPreDefColumn(pdstLeedPerf, "Electric Demand [W]");
         pdchLeedPerfGasEneUse = newPreDefColumn(pdstLeedPerf, "Natural Gas Energy Use [GJ]");
         pdchLeedPerfGasDem = newPreDefColumn(pdstLeedPerf, "Natural Gas Demand [W]");
+     //   pdchLeedPerfAddFuelEneUse = newPreDefColumn(pdstLeedPerf, "Additional Fuel Use [GJ]");
+     //   pdchLeedPerfAddFuelDem = newPreDefColumn(pdstLeedPerf, "Additional Fuel Demand [W]");
         pdchLeedPerfGasolineEneUse = newPreDefColumn(pdstLeedPerf, "Gasoline Use [GJ]");
         pdchLeedPerfGasolineDem = newPreDefColumn(pdstLeedPerf, "Gasoline Demand [W]");
         pdchLeedPerfDieselEneUse = newPreDefColumn(pdstLeedPerf, "Diesel Use [GJ]");

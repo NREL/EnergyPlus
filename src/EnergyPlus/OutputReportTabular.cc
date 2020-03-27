@@ -7515,9 +7515,8 @@ namespace OutputReportTabular {
         // SUBROUTINE PARAMETER DEFINITIONS:
         int const colElectricity(1);
         int const colGas(2);
-        int const colAdditionalFuel(3);
-        int const colPurchCool(4);
-        int const colPurchHeat(5);
+        int const colPurchCool(11);
+        int const colPurchHeat(12);
 
         Real64 const SmallValue(1.e-14);
 
@@ -7575,6 +7574,9 @@ namespace OutputReportTabular {
         Real64 processElecCost;
         Real64 processGasCost;
         Real64 processOthrCost;
+        Real64 useValColAddFuel15;
+        Real64 useValColAddFuel5;
+        Real64 useValColAddFuel13;
 
         std::string subCatName;
         static Real64 leedSiteIntLite(0.0);
@@ -8288,7 +8290,7 @@ namespace OutputReportTabular {
             }
 
             unconvert = largeConversionFactor / 1000000000.0; // to avoid double converting, the values for the LEED report should be in GJ
-            //  Energy Use Intensities
+            //  Energy Use Intensities - Electricity
             if (buildingGrossFloorArea > 0) {
                 PreDefTableEntry(
                     pdchLeedEuiElec, "Interior Lighting (All)", unconvert * 1000 * useVal(colElectricity, 3) / buildingGrossFloorArea, 2);
@@ -8312,7 +8314,7 @@ namespace OutputReportTabular {
             PreDefTableEntry(pdchLeedEcsProc, "Electricity", processElecCost, 2);
             addFootNoteSubTable(pdstLeedEneCostSum, "Process energy cost based on ratio of process to total energy.");
 
-            //  Energy Use Intensities
+            //  Energy Use Intensities- Natural Gas
             if (buildingGrossFloorArea > 0) {
                 PreDefTableEntry(pdchLeedEuiNatG, "Space Heating", unconvert * 1000 * useVal(colGas, 1) / buildingGrossFloorArea, 2);
                 PreDefTableEntry(pdchLeedEuiNatG, "Service Water Heating", unconvert * 1000 * useVal(colGas, 12) / buildingGrossFloorArea, 2);
@@ -8329,22 +8331,28 @@ namespace OutputReportTabular {
             }
             PreDefTableEntry(pdchLeedEcsProc, "Natural Gas", processGasCost, 2);
 
-            //  Energy Use Intensities
+            //  Energy Use Intensities  - Additional Fuel
+            useValColAddFuel15 =
+                useVal(3, 15) + useVal(4, 15) + useVal(5, 15) + useVal(6, 15) + useVal(7, 15) + useVal(8, 15) + useVal(9, 15) + useVal(10, 15);
+            useValColAddFuel5 = 
+                useVal(3, 5) + useVal(4, 5) + useVal(5, 5) + useVal(6, 5) + useVal(7, 5) + useVal(8, 5) + useVal(9, 5) + useVal(10, 5);
+            useValColAddFuel13 = 
+                useVal(3, 13) + useVal(4, 13) + useVal(5, 13) + useVal(6, 13) + useVal(7, 13) + useVal(8, 13) + useVal(9, 13) + useVal(10, 13);
             if (buildingGrossFloorArea > 0) {
-                PreDefTableEntry(pdchLeedEuiOthr, "Miscellaneous", unconvert * 1000 * useVal(colAdditionalFuel, 15) / buildingGrossFloorArea, 2);
-                PreDefTableEntry(pdchLeedEuiOthr, "Subtotal", unconvert * 1000 * useVal(colAdditionalFuel, 15) / buildingGrossFloorArea, 2);
+                PreDefTableEntry(pdchLeedEuiOthr, "Miscellaneous", unconvert * 1000 * useValColAddFuel15 / buildingGrossFloorArea, 2);
+                PreDefTableEntry(pdchLeedEuiOthr, "Subtotal", unconvert * 1000 * useValColAddFuel15 / buildingGrossFloorArea, 2);
             }
             PreDefTableEntry(
-                pdchLeedEusTotal, "Additional", unconvert * (useVal(colAdditionalFuel, 15) + useVal(colPurchCool, 15) + useVal(colPurchHeat, 15)), 2);
+                pdchLeedEusTotal, "Additional", unconvert * (useValColAddFuel15 + useVal(colPurchCool, 15) + useVal(colPurchHeat, 15)), 2);
             PreDefTableEntry(pdchLeedEusProc,
                              "Additional",
-                             unconvert * (useVal(colAdditionalFuel, 5) + useVal(colAdditionalFuel, 13) + useVal(colPurchCool, 5) +
+                             unconvert * (useValColAddFuel5 + useValColAddFuel13 + useVal(colPurchCool, 5) +
                                           useVal(colPurchCool, 13) + useVal(colPurchHeat, 5) + useVal(colPurchHeat, 13)),
                              2);
-            if ((useVal(colAdditionalFuel, 15) + useVal(colPurchCool, 15) + useVal(colPurchHeat, 15)) > 0.001) {
-                processFraction = (useVal(colAdditionalFuel, 5) + useVal(colAdditionalFuel, 13) + useVal(colPurchCool, 5) + useVal(colPurchCool, 13) +
+            if ((useValColAddFuel15 + useVal(colPurchCool, 15) + useVal(colPurchHeat, 15)) > 0.001) {
+                processFraction = (useValColAddFuel5 + useValColAddFuel13 + useVal(colPurchCool, 5) + useVal(colPurchCool, 13) +
                                    useVal(colPurchHeat, 5) + useVal(colPurchHeat, 13)) /
-                                  (useVal(colAdditionalFuel, 15) + useVal(colPurchCool, 15) + useVal(colPurchHeat, 15));
+                                  (useValColAddFuel15 + useVal(colPurchCool, 15) + useVal(colPurchHeat, 15));
             } else {
                 processFraction = 0.0;
             }
@@ -8385,12 +8393,12 @@ namespace OutputReportTabular {
             // totals across energy source
             PreDefTableEntry(pdchLeedEusTotal,
                              "Total",
-                             unconvert * (useVal(colAdditionalFuel, 15) + useVal(colPurchCool, 15) + useVal(colPurchHeat, 15) +
+                             unconvert * (useValColAddFuel15 + useVal(colPurchCool, 15) + useVal(colPurchHeat, 15) +
                                           useVal(colElectricity, 15) + useVal(colGas, 15)),
                              2);
             PreDefTableEntry(pdchLeedEusProc,
                              "Total",
-                             unconvert * (useVal(colAdditionalFuel, 5) + useVal(colAdditionalFuel, 13) + useVal(colPurchCool, 5) +
+                             unconvert * (useValColAddFuel5 + useValColAddFuel13 + useVal(colPurchCool, 5) +
                                           useVal(colPurchCool, 13) + useVal(colPurchHeat, 5) + useVal(colPurchHeat, 13) + useVal(colElectricity, 5) +
                                           useVal(colElectricity, 13) + useVal(colGas, 5) + useVal(colGas, 13)),
                              2);
@@ -8404,9 +8412,12 @@ namespace OutputReportTabular {
                 } else if (SELECT_CASE_var == colGas) {
                     footnote = "Note: Natural gas appears to be the principal heating source based on energy usage.";
                     PreDefTableEntry(pdchLeedGenData, "Principal Heating Source", "Natural Gas");
-                } else if (SELECT_CASE_var == colAdditionalFuel) {
+                } else if (SELECT_CASE_var == 3 || SELECT_CASE_var == 4 || SELECT_CASE_var == 5 || SELECT_CASE_var == 6 || SELECT_CASE_var == 7 ||
+                           SELECT_CASE_var == 8 || SELECT_CASE_var == 9 || SELECT_CASE_var == 10) {
                     footnote = "Note: Additional fuel appears to be the principal heating source based on energy usage.";
                     PreDefTableEntry(pdchLeedGenData, "Principal Heating Source", "Additional Fuel");
+                    // additional fuel  <- gasoline (3) | <- diesel (4) | <- coal (5) | <- fuel oil #1 (6) | <- fuel oil #2 (7)
+                    // <- propane (8) | <- otherfuel1 (9) | <- otherfuel2 (10)
                 } else if (SELECT_CASE_var == colPurchHeat) {
                     footnote = "Note: District heat appears to be the principal heating source based on energy usage.";
                     PreDefTableEntry(pdchLeedGenData, "Principal Heating Source", "District Heat");
