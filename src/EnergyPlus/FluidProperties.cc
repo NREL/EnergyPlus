@@ -147,8 +147,8 @@ namespace FluidProperties {
     bool DebugReportRefrigerants(false);
     int GlycolErrorLimitTest(1);      // how many times error is printed with details before recurring called
     int RefrigerantErrorLimitTest(1); // how many times error is printed with details before recurring called
-    Array1D_bool RefrigUsed;
-    Array1D_bool GlycolUsed;
+    EPVector<bool> RefrigUsed;
+    EPVector<bool> GlycolUsed;
     int FluidIndex_Water(0);
     int FluidIndex_EthyleneGlycol(0);
     int FluidIndex_PropoleneGlycol(0);
@@ -281,8 +281,8 @@ namespace FluidProperties {
         int Loop;                          // DO loop counter (various uses)
         int NumAlphas;                     // States which alpha value to read from a "Number" line
         Array1D<Real64> Numbers;           // brings in data from IP
-        Array1D_bool lAlphaFieldBlanks;    // logical for blank alpha fields
-        Array1D_bool lNumericFieldBlanks;  // logical for blank numeric fields
+        EPVector<bool> lAlphaFieldBlanks;    // logical for blank alpha fields
+        EPVector<bool> lNumericFieldBlanks;  // logical for blank numeric fields
         int NumNumbers;                    // States which number value to read from a "Numbers" line
         int MaxAlphas;                     // maximum number of alphas
         int MaxNumbers;                    // maximum number of numbers

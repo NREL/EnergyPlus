@@ -82,7 +82,7 @@ namespace DualDuct {
     // DERIVED TYPE DEFINITIONS
 
     // MODULE VARIABLE DECLARATIONS:
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> CheckEquipName;
 
     extern int NumDDAirTerminal; // The Number of dual duct air terminals found in the Input
     extern int NumDualDuctConstVolDampers;

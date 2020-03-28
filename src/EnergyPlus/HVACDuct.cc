@@ -105,7 +105,7 @@ namespace HVACDuct {
 
     // MODULE VARIABLE DECLARATIONS:
     int NumDucts(0);
-    Array1D_bool CheckEquipName;
+    EPVector<bool> CheckEquipName;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE HVACDuct:
 
@@ -271,7 +271,7 @@ namespace HVACDuct {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool MyOneTimeFlag(true);
-        static Array1D_bool MyEnvrnFlag;
+        static EPVector<bool> MyEnvrnFlag;
 
         // do one time initializations
         if (MyOneTimeFlag) {

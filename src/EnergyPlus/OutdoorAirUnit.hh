@@ -104,12 +104,12 @@ namespace OutdoorAirUnit {
     // MODULE VARIABLE DECLARATIONS:
     extern int NumOfOAUnits;      // Number of outdoor air unit in the input file
     extern Real64 OAMassFlowRate; // Outside air mass flow rate for the zone outdoor air unit
-    extern Array1D_bool MyOneTimeErrorFlag;
+    extern EPVector<bool> MyOneTimeErrorFlag;
     extern bool GetOutdoorAirUnitInputFlag; // Flag set to make sure you get input once
 
     // Autosizing variables
-    extern Array1D_bool MySizeFlag;
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> MySizeFlag;
+    extern EPVector<bool> CheckEquipName;
 
     struct OAEquipList
     {

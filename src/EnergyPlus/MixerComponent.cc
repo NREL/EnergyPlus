@@ -107,7 +107,7 @@ namespace MixerComponent {
     int NumMixers(0); // The Number of Mixers found in the Input
     int LoopInletNode(0);
     int LoopOutletNode(0);
-    Array1D_bool CheckEquipName;
+    EPVector<bool> CheckEquipName;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE Mixers
 
@@ -240,8 +240,8 @@ namespace MixerComponent {
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
         Array1D<Real64> NumArray;        // Numeric input items for object
-        Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
         // Flow
         CurrentModuleObject = "AirLoopHVAC:ZoneMixer";

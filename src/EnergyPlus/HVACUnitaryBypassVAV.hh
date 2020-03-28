@@ -102,7 +102,7 @@ namespace HVACUnitaryBypassVAV {
     extern Real64 PartLoadFrac;           // Compressor part-load fraction
     extern Real64 SaveCompressorPLR;      // Holds DX compressor PLR from active DX coil
     extern Real64 TempSteamIn;            // steam coil steam inlet temperature
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> CheckEquipName;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE
 

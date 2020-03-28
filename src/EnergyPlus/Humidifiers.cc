@@ -128,7 +128,7 @@ namespace Humidifiers {
     int NumHumidifiers(0);   // number of humidifiers of all types
     int NumElecSteamHums(0); // number of electric steam humidifiers
     int NumGasSteamHums(0);  // number of electric steam humidifiers
-    Array1D_bool CheckEquipName;
+    EPVector<bool> CheckEquipName;
 
     // Humidifier normalized thermal efficiency curve types
     int const Linear(1);
@@ -280,8 +280,8 @@ namespace Humidifiers {
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
         Array1D<Real64> Numbers;         // Numeric input items for object
-        Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
         //  certain object in the input file
 

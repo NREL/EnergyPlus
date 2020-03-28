@@ -480,8 +480,8 @@ namespace ZoneTempPredictorCorrector {
         struct NeededControlTypes
         {
             // Members
-            Array1D_bool MustHave; // 4= the four control types
-            Array1D_bool DidHave;
+            EPVector<bool> MustHave; // 4= the four control types
+            EPVector<bool> DidHave;
 
             // Default Constructor
             NeededControlTypes() : MustHave(4, false), DidHave(4, false)
@@ -492,8 +492,8 @@ namespace ZoneTempPredictorCorrector {
         struct NeededComfortControlTypes
         {
             // Members
-            Array1D_bool MustHave; // 4= the four control types
-            Array1D_bool DidHave;
+            EPVector<bool> MustHave; // 4= the four control types
+            EPVector<bool> DidHave;
 
             // Default Constructor
             NeededComfortControlTypes() : MustHave(12, false), DidHave(12, false)

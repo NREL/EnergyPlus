@@ -157,9 +157,9 @@ namespace MixedAir {
     extern int NumOAMixers;            // Number of Outdoor Air Mixers
     extern int NumVentMechControllers; // Number of Controller:MechanicalVentilation objects in input deck
 
-    extern Array1D_bool MyOneTimeErrorFlag;
-    extern Array1D_bool MyOneTimeCheckUnitarySysFlag;
-    extern Array1D_bool initOASysFlag;
+    extern EPVector<bool> MyOneTimeErrorFlag;
+    extern EPVector<bool> MyOneTimeCheckUnitarySysFlag;
+    extern EPVector<bool> initOASysFlag;
     extern bool GetOASysInputFlag;        // Flag set to make sure you get input once
     extern bool GetOAMixerInputFlag;      // Flag set to make sure you get input once
     extern bool GetOAControllerInputFlag; // Flag set to make sure you get input once
@@ -472,8 +472,8 @@ namespace MixedAir {
                                    int &NumAlphas,
                                    Array1D<Real64> const &NumArray,
                                    int &NumNums,
-                                   Array1D_bool const &lNumericBlanks, // Unused
-                                   Array1D_bool const &lAlphaBlanks,
+                                   EPVector<bool> const &lNumericBlanks, // Unused
+                                   EPVector<bool> const &lAlphaBlanks,
                                    Array1D_string const &cAlphaFields,
                                    Array1D_string const &cNumericFields, // Unused
                                    bool &ErrorsFound                    // If errors found in input

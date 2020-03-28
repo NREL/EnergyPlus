@@ -87,8 +87,8 @@ namespace Furnaces {
 
     // MODULE VARIABLE DECLARATIONS:
     extern int NumFurnaces; // The number of furnaces found in the input data file
-    extern Array1D_bool MySizeFlag;
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> MySizeFlag;
+    extern EPVector<bool> CheckEquipName;
     extern Real64 ModifiedHeatCoilLoad; // used to adjust heating coil capacity if outlet temp > DesignMaxOutletTemp,
     // used for Coil:Gas:Heating and Coil:Electric:Heating coils only.
     extern Real64 OnOffAirFlowRatioSave;        // Saves the OnOffAirFlowRatio calculated in RegulaFalsi CALLs.

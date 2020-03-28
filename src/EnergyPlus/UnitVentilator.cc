@@ -167,9 +167,9 @@ namespace UnitVentilator {
     int NumOfUnitVents(0);      // Number of unit ventilators in the input file
     Real64 OAMassFlowRate(0.0); // Outside air mass flow rate for the unit ventilator
     Real64 QZnReq(0.0);         // heating or cooling needed by zone [watts]
-    Array1D_bool MySizeFlag;
+    EPVector<bool> MySizeFlag;
     bool GetUnitVentilatorInputFlag(true); // First time, input is "gotten"
-    Array1D_bool CheckEquipName;
+    EPVector<bool> CheckEquipName;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE UnitVentilator
     // PRIVATE UpdateUnitVentilator
@@ -337,8 +337,8 @@ namespace UnitVentilator {
         Array1D<Real64> Numbers;       // Numeric items for object
         Array1D_string cAlphaFields;   // Alpha field names
         Array1D_string cNumericFields; // Numeric field names
-        Array1D_bool lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
         int CtrlZone;                  // index to loop counter
         int NodeNum;                   // index to loop counter
         bool ZoneNodeNotFound;         // used in error checking
@@ -1293,9 +1293,9 @@ namespace UnitVentilator {
         static bool MyOneTimeFlag(true);
         static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         int Loop;
-        static Array1D_bool MyEnvrnFlag;
-        static Array1D_bool MyPlantScanFlag;
-        static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
+        static EPVector<bool> MyEnvrnFlag;
+        static EPVector<bool> MyPlantScanFlag;
+        static EPVector<bool> MyZoneEqFlag; // used to set up zone equipment availability managers
         int HotConNode;                   // hot water control node number in unit ventilator loop
         int InNode;                       // inlet node number in unit ventilator loop
         int OutNode;                      // outlet node number in unit ventilator loop

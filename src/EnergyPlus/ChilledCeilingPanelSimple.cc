@@ -129,11 +129,11 @@ namespace CoolingPanelSimple {
     Array1D<Real64> LastCoolingPanelSrc; // Need to keep the last value in case we are still iterating
     Array1D<Real64> LastSysTimeElapsed;  // Need to keep the last value in case we are still iterating
     Array1D<Real64> LastTimeStepSys;     // Need to keep the last value in case we are still iterating
-    Array1D_bool CheckEquipName;
-    Array1D_bool SetLoopIndexFlag; // get loop number flag
+    EPVector<bool> CheckEquipName;
+    EPVector<bool> SetLoopIndexFlag; // get loop number flag
 
     // Autosizing variables
-    Array1D_bool MySizeFlagCoolPanel;
+    EPVector<bool> MySizeFlagCoolPanel;
 
     // Other variables
     static bool GetInputFlag(true); // One time get input flag
@@ -781,7 +781,7 @@ namespace CoolingPanelSimple {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool ZoneEquipmentListChecked(false);
-        static Array1D_bool MyEnvrnFlag;
+        static EPVector<bool> MyEnvrnFlag;
         int Loop;
         int ZoneNode;
         int ZoneNum;

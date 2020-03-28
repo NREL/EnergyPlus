@@ -100,7 +100,7 @@ namespace SplitterComponent {
     bool GetSplitterInputFlag(true);
     // Public because Used by SimAirServingZones and the Direct Air Unit
     int NumSplitters(0); // The Number of Splitters found in the Input
-    Array1D_bool CheckEquipName;
+    EPVector<bool> CheckEquipName;
 
     // Subroutine Specifications for the Module
     // Driver/Manager Routines
@@ -235,8 +235,8 @@ namespace SplitterComponent {
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
         Array1D<Real64> NumArray;        // Numeric input items for object
-        Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
         // RESET THE GETINPUT FLAG
         GetSplitterInputFlag = false;

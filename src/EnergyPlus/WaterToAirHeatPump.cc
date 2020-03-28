@@ -126,7 +126,7 @@ namespace WaterToAirHeatPump {
 
     // MODULE VARIABLE DECLARATIONS:
     int NumWatertoAirHPs(0); // The Number of Water to Air Heat Pumps found in the Input
-    Array1D_bool CheckEquipName;
+    EPVector<bool> CheckEquipName;
 
     int RefrigIndex(0);           // Refrigerant index
     int WaterIndex(0);            // Water index
@@ -284,8 +284,8 @@ namespace WaterToAirHeatPump {
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
         Array1D<Real64> NumArray;        // Numeric input items for object
-        Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
         // FLOW
 
@@ -872,8 +872,8 @@ namespace WaterToAirHeatPump {
         int WaterInletNode; // water inlet node number
         int PlantOutletNode;
         static bool MyOneTimeFlag(true);
-        static Array1D_bool MyPlantScanFlag;
-        static Array1D_bool MyEnvrnFlag;
+        static EPVector<bool> MyPlantScanFlag;
+        static EPVector<bool> MyEnvrnFlag;
         Real64 rho; // local fluid density
         Real64 Cp;  // local fluid specific heat
         bool errFlag;

@@ -2272,7 +2272,7 @@ void CostInfoOut()
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
     int unit; // Unit number on which to write file
     int surf; // Loop variable for surfaces
-    Array1D_bool uniqueSurf;
+    EPVector<bool> uniqueSurf;
     int write_stat;
 
     // Formats

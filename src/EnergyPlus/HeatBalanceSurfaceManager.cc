@@ -3833,7 +3833,7 @@ namespace HeatBalanceSurfaceManager {
         Real64 AbsGl;
         Real64 DividerRefl; // Window divider short-wave reflectance
 
-        static Array1D_bool FirstCalcZone; // for error message
+        static EPVector<bool> FirstCalcZone; // for error message
 
         // FLOW:
 

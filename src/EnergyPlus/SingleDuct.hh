@@ -97,7 +97,7 @@ namespace SingleDuct {
     extern bool GetInputFlag;   // Flag set to make sure you get input once
     extern bool GetATMixerFlag; // Flag set to make sure you get input once
     extern int NumConstVolSys;
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> CheckEquipName;
 
     // INTERFACE BLOCK SPECIFICATIONS
 

@@ -70,8 +70,8 @@ namespace BaseboardElectric {
 
     // MODULE VARIABLE DECLARATIONS:
     extern int NumBaseboards;
-    extern Array1D_bool MySizeFlag;
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> MySizeFlag;
+    extern EPVector<bool> CheckEquipName;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
 

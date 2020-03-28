@@ -174,8 +174,8 @@ namespace DataZoneEquipment {
     int NumOfZoneEquipLists(0); // The Number of Zone Equipment List objects
     Array1D_int ZoneEquipAvail;
 
-    Array1D_bool CrossMixingReportFlag;
-    Array1D_bool MixingReportFlag;
+    EPVector<bool> CrossMixingReportFlag;
+    EPVector<bool> MixingReportFlag;
     Array1D<Real64> VentMCP;
     Array1D<Real64> ZMAT;
     Array1D<Real64> ZHumRat;
@@ -324,8 +324,8 @@ namespace DataZoneEquipment {
         std::string CurrentModuleObject; // Object type for getting and error messages
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
-        Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         int maxEquipCount;
         int numEquipCount;
         int overallEquipCount;
@@ -1519,7 +1519,7 @@ namespace DataZoneEquipment {
         Real64 ZoneContamControllerSched; // Schedule value for ZoneControl:ContaminantController
         Real64 CO2PeopleGeneration;       // CO2 generation from people at design level
         int PeopleNum;
-        static Array1D_bool MyEnvrnFlag;
+        static EPVector<bool> MyEnvrnFlag;
         static bool OneTimeFlag(true);
 
         OAVolumeFlowRate = 0.0;

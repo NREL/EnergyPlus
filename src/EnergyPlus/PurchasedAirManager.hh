@@ -103,7 +103,7 @@ namespace PurchasedAirManager {
     extern int NumPurchAir;
     extern int NumPlenumArrays; // total number of plenum arrays
     extern bool GetPurchAirInputFlag;
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> CheckEquipName;
     // SUBROUTINE SPECIFICATIONS FOR MODULE PurchasedAir:
 
     // Types
@@ -290,7 +290,7 @@ namespace PurchasedAirManager {
         int NumPurchAir;
         int ReturnPlenumIndex;
         Array1D_int PurchAirArray;
-        Array1D_bool IsSimulated;
+        EPVector<bool> IsSimulated;
 
         // Default Constructor
         PurchAirPlenumArrayData() : NumPurchAir(0), ReturnPlenumIndex(0)

@@ -74,9 +74,9 @@ namespace SteamCoils {
     // MODULE VARIABLE DECLARATIONS:
     extern int SteamIndex;
     extern int NumSteamCoils; // The Number of SteamCoils found in the Input
-    extern Array1D_bool MySizeFlag;
-    extern Array1D_bool CoilWarningOnceFlag;
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> MySizeFlag;
+    extern EPVector<bool> CoilWarningOnceFlag;
+    extern EPVector<bool> CheckEquipName;
     extern bool GetSteamCoilsInputFlag; // Flag set to make sure you get input once
 
     // Subroutine Specifications for the Module

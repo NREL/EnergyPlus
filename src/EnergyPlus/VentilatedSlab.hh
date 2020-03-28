@@ -119,10 +119,10 @@ namespace VentilatedSlab {
     extern Array1D_double LastQRadSysSrc;      // Need to keep the last value in case we are still iterating
     extern Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
     extern Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> CheckEquipName;
 
     // Autosizing variables
-    extern Array1D_bool MySizeFlag;
+    extern EPVector<bool> MySizeFlag;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE VentilatedSlab
     // PRIVATE UpdateVentilatedSlabValAvg

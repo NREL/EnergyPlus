@@ -132,7 +132,7 @@ namespace TranspiredCollector {
 
     // MODULE VARIABLE DECLARATIONS:
     int NumUTSC(0); // number of transpired collectors in model
-    Array1D_bool CheckEquipName;
+    EPVector<bool> CheckEquipName;
     bool GetInputFlag(true); // First time, input is gotten
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE TranspiredCollector:
@@ -310,7 +310,7 @@ namespace TranspiredCollector {
         int IOStatusSplit;                    // Used in GetObjectItem
         int NumOASys;                         // do loop counter
         int ACountBase;                       // counter for alhpasSplit
-        Array1D_bool SplitterNameOK;          // check for correct association of
+        EPVector<bool> SplitterNameOK;          // check for correct association of
         std::string CurrentModuleObject;      // for ease in renaming.
         std::string CurrentModuleMultiObject; // for ease in renaming.
 
@@ -772,7 +772,7 @@ namespace TranspiredCollector {
         static bool MyOneTimeFlag(true);
         int UTSCUnitNum;
         static bool MySetPointCheckFlag(true);
-        static Array1D_bool MyEnvrnFlag;
+        static EPVector<bool> MyEnvrnFlag;
         int ControlNode;
         // unused  INTEGER             :: InletNode
         int SplitBranch;

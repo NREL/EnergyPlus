@@ -118,8 +118,8 @@ namespace ElectricBaseboardRadiator {
     Array1D<Real64> LastQBBElecRadSrc;  // Need to keep the last value in case we are still iterating
     Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
     Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
-    Array1D_bool MySizeFlag;
-    Array1D_bool CheckEquipName;
+    EPVector<bool> MySizeFlag;
+    EPVector<bool> CheckEquipName;
 
     // Object Data
     Array1D<ElecBaseboardParams> ElecBaseboard;
@@ -574,7 +574,7 @@ namespace ElectricBaseboardRadiator {
         static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         int ZoneNum;
         int Loop;
-        static Array1D_bool MyEnvrnFlag;
+        static EPVector<bool> MyEnvrnFlag;
 
         // Do the one time initializations
         if (MyOneTimeFlag) {

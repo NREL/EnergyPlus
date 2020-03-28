@@ -95,9 +95,9 @@ namespace UnitVentilator {
     extern int NumOfUnitVents;    // Number of unit ventilators in the input file
     extern Real64 OAMassFlowRate; // Outside air mass flow rate for the unit ventilator
     extern Real64 QZnReq;         // heating or cooling needed by zone [watts]
-    extern Array1D_bool MySizeFlag;
+    extern EPVector<bool> MySizeFlag;
     extern bool GetUnitVentilatorInputFlag; // First time, input is "gotten"
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> CheckEquipName;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE UnitVentilator
     // PRIVATE UpdateUnitVentilator

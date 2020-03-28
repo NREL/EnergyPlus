@@ -64,11 +64,11 @@ namespace DataZoneEnergyDemands {
 
     // MODULE VARIABLE DECLARATIONS:
 
-    extern Array1D_bool DeadBandOrSetback; // true if zone temperature is in the thermostat deadband
+    extern EPVector<bool> DeadBandOrSetback; // true if zone temperature is in the thermostat deadband
     // before any heating / cooling done
-    extern Array1D_bool Setback; // true if zone temperature has increased
+    extern EPVector<bool> Setback; // true if zone temperature has increased
     // from previous setting
-    extern Array1D_bool CurDeadBandOrSetback; // same as above except updated after each piece of zone equipment
+    extern EPVector<bool> CurDeadBandOrSetback; // same as above except updated after each piece of zone equipment
     // in a zone is simulated
 
     // Types

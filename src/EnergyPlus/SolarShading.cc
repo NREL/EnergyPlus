@@ -5295,7 +5295,7 @@ namespace SolarShading {
         int NGSS;                    // Number of shadowing surfaces for a receiving surface
         int NSBS;                    // Number of subsurfaces for a receiving surface
         bool ShadowingSurf;          // True if a receiving surface is a shadowing surface
-        Array1D_bool CastingSurface; // tracking during setup of ShadowComb
+        EPVector<bool> CastingSurface; // tracking during setup of ShadowComb
 
         static int MaxDim(0);
 
@@ -11602,8 +11602,8 @@ namespace SolarShading {
         int Count;
         int TotCount;
         std::string CountOut;
-        Array1D_bool SurfErrorReported;
-        Array1D_bool SurfErrorReported2;
+        EPVector<bool> SurfErrorReported;
+        EPVector<bool> SurfErrorReported2;
 
         if (NumTooManyFigures + NumTooManyVertices + NumBaseSubSurround > 0) {
             ShowMessage("");

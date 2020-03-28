@@ -73,7 +73,7 @@ namespace SplitterComponent {
     extern bool GetSplitterInputFlag;
     // Public because Used by SimAirServingZones and the Direct Air Unit
     extern int NumSplitters; // The Number of Splitters found in the Input
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> CheckEquipName;
 
     // Subroutine Specifications for the Module
     // Driver/Manager Routines

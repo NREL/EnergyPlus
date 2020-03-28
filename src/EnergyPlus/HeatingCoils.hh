@@ -83,11 +83,11 @@ namespace HeatingCoils {
 
     // MODULE VARIABLE DECLARATIONS:
     extern int NumHeatingCoils; // The Number of HeatingCoils found in the Input
-    extern Array1D_bool MySizeFlag;
-    extern Array1D_bool ValidSourceType; // Used to determine if a source for a desuperheater heating coil is valid
+    extern EPVector<bool> MySizeFlag;
+    extern EPVector<bool> ValidSourceType; // Used to determine if a source for a desuperheater heating coil is valid
     extern bool GetCoilsInputFlag;       // Flag set to make sure you get input once
     extern bool CoilIsSuppHeater;        // Flag set to indicate the heating coil is a supplemental heater
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> CheckEquipName;
 
     // Subroutine Specifications for the Module
     // Driver/Manager Routines

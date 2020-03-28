@@ -626,8 +626,8 @@ void InputProcessor::setObjectItemValue(json const &ep_object,
                                         int &NumAlphas,
                                         Array1D<Real64> &Numbers,
                                         int &NumNumbers,
-                                        Optional<Array1D_bool> NumBlank,
-                                        Optional<Array1D_bool> AlphaBlank,
+                                        Optional<EPVector<bool>> NumBlank,
+                                        Optional<EPVector<bool>> AlphaBlank,
                                         Optional<Array1D_string> AlphaFieldNames,
                                         Optional<Array1D_string> NumericFieldNames)
 {
@@ -714,8 +714,8 @@ void InputProcessor::getObjectItem(std::string const &Object,
                                    Array1D<Real64> &Numbers,
                                    int &NumNumbers,
                                    int &Status,
-                                   Optional<Array1D_bool> NumBlank,
-                                   Optional<Array1D_bool> AlphaBlank,
+                                   Optional<EPVector<bool>> NumBlank,
+                                   Optional<EPVector<bool>> AlphaBlank,
                                    Optional<Array1D_string> AlphaFieldNames,
                                    Optional<Array1D_string> NumericFieldNames)
 {

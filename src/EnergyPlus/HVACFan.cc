@@ -380,10 +380,10 @@ namespace HVACFan {
         std::string locCurrentModuleObject = "Fan:SystemModel";
         Array1D_string alphaArgs;
         Array1D_string alphaFieldNames;
-        Array1D_bool isAlphaFieldBlank;
+        EPVector<bool> isAlphaFieldBlank;
         Array1D<Real64> numericArgs;
         Array1D_string numericFieldNames;
-        Array1D_bool isNumericFieldBlank;
+        EPVector<bool> isNumericFieldBlank;
         int objectNum = inputProcessor->getObjectItemNum(locCurrentModuleObject, objectName);
         inputProcessor->getObjectDefMaxArgs(locCurrentModuleObject, numTotFields, numAlphas, numNums);
         if (numAlphas > 0) {

@@ -259,7 +259,7 @@ namespace SurfaceGeometry {
         std::string String2;
         std::string String3;
         int Count; // To count wall surfaces for ceiling height calculation
-        Array1D_bool ZoneCeilingHeightEntered;
+        EPVector<bool> ZoneCeilingHeightEntered;
         Array1D<Real64> ZoneCeilingArea;
         static int ErrCount(0);
         Real64 NominalUwithConvCoeffs;
@@ -9824,7 +9824,7 @@ namespace SurfaceGeometry {
     }
 
     // Calculates the volume (m3) of a zone using the surfaces as possible.
-    void CalculateZoneVolume(const Array1D_bool &CeilingHeightEntered)
+    void CalculateZoneVolume(const EPVector<bool> &CeilingHeightEntered)
     {
 
         // SUBROUTINE INFORMATION:

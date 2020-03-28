@@ -2515,7 +2515,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_SimpleBox_test)
 {
     using DataGlobals::NumOfZones;
 
-    Array1D_bool enteredCeilingHeight;
+    EPVector<bool> enteredCeilingHeight;
     NumOfZones = 1;
     enteredCeilingHeight.dimension(NumOfZones, false);
     Zone.dimension(NumOfZones);
@@ -2587,7 +2587,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxOneWallMissing_test)
 {
     using DataGlobals::NumOfZones;
 
-    Array1D_bool enteredCeilingHeight;
+    EPVector<bool> enteredCeilingHeight;
     NumOfZones = 1;
     enteredCeilingHeight.dimension(NumOfZones, false);
     Zone.dimension(NumOfZones);
@@ -2653,7 +2653,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeiling_test)
 {
     using DataGlobals::NumOfZones;
 
-    Array1D_bool enteredCeilingHeight;
+    EPVector<bool> enteredCeilingHeight;
     NumOfZones = 1;
     enteredCeilingHeight.dimension(NumOfZones, false);
     Zone.dimension(NumOfZones);
@@ -2719,7 +2719,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoFloor_test)
 {
     using DataGlobals::NumOfZones;
 
-    Array1D_bool enteredCeilingHeight;
+    EPVector<bool> enteredCeilingHeight;
     NumOfZones = 1;
     enteredCeilingHeight.dimension(NumOfZones, false);
     Zone.dimension(NumOfZones);
@@ -2785,7 +2785,7 @@ TEST_F(EnergyPlusFixture, CalculateZoneVolume_BoxNoCeilingFloor_test)
 {
     using DataGlobals::NumOfZones;
 
-    Array1D_bool enteredCeilingHeight;
+    EPVector<bool> enteredCeilingHeight;
     NumOfZones = 1;
     enteredCeilingHeight.dimension(NumOfZones, false);
     Zone.dimension(NumOfZones);

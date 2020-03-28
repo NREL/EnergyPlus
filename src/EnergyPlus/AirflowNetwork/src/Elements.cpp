@@ -149,7 +149,7 @@ namespace AirflowNetwork {
     int const AirflowNetworkControlMultiADS(5); // Perform distribution system during system on time
     // and multizone calculations during off time
 
-    Array1D<bool> AirflowNetworkZoneFlag;
+    EPVector<bool> AirflowNetworkZoneFlag;
 
     int NumOfNodesMultiZone(0);    // Number of nodes for multizone calculation
     int NumOfNodesDistribution(0); // Number of nodes for distribution system calculation
@@ -173,7 +173,7 @@ namespace AirflowNetwork {
     EPVector<Real64> ANCO;                      // Local zone air CO2 for roll back use
     EPVector<Real64> ANGC;                      // Local zone air generic contaminant for roll back use
     int AirflowNetworkNumOfExhFan(0);          // Number of zone exhaust fans
-    Array1D<bool> AirflowNetworkZoneExhaustFan; // Logical to use zone exhaust fans
+    EPVector<bool> AirflowNetworkZoneExhaustFan; // Logical to use zone exhaust fans
     bool AirflowNetworkFanActivated(false);    // Supply fan activation flag
     bool AirflowNetworkUnitarySystem(false);   // set to TRUE for unitary systems (to make answers equal, will remove eventually)
     // Multispeed HP only

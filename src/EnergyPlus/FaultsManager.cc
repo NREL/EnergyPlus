@@ -297,8 +297,8 @@ namespace FaultsManager {
         int NumNumbers; // Number of Numbers for each GetobjectItem call
         int IOStatus;
         Array1D_string cAlphaArgs(10); // Alpha input items for object
-        Array1D_bool lAlphaFieldBlanks(10, false);
-        Array1D_bool lNumericFieldBlanks(10, false);
+        EPVector<bool> lAlphaFieldBlanks(10, false);
+        EPVector<bool> lNumericFieldBlanks(10, false);
         Array1D_string cAlphaFieldNames(10);
         Array1D_string cNumericFieldNames(10);
         Array1D<Real64> rNumericArgs(10); // Numeric input items for object

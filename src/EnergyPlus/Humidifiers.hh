@@ -74,7 +74,7 @@ namespace Humidifiers {
     extern int NumHumidifiers;   // number of humidifiers of all types
     extern int NumElecSteamHums; // number of electric steam humidifiers
     extern int NumGasSteamHums;  // number of gas steam humidifiers
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> CheckEquipName;
 
     // Humidifier normalized thermal efficiency curve types
     extern int const Linear;

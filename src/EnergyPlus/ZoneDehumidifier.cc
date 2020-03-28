@@ -138,7 +138,7 @@ namespace ZoneDehumidifier {
     int NumDehumidifiers(0); // Number of zone dehumidifier objects in the input file
 
     bool GetInputFlag(true); // Set to FALSE after first time input is "gotten"
-    Array1D_bool CheckEquipName;
+    EPVector<bool> CheckEquipName;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE:
     // Driver/Manager Routines
@@ -300,8 +300,8 @@ namespace ZoneDehumidifier {
         Array1D_string cAlphaFields;    // Alpha field names
         Array1D_string cNumericFields;  // Numeric field names
         Array1D<Real64> Numbers;        // Numeric input items for object
-        Array1D_bool lAlphaBlanks;      // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;    // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;      // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;    // Logical array, numeric field input BLANK = .TRUE.
         static int TotalArgs(0);        // Total number of alpha and numeric arguments (max)
         Real64 CurveVal;                // Output from curve object (water removal or energy factor curves)
 
@@ -650,7 +650,7 @@ namespace ZoneDehumidifier {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Array1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
+        static EPVector<bool> MyEnvrnFlag; // Used for initializations each begin environment flag
         //  LOGICAL, ALLOCATABLE, SAVE, DIMENSION(:) :: MySizeFlag  ! Used for sizing zone dehumidifier inputs one time
         static bool MyOneTimeFlag(true);             // initialization flag
         static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items

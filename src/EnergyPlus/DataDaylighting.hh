@@ -136,7 +136,7 @@ namespace DataDaylighting {
         Array2D<Real64> DaylRefPtAbsCoord; // =0.0 ! X,Y,Z coordinates of all daylighting reference points
         // in absolute coordinate system (m)
         // Points 1 and 2 are the control reference points
-        Array1D_bool DaylRefPtInBounds; // True when coordinates are in bounds of zone coordinates
+        EPVector<bool> DaylRefPtInBounds; // True when coordinates are in bounds of zone coordinates
         Array1D<Real64> FracZoneDaylit; // =0.0  ! Fraction of zone controlled by each reference point
         Array1D<Real64> IllumSetPoint;  // =0.0  ! Illuminance setpoint at each reference point (lux)
         int LightControlType;           // Lighting control type (same for all reference points)
@@ -257,7 +257,7 @@ namespace DataDaylighting {
         Array2D<Real64> MapRefPtAbsCoord; // X,Y,Z coordinates of all illuminance map reference points
         // in absolute coordinate system (m)
         // Points 1 and 2 are the control reference points
-        Array1D_bool MapRefPtInBounds;     // True when coordinates are in bounds of zone coordinates
+        EPVector<bool> MapRefPtInBounds;     // True when coordinates are in bounds of zone coordinates
         Array1D<Real64> DaylIllumAtMapPt;  // Daylight illuminance at illuminance map points (lux)
         Array1D<Real64> GlareIndexAtMapPt; // Glare index at illuminance map points
         // following Hr - report avg hr

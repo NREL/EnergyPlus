@@ -163,9 +163,9 @@ namespace Fans {
         bool MyOneTimeFlag(true);             // used for allocation in Init
         bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
 
-        Array1D_bool MySizeFlag;
-        Array1D_bool MyEnvrnFlag;
-        Array1D_bool CheckEquipName;
+        EPVector<bool> MySizeFlag;
+        EPVector<bool> MyEnvrnFlag;
+        EPVector<bool> CheckEquipName;
     } // namespace
 
     // Subroutine Specifications for the Module
@@ -335,8 +335,8 @@ namespace Fans {
         static std::string const RoutineName("GetFanInput: "); // include trailing blank space
         Array1D_string cAlphaFieldNames;
         Array1D_string cNumericFieldNames;
-        Array1D_bool lNumericFieldBlanks;
-        Array1D_bool lAlphaFieldBlanks;
+        EPVector<bool> lNumericFieldBlanks;
+        EPVector<bool> lAlphaFieldBlanks;
         Array1D_string cAlphaArgs;
         Array1D<Real64> rNumericArgs;
         std::string cCurrentModuleObject;

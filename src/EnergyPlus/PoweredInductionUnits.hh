@@ -74,7 +74,7 @@ namespace PoweredInductionUnits {
     // DERIVED TYPE DEFINITIONS
 
     // MODULE VARIABLE DECLARATIONS:
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> CheckEquipName;
 
     extern int NumPIUs;
     extern int NumSeriesPIUs;

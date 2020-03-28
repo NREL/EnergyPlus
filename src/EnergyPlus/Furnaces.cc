@@ -213,8 +213,8 @@ namespace Furnaces {
 
     // MODULE VARIABLE DECLARATIONS:
     int NumFurnaces(0); // The number of furnaces found in the input data file
-    Array1D_bool MySizeFlag;
-    Array1D_bool CheckEquipName;
+    EPVector<bool> MySizeFlag;
+    EPVector<bool> CheckEquipName;
     Real64 ModifiedHeatCoilLoad(0.0); // used to adjust heating coil capacity if outlet temp > DesignMaxOutletTemp,
     // used for Coil:Gas:Heating and Coil:Electric:Heating coils only.
     Real64 OnOffAirFlowRatioSave(0.0);        // Saves the OnOffAirFlowRatio calculated in RegulaFalsi CALLs.
@@ -913,8 +913,8 @@ namespace Furnaces {
         Array1D_string Alphas;         // Alpha data
         Array1D_string cAlphaFields;   // Alpha field names
         Array1D_string cNumericFields; // Numeric field names
-        Array1D_bool lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
         std::string CompSetFanInlet;
         std::string CompSetFanOutlet;
         std::string CompSetCoolInlet;
@@ -4774,13 +4774,13 @@ namespace Furnaces {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool MyOneTimeFlag(true);             // one time allocation flag
-        static Array1D_bool MyEnvrnFlag;             // environment flag
-        static Array1D_bool MySecondOneTimeFlag;     // additional one time flag
-        static Array1D_bool MyFanFlag;               // used for sizing fan inputs one time
-        static Array1D_bool MyCheckFlag;             // Used to obtain the zone inlet node number in the controlled zone
-        static Array1D_bool MyFlowFracFlag;          // Used for calculatig flow fraction once
-        static Array1D_bool MyPlantScanFlag;         // used to initializa plant comp for water and steam heating coils
-        static Array1D_bool MySuppCoilPlantScanFlag; // used to initialize plant comp for water and steam heating coils
+        static EPVector<bool> MyEnvrnFlag;             // environment flag
+        static EPVector<bool> MySecondOneTimeFlag;     // additional one time flag
+        static EPVector<bool> MyFanFlag;               // used for sizing fan inputs one time
+        static EPVector<bool> MyCheckFlag;             // Used to obtain the zone inlet node number in the controlled zone
+        static EPVector<bool> MyFlowFracFlag;          // Used for calculatig flow fraction once
+        static EPVector<bool> MyPlantScanFlag;         // used to initializa plant comp for water and steam heating coils
+        static EPVector<bool> MySuppCoilPlantScanFlag; // used to initialize plant comp for water and steam heating coils
         bool errFlag;                                // error flag for mining functions
         Real64 FanVolFlowRate;                       // fan volumetric flow rate (m3/s)
         Real64 QZnReq;                               // furnace load based on control zone frac (W)

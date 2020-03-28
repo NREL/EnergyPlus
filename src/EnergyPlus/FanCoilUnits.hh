@@ -100,8 +100,8 @@ namespace FanCoilUnits {
 
     extern int NumFanCoils;
     extern int Num4PipeFanCoils;
-    extern Array1D_bool MySizeFlag;
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> MySizeFlag;
+    extern EPVector<bool> CheckEquipName;
     extern bool GetFanCoilInputFlag; // First time, input is "gotten"
     extern Real64 FanFlowRatio;
     extern bool HeatingLoad;         // True when zone needs heating

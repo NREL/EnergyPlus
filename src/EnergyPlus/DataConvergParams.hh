@@ -166,31 +166,31 @@ namespace DataConvergParams {
     struct HVACAirLoopIterationConvergenceStruct
     {
         // Members
-        Array1D_bool HVACMassFlowNotConverged;                   // Flag to show mass flow convergence
+        EPVector<bool> HVACMassFlowNotConverged;                   // Flag to show mass flow convergence
         Array1D<Real64> HVACFlowDemandToSupplyTolValue;          // Queue of convergence "results"
         Array1D<Real64> HVACFlowSupplyDeck1ToDemandTolValue;     // Queue of convergence "results"
         Array1D<Real64> HVACFlowSupplyDeck2ToDemandTolValue;     // Queue of convergence "results"
-        Array1D_bool HVACHumRatNotConverged;                     // Flag to show humidity ratio convergence   or failure
+        EPVector<bool> HVACHumRatNotConverged;                     // Flag to show humidity ratio convergence   or failure
         Array1D<Real64> HVACHumDemandToSupplyTolValue;           // Queue of convergence "results"
         Array1D<Real64> HVACHumSupplyDeck1ToDemandTolValue;      // Queue of convergence "results"
         Array1D<Real64> HVACHumSupplyDeck2ToDemandTolValue;      // Queue of convergence "results"
-        Array1D_bool HVACTempNotConverged;                       // Flag to show temperature convergence  or failure
+        EPVector<bool> HVACTempNotConverged;                       // Flag to show temperature convergence  or failure
         Array1D<Real64> HVACTempDemandToSupplyTolValue;          // Queue of convergence "results"
         Array1D<Real64> HVACTempSupplyDeck1ToDemandTolValue;     // Queue of convergence "results"
         Array1D<Real64> HVACTempSupplyDeck2ToDemandTolValue;     // Queue of convergence "results"
-        Array1D_bool HVACEnergyNotConverged;                     // Flag to show energy convergence   or failure
+        EPVector<bool> HVACEnergyNotConverged;                     // Flag to show energy convergence   or failure
         Array1D<Real64> HVACEnergyDemandToSupplyTolValue;        // Queue of convergence "results"
         Array1D<Real64> HVACEnergySupplyDeck1ToDemandTolValue;   // Queue of convergence "results"
         Array1D<Real64> HVACEnergySupplyDeck2ToDemandTolValue;   // Queue of convergence "results"
-        Array1D_bool HVACEnthalpyNotConverged;                   // Flag to show energy convergence   or failure
+        EPVector<bool> HVACEnthalpyNotConverged;                   // Flag to show energy convergence   or failure
         Array1D<Real64> HVACEnthalpyDemandToSupplyTolValue;      // Queue of convergence "results"
         Array1D<Real64> HVACEnthalpySupplyDeck1ToDemandTolValue; // Queue of convergence "results"
         Array1D<Real64> HVACEnthalpySupplyDeck2ToDemandTolValue; // Queue of convergence "results"
-        Array1D_bool HVACPressureNotConverged;                   // Flag to show energy convergence   or failure
+        EPVector<bool> HVACPressureNotConverged;                   // Flag to show energy convergence   or failure
         Array1D<Real64> HVACPressureDemandToSupplyTolValue;      // Queue of convergence "results"
         Array1D<Real64> HVACPressureSupplyDeck1ToDemandTolValue; // Queue of convergence "results"
         Array1D<Real64> HVACPressueSupplyDeck2ToDemandTolValue;  // Queue of convergence "results"
-        Array1D_bool HVACQualityNotConverged;                    // Flag to show energy convergence   or failure
+        EPVector<bool> HVACQualityNotConverged;                    // Flag to show energy convergence   or failure
         Array1D<Real64> HVACQualityDemandToSupplyTolValue;       // Queue of convergence "results"
         Array1D<Real64> HVACQualitSupplyDeck1ToDemandTolValue;   // Queue of convergence "results"
         Array1D<Real64> HVACQualitySupplyDeck2ToDemandTolValue;  // Queue of convergence "results"

@@ -104,8 +104,8 @@ namespace FluidProperties {
     extern bool DebugReportRefrigerants;
     extern int GlycolErrorLimitTest;      // how many times error is printed with details before recurring called
     extern int RefrigerantErrorLimitTest; // how many times error is printed with details before recurring called
-    extern Array1D_bool RefrigUsed;
-    extern Array1D_bool GlycolUsed;
+    extern EPVector<bool> RefrigUsed;
+    extern EPVector<bool> GlycolUsed;
     extern int FluidIndex_Water;
     extern int FluidIndex_EthyleneGlycol;
     extern int FluidIndex_PropoleneGlycol;

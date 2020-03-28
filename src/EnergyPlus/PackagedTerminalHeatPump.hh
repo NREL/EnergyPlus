@@ -86,7 +86,7 @@ namespace PackagedTerminalHeatPump {
     // DERIVED TYPE DEFINITIONS
 
     // MODULE VARIABLE DECLARATIONS:
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> CheckEquipName;
 
     extern Real64 SupHeaterLoad;     // load to be met by supplemental heater [W]
     extern int NumPTHP;              // total number of PTHP's

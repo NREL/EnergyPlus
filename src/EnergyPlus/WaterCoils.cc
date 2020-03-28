@@ -187,15 +187,15 @@ namespace WaterCoils {
 
     // MODULE VARIABLE DECLARATIONS:
     int NumWaterCoils(0); // The Number of WaterCoils found in the Input
-    Array1D_bool MySizeFlag;
-    Array1D_bool MyUAAndFlowCalcFlag;
-    Array1D_bool MyCoilDesignFlag;
-    Array1D_bool CoilWarningOnceFlag;
+    EPVector<bool> MySizeFlag;
+    EPVector<bool> MyUAAndFlowCalcFlag;
+    EPVector<bool> MyCoilDesignFlag;
+    EPVector<bool> CoilWarningOnceFlag;
     Array1D_int WaterTempCoolCoilErrs;              // error counting for detailed coils
     Array1D_int PartWetCoolCoilErrs;                // error counting for detailed coils
     bool GetWaterCoilsInputFlag(true);              // Flag set to make sure you get input once
     bool WaterCoilControllerCheckOneTimeFlag(true); // flg used to check water coil controller
-    Array1D_bool CheckEquipName;
+    EPVector<bool> CheckEquipName;
     namespace {
         // These were static variables within different functions. They were pulled out into the namespace
         // to facilitate easier unit testing of those functions.
@@ -382,8 +382,8 @@ namespace WaterCoils {
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
         Array1D<Real64> NumArray;        // Numeric input items for object
-        Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         static int MaxNums(0);           // Maximum number of numeric input fields
         static int MaxAlphas(0);         // Maximum number of alpha input fields
         static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
@@ -1033,9 +1033,9 @@ namespace WaterCoils {
         /////////// hoisted into namespace InitWaterCoilOneTimeFlag
         // static bool MyOneTimeFlag( true );
         /////////////////////////
-        static Array1D_bool MyEnvrnFlag;
-        static Array1D_bool MyCoilReportFlag;
-        static Array1D_bool PlantLoopScanFlag;
+        static EPVector<bool> MyEnvrnFlag;
+        static EPVector<bool> MyCoilReportFlag;
+        static EPVector<bool> PlantLoopScanFlag;
 
         static Array1D<Real64> CoefSeries(5); // Tuned Changed to static: High call count: Set before use
         Real64 FinDiamVar;
@@ -1060,7 +1060,7 @@ namespace WaterCoils {
         static Real64 CoilEffectiveness(0.0);   // effectiveness of the coil (rated)
         static Real64 SurfaceArea(0.0);         // heat exchanger surface area, [m2]
         static Real64 UATotal(0.0);             // heat exchanger UA total, [W/C]
-        static Array1D_bool RptCoilHeaderFlag(2, true);
+        static EPVector<bool> RptCoilHeaderFlag(2, true);
 
         Real64 DesUACoilExternalEnth; // enthalpy based UAExternal for wet coil surface {kg/s}
         Real64 LogMeanEnthDiff;       // long mean enthalpy difference {J/kg}

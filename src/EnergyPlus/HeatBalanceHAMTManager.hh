@@ -93,9 +93,9 @@ namespace HeatBalanceHAMTManager {
 
     extern Array1D<Real64> extvtc;   // External Surface vapor transfer coefficient
     extern Array1D<Real64> intvtc;   // Internal Surface Vapor Transfer Coefficient
-    extern Array1D_bool extvtcflag;  // External Surface vapor transfer coefficient flag
-    extern Array1D_bool intvtcflag;  // Internal Surface Vapor Transfer Coefficient flag
-    extern Array1D_bool MyEnvrnFlag; // Flag to reset surface properties.
+    extern EPVector<bool> extvtcflag;  // External Surface vapor transfer coefficient flag
+    extern EPVector<bool> intvtcflag;  // Internal Surface Vapor Transfer Coefficient flag
+    extern EPVector<bool> MyEnvrnFlag; // Flag to reset surface properties.
 
     extern Real64 deltat; // time step in seconds
 

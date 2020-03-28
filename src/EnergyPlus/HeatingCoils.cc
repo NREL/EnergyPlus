@@ -156,12 +156,12 @@ namespace HeatingCoils {
 
     // MODULE VARIABLE DECLARATIONS:
     int NumHeatingCoils(0); // The Number of HeatingCoils found in the Input
-    Array1D_bool MySizeFlag;
-    Array1D_bool ValidSourceType; // Used to determine if a source for a desuperheater heating coil is valid
+    EPVector<bool> MySizeFlag;
+    EPVector<bool> ValidSourceType; // Used to determine if a source for a desuperheater heating coil is valid
     bool GetCoilsInputFlag(true); // Flag set to make sure you get input once
     bool CoilIsSuppHeater(false); // Flag set to indicate the heating coil is a supplemental heater
     bool MyOneTimeFlag(true);     // one time initialization flag
-    Array1D_bool CheckEquipName;
+    EPVector<bool> CheckEquipName;
     bool InputErrorsFound(false);
 
     // Subroutine Specifications for the Module
@@ -360,8 +360,8 @@ namespace HeatingCoils {
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
         Array1D<Real64> Numbers;         // Numeric input items for object
-        Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         static int MaxNums(0);           // Maximum number of numeric input fields
         static int MaxAlphas(0);         // Maximum number of alpha input fields
         static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
@@ -1252,9 +1252,9 @@ namespace HeatingCoils {
         int DXCoilNum;                            // Index to DX cooling coil
         static int ValidSourceTypeCounter(0);     // Counter used to determine if desuperheater source name is valid
         static bool HeatingCoilFatalError(false); // used for error checking
-        static Array1D_bool MySPTestFlag;         // used for error checking
-        static Array1D_bool ShowSingleWarning;    // Used for single warning message for desuperheater coil
-        static Array1D_bool MyEnvrnFlag;          // one time environment flag
+        static EPVector<bool> MySPTestFlag;         // used for error checking
+        static EPVector<bool> ShowSingleWarning;    // Used for single warning message for desuperheater coil
+        static EPVector<bool> MyEnvrnFlag;          // one time environment flag
 
         if (MyOneTimeFlag) {
             // initialize the environment and sizing flags

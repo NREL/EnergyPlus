@@ -240,7 +240,7 @@ namespace DataBSDFWindow {
         Array3D<Real64> HitSurfDSq;   // for a given ray striking surface, list of distance^2 from window (# window el, NReflSurf, RefRayNHits)
         Array3D<Vector> HitPt;        // for a given ray striking surface, list of hit pts (# window el, NReflSurf, RefRayNHits)
         Array1D_int RefPointIndex;    // outgoing direction which containts reference point (# window el)
-        Array1D_bool RefPointIntersection; // determines if reference point is laying in light tube of bsdf outgoing direction (NTrnBasis)
+        EPVector<bool> RefPointIntersection; // determines if reference point is laying in light tube of bsdf outgoing direction (NTrnBasis)
         Array1D<Real64> RefPtIntPosFac; // position factors for intersections from reference point to window for each outgoing direction (NTrnBasis)
 
         // Default Constructor

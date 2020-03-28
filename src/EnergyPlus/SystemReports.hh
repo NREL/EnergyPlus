@@ -160,9 +160,9 @@ namespace SystemReports {
     extern Array1D_int FirstHeatCoolHour;
     extern Array1D_int LastHeatCoolFlag;
     extern Array1D_int LastHeatCoolHour;
-    extern Array1D_bool AirLoopCalcDone;
-    extern Array1D_bool NoLoadFlag;
-    extern Array1D_bool UnmetLoadFlag;
+    extern EPVector<bool> AirLoopCalcDone;
+    extern EPVector<bool> NoLoadFlag;
+    extern EPVector<bool> UnmetLoadFlag;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE SystemReports
 

@@ -78,8 +78,8 @@ namespace UnitHeater {
     extern bool HCoilOn;       // TRUE if the heating coil (gas or electric especially) should be running
     extern int NumOfUnitHeats; // Number of unit heaters in the input file
     extern Real64 QZnReq;      // heating or cooling needed by zone [watts]
-    extern Array1D_bool MySizeFlag;
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> MySizeFlag;
+    extern EPVector<bool> CheckEquipName;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE UnitHeater
 

@@ -220,7 +220,7 @@ namespace RoomAirModelUserTempPattern {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Array1D_bool MyEnvrnFlag; // flag for init once at start of environment
+        static EPVector<bool> MyEnvrnFlag; // flag for init once at start of environment
         static bool MyOneTimeFlag(true); // one time setup flag
         int SurfNum;                     // do loop counter
 
@@ -579,7 +579,7 @@ namespace RoomAirModelUserTempPattern {
         Real64 thisZeta;                     // non-dimensional height
         Real64 DeltaHeight;                  // height difference in m
         Real64 tempDeltaTai;                 // temporary temperature difference
-        static Array1D_bool SetupOutputFlag; // flag to set up output variable one-time if 2-grad model used
+        static EPVector<bool> SetupOutputFlag; // flag to set up output variable one-time if 2-grad model used
         static bool MyOneTimeFlag(true);
 
         if (MyOneTimeFlag) {

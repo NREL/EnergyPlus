@@ -102,7 +102,7 @@ namespace FuelCellElectricGenerator {
 
     int NumFuelCellGenerators(0);
     bool getFuelCellInputFlag(true);
-    Array1D_bool CheckEquipName;
+    EPVector<bool> CheckEquipName;
     Array1D<FCDataStruct> FuelCell; // dimension to number of machines
 
     void clear_state()
@@ -190,7 +190,7 @@ namespace FuelCellElectricGenerator {
         int IOStat;                    // IO Status when calling get input subroutine
         Array1D_string AlphArray(25);  // character string data
         Array1D<Real64> NumArray(200); // numeric data TODO deal with allocatable for extensible
-        Array1D_bool lAlphaBlanks(25);
+        EPVector<bool> lAlphaBlanks(25);
         bool ErrorsFound(false); // error flag
 
         DataIPShortCuts::cCurrentModuleObject = "Generator:FuelCell";

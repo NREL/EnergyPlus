@@ -104,8 +104,8 @@ namespace BaseboardElectric {
 
     // MODULE VARIABLE DECLARATIONS:
     int NumBaseboards(0);
-    Array1D_bool MySizeFlag;
-    Array1D_bool CheckEquipName;
+    EPVector<bool> MySizeFlag;
+    EPVector<bool> CheckEquipName;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
 
@@ -480,7 +480,7 @@ namespace BaseboardElectric {
         static bool MyOneTimeFlag(true);
         static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         int Loop;
-        static Array1D_bool MyEnvrnFlag;
+        static EPVector<bool> MyEnvrnFlag;
 
         // Do the one time initializations
         if (MyOneTimeFlag) {

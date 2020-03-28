@@ -162,7 +162,7 @@ namespace Psychrometrics {
                                                                    // PsyTwbFnTdbWPb_raw (raw calc) | 19 - PsyPsatFnTemp_raw
                                                                    // (raw calc)
 
-    Array1D_bool const PsyReportIt(NumPsychMonitors,
+    EPVector<bool> const PsyReportIt(NumPsychMonitors,
                                    {true,
                                     true,
                                     true,

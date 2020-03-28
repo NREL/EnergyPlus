@@ -76,7 +76,7 @@ namespace WaterUse {
 
     extern bool getWaterUseInputFlag;
 
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> CheckEquipName;
 
     struct WaterEquipmentType
     {

@@ -611,7 +611,7 @@ namespace FuelCellElectricGenerator {
 
     extern bool getFuelCellInputFlag;
     extern int NumFuelCellGenerators;
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> CheckEquipName;
     extern Array1D<FCDataStruct> FuelCell;
 
 } // namespace FuelCellElectricGenerator

@@ -189,8 +189,8 @@ namespace HVACManager {
     int HVACManageIteration(0); // counts iterations to enforce maximum iteration limit
     int RepIterAir(0);
 
-    // Array1D_bool CrossMixingReportFlag; // TRUE when Cross Mixing is active based on controls
-    // Array1D_bool MixingReportFlag; // TRUE when Mixing is active based on controls
+    // EPVector<bool> CrossMixingReportFlag; // TRUE when Cross Mixing is active based on controls
+    // EPVector<bool> MixingReportFlag; // TRUE when Mixing is active based on controls
     // Array1D< Real64 > VentMCP; // product of mass rate and Cp for each Venitlation object
 
     namespace {

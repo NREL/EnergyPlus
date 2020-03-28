@@ -246,7 +246,7 @@ namespace UFADManager {
         // na
 
         static bool MyOneTimeFlag(true);
-        static Array1D_bool MySizeFlag;
+        static EPVector<bool> MySizeFlag;
         static Real64 NumShadesDown(0.0);
         int UINum;             // index to underfloor interior zone model data
         static int Ctd(0);     // DO loop index

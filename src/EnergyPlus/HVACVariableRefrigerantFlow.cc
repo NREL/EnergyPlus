@@ -209,17 +209,17 @@ namespace HVACVariableRefrigerantFlow {
     Real64 LoopDXCoolCoilRTF(0.0);          // holds value of DX cooling coil RTF
     Real64 LoopDXHeatCoilRTF(0.0);          // holds value of DX heating coil RTF
     Real64 CondenserWaterMassFlowRate(0.0); // VRF water-cooled condenser mass flow rate (kg/s)
-    Array1D_bool HeatingLoad;               // defines a heating load on VRFTerminalUnits
-    Array1D_bool CoolingLoad;               // defines a cooling load on VRFTerminalUnits
-    Array1D_bool LastModeHeating;           // defines last mode was heating mode
-    Array1D_bool LastModeCooling;           // defines last mode was cooling mode
-    Array1D_bool CheckEquipName;            // Flag set to check equipment connections once
-    Array1D_bool MyEnvrnFlag;               // Flag for initializing at beginning of each new environment
-    Array1D_bool MySizeFlag;                // False after TU has been sized
-    Array1D_bool MyBeginTimeStepFlag;       // Flag to sense beginning of time step
-    Array1D_bool MyVRFFlag;                 // used for sizing VRF inputs one time
-    Array1D_bool MyVRFCondFlag;             // used to reset timer counter
-    Array1D_bool MyZoneEqFlag;              // used to set up zone equipment availability managers
+    EPVector<bool> HeatingLoad;               // defines a heating load on VRFTerminalUnits
+    EPVector<bool> CoolingLoad;               // defines a cooling load on VRFTerminalUnits
+    EPVector<bool> LastModeHeating;           // defines last mode was heating mode
+    EPVector<bool> LastModeCooling;           // defines last mode was cooling mode
+    EPVector<bool> CheckEquipName;            // Flag set to check equipment connections once
+    EPVector<bool> MyEnvrnFlag;               // Flag for initializing at beginning of each new environment
+    EPVector<bool> MySizeFlag;                // False after TU has been sized
+    EPVector<bool> MyBeginTimeStepFlag;       // Flag to sense beginning of time step
+    EPVector<bool> MyVRFFlag;                 // used for sizing VRF inputs one time
+    EPVector<bool> MyVRFCondFlag;             // used to reset timer counter
+    EPVector<bool> MyZoneEqFlag;              // used to set up zone equipment availability managers
     Array1D_int NumCoolingLoads;            // number of TU's requesting cooling
     Array1D_int NumHeatingLoads;            // number of TU's requesting heating
     Array1D<Real64> MaxCoolingCapacity;     // maximum capacity of any terminal unit
@@ -1472,8 +1472,8 @@ namespace HVACVariableRefrigerantFlow {
         bool IsNotOK; // Flag to verify name
         Array1D_string cAlphaFieldNames;
         Array1D_string cNumericFieldNames;
-        Array1D_bool lNumericFieldBlanks;
-        Array1D_bool lAlphaFieldBlanks;
+        EPVector<bool> lNumericFieldBlanks;
+        EPVector<bool> lAlphaFieldBlanks;
         Array1D_string cAlphaArgs;
         Array1D<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
@@ -6882,7 +6882,7 @@ namespace HVACVariableRefrigerantFlow {
 
         static std::string const RoutineName("SizeVRF: "); // include trailing blank space
 
-        static Array1D_bool CheckVRFCombinationRatio;
+        static EPVector<bool> CheckVRFCombinationRatio;
         bool FoundAll;                      // temporary variable used to check all terminal units
         bool errFlag;                       // temporary variable used for error checking
         Real64 TUCoolingCapacity;           // total terminal unit cooling capacity

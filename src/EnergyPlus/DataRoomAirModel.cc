@@ -168,7 +168,7 @@ namespace DataRoomAirModel {
     // UCSD
     Array1D<Real64> DVHcIn;
     int TotUCSDDV(0);             // Total number of UCSDDV zones
-    Array1D_bool IsZoneDV;        // Is the air model for the zone UCSDDV?
+    EPVector<bool> IsZoneDV;        // Is the air model for the zone UCSDDV?
     Array1D<Real64> ZTOC;         // Temperature of occupied (lower) zone
     Array1D<Real64> AvgTempGrad;  // vertical Average Temperature Gradient in the room
     Array1D<Real64> ZTMX;         // Temperature of the mixing(upper) layer
@@ -180,7 +180,7 @@ namespace DataRoomAirModel {
     Array1D<Real64> FracMinFlow;
     Array1D_int ZoneDVMixedFlag;
     Array1D<Real64> ZoneDVMixedFlagRep;
-    Array1D_bool ZoneAirSystemON;
+    EPVector<bool> ZoneAirSystemON;
     Array1D<Real64> TCMF; // comfort temperature
     Array1D<Real64> ZoneCeilingHeight;
     Array1D<Real64> MATFloor;    // [C] floor level mean air temp
@@ -235,7 +235,7 @@ namespace DataRoomAirModel {
     // UCSD-CV
     Array1D<Real64> CVHcIn;
     int TotUCSDCV(0);                // Total number of UCSDDV zones
-    Array1D_bool IsZoneCV;           // Is the air model for the zone UCSDDV?
+    EPVector<bool> IsZoneCV;           // Is the air model for the zone UCSDDV?
     Array1D<Real64> ZoneCVisMixing;  // Zone set to CV is actually using a mixing model
     Array1D<Real64> ZTJET;           // Jet Temperatures
     Array1D<Real64> ZTREC;           // Recirculation Temperatures
@@ -262,7 +262,7 @@ namespace DataRoomAirModel {
     // UCSD-UF
     int TotUCSDUI(0);      // total number of UCSDUI zones
     int TotUCSDUE(0);      // total number of UCSDUE zones
-    Array1D_bool IsZoneUI; // controls program flow, for interior or exterior UFAD model
+    EPVector<bool> IsZoneUI; // controls program flow, for interior or exterior UFAD model
     Array1D_int ZoneUFPtr;
     Array1D<Real64> UFHcIn;
     Array1D_int ZoneUFMixedFlag;

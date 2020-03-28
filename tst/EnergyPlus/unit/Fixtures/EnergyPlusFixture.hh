@@ -130,7 +130,7 @@ protected:
     // Will return true if containers are equal and false if they are not.
     // Example Usage:
     // 		EXPECT_TRUE( compare_containers( std::vector< bool >( { true } ) , ObjectDef( index ).AlphaOrNumeric ) );
-    // 		EXPECT_TRUE( compare_containers( Array1D_bool( { true } ) , ObjectDef( index ).AlphaOrNumeric ) );
+    // 		EXPECT_TRUE( compare_containers( EPVector<bool>( { true } ) , ObjectDef( index ).AlphaOrNumeric ) );
     template <class T, class T2> bool compare_containers(T const &expected_container, T2 const &actual_container)
     {
         bool is_valid = (expected_container.size() == actual_container.size());

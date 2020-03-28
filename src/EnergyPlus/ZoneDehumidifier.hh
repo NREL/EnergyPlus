@@ -78,7 +78,7 @@ namespace ZoneDehumidifier {
     extern int NumDehumidifiers; // Number of zone dehumidifier objects in the input file
 
     extern bool GetInputFlag; // Set to FALSE after first time input is "gotten"
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> CheckEquipName;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE:
     // Driver/Manager Routines

@@ -61,7 +61,7 @@ namespace EnergyPlus {
 
 namespace SolarCollectors {
 
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> CheckEquipName;
 
     extern int NumOfParameters;
     extern int NumOfCollectors;

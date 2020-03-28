@@ -104,7 +104,6 @@ using ObjexxFCL::Array1A;
 using ObjexxFCL::Array1A_bool;
 using ObjexxFCL::Array1A_int;
 using ObjexxFCL::Array1D;
-using ObjexxFCL::Array1D_bool;
 using ObjexxFCL::Array1D_double;
 using ObjexxFCL::Array1D_int;
 using ObjexxFCL::Array1D_string;
@@ -245,7 +244,6 @@ template <typename T> struct EPVector : std::vector<T>
     void deallocate()
     {
         this->clear();
-        return;
     }
 
     // operator= used for initialization of the vector
@@ -265,6 +263,139 @@ template <typename T> struct EPVector : std::vector<T>
     {
         return static_cast<int>(this->size());
     }
+
+    T* get(std::size_t n)
+    {
+        return &this->at(n);
+    }
+
+    const T * get(std::size_t n) const
+    {
+        return &this->at(n);
+    }
 };
+
+template <> struct EPVector<bool> : std::vector<std::uint8_t>
+{
+    using std::vector<std::uint8_t>::vector;
+
+    std::uint8_t& operator()(std::size_t n)
+    {
+        return this->at(n - 1);
+    }
+
+    const std::uint8_t& operator()(std::size_t n) const
+    {
+        return this->at(n - 1);
+    }
+
+    std::uint8_t* get(std::size_t n)
+    {
+        return &this->at(n);
+    }
+
+    const std::uint8_t * get(std::size_t n) const
+    {
+        return &this->at(n);
+    }
+
+    void allocate(int size)
+    {
+        this->resize(size);
+    }
+
+    void redimension(int size)
+    {
+        this->resize(size);
+    }
+
+    void deallocate()
+    {
+        this->clear();
+    }
+
+    // operator= used for initialization of the vector
+    void operator=(bool v)
+    {
+        std::fill(this->begin(), this->end(), v);
+    }
+
+    // dimension is often used to initalize the vector instead of allocate + operator=
+    void dimension(int size, const bool v)
+    {
+        this->resize(size, v);
+    }
+
+    // isize needed for current FindItemInList
+    int isize() const
+    {
+        return static_cast<int>(this->size());
+    }
+};
+
+template<typename T>
+inline
+bool allocated(EPVector<T> const & v)
+{
+	return v.size();
+}
+
+inline
+bool all(EPVector<bool> const & values)
+{
+	if ( values.empty() ) return true;
+    for (auto v : values) {
+        if (!v) return false;
+    }
+    return true;
+}
+
+inline
+bool any(EPVector<bool> const & values)
+{
+	if ( values.empty() ) return false;
+    for (auto v : values) {
+        if (v) return true;
+    }
+    return false;
+}
+
+inline
+std::size_t count(EPVector<bool> const & values)
+{
+	std::size_t c(0u);
+    for (auto v : values) {
+        if (v) ++c;
+    }
+	return c;
+}
+
+template<typename T>
+inline
+EPVector<T> pack(EPVector<T> const & v, EPVector<bool> const & mask)
+{
+	EPVector<T> r;
+    r.reserve(mask.size());
+    for (std::size_t i = 0; i < mask.size(); ++i) {
+        if (mask[i]) {
+            r.emplace_back(v[i]);
+        }
+    }
+	return r;
+}
+
+template<typename T>
+inline
+Array1D<T> pack(Array1<T> const & a, EPVector<bool> const & mask)
+{
+	Array1D<T> r;
+    r.reserve(mask.size());
+	for (std::size_t i = 0, e = mask.size(); i < e; ++i) {
+		if (mask[i]) {
+            r.emplace_back(a[i]);
+        }
+	}
+	return r;
+}
 
 #endif

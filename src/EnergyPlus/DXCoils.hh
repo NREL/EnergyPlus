@@ -157,7 +157,7 @@ namespace DXCoils {
 
     extern int NumDXMulSpeedCoolCoils; // number of multispeed DX cooling coils
     extern int NumDXMulSpeedHeatCoils; // number of multispeed DX heating coils
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> CheckEquipName;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE
 
@@ -189,15 +189,15 @@ namespace DXCoils {
         //          effects due to the supply air fan
         Array1D<Real64> RatedTotCap;                 // Gross total cooling capacity at rated conditions [watts]
         Real64 HeatSizeRatio;                        // heat pump heating to cooling sizing ratio when autosized
-        Array1D_bool RatedTotCapEMSOverrideOn;       // if true, then EMS is calling to override rated total capacity
+        Array1D<bool> RatedTotCapEMSOverrideOn;       // if true, then EMS is calling to override rated total capacity
         Array1D<Real64> RatedTotCapEMSOverrideValue; // value to use for EMS override
         Array1D<Real64> RatedSHR;                    // Sensible heat ratio (sens cap/total cap) at rated conditions
-        Array1D_bool RatedSHREMSOverrideOn;          // if true, then EMS is calling to override Sensible heat ratio
+        Array1D<bool> RatedSHREMSOverrideOn;          // if true, then EMS is calling to override Sensible heat ratio
         Array1D<Real64> RatedSHREMSOverrideValue;    // value to use for EMS override forSensible heat ratio
         Array1D<Real64> RatedCOP;                    // Coefficient of performance at rated conditions
         Array1D<Real64> RatedAirVolFlowRate;         // Air volume flow rate through coil at rated conditions [m3/s]
         // This is adjusted for bypassed air if any (see BypassedFlowFrac)
-        Array1D_bool RatedAirVolFlowRateEMSOverrideON;       // if true, then EMS is calling to override Air volume flow rate
+        Array1D<bool> RatedAirVolFlowRateEMSOverrideON;       // if true, then EMS is calling to override Air volume flow rate
         Array1D<Real64> RatedAirVolFlowRateEMSOverrideValue; // value to use for EMS override Air volume flow rate
         Array1D<Real64> FanPowerPerEvapAirFlowRate;          // Fan Power Per Air volume flow rate through the
         // Evaporator coil at rated conditions [W/(m3/s)]

@@ -216,13 +216,13 @@ namespace DataAirSystems {
         Array1D_string ControllerName;   // name of each controller on this system
         Array1D_string ControllerType;   // type of each controller on this system
         Array1D_int ControllerIndex;
-        Array1D_bool CanBeLockedOutByEcono; // true if controller inactive
+        EPVector<bool> CanBeLockedOutByEcono; // true if controller inactive
         // when the economizer is active
         int NumBranches;                   // number of branches making up this system
         Array1D<AirLoopBranchData> Branch; // data for each branch
         AirLoopSplitterData Splitter;      // Data for splitter (if any)
         AirLoopMixerData Mixer;            // Data for mixer (if any)
-        Array1D_bool ControlConverged;     // Convergence Parameter for controllers
+        EPVector<bool> ControlConverged;     // Convergence Parameter for controllers
         int NumOutletBranches;
         Array1D_int OutletBranchNum; // branch numbers of system outlets
         int NumInletBranches;

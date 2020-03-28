@@ -297,7 +297,7 @@ namespace ConductionTransferFunctionCalc {
         // property allowable, traditional value from BLAST
         int NumAdjResLayers;                         // Number of resistive layers that are adjacent
         int OppositeLayer;                           // Used for comparing constructions (to see if one is the reverse of another)
-        Array1D<bool> ResLayer(MaxLayersInConstruct); // Set true if the layer must be handled as a resistive
+        EPVector<bool> ResLayer(MaxLayersInConstruct); // Set true if the layer must be handled as a resistive
         bool RevConst;                               // Set true if one construct is the reverse of another (CTFs already
         // available)
         EPVector<Real64> rho(MaxLayersInConstruct); // Density of a material layer

@@ -108,14 +108,14 @@ namespace WaterCoils {
 
     // MODULE VARIABLE DECLARATIONS:
     extern int NumWaterCoils; // The Number of WaterCoils found in the Input
-    extern Array1D_bool MySizeFlag;
-    extern Array1D_bool MyUAAndFlowCalcFlag;
-    extern Array1D_bool MyCoilDesignFlag;
-    extern Array1D_bool CoilWarningOnceFlag;
+    extern EPVector<bool> MySizeFlag;
+    extern EPVector<bool> MyUAAndFlowCalcFlag;
+    extern EPVector<bool> MyCoilDesignFlag;
+    extern EPVector<bool> CoilWarningOnceFlag;
     extern Array1D_int WaterTempCoolCoilErrs; // error counting for detailed coils
     extern Array1D_int PartWetCoolCoilErrs;   // error counting for detailed coils
     extern bool GetWaterCoilsInputFlag;       // Flag set to make sure you get input once
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> CheckEquipName;
 
     // Subroutine Specifications for the Module
     // Driver/Manager Routines

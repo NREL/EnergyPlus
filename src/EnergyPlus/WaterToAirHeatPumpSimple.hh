@@ -76,8 +76,8 @@ namespace WaterToAirHeatPumpSimple {
     // INTEGER        :: WaterIndex = 0                   ! Water index
     // INTEGER        :: Count = 0
     extern bool GetCoilsInputFlag; // Flag set to make sure you get input once
-    extern Array1D_bool MySizeFlag;
-    extern Array1D_bool SimpleHPTimeStepFlag; // determines whether the previous operating mode for the coil and it's partner has been initialized
+    extern EPVector<bool> MySizeFlag;
+    extern EPVector<bool> SimpleHPTimeStepFlag; // determines whether the previous operating mode for the coil and it's partner has been initialized
 
     extern Real64 SourceSideMassFlowRate; // Source Side Mass flow rate [Kg/s]
     extern Real64 SourceSideInletTemp;    // Source Side Inlet Temperature [C]

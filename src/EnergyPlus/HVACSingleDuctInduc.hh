@@ -71,7 +71,7 @@ namespace HVACSingleDuctInduc {
 
     extern int NumIndUnits;
     extern int NumFourPipes;
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> CheckEquipName;
     extern bool GetIUInputFlag; // First time, input is "gotten"
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE HVACSingleDuctInduc:

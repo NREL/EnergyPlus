@@ -117,14 +117,14 @@ namespace HVACVariableRefrigerantFlow {
     extern bool GetVRFInputFlag;                 // Flag set to make sure you get input once
     extern bool MyOneTimeFlag;                   // One time flag used to allocate MyEnvrnFlag and MySizeFlag
     extern bool MyOneTimeSizeFlag;               // One time flag used to allocate MyEnvrnFlag and MySizeFlag
-    extern Array1D_bool CheckEquipName;          // Flag set to check equipment connections once
+    extern EPVector<bool> CheckEquipName;          // Flag set to check equipment connections once
     extern bool ZoneEquipmentListNotChecked;     // False after the Zone Equipment List has been checked for items
-    extern Array1D_bool MyEnvrnFlag;             // Flag for initializing at beginning of each new environment
-    extern Array1D_bool MySizeFlag;              // False after TU has been sized
-    extern Array1D_bool MyBeginTimeStepFlag;     // Flag to sense beginning of time step
-    extern Array1D_bool MyVRFFlag;               // used for sizing VRF inputs one time
-    extern Array1D_bool MyVRFCondFlag;           // used to reset timer counter
-    extern Array1D_bool MyZoneEqFlag;            // used to set up zone equipment availability managers
+    extern EPVector<bool> MyEnvrnFlag;             // Flag for initializing at beginning of each new environment
+    extern EPVector<bool> MySizeFlag;              // False after TU has been sized
+    extern EPVector<bool> MyBeginTimeStepFlag;     // Flag to sense beginning of time step
+    extern EPVector<bool> MyVRFFlag;               // used for sizing VRF inputs one time
+    extern EPVector<bool> MyVRFCondFlag;           // used to reset timer counter
+    extern EPVector<bool> MyZoneEqFlag;            // used to set up zone equipment availability managers
     extern int NumVRFCond;                       // total number of VRF condensers (All VRF Algorithm Types)
     extern int NumVRFCond_SysCurve;              // total number of VRF condensers with VRF Algorithm Type 1
     extern int NumVRFTU;                         // total number of VRF terminal units
@@ -136,10 +136,10 @@ namespace HVACVariableRefrigerantFlow {
     extern Real64 CompOnFlowRatio;               // fan flow ratio when coil on
     extern Real64 CompOffFlowRatio;              // fan flow ratio when coil off
     extern Real64 FanSpeedRatio;                 // ratio of air flow ratio passed to fan object
-    extern Array1D_bool HeatingLoad;             // defines a heating load on VRFTerminalUnits
-    extern Array1D_bool CoolingLoad;             // defines a cooling load on VRFTerminalUnits
-    extern Array1D_bool LastModeHeating;         // defines last mode was heating mode
-    extern Array1D_bool LastModeCooling;         // defines last mode was cooling mode
+    extern EPVector<bool> HeatingLoad;             // defines a heating load on VRFTerminalUnits
+    extern EPVector<bool> CoolingLoad;             // defines a cooling load on VRFTerminalUnits
+    extern EPVector<bool> LastModeHeating;         // defines last mode was heating mode
+    extern EPVector<bool> LastModeCooling;         // defines last mode was cooling mode
     extern Array1D<Real64> MaxCoolingCapacity;   // maximum capacity of any terminal unit
     extern Array1D<Real64> MaxHeatingCapacity;   // maximum capacity of any terminal unit
     extern Array1D<Real64> CoolCombinationRatio; // ratio of terminal unit capacity to VRF condenser capacity
@@ -603,17 +603,17 @@ namespace HVACVariableRefrigerantFlow {
         bool reset_isSimulatedFlags;           // used to align simulate flags with order of each TU in simulation
         Array1D_int ZoneTUPtr;                // index to VRF Terminal Unit
         Array1D_string ZoneTUName;            // Name of the VRF Terminal Unit
-        Array1D_bool IsSimulated;             // TRUE if TU has been simulated
+        EPVector<bool> IsSimulated;             // TRUE if TU has been simulated
         Array1D<Real64> TotalCoolLoad;        // Total zone cooling coil load met by TU
         Array1D<Real64> TotalHeatLoad;        // Total zone heating coil load met by TU
-        Array1D_bool CoolingCoilPresent;      // FALSE if coil not present
-        Array1D_bool HeatingCoilPresent;      // FALSE if coil not present
-        Array1D_bool SuppHeatingCoilPresent;  // FALSE if supplemental heating coil not present
-        Array1D_bool TerminalUnitNotSizedYet; // TRUE if terminal unit not sized
-        Array1D_bool HRHeatRequest;           // defines a heating load on VRFTerminalUnits when QZnReq < 0
-        Array1D_bool HRCoolRequest;           // defines a cooling load on VRFTerminalUnits when QZnReq > 0
-        Array1D_bool CoolingCoilAvailable;    // cooling coil availability scheduled on
-        Array1D_bool HeatingCoilAvailable;    // cooling coil availability scheduled on
+        EPVector<bool> CoolingCoilPresent;      // FALSE if coil not present
+        EPVector<bool> HeatingCoilPresent;      // FALSE if coil not present
+        EPVector<bool> SuppHeatingCoilPresent;  // FALSE if supplemental heating coil not present
+        EPVector<bool> TerminalUnitNotSizedYet; // TRUE if terminal unit not sized
+        EPVector<bool> HRHeatRequest;           // defines a heating load on VRFTerminalUnits when QZnReq < 0
+        EPVector<bool> HRCoolRequest;           // defines a cooling load on VRFTerminalUnits when QZnReq > 0
+        EPVector<bool> CoolingCoilAvailable;    // cooling coil availability scheduled on
+        EPVector<bool> HeatingCoilAvailable;    // cooling coil availability scheduled on
         Array1D_int CoolingCoilAvailSchPtr;   // cooling coil availability schedule index
         Array1D_int HeatingCoilAvailSchPtr;   // heating coil availability schedule index
 

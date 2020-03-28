@@ -135,8 +135,8 @@ public:
                        Array1D<Real64> &Numbers,
                        int &NumNumbers,
                        int &Status,
-                       Optional<Array1D_bool> NumBlank = _,
-                       Optional<Array1D_bool> AlphaBlank = _,
+                       Optional<EPVector<bool>> NumBlank = _,
+                       Optional<EPVector<bool>> AlphaBlank = _,
                        Optional<Array1D_string> AlphaFieldNames = _,
                        Optional<Array1D_string> NumericFieldNames = _);
 
@@ -247,8 +247,8 @@ private:
                             int &NumAlphas,
                             Array1D<Real64> &Numbers,
                             int &NumNumbers,
-                            Optional<Array1D_bool> NumBlank = _,
-                            Optional<Array1D_bool> AlphaBlank = _,
+                            Optional<EPVector<bool>> NumBlank = _,
+                            Optional<EPVector<bool>> AlphaBlank = _,
                             Optional<Array1D_string> AlphaFieldNames = _,
                             Optional<Array1D_string> NumericFieldNames = _);
 

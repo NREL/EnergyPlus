@@ -1981,8 +1981,8 @@ TEST_F(InputProcessorFixture, getObjectItem_json1)
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
-    Array1D_bool lNumericBlanks(NumNumbers, true);
-    Array1D_bool lAlphaBlanks(NumAlphas, true);
+    EPVector<bool> lNumericBlanks(NumNumbers, true);
+    EPVector<bool> lAlphaBlanks(NumAlphas, true);
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
@@ -2031,8 +2031,8 @@ TEST_F(InputProcessorFixture, getObjectItem_json2)
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
-    Array1D_bool lNumericBlanks(NumNumbers, true);
-    Array1D_bool lAlphaBlanks(NumAlphas, true);
+    EPVector<bool> lNumericBlanks(NumNumbers, true);
+    EPVector<bool> lAlphaBlanks(NumAlphas, true);
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
     inputProcessor->getObjectItem(CurrentModuleObject,
@@ -2105,8 +2105,8 @@ TEST_F(InputProcessorFixture, getObjectItem_json3)
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
-    Array1D_bool lNumericBlanks(NumNumbers, true);
-    Array1D_bool lAlphaBlanks(NumAlphas, true);
+    EPVector<bool> lNumericBlanks(NumNumbers, true);
+    EPVector<bool> lAlphaBlanks(NumAlphas, true);
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
     inputProcessor->getObjectItem(CurrentModuleObject,
@@ -2166,8 +2166,8 @@ TEST_F(InputProcessorFixture, getObjectItem_parsing_numbers_as_alpha_fields)
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
-    Array1D_bool lNumericBlanks(NumNumbers, true);
-    Array1D_bool lAlphaBlanks(NumAlphas, true);
+    EPVector<bool> lNumericBlanks(NumNumbers, true);
+    EPVector<bool> lAlphaBlanks(NumAlphas, true);
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
@@ -2230,8 +2230,8 @@ TEST_F(InputProcessorFixture, getObjectItem_parsing_numbers_as_alpha_fields2)
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
-    Array1D_bool lNumericBlanks(NumNumbers, true);
-    Array1D_bool lAlphaBlanks(NumAlphas, true);
+    EPVector<bool> lNumericBlanks(NumNumbers, true);
+    EPVector<bool> lAlphaBlanks(NumAlphas, true);
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
@@ -2302,8 +2302,8 @@ TEST_F(InputProcessorFixture, getObjectItem_empty_fields_with_no_defaults)
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
-    Array1D_bool lNumericBlanks(NumNumbers, true);
-    Array1D_bool lAlphaBlanks(NumAlphas, true);
+    EPVector<bool> lNumericBlanks(NumNumbers, true);
+    EPVector<bool> lAlphaBlanks(NumAlphas, true);
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
@@ -2408,8 +2408,8 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_obj_pulled_up_semicolon)
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
-    Array1D_bool lNumericBlanks(NumNumbers, true);
-    Array1D_bool lAlphaBlanks(NumAlphas, true);
+    EPVector<bool> lNumericBlanks(NumNumbers, true);
+    EPVector<bool> lAlphaBlanks(NumAlphas, true);
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
@@ -2510,8 +2510,8 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_sizing_system_min_fields)
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
-    Array1D_bool lNumericBlanks(NumNumbers, true);
-    Array1D_bool lAlphaBlanks(NumAlphas, true);
+    EPVector<bool> lNumericBlanks(NumNumbers, true);
+    EPVector<bool> lAlphaBlanks(NumAlphas, true);
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
@@ -2595,8 +2595,8 @@ TEST_F(InputProcessorFixture, getObjectItem_missing_numerics_with_defaults_and_a
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
-    Array1D_bool lNumericBlanks(NumNumbers, true);
-    Array1D_bool lAlphaBlanks(NumAlphas, true);
+    EPVector<bool> lNumericBlanks(NumNumbers, true);
+    EPVector<bool> lAlphaBlanks(NumAlphas, true);
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
@@ -2669,8 +2669,8 @@ TEST_F(InputProcessorFixture, getObjectItem_truncated_autosize_fields)
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
-    Array1D_bool lNumericBlanks(NumNumbers, true);
-    Array1D_bool lAlphaBlanks(NumAlphas, true);
+    EPVector<bool> lNumericBlanks(NumNumbers, true);
+    EPVector<bool> lAlphaBlanks(NumAlphas, true);
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
@@ -2768,8 +2768,8 @@ TEST_F(InputProcessorFixture, getObjectItem_unitary_system_input)
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
-    Array1D_bool lNumericBlanks(NumNumbers, true);
-    Array1D_bool lAlphaBlanks(NumAlphas, true);
+    EPVector<bool> lNumericBlanks(NumNumbers, true);
+    EPVector<bool> lAlphaBlanks(NumAlphas, true);
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
@@ -2856,8 +2856,8 @@ TEST_F(InputProcessorFixture, getObjectItem_test_numbers_as_strings)
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
-    Array1D_bool lNumericBlanks(NumNumbers, true);
-    Array1D_bool lAlphaBlanks(NumAlphas, true);
+    EPVector<bool> lNumericBlanks(NumNumbers, true);
+    EPVector<bool> lAlphaBlanks(NumAlphas, true);
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
@@ -2915,8 +2915,8 @@ TEST_F(InputProcessorFixture, getObjectItem_test_zone_input)
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
-    Array1D_bool lNumericBlanks(NumNumbers, true);
-    Array1D_bool lAlphaBlanks(NumAlphas, true);
+    EPVector<bool> lNumericBlanks(NumNumbers, true);
+    EPVector<bool> lAlphaBlanks(NumAlphas, true);
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
@@ -2972,8 +2972,8 @@ TEST_F(InputProcessorFixture, getObjectItem_zone_HVAC_input)
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
-    Array1D_bool lNumericBlanks(NumNumbers, true);
-    Array1D_bool lAlphaBlanks(NumAlphas, true);
+    EPVector<bool> lNumericBlanks(NumNumbers, true);
+    EPVector<bool> lAlphaBlanks(NumAlphas, true);
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
@@ -3013,8 +3013,8 @@ TEST_F(InputProcessorFixture, getObjectItem_zone_HVAC_input)
 
     Array1D_string Alphas2(NumAlphas2);
     Array1D<Real64> Numbers2(NumNumbers2, 0.0);
-    Array1D_bool lNumericBlanks2(NumNumbers2, true);
-    Array1D_bool lAlphaBlanks2(NumAlphas2, true);
+    EPVector<bool> lNumericBlanks2(NumNumbers2, true);
+    EPVector<bool> lAlphaBlanks2(NumAlphas2, true);
     Array1D_string cAlphaFields2(NumAlphas2);
     Array1D_string cNumericFields2(NumNumbers2);
 
@@ -3087,8 +3087,8 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_heating_fuel)
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
-    Array1D_bool lNumericBlanks(NumNumbers, true);
-    Array1D_bool lAlphaBlanks(NumAlphas, true);
+    EPVector<bool> lNumericBlanks(NumNumbers, true);
+    EPVector<bool> lAlphaBlanks(NumAlphas, true);
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
@@ -3114,8 +3114,8 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_heating_fuel)
 
     Array1D_string Alphas2(NumAlphas2);
     Array1D<Real64> Numbers2(NumNumbers2, 0.0);
-    Array1D_bool lNumericBlanks2(NumNumbers2, true);
-    Array1D_bool lAlphaBlanks2(NumAlphas2, true);
+    EPVector<bool> lNumericBlanks2(NumNumbers2, true);
+    EPVector<bool> lAlphaBlanks2(NumAlphas2, true);
     Array1D_string cAlphaFields2(NumAlphas2);
     Array1D_string cNumericFields2(NumNumbers2);
 
@@ -3173,8 +3173,8 @@ TEST_F(InputProcessorFixture, getObjectItem_schedule_objects)
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
-    Array1D_bool lNumericBlanks(NumNumbers, true);
-    Array1D_bool lAlphaBlanks(NumAlphas, true);
+    EPVector<bool> lNumericBlanks(NumNumbers, true);
+    EPVector<bool> lAlphaBlanks(NumAlphas, true);
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
@@ -3211,8 +3211,8 @@ TEST_F(InputProcessorFixture, getObjectItem_schedule_objects)
 
     Array1D_string Alphas2(NumAlphas);
     Array1D<Real64> Numbers2(NumNumbers, 0.0);
-    Array1D_bool lNumericBlanks2(NumNumbers, true);
-    Array1D_bool lAlphaBlanks2(NumAlphas, true);
+    EPVector<bool> lNumericBlanks2(NumNumbers, true);
+    EPVector<bool> lAlphaBlanks2(NumAlphas, true);
     Array1D_string cAlphaFields2(NumAlphas);
     Array1D_string cNumericFields2(NumNumbers);
 
@@ -3264,8 +3264,8 @@ TEST_F(InputProcessorFixture, getObjectItem_fan_on_off)
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
-    Array1D_bool lNumericBlanks(NumNumbers, true);
-    Array1D_bool lAlphaBlanks(NumAlphas, true);
+    EPVector<bool> lNumericBlanks(NumNumbers, true);
+    EPVector<bool> lAlphaBlanks(NumAlphas, true);
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
@@ -3328,8 +3328,8 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_quadratic)
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
-    Array1D_bool lNumericBlanks(NumNumbers, true);
-    Array1D_bool lAlphaBlanks(NumAlphas, true);
+    EPVector<bool> lNumericBlanks(NumNumbers, true);
+    EPVector<bool> lAlphaBlanks(NumAlphas, true);
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
@@ -3352,8 +3352,8 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_quadratic)
 
     Array1D_string Alphas2(NumAlphas2);
     Array1D<Real64> Numbers2(NumNumbers2, 0.0);
-    Array1D_bool lNumericBlanks2(NumNumbers2, true);
-    Array1D_bool lAlphaBlanks2(NumAlphas2, true);
+    EPVector<bool> lNumericBlanks2(NumNumbers2, true);
+    EPVector<bool> lAlphaBlanks2(NumAlphas2, true);
     Array1D_string cAlphaFields2(NumAlphas2);
     Array1D_string cNumericFields2(NumNumbers2);
 
@@ -3376,8 +3376,8 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_quadratic)
 
     Array1D_string Alphas3(NumAlphas3);
     Array1D<Real64> Numbers3(NumNumbers3, 0.0);
-    Array1D_bool lNumericBlanks3(NumNumbers3, true);
-    Array1D_bool lAlphaBlanks3(NumAlphas3, true);
+    EPVector<bool> lNumericBlanks3(NumNumbers3, true);
+    EPVector<bool> lAlphaBlanks3(NumAlphas3, true);
     Array1D_string cAlphaFields3(NumAlphas3);
     Array1D_string cNumericFields3(NumNumbers3);
 
@@ -3537,8 +3537,8 @@ TEST_F(InputProcessorFixture, getObjectItem_coil_cooling_dx_variable_speed)
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
-    Array1D_bool lNumericBlanks(NumNumbers, true);
-    Array1D_bool lAlphaBlanks(NumAlphas, true);
+    EPVector<bool> lNumericBlanks(NumNumbers, true);
+    EPVector<bool> lAlphaBlanks(NumAlphas, true);
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
@@ -3703,8 +3703,8 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_biquadratic)
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
-    Array1D_bool lNumericBlanks(NumNumbers, true);
-    Array1D_bool lAlphaBlanks(NumAlphas, true);
+    EPVector<bool> lNumericBlanks(NumNumbers, true);
+    EPVector<bool> lAlphaBlanks(NumAlphas, true);
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 
@@ -3731,8 +3731,8 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_biquadratic)
 
     Array1D_string Alphas2(NumAlphas2);
     Array1D<Real64> Numbers2(NumNumbers2, 0.0);
-    Array1D_bool lNumericBlanks2(NumNumbers2, true);
-    Array1D_bool lAlphaBlanks2(NumAlphas2, true);
+    EPVector<bool> lNumericBlanks2(NumNumbers2, true);
+    EPVector<bool> lAlphaBlanks2(NumAlphas2, true);
     Array1D_string cAlphaFields2(NumAlphas2);
     Array1D_string cNumericFields2(NumNumbers2);
 
@@ -3792,8 +3792,8 @@ TEST_F(InputProcessorFixture, getObjectItem_curve_biquadratic2)
     int IOStatus = 0;
     Array1D_string Alphas(NumAlphas);
     Array1D<Real64> Numbers(NumNumbers, 0.0);
-    Array1D_bool lNumericBlanks(NumNumbers, true);
-    Array1D_bool lAlphaBlanks(NumAlphas, true);
+    EPVector<bool> lNumericBlanks(NumNumbers, true);
+    EPVector<bool> lAlphaBlanks(NumAlphas, true);
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNumbers);
 

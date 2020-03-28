@@ -74,7 +74,7 @@ namespace PlantCentralGSHP {
     extern Real64 ChillerCyclingRatio;  // Chiller/heater cycling ratio
     extern Real64 ChillerFalseLoadRate; // Chiller/heater false load over and above the water-side load [W]
 
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> CheckEquipName;
 
     struct CGSHPNodeData
     {

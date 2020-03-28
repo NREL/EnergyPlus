@@ -66,10 +66,10 @@ namespace UserDefinedComponents {
     extern int NumUserZoneAir;
     extern int NumUserAirTerminals;
 
-    extern Array1D_bool CheckUserPlantCompName;
-    extern Array1D_bool CheckUserCoilName;
-    extern Array1D_bool CheckUserZoneAirName;
-    extern Array1D_bool CheckUserAirTerminal;
+    extern EPVector<bool> CheckUserPlantCompName;
+    extern EPVector<bool> CheckUserCoilName;
+    extern EPVector<bool> CheckUserZoneAirName;
+    extern EPVector<bool> CheckUserAirTerminal;
 
     struct PlantConnectionStruct
     {

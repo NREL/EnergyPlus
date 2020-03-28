@@ -140,8 +140,8 @@ namespace HVACStandAloneERV {
 
     int NumStandAloneERVs; // Total number of stand alone ERVs defined in the idf
 
-    Array1D_bool MySizeFlag;
-    Array1D_bool CheckEquipName;
+    EPVector<bool> MySizeFlag;
+    EPVector<bool> CheckEquipName;
     bool GetERVInputFlag(true); // First time, input is "gotten"
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE
@@ -290,8 +290,8 @@ namespace HVACStandAloneERV {
         Array1D<Real64> Numbers; // Numeric items for object
         Array1D_string cAlphaFields;
         Array1D_string cNumericFields;
-        Array1D_bool lAlphaBlanks;
-        Array1D_bool lNumericBlanks;
+        EPVector<bool> lAlphaBlanks;
+        EPVector<bool> lNumericBlanks;
         std::string CompSetSupplyFanInlet;
         std::string CompSetSupplyFanOutlet;
         std::string CompSetExhaustFanInlet;
@@ -1213,7 +1213,7 @@ namespace HVACStandAloneERV {
         using MixedAir::SimOAController;
 
         // Locals
-        static Array1D_bool MySizeFlag;
+        static EPVector<bool> MySizeFlag;
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
@@ -1232,8 +1232,8 @@ namespace HVACStandAloneERV {
         int SupInletNode; // supply air inlet node number for Stand Alone ERV 'StandAloneERVNum'
         Real64 RhoAir;    // air density at SupInNode, standard conditions (dry air @ 20C,actual elevation pressure)
         static bool MyOneTimeFlag(true);
-        static Array1D_bool MyEnvrnFlag;
-        static Array1D_bool MyZoneEqFlag;            // used to set up zone equipment availability managers
+        static EPVector<bool> MyEnvrnFlag;
+        static EPVector<bool> MyZoneEqFlag;            // used to set up zone equipment availability managers
         static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         int Loop;                                    // loop counter
 

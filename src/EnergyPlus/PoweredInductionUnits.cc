@@ -147,7 +147,7 @@ namespace PoweredInductionUnits {
     static std::string const fluidNameWater("WATER");
 
     // MODULE VARIABLE DECLARATIONS:
-    Array1D_bool CheckEquipName;
+    EPVector<bool> CheckEquipName;
 
     namespace {
         // These are purposefully not in the header file as an extern variable. No one outside of this should
@@ -778,9 +778,9 @@ namespace PoweredInductionUnits {
         int OutletNode; // unit air outlet node number
         Real64 RhoAir;  // air density at outside pressure and standard temperature and humidity
         static bool MyOneTimeFlag(true);
-        static Array1D_bool MyEnvrnFlag;
-        static Array1D_bool MySizeFlag;
-        static Array1D_bool MyPlantScanFlag;
+        static EPVector<bool> MyEnvrnFlag;
+        static EPVector<bool> MySizeFlag;
+        static EPVector<bool> MyPlantScanFlag;
         static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         int Loop;                                    // Loop checking control variable
         Real64 rho;                                  // local plant fluid density

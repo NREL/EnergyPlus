@@ -77,7 +77,7 @@ namespace DataZoneControls {
     extern int NumTempAndHumidityControlledZones; // number of zones with over cool control
     extern bool AnyOpTempControl;                 // flag set true if any zones have op temp control
     extern bool AnyZoneTempAndHumidityControl;    // flag set true if any zones have over cool control
-    extern Array1D_bool StageZoneLogic;           // Logical array, A zone with staged thermostat = .TRUE.
+    extern EPVector<bool> StageZoneLogic;           // Logical array, A zone with staged thermostat = .TRUE.
     extern Array1D<Real64> OccRoomTSetPointHeat;  // occupied heating set point for optimum start period
     extern Array1D<Real64> OccRoomTSetPointCool;  // occupied cooling set point for optimum start period
     extern bool GetZoneAirStatsInputFlag;         // True when need to get input

@@ -160,7 +160,7 @@ namespace PackagedThermalStorageCoil {
     // MODULE VARIABLE DECLARATIONS:
 
     int NumTESCoils;
-    Array1D_bool CheckEquipName;
+    EPVector<bool> CheckEquipName;
     bool GetTESInputFlag(true);
     // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
@@ -1850,10 +1850,10 @@ namespace PackagedThermalStorageCoil {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Array1D_bool MyFlag;       // One time environment flag
-        static Array1D_bool MySizeFlag;   // One time sizing flag
-        static Array1D_bool MyEnvrnFlag;  // flag for init once at start of environment
-        static Array1D_bool MyWarmupFlag; // flag for init after warmup complete
+        static EPVector<bool> MyFlag;       // One time environment flag
+        static EPVector<bool> MySizeFlag;   // One time sizing flag
+        static EPVector<bool> MyEnvrnFlag;  // flag for init once at start of environment
+        static EPVector<bool> MyWarmupFlag; // flag for init after warmup complete
         static bool MyOneTimeFlag(true);  // One time flag used to allocate MyEnvrnFlag and MySizeFlag
         bool errFlag;
         int plloopnum;

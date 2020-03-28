@@ -76,7 +76,7 @@ namespace HVACHXAssistedCoolingCoil {
     extern Array1D<Real64> HXAssistedCoilOutletHumRat; // Outlet humidity ratio from this compound object
     // PUBLIC so others can access this information
     extern bool GetCoilsInputFlag; // Flag to allow input data to be retrieved from idf on first call to this subroutine
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> CheckEquipName;
 
     // Subroutine Specifications for the Module
     // Driver/Manager Routines

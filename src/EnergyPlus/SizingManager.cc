@@ -2074,8 +2074,8 @@ namespace SizingManager {
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
         Array1D<Real64> Numbers;         // Numeric input items for object
-        Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
         CurrentModuleObject = "DesignSpecification:OutdoorAir";
         NumOARequirements = inputProcessor->getNumObjectsFound(CurrentModuleObject);
@@ -2141,8 +2141,8 @@ namespace SizingManager {
                                     int &NumAlphas,
                                     Array1D<Real64> const &Numbers,
                                     int &NumNumbers,
-                                    Array1D_bool const &EP_UNUSED(lNumericBlanks), // Unused
-                                    Array1D_bool const &lAlphaBlanks,
+                                    EPVector<bool> const &EP_UNUSED(lNumericBlanks), // Unused
+                                    EPVector<bool> const &lAlphaBlanks,
                                     Array1D_string const &cAlphaFields,
                                     Array1D_string const &EP_UNUSED(cNumericFields), // Unused
                                     bool &ErrorsFound                               // If errors found in input
@@ -2340,8 +2340,8 @@ namespace SizingManager {
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
         Array1D<Real64> Numbers;         // Numeric input items for object
-        Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
         CurrentModuleObject = "DesignSpecification:ZoneAirDistribution";
         NumZoneAirDistribution = inputProcessor->getNumObjectsFound(CurrentModuleObject);
@@ -4215,8 +4215,8 @@ namespace SizingManager {
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
         Array1D<Real64> Numbers;         // Numeric input items for object
-        Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
         CurrentModuleObject = "DesignSpecification:ZoneHVAC:Sizing";
         NumZoneHVACSizing = inputProcessor->getNumObjectsFound(CurrentModuleObject);

@@ -95,7 +95,7 @@ namespace DataZoneControls {
     int NumTempAndHumidityControlledZones(0);  // number of zones with over cool control
     bool AnyOpTempControl(false);              // flag set true if any zones have op temp control
     bool AnyZoneTempAndHumidityControl(false); // flag set true if any zones have over cool control
-    Array1D_bool StageZoneLogic;               // Logical array, A zone with staged thermostat = .TRUE.
+    EPVector<bool> StageZoneLogic;               // Logical array, A zone with staged thermostat = .TRUE.
     Array1D<Real64> OccRoomTSetPointHeat;      // occupied heating set point for optimum start period
     Array1D<Real64> OccRoomTSetPointCool;      // occupied cooling set point for optimum start period
     bool GetZoneAirStatsInputFlag(true);       // True when need to get input

@@ -73,9 +73,9 @@ namespace BaseboardRadiator {
 
     // MODULE VARIABLE DECLARATIONS:
     extern int NumBaseboards;
-    extern Array1D_bool MySizeFlag;
-    extern Array1D_bool CheckEquipName;
-    extern Array1D_bool SetLoopIndexFlag; // get loop number flag
+    extern EPVector<bool> MySizeFlag;
+    extern EPVector<bool> CheckEquipName;
+    extern EPVector<bool> SetLoopIndexFlag; // get loop number flag
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
 

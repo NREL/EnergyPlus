@@ -183,9 +183,9 @@ namespace OutdoorAirUnit {
     bool GetOutdoorAirUnitInputFlag(true); // Flag set to make sure you get input once
 
     // Autosizing variables
-    Array1D_bool MySizeFlag;
-    Array1D_bool CheckEquipName;
-    Array1D_bool MyOneTimeErrorFlag;
+    EPVector<bool> MySizeFlag;
+    EPVector<bool> CheckEquipName;
+    EPVector<bool> MyOneTimeErrorFlag;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE OUTDOOR AIR UNIT
     // PRIVATE UpdateOutdoorAirUnit
@@ -379,8 +379,8 @@ namespace OutdoorAirUnit {
         std::string CurrentModuleObject; // Object type for getting and messages
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
-        Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         Array1D<Real64> NumArray;
         Array1D_string AlphArray;
         static bool errFlag(false);
@@ -1138,9 +1138,9 @@ namespace OutdoorAirUnit {
         // static bool MyOneTimeFlag( true );
         // static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
         ////////////////////////////////////////////////////////////////////////////////////
-        static Array1D_bool MyEnvrnFlag;
-        static Array1D_bool MyPlantScanFlag;
-        static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
+        static EPVector<bool> MyEnvrnFlag;
+        static EPVector<bool> MyPlantScanFlag;
+        static EPVector<bool> MyZoneEqFlag; // used to set up zone equipment availability managers
         int InNode;                       // inlet node number in outdoor air unit
         int OutNode;                      // outlet node number in outdoor air unit
         int OutsideAirNode;               // outside air node number outdoor air unit

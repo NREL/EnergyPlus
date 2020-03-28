@@ -149,8 +149,8 @@ TEST_F(EnergyPlusFixture, MixedAir_ProcessOAControllerTest)
     Array1D_string AlphArray(NumAlphas);
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNums);
-    Array1D_bool lAlphaBlanks(NumAlphas, true);
-    Array1D_bool lNumericBlanks(NumNums, true);
+    EPVector<bool> lAlphaBlanks(NumAlphas, true);
+    EPVector<bool> lNumericBlanks(NumNums, true);
 
     NumOAControllers = inputProcessor->getNumObjectsFound(CurrentModuleObject);
     OAController.allocate(NumOAControllers);
@@ -1452,8 +1452,8 @@ TEST_F(EnergyPlusFixture, MixedAir_MissingHIghRHControlInputTest)
     Array1D_string AlphArray(NumAlphas);
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNums);
-    Array1D_bool lAlphaBlanks(NumAlphas, true);
-    Array1D_bool lNumericBlanks(NumNums, true);
+    EPVector<bool> lAlphaBlanks(NumAlphas, true);
+    EPVector<bool> lNumericBlanks(NumNums, true);
 
     NumOAControllers = inputProcessor->getNumObjectsFound(CurrentModuleObject);
     OAController.allocate(NumOAControllers);
@@ -1583,8 +1583,8 @@ TEST_F(EnergyPlusFixture, MixedAir_HIghRHControlTest)
     Array1D_string AlphArray(NumAlphas);
     Array1D_string cAlphaFields(NumAlphas);
     Array1D_string cNumericFields(NumNums);
-    Array1D_bool lAlphaBlanks(NumAlphas, true);
-    Array1D_bool lNumericBlanks(NumNums, true);
+    EPVector<bool> lAlphaBlanks(NumAlphas, true);
+    EPVector<bool> lNumericBlanks(NumNums, true);
 
     NumOAControllers = inputProcessor->getNumObjectsFound(CurrentModuleObject);
     OAController.allocate(NumOAControllers);

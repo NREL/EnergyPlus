@@ -300,7 +300,7 @@ namespace AirflowNetworkBalanceManager {
 
     EPVector<Real64> LoopPartLoadRatio;
     EPVector<Real64> LoopOnOffFanRunTimeFraction;
-    Array1D<bool> LoopOnOffFlag;
+    EPVector<bool> LoopOnOffFlag;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE AirflowNetworkBalanceManager:
     // Name Public routines, optionally name Private routines within this module
@@ -1631,8 +1631,8 @@ namespace AirflowNetworkBalanceManager {
         Array1D<std::string> cAlphaFields;   // Alpha field names
         Array1D<std::string> cNumericFields; // Numeric field names
         Array1D<Real64> Numbers;              // Numeric input items for object
-        Array1D<bool> lAlphaBlanks;           // Logical array, alpha field input BLANK = .TRUE.
-        Array1D<bool> lNumericBlanks;         // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;           // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;         // Logical array, numeric field input BLANK = .TRUE.
         static int MaxNums(0);                // Maximum number of numeric input fields
         static int MaxAlphas(0);              // Maximum number of alpha input fields
         static int TotalArgs(0);              // Total number of alpha and numeric arguments (max) for a
@@ -8201,8 +8201,8 @@ namespace AirflowNetworkBalanceManager {
         int FanNum;
         Real64 RepOnOffFanRunTimeFraction;
         bool static onetime = false;
-        static Array1D<bool> onceZoneFlag;
-        static Array1D<bool> onceSurfFlag;
+        static EPVector<bool> onceZoneFlag;
+        static EPVector<bool> onceSurfFlag;
 
         if (SimulateAirflowNetwork < AirflowNetworkControlMultizone) return;
 
@@ -9646,7 +9646,7 @@ namespace AirflowNetworkBalanceManager {
         int R1;
         int R2;
         bool LocalError;
-        Array1D<bool> NodeFound;
+        EPVector<bool> NodeFound;
 
         bool ErrorsFound(false);
         bool IsNotOK(false);

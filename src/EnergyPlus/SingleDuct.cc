@@ -175,7 +175,7 @@ namespace SingleDuct {
     bool GetInputFlag(true);   // Flag set to make sure you get input once
     bool GetATMixerFlag(true); // Flag set to make sure you get input once
     int NumConstVolSys(0);
-    Array1D_bool CheckEquipName;
+    EPVector<bool> CheckEquipName;
 
     // INTERFACE BLOCK SPECIFICATIONS
 
@@ -383,8 +383,8 @@ namespace SingleDuct {
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
         Array1D<Real64> Numbers;         // Numeric input items for object
-        Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         static int MaxNums(0);           // Maximum number of numeric input fields
         static int MaxAlphas(0);         // Maximum number of alpha input fields
         static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
@@ -2039,15 +2039,15 @@ namespace SingleDuct {
         int OutletNode;
         int SysIndex;
         static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
-        //static Array1D_bool MyEnvrnFlag;
-        //static Array1D_bool MySizeFlag;
-        //static Array1D_bool GetGasElecHeatCoilCap; // Gets autosized value of coil capacity
+        //static EPVector<bool> MyEnvrnFlag;
+        //static EPVector<bool> MySizeFlag;
+        //static EPVector<bool> GetGasElecHeatCoilCap; // Gets autosized value of coil capacity
         Real64 SteamTemp;
         Real64 SteamDensity;
         Real64 rho;
         bool errFlag;
 
-        //static Array1D_bool PlantLoopScanFlag;
+        //static EPVector<bool> PlantLoopScanFlag;
 
         // FLOW:
 

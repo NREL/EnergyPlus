@@ -152,7 +152,7 @@ namespace DataBranchNodeConnections {
     extern Array1D<ParentListData> ParentNodeList;
     extern Array1D<NodeConnectionDef> NodeConnections;
     extern Array1D<EqNodeConnectionDef> AirTerminalNodeConnections;
-    extern Array1D_bool NonConnectedNodes;
+    extern EPVector<bool> NonConnectedNodes;
 
     // Clears the global data in DataBranchNodeConnections.
     // Needed for unit tests, should not be normally called.

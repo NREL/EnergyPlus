@@ -208,7 +208,7 @@ namespace HVACMultiSpeedHeatPump {
     Real64 SupHeaterLoad(0.0);       // load to be met by supplemental heater [W]
     Real64 SaveLoadResidual(0.0);    // Saved load residual used to check convergence
     Real64 SaveCompressorPLR(0.0);   // holds compressor PLR from active DX coil
-    Array1D_bool CheckEquipName;
+    EPVector<bool> CheckEquipName;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE
 
@@ -603,8 +603,8 @@ namespace HVACMultiSpeedHeatPump {
         Array1D_string cAlphaFields;      // Alpha field names
         Array1D_string cNumericFields;    // Numeric field names
         Array1D<Real64> Numbers;          // Numeric input items for object
-        Array1D_bool lAlphaBlanks;        // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;      // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;        // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;      // Logical array, numeric field input BLANK = .TRUE.
         static int MaxNums(0);            // Maximum number of numeric input fields
         static int MaxAlphas(0);          // Maximum number of alpha input fields
         static int TotalArgs(0);          // Total number of alpha and numeric arguments (max) for a
@@ -1790,12 +1790,12 @@ namespace HVACMultiSpeedHeatPump {
         int ZoneInNode;                       // Zone inlet node number in the controlled zone for MSHP
         Real64 RhoAir;                        // Air density at InNode
         static bool MyOneTimeFlag(true);      // Initialization flag
-        static Array1D_bool MyEnvrnFlag;      // Used for initializations each begin environment flag
-        static Array1D_bool MySizeFlag;       // Used for sizing MSHP inputs one time
-        static Array1D_bool MyCheckFlag;      // Used to obtain the zone inlet node number in the controlled zone
-        static Array1D_bool MyFlowFracFlag;   // Used for calculatig flow fraction once
-        static Array1D_bool MyPlantScantFlag; // used for finding on heat recovery plant loop
-        static Array1D_bool MyStagedFlag;     // used for finding on staged thermostat
+        static EPVector<bool> MyEnvrnFlag;      // Used for initializations each begin environment flag
+        static EPVector<bool> MySizeFlag;       // Used for sizing MSHP inputs one time
+        static EPVector<bool> MyCheckFlag;      // Used to obtain the zone inlet node number in the controlled zone
+        static EPVector<bool> MyFlowFracFlag;   // Used for calculatig flow fraction once
+        static EPVector<bool> MyPlantScantFlag; // used for finding on heat recovery plant loop
+        static EPVector<bool> MyStagedFlag;     // used for finding on staged thermostat
 
         Real64 QSensUnitOut; // Output of MSHP system with coils off
         Real64 PartLoadFrac; // Part-load ratio

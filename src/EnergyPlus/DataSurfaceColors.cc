@@ -221,8 +221,8 @@ namespace DataSurfaceColors {
         Array1D_string cAlphas;
         Array1D_string cAlphaFields;
         Array1D_string cNumericFields;
-        Array1D_bool lAlphaBlanks;
-        Array1D_bool lNumericBlanks;
+        EPVector<bool> lAlphaBlanks;
+        EPVector<bool> lNumericBlanks;
         Array1D<Real64> rNumerics;
 
         DXFcolorno = defaultcolorno;

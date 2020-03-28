@@ -200,7 +200,7 @@ namespace MoistureBalanceEMPDManager {
         int SurfNum;           // Surface number
         int MatNum;            // Material number at interior layer
         int ConstrNum;         // Construction number
-        Array1D_bool EMPDzone; // EMPD property check for each zone
+        EPVector<bool> EMPDzone; // EMPD property check for each zone
         static int ErrCount(0);
 
         // Load the additional EMPD Material properties

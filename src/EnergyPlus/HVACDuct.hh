@@ -69,7 +69,7 @@ namespace HVACDuct {
 
     // MODULE VARIABLE DECLARATIONS:
     extern int NumDucts;
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> CheckEquipName;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE HVACDuct:
 

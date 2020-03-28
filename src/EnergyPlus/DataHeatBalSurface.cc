@@ -247,7 +247,7 @@ namespace DataHeatBalSurface {
     Array2D<Real64> QsrcHistM;  // Master heat source/sink history for the surface (SurfNum,Term)
 
     Array2D<Real64> FractDifShortZtoZ; // Fraction of diffuse short radiation in Zone 2 transmitted to Zone 1
-    Array1D_bool RecDifShortFromZ;     // True if Zone gets short radiation from another
+    EPVector<bool> RecDifShortFromZ;     // True if Zone gets short radiation from another
     bool InterZoneWindow(false);       // True if there is an interzone window
 
     Real64 SumSurfaceHeatEmission(0.0); // Heat emission from all surfaces

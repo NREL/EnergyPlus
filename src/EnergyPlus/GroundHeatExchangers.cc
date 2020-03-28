@@ -2296,7 +2296,7 @@ namespace GroundHeatExchangers {
 
                 int numPreviousFields = 2;
                 int numFields = 0;
-                for (auto &isFieldBlank : DataIPShortCuts::lNumericFieldBlanks) {
+                for (auto isFieldBlank : DataIPShortCuts::lNumericFieldBlanks) {
                     if (!isFieldBlank) {
                         numFields += 1;
                     } else if (isFieldBlank) {

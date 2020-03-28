@@ -222,7 +222,7 @@ namespace HVACControllers {
     int NumAirLoopStats(0); // Same size as NumPrimaryAirSys if controllers
     // are defined, 0 otherwise.
     // all controllers per air loop
-    Array1D_bool CheckEquipName;
+    EPVector<bool> CheckEquipName;
 
     // Flag set to make sure you get input once
     bool GetControllerInputFlag(true);
@@ -583,8 +583,8 @@ namespace HVACControllers {
         Array1D_string AlphArray;
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
-        Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         std::string CurrentModuleObject; // for ease in getting objects
         static bool ErrorsFound(false);
         int iNodeType;             // for checking actuator node type
@@ -968,9 +968,9 @@ namespace HVACControllers {
         int ActuatedNode;
         int SensedNode;
         int ControllerIndex;
-        static Array1D_bool MyEnvrnFlag;
-        static Array1D_bool MySizeFlag;
-        static Array1D_bool MyPlantIndexsFlag;
+        static EPVector<bool> MyEnvrnFlag;
+        static EPVector<bool> MySizeFlag;
+        static EPVector<bool> MyPlantIndexsFlag;
         Real64 rho; // local fluid density
 
         if (InitControllerOneTimeFlag) {

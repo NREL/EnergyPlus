@@ -77,7 +77,7 @@ namespace HVACDXHeatPumpSystem {
     extern bool GetInputFlag;        // Flag to get input only once
 
     // Make this type allocatable
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> CheckEquipName;
 
     // Subroutine Specifications for the Module
     // Driver/Manager Routines

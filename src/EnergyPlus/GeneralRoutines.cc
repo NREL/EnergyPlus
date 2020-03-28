@@ -1557,8 +1557,8 @@ void TestSupplyAirPathIntegrity(bool &ErrFound)
     int Count;
     std::string AirPathNodeName;    // Air Path Inlet Node Name
     std::string PrimaryAirLoopName; // Air Loop to which this supply air path is connected
-    Array1D_bool FoundSupplyPlenum;
-    Array1D_bool FoundZoneSplitter;
+    EPVector<bool> FoundSupplyPlenum;
+    EPVector<bool> FoundZoneSplitter;
     Array1D_string FoundNames;
     int NumErr(0); // Error Counter //Autodesk:Init Initialization added
     int BCount;
@@ -1850,8 +1850,8 @@ void TestReturnAirPathIntegrity(bool &ErrFound, Array2S_int ValRetAPaths)
     int Count;
     std::string AirPathNodeName;    // Air Path Inlet Node Name
     std::string PrimaryAirLoopName; // Air Loop to which this return air path is connected
-    Array1D_bool FoundReturnPlenum;
-    Array1D_bool FoundZoneMixer;
+    EPVector<bool> FoundReturnPlenum;
+    EPVector<bool> FoundZoneMixer;
     Array1D_string FoundNames;
     int NumErr; // Error Counter
     int BCount;

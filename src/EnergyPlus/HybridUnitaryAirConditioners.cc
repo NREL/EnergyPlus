@@ -96,7 +96,7 @@ namespace HybridUnitaryAirConditioners {
 
     Array1D<Model> ZoneHybridUnitaryAirConditioner;
     int NumZoneHybridEvap(0);
-    Array1D_bool CheckZoneHybridEvapName;
+    EPVector<bool> CheckZoneHybridEvapName;
     bool GetInputZoneHybridEvap(true);
     bool ZoneEquipmentListChecked(false);
 
@@ -217,12 +217,12 @@ namespace HybridUnitaryAirConditioners {
 
         // Locals
         int Loop;
-        static Array1D_bool MySizeFlag;
+        static EPVector<bool> MySizeFlag;
 
         static bool HybridCoolOneTimeFlag(true); // one time flag
-        static Array1D_bool MyEnvrnFlag;
-        static Array1D_bool MyFanFlag;
-        static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
+        static EPVector<bool> MyEnvrnFlag;
+        static EPVector<bool> MyFanFlag;
+        static EPVector<bool> MyZoneEqFlag; // used to set up zone equipment availability managers
 
         int InletNode;
 
@@ -489,8 +489,8 @@ namespace HybridUnitaryAirConditioners {
         Array1D<Real64> Numbers;          // Numeric items for object
         Array1D_string cAlphaFields;      // Alpha field names
         Array1D_string cNumericFields;    // Numeric field names
-        Array1D_bool lAlphaBlanks;        // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;      // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;        // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;      // Logical array, numeric field input BLANK = .TRUE.
         int NumAlphas;                    // Number of Alphas for each GetObjectItem call
         int NumNumbers;                   // Number of Numbers for each GetObjectItem call
         int NumFields;                    // Total number of fields in object

@@ -108,7 +108,7 @@ namespace HVACMultiSpeedHeatPump {
     extern Real64 SupHeaterLoad;            // load to be met by supplemental heater [W]
     extern Real64 SaveLoadResidual;         // Saved load residual used to check convergence
     extern Real64 SaveCompressorPLR;        // holds compressor PLR from active DX coil
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> CheckEquipName;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE
 

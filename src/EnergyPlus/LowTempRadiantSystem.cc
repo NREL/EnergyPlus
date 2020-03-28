@@ -212,10 +212,10 @@ namespace LowTempRadiantSystem {
     Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
     Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
     // Autosizing variables
-    Array1D_bool MySizeFlagHydr;
-    Array1D_bool MySizeFlagCFlo;
-    Array1D_bool MySizeFlagElec;
-    Array1D_bool CheckEquipName;
+    EPVector<bool> MySizeFlagHydr;
+    EPVector<bool> MySizeFlagCFlo;
+    EPVector<bool> MySizeFlagElec;
+    EPVector<bool> CheckEquipName;
 
     // Object Data
     Array1D<HydronicRadiantSystemData> HydrRadSys;
@@ -397,7 +397,7 @@ namespace LowTempRadiantSystem {
         Array1D_string Alphas;                 // Alpha items for object
         Array1D_string cAlphaFields;           // Alpha field names
         Array1D_string cNumericFields;         // Numeric field names
-        Array1D_bool AssignedAsRadiantSurface; // Set to true when a surface is part of a radiant system
+        EPVector<bool> AssignedAsRadiantSurface; // Set to true when a surface is part of a radiant system
         int CheckSurfNum;                      // Surface number to check to see if it has already been used by a radiant system
         static bool ErrorsFound(false);        // Set to true if errors in input, fatal at end of routine
         int GlycolIndex;                       // Index of 'Water' in glycol data structure
@@ -412,8 +412,8 @@ namespace LowTempRadiantSystem {
         int SurfListNum; // Index within the SurfList derived type for a surface list name
         int SurfNum;     // DO loop counter for surfaces
         int BaseNum;                 // Temporary number for creating RadiantSystemTypes structure
-        Array1D_bool lAlphaBlanks;   // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;   // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks; // Logical array, numeric field input BLANK = .TRUE.
 
         MaxAlphas = 0;
         MaxNumbers = 0;
@@ -1685,15 +1685,15 @@ namespace LowTempRadiantSystem {
         int SurfNum;                // Intermediate variable for keeping track of the surface number
         Real64 TotalEffic;          // Intermediate calculation variable for total pump efficiency
         int ZoneNum;                // Intermediate variable for keeping track of the zone number
-        static Array1D_bool MyEnvrnFlagHydr;
-        static Array1D_bool MyEnvrnFlagCFlo;
-        static Array1D_bool MyEnvrnFlagElec;
+        static EPVector<bool> MyEnvrnFlagHydr;
+        static EPVector<bool> MyEnvrnFlagCFlo;
+        static EPVector<bool> MyEnvrnFlagElec;
         static bool MyEnvrnFlagGeneral(true);
         static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         int Loop;
         static bool MyOneTimeFlag(true); // Initialization flag
-        static Array1D_bool MyPlantScanFlagHydr;
-        static Array1D_bool MyPlantScanFlagCFlo;
+        static EPVector<bool> MyPlantScanFlagHydr;
+        static EPVector<bool> MyPlantScanFlagCFlo;
         Real64 mdot; // local fluid mass flow rate
         Real64 rho;  // local fluid density
         bool errFlag;

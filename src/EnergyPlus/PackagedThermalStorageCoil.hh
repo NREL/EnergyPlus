@@ -95,7 +95,7 @@ namespace PackagedThermalStorageCoil {
     // MODULE VARIABLE DECLARATIONS:
 
     extern int NumTESCoils;
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> CheckEquipName;
     extern bool GetTESInputFlag;
 
     extern int const DehumidControl_CoolReheat;

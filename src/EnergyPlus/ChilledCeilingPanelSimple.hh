@@ -90,11 +90,11 @@ namespace CoolingPanelSimple {
     extern Array1D<Real64> LastCoolingPanelSrc; // Need to keep the last value in case we are still iterating
     extern Array1D<Real64> LastSysTimeElapsed;  // Need to keep the last value in case we are still iterating
     extern Array1D<Real64> LastTimeStepSys;     // Need to keep the last value in case we are still iterating
-    extern Array1D_bool CheckEquipName;
-    extern Array1D_bool SetLoopIndexFlag; // get loop number flag
+    extern EPVector<bool> CheckEquipName;
+    extern EPVector<bool> SetLoopIndexFlag; // get loop number flag
 
     // Autosizing variables
-    extern Array1D_bool MySizeFlagCoolPanel;
+    extern EPVector<bool> MySizeFlagCoolPanel;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE Simple Chilled Ceiling Panel
 

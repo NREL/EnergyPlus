@@ -98,7 +98,7 @@ namespace HeatRecovery {
     // DX coils use DXCoilFullLoadOutAirHumRat when coil is ON otherwise inlet node
     extern bool GetInputFlag;           // First time, input is "gotten"
     extern bool CalledFromParentObject; // Indicates that HX is called from parent object (this object is not on a branch)
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> CheckEquipName;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE:
 

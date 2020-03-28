@@ -77,10 +77,10 @@ namespace WindowAC {
 
     extern int NumWindAC;
     extern int NumWindACCyc;
-    extern Array1D_bool MySizeFlag;
+    extern EPVector<bool> MySizeFlag;
     extern bool GetWindowACInputFlag; // First time, input is "gotten"
     extern bool CoolingLoad;          // defines a cooling load
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> CheckEquipName;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE
 

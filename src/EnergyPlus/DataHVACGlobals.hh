@@ -491,7 +491,7 @@ namespace DataHVACGlobals {
         // Members
         Array1D_int ActualZoneNum;
         Array1D<Real64> OccStartTime;
-        Array1D_bool OptStartFlag;
+        EPVector<bool> OptStartFlag;
 
         // Default Constructor
         OptStartDataType()

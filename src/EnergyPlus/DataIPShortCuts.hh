@@ -74,8 +74,8 @@ namespace DataIPShortCuts {
     // MODULE VARIABLE DECLARATIONS:
     extern Array1D_string cAlphaFieldNames;
     extern Array1D_string cNumericFieldNames;
-    extern Array1D_bool lNumericFieldBlanks;
-    extern Array1D_bool lAlphaFieldBlanks;
+    extern EPVector<bool> lNumericFieldBlanks;
+    extern EPVector<bool> lAlphaFieldBlanks;
     extern Array1D_string cAlphaArgs;
     extern Array1D<Real64> rNumericArgs;
     extern std::string cCurrentModuleObject;

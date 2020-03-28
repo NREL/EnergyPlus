@@ -245,7 +245,7 @@ namespace DXFEarClipping {
         Array1D<Real64> rangles(nsides);
         Array1D_int c_vertices(nsides);
         Array2D_int earvert(nsides, 3);
-        Array1D_bool removed(nsides);
+        EPVector<bool> removed(nsides);
         // unused  type(Vector_2d), dimension(3) :: testtri
         // unused  type(Vector_2d) :: point
         Array1D_int earverts(3);
@@ -540,7 +540,7 @@ namespace DXFEarClipping {
                        int &nrverts,            // number of reflex vertices found (>=180)
                        Array1D_int &c_vertices, // number of convex vertices
                        int &ncverts,            // number of convex vertices found (< 180)
-                       Array1D_bool &removed,   // array that shows if a vertex has been removed (calling routine)
+                       EPVector<bool> &removed,   // array that shows if a vertex has been removed (calling routine)
                        Array1D_int &earvert,    // vertex indicators for first ear
                        Array1D<Real64> &rangles)
     {

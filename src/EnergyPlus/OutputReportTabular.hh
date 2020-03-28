@@ -168,7 +168,7 @@ namespace OutputReportTabular {
     extern int sizeMonthlyFieldSetInput;
     extern int MonthlyTablesCount;
     extern int MonthlyColumnsCount;
-    extern Array1D_bool IsMonthGathered; // shown as true for any month used
+    extern EPVector<bool> IsMonthGathered; // shown as true for any month used
 
     extern int TOCEntriesCount;
     extern int TOCEntriesSize;
@@ -218,10 +218,10 @@ namespace OutputReportTabular {
     // arrays that hold the meter numbers that are initialized at get input
     extern Array1D_int meterNumTotalsBEPS;
     extern Array1D_int meterNumTotalsSource;
-    extern Array1D_bool fuelfactorsused;
-    extern Array1D_bool ffUsed;
+    extern EPVector<bool> fuelfactorsused;
+    extern EPVector<bool> ffUsed;
     extern Array1D<Real64> SourceFactors;
-    extern Array1D_bool ffSchedUsed;
+    extern EPVector<bool> ffSchedUsed;
     extern Array1D_int ffSchedIndex;
     extern Array2D_int meterNumEndUseBEPS;
     extern Array3D_int meterNumEndUseSubBEPS;

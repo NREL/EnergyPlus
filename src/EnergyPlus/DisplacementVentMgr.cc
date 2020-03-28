@@ -221,7 +221,7 @@ namespace DisplacementVentMgr {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool MyOneTimeFlag(true);
-        static Array1D_bool MyEnvrnFlag;
+        static EPVector<bool> MyEnvrnFlag;
 
         // Do the one time initializations
         if (MyOneTimeFlag) {

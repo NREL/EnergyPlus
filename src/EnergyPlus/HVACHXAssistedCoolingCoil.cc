@@ -123,7 +123,7 @@ namespace HVACHXAssistedCoolingCoil {
     Array1D<Real64> HXAssistedCoilOutletHumRat; // Outlet humidity ratio from this compound object
     // PUBLIC so others can access this information
     bool GetCoilsInputFlag(true); // Flag to allow input data to be retrieved from idf on first call to this subroutine
-    Array1D_bool CheckEquipName;
+    EPVector<bool> CheckEquipName;
     std::unordered_map<std::string, std::string> UniqueHXAssistedCoilNames;
 
     // Subroutine Specifications for the Module
@@ -327,8 +327,8 @@ namespace HVACHXAssistedCoolingCoil {
         Array1D_string cAlphaFields;      // Alpha field names
         Array1D_string cNumericFields;    // Numeric field names
         Array1D<Real64> NumArray;         // Numeric input items for object
-        Array1D_bool lAlphaBlanks;        // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;      // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;        // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;      // Logical array, numeric field input BLANK = .TRUE.
         static int MaxNums(0);            // Maximum number of numeric input fields
         static int MaxAlphas(0);          // Maximum number of alpha input fields
         static int TotalArgs(0);          // Total number of alpha and numeric arguments (max) for a

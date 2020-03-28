@@ -147,7 +147,7 @@ namespace HybridEvapCoolingModel {
                        Array1D_string cAlphaFields,
                        Array1D<Real64> Numbers,
                        Array1D_string cNumericFields,
-                       Array1D<bool> lAlphaBlanks,
+                       EPVector<bool> lAlphaBlanks,
                        std::string cCurrentModuleObject);
         void InitializeCurve(int curveType, int CurveID);
         Real64 CalculateCurveVal(Real64 Tosa, Real64 Wosa, Real64 Tra, Real64 Wra, Real64 Msa, Real64 OSAF, int curveType);
@@ -379,7 +379,7 @@ namespace HybridEvapCoolingModel {
                        Array1D_string cAlphaFields,
                        Array1D<Real64> Numbers,
                        Array1D_string cNumericFields,
-                       Array1D<bool> lAlphaBlanks,
+                       EPVector<bool> lAlphaBlanks,
                        std::string cCurrentModuleObject);
         void
         doStep(Real64 RequestedLoad, Real64 ZoneHeatingLoad, Real64 OutputRequiredToHumidify, Real64 OutputRequiredToDehumidify, Real64 DesignMinVR);

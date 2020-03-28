@@ -517,8 +517,8 @@ namespace RuntimeLanguageProcessor {
         int SavedWhileInstructionNum;
         int SavedWhileExpressionNum;
         int NumWhileGotos;
-        Array1D_bool ReadyForElse(IfDepthAllowed);
-        Array1D_bool ReadyForEndif(IfDepthAllowed);
+        EPVector<bool> ReadyForElse(IfDepthAllowed);
+        EPVector<bool> ReadyForEndif(IfDepthAllowed);
 
         //  CHARACTER(len=2*MaxNameLength), DIMENSION(:), ALLOCATABLE :: DummyError
 
@@ -2756,8 +2756,8 @@ namespace RuntimeLanguageProcessor {
         static int TotalArgs(0);     // argument for call to GetObjectDefMaxArgs
         Array1D_string cAlphaFieldNames;
         Array1D_string cNumericFieldNames;
-        Array1D_bool lNumericFieldBlanks;
-        Array1D_bool lAlphaFieldBlanks;
+        EPVector<bool> lNumericFieldBlanks;
+        EPVector<bool> lAlphaFieldBlanks;
         Array1D_string cAlphaArgs;
         Array1D<Real64> rNumericArgs;
         std::string cCurrentModuleObject;

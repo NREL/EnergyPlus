@@ -121,7 +121,7 @@ namespace NodeInputManager {
     int NumCheckNodes(0);            // Num of Unique nodes in check
     int MaxCheckNodes(0);            // Current "max" unique nodes in check
     bool NodeVarsSetup(false);       // Setup indicator of node vars for reporting (also that all nodes have been entered)
-    Array1D_bool NodeWetBulbRepReq;
+    EPVector<bool> NodeWetBulbRepReq;
 
     // Object Data
     Array1D<NodeListDef> NodeLists; // Node Lists
@@ -1173,11 +1173,11 @@ namespace NodeInputManager {
         static Real64 RhoAirStdInit;
         static Real64 RhoWaterStdInit;
         static Array1D_int NodeWetBulbSchedPtr;
-        static Array1D_bool NodeRelHumidityRepReq;
+        static EPVector<bool> NodeRelHumidityRepReq;
         static Array1D_int NodeRelHumiditySchedPtr;
-        static Array1D_bool NodeDewPointRepReq;
+        static EPVector<bool> NodeDewPointRepReq;
         static Array1D_int NodeDewPointSchedPtr;
-        static Array1D_bool NodeSpecificHeatRepReq;
+        static EPVector<bool> NodeSpecificHeatRepReq;
         static Array1D_int NodeSpecificHeatSchedPtr;
         static std::vector<std::string> nodeReportingStrings;
         static std::vector<std::string> nodeFluidNames;

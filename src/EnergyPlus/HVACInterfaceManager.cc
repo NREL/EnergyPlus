@@ -948,7 +948,7 @@ namespace HVACInterfaceManager {
         static int NodeNumPriIn(0);
         static int NodeNumSecIn(0);
         int CPFlowDir; // flow direction in single common pipe
-        static Array1D_bool MyEnvrnFlag;
+        static EPVector<bool> MyEnvrnFlag;
         static bool OneTimeData(true);
         Real64 CommonPipeTemp;
 
@@ -1088,7 +1088,7 @@ namespace HVACInterfaceManager {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Array1D_bool MyEnvrnFlag;
+        static EPVector<bool> MyEnvrnFlag;
         static bool OneTimeData(true);
         int CurCallingCase;              // local temporary
         static Real64 MdotPri(0.0);      // flow rate on primary side kg/s

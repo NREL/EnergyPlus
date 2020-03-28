@@ -156,8 +156,8 @@ namespace UnitHeater {
     bool HCoilOn;       // TRUE if the heating coil (gas or electric especially) should be running
     int NumOfUnitHeats; // Number of unit heaters in the input file
     Real64 QZnReq;      // heating or cooling needed by zone [watts]
-    Array1D_bool MySizeFlag;
-    Array1D_bool CheckEquipName;
+    EPVector<bool> MySizeFlag;
+    EPVector<bool> CheckEquipName;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE UnitHeater
 
@@ -311,8 +311,8 @@ namespace UnitHeater {
         Array1D<Real64> Numbers;       // Numeric items for object
         Array1D_string cAlphaFields;   // Alpha field names
         Array1D_string cNumericFields; // Numeric field names
-        Array1D_bool lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
         int CtrlZone;                  // index to loop counter
         int NodeNum;                   // index to loop counter
         bool ZoneNodeNotFound;         // used in error checking
@@ -743,9 +743,9 @@ namespace UnitHeater {
         static std::string const RoutineName("InitUnitHeater");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Array1D_bool MyEnvrnFlag;
-        static Array1D_bool MyPlantScanFlag;
-        static Array1D_bool MyZoneEqFlag;            // used to set up zone equipment availability managers
+        static EPVector<bool> MyEnvrnFlag;
+        static EPVector<bool> MyPlantScanFlag;
+        static EPVector<bool> MyZoneEqFlag;            // used to set up zone equipment availability managers
         static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         int Loop;
         int HotConNode; // hot water control node number in unit heater loop

@@ -95,7 +95,7 @@ namespace HVACDXSystem {
     extern bool EconomizerFlag; // holds air loop economizer status
 
     // Make this type allocatable
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> CheckEquipName;
 
     // Subroutine Specifications for the Module
     // Driver/Manager Routines

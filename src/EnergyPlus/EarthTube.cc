@@ -174,7 +174,7 @@ namespace EarthTube {
         int NumNumber;
         int IOStat;
         int Loop;
-        Array1D_bool RepVarSet;
+        EPVector<bool> RepVarSet;
 
         RepVarSet.dimension(NumOfZones, true);
 

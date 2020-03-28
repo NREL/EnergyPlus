@@ -133,7 +133,7 @@ namespace CrossVentMgr {
         // use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
         // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
         bool InitUCSDCV_MyOneTimeFlag(true);
-        Array1D_bool InitUCSDCV_MyEnvrnFlag;
+        EPVector<bool> InitUCSDCV_MyEnvrnFlag;
     } // namespace
 
     // SUBROUTINE SPECIFICATIONS:

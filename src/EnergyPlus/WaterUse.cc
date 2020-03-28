@@ -87,7 +87,7 @@ namespace WaterUse {
     int numWaterEquipment(0);
     int numWaterConnections(0);
 
-    Array1D_bool CheckEquipName;
+    EPVector<bool> CheckEquipName;
 
     Array1D<WaterEquipmentType> WaterEquipment;
     Array1D<WaterConnectionsType> WaterConnections;

@@ -112,7 +112,7 @@ namespace MundtSimMgr {
         int ClassType;           // Type of air nodes
         Real64 Height;           // Z coordinates [m] node's Control Vol. center
         Real64 Temp;             // Surface temperature BC
-        Array1D_bool SurfMask;   // Limit of 60 surfaces at current sizing
+        EPVector<bool> SurfMask;   // Limit of 60 surfaces at current sizing
 
         // Default Constructor
         DefineLinearModelNode() : ClassType(0), Height(0.0), Temp(0.0)

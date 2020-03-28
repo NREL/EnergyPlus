@@ -101,7 +101,7 @@ namespace ZoneAirLoopEquipmentManager {
     namespace {
         bool GetAirDistUnitsFlag(true);  // If TRUE, Air Distribution Data has not been read in yet
         bool InitAirDistUnitsFlag(true); // If TRUE, not all Air Distribution Units have been initialized
-        Array1D_bool EachOnceFlag;       // If TRUE, Air Distribution unit has not been initialized yet
+        EPVector<bool> EachOnceFlag;       // If TRUE, Air Distribution unit has not been initialized yet
         int numADUInitialized(0);        // Count of ADUs that have been initialized
     } 
 
@@ -224,8 +224,8 @@ namespace ZoneAirLoopEquipmentManager {
         bool IsNotOK;                            // Flag to verify name
         static Array1D_string cAlphaFields(5);   // Alpha field names //Tuned Made static
         static Array1D_string cNumericFields(2); // Numeric field names //Tuned Made static
-        static Array1D_bool lAlphaBlanks(5);     // Logical array, alpha field input BLANK = .TRUE. //Tuned Made static
-        static Array1D_bool lNumericBlanks(2);   // Logical array, numeric field input BLANK = .TRUE. //Tuned Made static
+        static EPVector<bool> lAlphaBlanks(5);     // Logical array, alpha field input BLANK = .TRUE. //Tuned Made static
+        static EPVector<bool> lNumericBlanks(2);   // Logical array, numeric field input BLANK = .TRUE. //Tuned Made static
         bool DualDuctRecircIsUsed;               // local temporary for deciding if recirc side used by dual duct terminal
         // make sure the input data is read in only once
         if (!GetAirDistUnitsFlag) {

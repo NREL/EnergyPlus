@@ -74,8 +74,8 @@ namespace HVACStandAloneERV {
 
     extern int NumStandAloneERVs; // Total number of stand alone ERVs defined in the idf
 
-    extern Array1D_bool MySizeFlag;
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> MySizeFlag;
+    extern EPVector<bool> CheckEquipName;
     extern bool GetERVInputFlag; // First time, input is "gotten"
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE

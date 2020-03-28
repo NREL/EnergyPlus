@@ -80,9 +80,9 @@ namespace SteamBaseboardRadiator {
     extern Array1D<Real64> LastQBBSteamRadSrc; // Need to keep the last value in case we are still iterating
     extern Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
     extern Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
-    extern Array1D_bool MySizeFlag;
-    extern Array1D_bool CheckEquipName;
-    extern Array1D_bool SetLoopIndexFlag; // get loop number flag
+    extern EPVector<bool> MySizeFlag;
+    extern EPVector<bool> CheckEquipName;
+    extern EPVector<bool> SetLoopIndexFlag; // get loop number flag
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
 

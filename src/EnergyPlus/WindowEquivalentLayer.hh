@@ -90,7 +90,7 @@ namespace WindowEquivalentLayer {
     extern int const hipDIM; // dimension of parameter array
 
     extern Array3D<Real64> CFSDiffAbsTrans;
-    extern Array1D_bool EQLDiffPropFlag;
+    extern EPVector<bool> EQLDiffPropFlag;
 
     // MODULE SUBROUTINES:
     // Initialization routines for module

@@ -186,8 +186,8 @@ namespace FanCoilUnits {
 
     int NumFanCoils(0);
     int Num4PipeFanCoils(0);
-    Array1D_bool MySizeFlag;
-    Array1D_bool CheckEquipName;
+    EPVector<bool> MySizeFlag;
+    EPVector<bool> CheckEquipName;
     bool GetFanCoilInputFlag(true); // First time, input is "gotten"
     Real64 FanFlowRatio(0.0);
     bool HeatingLoad(false);       // True when zone needs heating
@@ -358,8 +358,8 @@ namespace FanCoilUnits {
         Array1D_string cAlphaFields;           // Alpha field names
         Array1D_string cNumericFields;         // Numeric field names
         Array1D<Real64> Numbers;               // Numeric input items for object
-        Array1D_bool lAlphaBlanks;             // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;           // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;             // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;           // Logical array, numeric field input BLANK = .TRUE.
         static int TotalArgs(0);               // Total number of alpha and numeric arguments (max) for a
         int CtrlZone;                          // index to loop counter
         int NodeNum;                           // index to loop counter
@@ -1116,9 +1116,9 @@ namespace FanCoilUnits {
         int AirRelNode;     // relief air node number in fan coil loop
         Real64 RhoAir;      // air density at InNode
         int Loop;
-        static Array1D_bool MyEnvrnFlag;
-        static Array1D_bool MyPlantScanFlag;
-        static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
+        static EPVector<bool> MyEnvrnFlag;
+        static EPVector<bool> MyPlantScanFlag;
+        static EPVector<bool> MyZoneEqFlag; // used to set up zone equipment availability managers
         Real64 rho;
         bool errFlag;
 

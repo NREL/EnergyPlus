@@ -278,7 +278,7 @@ namespace InternalHeatGains {
         int MaxNumber;
         int OptionNum(0); // Autodesk:Init Initialization added to elim poss use uninitialized
         int lastOption;
-        Array1D_bool RepVarSet;
+        EPVector<bool> RepVarSet;
         //   Variables for reporting nominal internal gains
         Real64 LightTot;       // Total Lights for calculating lights per square meter
         Real64 ElecTot;        // Total Electric Load for calculating electric per square meter

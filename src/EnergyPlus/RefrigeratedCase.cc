@@ -348,7 +348,7 @@ namespace RefrigeratedCase {
 
     // Refrigerated case variables
     Real64 CaseRAFactor(0.0);         // Factor determining case credit allocation (e.g. % to zone or HVAC)
-    Array1D_bool ShowStockingWarning; // Used for one-time warning message for possible case
+    EPVector<bool> ShowStockingWarning; // Used for one-time warning message for possible case
     // input error regarding stocking
 
     // Refrigeration compressor rack variables
@@ -366,27 +366,27 @@ namespace RefrigeratedCase {
     Real64 TotalEvapWaterUseRate(0.0);   // Total condenser water use rate (m3/s)
 
     // Refrigeration system variables
-    Array1D_bool ShowUnmetEnergyWarning; // Used for one-time warning message for possible
+    EPVector<bool> ShowUnmetEnergyWarning; // Used for one-time warning message for possible
     // compressor input error regarding total system compressor capacity
-    Array1D_bool ShowHiStageUnmetEnergyWarning; // Used for one-time warning message for possible
+    EPVector<bool> ShowHiStageUnmetEnergyWarning; // Used for one-time warning message for possible
     // high-stage compressor input error regarding high-stage compressor capacity
 
     // Transcritical refrigeration system variables
-    Array1D_bool ShowUnmetEnergyWarningTrans; // Used for one-time warning message for possible
+    EPVector<bool> ShowUnmetEnergyWarningTrans; // Used for one-time warning message for possible
     // compressor input error regarding total system compressor capacity
 
     // Refrigeration Secondary Loop variables
-    Array1D_bool ShowUnmetSecondEnergyWarning; // Used for one-time warning message for possible
+    EPVector<bool> ShowUnmetSecondEnergyWarning; // Used for one-time warning message for possible
     // compressor input error regarding secondary loop heat exchanger capacity
 
     // Refrigeration Plant connections checks
-    Array1D_bool CheckEquipNameRackWaterCondenser;
-    Array1D_bool CheckEquipNameWaterCondenser;
+    EPVector<bool> CheckEquipNameRackWaterCondenser;
+    EPVector<bool> CheckEquipNameWaterCondenser;
 
     // Control variables
-    Array1D_bool RefrigPresentInZone; // Used when translating rate to energy for reporting
+    EPVector<bool> RefrigPresentInZone; // Used when translating rate to energy for reporting
     //  total refrigeration impact on a zone
-    Array1D_bool CheckChillerSetName; // used when sim chiller set called form zone equip manager
+    EPVector<bool> CheckChillerSetName; // used when sim chiller set called form zone equip manager
 
     bool GetRefrigerationInputFlag(true); // Flag to show case input should be read
     bool HaveRefrigRacks(true);           // Is initialized as TRUE and remains true when
@@ -621,8 +621,8 @@ namespace RefrigeratedCase {
         Array1D_string cNumericFieldNames;      // Numeric field names (from input processor)
         std::string CurrentModuleObject;   // Object type for getting and error messages
 
-        Array1D_bool lAlphaBlanks;      // Logic array, alpha input blank = .TRUE.
-        Array1D_bool lNumericBlanks;    // Logic array, numeric input blank = .TRUE.
+        EPVector<bool> lAlphaBlanks;      // Logic array, alpha input blank = .TRUE.
+        EPVector<bool> lNumericBlanks;    // Logic array, numeric input blank = .TRUE.
         bool ErrorsFound(false);     // Set to true if errors in input, fatal at end of routine
 
         int AlphaNum(0);                       // Used to cycle through input

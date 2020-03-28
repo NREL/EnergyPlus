@@ -73,7 +73,7 @@ namespace WaterToAirHeatPump {
 
     // MODULE VARIABLE DECLARATIONS:
     extern int NumWatertoAirHPs; // The Number of Water to Air Heat Pumps found in the Input
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> CheckEquipName;
 
     extern int RefrigIndex;        // Refrigerant index
     extern int WaterIndex;         // Water index

@@ -302,7 +302,7 @@ namespace BranchInputManager {
                               Array1D_string &cAlphaFields,
                               int const NumAlphas,
                               Array1D_int &NodeNums,
-                              Array1D_bool &lAlphaBlanks);
+                              EPVector<bool> &lAlphaBlanks);
 
     void GetBranchListInput();
 

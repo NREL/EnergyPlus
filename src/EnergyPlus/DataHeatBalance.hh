@@ -1781,7 +1781,7 @@ namespace DataHeatBalance {
         bool EMSSimpleMixingOn;        // EMS actuating ventilation flow rate if .TRUE.
         bool RefDoorMixFlag;           // Refrigeration door mixing within zone
         Real64 EMSimpleMixingFlowRate; // Value EMS is directing to use for override
-        Array1D_bool EMSRefDoorMixingOn;
+        Array1D<bool> EMSRefDoorMixingOn;
         Array1D<Real64> EMSRefDoorFlowRate;
         Array1D<Real64> VolRefDoorFlowRate;
         Array1D_int OpenSchedPtr;            // Schedule for Refrigeration door open fraction

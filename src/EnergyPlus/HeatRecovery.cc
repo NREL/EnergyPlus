@@ -169,7 +169,7 @@ namespace HeatRecovery {
     // DX coils use DXCoilFullLoadOutAirHumRat when coil is ON otherwise inlet node
     bool GetInputFlag(true);           // First time, input is "gotten"
     bool CalledFromParentObject(true); // Indicates that HX is called from parent object (this object is not on a branch)
-    Array1D_bool CheckEquipName;
+    EPVector<bool> CheckEquipName;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE:
 
@@ -1303,8 +1303,8 @@ namespace HeatRecovery {
         //////////// hoisted into namespace ////////////////////////////////////////////////
         // static bool MyOneTimeAllocate( true );
         ////////////////////////////////////////////////////////////////////////////////////
-        static Array1D_bool MySetPointTest;
-        static Array1D_bool MySizeFlag;
+        static EPVector<bool> MySetPointTest;
+        static EPVector<bool> MySizeFlag;
         int ErrStat;            // error status returned by CalculateNTUfromEpsAndZ
         bool FatalError;        // fatal error flag
         bool LocalWarningError; // warning error flag

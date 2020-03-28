@@ -97,8 +97,8 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch)
     Array1D<Real64> Numbers; // Used to retrieve numbers from IDF
     Array1D_string cAlphaFields;
     Array1D_string cNumericFields;
-    Array1D_bool lNumericBlanks;
-    Array1D_bool lAlphaBlanks;
+    EPVector<bool> lNumericBlanks;
+    EPVector<bool> lAlphaBlanks;
     int IOStat; // Could be used in the Get Routines, not currently checked
 
     if (NumOfBranches > 0) {
@@ -256,8 +256,8 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_FourComponentBranch)
     Array1D<Real64> Numbers; // Used to retrieve numbers from IDF
     Array1D_string cAlphaFields;
     Array1D_string cNumericFields;
-    Array1D_bool lNumericBlanks;
-    Array1D_bool lAlphaBlanks;
+    EPVector<bool> lNumericBlanks;
+    EPVector<bool> lAlphaBlanks;
     int IOStat; // Could be used in the Get Routines, not currently checked
 
     if (NumOfBranches > 0) {

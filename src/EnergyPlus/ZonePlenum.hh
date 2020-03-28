@@ -68,8 +68,8 @@ namespace ZonePlenum {
     extern int NumZonePlenums;       // The Number of ZonePlenums found in the Input
     extern int NumZoneReturnPlenums; // The Number of ZoneReturnPlenums found in the Input
     extern int NumZoneSupplyPlenums; // The Number of ZoneSupplyPlenums found in the Input
-    extern Array1D_bool CheckRetEquipName;
-    extern Array1D_bool CheckSupEquipName;
+    extern EPVector<bool> CheckRetEquipName;
+    extern EPVector<bool> CheckSupEquipName;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE ZONEPLENUM
 

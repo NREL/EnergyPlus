@@ -134,7 +134,7 @@ namespace DualDuct {
     static std::string const BlankString;
 
     // MODULE VARIABLE DECLARATIONS:
-    Array1D_bool CheckEquipName;
+    EPVector<bool> CheckEquipName;
 
     int NumDDAirTerminal(0); // The Number of Dampers found in the Input //Autodesk Poss used uninitialized in ReportDualDuctConnections
     int NumDualDuctConstVolDampers;
@@ -275,8 +275,8 @@ namespace DualDuct {
         static Array1D_string AlphArray(7);
         static Array1D_string cAlphaFields(7);       // Alpha field names
         static Array1D_string cNumericFields(2);     // Numeric field names
-        static Array1D_bool lAlphaBlanks(7, true);   // Logical array, alpha field input BLANK = .TRUE.
-        static Array1D_bool lNumericBlanks(2, true); // Logical array, numeric field input BLANK = .TRUE.
+        static EPVector<bool> lAlphaBlanks(7, true);   // Logical array, alpha field input BLANK = .TRUE.
+        static EPVector<bool> lNumericBlanks(2, true); // Logical array, numeric field input BLANK = .TRUE.
         std::string CurrentModuleObject;             // for ease in getting objects
         static bool ErrorsFound(false);              // If errors detected in input
         int CtrlZone;                                // controlled zone do loop index
@@ -850,9 +850,9 @@ namespace DualDuct {
         int RAInNode; // Reciruclated Air Inlet Node for VAV:OutdoorAir units
         int OutNode;
         static bool MyOneTimeFlag(true);
-        //static Array1D_bool MyEnvrnFlag;
-        //static Array1D_bool MySizeFlag;
-        //static Array1D_bool MyAirLoopFlag;
+        //static EPVector<bool> MyEnvrnFlag;
+        //static EPVector<bool> MySizeFlag;
+        //static EPVector<bool> MyAirLoopFlag;
         static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         int Loop;                                    // Loop checking control variable
         Real64 PeopleFlow;                           // local sum variable, m3/s
@@ -2273,7 +2273,7 @@ namespace DualDuct {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         //  INTEGER :: DDNum
         static bool FirstTimeOnly(true);
-        static Array1D_bool RecircIsUsedARR;
+        static EPVector<bool> RecircIsUsedARR;
         static Array1D_string DamperNamesARR;
         int DamperIndex;                 // Loop index to Damper that you are currently loading input into
         std::string CurrentModuleObject; // for ease in getting objects
@@ -2281,8 +2281,8 @@ namespace DualDuct {
         static Array1D_string AlphArray(7);
         static Array1D_string cAlphaFields(7);       // Alpha field names
         static Array1D_string cNumericFields(2);     // Numeric field names
-        static Array1D_bool lAlphaBlanks(7, true);   // Logical array, alpha field input BLANK = .TRUE.
-        static Array1D_bool lNumericBlanks(2, true); // Logical array, numeric field input BLANK = .TRUE.
+        static EPVector<bool> lAlphaBlanks(7, true);   // Logical array, alpha field input BLANK = .TRUE.
+        static EPVector<bool> lNumericBlanks(2, true); // Logical array, numeric field input BLANK = .TRUE.
         int NumAlphas;
         int NumNums;
         int IOStat;

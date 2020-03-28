@@ -98,10 +98,10 @@ namespace UserDefinedComponents {
     int NumUserZoneAir(0);
     int NumUserAirTerminals(0);
 
-    Array1D_bool CheckUserPlantCompName;
-    Array1D_bool CheckUserCoilName;
-    Array1D_bool CheckUserZoneAirName;
-    Array1D_bool CheckUserAirTerminal;
+    EPVector<bool> CheckUserPlantCompName;
+    EPVector<bool> CheckUserCoilName;
+    EPVector<bool> CheckUserZoneAirName;
+    EPVector<bool> CheckUserAirTerminal;
 
     bool GetInput(true);
     bool GetPlantCompInput(true);
@@ -520,7 +520,7 @@ namespace UserDefinedComponents {
         int IOStat;    // IO Status when calling get input subroutine
         int TotalArgs; // argument for call to GetObjectDefMaxArgs
         Array1D_string cAlphaFieldNames;
-        Array1D_bool lAlphaFieldBlanks;
+        EPVector<bool> lAlphaFieldBlanks;
         Array1D_string cAlphaArgs;
         Array1D<Real64> rNumericArgs;
         std::string cCurrentModuleObject;
@@ -1248,7 +1248,7 @@ namespace UserDefinedComponents {
         int IOStat;    // IO Status when calling get input subroutine
         int TotalArgs; // argument for call to GetObjectDefMaxArgs
         Array1D_string cAlphaFieldNames;
-        Array1D_bool lAlphaFieldBlanks;
+        EPVector<bool> lAlphaFieldBlanks;
         Array1D_string cAlphaArgs;
         Array1D<Real64> rNumericArgs;
         std::string cCurrentModuleObject;

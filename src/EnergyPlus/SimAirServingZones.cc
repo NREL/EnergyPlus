@@ -409,14 +409,14 @@ namespace SimAirServingZones {
         int NumNumbers;                // number of numbers returned by GetObjectItem
         Array1D<Real64> Numbers;       // numbers (REAL(r64)s) returned by GetObjectItem
         Array1D_string cNumericFields; // Numeric field names
-        Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
         int NumAlphas;                 // number of strings returned by GetObjectItem
         int NumParams;
         int MaxNumbers;
         int MaxAlphas;
         Array1D_string Alphas;           // alpha strings returned by GetObjectItem
         Array1D_string cAlphaFields;     // Alpha field names
-        Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         std::string CurrentModuleObject; // Object type for getting and error messages
         int NumNodes;                    // number of nodes returned by GetNodeNums
         Array1D_int NodeNums;            // node numbers returned by GetNodeNums
@@ -452,7 +452,7 @@ namespace SimAirServingZones {
         static Array1D_int OutletNodeNumbers;  // Component outlet node numbers from GetBranchData call
         Array1D_int DummyInteger(2);           // Placeholder for corresponding plant loop branch pressure drop info
         static bool ErrorsFound(false);        // TRUE if errors detected in input
-        static Array1D_bool PackagedUnit;
+        static EPVector<bool> PackagedUnit;
         int test;
         int count;
         bool ErrInList;

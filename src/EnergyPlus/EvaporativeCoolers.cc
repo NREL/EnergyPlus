@@ -161,11 +161,11 @@ namespace EvaporativeCoolers {
     // MODULE VARIABLE DECLARATIONS:
     bool GetInputEvapComponentsFlag(true); // Flag set to make sure you get input once
     int NumEvapCool(0);                    // The Number of Evap Coolers found in the Input
-    Array1D_bool MySizeFlag;
-    Array1D_bool CheckEquipName;
+    EPVector<bool> MySizeFlag;
+    EPVector<bool> CheckEquipName;
 
     int NumZoneEvapUnits(0);
-    Array1D_bool CheckZoneEvapUnitName;
+    EPVector<bool> CheckZoneEvapUnitName;
     bool GetInputZoneEvapUnit(true);
 
     // Indirect Evaporative Coolers Research Special Operating Modes
@@ -3663,8 +3663,8 @@ namespace EvaporativeCoolers {
         Array1D<Real64> Numbers;         // Numeric items for object
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
-        Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         int NumAlphas;                   // Number of Alphas for each GetObjectItem call
         int NumNumbers;                  // Number of Numbers for each GetObjectItem call
         int MaxAlphas;                   // Maximum number of alpha fields in all objects

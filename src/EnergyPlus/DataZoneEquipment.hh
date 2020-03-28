@@ -136,8 +136,8 @@ namespace DataZoneEquipment {
     extern Array1D_int ZoneEquipAvail;
 
     // moved from HVACManager.hh to avoid circular call, B Nigusse, 05/14
-    extern Array1D_bool CrossMixingReportFlag; // TRUE when Cross Mixing is active based on controls
-    extern Array1D_bool MixingReportFlag;      // TRUE when Mixing is active based on controls
+    extern EPVector<bool> CrossMixingReportFlag; // TRUE when Cross Mixing is active based on controls
+    extern EPVector<bool> MixingReportFlag;      // TRUE when Mixing is active based on controls
     extern Array1D<Real64> VentMCP;            // product of mass rate and Cp for each Venitlation object
     extern Array1D<Real64> ZMAT;               // Zone air temperature for zone air mixing
     extern Array1D<Real64> ZHumRat;            // Zone air humidity ratio zone air mixing
@@ -301,7 +301,7 @@ namespace DataZoneEquipment {
         Array1D_int ReturnNodeAirLoopNum; // air loop number connected to this return node
         Array1D_int
             ReturnNodeInletNum; // zone supply air inlet index that matched this return node (same zone, same airloop) - not the inlet node number
-        Array1D_bool FixedReturnFlow;     // true if return node is fixed and cannot be adjusted in CalcZoneReturnFlows
+        EPVector<bool> FixedReturnFlow;     // true if return node is fixed and cannot be adjusted in CalcZoneReturnFlows
         Array1D_int ReturnNodePlenumNum; // number of the return plenum attached to this return node (zero if none)
         Array1D_int ReturnFlowBasisNode; // return air flow basis nodes
 

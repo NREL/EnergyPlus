@@ -1358,8 +1358,8 @@ namespace BranchInputManager {
         Array1D<Real64> Numbers; // Used to retrieve numbers from IDF
         Array1D_string cAlphaFields;
         Array1D_string cNumericFields;
-        Array1D_bool lNumericBlanks;
-        Array1D_bool lAlphaBlanks;
+        EPVector<bool> lNumericBlanks;
+        EPVector<bool> lAlphaBlanks;
         int IOStat; // Could be used in the Get Routines, not currently checked
         int NumParams;
 
@@ -1423,7 +1423,7 @@ namespace BranchInputManager {
                               Array1D_string &cAlphaFields,
                               int const NumAlphas,
                               Array1D_int &NodeNums,
-                              Array1D_bool &lAlphaBlanks)
+                              EPVector<bool> &lAlphaBlanks)
     {
         // Using
         using CurveManager::GetPressureCurveTypeAndIndex;
@@ -1629,8 +1629,8 @@ namespace BranchInputManager {
         Array1D<Real64> Numbers; // Not used in this object
         Array1D_string cAlphaFields;
         Array1D_string cNumericFields;
-        Array1D_bool lNumericBlanks;
-        Array1D_bool lAlphaBlanks;
+        EPVector<bool> lNumericBlanks;
+        EPVector<bool> lAlphaBlanks;
         int IOStat; // Could be used in the Get Routines, not currently checked
         int NumParams;
         std::string TestName;
@@ -1782,8 +1782,8 @@ namespace BranchInputManager {
         Array1D<Real64> Numbers; // Used to retrieve numbers from IDF
         Array1D_string cAlphaFields;
         Array1D_string cNumericFields;
-        Array1D_bool lNumericBlanks;
-        Array1D_bool lAlphaBlanks;
+        EPVector<bool> lNumericBlanks;
+        EPVector<bool> lAlphaBlanks;
         int IOStat; // Could be used in the Get Routines, not currently checked
         int NumParams;
         int NumConnectors;
@@ -2045,8 +2045,8 @@ namespace BranchInputManager {
         Array1D<Real64> Numbers; // Used to retrieve numbers from IDF
         Array1D_string cAlphaFields;
         Array1D_string cNumericFields;
-        Array1D_bool lNumericBlanks;
-        Array1D_bool lAlphaBlanks;
+        EPVector<bool> lNumericBlanks;
+        EPVector<bool> lAlphaBlanks;
         int IOStat; // Could be used in the Get Routines, not currently checked
         int NumParams;
         int Loop;
@@ -2290,8 +2290,8 @@ namespace BranchInputManager {
         Array1D<Real64> Numbers; // Used to retrieve numbers from IDF
         Array1D_string cAlphaFields;
         Array1D_string cNumericFields;
-        Array1D_bool lNumericBlanks;
-        Array1D_bool lAlphaBlanks;
+        EPVector<bool> lNumericBlanks;
+        EPVector<bool> lAlphaBlanks;
         int IOStat; // Could be used in the Get Routines, not currently checked
         int NumParams;
         int Loop;
@@ -2924,7 +2924,7 @@ namespace BranchInputManager {
         std::string BranchLoopName;       // Loop Name which Branch is part of
         std::string BranchLoopType;       // Loop Type which Branch is part of
         int NumErr;                       // Error Counter
-        Array1D_bool BranchReported;
+        EPVector<bool> BranchReported;
         int BCount;
         int Found;
         std::string ChrOut;

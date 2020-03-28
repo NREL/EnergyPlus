@@ -474,8 +474,8 @@ namespace VariableSpeedCoils {
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
         Array1D<Real64> NumArray;        // Numeric input items for object
-        Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
         NumCool = inputProcessor->getNumObjectsFound("COIL:COOLING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT");
         NumHeat = inputProcessor->getNumObjectsFound("COIL:HEATING:WATERTOAIRHEATPUMP:VARIABLESPEEDEQUATIONFIT");
@@ -3230,9 +3230,9 @@ namespace VariableSpeedCoils {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int AirInletNode;                // Node Number of the air inlet
         int WaterInletNode;              // Node Number of the Water inlet
-        static Array1D_bool MyEnvrnFlag; // used for initializations each begin environment flag
-        static Array1D_bool MySizeFlag;  // used for sizing PTHP inputs one time
-        static Array1D_bool MyPlantScanFlag;
+        static EPVector<bool> MyEnvrnFlag; // used for initializations each begin environment flag
+        static EPVector<bool> MySizeFlag;  // used for sizing PTHP inputs one time
+        static EPVector<bool> MyPlantScanFlag;
         Real64 rho;   // local fluid density
         Real64 Cp;    // local fluid specific heat
         int SpeedCal; // calculated speed level

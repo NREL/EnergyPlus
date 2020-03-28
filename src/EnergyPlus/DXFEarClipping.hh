@@ -107,7 +107,7 @@ namespace DXFEarClipping {
                        int &nrverts,            // number of reflex vertices found (>=180)
                        Array1D_int &c_vertices, // number of convex vertices
                        int &ncverts,            // number of convex vertices found (< 180)
-                       Array1D_bool &removed,   // array that shows if a vertex has been removed (calling routine)
+                       EPVector<bool> &removed,   // array that shows if a vertex has been removed (calling routine)
                        Array1D_int &earvert,    // vertex indicators for first ear
                        Array1D<Real64> &rangles);
 

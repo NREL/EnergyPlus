@@ -5004,8 +5004,8 @@ namespace HeatBalanceManager {
                          int &NumAlphas,
                          Array1D<Real64> const &rNumericArgs,
                          int &NumNumbers,
-                         Array1D_bool const &EP_UNUSED(lNumericFieldBlanks), // Unused
-                         Array1D_bool const &lAlphaFieldBlanks,
+                         EPVector<bool> const &EP_UNUSED(lNumericFieldBlanks), // Unused
+                         EPVector<bool> const &lAlphaFieldBlanks,
                          Array1D_string const &cAlphaFieldNames,
                          Array1D_string const &EP_UNUSED(cNumericFieldNames), // Unused
                          bool &ErrorsFound                                   // If errors found in input
@@ -8658,8 +8658,8 @@ namespace HeatBalanceManager {
         // to declare local variables for reading Construction:ComplexFenestrationState object(s)
         Array1D_string locAlphaFieldNames;
         Array1D_string locNumericFieldNames;
-        Array1D_bool locNumericFieldBlanks;
-        Array1D_bool locAlphaFieldBlanks;
+        EPVector<bool> locNumericFieldBlanks;
+        EPVector<bool> locAlphaFieldBlanks;
         Array1D_string locAlphaArgs;
         Array1D<Real64> locNumericArgs;
         std::string locCurrentModuleObject;

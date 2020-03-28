@@ -106,8 +106,8 @@ namespace HybridModel {
         using ScheduleManager::GetScheduleIndex;
 
         bool ErrorsFound(false); // If errors detected in input
-        Array1D_bool lAlphaFieldBlanks(16, false);
-        Array1D_bool lNumericFieldBlanks(4, false);
+        EPVector<bool> lAlphaFieldBlanks(16, false);
+        EPVector<bool> lNumericFieldBlanks(4, false);
         int NumAlphas;  // Number of Alphas for each GetobjectItem call
         int NumNumbers; // Number of Numbers for each GetobjectItem call
         int IOStatus;

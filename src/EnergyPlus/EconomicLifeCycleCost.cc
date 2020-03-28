@@ -1255,7 +1255,7 @@ namespace EconomicLifeCycleCost {
         int monthsBaseToService;
         Array2D<Real64> resourceCosts;
         Array1D<Real64> curResourceCosts(12);
-        Array1D_bool resourceCostNotZero;
+        EPVector<bool> resourceCostNotZero;
         Array1D<Real64> resourceCostAnnual;
         Real64 annualCost;
         int cashFlowCounter;

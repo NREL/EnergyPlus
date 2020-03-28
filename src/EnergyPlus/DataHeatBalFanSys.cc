@@ -169,8 +169,8 @@ namespace DataHeatBalFanSys {
     Array1D<Real64> MixingMassFlowZone;    // Mixing MASS FLOW
     Array1D<Real64> MixingMassFlowXHumRat; // Mixing MASS FLOW * Humidity Ratio
 
-    Array1D_bool ZoneMassBalanceFlag;  // zone mass flow balance flag
-    Array1D_bool ZoneInfiltrationFlag; // Zone Infiltration flag
+    EPVector<bool> ZoneMassBalanceFlag;  // zone mass flow balance flag
+    EPVector<bool> ZoneInfiltrationFlag; // Zone Infiltration flag
     Array1D_int ZoneReOrder;           // zone number reordered for zone mass balance
 
     // REAL Variables for the Heat Balance Simulation

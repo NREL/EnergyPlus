@@ -359,8 +359,8 @@ namespace DesiccantDehumidifiers {
         Array1D_string cAlphaFields;           // Alpha field names
         Array1D_string cNumericFields;         // Numeric field names
         Array1D<Real64> Numbers;               // Numeric input items for object
-        Array1D_bool lAlphaBlanks;             // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;           // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;             // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;           // Logical array, numeric field input BLANK = .TRUE.
         static int MaxNums(0);                 // Maximum number of numeric input fields
         static int MaxAlphas(0);               // Maximum number of alpha input fields
         static int TotalArgs(0);               // Total number of alpha and numeric arguments (max) for a
@@ -1735,8 +1735,8 @@ namespace DesiccantDehumidifiers {
         int RegenInNode; // inlet node number
         int ControlNode; // control node number
         static bool MySetPointCheckFlag(true);
-        static Array1D_bool MyEnvrnFlag;
-        static Array1D_bool MyPlantScanFlag; // Used for init plant component for heating coils
+        static EPVector<bool> MyEnvrnFlag;
+        static EPVector<bool> MyPlantScanFlag; // Used for init plant component for heating coils
 
         static bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
         int SteamIndex;                 // steam coil index

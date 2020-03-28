@@ -103,7 +103,7 @@ namespace HVACControllers {
     extern int NumAirLoopStats; // Same size as NumPrimaryAirSys if controllers
     // are defined, 0 otherwise.
     // all controllers per air loop
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> CheckEquipName;
 
     // Flag set to make sure you get input once
     extern bool GetControllerInputFlag;

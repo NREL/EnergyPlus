@@ -309,9 +309,9 @@ namespace RoomAirModelAirflowNetwork {
         int IdNode;
         int EquipLoop;
         int MaxNodeNum;
-        Array1D_bool NodeFound; // True if a node is found.
+        EPVector<bool> NodeFound; // True if a node is found.
         int MaxEquipNum;
-        Array1D_bool EquipFound;
+        EPVector<bool> EquipFound;
         int ISum;
         bool ErrorsFound;
         int I;
@@ -1156,7 +1156,7 @@ namespace RoomAirModelAirflowNetwork {
     } // CalcNodeSums
 
     void RAFNData::CalcSurfaceMoistureSums(
-        int const RoomAirNode, Real64 &SumHmAW, Real64 &SumHmARa, Real64 &SumHmARaW, Array1D<bool> const &EP_UNUSED(SurfMask))
+        int const RoomAirNode, Real64 &SumHmAW, Real64 &SumHmARa, Real64 &SumHmARaW, EPVector<bool> const &EP_UNUSED(SurfMask))
     {
 
         // SUBROUTINE INFORMATION:

@@ -134,7 +134,7 @@ namespace HVACSingleDuctInduc {
 
     int NumIndUnits(0);
     int NumFourPipes(0);
-    Array1D_bool CheckEquipName;
+    EPVector<bool> CheckEquipName;
     bool GetIUInputFlag(true); // First time, input is "gotten"
 
     namespace {
@@ -144,10 +144,10 @@ namespace HVACSingleDuctInduc {
         // use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
         // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
         static bool MyOneTimeFlag(true);
-        static Array1D_bool MyEnvrnFlag;
-        static Array1D_bool MySizeFlag;
-        static Array1D_bool MyPlantScanFlag;
-        static Array1D_bool MyAirDistInitFlag;
+        static EPVector<bool> MyEnvrnFlag;
+        static EPVector<bool> MySizeFlag;
+        static EPVector<bool> MyPlantScanFlag;
+        static EPVector<bool> MyAirDistInitFlag;
     } // namespace
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE HVACSingleDuctInduc:
@@ -295,8 +295,8 @@ namespace HVACSingleDuctInduc {
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
         Array1D<Real64> Numbers;         // Numeric input items for object
-        Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         static int NumAlphas(0);         // Number of Alphas for each GetObjectItem call
         static int NumNumbers(0);        // Number of Numbers for each GetObjectItem call
         static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a

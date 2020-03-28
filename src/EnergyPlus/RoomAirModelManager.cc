@@ -1935,7 +1935,7 @@ namespace RoomAirModelManager {
         int AirflowNetworkSurfPtr;
         int NSides;
         static bool MyOneTimeFlag(true);
-        static Array1D_bool MyEnvrnFlag;
+        static EPVector<bool> MyEnvrnFlag;
 
         static int CompNum(0);  // AirflowNetwork Component number
         static int TypeNum(0);  // Airflownetwork Type Number within a component

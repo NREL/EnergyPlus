@@ -181,7 +181,7 @@ namespace PackagedTerminalHeatPump {
     // DERIVED TYPE DEFINITIONS
 
     // MODULE VARIABLE DECLARATIONS:
-    Array1D_bool CheckEquipName;
+    EPVector<bool> CheckEquipName;
 
     Real64 SupHeaterLoad(0.0);     // load to be met by supplemental heater [W]
     int NumPTHP(0);                // total number of PTHP's
@@ -641,8 +641,8 @@ namespace PackagedTerminalHeatPump {
 
         Array1D_string cAlphaFields;   // Alpha field names
         Array1D_string cNumericFields; // Numeric field names
-        Array1D_bool lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
 
         MaxNumbers = 0;
         MaxAlphas = 0;
@@ -3739,11 +3739,11 @@ namespace PackagedTerminalHeatPump {
         Real64 CoilMaxVolFlowRate;                     // water or steam max volumetric water flow rate
         static bool ZoneEquipmentListNotChecked(true); // False after the Zone Equipment List has been checked for items
         int Loop;
-        static Array1D_bool MyEnvrnFlag; // used for initializations each begin environment flag
-        static Array1D_bool MySizeFlag;  // used for sizing PTHP inputs one time
-        static Array1D_bool MyFanFlag;   // used for sizing PTHP fan inputs one time
-        static Array1D_bool MyPlantScanFlag;
-        static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
+        static EPVector<bool> MyEnvrnFlag; // used for initializations each begin environment flag
+        static EPVector<bool> MySizeFlag;  // used for sizing PTHP inputs one time
+        static EPVector<bool> MyFanFlag;   // used for sizing PTHP fan inputs one time
+        static EPVector<bool> MyPlantScanFlag;
+        static EPVector<bool> MyZoneEqFlag; // used to set up zone equipment availability managers
         Real64 QActual;                   // actual PTAC steam heating coil load met (W)
         bool ErrorsFound;                 // flag returned from mining call
         Real64 QToCoolSetPt;

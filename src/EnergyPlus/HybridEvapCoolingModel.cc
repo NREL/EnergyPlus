@@ -448,7 +448,7 @@ namespace HybridEvapCoolingModel {
                           Array1D_string cAlphaFields,
                           Array1D<Real64> Numbers,
                           Array1D_string cNumericFields,
-                          Array1D<bool> lAlphaBlanks,
+                          EPVector<bool> lAlphaBlanks,
                           std::string cCurrentModuleObject)
     {
         CMode newMode;
@@ -472,7 +472,7 @@ namespace HybridEvapCoolingModel {
                           Array1D_string cAlphaFields,
                           Array1D<Real64> Numbers,
                           Array1D_string cNumericFields,
-                          Array1D<bool> lAlphaBlanks,
+                          EPVector<bool> lAlphaBlanks,
                           std::string cCurrentModuleObject)
     {
         // SUBROUTINE INFORMATION:

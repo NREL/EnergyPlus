@@ -345,7 +345,7 @@ namespace BranchNodeConnections {
         Array1D_int FluidStreamInletCount;
         Array1D_int FluidStreamOutletCount;
         Array1D_int NodeObjects;
-        Array1D_bool FluidStreamCounts;
+        EPVector<bool> FluidStreamCounts;
         int NumObjects;
         int MaxFluidStream;
 
@@ -1563,7 +1563,7 @@ namespace BranchNodeConnections {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Count;
         int Other;
-        Array1D_bool AlreadyNoted;
+        EPVector<bool> AlreadyNoted;
 
         // Test component sets created by branches
         AlreadyNoted.dimension(NumCompSets, false);
@@ -1711,7 +1711,7 @@ namespace BranchNodeConnections {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Count;
         int Other;
-        Array1D_bool AlreadyNoted;
+        EPVector<bool> AlreadyNoted;
 
         // Test component sets created by branches
         AlreadyNoted.dimension(NumCompSets, false);

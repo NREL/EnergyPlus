@@ -83,8 +83,8 @@ TEST_F(EnergyPlusFixture, GetOARequirementsTest_DSOA1)
     Array1D_string cAlphaFields;   // Alpha field names
     Array1D_string cNumericFields; // Numeric field names
     Array1D<Real64> Numbers;       // Numeric input items for object
-    Array1D_bool lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
-    Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
+    EPVector<bool> lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
+    EPVector<bool> lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
 
     Alphas.allocate(NumAlphas);
     cAlphaFields.allocate(NumAlphas);

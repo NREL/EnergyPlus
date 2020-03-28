@@ -116,7 +116,7 @@ namespace SwimmingPool {
 
     // MODULE VARIABLE DECLARATIONS:
     int NumSwimmingPools(0); // Number of swimming pools
-    Array1D_bool CheckEquipName;
+    EPVector<bool> CheckEquipName;
     bool getSwimmingPoolInput = true;
     Array1D<SwimmingPoolData> Pool;
 
@@ -196,8 +196,8 @@ namespace SwimmingPool {
         int NumAlphas;                   // Number of Alphas for each GetObjectItem call
         int NumArgs;                     // Unused variable that is part of a subroutine call
         int NumNumbers;                  // Number of Numbers for each GetObjectItem call
-        Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
 
         // Initializations and allocations
         int MaxAlphas = 0;  // Maximum number of alphas for these input keywords

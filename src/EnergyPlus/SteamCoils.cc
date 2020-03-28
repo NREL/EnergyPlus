@@ -134,9 +134,9 @@ namespace SteamCoils {
     // MODULE VARIABLE DECLARATIONS:
     int SteamIndex(0);
     int NumSteamCoils(0); // The Number of SteamCoils found in the Input
-    Array1D_bool MySizeFlag;
-    Array1D_bool CoilWarningOnceFlag;
-    Array1D_bool CheckEquipName;
+    EPVector<bool> MySizeFlag;
+    EPVector<bool> CoilWarningOnceFlag;
+    EPVector<bool> CheckEquipName;
     bool GetSteamCoilsInputFlag(true); // Flag set to make sure you get input once
     bool MyOneTimeFlag(true);          // one time initialization flag
 
@@ -297,8 +297,8 @@ namespace SteamCoils {
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
         Array1D<Real64> NumArray;        // Numeric input items for object
-        Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
                                          //  certain object in the input file
 
@@ -516,8 +516,8 @@ namespace SteamCoils {
         int AirOutletNode;
         Real64 SteamDensity;
         Real64 StartEnthSteam;
-        static Array1D_bool MyEnvrnFlag;
-        static Array1D_bool MyPlantScanFlag;
+        static EPVector<bool> MyEnvrnFlag;
+        static EPVector<bool> MyPlantScanFlag;
         bool errFlag;
 
         if (MyOneTimeFlag) {

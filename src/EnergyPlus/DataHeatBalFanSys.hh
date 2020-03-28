@@ -162,8 +162,8 @@ namespace DataHeatBalFanSys {
     extern Array1D<Real64> MixingMassFlowZone;    // Mixing MASS FLOW (kg/s)
     extern Array1D<Real64> MixingMassFlowXHumRat; // Mixing MASS FLOW * Humidity Ratio
 
-    extern Array1D_bool ZoneMassBalanceFlag;  // zone mass flow balance flag
-    extern Array1D_bool ZoneInfiltrationFlag; // Zone Infiltration flag
+    extern EPVector<bool> ZoneMassBalanceFlag;  // zone mass flow balance flag
+    extern EPVector<bool> ZoneInfiltrationFlag; // Zone Infiltration flag
     extern Array1D_int ZoneReOrder;           // zone number reordered for zone mass balance
 
     // REAL Variables for the Heat Balance Simulation

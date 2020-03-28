@@ -790,8 +790,8 @@ namespace EnergyPlus {
             static Array1D_string OutletNodeNames; // Node names from GetBranchData call
             static Array1D_int InletNodeNumbers;   // Node numbers from GetBranchData call
             static Array1D_int OutletNodeNumbers;  // Node numbers from GetBranchData call
-            static Array1D_bool SplitOutBranch;
-            static Array1D_bool MixerInBranch;
+            static EPVector<bool> SplitOutBranch;
+            static EPVector<bool> MixerInBranch;
             bool errFlag;
             int LoopNumInArray;
 
@@ -2112,7 +2112,7 @@ namespace EnergyPlus {
             static bool SupplyEnvrnFlag(true);
             static bool MySetPointCheckFlag(true);
 
-            static Array1D_bool PlantLoopSetPointInitFlag;
+            static EPVector<bool> PlantLoopSetPointInitFlag;
 
             int HalfLoopNum;
             int passNum;

@@ -877,10 +877,10 @@ namespace OutputProcessor {
         std::string cCurrentModuleObject;
         Array1D_string cAlphaArgs(4);
         Array1D_string cAlphaFieldNames(4);
-        Array1D_bool lAlphaFieldBlanks(4);
+        EPVector<bool> lAlphaFieldBlanks(4);
         Array1D<Real64> rNumericArgs(1);
         Array1D_string cNumericFieldNames(1);
-        Array1D_bool lNumericFieldBlanks(1);
+        EPVector<bool> lNumericFieldBlanks(1);
 
 
         // Bail out if the input has already been read in

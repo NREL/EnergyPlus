@@ -152,8 +152,8 @@ namespace DataSurfaceLists {
         Real64 SumOfAllFractions;      // Summation of all of the fractions for splitting flow (must sum to 1)
         int SurfNum;                   // DO loop counter for surfaces
         int ZoneForSurface;            // Zone number that a particular surface is attached to
-        Array1D_bool lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
         int Item;
         bool ErrorsFound;
         int IOStatus;

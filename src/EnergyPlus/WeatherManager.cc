@@ -2859,8 +2859,8 @@ namespace WeatherManager {
         struct HourlyWeatherData
         {
             // Members
-            Array1D_bool IsRain;              // Rain indicator, true=rain
-            Array1D_bool IsSnow;              // Snow indicator, true=snow
+            EPVector<bool> IsRain;              // Rain indicator, true=rain
+            EPVector<bool> IsSnow;              // Snow indicator, true=snow
             Array1D<Real64> OutDryBulbTemp;   // Hourly dry bulb temperature of outside air
             EPVector<Real64> OutDewPointTemp; // Hourly Dew Point Temperature of outside air
             EPVector<Real64> OutBaroPress;    // Hourly barometric pressure of outside air

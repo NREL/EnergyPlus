@@ -152,9 +152,9 @@ namespace SteamBaseboardRadiator {
     Array1D<Real64> LastQBBSteamRadSrc; // Need to keep the last value in case we are still iterating
     Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
     Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
-    Array1D_bool MySizeFlag;
-    Array1D_bool CheckEquipName;
-    Array1D_bool SetLoopIndexFlag; // get loop number flag
+    EPVector<bool> MySizeFlag;
+    EPVector<bool> CheckEquipName;
+    EPVector<bool> SetLoopIndexFlag; // get loop number flag
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
 
@@ -757,7 +757,7 @@ namespace SteamBaseboardRadiator {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool MyOneTimeFlag(true);
         static bool ZoneEquipmentListChecked(false);
-        static Array1D_bool MyEnvrnFlag;
+        static EPVector<bool> MyEnvrnFlag;
         int Loop;
         int SteamInletNode;
         int ZoneNode;

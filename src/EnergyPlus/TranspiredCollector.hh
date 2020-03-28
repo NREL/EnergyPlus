@@ -74,7 +74,7 @@ namespace TranspiredCollector {
 
     // MODULE VARIABLE DECLARATIONS:
     extern int NumUTSC; // number of transpired collectors in model
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> CheckEquipName;
     extern bool GetInputFlag; // First time, input is gotten
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE TranspiredCollector:

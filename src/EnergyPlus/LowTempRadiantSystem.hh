@@ -114,10 +114,10 @@ namespace LowTempRadiantSystem {
     extern Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
     extern Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
     // Autosizing variables
-    extern Array1D_bool MySizeFlagHydr;
-    extern Array1D_bool MySizeFlagCFlo;
-    extern Array1D_bool MySizeFlagElec;
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> MySizeFlagHydr;
+    extern EPVector<bool> MySizeFlagCFlo;
+    extern EPVector<bool> MySizeFlagElec;
+    extern EPVector<bool> CheckEquipName;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE LowTempRadiantSystem
 

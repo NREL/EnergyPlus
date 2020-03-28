@@ -264,8 +264,8 @@ namespace ScheduleManager {
         Array1D_string cAlphaFields;
         Array1D_string cNumericFields;
         Array1D<Real64> Numbers;
-        Array1D_bool lAlphaBlanks;
-        Array1D_bool lNumericBlanks;
+        EPVector<bool> lAlphaBlanks;
+        EPVector<bool> lNumericBlanks;
         int NumAlphas;
         int NumNumbers;
         int Status;
@@ -315,8 +315,8 @@ namespace ScheduleManager {
         int MaxAlps;
         int AddWeekSch;
         int AddDaySch;
-        Array1D_bool AllDays(MaxDayTypes);
-        Array1D_bool TheseDays(MaxDayTypes);
+        Array1D<bool> AllDays(MaxDayTypes);
+        Array1D<bool> TheseDays(MaxDayTypes);
         bool ErrorHere;
         int SchNum;
         int WkCount;
@@ -3647,8 +3647,8 @@ namespace ScheduleManager {
     }
 
     void ProcessForDayTypes(std::string const &ForDayField, // Field containing the "FOR:..."
-                            Array1D_bool &TheseDays,        // Array to contain returned "true" days
-                            Array1D_bool &AlReady,          // Array of days already done
+                            Array1D<bool> &TheseDays,        // Array to contain returned "true" days
+                            Array1D<bool> &AlReady,          // Array of days already done
                             bool &ErrorsFound               // Will be true if error found.
     )
     {

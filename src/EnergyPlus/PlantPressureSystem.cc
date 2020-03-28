@@ -186,12 +186,12 @@ namespace PlantPressureSystem {
         using DataPlant::Press_NoPressure;
         using DataPlant::SupplySide;
 
-        static Array1D_bool LoopInit;
+        static EPVector<bool> LoopInit;
 
         // Simulation Variables
         int NumBranches;
         int BranchPressureTally;
-        static Array1D_bool FullParallelBranchSetFound(2);
+        static EPVector<bool> FullParallelBranchSetFound(2);
         static bool CommonPipeErrorEncountered(false);
 
         if (InitPressureDropOneTimeInit) {

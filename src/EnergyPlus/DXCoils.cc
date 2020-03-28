@@ -235,7 +235,7 @@ namespace DXCoils {
 
     int NumDXMulSpeedCoolCoils(0); // number of multispeed DX cooling coils
     int NumDXMulSpeedHeatCoils(0); // number of multispeed DX heating coils
-    Array1D_bool CheckEquipName;
+    EPVector<bool> CheckEquipName;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE
 
@@ -897,8 +897,8 @@ namespace DXCoils {
         Array1D<Real64> Numbers2;        // Numeric input items for object
         Array1D_string cAlphaFields2;    // Alpha field names
         Array1D_string cNumericFields2;  // Numeric field names
-        Array1D_bool lAlphaBlanks2;      // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks2;    // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks2;      // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks2;    // Logical array, numeric field input BLANK = .TRUE.
         int NumAlphas2;                  // Number of alphas in input for performance object
         int NumNumbers2;                 // Number of numeric items in input for performance object
         int IOStatus;                    // Input status returned from GetObjectItem
@@ -920,8 +920,8 @@ namespace DXCoils {
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
         Array1D<Real64> Numbers;         // Numeric input items for object
-        Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         static int MaxNumbers(0);        // Maximum number of numeric input fields
         static int MaxAlphas(0);         // Maximum number of alpha input fields
         static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
@@ -6074,8 +6074,8 @@ namespace DXCoils {
         static std::string const RoutineName("InitDXCoil");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Array1D_bool MyEnvrnFlag;   // One time environment flag
-        static Array1D_bool MySizeFlag;    // One time sizing flag
+        static EPVector<bool> MyEnvrnFlag;   // One time environment flag
+        static EPVector<bool> MySizeFlag;    // One time sizing flag
         Real64 RatedHeatPumpIndoorAirTemp; // Indoor dry-bulb temperature to heat pump evaporator at rated conditions [C]
         Real64 RatedHeatPumpIndoorHumRat;  // Inlet humidity ratio to heat pump evaporator at rated conditions [kgWater/kgDryAir]
         Real64 RatedVolFlowPerRatedTotCap; // Rated Air Volume Flow Rate divided by Rated Total Capacity [m3/s-W)

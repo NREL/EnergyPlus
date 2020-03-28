@@ -254,7 +254,7 @@ namespace OutputReportTabular {
     int sizeMonthlyFieldSetInput(0);
     int MonthlyTablesCount(0);
     int MonthlyColumnsCount(0);
-    Array1D_bool IsMonthGathered(12, false); // shown as true for any month used
+    EPVector<bool> IsMonthGathered(12, false); // shown as true for any month used
 
     int TOCEntriesCount(0);
     int TOCEntriesSize(0);
@@ -306,10 +306,10 @@ namespace OutputReportTabular {
     // arrays that hold the meter numbers that are initialized at get input
     Array1D_int meterNumTotalsBEPS(numResourceTypes, 0);
     Array1D_int meterNumTotalsSource(numSourceTypes, 0);
-    Array1D_bool fuelfactorsused(numSourceTypes, false);
-    Array1D_bool ffUsed(numResourceTypes, false);
+    EPVector<bool> fuelfactorsused(numSourceTypes, false);
+    EPVector<bool> ffUsed(numResourceTypes, false);
     Array1D<Real64> SourceFactors(numResourceTypes, 0.0);
-    Array1D_bool ffSchedUsed(numResourceTypes, false);
+    EPVector<bool> ffSchedUsed(numResourceTypes, false);
     Array1D_int ffSchedIndex(numResourceTypes, 0);
     Array2D_int meterNumEndUseBEPS(numResourceTypes, NumEndUses, 0);
     Array3D_int meterNumEndUseSubBEPS;
@@ -325,7 +325,7 @@ namespace OutputReportTabular {
     Array2D<Real64> gatherEndUseBEPS(numResourceTypes, NumEndUses, 0.0);
     Array2D<Real64> gatherEndUseBySourceBEPS(numResourceTypes, NumEndUses, 0.0);
     Array3D<Real64> gatherEndUseSubBEPS;
-    Array1D_bool needOtherRowLEED45(NumEndUses);
+    EPVector<bool> needOtherRowLEED45(NumEndUses);
 
     // arrays the hold the demand values
     Array1D<Real64> gatherDemandTotal(numResourceTypes, 0.0);
@@ -564,7 +564,7 @@ namespace OutputReportTabular {
         sizeMonthlyFieldSetInput = 0;
         MonthlyTablesCount = 0;
         MonthlyColumnsCount = 0;
-        IsMonthGathered = Array1D_bool(12, false);
+        IsMonthGathered = EPVector<bool>(12, false);
         TOCEntriesCount = 0;
         TOCEntriesSize = 0;
         UnitConvSize = 0;
@@ -594,10 +594,10 @@ namespace OutputReportTabular {
         displayEioSummary = false;
         meterNumTotalsBEPS = Array1D_int(numResourceTypes, 0);
         meterNumTotalsSource = Array1D_int(numSourceTypes, 0);
-        fuelfactorsused = Array1D_bool(numSourceTypes, false);
-        ffUsed = Array1D_bool(numResourceTypes, false);
+        fuelfactorsused = EPVector<bool>(numSourceTypes, false);
+        ffUsed = EPVector<bool>(numResourceTypes, false);
         SourceFactors = Array1D<Real64>(numResourceTypes, 0.0);
-        ffSchedUsed = Array1D_bool(numResourceTypes, false);
+        ffSchedUsed = EPVector<bool>(numResourceTypes, false);
         ffSchedIndex = Array1D_int(numResourceTypes, 0);
         meterNumEndUseBEPS = Array2D_int(numResourceTypes, NumEndUses, 0);
         meterNumEndUseSubBEPS.deallocate();
@@ -11220,7 +11220,7 @@ namespace OutputReportTabular {
         int curNumRows;
         int curColumn;
         Array1D_string uniqueObjectName;
-        Array1D_bool useUniqueObjectName;
+        EPVector<bool> useUniqueObjectName;
         int numUnqObjName;
         std::string curObjectName;
         int countRow;

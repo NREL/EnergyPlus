@@ -71,7 +71,7 @@ namespace HVACCooledBeam {
     // DERIVED TYPE DEFINITIONS:
 
     // MODULE VARIABLE DECLARATIONS:
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> CheckEquipName;
 
     // INTEGER :: NumPassiveCB = 0
     // INTEGER :: NumActiveCB = 0

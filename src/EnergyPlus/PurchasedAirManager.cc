@@ -178,7 +178,7 @@ namespace PurchasedAirManager {
     int NumPurchAir;
     int NumPlenumArrays;
     bool GetPurchAirInputFlag(true);
-    Array1D_bool CheckEquipName;
+    EPVector<bool> CheckEquipName;
     // SUBROUTINE SPECIFICATIONS FOR MODULE PurchasedAir:
 
     // Object Data
@@ -197,9 +197,9 @@ namespace PurchasedAirManager {
         // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
         bool InitPurchasedAirMyOneTimeFlag(true);
         bool InitPurchasedAirZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
-        Array1D_bool InitPurchasedAirMyEnvrnFlag;
-        Array1D_bool InitPurchasedAirMySizeFlag;
-        Array1D_bool InitPurchasedAirOneTimeUnitInitsDone; // True if one-time inits for PurchAirNum are completed
+        EPVector<bool> InitPurchasedAirMyEnvrnFlag;
+        EPVector<bool> InitPurchasedAirMySizeFlag;
+        EPVector<bool> InitPurchasedAirOneTimeUnitInitsDone; // True if one-time inits for PurchAirNum are completed
 
     } // namespace
 
@@ -3451,7 +3451,7 @@ namespace PurchasedAirManager {
         int Loop;                     // loop counters
         int Loop2;                    // loop counters
         Array1D_int TempPurchArray;   // temporary array used for dynamic allocation
-        Array1D_bool TempIsSimulated; // temporary array used for dynamic allocation
+        EPVector<bool> TempIsSimulated; // temporary array used for dynamic allocation
 
         // index to ZoneHVAC:ReturnPlenum object
         ReturnPlenumIndex = PurchAir(PurchAirNum).ReturnPlenumIndex;

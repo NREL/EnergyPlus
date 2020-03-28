@@ -120,7 +120,7 @@ namespace DaylightingManager {
     extern Array2D_int MapErrIndex;
     extern Array2D_int RefErrIndex;
 
-    extern Array1D_bool CheckTDDZone;
+    extern EPVector<bool> CheckTDDZone;
 
     extern std::string mapLine; // character variable to hold map outputs
 

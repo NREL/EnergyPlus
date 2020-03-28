@@ -235,7 +235,7 @@ namespace DaylightingManager {
     Array2D_int MapErrIndex;
     Array2D_int RefErrIndex;
 
-    Array1D_bool CheckTDDZone;
+    EPVector<bool> CheckTDDZone;
 
     std::string mapLine; // character variable to hold map outputs
 
@@ -4806,7 +4806,7 @@ namespace DaylightingManager {
         bool doTransform;
         Real64 OldAspectRatio;
         Real64 NewAspectRatio;
-        Array1D_bool ZoneMsgDone;
+        EPVector<bool> ZoneMsgDone;
 
         CosBldgRelNorth = std::cos(-(BuildingAzimuth + BuildingRotationAppendixG) * DegToRadians);
         SinBldgRelNorth = std::sin(-(BuildingAzimuth + BuildingRotationAppendixG) * DegToRadians);
@@ -6770,7 +6770,7 @@ namespace DaylightingManager {
 
         Array1D<Real64> DILLSW;         // Illuminance a ref point from a group of windows that can be switched together,
         Array1D<Real64> DILLUN;         //  and from those that aren't (lux)
-        Array1D_bool previously_shaded; // array of flags to indicate that previously groups would have already shaded this window
+        EPVector<bool> previously_shaded; // array of flags to indicate that previously groups would have already shaded this window
         DILLSW.allocate(ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size());
         DILLUN.allocate(ZoneDaylight(ZoneNum).ShadeDeployOrderExtWins.size());
         previously_shaded.allocate(ZoneDaylight(ZoneNum).NumOfDayltgExtWins);
@@ -10056,8 +10056,8 @@ namespace DaylightingManager {
         //  REAL(r64)           :: NumOut
         int IllumOut;
 
-        static Array1D_bool FirstTimeMaps;
-        static Array1D_bool EnvrnPrint;
+        static EPVector<bool> FirstTimeMaps;
+        static EPVector<bool> EnvrnPrint;
         static Array1D_string SavedMnDy;
         static Array2D_string RefPts;
         std::string MapNoString;

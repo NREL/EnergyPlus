@@ -841,7 +841,7 @@ namespace AirLoopHVACDOAS {
         int LoopOA;
         int NodeNum;
         Real64 SchAvailValue;
-        static Array1D_bool MyEnvrnFlag; // Used for initializations each begin environment flag
+        static EPVector<bool> MyEnvrnFlag; // Used for initializations each begin environment flag
         static bool MyOneTimeFlag(true); // Initialization flag
         std::string RoutineName = "AirLoopDOAS::initAirLoopDOAS";
         bool ErrorsFound = false;

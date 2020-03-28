@@ -86,7 +86,7 @@ namespace NodeInputManager {
     extern int NumCheckNodes;               // Num of Unique nodes in check
     extern int MaxCheckNodes;               // Current "max" unique nodes in check
     extern bool NodeVarsSetup;              // Setup indicator of node vars for reporting (also that all nodes have been entered)
-    extern Array1D_bool NodeWetBulbRepReq;
+    extern EPVector<bool> NodeWetBulbRepReq;
 
     // Types
 

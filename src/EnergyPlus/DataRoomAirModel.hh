@@ -159,7 +159,7 @@ namespace DataRoomAirModel {
     // UCSD
     extern Array1D<Real64> DVHcIn;
     extern int TotUCSDDV;                // Total number of UCSDDV zones
-    extern Array1D_bool IsZoneDV;        // Is the air model for the zone UCSDDV?
+    extern EPVector<bool> IsZoneDV;        // Is the air model for the zone UCSDDV?
     extern Array1D<Real64> ZTOC;         // Temperature of occupied (lower) zone
     extern Array1D<Real64> AvgTempGrad;  // vertical Average Temperature Gradient in the room
     extern Array1D<Real64> ZTMX;         // Temperature of the mixing(upper) layer
@@ -171,7 +171,7 @@ namespace DataRoomAirModel {
     extern Array1D<Real64> FracMinFlow;
     extern Array1D_int ZoneDVMixedFlag;
     extern Array1D<Real64> ZoneDVMixedFlagRep;
-    extern Array1D_bool ZoneAirSystemON;
+    extern EPVector<bool> ZoneAirSystemON;
     extern Array1D<Real64> TCMF; // comfort temperature
     extern Array1D<Real64> ZoneCeilingHeight;
     extern Array1D<Real64> MATFloor;    // [C] floor level mean air temp
@@ -226,7 +226,7 @@ namespace DataRoomAirModel {
     // UCSD-CV
     extern Array1D<Real64> CVHcIn;
     extern int TotUCSDCV;                   // Total number of UCSDDV zones
-    extern Array1D_bool IsZoneCV;           // Is the air model for the zone UCSDDV?
+    extern EPVector<bool> IsZoneCV;           // Is the air model for the zone UCSDDV?
     extern Array1D<Real64> ZoneCVisMixing;  // Zone set to CV is actually using a mixing model
     extern Array1D<Real64> ZTJET;           // Jet Temperatures
     extern Array1D<Real64> ZTREC;           // Recirculation Temperatures
@@ -253,7 +253,7 @@ namespace DataRoomAirModel {
     // UCSD-UF
     extern int TotUCSDUI;         // total number of UCSDUI zones
     extern int TotUCSDUE;         // total number of UCSDUE zones
-    extern Array1D_bool IsZoneUI; // controls program flow, for interior or exterior UFAD model
+    extern EPVector<bool> IsZoneUI; // controls program flow, for interior or exterior UFAD model
     extern Array1D_int ZoneUFPtr;
     extern Array1D<Real64> UFHcIn;
     extern Array1D_int ZoneUFMixedFlag;
@@ -312,7 +312,7 @@ namespace DataRoomAirModel {
         int ClassType;             // depending on type of model
         Real64 Height;             // height
         Real64 ZoneVolumeFraction; // portion of zone air volume associated with this node
-        Array1D_bool SurfMask;     // limit of 60 surfaces at current sizing
+        EPVector<bool> SurfMask;     // limit of 60 surfaces at current sizing
         bool IsZone;               // TRUE if this node is zone node
 
         // Default Constructor
@@ -667,7 +667,7 @@ namespace DataRoomAirModel {
         Real64 ZoneVolumeFraction;                                  // Zone volume fraction applied to this specific node
         std::string NodeSurfListName;                               // name of nodes' adjacent surface list
         bool HasSurfacesAssigned;                                   // True if this node has surfaces assigned
-        Array1D<bool> SurfMask;                                     // Sized to num of surfs in Zone, true if surface is associated with this node
+        EPVector<bool> SurfMask;                                     // Sized to num of surfs in Zone, true if surface is associated with this node
         std::string NodeIntGainsListName;                           // name of node's internal gains list
         bool HasIntGainsAssigned;                                   // True if this node has internal gain assigned
         int NumIntGains;                                            // Number of internal gain objects

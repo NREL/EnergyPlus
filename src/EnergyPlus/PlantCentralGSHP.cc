@@ -118,7 +118,7 @@ namespace PlantCentralGSHP {
     Real64 ChillerCyclingRatio(0.0);  // Chiller/heater cycling ratio
     Real64 ChillerFalseLoadRate(0.0); // Chiller/heater false load over and above the water-side load [W]
 
-    Array1D_bool CheckEquipName;
+    EPVector<bool> CheckEquipName;
 
     Array1D<WrapperSpecs> Wrapper;
     Array1D<ChillerHeaterSpecs> ChillerHeater;

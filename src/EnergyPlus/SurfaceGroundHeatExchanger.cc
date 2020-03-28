@@ -160,7 +160,7 @@ namespace SurfaceGroundHeatExchanger {
     Real64 TopThermAbs(0.0);    // Thermal absortivity of top layer
     Real64 BtmThermAbs(0.0);    // Thermal absortivity of bottom layer
     Real64 TopSolarAbs(0.0);    // Solar absortivity of top layer
-    Array1D_bool CheckEquipName;
+    EPVector<bool> CheckEquipName;
 
     // weather data records updated every zone time step
     Real64 PastBeamSolarRad(0.0);    // Previous beam normal solar irradiance

@@ -79,11 +79,11 @@ namespace EvaporativeCoolers {
     // MODULE VARIABLE DECLARATIONS:
     extern bool GetInputEvapComponentsFlag; // Flag set to make sure you get input once
     extern int NumEvapCool;                 // The Number of Evap Coolers found in the Input
-    extern Array1D_bool MySizeFlag;
-    extern Array1D_bool CheckEquipName;
+    extern EPVector<bool> MySizeFlag;
+    extern EPVector<bool> CheckEquipName;
 
     extern int NumZoneEvapUnits;
-    extern Array1D_bool CheckZoneEvapUnitName;
+    extern EPVector<bool> CheckZoneEvapUnitName;
     extern bool GetInputZoneEvapUnit;
 
     // Indirect Evaporative Coolers Research Special Operating Modes

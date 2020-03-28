@@ -170,7 +170,7 @@ namespace HVACUnitaryBypassVAV {
     Real64 PartLoadFrac(0.0);           // Compressor part-load fraction
     Real64 SaveCompressorPLR(0.0);      // Holds DX compressor PLR from active DX coil
     Real64 TempSteamIn(100.0);          // steam coil steam inlet temperature
-    Array1D_bool CheckEquipName;
+    EPVector<bool> CheckEquipName;
     bool GetInputFlag(true); // Flag set to make sure you get input once
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE
@@ -406,8 +406,8 @@ namespace HVACUnitaryBypassVAV {
         Array1D<Real64> Numbers(9, 0.0);
         Array1D_string cAlphaFields(20, "");
         Array1D_string cNumericFields(9, "");
-        Array1D_bool lAlphaBlanks(20, true);
-        Array1D_bool lNumericBlanks(9, true);
+        EPVector<bool> lAlphaBlanks(20, true);
+        EPVector<bool> lNumericBlanks(9, true);
 
         // find the number of each type of CBVAV unit
         std::string CurrentModuleObject = "AirLoopHVAC:UnitaryHeatCool:VAVChangeoverBypass";
@@ -1403,9 +1403,9 @@ namespace HVACUnitaryBypassVAV {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static bool MyOneTimeFlag(true);     // Initialization flag
-        static Array1D_bool MyEnvrnFlag;     // Used for initializations each begin environment flag
-        static Array1D_bool MySizeFlag;      // Used for sizing CBVAV inputs one time
-        static Array1D_bool MyPlantScanFlag; // Used for initializations plant component for heating coils
+        static EPVector<bool> MyEnvrnFlag;     // Used for initializations each begin environment flag
+        static EPVector<bool> MySizeFlag;      // Used for sizing CBVAV inputs one time
+        static EPVector<bool> MyPlantScanFlag; // Used for initializations plant component for heating coils
         Real64 QSensUnitOut;                 // Output of CBVAV system with coils off
         Real64 OutsideAirMultiplier;         // Outside air multiplier schedule (= 1.0 if no schedule)
         static bool EMSSetPointCheck(false); // local temporary

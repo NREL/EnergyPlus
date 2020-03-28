@@ -165,10 +165,10 @@ namespace WindowAC {
 
     int NumWindAC(0);
     int NumWindACCyc(0);
-    Array1D_bool MySizeFlag;
+    EPVector<bool> MySizeFlag;
     bool GetWindowACInputFlag(true); // First time, input is "gotten"
     bool CoolingLoad(false);         // defines a cooling load
-    Array1D_bool CheckEquipName;
+    EPVector<bool> CheckEquipName;
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE
 
@@ -367,8 +367,8 @@ namespace WindowAC {
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
         Array1D<Real64> Numbers;         // Numeric input items for object
-        Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
         //  INTEGER                              :: FanType           ! Integer index for Fan type
         int CtrlZone;          // index to loop counter
@@ -867,8 +867,8 @@ namespace WindowAC {
         // static bool ZoneEquipmentListChecked( false ); // True after the Zone Equipment List has been checked for items
         ////////////////////////////////////////////////////////////////////////////////////
         int Loop;                         // loop counter
-        static Array1D_bool MyEnvrnFlag;  // one time initialization flag
-        static Array1D_bool MyZoneEqFlag; // used to set up zone equipment availability managers
+        static EPVector<bool> MyEnvrnFlag;  // one time initialization flag
+        static EPVector<bool> MyZoneEqFlag; // used to set up zone equipment availability managers
         Real64 QToCoolSetPt;              // sensible load to cooling setpoint (W)
         Real64 NoCompOutput;              // sensible load delivered with compressor off (W)
 

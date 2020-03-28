@@ -268,9 +268,9 @@ namespace MixedAir {
     int NumOAMixers(0);            // Number of Outdoor Air Mixers
     int NumVentMechControllers(0); // Number of Controller:MechanicalVentilation objects in input deck
 
-    Array1D_bool MyOneTimeErrorFlag;
-    Array1D_bool MyOneTimeCheckUnitarySysFlag;
-    Array1D_bool initOASysFlag;
+    EPVector<bool> MyOneTimeErrorFlag;
+    EPVector<bool> MyOneTimeCheckUnitarySysFlag;
+    EPVector<bool> initOASysFlag;
     bool GetOASysInputFlag(true);        // Flag set to make sure you get input once
     bool GetOAMixerInputFlag(true);      // Flag set to make sure you get input once
     bool GetOAControllerInputFlag(true); // Flag set to make sure you get input once
@@ -281,7 +281,7 @@ namespace MixedAir {
         // use these. They are cleared by clear_state() for use by unit tests, but normal simulations should be unaffected.
         // This is purposefully in an anonymous namespace so nothing outside this implementation file can use it.
         bool InitOAControllerOneTimeFlag(true);
-        Array1D_bool InitOAControllerSetPointCheckFlag(true);
+        EPVector<bool> InitOAControllerSetPointCheckFlag(true);
         bool InitOAControllerSetUpAirLoopHVACVariables(true);
         bool AllocateOAControllersFlag(true);
         Array1D_string DesignSpecOAObjName;     // name of the design specification outdoor air object
@@ -1017,8 +1017,8 @@ namespace MixedAir {
         std::string CurrentModuleObject; // Object type for getting and messages
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
-        Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         static int MaxNums(0);           // Maximum number of numeric input fields
         static int MaxAlphas(0);         // Maximum number of alpha input fields
         static int TotalArgs(0);         // Total number of alpha and numeric arguments (max) for a
@@ -1391,8 +1391,8 @@ namespace MixedAir {
         std::string CurrentModuleObject; // Object type for getting and messages
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
-        Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         static bool ErrorsFound(false);  // Flag identifying errors found during get input
         int ZoneListNum;                 // Index to Zone List
         int MechVentZoneCount;           // Index counter for zones with mechanical ventilation
@@ -2131,8 +2131,8 @@ namespace MixedAir {
         std::string CurrentModuleObject; // Object type for getting and messages
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
-        Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         static bool ErrorsFound(false);
 
         if (!GetOAMixerInputFlag) return;
@@ -2227,8 +2227,8 @@ namespace MixedAir {
                                    int &NumAlphas,
                                    Array1D<Real64> const &NumArray,
                                    int &NumNums,
-                                   Array1D_bool const &lNumericBlanks, // Unused
-                                   Array1D_bool const &lAlphaBlanks,
+                                   EPVector<bool> const &lNumericBlanks, // Unused
+                                   EPVector<bool> const &lAlphaBlanks,
                                    Array1D_string const &cAlphaFields,
                                    Array1D_string const &cNumericFields, // Unused
                                    bool &ErrorsFound                    // If errors found in input
@@ -2674,10 +2674,10 @@ namespace MixedAir {
         using EMSManager::CheckIfNodeSetPointManagedByEMS;
         using EMSManager::iTemperatureSetPoint;
 
-        static Array1D_bool OAControllerMyOneTimeFlag; // One-time initialization flag
-        static Array1D_bool OAControllerMyEnvrnFlag;   // One-time initialization flag
-        static Array1D_bool OAControllerMySizeFlag;    // One-time initialization flag
-        static Array1D_bool MechVentCheckFlag;         // One-time initialization flag
+        static EPVector<bool> OAControllerMyOneTimeFlag; // One-time initialization flag
+        static EPVector<bool> OAControllerMyEnvrnFlag;   // One-time initialization flag
+        static EPVector<bool> OAControllerMySizeFlag;    // One-time initialization flag
+        static EPVector<bool> MechVentCheckFlag;         // One-time initialization flag
         bool FoundZone;                                // Logical determines if ZONE object is accounted for in VENTILATION:MECHANICAL object
         bool FoundAreaZone;                            // Logical determines if ZONE object is accounted for in VENTILATION:MECHANICAL object
         bool FoundPeopleZone;                          // Logical determines if ZONE object is accounted for in VENTILATION:MECHANICAL object

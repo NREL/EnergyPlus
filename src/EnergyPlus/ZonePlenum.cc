@@ -113,8 +113,8 @@ namespace ZonePlenum {
     int NumZonePlenums(0);       // The Number of ZonePlenums found in the Input
     int NumZoneReturnPlenums(0); // The Number of ZoneReturnPlenums found in the Input
     int NumZoneSupplyPlenums(0); // The Number of ZoneSupplyPlenums found in the Input
-    Array1D_bool CheckRetEquipName;
-    Array1D_bool CheckSupEquipName;
+    EPVector<bool> CheckRetEquipName;
+    EPVector<bool> CheckSupEquipName;
 
     namespace {
         bool GetInputFlag(true); // Flag set to make sure you get input once
@@ -341,8 +341,8 @@ namespace ZonePlenum {
         Array1D_string AlphArray;        // Alpha input items for object
         Array1D_string cAlphaFields;     // Alpha field names
         Array1D_string cNumericFields;   // Numeric field names
-        Array1D_bool lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
-        Array1D_bool lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
+        EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
+        EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         static bool ErrorsFound(false);
         bool NodeListError; // Flag for node list error
         bool UniqueNodeError;

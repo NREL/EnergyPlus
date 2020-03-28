@@ -130,9 +130,9 @@ namespace BaseboardRadiator {
 
     // MODULE VARIABLE DECLARATIONS:
     int NumBaseboards(0);
-    Array1D_bool MySizeFlag;
-    Array1D_bool CheckEquipName;
-    Array1D_bool SetLoopIndexFlag; // get loop number flag
+    EPVector<bool> MySizeFlag;
+    EPVector<bool> CheckEquipName;
+    EPVector<bool> SetLoopIndexFlag; // get loop number flag
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE BaseboardRadiator
 
@@ -600,7 +600,7 @@ namespace BaseboardRadiator {
         static bool MyOneTimeFlag(true);
         static bool ZoneEquipmentListChecked(false); // True after the Zone Equipment List has been checked for items
         int Loop;
-        static Array1D_bool MyEnvrnFlag;
+        static EPVector<bool> MyEnvrnFlag;
         Real64 RhoAirStdInit;
         Real64 rho; // local fluid density
         Real64 Cp;  // local fluid specific heat

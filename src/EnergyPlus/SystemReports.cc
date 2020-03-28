@@ -230,9 +230,9 @@ namespace SystemReports {
     Array1D_int FirstHeatCoolHour;
     Array1D_int LastHeatCoolFlag;
     Array1D_int LastHeatCoolHour;
-    Array1D_bool AirLoopCalcDone;
-    Array1D_bool NoLoadFlag;
-    Array1D_bool UnmetLoadFlag;
+    EPVector<bool> AirLoopCalcDone;
+    EPVector<bool> NoLoadFlag;
+    EPVector<bool> UnmetLoadFlag;
 
     static ObjexxFCL::gio::Fmt fmtLD("*");
     static ObjexxFCL::gio::Fmt fmtA("(A)");

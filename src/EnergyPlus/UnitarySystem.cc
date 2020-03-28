@@ -425,8 +425,8 @@ namespace UnitarySystems {
                 int IOStatus = 0;
                 Array1D_string Alphas(NumAlphas);
                 Array1D<Real64> Numbers(NumNumbers, 0.0);
-                Array1D_bool lNumericBlanks(NumNumbers, true);
-                Array1D_bool lAlphaBlanks(NumAlphas, true);
+                EPVector<bool> lNumericBlanks(NumNumbers, true);
+                EPVector<bool> lAlphaBlanks(NumAlphas, true);
                 Array1D_string cAlphaFields(NumAlphas);
                 Array1D_string cNumericFields(NumNumbers);
                 inputProcessor->getObjectItem(cCurrentModuleObject,
@@ -9097,11 +9097,11 @@ namespace UnitarySystems {
         static std::string const routineName("InitUnitarySystems");
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        // static Array1D_bool MyEnvrnFlag; // environment flag
-        // static Array1D_bool MyFanFlag;   // used for sizing fan inputs one time
-        // static Array1D_bool MyCheckFlag; // Used to obtain the zone inlet node number
+        // static EPVector<bool> MyEnvrnFlag; // environment flag
+        // static EPVector<bool> MyFanFlag;   // used for sizing fan inputs one time
+        // static EPVector<bool> MyCheckFlag; // Used to obtain the zone inlet node number
         // in the controlled zone
-        // static Array1D_bool MyStagedFlag; // used for finding on m_Staged thermostat
+        // static EPVector<bool> MyStagedFlag; // used for finding on m_Staged thermostat
         //////////// hoisted into namespace ////////////////////////////////////////////////
         // static bool MyOneTimeFlag( true ); // one time allocation flag // InitLoadBasedControlOneTimeFlag
         // static bool MyAirLoopPass( true ); // one time allocation flag // InitLoadBasedControlAirLoopPass
