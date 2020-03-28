@@ -263,16 +263,6 @@ template <typename T> struct EPVector : std::vector<T>
     {
         return static_cast<int>(this->size());
     }
-
-    T* get(std::size_t n)
-    {
-        return &this->at(n);
-    }
-
-    const T * get(std::size_t n) const
-    {
-        return &this->at(n);
-    }
 };
 
 template <> struct EPVector<bool> : std::vector<std::uint8_t>
@@ -287,16 +277,6 @@ template <> struct EPVector<bool> : std::vector<std::uint8_t>
     const std::uint8_t& operator()(std::size_t n) const
     {
         return this->at(n - 1);
-    }
-
-    std::uint8_t* get(std::size_t n)
-    {
-        return &this->at(n);
-    }
-
-    const std::uint8_t * get(std::size_t n) const
-    {
-        return &this->at(n);
     }
 
     void allocate(int size)
