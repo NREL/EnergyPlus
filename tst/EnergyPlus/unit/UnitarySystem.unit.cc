@@ -11086,7 +11086,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_SizingWithFans)
     DataSizing::FinalSysSizing(DataSizing::CurSysNum).CoolSupHumRat = 0.0085;
     DataSizing::FinalSysSizing(DataSizing::CurSysNum).MixTempAtCoolPeak = 28.0;
     DataSizing::FinalSysSizing(DataSizing::CurSysNum).MixHumRatAtCoolPeak = 0.0075;
-    DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesCoolVolFlow = 1.005;
+    DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesMainVolFlow = 1.005;
     DataSizing::FinalSysSizing(DataSizing::CurSysNum).DesOutAirVolFlow = 0.2;
 
     DataAirSystems::PrimaryAirSystem.allocate(1);
