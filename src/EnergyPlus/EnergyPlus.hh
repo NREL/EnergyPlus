@@ -323,7 +323,7 @@ bool allocated(EPVector<T> const & v)
 inline
 bool all(EPVector<bool> const & values)
 {
-	if ( values.empty() ) return true;
+    if ( values.empty() ) return true;
     for (auto v : values) {
         if (!v) return false;
     }
@@ -333,7 +333,7 @@ bool all(EPVector<bool> const & values)
 inline
 bool any(EPVector<bool> const & values)
 {
-	if ( values.empty() ) return false;
+    if ( values.empty() ) return false;
     for (auto v : values) {
         if (v) return true;
     }
@@ -343,18 +343,18 @@ bool any(EPVector<bool> const & values)
 inline
 std::size_t count(EPVector<bool> const & values)
 {
-	std::size_t c(0u);
+    std::size_t c(0u);
     for (auto v : values) {
         if (v) ++c;
     }
-	return c;
+    return c;
 }
 
 template<typename T>
 inline
 EPVector<T> pack(EPVector<T> const & v, EPVector<bool> const & mask)
 {
-	EPVector<T> r;
+    EPVector<T> r;
     r.reserve(mask.size());
     for (std::size_t i = 0; i < mask.size(); ++i) {
         if (mask[i]) {
@@ -368,14 +368,14 @@ template<typename T>
 inline
 Array1D<T> pack(Array1<T> const & a, EPVector<bool> const & mask)
 {
-	Array1D<T> r;
+    Array1D<T> r;
     r.reserve(mask.size());
-	for (std::size_t i = 0, e = mask.size(); i < e; ++i) {
-		if (mask[i]) {
+    for (std::size_t i = 0, e = mask.size(); i < e; ++i) {
+        if (mask[i]) {
             r.emplace_back(a[i]);
         }
-	}
-	return r;
+    }
+    return r;
 }
 
 #endif

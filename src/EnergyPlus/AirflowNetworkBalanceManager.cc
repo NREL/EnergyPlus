@@ -247,7 +247,7 @@ namespace AirflowNetworkBalanceManager {
     EPVector<Real64> MA;
     EPVector<Real64> MV;
     EPVector<int> IVEC;
-    Array1D<int> SplitterNodeNumbers;
+    EPVector<int> SplitterNodeNumbers;
 
     bool AirflowNetworkGetInputFlag(true);
     int VentilationCtrl(0);  // Hybrid ventilation control type
@@ -1627,10 +1627,10 @@ namespace AirflowNetworkBalanceManager {
         int NumNumbers; // Number of Numbers for each GetObjectItem call
         int IOStatus;   // Used in GetObjectItem
         std::string CurrentModuleObject;
-        Array1D<std::string> Alphas;         // Alpha input items for object
-        Array1D<std::string> cAlphaFields;   // Alpha field names
-        Array1D<std::string> cNumericFields; // Numeric field names
-        Array1D<Real64> Numbers;              // Numeric input items for object
+        EPVector<std::string> Alphas;         // Alpha input items for object
+        EPVector<std::string> cAlphaFields;   // Alpha field names
+        EPVector<std::string> cNumericFields; // Numeric field names
+        EPVector<Real64> Numbers;              // Numeric input items for object
         EPVector<bool> lAlphaBlanks;           // Logical array, alpha field input BLANK = .TRUE.
         EPVector<bool> lNumericBlanks;         // Logical array, numeric field input BLANK = .TRUE.
         static int MaxNums(0);                // Maximum number of numeric input fields
@@ -9651,7 +9651,7 @@ namespace AirflowNetworkBalanceManager {
         bool ErrorsFound(false);
         bool IsNotOK(false);
         bool errFlag(false);
-        Array1D<int> NodeConnectionType; // Specifies the type of node connection
+        EPVector<int> NodeConnectionType; // Specifies the type of node connection
         std::string CurrentModuleObject;
 
         // Validate supply and return connections
@@ -9788,7 +9788,7 @@ namespace AirflowNetworkBalanceManager {
                 ShowContinueError("...occurs in Airflow Network simulation.");
             } else {
                 //   skip nodes for air cooled condensers
-                for (j = 1; j <= isize(NodeConnectionType); ++j) {
+                for (j = 1; j <= NodeConnectionType.isize(); ++j) {
                     if (NodeConnectionType(j) == NodeConnectionType_OutsideAirReference) {
                         NodeFound(i) = true;
                     }
@@ -11156,12 +11156,12 @@ namespace AirflowNetworkBalanceManager {
                         if (IsParentObject(TypeOfComp, NameOfComp)) {
 
                             int NumChildren = GetNumChildren(TypeOfComp, NameOfComp);
-                            Array1D<std::string> SubCompTypes;
-                            Array1D<std::string> SubCompNames;
-                            Array1D<std::string> InletNodeNames;
-                            Array1D<int> InletNodeNumbers;
-                            Array1D<std::string> OutletNodeNames;
-                            Array1D<int> OutletNodeNumbers;
+                            EPVector<std::string> SubCompTypes;
+                            EPVector<std::string> SubCompNames;
+                            EPVector<std::string> InletNodeNames;
+                            EPVector<int> InletNodeNumbers;
+                            EPVector<std::string> OutletNodeNames;
+                            EPVector<int> OutletNodeNumbers;
 
                             SubCompTypes.allocate(NumChildren);
                             SubCompNames.allocate(NumChildren);
@@ -11207,12 +11207,12 @@ namespace AirflowNetworkBalanceManager {
                                 if (IsParentObject(TypeOfComp, NameOfComp)) {
 
                                     int NumGrandChildren = GetNumChildren(TypeOfComp, NameOfComp);
-                                    Array1D<std::string> SubSubCompTypes;
-                                    Array1D<std::string> SubSubCompNames;
-                                    Array1D<std::string> SubSubInletNodeNames;
-                                    Array1D<int> SubSubInletNodeNumbers;
-                                    Array1D<std::string> SubSubOutletNodeNames;
-                                    Array1D<int> SubSubOutletNodeNumbers;
+                                    EPVector<std::string> SubSubCompTypes;
+                                    EPVector<std::string> SubSubCompNames;
+                                    EPVector<std::string> SubSubInletNodeNames;
+                                    EPVector<int> SubSubInletNodeNumbers;
+                                    EPVector<std::string> SubSubOutletNodeNames;
+                                    EPVector<int> SubSubOutletNodeNumbers;
 
                                     SubSubCompTypes.allocate(NumGrandChildren);
                                     SubSubCompNames.allocate(NumGrandChildren);

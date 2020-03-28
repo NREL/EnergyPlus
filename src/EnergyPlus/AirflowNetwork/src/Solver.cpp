@@ -124,12 +124,12 @@ namespace AirflowNetwork {
     int LIST(0);
 
     // Common block ZONL
-    // Array1D<Real64> RHOZ;
-    // Array1D<Real64> SQRTDZ;
-    // Array1D<Real64> VISCZ;
+    // EPVector<Real64> RHOZ;
+    // EPVector<Real64> SQRTDZ;
+    // EPVector<Real64> VISCZ;
     EPVector<Real64> SUMAF;
-    // Array1D<Real64> TZ; // Temperature [C]
-    // Array1D<Real64> WZ; // Humidity ratio [kg/kg]
+    // EPVector<Real64> TZ; // Temperature [C]
+    // EPVector<Real64> WZ; // Humidity ratio [kg/kg]
     EPVector<Real64> PZ; // Pressure [Pa]
 
     // Other array variables

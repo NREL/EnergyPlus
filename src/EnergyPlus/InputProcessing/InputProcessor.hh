@@ -140,6 +140,18 @@ public:
                        Optional<Array1D_string> AlphaFieldNames = _,
                        Optional<Array1D_string> NumericFieldNames = _);
 
+    void getObjectItem(std::string const &Object,
+                       int const Number,
+                       EPVector<std::string> &Alphas,
+                       int &NumAlphas,
+                       EPVector<Real64> &Numbers,
+                       int &NumNumbers,
+                       int &Status,
+                       EPVector<bool> &NumBlank,
+                       EPVector<bool> &AlphaBlank,
+                       EPVector<std::string> &AlphaFieldNames,
+                       EPVector<std::string> &NumericFieldNames);
+
     int getIDFObjNum(std::string const &Object, int const Number);
 
     int getJSONObjNum(std::string const &Object, int const Number);
@@ -251,6 +263,22 @@ private:
                             Optional<EPVector<bool>> AlphaBlank = _,
                             Optional<Array1D_string> AlphaFieldNames = _,
                             Optional<Array1D_string> NumericFieldNames = _);
+
+    void setObjectItemValue(json const &ep_object,
+                            json const &ep_schema_object,
+                            std::string const &field,
+                            json const &legacy_field_info,
+                            int &alpha_index,
+                            int &numeric_index,
+                            bool within_max_fields,
+                            EPVector<std::string> &Alphas,
+                            int &NumAlphas,
+                            EPVector<Real64> &Numbers,
+                            int &NumNumbers,
+                            EPVector<bool> &NumBlank,
+                            EPVector<bool> &AlphaBlank,
+                            EPVector<std::string> &AlphaFieldNames,
+                            EPVector<std::string> &NumericFieldNames);
 
     void addVariablesForMonthlyReport(std::string const &reportName);
 

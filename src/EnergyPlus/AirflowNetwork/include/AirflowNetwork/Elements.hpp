@@ -1316,7 +1316,6 @@ namespace AirflowNetwork {
     extern EPVector<DetailedOpening> MultizoneCompDetOpeningData;
     extern EPVector<SimpleOpening> MultizoneCompSimpleOpeningData;
     extern EPVector<HorizontalOpening> MultizoneCompHorOpeningData;
-    // extern Array1D<ReferenceConditions> MultizoneSurfaceStdConditionsCrackData;
     extern EPVector<SurfaceCrack> MultizoneSurfaceCrackData;
     extern EPVector<EffectiveLeakageArea> MultizoneSurfaceELAData;
     extern EPVector<MultizoneExternalNodeProp> MultizoneExternalNodeData;

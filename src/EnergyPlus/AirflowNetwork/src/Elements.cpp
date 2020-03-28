@@ -202,7 +202,6 @@ namespace AirflowNetwork {
     EPVector<DetailedOpening> MultizoneCompDetOpeningData;
     EPVector<SimpleOpening> MultizoneCompSimpleOpeningData;
     EPVector<HorizontalOpening> MultizoneCompHorOpeningData;
-    // Array1D<ReferenceConditions> MultizoneSurfaceStdConditionsCrackData;
     EPVector<SurfaceCrack> MultizoneSurfaceCrackData;
     EPVector<EffectiveLeakageArea> MultizoneSurfaceELAData;
     EPVector<MultizoneExternalNodeProp> MultizoneExternalNodeData;

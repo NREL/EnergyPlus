@@ -84,7 +84,7 @@ namespace AirflowNetworkBalanceManager {
     extern EPVector<Real64> MA;
     extern EPVector<Real64> MV;
     extern EPVector<int> IVEC;
-    extern Array1D<int> SplitterNodeNumbers;
+    extern EPVector<int> SplitterNodeNumbers;
 
     extern bool AirflowNetworkGetInputFlag;
     extern int VentilationCtrl;  // Hybrid ventilation control type

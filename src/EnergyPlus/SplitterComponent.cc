@@ -750,9 +750,9 @@ namespace SplitterComponent {
         return SplitterOutletNumber;
     }
 
-    Array1D_int GetSplitterNodeNumbers(std::string const &SplitterName, // must match Splitter names for the Splitter type
-                                       int const SplitterNum,           // Index of Splitters
-                                       bool &ErrorsFound                // set to true if problem
+    EPVector<int> GetSplitterNodeNumbers(std::string const &SplitterName, // must match Splitter names for the Splitter type
+                                         int const SplitterNum,           // Index of Splitters
+                                         bool &ErrorsFound                // set to true if problem
     )
     {
 
@@ -768,7 +768,7 @@ namespace SplitterComponent {
         // as zero.
 
         // Return value
-        Array1D_int SplitterNodeNumbers;
+        EPVector<int> SplitterNodeNumbers;
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int WhichSplitter;

@@ -1365,6 +1365,182 @@ namespace BranchNodeConnections {
         if (ErrInObject) ErrorsFound = true;
     }
 
+    void GetChildrenData(std::string const &ComponentType,
+                         std::string const &ComponentName,
+                         int &NumChildren,
+                         EPVector<std::string> &ChildrenCType,
+                         EPVector<std::string> & ChildrenCName,
+                         EPVector<std::string> &InletNodeName,
+                         EPVector<int> &InletNodeNum,
+                         EPVector<std::string> &OutletNodeName,
+                         EPVector<int> &OutletNodeNum,
+                         bool &ErrorsFound)
+    {
+
+        // SUBROUTINE INFORMATION:
+        //       AUTHOR         Linda Lawrie
+        //       DATE WRITTEN   May 2005
+        //       MODIFIED       na
+        //       RE-ENGINEERED  na
+
+        // PURPOSE OF THIS SUBROUTINE:
+        // This routine gets children data for given parent node.
+
+        // METHODOLOGY EMPLOYED:
+        // Traverses CompSet structure.
+
+        // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
+        EPVector<std::string> ChildCType;
+        EPVector<std::string> ChildCName;
+        EPVector<std::string> ChildInNodeName;
+        EPVector<std::string> ChildOutNodeName;
+        EPVector<int> ChildInNodeNum;
+        EPVector<int> ChildOutNodeNum;
+        int Loop;
+        int CountNum;
+        bool ErrInObject;
+        std::string MatchNodeName;
+        std::string ParentInletNodeName;
+        std::string ParentOutletNodeName;
+        int ParentInletNodeNum;
+        int ParentOutletNodeNum;
+        // unused1109  LOGICAL Matched
+        int CountMatchLoop;
+
+        ChildrenCType = BlankString;
+        ChildrenCName = BlankString;
+        InletNodeName = BlankString;
+        InletNodeNum = 0;
+        OutletNodeName = BlankString;
+        OutletNodeNum = 0;
+        ErrInObject = false;
+
+        if (IsParentObject(ComponentType, ComponentName)) {
+            NumChildren = GetNumChildren(ComponentType, ComponentName);
+            if (NumChildren == 0) {
+                ShowWarningError("GetChildrenData: Parent Node has no children, node=" + ComponentType + ':' + ComponentName);
+            } else {
+                GetParentData(
+                    ComponentType, ComponentName, ParentInletNodeName, ParentInletNodeNum, ParentOutletNodeName, ParentOutletNodeNum, ErrInObject);
+                ChildCType.allocate(NumChildren);
+                ChildCName.allocate(NumChildren);
+                ChildInNodeName.allocate(NumChildren);
+                ChildOutNodeName.allocate(NumChildren);
+                ChildInNodeNum.allocate(NumChildren);
+                ChildOutNodeNum.allocate(NumChildren);
+                ChildCType = BlankString;
+                ChildCName = BlankString;
+                ChildInNodeName = BlankString;
+                ChildOutNodeName = BlankString;
+                ChildInNodeNum = 0;
+                ChildOutNodeNum = 0;
+                CountNum = 0;
+                for (Loop = 1; Loop <= NumCompSets; ++Loop) {
+                    if (CompSets(Loop).ParentCType == ComponentType && CompSets(Loop).ParentCName == ComponentName) {
+                        ++CountNum;
+                        ChildCType(CountNum) = CompSets(Loop).CType;
+                        ChildCName(CountNum) = CompSets(Loop).CName;
+                        ChildInNodeName(CountNum) = CompSets(Loop).InletNodeName;
+                        ChildOutNodeName(CountNum) = CompSets(Loop).OutletNodeName;
+                        // Get Node Numbers
+                        ChildInNodeNum(CountNum) = UtilityRoutines::FindItemInList(ChildInNodeName(CountNum), NodeID({1, NumOfNodes}), NumOfNodes);
+                        //          IF (ChildInNodeNum(CountNum) == 0) THEN
+                        //            CALL ShowSevereError('GetChildrenData: Inlet Node not previously assigned, Node='//  &
+                        //                    TRIM(ChildInNodeName(CountNum)))
+                        //            CALL ShowContinueError('..Component='//TRIM(ChildCType(CountNum))//':'//TRIM(ChildCName(CountNum)))
+                        //            CALL ShowContinueError('..Parent Object='//TRIM(ComponentType)//':'//TRIM(ComponentName))
+                        //            ErrInObject=.TRUE.
+                        //          ENDIF
+                        ChildOutNodeNum(CountNum) = UtilityRoutines::FindItemInList(ChildOutNodeName(CountNum), NodeID({1, NumOfNodes}), NumOfNodes);
+                        //          IF (ChildOutNodeNum(CountNum) == 0) THEN
+                        //            CALL ShowSevereError('GetChildrenData: Outlet Node not previously assigned, Node='//  &
+                        //                    TRIM(ChildOutNodeName(CountNum)))
+                        //            CALL ShowContinueError('..Component='//TRIM(ChildCType(CountNum))//':'//TRIM(ChildCName(CountNum)))
+                        //            CALL ShowContinueError('..Parent Object='//TRIM(ComponentType)//':'//TRIM(ComponentName))
+                        //            ErrInObject=.TRUE.
+                        //          ENDIF
+                    }
+                }
+                if (CountNum != NumChildren) {
+                    ShowSevereError("GetChildrenData: Counted nodes not equal to GetNumChildren count");
+                    ErrInObject = true;
+                } else {
+                    // Children arrays built.  Now "sort" for flow connection order(?)
+                    MatchNodeName = ParentInletNodeName;
+                    CountNum = 0;
+                    CountMatchLoop = 0;
+                    while (CountMatchLoop < NumChildren) {
+                        ++CountMatchLoop;
+                        //          Matched=.FALSE.
+                        for (Loop = 1; Loop <= NumChildren; ++Loop) {
+                            if (ChildInNodeName(Loop) == MatchNodeName) {
+                                ++CountNum;
+                                ChildrenCType(CountNum) = ChildCType(Loop);
+                                ChildrenCName(CountNum) = ChildCName(Loop);
+                                InletNodeName(CountNum) = ChildInNodeName(Loop);
+                                InletNodeNum(CountNum) = ChildInNodeNum(Loop);
+                                OutletNodeName(CountNum) = ChildOutNodeName(Loop);
+                                OutletNodeNum(CountNum) = ChildOutNodeNum(Loop);
+                                ChildInNodeName(Loop).clear(); // So it won't match anymore
+                                //              Matched=.TRUE.
+                                MatchNodeName = ChildOutNodeName(Loop);
+                                break;
+                            }
+                        }
+                        //          IF (.not. Matched .and. MatchNodeName /= blank) THEN
+                        //            IF (CountMatchLoop > 1) THEN
+                        //              CALL ShowSevereError('GetChildrenData: Sorting for flow connection order..'//  &
+                        //                                 'Required Child Node, not matched.  Expected Inlet Node='//  &
+                        //                                 TRIM(MatchNodeName))
+                        //            ELSE
+                        //              CALL ShowSevereError('GetChildrenData: Sorting for 1st node in flow connection order..'//  &
+                        //                                 'Required Child Node, not matched.  Expected Inlet Node='//  &
+                        //                                 TRIM(MatchNodeName))
+                        //            ENDIF
+                        //            CALL ShowContinueError('..Parent Object='//TRIM(ComponentType)//':'//TRIM(ComponentName))
+                        //            ErrInObject=.TRUE.
+                        //          ENDIF
+                    }
+                    if (MatchNodeName != ParentOutletNodeName) {
+                        for (Loop = 1; Loop <= NumChildren; ++Loop) {
+                            if (ChildInNodeName(Loop).empty()) continue;
+                            if (ChildOutNodeName(Loop) == ParentOutletNodeName) break;
+                            //            CALL ShowSevereError('GetChildrenData: Sorting for flow connection order..'//  &
+                            //                                 'Required Child Node, not matched.  Expected (Last) Outlet Node='//  &
+                            //                                 TRIM(MatchNodeName))
+                            //            CALL ShowContinueError('..does not match Parent Outlet Node='//TRIM(ParentOutletNodeName))
+                            //            CALL ShowContinueError('..Parent Object='//TRIM(ComponentType)//':'//TRIM(ComponentName))
+                            break;
+                            //          ErrInObject=.TRUE.
+                        }
+                    }
+                    for (Loop = 1; Loop <= NumChildren; ++Loop) {
+                        if (ChildInNodeName(Loop).empty()) continue;
+                        ++CountNum;
+                        ChildrenCType(CountNum) = ChildCType(Loop);
+                        ChildrenCName(CountNum) = ChildCName(Loop);
+                        InletNodeName(CountNum) = ChildInNodeName(Loop);
+                        InletNodeNum(CountNum) = ChildInNodeNum(Loop);
+                        OutletNodeName(CountNum) = ChildOutNodeName(Loop);
+                        OutletNodeNum(CountNum) = ChildOutNodeNum(Loop);
+                    }
+                    ChildCType.deallocate();
+                    ChildCName.deallocate();
+                    ChildInNodeName.deallocate();
+                    ChildOutNodeName.deallocate();
+                    ChildInNodeNum.deallocate();
+                    ChildOutNodeNum.deallocate();
+                }
+            }
+        } else {
+            ShowSevereError("GetChildrenData: Requested Children Data for non Parent Node=" + ComponentType + ':' + ComponentName);
+            ErrInObject = true;
+        }
+
+        if (ErrInObject) ErrorsFound = true;
+    }
+
+
     void SetUpCompSets(std::string const &ParentType,    // Parent Object Type
                        std::string const &ParentName,    // Parent Object Name
                        std::string const &CompType,      // Component Type
@@ -1786,7 +1962,7 @@ namespace BranchNodeConnections {
         AlreadyNoted.deallocate();
     }
 
-    void GetNodeConnectionType(int const NodeNumber, Array1D_int &NodeConnectType, bool &errFlag)
+    void GetNodeConnectionType(int const NodeNumber, EPVector<int> &NodeConnectType, bool &errFlag)
     {
 
         // FUNCTION INFORMATION:

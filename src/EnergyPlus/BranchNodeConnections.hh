@@ -148,6 +148,17 @@ namespace BranchNodeConnections {
                          Array1D_int &OutletNodeNum,
                          bool &ErrorsFound);
 
+    void GetChildrenData(std::string const &ComponentType,
+                         std::string const &ComponentName,
+                         int &NumChildren,
+                         EPVector<std::string> &ChildrenCType,
+                         EPVector<std::string> &ChildrenCName,
+                         EPVector<std::string> &InletNodeName,
+                         EPVector<int> &InletNodeNum,
+                         EPVector<std::string> &OutletNodeName,
+                         EPVector<int> &OutletNodeNum,
+                         bool &ErrorsFound);
+
     void SetUpCompSets(std::string const &ParentType,        // Parent Object Type
                        std::string const &ParentName,        // Parent Object Name
                        std::string const &CompType,          // Component Type
@@ -168,7 +179,7 @@ namespace BranchNodeConnections {
 
     void TestCompSetInletOutletNodes(bool &ErrorsFound);
 
-    void GetNodeConnectionType(int const NodeNumber, Array1D_int &NodeConnectType, bool &errFlag);
+    void GetNodeConnectionType(int const NodeNumber, EPVector<int> &NodeConnectType, bool &errFlag);
 
     void FindAllNodeNumbersInList(int const WhichNumber,
                                   Array1D<DataBranchNodeConnections::NodeConnectionDef> const &NodeConnections,

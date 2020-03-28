@@ -173,9 +173,9 @@ namespace SplitterComponent {
                                 bool &ErrorsFound                // set to true if problem
     );
 
-    Array1D_int GetSplitterNodeNumbers(std::string const &SplitterName, // must match Splitter names for the Splitter type
-                                       int const SplitterNum,           // Index of Splitters
-                                       bool &ErrorsFound                // set to true if problem
+    EPVector<int> GetSplitterNodeNumbers(std::string const &SplitterName, // must match Splitter names for the Splitter type
+                                         int const SplitterNum,           // Index of Splitters
+                                         bool &ErrorsFound                // set to true if problem
     );
 
     //        End of Reporting subroutines for the Splitter Module
