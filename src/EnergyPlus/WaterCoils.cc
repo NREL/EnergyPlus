@@ -191,8 +191,8 @@ namespace WaterCoils {
     EPVector<bool> MyUAAndFlowCalcFlag;
     EPVector<bool> MyCoilDesignFlag;
     EPVector<bool> CoilWarningOnceFlag;
-    Array1D_int WaterTempCoolCoilErrs;              // error counting for detailed coils
-    Array1D_int PartWetCoolCoilErrs;                // error counting for detailed coils
+    EPVector<int> WaterTempCoolCoilErrs;              // error counting for detailed coils
+    EPVector<int> PartWetCoolCoilErrs;                // error counting for detailed coils
     bool GetWaterCoilsInputFlag(true);              // Flag set to make sure you get input once
     bool WaterCoilControllerCheckOneTimeFlag(true); // flg used to check water coil controller
     EPVector<bool> CheckEquipName;
@@ -220,8 +220,8 @@ namespace WaterCoils {
     // Other routines
 
     // Object Data
-    Array1D<WaterCoilEquipConditions> WaterCoil;
-    Array1D<WaterCoilNumericFieldData> WaterCoilNumericFields;
+    EPVector<WaterCoilEquipConditions> WaterCoil;
+    EPVector<WaterCoilNumericFieldData> WaterCoilNumericFields;
 
     // MODULE SUBROUTINES:
     //*************************************************************************
@@ -378,10 +378,10 @@ namespace WaterCoils {
         int NumNums;
         int IOStat;
         std::string CurrentModuleObject; // for ease in getting objects
-        Array1D_string AlphArray;        // Alpha input items for object
-        Array1D_string cAlphaFields;     // Alpha field names
-        Array1D_string cNumericFields;   // Numeric field names
-        Array1D<Real64> NumArray;        // Numeric input items for object
+        EPVector<std::string> AlphArray;        // Alpha input items for object
+        EPVector<std::string> cAlphaFields;     // Alpha field names
+        EPVector<std::string> cNumericFields;   // Numeric field names
+        EPVector<Real64> NumArray;        // Numeric input items for object
         EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         EPVector<bool> lNumericBlanks;     // Logical array, numeric field input BLANK = .TRUE.
         static int MaxNums(0);           // Maximum number of numeric input fields
@@ -1028,8 +1028,8 @@ namespace WaterCoils {
         int WaterInletNode;
         int WaterOutletNode;
 
-        static Array1D<Real64> DesCpAir;        // CpAir at Design Inlet Air Temp
-        static Array1D<Real64> DesUARangeCheck; // Value for range check based on Design Inlet Air Humidity Ratio
+        static EPVector<Real64> DesCpAir;        // CpAir at Design Inlet Air Temp
+        static EPVector<Real64> DesUARangeCheck; // Value for range check based on Design Inlet Air Humidity Ratio
         /////////// hoisted into namespace InitWaterCoilOneTimeFlag
         // static bool MyOneTimeFlag( true );
         /////////////////////////
@@ -1037,7 +1037,7 @@ namespace WaterCoils {
         static EPVector<bool> MyCoilReportFlag;
         static EPVector<bool> PlantLoopScanFlag;
 
-        static Array1D<Real64> CoefSeries(5); // Tuned Changed to static: High call count: Set before use
+        static EPVector<Real64> CoefSeries(5); // Tuned Changed to static: High call count: Set before use
         Real64 FinDiamVar;
         Real64 TubeToFinDiamRatio;
 
@@ -1046,7 +1046,7 @@ namespace WaterCoils {
         Real64 UA0;      // lower bound for UA
         Real64 UA1;      // upper bound for UA
         Real64 UA;
-        static Array1D<Real64> Par(4); // Tuned Changed to static: High call count: Set before use
+        static EPVector<Real64> Par(4); // Tuned Changed to static: High call count: Set before use
 
         static bool NoSatCurveIntersect(false); // TRUE if failed to find appatatus dew-point
         static bool BelowInletWaterTemp(false); // TRUE if apparatus dew-point below design inlet water temperature
@@ -4831,7 +4831,7 @@ namespace WaterCoils {
     // Beginning of Coil Utility subroutines for the Detailed Model
     // *****************************************************************************
 
-    void CalcDryFinEffCoef(Real64 const OutTubeEffFinDiamRatio, Array1D<Real64> &PolynomCoef)
+    void CalcDryFinEffCoef(Real64 const OutTubeEffFinDiamRatio, EPVector<Real64> &PolynomCoef)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR   Unknown
@@ -5066,7 +5066,7 @@ namespace WaterCoils {
         Real64 G1;
         Real64 GJ;
         Real64 HJ;
-        Array1D<Real64> T(12);
+        EPVector<Real64> T(12);
         Real64 X2J;
 
         KBessFunc = 0.0;
@@ -5179,7 +5179,7 @@ namespace WaterCoils {
         KBessFunc = GJ;
     }
 
-    void CalcPolynomCoef(Array2<Real64> const &OrderedPair, Array1D<Real64> &PolynomCoef)
+    void CalcPolynomCoef(Array2<Real64> const &OrderedPair, EPVector<Real64> &PolynomCoef)
     {
         // SUBROUTINE INFORMATION:
         //       AUTHOR   Unknown
@@ -5296,7 +5296,7 @@ namespace WaterCoils {
     }
 
     Real64 SimpleHeatingCoilUAResidual(Real64 const UA,           // UA of coil
-                                       Array1D<Real64> const &Par // par(1) = design coil load [W]
+                                       EPVector<Real64> const &Par // par(1) = design coil load [W]
     )
     {
 
@@ -5353,7 +5353,7 @@ namespace WaterCoils {
     }
 
     Real64 SimpleCoolingCoilUAResidual(Real64 const UA,           // UA of coil
-                                       Array1D<Real64> const &Par // par(1) = design coil load [W]
+                                       EPVector<Real64> const &Par // par(1) = design coil load [W]
     )
     {
 
@@ -6241,7 +6241,7 @@ namespace WaterCoils {
         Real64 T0;                // lower bound for Tprov [C]
         Real64 T1;                // upper bound for Tprov [C]
         static Real64 Tprov(0.0); // provisional value of drybulb temperature [C]
-        Array1D<Real64> Par(3);   // Par(1) = desired enthaply H [J/kg]
+        EPVector<Real64> Par(3);   // Par(1) = desired enthaply H [J/kg]
         // Par(2) = desired relative humidity (0.0 - 1.0)
         // Par(3) = barometric pressure [N/m2 (Pascals)]
 
@@ -6271,7 +6271,7 @@ namespace WaterCoils {
     }
 
     Real64 EnthalpyResidual(Real64 const Tprov,        // test value of Tdb [C]
-                            Array1D<Real64> const &Par // Par(1) = desired enthaply H [J/kg]
+                            EPVector<Real64> const &Par // Par(1) = desired enthaply H [J/kg]
     )
     {
 

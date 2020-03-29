@@ -420,7 +420,7 @@ namespace ReportSizingManager {
         Real64 SupFanDT;                           // supply air fan delta temperature [C]
         Real64 RetFanDT;                           // return air fan delta temperature [C]
         Real64 FanCoolLoad;                        // load due to fan operation added to cooling load [W]
-        Array1D<Real64> Par(4);                    // array passed to RegulaFalsi
+        EPVector<Real64> Par(4);                   // array passed to RegulaFalsi
         std::string ScalableSM;                    // scalable sizing methods label for reporting
         Real64 const RatedInletAirTemp(26.6667);   // 26.6667C or 80F
         Real64 const RatedInletAirHumRat(0.01125); // Humidity ratio corresponding to 80F dry bulb/67F wet bulb

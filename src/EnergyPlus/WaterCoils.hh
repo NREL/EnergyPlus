@@ -112,8 +112,8 @@ namespace WaterCoils {
     extern EPVector<bool> MyUAAndFlowCalcFlag;
     extern EPVector<bool> MyCoilDesignFlag;
     extern EPVector<bool> CoilWarningOnceFlag;
-    extern Array1D_int WaterTempCoolCoilErrs; // error counting for detailed coils
-    extern Array1D_int PartWetCoolCoilErrs;   // error counting for detailed coils
+    extern EPVector<int> WaterTempCoolCoilErrs; // error counting for detailed coils
+    extern EPVector<int> PartWetCoolCoilErrs;   // error counting for detailed coils
     extern bool GetWaterCoilsInputFlag;       // Flag set to make sure you get input once
     extern EPVector<bool> CheckEquipName;
 
@@ -198,7 +198,7 @@ namespace WaterCoils {
         Real64 CoilEffectiveInsideDiam;
         Real64 GeometryCoef1;
         Real64 GeometryCoef2;
-        Array1D<Real64> DryFinEfficncyCoef;
+        EPVector<Real64> DryFinEfficncyCoef;
         Real64 SatEnthlCurveConstCoef;
         Real64 SatEnthlCurveSlope;
         Real64 EnthVsTempCurveAppxSlope;
@@ -308,7 +308,7 @@ namespace WaterCoils {
     struct WaterCoilNumericFieldData
     {
         // Members
-        Array1D_string FieldNames;
+        EPVector<std::string> FieldNames;
 
         // Default Constructor
         WaterCoilNumericFieldData()
@@ -317,8 +317,8 @@ namespace WaterCoils {
     };
 
     // Object Data
-    extern Array1D<WaterCoilEquipConditions> WaterCoil;
-    extern Array1D<WaterCoilNumericFieldData> WaterCoilNumericFields;
+    extern EPVector<WaterCoilEquipConditions> WaterCoil;
+    extern EPVector<WaterCoilNumericFieldData> WaterCoilNumericFields;
 
     // Functions
     void clear_state();
@@ -481,20 +481,20 @@ namespace WaterCoils {
     // Beginning of Coil Utility subroutines for the Detailed Model
     // *****************************************************************************
 
-    void CalcDryFinEffCoef(Real64 const OutTubeEffFinDiamRatio, Array1D<Real64> &PolynomCoef);
+    void CalcDryFinEffCoef(Real64 const OutTubeEffFinDiamRatio, EPVector<Real64> &PolynomCoef);
 
     void CalcIBesselFunc(Real64 const BessFuncArg, int const BessFuncOrd, Real64 &IBessFunc, int &ErrorCode);
 
     void CalcKBesselFunc(Real64 const BessFuncArg, int const BessFuncOrd, Real64 &KBessFunc, int &ErrorCode);
 
-    void CalcPolynomCoef(Array2<Real64> const &OrderedPair, Array1D<Real64> &PolynomCoef);
+    void CalcPolynomCoef(Array2<Real64> const &OrderedPair, EPVector<Real64> &PolynomCoef);
 
     Real64 SimpleHeatingCoilUAResidual(Real64 const UA,           // UA of coil
-                                       Array1D<Real64> const &Par // par(1) = design coil load [W]
+                                       EPVector<Real64> const &Par // par(1) = design coil load [W]
     );
 
     Real64 SimpleCoolingCoilUAResidual(Real64 const UA,           // UA of coil
-                                       Array1D<Real64> const &Par // par(1) = design coil load [W]
+                                       EPVector<Real64> const &Par // par(1) = design coil load [W]
     );
 
     // Iterate Routine for Cooling Coil
@@ -567,7 +567,7 @@ namespace WaterCoils {
     );
 
     Real64 EnthalpyResidual(Real64 const Tprov,        // test value of Tdb [C]
-                            Array1D<Real64> const &Par // Par(1) = desired enthaply H [J/kg]
+                            EPVector<Real64> const &Par // Par(1) = desired enthaply H [J/kg]
     );
 
     Real64 EstimateHEXSurfaceArea(int const CoilNum); // coil number, [-]
