@@ -191,7 +191,7 @@ namespace ZoneTempPredictorCorrector {
     int const iZC_HStat(4);
     int const iZC_TandHStat(5);
     int const iZC_StagedDual(6);
-    Array1D_int const iZControlTypes(6, {iZC_TStat, iZC_TCTStat, iZC_OTTStat, iZC_HStat, iZC_TandHStat, iZC_StagedDual});
+    EPVector<int> const iZControlTypes({iZC_TStat, iZC_TCTStat, iZC_OTTStat, iZC_HStat, iZC_TandHStat, iZC_StagedDual});
 
     int const ADAP_NONE(1);
     int const ASH55_CENTRAL(2);
@@ -283,16 +283,16 @@ namespace ZoneTempPredictorCorrector {
 
     // Object Data
     std::unordered_set<std::string> HumidityControlZoneUniqueNames;
-    Array1D<ZoneTempControlType> SetPointSingleHeating;
-    Array1D<ZoneTempControlType> SetPointSingleCooling;
-    Array1D<ZoneTempControlType> SetPointSingleHeatCool;
-    Array1D<ZoneTempControlType> SetPointDualHeatCool;
-    Array1D<ZoneComfortFangerControlType> SetPointSingleHeatingFanger;
-    Array1D<ZoneComfortFangerControlType> SetPointSingleCoolingFanger;
-    Array1D<ZoneComfortFangerControlType> SetPointSingleHeatCoolFanger;
-    Array1D<ZoneComfortFangerControlType> SetPointDualHeatCoolFanger;
+    EPVector<ZoneTempControlType> SetPointSingleHeating;
+    EPVector<ZoneTempControlType> SetPointSingleCooling;
+    EPVector<ZoneTempControlType> SetPointSingleHeatCool;
+    EPVector<ZoneTempControlType> SetPointDualHeatCool;
+    EPVector<ZoneComfortFangerControlType> SetPointSingleHeatingFanger;
+    EPVector<ZoneComfortFangerControlType> SetPointSingleCoolingFanger;
+    EPVector<ZoneComfortFangerControlType> SetPointSingleHeatCoolFanger;
+    EPVector<ZoneComfortFangerControlType> SetPointDualHeatCoolFanger;
     AdaptiveComfortDailySetPointSchedule AdapComfortDailySetPointSchedule;
-    Array1D<Real64> AdapComfortSetPointSummerDesDay(7, -1);
+    EPVector<Real64> AdapComfortSetPointSummerDesDay(7, -1);
 
     // Functions
     void clear_state()
@@ -471,8 +471,8 @@ namespace ZoneTempPredictorCorrector {
         int NumStageControlledZones; // Number of staged controlled objects
         int StageControlledZoneNum;  // Index for staged controlled zones
 
-        Array1D_int CTSchedMapToControlledZone;
-        Array1D_int CCmSchedMapToControlledZone;
+        EPVector<int> CTSchedMapToControlledZone;
+        EPVector<int> CCmSchedMapToControlledZone;
         int Item;
         int Item1;
         int ZLItem;

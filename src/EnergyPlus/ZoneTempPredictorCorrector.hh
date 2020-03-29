@@ -88,7 +88,7 @@ namespace ZoneTempPredictorCorrector {
     extern int const iZC_HStat;
     extern int const iZC_TandHStat;
     extern int const iZC_StagedDual;
-    extern Array1D_int const iZControlTypes;
+    extern EPVector<int> const iZControlTypes;
 
     extern int const SglHeatSetPoint;
     extern int const SglCoolSetPoint;
@@ -211,16 +211,16 @@ namespace ZoneTempPredictorCorrector {
     };
 
     // Object Data
-    extern Array1D<ZoneTempControlType> SetPointSingleHeating;
-    extern Array1D<ZoneTempControlType> SetPointSingleCooling;
-    extern Array1D<ZoneTempControlType> SetPointSingleHeatCool;
-    extern Array1D<ZoneTempControlType> SetPointDualHeatCool;
-    extern Array1D<ZoneComfortFangerControlType> SetPointSingleHeatingFanger;
-    extern Array1D<ZoneComfortFangerControlType> SetPointSingleCoolingFanger;
-    extern Array1D<ZoneComfortFangerControlType> SetPointSingleHeatCoolFanger;
-    extern Array1D<ZoneComfortFangerControlType> SetPointDualHeatCoolFanger;
+    extern EPVector<ZoneTempControlType> SetPointSingleHeating;
+    extern EPVector<ZoneTempControlType> SetPointSingleCooling;
+    extern EPVector<ZoneTempControlType> SetPointSingleHeatCool;
+    extern EPVector<ZoneTempControlType> SetPointDualHeatCool;
+    extern EPVector<ZoneComfortFangerControlType> SetPointSingleHeatingFanger;
+    extern EPVector<ZoneComfortFangerControlType> SetPointSingleCoolingFanger;
+    extern EPVector<ZoneComfortFangerControlType> SetPointSingleHeatCoolFanger;
+    extern EPVector<ZoneComfortFangerControlType> SetPointDualHeatCoolFanger;
     extern AdaptiveComfortDailySetPointSchedule AdapComfortDailySetPointSchedule;
-    extern Array1D<Real64> AdapComfortSetPointSummerDesDay;
+    extern EPVector<Real64> AdapComfortSetPointSummerDesDay;
 
     // Functions
     void clear_state();

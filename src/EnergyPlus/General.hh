@@ -310,6 +310,17 @@ namespace General {
         return FindNumberInList;
     }
 
+    inline int
+    FindNumberInList(int const WhichNumber, const EPVector<int> &ListOfItems, int)
+    {
+        int FindNumberInList(0);
+        auto found = std::find(ListOfItems.begin(), ListOfItems.end(), WhichNumber);
+        if (found != ListOfItems.end()) {
+            FindNumberInList = std::distance(ListOfItems.begin(), found);
+        }
+        return FindNumberInList;
+    }
+
     void DecodeMonDayHrMin(int const Item, // word containing encoded month, day, hour, minute
                            int &Month,     // month in integer format (1-12)
                            int &Day,       // day in integer format (1-31)
