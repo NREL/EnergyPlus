@@ -156,10 +156,10 @@ namespace TARCOGCommon {
         return LDSumMean;
     }
 
-    void modifyHcGap(Array1D<Real64> const &hcgap, // Convective coefficient for gap
-                     Array1D<Real64> const &qv,    // Heat flow from ventilation [W/m2]
-                     Array1D<Real64> const &hcv,   // Convective heat flow coefficient due to ventilation
-                     Array1D<Real64> &hcgapMod,    // Modified heat flow coefficient for gap
+    void modifyHcGap(EPVector<Real64> const &hcgap, // Convective coefficient for gap
+                     EPVector<Real64> const &qv,    // Heat flow from ventilation [W/m2]
+                     EPVector<Real64> const &hcv,   // Convective heat flow coefficient due to ventilation
+                     EPVector<Real64> &hcgapMod,    // Modified heat flow coefficient for gap
                      int const nlayer,             // Number of layers
                      Real64 const edgeGlCorFac     // Edge of glass correction factor
     )
@@ -175,21 +175,21 @@ namespace TARCOGCommon {
 
     void matrixQBalance(int const nlayer,
                         Array2<Real64> &a,
-                        Array1D<Real64> &b,
-                        Array1D<Real64> const &sconScaled, // Solid layer coduction coefficient divided by thickness
-                        Array1D<Real64> const &hcgas,
-                        Array1D<Real64> &hcgapMod, // Modified heat flow coefficient for gap
-                        Array1D<Real64> const &asol,
-                        Array1D<Real64> const &qv,
-                        Array1D<Real64> const &hcv, // Convective heat flow coefficient due to ventilation
+                        EPVector<Real64> &b,
+                        EPVector<Real64> const &sconScaled, // Solid layer coduction coefficient divided by thickness
+                        EPVector<Real64> const &hcgas,
+                        EPVector<Real64> &hcgapMod, // Modified heat flow coefficient for gap
+                        EPVector<Real64> const &asol,
+                        EPVector<Real64> const &qv,
+                        EPVector<Real64> const &hcv, // Convective heat flow coefficient due to ventilation
                         Real64 const Tin,
                         Real64 const Tout,
                         Real64 const Gin,
                         Real64 const Gout,
-                        Array1D<Real64> const &theta,
-                        Array1D<Real64> const &tir,
-                        Array1D<Real64> const &rir,
-                        Array1D<Real64> const &emis,
+                        EPVector<Real64> const &theta,
+                        EPVector<Real64> const &tir,
+                        EPVector<Real64> const &rir,
+                        EPVector<Real64> const &emis,
                         Real64 const edgeGlCorrFac // Edge of glass correction factor
     )
     {
@@ -297,7 +297,7 @@ namespace TARCOGCommon {
         }
     }
 
-    void EquationsSolver(Array2<Real64> &a, Array1D<Real64> &b, int const n, int &nperr, std::string &ErrorMessage)
+    void EquationsSolver(Array2<Real64> &a, EPVector<Real64> &b, int const n, int &nperr, std::string &ErrorMessage)
     {
         //***********************************************************************
         // Purpose: solves the main system of energy balance equations
@@ -330,7 +330,7 @@ namespace TARCOGCommon {
 
         // Locals
         static int const NMAX(500);
-        static Array1D<Real64> vv(NMAX);
+        static EPVector<Real64> vv(NMAX);
 
         Real64 const TINY(1.0e-20);
 
@@ -397,7 +397,7 @@ namespace TARCOGCommon {
         } // j
     }
 
-    void lubksb(Array2A<Real64> const a, int const n, const Array1D_int &indx, Array1D<Real64> &b)
+    void lubksb(Array2A<Real64> const a, int const n, const Array1D_int &indx, EPVector<Real64> &b)
     {
         //***********************************************************************
         //***********************************************************************

@@ -96,14 +96,14 @@ namespace TARCOGDeflection {
                          Real64 const Pa,
                          Real64 const Pini,
                          Real64 const Tini,
-                         const Array1D<Real64> &PaneThickness,
-                         const Array1D<Real64> &NonDeflectedGapWidth,
-                         Array1D<Real64> &DeflectedGapWidthMax,
-                         Array1D<Real64> &DeflectedGapWidthMean,
-                         const Array1D<Real64> &PanelTemps,
-                         const Array1D<Real64> &YoungsMod,
-                         const Array1D<Real64> &PoissonsRat,
-                         Array1D<Real64> &LayerDeflection,
+                         const EPVector<Real64> &PaneThickness,
+                         const EPVector<Real64> &NonDeflectedGapWidth,
+                         EPVector<Real64> &DeflectedGapWidthMax,
+                         EPVector<Real64> &DeflectedGapWidthMean,
+                         const EPVector<Real64> &PanelTemps,
+                         const EPVector<Real64> &YoungsMod,
+                         const EPVector<Real64> &PoissonsRat,
+                         EPVector<Real64> &LayerDeflection,
                          int &nperr,
                          std::string &ErrorMessage)
     {
@@ -128,7 +128,7 @@ namespace TARCOGDeflection {
         // OUTPUT
 
         // Localy used
-        Array1D<Real64> DCoeff(maxlay);
+        EPVector<Real64> DCoeff(maxlay);
         int i;
 
         i = 0;
@@ -170,12 +170,12 @@ namespace TARCOGDeflection {
                                 Real64 const Pa,
                                 Real64 const Pini,
                                 Real64 const Tini,
-                                const Array1D<Real64> &NonDeflectedGapWidth,
-                                Array1D<Real64> &DeflectedGapWidthMax,
-                                Array1D<Real64> &DeflectedGapWidthMean,
-                                const Array1D<Real64> &PanelTemps,
-                                Array1D<Real64> &DCoeff,
-                                Array1D<Real64> &LayerDeflection,
+                                const EPVector<Real64> &NonDeflectedGapWidth,
+                                EPVector<Real64> &DeflectedGapWidthMax,
+                                EPVector<Real64> &DeflectedGapWidthMean,
+                                const EPVector<Real64> &PanelTemps,
+                                EPVector<Real64> &DCoeff,
+                                EPVector<Real64> &LayerDeflection,
                                 int &nperr,
                                 std::string &ErrorMessage)
     {
@@ -200,11 +200,11 @@ namespace TARCOGDeflection {
         static Real64 const Pi_6(pow_6(Pi));
 
         // localy used
-        Array1D<Real64> DPressure(maxlay); // delta pressure at each glazing layer
-        Array1D<Real64> Vini(MaxGap);
-        Array1D<Real64> Vgap(MaxGap);
-        Array1D<Real64> Pgap(MaxGap);
-        Array1D<Real64> Tgap(MaxGap);
+        EPVector<Real64> DPressure(maxlay); // delta pressure at each glazing layer
+        EPVector<Real64> Vini(MaxGap);
+        EPVector<Real64> Vgap(MaxGap);
+        EPVector<Real64> Pgap(MaxGap);
+        EPVector<Real64> Tgap(MaxGap);
         Real64 MaxLDSum;
         Real64 MeanLDSum;
         Real64 Ratio;
@@ -272,11 +272,11 @@ namespace TARCOGDeflection {
     void DeflectionWidths(int const nlayer,
                           Real64 const W,
                           Real64 const H,
-                          Array1D<Real64> &DCoeff,
-                          const Array1D<Real64> &NonDeflectedGapWidth,
-                          const Array1D<Real64> &DeflectedGapWidthMax,
-                          Array1D<Real64> &DeflectedGapWidthMean,
-                          Array1D<Real64> &LayerDeflection)
+                          EPVector<Real64> &DCoeff,
+                          const EPVector<Real64> &NonDeflectedGapWidth,
+                          const EPVector<Real64> &DeflectedGapWidthMax,
+                          EPVector<Real64> &DeflectedGapWidthMean,
+                          EPVector<Real64> &LayerDeflection)
     {
         // INPUT
 

@@ -55,6 +55,7 @@
 // C++ Headers
 #include <cassert>
 #include <cstdint> // C++11
+#include <numeric>
 
 #include <EnergyPlus/api/TypeDefs.h>
 
@@ -361,7 +362,7 @@ EPVector<T> pack(EPVector<T> const & v, EPVector<bool> const & mask)
             r.emplace_back(v[i]);
         }
     }
-	return r;
+    return r;
 }
 
 template<typename T>
@@ -376,6 +377,20 @@ Array1D<T> pack(Array1<T> const & a, EPVector<bool> const & mask)
         }
     }
     return r;
+}
+
+template<typename T>
+inline
+T magnitude_squared(const EPVector<T> & v)
+{
+    return std::inner_product(v.begin(), v.end(), v.begin(), 0);
+}
+
+template<typename T, typename V>
+inline
+T dot(const EPVector<T> & u, const V &v)
+{
+    return std::inner_product(u.begin(), u.end(), v.begin(), 0);
 }
 
 #endif

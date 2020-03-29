@@ -192,32 +192,32 @@ namespace ThermalISO15099Calc {
                        Real64 const fclr,
                        Real64 const VacuumPressure,
                        Real64 const VacuumMaxGapThickness,
-                       Array1D<Real64> &gap,
-                       Array1D<Real64> &thick,
-                       Array1D<Real64> &scon,
-                       const Array1D<Real64> &tir,
-                       const Array1D<Real64> &emis,
+                       EPVector<Real64> &gap,
+                       EPVector<Real64> &thick,
+                       EPVector<Real64> &scon,
+                       const EPVector<Real64> &tir,
+                       const EPVector<Real64> &emis,
                        Real64 const totsol,
                        Real64 const tilt,
-                       const Array1D<Real64> &asol,
+                       const EPVector<Real64> &asol,
                        Real64 const height,
                        Real64 const heightt,
                        Real64 const width,
-                       const Array1D<Real64> &presure,
+                       const EPVector<Real64> &presure,
                        Array2A_int const iprop,
                        Array2A<Real64> const frct,
                        Array2A<Real64> const xgcon,
                        Array2A<Real64> const xgvis,
                        Array2A<Real64> const xgcp,
-                       const Array1D<Real64> &xwght,
-                       const Array1D<Real64> &gama,
+                       const EPVector<Real64> &xwght,
+                       const EPVector<Real64> &gama,
                        const Array1D_int &nmix,
                        const Array1D_int &SupportPillar,     // Shows whether or not gap have support pillar
-                       const Array1D<Real64> &PillarSpacing, // Pillar spacing for each gap (used in case there is support pillar)
-                       const Array1D<Real64> &PillarRadius,  // Pillar radius for each gap (used in case there is support pillar)
-                       Array1D<Real64> &theta,
-                       Array1D<Real64> &q,
-                       Array1D<Real64> &qv,
+                       const EPVector<Real64> &PillarSpacing, // Pillar spacing for each gap (used in case there is support pillar)
+                       const EPVector<Real64> &PillarRadius,  // Pillar radius for each gap (used in case there is support pillar)
+                       EPVector<Real64> &theta,
+                       EPVector<Real64> &q,
+                       EPVector<Real64> &qv,
                        Real64 &ufactor,
                        Real64 &sc,
                        Real64 &hflux,
@@ -227,8 +227,8 @@ namespace ThermalISO15099Calc {
                        Real64 &hrout,
                        Real64 &hin,
                        Real64 &hout,
-                       Array1D<Real64> &hcgas,
-                       Array1D<Real64> &hrgas,
+                       EPVector<Real64> &hcgas,
+                       EPVector<Real64> &hrgas,
                        Real64 &shgc,
                        int &nperr,
                        std::string &ErrorMessage,
@@ -236,26 +236,26 @@ namespace ThermalISO15099Calc {
                        Real64 &tamb,
                        Real64 &troom,
                        const Array1D_int &ibc,
-                       const Array1D<Real64> &Atop,
-                       const Array1D<Real64> &Abot,
-                       const Array1D<Real64> &Al,
-                       const Array1D<Real64> &Ar,
-                       const Array1D<Real64> &Ah,
-                       const Array1D<Real64> &SlatThick,
-                       const Array1D<Real64> &SlatWidth,
-                       const Array1D<Real64> &SlatAngle,
-                       const Array1D<Real64> &SlatCond,
-                       const Array1D<Real64> &SlatSpacing,
-                       const Array1D<Real64> &SlatCurve,
-                       const Array1D<Real64> &vvent,
-                       const Array1D<Real64> &tvent,
+                       const EPVector<Real64> &Atop,
+                       const EPVector<Real64> &Abot,
+                       const EPVector<Real64> &Al,
+                       const EPVector<Real64> &Ar,
+                       const EPVector<Real64> &Ah,
+                       const EPVector<Real64> &SlatThick,
+                       const EPVector<Real64> &SlatWidth,
+                       const EPVector<Real64> &SlatAngle,
+                       const EPVector<Real64> &SlatCond,
+                       const EPVector<Real64> &SlatSpacing,
+                       const EPVector<Real64> &SlatCurve,
+                       const EPVector<Real64> &vvent,
+                       const EPVector<Real64> &tvent,
                        const Array1D_int &LayerType,
                        const Array1D_int &nslice,
-                       const Array1D<Real64> &LaminateA,
-                       const Array1D<Real64> &LaminateB,
-                       const Array1D<Real64> &sumsol,
-                       Array1D<Real64> &Ra,
-                       Array1D<Real64> &Nu,
+                       const EPVector<Real64> &LaminateA,
+                       const EPVector<Real64> &LaminateB,
+                       const EPVector<Real64> &sumsol,
+                       EPVector<Real64> &Ra,
+                       EPVector<Real64> &Nu,
                        int const ThermalMod,
                        int const Debug_mode, // Switch for debug output files:
                        Real64 &ShadeEmisRatioOut,
@@ -264,8 +264,8 @@ namespace ThermalISO15099Calc {
                        Real64 &ShadeHcRatioIn,
                        Real64 &HcUnshadedOut,
                        Real64 &HcUnshadedIn,
-                       Array1D<Real64> &Keff,
-                       Array1D<Real64> &ShadeGapKeffConv,
+                       EPVector<Real64> &Keff,
+                       EPVector<Real64> &ShadeGapKeffConv,
                        Real64 const SDScalar,
                        int const SHGCCalc, // SHGC calculation switch:
                        int &NumOfIterations,
@@ -361,18 +361,18 @@ namespace ThermalISO15099Calc {
 
         // Variables
 
-        static Array1D<Real64> thetas(maxlay2);
-        static Array1D<Real64> rir(maxlay2);
-        static Array1D<Real64> hcgass(maxlay1);
-        static Array1D<Real64> hrgass(maxlay1);
-        static Array1D<Real64> rs(maxlay3, 0.0);
+        static EPVector<Real64> thetas(maxlay2);
+        static EPVector<Real64> rir(maxlay2);
+        static EPVector<Real64> hcgass(maxlay1);
+        static EPVector<Real64> hrgass(maxlay1);
+        static EPVector<Real64> rs(maxlay3, 0.0);
 
         //  REAL(r64) :: grho(maxgas,3)
-        static Array1D<Real64> qs(maxlay3);
-        static Array1D<Real64> qvs(maxlay1);
-        static Array1D<Real64> LaminateAU(maxlay);
-        static Array1D<Real64> sumsolU(maxlay);
-        static Array1D<Real64> sol0(maxlay);
+        static EPVector<Real64> qs(maxlay3);
+        static EPVector<Real64> qvs(maxlay1);
+        static EPVector<Real64> LaminateAU(maxlay);
+        static EPVector<Real64> sumsolU(maxlay);
+        static EPVector<Real64> sol0(maxlay);
         Real64 shgct_NOSD;
         Real64 trmout;
 
@@ -387,10 +387,10 @@ namespace ThermalISO15099Calc {
         Real64 qc1;
         Real64 qc2;
         Real64 qcgg;
-        static Array1D<Real64> qcgas(maxlay1);
-        static Array1D<Real64> qcgaps(maxlay1);
-        static Array1D<Real64> qrgas(maxlay1);
-        static Array1D<Real64> qrgaps(maxlay1);
+        static EPVector<Real64> qcgas(maxlay1);
+        static EPVector<Real64> qcgaps(maxlay1);
+        static EPVector<Real64> qrgas(maxlay1);
+        static EPVector<Real64> qrgaps(maxlay1);
 
         Real64 ShadeHcModifiedOut;
         Real64 ShadeHcModifiedIn;
@@ -403,22 +403,22 @@ namespace ThermalISO15099Calc {
         int nlayer_NOSD;
         Real64 AchievedErrorTolerance_NOSD;
         int NumOfIter_NOSD;
-        static Array1D<Real64> Atop_NOSD(maxlay);
-        static Array1D<Real64> Abot_NOSD(maxlay);
-        static Array1D<Real64> Al_NOSD(maxlay);
-        static Array1D<Real64> Ar_NOSD(maxlay);
-        static Array1D<Real64> Ah_NOSD(maxlay);
-        static Array1D<Real64> EffectiveOpenness_NOSD(maxlay);
-        static Array1D<Real64> SlatThick_NOSD(maxlay);
-        static Array1D<Real64> SlatWidth_NOSD(maxlay);
-        static Array1D<Real64> SlatAngle_NOSD(maxlay);
-        static Array1D<Real64> SlatCond_NOSD(maxlay);
-        static Array1D<Real64> SlatSpacing_NOSD(maxlay);
-        static Array1D<Real64> SlatCurve_NOSD(maxlay);
-        static Array1D<Real64> vvent_NOSD(maxlay1);
-        static Array1D<Real64> tvent_NOSD(maxlay1);
-        static Array1D<Real64> qv_NOSD(maxlay1);
-        static Array1D<Real64> q_NOSD(maxlay3);
+        static EPVector<Real64> Atop_NOSD(maxlay);
+        static EPVector<Real64> Abot_NOSD(maxlay);
+        static EPVector<Real64> Al_NOSD(maxlay);
+        static EPVector<Real64> Ar_NOSD(maxlay);
+        static EPVector<Real64> Ah_NOSD(maxlay);
+        static EPVector<Real64> EffectiveOpenness_NOSD(maxlay);
+        static EPVector<Real64> SlatThick_NOSD(maxlay);
+        static EPVector<Real64> SlatWidth_NOSD(maxlay);
+        static EPVector<Real64> SlatAngle_NOSD(maxlay);
+        static EPVector<Real64> SlatCond_NOSD(maxlay);
+        static EPVector<Real64> SlatSpacing_NOSD(maxlay);
+        static EPVector<Real64> SlatCurve_NOSD(maxlay);
+        static EPVector<Real64> vvent_NOSD(maxlay1);
+        static EPVector<Real64> tvent_NOSD(maxlay1);
+        static EPVector<Real64> qv_NOSD(maxlay1);
+        static EPVector<Real64> q_NOSD(maxlay3);
         Real64 hin_NOSD;
         Real64 flux_NOSD;
         Real64 hcin_NOSD;
@@ -433,55 +433,55 @@ namespace ThermalISO15099Calc {
         Real64 hflux_NOSD;
         Real64 shgc_NOSD;
         Real64 hout_NOSD;
-        static Array1D<Real64> gap_NOSD(maxlay);
-        static Array1D<Real64> thick_NOSD(maxlay);
-        static Array1D<Real64> scon_NOSD(maxlay);
-        static Array1D<Real64> emis_NOSD(maxlay2);
-        static Array1D<Real64> rir_NOSD(maxlay2);
-        static Array1D<Real64> tir_NOSD(maxlay2);
-        static Array1D<Real64> theta_NOSD(maxlay2);
+        static EPVector<Real64> gap_NOSD(maxlay);
+        static EPVector<Real64> thick_NOSD(maxlay);
+        static EPVector<Real64> scon_NOSD(maxlay);
+        static EPVector<Real64> emis_NOSD(maxlay2);
+        static EPVector<Real64> rir_NOSD(maxlay2);
+        static EPVector<Real64> tir_NOSD(maxlay2);
+        static EPVector<Real64> theta_NOSD(maxlay2);
         static Array2D<Real64> frct_NOSD(maxgas, maxlay1);
         static Array2D_int iprop_NOSD(maxgas, maxlay1);
         static Array1D_int nmix_NOSD(maxlay1);
-        static Array1D<Real64> presure_NOSD(maxlay1);
-        static Array1D<Real64> hcgas_NOSD(maxlay1);
-        static Array1D<Real64> hrgas_NOSD(maxlay1);
+        static EPVector<Real64> presure_NOSD(maxlay1);
+        static EPVector<Real64> hcgas_NOSD(maxlay1);
+        static EPVector<Real64> hrgas_NOSD(maxlay1);
         // REAL(r64) ::  rs_NOSD(maxlay3)!,sol(maxlay)
-        static Array1D<Real64> LaminateA_NOSD(maxlay);
-        static Array1D<Real64> LaminateB_NOSD(maxlay);
-        static Array1D<Real64> sumsol_NOSD(maxlay);
-        static Array1D<Real64> Ra_NOSD(maxlay);
-        static Array1D<Real64> Nu_NOSD(maxlay);
+        static EPVector<Real64> LaminateA_NOSD(maxlay);
+        static EPVector<Real64> LaminateB_NOSD(maxlay);
+        static EPVector<Real64> sumsol_NOSD(maxlay);
+        static EPVector<Real64> Ra_NOSD(maxlay);
+        static EPVector<Real64> Nu_NOSD(maxlay);
         Real64 ShadeEmisRatioOut_NOSD;
         Real64 ShadeEmisRatioIn_NOSD;
         Real64 ShadeHcRatioOut_NOSD;
         Real64 ShadeHcRatioIn_NOSD;
         Real64 ShadeHcModifiedOut_NOSD;
         Real64 ShadeHcModifiedIn_NOSD;
-        static Array1D<Real64> Ebb(maxlay);
-        static Array1D<Real64> Ebf(maxlay);
-        static Array1D<Real64> Rb(maxlay);
-        static Array1D<Real64> Rf(maxlay);
-        static Array1D<Real64> Ebbs(maxlay);
-        static Array1D<Real64> Ebfs(maxlay);
-        static Array1D<Real64> Rbs(maxlay);
-        static Array1D<Real64> Rfs(maxlay);
-        static Array1D<Real64> Ebb_NOSD(maxlay);
-        static Array1D<Real64> Ebf_NOSD(maxlay);
-        static Array1D<Real64> Rb_NOSD(maxlay);
-        static Array1D<Real64> Rf_NOSD(maxlay);
+        static EPVector<Real64> Ebb(maxlay);
+        static EPVector<Real64> Ebf(maxlay);
+        static EPVector<Real64> Rb(maxlay);
+        static EPVector<Real64> Rf(maxlay);
+        static EPVector<Real64> Ebbs(maxlay);
+        static EPVector<Real64> Ebfs(maxlay);
+        static EPVector<Real64> Rbs(maxlay);
+        static EPVector<Real64> Rfs(maxlay);
+        static EPVector<Real64> Ebb_NOSD(maxlay);
+        static EPVector<Real64> Ebf_NOSD(maxlay);
+        static EPVector<Real64> Rb_NOSD(maxlay);
+        static EPVector<Real64> Rf_NOSD(maxlay);
 
-        static Array1D<Real64> ShadeGapKeffConv_NOSD(MaxGap);
-        static Array1D<Real64> qcgas_NOSD(maxlay1);
-        static Array1D<Real64> Keff_NOSD(maxlay1);
-        static Array1D<Real64> qrgas_NOSD(maxlay1);
+        static EPVector<Real64> ShadeGapKeffConv_NOSD(MaxGap);
+        static EPVector<Real64> qcgas_NOSD(maxlay1);
+        static EPVector<Real64> Keff_NOSD(maxlay1);
+        static EPVector<Real64> qrgas_NOSD(maxlay1);
         static Array1D_int nslice_NOSD(maxlay);
-        static Array1D<Real64> vfreevent_NOSD(maxlay1);
+        static EPVector<Real64> vfreevent_NOSD(maxlay1);
 
         int FirstSpecularLayer;
         int LastSpecularLayer;
 
-        static Array1D<Real64> vfreevent(maxlay1);
+        static EPVector<Real64> vfreevent(maxlay1);
 
         // cbi...Other variables:
         Real64 flux;
@@ -507,12 +507,12 @@ namespace ThermalISO15099Calc {
         static Real64 flux_nonsolar(0.0);
         static ObjexxFCL::gio::Fmt fmtLD("*");
 
-        static Array1D<Real64> Atop_eff(maxlay, 0.0);
-        static Array1D<Real64> Abot_eff(maxlay, 0.0);
-        static Array1D<Real64> Al_eff(maxlay, 0.0);
-        static Array1D<Real64> Ar_eff(maxlay, 0.0);
-        static Array1D<Real64> Ah_eff(maxlay, 0.0);
-        static Array1D<Real64> EffectiveOpenness(maxlay, 0.0);
+        static EPVector<Real64> Atop_eff(maxlay, 0.0);
+        static EPVector<Real64> Abot_eff(maxlay, 0.0);
+        static EPVector<Real64> Al_eff(maxlay, 0.0);
+        static EPVector<Real64> Ar_eff(maxlay, 0.0);
+        static EPVector<Real64> Ah_eff(maxlay, 0.0);
+        static EPVector<Real64> EffectiveOpenness(maxlay, 0.0);
 
         // Autodesk:Uninit Initialize variables used uninitialized
         shgc_NOSD = 0.0;            // Autodesk:Uninit Force default initialization
@@ -1304,32 +1304,32 @@ namespace ThermalISO15099Calc {
                  Real64 const trmin,
                  Real64 &ebroom,
                  Real64 const Gin,
-                 const Array1D<Real64> &tir,
-                 const Array1D<Real64> &rir,
-                 const Array1D<Real64> &emis,
-                 const Array1D<Real64> &gap,
-                 const Array1D<Real64> &thick,
-                 const Array1D<Real64> &scon,
+                 const EPVector<Real64> &tir,
+                 const EPVector<Real64> &rir,
+                 const EPVector<Real64> &emis,
+                 const EPVector<Real64> &gap,
+                 const EPVector<Real64> &thick,
+                 const EPVector<Real64> &scon,
                  Real64 const tilt,
-                 const Array1D<Real64> &asol,
+                 const EPVector<Real64> &asol,
                  Real64 const height,
                  Real64 const heightt,
                  Real64 const width,
                  Array2_int const &iprop,
                  Array2<Real64> const &frct,
-                 const Array1D<Real64> &presure,
+                 const EPVector<Real64> &presure,
                  const Array1D_int &nmix,
-                 const Array1D<Real64> &wght,
+                 const EPVector<Real64> &wght,
                  Array2<Real64> const &gcon,
                  Array2<Real64> const &gvis,
                  Array2<Real64> const &gcp,
-                 const Array1D<Real64> &gama,
+                 const EPVector<Real64> &gama,
                  const Array1D_int &SupportPillar,
-                 const Array1D<Real64> &PillarSpacing,
-                 const Array1D<Real64> &PillarRadius,
-                 Array1D<Real64> &theta,
-                 Array1D<Real64> &q,
-                 Array1D<Real64> &qv,
+                 const EPVector<Real64> &PillarSpacing,
+                 const EPVector<Real64> &PillarRadius,
+                 EPVector<Real64> &theta,
+                 EPVector<Real64> &q,
+                 EPVector<Real64> &qv,
                  Real64 &flux,
                  Real64 &hcin,
                  Real64 &hrin,
@@ -1337,32 +1337,32 @@ namespace ThermalISO15099Calc {
                  Real64 &hrout,
                  Real64 &hin,
                  Real64 &hout,
-                 Array1D<Real64> &hcgas,
-                 Array1D<Real64> &hrgas,
+                 EPVector<Real64> &hcgas,
+                 EPVector<Real64> &hrgas,
                  Real64 &ufactor,
                  int &nperr,
                  std::string &ErrorMessage,
                  Real64 &tamb,
                  Real64 &troom,
                  const Array1D_int &ibc,
-                 const Array1D<Real64> &Atop,
-                 const Array1D<Real64> &Abot,
-                 const Array1D<Real64> &Al,
-                 const Array1D<Real64> &Ar,
-                 const Array1D<Real64> &Ah,
-                 const Array1D<Real64> &EffectiveOpenness, // Effective opennes for airflow calculations [m2]
-                 const Array1D<Real64> &vvent,
-                 const Array1D<Real64> &tvent,
+                 const EPVector<Real64> &Atop,
+                 const EPVector<Real64> &Abot,
+                 const EPVector<Real64> &Al,
+                 const EPVector<Real64> &Ar,
+                 const EPVector<Real64> &Ah,
+                 const EPVector<Real64> &EffectiveOpenness, // Effective opennes for airflow calculations [m2]
+                 const EPVector<Real64> &vvent,
+                 const EPVector<Real64> &tvent,
                  const Array1D_int &LayerType,
-                 Array1D<Real64> &Ra,
-                 Array1D<Real64> &Nu,
-                 Array1D<Real64> &vfreevent,
-                 Array1D<Real64> &qcgas,
-                 Array1D<Real64> &qrgas,
-                 Array1D<Real64> &Ebf,
-                 Array1D<Real64> &Ebb,
-                 Array1D<Real64> &Rf,
-                 Array1D<Real64> &Rb,
+                 EPVector<Real64> &Ra,
+                 EPVector<Real64> &Nu,
+                 EPVector<Real64> &vfreevent,
+                 EPVector<Real64> &qcgas,
+                 EPVector<Real64> &qrgas,
+                 EPVector<Real64> &Ebf,
+                 EPVector<Real64> &Ebb,
+                 EPVector<Real64> &Rf,
+                 EPVector<Real64> &Rb,
                  Real64 &ShadeEmisRatioOut,
                  Real64 &ShadeEmisRatioIn,
                  Real64 &ShadeHcModifiedOut,
@@ -1446,12 +1446,12 @@ namespace ThermalISO15099Calc {
         //   3 - save in-between results (in all iterations) to existing debug file
 
         Array2D<Real64> a(4 * nlayer, 4 * nlayer);
-        Array1D<Real64> b(4 * nlayer);
-        static Array1D<Real64> hgas(maxlay1);
+        EPVector<Real64> b(4 * nlayer);
+        static EPVector<Real64> hgas(maxlay1);
         // REAL(r64) :: hhatv(maxlay3),hcv(maxlay3), Ebgap(maxlay3), Tgap(maxlay1)
-        static Array1D<Real64> Tgap(maxlay1);
-        static Array1D<Real64> hcgapMod(maxlay1);
-        static Array1D<Real64> hcv(maxlay1);
+        static EPVector<Real64> Tgap(maxlay1);
+        static EPVector<Real64> hcgapMod(maxlay1);
+        static EPVector<Real64> hcv(maxlay1);
 
         // REAL(r64) ::  alpha
         int maxiter;
@@ -1459,30 +1459,30 @@ namespace ThermalISO15099Calc {
         Real64 qr_gap_out;
         Real64 qr_gap_in;
 
-        Array1D<Real64> told(2 * nlayer);
+        EPVector<Real64> told(2 * nlayer);
 
         // Simon: parameters used in case of JCFN iteration method
         // REAL(r64) :: Dvector(maxlay4) ! store diagonal matrix used in JCFN iterations
-        Array1D<Real64> FRes({1, 4 * nlayer});      // store function results from current iteration
-        Array1D<Real64> FResOld({1, 4 * nlayer});   // store function results from previous iteration
-        Array1D<Real64> FResDiff({1, 4 * nlayer});  // save difference in results between iterations
-        Array1D<Real64> Radiation({1, 2 * nlayer}); // radiation on layer surfaces.  used as temporary storage during iterations
+        EPVector<Real64> FRes(4 * nlayer);      // store function results from current iteration
+        EPVector<Real64> FResOld(4 * nlayer);   // store function results from previous iteration
+        EPVector<Real64> FResDiff(4 * nlayer);  // save difference in results between iterations
+        EPVector<Real64> Radiation(2 * nlayer); // radiation on layer surfaces.  used as temporary storage during iterations
 
-        Array1D<Real64> x({1, 4 * nlayer});       // temporary vector for storing results (theta and Radiation).  used for easier handling
-        Array1D<Real64> dX({1, 4 * nlayer}, 0.0); // difference in results
+        EPVector<Real64> x(4 * nlayer);       // temporary vector for storing results (theta and Radiation).  used for easier handling
+        EPVector<Real64> dX(4 * nlayer, 0.0); // difference in results
         Array2D<Real64> Jacobian({1, 4 * nlayer}, {1, 4 * nlayer}); // diagonal vector for jacobian comuptation-free newton method
-        Array1D<Real64> DRes({1, 4 * nlayer});                      // used in jacobian forward-difference approximation
+        EPVector<Real64> DRes(4 * nlayer);                      // used in jacobian forward-difference approximation
 
         // This is used to store matrix before equation solver.  It is important because solver destroys
         // content of matrices
         Array2D<Real64> LeftHandSide({1, 4 * nlayer}, {1, 4 * nlayer});
-        Array1D<Real64> RightHandSide({1, 4 * nlayer});
+        EPVector<Real64> RightHandSide(4 * nlayer);
 
         // Simon: Keep best achieved convergence
         Real64 prevDifference;
         Real64 Relaxation;
-        Array1D<Real64> RadiationSave({1, 2 * nlayer});
-        Array1D<Real64> thetaSave({1, 2 * nlayer});
+        EPVector<Real64> RadiationSave(2 * nlayer);
+        EPVector<Real64> thetaSave(2 * nlayer);
         int currentTry;
 
         //		static Array1D_int LayerTypeSpec( maxlay ); //Unused
@@ -1511,7 +1511,7 @@ namespace ThermalISO15099Calc {
 
         int SDLayerIndex = -1;
 
-        Array1D<Real64> sconScaled(maxlay);
+        EPVector<Real64> sconScaled(maxlay);
 
         // Simon: This is set to zero until it is resolved what to do with modifier
         ShadeHcModifiedOut = 0.0;
@@ -1763,7 +1763,9 @@ namespace ThermalISO15099Calc {
 
             CalculateFuncResults(nlayer, a, b, x, FRes);
 
-            FResDiff = FRes - FResOld;
+            for(int i = 0; i < 4*nlayer; ++i) {
+                FResDiff[i] = FRes[i] - FResOld[i];
+            }
 
             // if (TurnOnNewton) then
             //  do i = 1, 4*nlayer
@@ -2108,13 +2110,13 @@ namespace ThermalISO15099Calc {
     void guess(Real64 const tout,
                Real64 const tind,
                int const nlayer,
-               const Array1D<Real64> &gap,
-               const Array1D<Real64> &thick,
+               const EPVector<Real64> &gap,
+               const EPVector<Real64> &thick,
                Real64 &width,
-               Array1D<Real64> &theta,
-               Array1D<Real64> &Ebb,
-               Array1D<Real64> &Ebf,
-               Array1D<Real64> &Tgap)
+               EPVector<Real64> &theta,
+               EPVector<Real64> &Ebb,
+               EPVector<Real64> &Ebf,
+               EPVector<Real64> &Tgap)
     {
         //***********************************************************************
         // purpose - initializes temperature distribution assuming
@@ -2147,7 +2149,7 @@ namespace ThermalISO15099Calc {
         EP_SIZE_CHECK(Tgap, maxlay1);
 
         // Locals
-        Array1D<Real64> x(maxlay2);
+        EPVector<Real64> x(maxlay2);
         Real64 delta;
         int i;
         int j;
@@ -2189,10 +2191,10 @@ namespace ThermalISO15099Calc {
         }
     }
 
-    void TemperaturesFromEnergy(Array1D<Real64> &theta,
-                                Array1D<Real64> &Tgap,
-                                const Array1D<Real64> &Ebf,
-                                const Array1D<Real64> &Ebb,
+    void TemperaturesFromEnergy(EPVector<Real64> &theta,
+                                EPVector<Real64> &Tgap,
+                                const EPVector<Real64> &Ebf,
+                                const EPVector<Real64> &Ebb,
                                 int const nlayer,
                                 int &nperr,
                                 std::string &ErrorMessage)
@@ -2214,7 +2216,7 @@ namespace ThermalISO15099Calc {
         // REAL(r64), intent(out) :: dtmax
         // integer, intent(out) :: MaxIndex
 
-        Array1D<Real64> told(maxlay2);
+        EPVector<Real64> told(maxlay2);
         int i;
         int j;
 
@@ -2243,7 +2245,7 @@ namespace ThermalISO15099Calc {
         }
     }
 
-    void solarISO15099(Real64 const totsol, Real64 const rtot, const Array1D<Real64> &rs, int const nlayer, const Array1D<Real64> &absol, Real64 &sf)
+    void solarISO15099(Real64 const totsol, Real64 const rtot, const EPVector<Real64> &rs, int const nlayer, const EPVector<Real64> &absol, Real64 &sf)
     {
         //***********************************************************************
         //   This subroutine calculates the shading coefficient for a window.
@@ -2293,18 +2295,18 @@ namespace ThermalISO15099Calc {
                 Real64 const Tout,
                 Real64 const trmin,
                 Real64 const tind,
-                const Array1D<Real64> &hcgas,
-                const Array1D<Real64> &hrgas,
-                Array1D<Real64> &Theta,
-                Array1D<Real64> &qlayer,
-                const Array1D<Real64> &qv,
+                const EPVector<Real64> &hcgas,
+                const EPVector<Real64> &hrgas,
+                EPVector<Real64> &Theta,
+                EPVector<Real64> &qlayer,
+                const EPVector<Real64> &qv,
                 const Array1D_int &LayerType,
-                const Array1D<Real64> &thick,
-                const Array1D<Real64> &scon,
+                const EPVector<Real64> &thick,
+                const EPVector<Real64> &scon,
                 Real64 &ufactor,
                 Real64 &flux,
-                Array1D<Real64> &qcgas,
-                Array1D<Real64> &qrgas)
+                EPVector<Real64> &qcgas,
+                EPVector<Real64> &qrgas)
     {
         //***********************************************************************
         // subroutine to calculate total thermal resistance of the glazing system
@@ -2377,31 +2379,31 @@ namespace ThermalISO15099Calc {
                 Real64 &tamb,
                 Real64 &ebroom,
                 Real64 &troom,
-                const Array1D<Real64> &gap,
+                const EPVector<Real64> &gap,
                 Real64 const height,
                 Real64 const heightt,
-                const Array1D<Real64> &scon,
+                const EPVector<Real64> &scon,
                 Real64 const tilt,
-                Array1D<Real64> &theta,
-                const Array1D<Real64> &Tgap,
-                Array1D<Real64> &Radiation,
+                EPVector<Real64> &theta,
+                const EPVector<Real64> &Tgap,
+                EPVector<Real64> &Radiation,
                 Real64 const trmout,
                 Real64 const trmin,
                 Array2_int const &iprop,
                 Array2<Real64> const &frct,
-                const Array1D<Real64> &presure,
+                const EPVector<Real64> &presure,
                 const Array1D_int &nmix,
-                const Array1D<Real64> &wght,
+                const EPVector<Real64> &wght,
                 Array2<Real64> const &gcon,
                 Array2<Real64> const &gvis,
                 Array2<Real64> const &gcp,
-                const Array1D<Real64> &gama,
+                const EPVector<Real64> &gama,
                 const Array1D_int &SupportPillar,
-                const Array1D<Real64> &PillarSpacing,
-                const Array1D<Real64> &PillarRadius,
-                Array1D<Real64> &hgas,
-                Array1D<Real64> &hcgas,
-                Array1D<Real64> &hrgas,
+                const EPVector<Real64> &PillarSpacing,
+                const EPVector<Real64> &PillarRadius,
+                EPVector<Real64> &hgas,
+                EPVector<Real64> &hcgas,
+                EPVector<Real64> &hrgas,
                 Real64 &hcin,
                 Real64 &hcout,
                 Real64 const hin,
@@ -2412,8 +2414,8 @@ namespace ThermalISO15099Calc {
                 std::string &ErrorMessage,
                 Real64 &hrin,
                 Real64 &hrout,
-                Array1D<Real64> &Ra,
-                Array1D<Real64> &Nu)
+                EPVector<Real64> &Ra,
+                EPVector<Real64> &Nu)
     {
         //***********************************************************************
         //  This subroutine calculates the array of conductances/film coefficients used to model convection.  The conductances/film
@@ -2602,25 +2604,25 @@ namespace ThermalISO15099Calc {
 
     void effectiveLayerCond(int const nlayer,
                             const Array1D_int &LayerType,             // Layer type
-                            const Array1D<Real64> &scon,              // Layer thermal conductivity
-                            const Array1D<Real64> &thick,             // Layer thickness
+                            const EPVector<Real64> &scon,              // Layer thermal conductivity
+                            const EPVector<Real64> &thick,             // Layer thickness
                             Array2A_int const iprop,                 // Gas type in gaps
                             Array2A<Real64> const frct,              // Fraction of gas
                             const Array1D_int &nmix,                  // Gas mixture
-                            const Array1D<Real64> &pressure,          // Gas pressure [Pa]
-                            const Array1D<Real64> &wght,              // Molecular weight
+                            const EPVector<Real64> &pressure,          // Gas pressure [Pa]
+                            const EPVector<Real64> &wght,              // Molecular weight
                             Array2A<Real64> const gcon,              // Gas specific conductivity
                             Array2A<Real64> const gvis,              // Gas specific viscosity
                             Array2A<Real64> const gcp,               // Gas specific heat
-                            const Array1D<Real64> &EffectiveOpenness, // Layer effective openneess [m2]
-                            Array1D<Real64> &theta,                   // Layer surface tempeartures [K]
-                            Array1D<Real64> &sconScaled,             // Layer conductivity divided by thickness
+                            const EPVector<Real64> &EffectiveOpenness, // Layer effective openneess [m2]
+                            EPVector<Real64> &theta,                   // Layer surface tempeartures [K]
+                            EPVector<Real64> &sconScaled,             // Layer conductivity divided by thickness
                             int &nperr,                              // Error message flag
                             std::string &ErrorMessage                // Error message
     )
     {
         static Array1D_int iprop1(maxgas);
-        static Array1D<Real64> frct1(maxgas);
+        static EPVector<Real64> frct1(maxgas);
 
         for (auto i = 1; i <= nlayer; ++i) {
             if (LayerType(i) != SPECULAR) {
@@ -2653,9 +2655,9 @@ namespace ThermalISO15099Calc {
                Real64 const height,
                Array2A_int const iprop,
                Array2A<Real64> const frct,
-               const Array1D<Real64> &presure,
+               const EPVector<Real64> &presure,
                const Array1D_int &nmix,
-               const Array1D<Real64> &wght,
+               const EPVector<Real64> &wght,
                Array2A<Real64> const gcon,
                Array2A<Real64> const gvis,
                Array2A<Real64> const gcp,
@@ -2699,7 +2701,7 @@ namespace ThermalISO15099Calc {
         gcp.dim(3, maxgas);
 
         // Locals
-        static Array1D<Real64> frcti(maxgas);
+        static EPVector<Real64> frcti(maxgas);
         int j;
         static Array1D_int ipropi(maxgas);
         Real64 tiltr;
@@ -2790,24 +2792,24 @@ namespace ThermalISO15099Calc {
     }
 
     void filmg(Real64 const tilt,
-               const Array1D<Real64> &theta,
-               const Array1D<Real64> &Tgap,
+               const EPVector<Real64> &theta,
+               const EPVector<Real64> &Tgap,
                int const nlayer,
                Real64 const height,
-               const Array1D<Real64> &gap,
+               const EPVector<Real64> &gap,
                Array2A_int const iprop,
                Array2A<Real64> const frct,
                Real64 const VacuumPressure,
-               const Array1D<Real64> &presure,
+               const EPVector<Real64> &presure,
                const Array1D_int &nmix,
-               const Array1D<Real64> &wght,
+               const EPVector<Real64> &wght,
                Array2A<Real64> const gcon,
                Array2A<Real64> const gvis,
                Array2A<Real64> const gcp,
-               const Array1D<Real64> &gama,
-               Array1D<Real64> &hcgas,
-               Array1D<Real64> &Rayleigh,
-               Array1D<Real64> &Nu,
+               const EPVector<Real64> &gama,
+               EPVector<Real64> &hcgas,
+               EPVector<Real64> &Rayleigh,
+               EPVector<Real64> &Nu,
                int &nperr,
                std::string &ErrorMessage)
     {
@@ -2868,7 +2870,7 @@ namespace ThermalISO15099Calc {
         Real64 ra;
         Real64 asp;
         Real64 gnu;
-        static Array1D<Real64> frctg(maxgas);
+        static EPVector<Real64> frctg(maxgas);
         static Array1D_int ipropg(maxgas);
         int i;
         int j;
@@ -2922,12 +2924,12 @@ namespace ThermalISO15099Calc {
     }
 
     void filmPillar(const Array1D_int &SupportPillar,     // Shows whether or not gap have support pillar
-                    const Array1D<Real64> &scon,          // Conductivity of glass layers
-                    const Array1D<Real64> &PillarSpacing, // Pillar spacing for each gap (used in case there is support pillar)
-                    const Array1D<Real64> &PillarRadius,  // Pillar radius for each gap (used in case there is support pillar)
+                    const EPVector<Real64> &scon,          // Conductivity of glass layers
+                    const EPVector<Real64> &PillarSpacing, // Pillar spacing for each gap (used in case there is support pillar)
+                    const EPVector<Real64> &PillarRadius,  // Pillar radius for each gap (used in case there is support pillar)
                     int const nlayer,
-                    const Array1D<Real64> &gap,
-                    Array1D<Real64> &hcgas,
+                    const EPVector<Real64> &gap,
+                    EPVector<Real64> &hcgas,
                     Real64 const EP_UNUSED(VacuumMaxGapThickness),
                     int &EP_UNUSED(nperr),
                     std::string &EP_UNUSED(ErrorMessage))
@@ -3136,33 +3138,33 @@ namespace ThermalISO15099Calc {
                     Real64 const tout,
                     Real64 const tind,
                     int const nlayer,
-                    const Array1D<Real64> &theta,
+                    const EPVector<Real64> &theta,
                     Real64 const wso,
                     Real64 const wsi,
                     int const iwd,
                     Real64 const height,
                     Real64 const heightt,
                     Real64 const tilt,
-                    const Array1D<Real64> &thick,
-                    const Array1D<Real64> &gap,
+                    const EPVector<Real64> &thick,
+                    const EPVector<Real64> &gap,
                     Real64 const hout,
                     Real64 const hrout,
                     Real64 const hin,
                     Real64 const hrin,
                     Array2A_int const iprop,
                     Array2A<Real64> const frct,
-                    const Array1D<Real64> &presure,
+                    const EPVector<Real64> &presure,
                     const Array1D_int &nmix,
-                    const Array1D<Real64> &wght,
+                    const EPVector<Real64> &wght,
                     Array2A<Real64> const gcon,
                     Array2A<Real64> const gvis,
                     Array2A<Real64> const gcp,
                     int const index,
                     Real64 const SDScalar,
-                    const Array1D<Real64> &Ebf,
-                    const Array1D<Real64> &Ebb,
-                    Array1D<Real64> &hgas,
-                    Array1D<Real64> &hhat,
+                    const EPVector<Real64> &Ebf,
+                    const EPVector<Real64> &Ebb,
+                    EPVector<Real64> &hgas,
+                    EPVector<Real64> &hhat,
                     int &nperr,
                     std::string &ErrorMessage)
     {
@@ -3204,7 +3206,7 @@ namespace ThermalISO15099Calc {
         Real64 hc_alpha2;
         Real64 hhat_alpha1;
         Real64 hhat_alpha2;
-        Array1D<Real64> frctg(maxgas);
+        EPVector<Real64> frctg(maxgas);
         int i;
         int j;
         int k;
@@ -3336,7 +3338,7 @@ namespace ThermalISO15099Calc {
 
     void storeIterationResults(int const nlayer,
                                int const index,
-                               const Array1D<Real64> &theta,
+                               const EPVector<Real64> &theta,
                                Real64 const trmout,
                                Real64 const tamb,
                                Real64 const trmin,
@@ -3349,10 +3351,10 @@ namespace ThermalISO15099Calc {
                                Real64 const hrout,
                                Real64 const hin,
                                Real64 const hout,
-                               const Array1D<Real64> &Ebb,
-                               const Array1D<Real64> &Ebf,
-                               const Array1D<Real64> &Rb,
-                               const Array1D<Real64> &Rf,
+                               const EPVector<Real64> &Ebb,
+                               const EPVector<Real64> &Ebf,
+                               const EPVector<Real64> &Rb,
+                               const EPVector<Real64> &Rf,
                                int &EP_UNUSED(nperr))
     {
 
@@ -3510,7 +3512,7 @@ namespace ThermalISO15099Calc {
         // close(IterationCSVFileNumber)
     }
 
-    void CalculateFuncResults(int const nlayer, Array2<Real64> const &a, const Array1D<Real64> &b, const Array1D<Real64> &x, Array1D<Real64> &FRes)
+    void CalculateFuncResults(int const nlayer, Array2<Real64> const &a, const EPVector<Real64> &b, const EPVector<Real64> &x, EPVector<Real64> &FRes)
     {
         // calculate balance equations by using temperature solution and estimates stores error in FRes
         // REAL(r64), intent(in) :: theta(maxlay2)

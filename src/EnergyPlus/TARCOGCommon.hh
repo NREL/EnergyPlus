@@ -66,38 +66,38 @@ namespace TARCOGCommon {
 
     Real64 LDSumMean(Real64 const Width, Real64 const Height);
 
-    void modifyHcGap(Array1D<Real64> const &hcgap, // Convective coefficient for gap
-                     Array1D<Real64> const &qv,    // Heat flow from ventilation [W/m2]
-                     Array1D<Real64> const &hcv,   // Convective heat flow coefficient due to ventilation
-                     Array1D<Real64> &hcgapMod,    // Modified heat flow coefficient for gap
+    void modifyHcGap(EPVector<Real64> const &hcgap, // Convective coefficient for gap
+                     EPVector<Real64> const &qv,    // Heat flow from ventilation [W/m2]
+                     EPVector<Real64> const &hcv,   // Convective heat flow coefficient due to ventilation
+                     EPVector<Real64> &hcgapMod,    // Modified heat flow coefficient for gap
                      int const nlayer,             // Number of layers
                      Real64 const edgeGlCorrFac    // Edge of glass correction factor
     );
 
     void matrixQBalance(int const nlayer,
                         Array2<Real64> &a,
-                        Array1D<Real64> &b,
-                        Array1D<Real64> const &thick,
-                        Array1D<Real64> const &hcgas,
-                        Array1D<Real64> &hcgapMod,
-                        Array1D<Real64> const &asol,
-                        Array1D<Real64> const &qv,
-                        Array1D<Real64> const &hcv,
+                        EPVector<Real64> &b,
+                        EPVector<Real64> const &thick,
+                        EPVector<Real64> const &hcgas,
+                        EPVector<Real64> &hcgapMod,
+                        EPVector<Real64> const &asol,
+                        EPVector<Real64> const &qv,
+                        EPVector<Real64> const &hcv,
                         Real64 const Tin,
                         Real64 const Tout,
                         Real64 const Gin,
                         Real64 const Gout,
-                        Array1D<Real64> const &theta,
-                        Array1D<Real64> const &tir,
-                        Array1D<Real64> const &rir,
-                        Array1D<Real64> const &emis,
+                        EPVector<Real64> const &theta,
+                        EPVector<Real64> const &tir,
+                        EPVector<Real64> const &rir,
+                        EPVector<Real64> const &emis,
                         Real64 const edgeGlCorrFac);
 
-    void EquationsSolver(Array2<Real64> &a, Array1D<Real64> &b, int const n, int &nperr, std::string &ErrorMessage);
+    void EquationsSolver(Array2<Real64> &a, EPVector<Real64> &b, int const n, int &nperr, std::string &ErrorMessage);
 
     void ludcmp(Array2<Real64> &a, int const n, Array1D_int &indx, Real64 &d, int &nperr, std::string &ErrorMessage);
 
-    void lubksb(Array2A<Real64> const a, int const n, const Array1D_int &indx, Array1D<Real64> &b);
+    void lubksb(Array2A<Real64> const a, int const n, const Array1D_int &indx, EPVector<Real64> &b);
 
     Real64 pos(Real64 const x);
 

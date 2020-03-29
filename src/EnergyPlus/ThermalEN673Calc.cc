@@ -95,23 +95,23 @@ namespace ThermalEN673Calc {
                     int const nlayer,
                     Real64 const tout,
                     Real64 const tind,
-                    Array1D<Real64> &gap,
-                    Array1D<Real64> &thick,
-                    Array1D<Real64> &scon,
-                    const Array1D<Real64> &emis,
+                    EPVector<Real64> &gap,
+                    EPVector<Real64> &thick,
+                    EPVector<Real64> &scon,
+                    const EPVector<Real64> &emis,
                     Real64 const totsol,
                     Real64 const tilt,
                     Real64 const dir,
-                    const Array1D<Real64> &asol,
-                    const Array1D<Real64> &presure,
+                    const EPVector<Real64> &asol,
+                    const EPVector<Real64> &presure,
                     Array2A_int const iprop,
                     Array2A<Real64> const frct,
                     const Array1D_int &nmix,
                     Array2A<Real64> const xgcon,
                     Array2A<Real64> const xgvis,
                     Array2A<Real64> const xgcp,
-                    const Array1D<Real64> &xwght,
-                    Array1D<Real64> &theta,
+                    const EPVector<Real64> &xwght,
+                    EPVector<Real64> &theta,
                     Real64 &ufactor,
                     Real64 &hcin,
                     Real64 &hin,
@@ -120,11 +120,11 @@ namespace ThermalEN673Calc {
                     int &nperr,
                     std::string &ErrorMessage,
                     const Array1D_int &ibc,
-                    Array1D<Real64> &hg,
-                    Array1D<Real64> &hr,
-                    Array1D<Real64> &hs,
-                    Array1D<Real64> &Ra,
-                    Array1D<Real64> &Nu)
+                    EPVector<Real64> &hg,
+                    EPVector<Real64> &hr,
+                    EPVector<Real64> &hs,
+                    EPVector<Real64> &Ra,
+                    EPVector<Real64> &Nu)
     {
 
         // Using/Aliasing
@@ -175,7 +175,7 @@ namespace ThermalEN673Calc {
 
         /// Gaps:
 
-        Array1D<Real64> rs(maxlay3);
+        EPVector<Real64> rs(maxlay3);
         Real64 rtot;
         Real64 sft;
 
@@ -229,32 +229,32 @@ namespace ThermalEN673Calc {
     void EN673ISO10292(int const nlayer,
                        Real64 const tout,
                        Real64 const tind,
-                       const Array1D<Real64> &emis,
-                       const Array1D<Real64> &gap,
-                       const Array1D<Real64> &thick,
-                       const Array1D<Real64> &scon,
+                       const EPVector<Real64> &emis,
+                       const EPVector<Real64> &gap,
+                       const EPVector<Real64> &thick,
+                       const EPVector<Real64> &scon,
                        Real64 const tilt,
                        Array2A_int const iprop,
                        Array2A<Real64> const frct,
                        Array2A<Real64> const xgcon,
                        Array2A<Real64> const xgvis,
                        Array2A<Real64> const xgcp,
-                       const Array1D<Real64> &xwght,
-                       const Array1D<Real64> &presure,
+                       const EPVector<Real64> &xwght,
+                       const EPVector<Real64> &presure,
                        const Array1D_int &nmix,
-                       Array1D<Real64> &theta,
+                       EPVector<Real64> &theta,
                        int const standard,
-                       Array1D<Real64> &hg,
-                       Array1D<Real64> &hr,
-                       Array1D<Real64> &hs,
+                       EPVector<Real64> &hg,
+                       EPVector<Real64> &hr,
+                       EPVector<Real64> &hs,
                        Real64 &hin,
                        Real64 const hout,
                        Real64 &hcin,
                        const Array1D_int &ibc,
-                       Array1D<Real64> &rs,
+                       EPVector<Real64> &rs,
                        Real64 &ufactor,
-                       Array1D<Real64> &Ra,
-                       Array1D<Real64> &Nu,
+                       EPVector<Real64> &Ra,
+                       EPVector<Real64> &Nu,
                        int &nperr,
                        std::string &ErrorMessage)
     {
@@ -289,7 +289,7 @@ namespace ThermalEN673Calc {
         Real64 Tm;
         Real64 diff;
         Real64 Rg;
-        Array1D<Real64> dT(maxlay1);
+        EPVector<Real64> dT(maxlay1);
         int i;
         int j;
         int iter;
@@ -298,7 +298,7 @@ namespace ThermalEN673Calc {
         Real64 con;
         Real64 cp;
         Real64 pr;
-        Array1D<Real64> Gr(maxlay);
+        EPVector<Real64> Gr(maxlay);
         Real64 A;
         Real64 n;
         Real64 hrin;
@@ -307,7 +307,7 @@ namespace ThermalEN673Calc {
 
         Real64 const eps(1.0e-4); // set iteration accuracy
 
-        Array1D<Real64> frctg(maxgas);
+        EPVector<Real64> frctg(maxgas);
         Array1D_int ipropg(maxgas);
 
         // jel..hrin is 4.4 for standard clear glass:
@@ -525,9 +525,9 @@ namespace ThermalEN673Calc {
     void solar_EN673(Real64 const dir,
                      Real64 const totsol,
                      Real64 const rtot,
-                     const Array1D<Real64> &rs,
+                     const EPVector<Real64> &rs,
                      int const nlayer,
-                     const Array1D<Real64> &absol,
+                     const EPVector<Real64> &absol,
                      Real64 &sf,
                      int const standard,
                      int &nperr,
