@@ -718,11 +718,15 @@ void InputProcessor::setObjectItemValue(json const &ep_object,
                                         int &NumAlphas,
                                         EPVector<Real64> &Numbers,
                                         int &NumNumbers,
-                                        EPVector<bool> &NumBlank,
-                                        EPVector<bool> &AlphaBlank,
-                                        EPVector<std::string> &AlphaFieldNames,
-                                        EPVector<std::string> &NumericFieldNames)
+                                        Optional<EPVector<bool>> NumBlank,
+                                        Optional<EPVector<bool>> AlphaBlank,
+                                        Optional<EPVector<std::string>> AlphaFieldNames,
+                                        Optional<EPVector<std::string>> NumericFieldNames)
 {
+    auto const is_AlphaBlank = present(AlphaBlank);
+    auto const is_AlphaFieldNames = present(AlphaFieldNames);
+    auto const is_NumBlank = present(NumBlank);
+    auto const is_NumericFieldNames = present(NumericFieldNames);
 
     auto const &field_type = legacy_field_info.at("field_type").get<std::string>();
     auto const &schema_field_obj = ep_schema_object[field];
@@ -735,7 +739,7 @@ void InputProcessor::setObjectItemValue(json const &ep_object,
                 auto const value = getObjectItemValue(field_value.get<std::string>(), schema_field_obj);
 
                 Alphas(alpha_index) = value.first;
-                AlphaBlank(alpha_index) = value.second;
+                if (is_AlphaBlank) AlphaBlank()(alpha_index) = value.second;
 
             } else {
                 if (field_value.is_number_integer()) {
@@ -744,7 +748,7 @@ void InputProcessor::setObjectItemValue(json const &ep_object,
                     dtoa(field_value.get<double>(), s);
                 }
                 Alphas(alpha_index) = s;
-                AlphaBlank(alpha_index) = false;
+                if (is_AlphaBlank) AlphaBlank()(alpha_index) = false;
             }
         } else if (field_type == "n") {
             // process numeric value
@@ -754,7 +758,7 @@ void InputProcessor::setObjectItemValue(json const &ep_object,
                 } else {
                     Numbers(numeric_index) = field_value.get<double>();
                 }
-                NumBlank(numeric_index) = false;
+                if (is_NumBlank) NumBlank()(numeric_index) = false;
             } else {
                 bool is_empty = field_value.get<std::string>().empty();
                 if (is_empty) {
@@ -762,7 +766,7 @@ void InputProcessor::setObjectItemValue(json const &ep_object,
                 } else {
                     Numbers(numeric_index) = -99999; // autosize and autocalculate
                 }
-                NumBlank(numeric_index) = is_empty;
+                if (is_NumBlank) NumBlank()(numeric_index) = is_empty;
             }
         }
     } else {
@@ -770,23 +774,27 @@ void InputProcessor::setObjectItemValue(json const &ep_object,
             if (!(within_max_fields && findDefault(Alphas(alpha_index), schema_field_obj))) {
                 Alphas(alpha_index) = "";
             }
-            AlphaBlank(alpha_index) = true;
+            if (is_AlphaBlank) AlphaBlank()(alpha_index) = true;
         } else if (field_type == "n") {
             if (within_max_fields) {
                 findDefault(Numbers(numeric_index), schema_field_obj);
             } else {
                 Numbers(numeric_index) = 0;
             }
-            NumBlank(numeric_index) = true;
+            if (is_NumBlank) NumBlank()(numeric_index) = true;
         }
     }
     if (field_type == "a") {
         if (within_max_fields) NumAlphas++;
-        AlphaFieldNames(alpha_index) = (DataGlobals::isEpJSON) ? field : legacy_field_info.at("field_name").get<std::string>();
+        if (is_AlphaFieldNames) {
+            AlphaFieldNames()(alpha_index) = (DataGlobals::isEpJSON) ? field : legacy_field_info.at("field_name").get<std::string>();
+        }
         alpha_index++;
     } else if (field_type == "n") {
         if (within_max_fields) NumNumbers++;
-        NumericFieldNames(numeric_index) = (DataGlobals::isEpJSON) ? field : legacy_field_info.at("field_name").get<std::string>();
+        if (is_NumericFieldNames) {
+            NumericFieldNames()(numeric_index) = (DataGlobals::isEpJSON) ? field : legacy_field_info.at("field_name").get<std::string>();
+        }
         numeric_index++;
     }
 }
@@ -980,10 +988,10 @@ void InputProcessor::getObjectItem(std::string const &Object,
                                    EPVector<Real64> &Numbers,
                                    int &NumNumbers,
                                    int &Status,
-                                   EPVector<bool> &NumBlank,
-                                   EPVector<bool> &AlphaBlank,
-                                   EPVector<std::string> &AlphaFieldNames,
-                                   EPVector<std::string> &NumericFieldNames)
+                                   Optional<EPVector<bool>> NumBlank,
+                                   Optional<EPVector<bool>> AlphaBlank,
+                                   Optional<EPVector<std::string>> AlphaFieldNames,
+                                   Optional<EPVector<std::string>> NumericFieldNames)
 {
     // SUBROUTINE INFORMATION:
     //       AUTHOR         Linda K. Lawrie
@@ -1013,6 +1021,10 @@ void InputProcessor::getObjectItem(std::string const &Object,
     NumAlphas = 0;
     NumNumbers = 0;
     Status = -1;
+    auto const is_AlphaBlank = present(AlphaBlank);
+    auto const is_AlphaFieldNames = present(AlphaFieldNames);
+    auto const is_NumBlank = present(NumBlank);
+    auto const is_NumericFieldNames = present(NumericFieldNames);
 
     auto const &epJSON_it = find_iterators->second.inputObjectIterators.at(adjustedNumber - 1);
     auto const &epJSON_schema_it = find_iterators->second.schemaIterator;
@@ -1044,10 +1056,18 @@ void InputProcessor::getObjectItem(std::string const &Object,
 
     Alphas = "";
     Numbers = 0;
-    NumBlank = true;
-    AlphaBlank = true;
-    AlphaFieldNames = "";
-    NumericFieldNames = "";
+    if (is_NumBlank) {
+        NumBlank() = true;
+    }
+    if (is_AlphaBlank) {
+        AlphaBlank() = true;
+    }
+    if (is_AlphaFieldNames) {
+        AlphaFieldNames() = "";
+    }
+    if (is_NumericFieldNames) {
+        NumericFieldNames() = "";
+    }
 
     auto const find_unused = unusedInputs.find(objectInfo);
     if (find_unused != unusedInputs.end()) {
@@ -1071,8 +1091,10 @@ void InputProcessor::getObjectItem(std::string const &Object,
             } else {
                 Alphas(alpha_index) = UtilityRoutines::MakeUPPERCase(objectInfo.objectName);
             }
-            AlphaBlank(alpha_index) = objectInfo.objectName.empty();
-            AlphaFieldNames(alpha_index) = (DataGlobals::isEpJSON) ? field : field_info_val.at("field_name").get<std::string>();
+            if (is_AlphaBlank) AlphaBlank()(alpha_index) = objectInfo.objectName.empty();
+            if (is_AlphaFieldNames) {
+                AlphaFieldNames()(alpha_index) = (DataGlobals::isEpJSON) ? field : field_info_val.at("field_name").get<std::string>();
+            }
             NumAlphas++;
             alpha_index++;
             continue;
@@ -1139,7 +1161,6 @@ void InputProcessor::getObjectItem(std::string const &Object,
 
     Status = 1;
 }
-
 
 int InputProcessor::getIDFObjNum(std::string const &Object, int const Number)
 {

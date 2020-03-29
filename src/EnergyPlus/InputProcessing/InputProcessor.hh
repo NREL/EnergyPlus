@@ -130,6 +130,18 @@ public:
 
     void getObjectItem(std::string const &Object,
                        int const Number,
+                       EPVector<std::string> &Alphas,
+                       int &NumAlphas,
+                       EPVector<Real64> &Numbers,
+                       int &NumNumbers,
+                       int &Status,
+                       Optional<EPVector<bool>> NumBlank = _,
+                       Optional<EPVector<bool>> AlphaBlank = _,
+                       Optional<EPVector<std::string>> AlphaFieldNames = _,
+                       Optional<EPVector<std::string>> NumericFieldNames = _);
+
+    void getObjectItem(std::string const &Object,
+                       int const Number,
                        Array1S_string Alphas,
                        int &NumAlphas,
                        Array1D<Real64> &Numbers,
@@ -139,18 +151,6 @@ public:
                        Optional<EPVector<bool>> AlphaBlank = _,
                        Optional<Array1D_string> AlphaFieldNames = _,
                        Optional<Array1D_string> NumericFieldNames = _);
-
-    void getObjectItem(std::string const &Object,
-                       int const Number,
-                       EPVector<std::string> &Alphas,
-                       int &NumAlphas,
-                       EPVector<Real64> &Numbers,
-                       int &NumNumbers,
-                       int &Status,
-                       EPVector<bool> &NumBlank,
-                       EPVector<bool> &AlphaBlank,
-                       EPVector<std::string> &AlphaFieldNames,
-                       EPVector<std::string> &NumericFieldNames);
 
     int getIDFObjNum(std::string const &Object, int const Number);
 
@@ -275,10 +275,10 @@ private:
                             int &NumAlphas,
                             EPVector<Real64> &Numbers,
                             int &NumNumbers,
-                            EPVector<bool> &NumBlank,
-                            EPVector<bool> &AlphaBlank,
-                            EPVector<std::string> &AlphaFieldNames,
-                            EPVector<std::string> &NumericFieldNames);
+                            Optional<EPVector<bool>> NumBlank = _,
+                            Optional<EPVector<bool>> AlphaBlank = _,
+                            Optional<EPVector<std::string>> AlphaFieldNames = _,
+                            Optional<EPVector<std::string>> NumericFieldNames = _);
 
     void addVariablesForMonthlyReport(std::string const &reportName);
 
