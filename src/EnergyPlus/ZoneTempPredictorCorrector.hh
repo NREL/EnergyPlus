@@ -76,11 +76,11 @@ namespace ZoneTempPredictorCorrector {
     // INTEGER, PUBLIC, PARAMETER :: iPushZoneTimestepHistories    = 5
     // INTEGER, PUBLIC, PARAMETER :: iPushSystemTimestepHistories  = 6
 
-    extern Array1D_string const ValidControlTypes;
+    extern EPVector<std::string> const ValidControlTypes;
 
-    extern Array1D_string const ValidComfortControlTypes;
+    extern EPVector<std::string> const ValidComfortControlTypes;
 
-    extern Array1D_string const cZControlTypes;
+    extern EPVector<std::string> const cZControlTypes;
 
     extern int const iZC_TStat;
     extern int const iZC_TCTStat;

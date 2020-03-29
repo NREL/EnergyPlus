@@ -404,6 +404,24 @@ namespace UtilityRoutines {
         return FindItem(String, ListOfItems, name_p, ListOfItems.isize());
     }
 
+    inline int FindItem(std::string const &String, const EPVector<std::string> &ListOfItems, int)
+    {
+        auto found = std::find(ListOfItems.begin(), ListOfItems.end(), String);
+        if (found != ListOfItems.end()) {
+            return std::distance(ListOfItems.begin(), found);
+        }
+        return 0;
+    }
+
+    inline int FindItem(std::string const &String, const EPVector<std::string> &ListOfItems)
+    {
+        auto found = std::find(ListOfItems.begin(), ListOfItems.end(), String);
+        if (found != ListOfItems.end()) {
+            return std::distance(ListOfItems.begin(), found);
+        }
+        return 0;
+    }
+
     std::string MakeUPPERCase(std::string const &InputString); // Input String
 
     inline bool SameString(std::string const &s, std::string const &t)

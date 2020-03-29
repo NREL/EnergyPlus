@@ -147,13 +147,12 @@ namespace ZoneTempPredictorCorrector {
     // INTEGER, PUBLIC, PARAMETER :: iPushZoneTimestepHistories    = 5
     // INTEGER, PUBLIC, PARAMETER :: iPushSystemTimestepHistories  = 6
 
-    Array1D_string const ValidControlTypes(4,
-                                           {"ThermostatSetpoint:SingleHeating",
+    EPVector<std::string> const ValidControlTypes{{"ThermostatSetpoint:SingleHeating",
                                             "ThermostatSetpoint:SingleCooling",
                                             "ThermostatSetpoint:SingleHeatingOrCooling",
-                                            "ThermostatSetpoint:DualSetpoint"});
+                                            "ThermostatSetpoint:DualSetpoint"}};
 
-    Array1D_string const ValidComfortControlTypes(12,
+    EPVector<std::string> const ValidComfortControlTypes{
                                                   {"ThermostatSetpoint:ThermalComfort:Fanger:SingleHeating",
                                                    "ThermostatSetpoint:ThermalComfort:Fanger:SingleCooling",
                                                    "ThermostatSetpoint:ThermalComfort:Fanger:SingleHeatingOrCooling",
@@ -165,25 +164,23 @@ namespace ZoneTempPredictorCorrector {
                                                    "ThermostatSetpoint:ThermalComfort:KSU:SingleHeating",
                                                    "ThermostatSetpoint:ThermalComfort:KSU:SingleCooling",
                                                    "ThermostatSetpoint:ThermalComfort:KSU:SingleHeatingOrCooling",
-                                                   "ThermostatSetpoint:ThermalComfort:KSU:DualSetpoint"});
+                                                   "ThermostatSetpoint:ThermalComfort:KSU:DualSetpoint"}};
 
-    Array1D_string const cZControlTypes(6,
-                                        {"ZoneControl:Thermostat",
+    EPVector<std::string> const cZControlTypes{{"ZoneControl:Thermostat",
                                          "ZoneControl:Thermostat:ThermalComfort",
                                          "ZoneControl:Thermostat:OperativeTemperature",
                                          "ZoneControl:Humidistat",
                                          "ZoneControl:Thermostat:TemperatureAndHumidity",
-                                         "ZoneControl:Thermostat:StagedDualSetpoint"});
+                                         "ZoneControl:Thermostat:StagedDualSetpoint"}};
 
-    Array1D_string const AdaptiveComfortModelTypes(8,
-                                                   {"None",
+    EPVector<std::string> const AdaptiveComfortModelTypes{{"None",
                                                     "AdaptiveASH55CentralLine",
                                                     "AdaptiveASH5590PercentUpperLine",
                                                     "AdaptiveASH5580PercentUpperLine",
                                                     "AdaptiveCEN15251CentralLine",
                                                     "AdaptiveCEN15251CategoryIUpperLine",
                                                     "AdaptiveCEN15251CategoryIIUpperLine",
-                                                    "AdaptiveCEN15251CategoryIIIUpperLine"});
+                                                    "AdaptiveCEN15251CategoryIIIUpperLine"}};
 
     int const iZC_TStat(1);
     int const iZC_TCTStat(2);
