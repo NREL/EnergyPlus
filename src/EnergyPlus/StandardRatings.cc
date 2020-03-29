@@ -133,8 +133,8 @@ namespace StandardRatings {
     // when the standard tests are conducted on units that do not have an
     // indoor air circulting fan. Used if user doesn't enter a specific value.
     Real64 const PLRforSEER(0.5);                                 // Part-load ratio for SEER calculation (single speed DX cooling coils)
-    Array1D<Real64> const ReducedPLR(4, {1.0, 0.75, 0.50, 0.25}); // Reduced Capacity part-load conditions
-    Array1D<Real64> const IEERWeightingFactor(4, {0.020, 0.617, 0.238, 0.125}); // EER Weighting factors (IEER)
+    EPVector<Real64> const ReducedPLR{{1.0, 0.75, 0.50, 0.25}}; // Reduced Capacity part-load conditions
+    EPVector<Real64> const IEERWeightingFactor{{0.020, 0.617, 0.238, 0.125}}; // EER Weighting factors (IEER)
     Real64 const OADBTempLowReducedCapacityTest(18.3);                          // Outdoor air dry-bulb temp in degrees C (65F)
     // Std. AHRI AHRI 340/360 Dry-bulb Temp at reduced capacity, <= 0.444
 
@@ -142,10 +142,9 @@ namespace StandardRatings {
     int const Timed(1);                                                     // defrost cycle is timed
     int const OnDemand(2);                                                  // defrost cycle occurs only when required
     int const TotalNumOfStandardDHRs(16);                                   // Total number of standard design heating requirements
-    Array1D_int const TotalNumOfTemperatureBins(6, {9, 10, 13, 15, 18, 9}); // Total number of temperature
+    EPVector<int> const TotalNumOfTemperatureBins{{9, 10, 13, 15, 18, 9}}; // Total number of temperature
     // bins for a region
-    Array1D<Real64> const StandardDesignHeatingRequirement(16,
-                                                           {1465.36,
+    EPVector<Real64> const StandardDesignHeatingRequirement{{1465.36,
                                                             2930.71,
                                                             4396.07,
                                                             5861.42,
@@ -160,39 +159,32 @@ namespace StandardRatings {
                                                             26376.41,
                                                             29307.12,
                                                             32237.83,
-                                                            38099.26});
+                                                            38099.26}};
     // Standardized DHRs from ANSI/AHRI 210/240
     Real64 const CorrectionFactor(0.77); // A correction factor which tends to improve the agreement
     // between calculated and measured building loads, dimensionless.
     Real64 const CyclicDegradationCoeff(0.25);
-    Array1D<Real64> const OutdoorDesignTemperature(6, {2.78, -2.78, -8.33, -15.0, -23.33, -1.11});
+    EPVector<Real64> const OutdoorDesignTemperature{{2.78, -2.78, -8.33, -15.0, -23.33, -1.11}};
     // Outdoor design temperature for a region from ANSI/AHRI 210/240
-    Array1D<Real64> const OutdoorBinTemperature(
-        18, {16.67, 13.89, 11.11, 8.33, 5.56, 2.78, 0.00, -2.78, -5.56, -8.33, -11.11, -13.89, -16.67, -19.44, -22.22, -25.00, -27.78, -30.56});
+    EPVector<Real64> const OutdoorBinTemperature{{16.67, 13.89, 11.11, 8.33, 5.56, 2.78, 0.00, -2.78, -5.56, -8.33, -11.11, -13.89, -16.67, -19.44, -22.22, -25.00, -27.78, -30.56}};
     // Fractional bin hours for different bin temperatures for region one, from ANSI/AHRI 210/240
-    Array1D<Real64> const RegionOneFracBinHoursAtOutdoorBinTemp(
-        18, {0.291, 0.239, 0.194, 0.129, 0.081, 0.041, 0.019, 0.005, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0});
+    EPVector<Real64> const RegionOneFracBinHoursAtOutdoorBinTemp{{0.291, 0.239, 0.194, 0.129, 0.081, 0.041, 0.019, 0.005, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}};
     // Fractional bin hours for different bin temperatures for region two, from ANSI/AHRI 210/240
-    Array1D<Real64> const RegionTwoFracBinHoursAtOutdoorBinTemp(
-        18, {0.215, 0.189, 0.163, 0.143, 0.112, 0.088, 0.056, 0.024, 0.008, 0.002, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0});
+    EPVector<Real64> const RegionTwoFracBinHoursAtOutdoorBinTemp{{0.215, 0.189, 0.163, 0.143, 0.112, 0.088, 0.056, 0.024, 0.008, 0.002, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}};
     // Fractional bin hours for different bin temperatures for region three, from ANSI/AHRI 210/240
-    Array1D<Real64> const RegionThreeFracBinHoursAtOutdoorBinTemp(
-        18, {0.153, 0.142, 0.138, 0.137, 0.135, 0.118, 0.092, 0.047, 0.021, 0.009, 0.005, 0.002, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0});
+    EPVector<Real64> const RegionThreeFracBinHoursAtOutdoorBinTemp{{0.153, 0.142, 0.138, 0.137, 0.135, 0.118, 0.092, 0.047, 0.021, 0.009, 0.005, 0.002, 0.001, 0.0, 0.0, 0.0, 0.0, 0.0}};
     // Fractional bin hours for different bin temperatures for region four, from ANSI/AHRI 210/240
-    Array1D<Real64> const RegionFourFracBinHoursAtOutdoorBinTemp(
-        18, {0.132, 0.111, 0.103, 0.093, 0.1, 0.109, 0.126, 0.087, 0.055, 0.036, 0.026, 0.013, 0.006, 0.002, 0.001, 0.0, 0.0, 0.0});
+    EPVector<Real64> const RegionFourFracBinHoursAtOutdoorBinTemp{{0.132, 0.111, 0.103, 0.093, 0.1, 0.109, 0.126, 0.087, 0.055, 0.036, 0.026, 0.013, 0.006, 0.002, 0.001, 0.0, 0.0, 0.0}};
     // Fractional bin hours for different bin temperatures for region five, from ANSI/AHRI 210/240
-    Array1D<Real64> const RegionFiveFracBinHoursAtOutdoorBinTemp(
-        18, {0.106, 0.092, 0.086, 0.076, 0.078, 0.087, 0.102, 0.094, 0.074, 0.055, 0.047, 0.038, 0.029, 0.018, 0.01, 0.005, 0.002, 0.001});
+    EPVector<Real64> const RegionFiveFracBinHoursAtOutdoorBinTemp{{0.106, 0.092, 0.086, 0.076, 0.078, 0.087, 0.102, 0.094, 0.074, 0.055, 0.047, 0.038, 0.029, 0.018, 0.01, 0.005, 0.002, 0.001}};
     // Fractional bin hours for different bin temperatures for region six, from ANSI/AHRI 210/240
-    Array1D<Real64> const RegionSixFracBinHoursAtOutdoorBinTemp(
-        18, {0.113, 0.206, 0.215, 0.204, 0.141, 0.076, 0.034, 0.008, 0.003, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0});
+    EPVector<Real64> const RegionSixFracBinHoursAtOutdoorBinTemp{{0.113, 0.206, 0.215, 0.204, 0.141, 0.076, 0.034, 0.008, 0.003, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}};
 
     // Representative cooling season Outdoor air temperature bin from ANSI/AHRI 210/240-2008
     int const NumOfOATempBins(8); // number of outdoor temperature bins for cooling season
-    Array1D<Real64> const OutdoorBinTemperatureSEER(NumOfOATempBins, {19.44, 22.22, 25.00, 27.78, 30.56, 33.33, 36.11, 38.89});
+    EPVector<Real64> const OutdoorBinTemperatureSEER{{19.44, 22.22, 25.00, 27.78, 30.56, 33.33, 36.11, 38.89}};
     // Fractional bin hours for different bin temperatures for cooling, from ANSI/AHRI 210/240 - 2008
-    Array1D<Real64> const CoolFracBinHoursAtOutdoorBinTemp(NumOfOATempBins, {0.214, 0.231, 0.216, 0.161, 0.104, 0.052, 0.018, 0.004});
+    EPVector<Real64> const CoolFracBinHoursAtOutdoorBinTemp{{0.214, 0.231, 0.216, 0.161, 0.104, 0.052, 0.018, 0.004}};
 
     Real64 const HeatingIndoorCoilInletAirDBTempRated(21.11); // Heating coil entering air dry-bulb temperature in
     // degrees C (70F) Test H1, H2 and H3
@@ -211,10 +203,10 @@ namespace StandardRatings {
     //	Class 2 29.4C( 85.0F ) 29.4C( 85.0F ) 29.4C( 85.0F ) 29.4C( 85.0F )
     //	Class 3 35.0C( 95.0F ) 35.0C( 95.0F ) 35.0C( 95.0F ) 35.0C( 95.0F )
     //	Class 4 40.5C( 105F ) 40.5C( 105F ) 40.5C( 105F ) 40.5C( 105F )
-    Array1D<Real64> const IndoorDBTempClassI2IV(4, {23.9, 29.4, 35.0, 40.5});
+    EPVector<Real64> const IndoorDBTempClassI2IV{{23.9, 29.4, 35.0, 40.5}};
     Real64 const IndoorTDPA2D(11.1);
     // 35.0C( 95.0F ) 26.7C( 80.0F ) 18.3C( 65.0F ) 4.4C( 40.0F )
-    Array1D<Real64> const OutdoorDBTempAllClassA2D(4, {35.0, 26.7, 18.3, 4.4});
+    EPVector<Real64> const OutdoorDBTempAllClassA2D{{35.0, 26.7, 18.3, 4.4}};
 
     // Functions
 
@@ -271,7 +263,7 @@ namespace StandardRatings {
 
         // Locals
         Real64 const ConvFromSIToIP(3.412141633);                            // Conversion from SI to IP [3.412 Btu/hr-W]
-        static Array1D<Real64> const ReducedPLR(4, {1.0, 0.75, 0.50, 0.25}); // Reduced Capacity part-load conditions
+        static EPVector<Real64> const ReducedPLR{{1.0, 0.75, 0.50, 0.25}}; // Reduced Capacity part-load conditions
 
         // SUBROUTINE ARGUMENT DEFINITIONS:
         // (function of leaving chilled water temperature and
@@ -287,7 +279,7 @@ namespace StandardRatings {
         Real64 const Acc(0.0001);          // Accuracy of result
         int const NumOfReducedCap(4);      // Number of reduced capacity test conditions (100%,75%,50%,and 25%)
         int const IterMax(500);            // Maximum number of iterations
-        static Array1D<Real64> const IPLVWeightingFactor(4, {0.010, 0.42, 0.45, 0.12}); // EER Weighting factors (IPLV)
+        static EPVector<Real64> const IPLVWeightingFactor{{0.010, 0.42, 0.45, 0.12}}; // EER Weighting factors (IPLV)
         static std::string const RoutineName("CalcChillerIPLV");
 
         // INTERFACE BLOCK SPECIFICATIONS
@@ -322,7 +314,7 @@ namespace StandardRatings {
         static Real64 PartLoadRatio(0.0);    // Part load ratio (PLR) at which chiller is operatign at reduced capacity
         int RedCapNum;                       // Integer counter for reduced capacity
         int SolFla;                          // Flag of solver
-        Array1D<Real64> Par(11);             // Parameter array need for RegulaFalsi routine
+        EPVector<Real64> Par(11);             // Parameter array need for RegulaFalsi routine
 
         // Initialize local variables
         AvailChillerCap = 0.0;
@@ -958,7 +950,7 @@ namespace StandardRatings {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D<Real64> FanPowerPerEvapAirFlowRate(ns); // Fan power per air volume flow rate through the evaporator coil [W/(m3/s)]
+        EPVector<Real64> FanPowerPerEvapAirFlowRate(ns); // Fan power per air volume flow rate through the evaporator coil [W/(m3/s)]
 
         // Intermediate values calculated from the inputs in the idf file
         int spnum; // compressor speed number
@@ -970,9 +962,9 @@ namespace StandardRatings {
         static Real64 HSPF(0.0);                       // Heating Seasonal Performance Factor in SI [W/W]
         static Real64 NetHeatingCapRatedHighTemp(0.0); // Net Rated heating capacity at high temp [W]
         static Real64 NetHeatingCapRatedLowTemp(0.0);  // Net Rated heating capacity at low temp [W]
-        Array1D<Real64> NetCoolingCapRated(ns);        // Net Cooling Coil capacity at Rated conditions, accounting for supply fan heat [W]
-        Array1D<Real64> NetTotCoolingCapRated(16);     // net total cooling capacity of DX Coils for the sixteen ASHRAE Std 127 Test conditions
-        Array1D<Real64> TotElectricPowerRated(16);     // total electric power of DX Coils for the sixteen ASHRAE Std 127 Test conditions
+        EPVector<Real64> NetCoolingCapRated(ns);        // Net Cooling Coil capacity at Rated conditions, accounting for supply fan heat [W]
+        EPVector<Real64> NetTotCoolingCapRated(16);     // net total cooling capacity of DX Coils for the sixteen ASHRAE Std 127 Test conditions
+        EPVector<Real64> TotElectricPowerRated(16);     // total electric power of DX Coils for the sixteen ASHRAE Std 127 Test conditions
 
         NetCoolingCapRated = 0.0;
 
@@ -1679,8 +1671,8 @@ namespace StandardRatings {
         Real64 const RatedCOP,                            // Rated gross COP
         Real64 const RatedAirVolFlowRate,                 // air flow rate through the coil at rated condition
         Real64 const FanPowerPerEvapAirFlowRateFromInput, // Fan power per air volume flow rate through the evaporator coil
-        Array1D<Real64> &NetCoolingCapRated,              // net cooling capacity of single speed DX cooling coil
-        Array1D<Real64> &TotElectricPowerRated            // total electric power including supply fan
+        EPVector<Real64> &NetCoolingCapRated,              // net cooling capacity of single speed DX cooling coil
+        EPVector<Real64> &TotElectricPowerRated            // total electric power including supply fan
     )
     {
 
@@ -1832,18 +1824,18 @@ namespace StandardRatings {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         // Intermediate values calculated from the inputs in the idf file
-        Array1D<Real64> FanPowerPerEvapAirFlowRate(nsp); // Fan power per air volume flow rate through the evaporator coil [W/(m3/s)]
-        Array1D<Real64> TotCoolCapTestA2(nsp);           // Total cooling capacity at A2 test condition (High speed)
-        Array1D<Real64> TotCoolCapTestB2(nsp);           // Total cooling capacity at B2 test condition (High speed)
-        Array1D<Real64> TotCoolCapTestB1(nsp);           // Total cooling capacity at B1 test condition (Low speed)
-        Array1D<Real64> TotCoolCapTestF1(nsp);           // Total cooling capacity at F1 test condition (Low speed)
-        Array1D<Real64> OutdoorUnitPowerTestA2(nsp);     // Outdoor Unit electric power at A2 test condition (High speed)
-        Array1D<Real64> OutdoorUnitPowerTestB2(nsp);     // Outdoor Unit electric power at B2 test condition (High speed)
-        Array1D<Real64> OutdoorUnitPowerTestB1(nsp);     // Outdoor Unit electric power at B1 test condition (Low speed)
-        Array1D<Real64> OutdoorUnitPowerTestF1(nsp);     // Outdoor Unit electric power at F1 test condition (Low speed)
-        Array1D<Real64> NetCoolingCapRated(nsp);         // net cooling capacity at each speed
-        Array1D<Real64> TotCapFlowModFac(nsp);           // Total capacity modifier f(actual flow vs rated flow) for each speed [-]
-        Array1D<Real64> EIRFlowModFac(nsp);              // EIR modifier f(actual supply air flow vs rated flow) for each speed [-]
+        EPVector<Real64> FanPowerPerEvapAirFlowRate(nsp); // Fan power per air volume flow rate through the evaporator coil [W/(m3/s)]
+        EPVector<Real64> TotCoolCapTestA2(nsp);           // Total cooling capacity at A2 test condition (High speed)
+        EPVector<Real64> TotCoolCapTestB2(nsp);           // Total cooling capacity at B2 test condition (High speed)
+        EPVector<Real64> TotCoolCapTestB1(nsp);           // Total cooling capacity at B1 test condition (Low speed)
+        EPVector<Real64> TotCoolCapTestF1(nsp);           // Total cooling capacity at F1 test condition (Low speed)
+        EPVector<Real64> OutdoorUnitPowerTestA2(nsp);     // Outdoor Unit electric power at A2 test condition (High speed)
+        EPVector<Real64> OutdoorUnitPowerTestB2(nsp);     // Outdoor Unit electric power at B2 test condition (High speed)
+        EPVector<Real64> OutdoorUnitPowerTestB1(nsp);     // Outdoor Unit electric power at B1 test condition (Low speed)
+        EPVector<Real64> OutdoorUnitPowerTestF1(nsp);     // Outdoor Unit electric power at F1 test condition (Low speed)
+        EPVector<Real64> NetCoolingCapRated(nsp);         // net cooling capacity at each speed
+        EPVector<Real64> TotCapFlowModFac(nsp);           // Total capacity modifier f(actual flow vs rated flow) for each speed [-]
+        EPVector<Real64> EIRFlowModFac(nsp);              // EIR modifier f(actual supply air flow vs rated flow) for each speed [-]
         static Real64 CoolingCapacityLS(0.0);            // cooling capacity of Mult-speed DX coil at lower speed, [W]
         static Real64 CoolingCapacityHS(0.0);            // cooling capacity of Mult-speed DX coil at higher speed, [W]
         static Real64 CoolingElecPowerLS(0.0);           // outdoor unit electric power input at low speed, [W]
@@ -2055,26 +2047,26 @@ namespace StandardRatings {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         // Intermediate values calculated from the inputs in the idf file
-        Array1D<Real64> FanPowerPerEvapAirFlowRate(nsp); // Fan power per air volume flow rate through the evaporator coil [W/(m3/s)]
-        Array1D<Real64> TotHeatCapTestH0(nsp);           // Total cooling capacity at A2 test condition (High speed)
-        Array1D<Real64> TotHeatCapTestH1(nsp);           // Total cooling capacity at B2 test condition (High speed)
-        Array1D<Real64> TotHeatCapTestH2(nsp);           // Total cooling capacity at B1 test condition (Low speed)
-        Array1D<Real64> TotHeatCapTestH3(nsp);           // Total cooling capacity at F1 test condition (Low speed)
-        Array1D<Real64> OutdoorUnitPowerTestH0(nsp);     // Outdoor Unit electric power at A2 test condition (High speed)
-        Array1D<Real64> OutdoorUnitPowerTestH1(nsp);     // Outdoor Unit electric power at B2 test condition (High speed)
-        Array1D<Real64> OutdoorUnitPowerTestH2(nsp);     // Outdoor Unit electric power at B1 test condition (Low speed)
-        Array1D<Real64> OutdoorUnitPowerTestH3(nsp);     // Outdoor Unit electric power at F1 test condition (Low speed)
+        EPVector<Real64> FanPowerPerEvapAirFlowRate(nsp); // Fan power per air volume flow rate through the evaporator coil [W/(m3/s)]
+        EPVector<Real64> TotHeatCapTestH0(nsp);           // Total cooling capacity at A2 test condition (High speed)
+        EPVector<Real64> TotHeatCapTestH1(nsp);           // Total cooling capacity at B2 test condition (High speed)
+        EPVector<Real64> TotHeatCapTestH2(nsp);           // Total cooling capacity at B1 test condition (Low speed)
+        EPVector<Real64> TotHeatCapTestH3(nsp);           // Total cooling capacity at F1 test condition (Low speed)
+        EPVector<Real64> OutdoorUnitPowerTestH0(nsp);     // Outdoor Unit electric power at A2 test condition (High speed)
+        EPVector<Real64> OutdoorUnitPowerTestH1(nsp);     // Outdoor Unit electric power at B2 test condition (High speed)
+        EPVector<Real64> OutdoorUnitPowerTestH2(nsp);     // Outdoor Unit electric power at B1 test condition (Low speed)
+        EPVector<Real64> OutdoorUnitPowerTestH3(nsp);     // Outdoor Unit electric power at F1 test condition (Low speed)
         Real64 HeatingCapacityLS;                        // cooling capacity of Mult-speed DX coil at lower speed, [W]
         Real64 HeatingCapacityHS;                        // cooling capacity of Mult-speed DX coil at higher speed, [W]
         Real64 HeatingElecPowerLS;                       // outdoor unit electric power input at low speed, [W]
         Real64 HeatingElecPowerHS;                       // outdoor unit electric power input at high speed, [W]
         Real64 HeatingCapacityMax;                       // cooling capacity of Mult-speed DX coil at max speed, [W]
         Real64 HeatingElecPowerMax;                      // outdoor unit electric power input at Max speed, [W]
-        Array1D<Real64> TotHeatCapTestH1High(nsp);       // net heating capacity high speed at H1 test conditon, [W]
+        EPVector<Real64> TotHeatCapTestH1High(nsp);       // net heating capacity high speed at H1 test conditon, [W]
 
         // Intermediate values calculated from the inputs in the idf file
-        Array1D<Real64> TotCapFlowModFac(nsp); // Total capacity modifier f(actual flow vs rated flow) for each speed [-]
-        Array1D<Real64> EIRFlowModFac(nsp);    // EIR modifier f(actual supply air flow vs rated flow) for each speed [-]
+        EPVector<Real64> TotCapFlowModFac(nsp); // Total capacity modifier f(actual flow vs rated flow) for each speed [-]
+        EPVector<Real64> EIRFlowModFac(nsp);    // EIR modifier f(actual supply air flow vs rated flow) for each speed [-]
 
         static Real64 TotCapTempModFacH0(0.0); // Tot capacity modifier (function of entering wetbulb, outside drybulb) at H0 Test [-]
         static Real64 EIRTempModFacH0(0.0);    // EIR modifier (function of entering wetbulb, outside drybulb)  at H0 Test[-]
@@ -2513,8 +2505,8 @@ namespace StandardRatings {
                                                std::string const &CompType,           // Type of component
                                                std::string const &CompName,           // Name of component
                                                int const CompTypeNum,                 // TypeNum of component
-                                               Array1D<Real64> &NetCoolingCapRated,   // net cooling capacity of single speed DX cooling coil
-                                               Array1D<Real64> &TotElectricPowerRated // total electric power including supply fan
+                                               EPVector<Real64> &NetCoolingCapRated,   // net cooling capacity of single speed DX cooling coil
+                                               EPVector<Real64> &TotElectricPowerRated // total electric power including supply fan
     )
     {
 

@@ -80,8 +80,8 @@ namespace StandardRatings {
     // when the standard tests are conducted on units that do not have an
     // indoor air circulting fan. Used if user doesn't enter a specific value.
     extern Real64 const PLRforSEER;                     // Part-load ratio for SEER calculation (single speed DX cooling coils)
-    extern Array1D<Real64> const ReducedPLR;            // Reduced Capacity part-load conditions
-    extern Array1D<Real64> const IEERWeightingFactor;   // EER Weighting factors (IEER)
+    extern EPVector<Real64> const ReducedPLR;            // Reduced Capacity part-load conditions
+    extern EPVector<Real64> const IEERWeightingFactor;   // EER Weighting factors (IEER)
     extern Real64 const OADBTempLowReducedCapacityTest; // Outdoor air dry-bulb temp in degrees C (65F)
     // Std. AHRI AHRI 340/360 Dry-bulb Temp at reduced capacity, <= 0.444
 
@@ -89,34 +89,34 @@ namespace StandardRatings {
     extern int const Timed;                             // defrost cycle is timed
     extern int const OnDemand;                          // defrost cycle occurs only when required
     extern int const TotalNumOfStandardDHRs;            // Total number of standard design heating requirements
-    extern Array1D_int const TotalNumOfTemperatureBins; // Total number of temperature
+    extern EPVector<int> const TotalNumOfTemperatureBins; // Total number of temperature
     // bins for a region
-    extern Array1D<Real64> const StandardDesignHeatingRequirement;
+    extern EPVector<Real64> const StandardDesignHeatingRequirement;
     // Standardized DHRs from ANSI/AHRI 210/240
     extern Real64 const CorrectionFactor; // A correction factor which tends to improve the agreement
     // between calculated and measured building loads, dimensionless.
     extern Real64 const CyclicDegradationCoeff;
-    extern Array1D<Real64> const OutdoorDesignTemperature;
+    extern EPVector<Real64> const OutdoorDesignTemperature;
     // Outdoor design temperature for a region from ANSI/AHRI 210/240
-    extern Array1D<Real64> const OutdoorBinTemperature;
+    extern EPVector<Real64> const OutdoorBinTemperature;
     // Fractional bin hours for different bin temperatures for region one, from ANSI/AHRI 210/240
-    extern Array1D<Real64> const RegionOneFracBinHoursAtOutdoorBinTemp;
+    extern EPVector<Real64> const RegionOneFracBinHoursAtOutdoorBinTemp;
     // Fractional bin hours for different bin temperatures for region two, from ANSI/AHRI 210/240
-    extern Array1D<Real64> const RegionTwoFracBinHoursAtOutdoorBinTemp;
+    extern EPVector<Real64> const RegionTwoFracBinHoursAtOutdoorBinTemp;
     // Fractional bin hours for different bin temperatures for region three, from ANSI/AHRI 210/240
-    extern Array1D<Real64> const RegionThreeFracBinHoursAtOutdoorBinTemp;
+    extern EPVector<Real64> const RegionThreeFracBinHoursAtOutdoorBinTemp;
     // Fractional bin hours for different bin temperatures for region four, from ANSI/AHRI 210/240
-    extern Array1D<Real64> const RegionFourFracBinHoursAtOutdoorBinTemp;
+    extern EPVector<Real64> const RegionFourFracBinHoursAtOutdoorBinTemp;
     // Fractional bin hours for different bin temperatures for region five, from ANSI/AHRI 210/240
-    extern Array1D<Real64> const RegionFiveFracBinHoursAtOutdoorBinTemp;
+    extern EPVector<Real64> const RegionFiveFracBinHoursAtOutdoorBinTemp;
     // Fractional bin hours for different bin temperatures for region six, from ANSI/AHRI 210/240
-    extern Array1D<Real64> const RegionSixFracBinHoursAtOutdoorBinTemp;
+    extern EPVector<Real64> const RegionSixFracBinHoursAtOutdoorBinTemp;
 
     // Representative cooling season Outdoor air temperature bin from ANSI/AHRI 210/240-2008
     extern int const NumOfOATempBins; // number of outdoor temperature bins for cooling season
-    extern Array1D<Real64> const OutdoorBinTemperatureSEER;
+    extern EPVector<Real64> const OutdoorBinTemperatureSEER;
     // Fractional bin hours for different bin temperatures for cooling, from ANSI/AHRI 210/240 - 2008
-    extern Array1D<Real64> const CoolFracBinHoursAtOutdoorBinTemp;
+    extern EPVector<Real64> const CoolFracBinHoursAtOutdoorBinTemp;
 
     extern Real64 const HeatingIndoorCoilInletAirDBTempRated; // Heating coil entering air dry-bulb temperature in
     // degrees C (70F) Test H1, H2 and H3
@@ -132,11 +132,11 @@ namespace StandardRatings {
 
     // ANSI/ASHRAE Standard 127-2012 -Method of Testing for Rating Computer and Data Processing Room Unitary Air Conditioners
     // indoor dry bulb temperatures for tests A, B, C and D and Classes I, II, III, and IV
-    extern Array1D<Real64> const IndoorDBTempClassI2IV;
+    extern EPVector<Real64> const IndoorDBTempClassI2IV;
     // indoor dew point temperature
     extern Real64 const IndoorTDPA2D;
     // outdoor dry bulb temperatures for tests A, B, C and D
-    extern Array1D<Real64> const OutdoorDBTempAllClassA2D;
+    extern EPVector<Real64> const OutdoorDBTempAllClassA2D;
 
     // Functions
 
@@ -250,8 +250,8 @@ namespace StandardRatings {
         Real64 const RatedCOP,                            // Rated gross COP
         Real64 const RatedAirVolFlowRate,                 // air flow rate through the coil at rated condition
         Real64 const FanPowerPerEvapAirFlowRateFromInput, // Fan power per air volume flow rate through the evaporator coil
-        Array1D<Real64> &NetCoolingCapRated,              // net cooling capacity of single speed DX cooling coil
-        Array1D<Real64> &TotElectricPowerRated            // total electric power including supply fan
+        EPVector<Real64> &NetCoolingCapRated,              // net cooling capacity of single speed DX cooling coil
+        EPVector<Real64> &TotElectricPowerRated            // total electric power including supply fan
     );
 
     void MultiSpeedDXCoolingCoilStandardRatings(
@@ -313,8 +313,8 @@ namespace StandardRatings {
                                                std::string const &CompType,           // Type of component
                                                std::string const &CompName,           // Name of component
                                                int const CompTypeNum,                 // TypeNum of component
-                                               Array1D<Real64> &NetCoolingCapRated,   // net cooling capacity of single speed DX cooling coil
-                                               Array1D<Real64> &TotElectricPowerRated // total electric power including supply fan
+                                               EPVector<Real64> &NetCoolingCapRated,   // net cooling capacity of single speed DX cooling coil
+                                               EPVector<Real64> &TotElectricPowerRated // total electric power including supply fan
     );
 
     void CheckCurveLimitsForStandardRatings(std::string const &DXCoilName, // Name of DX coil for which HSPF is calculated
