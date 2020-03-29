@@ -406,18 +406,12 @@ namespace UtilityRoutines {
 
     inline int FindItem(std::string const &String, const EPVector<std::string> &ListOfItems, int)
     {
-        auto found = std::find(ListOfItems.begin(), ListOfItems.end(), String);
-        if (found != ListOfItems.end()) {
-            return std::distance(ListOfItems.begin(), found);
-        }
-        return 0;
-    }
-
-    inline int FindItem(std::string const &String, const EPVector<std::string> &ListOfItems)
-    {
-        auto found = std::find(ListOfItems.begin(), ListOfItems.end(), String);
-        if (found != ListOfItems.end()) {
-            return std::distance(ListOfItems.begin(), found);
+        int count = 1;
+        for(auto &el : ListOfItems) {
+            if (equali(String, el)) {
+                return count;
+            }
+            ++count;
         }
         return 0;
     }
