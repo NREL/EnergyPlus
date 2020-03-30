@@ -224,12 +224,12 @@ namespace SystemReports {
     int MaxCompArraySize(500);
     int DBFlag(0);
 
-    Array1D_int SetBackCounter;
-    Array1D_int HeatCoolFlag;
-    Array1D_int FirstHeatCoolFlag;
-    Array1D_int FirstHeatCoolHour;
-    Array1D_int LastHeatCoolFlag;
-    Array1D_int LastHeatCoolHour;
+    EPVector<int> SetBackCounter;
+    EPVector<int> HeatCoolFlag;
+    EPVector<int> FirstHeatCoolFlag;
+    EPVector<int> FirstHeatCoolHour;
+    EPVector<int> LastHeatCoolFlag;
+    EPVector<int> LastHeatCoolHour;
     EPVector<bool> AirLoopCalcDone;
     EPVector<bool> NoLoadFlag;
     EPVector<bool> UnmetLoadFlag;

@@ -49,7 +49,7 @@
 #define SystemReports_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
+//#include <ObjexxFCL/Array1D.hh>
 
 // EnergyPlus Headers
 #include <EnergyPlus/EnergyPlus.hh>
@@ -154,12 +154,12 @@ namespace SystemReports {
     extern int MaxCompArraySize;
     extern int DBFlag;
 
-    extern Array1D_int SetBackCounter;
-    extern Array1D_int HeatCoolFlag;
-    extern Array1D_int FirstHeatCoolFlag;
-    extern Array1D_int FirstHeatCoolHour;
-    extern Array1D_int LastHeatCoolFlag;
-    extern Array1D_int LastHeatCoolHour;
+    extern EPVector<int> SetBackCounter;
+    extern EPVector<int> HeatCoolFlag;
+    extern EPVector<int> FirstHeatCoolFlag;
+    extern EPVector<int> FirstHeatCoolHour;
+    extern EPVector<int> LastHeatCoolFlag;
+    extern EPVector<int> LastHeatCoolHour;
     extern EPVector<bool> AirLoopCalcDone;
     extern EPVector<bool> NoLoadFlag;
     extern EPVector<bool> UnmetLoadFlag;
