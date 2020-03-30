@@ -1922,7 +1922,7 @@ namespace RoomAirModelManager {
         static Real64 Z2Zone(0.0);               // Auxiliary variables
         static Real64 CeilingHeightDiffMax(0.1); // Maximum difference between wall height and ceiling height
         bool SetZoneAux;
-        Array1D_int AuxSurf;
+        Array1D<int> AuxSurf;
         int MaxSurf;
         Array2D_int AuxAirflowNetworkSurf;
         Real64 WidthFactMax;

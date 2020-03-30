@@ -1008,7 +1008,7 @@ int GetNewUnitNumber()
     //	//  Indicate number and value of preconnected units
     //
     //	int const NUMBER_OF_PRECONNECTED_UNITS( 2 );
-    //	static Array1D_int const PRECONNECTED_UNITS( NUMBER_OF_PRECONNECTED_UNITS, { 5, 6 } );
+    //	static Array1D<int> const PRECONNECTED_UNITS( NUMBER_OF_PRECONNECTED_UNITS, { 5, 6 } );
     //
     //	//  Largest allowed unit number (or a large number, if none)
     //	int const MaxUnitNumber( 1000 );

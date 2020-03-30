@@ -74,8 +74,8 @@ namespace MundtSimMgr {
     // na
 
     // MODULE VARIABLE DECLARATIONS:
-    extern Array1D_int FloorSurfSetIDs; // fixed variable for floors
-    extern Array1D_int TheseSurfIDs;    // temporary working variable
+    extern Array1D<int> FloorSurfSetIDs; // fixed variable for floors
+    extern Array1D<int> TheseSurfIDs;    // temporary working variable
     extern int MundtCeilAirID;          // air node index in AirDataManager
     extern int MundtFootAirID;          // air node index in AirDataManager
     extern int SupplyNodeID;            // air node index in AirDataManager
@@ -83,8 +83,8 @@ namespace MundtSimMgr {
     extern int ReturnNodeID;            // air node index in AirDataManager
     extern int NumRoomNodes;            // number of nodes connected to walls
     extern int NumFloorSurfs;           // total number of surfaces for floor
-    extern Array1D_int RoomNodeIDs;     // ids of the first NumRoomNode Air Nodes
-    extern Array1D_int ID1dSurf;        // numbers used to identify surfaces
+    extern Array1D<int> RoomNodeIDs;     // ids of the first NumRoomNode Air Nodes
+    extern Array1D<int> ID1dSurf;        // numbers used to identify surfaces
     extern int MundtZoneNum;            // index of zones using Mundt model
     extern Real64 ZoneHeight;           // zone height
     extern Real64 ZoneFloorArea;        // zone floor area

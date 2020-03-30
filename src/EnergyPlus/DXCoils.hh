@@ -130,7 +130,7 @@ namespace DXCoils {
     extern Array1D<Real64> DXCoilOutletTemp;           // DX coil outlet dry bulb temperature [C]
     extern Array1D<Real64> DXCoilOutletHumRat;         // DX coil outlet humidity ratio [kgWater/kgDryAir]
     extern Array1D<Real64> DXCoilPartLoadRatio;        // DX coil part-load ratio
-    extern Array1D_int DXCoilFanOpMode;                // supply air fan operating mode
+    extern Array1D<int> DXCoilFanOpMode;                // supply air fan operating mode
     extern Array1D<Real64> DXCoilFullLoadOutAirTemp;   // DX coil full load outlet dry bulb temperature [C]
     extern Array1D<Real64> DXCoilFullLoadOutAirHumRat; // DX coil full load outlet humidity ratio [kgWater/kgDryAir]
     extern Array1D<Real64> DXCoilTotalCooling;         // DX cooling coil total cooling output [W]
@@ -207,19 +207,19 @@ namespace DXCoils {
         Array1D<Real64> RatedCBF;         // rated coil bypass factor, determined using RatedTotCap and RatedSHR
         int AirInNode;                    // Air inlet node number
         int AirOutNode;                   // Air outlet node number
-        Array1D_int CCapFTemp;            // index of total cooling capacity modifier curve
+        Array1D<int> CCapFTemp;            // index of total cooling capacity modifier curve
         // (function of entering wetbulb, outside drybulb)
         int CCapFTempErrorIndex; // Used for warning messages when output of CCapFTemp is negative
-        Array1D_int CCapFFlow;   // index of total cooling capacity modifier curve
+        Array1D<int> CCapFFlow;   // index of total cooling capacity modifier curve
         // (function of actual supply air flow vs rated air flow)
         int CCapFFlowErrorIndex; // Used for warning messages when output of CCapFFlow is negative
-        Array1D_int EIRFTemp;    // index of energy input ratio modifier curve
+        Array1D<int> EIRFTemp;    // index of energy input ratio modifier curve
         // (function of entering wetbulb, outside drybulb)
         int EIRFTempErrorIndex; // Used for warning messages when output of EIRFTemp is negative
-        Array1D_int EIRFFlow;   // index of energy input ratio modifier curve
+        Array1D<int> EIRFFlow;   // index of energy input ratio modifier curve
         // (function of actual supply air flow vs rated air flow)
         int EIRFFlowErrorIndex;               // Used for warning messages when output of EIRFFlow is negative
-        Array1D_int PLFFPLR;                  // index of part-load factor vs part-load ratio curve
+        Array1D<int> PLFFPLR;                  // index of part-load factor vs part-load ratio curve
         bool ReportCoolingCoilCrankcasePower; // logical determines if the cooling coil crankcase heater power is reported
         Real64 CrankcaseHeaterCapacity;       // total crankcase heater capacity [W]
         Real64 CrankcaseHeaterPower;          // report variable for average crankcase heater power [W]
@@ -231,7 +231,7 @@ namespace DXCoils {
         // UnitarySystem:HeatPump:AirToAir for proper calculation of crankcase heater energy
         // consumption
         bool FindCompanionUpStreamCoil;    // Flag to get the companion coil in Init.
-        Array1D_int CondenserInletNodeNum; // Node number of outdoor condenser(s) (actually an evaporator for heating coils)
+        Array1D<int> CondenserInletNodeNum; // Node number of outdoor condenser(s) (actually an evaporator for heating coils)
         int LowOutletTempIndex;            // used for low outlet temperature warnings
         Real64 FullLoadOutAirTempLast;     // used for low outlet temperature warnings
         Real64 FullLoadInletAirTempLast;   // used for low outlet temperature warnings
@@ -318,7 +318,7 @@ namespace DXCoils {
         Array1D<Real64> LatentCapacityTimeConstant; // Time constant for latent capacity to reach steady state
         // after startup (sec)
         // end of variables for DX cooling coil latent degradation model
-        Array1D_int CondenserType; // Type of condenser for DX cooling coil: AIR COOLED or EVAP COOLED
+        Array1D<int> CondenserType; // Type of condenser for DX cooling coil: AIR COOLED or EVAP COOLED
         // start of variables for DX cooling coil evaporative condenser option
         bool ReportEvapCondVars;        // true if any performance mode includes an evap condenser
         Array1D<Real64> EvapCondEffect; // effectiveness of the evaporatively cooled condenser
@@ -345,7 +345,7 @@ namespace DXCoils {
         int NumDehumidModes; // number of enhanced dehumidification modes, up to MaxDehumidModes for Multimode DX coil,
         // always 0 for other coils)
         Array1D<std::string> CoilPerformanceType;  // Coil Performance object type
-        Array1D_int CoilPerformanceType_Num; // Coil Performance object type number
+        Array1D<int> CoilPerformanceType_Num; // Coil Performance object type number
         Array1D<std::string> CoilPerformanceName;  // Coil Performance object names
         Real64 CoolingCoilStg2RuntimeFrac;   // Run time fraction of stage 2
         int DehumidificationMode;            // Dehumidification mode for multimode coil,
@@ -418,7 +418,7 @@ namespace DXCoils {
         int NumOfSpeeds;                            // Number of speeds
         bool PLRImpact;                             // Part load fraction applied to Speed Number > 1
         bool LatentImpact;                          // Latent degradation applied to Speed Number > 1
-        Array1D_int MSErrIndex;                     // index flag for num speeds/recurring messages
+        Array1D<int> MSErrIndex;                     // index flag for num speeds/recurring messages
         Array1D<Real64> MSRatedTotCap;              // Rated cooling capacity for MS heat pump [W]
         Array1D<Real64> MSRatedTotCapDes;           // Autosized Gross total cooling capacity at rated conditions [watts]
         Array1D<Real64> MSRatedSHR;                 // Rated SHR for MS heat pump [dimensionless]
@@ -426,12 +426,12 @@ namespace DXCoils {
         Array1D<Real64> MSRatedAirVolFlowRate;      // Air volume flow rate through unit at rated conditions [m3/s]
         Array1D<Real64> MSRatedAirMassFlowRate;     // Air mass flow rate through unit at rated conditions [m3/s]
         Array1D<Real64> MSRatedCBF;                 // rated coil bypass factor
-        Array1D_int MSCCapFTemp;                    // index of total cooling capacity modifier curve
-        Array1D_int MSCCapFFlow;                    // index of total cooling capacity modifier curve
-        Array1D_int MSEIRFTemp;                     // index of energy input ratio modifier curve as a function of temperature
-        Array1D_int MSEIRFFlow;                     // index of energy input ratio modifier curve as a function of flow fraction
-        Array1D_int MSPLFFPLR;                      // index of part load factor as a function of part load ratio
-        Array1D_int MSWasteHeat;                    // index of waste heat as a function of temperature
+        Array1D<int> MSCCapFTemp;                    // index of total cooling capacity modifier curve
+        Array1D<int> MSCCapFFlow;                    // index of total cooling capacity modifier curve
+        Array1D<int> MSEIRFTemp;                     // index of energy input ratio modifier curve as a function of temperature
+        Array1D<int> MSEIRFFlow;                     // index of energy input ratio modifier curve as a function of flow fraction
+        Array1D<int> MSPLFFPLR;                      // index of part load factor as a function of part load ratio
+        Array1D<int> MSWasteHeat;                    // index of waste heat as a function of temperature
         Array1D<Real64> MSWasteHeatFrac;            // Waste heat fraction
         Array1D<Real64> MSEvapCondEffect;           // effectiveness of the evaporatively cooled condenser
         Array1D<Real64> MSEvapCondAirFlow;          // Air flow rate through the evap condenser for water use calcs [m3/s]
@@ -454,10 +454,10 @@ namespace DXCoils {
         bool CoolingCoilPresent;         // FALSE if coil not present
         bool HeatingCoilPresent;         // FALSE if coil not present
         bool ISHundredPercentDOASDXCoil; // FALSE if coil is regular dx coil
-        Array1D_int SHRFTemp;            // index of sensible heat ratio modifier curve
+        Array1D<int> SHRFTemp;            // index of sensible heat ratio modifier curve
         // (function of entering wetbulb and drybulb)
         int SHRFTempErrorIndex; // Used for warning messages when output of SHRFTemp is negative
-        Array1D_int SHRFFlow;   // index of sensible heat ratio modifier curve
+        Array1D<int> SHRFFlow;   // index of sensible heat ratio modifier curve
         // (function of actual supply air flow vs rated air flow)
         int SHRFFlowErrorIndex; // Used for warning messages when output of SHRFFlow is negative
         int SHRFTemp2;          // index of sensible heat ratio modifier curve
@@ -482,8 +482,8 @@ namespace DXCoils {
         bool IsSecondaryDXCoilInZone;                  // true means secondary dx coil is zone instead of outside
         bool IsDXCoilInZone;                           // true means dx coil is in zone instead of outside
         Real64 CompressorPartLoadRatio;                // compressor part load ratio of the primary DX coil
-        Array1D_int MSSecCoilSHRFT;                    // index to the multi speed secondary coil sensible heat ratio temperature modifier curve
-        Array1D_int MSSecCoilSHRFF;                    //  index to the multi speed secondary coil sensible heat ratio flow fraction modifier curve
+        Array1D<int> MSSecCoilSHRFT;                    // index to the multi speed secondary coil sensible heat ratio temperature modifier curve
+        Array1D<int> MSSecCoilSHRFF;                    //  index to the multi speed secondary coil sensible heat ratio flow fraction modifier curve
         Array1D<Real64> MSSecCoilAirFlow;              // multispeed secondary coil air flow rate
         Array1D<Real64> MSSecCoilAirFlowScalingFactor; // multispeed secondary coil air flow rate autosize scaling factor
         Array1D<Real64> MSSecCoilRatedSHR;             // multispeed secondary coil nominal or rated sensible heat ratio

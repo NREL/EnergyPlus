@@ -95,7 +95,7 @@ namespace ZonePlenum {
         Real64 OutletMassFlowRateMaxAvail; // [kg/Sec]
         Real64 OutletMassFlowRateMinAvail; // [kg/Sec]
         int NumInducedNodes;
-        Array1D_int InducedNode;
+        Array1D<int> InducedNode;
         Array1D<Real64> InducedMassFlowRate;
         Array1D<Real64> InducedMassFlowRateMaxAvail;
         Array1D<Real64> InducedMassFlowRateMinAvail;
@@ -107,7 +107,7 @@ namespace ZonePlenum {
         Array1D<Real64> InducedGenContam;
         bool InitFlag;
         int NumInletNodes;
-        Array1D_int InletNode;
+        Array1D<int> InletNode;
         Array1D<Real64> InletMassFlowRate;
         Array1D<Real64> InletMassFlowRateMaxAvail;
         Array1D<Real64> InletMassFlowRateMinAvail;
@@ -115,9 +115,9 @@ namespace ZonePlenum {
         Array1D<Real64> InletHumRat;
         Array1D<Real64> InletEnthalpy;
         Array1D<Real64> InletPressure;
-        Array1D_int ADUIndex;  // index to AirDistUnit leaking to this plenum
+        Array1D<int> ADUIndex;  // index to AirDistUnit leaking to this plenum
         int NumADUs;           // number of ADU's that can leak to this plenum
-        Array1D_int ZoneEqNum; // list of zone equip config indices for this plenum
+        Array1D<int> ZoneEqNum; // list of zone equip config indices for this plenum
 
         // Default Constructor
         ZoneReturnPlenumConditions()
@@ -149,7 +149,7 @@ namespace ZonePlenum {
         Real64 InletMassFlowRateMinAvail; // [kg/Sec]
         bool InitFlag;
         int NumOutletNodes;
-        Array1D_int OutletNode;
+        Array1D<int> OutletNode;
         Array1D<Real64> OutletMassFlowRate;
         Array1D<Real64> OutletMassFlowRateMaxAvail;
         Array1D<Real64> OutletMassFlowRateMinAvail;

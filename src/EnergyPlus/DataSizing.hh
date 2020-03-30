@@ -681,9 +681,9 @@ namespace DataSizing {
         bool HeatingCapacity;         // TRUE if AirloopHVAC system heating capacity is calculated
         bool SystemCapacity;          // TRUE if AirloopHVAC system heating capacity is calculated
         bool DesignSizeFromParent;    // TRUE if design size is set by parent object - normally false, set to true for special cases e.g. ERV
-        Array1D_int SizingMethod;    // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow and
+        Array1D<int> SizingMethod;    // supply air flow rate sizing method (SupplyAirFlowRate, FlowPerFloorArea, FractionOfAutosizedCoolingAirflow and
                                      // FractionOfAutosizedHeatingAirflow)
-        Array1D_int CapSizingMethod; // capacity sizing methods (HeatingDesignCapacity, CoolingDesignCapacity, CapacityPerFloorArea,
+        Array1D<int> CapSizingMethod; // capacity sizing methods (HeatingDesignCapacity, CoolingDesignCapacity, CapacityPerFloorArea,
                                      // FractionOfAutosizedCoolingCapacity and FractionOfAutosizedHeatingCapacity )
 
         // Default Constructor

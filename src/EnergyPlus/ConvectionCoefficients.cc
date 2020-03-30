@@ -1010,7 +1010,7 @@ namespace ConvectionCoefficients {
                                                                   "ALAMDARIHAMMONDSTABLEHORIZONTAL",
                                                                   "ALAMDARIHAMMONDUNSTABLEHORIZONTAL"});
 
-        static Array1D_int const ExtConvectionValue(22,
+        static Array1D<int> const ExtConvectionValue(22,
                                                     {-999,
                                                      -999,
                                                      ASHRAESimple,
@@ -1051,7 +1051,7 @@ namespace ConvectionCoefficients {
                                                                         "BLOCKENWINDWARD",
                                                                         "CLEARROOF",
                                                                         "USERCURVE"});
-        static Array1D_int const MoreSpecificExtWindConvectionValue(15,
+        static Array1D<int> const MoreSpecificExtWindConvectionValue(15,
                                                                     {HcExt_ASHRAESimpleCombined,
                                                                      HcExt_SparrowWindward,
                                                                      HcExt_SparrowLeeward,
@@ -1080,7 +1080,7 @@ namespace ConvectionCoefficients {
                                                                           "ISO15099WINDOWS",
                                                                           "USERCURVE",
                                                                           "NONE"});
-        static Array1D_int const SpecificExtNatConvectionValue(10,
+        static Array1D<int> const SpecificExtNatConvectionValue(10,
                                                                {HcExt_NaturalASHRAEVerticalWall,
                                                                 HcExt_AlamdariHammondVerticalWall,
                                                                 HcExt_FohannoPolidoriVerticalWall,
@@ -1129,7 +1129,7 @@ namespace ConvectionCoefficients {
                                                                   "GOLDSTEINNOVOSELACCEILINGDIFFUSERWINDOW",
                                                                   "GOLDSTEINNOVOSELACCEILINGDIFFUSERWALLS",
                                                                   "GOLDSTEINNOVOSELACCEILINGDIFFUSERFLOOR"});
-        static Array1D_int const IntConvectionValue(34,
+        static Array1D<int> const IntConvectionValue(34,
                                                     {-999,
                                                      -999,
                                                      ASHRAESimple,
@@ -6680,9 +6680,9 @@ namespace ConvectionCoefficients {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static int ZoneNum(0);
         static int PriorityEquipOn(0);
-        static Array1D_int HeatingPriorityStack({0, 10}, 0);
-        static Array1D_int CoolingPriorityStack({0, 10}, 0);
-        static Array1D_int FlowRegimeStack({0, 10}, 0);
+        static Array1D<int> HeatingPriorityStack({0, 10}, 0);
+        static Array1D<int> CoolingPriorityStack({0, 10}, 0);
+        static Array1D<int> FlowRegimeStack({0, 10}, 0);
         static int EquipNum(0);
         static int ZoneNode(0);
         static int EquipOnCount(0);

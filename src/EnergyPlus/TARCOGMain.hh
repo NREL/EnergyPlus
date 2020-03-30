@@ -101,8 +101,8 @@ namespace TARCOGMain {
                   Array2A<Real64> const xgcp,          // Matrix of constants for gas specific heat calc at constant pressure
                   const EPVector<Real64> &xwght,         // Vector of Molecular weights for gasses
                   const EPVector<Real64> &gama,          // Vector of spefic heat ration for low pressure calc
-                  const Array1D_int &nmix,              // Vector of number of gasses in gas mixture of each gap
-                  const Array1D_int &SupportPillar,     // Shows whether or not gap have support pillar
+                  const Array1D<int> &nmix,              // Vector of number of gasses in gas mixture of each gap
+                  const Array1D<int> &SupportPillar,     // Shows whether or not gap have support pillar
                   const EPVector<Real64> &PillarSpacing, // Pillar spacing for each gap (used in case there is support pillar)
                   const EPVector<Real64> &PillarRadius,  // Pillar radius for each gap (used in case there is support pillar)
                   EPVector<Real64> &theta,               // Vector of average temperatures of glazing surfaces [K]
@@ -126,7 +126,7 @@ namespace TARCOGMain {
                   Real64 &shgct,                       // Solar heat gain coefficient - per old procedure
                   Real64 &tamb,                        // Outdoor environmental temperature [K]
                   Real64 &troom,                       // Indoor environmental temperature [K]
-                  const Array1D_int &ibc,               // Vector of boundary condition flags (ibc(1) - outdoor, ibc(2) - indoor
+                  const Array1D<int> &ibc,               // Vector of boundary condition flags (ibc(1) - outdoor, ibc(2) - indoor
                   const EPVector<Real64> &Atop,         // Vector with areas of top openings - between SD layers and top of
                   const EPVector<Real64> &Abot,         // Vector with areas of bottom openings - between SD layers and
                   const EPVector<Real64> &Al,           // Vector with areas of left-hand side openings - between SD layers and
@@ -140,8 +140,8 @@ namespace TARCOGMain {
                   const EPVector<Real64> &SlatCurve,    // Curvature radius of the slat [m]
                   const EPVector<Real64> &vvent,        // Vector of velocities for forced ventilation, for each gap, and for
                   const EPVector<Real64> &tvent,        // Vector of temperatures of ventilation gas for forced ventilation,
-                  const Array1D_int &LayerType,         // Glazing layer type flag
-                  const Array1D_int &nslice,            // Vector of numbers of slices in a laminated glazing layers
+                  const Array1D<int> &LayerType,         // Glazing layer type flag
+                  const Array1D<int> &nslice,            // Vector of numbers of slices in a laminated glazing layers
                   const EPVector<Real64> &LaminateA,    // Left-hand side array for creating slice equations
                   const EPVector<Real64> &LaminateB,    // Right-hand side array for creating slice equations
                   const EPVector<Real64> &sumsol,       // Array of absorbed solar energy fractions for each laminated

@@ -91,7 +91,7 @@ namespace DataMoistureBalance {
     extern Array1D<Real64> TempOutsideAirFD; // Temperature outside air for the FD surface
 
     extern Array2D_int mhstry; // # of FD History terms for each equation
-    extern Array1D_int CMTF;   // Type of material layer
+    extern Array1D<int> CMTF;   // Type of material layer
     extern Array2D_int Nmrf;   // # of Moisture Response Factors for CPF Solution
 
     // variables used for MTF moisture implementation

@@ -241,7 +241,7 @@ namespace EconomicTariff {
     extern int sizeEconVar;
 
     // holds the outbound connections for each variable
-    extern Array1D_int operand; // sized to sizeOperand
+    extern Array1D<int> operand; // sized to sizeOperand
     extern int numOperand;
     extern int sizeOperand;
 
@@ -258,8 +258,8 @@ namespace EconomicTariff {
     extern int numComputation;
 
     // list of pointers to variable, 0 end of line, negative indicate operations
-    extern Array1D_int steps;
-    extern Array1D_int stepsCopy;
+    extern Array1D<int> steps;
+    extern Array1D<int> stepsCopy;
     extern int numSteps;
     extern int sizeSteps;
 
@@ -405,7 +405,7 @@ namespace EconomicTariff {
         Array1D<Real64> RTPbelowBaseCost;
         Array1D<Real64> RTPaboveBaseEnergy;
         Array1D<Real64> RTPbelowBaseEnergy;
-        Array1D_int seasonForMonth;
+        Array1D<int> seasonForMonth;
         // overall qualification of the rate
         bool isQualified;
         int ptDisqualifier;
@@ -487,9 +487,9 @@ namespace EconomicTariff {
         int blkSzMultPt;            // block size variable in the variable array (0 is flag for no variable)
         int numBlk;                 // number of blocks used
         Array1D<Real64> blkSzVal;   // array of block size values
-        Array1D_int blkSzPt;        // block size variables index to the variable array (0 is no variable)
+        Array1D<int> blkSzPt;        // block size variables index to the variable array (0 is no variable)
         Array1D<Real64> blkCostVal; // array of block cost values
-        Array1D_int blkCostPt;      // block cost variables index to the variable array (0 is no variable)
+        Array1D<int> blkCostPt;      // block cost variables index to the variable array (0 is no variable)
 
         // Default Constructor
         ChargeBlockType()

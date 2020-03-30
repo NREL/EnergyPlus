@@ -206,7 +206,7 @@ namespace DXCoils {
     Array1D<Real64> DXCoilOutletTemp;           // DX coil outlet dry bulb temperature [C]
     Array1D<Real64> DXCoilOutletHumRat;         // DX coil outlet humidity ratio [kgWater/kgDryAir]
     Array1D<Real64> DXCoilPartLoadRatio;        // DX coil part-load ratio
-    Array1D_int DXCoilFanOpMode;                // supply air fan operating mode
+    Array1D<int> DXCoilFanOpMode;                // supply air fan operating mode
     Array1D<Real64> DXCoilFullLoadOutAirTemp;   // DX coil full load outlet dry bulb temperature [C]
     Array1D<Real64> DXCoilFullLoadOutAirHumRat; // DX coil full load outlet humidity ratio [kgWater/kgDryAir]
     Array1D<Real64> DXCoilTotalCooling;         // DX cooling coil total cooling output [W]

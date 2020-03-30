@@ -147,10 +147,10 @@ namespace Psychrometrics {
     // MODULE VARIABLE DEFINITIONS:
     extern std::string String;
     extern bool ReportErrors;
-    extern Array1D_int iPsyErrIndex; // Number of times error occurred
+    extern Array1D<int> iPsyErrIndex; // Number of times error occurred
 #ifdef EP_psych_stats
     extern Array1D<Int64> NumTimesCalled;
-    extern Array1D_int NumIterations;
+    extern Array1D<int> NumIterations;
 #endif
 
     // DERIVED TYPE DEFINITIONS

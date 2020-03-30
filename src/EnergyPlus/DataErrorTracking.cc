@@ -207,7 +207,7 @@ namespace DataErrorTracking {
     // na
 
     // MODULE VARIABLE DECLARATIONS:
-    Array1D_int MatchCounts(SearchCounts, 0);
+    Array1D<int> MatchCounts(SearchCounts, 0);
     bool AbortProcessing(false);            // Flag used to if currently in "abort processing"
     int NumRecurringErrors(0);              // Number of stored recurring error messages
     int TotalSevereErrors(0);               // Counter

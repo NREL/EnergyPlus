@@ -193,7 +193,7 @@ namespace FaultsManager {
     //      'FaultModel:DamperLeakage:ReturnAir           ', &
     //      'FaultModel:DamperLeakage:OutdoorAir          ' /)
 
-    Array1D_int const iFaultTypeEnums(NumFaultTypes,
+    Array1D<int> const iFaultTypeEnums(NumFaultTypes,
                                       {iFault_TemperatureSensorOffset_OutdoorAir,
                                        iFault_HumiditySensorOffset_OutdoorAir,
                                        iFault_EnthalpySensorOffset_OutdoorAir,

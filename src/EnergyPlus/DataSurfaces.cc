@@ -382,13 +382,13 @@ namespace DataSurfaces {
 
     bool ShadingTransmittanceVaries(false); // overall, shading transmittance varies for the building
 
-    Array1D_int InsideGlassCondensationFlag; // 1 if innermost glass inside surface temp < zone air dew point;
+    Array1D<int> InsideGlassCondensationFlag; // 1 if innermost glass inside surface temp < zone air dew point;
     // 0 otherwise
-    Array1D_int InsideFrameCondensationFlag; // 1 if frame inside surface temp < zone air dew point;
+    Array1D<int> InsideFrameCondensationFlag; // 1 if frame inside surface temp < zone air dew point;
     // 0 otherwise
-    Array1D_int InsideDividerCondensationFlag; // 1 if divider inside surface temp < zone air dew point;
+    Array1D<int> InsideDividerCondensationFlag; // 1 if divider inside surface temp < zone air dew point;
     // 0 otherwise
-    Array1D_int AdjacentZoneToSurface; // Array of adjacent zones to each surface
+    Array1D<int> AdjacentZoneToSurface; // Array of adjacent zones to each surface
 
     Array1D<Real64> X0;     // X-component of translation vector
     Array1D<Real64> Y0;     // Y-component of translation vector

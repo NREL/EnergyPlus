@@ -84,7 +84,7 @@ void AnnualFieldSet::getVariableKeysFromFldSt(int &typeVar, int keyCount, std::v
 {
     // this hides the Objexx arrays and returns regular vectors
     Array1D<std::string> tempNamesOfKeys;
-    Array1D_int tempIndexesForKeyVar;
+    Array1D<int> tempIndexesForKeyVar;
     tempNamesOfKeys.allocate(keyCount);
     tempIndexesForKeyVar.allocate(keyCount);
     GetVariableKeys(m_variMeter, typeVar, tempNamesOfKeys, tempIndexesForKeyVar); // call outputprocessor routine with member variable

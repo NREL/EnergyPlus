@@ -285,10 +285,10 @@ namespace MixedAir {
         bool InitOAControllerSetUpAirLoopHVACVariables(true);
         bool AllocateOAControllersFlag(true);
         Array1D<std::string> DesignSpecOAObjName;     // name of the design specification outdoor air object
-        Array1D_int DesignSpecOAObjIndex;       // index of the design specification outdoor air object
+        Array1D<int> DesignSpecOAObjIndex;       // index of the design specification outdoor air object
         Array1D<std::string> VentMechZoneOrListName;  // Zone or Zone List to apply mechanical ventilation rate
         Array1D<std::string> DesignSpecZoneADObjName; // name of the design specification zone air distribution object
-        Array1D_int DesignSpecZoneADObjIndex;   // index of the design specification zone air distribution object
+        Array1D<int> DesignSpecZoneADObjIndex;   // index of the design specification zone air distribution object
     }                                           // namespace
     // SUBROUTINE SPECIFICATIONS FOR MODULE MixedAir
     // Driver/Manager Routines
@@ -5323,7 +5323,7 @@ namespace MixedAir {
         return Residuum;
     }
 
-    Array1D_int GetOAMixerNodeNumbers(std::string const &OAMixerName, // must match OA mixer names for the OA mixer type
+    Array1D<int> GetOAMixerNodeNumbers(std::string const &OAMixerName, // must match OA mixer names for the OA mixer type
                                       bool &ErrorsFound               // set to true if problem
     )
     {
@@ -5340,7 +5340,7 @@ namespace MixedAir {
         // as zero.
 
         // Return value
-        Array1D_int OANodeNumbers(4); // return OA mixer nodes
+        Array1D<int> OANodeNumbers(4); // return OA mixer nodes
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
         int WhichOAMixer;

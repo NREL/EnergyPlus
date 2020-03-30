@@ -116,7 +116,7 @@ namespace DataDaylighting {
         // Members
         int SurfNum;           // exterior window index
         int NumOfIntWindows;   // count of interior windows associated with this ext win
-        Array1D_int IntWinNum; // index numbers for interior windows assoc with this ext win
+        Array1D<int> IntWinNum; // index numbers for interior windows assoc with this ext win
 
         // Default Constructor
         IntWinAdjZoneExtWinStruct() : SurfNum(0), NumOfIntWindows(0)
@@ -132,7 +132,7 @@ namespace DataDaylighting {
         int DaylightMethod;                // Type of Daylighting (1=SplitFlux, 2=DElight)
         int AvailSchedNum;                 // pointer to availability schedule if present
         int TotalDaylRefPoints;            // Number of daylighting reference points in a zone (0,1 or 2)
-        Array1D_int DaylRefPtNum;          // Reference number to DaylRefPt array that stores Daylighting:ReferencePoint
+        Array1D<int> DaylRefPtNum;          // Reference number to DaylRefPt array that stores Daylighting:ReferencePoint
         Array2D<Real64> DaylRefPtAbsCoord; // =0.0 ! X,Y,Z coordinates of all daylighting reference points
         // in absolute coordinate system (m)
         // Points 1 and 2 are the control reference points
@@ -156,7 +156,7 @@ namespace DataDaylighting {
         Real64 ZonePowerReductionFactor;   // Electric power reduction factor for entire zone due to daylighting
         Array1D<Real64> DaylIllumAtRefPt;  // =0.0 ! Daylight illuminance at reference points (lux)
         Array1D<Real64> GlareIndexAtRefPt; // =0.0 ! Glare index at reference points
-        Array1D_int AdjIntWinZoneNums;     // List of zone numbers of adjacent zones that have exterior windows and
+        Array1D<int> AdjIntWinZoneNums;     // List of zone numbers of adjacent zones that have exterior windows and
         // share one or more interior windows with target zone
         int NumOfIntWinAdjZones; // Number of adjacent zones that have exterior windows and share one or
         // more interior windows with target zone
@@ -164,12 +164,12 @@ namespace DataDaylighting {
         Array1D<IntWinAdjZoneExtWinStruct>
             IntWinAdjZoneExtWin;          // nested structure | info about exterior window associated with zone via interior window
         int NumOfDayltgExtWins;           // Number of associated exterior windows providing daylight to this zone
-        Array1D_int DayltgExtWinSurfNums; // List of surface numbers of zone's exterior windows or
+        Array1D<int> DayltgExtWinSurfNums; // List of surface numbers of zone's exterior windows or
         // exterior windows in adjacent zones sharing interior windows with the zone
         std::vector<std::vector<int>> ShadeDeployOrderExtWins; // describes how the fenestration surfaces should deploy the shades. 
         // It is a list of lists. Each sublist is a group of fenestration surfaces that should be deployed together. Many times the 
         // sublists a just a single index to a fenestration surface if they are deployed one at a time.
-        Array1D_int MapShdOrdToLoopNum;  // list that maps back the original loop order when using ShadeDeployOrderExtWins for shade deployment
+        Array1D<int> MapShdOrdToLoopNum;  // list that maps back the original loop order when using ShadeDeployOrderExtWins for shade deployment
         Real64 MinIntWinSolidAng;     // Minimum solid angle subtended by an interior window in a zone
         Real64 TotInsSurfArea;        // Total inside surface area of a daylit zone (m2)
         Real64 FloorVisRefl;          // Area-weighted visible reflectance of floor of a daylit zone
@@ -211,7 +211,7 @@ namespace DataDaylighting {
         // True if at least one adjacent zone, sharing one or more interior windows, has daylighting control
         bool AdjZoneHasDayltgCtrl;
         int MapCount;          // Number of maps assigned to Zone
-        Array1D_int ZoneToMap; // Pointers to maps allocated to Zone
+        Array1D<int> ZoneToMap; // Pointers to maps allocated to Zone
 
         // Default Constructor
         ZoneDaylightCalc()

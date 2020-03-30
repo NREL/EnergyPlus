@@ -108,7 +108,7 @@ namespace WindowManager {
     extern Array3D<Real64> gcp;    // Gas specific-heat coefficients for each gap
     extern Array2D<Real64> gwght;  // Gas molecular weights for each gap
     extern Array2D<Real64> gfract; // Gas fractions for each gap
-    extern Array1D_int gnmix;      // Number of gases in gap
+    extern Array1D<int> gnmix;      // Number of gases in gap
     extern Array1D<Real64> gap;    // Gap width (m)
     extern Array1D<Real64> thick;  // Glass layer thickness (m)
     extern Array1D<Real64> scon;   // Glass layer conductance--conductivity/thickness (W/m2-K)
@@ -163,7 +163,7 @@ namespace WindowManager {
     extern Array2D<Real64> rfadjPhi; // front reflectance at angle of incidence
     extern Array2D<Real64> rbadjPhi; // back reflectance at angle of incidence
 
-    extern Array1D_int numpt;      // Number of spectral data wavelengths for each layer; =2 if no spectra data for a layer
+    extern Array1D<int> numpt;      // Number of spectral data wavelengths for each layer; =2 if no spectra data for a layer
     extern Array1D<Real64> stPhi;  // Glazing system transmittance at angle of incidence for each wavelength in wle
     extern Array1D<Real64> srfPhi; // Glazing system front reflectance at angle of incidence for each wavelength in wle
     extern Array1D<Real64> srbPhi; // Glazing system back reflectance at angle of incidence for each wavelenth in wle
@@ -317,7 +317,7 @@ namespace WindowManager {
 
     void LUdecomposition(Array2<Real64> &ajac, // As input: matrix to be decomposed;
                          int const n,          // Dimension of matrix
-                         Array1D_int &indx,    // Vector of row permutations
+                         Array1D<int> &indx,    // Vector of row permutations
                          Real64 &d             // +1 if even number of row interchange is even, -1
     );
 
@@ -325,7 +325,7 @@ namespace WindowManager {
 
     void LUsolution(Array2<Real64> const &a, // Matrix and vector in a.x = b;
                     int const n,             // Dimension of a and b
-                    Array1D_int const &indx, // Vector of row permutations
+                    Array1D<int> const &indx, // Vector of row permutations
                     Array1D<Real64> &b       // Matrix and vector in a.x = b;
     );
 

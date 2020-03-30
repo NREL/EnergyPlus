@@ -74,15 +74,15 @@ namespace HeatBalanceHAMTManager {
     // DERIVED TYPE DEFINITIONS:
 
     // MODULE VARIABLE DECLARATIONS:
-    extern Array1D_int firstcell;
-    extern Array1D_int lastcell;
-    extern Array1D_int Extcell;
-    extern Array1D_int ExtRadcell;
-    extern Array1D_int ExtConcell;
-    extern Array1D_int ExtSkycell;
-    extern Array1D_int ExtGrncell;
-    extern Array1D_int Intcell;
-    extern Array1D_int IntConcell;
+    extern Array1D<int> firstcell;
+    extern Array1D<int> lastcell;
+    extern Array1D<int> Extcell;
+    extern Array1D<int> ExtRadcell;
+    extern Array1D<int> ExtConcell;
+    extern Array1D<int> ExtSkycell;
+    extern Array1D<int> ExtGrncell;
+    extern Array1D<int> Intcell;
+    extern Array1D<int> IntConcell;
 
     extern Array1D<Real64> watertot;
     extern Array1D<Real64> surfrh;
@@ -139,8 +139,8 @@ namespace HeatBalanceHAMTManager {
         Array1D<Real64> length;  // Cell lengths
         Array1D<Real64> overlap; // Area of overlap
         Array1D<Real64> dist;    // distance between cell origins
-        Array1D_int adjs;
-        Array1D_int adjsl;
+        Array1D<int> adjs;
+        Array1D<int> adjsl;
 
         // Default Constructor
         subcell()

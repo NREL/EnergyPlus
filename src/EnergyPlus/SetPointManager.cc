@@ -601,7 +601,7 @@ namespace SetPointManager {
         int NumZones;       // number of zone nodes in input node list
         int ZoneNum;        // loop index for zone nodes
         int NumNodes;
-        Array1D_int NodeNums;
+        Array1D<int> NodeNums;
         static bool NodeListError(false);
         bool ErrInList;
         int Found;
@@ -7792,11 +7792,11 @@ namespace SetPointManager {
         std::string TypeOfComp;
         std::string NameOfComp;
 
-        Array1D_int VarIndexes;                            // Variable Numbers
-        Array1D_int VarTypes;                              // Variable Types (1=integer, 2=real, 3=meter)
+        Array1D<int> VarIndexes;                            // Variable Numbers
+        Array1D<int> VarTypes;                              // Variable Types (1=integer, 2=real, 3=meter)
         Array1D<OutputProcessor::TimeStepType> IndexTypes; // Variable Index Types (1=Zone,2=HVAC)
         Array1D<OutputProcessor::Unit> unitsForVar;        // units from enum for each variable
-        Array1D_int ResourceTypes;                         // ResourceTypes for each variable
+        Array1D<int> ResourceTypes;                         // ResourceTypes for each variable
         Array1D<std::string> EndUses;                            // EndUses for each variable
         Array1D<std::string> Groups;                             // Groups for each variable
         Array1D<std::string> Names;                              // Variable Names for each variable

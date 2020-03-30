@@ -3450,7 +3450,7 @@ namespace PurchasedAirManager {
         bool PlenumNotFound;          // logical to determine if same plenum is used by other ideal loads air systems
         int Loop;                     // loop counters
         int Loop2;                    // loop counters
-        Array1D_int TempPurchArray;   // temporary array used for dynamic allocation
+        Array1D<int> TempPurchArray;   // temporary array used for dynamic allocation
         EPVector<bool> TempIsSimulated; // temporary array used for dynamic allocation
 
         // index to ZoneHVAC:ReturnPlenum object

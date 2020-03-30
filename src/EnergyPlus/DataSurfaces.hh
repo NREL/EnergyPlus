@@ -360,13 +360,13 @@ namespace DataSurfaces {
 
     extern bool ShadingTransmittanceVaries; // overall, shading transmittance varies for the building
 
-    extern Array1D_int InsideGlassCondensationFlag; // 1 if innermost glass inside surface temp < zone air dew point;
+    extern Array1D<int> InsideGlassCondensationFlag; // 1 if innermost glass inside surface temp < zone air dew point;
     // 0 otherwise
-    extern Array1D_int InsideFrameCondensationFlag; // 1 if frame inside surface temp < zone air dew point;
+    extern Array1D<int> InsideFrameCondensationFlag; // 1 if frame inside surface temp < zone air dew point;
     // 0 otherwise
-    extern Array1D_int InsideDividerCondensationFlag; // 1 if divider inside surface temp < zone air dew point;
+    extern Array1D<int> InsideDividerCondensationFlag; // 1 if divider inside surface temp < zone air dew point;
     // 0 otherwise
-    extern Array1D_int AdjacentZoneToSurface; // Array of adjacent zones to each surface
+    extern Array1D<int> AdjacentZoneToSurface; // Array of adjacent zones to each surface
 
     extern Array1D<Real64> X0;     // X-component of translation vector
     extern Array1D<Real64> Y0;     // Y-component of translation vector
@@ -1383,7 +1383,7 @@ namespace DataSurfaces {
         int MultiSurfaceCtrlIsGroup;           // True if Group, False if Sequential - type of control order when multiple surfaces are referenced
         int FenestrationCount;                 // count of fenestration references
         Array1D<std::string> FenestrationName; // string holding list of fenestration surfaces
-        Array1D_int FenestrationIndex;         // Pointers to fenestration surfaces
+        Array1D<int> FenestrationIndex;         // Pointers to fenestration surfaces
 
         // Default Constructor
         WindowShadingControlData()
@@ -1497,7 +1497,7 @@ namespace DataSurfaces {
         int BaffleRoughness;  // surface roughness for exterior convection calcs.
         Real64 PlenGapThick;  // Depth of Plenum Behind Baffle [m]
         int NumSurfs;         // a single baffle can have multiple surfaces underneath it
-        Array1D_int SurfPtrs; // = 0  ! array of pointers for participating underlying surfaces
+        Array1D<int> SurfPtrs; // = 0  ! array of pointers for participating underlying surfaces
         Real64 HdeltaNPL;     // Height scale for Cavity bouyancy  [m]
         Real64 AreaRatio;     // Ratio of actual surface are to projected surface area [dimensionless]
         Real64 Cv;            // volume-based effectiveness of openings for wind-driven vent when Passive
@@ -1554,7 +1554,7 @@ namespace DataSurfaces {
         int SurfPtr;           // surface pointer
         int ConstrPtr;         // construction pointer
         int NumOfSched;        // number of scheduled layers
-        Array1D_int SchedPtrs; // pointer to schedules for each layer in construction
+        Array1D<int> SchedPtrs; // pointer to schedules for each layer in construction
 
         // Default Constructor
         FenestrationSolarAbsorbed() : SurfPtr(0), ConstrPtr(0), NumOfSched(0)

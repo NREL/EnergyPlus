@@ -902,8 +902,8 @@ namespace HeatBalanceSurfaceManager {
         Real64 frameArea;
         Real64 dividerArea;
         // counts for object count report
-        Array1D_int numSurfaces(20);
-        Array1D_int numExtSurfaces(20);
+        Array1D<int> numSurfaces(20);
+        Array1D<int> numExtSurfaces(20);
         int frameDivNum;
         bool isExterior;
         Array1D<Real64> computedNetArea; // holds the gross wall area minus the window and door areas

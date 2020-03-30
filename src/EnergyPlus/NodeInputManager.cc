@@ -115,7 +115,7 @@ namespace NodeInputManager {
     // this module that may need to get the Node Inputs.
     bool GetNodeInputFlag(true);     // Flag to Get Node Input(s)
     Array1D<std::string> TmpNodeID;        // Used to "reallocate" name arrays
-    Array1D_int NodeRef;             // Number of times a Node is "referenced"
+    Array1D<int> NodeRef;             // Number of times a Node is "referenced"
     std::string CurCheckContextName; // Used in Uniqueness checks
     Array1D<std::string> UniqueNodeNames;  // used in uniqueness checks
     int NumCheckNodes(0);            // Num of Unique nodes in check
@@ -127,7 +127,7 @@ namespace NodeInputManager {
     Array1D<NodeListDef> NodeLists; // Node Lists
     namespace {
         bool CalcMoreNodeInfoMyOneTimeFlag(true); // one time flag
-        Array1D_int GetOnlySingleNodeNodeNums;
+        Array1D<int> GetOnlySingleNodeNodeNums;
         bool GetOnlySingleNodeFirstTime(true);
     } // namespace
     // MODULE SUBROUTINES:
@@ -158,7 +158,7 @@ namespace NodeInputManager {
 
     void GetNodeNums(std::string const &Name,                  // Name for which to obtain information
                      int &NumNodes,                            // Number of nodes accompanying this Name
-                     Array1D_int &NodeNumbers,                 // Node Numbers accompanying this Name
+                     Array1D<int> &NodeNumbers,                 // Node Numbers accompanying this Name
                      bool &ErrorsFound,                        // True when errors are found...
                      int const NodeFluidType,                  // Fluidtype for checking/setting node FluidType
                      std::string const &NodeObjectType,        // Node Object Type (i.e. "Chiller:Electric")
@@ -1172,13 +1172,13 @@ namespace NodeInputManager {
 
         static Real64 RhoAirStdInit;
         static Real64 RhoWaterStdInit;
-        static Array1D_int NodeWetBulbSchedPtr;
+        static Array1D<int> NodeWetBulbSchedPtr;
         static EPVector<bool> NodeRelHumidityRepReq;
-        static Array1D_int NodeRelHumiditySchedPtr;
+        static Array1D<int> NodeRelHumiditySchedPtr;
         static EPVector<bool> NodeDewPointRepReq;
-        static Array1D_int NodeDewPointSchedPtr;
+        static Array1D<int> NodeDewPointSchedPtr;
         static EPVector<bool> NodeSpecificHeatRepReq;
-        static Array1D_int NodeSpecificHeatSchedPtr;
+        static Array1D<int> NodeSpecificHeatSchedPtr;
         static std::vector<std::string> nodeReportingStrings;
         static std::vector<std::string> nodeFluidNames;
         bool ReportWetBulb;

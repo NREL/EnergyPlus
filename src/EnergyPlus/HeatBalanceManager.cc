@@ -6245,13 +6245,13 @@ namespace HeatBalanceManager {
         std::string MullionOrientation; // Horizontal, vertical or none
         int LineNum;
         int ReadStat;                       // File read status
-        Array1D_int NGlass(2);              // Number of glass layers in glazing system
+        Array1D<int> NGlass(2);              // Number of glass layers in glazing system
         Array2D_int NumGases(4, 2);         // Number of gases in each gap of a glazing system
         Array2D_int MaterNumSysGlass(5, 2); // Material numbers for glazing system / glass combinations
         Array2D_int MaterNumSysGap(4, 2);   // Material numbers for glazing system / gap combinations
         int TotMaterialsPrev;               // Number of materials before adding ones from W5DataFile
         int TotFrameDividerPrev;            // Number of FrameAndDivider objects before adding ones from W5DataFile
-        Array1D_int NGaps(2);               // Number of gaps in window construction
+        Array1D<int> NGaps(2);               // Number of gaps in window construction
         int NGlSys;                         // Number of glazing systems (normally 1, but 2 for mullioned window
         //  with two different glazing systems
         int loop;      // DO loop counter
@@ -6297,8 +6297,8 @@ namespace HeatBalanceManager {
         Real64 FrameSolAbsorp;
         Real64 FrameVisAbsorp;
         Real64 FrameEmis;
-        Array1D_int HorDividers(2);  // For divider: number horizontal for each glazing system
-        Array1D_int VertDividers(2); // For divider: number vertical for each glazing system
+        Array1D<int> HorDividers(2);  // For divider: number horizontal for each glazing system
+        Array1D<int> VertDividers(2); // For divider: number vertical for each glazing system
         Array1D<Real64> DividerWidth(2);
         Array1D<Real64> DividerProjectionOut(2);
         Array1D<Real64> DividerProjectionIn(2);

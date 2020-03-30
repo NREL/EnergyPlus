@@ -93,7 +93,7 @@ namespace HWBaseboardRadiator {
         int EquipType;
         std::string Schedule;
         Array1D<std::string> SurfaceName;
-        Array1D_int SurfacePtr;
+        Array1D<int> SurfacePtr;
         int ZonePtr;
         int SchedPtr;
         int WaterInletNode;

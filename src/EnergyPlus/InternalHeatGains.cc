@@ -6077,7 +6077,7 @@ namespace InternalHeatGains {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         int Loop;
         int ZoneLoop; // Counter for the # of zones (nz)
-        static Array1D_int TradIntGainTypes(8,
+        static Array1D<int> TradIntGainTypes(8,
                                             {IntGainTypeOf_People,
                                              IntGainTypeOf_Lights,
                                              IntGainTypeOf_ElectricEquipment,
@@ -6611,7 +6611,7 @@ namespace InternalHeatGains {
     }
 
     void SumInternalConvectionGainsByTypes(int const ZoneNum,             // zone index pointer for which zone to sum gains for
-                                           const Array1D_int &GainTypeARR, // variable length 1-d array of integer valued gain types
+                                           const Array1D<int> &GainTypeARR, // variable length 1-d array of integer valued gain types
                                            Real64 &SumConvGainRate)
     {
 
@@ -6707,7 +6707,7 @@ namespace InternalHeatGains {
     }
 
     void SumReturnAirConvectionGainsByTypes(int const ZoneNum,             // zone index pointer for which zone to sum gains for
-                                            const Array1D_int &GainTypeARR, // variable length 1-d array of integer valued gain types
+                                            const Array1D<int> &GainTypeARR, // variable length 1-d array of integer valued gain types
                                             Real64 &SumReturnAirGainRate)
     {
 
@@ -6822,7 +6822,7 @@ namespace InternalHeatGains {
     }
 
     void SumInternalRadiationGainsByTypes(int const ZoneNum,             // zone index pointer for which zone to sum gains for
-                                          const Array1D_int &GainTypeARR, // variable length 1-d array of integer valued gain types
+                                          const Array1D<int> &GainTypeARR, // variable length 1-d array of integer valued gain types
                                           Real64 &SumRadiationGainRate)
     {
 
@@ -6952,7 +6952,7 @@ namespace InternalHeatGains {
     }
 
     void SumInternalLatentGainsByTypes(int const ZoneNum,              // zone index pointer for which zone to sum gains for
-                                       const Array1D_int &GainTypeARR, // variable length 1-d array of integer valued gain types
+                                       const Array1D<int> &GainTypeARR, // variable length 1-d array of integer valued gain types
                                        Real64 &SumLatentGainRate)
     {
 
@@ -7140,7 +7140,7 @@ namespace InternalHeatGains {
     }
 
     void SumInternalCO2GainsByTypes(int const ZoneNum,              // zone index pointer for which zone to sum gains for
-                                    const Array1D_int &GainTypeARR, // variable length 1-d array of integer valued gain types
+                                    const Array1D<int> &GainTypeARR, // variable length 1-d array of integer valued gain types
                                     Real64 &SumCO2GainRate)
     {
 
@@ -7314,16 +7314,16 @@ namespace InternalHeatGains {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         static int iZone(0);
         static int TimeStepInDay(0);
-        static Array1D_int IntGainTypesPeople(1, {IntGainTypeOf_People});
-        static Array1D_int IntGainTypesLight(1, {IntGainTypeOf_Lights});
-        static Array1D_int IntGainTypesEquip(6,
+        static Array1D<int> IntGainTypesPeople(1, {IntGainTypeOf_People});
+        static Array1D<int> IntGainTypesLight(1, {IntGainTypeOf_Lights});
+        static Array1D<int> IntGainTypesEquip(6,
                                              {IntGainTypeOf_ElectricEquipment,
                                               IntGainTypeOf_ElectricEquipmentITEAirCooled,
                                               IntGainTypeOf_GasEquipment,
                                               IntGainTypeOf_HotWaterEquipment,
                                               IntGainTypeOf_SteamEquipment,
                                               IntGainTypeOf_OtherEquipment});
-        static Array1D_int IntGainTypesRefrig(10,
+        static Array1D<int> IntGainTypesRefrig(10,
                                               {IntGainTypeOf_RefrigerationCase,
                                                IntGainTypeOf_RefrigerationCompressorRack,
                                                IntGainTypeOf_RefrigerationSystemAirCooledCondenser,
@@ -7334,9 +7334,9 @@ namespace InternalHeatGains {
                                                IntGainTypeOf_RefrigerationTransSysAirCooledGasCooler,
                                                IntGainTypeOf_RefrigerationTransSysSuctionPipeMT,
                                                IntGainTypeOf_RefrigerationTransSysSuctionPipeLT});
-        static Array1D_int IntGainTypesWaterUse(
+        static Array1D<int> IntGainTypesWaterUse(
             3, {IntGainTypeOf_WaterUseEquipment, IntGainTypeOf_WaterHeaterMixed, IntGainTypeOf_WaterHeaterStratified});
-        static Array1D_int IntGainTypesHvacLoss(20,
+        static Array1D<int> IntGainTypesHvacLoss(20,
                                                 {IntGainTypeOf_ZoneBaseboardOutdoorTemperatureControlled,
                                                  IntGainTypeOf_ThermalStorageChilledWaterMixed,
                                                  IntGainTypeOf_ThermalStorageChilledWaterStratified,
@@ -7357,7 +7357,7 @@ namespace InternalHeatGains {
                                                  IntGainTypeOf_SecCoolingDXCoilTwoSpeed,
                                                  IntGainTypeOf_SecCoolingDXCoilMultiSpeed,
                                                  IntGainTypeOf_SecHeatingDXCoilMultiSpeed});
-        static Array1D_int IntGainTypesPowerGen(9,
+        static Array1D<int> IntGainTypesPowerGen(9,
                                                 {IntGainTypeOf_GeneratorFuelCell,
                                                  IntGainTypeOf_GeneratorMicroCHP,
                                                  IntGainTypeOf_ElectricLoadCenterTransformer,
@@ -7467,7 +7467,7 @@ namespace InternalHeatGains {
 
     void SumInternalConvectionGainsByIndices(
         int const ZoneNum,                 // zone index pointer for which zone to sum gains for
-        const Array1D_int &DeviceIndexARR,  // variable length 1-d array of integer device index pointers to include in summation
+        const Array1D<int> &DeviceIndexARR,  // variable length 1-d array of integer device index pointers to include in summation
         const Array1D<Real64> &FractionARR, // array of fractional multipliers to apply to devices
         Real64 &SumConvGainRate)
     {
@@ -7536,7 +7536,7 @@ namespace InternalHeatGains {
 
     void SumInternalLatentGainsByIndices(
         int const ZoneNum,                  // zone index pointer for which zone to sum gains for
-        const Array1D_int &DeviceIndexARR,  // variable length 1-d array of integer device index pointers to include in summation
+        const Array1D<int> &DeviceIndexARR,  // variable length 1-d array of integer device index pointers to include in summation
         const Array1D<Real64> &FractionARR, // array of fractional multipliers to apply to devices
         Real64 &SumLatentGainRate)
     {
@@ -7605,7 +7605,7 @@ namespace InternalHeatGains {
 
     void SumReturnAirConvectionGainsByIndices(
         int const ZoneNum,                  // zone index pointer for which zone to sum gains for
-        const Array1D_int &DeviceIndexARR,  // variable length 1-d array of integer device index pointers to include in summation
+        const Array1D<int> &DeviceIndexARR,  // variable length 1-d array of integer device index pointers to include in summation
         const Array1D<Real64> &FractionARR, // array of fractional multipliers to apply to devices
         Real64 &SumReturnAirGainRate)
     {

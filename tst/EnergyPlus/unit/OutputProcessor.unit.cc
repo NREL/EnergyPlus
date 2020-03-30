@@ -77,11 +77,11 @@ namespace OutputProcessor {
     TEST_F(SQLiteFixture, OutputProcessor_TestGetMeteredVariables)
     {
         int const NumVariables = 2;
-        Array1D_int VarIndexes(NumVariables);                            // Variable Numbers
-        Array1D_int VarTypes(NumVariables);                              // Variable Types (1=integer, 2=real, 3=meter)
+        Array1D<int> VarIndexes(NumVariables);                            // Variable Numbers
+        Array1D<int> VarTypes(NumVariables);                              // Variable Types (1=integer, 2=real, 3=meter)
         Array1D<OutputProcessor::TimeStepType> IndexTypes(NumVariables); // Variable Index Types (1=Zone,2=HVAC)
         Array1D<OutputProcessor::Unit> unitsForVar(NumVariables);        // units from enum for each variable
-        Array1D_int ResourceTypes(NumVariables);                         // ResourceTypes for each variable
+        Array1D<int> ResourceTypes(NumVariables);                         // ResourceTypes for each variable
         Array1D<std::string> EndUses(NumVariables);                            // EndUses for each variable
         Array1D<std::string> Groups(NumVariables);                             // Groups for each variable
         Array1D<std::string> Names(NumVariables);                              // Variable Names for each variable

@@ -314,7 +314,7 @@ namespace TARCOGCommon {
         using namespace TARCOGParams;
 
         // Locals
-        Array1D_int indx(n);
+        Array1D<int> indx(n);
         Real64 d;
 
         ludcmp(a, n, indx, d, nperr, ErrorMessage);
@@ -325,7 +325,7 @@ namespace TARCOGCommon {
         lubksb(a, n, indx, b);
     }
 
-    void ludcmp(Array2<Real64> &a, int const n, Array1D_int &indx, Real64 &d, int &nperr, std::string &ErrorMessage)
+    void ludcmp(Array2<Real64> &a, int const n, Array1D<int> &indx, Real64 &d, int &nperr, std::string &ErrorMessage)
     {
 
         // Locals
@@ -397,7 +397,7 @@ namespace TARCOGCommon {
         } // j
     }
 
-    void lubksb(Array2A<Real64> const a, int const n, const Array1D_int &indx, EPVector<Real64> &b)
+    void lubksb(Array2A<Real64> const a, int const n, const Array1D<int> &indx, EPVector<Real64> &b)
     {
         //***********************************************************************
         //***********************************************************************

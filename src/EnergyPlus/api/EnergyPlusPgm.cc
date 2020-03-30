@@ -501,7 +501,7 @@ void CreateCurrentDateTimeString(std::string &CurrentDateTimeString)
     ObjexxFCL::gio::Fmt fmtDate("(1X,'YMD=',I4,'.',I2.2,'.',I2.2,1X,I2.2,':',I2.2)");
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    Array1D_int value(8);
+    Array1D<int> value(8);
     // value(1)   Current year
     // value(2)   Current month
     // value(3)   Current day

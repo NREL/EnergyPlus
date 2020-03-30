@@ -95,7 +95,7 @@ namespace SteamBaseboardRadiator {
         int EquipType;
         std::string Schedule;
         Array1D<std::string> SurfaceName;
-        Array1D_int SurfacePtr;
+        Array1D<int> SurfacePtr;
         int ZonePtr;
         int SchedPtr;         // Pointer to the correct schedule
         int SteamInletNode;   // Inlet steam baseboard node

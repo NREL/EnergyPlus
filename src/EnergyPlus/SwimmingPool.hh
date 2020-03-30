@@ -135,7 +135,7 @@ namespace SwimmingPool {
         bool MyOneTimeFlag;
         bool MyEnvrnFlagGeneral;
         bool MyPlantScanFlagPool;
-        Array1D_int SurfaceToPoolIndex;
+        Array1D<int> SurfaceToPoolIndex;
         Array1D<Real64> QPoolSrcAvg;          // Average source over the time step for a particular radiant surface
         Array1D<Real64> HeatTransCoefsAvg;    // Average denominator term over the time step for a particular pool
         Array1D<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source

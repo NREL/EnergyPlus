@@ -202,7 +202,7 @@ namespace WaterUse {
         Real64 Energy;      // Heating energy required to raise temperature from cold to hot (J)
         int NumWaterEquipment;
         int MaxIterationsErrorIndex; // recurring error index
-        Array1D_int myWaterEquipArr;
+        Array1D<int> myWaterEquipArr;
         int PlantLoopNum;
         int PlantLoopSide;
         int PlantLoopBranchNum;

@@ -63,8 +63,8 @@ namespace DataPlant {
         int CorrMixIndex;           // Index of Mixer corresponding to this Splitter
         std::string NodeNameIn;     // Node name for the inlet to the splitter
         int TotalOutletNodes;       // Number of outlet nodes for the splitter
-        Array1D_int NodeNumOut;     // Node number for the outlet to the splitter
-        Array1D_int BranchNumOut;   // Reference number for branch connected to splitter outlet
+        Array1D<int> NodeNumOut;     // Node number for the outlet to the splitter
+        Array1D<int> BranchNumOut;   // Reference number for branch connected to splitter outlet
         Array1D<std::string> NodeNameOut; // Node name for the outlet to the splitter
 
         // Default Constructor

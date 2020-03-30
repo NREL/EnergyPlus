@@ -178,7 +178,7 @@ namespace OutputReportTabularAnnual {
         OutputProcessor::TimeStepType stepTypeVar;
         OutputProcessor::Unit unitsVar = OutputProcessor::Unit::None;
         Array1D<std::string> namesOfKeys;   // keyNames
-        Array1D_int indexesForKeyVar; // keyVarIndexes
+        Array1D<int> indexesForKeyVar; // keyVarIndexes
         std::list<std::string> allKeys;
 
         std::string filterFieldUpper = m_filter;
@@ -636,7 +636,7 @@ namespace OutputReportTabularAnnual {
     void AnnualTable::writeTable(int unitsStyle)
     {
         Array1D<std::string> columnHead;
-        Array1D_int columnWidth;
+        Array1D<int> columnWidth;
         Array1D<std::string> rowHead;
         Array2D_string tableBody;
         Real64 veryLarge = 1.0E280;
@@ -930,7 +930,7 @@ namespace OutputReportTabularAnnual {
         // for the new binning aggregation types create a second table of the bin ranges
         if (createBinRangeTable) {
             Array1D<std::string> colHeadRange;
-            Array1D_int colWidthRange;
+            Array1D<int> colWidthRange;
             Array1D<std::string> rowHeadRange;
             Array2D_string tableBodyRange;
             colHeadRange.allocate(10);

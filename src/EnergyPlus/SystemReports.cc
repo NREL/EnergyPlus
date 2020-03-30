@@ -224,12 +224,12 @@ namespace SystemReports {
     int MaxCompArraySize(500);
     int DBFlag(0);
 
-    Array1D_int SetBackCounter;
-    Array1D_int HeatCoolFlag;
-    Array1D_int FirstHeatCoolFlag;
-    Array1D_int FirstHeatCoolHour;
-    Array1D_int LastHeatCoolFlag;
-    Array1D_int LastHeatCoolHour;
+    Array1D<int> SetBackCounter;
+    Array1D<int> HeatCoolFlag;
+    Array1D<int> FirstHeatCoolFlag;
+    Array1D<int> FirstHeatCoolHour;
+    Array1D<int> LastHeatCoolFlag;
+    Array1D<int> LastHeatCoolHour;
     EPVector<bool> AirLoopCalcDone;
     EPVector<bool> NoLoadFlag;
     EPVector<bool> UnmetLoadFlag;
@@ -2470,22 +2470,22 @@ namespace SystemReports {
         Array1D<std::string> SubCompTypes;
         Array1D<std::string> SubCompNames;
         Array1D<std::string> InletNodeNames;
-        Array1D_int InletNodeNumbers;
-        Array1D_int InletFluidStreams;
+        Array1D<int> InletNodeNumbers;
+        Array1D<int> InletFluidStreams;
         Array1D<std::string> OutletNodeNames;
-        Array1D_int OutletNodeNumbers;
-        Array1D_int OutletFluidStreams;
+        Array1D<int> OutletNodeNumbers;
+        Array1D<int> OutletFluidStreams;
         int NumChildren;
         int NumGrandChildren;
         bool IsParent;
 
         // Dimension GetMeteredVariables arrays
-        Array1D_int VarIndexes;                            // Variable Numbers
-        Array1D_int VarTypes;                              // Variable Types (1=integer, 2=real, 3=meter)
+        Array1D<int> VarIndexes;                            // Variable Numbers
+        Array1D<int> VarTypes;                              // Variable Types (1=integer, 2=real, 3=meter)
         Array1D<std::string> UnitsStrings;                       // UnitsStrings for each variable
         Array1D<OutputProcessor::TimeStepType> IndexTypes; // Variable Idx Types (1=Zone,2=HVAC)
         Array1D<OutputProcessor::Unit> unitsForVar;        // units from enum for each variable
-        Array1D_int ResourceTypes;                         // ResourceTypes for each variable
+        Array1D<int> ResourceTypes;                         // ResourceTypes for each variable
         Array1D<std::string> EndUses;                            // EndUses for each variable
         Array1D<std::string> Groups;                             // Groups for each variable
         Array1D<std::string> Names;                              // Variable Names for each variable

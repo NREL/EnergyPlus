@@ -101,7 +101,7 @@ namespace SolarReflectionManager {
         Array2D<Real64> RecPtHitPtDis;         // Distance from receiving point to hit point (m)
         Array2D<Vector3<Real64>> HitPtNormVec; // Hit point's surface normal unit vector pointing into hemisphere
         //  containing the receiving point
-        Array1D_int PossibleObsSurfNums; // Surface numbers of possible obstructions for a receiving surf
+        Array1D<int> PossibleObsSurfNums; // Surface numbers of possible obstructions for a receiving surf
         int NumPossibleObs;              // Number of possible obstructions for a receiving surface
 
         // Default Constructor

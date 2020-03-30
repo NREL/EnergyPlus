@@ -203,12 +203,12 @@ namespace HVACUnitaryBypassVAV {
         Real64 CompPartLoadFrac;   // Compressor part load ratio
         int AirLoopNumber;         // Air loop served by the CBVAV system
         int NumControlledZones;
-        Array1D_int ControlledZoneNum;           // Index to controlled zones
-        Array1D_int ActualZoneNum;               // Actual zone number of controlled zone
-        Array1D_int ActualZoneNodeNum;           // Actual zone node num of controlled zone
-        Array1D_int CBVAVBoxOutletNode;          // Outlet node of CBVAV Box in controlled zone
-        Array1D_int ZoneSequenceCoolingNum;      // Index to cooling sequence/priority for this zone
-        Array1D_int ZoneSequenceHeatingNum;      // Index to heating sequence/priority for this zone
+        Array1D<int> ControlledZoneNum;           // Index to controlled zones
+        Array1D<int> ActualZoneNum;               // Actual zone number of controlled zone
+        Array1D<int> ActualZoneNodeNum;           // Actual zone node num of controlled zone
+        Array1D<int> CBVAVBoxOutletNode;          // Outlet node of CBVAV Box in controlled zone
+        Array1D<int> ZoneSequenceCoolingNum;      // Index to cooling sequence/priority for this zone
+        Array1D<int> ZoneSequenceHeatingNum;      // Index to heating sequence/priority for this zone
         int PriorityControl;                     // Control mode - CoolingPriority, HeatingPriority, ZonePriority or LoadPriority
         int NumZonesCooled;                      // Number of zones requesting cooling
         int NumZonesHeated;                      // Number of zones requesting heating

@@ -1083,7 +1083,7 @@ namespace HeatBalanceIntRadExchange {
     void GetInputViewFactors(std::string const &ZoneName, // Needed to check for user input view factors.
                              int const N,                 // NUMBER OF SURFACES
                              Array2A<Real64> F,           // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
-                             const Array1D_int &EP_UNUSED(SPtr),     // pointer to actual surface number
+                             const Array1D<int> &EP_UNUSED(SPtr),     // pointer to actual surface number
                              bool &NoUserInputF,          // Flag signifying no input F's for this
                              bool &ErrorsFound            // True when errors are found in number of fields vs max args
     )
@@ -1269,7 +1269,7 @@ namespace HeatBalanceIntRadExchange {
     void GetInputViewFactorsbyName(std::string const &EnclosureName, // Needed to check for user input view factors.
                                    int const N,                      // NUMBER OF SURFACES
                                    Array2A<Real64> F,                // USER INPUT DIRECT VIEW FACTOR MATRIX (N X N)
-                                   const Array1D_int &SPtr,          // pointer to actual surface number
+                                   const Array1D<int> &SPtr,          // pointer to actual surface number
                                    bool &NoUserInputF,               // Flag signifying no input F's for this
                                    bool &ErrorsFound                 // True when errors are found in number of fields vs max args
     )
@@ -1357,7 +1357,7 @@ namespace HeatBalanceIntRadExchange {
                                     const Array1D<Real64> &Azimuth, // Facing angle of the surface (in degrees)
                                     const Array1D<Real64> &Tilt,    // Tilt angle of the surface (in degrees)
                                     Array2A<Real64> F,              // APPROXIMATE DIRECT VIEW FACTOR MATRIX (N X N)
-                                    const Array1D_int &SPtr         // pointer to REAL(r64) surface number (for error message)
+                                    const Array1D<int> &SPtr         // pointer to REAL(r64) surface number (for error message)
     )
     {
 

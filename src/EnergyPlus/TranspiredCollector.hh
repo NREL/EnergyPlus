@@ -89,10 +89,10 @@ namespace TranspiredCollector {
         std::string OSCMName;         // OtherSideConditionsModel
         int OSCMPtr;                  // OtherSideConditionsModel index
         int SchedPtr;                 // Availablity schedule
-        Array1D_int InletNode;        // Air system node "pointer", should be set to outdoor air
-        Array1D_int OutletNode;       // Air system node "pointer", outlet from UTSC
-        Array1D_int ControlNode;      // Air system node "pointer", should have mixed air setpoint
-        Array1D_int ZoneNode;         // Air system node "pointer", should have zone node
+        Array1D<int> InletNode;        // Air system node "pointer", should be set to outdoor air
+        Array1D<int> OutletNode;       // Air system node "pointer", outlet from UTSC
+        Array1D<int> ControlNode;      // Air system node "pointer", should have mixed air setpoint
+        Array1D<int> ZoneNode;         // Air system node "pointer", should have zone node
         int Layout;                   // 'Square' or 'Triangle'
         int Correlation;              // which heat exchanger effectiveness model
         Real64 HoleDia;               // Diameter of Perforations in Collector [m]
@@ -103,7 +103,7 @@ namespace TranspiredCollector {
         Real64 PlenGapThick;          // Depth of Plenum Behind Collector [m]
         Real64 PlenCrossArea;         // cross section area of plenum behind collector [m2]
         int NumSurfs;                 // a single collector can have multiple surfaces underneath it
-        Array1D_int SurfPtrs;         // = 0  ! array of pointers for participating underlying surfaces
+        Array1D<int> SurfPtrs;         // = 0  ! array of pointers for participating underlying surfaces
         Real64 Height;                // Overall Height of Collector  [m]
         Real64 AreaRatio;             // Ratio of actual surface are to projected surface area [dimensionless]
         Real64 CollectThick;          // Thickness of collector absorber plate material.  [m]

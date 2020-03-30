@@ -2062,7 +2062,7 @@ namespace EconomicLifeCycleCost {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // all arrays are in the format: (row, column)
         Array1D<std::string> columnHead;
-        Array1D_int columnWidth;
+        Array1D<int> columnWidth;
         Array1D<std::string> rowHead;
         Array2D_string tableBody;
 

@@ -115,7 +115,7 @@ namespace HeatBalanceManager {
     struct WarmupConvergence
     {
         // Members
-        Array1D_int PassFlag; // one flag (1=Fail), (2=Pass) for each of the 4 conditions of convergence from
+        Array1D<int> PassFlag; // one flag (1=Fail), (2=Pass) for each of the 4 conditions of convergence from
         // warmup (PassFlag(1)=Max Temp, PassFlag(2)=Min Temp, PassFlag(3)=Max Heat Load
         // PassFlag(4)=Max Cool Load)
         // Following are stored test values for temperature and loads convergence

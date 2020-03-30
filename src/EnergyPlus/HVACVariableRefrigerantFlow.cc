@@ -220,8 +220,8 @@ namespace HVACVariableRefrigerantFlow {
     EPVector<bool> MyVRFFlag;                 // used for sizing VRF inputs one time
     EPVector<bool> MyVRFCondFlag;             // used to reset timer counter
     EPVector<bool> MyZoneEqFlag;              // used to set up zone equipment availability managers
-    Array1D_int NumCoolingLoads;            // number of TU's requesting cooling
-    Array1D_int NumHeatingLoads;            // number of TU's requesting heating
+    Array1D<int> NumCoolingLoads;            // number of TU's requesting cooling
+    Array1D<int> NumHeatingLoads;            // number of TU's requesting heating
     Array1D<Real64> MaxCoolingCapacity;     // maximum capacity of any terminal unit
     Array1D<Real64> MaxHeatingCapacity;     // maximum capacity of any terminal unit
     Array1D<Real64> CoolCombinationRatio;   // ratio of terminal unit capacity to VRF condenser capacity
@@ -1490,7 +1490,7 @@ namespace HVACVariableRefrigerantFlow {
         Real64 FanVolFlowRate;           // Fan Max Flow Rate from Fan object (for comparisons to validity)
         int FanInletNodeNum;             // Used in TU configuration setup
         int FanOutletNodeNum;            // Used in TU configuration setup
-        Array1D_int OANodeNums(4);       // Node numbers of OA mixer (OA, EA, RA, MA)
+        Array1D<int> OANodeNums(4);       // Node numbers of OA mixer (OA, EA, RA, MA)
         int CCoilInletNodeNum;           // Used in TU configuration setup
         int CCoilOutletNodeNum;          // Used in TU configuration setup
         int HCoilInletNodeNum;           // Used in TU configuration setup
@@ -5578,7 +5578,7 @@ namespace HVACVariableRefrigerantFlow {
             }
             // check OA Mixer return node
             if (VRFTU(VRFTUNum).isInZone && !VRFTU(VRFTUNum).ATMixerExists && VRFTU(VRFTUNum).OAMixerUsed) {
-                Array1D_int OANodeNums = MixedAir::GetOAMixerNodeNumbers(VRFTU(VRFTUNum).OAMixerName, errFlag);
+                Array1D<int> OANodeNums = MixedAir::GetOAMixerNodeNumbers(VRFTU(VRFTUNum).OAMixerName, errFlag);
                 if (VRFTU(VRFTUNum).VRFTUInletNodeNum != OANodeNums(3)) {
                     ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name +
                                     "\" Zone terminal unit air inlet node name must be the same as the OutdoorAir:Mixer return air node name.");
@@ -5622,7 +5622,7 @@ namespace HVACVariableRefrigerantFlow {
             int HCoilOutletNodeNum = DXCoils::getCoilOutNodeIndex(VRFTU(VRFTUNum).HeatCoilIndex, errFlag);
             if (VRFTU(VRFTUNum).isInZone && VRFTU(VRFTUNum).FanPlace == DataHVACGlobals::BlowThru) {
                 if (!VRFTU(VRFTUNum).ATMixerExists && VRFTU(VRFTUNum).OAMixerUsed) {
-                    Array1D_int OANodeNums = MixedAir::GetOAMixerNodeNumbers(VRFTU(VRFTUNum).OAMixerName, errFlag);
+                    Array1D<int> OANodeNums = MixedAir::GetOAMixerNodeNumbers(VRFTU(VRFTUNum).OAMixerName, errFlag);
                     if (FanInletNodeNum != OANodeNums(4)) {
                         ShowSevereError(cCurrentModuleObject + " \"" + VRFTU(VRFTUNum).Name + "\" Fan inlet node name must be the same");
                         ShowContinueError("as the outside air mixers mixed air node name when blow through fan is specified and an outside air "

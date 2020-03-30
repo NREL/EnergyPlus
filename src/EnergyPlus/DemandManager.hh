@@ -118,7 +118,7 @@ namespace DemandManager {
         Array1D<Real64> History;  // Demand window history
         int ManagerPriority;      // Indicator for priority (SEQUENTIAL, OPTIMAL, ALL)
         int NumOfManager;         // Number of DEMAND MANAGERs
-        Array1D_int Manager;      // Indexes for DEMAND MANAGERs
+        Array1D<int> Manager;      // Indexes for DEMAND MANAGERs
         Real64 MeterDemand;       // Meter demand at this timestep
         Real64 AverageDemand;     // Current demand over the demand window
         Real64 PeakDemand;        // Peak demand in the billing month so far
@@ -160,7 +160,7 @@ namespace DemandManager {
         Real64 UpperLimit; // Not used for demand limit
         // Highest cooling setpoint for thermostats
         int NumOfLoads;   // Number of load objects
-        Array1D_int Load; // Pointers to load objects
+        Array1D<int> Load; // Pointers to load objects
 
         // Additional fields related to DemandManager:Ventilation
         Real64 FixedRate;      // m3 per person

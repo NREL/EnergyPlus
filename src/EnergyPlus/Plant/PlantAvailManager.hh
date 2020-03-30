@@ -59,8 +59,8 @@ namespace DataPlant {
         int StartTime;                   // cycle on time (in SimTimeSteps)
         int StopTime;                    // cycle off time (in SimTimeSteps)
         Array1D<std::string> AvailManagerName; // name of each availability manager
-        Array1D_int AvailManagerType;    // type of availability manager
-        Array1D_int AvailManagerNum;     // index of availability manager
+        Array1D<int> AvailManagerType;    // type of availability manager
+        Array1D<int> AvailManagerNum;     // index of availability manager
 
         // Default Constructor
         PlantAvailMgrData() : NumAvailManagers(0), AvailStatus(0), StartTime(0), StopTime(0)

@@ -145,8 +145,8 @@ namespace RuntimeLanguageProcessor {
     int OffVariableNum(0);
     int OnVariableNum(0);
     int PiVariableNum(0);
-    Array1D_int CurveIndexVariableNums;
-    Array1D_int ConstructionIndexVariableNums;
+    Array1D<int> CurveIndexVariableNums;
+    Array1D<int> ConstructionIndexVariableNums;
     int YearVariableNum(0);
     int MonthVariableNum(0);
     int DayOfMonthVariableNum(0);
@@ -256,7 +256,7 @@ namespace RuntimeLanguageProcessor {
         static Real64 tmpMinutes(0.0);
         static Real64 tmpHours(0.0);
         static Real64 tmpCurEnvirNum(0.0);
-        Array1D_int datevalues(8);
+        Array1D<int> datevalues(8);
         // value(1)   Current year
         // value(2)   Current month
         // value(3)   Current day
@@ -511,9 +511,9 @@ namespace RuntimeLanguageProcessor {
         int InstructionNum;
         int InstructionNum2;
         int GotoNum;
-        Array1D_int SavedIfInstructionNum(IfDepthAllowed); // index is depth of If statements
+        Array1D<int> SavedIfInstructionNum(IfDepthAllowed); // index is depth of If statements
         Array2D_int SavedGotoInstructionNum(ELSEIFLengthAllowed, IfDepthAllowed);
-        Array1D_int NumGotos(IfDepthAllowed); // index is depth of If statements,
+        Array1D<int> NumGotos(IfDepthAllowed); // index is depth of If statements,
         int SavedWhileInstructionNum;
         int SavedWhileExpressionNum;
         int NumWhileGotos;
@@ -2079,7 +2079,7 @@ namespace RuntimeLanguageProcessor {
         Real64 thisMin;     // local temporary
         int OperandNum;
         int SeedN;              // number of digits in the number used to seed the generator
-        Array1D_int SeedIntARR; // local temporary for random seed
+        Array1D<int> SeedIntARR; // local temporary for random seed
         Real64 tmpRANDU1;       // local temporary for uniform random number
         Real64 tmpRANDU2;       // local temporary for uniform random number
         Real64 tmpRANDG;        // local temporary for gaussian random number

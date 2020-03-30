@@ -229,7 +229,7 @@ namespace VariableSpeedCoils {
         Real64 FanDelayTime;            // Fan delay time, time delay for the HP's fan to
         // beginning for multispeed coil type
         int MSHPDesignSpecIndex;              // index to UnitarySystemPerformance:Multispeed object
-        Array1D_int MSErrIndex;               // index flag for num speeds/recurring messages
+        Array1D<int> MSErrIndex;               // index flag for num speeds/recurring messages
         Array1D<Real64> MSRatedPercentTotCap; // Percentage to the total cooling capacity for MS heat pump at the highest speed [dimensionless]
         Array1D<Real64> MSRatedTotCap;        // Rated cooling capacity for MS heat pump [W]
         Array1D<Real64> MSRatedSHR;           // Rated SHR for MS heat pump [dimensionless]
@@ -250,19 +250,19 @@ namespace VariableSpeedCoils {
         // rated coil bypass factor
         Array1D<Real64> MSEffectiveAo;
         // effective heat transfer surface at each speed
-        Array1D_int MSCCapFTemp;
+        Array1D<int> MSCCapFTemp;
         // index of total capacity modifier curve
-        Array1D_int MSCCapAirFFlow;
+        Array1D<int> MSCCapAirFFlow;
         // index of total capacity modifier curve as a function of air flow
-        Array1D_int MSCCapWaterFFlow;
+        Array1D<int> MSCCapWaterFFlow;
         // index of total capacity modifier curve as a function of water flow
-        Array1D_int MSEIRFTemp;
+        Array1D<int> MSEIRFTemp;
         // index of energy input ratio modifier curve as a function of temperature
-        Array1D_int MSEIRAirFFlow;
+        Array1D<int> MSEIRAirFFlow;
         // index of energy input ratio modifier curve as a function of air flow fraction
-        Array1D_int MSEIRWaterFFlow;
+        Array1D<int> MSEIRWaterFFlow;
         // index of energy input ratio modifier curve as a function of water flow fraction
-        Array1D_int MSWasteHeat;
+        Array1D<int> MSWasteHeat;
         // index of waste heat as a function of temperature
         Array1D<Real64> MSWasteHeatFrac;
         // water heating coil pump power at various speeds

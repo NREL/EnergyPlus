@@ -6778,7 +6778,7 @@ TEST(OutputReportTabularTest, CreateListOfZonesForAirLoop_test)
     ShowMessage("Begin Test: OutputReportTabularTest, CreateListOfZonesForAirLoop_test");
 
     CompLoadTablesType compLoad;
-    Array1D_int zoneToAirLoop;
+    Array1D<int> zoneToAirLoop;
 
     NumOfZones = 15;
     compLoad.zoneIndices.allocate(NumOfZones);

@@ -258,7 +258,7 @@ TEST_F(EnergyPlusFixture, SurfaceControlMovableInsulation_InvalidWindowSimpleGla
     int SurfNum = 0;
     int TotHTSurfs = DataSurfaces::TotSurfaces = 1;
     Array1D<std::string> const BaseSurfCls(1, {"WALL"});
-    Array1D_int const BaseSurfIDs(1, {1});
+    Array1D<int> const BaseSurfIDs(1, {1});
     int NeedToAddSurfaces;
     // get heat tranfer surface data
     SurfaceGeometry::GetHTSurfaceData(OutputFiles::getSingleton(), ErrorsFound, SurfNum, TotHTSurfs, 0, 0, 0, BaseSurfCls, BaseSurfIDs, NeedToAddSurfaces);

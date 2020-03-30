@@ -180,14 +180,14 @@ namespace VentilatedSlab {
     bool HCoilOn(false);                  // TRUE if the heating coil (gas or electric especially) should be running
     int NumOfVentSlabs(0);                // Number of ventilated slab in the input file
     Real64 OAMassFlowRate(0.0);           // Outside air mass flow rate for the ventilated slab
-    Array1D_double QRadSysSrcAvg;         // Average source over the time step for a particular radiant surfaceD
+    Array1D<Real64> QRadSysSrcAvg;         // Average source over the time step for a particular radiant surfaceD
     Array1D<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
     int MaxCloNumOfSurfaces(0);           // Used to set allocate size in CalcClo routine
     Real64 QZnReq(0.0);                   // heating or cooling needed by system [watts]
 
     // Record keeping variables used to calculate QRadSysSrcAvg locally
 
-    Array1D_double LastQRadSysSrc;      // Need to keep the last value in case we are still iterating
+    Array1D<Real64> LastQRadSysSrc;      // Need to keep the last value in case we are still iterating
     Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
     Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
     EPVector<bool> CheckEquipName;

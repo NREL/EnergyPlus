@@ -254,7 +254,7 @@ namespace ScheduleManager {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
-        Array1D_int DaysInYear(366);
+        Array1D<int> DaysInYear(366);
         int UnitNumber;
         int LoopIndex;
         int InLoopIndex;

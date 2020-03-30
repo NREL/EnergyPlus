@@ -150,7 +150,7 @@ namespace DataGenerators {
         Array1D<std::string> ConstitName;
         Array1D<Real64> ConstitMolalFract;
         // calculated data (except some for generic liquid)
-        Array1D_int GasLibID;        // lookup ID in Gas Phase ThermoChemistry Structure Array
+        Array1D<int> GasLibID;        // lookup ID in Gas Phase ThermoChemistry Structure Array
         Real64 LHV;                  // lower heating value of gaseous fuel (kJ/mol)
         Real64 LHVJperkg;            // lower heating value of gaseous fuel (J/kg)
         Real64 LHVliquid;            // userdefined lhv for generic liquid (J/kg)

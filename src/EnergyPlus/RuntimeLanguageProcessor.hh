@@ -111,8 +111,8 @@ namespace RuntimeLanguageProcessor {
     extern int OffVariableNum;
     extern int OnVariableNum;
     extern int PiVariableNum;
-    extern Array1D_int CurveIndexVariableNums;
-    extern Array1D_int ConstructionIndexVariableNums;
+    extern Array1D<int> CurveIndexVariableNums;
+    extern Array1D<int> ConstructionIndexVariableNums;
     extern int YearVariableNum;
     extern int MonthVariableNum;
     extern int DayOfMonthVariableNum;

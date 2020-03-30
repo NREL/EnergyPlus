@@ -129,9 +129,9 @@ namespace SurfaceGeometry {
     static std::string const BlankString;
     Array1D<std::string> const BaseSurfCls(3, {"WALL", "FLOOR", "ROOF"});
     Array1D<std::string> const SubSurfCls(6, {"WINDOW", "DOOR", "GLASSDOOR", "SHADING", "TUBULARDAYLIGHTDOME", "TUBULARDAYLIGHTDIFFUSER"});
-    Array1D_int const BaseSurfIDs(3, {SurfaceClass_Wall, SurfaceClass_Floor, SurfaceClass_Roof});
+    Array1D<int> const BaseSurfIDs(3, {SurfaceClass_Wall, SurfaceClass_Floor, SurfaceClass_Roof});
 
-    Array1D_int const SubSurfIDs(
+    Array1D<int> const SubSurfIDs(
         6, {SurfaceClass_Window, SurfaceClass_Door, SurfaceClass_GlassDoor, SurfaceClass_Shading, SurfaceClass_TDD_Dome, SurfaceClass_TDD_Diffuser});
 
     int const UnenteredAdjacentZoneSurface(-998); // allows users to enter one zone surface ("Zone")
@@ -2742,7 +2742,7 @@ namespace SurfaceGeometry {
                           int const TotDetailedRoofs,       // Number of RoofCeiling:Detailed items to obtain
                           int const TotDetailedFloors,      // Number of Floor:Detailed items to obtain
                           const Array1D<std::string> &BaseSurfCls, // Valid Classes for Base Surfaces
-                          const Array1D_int &BaseSurfIDs,
+                          const Array1D<int> &BaseSurfIDs,
                           int &NeedToAddSurfaces // Number of surfaces to add, based on unentered IZ surfaces
     )
     {
@@ -3296,7 +3296,7 @@ namespace SurfaceGeometry {
                          int const TotRectGCFloors,     // Number of Floors with Ground Contact to obtain
                          int const TotRectIntFloors,    // Number of Adiabatic Walls to obtain
                          int const TotRectIZFloors,     // Number of Interzone Floors to obtain
-                         const Array1D_int &BaseSurfIDs, // ID Assignments for valid surface classes
+                         const Array1D<int> &BaseSurfIDs, // ID Assignments for valid surface classes
                          int &NeedToAddSurfaces         // Number of surfaces to add, based on unentered IZ surfaces
     )
     {
@@ -3774,7 +3774,7 @@ namespace SurfaceGeometry {
                              int &SurfNum,                    // Count of Current SurfaceNumber
                              int const TotHTSubs,             // Number of Heat Transfer SubSurfaces to obtain
                              const Array1D<std::string> &SubSurfCls, // Valid Classes for Sub Surfaces
-                             const Array1D_int &SubSurfIDs,    // ID Assignments for valid sub surface classes
+                             const Array1D<int> &SubSurfIDs,    // ID Assignments for valid sub surface classes
                              int &AddedSubSurfaces,           // Subsurfaces added when windows reference Window5
                              int &NeedToAddSurfaces           // Number of surfaces to add, based on unentered IZ surfaces
     )
@@ -4153,7 +4153,7 @@ namespace SurfaceGeometry {
                             int const TotIZWindows,       // Number of Interzone Window SubSurfaces to obtain
                             int const TotIZDoors,         // Number of Interzone Door SubSurfaces to obtain
                             int const TotIZGlazedDoors,   // Number of Interzone Glass Door SubSurfaces to obtain
-                            const Array1D_int &SubSurfIDs, // ID Assignments for valid sub surface classes
+                            const Array1D<int> &SubSurfIDs, // ID Assignments for valid sub surface classes
                             int &AddedSubSurfaces,        // Subsurfaces added when windows reference Window5
                             int &NeedToAddSubSurfaces     // Number of surfaces to add, based on unentered IZ surfaces
     )
@@ -7825,7 +7825,7 @@ namespace SurfaceGeometry {
                                                         "BETWEENGLASSSHADE",
                                                         "BETWEENGLASSBLIND",
                                                         "SWITCHABLEGLAZING"});
-        static Array1D_int const ValidShadingTypes(NumValidShadingTypes,
+        static Array1D<int> const ValidShadingTypes(NumValidShadingTypes,
                                                    {WSC_ST_InteriorShade,
                                                     WSC_ST_ExteriorShade,
                                                     WSC_ST_ExteriorScreen,
@@ -7859,7 +7859,7 @@ namespace SurfaceGeometry {
                                                                      "ONIFHIGHZONEAIRTEMPANDHIGHSOLARONWINDOW",
                                                                      "ONIFHIGHZONEAIRTEMPANDHIGHHORIZONTALSOLAR"});
 
-        static Array1D_int const ValidWindowShadingControlTypes(
+        static Array1D<int> const ValidWindowShadingControlTypes(
             NumValidWindowShadingControlTypes,
             {WSCT_AlwaysOn,
              WSCT_AlwaysOff,
@@ -9853,7 +9853,7 @@ namespace SurfaceGeometry {
         Real64 SurfCount; // Surface Count
         int SurfNum;      // Loop counter for surfaces
         int ZoneNum;      // Loop counter for Zones
-        Array1D_int surfacenotused;
+        Array1D<int> surfacenotused;
         int notused;
         int NFaces;
         int NActFaces;
@@ -12975,7 +12975,7 @@ namespace SurfaceGeometry {
         static Array1D<Real64> Z;
         static Array1D<Real64> A; // containers for convexity test
         static Array1D<Real64> B;
-        static Array1D_int SurfCollinearVerts; // Array containing indices of collinear vertices
+        static Array1D<int> SurfCollinearVerts; // Array containing indices of collinear vertices
         static int VertSize;                   // size of X,Y,Z,A,B arrays
         Real64 cosarg;
         int M;   // Array index for SurfCollinearVerts container

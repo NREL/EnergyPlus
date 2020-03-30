@@ -5106,7 +5106,7 @@ namespace WindowEquivalentLayer {
         int L;
         int ITRY;
         int hin_scheme;                   // flags different schemes for indoor convection coefficients
-        Array1D_int ISDL({0, FS.NL + 1}); // Flag to mark diathermanous layers, 0=opaque
+        Array1D<int> ISDL({0, FS.NL + 1}); // Flag to mark diathermanous layers, 0=opaque
         Array1D<Real64> QOCF_F(FS.NL);    // heat flux to outdoor-facing surface of layer i, from gap i-1,
                                           //   due to open channel flow, W/m2
         Array1D<Real64> QOCF_B(FS.NL);    // heat flux to indoor-facing surface of layer i, from gap i,
@@ -5572,7 +5572,7 @@ namespace WindowEquivalentLayer {
         int L;
         int ITRY;
         int hin_scheme;                   // flags different schemes for indoor convection coefficients
-        Array1D_int ISDL({0, FS.NL + 1}); // Flag to mark diathermanous layers, 0=opaque
+        Array1D<int> ISDL({0, FS.NL + 1}); // Flag to mark diathermanous layers, 0=opaque
         int NDLIAR;                       // Number of Diathermanous Layers In A Row (i.e., consecutive)
         int IB;                           // Counter begin and end limits
         int IE;

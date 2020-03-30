@@ -523,7 +523,7 @@ private:
     private:
         int const number;
         std::string const &name;
-        Array1D_int const &zones;
+        Array1D<int> const &zones;
     };
 
     class ZoneGroup : SQLiteData

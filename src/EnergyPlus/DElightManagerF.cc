@@ -157,7 +157,7 @@ namespace DElightManagerF {
         Real64 Xb;              // temp var for transformation calc
         Real64 Yb;              // temp var for transformation calc
         Array1D<Real64> RefPt_WCS_Coord(3);
-        Array1D_int iWndoConstIndexes(100);
+        Array1D<int> iWndoConstIndexes(100);
         bool lWndoConstFound;      // Flag for non-unique window const index
         std::string cNameWOBlanks; // Name without blanks
         bool ErrorsFound;

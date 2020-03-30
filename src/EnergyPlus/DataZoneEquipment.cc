@@ -172,7 +172,7 @@ namespace DataZoneEquipment {
     bool ZoneEquipInputsFilled(false);
     bool ZoneEquipSimulatedOnce(false);
     int NumOfZoneEquipLists(0); // The Number of Zone Equipment List objects
-    Array1D_int ZoneEquipAvail;
+    Array1D<int> ZoneEquipAvail;
 
     EPVector<bool> CrossMixingReportFlag;
     EPVector<bool> MixingReportFlag;
@@ -311,7 +311,7 @@ namespace DataZoneEquipment {
         int MaxNums;
         int NumParams;
         int NumNodes;
-        Array1D_int NodeNums;
+        Array1D<int> NodeNums;
         int Counter;
         //////////// hoisted into namespace ////////////////////////////////////////////////
         // static bool ErrorsFound( false ); // If errors detected in input // GetZoneEquipmentDataErrorsFound

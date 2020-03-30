@@ -301,7 +301,7 @@ namespace General {
 
     template <typename A> inline int FindNumberInList(int const WhichNumber, MArray1<A, int> const &ListOfItems, int const NumItems)
     {
-        return FindNumberInList(WhichNumber, Array1D_int(ListOfItems), NumItems);
+        return FindNumberInList(WhichNumber, Array1D<int>(ListOfItems), NumItems);
     }
 
     template <typename Container,

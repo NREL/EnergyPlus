@@ -576,7 +576,7 @@ namespace HeatBalanceKivaManager {
         Real64 Albedo;
         Real64 LiquidPrecip;
         int PresWeathObs;
-        Array1D_int PresWeathConds(9);
+        Array1D<int> PresWeathConds(9);
 
         Real64 totalDB = 0.0;
         int count = 0;

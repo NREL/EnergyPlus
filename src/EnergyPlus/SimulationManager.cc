@@ -751,7 +751,7 @@ namespace SimulationManager {
         using namespace DataIPShortCuts;
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Array1D_int const Div60(12, {1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60});
+        static Array1D<int> const Div60(12, {1, 2, 3, 4, 5, 6, 10, 12, 15, 20, 30, 60});
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D<std::string> Alphas(8);
@@ -2914,8 +2914,8 @@ namespace SimulationManager {
         Array1D<std::string> ChildCName;
         Array1D<std::string> ChildInNodeName;
         Array1D<std::string> ChildOutNodeName;
-        Array1D_int ChildInNodeNum;
-        Array1D_int ChildOutNodeNum;
+        Array1D<int> ChildInNodeNum;
+        Array1D<int> ChildOutNodeNum;
         int NumChildren;
         bool ErrorsFound;
 
@@ -3007,13 +3007,13 @@ namespace SimulationManager {
         int Loop;
         int Loop1;
         int NumVariables;
-        Array1D_int VarIndexes;
-        Array1D_int VarIDs;
+        Array1D<int> VarIndexes;
+        Array1D<int> VarIDs;
         Array1D<OutputProcessor::TimeStepType> IndexTypes;
-        Array1D_int VarTypes;
+        Array1D<int> VarTypes;
         Array1D<OutputProcessor::Unit> unitsForVar; // units from enum for each variable
         Array1D<std::string> VarNames;
-        Array1D_int ResourceTypes;
+        Array1D<int> ResourceTypes;
         Array1D<std::string> EndUses;
         Array1D<std::string> Groups;
 

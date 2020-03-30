@@ -73,9 +73,9 @@ namespace PlantManager {
     extern bool InitLoopEquip;
     extern bool GetCompSizFac;
 
-    extern Array1D_int SupplySideInletNode;  // Node number for the supply side inlet
-    extern Array1D_int SupplySideOutletNode; // Node number for the supply side outlet
-    extern Array1D_int DemandSideInletNode;  // Inlet node on the demand side
+    extern Array1D<int> SupplySideInletNode;  // Node number for the supply side inlet
+    extern Array1D<int> SupplySideOutletNode; // Node number for the supply side outlet
+    extern Array1D<int> DemandSideInletNode;  // Inlet node on the demand side
 
     void clear_state();
 

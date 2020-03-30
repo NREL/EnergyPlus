@@ -109,14 +109,14 @@ namespace VentilatedSlab {
     extern bool HCoilOn;                         // TRUE if the heating coil (gas or electric especially) should be running
     extern int NumOfVentSlabs;                   // Number of ventilated slab in the input file
     extern Real64 OAMassFlowRate;                // Outside air mass flow rate for the ventilated slab
-    extern Array1D_double QRadSysSrcAvg;         // Average source over the time step for a particular radiant surfaceD
+    extern Array1D<Real64> QRadSysSrcAvg;         // Average source over the time step for a particular radiant surfaceD
     extern Array1D<Real64> ZeroSourceSumHATsurf; // Equal to SumHATsurf for all the walls in a zone with no source
     extern int MaxCloNumOfSurfaces;              // Used to set allocate size in CalcClo routine
     extern Real64 QZnReq;                        // heating or cooling needed by system [watts]
 
     // Record keeping variables used to calculate QRadSysSrcAvg locally
 
-    extern Array1D_double LastQRadSysSrc;      // Need to keep the last value in case we are still iterating
+    extern Array1D<Real64> LastQRadSysSrc;      // Need to keep the last value in case we are still iterating
     extern Array1D<Real64> LastSysTimeElapsed; // Need to keep the last value in case we are still iterating
     extern Array1D<Real64> LastTimeStepSys;    // Need to keep the last value in case we are still iterating
     extern EPVector<bool> CheckEquipName;
@@ -140,10 +140,10 @@ namespace VentilatedSlab {
         int ZonePtr;           // Point to this zone in the Zone derived type
         // Variables for Delivery Config.
         Array1D<std::string> ZName;            // Name of zone the system is serving
-        Array1D_int ZPtr;                // Point to this zone in the Zone derived type
+        Array1D<int> ZPtr;                // Point to this zone in the Zone derived type
         std::string SurfListName;        // Name of surface/surface list that is the radiant system
         int NumOfSurfaces;               // Number of surfaces included in this system (coordinated control)
-        Array1D_int SurfacePtr;          // Pointer to the slabs in the Surface derived type
+        Array1D<int> SurfacePtr;          // Pointer to the slabs in the Surface derived type
         Array1D<std::string> SurfaceName;      // Name of surfaces that are the radiant system (can be one or more)
         Array1D<Real64> SurfaceFlowFrac; // Fraction of flow/pipe length for a particular surface
         Array1D<Real64> CDiameter;       // Number of core diameter

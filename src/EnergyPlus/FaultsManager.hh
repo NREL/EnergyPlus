@@ -130,7 +130,7 @@ namespace FaultsManager {
     //      'FaultModel:DamperLeakage:ReturnAir           ', &
     //      'FaultModel:DamperLeakage:OutdoorAir          ' /)
 
-    extern Array1D_int const iFaultTypeEnums;
+    extern Array1D<int> const iFaultTypeEnums;
 
     extern bool AnyFaultsInModel;           // True if there are operational faults in the model
     extern int NumFaults;                   // Total number of all faults

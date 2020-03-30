@@ -125,7 +125,7 @@ namespace HighTempRadiantSystem {
         Real64 FracDistribPerson;          // Fraction of fraction radiant incident on a "person" in the space
         int TotSurfToDistrib;              // Total number of surfaces the heater sends radiation to
         Array1D<std::string> SurfaceName;        // Surface name in the list of surfaces heater sends radiation to
-        Array1D_int SurfacePtr;            // Surface number in the list of surfaces heater sends radiation to
+        Array1D<int> SurfacePtr;            // Surface number in the list of surfaces heater sends radiation to
         Array1D<Real64> FracDistribToSurf; // Fraction of fraction radiant incident on the surface
         // Other parameters
         // Report data

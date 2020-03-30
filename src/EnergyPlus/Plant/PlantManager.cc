@@ -158,9 +158,9 @@ namespace EnergyPlus {
 
         static std::string const fluidNameSteam("STEAM");
 
-        Array1D_int SupplySideInletNode;  // Node number for the supply side inlet
-        Array1D_int SupplySideOutletNode; // Node number for the supply side outlet
-        Array1D_int DemandSideInletNode;  // Inlet node on the demand side
+        Array1D<int> SupplySideInletNode;  // Node number for the supply side inlet
+        Array1D<int> SupplySideOutletNode; // Node number for the supply side outlet
+        Array1D<int> DemandSideInletNode;  // Inlet node on the demand side
 
         void clear_state() {
             InitLoopEquip = true;
@@ -785,11 +785,11 @@ namespace EnergyPlus {
             static Array1D<std::string> BranchNames;     // Branch names from GetBranchList call
             static Array1D<std::string> CompTypes;       // Branch names from GetBranchList call
             static Array1D<std::string> CompNames;       // Branch names from GetBranchList call
-            static Array1D_int CompCtrls;          // Branch names from GetBranchList call
+            static Array1D<int> CompCtrls;          // Branch names from GetBranchList call
             static Array1D<std::string> InletNodeNames;  // Node names from GetBranchData call
             static Array1D<std::string> OutletNodeNames; // Node names from GetBranchData call
-            static Array1D_int InletNodeNumbers;   // Node numbers from GetBranchData call
-            static Array1D_int OutletNodeNumbers;  // Node numbers from GetBranchData call
+            static Array1D<int> InletNodeNumbers;   // Node numbers from GetBranchData call
+            static Array1D<int> OutletNodeNumbers;  // Node numbers from GetBranchData call
             static EPVector<bool> SplitOutBranch;
             static EPVector<bool> MixerInBranch;
             bool errFlag;

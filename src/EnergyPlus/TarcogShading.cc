@@ -101,7 +101,7 @@ namespace TarcogShading {
                  Array2<Real64> const &frct,
                  Array2_int const &iprop,
                  EPVector<Real64> const &pressure,
-                 Array1D_int const &nmix,
+                 Array1D<int> const &nmix,
                  const EPVector<Real64> &xwght,
                  Array2<Real64> const &xgcon,
                  Array2<Real64> const &xgvis,
@@ -119,7 +119,7 @@ namespace TarcogShading {
                  EPVector<Real64> const &Ah,
                  EPVector<Real64> const &vvent,
                  EPVector<Real64> const &tvent,
-                 Array1D_int const &LayerType,
+                 Array1D<int> const &LayerType,
                  EPVector<Real64> &Tgaps,
                  EPVector<Real64> &qv,
                  EPVector<Real64> &hcv, // Heat transfer coeefficient in gaps including airlow
@@ -203,8 +203,8 @@ namespace TarcogShading {
         int k;
         int nmix1;
         int nmix2;
-        static Array1D_int iprop1(maxgas);
-        static Array1D_int iprop2(maxgas);
+        static Array1D<int> iprop1(maxgas);
+        static Array1D<int> iprop2(maxgas);
 
         // init vectors:
         qv = 0.0;
@@ -475,7 +475,7 @@ namespace TarcogShading {
         }
     }
 
-    void forcedventilation(const Array1D_int &iprop,
+    void forcedventilation(const Array1D<int> &iprop,
                            const EPVector<Real64> &frct,
                            Real64 const press,
                            int const nmix,
@@ -543,11 +543,11 @@ namespace TarcogShading {
         hcv = 2.0 * hc + 4.0 * forcedspeed;
     }
 
-    void shadingin(const Array1D_int &iprop1,
+    void shadingin(const Array1D<int> &iprop1,
                    const EPVector<Real64> &frct1,
                    Real64 const press1,
                    int const nmix1,
-                   const Array1D_int &iprop2,
+                   const Array1D<int> &iprop2,
                    const EPVector<Real64> &frct2,
                    Real64 const press2,
                    int const nmix2,
@@ -843,11 +843,11 @@ namespace TarcogShading {
         }
     }
 
-    void shadingedge(const Array1D_int &iprop1,
+    void shadingedge(const Array1D<int> &iprop1,
                      const EPVector<Real64> &frct1,
                      Real64 const press1,
                      int const nmix1,
-                     const Array1D_int &iprop2,
+                     const Array1D<int> &iprop2,
                      const EPVector<Real64> &frct2,
                      Real64 const press2,
                      int const nmix2,
@@ -1081,7 +1081,7 @@ namespace TarcogShading {
                                     EPVector<Real64> &Al_eff,         // Output - Effective left side openning area [m2]
                                     EPVector<Real64> &Ar_eff,         // Output - Effective right side openning area [m2]
                                     EPVector<Real64> &Ah_eff,         // Output - Effective front side openning area [m2]
-                                    const Array1D_int &LayerType,    // Layer type
+                                    const Array1D<int> &LayerType,    // Layer type
                                     const EPVector<Real64> &SlatAngle // Venetian layer slat angle [deg]
     )
     {

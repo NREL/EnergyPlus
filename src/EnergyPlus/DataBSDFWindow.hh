@@ -161,7 +161,7 @@ namespace DataBSDFWindow {
         Array1D<Real64> SolAng;       // Vector of basis element solid angles for grid
         int NThetas;                  // No. Theta values in basis
         Array1D<Real64> Thetas;       // List of basis theta values
-        Array1D_int NPhis;            // No. basis phi values for each theta
+        Array1D<int> NPhis;            // No. basis phi values for each theta
         Array2D<Real64> Phis;         // List of basis phi values for each theta
         Array2D_int BasisIndex;       // Index of basis element for theta, phi
         Array1D<BasisElemDescr> Grid; // actual basis (to be constructed from matrix)
@@ -185,11 +185,11 @@ namespace DataBSDFWindow {
         int NSky;                          // Number of Inc basis rays from sky
         int NGnd;                          // Number of Inc basis rays from gnd
         int NReflSurf;                     // Number of Inc basis rays from (potentially reflecting) surfaces
-        Array1D_int SkyIndex;              // list of sky basis indices
-        Array1D_int GndIndex;              // list of gnd basis indices
+        Array1D<int> SkyIndex;              // list of sky basis indices
+        Array1D<int> GndIndex;              // list of gnd basis indices
         Array1D<Vector> GndPt;             // gnd intersection pt of gnd basis ray (z=0)
-        Array1D_int RefSurfIndex;          // list of basis indices of rays striking exterior surf
-        Array1D_int RefRayNHits;           // for a given ray striking a surface, no. of surfaces pierced
+        Array1D<int> RefSurfIndex;          // list of basis indices of rays striking exterior surf
+        Array1D<int> RefRayNHits;           // for a given ray striking a surface, no. of surfaces pierced
         Array2D_int HitSurfNo;             // for a given ray striking surface, list of intersected surf nos
         Array2D<Real64> HitSurfDSq;        // for a given ray striking surface, list of distance^2
         //  from window
@@ -205,7 +205,7 @@ namespace DataBSDFWindow {
         BasisStruct Trn;
         Array1D<Vector> sTrn;              // Central direction vectors of Outgoing grid (World coords)
         Array1D<BSDFDaylghtPosition> pTrn; // azimuth and altitude of incidence vectors
-        Array1D_int NSurfInt;              // No. of basis rays intersecting back surface (dim from
+        Array1D<int> NSurfInt;              // No. of basis rays intersecting back surface (dim from
         // NBkSurf in BSDF State Descr)
         Array2D_int SurfInt;    // Basis index (IBkSurf, j) of the jth ray intersecting IBkSurf
         Array2D<Real64> SjdotN; // dot product (IBksurf, j) of the jth ray direction with
@@ -226,9 +226,9 @@ namespace DataBSDFWindow {
     struct BSDFRefPoints
     {
         // Members
-        Array1D_int NSky;                   // number of sky elements for each window element (# window el)
-        Array1D_int NGnd;                   // number of ground elements for each window element (# window el)
-        Array1D_int NReflSurf;              // number of Inc basis rays from reflecting surfaces (# window el)
+        Array1D<int> NSky;                   // number of sky elements for each window element (# window el)
+        Array1D<int> NGnd;                   // number of ground elements for each window element (# window el)
+        Array1D<int> NReflSurf;              // number of Inc basis rays from reflecting surfaces (# window el)
         Array2D_int SkyIndex;               // list of sky basis indices (# window el, NSky)
         Array2D_int GndIndex;               // list of gnd basis indices (# window el, NGnd)
         Array2D<Vector> GndPt;              // gnd intersection pt of gnd basis ray (z=0) (# window el, NGnd)
@@ -239,7 +239,7 @@ namespace DataBSDFWindow {
         Array3D_int HitSurfNo;        // for a given ray striking surface, list of intersected surf nos (# window el, NReflSurf, RefRayNHits)
         Array3D<Real64> HitSurfDSq;   // for a given ray striking surface, list of distance^2 from window (# window el, NReflSurf, RefRayNHits)
         Array3D<Vector> HitPt;        // for a given ray striking surface, list of hit pts (# window el, NReflSurf, RefRayNHits)
-        Array1D_int RefPointIndex;    // outgoing direction which containts reference point (# window el)
+        Array1D<int> RefPointIndex;    // outgoing direction which containts reference point (# window el)
         EPVector<bool> RefPointIntersection; // determines if reference point is laying in light tube of bsdf outgoing direction (NTrnBasis)
         Array1D<Real64> RefPtIntPosFac; // position factors for intersections from reference point to window for each outgoing direction (NTrnBasis)
 

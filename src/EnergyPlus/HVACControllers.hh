@@ -252,9 +252,9 @@ namespace HVACControllers {
     struct ControllerStatsType
     {
         // Members
-        Array1D_int NumCalls;      // Number of times this controller operated in each mode
-        Array1D_int TotIterations; // Total number of iterations required to solve this controller
-        Array1D_int MaxIterations; // Maximum number of iterations required to solve this controller
+        Array1D<int> NumCalls;      // Number of times this controller operated in each mode
+        Array1D<int> TotIterations; // Total number of iterations required to solve this controller
+        Array1D<int> MaxIterations; // Maximum number of iterations required to solve this controller
 
         // Default Constructor
         ControllerStatsType()

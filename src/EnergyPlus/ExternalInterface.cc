@@ -137,9 +137,9 @@ namespace ExternalInterface {
     // which phase an error occurred.
     // (1=initialization, 2=time stepping)
 
-    Array1D_int keyVarIndexes; // Array index for specific key name
-    Array1D_int varTypes;      // Types of variables in keyVarIndexes
-    Array1D_int varInd;        // Index of ErlVariables for ExternalInterface
+    Array1D<int> keyVarIndexes; // Array index for specific key name
+    Array1D<int> varTypes;      // Types of variables in keyVarIndexes
+    Array1D<int> varInd;        // Index of ErlVariables for ExternalInterface
     int socketFD(-1);          // socket file descriptor
     bool ErrorsFound(false);   // Set to true if errors are found
     bool noMoreValues(false);  // Flag, true if no more values
@@ -147,7 +147,7 @@ namespace ExternalInterface {
 
     Array1D<std::string> varKeys;     // Keys of report variables used for data exchange
     Array1D<std::string> varNames;    // Names of report variables used for data exchange
-    Array1D_int inpVarTypes;    // Names of report variables used for data exchange
+    Array1D<int> inpVarTypes;    // Names of report variables used for data exchange
     Array1D<std::string> inpVarNames; // Names of report variables used for data exchange
 
     bool configuredControlPoints(false); // True if control points have been configured
@@ -1072,8 +1072,8 @@ namespace ExternalInterface {
         std::string Name_NEW;        // Units sting, may be blank
         std::string Name_OLD;        // Units sting, may be blank
 
-        Array1D_int keyIndexes(1);     // Array index for
-        Array1D_int varTypes(1);       // Array index for
+        Array1D<int> keyIndexes(1);     // Array index for
+        Array1D<int> varTypes(1);       // Array index for
         Array1D<std::string> NamesOfKeys(1); // Specific key name
         int retValfmiVersion;
         int retValfmiPathLib;
@@ -1968,7 +1968,7 @@ namespace ExternalInterface {
         static int fmiEndSimulation(0);        // Flag to indicate end of simulation
 
         Array1D<std::string> Alphas(5);
-        Array1D_int keyIndexes(1);     // Array index for
+        Array1D<int> keyIndexes(1);     // Array index for
         Array1D<std::string> NamesOfKeys(1); // Specific key name
 
         if (WarmupFlag && (KindOfSim != ksRunPeriodWeather)) { // No data exchange during design days
@@ -2394,8 +2394,8 @@ namespace ExternalInterface {
     void GetReportVariableKey(const Array1D<std::string> &varKeys,  // Standard variable name
                               int const numberOfKeys,        // Number of keys=size(varKeys)
                               const Array1D<std::string> &varNames, // Standard variable name
-                              Array1D_int &keyVarIndexes,     // Array index
-                              Array1D_int &varTypes           // Types of variables in keyVarIndexes
+                              Array1D<int> &keyVarIndexes,     // Array index
+                              Array1D<int> &varTypes           // Types of variables in keyVarIndexes
     )
     {
         // SUBROUTINE INFORMATION:
@@ -2413,7 +2413,7 @@ namespace ExternalInterface {
         OutputProcessor::StoreType varAvgSum(OutputProcessor::StoreType::Averaged); // Variable  is Averaged=1 or Summed=2
         OutputProcessor::TimeStepType varStepType(OutputProcessor::TimeStepType::TimeStepZone); // Variable time step is Zone=1 or HVAC=2
         OutputProcessor::Unit varUnits(OutputProcessor::Unit::None);                // Units sting, may be blank
-        Array1D_int keyIndexes;                                                     // Array index for
+        Array1D<int> keyIndexes;                                                     // Array index for
         Array1D<std::string> NamesOfKeys;                                                 // Specific key name
         int Loop, iKey;                                                             // Loop counters
 

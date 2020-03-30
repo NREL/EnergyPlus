@@ -73,7 +73,7 @@ namespace SortAndStringUtilities {
     // Functions
 
     void SetupAndSort(Array1D<std::string> &Alphas, // Alphas to be sorted
-                      Array1D_int &iAlphas    // Indexes of sorted array
+                      Array1D<int> &iAlphas    // Indexes of sorted array
     );
 
     void QsortC(Array1S_string Alphas, // Alphas to be sorted

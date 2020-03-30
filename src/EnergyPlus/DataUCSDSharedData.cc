@@ -91,18 +91,18 @@ namespace DataUCSDSharedData {
     // type of surface. The PosZ_Wall array has dimension 2 times the Number of Zones and
     // for each zone it has 2 positions: the start and end positions in the Apos_Wall array
     // for that specific zone.
-    Array1D_int APos_Wall;
-    Array1D_int APos_Floor;
-    Array1D_int APos_Ceiling;
-    Array1D_int PosZ_Wall;
-    Array1D_int PosZ_Floor;
-    Array1D_int PosZ_Ceiling;
-    Array1D_int APos_Window;
-    Array1D_int APos_Door;
-    Array1D_int APos_Internal;
-    Array1D_int PosZ_Window;
-    Array1D_int PosZ_Door;
-    Array1D_int PosZ_Internal;
+    Array1D<int> APos_Wall;
+    Array1D<int> APos_Floor;
+    Array1D<int> APos_Ceiling;
+    Array1D<int> PosZ_Wall;
+    Array1D<int> PosZ_Floor;
+    Array1D<int> PosZ_Ceiling;
+    Array1D<int> APos_Window;
+    Array1D<int> APos_Door;
+    Array1D<int> APos_Internal;
+    Array1D<int> PosZ_Window;
+    Array1D<int> PosZ_Door;
+    Array1D<int> PosZ_Internal;
     // Convection coeficients for the various surfaces
     Array1D<Real64> HCeiling;
     Array1D<Real64> HWall;

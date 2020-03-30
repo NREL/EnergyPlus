@@ -80,7 +80,7 @@ namespace NodeInputManager {
     // The following is a module level flag because there are several possible "entries" into
     // this module that may need to get the Node Inputs.
     extern bool GetNodeInputFlag;           // Flag to Get Node Input(s)
-    extern Array1D_int NodeRef;             // Number of times a Node is "referenced"
+    extern Array1D<int> NodeRef;             // Number of times a Node is "referenced"
     extern std::string CurCheckContextName; // Used in Uniqueness checks
     extern Array1D<std::string> UniqueNodeNames;  // used in uniqueness checks
     extern int NumCheckNodes;               // Num of Unique nodes in check
@@ -96,7 +96,7 @@ namespace NodeInputManager {
         std::string Name;         // Name of this Node List
         int NumOfNodesInList;     // Number of Nodes in this Node List
         Array1D<std::string> NodeNames; // List of Names in this Node List
-        Array1D_int NodeNumbers;  // Number of each Node (ref NodeNames) in this Node List
+        Array1D<int> NodeNumbers;  // Number of each Node (ref NodeNames) in this Node List
 
         // Default Constructor
         NodeListDef() : NumOfNodesInList(0)
@@ -115,7 +115,7 @@ namespace NodeInputManager {
 
     void GetNodeNums(std::string const &Name,                      // Name for which to obtain information
                      int &NumNodes,                                // Number of nodes accompanying this Name
-                     Array1D_int &NodeNumbers,                     // Node Numbers accompanying this Name
+                     Array1D<int> &NodeNumbers,                     // Node Numbers accompanying this Name
                      bool &ErrorsFound,                            // True when errors are found...
                      int const NodeFluidType,                      // Fluidtype for checking/setting node FluidType
                      std::string const &NodeObjectType,            // Node Object Type (i.e. "Chiller:Electric")

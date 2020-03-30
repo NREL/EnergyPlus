@@ -1635,7 +1635,7 @@ namespace ZoneContaminantPredictorCorrector {
                 if (HybridModel::FlagHybridModel_PC) {
                     SumAllInternalCO2GainsExceptPeople(Loop, ZoneCO2GainExceptPeople(Loop));
                 }
-                SumInternalCO2GainsByTypes(Loop, Array1D_int(1, IntGainTypeOf_People), ZoneCO2GainFromPeople(Loop));
+                SumInternalCO2GainsByTypes(Loop, Array1D<int>(1, IntGainTypeOf_People), ZoneCO2GainFromPeople(Loop));
             }
         }
 

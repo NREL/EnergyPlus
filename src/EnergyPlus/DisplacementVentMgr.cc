@@ -637,7 +637,7 @@ namespace DisplacementVentMgr {
         int FlagApertures;
         static Real64 TempDepCoef(0.0); // Formerly CoefSumha, coef in zone temp equation with dimensions of h*A
         static Real64 TempIndCoef(0.0); // Formerly CoefSumhat, coef in zone temp equation with dimensions of h*A(T1
-        static Array1D_int IntGainTypesOccupied(29,
+        static Array1D<int> IntGainTypesOccupied(29,
                                                 {IntGainTypeOf_People,
                                                  IntGainTypeOf_WaterHeaterMixed,
                                                  IntGainTypeOf_WaterHeaterStratified,
@@ -668,7 +668,7 @@ namespace DisplacementVentMgr {
                                                  IntGainTypeOf_RefrigerationSecondaryPipe,
                                                  IntGainTypeOf_RefrigerationWalkIn});
 
-        static Array1D_int IntGainTypesMixedSubzone(2, {IntGainTypeOf_DaylightingDeviceTubular, IntGainTypeOf_Lights});
+        static Array1D<int> IntGainTypesMixedSubzone(2, {IntGainTypeOf_DaylightingDeviceTubular, IntGainTypeOf_Lights});
         Real64 RetAirGain;
 
         // Exact solution or Euler method

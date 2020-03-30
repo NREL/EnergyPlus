@@ -328,7 +328,7 @@ namespace DataPlant {
                                                "HeatPump:PlantLoop:EIR:Cooling",
                                                "HeatPump:PlantLoop:EIR:Heating"});
 
-    Array1D_int const ValidLoopEquipTypes(
+    Array1D<int> const ValidLoopEquipTypes(
         NumSimPlantEquipTypes,
         {LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Plant,
          LoopType_Plant, LoopType_Plant, LoopType_Plant, LoopType_Both,  LoopType_Both,  LoopType_Both,  LoopType_Plant, LoopType_Plant,

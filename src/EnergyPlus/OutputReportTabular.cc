@@ -278,7 +278,7 @@ namespace OutputReportTabular {
     std::ofstream xml_stream;                                                                                                    // XML table stream
     Array1D<std::ofstream *> TabularOutputFile(maxNumStyles, {&csv_stream, &tab_stream, &fix_stream, &htm_stream, &xml_stream}); // Table stream array
     Array1D<std::string> del(maxNumStyles);        // the delimiter to use
-    Array1D_int TableStyle(maxNumStyles, 0); // see list of parameters
+    Array1D<int> TableStyle(maxNumStyles, 0); // see list of parameters
 
     Real64 timeInYear(0.0);
 
@@ -304,13 +304,13 @@ namespace OutputReportTabular {
     // BEPS Report Related Variables
     // From Report:Table:Predefined - BEPS
     // arrays that hold the meter numbers that are initialized at get input
-    Array1D_int meterNumTotalsBEPS(numResourceTypes, 0);
-    Array1D_int meterNumTotalsSource(numSourceTypes, 0);
+    Array1D<int> meterNumTotalsBEPS(numResourceTypes, 0);
+    Array1D<int> meterNumTotalsSource(numSourceTypes, 0);
     EPVector<bool> fuelfactorsused(numSourceTypes, false);
     EPVector<bool> ffUsed(numResourceTypes, false);
     Array1D<Real64> SourceFactors(numResourceTypes, 0.0);
     EPVector<bool> ffSchedUsed(numResourceTypes, false);
-    Array1D_int ffSchedIndex(numResourceTypes, 0);
+    Array1D<int> ffSchedIndex(numResourceTypes, 0);
     Array2D_int meterNumEndUseBEPS(numResourceTypes, NumEndUses, 0);
     Array3D_int meterNumEndUseSubBEPS;
     // arrays that hold the names of the resource and end uses
@@ -333,7 +333,7 @@ namespace OutputReportTabular {
     Array2D<Real64> gatherDemandIndEndUse(numResourceTypes, NumEndUses, 0.0);
     Array3D<Real64> gatherDemandEndUseSub;
     Array3D<Real64> gatherDemandIndEndUseSub;
-    Array1D_int gatherDemandTimeStamp(numResourceTypes, 0);
+    Array1D<int> gatherDemandTimeStamp(numResourceTypes, 0);
     // to keep track of hours for the BEPS report gathering
     Real64 gatherElapsedTimeBEPS(0.0);
     // for normalization of results
@@ -400,7 +400,7 @@ namespace OutputReportTabular {
     Real64 sourceFactorOtherFuel1(0.0);
     Real64 sourceFactorOtherFuel2(0.0);
 
-    Array1D_int td(8);
+    Array1D<int> td(8);
     //(1)   Current year
     //(2)   Current month
     //(3)   Current day
@@ -573,7 +573,7 @@ namespace OutputReportTabular {
         numStyles = 0;
         TabularOutputFile = Array1D<std::ofstream *>(maxNumStyles, {&csv_stream, &tab_stream, &fix_stream, &htm_stream, &xml_stream});
         del = Array1D<std::string>(maxNumStyles);
-        TableStyle = Array1D_int(maxNumStyles, 0);
+        TableStyle = Array1D<int>(maxNumStyles, 0);
         timeInYear = 0.0;
         displayTabularBEPS = false;
         displayLEEDSummary = false;
@@ -592,13 +592,13 @@ namespace OutputReportTabular {
         displayEconomicResultSummary = false;
         displayHeatEmissionsSummary = false;
         displayEioSummary = false;
-        meterNumTotalsBEPS = Array1D_int(numResourceTypes, 0);
-        meterNumTotalsSource = Array1D_int(numSourceTypes, 0);
+        meterNumTotalsBEPS = Array1D<int>(numResourceTypes, 0);
+        meterNumTotalsSource = Array1D<int>(numSourceTypes, 0);
         fuelfactorsused = EPVector<bool>(numSourceTypes, false);
         ffUsed = EPVector<bool>(numResourceTypes, false);
         SourceFactors = Array1D<Real64>(numResourceTypes, 0.0);
         ffSchedUsed = EPVector<bool>(numResourceTypes, false);
-        ffSchedIndex = Array1D_int(numResourceTypes, 0);
+        ffSchedIndex = Array1D<int>(numResourceTypes, 0);
         meterNumEndUseBEPS = Array2D_int(numResourceTypes, NumEndUses, 0);
         meterNumEndUseSubBEPS.deallocate();
         gatherTotalsBEPS = Array1D<Real64>(numResourceTypes, 0.0);
@@ -612,7 +612,7 @@ namespace OutputReportTabular {
         gatherDemandEndUse = Array2D<Real64>(numResourceTypes, NumEndUses, 0.0);
         gatherDemandEndUseSub.deallocate();
         gatherDemandIndEndUseSub.deallocate();
-        gatherDemandTimeStamp = Array1D_int(numResourceTypes, 0);
+        gatherDemandTimeStamp = Array1D<int>(numResourceTypes, 0);
         gatherElapsedTimeBEPS = 0.0;
         buildingGrossFloorArea = 0.0;
         buildingConditionedFloorArea = 0.0;
@@ -1573,7 +1573,7 @@ namespace OutputReportTabular {
         Real64 const bigVal(0.0); // used with HUGE: Value doesn't matter, only type: Initialize so compiler doesn't warn about use uninitialized
 
         Array1D<std::string> objNames;
-        Array1D_int objVarIDs;
+        Array1D<int> objVarIDs;
 
         inputProcessor->getObjectDefMaxArgs(CurrentModuleObject, NumParams, NumAlphas, NumNums);
         AlphArray.allocate(NumAlphas);
@@ -4077,11 +4077,11 @@ namespace OutputReportTabular {
         // local copies of some of the MonthlyColumns array references since
         // profiling showed that they were slow.
 
-        static Array1D_int MonthlyColumnsTypeOfVar;
+        static Array1D<int> MonthlyColumnsTypeOfVar;
         static Array1D<OutputProcessor::TimeStepType> MonthlyColumnsStepType;
-        static Array1D_int MonthlyColumnsAggType;
-        static Array1D_int MonthlyColumnsVarNum;
-        static Array1D_int MonthlyTablesNumColumns;
+        static Array1D<int> MonthlyColumnsAggType;
+        static Array1D<int> MonthlyColumnsVarNum;
+        static Array1D<int> MonthlyTablesNumColumns;
         static int curFirstColumn(0);
 
         if (!DoWeathSim) return;
@@ -6851,7 +6851,7 @@ namespace OutputReportTabular {
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         Array1D<std::string> columnHead;
-        Array1D_int columnWidth;
+        Array1D<int> columnWidth;
         Array1D<std::string> rowHead(16);
         Array2D_string tableBody;
         Array1D<std::string> aggString(13);
@@ -7241,12 +7241,12 @@ namespace OutputReportTabular {
         int nCol;
         // main table
         Array1D<std::string> columnHead;
-        Array1D_int columnWidth;
+        Array1D<int> columnWidth;
         Array1D<std::string> rowHead(39);
         Array2D_string tableBody;
         // stat table
         Array1D<std::string> columnHeadStat(1);
-        Array1D_int columnWidthStat(1);
+        Array1D<int> columnWidthStat(1);
         Array1D<std::string> rowHeadStat(6);
         Array2D_string tableBodyStat(1, 6);
 
@@ -7523,7 +7523,7 @@ namespace OutputReportTabular {
 
         // all arrays are in the format: (row, column)
         Array1D<std::string> columnHead;
-        Array1D_int columnWidth;
+        Array1D<int> columnWidth;
         Array1D<std::string> rowHead;
         Array2D_string tableBody;
 
@@ -8539,7 +8539,7 @@ namespace OutputReportTabular {
             // EAp2-4/5. Performance Rating Method Compliance
             // repeat some of the code for the end use subcategory table but only looping over the energy resources and not including water
 
-            Array1D_int resource_entry_map;
+            Array1D<int> resource_entry_map;
             resource_entry_map.allocate(5);
             resource_entry_map(1) = pdchLeedPerfElEneUse;      // electricity
             resource_entry_map(2) = pdchLeedPerfGasEneUse;     // natural gas
@@ -9101,7 +9101,7 @@ namespace OutputReportTabular {
 
         // all arrays are in the format: (row, column)
         Array1D<std::string> columnHead;
-        Array1D_int columnWidth;
+        Array1D<int> columnWidth;
         Array1D<std::string> rowHead;
         Array2D_string tableBody;
 
@@ -9417,7 +9417,7 @@ namespace OutputReportTabular {
 
         // all arrays are in the format: (row, column)
         Array1D<std::string> columnHead;
-        Array1D_int columnWidth;
+        Array1D<int> columnWidth;
         Array1D<std::string> rowHead;
         Array2D_string tableBody;
 
@@ -9426,7 +9426,7 @@ namespace OutputReportTabular {
         Array1D<Real64> collapsedTotal(6);
         Array2D<Real64> collapsedEndUse(6, NumEndUses);
         Array2D<Real64> collapsedIndEndUse(6, NumEndUses);
-        Array1D_int collapsedTimeStep(6);
+        Array1D<int> collapsedTimeStep(6);
         Array3D<Real64> collapsedEndUseSub(MaxNumSubcategories, NumEndUses, 6);
         Array3D<Real64> collapsedIndEndUseSub(MaxNumSubcategories, NumEndUses, 6);
         Array2D<Real64> endUseSubOther(6, NumEndUses);
@@ -9901,7 +9901,7 @@ namespace OutputReportTabular {
                 }
             }
 
-            Array1D_int resource_entry_map;
+            Array1D<int> resource_entry_map;
             resource_entry_map.allocate(5);
             resource_entry_map(1) = pdchLeedPerfElDem;      // electricity
             resource_entry_map(2) = pdchLeedPerfGasDem;     // natural gas
@@ -9976,7 +9976,7 @@ namespace OutputReportTabular {
         Real64 RefBldgConstCost;   // holds interim value for construction component costs: reference bldg.
         Real64 CurntBldgConstCost; // holds interim value for construction component costs: current bldg.
         Array1D<std::string> columnHead;
-        Array1D_int columnWidth;
+        Array1D<int> columnWidth;
         Array1D<std::string> rowHead;
         Array2D_string tableBody;
         int item;    // do-loop counter for line items
@@ -10273,7 +10273,7 @@ namespace OutputReportTabular {
 
         // all arrays are in the format: (row, column)
         Array1D<std::string> columnHead;
-        Array1D_int columnWidth;
+        Array1D<int> columnWidth;
         Array1D<std::string> rowHead;
         Array2D_string tableBody;
 
@@ -11085,12 +11085,12 @@ namespace OutputReportTabular {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
 
         Array1D<std::string> columnHead(5);
-        Array1D_int columnWidth;
+        Array1D<int> columnWidth;
         Array1D<std::string> rowHead;
         Array2D_string tableBody;
         static int numPeopleAdaptive(0);
         int i;
-        Array1D_int peopleInd; // Index the relevant people
+        Array1D<int> peopleInd; // Index the relevant people
 
         // Should deallocate after writing table. - LKL
 
@@ -11147,7 +11147,7 @@ namespace OutputReportTabular {
     {
 
         Array1D<std::string> columnHead(6);
-        Array1D_int columnWidth;
+        Array1D<int> columnWidth;
         Array1D<std::string> rowHead;
         Array2D_string tableBody;
 
@@ -11211,11 +11211,11 @@ namespace OutputReportTabular {
 
         // all arrays are in the format: (row, column)
         Array1D<std::string> columnHead;
-        Array1D_int columnWidth;
+        Array1D<int> columnWidth;
         Array1D<std::string> rowHead;
         Array2D_string tableBody;
-        Array1D_int rowToUnqObjName;
-        Array1D_int colHeadToColTag;
+        Array1D<int> rowToUnqObjName;
+        Array1D<int> colHeadToColTag;
         int curNumColumns;
         int curNumRows;
         int curColumn;
@@ -11238,7 +11238,7 @@ namespace OutputReportTabular {
         int oRowHead;
         std::string colTagWithSI;
         std::string curColTag;
-        Array1D_int colUnitConv;
+        Array1D<int> colUnitConv;
         int indexUnitConv;
         int columnUnitConv;
         std::string repTableTag;
@@ -11431,8 +11431,8 @@ namespace OutputReportTabular {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // all arrays are in the format: (row, column)
         Array1D<std::string> columnHead;
-        Array1D_int columnWidth;
-        Array1D_int colUnitConv;
+        Array1D<int> columnWidth;
+        Array1D<int> colUnitConv;
         Array1D<std::string> rowHead;
         Array2D_string tableBody;
         Array1D<std::string> uniqueDesc;
@@ -11673,11 +11673,11 @@ namespace OutputReportTabular {
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         // all arrays are in the format: (row, column)
         Array1D<std::string> columnHead(1);
-        Array1D_int columnWidth(1);
+        Array1D<int> columnWidth(1);
         Array1D<std::string> rowHead;
         Array2D_string tableBody;
         // CHARACTER(len=MaxNameLength),ALLOCATABLE, DIMENSION(:)     :: unique
-        Array1D_int unique;
+        Array1D<int> unique;
         int numUnique;
         // CHARACTER(len=MaxNameLength)                               :: curRecSurf
         int curRecSurf;
@@ -11807,10 +11807,10 @@ namespace OutputReportTabular {
 
         if (displayEioSummary) {
             Array1D<std::string> columnHead;
-            Array1D_int columnWidth;
+            Array1D<int> columnWidth;
             Array1D<std::string> rowHead;
             Array2D_string tableBody; // in the format: (row, column)
-            Array1D_int colUnitConv;
+            Array1D<int> colUnitConv;
 
             // setting up  report header
             WriteReportHeaders("Initialization Summary", "Entire Facility", OutputProcessor::StoreType::Averaged);
@@ -12349,7 +12349,7 @@ namespace OutputReportTabular {
         static int iSurf(0);
         static int ZoneNum(0);
         static int TimeStepInDay(0);
-        static Array1D_int IntGainTypesTubular(1, {IntGainTypeOf_DaylightingDeviceTubular});
+        static Array1D<int> IntGainTypesTubular(1, {IntGainTypeOf_DaylightingDeviceTubular});
 
         if (CompLoadReportIsReq && !isPulseZoneSizing) {
             TimeStepInDay = (HourOfDay - 1) * NumOfTimeStepInHour + TimeStep;
@@ -12769,9 +12769,9 @@ namespace OutputReportTabular {
 
         // AirLoopComponentLoadSummary
         if (displayAirLoopComponentLoadSummary && NumPrimaryAirSys > 0) {
-            Array1D_int zoneToAirLoopCool;
+            Array1D<int> zoneToAirLoopCool;
             zoneToAirLoopCool.dimension(NumOfZones);
-            Array1D_int zoneToAirLoopHeat;
+            Array1D<int> zoneToAirLoopHeat;
             zoneToAirLoopHeat.dimension(NumOfZones);
             // set the peak day and time for each zone used by the airloops - use all zones connected to the airloop for both heating and cooling
             // (regardless of "heated" or "cooled" zone status)
@@ -13884,7 +13884,7 @@ namespace OutputReportTabular {
     }
 
     // make a list of the zones for the airloop component loads report
-    void CreateListOfZonesForAirLoop(CompLoadTablesType &compLoad, Array1D_int const &zoneToAirLoop, int const &curAirLoop)
+    void CreateListOfZonesForAirLoop(CompLoadTablesType &compLoad, Array1D<int> const &zoneToAirLoop, int const &curAirLoop)
     {
         int counter = 0;
         for (int zi = 1; zi <= NumOfZones; ++zi) {
@@ -13904,7 +13904,7 @@ namespace OutputReportTabular {
         CompLoadTablesType curCompLoad;
         bool writeOutput;
         Array1D<std::string> columnHead;
-        Array1D_int columnWidth;
+        Array1D<int> columnWidth;
         Array1D<std::string> rowHead;
         Array2D_string tableBody; //(row, column)
 
@@ -14358,7 +14358,7 @@ namespace OutputReportTabular {
     void WriteTable(Array2S_string const body, // row,column
                     const Array1D<std::string> &rowLabels,
                     const Array1D<std::string> &columnLabels,
-                    Array1D_int &widthColumn,
+                    Array1D<int> &widthColumn,
                     Optional_bool_const transposeXML,
                     Optional_string_const footnoteText)
     {

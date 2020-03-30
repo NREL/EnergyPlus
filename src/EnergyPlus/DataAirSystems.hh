@@ -137,8 +137,8 @@ namespace DataAirSystems {
         std::string Name;              // Name of the branch
         std::string ControlType;       // Control type for the branch (not used)
         int TotalComponents;           // Total number of high level components on the branch
-        Array1D_int FirstCompIndex;    // Gives the component index in AllComp that corresponds to Comp
-        Array1D_int LastCompIndex;     // Gives comp index in AllComp that corresponds to last subcomponent
+        Array1D<int> FirstCompIndex;    // Gives the component index in AllComp that corresponds to Comp
+        Array1D<int> LastCompIndex;     // Gives comp index in AllComp that corresponds to last subcomponent
         int NodeNumIn;                 // Branch inlet node number
         int NodeNumOut;                // Branch outlet node number
         int DuctType;                  // 1=main, 2=cooling, 3=heating, 4=other
@@ -147,7 +147,7 @@ namespace DataAirSystems {
         //           ALLOCATABLE, DIMENSION(:) :: MegaComp              ! Component list
         //  This list would include children, grandchildren, etc.
         int TotalNodes;      // total number of nodes on branch
-        Array1D_int NodeNum; // node list (numbers)
+        Array1D<int> NodeNum; // node list (numbers)
 
         // Default Constructor
         AirLoopBranchData() : TotalComponents(0), NodeNumIn(0), NodeNumOut(0), DuctType(0), TotalNodes(0)
@@ -164,8 +164,8 @@ namespace DataAirSystems {
         int BranchNumIn;            // Reference number for branch connected to splitter inlet
         std::string NodeNameIn;     // Node name for the inlet to the splitter
         int TotalOutletNodes;       // Number of outlet nodes for the splitter
-        Array1D_int NodeNumOut;     // Node numbers for the outlets to the splitter
-        Array1D_int BranchNumOut;   // Reference numbers for branches connected to splitter outlet
+        Array1D<int> NodeNumOut;     // Node numbers for the outlets to the splitter
+        Array1D<int> BranchNumOut;   // Reference numbers for branches connected to splitter outlet
         Array1D<std::string> NodeNameOut; // Node names for the outlets to the splitter
 
         // Default Constructor
@@ -183,8 +183,8 @@ namespace DataAirSystems {
         int BranchNumOut;          // Reference number for branch connected to mixer outlet
         std::string NodeNameOut;   // Node name for the outlet to the mixer
         int TotalInletNodes;       // Number of inlet nodes for the mixer
-        Array1D_int NodeNumIn;     // Node numbers for the inlets to the mixer
-        Array1D_int BranchNumIn;   // Reference numbers for branches connected to mixer inlet
+        Array1D<int> NodeNumIn;     // Node numbers for the inlets to the mixer
+        Array1D<int> BranchNumIn;   // Reference numbers for branches connected to mixer inlet
         Array1D<std::string> NodeNameIn; // Node names for the inlets to the mixer
 
         // Default Constructor
@@ -215,7 +215,7 @@ namespace DataAirSystems {
         int NumControllers;              // number of controllers on this air path
         Array1D<std::string> ControllerName;   // name of each controller on this system
         Array1D<std::string> ControllerType;   // type of each controller on this system
-        Array1D_int ControllerIndex;
+        Array1D<int> ControllerIndex;
         EPVector<bool> CanBeLockedOutByEcono; // true if controller inactive
         // when the economizer is active
         int NumBranches;                   // number of branches making up this system
@@ -224,9 +224,9 @@ namespace DataAirSystems {
         AirLoopMixerData Mixer;            // Data for mixer (if any)
         EPVector<bool> ControlConverged;     // Convergence Parameter for controllers
         int NumOutletBranches;
-        Array1D_int OutletBranchNum; // branch numbers of system outlets
+        Array1D<int> OutletBranchNum; // branch numbers of system outlets
         int NumInletBranches;
-        Array1D_int InletBranchNum; // branch number of system inlets
+        Array1D<int> InletBranchNum; // branch number of system inlets
         bool CentralHeatCoilExists; // true if there are central heating coils
         bool CentralCoolCoilExists; // true if there are central cooling coils
         bool OASysExists;           // true if there is an Outside Air Sys

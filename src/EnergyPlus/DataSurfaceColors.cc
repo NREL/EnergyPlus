@@ -100,7 +100,7 @@ namespace DataSurfaceColors {
     int const ColorNo_DaylSensor1(14);
     int const ColorNo_DaylSensor2(15);
 
-    Array1D_int const defaultcolorno(NumColors, {3, 43, 143, 143, 45, 8, 15, 195, 9, 13, 174, 143, 143, 10, 5}); // text | wall | window | glassdoor |
+    Array1D<int> const defaultcolorno(NumColors, {3, 43, 143, 143, 45, 8, 15, 195, 9, 13, 174, 143, 143, 10, 5}); // text | wall | window | glassdoor |
                                                                                                                  // door | floor | roof | detached
                                                                                                                  // building shade (moves with
                                                                                                                  // building) | detached building
@@ -126,7 +126,7 @@ namespace DataSurfaceColors {
                                     "DaylightReferencePoint1",
                                     "DaylightReferencePoint2"});
 
-    Array1D_int const colorkeyptr(NumColors,
+    Array1D<int> const colorkeyptr(NumColors,
                                   {ColorNo_Text,
                                    ColorNo_Wall,
                                    ColorNo_Window,
@@ -147,7 +147,7 @@ namespace DataSurfaceColors {
     // na
 
     // MODULE VARIABLE DECLARATIONS:
-    Array1D_int DXFcolorno(NumColors, defaultcolorno);
+    Array1D<int> DXFcolorno(NumColors, defaultcolorno);
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE:
 

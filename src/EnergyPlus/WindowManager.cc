@@ -211,7 +211,7 @@ namespace WindowManager {
     Array3D<Real64> gcp(3, 5, 5, 0.0);  // Gas specific-heat coefficients for each gap
     Array2D<Real64> gwght(5, 5, 0.0);   // Gas molecular weights for each gap
     Array2D<Real64> gfract(5, 5, 0.0);  // Gas fractions for each gap
-    Array1D_int gnmix(5, 0);            // Number of gases in gap
+    Array1D<int> gnmix(5, 0);            // Number of gases in gap
     Array1D<Real64> gap(5, 0.0);        // Gap width (m)
     Array1D<Real64> thick(5, 0.0);      // Glass layer thickness (m)
     Array1D<Real64> scon(5, 0.0);       // Glass layer conductance--conductivity/thickness (W/m2-K)
@@ -268,7 +268,7 @@ namespace WindowManager {
     Array2D<Real64> rfadjPhi(5, MaxSpectralDataElements, 0.0); // front reflectance at angle of incidence
     Array2D<Real64> rbadjPhi(5, MaxSpectralDataElements, 0.0); // back reflectance at angle of incidence
 
-    Array1D_int numpt(5, 0);             // Number of spectral data wavelengths for each layer; =2 if no spectra data for a layer
+    Array1D<int> numpt(5, 0);             // Number of spectral data wavelengths for each layer; =2 if no spectra data for a layer
     Array1D<Real64> stPhi(nume, 0.0);    // Glazing system transmittance at angle of incidence for each wavelength in wle
     Array1D<Real64> srfPhi(nume, 0.0);   // Glazing system front reflectance at angle of incidence for each wavelength in wle
     Array1D<Real64> srbPhi(nume, 0.0);   // Glazing system back reflectance at angle of incidence for each wavelenth in wle
@@ -351,7 +351,7 @@ namespace WindowManager {
         gcp = Array3D<Real64>(3, 5, 5, 0.0);
         gwght = Array2D<Real64>(5, 5, 0.0);
         gfract = Array2D<Real64>(5, 5, 0.0);
-        gnmix = Array1D_int(5, 0);
+        gnmix = Array1D<int>(5, 0);
         gap = Array1D<Real64>(5, 0.0);
         thick = Array1D<Real64>(5, 0.0);
         scon = Array1D<Real64>(5, 0.0);
@@ -398,7 +398,7 @@ namespace WindowManager {
         tadjPhi = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
         rfadjPhi = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
         rbadjPhi = Array2D<Real64>(5, MaxSpectralDataElements, 0.0);
-        numpt = Array1D_int(5, 0);
+        numpt = Array1D<int>(5, 0);
         stPhi = Array1D<Real64>(nume, 0.0);
         srfPhi = Array1D<Real64>(nume, 0.0);
         srbPhi = Array1D<Real64>(nume, 0.0);
@@ -2542,8 +2542,8 @@ namespace WindowManager {
         static bool locTCFlag(false); // True if this surface is a TC window
         static Array1D<Real64> deltaTemp(100, 0.0);
         int i;
-        static Array1D_int iMinDT(1, 0);
-        static Array1D_int IDConst(100, 0);
+        static Array1D<int> iMinDT(1, 0);
+        static Array1D<int> IDConst(100, 0);
         static Real64 dT0(0.0);
         static Real64 dT1(0.0);
         Real64 SurfOutsideEmiss; // temporary for result of outside surface emissivity
@@ -3319,7 +3319,7 @@ namespace WindowManager {
         static Array1D<Real64> hr(10);  // Radiative conductance (W/m2-K) //Tuned Made static
         Real64 d;                       // +1 if number of row interchanges is even,
         // -1 if odd (in LU decomposition)
-        static Array1D_int indx(10);          // Vector of row permutations in LU decomposition //Tuned Made static
+        static Array1D<int> indx(10);          // Vector of row permutations in LU decomposition //Tuned Made static
         static Array2D<Real64> Aface(10, 10); // Coefficient in equation Aface*thetas = Bface //Tuned Made static
         static Array1D<Real64> Bface(10);     // Coefficient in equation Aface*thetas = Bface //Tuned Made static
 
@@ -4710,7 +4710,7 @@ namespace WindowManager {
 
     void LUdecomposition(Array2<Real64> &ajac, // As input: matrix to be decomposed;
                          int const n,          // Dimension of matrix
-                         Array1D_int &indx,    // Vector of row permutations
+                         Array1D<int> &indx,    // Vector of row permutations
                          Real64 &d             // +1 if even number of row interchange is even, -1
     )
     {
@@ -4813,7 +4813,7 @@ namespace WindowManager {
 
     void LUsolution(Array2<Real64> const &a, // Matrix and vector in a.x = b;
                     int const n,             // Dimension of a and b
-                    Array1D_int const &indx, // Vector of row permutations
+                    Array1D<int> const &indx, // Vector of row permutations
                     Array1D<Real64> &b       // Matrix and vector in a.x = b;
     )
     {
@@ -7281,7 +7281,7 @@ namespace WindowManager {
         Real64 hcinprev;            // Value of hcin from previous iteration
         Real64 d;                   // +1 if number of row interchanges is even,
         // -1 if odd (in LU decomposition)
-        Array1D_int indx(10);          // Vector of row permutations in LU decomposition
+        Array1D<int> indx(10);          // Vector of row permutations in LU decomposition
         Array2D<Real64> Aface(10, 10); // Coefficient in equation Aface*thetas = Bface
         Array1D<Real64> Bface(10);     // Coefficient in equation Aface*thetas = Bface
         int iter;                      // Iteration number
@@ -8633,7 +8633,7 @@ namespace WindowManager {
         Array2D<Real64> Xinv(4, 4); // Inverse of exchange matrix
         int k;                      // Array indices
         int m;
-        Array1D_int indx(4);     // LU decomposition indices
+        Array1D<int> indx(4);     // LU decomposition indices
         Real64 BlindIRreflFront; // Blind front IR reflectance
         Real64 BlindIRreflBack;  // Blind back IR reflectance
 
@@ -8999,7 +8999,7 @@ namespace WindowManager {
         int i; // Array indices
         int k;
         int m;
-        Array1D_int indx(4); // Indices for LU decomposition
+        Array1D<int> indx(4); // Indices for LU decomposition
 
         p = 0.0;
 

@@ -987,7 +987,7 @@ void ValidateComponent(std::string const &CompType,    // Component Type (e.g. C
     }
 }
 
-void CalcPassiveExteriorBaffleGap(const Array1D_int &SurfPtrARR, // Array of indexes pointing to Surface structure in DataSurfaces
+void CalcPassiveExteriorBaffleGap(const Array1D<int> &SurfPtrARR, // Array of indexes pointing to Surface structure in DataSurfaces
                                   Real64 const VentArea,        // Area available for venting the gap [m2]
                                   Real64 const Cv,              // Oriface coefficient for volume-based discharge, wind-driven [--]
                                   Real64 const Cd,              // oriface coefficient for discharge,  bouyancy-driven [--]
@@ -1861,7 +1861,7 @@ void TestReturnAirPathIntegrity(bool &ErrFound, Array2S_int ValRetAPaths)
     int Count2;
     bool HasMixer;
     int MixerComp;
-    Array1D_int AllNodes;
+    Array1D<int> AllNodes;
     int MixerCount;
     int Count3;
     int NumComp;

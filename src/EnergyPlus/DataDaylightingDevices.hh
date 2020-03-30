@@ -98,7 +98,7 @@ namespace DataDaylightingDevices {
         Real64 TotLength;            // Total length of pipe, including exterior
         Real64 Reff;                 // Effective R value between TDD:DOME and TDD:DIFFUSER
         int NumOfTZones;             // Number of transition zone
-        Array1D_int TZone;           // Pointers to transition zones
+        Array1D<int> TZone;           // Pointers to transition zones
         Array1D<Real64> TZoneLength; // Length of pipe in each transition zone
         // Calculated variables
         Real64 AspectRatio;               // Aspect ratio, length / diameter

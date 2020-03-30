@@ -395,7 +395,7 @@ namespace HVACUnitaryBypassVAV {
         static bool DXErrorsFound(false);   // Set to true if errors in get coil input
         static bool FanErrFlag(false);      // Error flag returned during CALL to GetFanType
         static bool errFlag(false);         // Error flag returned during CALL to mining functions
-        Array1D_int OANodeNums(4);          // Node numbers of OA mixer (OA, EA, RA, MA)
+        Array1D<int> OANodeNums(4);          // Node numbers of OA mixer (OA, EA, RA, MA)
         std::string HXDXCoolCoilName;       // Name of DX cooling coil used with Heat Exchanger Assisted Cooling Coil
         std::string MixerInletNodeName;     // Name of mixer inlet node
         std::string SplitterOutletNodeName; // Name of splitter outlet node

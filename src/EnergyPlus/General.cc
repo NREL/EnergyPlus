@@ -2225,7 +2225,7 @@ namespace General {
         // message when not valid, and sets error flag.
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Array1D_int const EndMonthDay(12, {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31});
+        static Array1D<int> const EndMonthDay(12, {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31});
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
         bool InternalError;
@@ -2285,7 +2285,7 @@ namespace General {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        static Array1D_int EndDayofMonth(12, {31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365});
+        static Array1D<int> EndDayofMonth(12, {31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365});
         // End day numbers of each month (without Leap Year)
 
         if (Month == 1) {
@@ -2334,7 +2334,7 @@ namespace General {
         // SUBROUTINE ARGUMENT DEFINITIONS:
 
         // SUBROUTINE PARAMETER DEFINITIONS:
-        static Array1D_int const EndOfMonth({0, 12}, {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365});
+        static Array1D<int> const EndOfMonth({0, 12}, {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365});
 
         // INTERFACE BLOCK SPECIFICATIONS
         // na

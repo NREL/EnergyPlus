@@ -103,7 +103,7 @@ namespace SplitterComponent {
         Real64 InletMassFlowRateMaxAvail; // Max Avail MassFlow through the Splitter being Simulated [kg/Sec]
         Real64 InletMassFlowRateMinAvail; // Min Avail MassFlow through the Splitter being Simulated [kg/Sec]
         int NumOutletNodes;
-        Array1D_int OutletNode;
+        Array1D<int> OutletNode;
         Array1D<Real64> OutletMassFlowRate;
         Array1D<Real64> OutletMassFlowRateMaxAvail;
         Array1D<Real64> OutletMassFlowRateMinAvail;

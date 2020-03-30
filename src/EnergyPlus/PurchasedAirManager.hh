@@ -289,7 +289,7 @@ namespace PurchasedAirManager {
         // Members
         int NumPurchAir;
         int ReturnPlenumIndex;
-        Array1D_int PurchAirArray;
+        Array1D<int> PurchAirArray;
         EPVector<bool> IsSimulated;
 
         // Default Constructor

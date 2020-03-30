@@ -198,7 +198,7 @@ namespace DataWater {
         Real64 MaxCollectRate;
         int NumCollectSurfs; // number of surfaces used in the collector
         Array1D<std::string> SurfName;
-        Array1D_int SurfID;
+        Array1D<int> SurfID;
         // calculated and from elsewhere
         Real64 HorizArea; // area of surfaces in the vertical normal direction
         Real64 VdotAvail;

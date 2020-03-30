@@ -147,8 +147,8 @@ namespace HVACVariableRefrigerantFlow {
     extern Real64 LoopDXCoolCoilRTF;             // holds value of DX cooling coil RTF
     extern Real64 LoopDXHeatCoilRTF;             // holds value of DX heating coil RTF
     extern Real64 CondenserWaterMassFlowRate;    // VRF water-cooled condenser mass flow rate (kg/s)
-    extern Array1D_int NumCoolingLoads;          // number of TU's requesting cooling
-    extern Array1D_int NumHeatingLoads;          // number of TU's requesting heating
+    extern Array1D<int> NumCoolingLoads;          // number of TU's requesting cooling
+    extern Array1D<int> NumHeatingLoads;          // number of TU's requesting heating
     extern Array1D<Real64> MaxDeltaT;            // maximum zone temperature difference from setpoint
     extern Array1D<Real64> MinDeltaT;            // minimum zone temperature difference from setpoint
     extern Array1D<Real64> SumCoolingLoads;      // sum of cooling loads
@@ -357,8 +357,8 @@ namespace HVACVariableRefrigerantFlow {
         Real64 Ncomp;                     // compressor electric power [W]
         Real64 NcompCooling;              // compressor electric power at cooling mode [W]
         Real64 NcompHeating;              // compressor electric power at heating mode [W]
-        Array1D_int OUCoolingCAPFT;       // index to outdoor unit cooling capacity function of temperature at different compressor speed
-        Array1D_int OUCoolingPWRFT;       // index to outdoor unit cooling power function of temperature at different compressor speed
+        Array1D<int> OUCoolingCAPFT;       // index to outdoor unit cooling capacity function of temperature at different compressor speed
+        Array1D<int> OUCoolingPWRFT;       // index to outdoor unit cooling power function of temperature at different compressor speed
         Real64 OUEvapTempLow;             // VRV system outdoor unit evaporating temperature, lower bound[C]
         Real64 OUEvapTempHigh;            // VRV system outdoor unit evaporating temperature, higher bound [C]
         Real64 OUCondTempLow;             // VRV system outdoor unit condensing temperature, lower bound [C]
@@ -601,7 +601,7 @@ namespace HVACVariableRefrigerantFlow {
         std::string Name;                     // Name of the VRF Terminal Unit List
         int NumTUInList;                      // Number of VRF Terminal Units in List
         bool reset_isSimulatedFlags;           // used to align simulate flags with order of each TU in simulation
-        Array1D_int ZoneTUPtr;                // index to VRF Terminal Unit
+        Array1D<int> ZoneTUPtr;                // index to VRF Terminal Unit
         Array1D<std::string> ZoneTUName;            // Name of the VRF Terminal Unit
         EPVector<bool> IsSimulated;             // TRUE if TU has been simulated
         Array1D<Real64> TotalCoolLoad;        // Total zone cooling coil load met by TU
@@ -614,8 +614,8 @@ namespace HVACVariableRefrigerantFlow {
         EPVector<bool> HRCoolRequest;           // defines a cooling load on VRFTerminalUnits when QZnReq > 0
         EPVector<bool> CoolingCoilAvailable;    // cooling coil availability scheduled on
         EPVector<bool> HeatingCoilAvailable;    // cooling coil availability scheduled on
-        Array1D_int CoolingCoilAvailSchPtr;   // cooling coil availability schedule index
-        Array1D_int HeatingCoilAvailSchPtr;   // heating coil availability schedule index
+        Array1D<int> CoolingCoilAvailSchPtr;   // cooling coil availability schedule index
+        Array1D<int> HeatingCoilAvailSchPtr;   // heating coil availability schedule index
 
         // Default Constructor
         TerminalUnitListData() : NumTUInList(0), reset_isSimulatedFlags(true)

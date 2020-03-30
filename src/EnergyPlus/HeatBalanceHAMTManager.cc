@@ -152,15 +152,15 @@ namespace HeatBalanceHAMTManager {
     // DERIVED TYPE DEFINITIONS:
 
     // MODULE VARIABLE DECLARATIONS:
-    Array1D_int firstcell;
-    Array1D_int lastcell;
-    Array1D_int Extcell;
-    Array1D_int ExtRadcell;
-    Array1D_int ExtConcell;
-    Array1D_int ExtSkycell;
-    Array1D_int ExtGrncell;
-    Array1D_int Intcell;
-    Array1D_int IntConcell;
+    Array1D<int> firstcell;
+    Array1D<int> lastcell;
+    Array1D<int> Extcell;
+    Array1D<int> ExtRadcell;
+    Array1D<int> ExtConcell;
+    Array1D<int> ExtSkycell;
+    Array1D<int> ExtGrncell;
+    Array1D<int> Intcell;
+    Array1D<int> IntConcell;
 
     Array1D<Real64> watertot;
     Array1D<Real64> surfrh;

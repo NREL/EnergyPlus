@@ -73,7 +73,7 @@ namespace DataHeatBalSurface {
 
     // SUBROUTINE SPECIFICATIONS FOR MODULE DataHeatBalSurface
     // Integer Variables for the Heat Balance Simulation
-    extern Array1D_int SUMH; // From Old Bldctf.inc
+    extern Array1D<int> SUMH; // From Old Bldctf.inc
 
     // Variables Dimensioned to Max Number of Heat Transfer Surfaces (maxhts)
     extern Real64 MaxSurfaceTempLimit;            // Highest inside surface temperature allowed in Celsius

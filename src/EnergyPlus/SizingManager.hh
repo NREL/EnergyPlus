@@ -80,7 +80,7 @@ namespace SizingManager {
         // Members
         std::string Name;
         int NumOfZones;
-        Array1D_int Zones;
+        Array1D<int> Zones;
 
         // Default Constructor
         ZoneListData() : NumOfZones(0)

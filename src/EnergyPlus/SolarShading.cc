@@ -224,8 +224,8 @@ namespace SolarShading {
     } // namespace
 
     std::ofstream shd_stream; // Shading file stream
-    Array1D_int HCNS;         // Surface number of back surface HC figures
-    Array1D_int HCNV;         // Number of vertices of each HC figure
+    Array1D<int> HCNS;         // Surface number of back surface HC figures
+    Array1D<int> HCNV;         // Number of vertices of each HC figure
     Array2D<Int64> HCA;       // 'A' homogeneous coordinates of sides
     Array2D<Int64> HCB;       // 'B' homogeneous coordinates of sides
     Array2D<Int64> HCC;       // 'C' homogeneous coordinates of sides
@@ -857,7 +857,7 @@ namespace SolarShading {
         aNum++;
         int SurfZoneGroup, CurZoneGroup;
         if (DisableGroupSelfShading) {
-            Array1D_int DisableSelfShadingGroups;
+            Array1D<int> DisableSelfShadingGroups;
             int NumOfShadingGroups;
             if (NumAlphas >= aNum) {
                 // Read all shading groups
@@ -5277,9 +5277,9 @@ namespace SolarShading {
         // na
 
         // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-        Array1D_int GSS;             // List of shadowing surfaces numbers for a receiving surface
-        Array1D_int BKS;             // List of back surface numbers for a receiving surface
-        Array1D_int SBS;             // List of subsurfaces for a receiving surface
+        Array1D<int> GSS;             // List of shadowing surfaces numbers for a receiving surface
+        Array1D<int> BKS;             // List of back surface numbers for a receiving surface
+        Array1D<int> SBS;             // List of subsurfaces for a receiving surface
         static int MaxGSS(50);       // Current Max for GSS array
         static int MaxBKS(50);       // Current Max for BKS array
         static int MaxSBS(50);       // Current Max for SBS array

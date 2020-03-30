@@ -600,7 +600,7 @@ namespace PackagedTerminalHeatPump {
         int PTUnitNum;               // current packaged terminal unit number
         Array1D<std::string> Alphas;       // Alpha items for object
         Array1D<Real64> Numbers;     // Numeric items for object
-        Array1D_int OANodeNums(4);   // Node numbers of OA mixer (OA, EA, RA, MA)
+        Array1D<int> OANodeNums(4);   // Node numbers of OA mixer (OA, EA, RA, MA)
         int FanInletNodeNum;         // Fan inlet node number
         int FanOutletNodeNum;        // Fan outlet node number
         int SuppHeatInletNodeNum;    // Supplemental heating coil inlet node number

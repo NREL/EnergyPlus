@@ -162,7 +162,7 @@ namespace DataRoomAirModel {
     // MODULE VARIABLE DECLARATIONS:
     int TotNumOfAirNodes(0);
     int TotNumOfRoomAFNNodes(0);
-    Array1D_int TotNumOfZoneAirNodes;
+    Array1D<int> TotNumOfZoneAirNodes;
     Array1D<Real64> ConvectiveFloorSplit;
     Array1D<Real64> InfiltratFloorSplit;
     // UCSD
@@ -178,7 +178,7 @@ namespace DataRoomAirModel {
     Array1D<Real64> ZTFloor;
     Array1D<Real64> HeightTransition;
     Array1D<Real64> FracMinFlow;
-    Array1D_int ZoneDVMixedFlag;
+    Array1D<int> ZoneDVMixedFlag;
     Array1D<Real64> ZoneDVMixedFlagRep;
     EPVector<bool> ZoneAirSystemON;
     Array1D<Real64> TCMF; // comfort temperature
@@ -263,9 +263,9 @@ namespace DataRoomAirModel {
     int TotUCSDUI(0);      // total number of UCSDUI zones
     int TotUCSDUE(0);      // total number of UCSDUE zones
     EPVector<bool> IsZoneUI; // controls program flow, for interior or exterior UFAD model
-    Array1D_int ZoneUFPtr;
+    Array1D<int> ZoneUFPtr;
     Array1D<Real64> UFHcIn;
-    Array1D_int ZoneUFMixedFlag;
+    Array1D<int> ZoneUFMixedFlag;
     Array1D<Real64> ZoneUFMixedFlagRep;
     Array1D<Real64> ZoneUFGamma;
     Array1D<Real64> ZoneUFPowInPlumes;            // [W]

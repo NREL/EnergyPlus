@@ -230,7 +230,7 @@ namespace EnergyPlus {
             int prevHour;
             int AGG;               // Minimum Hourly History required
             int SubAGG;            // Minimum sub-hourly History
-            Array1D_int LastHourN; // Stores the Previous hour's N for past hours until the minimum sub-hourly history
+            Array1D<int> LastHourN; // Stores the Previous hour's N for past hours until the minimum sub-hourly history
             Real64 bhTemp;         // [degC]
             Real64 massFlowRate;   // [kg/s]
             Real64 outletTemp;     // [degC]

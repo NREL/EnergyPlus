@@ -348,7 +348,7 @@ namespace FanCoilUnits {
         int FanCoilNum;                        // current fan coil number
         int NumAlphas;                         // Number of Alphas for each GetObjectItem call
         int NumNumbers;                        // Number of Numbers for each GetObjectItem call
-        Array1D_int OANodeNums(4);             // Node numbers of Outdoor air mixer (OA, EA, RA, MA)
+        Array1D<int> OANodeNums(4);             // Node numbers of Outdoor air mixer (OA, EA, RA, MA)
         int IOStatus;                          // Used in GetObjectItem
         static bool ErrorsFound(false);        // Set to true if errors in input, fatal at end of routine
         static bool errFlag(false);            // Local error flag for GetOAMixerNodeNums

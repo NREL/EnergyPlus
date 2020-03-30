@@ -333,7 +333,7 @@ namespace ExternalInterface {
     void ParseString(std::string const &str, Array1D<std::string> &ele, int const nEle);
 
     void GetReportVariableKey(
-        const Array1D<std::string> &varKeys, int const numberOfKeys, const Array1D<std::string> &varNames, Array1D_int &keyVarIndexes, Array1D_int &varTypes);
+        const Array1D<std::string> &varKeys, int const numberOfKeys, const Array1D<std::string> &varNames, Array1D<int> &keyVarIndexes, Array1D<int> &varTypes);
 
     std::vector<char> getCharArrayFromString(std::string const &originalString);
 

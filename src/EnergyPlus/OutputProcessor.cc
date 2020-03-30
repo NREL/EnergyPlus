@@ -210,7 +210,7 @@ namespace OutputProcessor {
 
     int InstMeterCacheSize(1000);    // the maximum size of the instant meter cache used in GetInstantMeterValue
     int InstMeterCacheSizeInc(1000); // the increment for the instant meter cache used in GetInstantMeterValue
-    Array1D_int InstMeterCache;      // contains a list of RVariableTypes that make up a specific meter
+    Array1D<int> InstMeterCache;      // contains a list of RVariableTypes that make up a specific meter
     int InstMeterCacheLastUsed(0);   // the last item in the instant meter cache used
 
     // INTERFACE BLOCK SPECIFICATIONS:
@@ -238,7 +238,7 @@ namespace OutputProcessor {
     int NumHoursInDay(24);
     int NumHoursInMonth(0);
     int NumHoursInSim(0);
-    Array1D_int ReportList;
+    Array1D<int> ReportList;
     int NumReportList(0);
     int NumExtraVars(0);
 
@@ -1450,7 +1450,7 @@ namespace OutputProcessor {
         int fldIndex;
         bool KeyIsStar;
         Array1D<std::string> NamesOfKeys;                                    // Specific key name
-        Array1D_int IndexesForKeyVar;                                  // Array index
+        Array1D<int> IndexesForKeyVar;                                  // Array index
         OutputProcessor::Unit UnitsVar(OutputProcessor::Unit::None);   // Units enumeration
         OutputProcessor::Unit MeterUnits(OutputProcessor::Unit::None); // Units enumeration
         int KeyCount;
@@ -1460,10 +1460,10 @@ namespace OutputProcessor {
         int iKey;
         int iKey1;
         bool MeterCreated;
-        Array1D_int VarsOnCustomMeter;
+        Array1D<int> VarsOnCustomMeter;
         int MaxVarsOnCustomMeter;
         int NumVarsOnCustomMeter;
-        Array1D_int VarsOnSourceMeter;
+        Array1D<int> VarsOnSourceMeter;
         int MaxVarsOnSourceMeter;
         int NumVarsOnSourceMeter;
         int iOnMeter;
@@ -2648,7 +2648,7 @@ namespace OutputProcessor {
 
     void UpdateMeterValues(Real64 const TimeStepValue,                // Value of this variable at the current time step.
                            int const NumOnMeters,                     // Number of meters this variable is "on".
-                           const Array1D_int &OnMeters                // Which meters this variable is on (index values)
+                           const Array1D<int> &OnMeters                // Which meters this variable is on (index values)
     )
     {
 
@@ -2705,9 +2705,9 @@ namespace OutputProcessor {
 
     void UpdateMeterValues(Real64 const TimeStepValue,                // Value of this variable at the current time step.
                            int const NumOnMeters,                     // Number of meters this variable is "on".
-                           const Array1D_int &OnMeters,                // Which meters this variable is on (index values)
+                           const Array1D<int> &OnMeters,                // Which meters this variable is on (index values)
                            int const NumOnCustomMeters,               // Number of custom meters this variable is "on".
-                           const Array1D_int &OnCustomMeters // Which custom meters this variable is on (index values)
+                           const Array1D<int> &OnCustomMeters // Which custom meters this variable is on (index values)
     )
     {
 
@@ -7771,7 +7771,7 @@ int GetMeterIndex(std::string const &MeterName)
     // FUNCTION LOCAL VARIABLE DECLARATIONS:
     // Valid Meter names because matching case insensitive
     static Array1D<std::string> ValidMeterNames;
-    static Array1D_int iValidMeterNames;
+    static Array1D<int> iValidMeterNames;
     static int NumValidMeters(0);
     //////////// hoisted into namespace changed to GetMeterIndexFirstCall////////////
     // static bool FirstCall( true );
@@ -8306,11 +8306,11 @@ int GetNumMeteredVariables(std::string const &EP_UNUSED(ComponentType), // Given
 
 void GetMeteredVariables(std::string const &ComponentType,                      // Given Component Type
                          std::string const &ComponentName,                      // Given Component Name (user defined)
-                         Array1D_int &VarIndexes,                               // Variable Numbers
-                         Array1D_int &VarTypes,                                 // Variable Types (1=integer, 2=real, 3=meter)
+                         Array1D<int> &VarIndexes,                               // Variable Numbers
+                         Array1D<int> &VarTypes,                                 // Variable Types (1=integer, 2=real, 3=meter)
                          Array1D<OutputProcessor::TimeStepType> &TimeStepTypes, // Variable Index Types (1=Zone,2=HVAC)
                          Array1D<OutputProcessor::Unit> &unitsForVar,           // units from enum for each variable
-                         Array1D_int &ResourceTypes,                            // ResourceTypes for each variable
+                         Array1D<int> &ResourceTypes,                            // ResourceTypes for each variable
                          Array1D<std::string> &EndUses,                               // EndUses for each variable
                          Array1D<std::string> &Groups,                                // Groups for each variable
                          Array1D<std::string> &Names,                                 // Variable Names for each variable
@@ -8387,15 +8387,15 @@ void GetMeteredVariables(std::string const &ComponentType,                      
 
 void GetMeteredVariables(std::string const &ComponentType,                      // Given Component Type
                          std::string const &ComponentName,                      // Given Component Name (user defined)
-                         Array1D_int &VarIndexes,                               // Variable Numbers
-                         Array1D_int &VarTypes,                                 // Variable Types (1=integer, 2=real, 3=meter)
+                         Array1D<int> &VarIndexes,                               // Variable Numbers
+                         Array1D<int> &VarTypes,                                 // Variable Types (1=integer, 2=real, 3=meter)
                          Array1D<OutputProcessor::TimeStepType> &TimeStepTypes, // Variable Index Types (1=Zone,2=HVAC)
                          Array1D<OutputProcessor::Unit> &unitsForVar,           // units from enum for each variable
-                         Array1D_int &ResourceTypes,                            // ResourceTypes for each variable
+                         Array1D<int> &ResourceTypes,                            // ResourceTypes for each variable
                          Array1D<std::string> &EndUses,                               // EndUses for each variable
                          Array1D<std::string> &Groups,                                // Groups for each variable
                          Array1D<std::string> &Names,                                 // Variable Names for each variable
-                         Array1D_int &VarIDs                                    // Variable Report Numbers
+                         Array1D<int> &VarIDs                                    // Variable Report Numbers
 )
 {
 
@@ -8520,7 +8520,7 @@ void GetVariableKeyCountandType(std::string const &varName,                 // S
     using SortAndStringUtilities::SetupAndSort;
 
     // SUBROUTINE LOCAL VARIABLE DECLARATIONS:
-    static Array1D_int keyVarIndexes; // Array index for specific key name
+    static Array1D<int> keyVarIndexes; // Array index for specific key name
     static int curKeyVarIndexLimit;   // current limit for keyVarIndexes
     //////////// hoisted into namespace ////////////////////////////////////////////////
     // static bool InitFlag( true ); // for initting the keyVarIndexes array
@@ -8534,7 +8534,7 @@ void GetVariableKeyCountandType(std::string const &varName,                 // S
     std::string VarKeyPlusName;      // Full variable name including keyname and units
     std::string varNameUpper;        // varName pushed to all upper case
     static Array1D<std::string> varNames;  // stored variable names
-    static Array1D_int ivarNames;    // pointers for sorted information
+    static Array1D<int> ivarNames;    // pointers for sorted information
     static int numVarNames;          // number of variable names
 
     // INITIALIZATIONS
@@ -8668,7 +8668,7 @@ void GetVariableKeyCountandType(std::string const &varName,                 // S
 void GetVariableKeys(std::string const &varName, // Standard variable name
                      int const varType,          // 1=integer, 2=real, 3=meter
                      Array1D<std::string> &keyNames,   // Specific key name
-                     Array1D_int &keyVarIndexes  // Array index for
+                     Array1D<int> &keyVarIndexes  // Array index for
 )
 {
 
@@ -9161,7 +9161,7 @@ void ProduceRDDMDD()
     Array1D<std::string> VariableNames(NumVariablesForOutput);
     for (int i = 1; i <= NumVariablesForOutput; ++i)
         VariableNames(i) = DDVariableTypes(i).VarNameOnly;
-    Array1D_int iVariableNames(NumVariablesForOutput);
+    Array1D<int> iVariableNames(NumVariablesForOutput);
 
     if (SortByName) {
         SetupAndSort(VariableNames, iVariableNames);

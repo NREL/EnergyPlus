@@ -240,15 +240,15 @@ namespace DXFEarClipping {
 
         // Subroutine local variable declarations:
         bool errFlag;
-        Array1D_int ears(nsides);
-        Array1D_int r_angles(nsides);
+        Array1D<int> ears(nsides);
+        Array1D<int> r_angles(nsides);
         Array1D<Real64> rangles(nsides);
-        Array1D_int c_vertices(nsides);
+        Array1D<int> c_vertices(nsides);
         Array2D_int earvert(nsides, 3);
         EPVector<bool> removed(nsides);
         // unused  type(Vector_2d), dimension(3) :: testtri
         // unused  type(Vector_2d) :: point
-        Array1D_int earverts(3);
+        Array1D<int> earverts(3);
         Array1D<Real64> xvt(nsides);
         Array1D<Real64> yvt(nsides);
         Array1D<Real64> zvt(nsides);
@@ -534,14 +534,14 @@ namespace DXFEarClipping {
 
     void generate_ears(int const nvert, // number of vertices in polygon
                        Array1D<Vector_2d> &vertex,
-                       Array1D_int &ears,       // number of ears possible (dimensioned to nvert)
+                       Array1D<int> &ears,       // number of ears possible (dimensioned to nvert)
                        int &nears,              // number of ears found
-                       Array1D_int &r_vertices, // number of reflex vertices (>180) possible
+                       Array1D<int> &r_vertices, // number of reflex vertices (>180) possible
                        int &nrverts,            // number of reflex vertices found (>=180)
-                       Array1D_int &c_vertices, // number of convex vertices
+                       Array1D<int> &c_vertices, // number of convex vertices
                        int &ncverts,            // number of convex vertices found (< 180)
                        EPVector<bool> &removed,   // array that shows if a vertex has been removed (calling routine)
-                       Array1D_int &earvert,    // vertex indicators for first ear
+                       Array1D<int> &earvert,    // vertex indicators for first ear
                        Array1D<Real64> &rangles)
     {
 

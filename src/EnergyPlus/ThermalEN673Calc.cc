@@ -106,7 +106,7 @@ namespace ThermalEN673Calc {
                     const EPVector<Real64> &presure,
                     Array2A_int const iprop,
                     Array2A<Real64> const frct,
-                    const Array1D_int &nmix,
+                    const Array1D<int> &nmix,
                     Array2A<Real64> const xgcon,
                     Array2A<Real64> const xgvis,
                     Array2A<Real64> const xgcp,
@@ -119,7 +119,7 @@ namespace ThermalEN673Calc {
                     Real64 &shgc,
                     int &nperr,
                     std::string &ErrorMessage,
-                    const Array1D_int &ibc,
+                    const Array1D<int> &ibc,
                     EPVector<Real64> &hg,
                     EPVector<Real64> &hr,
                     EPVector<Real64> &hs,
@@ -241,7 +241,7 @@ namespace ThermalEN673Calc {
                        Array2A<Real64> const xgcp,
                        const EPVector<Real64> &xwght,
                        const EPVector<Real64> &presure,
-                       const Array1D_int &nmix,
+                       const Array1D<int> &nmix,
                        EPVector<Real64> &theta,
                        int const standard,
                        EPVector<Real64> &hg,
@@ -250,7 +250,7 @@ namespace ThermalEN673Calc {
                        Real64 &hin,
                        Real64 const hout,
                        Real64 &hcin,
-                       const Array1D_int &ibc,
+                       const Array1D<int> &ibc,
                        EPVector<Real64> &rs,
                        Real64 &ufactor,
                        EPVector<Real64> &Ra,
@@ -308,7 +308,7 @@ namespace ThermalEN673Calc {
         Real64 const eps(1.0e-4); // set iteration accuracy
 
         EPVector<Real64> frctg(maxgas);
-        Array1D_int ipropg(maxgas);
+        Array1D<int> ipropg(maxgas);
 
         // jel..hrin is 4.4 for standard clear glass:
         if ((emis(2 * nlayer) < 0.85) && (emis(2 * nlayer) > 0.83)) {

@@ -186,7 +186,7 @@ namespace DataRuntimeLanguage {
     // INTERFACE BLOCK SPECIFICATIONS: na
 
     // MODULE VARIABLE DECLARATIONS:
-    Array1D_int EMSProgram;
+    Array1D<int> EMSProgram;
 
     int NumProgramCallManagers(0);      // count of Erl program managers with calling points
     int NumSensors(0);                  // count of EMS sensors used in model (data from output variables)

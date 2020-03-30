@@ -365,11 +365,11 @@ namespace DataHVACGlobals {
 
     // Hybrid ventilation control part
     extern int NumHybridVentSysAvailMgrs;                  // Number of hybrid ventilation control
-    extern Array1D_int HybridVentSysAvailAirLoopNum;       // Airloop number in hybrid vent availability manager
-    extern Array1D_int HybridVentSysAvailVentCtrl;         // Ventilation control action in hybrid vent availability manager
-    extern Array1D_int HybridVentSysAvailActualZoneNum;    // Actual zone num in hybrid vent availability manager
-    extern Array1D_int HybridVentSysAvailANCtrlStatus;     // AN control status in hybrid vent availability manager
-    extern Array1D_int HybridVentSysAvailMaster;           // Master object name: Ventilation for simple; Zone name for AN
+    extern Array1D<int> HybridVentSysAvailAirLoopNum;       // Airloop number in hybrid vent availability manager
+    extern Array1D<int> HybridVentSysAvailVentCtrl;         // Ventilation control action in hybrid vent availability manager
+    extern Array1D<int> HybridVentSysAvailActualZoneNum;    // Actual zone num in hybrid vent availability manager
+    extern Array1D<int> HybridVentSysAvailANCtrlStatus;     // AN control status in hybrid vent availability manager
+    extern Array1D<int> HybridVentSysAvailMaster;           // Master object name: Ventilation for simple; Zone name for AN
     extern Array1D<Real64> HybridVentSysAvailWindModifier; // Wind modifier for AirflowNetwork
     // For multispeed heat pump only
     extern Real64 MSHPMassFlowRateLow;     // Mass flow rate at low speed
@@ -462,8 +462,8 @@ namespace DataHVACGlobals {
         int StopTime;                     // cycle off time (in SimTimeSteps)
         std::string AvailManagerListName; // name of each availability manager
         Array1D<std::string> AvailManagerName;  // name of each availability manager
-        Array1D_int AvailManagerType;     // type of availability manager
-        Array1D_int AvailManagerNum;      // index for availability manager
+        Array1D<int> AvailManagerType;     // type of availability manager
+        Array1D<int> AvailManagerNum;      // index for availability manager
         int ZoneNum;                      // cycle off time (in SimTimeSteps)
         bool Input;                       // starts off as true to initialize zone equipment availability manager data
         int Count;                        // initialize twice to ensure zone equipment availability manager list name has been read in
@@ -489,7 +489,7 @@ namespace DataHVACGlobals {
     struct OptStartDataType
     {
         // Members
-        Array1D_int ActualZoneNum;
+        Array1D<int> ActualZoneNum;
         Array1D<Real64> OccStartTime;
         EPVector<bool> OptStartFlag;
 

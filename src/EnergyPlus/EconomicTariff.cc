@@ -264,7 +264,7 @@ namespace EconomicTariff {
     int sizeEconVar(0);
 
     // holds the outbound connections for each variable
-    Array1D_int operand; // sized to sizeOperand
+    Array1D<int> operand; // sized to sizeOperand
     int numOperand(0);
     int sizeOperand(0);
 
@@ -281,8 +281,8 @@ namespace EconomicTariff {
     int numComputation(0);
 
     // list of pointers to variable, 0 end of line, negative indicate operations
-    Array1D_int steps;
-    Array1D_int stepsCopy;
+    Array1D<int> steps;
+    Array1D<int> stepsCopy;
     int numSteps(0);
     int sizeSteps(0);
 
@@ -405,7 +405,7 @@ namespace EconomicTariff {
         OutputProcessor::TimeStepType StepTypeVar;
         OutputProcessor::Unit UnitsVar(OutputProcessor::Unit::None); // Units sting, may be blank
         Array1D<std::string> NamesOfKeys;                                  // Specific key name
-        Array1D_int IndexesForKeyVar;                                // Array index
+        Array1D<int> IndexesForKeyVar;                                // Array index
         int jFld;
         std::string CurrentModuleObject; // for ease in renaming.
 
@@ -2958,7 +2958,7 @@ namespace EconomicTariff {
                             pushStack(ObjexxFCL::abs(a), noVar);
                         } else if (SELECT_CASE_var == opINTEGER) {
                             popStack(a, aPt);
-                            pushStack(Array1D_double(Array1D_int(a)), noVar);
+                            pushStack(Array1D<Real64>(Array1D<int>(a)), noVar);
                         } else if (SELECT_CASE_var == opSIGN) {
                             popStack(a, aPt);
                             pushStack(sign(1.0, a), noVar);
@@ -3652,7 +3652,7 @@ namespace EconomicTariff {
         int indexInQual;
         Array1D<Real64> sourceVals(MaxNumMonths);
         Array1D<Real64> thresholdVals(MaxNumMonths);
-        Array1D_int monthsQualify(MaxNumMonths);
+        Array1D<int> monthsQualify(MaxNumMonths);
         Array1D<Real64> seasonMask(MaxNumMonths);
         bool curIsMaximum;
         bool curIsConsecutive;
@@ -4201,7 +4201,7 @@ namespace EconomicTariff {
 
         // all arrays are in the format: (row, column)
         Array1D<std::string> columnHead;
-        Array1D_int columnWidth;
+        Array1D<int> columnWidth;
         Array1D<std::string> rowHead;
         Array2D_string tableBody;
         // other local variables
@@ -4689,7 +4689,7 @@ namespace EconomicTariff {
 
         // all arrays are in the format: (row, column)
         Array1D<std::string> columnHead;
-        Array1D_int columnWidth;
+        Array1D<int> columnWidth;
         Array1D<std::string> rowHead;
         Array2D_string tableBody;
         Real64 sumVal;
@@ -4854,8 +4854,8 @@ namespace EconomicTariff {
         int kTariff;
         int lMin;
         int mGroup;
-        Array1D_int groupIndex;     // index number (in tariff) for the group name
-        Array1D_int MinTariffIndex; // tariff index for the Minimum value
+        Array1D<int> groupIndex;     // index number (in tariff) for the group name
+        Array1D<int> MinTariffIndex; // tariff index for the Minimum value
         int numMins;
         int curMinTariffIndex;
         bool isFound;

@@ -164,7 +164,7 @@ namespace DataHeatBalFanSys {
 
     extern EPVector<bool> ZoneMassBalanceFlag;  // zone mass flow balance flag
     extern EPVector<bool> ZoneInfiltrationFlag; // Zone Infiltration flag
-    extern Array1D_int ZoneReOrder;           // zone number reordered for zone mass balance
+    extern Array1D<int> ZoneReOrder;           // zone number reordered for zone mass balance
 
     // REAL Variables for the Heat Balance Simulation
 
@@ -229,8 +229,8 @@ namespace DataHeatBalFanSys {
     extern Array1D<Real64> ZoneWMX; // TEMPORARY ZONE TEMPERATURE TO TEST CONVERGENCE in Exact and Euler method
     extern Array1D<Real64> ZoneWM2; // TEMPORARY ZONE TEMPERATURE at timestep t-2 in Exact and Euler method
     extern Array1D<Real64> ZoneW1;  // Zone temperature at the previous time step used in Exact and Euler method
-    extern Array1D_int TempControlType;
-    extern Array1D_int ComfortControlType;
+    extern Array1D<int> TempControlType;
+    extern Array1D<int> ComfortControlType;
 
     // Types
 

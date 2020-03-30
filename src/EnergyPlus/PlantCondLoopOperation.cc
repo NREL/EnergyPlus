@@ -1121,8 +1121,8 @@ namespace PlantCondLoopOperation {
         std::string CurrentModuleObject;
         static int TotNumLists(0);
         static Array1D<std::string> EquipListsNameList;
-        static Array1D_int EquipListsTypeList;
-        static Array1D_int EquipListsIndexList;
+        static Array1D<int> EquipListsTypeList;
+        static Array1D<int> EquipListsIndexList;
         int iIndex;
         bool firstblank;
 

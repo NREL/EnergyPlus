@@ -104,7 +104,7 @@ namespace BranchInputManager {
         int NumOfMixers;              // Number of Mixers in this connector group
         Array1D<std::string> ConnectorType; // Connector:Splitter or Connector:Mixer
         Array1D<std::string> ConnectorName; // Name for that Connector:Splitter or Connector:Mixer
-        Array1D_int ConnectorMatchNo; // Pointer to index where this Splitter or Mixer matches
+        Array1D<int> ConnectorMatchNo; // Pointer to index where this Splitter or Mixer matches
         // Splitter => Mixer or Mixer => Splitter.  0 indicates no match
 
         // Default Constructor
@@ -223,9 +223,9 @@ namespace BranchInputManager {
                        Array1D<std::string> &CompType,            // Component Type for each item on Branch
                        Array1D<std::string> &CompName,            // Component Name for each item on Branch
                        Array1D<std::string> &CompInletNodeNames,  // Component Inlet Node IDs for each item on Branch
-                       Array1D_int &CompInletNodeNums,      // Component Inlet Node Numbers for each item on Branch
+                       Array1D<int> &CompInletNodeNums,      // Component Inlet Node Numbers for each item on Branch
                        Array1D<std::string> &CompOutletNodeNames, // Component Outlet Node IDs for each item on Branch
-                       Array1D_int &CompOutletNodeNums,     // Component Outlet Node Numbers for each item on Branch
+                       Array1D<int> &CompOutletNodeNums,     // Component Outlet Node Numbers for each item on Branch
                        bool &ErrorsFound);
 
     int NumCompsInBranch(std::string const &BranchName);
@@ -266,7 +266,7 @@ namespace BranchInputManager {
                       int &OutletNodeNum,                   // Outlet Node Number
                       int &NumInletNodes,                   // Number of Inlet Nodes
                       Array1D<std::string> &InletNodeNames,        // Inlet Node IDs
-                      Array1D_int &InletNodeNums,            // Inlet Node Numbers
+                      Array1D<int> &InletNodeNums,            // Inlet Node Numbers
                       bool &ErrorsFound,
                       Optional_int_const ConnectorNumber = _, // number of the current item in connector list
                       Optional_int MixerNumber = _            // Mixer number for this specific splitter
@@ -280,7 +280,7 @@ namespace BranchInputManager {
                          int &InletNodeNum,                    // Inlet Node Number
                          int &NumOutletNodes,                  // Number of Outlet Nodes
                          Array1D<std::string> &OutletNodeNames,       // Outlet Node IDs
-                         Array1D_int &OutletNodeNums,           // Outlet Node Numbers
+                         Array1D<int> &OutletNodeNums,           // Outlet Node Numbers
                          bool &ErrorsFound,
                          Optional_int_const ConnectorNumber = _, // number of the current item in connector list
                          Optional_int SplitterNumber = _         // splitter number for this specific splitter
@@ -301,7 +301,7 @@ namespace BranchInputManager {
                               Array1D<std::string> &Alphas,
                               Array1D<std::string> &cAlphaFields,
                               int const NumAlphas,
-                              Array1D_int &NodeNums,
+                              Array1D<int> &NodeNums,
                               EPVector<bool> &lAlphaBlanks);
 
     void GetBranchListInput();

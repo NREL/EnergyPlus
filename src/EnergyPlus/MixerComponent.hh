@@ -91,7 +91,7 @@ namespace MixerComponent {
         Real64 OutletMassFlowRateMinAvail; // [kg/Sec]
         bool InitFlag;
         int NumInletNodes;
-        Array1D_int InletNode;
+        Array1D<int> InletNode;
         Array1D<Real64> InletMassFlowRate;
         Array1D<Real64> InletMassFlowRateMaxAvail;
         Array1D<Real64> InletMassFlowRateMinAvail;

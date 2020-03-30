@@ -148,7 +148,7 @@ namespace ScheduleManager {
         // Members
         std::string Name;               // Week Schedule Name
         bool Used;                      // Indicator for this schedule being "used".
-        Array1D_int DaySchedulePointer; // Index of Day Schedule
+        Array1D<int> DaySchedulePointer; // Index of Day Schedule
 
         // Default Constructor
         WeekScheduleData() : Used(false), DaySchedulePointer(MaxDayTypes, 0)
@@ -161,7 +161,7 @@ namespace ScheduleManager {
         // Members
         std::string Name;                // Schedule Name
         int ScheduleTypePtr;             // Index of Schedule Type
-        Array1D_int WeekSchedulePointer; // one created for each day of possible simulation
+        Array1D<int> WeekSchedulePointer; // one created for each day of possible simulation
         int SchType;                     // what kind of object has been input.
         bool Used;                       // Indicator for this schedule being "used".
         bool MaxMinSet;                  // Max/min values have been stored for this schedule

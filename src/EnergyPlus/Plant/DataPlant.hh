@@ -143,7 +143,7 @@ namespace DataPlant {
 
     extern Array1D<std::string> const ccSimPlantEquipTypes;
 
-    extern Array1D_int const ValidLoopEquipTypes;
+    extern Array1D<int> const ValidLoopEquipTypes;
 
     extern int const TypeOf_Other;
     extern int const TypeOf_Boiler_Simple;

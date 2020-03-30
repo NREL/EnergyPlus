@@ -67,7 +67,7 @@ TEST(WindowRoutines, EffectiveOpennessHorizontalVenetianBlind_0_deg)
         int const nlayer = 1;
         Real64 const width = 1;
         Real64 const height = 1;
-        Array1D_int LayerType(nlayer);
+        Array1D<int> LayerType(nlayer);
 
         EPVector<Real64> Atop_eff(nlayer, 0.0);
         EPVector<Real64> Abot_eff(nlayer, 0.0);
@@ -100,7 +100,7 @@ TEST(WindowRoutines, EffectiveOpennessVerticalVenetianBlind_0_deg)
         int const nlayer = 1;
         Real64 const width = 1;
         Real64 const height = 1;
-        Array1D_int LayerType(nlayer);
+        Array1D<int> LayerType(nlayer);
 
         EPVector<Real64> Atop_eff(nlayer, 0.0);
         EPVector<Real64> Abot_eff(nlayer, 0.0);
@@ -133,7 +133,7 @@ TEST(WindowRoutines, EffectiveOpennessHorizontalVenetianBlind_45_deg)
         int const nlayer = 1;
         Real64 const width = 1;
         Real64 const height = 1;
-        Array1D_int LayerType(nlayer);
+        Array1D<int> LayerType(nlayer);
 
         EPVector<Real64> Atop_eff(nlayer, 0.0);
         EPVector<Real64> Abot_eff(nlayer, 0.0);
@@ -166,7 +166,7 @@ TEST(WindowRoutines, EffectiveOpennessVerticalVenetianBlind_45_deg)
         int const nlayer = 1;
         Real64 const width = 1;
         Real64 const height = 1;
-        Array1D_int LayerType(nlayer);
+        Array1D<int> LayerType(nlayer);
 
         EPVector<Real64> Atop_eff(nlayer, 0.0);
         EPVector<Real64> Abot_eff(nlayer, 0.0);
@@ -199,7 +199,7 @@ TEST(WindowRoutines, EffectiveOpennessOtherShades)
         int const nlayer = 1;
         Real64 const width = 1;
         Real64 const height = 1;
-        Array1D_int LayerType(nlayer);
+        Array1D<int> LayerType(nlayer);
 
         EPVector<Real64> Atop_eff(nlayer, 0.0);
         EPVector<Real64> Abot_eff(nlayer, 0.0);

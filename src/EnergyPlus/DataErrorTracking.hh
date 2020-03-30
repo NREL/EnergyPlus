@@ -96,7 +96,7 @@ namespace DataErrorTracking {
     // na
 
     // MODULE VARIABLE DECLARATIONS:
-    extern Array1D_int MatchCounts;
+    extern Array1D<int> MatchCounts;
     extern bool AbortProcessing;                // Flag used to if currently in "abort processing"
     extern int NumRecurringErrors;              // Number of stored recurring error messages
     extern int TotalSevereErrors;               // Counter

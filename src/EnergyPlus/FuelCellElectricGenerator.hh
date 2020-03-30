@@ -112,7 +112,7 @@ namespace FuelCellElectricGenerator {
         Real64 TotFuelInEnthalphy; // Enthalpy of fuel coming into FCPM (watts)
         Real64 NdotProdGas;        // (kmol/sec)
         Array1D<Real64> ConstitMolalFract;
-        Array1D_int GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
+        Array1D<int> GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
         Real64 TprodGasLeavingFCPM;
         Real64 NdotAir;           // molar air use rate    (kmol/sec)
         Real64 TotAirInEnthalphy; // Enthalpy of air coming nto FCPM energy balance (watts)
@@ -161,7 +161,7 @@ namespace FuelCellElectricGenerator {
         Array1D<std::string> ConstitName;
         Array1D<Real64> ConstitMolalFract;
         // Calculated values and input from elsewhere
-        Array1D_int GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
+        Array1D<int> GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
         Real64 O2fraction;
         Real64 TairIntoBlower;  // temperature entering blower
         Real64 TairIntoFCPM;    // temperature leaving blower and entering FCPM
@@ -223,7 +223,7 @@ namespace FuelCellElectricGenerator {
         Real64 TauxMix;
         Real64 NdotAuxMix;
         Array1D<Real64> ConstitMolalFract;
-        Array1D_int GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
+        Array1D<int> GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
         Real64 QskinLoss;     // Heat lost to room
         Real64 QairIntake;    // heat into intake air
 
@@ -274,7 +274,7 @@ namespace FuelCellElectricGenerator {
         Real64 WaterVaporFractExh; // water vapor fraction in exhaust gas stream.
         Real64 CondensateRate;     // water condensation rate.
         Array1D<Real64> ConstitMolalFract;
-        Array1D_int GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
+        Array1D<int> GasLibID; // lookup ID in Gas Phase ThermoChemistry Structure Array
         Real64 NdotHXleaving;
         Real64 WaterOutletTemp;
         Real64 WaterOutletEnthalpy;

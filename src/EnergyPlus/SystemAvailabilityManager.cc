@@ -185,7 +185,7 @@ namespace SystemAvailabilityManager {
     int const SysAvailMgr_HybridVent(11);
 
     int const SysAvailMgr_OptimumStart(12);
-    Array1D_int const ValidSysAvailManagerTypes(NumValidSysAvailManagerTypes,
+    Array1D<int> const ValidSysAvailManagerTypes(NumValidSysAvailManagerTypes,
                                                 {SysAvailMgr_Scheduled,
                                                  SysAvailMgr_ScheduledOn,
                                                  SysAvailMgr_ScheduledOff,
@@ -2534,7 +2534,7 @@ namespace SystemAvailabilityManager {
         NCycSysAvailMgrData(SysAvailNum).PriorAvailStatus = AvailStatus;
     }
 
-    bool CoolingZoneOutOfTolerance(Array1D_int const ZonePtrList, // list of controlled zone pointers
+    bool CoolingZoneOutOfTolerance(Array1D<int> const ZonePtrList, // list of controlled zone pointers
                                    int const NumZones,            // number of zones in list
                                    Real64 const TempTolerance     // temperature tolerance
     )
@@ -2559,7 +2559,7 @@ namespace SystemAvailabilityManager {
         return false;
     }
 
-    bool HeatingZoneOutOfTolerance(Array1D_int const ZonePtrList, // list of controlled zone pointers
+    bool HeatingZoneOutOfTolerance(Array1D<int> const ZonePtrList, // list of controlled zone pointers
                                    int const NumZones,            // number of zones in list
                                    Real64 const TempTolerance     // temperature tolerance
     )

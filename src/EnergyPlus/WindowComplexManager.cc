@@ -222,7 +222,7 @@ namespace WindowComplexManager {
         int NumStates;          // Local variable for the number of states
         static int MatrixNo(0); // Index of Basis matrix
         EPVector<Real64> Thetas; // temp array holding theta values
-        Array1D_int NPhis;      // temp array holding number of phis for a given theta
+        Array1D<int> NPhis;      // temp array holding number of phis for a given theta
         EPVector<Real64> V(3);   // vector array
         Real64 VLen;            // Length of vector array
         int NHold;              // No. values in the Temporary array
@@ -973,7 +973,7 @@ namespace WindowComplexManager {
         int IBm;                 // index of beam ray in incoming basis
         int BkIncRay;            // index of sun dir in back incidence basis
         bool RegWindFnd;         // flag for regular exterior back surf window
-        Array1D_int RegWinIndex; // bk surf nos of reg windows
+        Array1D<int> RegWinIndex; // bk surf nos of reg windows
         static int NRegWin(0);   // no reg windows found as back surfaces
         static int KRegWin(0);   // index of reg window as back surface
         Real64 Refl;             // temporary reflectance
@@ -1316,7 +1316,7 @@ namespace WindowComplexManager {
         static Real64 LowerTheta(0.0); // Lower theta boundary of the element
         static Real64 UpperTheta(0.0); // Upper theta boundary of the element
         EPVector<Real64> Thetas;        // temp array holding theta values
-        Array1D_int NPhis;             // temp array holding number of phis for a given theta
+        Array1D<int> NPhis;             // temp array holding number of phis for a given theta
 
         NThetas = Construct(IConst).BSDFInput.BasisMatNrows; // Note here assuming row by row input
         Basis.NThetas = NThetas;
@@ -1619,15 +1619,15 @@ namespace WindowComplexManager {
         Real64 HitDsq;               // Squared distance to current hit pt
         Real64 LeastHitDsq;          // Squared distance to closest hit pt
         EPVector<Real64> V(3);        // vector array
-        Array1D_int TmpRfSfInd;      // Temporary RefSurfIndex
-        Array1D_int TmpRfRyNH;       // Temporary RefRayNHits
+        Array1D<int> TmpRfSfInd;      // Temporary RefSurfIndex
+        Array1D<int> TmpRfRyNH;       // Temporary RefRayNHits
         Array2D_int TmpHSurfNo;      // Temporary HitSurfNo
         Array2D<Real64> TmpHSurfDSq; // Temporary HitSurfDSq
-        Array1D_int TmpSkyInd;       // Temporary sky index list
-        Array1D_int TmpGndInd;       // Temporary gnd index list
+        Array1D<int> TmpSkyInd;       // Temporary sky index list
+        Array1D<int> TmpGndInd;       // Temporary gnd index list
         Array2D_int TmpSurfInt;      // Temporary index of ray intersecing back surf
         Array2D<Real64> TmpSjdotN;   // Temporary dot prod of ray angle w bk surf norm
-        Array1D_int ITemp1D;         // Temporary INT 1D array
+        Array1D<int> ITemp1D;         // Temporary INT 1D array
         Array2D<Real64> Temp2D;      // Temporary real 2D array
         Real64 TransRSurf;           // Norminal transmittance of shading surface
         Real64 WtSum;                // Sum for normalizing various weights
@@ -3021,7 +3021,7 @@ namespace WindowComplexManager {
         static EPVector<Real64> scon(maxlay, 0.0);     // Vector of conductivities of each glazing layer  [W/m.K] {maxlay}
         static EPVector<Real64> tir(maxlay * 2, 0.0);  // Vector of IR transmittances of each layer {2*maxlay - 2 surfaces per layer}
         static EPVector<Real64> emis(maxlay * 2, 0.0); // Vector of IR emittances of each surface {2*maxlay - 2 surfaces per layer}
-        static Array1D_int SupportPlr(maxlay, 0);     // Shows whether or not gap have support pillar
+        static Array1D<int> SupportPlr(maxlay, 0);     // Shows whether or not gap have support pillar
         // 0 - does not have support pillar
         // 1 - have support pillar
         static EPVector<Real64> PillarSpacing(maxlay, 0.0); // Pillar spacing for each gap (used in case there is support pillar)
@@ -3062,10 +3062,10 @@ namespace WindowComplexManager {
         static EPVector<Real64> wght(maxgas, 0.0); // Vector of Molecular weights for gasses {maxgas}
         static EPVector<Real64> gama(maxgas, 0.0); // Vector of spefic heat ration for low pressure calc {maxgas}
         static bool feedData(false);              // flag to notify if data needs to be feed into gas arrays
-        static Array1D_int nmix(maxlay + 1, 0);   // Vector of number of gasses in gas mixture of each gap {maxlay+1}
+        static Array1D<int> nmix(maxlay + 1, 0);   // Vector of number of gasses in gas mixture of each gap {maxlay+1}
         static Real64 hin(0.0);                   // Indoor combined film coefficient (if non-zero) [W/m^2.K]
         static Real64 hout(0.0);                  // Outdoor combined film coefficient (if non-zero) [W/m^2.K]
-        static Array1D_int ibc(2, 0);             // Vector of boundary condition flags (ibc(1) - outdoor, ibc(2) - indoor)
+        static Array1D<int> ibc(2, 0);             // Vector of boundary condition flags (ibc(1) - outdoor, ibc(2) - indoor)
         //             0 - h to be calculated;
         //             1 - combined film coefficient (h) prescribed;
         //             2 - convective film coefficient (hc) prescribed.
@@ -3093,12 +3093,12 @@ namespace WindowComplexManager {
         //               outdoor and indoor environment [m/s] {maxlay+1} ***
         static EPVector<Real64> tvent(maxlay + 1, 0.0); // Vector of temperatures of ventilation gas for forced ventilation, for each
         //  gap, and for outdoor and indoor environment [K] {maxlay+1}
-        static Array1D_int LayerType(maxlay, 0); // Glazing layer type flag {maxlay}:
+        static Array1D<int> LayerType(maxlay, 0); // Glazing layer type flag {maxlay}:
         //                 0 - Specular layer,
         //                 1 - Venetian blind (SD)
         //                 2 - Woven shade (SD) (not implemented)
         //                 3 - Diffuse shade (not implemented)
-        static Array1D_int nslice(maxlay, 0); // Vector of numbers of slices in a laminated glazing layers
+        static Array1D<int> nslice(maxlay, 0); // Vector of numbers of slices in a laminated glazing layers
         //   (0 - monolithic layer) {maxlay}
         static EPVector<Real64> LaminateA(maxlay, 0.0); // Left-hand side array for creating slice equations {maxlay}
         static EPVector<Real64> LaminateB(maxlay, 0.0); // Right-hand side array for creating slice equations {maxlay}
@@ -3180,8 +3180,8 @@ namespace WindowComplexManager {
 
         static EPVector<Real64> deltaTemp(100, 0.0);
         int i;
-        static Array1D_int iMinDT(1, 0);
-        static Array1D_int IDConst(100, 0);
+        static Array1D<int> iMinDT(1, 0);
+        static Array1D<int> IDConst(100, 0);
 
         int TotLay; // Total number of layers in a construction
         //   (sum of solid layers and gap layers)

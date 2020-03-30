@@ -93,7 +93,7 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_SingleComponentBranch)
     bool IsNotOK;            // Flag to verify name
     bool IsBlank;            // Flag for blank name
     Array1D<std::string> Alphas;   // Used to retrieve names from IDF
-    Array1D_int NodeNums;    // Possible Array of Node Numbers (only 1 allowed)
+    Array1D<int> NodeNums;    // Possible Array of Node Numbers (only 1 allowed)
     Array1D<Real64> Numbers; // Used to retrieve numbers from IDF
     Array1D<std::string> cAlphaFields;
     Array1D<std::string> cNumericFields;
@@ -252,7 +252,7 @@ TEST_F(EnergyPlusFixture, GetBranchInput_One_FourComponentBranch)
     bool IsNotOK;            // Flag to verify name
     bool IsBlank;            // Flag for blank name
     Array1D<std::string> Alphas;   // Used to retrieve names from IDF
-    Array1D_int NodeNums;    // Possible Array of Node Numbers (only 1 allowed)
+    Array1D<int> NodeNums;    // Possible Array of Node Numbers (only 1 allowed)
     Array1D<Real64> Numbers; // Used to retrieve numbers from IDF
     Array1D<std::string> cAlphaFields;
     Array1D<std::string> cNumericFields;

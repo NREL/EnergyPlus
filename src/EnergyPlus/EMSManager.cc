@@ -1324,7 +1324,7 @@ namespace EMSManager {
         OutputProcessor::TimeStepType StepType;
         OutputProcessor::Unit Units(OutputProcessor::Unit::None);
         Array1D<std::string> KeyName;
-        Array1D_int KeyIndex;
+        Array1D<int> KeyIndex;
         bool Found;
 
         // FLOW:

@@ -106,11 +106,11 @@ namespace DataDefineEquip {
         int NumComponents;        // number of subcomponents (=1)
         int NumControls;          // number of controls (not used; =0)
         Array1D<std::string> EquipType; // Pointer indentifying type of subcomponent
-        Array1D_int EquipType_Num;
+        Array1D<int> EquipType_Num;
         ///// Note use of shared_ptr here is not a good pattern, not to be replicated without further discussion.
         std::shared_ptr<AirTerminalUnit> airTerminalPtr;
         Array1D<std::string> EquipName; // name of subcomponent
-        Array1D_int EquipIndex;
+        Array1D<int> EquipIndex;
         int AirTerminalSizingSpecIndex; // index to DesignSpecification:AirTerminal:Sizing obect
         int TermUnitSizingNum;          // index to TermUnitSizing and TermUnitFinalZoneSizing for this air distribution unit
         Real64 UpStreamLeakFrac;        // upstream nominal leakage fraction

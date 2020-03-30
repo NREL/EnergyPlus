@@ -3488,7 +3488,7 @@ TEST_F(EnergyPlusFixture, UnitarySystemModel_ConfirmUnitarySystemSizingTest)
     int iCoolingSizingType(1);
     int iHeatingSizingType(1);
     bool FirstHVACIteration(true);
-    Array1D_int SizingTypes({DataSizing::None,
+    Array1D<int> SizingTypes({DataSizing::None,
                              DataSizing::SupplyAirFlowRate,
                              DataSizing::FlowPerFloorArea,
                              DataSizing::FractionOfAutosizedCoolingAirflow,

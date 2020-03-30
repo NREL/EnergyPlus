@@ -134,7 +134,7 @@ namespace LowTempRadiantSystem {
         int ZonePtr;                     // Point to this zone in the Zone derived type
         std::string SurfListName;        // Name of surface/surface list that is the radiant system
         int NumOfSurfaces;               // Number of surfaces included in this radiant system (coordinated control)
-        Array1D_int SurfacePtr;          // Pointer to the surface(s) in the Surface derived type
+        Array1D<int> SurfacePtr;          // Pointer to the surface(s) in the Surface derived type
         Array1D<std::string> SurfaceName;      // Name of surfaces that are the radiant system (can be one or more)
         Array1D<Real64> SurfaceFlowFrac; // Fraction of flow/pipe length for a particular surface
         Array1D<Real64> NumCircuits;     // Number of fluid circuits in the surface
@@ -222,7 +222,7 @@ namespace LowTempRadiantSystem {
         int ZonePtr;                     // Point to this zone in the Zone derived type
         std::string SurfListName;        // Name of surface/surface list that is the radiant system
         int NumOfSurfaces;               // Number of surfaces included in this radiant system (coordinated control)
-        Array1D_int SurfacePtr;          // Pointer to the surface(s) in the Surface derived type
+        Array1D<int> SurfacePtr;          // Pointer to the surface(s) in the Surface derived type
         Array1D<std::string> SurfaceName;      // Name of surfaces that are the radiant system (can be one or more)
         Array1D<Real64> SurfaceFlowFrac; // Fraction of flow/pipe length for a particular surface
         Array1D<Real64> NumCircuits;     // Number of fluid circuits in the surface
@@ -339,7 +339,7 @@ namespace LowTempRadiantSystem {
         int ZonePtr;                      // Point to this zone in the Zone derived type
         std::string SurfListName;         // Name of surface/surface list that is the radiant system
         int NumOfSurfaces;                // Number of surfaces included in this radiant system (coordinated control)
-        Array1D_int SurfacePtr;           // Pointer to the surface(s) in the Surface derived type
+        Array1D<int> SurfacePtr;           // Pointer to the surface(s) in the Surface derived type
         Array1D<std::string> SurfaceName;       // Name of surfaces that are the radiant system (can be one or more)
         Array1D<Real64> SurfacePowerFrac; // Fraction of total power input to surface
         Real64 TotalSurfaceArea;          // Total surface area for all surfaces that are part of this radiant system

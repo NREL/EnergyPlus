@@ -153,7 +153,7 @@ namespace DataRoomAirModel {
     // MODULE VARIABLE DECLARATIONS:
     extern int TotNumOfAirNodes;
     extern int TotNumOfRoomAFNNodes;
-    extern Array1D_int TotNumOfZoneAirNodes;
+    extern Array1D<int> TotNumOfZoneAirNodes;
     extern Array1D<Real64> ConvectiveFloorSplit;
     extern Array1D<Real64> InfiltratFloorSplit;
     // UCSD
@@ -169,7 +169,7 @@ namespace DataRoomAirModel {
     extern Array1D<Real64> ZTFloor;
     extern Array1D<Real64> HeightTransition;
     extern Array1D<Real64> FracMinFlow;
-    extern Array1D_int ZoneDVMixedFlag;
+    extern Array1D<int> ZoneDVMixedFlag;
     extern Array1D<Real64> ZoneDVMixedFlagRep;
     extern EPVector<bool> ZoneAirSystemON;
     extern Array1D<Real64> TCMF; // comfort temperature
@@ -254,9 +254,9 @@ namespace DataRoomAirModel {
     extern int TotUCSDUI;         // total number of UCSDUI zones
     extern int TotUCSDUE;         // total number of UCSDUE zones
     extern EPVector<bool> IsZoneUI; // controls program flow, for interior or exterior UFAD model
-    extern Array1D_int ZoneUFPtr;
+    extern Array1D<int> ZoneUFPtr;
     extern Array1D<Real64> UFHcIn;
-    extern Array1D_int ZoneUFMixedFlag;
+    extern Array1D<int> ZoneUFMixedFlag;
     extern Array1D<Real64> ZoneUFMixedFlagRep;
     extern Array1D<Real64> ZoneUFGamma;
     extern Array1D<Real64> ZoneUFPowInPlumes;            // [W]
@@ -472,7 +472,7 @@ namespace DataRoomAirModel {
         Array1D<Real64> DeltaTai; // (Tai - MAT ) offset from mean air temp
         int NumSurfs;             // number of surfaces in this pattern
         // calculated and from elsewhere
-        Array1D_int SurfID; // index in HB surface structure array
+        Array1D<int> SurfID; // index in HB surface structure array
 
         // Default Constructor
         SurfMapPattern() : NumSurfs(0)
@@ -578,7 +578,7 @@ namespace DataRoomAirModel {
         // calculated and from elsewhere
         Real64 ZoneHeight;                      // in meters, from Zone%CeilingHeight
         int ZoneNodeID;                         // index in Node array for this zone
-        Array1D_int ExhaustAirNodeID;           // indexes in Node array
+        Array1D<int> ExhaustAirNodeID;           // indexes in Node array
         Real64 TairMean;                        // comes from MAT
         Real64 Tstat;                           // temperature for thermostat
         Real64 Tleaving;                        // temperature for return air node

@@ -217,10 +217,10 @@ namespace Psychrometrics {
     // MODULE VARIABLE DEFINITIONS:
     std::string String;
     bool ReportErrors(true);
-    Array1D_int iPsyErrIndex(NumPsychMonitors, 0); // Number of times error occurred
+    Array1D<int> iPsyErrIndex(NumPsychMonitors, 0); // Number of times error occurred
 #ifdef EP_psych_stats
     Array1D<Int64> NumTimesCalled(NumPsychMonitors, 0);
-    Array1D_int NumIterations(NumPsychMonitors, 0);
+    Array1D<int> NumIterations(NumPsychMonitors, 0);
 #endif
 
     // Object Data
@@ -244,10 +244,10 @@ namespace Psychrometrics {
     {
         String = "";
         ReportErrors = true;
-        iPsyErrIndex = Array1D_int(NumPsychMonitors, 0);
+        iPsyErrIndex = Array1D<int>(NumPsychMonitors, 0);
 #ifdef EP_psych_stats
         NumTimesCalled = Array1D<Int64>(NumPsychMonitors, 0);
-        NumIterations = Array1D_int(NumPsychMonitors, 0);
+        NumIterations = Array1D<int>(NumPsychMonitors, 0);
 #endif
 #ifdef EP_cache_PsyTwbFnTdbWPb
         cached_Twb.deallocate();

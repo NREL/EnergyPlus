@@ -509,7 +509,7 @@ namespace DataHeatBalance {
     extern Array1D<Real64> QRadSWOutIncSkyDiffReflObs; // Exterior diffuse solar incident from sky diffuse
     // reflection from obstructions (W/m2)
     extern Array1D<Real64> CosIncidenceAngle; // Cosine of beam solar incidence angle (for reporting)
-    extern Array1D_int BSDFBeamDirectionRep;  // BSDF beam direction number for given complex fenestration state (for reporting) []
+    extern Array1D<int> BSDFBeamDirectionRep;  // BSDF beam direction number for given complex fenestration state (for reporting) []
     extern Array1D<Real64> BSDFBeamThetaRep;  // BSDF beam Theta angle (for reporting) [rad]
     extern Array1D<Real64> BSDFBeamPhiRep;    // BSDF beam Phi angle (for reporting) [rad]
 
@@ -650,7 +650,7 @@ namespace DataHeatBalance {
         // based on the water vapor density (kg/kgK)
         Real64 Thickness;    // Layer thickness (m)
         Real64 VaporDiffus;  // Layer vapor diffusivity
-        Array1D_int GasType; // Gas type (air=1, argon=2, krypton=3, xenon=4, custom=0) for
+        Array1D<int> GasType; // Gas type (air=1, argon=2, krypton=3, xenon=4, custom=0) for
         //  up to 5 gases in a mixture [Window gas only].  It is defined as parameter (GasCoefs)
         int GlassSpectralDataPtr;         // Number of a spectral data set associated with a window glass material
         int NumberOfGasesInMixture;       // Number of gases in a window gas mixture
@@ -855,7 +855,7 @@ namespace DataHeatBalance {
         // Members
         std::string Name;         // Name
         int NumGlzMat;            // Number of TC glazing materials
-        Array1D_int LayerPoint;   // Layer pointer
+        Array1D<int> LayerPoint;   // Layer pointer
         Array1D<Real64> SpecTemp; // Temperature corresponding to the specified TC glazing optical data
         Array1D<std::string> LayerName; // Name of the referenced WindowMaterial:Glazing object
 
@@ -873,7 +873,7 @@ namespace DataHeatBalance {
         //  this is the total of the glass, gas and shade layers
         int TotSolidLayers;     // Total number of solid (glass or shade) layers (windows only)
         int TotGlassLayers;     // Total number of glass layers (windows only)
-        Array1D_int LayerPoint; // Pointer array which refers back to
+        Array1D<int> LayerPoint; // Pointer array which refers back to
         // the Material structure; LayerPoint(i)=j->Material(j)%Name,etc
         bool IsUsed;                // Marked true when the construction is used
         bool IsUsedCTF;             // Mark true when the construction is used for a surface with CTF calculations
@@ -1274,7 +1274,7 @@ namespace DataHeatBalance {
         std::string Name;                         // Zone List name
         int NumOfZones;                           // Number of zones in the list
         std::string::size_type MaxZoneNameLength; // Max Name length of zones in the list
-        Array1D_int Zone;                         // Pointers to zones in the list
+        Array1D<int> Zone;                         // Pointers to zones in the list
 
         // Default Constructor
         ZoneListData() : NumOfZones(0), MaxZoneNameLength(0u)
@@ -1739,8 +1739,8 @@ namespace DataHeatBalance {
         Real64 ERVMassFlowRate;     // unbalanced mass flow rate from stand-alone ERV
         bool OneTimeFlag;           // One time flag to get nodes of stand alone ERV
         int NumOfERVs;              // Number of zone stand alone ERVs
-        Array1D_int ERVInletNode;   // Stand alone ERV supply air inlet nodes
-        Array1D_int ERVExhaustNode; // Stand alone ERV air exhaust nodes
+        Array1D<int> ERVInletNode;   // Stand alone ERV supply air inlet nodes
+        Array1D<int> ERVExhaustNode; // Stand alone ERV air exhaust nodes
 
         // Default Constructor
         ZoneAirBalanceData()
@@ -1784,11 +1784,11 @@ namespace DataHeatBalance {
         Array1D<bool> EMSRefDoorMixingOn;
         Array1D<Real64> EMSRefDoorFlowRate;
         Array1D<Real64> VolRefDoorFlowRate;
-        Array1D_int OpenSchedPtr;            // Schedule for Refrigeration door open fraction
+        Array1D<int> OpenSchedPtr;            // Schedule for Refrigeration door open fraction
         Array1D<Real64> DoorHeight;          // Door height for refrigeration door, m
         Array1D<Real64> DoorArea;            // Door area for refrigeration door, m2
         Array1D<Real64> Protection;          // Refrigeration door protection factor, dimensionless
-        Array1D_int MateZonePtr;             // Zone connected by refrigeration door (MateZone > ZonePtr)
+        Array1D<int> MateZonePtr;             // Zone connected by refrigeration door (MateZone > ZonePtr)
         Array1D<std::string> DoorMixingObjectName; // Used in one error statement and eio
         Array1D<std::string> DoorProtTypeName;     // Used in eio
                                              // Note, for mixing and crossmixing, this type dimensioned by number of mixing objects.
@@ -1836,8 +1836,8 @@ namespace DataHeatBalance {
         int InfiltrationPtr;                   // pointer to infiltration object
         Real64 InfiltrationMassFlowRate;       // infiltration added to enforced source zone mass balance, kg/s
         int IncludeInfilToZoneMassBal;         // not self-balanced, include infiltration in zone air mass balance
-        Array1D_int ZoneMixingSourcesPtr;      // source zones pointer
-        Array1D_int ZoneMixingReceivingPtr;    // receiving zones pointer
+        Array1D<int> ZoneMixingSourcesPtr;      // source zones pointer
+        Array1D<int> ZoneMixingReceivingPtr;    // receiving zones pointer
         Array1D<Real64> ZoneMixingReceivingFr; // receiving zones fraction
                                                // Note, this type dimensioned by number of zones
 

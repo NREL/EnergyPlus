@@ -2829,11 +2829,11 @@ namespace DaylightingManager {
         // temporary arrays for surfaces
         // Each complex fenestration state can have different number of basis elements
         // This is the reason for making these temporary arrays local
-        Array1D_int TmpSkyInd(NBasis, 0);                      // Temporary sky index list
-        Array1D_int TmpGndInd(NBasis, 0);                      // Temporary gnd index list
+        Array1D<int> TmpSkyInd(NBasis, 0);                      // Temporary sky index list
+        Array1D<int> TmpGndInd(NBasis, 0);                      // Temporary gnd index list
         Array1D<Real64> TmpGndMultiplier(NBasis, 0.0);         // Temporary ground obstruction multiplier
-        Array1D_int TmpRfSfInd(NBasis, 0);                     // Temporary RefSurfIndex
-        Array1D_int TmpRfRyNH(NBasis, 0);                      // Temporary RefRayNHits
+        Array1D<int> TmpRfSfInd(NBasis, 0);                     // Temporary RefSurfIndex
+        Array1D<int> TmpRfRyNH(NBasis, 0);                      // Temporary RefRayNHits
         Array2D_int TmpHSurfNo(TotSurfaces, NBasis, 0);        // Temporary HitSurfNo
         Array2D<Real64> TmpHSurfDSq(TotSurfaces, NBasis, 0.0); // Temporary HitSurfDSq
 
@@ -4778,7 +4778,7 @@ namespace DaylightingManager {
 
         static ObjexxFCL::gio::Fmt fmtA("(A)");
 
-        Array1D_int ZoneMapCount;
+        Array1D<int> ZoneMapCount;
         int MapNum;
         int IOStat;
         int NumAlpha;
@@ -10436,7 +10436,7 @@ namespace DaylightingManager {
 
         using General::RoundSigDigits;
 
-        Array1D_int ZoneExtWin;
+        Array1D<int> ZoneExtWin;
         int WinSize;
         int RefSize;
         int MapNum;

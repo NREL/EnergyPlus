@@ -184,7 +184,7 @@ namespace DataRuntimeLanguage {
     // INTERFACE BLOCK SPECIFICATIONS: na
 
     // MODULE VARIABLE DECLARATIONS:
-    extern Array1D_int EMSProgram;
+    extern Array1D<int> EMSProgram;
 
     extern int NumProgramCallManagers;      // count of Erl program managers with calling points
     extern int NumSensors;                  // count of EMS sensors used in model (data from output variables)
@@ -334,7 +334,7 @@ namespace DataRuntimeLanguage {
         std::string Name;          // user defined name for calling manager
         int CallingPoint;          // EMS Calling point for this manager, see parameters emsCallFrom*
         int NumErlPrograms;        // count of total number of Erl programs called by this manager
-        Array1D_int ErlProgramARR; // list of integer pointers to Erl programs used by this manager
+        Array1D<int> ErlProgramARR; // list of integer pointers to Erl programs used by this manager
 
         // Default Constructor
         EMSProgramCallManagementType() : CallingPoint(0), NumErlPrograms(0)

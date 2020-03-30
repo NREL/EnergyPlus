@@ -190,7 +190,7 @@ namespace OutputReportTabular {
     extern std::ofstream xml_stream;                   // XML table stream
     extern Array1D<std::ofstream *> TabularOutputFile; // Table stream array
     extern Array1D<std::string> del;                         // the delimiter to use
-    extern Array1D_int TableStyle;                     // see list of parameters
+    extern Array1D<int> TableStyle;                     // see list of parameters
 
     extern Real64 timeInYear;
 
@@ -216,13 +216,13 @@ namespace OutputReportTabular {
     // BEPS Report Related Variables
     // From Report:Table:Predefined - BEPS
     // arrays that hold the meter numbers that are initialized at get input
-    extern Array1D_int meterNumTotalsBEPS;
-    extern Array1D_int meterNumTotalsSource;
+    extern Array1D<int> meterNumTotalsBEPS;
+    extern Array1D<int> meterNumTotalsSource;
     extern EPVector<bool> fuelfactorsused;
     extern EPVector<bool> ffUsed;
     extern Array1D<Real64> SourceFactors;
     extern EPVector<bool> ffSchedUsed;
-    extern Array1D_int ffSchedIndex;
+    extern Array1D<int> ffSchedIndex;
     extern Array2D_int meterNumEndUseBEPS;
     extern Array3D_int meterNumEndUseSubBEPS;
     // arrays that hold the names of the resource and end uses
@@ -243,7 +243,7 @@ namespace OutputReportTabular {
     extern Array2D<Real64> gatherDemandIndEndUse;
     extern Array3D<Real64> gatherDemandEndUseSub;
     extern Array3D<Real64> gatherDemandIndEndUseSub;
-    extern Array1D_int gatherDemandTimeStamp;
+    extern Array1D<int> gatherDemandTimeStamp;
     // to keep track of hours for the BEPS report gathering
     extern Real64 gatherElapsedTimeBEPS;
     // for normalization of results
@@ -310,7 +310,7 @@ namespace OutputReportTabular {
     extern Real64 sourceFactorOtherFuel1;
     extern Real64 sourceFactorOtherFuel2;
 
-    extern Array1D_int td;
+    extern Array1D<int> td;
     //(1)   Current year
     //(2)   Current month
     //(3)   Current day
@@ -529,7 +529,7 @@ namespace OutputReportTabular {
         OutputProcessor::StoreType varAvgSum; // Variable  is Averaged=1 or Summed=2
         OutputProcessor::TimeStepType varStepType;                      // Variable time step is Zone=1 or HVAC=2
         Array1D<std::string> NamesOfKeys;           // keyNames !noel
-        Array1D_int IndexesForKeyVar;         // keyVarIndexes !noel
+        Array1D<int> IndexesForKeyVar;         // keyVarIndexes !noel
 
         // Default Constructor
         MonthlyFieldSetInputType()
@@ -565,7 +565,7 @@ namespace OutputReportTabular {
         int aggType;                       // index to the type of aggregation (see list of parameters)
         Array1D<Real64> reslt;             // monthly results
         Array1D<Real64> duration;          // the time during which results are summed for use in averages
-        Array1D_int timeStamp;             // encoded timestamp of max or min
+        Array1D<int> timeStamp;             // encoded timestamp of max or min
         Real64 aggForStep;                 // holds the aggregation for the HVAC time steps when smaller than
         // the zone timestep
 
@@ -632,7 +632,7 @@ namespace OutputReportTabular {
         Real64 peakDesSensLoad;    // peak design sensible load
         Real64 estInstDelSensLoad; // estimated instant plus delayed sensible load
         Real64 diffPeakEst;        // difference between the peak design sensible load and the estimated instant plus delayed sensible load
-        Array1D_int zoneIndices;   // the zone numbers covered by the report
+        Array1D<int> zoneIndices;   // the zone numbers covered by the report
 
         Real64 outsideAirRatio;   // outside Air
         Real64 floorArea;         // floor area
@@ -885,7 +885,7 @@ namespace OutputReportTabular {
 
     void LoadSummaryUnitConversion(CompLoadTablesType &compLoadTotal);
 
-    void CreateListOfZonesForAirLoop(CompLoadTablesType &compLoad, Array1D_int const &zoneToAirLoop, int const &curAirLoop);
+    void CreateListOfZonesForAirLoop(CompLoadTablesType &compLoad, Array1D<int> const &zoneToAirLoop, int const &curAirLoop);
 
     void OutputCompLoadSummary(int const &kind, // zone=1, airloop=2, facility=3
                                CompLoadTablesType const &compLoadCool,
@@ -901,7 +901,7 @@ namespace OutputReportTabular {
     void WriteTable(Array2S_string const body, // row,column
                     const Array1D<std::string> &rowLabels,
                     const Array1D<std::string> &columnLabels,
-                    Array1D_int &widthColumn,
+                    Array1D<int> &widthColumn,
                     Optional_bool_const transposeXML = _,
                     Optional_string_const footnoteText = _);
 

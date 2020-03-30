@@ -154,12 +154,12 @@ namespace SystemReports {
     extern int MaxCompArraySize;
     extern int DBFlag;
 
-    extern Array1D_int SetBackCounter;
-    extern Array1D_int HeatCoolFlag;
-    extern Array1D_int FirstHeatCoolFlag;
-    extern Array1D_int FirstHeatCoolHour;
-    extern Array1D_int LastHeatCoolFlag;
-    extern Array1D_int LastHeatCoolHour;
+    extern Array1D<int> SetBackCounter;
+    extern Array1D<int> HeatCoolFlag;
+    extern Array1D<int> FirstHeatCoolFlag;
+    extern Array1D<int> FirstHeatCoolHour;
+    extern Array1D<int> LastHeatCoolFlag;
+    extern Array1D<int> LastHeatCoolHour;
     extern EPVector<bool> AirLoopCalcDone;
     extern EPVector<bool> NoLoadFlag;
     extern EPVector<bool> UnmetLoadFlag;

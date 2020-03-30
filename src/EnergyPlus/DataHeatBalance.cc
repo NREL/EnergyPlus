@@ -656,7 +656,7 @@ namespace DataHeatBalance {
     Array1D<Real64> QRadSWOutIncSkyDiffReflObs; // Exterior diffuse solar incident from sky diffuse
     // reflection from obstructions (W/m2)
     Array1D<Real64> CosIncidenceAngle; // Cosine of beam solar incidence angle (for reporting)
-    Array1D_int BSDFBeamDirectionRep;  // BSDF beam direction number for given complex fenestration state (for reporting) []
+    Array1D<int> BSDFBeamDirectionRep;  // BSDF beam direction number for given complex fenestration state (for reporting) []
     Array1D<Real64> BSDFBeamThetaRep;  // BSDF beam Theta angle (for reporting) [rad]
     Array1D<Real64> BSDFBeamPhiRep;    // BSDF beam Phi angle (for reporting) [rad]
 
@@ -1694,7 +1694,7 @@ namespace DataHeatBalance {
         // na
 
         // FUNCTION LOCAL VARIABLE DECLARATIONS:
-        static Array1D_int LayerPoint(MaxLayersInConstruct, 0); // Pointer array which refers back to
+        static Array1D<int> LayerPoint(MaxLayersInConstruct, 0); // Pointer array which refers back to
         int nLayer;
         int Loop;
         bool Found;

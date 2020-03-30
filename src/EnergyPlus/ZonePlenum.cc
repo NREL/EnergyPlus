@@ -331,7 +331,7 @@ namespace ZonePlenum {
         int NumNums;
         int NumArgs;
         int NumNodes;
-        Array1D_int NodeNums;
+        Array1D<int> NodeNums;
         int MaxNums;
         int MaxAlphas;
         int NodeNum;

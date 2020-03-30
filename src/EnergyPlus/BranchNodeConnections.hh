@@ -128,12 +128,12 @@ namespace BranchNodeConnections {
                           bool &IsParent,                    // true or false
                           int &NumInlets,
                           Array1D<std::string> &InletNodeNames,
-                          Array1D_int &InletNodeNums,
-                          Array1D_int &InletFluidStreams,
+                          Array1D<int> &InletNodeNums,
+                          Array1D<int> &InletFluidStreams,
                           int &NumOutlets,
                           Array1D<std::string> &OutletNodeNames,
-                          Array1D_int &OutletNodeNums,
-                          Array1D_int &OutletFluidStreams,
+                          Array1D<int> &OutletNodeNums,
+                          Array1D<int> &OutletFluidStreams,
                           bool &ErrorsFound                  // set to true if errors found, unchanged otherwise
     );
 
@@ -143,9 +143,9 @@ namespace BranchNodeConnections {
                          Array1D<std::string> &ChildrenCType,
                          Array1D<std::string> &ChildrenCName,
                          Array1D<std::string> &InletNodeName,
-                         Array1D_int &InletNodeNum,
+                         Array1D<int> &InletNodeNum,
                          Array1D<std::string> &OutletNodeName,
-                         Array1D_int &OutletNodeNum,
+                         Array1D<int> &OutletNodeNum,
                          bool &ErrorsFound);
 
     void GetChildrenData(std::string const &ComponentType,
@@ -185,7 +185,7 @@ namespace BranchNodeConnections {
                                   Array1D<DataBranchNodeConnections::NodeConnectionDef> const &NodeConnections,
                                   int const NumItems,
                                   int &CountOfItems,            // Number of items found
-                                  Array1D_int &AllNumbersInList // Index array to all numbers found
+                                  Array1D<int> &AllNumbersInList // Index array to all numbers found
     );
 
 } // namespace BranchNodeConnections

@@ -487,11 +487,11 @@ namespace DataHVACGlobals {
 
     // Hybrid ventilation control part
     int NumHybridVentSysAvailMgrs(0);               // Number of hybrid ventilation control
-    Array1D_int HybridVentSysAvailAirLoopNum;       // Airloop number in hybrid vent availability manager
-    Array1D_int HybridVentSysAvailVentCtrl;         // Ventilation control action in hybrid vent availability manager
-    Array1D_int HybridVentSysAvailActualZoneNum;    // Actual zone num in hybrid vent availability manager
-    Array1D_int HybridVentSysAvailANCtrlStatus;     // AN control status in hybrid vent availability manager
-    Array1D_int HybridVentSysAvailMaster;           // Master object name: Ventilation for simple; Zone name for AN
+    Array1D<int> HybridVentSysAvailAirLoopNum;       // Airloop number in hybrid vent availability manager
+    Array1D<int> HybridVentSysAvailVentCtrl;         // Ventilation control action in hybrid vent availability manager
+    Array1D<int> HybridVentSysAvailActualZoneNum;    // Actual zone num in hybrid vent availability manager
+    Array1D<int> HybridVentSysAvailANCtrlStatus;     // AN control status in hybrid vent availability manager
+    Array1D<int> HybridVentSysAvailMaster;           // Master object name: Ventilation for simple; Zone name for AN
     Array1D<Real64> HybridVentSysAvailWindModifier; // Wind modifier for AirflowNetwork
     // For multispeed heat pump only
     Real64 MSHPMassFlowRateLow(0.0);       // Mass flow rate at low speed

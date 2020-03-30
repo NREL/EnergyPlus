@@ -133,7 +133,7 @@ namespace DataZoneEquipment {
     extern bool ZoneEquipInputsFilled;
     extern bool ZoneEquipSimulatedOnce;
     extern int NumOfZoneEquipLists; // The Number of Zone Equipment List objects
-    extern Array1D_int ZoneEquipAvail;
+    extern Array1D<int> ZoneEquipAvail;
 
     // moved from HVACManager.hh to avoid circular call, B Nigusse, 05/14
     extern EPVector<bool> CrossMixingReportFlag; // TRUE when Cross Mixing is active based on controls
@@ -293,17 +293,17 @@ namespace DataZoneEquipment {
         int NumReturnFlowBasisNodes;      // number of return air flow basis nodes
         int ReturnFlowSchedPtrNum;        // return air flow fraction schedule pointer
         bool FlowError;                   // flow error flag
-        Array1D_int InletNode;            // zone supply air inlet nodes
-        Array1D_int InletNodeAirLoopNum;  // air loop number connected to this inlet node (0 if not an airloop node)
-        Array1D_int InletNodeADUNum;      // AirDistUnit connected to this inlet node (0 if not an ADU node, could be zone equip or direct air)
-        Array1D_int ExhaustNode;          // zone air exhaust nodes
-        Array1D_int ReturnNode;           // zone return air nodes (node numbers)
-        Array1D_int ReturnNodeAirLoopNum; // air loop number connected to this return node
-        Array1D_int
+        Array1D<int> InletNode;            // zone supply air inlet nodes
+        Array1D<int> InletNodeAirLoopNum;  // air loop number connected to this inlet node (0 if not an airloop node)
+        Array1D<int> InletNodeADUNum;      // AirDistUnit connected to this inlet node (0 if not an ADU node, could be zone equip or direct air)
+        Array1D<int> ExhaustNode;          // zone air exhaust nodes
+        Array1D<int> ReturnNode;           // zone return air nodes (node numbers)
+        Array1D<int> ReturnNodeAirLoopNum; // air loop number connected to this return node
+        Array1D<int>
             ReturnNodeInletNum; // zone supply air inlet index that matched this return node (same zone, same airloop) - not the inlet node number
         EPVector<bool> FixedReturnFlow;     // true if return node is fixed and cannot be adjusted in CalcZoneReturnFlows
-        Array1D_int ReturnNodePlenumNum; // number of the return plenum attached to this return node (zero if none)
-        Array1D_int ReturnFlowBasisNode; // return air flow basis nodes
+        Array1D<int> ReturnNodePlenumNum; // number of the return plenum attached to this return node (zero if none)
+        Array1D<int> ReturnFlowBasisNode; // return air flow basis nodes
 
         bool ZonalSystemOnly;     // TRUE if served by a zonal system (only)
         bool IsControlled;        // True when this is a controlled zone.
@@ -351,8 +351,8 @@ namespace DataZoneEquipment {
         bool ON;            // When true, the designated component or operation scheme is available
         int NumInlets;
         int NumOutlets;
-        Array1D_int InletNodeNums;
-        Array1D_int OutletNodeNums;
+        Array1D<int> InletNodeNums;
+        Array1D<int> OutletNodeNums;
         int NumMeteredVars;
         Array1D<EquipMeterData> MeteredVar;     // Index of energy output report data
         Array1D<SubEquipmentData> SubEquipData; // Component list
@@ -391,16 +391,16 @@ namespace DataZoneEquipment {
         int NumAvailHeatEquip;                      // Number of pieces of equipment available for heating
         int NumAvailCoolEquip;                      // Number of pieces of equipment available for cooling
         Array1D<std::string> EquipType;
-        Array1D_int EquipType_Num;
+        Array1D<int> EquipType_Num;
         Array1D<std::string> EquipName;
-        Array1D_int EquipIndex;
+        Array1D<int> EquipIndex;
         std::vector<HVACSystemData *> compPointer;
-        Array1D_int CoolingPriority;
-        Array1D_int HeatingPriority;
-        Array1D_int SequentialCoolingFractionSchedPtr;
-        Array1D_int SequentialHeatingFractionSchedPtr;
-        Array1D_int CoolingCapacity;      // Current cooling capacity (negative) [W]
-        Array1D_int HeatingCapacity;      // Current heating capacity (positive) [W]
+        Array1D<int> CoolingPriority;
+        Array1D<int> HeatingPriority;
+        Array1D<int> SequentialCoolingFractionSchedPtr;
+        Array1D<int> SequentialHeatingFractionSchedPtr;
+        Array1D<int> CoolingCapacity;      // Current cooling capacity (negative) [W]
+        Array1D<int> HeatingCapacity;      // Current heating capacity (positive) [W]
         Array1D<EquipmentData> EquipData; // Index of energy output report data
 
         // Default Constructor
@@ -439,16 +439,16 @@ namespace DataZoneEquipment {
         int NumOfComponents;
         int InletNodeNum;
         Array1D<std::string> ComponentType;
-        Array1D_int ComponentType_Num;
+        Array1D<int> ComponentType_Num;
         Array1D<std::string> ComponentName;
-        Array1D_int ComponentIndex;
-        Array1D_int SplitterIndex;
-        Array1D_int PlenumIndex;
+        Array1D<int> ComponentIndex;
+        Array1D<int> SplitterIndex;
+        Array1D<int> PlenumIndex;
         int NumOutletNodes;
-        Array1D_int OutletNode;
+        Array1D<int> OutletNode;
         int NumNodes;
-        Array1D_int Node;
-        Array1D_int NodeType;
+        Array1D<int> Node;
+        Array1D<int> NodeType;
 
         // Default Constructor
         SupplyAir() : NumOfComponents(0), InletNodeNum(0), NumOutletNodes(0), NumNodes(0)
@@ -463,9 +463,9 @@ namespace DataZoneEquipment {
         int NumOfComponents;
         int OutletNodeNum;
         Array1D<std::string> ComponentType;
-        Array1D_int ComponentType_Num;
+        Array1D<int> ComponentType_Num;
         Array1D<std::string> ComponentName;
-        Array1D_int ComponentIndex;
+        Array1D<int> ComponentIndex;
 
         // Default Constructor
         ReturnAir() : NumOfComponents(0), OutletNodeNum(0)

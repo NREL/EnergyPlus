@@ -113,7 +113,7 @@ namespace SystemAvailabilityManager {
     extern int const SysAvailMgr_HybridVent;
 
     extern int const SysAvailMgr_OptimumStart;
-    extern Array1D_int const ValidSysAvailManagerTypes;
+    extern Array1D<int> const ValidSysAvailManagerTypes;
     // DERIVED TYPE DEFINITIONS
 
     // Not used yet
@@ -199,16 +199,16 @@ namespace SystemAvailabilityManager {
         int PriorAvailStatus;              // prior status of availability manager
         std::string CtrlZoneListName;      // controlled zone or zonelist name
         int NumOfCtrlZones;                // number of controlled zones
-        Array1D_int CtrlZonePtrs;          // pointers to controlled zone(s)
+        Array1D<int> CtrlZonePtrs;          // pointers to controlled zone(s)
         std::string CoolingZoneListName;   // coolin zone or zonelist name
         int NumOfCoolingZones;             // number of cooling zones
-        Array1D_int CoolingZonePtrs;       // pointers to cooling zone(s)
+        Array1D<int> CoolingZonePtrs;       // pointers to cooling zone(s)
         std::string HeatingZoneListName;   // heatig zone or zonelist name
         int NumOfHeatingZones;             // number of heatig zones
-        Array1D_int HeatingZonePtrs;       // pointers to heating zone(s)
+        Array1D<int> HeatingZonePtrs;       // pointers to heating zone(s)
         std::string HeatZnFanZoneListName; // heating zone fans only zone or zonelist name
         int NumOfHeatZnFanZones;           // number of heating zone fans only zones
-        Array1D_int HeatZnFanZonePtrs;     // pointers to heating zone fans only zone(s)
+        Array1D<int> HeatZnFanZonePtrs;     // pointers to heating zone fans only zone(s)
 
         // Default Constructor
         DefineNightCycSysAvailManager()
@@ -233,7 +233,7 @@ namespace SystemAvailabilityManager {
         int ControlledZoneNum;    // controlled zone number of control zone
         std::string ZoneListName; // Zone List name
         int NumOfZones;           // Number of zones in the list
-        Array1D_int ZonePtrs;     // Pointers to zones in the list
+        Array1D<int> ZonePtrs;     // Pointers to zones in the list
         Real64 MaxOptStartTime;   // Maximum value of start time in hours
         int CtrlAlgType;          // Control algorithm: ConstantTemperatureGradient,
         // AdaptiveTemperatureGradient, AdaptiveASHRAE, ConstantStartTime
@@ -425,7 +425,7 @@ namespace SystemAvailabilityManager {
         int NumItems;
         Array1D<std::string> AvailManagerName;
         Array1D<std::string> cAvailManagerType;
-        Array1D_int AvailManagerType;
+        Array1D<int> AvailManagerType;
 
         // Default Constructor
         SysAvailManagerList() : NumItems(0)
@@ -507,12 +507,12 @@ namespace SystemAvailabilityManager {
                              Optional_int_const CompNum = _        // Index of ZoneHVAC equipment component
     );
 
-    bool CoolingZoneOutOfTolerance(Array1D_int const ZonePtrList, // list of controlled zone pointers
+    bool CoolingZoneOutOfTolerance(Array1D<int> const ZonePtrList, // list of controlled zone pointers
                                    int const NumZones,            // number of zones in list
                                    Real64 const TempTolerance     // temperature tolerance
     );
 
-    bool HeatingZoneOutOfTolerance(Array1D_int const ZonePtrList, // list of controlled zone pointers
+    bool HeatingZoneOutOfTolerance(Array1D<int> const ZonePtrList, // list of controlled zone pointers
                                    int const NumZones,            // number of zones in list
                                    Real64 const TempTolerance     // temperature tolerance
     );

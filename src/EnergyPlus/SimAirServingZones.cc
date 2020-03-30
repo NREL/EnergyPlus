@@ -419,7 +419,7 @@ namespace SimAirServingZones {
         EPVector<bool> lAlphaBlanks;       // Logical array, alpha field input BLANK = .TRUE.
         std::string CurrentModuleObject; // Object type for getting and error messages
         int NumNodes;                    // number of nodes returned by GetNodeNums
-        Array1D_int NodeNums;            // node numbers returned by GetNodeNums
+        Array1D<int> NodeNums;            // node numbers returned by GetNodeNums
         int NodeNum;                     // a node number
         int AirSysNum;                   // an air system (air loop) number
         int OANum;                       // outside air system index
@@ -447,10 +447,10 @@ namespace SimAirServingZones {
         static Array1D<std::string> InletNodeNames;  // Component inlet node names from GetBranchData call
         static Array1D<std::string> OutletNodeNames; // Component outlet node names from GetBranchData call
         static Array1D<std::string> NodeNames;       // Outlet node names from GetLoopSplitter call
-        static Array1D_int NodeNumbers;        // Outlet node numbers from GetLoopSplitter call
-        static Array1D_int InletNodeNumbers;   // Component inlet node numbers from GetBranchData call
-        static Array1D_int OutletNodeNumbers;  // Component outlet node numbers from GetBranchData call
-        Array1D_int DummyInteger(2);           // Placeholder for corresponding plant loop branch pressure drop info
+        static Array1D<int> NodeNumbers;        // Outlet node numbers from GetLoopSplitter call
+        static Array1D<int> InletNodeNumbers;   // Component inlet node numbers from GetBranchData call
+        static Array1D<int> OutletNodeNumbers;  // Component outlet node numbers from GetBranchData call
+        Array1D<int> DummyInteger(2);           // Placeholder for corresponding plant loop branch pressure drop info
         static bool ErrorsFound(false);        // TRUE if errors detected in input
         static EPVector<bool> PackagedUnit;
         int test;
@@ -1551,16 +1551,16 @@ namespace SimAirServingZones {
         bool FoundOASys;
         static int TUInNode(0); // inlet node number of a terminal unit
         static Real64 MassFlowSetToler;
-        static Array1D_int CtrlZoneNumsCool;
-        static Array1D_int CtrlZoneNumsHeat;
-        static Array1D_int ZoneInletNodesCool;
-        static Array1D_int ZoneInletNodesHeat;
-        static Array1D_int TermInletNodesCool;
-        static Array1D_int TermInletNodesHeat;
-        static Array1D_int TermUnitSizingNumsCool;
-        static Array1D_int TermUnitSizingNumsHeat;
-        static Array1D_int SupNode;
-        static Array1D_int SupNodeType;
+        static Array1D<int> CtrlZoneNumsCool;
+        static Array1D<int> CtrlZoneNumsHeat;
+        static Array1D<int> ZoneInletNodesCool;
+        static Array1D<int> ZoneInletNodesHeat;
+        static Array1D<int> TermInletNodesCool;
+        static Array1D<int> TermInletNodesHeat;
+        static Array1D<int> TermUnitSizingNumsCool;
+        static Array1D<int> TermUnitSizingNumsHeat;
+        static Array1D<int> SupNode;
+        static Array1D<int> SupNodeType;
 
         // Dimension the local subcomponent arrays
 
@@ -1574,7 +1574,7 @@ namespace SimAirServingZones {
         bool ErrorsFound;
         static Real64 OAReliefDiff(0.0); // local for massflow change across OA system, kg/s
 
-        Array1D_int tmpNodeARR;
+        Array1D<int> tmpNodeARR;
         int nodeLoop;
         int ZoneNum;
 

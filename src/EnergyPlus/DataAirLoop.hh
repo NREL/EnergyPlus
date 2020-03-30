@@ -93,19 +93,19 @@ namespace DataAirLoop {
         int NumSupplyNodes;                  // number of supply nodes exiting primary air system
         int NumZonesCooled;                  // number of zones cooled by this primary air system
         int NumZonesHeated;                  // number of zones heated by this primary air system
-        Array1D_int ZoneEquipReturnNodeNum;  // Zone Equip side return air node numbers (currently limited to 1 node)
-        Array1D_int ZoneEquipSupplyNodeNum;  // Zone equip side supply air node numbers
-        Array1D_int AirLoopReturnNodeNum;    // Air loop side return air node numbers
-        Array1D_int AirLoopSupplyNodeNum;    // Air loop side supply air node numbers
-        Array1D_int CoolCtrlZoneNums;        // Controlled zone numbers of zones cooled by this air loop
-        Array1D_int HeatCtrlZoneNums;        // Controlled zone numbers of zones heated by this air loop
-        Array1D_int CoolZoneInletNodes;      // Zone inlet node numbers of zones cooled by this air loop
-        Array1D_int HeatZoneInletNodes;      // Zone inlet node numbers of zones heated by this air loop
-        Array1D_int TermUnitCoolInletNodes;  // Air terminal unit cooling inlet node numbers for this air loop
-        Array1D_int TermUnitHeatInletNodes;  // Air terminal unit heating inlet node numbers for this air loop
-        Array1D_int TermUnitCoolSizingIndex; // Air terminal sizing numbers for zones cooled by this air loop
-        Array1D_int TermUnitHeatSizingIndex; // Air terminal sizing numbers for zones heated by this air loop
-        Array1D_int SupplyDuctType;          // 1=main, 2=cooling, 3=heating, 4=other
+        Array1D<int> ZoneEquipReturnNodeNum;  // Zone Equip side return air node numbers (currently limited to 1 node)
+        Array1D<int> ZoneEquipSupplyNodeNum;  // Zone equip side supply air node numbers
+        Array1D<int> AirLoopReturnNodeNum;    // Air loop side return air node numbers
+        Array1D<int> AirLoopSupplyNodeNum;    // Air loop side supply air node numbers
+        Array1D<int> CoolCtrlZoneNums;        // Controlled zone numbers of zones cooled by this air loop
+        Array1D<int> HeatCtrlZoneNums;        // Controlled zone numbers of zones heated by this air loop
+        Array1D<int> CoolZoneInletNodes;      // Zone inlet node numbers of zones cooled by this air loop
+        Array1D<int> HeatZoneInletNodes;      // Zone inlet node numbers of zones heated by this air loop
+        Array1D<int> TermUnitCoolInletNodes;  // Air terminal unit cooling inlet node numbers for this air loop
+        Array1D<int> TermUnitHeatInletNodes;  // Air terminal unit heating inlet node numbers for this air loop
+        Array1D<int> TermUnitCoolSizingIndex; // Air terminal sizing numbers for zones cooled by this air loop
+        Array1D<int> TermUnitHeatSizingIndex; // Air terminal sizing numbers for zones heated by this air loop
+        Array1D<int> SupplyDuctType;          // 1=main, 2=cooling, 3=heating, 4=other
 
         // Default Constructor
         AirLoopZoneEquipConnectData() : NumReturnNodes(0), NumSupplyNodes(0), NumZonesCooled(0), NumZonesHeated(0)
@@ -135,8 +135,8 @@ namespace DataAirLoop {
         int StopTime;                    // cycle off time (in SimTimeSteps)
         Real64 ReqSupplyFrac;            // required system flow rate (as a fraction)
         Array1D<std::string> AvailManagerName; // name of each availability manager
-        Array1D_int AvailManagerType;    // type of availability manager
-        Array1D_int AvailManagerNum;     // index for availability manager
+        Array1D<int> AvailManagerType;    // type of availability manager
+        Array1D<int> AvailManagerNum;     // index for availability manager
 
         // Default Constructor
         DefinePriAirSysAvailMgrs() : NumAvailManagers(0), AvailStatus(0), StartTime(0), StopTime(0), ReqSupplyFrac(0.0)
@@ -148,8 +148,8 @@ namespace DataAirLoop {
     {
         // Members
         int NumZones;
-        Array1D_int Zone;
-        Array1D_int ActualZoneNumber;
+        Array1D<int> Zone;
+        Array1D<int> ActualZoneNumber;
 
         // Default Constructor
         AirLooptoZoneData() : NumZones(0)
@@ -258,15 +258,15 @@ namespace DataAirLoop {
         int OAControllerIndex;        // OA controller index in OAController
         Array1D<std::string> ComponentName;
         Array1D<std::string> ComponentType;
-        Array1D_int ComponentType_Num; // Parameterized (see above) Component Types this
+        Array1D<int> ComponentType_Num; // Parameterized (see above) Component Types this
         // module can address
-        Array1D_int ComponentIndex; // Which one in list -- updated by routines called from here
+        Array1D<int> ComponentIndex; // Which one in list -- updated by routines called from here
         std::vector<HVACSystemData *> compPointer;
         Array1D<std::string> ControllerName;
         Array1D<std::string> ControllerType;
-        Array1D_int ControllerIndex; // Which one in list -- updated by routines called from here
-        Array1D_int InletNodeNum;    // component inelt node number
-        Array1D_int OutletNodeNum;   // component outelt node number
+        Array1D<int> ControllerIndex; // Which one in list -- updated by routines called from here
+        Array1D<int> InletNodeNum;    // component inelt node number
+        Array1D<int> OutletNodeNum;   // component outelt node number
         bool HeatExchangerFlag;      // True to have a heat exchanger in the equipment list
         int AirLoopDOASNum;          // AirLoopHVAC:DedicatedOutdoorAirSystem number
         bool DXCoolingCoilFlag;      // True with DX cooling coil

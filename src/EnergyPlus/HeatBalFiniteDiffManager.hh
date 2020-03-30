@@ -95,7 +95,7 @@ namespace HeatBalFiniteDiffManager {
         Array1D<Real64> DelX;
         Array1D<Real64> TempStability;
         Array1D<Real64> MoistStability;
-        Array1D_int NodeNumPoint;
+        Array1D<int> NodeNumPoint;
         Array1D<Real64> Thickness;
         Array1D<Real64> NodeXlocation; // sized to TotNode, contains X distance in m from outside face
         int TotNodes;
