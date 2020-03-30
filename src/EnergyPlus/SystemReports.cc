@@ -2467,14 +2467,14 @@ namespace SystemReports {
         int PlantLoopNum;
 
         // Dimension GetChildrenData arrays
-        Array1D_string SubCompTypes;
-        Array1D_string SubCompNames;
-        Array1D_string InletNodeNames;
-        Array1D_int InletNodeNumbers;
-        Array1D_int InletFluidStreams;
-        Array1D_string OutletNodeNames;
-        Array1D_int OutletNodeNumbers;
-        Array1D_int OutletFluidStreams;
+        EPVector<std::string> SubCompTypes;
+        EPVector<std::string> SubCompNames;
+        EPVector<std::string> InletNodeNames;
+        EPVector<int> InletNodeNumbers;
+        EPVector<int> InletFluidStreams;
+        EPVector<std::string> OutletNodeNames;
+        EPVector<int> OutletNodeNumbers;
+        EPVector<int> OutletFluidStreams;
         int NumChildren;
         int NumGrandChildren;
         bool IsParent;

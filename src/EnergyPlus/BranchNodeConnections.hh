@@ -127,13 +127,13 @@ namespace BranchNodeConnections {
                           std::string const &ComponentName,
                           bool &IsParent,                    // true or false
                           int &NumInlets,
-                          Array1D_string &InletNodeNames,
-                          Array1D_int &InletNodeNums,
-                          Array1D_int &InletFluidStreams,
+                          EPVector<std::string> &InletNodeNames,
+                          EPVector<int> &InletNodeNums,
+                          EPVector<int> &InletFluidStreams,
                           int &NumOutlets,
-                          Array1D_string &OutletNodeNames,
-                          Array1D_int &OutletNodeNums,
-                          Array1D_int &OutletFluidStreams,
+                          EPVector<std::string> &OutletNodeNames,
+                          EPVector<int> &OutletNodeNums,
+                          EPVector<int> &OutletFluidStreams,
                           bool &ErrorsFound                  // set to true if errors found, unchanged otherwise
     );
 
@@ -143,9 +143,9 @@ namespace BranchNodeConnections {
                          Array1D_string &ChildrenCType,
                          Array1D_string &ChildrenCName,
                          Array1D_string &InletNodeName,
-                         Array1D_int &InletNodeNum,
+                         EPVector<int> &InletNodeNum,
                          Array1D_string &OutletNodeName,
-                         Array1D_int &OutletNodeNum,
+                         EPVector<int> &OutletNodeNum,
                          bool &ErrorsFound);
 
     void GetChildrenData(std::string const &ComponentType,
@@ -185,7 +185,7 @@ namespace BranchNodeConnections {
                                   EPVector<DataBranchNodeConnections::NodeConnectionDef> const &NodeConnections,
                                   int const NumItems,
                                   int &CountOfItems,            // Number of items found
-                                  Array1D_int &AllNumbersInList // Index array to all numbers found
+                                  EPVector<int> &AllNumbersInList // Index array to all numbers found
     );
 
 } // namespace BranchNodeConnections

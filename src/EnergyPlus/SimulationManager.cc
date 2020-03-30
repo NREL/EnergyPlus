@@ -2914,8 +2914,8 @@ namespace SimulationManager {
         Array1D_string ChildCName;
         Array1D_string ChildInNodeName;
         Array1D_string ChildOutNodeName;
-        Array1D_int ChildInNodeNum;
-        Array1D_int ChildOutNodeNum;
+        EPVector<int> ChildInNodeNum;
+        EPVector<int> ChildOutNodeNum;
         int NumChildren;
         bool ErrorsFound;
 
