@@ -7877,7 +7877,7 @@ TEST_F(SQLiteFixture, OutputReportTabular_EndUseBySubcategorySQL)
                 "  AND RowName = 'Exterior Lighting:AnotherEndUseSubCat'");
         auto result = queryResult(query, "TabularDataWithStrings");
 
-        ASSERT_EQ(6u, result.size()) << "Failed for query: " << query;
+        ASSERT_EQ(13u, result.size()) << "Failed for query: " << query;
     }
 }
 
