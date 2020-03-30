@@ -48,9 +48,6 @@
 #ifndef WindTurbine_hh_INCLUDED
 #define WindTurbine_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -146,7 +143,7 @@ namespace WindTurbine {
     };
 
     // Object Data
-    extern Array1D<WindTurbineParams> WindTurbineSys;
+    extern EPVector<WindTurbineParams> WindTurbineSys;
 
     // Functions
 

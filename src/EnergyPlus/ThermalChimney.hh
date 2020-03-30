@@ -49,7 +49,6 @@
 #define ThermalChimney_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2A.hh>
 
 // EnergyPlus Headers
@@ -88,11 +87,11 @@ namespace ThermalChimney {
         Real64 AirOutletCrossArea;
         Real64 DischargeCoeff;
         int TotZoneToDistrib;
-        Array1D<int> ZonePtr;
-        Array1D<std::string> ZoneName;
-        Array1D<Real64> DistanceThermChimInlet;
-        Array1D<Real64> RatioThermChimAirFlow;
-        Array1D<Real64> EachAirInletCrossArea;
+        EPVector<int> ZonePtr;
+        EPVector<std::string> ZoneName;
+        EPVector<Real64> DistanceThermChimInlet;
+        EPVector<Real64> RatioThermChimAirFlow;
+        EPVector<Real64> EachAirInletCrossArea;
 
         // Default Constructor
         ThermalChimneyData() : RealZonePtr(0), SchedPtr(0), AbsorberWallWidth(0.0), AirOutletCrossArea(0.0), DischargeCoeff(0.0), TotZoneToDistrib(0)
@@ -129,9 +128,9 @@ namespace ThermalChimney {
     };
 
     // Object Data
-    extern Array1D<ThermalChimneyData> ThermalChimneySys;
-    extern Array1D<ThermChimZnReportVars> ZnRptThermChim;
-    extern Array1D<ThermChimReportVars> ThermalChimneyReport;
+    extern EPVector<ThermalChimneyData> ThermalChimneySys;
+    extern EPVector<ThermChimZnReportVars> ZnRptThermChim;
+    extern EPVector<ThermChimReportVars> ThermalChimneyReport;
 
     // Functions
 
@@ -143,7 +142,7 @@ namespace ThermalChimney {
 
     void ReportThermalChimney();
 
-    void GaussElimination(Array2A<Real64> EquaCoef, Array1D<Real64> &EquaConst, Array1D<Real64> &ThermChimSubTemp, int const NTC);
+    void GaussElimination(Array2A<Real64> EquaCoef, EPVector<Real64> &EquaConst, Array1D<Real64> &ThermChimSubTemp, int const NTC);
 
     //        End of Module Subroutines for ThermalChimney
 

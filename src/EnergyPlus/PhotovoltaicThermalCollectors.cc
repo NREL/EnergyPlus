@@ -110,7 +110,7 @@ namespace PhotovoltaicThermalCollectors {
 
     int NumPVT(0); // count of all types of PVT in input file
 
-    Array1D<PVTCollectorStruct> PVT;
+    EPVector<PVTCollectorStruct> PVT;
 
     void clear_state()
     {
@@ -175,7 +175,7 @@ namespace PhotovoltaicThermalCollectors {
         bool ErrorsFound(false); // Set to true if errors in input, fatal at end of routine
 
         // Object Data
-        Array1D<SimplePVTModelStruct> tmpSimplePVTperf;
+        EPVector<SimplePVTModelStruct> tmpSimplePVTperf;
 
         // first load the performance object info into temporary structure
         DataIPShortCuts::cCurrentModuleObject = "SolarCollectorPerformance:PhotovoltaicThermal:Simple";

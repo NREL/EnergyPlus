@@ -49,7 +49,6 @@
 #define WaterThermalTanks_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.fwd.hh>
 #include <ObjexxFCL/Optional.fwd.hh>
 
 // EnergyPlus Headers
@@ -348,12 +347,12 @@ namespace WaterThermalTanks {
         // heat pump back on.
         // variables for variable-speed HPWH
         int NumofSpeed;                        // number of speeds for VS HPWH
-        Array1D<Real64> HPWHAirVolFlowRate;    // air volume flow rate during heating operation
-        Array1D<Real64> HPWHAirMassFlowRate;   // air mass flow rate during heating operation
-        Array1D<Real64> HPWHWaterVolFlowRate;  // water volume flow rate during heating operation
-        Array1D<Real64> HPWHWaterMassFlowRate; // water mass flow rate during heating operation
-        Array1D<Real64> MSAirSpeedRatio;       // air speed ratio in heating mode
-        Array1D<Real64> MSWaterSpeedRatio;     // water speed ratio in heating mode
+        EPVector<Real64> HPWHAirVolFlowRate;    // air volume flow rate during heating operation
+        EPVector<Real64> HPWHAirMassFlowRate;   // air mass flow rate during heating operation
+        EPVector<Real64> HPWHWaterVolFlowRate;  // water volume flow rate during heating operation
+        EPVector<Real64> HPWHWaterMassFlowRate; // water mass flow rate during heating operation
+        EPVector<Real64> MSAirSpeedRatio;       // air speed ratio in heating mode
+        EPVector<Real64> MSWaterSpeedRatio;     // water speed ratio in heating mode
         bool bIsIHP;                           // whether the HP is a part of Integrated Heat Pump
         bool MyOneTimeFlagHP;                  // first pass log
         bool MyTwoTimeFlagHP;                  // second pass do input check
@@ -532,9 +531,9 @@ namespace WaterThermalTanks {
         int SourceOutletStratNode;          // Source-side outlet node number
         InletModeEnum InletMode;            // Inlet position mode:  1 = FIXED; 2 = SEEKING
         Real64 InversionMixingRate;
-        Array1D<Real64> AdditionalLossCoeff; // Loss coefficient added to the skin loss coefficient (W/m2-K)
+        EPVector<Real64> AdditionalLossCoeff; // Loss coefficient added to the skin loss coefficient (W/m2-K)
         int Nodes;                           // Number of nodes
-        Array1D<StratifiedNodeData> Node;    // Array of node data
+        EPVector<StratifiedNodeData> Node;    // Array of node data
         // Report variables
         Real64 VolFlowRate;            // Scheduled DHW demand (m3/s)
         Real64 VolumeConsumed;         // Volume of DHW consumed (m3)
@@ -763,7 +762,7 @@ namespace WaterThermalTanks {
         void CalcDesuperheaterWaterHeater(bool FirstHVACIteration);
 
         Real64 PLRResidualWaterThermalTank(Real64 HPPartLoadRatio,    // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                           Array1D<Real64> const &Par // par(1) = HP set point temperature [C]
+                                           EPVector<Real64> const &Par // par(1) = HP set point temperature [C]
         );
 
         void CalcHeatPumpWaterHeater(bool FirstHVACIteration);
@@ -778,10 +777,10 @@ namespace WaterThermalTanks {
                                 bool FirstHVACIteration // TRUE if First iteration of simulation
         );
 
-        Real64 PLRResidualHPWH(Real64 HPPartLoadRatio, Array1D<Real64> const &Par);
+        Real64 PLRResidualHPWH(Real64 HPPartLoadRatio, EPVector<Real64> const &Par);
 
         Real64 PLRResidualIterSpeed(Real64 SpeedRatio,        // speed ratio between two speed levels
-                                    Array1D<Real64> const &Par
+                                    EPVector<Real64> const &Par
         );
 
         static void ValidatePLFCurve(int CurveIndex, bool &IsValid);
@@ -872,9 +871,9 @@ namespace WaterThermalTanks {
     };
 
     // Object Data
-    extern Array1D<WaterThermalTankData> WaterThermalTank;
-    extern Array1D<HeatPumpWaterHeaterData> HPWaterHeater;
-    extern Array1D<WaterHeaterDesuperheaterData> WaterHeaterDesuperheater;
+    extern EPVector<WaterThermalTankData> WaterThermalTank;
+    extern EPVector<HeatPumpWaterHeaterData> HPWaterHeater;
+    extern EPVector<WaterHeaterDesuperheaterData> WaterHeaterDesuperheater;
 
     // Functions
 

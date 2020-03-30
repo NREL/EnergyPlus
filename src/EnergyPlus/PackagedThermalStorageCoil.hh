@@ -49,7 +49,6 @@
 #define PackagedThermalStorageCoil_hh_INCLUDED
 
 // ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Optional.hh>
 
 // EnergyPlus Headers
@@ -414,7 +413,7 @@ namespace PackagedThermalStorageCoil {
     };
 
     // Object Data
-    extern Array1D<PackagedTESCoolingCoilStruct> TESCoil;
+    extern EPVector<PackagedTESCoolingCoilStruct> TESCoil;
 
     // Functions
 
@@ -468,11 +467,11 @@ namespace PackagedThermalStorageCoil {
                                       int &LatPLRFailIndex);
 
     Real64 TESCoilResidualFunction(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                   Array1D<Real64> const &Par  // par(1) = DX coil number
+                                   EPVector<Real64> const &Par  // par(1) = DX coil number
     );
 
     Real64 TESCoilHumRatResidualFunction(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                         Array1D<Real64> const &Par  // par(1) = DX coil number
+                                         EPVector<Real64> const &Par  // par(1) = DX coil number
     );
 
     void UpdateColdWeatherProtection(int const TESCoilNum);

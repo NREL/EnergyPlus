@@ -48,9 +48,6 @@
 #ifndef PhotovoltaicThermalCollectors_hh_INCLUDED
 #define PhotovoltaicThermalCollectors_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/PlantComponent.hh>
 
@@ -176,7 +173,7 @@ namespace PhotovoltaicThermalCollectors {
         void update();
     };
 
-    extern Array1D<PVTCollectorStruct> PVT;
+    extern EPVector<PVTCollectorStruct> PVT;
 
     void clear_state();
 

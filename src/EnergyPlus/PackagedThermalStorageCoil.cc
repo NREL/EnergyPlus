@@ -165,7 +165,7 @@ namespace PackagedThermalStorageCoil {
     // SUBROUTINE SPECIFICATIONS FOR MODULE <module_name>:
 
     // Object Data
-    Array1D<PackagedTESCoolingCoilStruct> TESCoil;
+    EPVector<PackagedTESCoolingCoilStruct> TESCoil;
 
     // Functions
 
@@ -4140,7 +4140,7 @@ namespace PackagedThermalStorageCoil {
         Real64 ReqOutput;
         Real64 OutletHumRatDXCoil;
         int SolFlag;            // return flag from RegulaFalsi for sensible load
-        Array1D<Real64> Par(5); // Parameter array passed to solver
+        EPVector<Real64> Par(5); // Parameter array passed to solver
 
         InletNode = TESCoil(CoilIndex).EvapAirInletNodeNum;
         OutletNode = TESCoil(CoilIndex).EvapAirOutletNodeNum;
@@ -4308,7 +4308,7 @@ namespace PackagedThermalStorageCoil {
     }
 
     Real64 TESCoilResidualFunction(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                   Array1D<Real64> const &Par  // par(1) = DX coil number
+                                   EPVector<Real64> const &Par  // par(1) = DX coil number
     )
     {
         // FUNCTION INFORMATION:
@@ -4387,7 +4387,7 @@ namespace PackagedThermalStorageCoil {
     }
 
     Real64 TESCoilHumRatResidualFunction(Real64 const PartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                         Array1D<Real64> const &Par  // par(1) = DX coil number
+                                         EPVector<Real64> const &Par  // par(1) = DX coil number
     )
     {
         // FUNCTION INFORMATION:

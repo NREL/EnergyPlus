@@ -119,9 +119,9 @@ namespace ThermalChimney {
     // Utility routines for module
 
     // Object Data
-    Array1D<ThermalChimneyData> ThermalChimneySys;
-    Array1D<ThermChimZnReportVars> ZnRptThermChim;
-    Array1D<ThermChimReportVars> ThermalChimneyReport;
+    EPVector<ThermalChimneyData> ThermalChimneySys;
+    EPVector<ThermChimZnReportVars> ZnRptThermChim;
+    EPVector<ThermChimReportVars> ThermalChimneyReport;
 
     // MODULE SUBROUTINES:
     //*************************************************************************
@@ -571,8 +571,8 @@ namespace ThermalChimney {
         // REAL(r64)                    :: OutletAirTempThermalChim
         Real64 OverallThermalChimLength;
         Real64 ThermChimTolerance;
-        Array1D<Real64> TempTCMassAirFlowRate(10);   // Temporary Value of Thermal Chimney Mass Flow Rate ()
-        Array1D<Real64> TempTCVolumeAirFlowRate(10); // Temporary Value of Thermal Chimney Volume Flow Rate ()
+        EPVector<Real64> TempTCMassAirFlowRate(10);   // Temporary Value of Thermal Chimney Mass Flow Rate ()
+        EPVector<Real64> TempTCVolumeAirFlowRate(10); // Temporary Value of Thermal Chimney Volume Flow Rate ()
         int IterationLoop;
         Real64 Process1; // Temporary Variable Used in the Middle of the Calculation
         Real64 Process2; // Temporary Variable Used in the Middle of the Calculation
@@ -587,7 +587,7 @@ namespace ThermalChimney {
         int ThermChimLoop1;
         int ThermChimLoop2;
         Array2D<Real64> EquaCoef(NTC, NTC);    // Coefficients in Linear Algebraic Euqation for FINITE DIFFERENCE
-        Array1D<Real64> EquaConst(NTC);        // Constants in Linear Algebraic Equation for FINITE DIFFERENCE
+        EPVector<Real64> EquaConst(NTC);        // Constants in Linear Algebraic Equation for FINITE DIFFERENCE
         Array1D<Real64> ThermChimSubTemp(NTC); // Air temperature of each thermal chimney air channel subregion
 
         for (Loop = 1; Loop <= TotThermalChimney; ++Loop) {
@@ -871,7 +871,7 @@ namespace ThermalChimney {
         } // ... end of zone loads report variable update loop.
     }
 
-    void GaussElimination(Array2A<Real64> EquaCoef, Array1D<Real64> &EquaConst, Array1D<Real64> &ThermChimSubTemp, int const NTC)
+    void GaussElimination(Array2A<Real64> EquaCoef, EPVector<Real64> &EquaConst, Array1D<Real64> &ThermChimSubTemp, int const NTC)
     {
         // SUBROUTINE INFORMATION:
 

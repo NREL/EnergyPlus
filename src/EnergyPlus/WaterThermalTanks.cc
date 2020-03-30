@@ -159,9 +159,9 @@ namespace WaterThermalTanks {
     Real64 mdotAir(0.0);               // mass flow rate of evaporator air, kg/s
 
     // Object Data
-    Array1D<WaterThermalTankData> WaterThermalTank;
-    Array1D<HeatPumpWaterHeaterData> HPWaterHeater;
-    Array1D<WaterHeaterDesuperheaterData> WaterHeaterDesuperheater;
+    EPVector<WaterThermalTankData> WaterThermalTank;
+    EPVector<HeatPumpWaterHeaterData> HPWaterHeater;
+    EPVector<WaterHeaterDesuperheaterData> WaterHeaterDesuperheater;
     std::unordered_map<std::string, std::string> UniqueWaterThermalTankNames;
 
     static ObjexxFCL::gio::Fmt fmtLD("*");
@@ -7761,8 +7761,12 @@ namespace WaterThermalTanks {
             e.TempSum = 0.0;
         }
 
-        this->TankTemp = sum(this->Node, &StratifiedNodeData::Temp) / this->Nodes;
-        this->TankTempAvg = sum(this->Node, &StratifiedNodeData::TempAvg) / this->Nodes;
+        //this->TankTemp = sum(this->Node, &StratifiedNodeData::Temp) / this->Nodes;
+        this->TankTemp = std::accumulate(this->Node.begin(), this->Node.end(), 0.0,
+                                         [](const Real64 &a, const StratifiedNodeData &b) {return a + b.Temp;}) / this->Nodes;
+        //this->TankTempAvg = sum(this->Node, &StratifiedNodeData::TempAvg) / this->Nodes;
+        this->TankTempAvg = std::accumulate(this->Node.begin(), this->Node.end(), 0.0,
+                                         [](const Real64 &a, const StratifiedNodeData &b) {return a + b.TempAvg;}) / this->Nodes;
 
         if (!DataGlobals::WarmupFlag) {
             // Warn for potential freezing when avg of final temp over all nodes is below 2°C (nearing 0°C)
@@ -8018,7 +8022,7 @@ namespace WaterThermalTanks {
 
         int const MaxIte(500); // Maximum number of iterations for RegulaFalsi
 
-        Array1D<Real64> Par(5); // Parameters passed to RegulaFalsi
+        EPVector<Real64> Par(5); // Parameters passed to RegulaFalsi
 
         auto &DesupHtr = WaterHeaterDesuperheater(this->DesuperheaterNum);
 
@@ -9016,7 +9020,7 @@ namespace WaterThermalTanks {
             Real64 LowSpeedTankTemp = NewTankTemp;
             Real64 HPWHCondInletNodeLast = DataLoopNode::Node(HPWaterInletNode).Temp;
 
-            Array1D<Real64> Par(5); // Parameters passed to RegulaFalsi
+            EPVector<Real64> Par(5); // Parameters passed to RegulaFalsi
             if (NewTankTemp > HPSetPointTemp) {
                 HeatPump.Mode = floatMode;
                 Par(1) = HPSetPointTemp;
@@ -9207,7 +9211,7 @@ namespace WaterThermalTanks {
                         }
                     }
 
-                    Array1D<Real64> ParVS(10); // Parameters passed to RegulaFalsi, for variable-speed HPWH
+                    EPVector<Real64> ParVS(10); // Parameters passed to RegulaFalsi, for variable-speed HPWH
                     if (NewTankTemp > HPSetPointTemp) {
                         ParVS(2) = this->HeatPumpNum;
                         ParVS(3) = SpeedNum;
@@ -9779,7 +9783,7 @@ namespace WaterThermalTanks {
     }
 
     Real64 WaterThermalTankData::PLRResidualIterSpeed(Real64 const SpeedRatio, // speed ratio between two speed levels
-                                                      Array1D<Real64> const &Par)
+                                                      EPVector<Real64> const &Par)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         B.Shen, ORNL, 12/2014
@@ -9868,7 +9872,7 @@ namespace WaterThermalTanks {
     }
 
     Real64 WaterThermalTankData::PLRResidualWaterThermalTank(Real64 const HPPartLoadRatio, // compressor cycling ratio (1.0 is continuous, 0.0 is off)
-                                                             Array1D<Real64> const &Par    // par(1) = HP set point temperature [C]
+                                                             EPVector<Real64> const &Par    // par(1) = HP set point temperature [C]
 
     )
     {
@@ -9903,7 +9907,7 @@ namespace WaterThermalTanks {
         return PLRResidualWaterThermalTank;
     }
 
-    Real64 WaterThermalTankData::PLRResidualHPWH(Real64 const HPPartLoadRatio, Array1D<Real64> const &Par)
+    Real64 WaterThermalTankData::PLRResidualHPWH(Real64 const HPPartLoadRatio, EPVector<Real64> const &Par)
     {
         // FUNCTION INFORMATION:
         //       AUTHOR         B.Griffith,  Richard Raustad

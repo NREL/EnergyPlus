@@ -128,7 +128,7 @@ namespace WindTurbine {
     // Subroutine Specifications for the Heat Balance Module
 
     // Object Data
-    Array1D<WindTurbineParams> WindTurbineSys;
+    EPVector<WindTurbineParams> WindTurbineSys;
 
     // Functions
 
@@ -266,10 +266,10 @@ namespace WindTurbine {
         int NumNumbers;                 // Number of Numbers for each GetobjectItem call
         int NumArgs;
         int IOStat;
-        Array1D<std::string> cAlphaArgs;     // Alpha input items for object
-        Array1D<std::string> cAlphaFields;   // Alpha field names
-        Array1D<std::string> cNumericFields; // Numeric field names
-        Array1D<Real64> rNumericArgs;  // Numeric input items for object
+        EPVector<std::string> cAlphaArgs;     // Alpha input items for object
+        EPVector<std::string> cAlphaFields;   // Alpha field names
+        EPVector<std::string> cNumericFields; // Numeric field names
+        EPVector<Real64> rNumericArgs;  // Numeric input items for object
         EPVector<bool> lAlphaBlanks;     // Logical array, alpha field input BLANK = .TRUE.
         EPVector<bool> lNumericBlanks;   // Logical array, numeric field input BLANK = .TRUE.
 

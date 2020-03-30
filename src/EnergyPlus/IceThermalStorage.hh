@@ -48,9 +48,6 @@
 #ifndef IceThermalStorage_hh_INCLUDED
 #define IceThermalStorage_hh_INCLUDED
 
-// ObjexxFCL Headers
-#include <ObjexxFCL/Array1D.hh>
-
 // EnergyPlus Headers
 #include <EnergyPlus/DataGlobals.hh>
 #include <EnergyPlus/EnergyPlus.hh>
@@ -265,8 +262,8 @@ namespace IceThermalStorage {
     };
 
     // Object Data
-    extern Array1D<SimpleIceStorageData> SimpleIceStorage;     // dimension to number of machines
-    extern Array1D<DetailedIceStorageData> DetailedIceStorage; // Derived type for detailed ice storage model
+    extern EPVector<SimpleIceStorageData> SimpleIceStorage;     // dimension to number of machines
+    extern EPVector<DetailedIceStorageData> DetailedIceStorage; // Derived type for detailed ice storage model
 
     // Static Functions
     void clear_state();

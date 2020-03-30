@@ -123,8 +123,8 @@ namespace IceThermalStorage {
     bool getITSInput = true;
 
     // Object Data
-    Array1D<SimpleIceStorageData> SimpleIceStorage;     // dimension to number of machines
-    Array1D<DetailedIceStorageData> DetailedIceStorage; // Derived type for detailed ice storage model
+    EPVector<SimpleIceStorageData> SimpleIceStorage;     // dimension to number of machines
+    EPVector<DetailedIceStorageData> DetailedIceStorage; // Derived type for detailed ice storage model
 
     //*************************************************************************
 

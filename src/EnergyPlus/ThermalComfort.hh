@@ -163,9 +163,9 @@ namespace ThermalComfort {
     extern Real64 TotalAnyZoneNotMetHeatingOccupied;
     extern Real64 TotalAnyZoneNotMetCoolingOccupied;
     extern Real64 TotalAnyZoneNotMetOccupied;
-    extern Array1D<Real64> ZoneOccHrs;
+    extern EPVector<Real64> ZoneOccHrs;
     extern bool useEpwData;
-    extern Array1D<Real64> DailyAveOutTemp;
+    extern EPVector<Real64> DailyAveOutTemp;
 
     extern Real64 runningAverageASH;
 
@@ -259,10 +259,10 @@ namespace ThermalComfort {
     struct AngleFactorData
     {
         // Members
-        Array1D<Real64> AngleFactor; // Angle factor of each surface
+        EPVector<Real64> AngleFactor; // Angle factor of each surface
         std::string Name;            // Angle factor list name
-        Array1D<std::string> SurfaceName;  // Names of the Surfces
-        Array1D<int> SurfacePtr;      // ALLOCATABLE to the names of the Surfces
+        EPVector<std::string> SurfaceName;  // Names of the Surfces
+        EPVector<int> SurfacePtr;      // ALLOCATABLE to the names of the Surfces
         int TotAngleFacSurfaces;     // Total number of surfaces
         std::string ZoneName;        // Name of zone the system is serving
         int ZonePtr;                 // Point to this zone in the Zone derived type
@@ -274,10 +274,10 @@ namespace ThermalComfort {
     };
 
     // Object Data
-    extern Array1D<ThermalComfortInASH55Type> ThermalComfortInASH55;
-    extern Array1D<ThermalComfortSetPointType> ThermalComfortSetPoint;
-    extern Array1D<ThermalComfortDataType> ThermalComfortData;
-    extern Array1D<AngleFactorData> AngleFactorList; // Angle Factor List data for each Angle Factor List
+    extern EPVector<ThermalComfortInASH55Type> ThermalComfortInASH55;
+    extern EPVector<ThermalComfortSetPointType> ThermalComfortSetPoint;
+    extern EPVector<ThermalComfortDataType> ThermalComfortData;
+    extern EPVector<AngleFactorData> AngleFactorList; // Angle Factor List data for each Angle Factor List
 
     // Functions
 
@@ -297,11 +297,11 @@ namespace ThermalComfort {
     void CalcThermalComfortKSU();
 
     void DERIV(int &TempIndiceNum,         // Number of temperature indices  unused1208
-               Array1D<Real64> &Temp,      // Temperature unused1208
-               Array1D<Real64> &TempChange // Change of temperature
+               EPVector<Real64> &Temp,      // Temperature unused1208
+               EPVector<Real64> &TempChange // Change of temperature
     );
 
-    void RKG(int &NEQ, Real64 &H, Real64 &X, Array1D<Real64> &Y, Array1D<Real64> &DY, Array1D<Real64> &C);
+    void RKG(int &NEQ, Real64 &H, Real64 &X, EPVector<Real64> &Y, EPVector<Real64> &DY, EPVector<Real64> &C);
 
     void GetAngleFactorList();
 
