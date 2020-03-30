@@ -47,7 +47,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
-#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Fmath.hh>
 
 // EnergyPlus Headers
@@ -135,7 +134,7 @@ namespace RoomAirModelAirflowNetwork {
     // SUBROUTINE SPECIFICATIONS FOR MODULE
 
     // Object Data
-    Array1D<RAFNData> RAFN;
+    EPVector<RAFNData> RAFN;
 
     namespace {
         bool InitRoomAirModelAirflowNetworkOneTimeFlag(true);
@@ -315,8 +314,8 @@ namespace RoomAirModelAirflowNetwork {
         int ISum;
         bool ErrorsFound;
         int I;
-        Array1D<Real64> SupplyFrac;
-        Array1D<Real64> ReturnFrac;
+        EPVector<Real64> SupplyFrac;
+        EPVector<Real64> ReturnFrac;
 
         if (InitRoomAirModelAirflowNetworkOneTimeFlag) { // then do one - time setup inits
 

@@ -52,7 +52,6 @@
 
 // ObjexxFCL Headers
 #include <ObjexxFCL/Array.functions.hh>
-#include <ObjexxFCL/Array1D.hh>
 #include <ObjexxFCL/Array2D.hh>
 #include <ObjexxFCL/Fmath.hh>
 
@@ -1922,7 +1921,7 @@ namespace RoomAirModelManager {
         static Real64 Z2Zone(0.0);               // Auxiliary variables
         static Real64 CeilingHeightDiffMax(0.1); // Maximum difference between wall height and ceiling height
         bool SetZoneAux;
-        Array1D<int> AuxSurf;
+        EPVector<int> AuxSurf;
         int MaxSurf;
         Array2D_int AuxAirflowNetworkSurf;
         Real64 WidthFactMax;
@@ -2819,8 +2818,8 @@ namespace RoomAirModelManager {
         int MaxNums = 0;         // Maximum number of numeric input fields
         int MaxAlphas = 0;       // Maximum number of alpha input fields
         int TotalArgs = 0;       // Total number of alpha and numeric arguments(max) for a
-        Array1D<std::string> Alphas;   // Alpha input items for object
-        Array1D<Real64> Numbers; // Numeric input items for object
+        EPVector<std::string> Alphas;   // Alpha input items for object
+        EPVector<Real64> Numbers; // Numeric input items for object
         bool errorfound;
 
         NumAlphas = 1;
